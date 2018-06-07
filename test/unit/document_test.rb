@@ -4,13 +4,16 @@ class DocumentTest < ActiveSupport::TestCase
   fixtures :all
 
   test 'project' do
-    p = projects(:sysmo_project)
-    s = Factory(:document, projects: [p])
+    person = Factory(:person)
+    p = person.projects.first
+    s = Factory(:document, projects: [p], contributor:person)
     assert_equal p, s.projects.first
   end
 
   test 'to_rdf' do
-    object = Factory :document, description: 'An excellent Document', projects: [Factory(:project), Factory(:project)], assay_ids: [Factory(:assay).id]
+    person = Factory(:person)
+    person.add_to_project_and_institution(Factory(:project),person.institutions.first)
+    object = Factory :document, description: 'An excellent Document', projects: person.projects, assay_ids: [Factory(:assay).id], contributor:person
     Factory :assets_creator, asset: object, creator: Factory(:person)
 
     object = Document.find(object.id)
@@ -39,16 +42,10 @@ class DocumentTest < ActiveSupport::TestCase
 
     asset = Document.new projects: [projects(:sysmo_project)], policy: Factory(:private_policy)
     assert !asset.valid?
-
-    # VL only:allow no projects
-    as_virtualliver do
-      asset = Document.new title: 'fred', policy: Factory(:private_policy)
-      assert asset.valid?
-    end
   end
 
   test 'assay association' do
-    document = Factory(:document)
+    document = Factory(:document, policy: Factory(:publicly_viewable_policy))
     assay = assays(:modelling_assay_with_data_and_relationship)
     assay_asset = assay_assets(:metabolomics_assay_asset1)
     assert_not_equal assay_asset.asset, document
@@ -72,7 +69,8 @@ class DocumentTest < ActiveSupport::TestCase
 
   test 'policy defaults to system default' do
     with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
-      document = Document.new Factory.attributes_for(:document, policy: nil)
+      document = Factory.build(:document)
+      refute document.persisted?
       document.save!
       document.reload
       assert document.valid?
@@ -127,16 +125,20 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test 'project for document and document version match' do
-    project = projects(:sysmo_project)
-    document = Factory(:document, projects: [project])
+    person = Factory(:person)
+    project = person.projects.first
+    document = Factory(:document, projects: [project], contributor:person)
     assert_equal project, document.projects.first
     assert_equal project, document.latest_version.projects.first
   end
 
   test 'assign projects' do
-    project = Factory(:project)
-    document = Factory(:document, projects: [project])
-    projects = [project, Factory(:project)]
+    person = Factory(:person)
+    project = person.projects.first
+    document = Factory(:document, projects: [project],contributor:person)
+    person.add_to_project_and_institution(Factory(:project),person.institutions.first)
+    projects = person.projects
+    assert_equal 2,projects.count
     document.update_attributes(project_ids: projects.map(&:id))
     document.save!
     document.reload
@@ -168,11 +170,9 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test 'contributing user' do
-    document = Factory :document
+    document = Factory :document, contributor: Factory(:person)
     assert document.contributor
     assert_equal document.contributor.user, document.contributing_user
     assert_equal document.contributor.user, document.latest_version.contributing_user
-    document_without_contributor = Factory :document, contributor: nil
-    assert_nil document_without_contributor.contributing_user
   end
 end

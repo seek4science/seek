@@ -11,7 +11,9 @@ class SopsControllerTest < ActionController::TestCase
   include HtmlHelper
 
   def setup
-    login_as(:quentin)
+    @user = users(:quentin)
+    @project = @user.person.projects.first
+    login_as(@user)
   end
 
   def rest_api_test_object
@@ -138,7 +140,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should correctly handle bad data url' do
     stub_request(:any, 'http://sdfsdfds.com/sdf.png').to_raise(SocketError)
-    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://sdfsdfds.com/sdf.png' }
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
@@ -148,7 +150,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_not_nil flash.now[:error]
 
     # not even a valid url
-    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 's  df::sd:dfds.com/sdf.png' }
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
@@ -159,7 +161,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not create invalid sop' do
-    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    sop = { title: 'Test', project_ids: [@project.id] }
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, sop: sop, content_blobs: [{}], policy_attributes: valid_sharing
@@ -170,12 +172,12 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'associates assay' do
     login_as(:owner_of_my_first_sop) # can edit assay_can_edit_by_my_first_sop_owner
-    s = sops(:my_first_sop)
-    original_assay = assays(:assay_can_edit_by_my_first_sop_owner1)
+    s = Factory(:sop, contributor:User.current_user.person)
+    original_assay = Factory(:assay, contributor:User.current_user.person, assay_assets: [Factory(:assay_asset, asset:s)])
 
     assert_includes original_assay.sops, s
 
-    new_assay = assays(:assay_can_edit_by_my_first_sop_owner2)
+    new_assay = Factory(:assay, contributor:User.current_user.person)
 
     refute_includes new_assay.sops, s
 
@@ -192,17 +194,17 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should create sop' do
-    login_as(:owner_of_my_first_sop) # can edit assay_can_edit_by_my_first_sop_owner
     sop, blob = valid_sop
-    assay = assays(:assay_can_edit_by_my_first_sop_owner1)
+    assay = Factory(:assay, contributor: User.current_user.person)
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [assay.id.to_s]
+        post :create, sop: sop, content_blobs: [blob],
+             policy_attributes: valid_sharing,
+             assay_ids: [assay.id.to_s]
       end
     end
 
     assert_redirected_to sop_path(assigns(:sop))
-    assert_equal users(:owner_of_my_first_sop), assigns(:sop).contributor
 
     assert assigns(:sop).content_blob.url.blank?
     assert !assigns(:sop).content_blob.data_io_object.read.nil?
@@ -320,7 +322,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_show_version
-    s = sops(:editable_sop)
+    s = Factory(:sop, contributor: @user)
 
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
@@ -334,17 +336,17 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 1, s.versions[0].version
     assert_equal 2, s.versions[1].version
 
-    get :show, id: sops(:editable_sop)
+    get :show, id: s
     assert_select 'p', text: /little_file_v2.txt/, count: 1
-    assert_select 'p', text: /little_file.txt/, count: 0
+    assert_select 'p', text: /sop.pdf/, count: 0
 
-    get :show, id: sops(:editable_sop), version: '2'
+    get :show, id: s, version: '2'
     assert_select 'p', text: /little_file_v2.txt/, count: 1
-    assert_select 'p', text: /little_file.txt/, count: 0
+    assert_select 'p', text: /sop.pdf/, count: 0
 
-    get :show, id: sops(:editable_sop), version: '1'
+    get :show, id: s, version: '1'
     assert_select 'p', text: /little_file_v2.txt/, count: 0
-    assert_select 'p', text: /little_file.txt/, count: 1
+    assert_select 'p', text: /sop.pdf/, count: 1
   end
 
   test 'should download SOP from standard route' do
@@ -363,7 +365,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_create_new_version
-    s = sops(:editable_sop)
+    s = Factory(:sop, contributor: @user)
 
     assert_difference('Sop::Version.count', 1) do
       post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision'
@@ -379,7 +381,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 2, s.version
     assert_equal 'file_picture.png', s.content_blob.original_filename
     assert_equal 'file_picture.png', s.versions[1].content_blob.original_filename
-    assert_equal 'little_file.txt', s.versions[0].content_blob.original_filename
+    assert_equal 'sop.pdf', s.versions[0].content_blob.original_filename
     assert_equal 'This is a new revision', s.versions[1].revision_comments
   end
 
@@ -387,6 +389,9 @@ class SopsControllerTest < ActionController::TestCase
     s = sops(:downloadable_sop)
     current_version = s.version
     current_version_count = s.versions.size
+
+    assert s.can_download?
+    refute s.can_edit?
 
     assert_no_difference('Sop::Version.count') do
       post :new_version, id: s, data: fixture_file_upload('files/file_picture.png'), revision_comments: 'This is a new revision'
@@ -419,7 +424,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_adding_new_conditions_to_different_versions
-    s = sops(:editable_sop)
+    s = Factory(:sop, contributor:User.current_user.person)
+    assert s.can_edit?
     condition1 = ExperimentalCondition.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
                                               start_value: 1, sop_id: s.id, sop_version: s.version)
     assert_difference('Sop::Version.count', 1) do
@@ -507,19 +513,19 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not be able to update sharing without manage rights' do
-    login_as(:quentin)
-    user = users(:quentin)
-    sop = sops(:sop_with_all_sysmo_users_policy)
+    sop = Factory(:sop)
+    sop.policy.permissions << Factory(:permission, contributor: @user.person, access_type: Policy::EDITING)
 
-    assert sop.can_edit?(user), 'sop should be editable but not manageable for this test'
-    assert !sop.can_manage?(user), 'sop should be editable but not manageable for this test'
-    assert_equal Policy::EDITING, sop.policy.access_type, 'data file should have an initial policy with access type for editing'
-    put :update, id: sop, sop: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS }
+    assert sop.can_edit?(@user), 'sop should be editable but not manageable for this test'
+    refute sop.can_manage?(@user), 'sop should be editable but not manageable for this test'
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type
+    put :update, id: sop, sop: { title: 'new title' }, policy_attributes: { access_type: Policy::EDITING }
+
     assert_redirected_to sop_path(sop)
     sop.reload
 
     assert_equal 'new title', sop.title
-    assert_equal Policy::EDITING, sop.policy.access_type, 'policy should not have been updated'
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type, 'policy should not have been updated'
   end
 
   test 'owner should be able to update sharing' do
@@ -604,6 +610,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should set the policy to projects_policy if the item is requested to be published, when creating new sop' do
     as_not_virtualliver do
       gatekeeper = Factory(:asset_gatekeeper)
+      @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
       post :create, sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: file_for_upload }],
                     policy_attributes: { access_type: Policy::VISIBLE }
       sop = assigns(:sop)
@@ -838,7 +845,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not lose project assignment when an asset is managed by a person from different project' do
-    sop = Factory :sop, contributor: User.current_user
+    sop = Factory(:sop)
+    sop.policy.permissions << Factory(:permission, contributor: User.current_user.person, access_type: Policy::MANAGING)
+    assert sop.can_edit?
     assert_not_equal sop.projects.first, User.current_user.person.projects.first
 
     get :edit, id: sop
@@ -898,9 +907,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should update license' do
-    user = users(:owner_of_my_first_sop)
-    login_as(user)
-    sop = sops(:editable_sop)
+    sop = Factory(:sop, contributor: @user, license: nil)
 
     assert_nil sop.license
 
@@ -1021,45 +1028,45 @@ class SopsControllerTest < ActionController::TestCase
   test 'content blob filename precedence should take user input first' do
     stub_request(:any, 'http://example.com/url_filename.txt')
         .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
-    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt', original_filename: 'user_filename.txt' }
 
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
         post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
-
-        assert_equal 'user_filename.txt', assigns(:sop).content_blob.original_filename
       end
     end
+
+    assert_equal 'user_filename.txt', assigns(:sop).content_blob.original_filename
   end
 
   test 'content blob filename precedence should take server filename second' do
     stub_request(:any, 'http://example.com/url_filename.txt')
         .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
-    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt' }
 
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
         post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
-
-        assert_equal 'server_filename.txt', assigns(:sop).content_blob.original_filename
       end
     end
+
+    assert_equal 'server_filename.txt', assigns(:sop).content_blob.original_filename
   end
 
   test 'content blob filename precedence should take URL filename last' do
     stub_request(:any, 'http://example.com/url_filename.txt').to_return(body: 'hi')
-    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt' }
 
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
         post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
-
-        assert_equal 'url_filename.txt', assigns(:sop).content_blob.original_filename
       end
     end
+
+    assert_equal 'url_filename.txt', assigns(:sop).content_blob.original_filename
   end
 
   test 'should show sop as RDF' do
@@ -1068,6 +1075,78 @@ class SopsControllerTest < ActionController::TestCase
     get :show, id: sop, format: :rdf
 
     assert_response :success
+  end
+
+  test 'when updating, assay linked to must be editable' do
+    person = Factory(:person)
+    login_as(person)
+    sop = Factory(:sop,contributor:person,projects:person.projects)
+    assert sop.can_edit?
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+
+    investigation = Factory(:investigation,contributor:person,projects:person.projects)
+
+    study = Factory(:study, contributor:person, investigation:investigation)
+
+    good_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:editing_public_policy))
+    bad_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:publicly_viewable_policy))
+
+    assert good_assay.can_edit?
+    refute bad_assay.can_edit?
+
+    assert_no_difference('AssayAsset.count') do
+      put :update, id: sop.id, sop: { title: sop.title }, assay_ids: [bad_assay.id.to_s]
+    end
+    # FIXME: currently just skips the bad assay, but ideally should respond with an error status
+    # assert_response :unprocessable_entity
+
+    sop.reload
+    assert_empty sop.assays
+
+    assert_difference('AssayAsset.count') do
+      put :update, id: sop.id, sop: { title: sop.title }, assay_ids: [good_assay.id.to_s]
+    end
+    sop.reload
+    assert_equal [good_assay], sop.assays
+
+  end
+
+  test 'when creating, assay linked to must be editable' do
+    person = @user.person
+
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+
+    investigation = Factory(:investigation,contributor:person,projects:person.projects)
+
+    study = Factory(:study, contributor:person, investigation:investigation)
+
+    good_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:editing_public_policy))
+    bad_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:publicly_viewable_policy))
+
+    assert good_assay.can_edit?
+    refute bad_assay.can_edit?
+
+    sop, blob = valid_sop
+
+    assert_no_difference('AssayAsset.count') do
+      post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [bad_assay.id.to_s]
+    end
+    # FIXME: currently just skips the bad assay, but ideally should respond with an error status
+    #assert_response :unprocessable_entity
+
+    sop, blob = valid_sop
+
+    assert_difference('Sop.count') do
+      assert_difference('AssayAsset.count') do
+        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [good_assay.id.to_s]
+      end
+    end
+    sop = assigns(:sop)
+    assert_equal [good_assay],sop.assays
   end
 
   private
@@ -1098,10 +1177,10 @@ class SopsControllerTest < ActionController::TestCase
 
   def valid_sop_with_url
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png'
-    [{ title: 'Test', project_ids: [projects(:sysmo_project).id] }, { data_url: 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png' }]
+    [{ title: 'Test', project_ids: [@project.id] }, { data_url: 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png' }]
   end
 
   def valid_sop
-    [{ title: 'Test', project_ids: [projects(:sysmo_project).id] }, { data: file_for_upload, data_url: '' }]
+    [{ title: 'Test', project_ids: [@project.id] }, { data: file_for_upload, data_url: '' }]
   end
 end

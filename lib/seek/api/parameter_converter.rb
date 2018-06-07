@@ -14,10 +14,13 @@ module Seek
             value[:access_type] = PolicyHelper::key_access_type(value.delete(:access))
             perms = {}
             (value.delete(:permissions) || []).each_with_index do |permission, index|
+              contributor_id = permission[:resource][:id]
+              contributor_type = permission[:resource][:type].singularize.classify
+
               perms[index.to_s] = {
                   access_type: PolicyHelper::key_access_type(permission[:access]),
-                  contributor_type: permission[:resource_type].singularize.classify,
-                  contributor_id: permission[:resource_id],
+                  contributor_type: contributor_type,
+                  contributor_id: contributor_id,
               }
             end
             value[:permissions_attributes] = perms

@@ -29,7 +29,7 @@ module Seek
       module Associations
         extend ActiveSupport::Concern
         included do
-          has_many :assay_assets, dependent: :destroy, as: :asset, foreign_key: :asset_id
+          has_many :assay_assets, dependent: :destroy, as: :asset, foreign_key: :asset_id, autosave: true # change this to validate: true in the future
           has_many :assays, through: :assay_assets
         end
       end

@@ -3,7 +3,8 @@ require 'test_helper'
 class ProjectFolderAssetTest < ActiveSupport::TestCase
   test 'associations' do
     pf = Factory :project_folder
-    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project]
+    person = Factory(:person,project:pf.project)
+    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project], contributor:person
     pfa = ProjectFolderAsset.create asset: sop, project_folder: pf
     pfa.save!
     pfa.reload
@@ -20,7 +21,8 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
 
   test 'dependents destroyed' do
     pf = Factory :project_folder
-    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project]
+    person = Factory(:person,project:pf.project)
+    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project], contributor: person
     pfa = ProjectFolderAsset.create asset: sop, project_folder: pf
 
     assert_difference('ProjectFolderAsset.count', -1) do
@@ -29,7 +31,8 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
     end
 
     pf = Factory :project_folder
-    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project]
+    person = Factory(:person,project:pf.project)
+    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project], contributor:person
     pfa = ProjectFolderAsset.create asset: sop, project_folder: pf
 
     assert_difference('ProjectFolderAsset.count', -1) do
@@ -41,7 +44,11 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
   test 'assets added to default folder upon creation' do
     pf = Factory :project_folder, title: 'Unsorted items', editable: false, incoming: true
     pf2 = Factory :project_folder, title: 'Unsorted items', editable: false, incoming: true
-    model = Factory.build :model, projects: [pf.project, pf2.project], policy: Factory(:public_policy)
+
+    person = Factory(:person,project: pf.project)
+    person.add_to_project_and_institution(pf2.project, person.institutions.first)
+
+    model = Factory.build :model, projects: [pf.project, pf2.project], policy: Factory(:public_policy), contributor: person
 
     model.save!
 
@@ -59,7 +66,8 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
   test 'validations' do
     pfa = ProjectFolderAsset.new
     pf = Factory :project_folder
-    model = Factory :model, policy: Factory(:public_policy), projects: [pf.project]
+    person = Factory(:person, project: pf.project)
+    model = Factory :model, policy: Factory(:public_policy), projects: [pf.project], contributor: person
 
     assert !pfa.valid?
 
@@ -74,9 +82,12 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
     # asset must belong in same project as folder
     pfa.asset = model
     assert pfa.valid?
-    pfa.asset = Factory :model, policy: Factory(:public_policy), projects: [pf.project, Factory(:project)]
+    person.add_to_project_and_institution(Factory(:project),person.institutions.first)
+    pfa.asset = Factory :model, policy: Factory(:public_policy), projects: person.projects, contributor: person
     assert pfa.valid?
-    pfa.asset = Factory :model, policy: Factory(:public_policy), projects: [Factory(:project)]
+
+    other_person = Factory(:person)
+    pfa.asset = Factory :model, policy: Factory(:public_policy), projects: other_person.projects,contributor: other_person
     assert !pfa.valid?
 
     # final check for save
@@ -85,18 +96,21 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
   end
 
   test 'assign existing assets to folders' do
+
     proj = Factory :project
-    old_sop = Factory :sop, policy: Factory(:public_policy), projects: [proj]
-    old_model = Factory :model, policy: Factory(:public_policy), projects: [proj]
-    old_presentation = Factory :presentation, policy: Factory(:public_policy), projects: [proj]
-    old_publication = Factory :publication, policy: Factory(:public_policy), projects: [proj]
-    old_datafile = Factory :data_file, policy: Factory(:public_policy), projects: [proj]
-    old_private_datafile = Factory :data_file, policy: Factory(:private_policy), projects: [proj]
-    old_datafile_other_proj = Factory :model, policy: Factory(:public_policy), projects: [Factory(:project)]
+    contributor = Factory(:person,project:proj)
+
+    old_sop = Factory :sop, policy: Factory(:public_policy), projects: [proj], contributor:contributor
+    old_model = Factory :model, policy: Factory(:public_policy), projects: [proj], contributor:contributor
+    old_presentation = Factory :presentation, policy: Factory(:public_policy), projects: [proj], contributor:contributor
+    old_publication = Factory :publication, policy: Factory(:public_policy), projects: [proj], contributor:contributor
+    old_datafile = Factory :data_file, policy: Factory(:public_policy), projects: [proj], contributor:contributor
+    old_private_datafile = Factory :data_file, policy: Factory(:private_policy), projects: [proj], contributor:contributor
+    old_datafile_other_proj = Factory :model, policy: Factory(:public_policy), contributor:Factory(:person)
 
     pf = Factory :project_folder, project: proj
     pf_incoming = Factory :project_folder, project: pf.project, title: 'New items', incoming: true
-    already_assigned_sop = Factory :sop, policy: Factory(:public_policy), projects: [proj]
+    already_assigned_sop = Factory :sop, policy: Factory(:public_policy), projects: [proj], contributor:contributor
     pf.add_assets already_assigned_sop
 
     ProjectFolderAsset.assign_existing_assets(proj)

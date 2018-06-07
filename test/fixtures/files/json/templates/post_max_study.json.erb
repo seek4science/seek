@@ -11,8 +11,10 @@
         "access": "download",
         "permissions": [
           {
-            "resource_id": "<%= Investigation.find_by_id(investigation_id).projects.first.id %>",
-            "resource_type": "projects",
+            "resource": {
+              "id" : "<%= Investigation.find_by_id(investigation_id).projects.first.id %>",
+              "type": "projects"
+            },
             "access": "view"
           }
         ]

@@ -95,7 +95,8 @@ class MailerTest < ActionMailer::TestCase
 
   test 'request publish approval' do
     gatekeeper = Factory(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
-    resources = [Factory(:data_file, projects: gatekeeper.projects, title: 'Picture'), Factory(:teusink_model, projects: gatekeeper.projects, title: 'Teusink')]
+    person = Factory(:person, project: gatekeeper.projects.first)
+    resources = [Factory(:data_file, projects: gatekeeper.projects, title: 'Picture', contributor:person), Factory(:teusink_model, projects: gatekeeper.projects, title: 'Teusink', contributor:person)]
     requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
 
     @expected.subject = 'A Sysmo SEEK member requested your approval to publish some items.'
@@ -136,7 +137,8 @@ class MailerTest < ActionMailer::TestCase
 
   test 'gatekeeper approval feedback' do
     gatekeeper = Factory(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
-    item = Factory(:data_file, projects: gatekeeper.projects, title: 'Picture')
+    person = Factory(:person, project: gatekeeper.projects.first)
+    item = Factory(:data_file, projects: gatekeeper.projects, title: 'Picture', contributor:person)
     items_and_comments = [{ item: item, comment: nil }]
     requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
     @expected.subject = 'A Sysmo SEEK gatekeeper approved your publishing requests.'
@@ -155,7 +157,8 @@ class MailerTest < ActionMailer::TestCase
 
   test 'gatekeeper reject feedback' do
     gatekeeper = Factory(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
-    item = Factory(:data_file, projects: gatekeeper.projects, title: 'Picture')
+    person = Factory(:person, project: gatekeeper.projects.first)
+    item = Factory(:data_file, projects: gatekeeper.projects, title: 'Picture',contributor:person)
     items_and_comments = [{ item: item, comment: 'not ready' }]
 
     requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')

@@ -22,6 +22,7 @@ namespace :seek do
     reencrypt_settings
     convert_organism_concept_uris
     merge_duplicate_organisms
+    fix_setting_hash_values
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -130,11 +131,15 @@ namespace :seek do
 
     Project.all.each do |project|
       if project.site_credentials.present?
-        credentials_hash = decrypt(Base64.decode64(project.site_credentials), key)
-        project.site_username = credentials_hash[:username]
-        project.site_password = credentials_hash[:password]
-        project.update_column(:site_credentials, nil)
-        conversions += 1
+        if project.site_credentials == "\u0010" # some spurious value from very old SysMO projects
+          project.update_column(:site_credentials, nil)
+        else
+          credentials_hash = decrypt(Base64.decode64(project.site_credentials), key)
+          project.site_username = credentials_hash[:username]
+          project.site_password = credentials_hash[:password]
+          project.update_column(:site_credentials, nil)
+          conversions += 1
+        end
       end
     end
 
@@ -283,6 +288,13 @@ namespace :seek do
       end
     ensure
       ActiveRecord::Base.logger = logger
+    end
+  end
+
+  task(fix_setting_hash_values: :environment) do
+    Settings.pluck(:var).select { |k| Settings[k].class.name == 'Hash' }.each do |key|
+      puts "Updating '#{key}' to a HashWithIndifferentAccess"
+      Settings.merge!(key, {})
     end
   end
 end

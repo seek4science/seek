@@ -15,6 +15,8 @@ class DataFile < ActiveRecord::Base
 
   acts_as_doi_parent(child_accessor: :versions)
 
+  validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
+
   scope :default_order, -> { order('title') }
 
   # allow same titles, but only if these belong to different users
@@ -233,13 +235,11 @@ class DataFile < ActiveRecord::Base
   end
 
   def populate_metadata_from_template
-
     if contains_extractable_spreadsheet?
       Seek::Templates::Extract::DataFileRightFieldExtractor.new(self).populate(self)
     else
       Set.new
     end
-
   end
 
   def initialise_assay_from_template

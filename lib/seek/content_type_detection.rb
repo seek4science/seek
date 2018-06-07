@@ -11,7 +11,7 @@ module Seek
     PDF_CONVERTABLE_FORMAT = %w(doc docx ppt pptx odt odp rtf xls xlsx)
     PDF_VIEWABLE_FORMAT = PDF_CONVERTABLE_FORMAT - %w(xls xlsx) + %w(pdf)
     IMAGE_VIEWABLE_FORMAT = %w(gif jpeg png jpg bmp svg)
-    TEXT_MIME_TYPES = %w(text/plain text/csv text/x-comma-separated-values text/tab-separated-values application/sbml+xml application/xml text/xml application/json)
+    TEXT_MIME_TYPES = %w(text/plain text/csv text/x-comma-separated-values text/tab-separated-values application/sbml+xml application/xml text/xml application/json text/x-python)
 
     def is_text?(blob = self)
       TEXT_MIME_TYPES.include?(blob.content_type)

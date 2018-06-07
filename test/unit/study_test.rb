@@ -20,7 +20,8 @@ class StudyTest < ActiveSupport::TestCase
   end
 
   test 'to_rdf' do
-    object = Factory :study, description: 'My famous study', assays: [Factory(:assay), Factory(:assay)]
+    object = Factory(:study, description: 'My famous study')
+    FactoryGirl.create_list(:assay, 2, contributor: object.contributor, study: object)
     rdf = object.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
@@ -34,19 +35,24 @@ class StudyTest < ActiveSupport::TestCase
 
   # only authorized people can delete a study, and a study must have no assays
   test 'can delete' do
-    project_member = Factory :person
-    study = Factory :study, contributor: Factory(:person), investigation: Factory(:investigation, projects: project_member.projects)
+    project_member = Factory(:person)
+    another_project_member = Factory(:person, project: project_member.projects.first)
+    study = Factory(:study, contributor: another_project_member)
+
+    assert_empty study.assays
     assert !study.can_delete?(Factory(:user))
     assert !study.can_delete?(project_member.user)
     assert study.can_delete?(study.contributor.user)
 
-    study = Factory :study, contributor: Factory(:person), assays: [Factory(:assay)]
+    study = Factory(:assay).study
+    assert_not_empty study.assays
     assert !study.can_delete?(study.contributor)
   end
 
   test 'publications through assays' do
-    assay1 = Factory :assay
-    assay2 = Factory :assay
+    assay1 = Factory(:assay)
+    study = assay1.study
+    assay2 = Factory(:assay, contributor: assay1.contributor, study: study)
 
     pub1 = Factory :publication, title: 'pub 1'
     pub2 = Factory :publication, title: 'pub 2'
@@ -56,8 +62,6 @@ class StudyTest < ActiveSupport::TestCase
 
     Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
     Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub3
-
-    study = Factory(:study, assays: [assay1, assay2])
 
     assay1.reload
     assay2.reload

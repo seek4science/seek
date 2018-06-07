@@ -56,7 +56,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
     assert_response :success
     logout 'http://www.example.com/sops'
 
-    data_file = Factory :data_file, contributor: User.current_user, policy: Factory(:public_policy)
+    data_file = Factory :data_file, policy: Factory(:public_policy)
     get "/data_files/#{data_file.id}"
     assert_response :success
 

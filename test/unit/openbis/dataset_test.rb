@@ -59,29 +59,31 @@ class DatasetTest < ActiveSupport::TestCase
   end
 
   test 'create datafile' do
-    User.current_user = Factory(:person).user
-    @openbis_endpoint.project.update_attributes(default_license: 'wibble')
+    person = Factory :person, project:@openbis_endpoint.project
+    User.with_current_user(person.user) do
+      @openbis_endpoint.project.update_attributes(default_license: 'wibble')
 
-    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
-    datafile = dataset.create_seek_datafile
-    assert_equal DataFile, datafile.class
-    refute_nil 1, datafile.content_blob
-    assert datafile.valid?
-    assert datafile.content_blob.valid?
+      dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
+      datafile = dataset.create_seek_datafile
+      assert_equal DataFile, datafile.class
+      refute_nil 1, datafile.content_blob
+      assert datafile.valid?
+      assert datafile.content_blob.valid?
 
-    assert datafile.openbis?
-    assert datafile.content_blob.openbis?
-    assert datafile.content_blob.custom_integration?
-    refute datafile.content_blob.external_link?
-    refute datafile.content_blob.show_as_external_link?
+      assert datafile.openbis?
+      assert datafile.content_blob.openbis?
+      assert datafile.content_blob.custom_integration?
+      refute datafile.content_blob.external_link?
+      refute datafile.content_blob.show_as_external_link?
 
-    assert_equal "openbis:#{@openbis_endpoint.id}:dataset:20160210130454955-23", datafile.content_blob.url
-    assert_equal 'wibble', datafile.license
+      assert_equal "openbis:#{@openbis_endpoint.id}:dataset:20160210130454955-23", datafile.content_blob.url
+      assert_equal 'wibble', datafile.license
 
-    normal = Factory(:data_file)
-    refute normal.openbis?
-    refute normal.content_blob.openbis?
-    refute normal.content_blob.custom_integration?
+      normal = Factory(:data_file)
+      refute normal.openbis?
+      refute normal.content_blob.openbis?
+      refute normal.content_blob.custom_integration?
+    end
   end
 
   test 'registered?' do

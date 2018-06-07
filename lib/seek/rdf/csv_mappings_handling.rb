@@ -55,6 +55,7 @@ module Seek
               else
                 handle_literal_for_item(item)
               end
+
           rdf_graph << [resource, property_uri, o] unless o.nil?
         end
         rdf_graph

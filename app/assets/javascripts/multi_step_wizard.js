@@ -83,5 +83,9 @@ $j(document).ready(function () {
         if (e.keyCode==35) {
             MultiStepWizard.jumpToEnd();
         }
+
+        if (e.keyCode==36) {
+            MultiStepWizard.jumpToStart();
+        }
     });
 });

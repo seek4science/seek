@@ -52,16 +52,15 @@ class PeopleController < ApplicationController
     end
 
     if @people
-      @people = @people.select(&:can_view?).reject { |p| p.projects.empty? }
+      @people = @people.select(&:can_view?)
     else
       @people = if params[:page].blank? || params[:page] == 'latest' || params[:page] == 'all'
                   Person.active
                 else
                   Person.all
                 end
-      @people = @people.reject { |p| p.group_memberships.empty? }
-      @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
 
+      @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
       unless view_context.index_with_facets?('people') && params[:user_enable_facet] == 'true'
         @people = Person.paginate_after_fetch(@people,
                                               page: (params[:page] || Seek::Config.default_page('people')),
@@ -339,8 +338,7 @@ class PeopleController < ApplicationController
     results = Person.where("#{concat_clause} LIKE :query OR LOWER(first_name) LIKE :query OR LOWER(last_name) LIKE :query",
                            query: "#{params[:query].downcase}%").limit(params[:limit] || 10)
     items = results.map do |person|
-      projects = person.projects.collect(&:title).join(', ')
-      { id: person.id, name: person.name, projects: projects, hint: projects }
+      { id: person.id, name: person.name, projects: person.projects.collect(&:title).join(', '), hint: person.typeahead_hint }
     end
 
     respond_to do |format|

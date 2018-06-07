@@ -9,7 +9,7 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     @clz = 'study'
     @plural_clz = @clz.pluralize
 
-    @investigation = Factory(:investigation)
+    @investigation = Factory(:investigation, contributor: @current_person, projects: [@current_person.projects.first])
     @investigation.title = 'Fred'
 
     @study = Factory(:study, policy: Factory(:public_policy), contributor: @current_person)
@@ -73,7 +73,7 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     user_login(person)
     proj = person.projects.first
     study = Factory(:study,
-                    investigation: Factory(:investigation, project_ids: [proj.id]),
+                    contributor: person,
                     policy: Factory(:policy,
                         access_type: Policy::NO_ACCESS,
                         permissions: [Factory(:permission, contributor: proj, access_type: Policy::MANAGING)]))

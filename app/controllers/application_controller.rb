@@ -559,7 +559,7 @@ class ApplicationController < ActionController::Base
             raise ArgumentError.new('A POST request is not allowed to specify an id')
           end
         when "update"
-          if (!params[:data][:id].nil?) && (params[:id] != params[:data][:id])
+          if (!params[:data][:id].nil?) && (params[:id].to_s != params[:data][:id].to_s)
             raise ArgumentError.new('id specified by the PUT request does not match object-id in the JSON input')
           end
       end

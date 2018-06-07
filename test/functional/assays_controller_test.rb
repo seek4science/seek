@@ -18,7 +18,6 @@ class AssaysControllerTest < ActionController::TestCase
     @object = Factory(:experimental_assay, policy: Factory(:public_policy))
   end
 
-
   test 'modelling assay validates with schema' do
     df = Factory(:data_file, contributor: User.current_user.person)
     a = Factory(:modelling_assay, contributor: User.current_user.person)
@@ -248,7 +247,7 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should create modelling assay with/without organisms' do
     assert_difference('Assay.count') do
       post :create, assay: { title: 'test',
-                             study_id: studies(:metabolomics_study).id,
+                             study_id: Factory(:study,contributor:User.current_user.person).id,
                              assay_class_id: assay_classes(:modelling_assay_class).id }, policy_attributes: valid_sharing
     end
 
@@ -262,7 +261,7 @@ class AssaysControllerTest < ActionController::TestCase
     growth_type = Factory(:culture_growth_type, title: 'batch')
     assert_difference('Assay.count') do
       post :create, assay: { title: 'test',
-                             study_id: studies(:metabolomics_study).id,
+                             study_id: Factory(:study,contributor:User.current_user.person).id,
                              assay_class_id: assay_classes(:modelling_assay_class).id },
                     assay_organism_ids: [organism.id, strain.title, strain.id, growth_type.title].join(','), policy_attributes: valid_sharing
     end
@@ -278,7 +277,7 @@ class AssaysControllerTest < ActionController::TestCase
       post :create, assay: { title: 'test',
                              technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',
                              assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics',
-                             study_id: Factory(:study).id,
+                             study_id: Factory(:study,contributor:User.current_user.person).id,
                              assay_class_id: Factory(:experimental_assay_class).id },
                     policy_attributes: valid_sharing
     end
@@ -297,7 +296,7 @@ class AssaysControllerTest < ActionController::TestCase
       post :create, assay: { title: 'test',
                              technology_type_uri: tech_type.uri,
                              assay_type_uri: assay_type.uri,
-                             study_id: Factory(:study).id,
+                             study_id: Factory(:study,contributor:User.current_user.person).id,
                              assay_class_id: Factory(:experimental_assay_class).id },
                     policy_attributes: valid_sharing
     end
@@ -649,12 +648,10 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'links have nofollow in sop tabs' do
-    login_as(:owner_of_my_first_sop)
-    sop_version = sops(:my_first_sop)
-    sop_version.description = 'http://news.bbc.co.uk'
-    sop_version.save!
+    assay = Factory(:assay, contributor:User.current_user.person)
+    sop = Factory(:sop,description:'http://news.bbc.co.uk',assays:[assay],contributor: User.current_user.person)
     assert_difference('ActivityLog.count') do
-      get :show, id: assays(:metabolomics_assay)
+      get :show, id: assay
     end
 
     assert_select 'div.list_item div.list_item_desc' do
@@ -894,9 +891,11 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'edit assay with selected projects scope policy' do
-    proj = User.current_user.person.projects.first
-    assay = Factory(:assay, contributor: User.current_user.person,
-                            study: Factory(:study, investigation: Factory(:investigation, project_ids: [proj.id])),
+    person = User.current_user.person
+    proj = person.projects.first
+    investigation = Factory(:investigation, projects: [proj], contributor:person)
+    assay = Factory(:assay, contributor: person,
+                            study: Factory(:study, investigation: investigation,contributor:person),
                             policy: Factory(:policy,
                                             access_type: Policy::NO_ACCESS,
                                             permissions: [Factory(:permission, contributor: proj, access_type: Policy::EDITING)]))
@@ -904,12 +903,13 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
-    login_as(:quentin)
-    study = studies(:metabolomics_study)
+
+    study = Factory(:study,contributor:User.current_user.person)
 
     a = { title: 'test',
           study_id: study.id,
           assay_class_id: assay_classes(:experimental_assay_class).id }
+
     assert_difference('ActivityLog.count') do
       assert_difference('Assay.count') do
         post :create, assay: a,
@@ -932,14 +932,18 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "should update sharing permissions 'with your project and with all SysMO members'" do
-    login_as Factory(:user)
-    study = Factory(:study, investigation: (Factory(:investigation,
-                                                    project_ids: [Factory(:project).id, Factory(:project).id])))
+    person = Factory(:person)
+    person.add_to_project_and_institution(Factory(:project),Factory(:institution))
+    login_as person.user
+
+    inv = Factory(:investigation, projects: person.projects,contributor: person)
+    study = Factory(:study, investigation: inv, contributor: person)
     assay = Factory(:assay,
                     policy: Factory(:private_policy),
-                    contributor: User.current_user.person,
+                    contributor: person,
                     study: study)
 
+    assert_equal 2, study.projects.count
     assert assay.can_manage?
     assert_equal Policy::NO_ACCESS, assay.policy.access_type
     assert assay.policy.permissions.empty?
@@ -964,10 +968,11 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should have associated datafiles, models, on modelling assay show page' do
-    df = Factory(:data_file, contributor: User.current_user)
-    model = Factory(:model, contributor: User.current_user)
+    df = Factory(:data_file, contributor: User.current_user.person)
+    model = Factory(:model, contributor: User.current_user.person)
+    investigation = Factory(:investigation, contributor:User.current_user.person)
     assay = Factory(:assay, contributor: User.current_user.person,
-                            study: (Factory(:study, investigation: (Factory(:investigation)))))
+                            study: Factory(:study, investigation: investigation, contributor:User.current_user.person))
     assay.data_files << df
     assay.models << model
     assert assay.save
@@ -981,11 +986,12 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should have associated datafiles, models and sops on assay index page for modelling assays' do
     Assay.delete_all
-    df = Factory(:data_file, contributor: User.current_user)
-    model = Factory(:model, contributor: User.current_user)
-    sop = Factory(:sop, contributor: User.current_user)
+    df = Factory(:data_file, contributor: User.current_user.person)
+    model = Factory(:model, contributor: User.current_user.person)
+    sop = Factory(:sop, contributor: User.current_user.person)
+    investigation = Factory(:investigation, contributor:User.current_user.person)
     assay = Factory(:modelling_assay, contributor: User.current_user.person,
-                                      study: (Factory(:study, investigation: (Factory(:investigation)))))
+                    study: Factory(:study, investigation: investigation, contributor:User.current_user.person))
     assay.data_files << df
     assay.models << model
     assay.sops << sop
@@ -1001,11 +1007,12 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should have only associated datafiles and sops on assay index page for experimental assays' do
     Assay.delete_all
-    df = Factory(:data_file, contributor: User.current_user)
-    model = Factory(:model, contributor: User.current_user)
-    sop = Factory(:sop, contributor: User.current_user)
+    df = Factory(:data_file, contributor: User.current_user.person)
+    model = Factory(:model, contributor: User.current_user.person)
+    sop = Factory(:sop, contributor: User.current_user.person)
+    investigation = Factory(:investigation, contributor:User.current_user.person)
     assay = Factory(:experimental_assay, contributor: User.current_user.person,
-                                         study: (Factory(:study, investigation: (Factory(:investigation)))))
+                    study: Factory(:study, investigation: investigation, contributor:User.current_user.person))
     assay.data_files << df
     assay.models << model
     assay.sops << sop
@@ -1020,8 +1027,8 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'preview assay with associated hidden items' do
-    assay = Factory(:assay, policy: Factory(:public_policy))
-    private_df = Factory(:data_file, policy: Factory(:private_policy))
+    assay = Factory(:assay, policy: Factory(:public_policy), contributor:User.current_user.person)
+    private_df = Factory(:data_file, policy: Factory(:private_policy),contributor:User.current_user.person)
     assay.data_files << private_df
     assay.save!
     login_as Factory(:user)
@@ -1030,11 +1037,12 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should not show private data or model title on modelling analysis summary' do
-    df = Factory(:data_file, title: 'private data file', policy: Factory(:private_policy))
-    df2 = Factory(:data_file, title: 'public data file', policy: Factory(:public_policy))
-    model = Factory(:model, title: 'private model', policy: Factory(:private_policy))
-    model2 = Factory(:model, title: 'public model', policy: Factory(:public_policy))
-    assay = Factory(:modelling_assay, policy: Factory(:public_policy))
+    person = User.current_user.person
+    df = Factory(:data_file, title: 'private data file', policy: Factory(:private_policy),contributor: person)
+    df2 = Factory(:data_file, title: 'public data file', policy: Factory(:public_policy),contributor: person)
+    model = Factory(:model, title: 'private model', policy: Factory(:private_policy),contributor: person)
+    model2 = Factory(:model, title: 'public model', policy: Factory(:public_policy),contributor: person)
+    assay = Factory(:modelling_assay, policy: Factory(:public_policy),contributor: person)
 
     assay.data_files << df
     assay.data_files << df2
@@ -1064,14 +1072,15 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should not show investigation and study title if they are hidden on assay show page' do
     investigation = Factory(:investigation,
                             policy: Factory(:private_policy),
-                            contributor: User.current_user)
+                            contributor: User.current_user.person)
     study = Factory(:study,
                     policy: Factory(:private_policy),
-                    contributor: User.current_user,
+                    contributor: User.current_user.person,
                     investigation: investigation)
     assay = Factory(:assay,
                     policy: Factory(:public_policy),
-                    study: study)
+                    study: study,
+                    contributor: User.current_user.person)
 
     logout
     get :show, id: assay
@@ -1121,9 +1130,10 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'new object based on existing one' do
-    investigation = Factory(:investigation, policy: Factory(:public_policy))
-    study = Factory(:study, policy: Factory(:public_policy), investigation: investigation)
-    assay = Factory(:assay, policy: Factory(:public_policy), title: 'the assay', study: study)
+    person = User.current_user.person
+    investigation = Factory(:investigation, policy: Factory(:public_policy), contributor:person)
+    study = Factory(:study, policy: Factory(:public_policy), investigation: investigation, contributor:person)
+    assay = Factory(:assay, policy: Factory(:public_policy), title: 'the assay', study: study, contributor:person)
     assert assay.can_view?
     assert assay.study.can_edit?
     get :new_object_based_on_existing_one, id: assay.id
@@ -1353,12 +1363,14 @@ class AssaysControllerTest < ActionController::TestCase
   test 'programme assays through nested routing' do
     assert_routing 'programmes/2/assays', controller: 'assays', action: 'index', programme_id: '2'
     programme = Factory(:programme)
-    investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy))
-    investigation2 = Factory(:investigation, policy: Factory(:public_policy))
-    study = Factory(:study, investigation: investigation, policy: Factory(:public_policy))
-    study2 = Factory(:study, investigation: investigation2, policy: Factory(:public_policy))
-    assay = Factory(:assay, study: study, policy: Factory(:public_policy))
-    assay2 = Factory(:assay, study: study2, policy: Factory(:public_policy))
+    person = Factory(:person,project:programme.projects.first)
+    other_person = Factory(:person)
+    investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy),contributor:person)
+    investigation2 = Factory(:investigation, policy: Factory(:public_policy),contributor:other_person)
+    study = Factory(:study, investigation: investigation, policy: Factory(:public_policy),contributor:person)
+    study2 = Factory(:study, investigation: investigation2, policy: Factory(:public_policy),contributor:other_person)
+    assay = Factory(:assay, study: study, policy: Factory(:public_policy),contributor:person)
+    assay2 = Factory(:assay, study: study2, policy: Factory(:public_policy),contributor:other_person)
 
     get :index, programme_id: programme.id
 
@@ -1374,7 +1386,8 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(person.user)
     project = person.projects.first
     project.settings['nels_enabled'] = true
-    study = Factory(:study, investigation: Factory(:investigation, project_ids: [project.id]))
+    inv = Factory(:investigation, projects: [project], contributor:person)
+    study = Factory(:study, investigation: inv, contributor:person)
     assay = Factory(:assay, contributor: person, study: study)
 
     get :show, id: assay
@@ -1388,7 +1401,8 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(person.user)
     project = person.projects.first
     project.settings['nels_enabled'] = true
-    study = Factory(:study, investigation: Factory(:investigation, project_ids: [project.id]))
+    inv = Factory(:investigation, projects: [project],contributor: person)
+    study = Factory(:study, investigation: inv,contributor: person)
     assay = Factory(:assay, contributor: person, study: study)
 
     with_config_value(:nels_enabled, false) do
@@ -1403,7 +1417,8 @@ class AssaysControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person.user)
     project = person.projects.first
-    study = Factory(:study, investigation: Factory(:investigation, project_ids: [project.id]))
+    inv =  Factory(:investigation, projects: [project], contributor: person)
+    study = Factory(:study,investigation:inv,contributor: person )
     assay = Factory(:assay, contributor: person, study: study)
 
     get :show, id: assay
@@ -1415,10 +1430,14 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should not show NeLS button for NeLS-enabled project to non-NeLS project member' do
     nels_person = Factory(:person)
     non_nels_person = Factory(:person)
-    login_as(non_nels_person.user)
+    login_as(non_nels_person)
     nels_project = nels_person.projects.first
     non_nels_project = non_nels_person.projects.first
-    study = Factory(:study, investigation: Factory(:investigation, project_ids: [non_nels_project.id, non_nels_project.id]))
+
+    assert_empty nels_person.projects & non_nels_person.projects
+
+    inv = Factory(:investigation, project_ids: [nels_project.id],contributor:nels_person)
+    study = Factory(:study, investigation: inv, contributor:nels_person)
     assay = Factory(:assay, contributor: nels_person, study: study, policy: Factory(:policy, permissions: [
         Factory(:permission, contributor: nels_project, access_type: Policy::MANAGING),
         Factory(:permission, contributor: non_nels_project, access_type: Policy::MANAGING)]))
@@ -1436,10 +1455,6 @@ class AssaysControllerTest < ActionController::TestCase
 
     org = Factory(:organism)
     assay.associate_organism(org)
-    assay.contributor = User.current_user.person
-    assay.save
-    login_as(User.current_user)
-
   end
 
   test 'add data file button' do
@@ -1537,4 +1552,133 @@ class AssaysControllerTest < ActionController::TestCase
     assert_includes assigns(:assay).documents, document
     assert_not_equal timestamp, assigns(:assay).updated_at
   end
+
+  test 'cannot create with link to study in another project' do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    login_as(person)
+    investigation = Factory(:investigation,contributor:another_person,projects:another_person.projects)
+    study = Factory(:study, investigation:investigation,policy:Factory(:publicly_viewable_policy), contributor:another_person )
+    assert study.can_view?
+    assert_empty person.projects & study.projects
+    assert_no_difference('Assay.count') do
+      post :create, assay: { title: 'test', study_id: study.id, assay_class_id: AssayClass.experimental.id }, policy_attributes: valid_sharing
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test 'cannot create with hidden study in same project' do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+    login_as(person)
+    investigation = Factory(:investigation,contributor:another_person,projects:person.projects)
+    study = Factory(:study, investigation:investigation,policy:Factory(:private_policy), contributor:another_person )
+    refute study.can_view?
+    refute_empty person.projects & study.projects
+
+    assert_no_difference('Assay.count') do
+      post :create, assay: { title: 'test', study_id: study.id, assay_class_id: AssayClass.experimental.id }, policy_attributes: valid_sharing
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test 'cannot update with link to study in another project' do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    login_as(person)
+    investigation = Factory(:investigation,contributor:another_person,projects:another_person.projects)
+    study = Factory(:study,contributor:another_person,investigation:investigation,policy:Factory(:publicly_viewable_policy))
+    assay = Factory(:assay,contributor:person)
+
+    assert study.can_view?
+    assert_empty person.projects & study.projects
+
+    refute_equal study,assay.study
+
+    put :update,id:assay.id,assay:{study_id:study.id}
+
+    assert_response :unprocessable_entity
+    assay.reload
+    refute_equal study,assay.study
+  end
+
+  test 'cannot update with link to hidden study in same project' do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+    login_as(person)
+    investigation = Factory(:investigation,contributor:another_person,projects:person.projects)
+    study = Factory(:study,contributor:another_person,investigation:investigation,policy:Factory(:private_policy))
+    assay = Factory(:assay,contributor:person)
+
+    refute study.can_view?
+    refute_empty person.projects & study.projects
+    refute_equal study,assay.study
+
+    put :update,id:assay.id,assay:{study_id:study.id}
+
+    assert_response :unprocessable_entity
+    assay.reload
+    refute_equal study,assay.study
+  end
+
+  test 'cannot update and link to none visible SOP' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay,contributor:person)
+    assert assay.can_edit?
+
+    good_sop = Factory(:sop,policy:Factory(:publicly_viewable_policy))
+    bad_sop = Factory(:sop,policy:Factory(:private_policy))
+    assert good_sop.can_view?
+    refute bad_sop.can_view?
+
+    assert_no_difference('AssayAsset.count') do
+      put :update, id: assay, assay_sop_ids: [bad_sop.id], assay: { title: assay.title }
+    end
+    #FIXME: it currently ignores the bad asset, but ideally should respond with an error
+    #assert_response :unprocessable_entity
+    assay.reload
+    assert_empty assay.sops
+
+    assert_difference('AssayAsset.count') do
+      put :update, id: assay, assay_sop_ids: [good_sop.id], assay: { title: assay.title }
+    end
+    assay.reload
+    assert_equal [good_sop],assay.sops
+
+  end
+
+  test 'cannot create and link to none visible SOP' do
+    person = Factory(:person)
+    login_as(person)
+
+    investigation = Factory(:investigation,contributor:person)
+    study = Factory(:study, investigation:investigation,policy:Factory(:publicly_viewable_policy), contributor:person)
+
+
+    good_sop = Factory(:sop,policy:Factory(:publicly_viewable_policy))
+    bad_sop = Factory(:sop,policy:Factory(:private_policy))
+    assert good_sop.can_view?
+    refute bad_sop.can_view?
+
+    assert_no_difference('AssayAsset.count') do
+      post :create, assay_sop_ids: [bad_sop.id], assay: { title: 'testing', assay_class_id:AssayClass.experimental.id, study_id:study.id },policy_attributes: valid_sharing
+    end
+    #FIXME: it currently ignores the bad asset, but ideally should respond with an error
+    #assert_response :unprocessable_entity
+    assert_empty assigns(:assay).sops
+
+
+    assert_difference('AssayAsset.count') do
+      post :create, assay_sop_ids: [good_sop.id], assay: { title: 'testing', assay_class_id:AssayClass.experimental.id,study_id:study.id },policy_attributes: valid_sharing
+    end
+    assay = assigns(:assay)
+    assert_equal [good_sop],assay.sops
+
+  end
+
 end
