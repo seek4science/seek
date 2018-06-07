@@ -18,6 +18,76 @@ each released minor version in order incrementally (i.e. 0.13.x -> 0.14.x ->
 Each version has a tag in mercurial, which has the format of *v* prefix
 followed by the version - e.g. v0.11.1, v0.13.2, v0.17.1
 
+## Steps to upgrade from 1.4.x to 1.5.x
+
+
+### Set RAILS_ENV
+
+**If upgrading a production instance of SEEK, remember to set the RAILS_ENV first**
+
+    export RAILS_ENV=production
+
+### Stopping services before upgrading
+
+    bundle exec rake seek:workers:stop
+    bundle exec rake sunspot:solr:stop
+
+### Updating from GitHub
+
+If you have an existing installation linked to our GitHub, you can fetch the
+files with:
+
+    git pull
+    git checkout v1.5.2
+
+### Updating using the tarball
+
+
+You can download the file from
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.5.2.tar.gz> You can
+unpack this file using:
+
+    tar zxvf seek-1.5.2.tar.gz
+    mv seek seek-previous
+    mv seek-1.5.2 seek
+    cd seek/
+
+and then copy across your existing filestore and database configuration file
+from your previous installation and continue with the upgrade steps. The
+database configuration file you would need to copy is _config/database.yml_,
+and the filestore is simply _filestore/_
+
+If you have a modified _config/sunspot.yml_ you will also need to copy that across.
+
+### Update RVM and Ruby
+
+    rvm get stable
+    rvm install $(cat .ruby-version) 
+
+### Doing the upgrade
+
+After updating the files, the following steps will update the database, gems,
+and other necessary changes. Note that seek:upgrade may take longer than usual if you have data stored that points to remote
+content.
+
+    cd . #this is to allow RVM to pick up the ruby and gemset changes
+    gem install bundler
+    bundle install --deployment
+    bundle exec rake seek:upgrade
+    bundle exec rake assets:precompile # this task will take a while
+    
+**Note**: During the upgrade, and items that previously were shared with _All registered users_ have had their permissions updated,
+and this permission has been transferred to its associated projects. An audit CSV file is created, tmp/all-users-policy-update-audit-<timestamp>.csv .
+This file contains a list of all the items affected, along with the contributor and project ids.    
+       
+
+### Restarting services
+
+    bundle exec rake sunspot:solr:start
+    bundle exec rake seek:workers:start  
+    
+---    
+
 ## Steps to upgrade from 1.3.x to 1.4.x
 
 
