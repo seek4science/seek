@@ -22,7 +22,7 @@ Major changes include:
     Most write abilities are now available through the API including creating Datafiles, SOPs, Models, 
     Investigation, Studies and Assays and linking them together. More details about the api can be found in the 
     [API Guide](/help/user-guide/api.html), with more technical details found in the [JSON API Overview](/tech/api/index.html) 
-  * Changes **DataFiles upload workflow**, along with better RightField template support. The flow has been changed such that the 
+  * Changes [**DataFiles upload workflow**](/help/user-guide/data-file-upload-wizard.html), along with better RightField template support. The flow has been changed such that the 
  file is registered before providing additional details. This allows information to be extracted and details automatically populated where
  possible. The supported templates are now provided as part of the templates generated for Sample Types, but will soon be available more widely.
   * DataFile metadata is now provided through a Wizard, split into logical steps, that can easily be stepped through.

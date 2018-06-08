@@ -2,7 +2,7 @@
 title: SEEK User Guide - Adding assets
 layout: page
 ---
-# Adding assets (data, models, SOPs, publications) to SEEK
+# Adding assets (Data, Models, SOPs, Presentations, Documents) to SEEK
 
 To add a data file to SEEK, select Create from the menu bar, and select the appropriate asset from the drop down menu.
 
@@ -21,11 +21,14 @@ SEEK will show a preview of the link
 ![add data 4](/images/user-guide/add_data_4.png){:.screenshot}
 
 
+If adding a Data file, you will now be presented with a series of steps. Please read the [Data file upload wizard](data-file-upload-wizard.html)
+
 Assets in SEEK can be described using a number of fields, for example:
 
 * [Title](general-attributes.html#title)
 * [Description](general-attributes.html#description)
 * [Projects](general-attributes.html#projects)
+* [Licenses](licenses.html)
 * [Sharing](general-attributes.html#sharing)
 * [Tags](general-attributes.html#tags)
 * [Attributions](general-attributes.html#attributions)
