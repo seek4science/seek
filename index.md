@@ -4,7 +4,7 @@ layout: page
 
 ## About FAIRDOM
 
-SEEK is being developed and funded as part of the [FAIRDOM](http://fair-dom.org) initiative. SEEK is a component of the FAIRDOM suite, which also include [openBIS](http://fair-dom.org/openbis).
+SEEK is being developed and funded as part of the [FAIRDOM](http://fair-dom.org) initiative. SEEK is a component of the FAIRDOM suite, which also includes [openBIS](http://fair-dom.org/openbis).
 
 ## About SEEK
 
