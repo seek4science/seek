@@ -15,9 +15,7 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| JSON Write API (Application Programming Interface) | Spring 2018  |
 | Further integration with openBIS, with improved metadata mappings | Summer 2018  |
-| Improved JERM templates and auto-extraction | Spring 2018 |
 | Metadata search and querying | Autumn 2018  |
 
 
@@ -33,6 +31,8 @@ You can find more details about each release in our [Change Logs](/tech/releases
 
 | Feature | SEEK version |
 | --- | --- | --- |
+| JSON Write API (Application Programming Interface) | 1.6  |
+| Improved JERM templates and auto-extraction | 1.6 |
 | JSON Read API (Application Programming Interface) | 1.5 |
 | JERM 2 Ontology and RDF updates | 1.5 |
 | Rails 4 upgrade | 1.4 |

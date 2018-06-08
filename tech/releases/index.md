@@ -30,8 +30,10 @@ Major changes include:
  a template.
   * Support for a new **Document** asset type. This is to represent general documents that do not fit as other asset types - such as
   reports or meeting minutes.     
-  * Ability to enable and provide **Terms and Conditions**, that need to be accepted as part of the registration process    
+  * Ability to enable and provide **Terms and Conditions**, that need to be accepted as part of the registration process
+  * Creating DOI's for individual items has been made clearer and easier to use.    
 
+There have also been many other bug fixes and small improvements.
 A full list of changes included in this release can be found in the [SEEK v1.6.0 release notes](release-notes-1.6.0.html).
  
 If you have any comments or feedback then please [Contact Us](/contacting-us.html)
