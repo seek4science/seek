@@ -16,10 +16,11 @@ They are expected to be added to SEEK in roughly the order they are presented he
 | Feature | Milestone date |
 | --- | --- |
 | Further integration with openBIS, with improved metadata mappings | Summer 2018  |
-| Metadata search and querying | Autumn 2018  |
+| Metadata search and querying | Winter 2018  |
 
+<br/>
 
-
+---
 
 
 ## Completed

@@ -15,14 +15,14 @@ Release date: _June 8th 2018_
 
 Major changes include:
 
-  * Interliking the [**ELIXIR Norwegian e-Infrastructure for Life Sciences (NeLS)**](https://nels.bioinfo.no/) with the SEEK platform. 
+  * Interlinking the [**ELIXIR Norwegian e-Infrastructure for Life Sciences (NeLS)**](https://nels.bioinfo.no/) with the SEEK platform. 
  This will provide NeLS and SEEK users with unprecedented opportunities for storing, sharing, 
  and archiving of data in ways that comply with the FAIR principles.
-  * Our second installment of our **JSON API**, in particular to include support for **writing** and submitting new entries in SEEK. 
+  * Our second installment of our [**JSON API**](/help/user-guide/api.html), in particular to include support for **writing** and submitting new entries in SEEK. 
     Most write abilities are now available through the API including creating Datafiles, SOPs, Models, 
     Investigation, Studies and Assays and linking them together. More details about the api can be found in the 
     [API Guide](/help/user-guide/api.html), with more technical details found in the [JSON API Overview](/tech/api/index.html) 
-  * Changes [**DataFiles upload workflow**](/help/user-guide/data-file-upload-wizard.html), along with better RightField template support. The flow has been changed such that the 
+  * Changes to the  [**DataFiles upload workflow**](/help/user-guide/data-file-upload-wizard.html), along with better RightField template support. The flow has been changed such that the 
  file is registered before providing additional details. This allows information to be extracted and details automatically populated where
  possible. The supported templates are now provided as part of the templates generated for Sample Types, but will soon be available more widely.
   * DataFile metadata is now provided through a Wizard, split into logical steps, that can easily be stepped through.
@@ -47,7 +47,7 @@ Bugfix release that includes:
   * Minor security fixes, following an external security review  (more details available later)
   * Image scaling fix - where some avatars were scaled down, and then expanded causing them to appear blurred.
 
-
+A full list of changes included in this release can be found in the [SEEK v1.5.2 release notes](release-notes-1.5.2.html).
   
 
 ## Version 1.5.1
@@ -59,6 +59,8 @@ Bugfix patch release that in particular fixes:
   * An error that prevented people entries being deleted in some cases.
   * An error turning exception emails on or off in the admin settings
   * An error that prevented a Programme submission being rejected
+  
+A full list of changes included in this release can be found in the [SEEK v1.5.1 release notes](release-notes-1.5.1.html).
   
 
 ## Version 1.5.0
