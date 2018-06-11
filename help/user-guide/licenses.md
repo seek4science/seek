@@ -100,7 +100,7 @@ These additional licenses are also available to be used in SEEK.
         <td>Open Government Licence 3.0 (United Kingdom)</td><td><a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/</a></td>
     </tr>
     <tr>
-        <td>Open Government License 2.0 (Canada)</td><td><a href="http://data.gc.ca/eng/open-government-licence-canada" target="_blank">http://data.gc.ca/eng/open-government-licence-canada</a></td>
+        <td>Open Government License 2.0 (Canada)</td><td><a href="https://open.canada.ca/en/open-government-licence-canada" target="_blank">http://data.gc.ca/eng/open-government-licence-canada</a></td>
     </tr>
     <tr>
         <td>Open Software License 3.0</td><td><a href="http://www.opensource.org/licenses/OSL-3.0" target="_blank">http://www.opensource.org/licenses/OSL-3.0</a></td>
