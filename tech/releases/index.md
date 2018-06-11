@@ -22,16 +22,16 @@ Major changes include:
     Most write abilities are now available through the API including creating Datafiles, SOPs, Models, 
     Investigation, Studies and Assays and linking them together. More details about the api can be found in the 
     [API Guide](/help/user-guide/api.html), with more technical details found in the [JSON API Overview](/tech/api/index.html) 
-  * Changes to the  [**DataFiles upload workflow**](/help/user-guide/data-file-upload-wizard.html), along with better RightField template support. The flow has been changed such that the 
+  * Changes to the  **DataFiles upload workflow**, along with better RightField template support. The flow has been changed such that the 
  file is registered before providing additional details. This allows information to be extracted and details automatically populated where
  possible. The supported templates are now provided as part of the templates generated for Sample Types, but will soon be available more widely.
-  * DataFile metadata is now provided through a Wizard, split into logical steps, that can easily be stepped through.
+  * DataFile metadata is now provided through a [**Wizard**](/help/user-guide/data-file-upload-wizard.html), split into logical steps, that can easily be stepped through.
   * Assays can be created and linked to the DataFile being submitted as part of the same process. This can either be manual or from the details provided within
  a template.
   * Support for a new **Document** asset type. This is to represent general documents that do not fit as other asset types - such as
   reports or meeting minutes.     
   * Ability to enable and provide **Terms and Conditions**, that need to be accepted as part of the registration process
-  * Creating DOI's for individual items has been made clearer and easier to use.    
+  * Creating **DOI's** for individual items has been made clearer and easier to use.    
 
 There have also been many other bug fixes and small improvements.
 A full list of changes included in this release can be found in the [SEEK v1.6.0 release notes](release-notes-1.6.0.html).
