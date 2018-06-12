@@ -149,7 +149,6 @@ class DatasetTest < ActiveSupport::TestCase
   #   end
 
   test 'registered?' do
-    blob = openbis_linked_content_blob('20160210130454955-23', @openbis_endpoint)
     dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
     dataset2 = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160215111736723-31')
 

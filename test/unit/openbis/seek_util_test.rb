@@ -9,10 +9,11 @@ class SeekUtilTest < ActiveSupport::TestCase
     @endpoint = Factory(:openbis_endpoint)
     @endpoint.assay_types = ['TZ_FAIR_ASSAY'] # EXPERIMENTAL_STEP
     @util = Seek::Openbis::SeekUtil.new
-    @study = Factory :study # studies(:junk_study)
+    @creator = Factory(:person, project:@endpoint.project)
+    @study = Factory :study, contributor: @creator
     @zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
     @experiment = Seek::Openbis::Experiment.new(@endpoint, '20171121152132641-51')
-    @creator = Factory(:person)
+    User.current_user = @creator.user
   end
 
   test 'setup work' do
@@ -28,7 +29,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'creates valid study with external_asset that can be saved' do
-    investigation = Factory(:investigation)
+    investigation = Factory(:investigation, contributor: @creator)
     assert investigation.save
 
     params = { investigation_id: investigation.id }
@@ -63,10 +64,13 @@ class SeekUtilTest < ActiveSupport::TestCase
     assay = @util.createObisAssay(params, @creator, asset)
 
     assert assay.valid?
+    assert_equal assay.contributor,User.current_user.person
+    assert assay.can_manage?
+    assert assay.can_edit?
 
     assert_difference('Assay.count') do
       assert_difference('ExternalAsset.count') do
-        assay.save!
+          assay.save!
       end
     end
 
@@ -396,7 +400,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   test 'sync_external_asset links datasets to assay if follow links' do
     refute @zample.dataset_ids.empty?
 
-    assay = Factory :assay
+    assay = Factory :assay, contributor: @creator
 
     assert assay.data_files.empty?
 
@@ -461,7 +465,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     refute @experiment.dataset_ids.empty?
     refute @experiment.sample_ids.empty?
 
-    study = Factory :study
+    study = Factory :study, contributor: @creator
 
     assert study.assays.empty?
     assert study.related_data_files.empty?
@@ -521,7 +525,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   test 'follow_dependent links datasets to assay' do
     refute @zample.dataset_ids.empty?
 
-    assay = Factory :assay
+    assay = Factory :assay, contributor: @creator
 
     assert assay.data_files.empty?
 
@@ -541,9 +545,9 @@ class SeekUtilTest < ActiveSupport::TestCase
   ## --------- linking datasets to assay ---------- ##
 
   test 'associate_data_sets links datasets with assay creating new datafiles if necessary' do
-    assay = Factory :assay
+    assay = Factory :assay, contributor:@creator
 
-    df0 = Factory :data_file
+    df0 = Factory :data_file, contributor:@creator
     assay.associate(df0)
     assert df0.persisted?
     assert_equal 1, assay.data_files.length
@@ -551,7 +555,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(['20171002172401546-38', '20171002190934144-40', '20171004182824553-41'])
     assert_equal 3, datasets.length
 
-    df1 = @util.createObisDataFile({}, @user, OpenbisExternalAsset.build(datasets[0]))
+    df1 = @util.createObisDataFile({}, @creator, OpenbisExternalAsset.build(datasets[0]))
     assert df1.save
 
     reg_info = nil
@@ -572,9 +576,9 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'associate_data_sets_ids links datasets with assay creating new datafiles if necessary' do
-    assay = Factory :assay
+    assay = Factory :assay, contributor:@creator
 
-    df0 = Factory :data_file
+    df0 = Factory :data_file, contributor:@creator
     assay.associate(df0)
     assert df0.persisted?
     assert_equal 1, assay.data_files.length
@@ -601,7 +605,7 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   ## --------- linking assays to study ---------- ##
   test 'associate_zamples_as_assays links zamples as new assays with study' do
-    study = Factory :study
+    study = Factory :study, contributor: @creator
 
     assert study.assays.empty?
 
@@ -628,7 +632,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'associate_zamples_as_assays links datafiles to assays under the study if selected so' do
-    study = Factory :study
+    study = Factory :study, contributor:@creator
 
     assert study.assays.empty?
 
@@ -662,7 +666,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'associate_zamples_as_assays reports issues if zample already registered but not as assay' do
-    study = Factory :study
+    study = Factory :study, contributor: @creator
 
     assert study.assays.empty?
 
@@ -695,15 +699,15 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'associate_zamples_as_assays reports issues if zample already registered under different study' do
-    study = Factory :study
+    study = Factory :study, contributor: @creator
 
     assert study.assays.empty?
 
     zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(['20171002172111346-37', '20171002172639055-39'])
     assert_equal 2, zamples.length
 
-    study2 = Factory :study
-    assay2 = Factory :assay
+    study2 = Factory :study, contributor: @creator
+    assay2 = Factory :assay, contributor: @creator
     assay2.study = study2
 
     ea = OpenbisExternalAsset.find_or_create_by_entity(zamples[0])
@@ -742,14 +746,14 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'associate_zamples_as_assays sets sync_options for new assays and leaves existing untouched' do
-    study = Factory :study
+    study = Factory :study, contributor: @creator
 
     assert study.assays.empty?
 
     zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(['20171002172111346-37', '20171002172639055-39'])
     assert_equal 2, zamples.length
 
-    assay2 = Factory :assay
+    assay2 = Factory :assay, contributor: @creator
     assay2.study = study
 
     ea = OpenbisExternalAsset.find_or_create_by_entity(zamples[0])
@@ -783,7 +787,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   ## --------- follow_study_dependent_assays ---------- ##
 
   test 'follow_study_dependent_assays registers assays if set so' do
-    study = Factory :study
+    study = Factory :study, contributor: @creator
     assert study.assays.empty?
     refute @experiment.sample_ids.empty?
 
@@ -810,7 +814,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'follow_study_dependent_assays registers selected assays if set so' do
-    study = Factory :study
+    study = Factory :study, contributor: @creator
     assert study.assays.empty?
     assert(@experiment.sample_ids.length > 1)
 
@@ -826,7 +830,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'follow_study_dependent_assays registers assays with unique titles' do
-    study = Factory :study
+    study = Factory :study, contributor: @creator
     assert study.assays.empty?
     assert @experiment.sample_ids.size > 1
 
@@ -847,7 +851,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   ## --------- follow_study_dependent_datafiles ---------- ##
 
   test 'follow_study_dependent_datafiles registers datafiles under fake assay if said so' do
-    study = Factory :study
+    study = Factory :study, contributor: @creator
     assert study.assays.empty?
     assert study.related_data_files.empty?
     refute @experiment.dataset_ids.empty?
@@ -877,7 +881,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'follow_study_dependent_datafiles registers selected datafiles under fake assay if said so' do
-    study = Factory :study
+    study = Factory :study, contributor: @creator
     assert study.assays.empty?
     assert study.related_data_files.empty?
     refute @experiment.dataset_ids.empty?
@@ -894,7 +898,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'follow_study_dependent_datafiles registers datafiles with unique names' do
-    study = Factory :study
+    study = Factory :study, contributor: @creator
     assert study.assays.empty?
     assert study.related_data_files.empty?
     assert @experiment.dataset_ids.size > 1
@@ -918,7 +922,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   test 'follow assay registers all dependent datasets if set so' do
     # puts @zample.dataset_ids
 
-    assay = Factory :assay
+    assay = Factory :assay, contributor: @creator
     es = OpenbisExternalAsset.find_or_create_by_entity(@zample)
     es.sync_options = { link_datasets: '1' }
     assay.external_asset = es
@@ -937,7 +941,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   test 'follow assay registers selected detasets' do
     # puts @zample.dataset_ids
 
-    assay = Factory :assay
+    assay = Factory :assay, contributor: @creator
     es = OpenbisExternalAsset.find_or_create_by_entity(@zample)
     es.sync_options = { linked_datasets: [@zample.dataset_ids[1]] }
     assay.external_asset = es
@@ -953,7 +957,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'follow assay registers dependent datasets with unique names' do
-    assay = Factory :assay
+    assay = Factory :assay, contributor: @creator
     es = OpenbisExternalAsset.find_or_create_by_entity(@zample)
     es.sync_options = { link_datasets: '1' }
     assay.external_asset = es
@@ -1078,13 +1082,13 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   test 'fake_file_assay gives first assay of the openbis name' do
     disable_authorization_checks do
-      study = Factory :study
-      assay1 = Factory :assay
+      study = Factory :study, contributor: @creator
+      assay1 = Factory :assay, contributor: @creator
       assay1.title = 'Cos'
       assay1.study = study
       assert assay1.save
 
-      assay2 = Factory :assay
+      assay2 = Factory :assay, contributor: @creator
       assay2.title = 'OpenBIS FILES'
       assay2.study = study
       assert assay2.save
@@ -1094,7 +1098,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'fake_file_assay creates assay of the openbis name if missing' do
-    study = Factory :study
+    study = Factory :study, contributor: @creator
     assert study.assays.empty?
     assay = @util.fake_file_assay(study)
 

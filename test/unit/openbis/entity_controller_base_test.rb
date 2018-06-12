@@ -12,8 +12,10 @@ class EntityControllerBaseTest < ActionController::TestCase
 
   def setup
     mock_openbis_calls
+    Factory :experimental_assay_class
     @controller = BaseTest.new
     @user = Factory(:project_administrator)
+    User.current_user = @user.user
     @project = @user.projects.first
     @endpoint = Factory(:openbis_endpoint, project: @project)
   end
@@ -36,9 +38,9 @@ class EntityControllerBaseTest < ActionController::TestCase
     linked = @controller.datasets_linked_to datafiles[0]
     assert_equal [], linked
 
-    normaldf = Factory :data_file
+    normaldf = Factory :data_file, contributor:@user
 
-    assay = Factory :assay
+    assay = Factory :assay, contributor:@user
 
     assay.data_files << normaldf
     assay.data_files << datafiles[0]
@@ -62,7 +64,7 @@ class EntityControllerBaseTest < ActionController::TestCase
 
     assert_equal [], @controller.zamples_linked_to(nil)
 
-    normalas = Factory :assay
+    normalas = Factory(:assay, contributor:@user)
     study = normalas.study
 
     assert_equal [], @controller.zamples_linked_to(normalas)

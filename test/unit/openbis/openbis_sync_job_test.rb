@@ -7,10 +7,11 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     mock_openbis_calls
 
     @batch_size = 3
-    # @endpoint = Factory(:openbis_endpoint)
     @endpoint = Factory(:openbis_endpoint, refresh_period_mins: 60)
     @job = OpenbisSyncJob.new(@endpoint, @batch_size)
     Delayed::Job.destroy_all # avoids jobs created from the after_create callback, this is tested for OpenbisEndpoint
+    @person = Factory(:person, project:@endpoint.project)
+    User.current_user = @person.user
   end
 
   test 'setup' do
@@ -279,7 +280,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
   end
 
   test 'perfom_job does nothing on synchronized assets' do
-    assay = Factory :assay
+    assay = Factory :assay, contributor:@person
     assert assay.data_files.empty?
 
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
@@ -300,8 +301,8 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
   end
 
   test 'perfom_job refresh content and dependencies on non-synchronized assets' do
-    assay = Factory :assay
-    assert assay.data_files.empty?
+    assay = Factory :assay, contributor:@person
+    assert_empty assay.data_files
 
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
     refute zample.dataset_ids.empty?
@@ -313,6 +314,8 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
 
     assert asset.save
 
+    assert assay.can_edit?
+
     @job.perform_job(asset)
 
     asset.reload
@@ -320,7 +323,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
 
     assert asset.synchronized?
     assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
-    refute assay.data_files.empty?
+    refute_empty assay.data_files
     assert_equal zample.dataset_ids.length, assay.data_files.length
   end
 
@@ -353,7 +356,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
   end
 
   test 'perfom_job always update mod stamp even if errors' do
-    assay = Factory :assay
+    assay = Factory :assay, contributor:@person
 
     # normal sample
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
@@ -397,7 +400,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
   end
 
   test 'perfom_job sets fatal if failures larger than threshold' do
-    assay = Factory :assay
+    assay = Factory :assay, contributor:@person
 
     # normal sample
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
@@ -460,7 +463,4 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     end
   end
 
-  #test 'seek_util created only once' do
-  #  assert_same @job.seek_util, @job.seek_util
-  #end
 end

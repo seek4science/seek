@@ -92,12 +92,6 @@ def openbis_linked_data_file(user = User.current_user, endpoint = nil)
   end
 end
 
-#
-# def openbis_linked_content_blob(perm_id = '20160210130454955-23', endpoint = nil)
-#  endpoint ||= Factory(:openbis_endpoint)
-#  Factory(:url_content_blob, make_local_copy: false, url: "openbis:#{endpoint.id}:dataset:#{perm_id}")
-# end
-
 module Fairdom
   module OpenbisApi
     module ExplicitMockedQuery

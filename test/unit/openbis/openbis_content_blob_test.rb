@@ -4,6 +4,7 @@ require 'openbis_test_helper'
 # ContentBlob related tests specific to OpenBIS
 class OpenbisContentBlobTest < ActiveSupport::TestCase
   def setup
+    User.current_user = Factory(:user)
     mock_openbis_calls
   end
 
