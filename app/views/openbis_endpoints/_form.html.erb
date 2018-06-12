@@ -34,6 +34,17 @@
       <%= f.select :refresh_period_mins,(1..24).collect{|x| [x,x*60]},{},class:"form-control" %>
     </div>
 
+    <div class="form-group">
+      <label>Study like types</label><span class="required">*</span>
+      <%= f.text_field :study_types, :class=>"form-control login-credential"-%>
+    </div>
+
+    <div class="form-group">
+      <label>Assay like types</label><span class="required">*</span>
+      <%= f.text_field :assay_types, :class=>"form-control login-credential"-%>
+    </div>
+
+
     <div id="check-result">
 
     </div>
@@ -63,6 +74,7 @@
 <script>
 
   function testEndpoint() {
+      console.log("Test endpoint",$j('input.login-credential').serialize());
     $j.ajax('<%= test_endpoint_project_openbis_endpoints_path(@project) %>', {
           data: $j('input.login-credential').serialize(),
           success: function (data) {
@@ -84,6 +96,7 @@
   }
 
   function fetchSpaces() {
+      console.log("Fetch spacis",$j('input.login-credential').serialize());
     $j.ajax('<%= fetch_spaces_project_openbis_endpoints_path(@project) %>', {
       data: $j('input.login-credential').serialize(),
       success: function (html) {

@@ -2,15 +2,22 @@ module Seek
   module Openbis
     # Represents an openBIS DataSet entity
     class Dataset < Entity
-      attr_reader :dataset_type, :experiment_id, :sample_ids, :properties
+      attr_reader :dataset_type, :experiment_id, :sample_ids
 
       def populate_from_json(json)
-        @properties = json['properties']
+        @properties = json['properties'] || {}
         @properties.delete_if { |key, _value| key == '@type' }
         @dataset_type = json['dataset_type']
         @experiment_id = json['experiment']
-        @sample_ids = json['samples'].last
+        @sample_ids = json['samples'] ? json['samples'].last : nil
+        @dataset_files = construct_files_from_json(json['dataset_files']) if json['dataset_files']
         super(json)
+      end
+
+      def construct_files_from_json(files_json)
+        files_json
+          .map { |json| Seek::Openbis::DatasetFile.new(openbis_endpoint).populate_from_json(json) }
+          .sort_by(&:path)
       end
 
       def dataset_type_text
@@ -27,6 +34,24 @@ module Seek
         dataset_type['code']
       end
 
+      def type_code
+        dataset_type_code
+      end
+
+      def type_description
+        dataset_type_description
+      end
+
+      def type_text
+        dataset_type_text
+      end
+
+      def prefetch_files
+        @dataset_files = Seek::Openbis::DatasetFile.new(openbis_endpoint).find_by_dataset_perm_id(perm_id)
+        json['dataset_files'] = @dataset_files.map(&:json)
+        @dataset_files
+      end
+
       def dataset_files
         @dataset_files ||= Seek::Openbis::DatasetFile.new(openbis_endpoint).find_by_dataset_perm_id(perm_id)
       end
@@ -35,8 +60,6 @@ module Seek
         dataset_files.reject(&:is_directory)
       end
 
-      # FIMXE: we can speed things up and get this directly from the first API call rather than
-      #   fetching the datasets, only getting the datasets on demand
       def dataset_file_count
         dataset_files_no_directories.count
       end
@@ -73,26 +96,26 @@ module Seek
         Rails.logger.info("Deleting #{dest_folder}")
       end
 
-      def create_seek_datafile
-        raise 'Already registered' if registered?
-        df = DataFile.new(projects: [openbis_endpoint.project], title: "OpenBIS #{perm_id}",
-                          license: openbis_endpoint.project.default_license)
-        if df.save
-          df.content_blob = ContentBlob.create(url: content_blob_uri, make_local_copy: false,
-                                               external_link: false, original_filename: "openbis-#{perm_id}")
-        end
-        df
-      end
+      # That is original Stuart's code that was based on purely on ContentBlob
+      # Commented out not deleted in case it is needed for migration from first implementation to new one
 
-      def registered?
-        ContentBlob.where(url: content_blob_uri).any?
-      end
+      #       def create_seek_datafile
+      #         raise 'Already registered' if registered?
+      #         df = DataFile.new(projects: [openbis_endpoint.project], title: "OpenBIS #{perm_id}",
+      #                           license: openbis_endpoint.project.default_license)
+      #         if df.save
+      #           df.content_blob = ContentBlob.create(url: content_blob_uri, make_local_copy: false,
+      #                                                external_link: false, original_filename: "openbis-#{perm_id}")
+      #         end
+      #         df
+      #       end
+      #
+      #
+      #       def content_blob_uri
+      #         "openbis:#{openbis_endpoint.id}:dataset:#{perm_id}"
+      #       end
 
       private
-
-      def content_blob_uri
-        "openbis:#{openbis_endpoint.id}:dataset:#{perm_id}"
-      end
     end
   end
 end

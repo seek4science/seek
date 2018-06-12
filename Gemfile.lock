@@ -90,6 +90,14 @@ GIT
       json (~> 1.8)
       rest-client (~> 1.7)
 
+GIT
+  remote: https://github.com/tzielins/openseek-api-gem
+  revision: 361acee4d223dd1229b15d433beb2cd33124c74c
+  ref: 361acee4d223dd1229b15d433beb2cd33124c74c
+  specs:
+    openseek-api (0.17.1)
+      terrapin
+
 GEM
   remote: https://rubygems.org/
   remote: https://rails-assets.org/
@@ -442,8 +450,6 @@ GEM
       pyu-ruby-sasl (~> 0.0.3.2)
       rubyntlm (~> 0.3.4)
     open4 (1.3.0)
-    openseek-api (0.11.1)
-      terrapin (~> 0.6)
     options (2.3.2)
     parser (2.4.0.0)
       ast (~> 2.2)
@@ -840,6 +846,7 @@ DEPENDENCIES
   libxml-ruby (= 2.8.0)
   linkeddata
   lograge
+  loofah
   magic_lamp
   mechanize
   metainspector
@@ -852,7 +859,7 @@ DEPENDENCIES
   nokogiri (~> 1.8.1)
   omniauth (~> 1.3.1)
   omniauth-ldap (~> 1.0.5)
-  openseek-api
+  openseek-api!
   passenger
   pg
   pothoven-attachment_fu

@@ -31,7 +31,7 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
   end
 
   def follow_on_job?
-    true && endpoint #don't follow on if the endpoint no longer exists
+    Seek::Config.openbis_enabled && endpoint #don't follow on if the endpoint no longer exists
   end
 
   # overidden to ignore_locked false by default
@@ -45,6 +45,7 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
   end
 
   def self.create_initial_jobs
+    return unless Seek::Config.openbis_enabled
     OpenbisEndpoint.all.each(&:create_refresh_metadata_job)
   end
 
