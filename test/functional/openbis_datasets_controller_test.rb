@@ -2,7 +2,7 @@ require 'test_helper'
 require 'openbis_test_helper'
 
 class OpenbisDatasetsControllerTest < ActionController::TestCase
-  #fixtures :all
+
   include AuthenticatedTestHelper
 
   def setup
@@ -123,7 +123,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
   test 'register registers new DataFile under Assay if passed' do
     login_as(@user)
 
-    assay = Factory :assay
+    assay = Factory :assay, contributor: @user
 
     post :register, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id,
                     data_file: { assay_ids: assay.id }
@@ -196,7 +196,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
   test 'batch register multiple DataSets' do
     login_as(@user)
-    assay = Factory :assay
+    assay = Factory :assay, contributor: @user
 
     sync_options = {}
     batch_ids = ['20160210130454955-23', '20160215111736723-31']
@@ -220,7 +220,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
   # there was a bug and all were named same, lets have test for it
   test 'batch register independently names them' do
     login_as(@user)
-    assay = Factory :assay
+    assay = Factory :assay, contributor: @user
 
     sync_options = {}
     batch_ids = ['20160210130454955-23', '20160215111736723-31']
