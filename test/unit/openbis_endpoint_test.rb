@@ -192,12 +192,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     User.with_current_user(pa.user) do
       assert ep.can_delete?
     end
-
-    refute_nil openbis_linked_data_file(person, ep)
-    refute ep.can_delete?(pa.user)
-    User.with_current_user(pa.user) do
-      refute ep.can_delete?
-    end
   end
 
   test 'available spaces' do

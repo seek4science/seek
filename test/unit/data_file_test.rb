@@ -323,28 +323,30 @@ class DataFileTest < ActiveSupport::TestCase
 
   test 'openbis?' do
     mock_openbis_calls
+    User.with_current_user(Factory(:user)) do
+      stub_request(:head, 'http://www.abc.com').to_return(
+          headers: { content_length: 500, content_type: 'text/plain' }, status: 200
+      )
 
-    stub_request(:head, 'http://www.abc.com').to_return(
-      headers: { content_length: 500, content_type: 'text/plain' }, status: 200
-    )
+      refute Factory(:data_file).openbis?
+      refute Factory(:data_file, content_blob: Factory(:url_content_blob)).openbis?
 
-    refute Factory(:data_file).openbis?
-    refute Factory(:data_file, content_blob: Factory(:url_content_blob)).openbis?
-
-    # old openbis integration entry
-    refute Factory(:data_file, content_blob: Factory(:url_content_blob, url: 'openbis:1:dataset:2222')).openbis?
-    assert openbis_linked_data_file.openbis?
+      # old openbis integration entry
+      refute Factory(:data_file, content_blob: Factory(:url_content_blob, url: 'openbis:1:dataset:2222')).openbis?
+      assert openbis_linked_data_file.openbis?
+    end
   end
 
   test 'openbis_dataset' do
     mock_openbis_calls
+    User.with_current_user(Factory(:user)) do
+      assert_nil Factory(:data_file).openbis_dataset
+      ds = openbis_linked_data_file.openbis_dataset
 
-    assert_nil Factory(:data_file).openbis_dataset
-    ds = openbis_linked_data_file.openbis_dataset
-
-    assert ds
-    assert ds.is_a? Seek::Openbis::Dataset
-    assert ds.perm_id
+      assert ds
+      assert ds.is_a? Seek::Openbis::Dataset
+      assert ds.perm_id
+    end
   end
 
   # DataFile no longers knows how to create openbis, it is other way arround
@@ -390,20 +392,20 @@ class DataFileTest < ActiveSupport::TestCase
 
   test 'openbis download restricted' do
     mock_openbis_calls
-    df = openbis_linked_data_file
-    # assert df.content_blob.openbis_dataset.size < 600.kilobytes
-    # assert df.content_blob.openbis_dataset.size > 100.kilobytes
-    assert df.external_asset.content.size < 600.kilobytes
-    assert df.external_asset.content.size > 100.kilobytes
+    User.with_current_user(Factory(:user)) do
+      df = openbis_linked_data_file
+      assert df.external_asset.content.size < 600.kilobytes
+      assert df.external_asset.content.size > 100.kilobytes
 
-    with_config_value :openbis_download_limit, 100.kilobytes do
-      assert df.openbis_size_download_restricted?
-      assert df.download_disabled?
-    end
+      with_config_value :openbis_download_limit, 100.kilobytes do
+        assert df.openbis_size_download_restricted?
+        assert df.download_disabled?
+      end
 
-    with_config_value :openbis_download_limit, 600.kilobytes do
-      refute df.openbis_size_download_restricted?
-      refute df.download_disabled?
+      with_config_value :openbis_download_limit, 600.kilobytes do
+        refute df.openbis_size_download_restricted?
+        refute df.download_disabled?
+      end
     end
   end
 
@@ -468,11 +470,6 @@ class DataFileTest < ActiveSupport::TestCase
 
       assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
     end
-
-    assert_equal [aa1.assay], s1.assays
-    assert_equal [aa1.assay], s2.assays
-
-    assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
   end
 
   test 'can copy assay associations for selected assay IDs' do
