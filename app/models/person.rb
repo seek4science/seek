@@ -351,7 +351,7 @@ class Person < ActiveRecord::Base
     person = user.try(:person)
     return false unless user && person
     is_proj_or_prog_admin = person.is_project_administrator_of_any_project? || person.is_programme_administrator_of_any_programme?
-    user.is_admin? || (is_proj_or_prog_admin && (is_admin? || self != publication_authorsperson))
+    user.is_admin? || (is_proj_or_prog_admin && (is_admin? || self != person))
   end
 
   def can_view?(user = User.current_user)
