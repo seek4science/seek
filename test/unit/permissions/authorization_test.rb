@@ -682,25 +682,13 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert_equal false, Seek::Permissions::Authorization.is_authorized?("view",df,nil)
   end
 
-  private 
-
-  def actions
-    [:view, :edit, :download, :delete, :manage]
-  end
-
-  # To save me re-writing lots of tests. Code copied from authorization.rb
-  # Mimics how authorized_by_policy method used to work, but with my changes.
-  def temp_authorized_by_policy?(_policy, thing, action, user, _not_used_2)
-    Seek::Permissions::Authorization.send(:authorized_by_policy?, action, thing,user)
-  end
-
   test 'all users scope overrides more restrictive permissions' do
     person = Factory(:person)
 
     user = person.user
 
     sop = Factory(:sop, policy: Factory(:public_policy, permissions: [
-      Factory(:permission, contributor: person, access_type: Policy::NO_ACCESS)
+        Factory(:permission, contributor: person, access_type: Policy::NO_ACCESS)
     ]))
     assert sop.can_view?(nil)
     assert sop.can_download?(nil)
@@ -711,8 +699,8 @@ class AuthorizationTest < ActiveSupport::TestCase
     user2 = person2.user
 
     sop = Factory(:sop, policy: Factory(:publicly_viewable_policy, permissions: [
-      Factory(:permission, contributor: person, access_type: Policy::NO_ACCESS),
-      Factory(:permission, contributor: person2, access_type: Policy::ACCESSIBLE)
+        Factory(:permission, contributor: person, access_type: Policy::NO_ACCESS),
+        Factory(:permission, contributor: person2, access_type: Policy::ACCESSIBLE)
     ]))
 
     assert sop.can_view?(nil)
@@ -774,6 +762,18 @@ class AuthorizationTest < ActiveSupport::TestCase
     User.with_current_user(person.user) do
       assert public_item.can_view?
     end
+  end
+
+  private 
+
+  def actions
+    [:view, :edit, :download, :delete, :manage]
+  end
+
+  # To save me re-writing lots of tests. Code copied from authorization.rb
+  # Mimics how authorized_by_policy method used to work, but with my changes.
+  def temp_authorized_by_policy?(_policy, thing, action, user, _not_used_2)
+    Seek::Permissions::Authorization.send(:authorized_by_policy?, action, thing,user)
   end
 
   def temp_get_group_permissions(policy)
