@@ -1165,7 +1165,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'publication authors updated with name when person deleted' do
-    person = Factory(:person, first_name: "Fred", last_name: "Bloggs")
+    person = Factory(:person, first_name: "Zak", last_name: "Bloggs")
     pub1 = Factory(:publication, publication_authors:[Factory(:publication_author, person:person, last_name:nil, first_name:nil)])
     pub2 = Factory(:publication, publication_authors:[Factory(:publication_author)])
     pub3 = Factory(:publication, publication_authors:[Factory(:publication_author,person:person),Factory(:publication_author,person:Factory(:person))])
@@ -1182,17 +1182,17 @@ class PersonTest < ActiveSupport::TestCase
     refute_nil pub2.publication_authors.first.last_name
     assert_nil pub2.publication_authors.first.person
 
-    refute_nil pub3.publication_authors[0].first_name
-    refute_nil pub3.publication_authors[0].last_name
-    refute_equal "Fred",pub3.publication_authors[0].first_name
-    refute_equal "Bloggs",pub3.publication_authors[0].last_name
-    refute_nil pub3.publication_authors[0].person
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[0].first_name
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[0].last_name
+    refute_equal "Zak",pub3.publication_authors.sort_by(&:first_name)[0].first_name
+    refute_equal "Bloggs",pub3.publication_authors.sort_by(&:first_name)[0].last_name
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[0].person
 
-    refute_nil pub3.publication_authors[1].first_name
-    refute_nil pub3.publication_authors[1].last_name
-    refute_equal "Fred",pub3.publication_authors[1].first_name
-    refute_equal "Bloggs",pub3.publication_authors[1].last_name
-    refute_nil pub3.publication_authors[1].person
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[1].first_name
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[1].last_name
+    refute_equal "Zak",pub3.publication_authors.sort_by(&:first_name)[1].first_name
+    refute_equal "Bloggs",pub3.publication_authors.sort_by(&:first_name)[1].last_name
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[1].person
 
     disable_authorization_checks{person.destroy}
 
@@ -1207,7 +1207,7 @@ class PersonTest < ActiveSupport::TestCase
     refute_nil pub1.publication_authors.first.first_name
     refute_nil pub1.publication_authors.first.last_name
     assert_nil pub1.publication_authors.first.person
-    assert_equal "Fred",pub1.publication_authors.first.first_name
+    assert_equal "Zak",pub1.publication_authors.first.first_name
     assert_equal "Bloggs",pub1.publication_authors.first.last_name
 
     #unaffected
@@ -1216,18 +1216,18 @@ class PersonTest < ActiveSupport::TestCase
     assert_nil pub2.publication_authors.first.person
 
 
-    #only first person affected
-    refute_nil pub3.publication_authors[0].first_name
-    refute_nil pub3.publication_authors[0].last_name
-    assert_equal "Fred",pub3.publication_authors[0].first_name
-    assert_equal "Bloggs",pub3.publication_authors[0].last_name
-    assert_nil pub3.publication_authors[0].person
-
+    #only one person affected, the last after sorting
     refute_nil pub3.publication_authors[1].first_name
     refute_nil pub3.publication_authors[1].last_name
-    refute_equal "Fred",pub3.publication_authors[1].first_name
-    refute_equal "Bloggs",pub3.publication_authors[1].last_name
-    refute_nil pub3.publication_authors[1].person
+    assert_equal "Zak",pub3.publication_authors.sort_by(&:first_name)[1].first_name
+    assert_equal "Bloggs",pub3.publication_authors.sort_by(&:first_name)[1].last_name
+    assert_nil pub3.publication_authors.sort_by(&:first_name)[1].person
+
+    refute_nil pub3.publication_authors[0].first_name
+    refute_nil pub3.publication_authors[0].last_name
+    refute_equal "Zak",pub3.publication_authors.sort_by(&:first_name)[0].first_name
+    refute_equal "Bloggs",pub3.publication_authors.sort_by(&:first_name)[0].last_name
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[0].person
 
   end
 end
