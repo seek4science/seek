@@ -764,6 +764,65 @@ class AuthorizationTest < ActiveSupport::TestCase
     end
   end
 
+  test 'programme permissions' do
+    programme = Factory(:programme)
+
+    project1 = Factory(:project, programme: programme)
+    project2 = Factory(:project, programme: programme)
+    project3 = Factory(:project)
+
+    person1 = Factory(:person, project: project1)
+    person2 = Factory(:person, project: project2)
+    person3 = Factory(:person, project: project3)
+
+    sop = Factory(:sop, contributor: person1, policy: Factory(:private_policy))
+    sop.reload
+
+    assert sop.can_view?(person1.user)
+    refute sop.can_view?(person2.user)
+    refute sop.can_view?(person3.user)
+
+    sop.policy.permissions.create!(contributor: programme, access_type: Policy::ACCESSIBLE)
+    sop = Sop.find(sop.id) # HAve to do this to clear authorization "cache"
+
+    assert sop.can_view?(person1.user)
+    assert sop.can_view?(person2.user)
+    refute sop.can_view?(person3.user)
+  end
+
+  test 'programme permissions precedence' do
+    programme = Factory(:programme)
+
+    project1 = Factory(:project, programme: programme)
+    project2 = Factory(:project, programme: programme)
+    project3 = Factory(:project)
+
+    person1 = Factory(:person, project: project1)
+    person2 = Factory(:person, project: project2)
+    person3 = Factory(:person, project: project3)
+
+    sop = Factory(:sop, contributor: person1, policy: Factory(:private_policy))
+    sop.policy.permissions.create!(contributor: programme, access_type: Policy::VISIBLE)
+    sop.reload
+
+    assert sop.can_view?(person1.user)
+    assert sop.can_view?(person2.user)
+    refute sop.can_view?(person3.user)
+    assert sop.can_download?(person1.user)
+    refute sop.can_download?(person2.user)
+    refute sop.can_download?(person3.user)
+
+    sop.policy.permissions.create!(contributor: project2, access_type: Policy::ACCESSIBLE)
+    sop = Sop.find(sop.id) # HAve to do this to clear authorization "cache"
+
+    assert sop.can_view?(person1.user)
+    assert sop.can_view?(person2.user)
+    refute sop.can_view?(person3.user)
+    assert sop.can_download?(person1.user)
+    assert sop.can_download?(person2.user)
+    refute sop.can_download?(person3.user)
+  end
+
   private 
 
   def actions
