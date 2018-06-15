@@ -128,10 +128,7 @@ module Seek
           if c == 0 && !last_asset_id.nil?
             AuthLookupUpdateJob.new.add_items_to_queue User.find_by_id(user_id)
           end
-
-          # if the count is wrong, attempt to clean out entries that do no match existing asset ids, which is the most likely cause
-          remove_invalid_auth_lookup_entries if c != count
-
+          
           (c == count && (count == 0 || (last_stored_asset_id == last_asset_id)))
         end
 
