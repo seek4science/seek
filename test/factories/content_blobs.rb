@@ -73,6 +73,12 @@ Factory.define(:xlsx_content_blob, parent: :content_blob) do |f|
   f.data { File.new("#{Rails.root}/test/fixtures/files/lihua_column_index_error.xlsx", 'rb').read }
 end
 
+Factory.define(:xlsm_content_blob, parent: :content_blob) do |f|
+  f.content_type 'application/vnd.ms-excel.sheet.macroEnabled.12'
+  f.original_filename 'test.xlsm'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/test.xlsm", 'rb').read }
+end
+
 Factory.define(:cronwright_model_content_blob, parent: :content_blob) do |f|
   f.content_type 'text/xml'
   f.original_filename 'cronwright.xml'

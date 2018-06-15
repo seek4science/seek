@@ -7,6 +7,15 @@ class SpreadsheetTest < ActiveSupport::TestCase
     datafile = Factory :small_test_spreadsheet_datafile
     assert datafile.content_blob.is_excel?
     assert datafile.content_blob.is_extractable_spreadsheet?
+    assert datafile.contains_extractable_spreadsheet?
+  end
+
+  test 'xlsm are spreadsheets' do
+    datafile = Factory :xlsm_spreadsheet_datafile
+    assert datafile.content_blob.is_excel?
+    assert datafile.content_blob.is_extractable_spreadsheet?
+    assert datafile.contains_extractable_spreadsheet?
+
   end
 
   test 'spreadsheet is properly parsed' do

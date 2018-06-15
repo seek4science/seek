@@ -65,6 +65,8 @@ class Person < ActiveRecord::Base
   has_many :created_studies, through: :assets_creators, source: :asset, source_type: 'Study'
   has_many :created_assays, through: :assets_creators, source: :asset, source_type: 'Assay'
 
+  has_many :publication_authors
+
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
       text :project_positions
@@ -85,6 +87,8 @@ class Person < ActiveRecord::Base
   include Seek::OrcidSupport
 
   after_commit :queue_update_auth_table
+
+  after_destroy :update_publication_authors_after_destroy
 
   # not registered profiles that match this email
   def self.not_registered_with_matching_email(email)
@@ -485,6 +489,14 @@ class Person < ActiveRecord::Base
     User.admin_or_project_administrator_logged_in? ||
       User.activated_programme_administrator_logged_in? ||
       (User.logged_in? && !User.current_user.registration_complete?)
+  end
+
+  #replaces the author names with those of the deleted person
+  def update_publication_authors_after_destroy
+    publication_authors.each do |author|
+      author.update_attribute(:last_name,self.last_name)
+      author.update_attribute(:first_name,self.first_name)
+    end
   end
 
   include Seek::ProjectHierarchies::PersonExtension if Seek::Config.project_hierarchy_enabled
