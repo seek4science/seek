@@ -228,6 +228,7 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html { redirect_to root_url }
       format.json { render json: { errors: [{ title: notice, detail: _message }] }, status:  _status }
+
     end
   end
 

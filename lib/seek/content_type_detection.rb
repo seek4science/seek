@@ -22,7 +22,7 @@ module Seek
     end
 
     def is_excel?(blob = self)
-      is_xls?(blob) || is_xlsx?(blob)
+      is_xls?(blob) || is_xlsx?(blob) || is_xlsm?(blob)
     end
 
     def is_extractable_spreadsheet?(blob = self)
@@ -39,6 +39,10 @@ module Seek
 
     def is_xls?(blob = self)
       mime_extensions(blob.content_type).include?('xls')
+    end
+
+    def is_xlsm?(blob = self)
+      mime_extensions(blob.content_type).include?('xlsm')
     end
 
     def is_binary?(blob = self)

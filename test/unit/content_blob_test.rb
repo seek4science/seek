@@ -329,6 +329,9 @@ class ContentBlobTest < ActiveSupport::TestCase
     content_blob = Factory(:content_blob, content_type: 'application/msexcel')
     assert_equal 'Spreadsheet', content_blob.human_content_type
 
+    content_blob = Factory(:xlsm_content_blob)
+    assert_equal 'Spreadsheet (macro enabled)', content_blob.human_content_type
+
     content_blob = Factory.create(:pdf_content_blob, content_type: 'application/pdf')
     assert_equal 'PDF document', content_blob.human_content_type
 

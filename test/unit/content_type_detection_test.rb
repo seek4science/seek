@@ -32,19 +32,35 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     assert blob.is_excel?
     assert is_excel?(blob)
 
+    blob = Factory :xlsm_content_blob
+    assert blob.is_excel?(blob)
+    assert is_excel?(blob)
+
     blob = Factory :doc_content_blob
     assert !blob.is_excel?(blob)
     assert !is_excel?(blob)
+
   end
 
   def test_is_extractable_spreadsheet
+
+    blob = Factory :spreadsheet_content_blob
+    assert blob.is_extractable_spreadsheet?
+    assert is_extractable_spreadsheet?(blob)
+
     blob = Factory :xlsx_content_blob
+    assert blob.is_extractable_spreadsheet?
+    assert is_extractable_spreadsheet?(blob)
+
+    blob = Factory :xlsm_content_blob
     assert blob.is_extractable_spreadsheet?
     assert is_extractable_spreadsheet?(blob)
 
     blob = Factory :doc_content_blob
     assert !blob.is_extractable_spreadsheet?
     assert !is_extractable_spreadsheet?(blob)
+
+
   end
 
   def test_is_sbml
