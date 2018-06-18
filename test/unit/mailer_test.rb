@@ -267,6 +267,33 @@ class MailerTest < ActionMailer::TestCase
     assert_equal expected_text, actual_text
   end
 
+  test 'contact_project_administrator_new_user no other institutions' do
+    project_administrator = Factory(:project_administrator)
+    admin_project = project_administrator.projects.first
+
+    assert project_administrator.is_project_administrator?(admin_project)
+    @expected.subject = 'Sysmo SEEK member signed up, please assign this person to the projects of which you are Project Administrator'
+    @expected.to = project_administrator.email_with_name
+    @expected.from = 'no-reply@sysmo-db.org'
+    @expected.reply_to = 'Aaron Spiggle <aaron@email.com>'
+
+    params = {}
+    params[:projects] = [Factory(:project, title: 'Project X').id.to_s, admin_project.id.to_s]
+    params[:institutions] = [Factory(:institution, title: 'The Institute').id.to_s]
+    params[:other_projects] = ''
+    params[:other_institutions] = ''
+
+    @expected.body = read_fixture('contact_project_administrator_new_user_no_other')
+
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!('-pr_name-', admin_project.title)
+    expected_text.gsub!('-pr_id-', admin_project.id.to_s)
+    expected_text.gsub!('-person_id-', users(:aaron).person.id.to_s)
+    actual_text = encode_mail(Mailer.contact_project_administrator_new_user(project_administrator, params, users(:aaron)))
+
+    assert_equal expected_text, actual_text
+  end
+
   test 'welcome' do
     @expected.subject = 'Welcome to Sysmo SEEK'
     @expected.to = 'Quentin Jones <quentin@email.com>'
