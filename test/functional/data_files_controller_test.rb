@@ -709,7 +709,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'download', al.action
     assert_equal df, al.activity_loggable
     assert_equal "attachment; filename=\"rightfield.xls\"", @response.header['Content-Disposition']
-    assert_equal 'application/excel', @response.header['Content-Type']
+    assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '9216', @response.header['Content-Length']
   end
 
@@ -719,7 +719,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     assert_response :success
     assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"", @response.header['Content-Disposition']
-    assert_equal 'application/excel', @response.header['Content-Type']
+    assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '7168', @response.header['Content-Length']
   end
 

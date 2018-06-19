@@ -101,7 +101,7 @@ module Seek
     def update_content_mime_type
       if url
         set_content_type_according_to_url
-      elsif (is_binary? || unknown_file_type?) && file_exists?
+      elsif file_exists?
         set_content_type_according_to_file
       end
     end
@@ -143,9 +143,11 @@ module Seek
 
     def find_or_keep_type_with_mime_magic
       mime = MimeMagic.by_extension(file_extension)
-      io = File.open(filepath)
-      mime ||= MimeMagic.by_magic(io) if file_exists?
-      io.close
+      if mime.nil? && file_exists?
+        io = File.open(filepath)
+        mime ||= MimeMagic.by_magic(io) if file_exists?
+        io.close
+      end
       mime.try(:type) || content_type
     end
 
