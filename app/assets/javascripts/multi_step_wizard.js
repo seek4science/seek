@@ -72,6 +72,16 @@ $j(document).ready(function () {
     });
 
     $j(document).keydown(function(e) {
+
+        //ignore keypress events if in a text box
+        console.log(document.activeElement.type);
+        if (document.activeElement != null) {
+            if (document.activeElement.type=="text" || document.activeElement.type == "textarea") {
+                console.log("returning");
+                return;
+            }
+        }
+
         if (e.keyCode==39) {
             MultiStepWizard.nextStep();
         }

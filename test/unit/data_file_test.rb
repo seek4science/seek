@@ -303,7 +303,7 @@ class DataFileTest < ActiveSupport::TestCase
     blob = df.content_blob
     assert blob.file_exists?
     assert_equal 'simple_populated_rightfield.xls', blob.original_filename
-    assert_equal 'application/excel', blob.content_type
+    assert_equal 'application/vnd.ms-excel', blob.content_type
   end
 
   test 'spreadsheet annotation search fields' do
