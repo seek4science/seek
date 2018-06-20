@@ -64,19 +64,19 @@ These additional licenses are also available to be used in SEEK.
         <td>Academic Free License 3.0</td><td><a href="http://www.opensource.org/licenses/AFL-3.0" target="_blank">http://www.opensource.org/licenses/AFL-3.0</a></td>
     </tr>
     <tr>
-        <td>Against DRM</td><td><a href="http://www.opendefinition.org/licenses/against-drm" target="_blank">http://www.opendefinition.org/licenses/against-drm</a></td>
+        <td>Against DRM</td><td><a href="https://www.opendefinition.org/licenses/against-drm" target="_blank">https://www.opendefinition.org/licenses/against-drm</a></td>
     </tr>
     <tr>
         <td>Creative Commons Attribution-NonCommercial 4.0</td><td><a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">https://creativecommons.org/licenses/by-nc/4.0/</a></td>
     </tr>
     <tr>
-        <td>Design Science License</td><td><a href="http://www.opendefinition.org/licenses/dsl" target="_blank">http://www.opendefinition.org/licenses/dsl</a></td>
+        <td>Design Science License</td><td><a href="https://opendefinition.org/licenses/dsl" target="_blank">https://opendefinition.org/licenses/dsl</a></td>
     </tr>
     <tr>
-        <td>Free Art License 1.3</td><td><a href="http://www.opendefinition.org/licenses/fal" target="_blank">http://www.opendefinition.org/licenses/fal</a></td>
+        <td>Free Art License 1.3</td><td><a href="https://opendefinition.org/licenses/fal" target="_blank">https://opendefinition.org/licenses/fal</a></td>
     </tr>
     <tr>
-        <td>GNU Free Documentation License 1.3 with no cover texts and no invariant sections</td><td><a href="http://www.opendefinition.org/licenses/gfdl" target="_blank">http://www.opendefinition.org/licenses/gfdl</a></td>
+        <td>GNU Free Documentation License 1.3 with no cover texts and no invariant sections</td><td><a href="https://opendefinition.org/licenses/gfdl" target="_blank">https://opendefinition.org/licenses/gfdl</a></td>
     </tr>    
     <tr>
         <td>Higher Education Statistics Agency Copyright with data.gov.uk rights</td><td><a href="http://www.hesa.ac.uk/index.php?option=com_content&task=view&id=2619&Itemid=209" target="_blank">http://www.hesa.ac.uk/index.php?option=com_content&task=view&id=2619&Itemid=209</a></td>
@@ -109,7 +109,7 @@ These additional licenses are also available to be used in SEEK.
         <td>Statistics Canada: Data Liberation Initiative (DLI) - Model Data Use Licence</td><td><a href="http://data.library.ubc.ca/datalib/geographic/DMTI/license.html" target="_blank">http://data.library.ubc.ca/datalib/geographic/DMTI/license.html</a></td>
     </tr>
     <tr>
-        <td>Talis Community License</td><td><a href="http://www.opendefinition.org/licenses/tcl" target="_blank">http://www.opendefinition.org/licenses/tcl</a></td>
+        <td>Talis Community License</td><td><a href="https://opendefinition.org/licenses/tcl" target="_blank">https://opendefinition.org/licenses/tcl</a></td>
     </tr>
     <tr>
         <td>UK Click Use PSI</td><td><a href="" target="_blank"></a></td>
@@ -118,7 +118,7 @@ These additional licenses are also available to be used in SEEK.
         <td>UK Crown Copyright with data.gov.uk rights</td><td><a href="" target="_blank"></a></td>
     </tr>
     <tr>
-        <td>UK PSI Public Sector Information</td><td><a href="http://www.opendefinition.org/licenses/ukpsi" target="_blank">http://www.opendefinition.org/licenses/ukpsi</a></td>
+        <td>UK PSI Public Sector Information</td><td><a href="https://opendefinition.org/licenses/ukpsi" target="_blank">https://opendefinition.org/licenses/ukpsi</a></td>
     </tr>
 </tbody>
 </table>
