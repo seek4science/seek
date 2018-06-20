@@ -462,7 +462,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     end
     assert_response :success
     assert_equal 'attachment; filename="small-test-spreadsheet.xls"', @response.header['Content-Disposition']
-    assert_equal 'application/excel', @response.header['Content-Type']
+    assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '7168', @response.header['Content-Length']
   end
 

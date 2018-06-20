@@ -306,4 +306,45 @@ class AdminControllerTest < ActionController::TestCase
     xml_http_request :get, :get_stats, page:  'snapshot_and_doi_stats'
     assert_response :success
   end
+
+  test 'clear failed jobs' do
+    
+    Delayed::Job.destroy_all
+    ContentBlobCleanerJob.new.queue_job
+    job = Delayed::Job.last
+    job.update_column(:failed_at,Time.now)
+    ContentBlobCleanerJob.new.queue_job
+    assert_equal 2,Delayed::Job.count
+    assert_difference('Delayed::Job.count',-1) do
+      post :clear_failed_jobs, format: 'json'
+    end
+
+    assert_equal 1,Delayed::Job.count
+    assert_equal 0,Delayed::Job.where('failed_at IS NOT NULL').count
+  end
+
+  test 'admin required to clear failed jobs' do
+    logout
+    person = Factory(:person)
+
+    Delayed::Job.destroy_all
+    ContentBlobCleanerJob.new.queue_job
+    job = Delayed::Job.last
+    job.update_column(:failed_at,Time.now)
+    ContentBlobCleanerJob.new.queue_job
+    assert_equal 2,Delayed::Job.count
+
+    assert_no_difference('Delayed::Job.count') do
+      post :clear_failed_jobs, format: 'json'
+    end
+
+    login_as(person)
+
+    assert_no_difference('Delayed::Job.count') do
+      post :clear_failed_jobs, format: 'json'
+    end
+
+    assert_equal 2,Delayed::Job.count
+    assert_equal 1,Delayed::Job.where('failed_at IS NOT NULL').count
+  end
 end

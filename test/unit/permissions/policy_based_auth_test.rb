@@ -136,4 +136,27 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'remove_invalid_auth_lookup_entries' do
+    with_config_value :auth_lookup_enabled, true do
+      User.current_user = nil
+      user = Factory :user
+      disable_authorization_checks do
+        Sop.clear_lookup_table
+        sop = Factory :sop
+        sop.update_lookup_table(user)
+        assert_equal 1, Sop.lookup_count_for_user(user.id)
+        assert_equal 2,Sop.connection.select_one('select count(*) from sop_auth_lookup;').values[0].to_i
+        f=ActiveRecord::Base.connection.quote(false)
+        Sop.connection.execute("insert into sop_auth_lookup(user_id,asset_id,can_view,can_manage,can_edit,can_download,can_delete) values (#{user.id},#{sop.id+10},#{f},#{f},#{f},#{f},#{f});")
+        Sop.connection.execute("insert into sop_auth_lookup(user_id,asset_id,can_view,can_manage,can_edit,can_download,can_delete) values (#{user.id},#{sop.id+11},#{f},#{f},#{f},#{f},#{f});")
+        Sop.connection.execute("insert into sop_auth_lookup(user_id,asset_id,can_view,can_manage,can_edit,can_download,can_delete) values (0,#{sop.id+10},#{f},#{f},#{f},#{f},#{f});")
+        assert_equal 3, Sop.lookup_count_for_user(user.id)
+        assert_equal 5,Sop.connection.select_one('select count(*) from sop_auth_lookup;').values[0].to_i
+        Sop.remove_invalid_auth_lookup_entries
+        assert_equal 1, Sop.lookup_count_for_user(user.id)
+        assert_equal 2,Sop.connection.select_one('select count(*) from sop_auth_lookup;').values[0].to_i
+      end
+    end
+  end
 end

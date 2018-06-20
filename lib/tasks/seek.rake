@@ -181,6 +181,7 @@ namespace :seek do
   desc "Creates background jobs to rebuild all authorization lookup table for all items."
   task(:repopulate_auth_lookup_tables=>:environment) do
     Seek::Util.authorized_types.each do |type|
+      type.remove_invalid_auth_lookup_entries
       type.find_each do |item|
         AuthLookupUpdateQueue.create(item: item, priority: 1) unless AuthLookupUpdateQueue.exists?(item)
       end
