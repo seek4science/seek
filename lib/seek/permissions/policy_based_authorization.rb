@@ -419,7 +419,7 @@ module Seek
 
       private
 
-      # Note, nil user means ALL users, not anonymous user. Anon user is represented with ;anonymous
+      # Note, nil user means ALL users, not anonymous user. Anon user is represented with `:anonymous`
       def update_lookup(permission, user = nil, overwrite = true)
         if permission.is_a?(Array)
           can_view, can_edit, can_download, can_manage, can_delete = *permission
