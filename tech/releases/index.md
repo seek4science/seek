@@ -9,6 +9,24 @@ layout: page
 
 Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
+## Version 1.6.1
+
+Release date: _June 20th 2018_
+
+Bugfixes and some small improvements, in particular
+
+  * Fixed an error when uploading a DataFile with no Assays in the database (only seemed to affect Docker)
+  * Fixed a mime type problem when uploading files, in particular CSV files being incorrectly treated as Excel
+  * When using the DataFile upload wizard, the arrow keys no longer affect navigation whilst editing a field
+  * Recognise and handle Excel (macro-enabled), XLSM, files as standard Excel files.
+  * Within the admin area, when showing the queued jobs, there is no a button to clear failed jobs. 
+  * You no longer have to accept the (blank) Terms and Conditions when setting up the first user for a new SEEK installation.
+  
+There have also been a few other smaller fixes and improvements, a full list of changes included in this release can be found in 
+the [SEEK v1.6.1 release notes](release-notes-1.6.1.html).
+                                                                  
+If you have any comments or feedback then please [Contact Us](/contacting-us.html)  
+
 ## Version 1.6.0
 
 Release date: _June 8th 2018_
@@ -36,7 +54,6 @@ Major changes include:
 There have also been many other bug fixes and small improvements.
 A full list of changes included in this release can be found in the [SEEK v1.6.0 release notes](release-notes-1.6.0.html).
  
-If you have any comments or feedback then please [Contact Us](/contacting-us.html)
  
 ## Version 1.5.2
 
