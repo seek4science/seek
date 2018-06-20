@@ -788,6 +788,11 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert sop.can_view?(person1.user)
     assert sop.can_view?(person2.user)
     refute sop.can_view?(person3.user)
+
+    # All other users
+    ([nil] + User.includes(:person).all.reject { |u| u.person.nil? || u.person.programmes.include?(programme) }).each do |user|
+      refute sop.can_view?(user)
+    end
   end
 
   test 'programme permissions precedence' do
@@ -813,7 +818,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     refute sop.can_download?(person3.user)
 
     sop.policy.permissions.create!(contributor: project2, access_type: Policy::ACCESSIBLE)
-    sop = Sop.find(sop.id) # HAve to do this to clear authorization "cache"
+    sop = Sop.find(sop.id) # Have to do this to clear authorization "cache"
 
     assert sop.can_view?(person1.user)
     assert sop.can_view?(person2.user)
