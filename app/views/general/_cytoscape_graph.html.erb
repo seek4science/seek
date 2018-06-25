@@ -8,14 +8,24 @@
         <%= render partial: 'general/jstree', locals: { hash: hash } %>
       </div>
       <div class="isa-footer">
-        <button class="btn btn-default" id="toggle-fullscreen-btn">
-          <span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span>
+        <button class="btn btn-default pull-left" id="toggle-fullscreen-btn">
+          <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
           Toggle fullscreen
         </button>
-        <button class="btn btn-default" id="toggle-isa-sidebar-btn">
-          <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
-          Toggle Sidebar
-        </button>
+        <div id="isa-view-controls">
+          View:
+          <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-default active" id="isa-split-view-btn">
+              <input type="radio" name="options" autocomplete="off" checked> Split
+            </label>
+            <label class="btn btn-default" id="isa-graph-view-btn" >
+              <input type="radio" name="options" autocomplete="off"> Graph
+            </label>
+            <label class="btn btn-default" id="isa-tree-view-btn" >
+              <input type="radio" name="options" autocomplete="off"> Tree
+            </label>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -45,6 +55,29 @@
       $j('#jstree').toggle();
       cy.resize();
       return false;
+    });
+
+    $j('#isa-split-view-btn').click(function () {
+        $j(this).button('toggle');
+        $j('#cy').show();
+        $j('#jstree').show();
+        $j('#jstree').css('width', '300px');
+        cy.resize();
+        return false;
+    });
+
+    $j('#isa-graph-view-btn').click(function () {
+        $j(this).button('toggle');
+        $j('#cy').show();
+        $j('#jstree').hide();
+        cy.resize();
+    });
+
+    $j('#isa-tree-view-btn').click(function () {
+        $j(this).button('toggle');
+        $j('#cy').hide();
+        $j('#jstree').show();
+        $j('#jstree').css('width', '100%');
     });
 
     $j('#exit-fullscreen-btn').click(function () {

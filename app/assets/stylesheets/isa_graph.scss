@@ -69,6 +69,7 @@ a.graph_toggle {
 #jstree {
   background-color: #fff;
   max-height: 600px !important;
+  min-height: 400px;
   width: 300px;
   flex-shrink: 0;
   border-left: 1px solid $panel-default-border;
@@ -98,10 +99,14 @@ a.graph_toggle {
 }
 
 .isa-footer {
-  text-align: right;
   border-top: 1px solid $panel-default-border;
   padding: 10px;
   background-color: $panel-footer-bg;
+  overflow: auto;
+
+  #isa-view-controls {
+    float: right;
+  }
 }
 
 #exit-fullscreen-btn {
