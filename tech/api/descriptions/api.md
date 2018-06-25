@@ -7,7 +7,7 @@ specification](https://swagger.io/specification) currently in [version
 
 Example IPython notebooks showing use of the API are available on [GitHub](https://github.com/hleonov/ipython_for_SEEK-API).
 
----
+===
 
 ## Policy
 
@@ -25,7 +25,7 @@ The access may be one of (in order of increasing "power"):
 
 In addition a **Policy** may give special access to specific [**People**](#tag/people), People working at an [**Institution**](#tag/institutions) or working on a [**Project**](#tag/projects).
 
----
+===
 
 ## License
 
@@ -65,7 +65,7 @@ The license can currently be:
 * ukcrown-withrights - UK Crown Copyright with data.gov.uk rights
 * [ukpsi](http://www.opendefinition.org/licenses/ukpsi) - UK PSI Public Sector Information
 
----
+===
 
 ## ContentBlob
 
@@ -99,4 +99,4 @@ may be satisfied by uploading a file to http://www.fairdomhub.org/data_files/57/
 
 The content of a resource may be downloaded by first *reading* the resource and then *downloading* the ContentBlobs from their URI.
 
----
+===
