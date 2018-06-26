@@ -34,7 +34,7 @@ class Permission < ActiveRecord::Base
   end
 
   #precedence of permission types. Highest precedence is listed first
-  @@precedence = ['Person', 'FavouriteGroup', 'WorkGroup', 'Project', 'Institution']
+  @@precedence = ['Person', 'FavouriteGroup', 'WorkGroup', 'Project', 'Programme', 'Institution']
 
   #takes a list of permissions, and gives you a list from the highest precedence to the lowest
   def self.sort_for person, list
@@ -78,5 +78,4 @@ class Permission < ActiveRecord::Base
       []
     end
   end
-
 end

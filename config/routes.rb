@@ -50,6 +50,7 @@ SEEK::Application.routes.draw do
       post :delete_tag
       post :edit_tag
       post :update_imprint_setting
+      post :clear_failed_jobs
     end
   end
 
@@ -60,6 +61,7 @@ SEEK::Application.routes.draw do
       get :funding
       post :send_feedback
       get :imprint
+      get :terms
       get :about
     end
   end

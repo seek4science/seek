@@ -16,7 +16,7 @@ def load_seek_config_defaults!
   Seek::Config.default :jws_enabled, true
   Seek::Config.default :jws_online_root,"https://jws2.sysmo-db.org/"
   Seek::Config.default :internal_help_enabled, false
-  Seek::Config.default :external_help_url,"http://docs.seek4science.org/help"
+  Seek::Config.default :external_help_url,"https://docs.seek4science.org/help"
   Seek::Config.default :sabiork_ws_base_url, "http://sabiork.h-its.org/sabioRestWebServices/"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
@@ -104,6 +104,10 @@ def load_seek_config_defaults!
   #About page
   Settings.defaults[:about_page_enabled]= false
   Seek::Config.default :about_page, File.read(Rails.root.join('config/default_data/about_page_example'))
+
+  #Terms and conditions page
+  Settings.defaults[:terms_enabled]= false
+  Seek::Config.default :terms_page, File.read(Rails.root.join('config/default_data/terms_and_conditions'))
 
   #the maximum size, in Mb, for a spreadsheet file that can be extracted and explored
   Seek::Config.default :max_extractable_spreadsheet_size,10

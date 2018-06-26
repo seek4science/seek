@@ -12,7 +12,7 @@ RUN echo "deb http://http.debian.net/debian jessie-backports main" >> /etc/apt/s
 		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
 		libxslt1-dev mysql-client nginx nodejs poppler-utils \
-		postgresql-client sqlite3 links telnet && \
+		postgresql-client sqlite3 links telnet vim-tiny && \
 	apt-get install -y -t jessie-backports openjdk-8-jdk && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

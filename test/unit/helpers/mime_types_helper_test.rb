@@ -7,6 +7,7 @@ class MimeTypesHelperTest < ActionView::TestCase
   MISC = %w(application/octet-stream application/zip text/x-objcsrc)
   EXCEL = %w(application/excel application/vnd.excel application/vnd.ms-excel)
   EXCELX = %w(application/vnd.openxmlformats-officedocument.spreadsheetml.sheet)
+  EXCELM = %w(application/vnd.ms-excel.sheet.macroEnabled.12)
   DOC = %w(application/msword)
   DOCX = %w(application/vnd.openxmlformats-officedocument.wordprocessingml.document)
   PPT = %w(application/vnd.ms-powerpoint)
@@ -25,7 +26,7 @@ class MimeTypesHelperTest < ActionView::TestCase
   MP4_IN_MIME_MAGIC = %w(video/mp4)
 
   def test_recognised
-    supported_types = MISC + EXCEL + EXCELX + DOC + DOCX + PPT + PDF + IMAGE + TEXT + CSV + XML + ODP + FODP + ODT + FODT + RTF + HTML
+    supported_types = MISC + EXCEL + EXCELX + EXCELM + DOC + DOCX + PPT + PDF + IMAGE + TEXT + CSV + XML + ODP + FODP + ODT + FODT + RTF + HTML
     supported_types.each do |type|
       assert_not_equal 'Unknown file type', mime_nice_name(type), "Didn't recognise mime type #{type}"
     end
@@ -64,6 +65,12 @@ class MimeTypesHelperTest < ActionView::TestCase
     EXCELX.each do |type|
       assert mime_extensions(type).include?('xlsx')
       assert_equal 'Spreadsheet', mime_nice_name(type)
+      assert_equal icon_filename_for_key('xls_file'), mime_icon_url(type)
+    end
+
+    EXCELM.each do |type|
+      assert mime_extensions(type).include?('xlsm')
+      assert_equal 'Spreadsheet (macro enabled)', mime_nice_name(type)
       assert_equal icon_filename_for_key('xls_file'), mime_icon_url(type)
     end
 

@@ -144,9 +144,13 @@ module ResourceListItemHelper
     list_item_description text, auto_link, length
   end
 
-  def list_item_contributor(resource, key = t('contributor').capitalize)
+  def list_item_contributors(resource, key = t('contributor').capitalize)
     return "<p class=\"list_item_attribute\"><b>#{key}</b>: #{jerm_harvester_name}</p>".html_safe if resource.contributor.nil?
-    list_item_authorized_attribute key, resource.contributor.person
+    if resource.respond_to?(:contributors) && resource.contributors.length > 1
+      list_item_person_list(resource.contributors.map(&:person), nil, key.pluralize)
+    else
+      list_item_authorized_attribute key, resource.contributor.person
+    end
   end
 
   def list_item_expandable_text(attribute, text, length = 200)

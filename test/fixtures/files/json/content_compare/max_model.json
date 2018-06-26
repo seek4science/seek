@@ -36,7 +36,7 @@
           "url": null,
           "md5sum": "6b9283ed4ca52a081398b715aaeb8113",
           "sha1sum": "454e4b6067f577b680bb8538772b12ebcdb6c4a4",
-          "content_type": "text/xml",
+          "content_type": "application/xml",
           "link": "http://localhost:3000/models/1004285489/content_blobs/1050452553",
           "size": 5933
         },
@@ -45,7 +45,7 @@
           "url": null,
           "md5sum": "01788bca93265d80e8127ca0039bb69b",
           "sha1sum": "ffd634ac7564083ab7b66bc3eb2053cbc3d608f5",
-          "content_type": "application/excel",
+          "content_type": "application/vnd.ms-excel",
           "link": "http://localhost:3000/models/1004285489/content_blobs/1050452554",
           "size": 9216
         }

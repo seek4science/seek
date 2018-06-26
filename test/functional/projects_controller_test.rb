@@ -35,6 +35,19 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'get new with programme' do
+    programme_admin = Factory(:programme_administrator)
+    prog = programme_admin.programmes.first
+    refute_nil prog
+    login_as(programme_admin)
+    get :new,programme_id:prog.id
+    assert_response :success
+    assert_select "select#project_programme_id" do
+      assert_select "option[selected!='selected']", count:0
+      assert_select "option[selected='selected'][value='#{prog.id}']",count:1
+    end
+  end
+
   def test_avatar_show_in_list
     p = Factory :project
     get :index
