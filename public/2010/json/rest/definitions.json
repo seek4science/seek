@@ -1596,8 +1596,6 @@
         "jsonapi": {
           "$ref": "#/definitions/JsonApiVersion"
         },
-        "links": {
-        },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
         }
@@ -1605,7 +1603,6 @@
       "required": [
         "data",
         "jsonapi",
-        "links",
         "meta"
       ],
       "additionalProperties": false
@@ -4536,7 +4533,7 @@
                   "$ref": "#/definitions/nullableUriString"
                 },
                 "pubmed_id": {
-                  "type": "number"
+                  "type": "#/definitions/nullableInteger"
                 },
                 "abstract": {
                   "$ref": "#/definitions/nullableNonEmptyString"
