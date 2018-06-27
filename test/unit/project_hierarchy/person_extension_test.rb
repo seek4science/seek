@@ -29,11 +29,15 @@ class PersonExtensionTest < ActiveSupport::TestCase
   end
 
   test 'remove also child project subscriptions when removing workgroups' do
+    
     # when created without a project
     person = Factory(:brand_new_person)
+    assert_empty person.projects
+    assert_empty person.work_groups
+
     assert_equal 0, person.project_subscriptions.count
     # subsribe to @proj after workgroups is added
-    person.work_groups.create project: @proj, institution: Factory(:institution)
+    person.add_to_project_and_institution(@proj, Factory(:institution))
 
     # subscribe to @proj_child1
     person.project_subscriptions.create project_id: @proj_child1.id

@@ -5,12 +5,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../config/environment')
 
 class Time
   class <<self
-    attr_writer :testing_offset
+    attr_accessor :pretend_time
     alias_method :real_now, :now
     def now
-      time = real_now
-      time -= @testing_offset if @testing_offset
-      time
+      pretend_time.nil? ? real_now : pretend_time
     end
   end
 end
@@ -25,8 +23,8 @@ ensure
 end
 
 def pretend_now_is(time)
-  Time.testing_offset = Time.now - time
+  Time.pretend_time = time
   yield
 ensure
-  Time.testing_offset = nil
+  Time.pretend_time = nil
 end

@@ -13,8 +13,10 @@
         "access": "download",
         "permissions": [
           {
-            "resource_id": "<%= Project.maximum(:id) + 10 %>",
-            "resource_type": "projects",
+            "resource": {
+              "id" : "<%= Project.maximum(:id) + 10 %>",
+              "type": "projects"
+            },
             "access": "golf"
           }
         ]
@@ -26,14 +28,6 @@
           {
             "id": "abcdef",
             "type": "people"
-          }
-        ]
-      },
-      "assays": {
-        "data": [
-          {
-            "id": "<%= Assay.maximum(:id) + 10 %>",
-            "type": "assays"
           }
         ]
       }

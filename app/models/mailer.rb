@@ -108,6 +108,7 @@ class Mailer < ActionMailer::Base
   def contact_project_administrator_new_user(project_administrator, params, user)
     new_member_details = Seek::Mail::NewMemberAffiliationDetails.new(params)
     @details = new_member_details.message
+    @other_institutions = params[:other_institutions]
     @person = user.person
     @projects = new_member_details.projects.select{|project| project_administrator.is_project_administrator?(project)}
     @user = user

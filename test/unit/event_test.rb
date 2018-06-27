@@ -77,4 +77,12 @@ class EventTest < ActiveSupport::TestCase
       event.presentations << [Factory(:presentation, policy: Factory(:public_policy))]
     end
   end
+
+  test 'contributors method non non-versioned asset' do
+    event = Factory(:event)
+
+    refute event.respond_to?(:versions)
+    assert_equal 1, event.contributors.length
+    assert_includes event.contributors, event.contributor
+  end
 end

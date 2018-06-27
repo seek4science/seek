@@ -35,6 +35,8 @@
 
     <%= render :partial => "assets/associate_model", :locals=>{:resource => @publication} -%>
 
+    <%= render :partial => "assets/associate_presentation", :locals=>{:resource => @publication} -%>
+
     <%= submit_tag 'Update',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
     or <%= cancel_button(publication_path(@publication)) %>
 <% end %>

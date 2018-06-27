@@ -537,4 +537,12 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'test', setting.reload.value
     assert_nil setting[:value], 'Password should be encrypted now'
   end
+
+  test 'merge! converts Hash to HashWithIndifferentAccess' do
+    with_config_value 'smtp', {} do
+      assert_equal 'Hash', Seek::Config.smtp.class.name
+      Settings.merge!(:smtp, {})
+      assert_equal 'ActiveSupport::HashWithIndifferentAccess', Seek::Config.smtp.class.name
+    end
+  end
 end

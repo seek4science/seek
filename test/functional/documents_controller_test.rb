@@ -12,7 +12,7 @@ class DocumentsControllerTest < ActionController::TestCase
   include HtmlHelper
 
   def test_json_content
-    login_as(:quentin)
+    login_as(Factory(:user))
     super
   end
 

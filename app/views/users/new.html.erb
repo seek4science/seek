@@ -19,17 +19,8 @@
 <% else  %>
   <div class="row">
     <div class="col-md-5 col-md-push-7">
-      <p>
-        <b>By registering, you are indicating that you have read and agree that:</b>
-        You are responsible for any content that you upload. We receive and store certain types of information whenever you
-        interact with us which we will use only for operational purposes. We will not make
-        personally identifiable data available to third parties without consent.
-        Please contact us if you have any queries about our terms or our privacy policy.
-      </p>
-      <p>
-        If you have previously provided a login and password but didn't select or create a profile, then your details have already been stored
-        and you should Login to continue the registration process.
-      </p>
+
+
     </div>
     <div class="col-md-7 col-md-pull-5">
       <p style="text-align:right">
@@ -59,9 +50,30 @@
             <label>Confirm Password</label>
             <%= f.password_field :password_confirmation, :class => 'form-control' %>
           </div>
-
-          <%= submit_tag 'Register', data: { disable_with: 'Registering...' }, :class => 'btn btn-primary' %>
+        <% if (User.any? && Seek::Config.terms_enabled) %>
+          <div class="form-group">
+            <label>
+              <%= check_box_tag "tc_agree","1",false -%> I have read and agree to the
+              <%= link_to 'Terms and Conditions and the Data Policy', terms_home_path ,'data-popup' => true,
+              :onclick=>"window.open(this.href,'terms', 'height=700, width=600, left=500, top=100'); return false;" %>
+            </label>
+          </div>
+        <% end %>
+          <%= submit_tag 'Register', data: { disable_with: 'Registering...' }, :class => 'btn btn-primary', :disabled => (User.any? && Seek::Config.terms_enabled ) %>
       <% end -%>
     </div>
   </div>
 <% end -%>
+
+<script type="text/javascript">
+
+    $j('input:checkbox').change(
+        function () {
+            if ($j(this).is(':checked')) {
+                $j("[name=commit]").attr("disabled", false);
+            } else {
+                $j("[name=commit]").attr("disabled", true);
+            }
+        });
+
+</script>

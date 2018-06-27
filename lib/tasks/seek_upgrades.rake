@@ -17,10 +17,12 @@ namespace :seek do
     rebuild_sample_templates
     delete_redundant_subscriptions
     update_sample_resource_links
+    update_content_blob_timestamps
     move_site_credentials_to_settings
     reencrypt_settings
     convert_organism_concept_uris
     merge_duplicate_organisms
+    fix_setting_hash_values
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -92,6 +94,34 @@ namespace :seek do
     puts "Created #{SampleResourceLink.count - pre_count} SampleResourceLinks"
   end
 
+  task(update_content_blob_timestamps: :environment) do
+    puts "Copying timestamps from assets to content blobs"
+    bar = ProgressBar.new(ContentBlob.where('created_at IS NULL').count)
+    puts "... collecting content blobs with assets ..."
+    bar = ProgressBar.new(ContentBlob.where('created_at IS NULL').count)
+    blobs_with_assets = ContentBlob.where('created_at IS NULL').find_each.select do |blob|
+      bar.increment!
+      blob.asset.present?
+    end
+    puts "... transferring timestamps from assets ..."
+    bar = ProgressBar.new(blobs_with_assets.count)
+    blobs_with_assets.each do |blob|
+      blob.update_attribute(:created_at, blob.asset.created_at)
+      blob.update_attribute(:updated_at, blob.asset.updated_at)
+      bar.increment!
+    end
+
+    #clean up the remaining ones.
+    puts "... removing content blobs without assets or timestamps"
+    bar = ProgressBar.new(ContentBlob.where('created_at IS NULL AND updated_at IS NULL').count)
+    ContentBlob.where('created_at IS NULL AND updated_at IS NULL').find_each do |blob|
+      raise 'Attempting to destroy a content blob with an asset' if blob.asset.present?
+      blob.destroy
+      bar.increment!
+    end
+
+  end
+
   task(move_site_credentials_to_settings: :environment) do
     puts 'Moving project site credentials into settings table...'
 
@@ -101,11 +131,15 @@ namespace :seek do
 
     Project.all.each do |project|
       if project.site_credentials.present?
-        credentials_hash = decrypt(Base64.decode64(project.site_credentials), key)
-        project.site_username = credentials_hash[:username]
-        project.site_password = credentials_hash[:password]
-        project.update_column(:site_credentials, nil)
-        conversions += 1
+        if project.site_credentials == "\u0010" # some spurious value from very old SysMO projects
+          project.update_column(:site_credentials, nil)
+        else
+          credentials_hash = decrypt(Base64.decode64(project.site_credentials), key)
+          project.site_username = credentials_hash[:username]
+          project.site_password = credentials_hash[:password]
+          project.update_column(:site_credentials, nil)
+          conversions += 1
+        end
       end
     end
 
@@ -254,6 +288,13 @@ namespace :seek do
       end
     ensure
       ActiveRecord::Base.logger = logger
+    end
+  end
+
+  task(fix_setting_hash_values: :environment) do
+    Settings.pluck(:var).select { |k| Settings[k].class.name == 'Hash' }.each do |key|
+      puts "Updating '#{key}' to a HashWithIndifferentAccess"
+      Settings.merge!(key, {})
     end
   end
 end

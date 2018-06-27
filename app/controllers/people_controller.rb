@@ -47,17 +47,20 @@ class PeopleController < ApplicationController
       @people = @people.reject { |p| (p.group_memberships & @project_position.group_memberships).empty? }
     end
 
+    if (request.format == 'json' && params[:page].nil?)
+      params[:page] = 'all'
+    end
+
     if @people
-      @people = @people.select(&:can_view?).reject { |p| p.projects.empty? }
+      @people = @people.select(&:can_view?)
     else
       @people = if params[:page].blank? || params[:page] == 'latest' || params[:page] == 'all'
                   Person.active
                 else
                   Person.all
                 end
-      @people = @people.reject { |p| p.group_memberships.empty? }
-      @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
 
+      @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
       unless view_context.index_with_facets?('people') && params[:user_enable_facet] == 'true'
         @people = Person.paginate_after_fetch(@people,
                                               page: (params[:page] || Seek::Config.default_page('people')),
@@ -260,16 +263,32 @@ class PeopleController < ApplicationController
     end
   end
 
-  def set_group_membership_project_position_ids(person, params)
-    prefix = 'group_membership_role_ids_'
+  def set_group_membership_from_api_params(person,params)
     person.group_memberships.each do |gr|
-      key = prefix + gr.id.to_s
-      gr.project_positions.clear
-      next unless params[key.to_sym]
-      params[key.to_sym].each do |r|
-        r = ProjectPosition.find(r)
-        gr.project_positions << r
+      #gr.project_positions.clear ???
+      params[:person][:project_positions].each do |pos|
+        if (gr.project.id.to_s == pos[:project_id].to_s)
+          r = ProjectPosition.find(pos[:position_id])
+          gr.project_positions << r
+        end
       end
+    end
+  end
+
+  def set_group_membership_project_position_ids(person, params)
+    if params[:person][:project_positions].nil?
+      prefix = 'group_membership_role_ids_'
+      person.group_memberships.each do |gr|
+        key = prefix + gr.id.to_s
+        gr.project_positions.clear
+        next unless params[key.to_sym]
+        params[key.to_sym].each do |r|
+          r = ProjectPosition.find(r)
+          gr.project_positions << r
+        end
+      end
+    else
+      set_group_membership_from_api_params(person, params)
     end
   end
 
@@ -321,8 +340,7 @@ class PeopleController < ApplicationController
     results = Person.where("#{concat_clause} LIKE :query OR LOWER(first_name) LIKE :query OR LOWER(last_name) LIKE :query",
                            query: "#{params[:query].downcase}%").limit(params[:limit] || 10)
     items = results.map do |person|
-      projects = person.projects.collect(&:title).join(', ')
-      { id: person.id, name: person.name, projects: projects, hint: projects }
+      { id: person.id, name: person.name, projects: person.projects.collect(&:title).join(', '), hint: person.typeahead_hint }
     end
 
     respond_to do |format|

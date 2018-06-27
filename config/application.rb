@@ -64,7 +64,7 @@ module SEEK
 
     config.active_support.escape_html_entities_in_json = true
 
-    #uncomment and set the value if running under a suburi
+    #uncomment and set the value if running under a suburi or use RAILS_RELATIVE_URL_ROOT
     #config.relative_url_root = '/seek'
 
     # The default cache timestamp format is "nsec", however timestamps in AR aren't stored with that precision

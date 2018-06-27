@@ -39,18 +39,18 @@ class StudiedFactorTest < ActiveSupport::TestCase
 
   test 'should list the existing FSes of the project the datafile belongs to filtered by can_view' do
     user = Factory(:user)
-    other_user = Factory :user
+    other_user = Factory(:person,project:user.person.projects.first).user
     data_file = Factory(:data_file, contributor: user)
     n = 2
     # create bunch of data_files and FSes which belong to the same project and the datafiles can be viewed
     (0...n).to_a.each do |i|
-      d = Factory(:data_file, projects: [data_file.projects.first], policy: Factory(:all_sysmo_viewable_policy), contributor: other_user)
+      d = Factory(:data_file, policy: Factory(:all_sysmo_viewable_policy), contributor: other_user)
       Factory(:studied_factor, data_file: d, start_value: i)
     end
 
     # create bunch of data_files and FSes which belong to the same project and the datafiles can not be viewed
     (0...n).to_a.each do |i|
-      d = Factory(:data_file, projects: [Factory(:project), data_file.projects.first], contributor: other_user)
+      d = Factory(:data_file, contributor: other_user)
       Factory(:studied_factor, data_file: d, start_value: i)
     end
 

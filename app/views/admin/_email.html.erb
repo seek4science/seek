@@ -14,9 +14,9 @@
 
       <%= admin_checkbox_setting(:enable_starttls_auto, 1, Seek::Config.smtp_settings('enable_starttls_auto'), 'Auto STARTTLS enabled') %>
 
-      <%= admin_text_setting(:smtp_user_name, Seek::Config.smtp_settings('user_name'), 'User name') %>
+      <%= admin_text_setting(:smtp_user_name, Seek::Config.smtp_settings('user_name'), 'User name', nil, autocomplete: 'off') %>
 
-      <%= admin_password_setting(:smtp_password, Seek::Config.smtp_settings('password'), 'Password', nil, :autocomplete => 'off') %>
+      <%= admin_password_setting(:smtp_password, Seek::Config.smtp_settings('password'), 'Password', nil, autocomplete: 'off') %>
 
       <%= admin_checkbox_setting(:exception_notification_enabled, 1, Seek::Config.exception_notification_enabled,
                                  "Exception notification enabled", "Allows notifications of certain exceptions, allowing unexpected errors to be picked up quickly and fixed.",

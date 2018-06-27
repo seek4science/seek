@@ -12,6 +12,7 @@ Factory.define(:max_project, class: Project) do |f|
   f.description "A Taverna project"
   f.web_page "http://www.taverna.org.uk"
   f.wiki_page "http://www.mygrid.org.uk"
+  f.default_license "Other (Open)"
   f.investigations {[Factory(:max_investigation, policy: Factory(:public_policy))]}
   f.data_files {[Factory(:data_file, policy: Factory(:public_policy))]}
   f.sops {[Factory(:sop, policy: Factory(:public_policy))]}

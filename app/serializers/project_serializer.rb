@@ -2,12 +2,12 @@ class ProjectSerializer < AvatarObjSerializer
 
   # class ProjectSerializer < ActiveModel::Serializer
   attributes :title, :description,
-             :web_page, :wiki_page
+             :web_page, :wiki_page, :default_license
 
   attribute :default_policy, if: :show_default_policy?
 
   def default_policy
-    self.convert_policy object.default_policy
+    BaseSerializer.convert_policy object.default_policy
   end
 
   has_many :organisms,  include_data: true

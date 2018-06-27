@@ -36,6 +36,7 @@ module Seek
             def can_#{action}? user = User.current_user
               authorized_for_#{action}?(user) && state_allows_#{action}?(user)
             end
+
             def authorized_for_#{action}? user = User.current_user
                 return true if new_record?
                 user_id = user.nil? ? 0 : user.id
@@ -107,7 +108,15 @@ module Seek
           assets
         end
 
+        # deletes entries where the ID doesn't match that of an existing ID
+        def remove_invalid_auth_lookup_entries
+          # the wrapping of the SELECT with another SELECT avoids the problem of attempting to DELETE FROM a locked table.
+          sql = "DELETE FROM #{lookup_table_name} WHERE asset_id IN (SELECT asset_id FROM (SELECT asset_id FROM #{lookup_table_name} LEFT JOIN #{table_name} f ON f.id = asset_id WHERE f.id IS NULL) AS result);"
+          ActiveRecord::Base.connection.execute(sql)
+        end
+
         # determines whether the lookup table records are consistent with the number of asset items in the database and the last id of the item added
+        #  if it isn't consistent it will automatically remove entries that do no match the id of an existing asset of the type (calling #remove_invalid_auth_lookup_entries)
         def lookup_table_consistent?(user_id)
           user_id = user_id.nil? ? 0 : user_id.id unless user_id.is_a?(Numeric)
           # cannot rely purely on the count, since an item could have been deleted and a new one added
@@ -119,7 +128,8 @@ module Seek
           if c == 0 && !last_asset_id.nil?
             AuthLookupUpdateJob.new.add_items_to_queue User.find_by_id(user_id)
           end
-          c == count && (count == 0 || (last_stored_asset_id == last_asset_id))
+          
+          (c == count && (count == 0 || (last_stored_asset_id == last_asset_id)))
         end
 
         # the name of the lookup table, holding authorisation lookup information, for this given authorised type
@@ -410,9 +420,15 @@ module Seek
         ActiveRecord::Base.connection.select_one(sql).values[0].to_i
       end
 
+      def contributors
+        a = [contributor]
+        a += versions.map(&:contributor) if respond_to?(:versions)
+        a.compact.uniq
+      end
+
       private
 
-      # Note, nil user means ALL users, not anonymous user. Anon user is represented with ;anonymous
+      # Note, nil user means ALL users, not anonymous user. Anon user is represented with `:anonymous`
       def update_lookup(permission, user = nil, overwrite = true)
         if permission.is_a?(Array)
           can_view, can_edit, can_download, can_manage, can_delete = *permission

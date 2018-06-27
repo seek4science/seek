@@ -24,7 +24,6 @@ class ProgrammesController < ApplicationController
   def create
     #because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
     funding_codes = params[:programme].delete(:funding_codes)
-
     @programme = Programme.new(programme_params)
 
     respond_to do |format|
@@ -73,7 +72,6 @@ class ProgrammesController < ApplicationController
 
   def handle_administrators
     params[:programme][:administrator_ids] = params[:programme][:administrator_ids].split(',')
-
     prevent_removal_of_self_as_programme_administrator
   end
 
@@ -180,7 +178,7 @@ class ProgrammesController < ApplicationController
   private
 
   def programme_params
-    handle_administrators if params[:programme][:administrator_ids]
+    handle_administrators if params[:programme][:administrator_ids] && !(params[:programme][:administrator_ids].is_a? Array)
 
     params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
                                       { project_ids: [] }, :funding_details, { administrator_ids: [] },

@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleTest < ActiveSupport::TestCase
+
   test 'validation' do
     sample = Factory :sample, title: 'fish', sample_type: Factory(:simple_sample_type), data: { the_title: 'fish' }
     assert sample.valid?
@@ -379,8 +380,10 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'projects' do
-    sample = Factory(:sample)
+    person = Factory(:person)
+    sample = Factory(:sample, contributor:person)
     project = Factory(:project)
+    person.add_to_project_and_institution(project,person.institutions.first)
     sample.update_attributes(project_ids: [project.id])
     disable_authorization_checks { sample.save! }
     sample.reload
@@ -419,14 +422,16 @@ class SampleTest < ActiveSupport::TestCase
     assay = Factory(:assay)
     study = assay.study
     investigation = study.investigation
-    sample = Factory(:sample)
+    sample = Factory(:sample, policy: Factory(:publicly_viewable_policy))
 
     assert_empty sample.assays
     assert_empty sample.studies
     assert_empty sample.investigations
 
-    assay.associate(sample)
-    assay.save!
+    User.with_current_user(assay.contributor.user) do
+      assay.associate(sample)
+      assay.save!
+    end
     sample.reload
 
     assert_equal [assay], sample.assays
@@ -438,7 +443,9 @@ class SampleTest < ActiveSupport::TestCase
     assay = Factory(:assay)
     sample = Factory(:sample, policy: Factory(:public_policy))
     assert_difference('AssayAsset.count', 1) do
-      assay.associate(sample)
+      User.with_current_user(assay.contributor.user) do
+        assay.associate(sample)
+      end
     end
     assay.save!
     sample.reload
@@ -780,9 +787,10 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'extracted samples inherit projects from data file' do
+    person = Factory(:person)
     create_sample_attribute_type
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                    policy: Factory(:private_policy)
+                                    policy: Factory(:private_policy), contributor:person
     sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
@@ -795,6 +803,7 @@ class SampleTest < ActiveSupport::TestCase
 
     # Change the projects
     new_projects = [Factory(:project), Factory(:project)]
+    new_projects.each{|p| person.add_to_project_and_institution(p,person.institutions.first)}
     disable_authorization_checks do
       data_file.projects = new_projects
       data_file.save!
@@ -839,7 +848,9 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'can overwrite existing samples when extracting from data file' do
-    project_ids = [Factory(:project).id]
+    person = Factory(:person)
+    project_ids = [person.projects.first.id]
+
     disable_authorization_checks do
       source_type = Factory(:source_sample_type, project_ids: project_ids)
       lib1 = source_type.samples.create(data: { title: 'Lib-1', info: 'bla' }, sample_type: source_type, project_ids: project_ids)
@@ -861,7 +872,7 @@ class SampleTest < ActiveSupport::TestCase
                                               required: false, sample_type: type)
       type.save!
 
-      data_file = Factory(:data_file, content_blob: Factory(:linked_samples_incomplete_content_blob), project_ids: project_ids)
+      data_file = Factory(:data_file, content_blob: Factory(:linked_samples_incomplete_content_blob), project_ids: project_ids, contributor:person)
 
       assert_difference('Sample.count', 4) do
         data_file.extract_samples(type, true, false)

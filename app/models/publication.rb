@@ -28,6 +28,9 @@ class Publication < ActiveRecord::Base
            as: :other_object,
            dependent: :destroy
 
+  has_many :presentations,through: :backwards_relationships, source: :subject, source_type:'Presentation'
+
+
   VALID_DOI_REGEX = /\A(10[.][0-9]{4,}(?:[.][0-9]+)*\/(?:(?!["&\'<>])\S)+)\z/
   VALID_PUBMED_REGEX = /\A(([1-9])([0-9]{0,7}))\z/
   # Note that the PubMed regex deliberately does not allow versions
@@ -186,9 +189,9 @@ class Publication < ActiveRecord::Base
     backwards_relationships.select { |a| a.subject_type == 'Investigation' }.collect(&:subject)
   end
 
-  def presentations
-    backwards_relationships.select { |a| a.subject_type == 'Presentation' }.collect(&:subject)
-  end
+  # def presentations
+  #   backwards_relationships.select { |a| a.subject_type == 'Presentation' }.collect(&:subject)
+  # end
 
   def associate(item)
     clause = { subject_type: item.class.name,
@@ -251,13 +254,6 @@ class Publication < ActiveRecord::Base
     author_names
   end
 
-  # those displayed on the right. We don't want authors listed as creators here (OPSK-1247). Changing .creators breaks behaviour when editing
-  def displayed_creators
-    [contributor].compact.map do |creator|
-      creator.is_a?(User) ? creator.person : creator
-    end
-  end
-
   def has_doi?
     self.doi.present?
   end
@@ -268,9 +264,19 @@ class Publication < ActiveRecord::Base
 
   private
 
+  def pubmed_entry
+    if pubmed_id
+      Rails.cache.fetch("bio-reference-#{pubmed_id}") do
+        entry = Bio::PubMed.efetch(pubmed_id).first
+        raise "PubMed entry was nil" if entry.nil?
+        entry
+      end
+    end
+  end
+
   def bio_reference
     if pubmed_id
-      Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+      Bio::MEDLINE.new(pubmed_entry).reference
     else
       # TODO: Bio::Reference supports a 'url' option. Should this be the URL on seek, or the URL of the 'View Publication' button, or neither?
       Bio::Reference.new({ title: title, journal: journal, abstract: abstract,

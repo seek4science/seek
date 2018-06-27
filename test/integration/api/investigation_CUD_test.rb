@@ -15,9 +15,11 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
     @max_project = Factory(:max_project)
     @max_project.title = 'Bert'
 
-    @inv = Factory(:investigation, policy: Factory(:public_policy))
-    @inv.contributor = @current_user.person
-    @inv.save
+    institution = Factory(:institution)
+    @current_person.add_to_project_and_institution(@min_project, institution)
+    @current_person.add_to_project_and_institution(@max_project, institution)
+
+    @inv = Factory(:investigation, contributor: @current_person, policy: Factory(:public_policy))
 
     hash = {project_ids: [@min_project.id, @max_project.id],
             r: ApiTestHelper.method(:render_erb) }
@@ -37,7 +39,7 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
                      r: ApiTestHelper.method(:render_erb) }
   end
 
-  def populate_extra_relationships
+  def populate_extra_relationships(hash = nil)
     person_id = @current_user.person.id
     extra_relationships = {}
     extra_relationships[:submitter] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
@@ -50,6 +52,7 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
     assert_no_difference('Investigation.count') do
       delete "/#{@plural_clz}/#{inv.id}.json"
       assert_response :forbidden
+      validate_json_against_fragment response.body, '#/definitions/errors'
     end
   end
 

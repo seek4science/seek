@@ -26,8 +26,9 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should show aggregated publications linked to assay' do
-    assay1 = Factory :assay, policy: Factory(:public_policy)
-    assay2 = Factory :assay, policy: Factory(:public_policy)
+    person = User.current_user.person
+    assay1 = Factory :assay, policy: Factory(:public_policy), contributor:person
+    assay2 = Factory :assay, policy: Factory(:public_policy), contributor:person
 
     pub1 = Factory :publication, title: 'pub 1'
     pub2 = Factory :publication, title: 'pub 2'
@@ -38,7 +39,7 @@ class StudiesControllerTest < ActionController::TestCase
     Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
     Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub3
 
-    study = Factory(:study, assays: [assay1, assay2], policy: Factory(:public_policy))
+    study = Factory(:study, assays: [assay1, assay2], policy: Factory(:public_policy), contributor:person)
 
     get :show, id: study.id
     assert_response :success
@@ -145,8 +146,9 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should create' do
+    investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
     assert_difference('Study.count') do
-      post :create, study: { title: 'test', investigation_id: investigations(:metabolomics_investigation).id }, policy_attributes: valid_sharing
+      post :create, study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing
     end
     s = assigns(:study)
     assert_redirected_to study_path(s)
@@ -175,7 +177,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     put :update, id: s, study: { title: s.title }, policy_attributes: { access_type: Policy::NO_ACCESS }
     s = assigns(:study)
-    assert_response :success
+    assert_response :unprocessable_entity
     s.reload
     assert_equal Policy::EVERYONE, s.policy.access_type
   end
@@ -388,7 +390,7 @@ class StudiesControllerTest < ActionController::TestCase
   test 'edit study with selected projects scope policy' do
     proj = User.current_user.person.projects.first
     study = Factory(:study, contributor: User.current_user.person,
-                            investigation: Factory(:investigation, project_ids: [proj.id]),
+                            investigation: Factory(:investigation, contributor: User.current_user.person),
                             policy: Factory(:policy,
                                             access_type: Policy::NO_ACCESS,
                                             permissions: [Factory(:permission, contributor: proj, access_type: Policy::EDITING)]))
@@ -407,8 +409,10 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'object based on existing study' do
+    person = User.current_user.person
+    inv = Factory :investigation, policy: Factory(:public_policy), contributor:person
     study = Factory :study, title: 'the study', policy: Factory(:public_policy),
-                            investigation: Factory(:investigation, policy: Factory(:public_policy))
+                            investigation: inv, contributor:person
     get :new_object_based_on_existing_one, id: study.id
     assert_response :success
     assert_select '#study_title[value=?]', 'the study'
@@ -438,9 +442,10 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'object based on existing one when unauthorized to edit investigation' do
-    inv = Factory(:investigation, policy: Factory(:private_policy), contributor: Factory(:person))
+    person = Factory(:person)
+    inv = Factory(:investigation, policy: Factory(:private_policy), contributor: person)
 
-    study = Factory :study, title: 'the private study', policy: Factory(:public_policy), investigation: inv
+    study = Factory :study, title: 'the private study', policy: Factory(:public_policy), investigation: inv, contributor:person
     assert study.can_view?
     refute study.investigation.can_edit?
     get :new_object_based_on_existing_one, id: study.id
@@ -532,10 +537,11 @@ class StudiesControllerTest < ActionController::TestCase
   test 'programme studies through nested routing' do
     assert_routing 'programmes/2/studies', { controller: 'studies', action: 'index', programme_id: '2' }
     programme = Factory(:programme)
-    investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy))
+    person = Factory(:person,project:programme.projects.first)
+    investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy),contributor:person)
     investigation2 = Factory(:investigation, policy: Factory(:public_policy))
-    study = Factory(:study, investigation: investigation, policy: Factory(:public_policy))
-    study2 = Factory(:study, investigation: investigation2, policy: Factory(:public_policy))
+    study = Factory(:study, investigation: investigation, policy: Factory(:public_policy), contributor:investigation.contributor)
+    study2 = Factory(:study, investigation: investigation2, policy: Factory(:public_policy), contributor:investigation2.contributor)
 
     get :index, programme_id: programme.id
 
@@ -547,7 +553,6 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(study)
-    add_tags_to_test_object(study)
     study.person_responsible = Factory(:max_person)
     add_creator_to_test_object(study)
   end
@@ -568,4 +573,75 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert_redirected_to studies_path
   end
+
+  test 'cannot create with link to investigation in another project' do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    login_as(person)
+    investigation = Factory(:investigation,contributor:another_person,projects:another_person.projects,policy:Factory(:publicly_viewable_policy))
+    assert investigation.can_view?
+    assert_empty person.projects & investigation.projects
+    assert_no_difference('Study.count') do
+      post :create, study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test 'cannot create with hidden investigation in same project' do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+    login_as(person)
+    investigation = Factory(:investigation,contributor:another_person,projects:person.projects,policy:Factory(:private_policy))
+    refute investigation.can_view?
+    refute_empty person.projects & investigation.projects
+
+    assert_no_difference('Study.count') do
+      post :create, study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test 'cannot update with link to investigation in another project' do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    login_as(person)
+    investigation = Factory(:investigation,contributor:another_person,projects:another_person.projects,policy:Factory(:publicly_viewable_policy))
+    study = Factory(:study,contributor:person,investigation:Factory(:investigation,contributor:person,projects:person.projects))
+
+    assert investigation.can_view?
+    assert_empty person.projects & investigation.projects
+
+    refute_equal investigation,study.investigation
+
+
+    put :update,id:study.id,study:{investigation_id:investigation.id}
+
+    assert_response :unprocessable_entity
+    study.reload
+    refute_equal investigation,study.investigation
+  end
+
+  test 'cannot update with link to hidden investigation in same project' do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+    login_as(person)
+    investigation = Factory(:investigation,contributor:another_person,projects:person.projects,policy:Factory(:private_policy))
+    study = Factory(:study,contributor:person,investigation:Factory(:investigation,contributor:person,projects:person.projects))
+
+    refute investigation.can_view?
+    refute_empty person.projects & investigation.projects
+    refute_equal investigation,study.investigation
+
+    put :update,id:study.id,study:{investigation_id:investigation.id}
+
+    assert_response :unprocessable_entity
+    study.reload
+    refute_equal investigation,study.investigation
+  end
+
+
 end

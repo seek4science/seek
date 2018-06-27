@@ -40,6 +40,7 @@ Rails.application.config.assets.precompile += [
     'project_folders',
     'tablesorter/jquery-latest.js',
     'tablesorter/jquery.tablesorter.js',
+    'multi_step_wizard.js',
 
     "prepended/*.css",
     "cytoscape_isa_graph.css",

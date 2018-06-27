@@ -127,8 +127,9 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
         assert cv_with_sample_type.can_edit?
 
         # cannot edit if linked to samples
+        contributor=Factory(:person)
         sample = Sample.new(sample_type: Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test2'),
-                            title: 'testing cv can edit', project_ids: [Factory(:project).id])
+                            title: 'testing cv can edit', project_ids: person.projects.collect(&:id), contributor: person)
         sample.set_attribute(:apples, 'Bramley')
         disable_authorization_checks do
           assert sample.save!

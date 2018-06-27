@@ -8,6 +8,10 @@
   Total delayed jobs waiting = <%= delayed_jobs.count -%>
 </p>
 
+<% if Delayed::Job.where('failed_at IS NOT NULL').count > 0 %>
+  <%= button_link_to "Clear failed jobs", 'clear', '#', id: 'clear-failed-btn', class: 'btn-primary' %>
+<% end %>
+
 <table class="table table-hover">
   <thead>
   <tr>
@@ -67,3 +71,26 @@
       </tr>
   <% end -%>
 </table>
+
+<script type="application/javascript">
+
+    $j('#clear-failed-btn').click(function () {
+        if (confirm("This will clear all failed jobs listed, are you sure?")) {
+            var request = $j.ajax({
+                type: "POST",
+                dataType: "json",
+                timeout: 0,
+                url: '<%= clear_failed_jobs_admin_path -%>'
+            });
+
+            request.done(function (data) {
+
+            }).fail(function (jqXHR, textStatus,errorThrown) {
+
+            })
+
+            $j('#stats-refresh-btn').click();
+        }
+    });
+
+</script>

@@ -82,12 +82,6 @@ class ModelTest < ActiveSupport::TestCase
     assert !model.is_jws_supported?
     assert !model.contains_jws_dat?
 
-    # should also be able to handle versions
-    model = models(:teusink).latest_version
-    assert model.contains_sbml?
-    assert model.is_jws_supported?
-    assert !model.contains_jws_dat?
-
     model = Factory(:teusink_jws_model).latest_version
     assert !model.contains_sbml?
     assert model.is_jws_supported?
@@ -102,21 +96,42 @@ class ModelTest < ActiveSupport::TestCase
     assert !model.contains_sbml?
     assert !model.is_jws_supported?
     assert !model.contains_jws_dat?
+
+    # should also be able to handle new versions
+    model = Factory(:non_sbml_xml_model)
+    assert !model.contains_sbml?
+    assert !model.is_jws_supported?
+
+    disable_authorization_checks {
+      assert model.save_as_new_version
+      model.content_blobs = [Factory(:teusink_model_content_blob, asset: model, asset_version: model.version)]
+      model.save
+    }
+    model.reload
+    assert_equal 2,model.version
+    assert model.contains_sbml?
+    assert model.is_jws_supported?
+    assert !model.contains_jws_dat?
+
   end
 
   test 'assay association' do
-    model = models(:teusink)
-    assay = assays(:modelling_assay_with_data_and_relationship)
-    assay_asset = assay_assets(:metabolomics_assay_asset1)
-    assert_not_equal assay_asset.asset, model
-    assert_not_equal assay_asset.assay, assay
-    assay_asset.asset = model
-    assay_asset.assay = assay
-    User.with_current_user(model.contributor) { assay_asset.save! }
-    assay_asset.reload
-    assert assay_asset.valid?
-    assert_equal assay_asset.asset, model
-    assert_equal assay_asset.assay, assay
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      model = Factory(:model, contributor:person)
+      assay = Factory(:assay, contributor:person)
+      assay_asset = AssayAsset.new
+      assert_not_equal assay_asset.asset, model
+      assert_not_equal assay_asset.assay, assay
+      assay_asset.asset = model
+      assay_asset.assay = assay
+      assay_asset.save!
+      assay_asset.reload
+      assert assay_asset.valid?
+      assert_equal assay_asset.asset, model
+      assert_equal assay_asset.assay, assay
+    end
+
   end
 
   test 'sort by updated_at' do
@@ -178,12 +193,13 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'policy defaults to system default' do
-    with_config_value 'default_all_visitors_access_type', Policy::VISIBLE do
-      model = Model.new Factory.attributes_for(:model, policy: nil)
+    with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
+      model = Factory.build(:model)
+      refute model.persisted?
       model.save!
       model.reload
       assert_not_nil model.policy
-      assert_equal Policy::VISIBLE, model.policy.access_type
+      assert_equal Policy::NO_ACCESS, model.policy.access_type
       assert model.policy.permissions.empty?
     end
   end
@@ -237,34 +253,6 @@ class ModelTest < ActiveSupport::TestCase
       end
       assert_not_nil ContentBlob.find(cb.id)
     end
-  end
-
-  test 'is restorable after destroy' do
-    model = Factory :model, policy: Factory(:all_sysmo_viewable_policy), title: 'is it restorable?'
-    User.with_current_user model.contributor do
-      assert_difference('Model.count', -1) do
-        model.destroy
-      end
-    end
-    assert_nil Model.find_by_title 'is it restorable?'
-    assert_difference('Model.count', 1) do
-      disable_authorization_checks { Model.restore_trash!(model.id) }
-    end
-    assert_not_nil Model.find_by_title 'is it restorable?'
-  end
-
-  test 'failing to delete due to can_delete still creates trash' do
-    user = Factory :user
-    contributor = Factory :person
-    model = Factory :model, policy: Factory(:private_policy), contributor: contributor
-    User.with_current_user user do
-      assert !model.can_delete?
-      assert_no_difference('Model.count') do
-        model.destroy
-      end
-    end
-
-    assert_not_nil Model.restore_trash(model.id)
   end
 
   test 'test uuid generated' do

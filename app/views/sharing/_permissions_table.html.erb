@@ -7,6 +7,7 @@
 
 <%= render partial: 'sharing/person_permission_modal', locals: { object: object } %>
 <%= render partial: 'sharing/group_permission_modal', locals: { object: object } %>
+<%= render partial: 'sharing/programme_permission_modal', locals: { object: object } %>
 
 <script>
   var policy = <%= policy_json(policy, projects) -%>;

@@ -36,17 +36,6 @@ class AssetTest < ActiveSupport::TestCase
     assert Assay.can_create?
   end
 
-  test 'default contributor or nil' do
-    User.current_user = users(:owner_of_my_first_sop)
-    model = Model.new(Factory.attributes_for(:model).tap { |h| h[:contributor] = nil; h[:policy] = Factory(:private_policy) })
-    assert_equal users(:owner_of_my_first_sop), model.contributor
-    model.contributor = nil
-    model.save!
-    assert_nil model.contributor
-    model = Model.find(model.id)
-    assert_nil model.contributor
-  end
-
   test 'latest version?' do
     d = Factory(:xlsx_spreadsheet_datafile, policy: Factory(:public_policy))
 
@@ -196,14 +185,6 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal 2, assay.managers.count
     assert assay.managers.include?(user.person)
     assert assay.managers.include?(person2)
-
-    # this is liable to change when Project contributors are handled
-    p1 = Factory(:project)
-    p2 = Factory(:project)
-    policy = Factory(:private_policy)
-    policy.permissions << Factory(:permission, contributor: p1, access_type: Policy::MANAGING, policy: policy)
-    model = Factory(:model, policy: policy, contributor: p2)
-    assert model.managers.empty?
   end
 
   test 'tags as text array' do

@@ -228,6 +228,7 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html { redirect_to root_url }
       format.json { render json: { errors: [{ title: notice, detail: _message }] }, status:  _status }
+
     end
   end
 
@@ -393,7 +394,7 @@ class ApplicationController < ActionController::Base
                              data: activity_loggable.title)
         end
       when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } # TODO: Find a nicer way of doing this...
-        action = 'create' if action == 'upload_for_tool'
+        action = 'create' if action == 'upload_for_tool' || action == 'create_metadata'
         action = 'update' if action == 'new_version'
         action = 'inline_view' if action == 'explore'
         if %w(show create update destroy download inline_view).include?(action)
@@ -559,12 +560,13 @@ class ApplicationController < ActionController::Base
             raise ArgumentError.new('A POST request is not allowed to specify an id')
           end
         when "update"
-          if (!params[:data][:id].nil?) && (params[:id] != params[:data][:id])
+          if (!params[:data][:id].nil?) && (params[:id].to_s != params[:data][:id].to_s)
             raise ArgumentError.new('id specified by the PUT request does not match object-id in the JSON input')
           end
       end
     rescue ArgumentError => e
-      render json: {error: e.message, status: :unprocessable_entity}, status: :unprocessable_entity
+      output = "{\"errors\" : [{\"detail\" : \"#{e.message}\"}]}"
+      render plain: output, status: :unprocessable_entity
     end
   end
 

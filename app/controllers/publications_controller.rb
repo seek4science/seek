@@ -42,7 +42,18 @@ class PublicationsController < ApplicationController
       format.xml
       format.rdf { render template: 'rdf/show' }
       format.json {render json: @publication}
-      format.any( *Publication::EXPORT_TYPES.keys ) { send_data @publication.export(request.format.to_sym), type: request.format.to_sym, filename: "#{@publication.title}.#{request.format.to_sym}" }
+      format.any( *Publication::EXPORT_TYPES.keys ) do
+        begin
+          send_data @publication.export(request.format.to_sym), type: request.format.to_sym, filename: "#{@publication.title}.#{request.format.to_sym}"
+        rescue StandardError => exception
+          if Seek::Config.exception_notification_enabled
+            ExceptionNotifier.notify_exception(exception, data: { message: "Error exporting publication as #{request.format}" })
+          end
+
+          flash[:error] = "There was a problem communicating with PubMed to generate the requested #{request.format.to_sym.to_s.upcase}."
+          redirect_to @publication
+        end
+      end
     end
   end
 
@@ -113,6 +124,7 @@ class PublicationsController < ApplicationController
     assay_ids = params[:assay_ids] || []
     data_files = params[:data_files] || []
     model_ids = params[:model_ids] || []
+    presentation_ids = params[:publication][:presentation_ids] || []
 
     respond_to do |format|
       if valid && @publication.update_attributes(publication_params)
@@ -126,6 +138,8 @@ class PublicationsController < ApplicationController
         create_or_update_associations data_files, 'DataFile', 'view'
 
         create_or_update_associations model_ids, 'Model', 'view'
+
+        create_or_update_associations presentation_ids, 'Presentation', 'view'
 
         # Create policy if not present (should be)
         if @publication.policy.nil?

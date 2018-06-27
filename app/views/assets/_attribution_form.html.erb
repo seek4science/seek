@@ -3,9 +3,12 @@
 <%# - existing_attributions - collection of existing attributions for the current resource (this should be collection of resources - NOT collection of records of Attribution class) -%>
 
 <!-- Attributions -->
-<% resource_type_text = text_for_resource(resource_class.name) -%>
+<%
+  resource_type_text = text_for_resource(resource_class.name)
+  collapsed = existing_attributions.blank? if collapsed.nil?
+-%>
 
-<%= folding_panel('Attributions', existing_attributions.blank?, :body_options => {:id => 'attributions_fold_content'},
+<%= folding_panel('Attributions', collapsed, :body_options => {:id => 'attributions_fold_content'},
                   :help_text => "Here you attribute this #{resource_type_text} to other #{resource_type_text.pluralize}.") do %>
     <p>
       If this <%= resource_type_text %> is based on any existing <%= resource_type_text.pluralize -%>, please list them below

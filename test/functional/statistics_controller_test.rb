@@ -33,7 +33,6 @@ class StatisticsControllerTest < ActionController::TestCase
         get :application_status
         assert_response :success
         assert_match(/Euro SEEK is running \| search is enabled \| [0-9] delayed jobs running \| soffice is #{soffice}/, @response.body)
-        puts @response.body
       end
     end
   end

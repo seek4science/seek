@@ -85,7 +85,7 @@ module ProjectsHelper
     administrators = project.send(role.to_s.pluralize)
     members = project.people
     box = ''
-    box << objects_input("project[#{role}_ids]", administrators, typeahead: { values: members.map { |p| { id: p.id, name: p.name, hint: p.email } } })
+    box << objects_input("project[#{role}_ids]", administrators, typeahead: { values: members.map { |p| { id: p.id, name: p.name, hint: p.typeahead_hint } } })
     box.html_safe
   end
 

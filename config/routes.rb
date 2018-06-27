@@ -51,6 +51,7 @@ SEEK::Application.routes.draw do
       post :delete_tag
       post :edit_tag
       post :update_imprint_setting
+      post :clear_failed_jobs
     end
   end
 
@@ -61,6 +62,7 @@ SEEK::Application.routes.draw do
       get :funding
       post :send_feedback
       get :imprint
+      get :terms
       get :about
     end
   end
@@ -357,6 +359,10 @@ SEEK::Application.routes.draw do
       post :upload_from_email
       post :items_for_result
       post :resource_in_tab
+      get :provide_metadata
+      post :create_content_blob
+      post :rightfield_extraction_ajax
+      post :create_metadata
     end
     member do
       get :matching_models
@@ -719,6 +725,7 @@ SEEK::Application.routes.draw do
   get "/404" => "errors#error_404"
   get "/422" => "errors#error_422"
   get "/500" => "errors#error_500"
+  get "/503" => "errors#error_503"
 
   get "/zenodo_oauth_callback" => "zenodo/oauth2/callbacks#callback"
   get "/seek_nels" => "nels#callback", as: 'nels_oauth_callback'

@@ -3,16 +3,15 @@ module NelsTestHelper
   def setup_nels_for_units
     create_sample_attribute_type
 
-    person = Factory(:person)
-    @user = person.user
-    @project = person.projects.first
+    @project = Factory(:project)
     @project.settings['nels_enabled'] = true
+    person = Factory(:person, project: @project)
+    @user = person.user
     @nels_access_token = 'fake-access-token'
 
     @user.oauth_sessions.where(provider: 'NeLS').create(access_token: @nels_access_token, expires_at: 1.week.from_now)
 
-    study = Factory(:study, investigation: Factory(:investigation, project_ids: [@project.id]))
-    @assay = Factory(:assay, contributor: person, study: study)
+    @assay = Factory(:assay, contributor: person)
 
     @project_id = 91123122
     @dataset_id = 91123528

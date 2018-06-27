@@ -3,8 +3,9 @@
    project_publications=authorised_publications(current_user.person.projects).sort_by &:title
    select_truncate_length=120
    show_relationships=false
+  collapsed = related_publications.blank? if collapsed.nil?
 %>
-<%= folding_panel('Publications', related_publications.blank?, :body_options => {:id => 'publications_fold_content'},
+<%= folding_panel('Publications', collapsed, :body_options => {:id => 'publications_fold_content'},
                   :help_text => "Here you attribute this #{resource_type} to any Publications registered in SEEK, or vice versa.") do %>
     <div class="row">
       <div class="col-md-8">

@@ -23,11 +23,11 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
-    model = Factory(:model, policy: Factory(:public_policy), contributor: @current_person)
+    model = Factory(:model, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: model.id})
   end
 
-  def populate_extra_relationships
+  def populate_extra_relationships(hash = nil)
     extra_relationships = {}
     extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
     extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' },
@@ -83,6 +83,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
         'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
 
     assert_response :forbidden
+    validate_json_against_fragment response.body, '#/definitions/errors'
     blob = pdf_blob.reload
     assert_nil blob.md5sum
     assert blob.no_content?
@@ -103,6 +104,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
         'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
 
     assert_response :bad_request
+    validate_json_against_fragment response.body, '#/definitions/errors'
     blob = pdf_blob.reload
     assert_equal original_md5, blob.md5sum
     assert blob.file_size > 0
@@ -119,11 +121,14 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     template_file = File.join(ApiTestHelper.template_dir, 'post_remote_model.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
+    validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz.camelize(:lower)}Post"
 
     assert_difference("#{@clz.classify}.count") do
       post "/#{@plural_clz}.json", @to_post
       assert_response :success
     end
+
+    validate_json_against_fragment response.body, "#/definitions/#{@clz.camelize(:lower)}Response"
 
     h = JSON.parse(response.body)
 
@@ -143,6 +148,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     assert_no_difference("#{@clz.classify}.count") do
       post "/#{@plural_clz}.json", @to_post
       assert_response :unprocessable_entity
+      validate_json_against_fragment response.body, '#/definitions/errors'
     end
 
     h = JSON.parse(response.body)

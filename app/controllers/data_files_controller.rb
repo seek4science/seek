@@ -11,7 +11,8 @@ class DataFilesController < ApplicationController
   include Seek::AssetsCommon
 
   before_filter :find_assets, only: [:index]
-  before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob,
+                                                             :request_resource, :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
   before_filter :find_display_asset, only: [:show, :explore, :download, :matching_models]
   skip_before_filter :verify_authenticity_token, only: [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, only: [:upload_for_tool, :upload_from_email]
@@ -22,6 +23,8 @@ class DataFilesController < ApplicationController
   before_filter :oauth_client, only: :retrieve_nels_sample_metadata
   before_filter :nels_oauth_session, only: :retrieve_nels_sample_metadata
   before_filter :rest_client, only: :retrieve_nels_sample_metadata
+
+  before_filter :login_required, only: [:create, :create_content_blob, :create_metadata, :rightfield_extraction_ajax, :provide_metadata]
 
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
@@ -141,6 +144,8 @@ class DataFilesController < ApplicationController
     end
   end
 
+
+
   def create
     @data_file = DataFile.new(data_file_params)
 
@@ -199,7 +204,10 @@ class DataFilesController < ApplicationController
   end
 
   def update
-    @data_file.attributes = data_file_params.except!(:content)
+    if params[:data_file].empty? && !params[:datafile].empty?
+      params[:data_file] = params[:datafile]
+    end	
+    @data_file.assign_attributes(data_file_params)
 
     update_annotations(params[:tag_list], @data_file) if params.key?(:tag_list)
     update_scales @data_file
@@ -234,7 +242,7 @@ class DataFilesController < ApplicationController
     if !(%w(xls xlsx) & mime_extensions).empty?
       respond_to do |format|
         format.html # currently complains about a missing template, but we don't want people using this for now - its purely XML
-        format.xml { render xml: spreadsheet_to_xml(file) }
+        format.xml { render xml: spreadsheet_to_xml(file, memory_allocation = Seek::Config.jvm_memory_allocation) }
         format.csv { render text: spreadsheet_to_csv(file, sheet, trim) }
       end
     else
@@ -388,6 +396,151 @@ class DataFilesController < ApplicationController
     end
   end
 
+  ### ACTIONS RELATED TO DATA FILE UPLOAD AND RIGHTFIELD EXTRACTION ###
+
+  # handles the uploading of the file to create a content blob, which is then associated with a new unsaved datafile
+  # and stored on the session
+  def create_content_blob
+    @data_file = DataFile.new
+    respond_to do |format|
+      if handle_upload_data
+        create_content_blobs
+        session[:uploaded_content_blob_id] = @data_file.content_blob.id
+        # assay ids passed forwards, e.g from "Add Datafile" button
+        @source_assay_ids = (params[:assay_ids] || [] ).reject(&:blank?)
+        format.html {}
+      else
+        session.delete(:uploaded_content_blob_id)
+        format.html { render action: :new }
+      end
+    end
+  end
+
+  # AJAX call to trigger any RightField extraction (if appropriate), and pre-populates the associated @data_file and
+  # @assay
+  def rightfield_extraction_ajax
+
+    @data_file = DataFile.new
+    @warnings = nil
+    @assay = Assay.new
+    critical_error_msg = nil
+    session.delete :extraction_exception_message
+
+    begin
+      if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
+        @data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
+        @warnings = @data_file.populate_metadata_from_template
+        @assay, warnings = @data_file.initialise_assay_from_template
+        @warnings.merge(warnings)
+      else
+        critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
+      end
+    rescue Exception => e
+      ExceptionNotifier.notify_exception(e, data: {
+          message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}",
+          current_logged_in_user: current_user
+      })
+      session[:extraction_exception_message] = e.message
+    end
+
+    session[:processed_datafile] = @data_file
+    session[:processed_assay] = @assay
+    session[:processing_warnings] = @warnings
+
+    respond_to do |format|
+      if critical_error_msg
+        format.js { render text: critical_error_msg, status: :unprocessable_entity }
+      else
+        format.js { render text: 'done', status: :ok }
+      end
+    end
+  end
+
+  # Displays the form Wizard for providing the metadata for both the data file, and possibly related Assay
+  # if not already provided and available, it will use those that had previously been populated through RightField extraction
+  def provide_metadata
+    @data_file ||= session[:processed_datafile]
+    @assay ||= session[:processed_assay]
+
+    #this perculiar line avoids a no method error when calling super later on, when there are no assays in the database
+    # this I believe is caused by accessing the unmarshalled @assay before the Assay class has been encountered. Adding this line
+    # avoids the error
+    Assay.new
+    @warnings ||= session[:processing_warnings] || []
+    @exception_message ||= session[:extraction_exception_message]
+    @create_new_assay = !(@assay.title.blank? && @assay.description.blank?)
+    respond_to do |format|
+      format.html {}
+    end
+  end
+
+  # Receives the submitted metadata and registers the datafile and assay
+  def create_metadata
+    @data_file = DataFile.new(data_file_params)
+    assay_params = data_file_assay_params
+    sop_id = assay_params.delete(:sop_id)
+    @create_new_assay = assay_params.delete(:create_assay)
+
+    update_sharing_policies(@data_file)
+
+    @assay = Assay.new(assay_params)
+    if sop_id
+      sop = Sop.find_by_id(sop_id)
+      @assay.sops << sop if sop && sop.can_view?
+    end
+    @assay.policy = @data_file.policy.deep_copy if @create_new_assay
+
+    filter_associated_projects(@data_file)
+
+    # check the content blob id matches that previously uploaded and recorded on the session
+    all_valid = uploaded_blob_matches = (params[:content_blob_id].to_s == session[:uploaded_content_blob_id].to_s)
+
+    #associate the content blob with the data file
+    blob = ContentBlob.find(params[:content_blob_id])
+    @data_file.content_blob = blob
+
+    # if creating a new assay, check it is valid and the associated study is editable
+    all_valid = all_valid && !@create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)
+
+    # check the datafile can be saved, and also the content blob can be saved
+    all_valid = all_valid && @data_file.save && blob.save
+
+    if all_valid
+      update_annotations(params[:tag_list], @data_file)
+      update_scales @data_file
+
+      update_relationships(@data_file, params)
+
+      session.delete(:uploaded_content_blob_id)
+
+      respond_to do |format|
+        flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
+        # parse the data file if it is with sample data
+
+        # the assay_id param can also contain the relationship type
+        assay_ids, _relationship_types = determine_related_assay_ids_and_relationship_types(params)
+        assay_ids = [@assay.id.to_s] if @create_new_assay
+        update_assay_assets(@data_file, assay_ids)
+        format.html { redirect_to data_file_path(@data_file) }
+        format.json { render json: @data_file }
+      end
+
+    else
+      @data_file.errors[:base] = "The file uploaded doesn't match" unless uploaded_blob_matches
+
+      # this helps trigger the complete validation error messages, as not both may be validated in a single action
+      # - want the avoid the user fixing one set of validation only to be presented with a new set
+      @assay.valid? if @create_new_assay
+      @data_file.valid? if uploaded_blob_matches
+
+      respond_to do |format|
+        format.html do
+          render :provide_metadata, status: :unprocessable_entity
+        end
+      end
+    end
+  end
+
   protected
 
   def xml_login_only
@@ -435,12 +588,19 @@ class DataFilesController < ApplicationController
     end
   end
 
+
+
+
   private
 
   def data_file_params
     params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] }, :license, :other_creators,
                                       :parent_name, { event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+  end
+
+  def data_file_assay_params
+    params.fetch(:assay,{}).permit(:title, :description, :assay_class_id, :study_id, :sop_id,:assay_type_uri,:technology_type_uri, :create_assay)
   end
 
   def oauth_client

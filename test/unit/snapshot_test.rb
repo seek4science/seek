@@ -6,8 +6,11 @@ class SnapshotTest < ActiveSupport::TestCase
   fixtures :investigations
 
   setup do
+    contributor = Factory(:person)
+    User.current_user = contributor.user
+
     @investigation = Factory(:investigation, title: 'i1', description: 'not blank',
-                                             policy: Factory(:downloadable_public_policy))
+                                             policy: Factory(:downloadable_public_policy), contributor:contributor)
     @study = Factory(:study, title: 's1', investigation: @investigation, contributor: @investigation.contributor,
                              policy: Factory(:downloadable_public_policy))
     @assay = Factory(:assay, title: 'a1', study: @study, contributor: @investigation.contributor,
@@ -19,6 +22,7 @@ class SnapshotTest < ActiveSupport::TestCase
                                      policy: Factory(:downloadable_public_policy))
     @publication = Factory(:publication, title: 'p1', contributor: @investigation.contributor,
                                          policy: Factory(:downloadable_public_policy))
+
     @assay.associate(@data_file)
     @assay2.associate(@data_file)
     Factory(:relationship, subject: @assay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: @publication)
@@ -256,6 +260,7 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   test 'assay snapshot' do
+
     snapshot = @assay.create_snapshot
 
     assert_equal 'a1', snapshot.title

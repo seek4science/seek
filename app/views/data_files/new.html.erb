@@ -1,87 +1,23 @@
 <% @page_title ||= "New #{t('data_file')}" %>
 <h1><%= @page_title %></h1>
-<% all_institutions = Institution.order(:title) %>
 
-<%= form_tag({:action => :create}, :multipart => true) do -%>
+<%= form_tag({:action => :create_content_blob}, :multipart => true) do -%>
     <%= hidden_field_tag 'data_file[parent_name]', @data_file.parent_name%>
     <%= hidden_field_tag 'data_file[is_with_sample]', @data_file.is_with_sample%>
+    <%= hidden_field_tag 'assay_ids[]',params[:assay_ids] %>
 
     <div class="asset_form">
       <%= error_messages_for :data_file -%>
 
       <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file} -%>
 
-      <div class="form-group">
-        <label>Title <span class="required">*</span></label>
-        <% data_file_title_value = (params[:data_file].blank? || params[:data_file][:title].blank?) ? nil : params[:data_file][:title] -%>
-        <%= text_field_tag 'data_file[title]', data_file_title_value, :class=>"form-control" -%>
-      </div>
-
-
-      <% if @data_file.is_with_sample? %>
-          <div class="form-group">
-            <label>
-              Institution
-              <% if Seek::Config.is_virtualliver %>
-                  <span class="required"> * </span>
-              <% end %>
-            </label>
-            <%= select_tag :institution_id,
-                           options_for_select(all_institutions.collect { |o| [h(o.title), o.id] }, current_user.try(:person).try(:projects).try(:first).try(:institution_ids).try(:first)),
-                           :class => 'form-control' %>
-          </div>
-      <% end %>
-
-      <% if @data_file.is_with_sample? %>
-          <div class="form-group">
-            <label>Template</label>
-            <%=  select_tag 'data_file[template_name]',
-                            options_for_select(["Autodetect by filename", "Jena", "Duesseldorf_Bode", "Duesseldorf_Bode_Surgical","Dortmund_Hengstler", "Dortmund_BCat_KO"], "Autodetect by filename"),#
-                            :class => 'form-control' %>
-          </div>
-      <% end %>
-
-      <div class="form-group">
-        <label>Description</label>
-        <% data_file_description_value = (params[:data_file].blank? || params[:data_file][:description].blank?) ? nil : params[:data_file][:description] -%>
-        <%= text_area_tag 'data_file[description]', data_file_description_value, :class=>"form-control", :rows => 5 -%>
-      </div>
-
-      <div class="form-group">
-        <% data_file_simulation_data_value = (params[:data_file].blank? || params[:data_file][:simulation_data].blank?) ? false : params[:data_file][:simulation_data] -%>
-        <div class='help-block'>Check this box if this data is the result of a model simulation</div>
-        <label>
-          <%= check_box_tag 'data_file[simulation_data]','1',data_file_simulation_data_value %>
-          Model simulation data
-        </label>
-      </div>
-
-
-      <%= render :partial => "projects/project_selector", :locals => { :resource => @data_file, :allow_nil => Seek::Config.is_virtualliver } -%>
-
-      <%= render :partial => "scales/scales_selector",:locals=>{:object=>@data_file} if show_scales?%>
-
-      <%= render :partial => 'assets/license_selector', :locals => { :resource => @data_file } %>
-
-      <%= fields_for(@data_file) {|f|render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
-
-      <% if Seek::Config.assays_enabled %>
-          <%= render :partial => "assays/associate_assays", :locals => {:resource => @data_file} -%>
-      <% end %>
-
-      <% if Seek::Config.events_enabled %>
-          <%= render :partial => "assets/associate_event", :locals => {:resource => @data_file} -%>
-      <% end -%>
-
       <div>
-        <%= preview_permission_popup_link(@data_file)-%>
-        <%= create_button :id => "data_file_submit_btn",
-                       :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);",
-                       :class => 'btn btn-primary'-%>
+        <%= create_button id:"data_file_submit_btn",
+                          onclick:"javascript: validateResourceFields(true,'data_file',true); return(false);",
+                          class:'btn btn-primary',
+                          button_text:'Upload',
+                          'data-upload-file-text' => 'Upload' %>
         or <%= cancel_button(data_files_path) -%>
       </div>
     </div>
 <% end -%>
-
-
-

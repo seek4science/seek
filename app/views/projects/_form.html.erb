@@ -67,5 +67,16 @@
     <% end %>
 <% end %>
 
+<% if admin_logged_in? %>
+  <%= folding_panel('Project Settings', false, id: 'admin_section') do %>
+    <span class="subtle">(Only visible to administrators)</span>
+    <div class="checkbox">
+      <label>
+        <%= f.check_box(:nels_enabled, autocomplete: 'off') %> <strong>Enable NeLS Integration</strong>
+      </label>
+    </div>
+  <% end %>
+<% end %>
+
 <%= f.submit(project ? "Update" : "Create",data: { disable_with: (project ? "Updating..." : "Creating...") }, :class => 'btn btn-primary') -%>
  or <%= cancel_button(project ? project_path(project.id) : projects_path) -%>

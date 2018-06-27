@@ -18,11 +18,11 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
-    document = Factory(:document, policy: Factory(:public_policy), contributor: @current_person)
+    document = Factory(:document, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: document.id})
   end
 
-  def populate_extra_relationships
+  def populate_extra_relationships(hash = nil)
     extra_relationships = {}
     extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
     extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' },
@@ -92,11 +92,14 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     template_file = File.join(ApiTestHelper.template_dir, 'post_remote_document.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
+    validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz.camelize(:lower)}Post"
 
     assert_difference("#{@clz.classify}.count") do
       post "/#{@plural_clz}.json", @to_post
       assert_response :success
     end
+
+    validate_json_against_fragment response.body, "#/definitions/#{@clz.camelize(:lower)}Response"
 
     h = JSON.parse(response.body)
 

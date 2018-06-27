@@ -2,6 +2,7 @@ require 'test_helper'
 require 'docsplit'
 require 'seek/download_handling/http_streamer' # Needed to load exceptions that are tested later
 require 'minitest/mock'
+require 'time_test_helper'
 require 'private_address_check'
 
 class ContentBlobTest < ActiveSupport::TestCase
@@ -193,11 +194,10 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   def test_uuid
-    pic = content_blobs(:picture_blob)
-    blob = ContentBlob.new(data: pic.data_io_object.read, original_filename: 'piccy.jpg')
+    blob = Factory(:content_blob)
     blob.save!
     assert_not_nil blob.uuid
-    assert_not_nil ContentBlob.find(blob.id).uuid
+    assert_equal blob.uuid, ContentBlob.find(blob.id).uuid
   end
 
   def data_for_test(filename)
@@ -329,6 +329,9 @@ class ContentBlobTest < ActiveSupport::TestCase
     content_blob = Factory(:content_blob, content_type: 'application/msexcel')
     assert_equal 'Spreadsheet', content_blob.human_content_type
 
+    content_blob = Factory(:xlsm_content_blob)
+    assert_equal 'Spreadsheet (macro enabled)', content_blob.human_content_type
+
     content_blob = Factory.create(:pdf_content_blob, content_type: 'application/pdf')
     assert_equal 'PDF document', content_blob.human_content_type
 
@@ -346,6 +349,18 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     content_blob = Factory(:tiff_content_blob)
     assert_equal 'TIFF image', content_blob.human_content_type
+  end
+
+  test 'override mimetype presented, with detected type' do
+    blob = Factory.build(:csv_content_blob, content_type:'application/vnd.excel')
+    assert_equal 'application/vnd.excel',blob.content_type
+    blob.save!
+    assert_equal 'text/csv',blob.content_type
+
+    blob = Factory.build(:xlsm_content_blob,content_type:'text/csv')
+    assert_equal 'text/csv',blob.content_type
+    blob.save!
+    assert_equal 'application/vnd.ms-excel.sheet.macroEnabled.12',blob.content_type
   end
 
   test 'mimemagic updates content type on creation if binary' do
@@ -537,26 +552,26 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   test 'is_content_viewable? without soffice' do
     Seek::Config.stub(:soffice_available?, false) do
-      viewable_formats = %w[application/pdf] # Can still view PDFs
+      viewable_formats = %w[pdf_content_blob] # Can still view PDFs
 
       unviewable_formats = []
-      unviewable_formats << 'application/msword'
-      unviewable_formats << 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-      unviewable_formats << 'application/vnd.ms-powerpoint'
-      unviewable_formats << 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-      unviewable_formats << 'application/vnd.oasis.opendocument.text'
-      unviewable_formats << 'application/vnd.oasis.opendocument.presentation'
-      unviewable_formats << 'application/rtf'
+      unviewable_formats << 'doc_content_blob'
+      unviewable_formats << 'docx_content_blob'
+      unviewable_formats << 'ppt_content_blob'
+      unviewable_formats << 'pptx_content_blob'
+      unviewable_formats << 'odt_content_blob'
+      unviewable_formats << 'odp_content_blob'
+      unviewable_formats << 'rtf_content_blob'
 
       viewable_formats.each do |viewable_format|
-        cb_with_content_viewable_format = Factory(:content_blob, content_type: viewable_format, asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
+        cb_with_content_viewable_format = Factory(viewable_format.to_s, asset:Factory(:sop))
         User.with_current_user cb_with_content_viewable_format.asset.contributor do
           assert cb_with_content_viewable_format.is_viewable_format?
           assert cb_with_content_viewable_format.is_content_viewable?
         end
       end
       unviewable_formats.each do |unviewable_format|
-        cb_with_content_unviewable_format = Factory(:content_blob, content_type: unviewable_format, asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
+        cb_with_content_unviewable_format = Factory(unviewable_format.to_s, asset:Factory(:sop))
         User.with_current_user cb_with_content_unviewable_format.asset.contributor do
           refute cb_with_content_unviewable_format.is_viewable_format?
           refute cb_with_content_unviewable_format.is_content_viewable?
@@ -567,17 +582,17 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   test 'content needing conversion should not be viewable when pdf_conversion is disabled' do
     with_config_value :pdf_conversion_enabled, false do
-      viewable_formats = %w[application/msword]
-      viewable_formats << 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-      viewable_formats << 'application/vnd.ms-powerpoint'
-      viewable_formats << 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-      viewable_formats << 'application/vnd.oasis.opendocument.text'
-      viewable_formats << 'application/vnd.oasis.opendocument.presentation'
+      viewable_formats = %w[doc_content_blob]
+      viewable_formats << 'docx_content_blob'
+      viewable_formats << 'ppt_content_blob'
+      viewable_formats << 'pptx_content_blob'
+      viewable_formats << 'odt_content_blob'
+      viewable_formats << 'odp_content_blob'
 
-      viewable_formats.each do |viewable_format|
-        cb_with_content_viewable_format = Factory(:content_blob, content_type: viewable_format, asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
-        User.with_current_user cb_with_content_viewable_format.asset.contributor do
-          assert !cb_with_content_viewable_format.is_content_viewable?
+      viewable_formats.each do |format|
+        cb = Factory(format.to_s, asset:Factory(:sop))
+        User.with_current_user cb.asset.contributor do
+          refute cb.is_content_viewable?
         end
       end
     end
@@ -587,18 +602,15 @@ class ContentBlobTest < ActiveSupport::TestCase
     pdf_content_blob = Factory(:content_blob, content_type: 'application/pdf', asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
 
     with_config_value :pdf_conversion_enabled, false do
-      viewable_formats = %w[text/plain text/csv text/tsv]
+      viewable_formats = %w[txt_content_blob csv_content_blob tsv_content_blob pdf_content_blob]
 
-      viewable_formats.each do |viewable_format|
-        cb_with_content_viewable_format = Factory(:content_blob, content_type: viewable_format, asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
-        User.with_current_user cb_with_content_viewable_format.asset.contributor do
-          assert cb_with_content_viewable_format.is_content_viewable?
+      viewable_formats.each do |format|
+        cb = Factory(format.to_s,asset:Factory(:sop))
+        User.with_current_user cb.asset.contributor do
+          assert cb.is_content_viewable?
         end
       end
 
-      User.with_current_user pdf_content_blob.asset.contributor do
-        assert pdf_content_blob.is_content_viewable?
-      end
     end
   end
 
@@ -642,6 +654,28 @@ class ContentBlobTest < ActiveSupport::TestCase
     stub_request(:head, 'http://www.abc.com').to_return(headers: { content_length: 500, content_type: 'text/plain' }, status: 200)
     blob = Factory(:url_content_blob)
     assert_equal 500, blob.file_size
+  end
+
+  test 'calculates checksums of remote content' do
+    stub_request(:head, 'http://www.abc.com').to_return(
+        headers: { content_length: nil, content_type: 'text/plain' }, status: 200
+    )
+    stub_request(:get, 'http://www.abc.com').to_return(
+        body: File.new("#{Rails.root}/test/fixtures/files/checksums.txt"),
+        headers: { content_type: 'text/plain' }, status: 200)
+
+    blob = Factory(:url_content_blob)
+    blob.save
+    blob.reload
+    assert !blob.file_exists?
+    assert blob.md5sum.blank?
+    assert blob.sha1sum.blank?
+
+    blob.retrieve
+
+    assert blob.reload.file_exists?
+    assert_equal 'd41d8cd98f00b204e9800998ecf8427e', blob.md5sum
+    assert_equal 'da39a3ee5e6b4b0d3255bfef95601890afd80709', blob.sha1sum
   end
 
   test 'can retrieve remote content' do
@@ -817,12 +851,69 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'raises 404 when nels sample metadata missing' do
     setup_nels_for_units
 
-    blob = ContentBlob.create(url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=404")
+    blob = ContentBlob.create(url: 'https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=404')
 
     assert_raises(RestClient::ResourceNotFound) do
       VCR.use_cassette('nels/missing_sample_metadata') do
         blob.retrieve_from_nels(@nels_access_token)
       end
     end
+  end
+
+  test 'added timestamps' do
+    t1 = 1.day.ago
+    blob = nil
+    pretend_now_is(t1) do
+      blob = Factory(:content_blob)
+      assert_equal t1.to_s, blob.created_at.to_s
+      assert_equal t1.to_s, blob.updated_at.to_s
+    end
+
+    t2 = 1.hour.ago
+    pretend_now_is(t2) do
+      blob.content_type = 'text/xml'
+      blob.save!
+      assert_equal t2.to_s, blob.updated_at.to_s
+    end
+  end
+
+  test 'deletes image files after destroy' do
+    blob = Factory(:image_content_blob)
+    filepath = blob.file_path
+    refute_nil filepath
+    assert File.exist?(filepath)
+    assert_difference('ContentBlob.count', -1) do
+      blob.destroy
+    end
+    refute File.exist?(filepath)
+  end
+
+  test 'deletes files after destroy' do
+    blob = Factory(:spreadsheet_content_blob)
+    filepath = blob.file_path
+    refute_nil filepath
+    assert File.exist?(filepath)
+    assert_difference('ContentBlob.count', -1) do
+      blob.destroy
+    end
+    refute File.exist?(filepath)
+  end
+
+  test 'deletes converted files after destroy' do
+    blob = Factory(:doc_content_blob)
+    pdf_path = blob.filepath('pdf')
+    txt_path = blob.filepath('txt')
+
+    # pretend the conversion has taken place
+    FileUtils.touch(pdf_path)
+    FileUtils.touch(txt_path)
+
+    assert File.exist?(pdf_path)
+    assert File.exist?(txt_path)
+    assert_difference('ContentBlob.count', -1) do
+      blob.destroy
+    end
+    refute File.exist?(pdf_path)
+    refute File.exist?(txt_path)
   end
 end

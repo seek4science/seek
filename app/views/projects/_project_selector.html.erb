@@ -61,7 +61,7 @@
 <%= content_tag :script, project_policies_json(possible_projects | selected_projects), type: 'application/json', id: 'project-default-policies-json' %>
 <%= content_tag :script, enable_auto_project_license? ? project_licenses_json : '{}', type: 'application/json', id: 'project-default-licenses-json' %>
 
-<script>
+<script id="project-selector-script">
   Sharing.defaultPolicies = JSON.parse($j('#project-default-policies-json').text());
   Sharing.defaultLicenses = JSON.parse($j('#project-default-licenses-json').text());
 

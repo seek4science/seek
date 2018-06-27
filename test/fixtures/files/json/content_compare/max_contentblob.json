@@ -1,0 +1,35 @@
+{
+  "data": {
+    "id": "1050453205",
+    "type": "content_blobs",
+    "attributes": {
+      "original_filename": "min file",
+      "url": "http://example.com/remote.txt",
+      "md5sum": "726de0a3f94d65056b909b9736e10349",
+      "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
+      "content_type": "text/plain",
+      "size": 8
+    },
+    "relationships": {
+      "asset": {
+        "data": {
+          "id": "1055250740",
+          "type": "sops"
+        }
+      }
+    },
+    "links": {
+      "self": "/sops/1055250740/content_blobs/1050453205"
+    },
+    "meta": {
+      "created": "2018-04-18T14:24:16.000Z",
+      "modified": "2018-04-18T14:24:16.000Z",
+      "api_version": "0.1",
+      "uuid": "191d5e20-2542-0136-c088-0800279c491a",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

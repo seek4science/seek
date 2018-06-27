@@ -17,8 +17,10 @@
         "access": "download",
         "permissions": [
           {
-            "resource_id": "<%= @project.id %>",
-            "resource_type": "projects",
+            "resource": {
+              "id" : "<%= @project.id %>",
+              "type": "projects"
+            },
             "access": "edit"
           }
         ]

@@ -9,7 +9,7 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     @clz = 'study'
     @plural_clz = @clz.pluralize
 
-    @investigation = Factory(:investigation)
+    @investigation = Factory(:investigation, contributor: @current_person, projects: [@current_person.projects.first])
     @investigation.title = 'Fred'
 
     @study = Factory(:study, policy: Factory(:public_policy), contributor: @current_person)
@@ -34,13 +34,12 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
                      r: ApiTestHelper.method(:render_erb) }
   end
 
-  def populate_extra_relationships
+  def populate_extra_relationships(hash = nil)
     person_id = @current_user.person.id
-    project_id = @investigation.projects[0].id
+
     extra_relationships = {}
-    extra_relationships[:submitter] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
-    extra_relationships[:people] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
-    extra_relationships[:projects] = JSON.parse "{\"data\" : [{\"id\" : \"#{project_id}\", \"type\" : \"projects\"}]}"
+    extra_relationships[:submitter] = { data: [{ id: person_id.to_s, type: 'people' }] }
+    extra_relationships[:people] = { data: [{ id: person_id.to_s, type: 'people' }] }
     extra_relationships.with_indifferent_access
   end
 
@@ -49,6 +48,7 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     assert_no_difference('Study.count') do
       delete "/#{@plural_clz}/#{study.id}.json"
       assert_response :forbidden
+      validate_json_against_fragment response.body, '#/definitions/errors'
     end
   end
 
@@ -73,7 +73,7 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     user_login(person)
     proj = person.projects.first
     study = Factory(:study,
-                    investigation: Factory(:investigation, project_ids: [proj.id]),
+                    contributor: person,
                     policy: Factory(:policy,
                         access_type: Policy::NO_ACCESS,
                         permissions: [Factory(:permission, contributor: proj, access_type: Policy::MANAGING)]))
