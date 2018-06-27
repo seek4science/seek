@@ -6,8 +6,9 @@ data:
     policy:
       access: download
       permissions:
-      - resource_type: projects
-        resource_id: '1973'
+      - resource:
+          id: '1973'
+          type: projects
         access: edit
     title: A Maximal SOP
     description: This is the description

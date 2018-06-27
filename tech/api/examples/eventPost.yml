@@ -7,8 +7,9 @@ data:
     policy:
       access: view
       permissions:
-      - resource_id: '242'
-        resource_type: projects
+      - resource:
+          id: '242'
+          type: projects
         access: edit
     url: http://www.example.com/events/123
     address: Sofienstr 2

@@ -15,7 +15,7 @@ data:
     - version: 2
       revision_comments: 
       url: https://fairdomhub.org/data_files/1152?version=2
-    version: '2'
+    version: 2
     revision_comments: 
     created_at: '2014-12-08T17:25:32.000Z'
     updated_at: '2015-05-07T12:16:24.000Z'

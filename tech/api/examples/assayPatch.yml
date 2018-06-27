@@ -10,17 +10,14 @@ data:
       uri: http://www.mygrid.org.uk/ontology/JERMOntology#Transcriptomics
     technology_type:
       uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
-    tags:
-    - Assay-tag1
-    - Assay-tag2
-    - Assay-tag3
     other_creators: Anonymous creator
     description: A Western Blot Assay
     policy:
       access: download
       permissions:
-      - resource_id: '585'
-        resource_type: projects
+      - resource:
+          id: '585'
+          type: projects
         access: manage
   relationships:
     study:

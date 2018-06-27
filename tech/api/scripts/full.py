@@ -9,6 +9,7 @@ from pprint import pprint
 from collections import OrderedDict
 import jsonschema
 import os
+import zipfile, io
 
 master_definitions_url = 'https://raw.githubusercontent.com/seek4science/seek/master/public/2010/json/rest/definitions.json'
 
@@ -21,32 +22,9 @@ r = session.get(master_definitions_url)
 r.raise_for_status()
 definitions_json = r.text.replace('\r', '')
 
-
-definitions_json_file = open('definitions.json', 'w', encoding='utf-8')
+definitions_json_file = open('../definitions/definitions.json', 'w', encoding='utf-8')
 definitions_json_file.write(definitions_json)
 definitions_json_file.close()
-
-# Check examples against schema
-
-v = json.loads(definitions_json)
-x = v['definitions']
-y = x['assayPatch']
-validator = jsonschema.Draft4Validator(y)
-print (type(y))
-
-directory = os.fsencode('../examples')
-
-for file in os.listdir(directory):
-    filename = os.fsdecode(file)
-    if filename.endswith("Patch.yml"):
-        print (filename)
-        print (filename[:-4])
-        example = load(open(os.path.join(directory, file)).read(), Loader=ruamel.yaml.RoundTripLoader)
-
-        validator.validate(example, y)
-        continue
-    else:
-        continue
 
 # Convert to yaml
 
@@ -55,9 +33,27 @@ r = requests.post('https://www.json2yaml.com/api/j2y', data=payload)
 r.raise_for_status()
 definitions_yaml = r.text
 
-definitions_yaml_file = open('definitions.yml', 'w', encoding='utf-8')
+definitions_yaml_file = open('../definitions/definitions.yml', 'w', encoding='utf-8')
 definitions_yaml_file.write(definitions_yaml)
 definitions_yaml_file.close()
+
+# Get examples zip
+
+examples_url = 'https://api.github.com/repos/seek4science/seek/contents/test/examples'
+r = requests.get(examples_url)
+r.raise_for_status()
+
+examples_json = r.text
+examples = json.loads(examples_json)
+
+for example in examples:
+    name = example['name']
+    download_link = example['download_url']
+    r = requests.get(download_link)
+    r.raise_for_status()
+    example_file = open('../examples/{0}'.format(name), 'w', encoding='utf-8')
+    example_file.write(r.text)
+    example_file.close()
 
 def walk_tree(base):
     if isinstance(base, dict):
@@ -76,15 +72,15 @@ def walk_tree(base):
         for idx, elem in enumerate(base):
             walk_tree(elem)
 
-operations = load(open('..\definitions\operations.yml').read(), Loader=ruamel.yaml.RoundTripLoader)
+operations = load(open('../definitions/operations.yml').read(), Loader=ruamel.yaml.RoundTripLoader)
 
-new_definitions = load(open('definitions.yml').read(), Loader=ruamel.yaml.RoundTripLoader)
+new_definitions = load(open('../definitions/definitions.yml').read(), Loader=ruamel.yaml.RoundTripLoader)
 
 walk_tree (new_definitions['definitions'])
 
 operations['definitions'] = new_definitions['definitions']
 
-redocSeekFile = open('redocSeek.yml', 'w')
+redocSeekFile = open('../definitions/redocSeek.yml', 'w')
 dump (operations,
       redocSeekFile,
             Dumper=ruamel.yaml.RoundTripDumper)
@@ -113,10 +109,10 @@ def find_descriptions(d) :
                 if isinstance(item, dict):
                     find_descriptions(item)
 
-full_data = load(open('redocSeek.yml').read(), Loader=ruamel.yaml.RoundTripLoader)
+full_data = load(open('../definitions/redocSeek.yml').read(), Loader=ruamel.yaml.RoundTripLoader)
 
 find_descriptions(full_data)
 
 dump (full_data,
-      open('swaggerSeek.yml', 'w'),
+      open('../definitions/swaggerSeek.yml', 'w'),
             Dumper=ruamel.yaml.RoundTripDumper)

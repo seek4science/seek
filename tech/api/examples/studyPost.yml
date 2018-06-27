@@ -10,8 +10,9 @@ data:
     policy:
       access: download
       permissions:
-      - resource_id: '1672'
-        resource_type: projects
+      - resource:
+          id: '1672'
+          type: projects
         access: view
   relationships:
     investigation:

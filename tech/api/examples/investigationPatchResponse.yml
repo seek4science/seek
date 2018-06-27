@@ -6,11 +6,13 @@ data:
     policy:
       access: download
       permissions:
-      - resource_type: projects
-        resource_id: '1293'
+      - resource:
+          id: '1293'
+          type: projects
         access: manage
-      - resource_type: projects
-        resource_id: '1343'
+      - resource:
+          id: '1343'
+          type: projects
         access: manage
     title: A Maximal Investigation
     description: This is a more complex investigation

@@ -15,8 +15,9 @@ data:
     policy:
       access: download
       permissions:
-      - resource_id: '359'
-        resource_type: projects
+      - resource:
+          id: '359'
+          type: projects
         access: edit
   relationships:
     creators:

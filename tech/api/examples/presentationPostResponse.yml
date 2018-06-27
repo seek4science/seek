@@ -6,8 +6,9 @@ data:
     policy:
       access: download
       permissions:
-      - resource_type: projects
-        resource_id: '1836'
+      - resource:
+          id: '1836'
+          type: projects
         access: edit
     title: A Maximal Presentation
     description: This is the description

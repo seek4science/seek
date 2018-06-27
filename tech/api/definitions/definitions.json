@@ -45,6 +45,84 @@
         }
       }
     },
+    "ok": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/nonEmptyString"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false,
+      "example": {
+        "status": "ok"
+      }
+    },
+    "not_implemented": {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/errors_array"
+        }
+      }
+    },
+    "unprocessable_entity": {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/errors_array"
+        }
+      },
+      "example": {
+        "errors": [
+          {
+            "detail": "id specified by the PUT request does not match object-id in the JSON input"
+          }
+        ]
+      }
+    },
+    "bad_request": {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/errors_array"
+        }
+      },
+      "example": {
+        "errors": [
+          {
+            "title": "You do not have permission",
+            "detail": "No permission"
+          }
+        ]
+      }
+    },
+    "forbidden": {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/errors_array"
+        }
+      }
+    },
+    "not_found": {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/errors_array"
+        }
+      },
+      "example": {
+        "errors": [
+          {
+            "title": "Not found",
+            "detail": "Couldn't find Institution with 'id'=[70]"
+          }
+        ]
+      }
+    },
     "dateTimeString": {
       "type": "string",
       "minLength": 1,
@@ -272,7 +350,7 @@
           "$ref": "#/definitions/uriString"
         },
         "api_version": {
-          "ref": "#/definitions/nonEmptyString"
+          "$ref": "#/definitions/nonEmptyString"
         }
       },
       "required": [
@@ -291,7 +369,7 @@
           "$ref": "#/definitions/uriString"
         },
         "api_version": {
-          "ref": "#/definitions/nonEmptyString"
+          "$ref": "#/definitions/nonEmptyString"
         }
       },
       "required": [
@@ -299,93 +377,6 @@
         "api_version"
       ],
       "additionalProperties": false
-    },
-    "ok": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/nonEmptyString"
-        }
-      },
-      "required": [
-        "status"
-      ],
-      "additionalProperties": false,
-      "example": {
-        "status": "ok"
-      }
-    },
-    "not_implemented": {
-      "type": "object",
-      "properties": {
-        "errors": {
-          "$ref": "#/definitions/errors_array"
-        }
-      }
-    },
-    "unprocessable_entity": {
-      "type": "object",
-      "properties": {
-        "errors": {
-          "$ref": "#/definitions/errors_array"
-        }
-      },
-      "example": {
-        "errors": [
-          {
-            "detail": "id specified by the PUT request does not match object-id in the JSON input"
-          }
-        ]
-      }
-    },
-    "bad_request": {
-      "type": "object",
-      "properties": {
-        "errors": {
-          "$ref": "#/definitions/errors_array"
-        }
-      },
-      "example": {
-        "errors": [
-          {
-            "title": "You do not have permission",
-            "detail": "No permission"
-          }
-        ]
-      }
-    },
-    "forbidden": {
-      "type": "object",
-      "properties": {
-        "errors": {
-          "$ref": "#/definitions/errors_array"
-        }
-      }
-    },
-    "not_found": {
-      "type": "object",
-      "properties": {
-        "errors": {
-          "$ref": "#/definitions/errors_array"
-        }
-      },
-      "example": {
-        "errors": [
-          {
-            "title": "Not found",
-            "detail": "Couldn't find Institution with 'id'=[70]"
-          }
-        ]
-      }
-    },
-    "permittedResourceType": {
-      "type": "string",
-      "minLength": 1,
-      "enum": [
-        "institutions",
-        "people",
-        "projects"
-      ]
     },
     "policy": {
       "type": "object",
@@ -399,19 +390,15 @@
           "uniqueItems": true,
           "items": {
             "properties": {
-              "resource_type": {
-                "$ref": "#/definitions/permittedResourceType"
-              },
-              "resource_id": {
-                "$ref": "#/definitions/nonEmptyString"
+              "resource": {
+                "$ref": "#/definitions/permissionResource"
               },
               "access": {
                 "$ref": "#/definitions/accessType"
               }
             },
             "required": [
-              "resource_type",
-              "resource_id",
+              "resource",
               "access"
             ],
             "additionalProperties": false
@@ -455,6 +442,29 @@
         "sample_types",
         "sops",
         "studies"
+      ]
+    },
+    "permissionResource" : {
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/permissionResourceType"
+        },
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        }
+      },
+      "additionalProperties": false
+    },
+    "permissionResourceType": {
+      "type": "string",
+      "minLength": 1,
+      "enum": [
+        "people",
+        "favourite_groups",
+        "work_groups",
+        "projects",
+        "programmes",
+        "institutions"
       ]
     },
     "contributedTypeAttributes": {
@@ -1587,8 +1597,6 @@
         "jsonapi": {
           "$ref": "#/definitions/JsonApiVersion"
         },
-        "links": {
-        },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
         }
@@ -1596,7 +1604,6 @@
       "required": [
         "data",
         "jsonapi",
-        "links",
         "meta"
       ],
       "additionalProperties": false
@@ -4527,7 +4534,7 @@
                   "$ref": "#/definitions/nullableUriString"
                 },
                 "pubmed_id": {
-                  "type": "number"
+                  "type": "#/definitions/nullableInteger"
                 },
                 "abstract": {
                   "$ref": "#/definitions/nullableNonEmptyString"

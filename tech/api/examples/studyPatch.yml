@@ -11,8 +11,9 @@ data:
     policy:
       access: download
       permissions:
-      - resource_id: '1777'
-        resource_type: projects
+      - resource:
+          id: '1777'
+          type: projects
         access: view
   relationships:
     investigation:

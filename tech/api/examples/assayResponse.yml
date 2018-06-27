@@ -3,7 +3,6 @@ data:
   id: '267'
   type: assays
   attributes:
-    tags: 
     title: Culturing and synchronisation of P. falciparum
     description: 
     assay_class:
@@ -48,6 +47,8 @@ data:
     sops:
       data: []
     publications:
+      data: []
+    documents:
       data: []
   links:
     self: "/assays/267"
