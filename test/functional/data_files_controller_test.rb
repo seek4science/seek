@@ -654,11 +654,11 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'publications included in form for datafile' do
     get :edit, id: data_files(:picture)
     assert_response :success
-    assert_select 'div#publications_fold_content', true
+    assert_select 'div#add_publications_form', true
 
     register_content_blob
     assert_response :success
-    assert_select 'div#publications_fold_content', true
+    assert_select 'div#add_publications_form', true
   end
 
   test 'dont show download button or count for website/external_link data file' do

@@ -587,11 +587,11 @@ class ModelsControllerTest < ActionController::TestCase
   test 'publications included in form for model' do
     get :edit, id: models(:teusink)
     assert_response :success
-    assert_select 'div#publications_fold_content', true
+    assert_select 'div#add_publications_form', true
 
     get :new
     assert_response :success
-    assert_select 'div#publications_fold_content', true
+    assert_select 'div#add_publications_form', true
   end
 
   test 'should update model' do
