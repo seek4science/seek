@@ -49,7 +49,7 @@ class SessionsController < ApplicationController
     if @user = User.authenticate(params[:login], params[:password])
       check_login
     elsif Seek::Config.ldap_enabled
-      authenticateLDAP(params[:login], params[:password])
+      authenticate_ldap(params[:login], params[:password])
     else
       failed_login "Invalid username/password. Have you <b> #{view_context.link_to "forgotten your password?", main_app.forgot_password_url }</b>".html_safe
     end
@@ -104,7 +104,7 @@ class SessionsController < ApplicationController
     URI.parse(return_to_url).path rescue root_path
   end
 
-  def authenticateLDAP(login, password)
+  def authenticate_ldap(login, password)
 
     begin
       # create connection
