@@ -65,11 +65,15 @@ class NelsController < ApplicationController
 
     title = [dataset['name'], params[:subtype_name]].reject(&:blank?).join(' - ')
 
-    redirect_to new_data_file_path(anchor: 'remote-url',
-                                   'data_file[title]' => title,
-                                   'content_blobs[][data_url]' => url,
-                                   assay_ids: [params[:assay_id]],
-                                   project_ids: Assay.find(params[:assay_id]).project_ids)
+    @content_blob = ContentBlob.create(url: url.chomp)
+    @data_file = DataFile.new(title: title)
+    @data_file.content_blob = @content_blob
+
+    session[:uploaded_content_blob_id] = @content_blob.id
+    session[:processed_datafile] = @data_file
+    session[:processed_assay] = Assay.new
+
+    redirect_to provide_metadata_data_files_path(assay_ids: [@assay.id], project_ids: @assay.project_ids)
   end
 
   private
@@ -89,7 +93,7 @@ class NelsController < ApplicationController
       return false
     end
 
-    unless @assay.projects.any? { |p| p.settings['nels_enabled'] }
+    unless @assay.projects.any?(&:nels_enabled)
       flash[:error] = 'This assay is not associated with a NeLS-enabled project.'
       redirect_to @assay
       return false

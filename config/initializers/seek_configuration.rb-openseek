@@ -16,7 +16,7 @@ def load_seek_config_defaults!
   Seek::Config.default :jws_enabled, true
   Seek::Config.default :jws_online_root,"https://jws2.sysmo-db.org/"
   Seek::Config.default :internal_help_enabled, false
-  Seek::Config.default :external_help_url,"http://docs.seek4science.org/help"
+  Seek::Config.default :external_help_url,"https://docs.seek4science.org/help"
   Seek::Config.default :sabiork_ws_base_url, "http://sabiork.h-its.org/sabioRestWebServices/"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
@@ -105,8 +105,13 @@ def load_seek_config_defaults!
   Settings.defaults[:about_page_enabled]= false
   Seek::Config.default :about_page, File.read(Rails.root.join('config/default_data/about_page_example'))
 
+  #Terms and conditions page
+  Settings.defaults[:terms_enabled]= false
+  Seek::Config.default :terms_page, File.read(Rails.root.join('config/default_data/terms_and_conditions'))
+
   #the maximum size, in Mb, for a spreadsheet file that can be extracted and explored
   Seek::Config.default :max_extractable_spreadsheet_size,10
+  Seek::Config.default :jvm_memory_allocation,'512M'
 
   #the maximum size, in Mb, for a text file that can be indexed for search (too high and the indexing will timeout)
   Seek::Config.default :max_indexable_text_size,100
@@ -114,7 +119,12 @@ def load_seek_config_defaults!
   Seek::Config.default :is_virtualliver, false
 
 # Pagination
-  Seek::Config.default :default_pages,{:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest', :strains => 'latest', :presentations => 'latest', :documents => 'latest'}
+  Seek::Config.default :default_pages,{people: 'latest', projects: 'latest', institutions: 'latest',
+                                                  investigations: 'latest',studies: 'latest', assays: 'latest',
+                                                  data_files: 'latest', models: 'latest',sops: 'latest',
+                                                  publications: 'latest',events: 'latest', strains: 'latest',
+                                                  presentations: 'latest', documents: 'latest', programmes: 'latest'}
+
   Seek::Config.default :limit_latest,7
 
   Seek::Config.default :related_items_limit,5
@@ -134,6 +144,7 @@ def load_seek_config_defaults!
   Seek::Config.default :crossref_api_email,nil
   Seek::Config.default :site_base_host,"http://localhost:3000"
   Seek::Config.default :open_id_authentication_store,:memory
+  Seek::Config.default :session_store_timeout, 1.hour
 
 
 

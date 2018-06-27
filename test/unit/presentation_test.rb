@@ -60,21 +60,29 @@ class PresentationTest < ActiveSupport::TestCase
     assert_not_nil presentation.uuid
   end
 
-  test 'is restorable after destroy' do
-    pre = Factory :presentation, policy: Factory(:all_sysmo_viewable_policy), title: 'is it restorable?'
-    blob_path = pre.content_blob.filepath
-    User.current_user = pre.contributor
-    assert_difference('Presentation.count', -1) do
-      pre.destroy
-    end
-    assert_nil Presentation.find_by_title 'is it restorable?'
-    assert_difference('Presentation.count', 1) do
-      disable_authorization_checks { Presentation.restore_trash!(pre.id) }
-    end
-    pre = Presentation.find_by_title('is it restorable?')
-    refute_nil pre
-    refute_nil pre.content_blob
-    assert_equal blob_path, pre.content_blob.filepath
-    assert File.exist?(blob_path)
+  test 'factory using with_project_contributor is still configurable' do
+    default_factory_pres = Factory(:min_presentation)
+    assert default_factory_pres.contributor
+    assert default_factory_pres.projects.any?
+    assert default_factory_pres.projects.first.has_member?(default_factory_pres.contributor)
+
+    bob = Factory(:person)
+    bobs_project = bob.projects.first
+    specified_contributor_pres = Factory(:min_presentation, contributor: bob)
+    assert_equal bob, specified_contributor_pres.contributor
+    assert_equal bobs_project, specified_contributor_pres.projects.first
+    assert specified_contributor_pres.projects.first.has_member?(bob)
+
+    project = Factory(:project)
+    specified_project_pres = Factory(:min_presentation, projects: [project])
+    assert specified_project_pres.contributor
+    assert_equal project, specified_project_pres.projects.first
+    assert specified_project_pres.projects.first.has_member?(specified_project_pres.contributor)
+
+    factory_specified_project_pres = Factory(:presentation_with_specified_project)
+    assert_equal 'Specified Project', factory_specified_project_pres.projects.first.title
+    assert factory_specified_project_pres.contributor
+    assert factory_specified_project_pres.projects.any?
+    assert factory_specified_project_pres.projects.first.has_member?(factory_specified_project_pres.contributor)
   end
 end

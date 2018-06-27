@@ -1,0 +1,36 @@
+<% environment.context_class.instance_eval { include ImagesHelper } %>
+
+.multi-step-buttons {
+    float:right;
+}
+
+.multi-step-block {
+    display:none;
+}
+
+.multi-step-progress-indicator {
+    float:right;
+    margin-top: 0.25em;
+    margin-right: 0.25em;
+}
+
+.multi-step-block .panel-heading {
+  font-weight: bolder;
+}
+
+.multi-step-progress-indicator-icon {
+  
+  background: url('<%= asset_path(icon_filename_for_key('multi_step_progress_indicator_icon')) %>') no-repeat;
+
+  margin: 2px;
+
+  border-width: 0px;
+  width: 12px; /*or your image's width*/
+  height: 12px; /*or your image's height*/
+  display:inline-block;
+}
+
+
+
+
+

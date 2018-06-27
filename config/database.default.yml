@@ -1,37 +1,20 @@
 #MySQL
-development:
+
+default: &default
   adapter: mysql2
-  database: seek_development
+  encoding: utf8
+  pool: 5
   username: mysqluser
   password: mysqlpassword
-  #socket: /var/run/mysqld/mysqld.sock 
+
+development:
+  <<: *default
+  database: seek_development
 
 test:
-  adapter: mysql2
+  <<: *default
   database: seek_test
-  username: mysqluser
-  password: mysqlpassword
-  #socket: /var/run/mysqld/mysqld.sock 
 
 production:
-  adapter: mysql2
+  <<: *default
   database: seek_production
-  username: mysqluser
-  password: mysqlpassword
-
-# SQLite version 3.x
-#   gem install sqlite3-ruby (not necessary on OS X Leopard)
-#development:
-#  adapter: sqlite3
-#  database: db/development.sqlite3
-#  timeout: 5000 
-
-#test:
-#  adapter: sqlite3
-#  database: db/test.sqlite3
-#  timeout: 5000
-#
-#production:
-#  adapter: sqlite3
-#  database: db/production.sqlite3
-#  timeout: 5000

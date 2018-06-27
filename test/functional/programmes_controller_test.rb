@@ -20,8 +20,7 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   test 'new page works even when no programme-less projects' do
     programme = Factory(:programme)
-    work_group = Factory(:work_group, project: programme.projects.first)
-    admin = Factory(:admin, group_memberships: [Factory(:group_membership, work_group: work_group)])
+    admin = Factory(:admin, project:programme.projects.first)
 
     Project.without_programme.delete_all
 
@@ -805,5 +804,9 @@ class ProgrammesControllerTest < ActionController::TestCase
     end
     Factory :funding_code, value: 'DFG', annotatable: programme
     add_avatar_to_test_object(programme)
+    person = Factory(:person)
+    login_as(person)
+    person.is_programme_administrator = true, programme
+    disable_authorization_checks { person.save! }
   end
 end

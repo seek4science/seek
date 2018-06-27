@@ -40,9 +40,11 @@
    else
      add_new_assay_title = ""
    end
+
+  collapsed = associated_assays.blank? && params[:assay_ids].blank? if collapsed.nil?
 %>
 
-<%= folding_panel(assay_class_text, associated_assays.blank? && params[:assay_ids].blank?, :body_options => {:id => 'associate_assay_fold_content'},
+<%= folding_panel(assay_class_text, collapsed, :body_options => {:id => 'associate_assay_fold_content'},
                   :help_text => "Here you can associate #{assay_class_text} in SEEK to this #{resource_text}. You can only associate #{assay_class_text} you are authorized to edit.") do %>
     <div class="row">
       <div class="col-md-8">
@@ -102,7 +104,7 @@
 
 <% end %>
 
-<script type="text/javascript">
+<script type="text/javascript" id="associate-assays-script">
     var assayOptions = {
         project: <%= (project_assays.collect{|assay| {title:assay_selection_dropdown_text(assay).html_safe,id:assay.id,parent_id:assay.study.id,parent_title:assay.study.title}}).to_json.html_safe %>,
         all: <%= (all_assays.collect{|assay| {title:assay_selection_dropdown_text(assay).html_safe,id:assay.id,parent_id:assay.study.id,parent_title:assay.study.title}}).to_json.html_safe %>
@@ -129,7 +131,7 @@
         }
     }
 
-    <% associated_assay_ids = resource.assays.collect(&:id) %>
+    <% associated_assay_ids = resource.assay_assets.collect(&:assay_id) %>
     <% associated_assay_ids.each do |associated_assay_id|%>
     <% assay = Assay.find(associated_assay_id) %>
     <% if assay.try :can_view? -%>

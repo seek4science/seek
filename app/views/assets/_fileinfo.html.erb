@@ -18,7 +18,11 @@
 <% else %>
     <p>
       <b>Filename:</b>
-      <span class='filename'><%=h fileinfo.original_filename -%></span>
+      <span class='filename'>
+        <%=h fileinfo.original_filename %>&nbsp;
+        <%= render :partial => "assets/view_content", :locals => {:content_blob => fileinfo, :icon_view => true} -%>
+        <%= mini_file_download_icon(fileinfo) %>
+      </span>
     </p>
 
     <p>
@@ -31,13 +35,5 @@
       <span class="filesize"><%= filesize_as_text(fileinfo) %></span>
     </p>
 
-    <%# This is for multiple files asset %>
-    <% asset = fileinfo.asset
-       if Seek::Util.is_multi_file_asset_type?(asset.class) && (can_download_asset?(asset, params[:code])) -%>
-        <p>
-          <%= render :partial => "assets/view_content", :locals => {:content_blob => fileinfo} -%>
-          <%= image_tag_for_key('download', polymorphic_path([asset, fileinfo], :action=>:download,:code=>params[:code]), "Download", {:title => 'Download this file'}, "") -%>
-        </p>
-    <% end %>
 <% end -%>
 </div>

@@ -71,10 +71,18 @@ module ApplicationHelper
   # provide the block that shows the URL to the resource, including the version if it is a versioned resource
   # label is based on the application name, for example <label>FAIRDOMHUB ID: </label>
   def persistent_resource_id(resource)
-    url = polymorphic_url(resource)
+
+    # FIXME: this contains some duplication of Seek::Rdf::RdfGeneration#rdf_resource - however not every model includes that Module at this time.
+    # ... its also a bit messy handling the version
+    url= if resource.class.name.include?("::Version")
+      URI.join(Seek::Config.site_base_host + "/", "#{resource.parent.class.name.tableize}/","#{resource.parent.id}?version=#{resource.version}").to_s
+    else
+      URI.join(Seek::Config.site_base_host + "/", "#{resource.class.name.tableize}/","#{resource.id}").to_s
+    end
+
     content_tag :p, class: :id do
       content_tag(:strong) do
-        "#{Seek::Config.application_name} ID: "
+        t('seek_id')+":"
       end + ' ' + link_to(url, url)
     end
   end

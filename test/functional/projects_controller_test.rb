@@ -35,6 +35,19 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'get new with programme' do
+    programme_admin = Factory(:programme_administrator)
+    prog = programme_admin.programmes.first
+    refute_nil prog
+    login_as(programme_admin)
+    get :new,programme_id:prog.id
+    assert_response :success
+    assert_select "select#project_programme_id" do
+      assert_select "option[selected!='selected']", count:0
+      assert_select "option[selected='selected'][value='#{prog.id}']",count:1
+    end
+  end
+
   def test_avatar_show_in_list
     p = Factory :project
     get :index
@@ -394,11 +407,13 @@ class ProjectsControllerTest < ActionController::TestCase
     get :show, id: projects(:three)
     assert_response :success
     assert_select 'a', text: /Edit Project/, count: 0
+    assert_select 'a', text: /Manage Project/, count: 0
 
     logout
     get :show, id: projects(:three)
     assert_response :success
     assert_select 'a', text: /Edit Project/, count: 0
+    assert_select 'a', text: /Manage Project/, count: 0
   end
 
   def test_user_project_administrator
@@ -406,7 +421,7 @@ class ProjectsControllerTest < ActionController::TestCase
     proj = project_admin.projects.first
     login_as(project_admin.user)
     get :show, id: proj.id
-    assert_select 'a', text: /Edit #{I18n.t('project')}/, count: 1
+    assert_select 'a', text: /Manage #{I18n.t('project')}/, count: 1
 
     get :edit, id: proj.id
     assert_response :success
@@ -421,6 +436,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(Factory(:user))
     get :show, id: projects(:three)
     assert_select 'a', text: /Edit #{I18n.t('project')}/, count: 0
+    assert_select 'a', text: /Manage #{I18n.t('project')}/, count: 0
 
     get :edit, id: projects(:three)
     assert_response :redirect
@@ -430,7 +446,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   def test_admin_can_edit
     get :show, id: projects(:one)
-    assert_select 'a', text: /Edit #{I18n.t('project')}/, count: 1
+    assert_select 'a', text: /Manage #{I18n.t('project')}/, count: 1
 
     get :edit, id: projects(:one)
     assert_response :success
@@ -438,6 +454,23 @@ class ProjectsControllerTest < ActionController::TestCase
     put :update, id: projects(:three).id, project: { title: 'asd' }
 
     assert_redirected_to project_path(assigns(:project))
+  end
+
+  test 'member can edit project details' do
+    p = Factory(:person)
+    login_as(p)
+
+    get :show, id: p.projects.first
+    assert_select 'a', text: /Edit #{I18n.t('project')}/, count: 1
+    assert_select 'a', text: /Manage #{I18n.t('project')}/, count: 0
+
+    get :edit, id: p.projects.first
+    assert_response :success
+
+    put :update, id: p.projects.first.id, project: { title: 'asd' }
+
+    assert_redirected_to project_path(assigns(:project))
+    assert_equal 'asd', assigns(:project).title
   end
 
   test 'links have nofollow in sop tabs' do
@@ -1546,6 +1579,63 @@ class ProjectsControllerTest < ActionController::TestCase
           refute_nil flash[:notice]
       end
     end
+  end
+
+  test 'project administrator can not enable NeLS integration' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    assert_nil project.nels_enabled
+
+    login_as(project_administrator.user)
+
+    get :edit, id: project.id
+
+    assert_select '#project_nels_enabled', count: 0
+
+    put :update, id: project.id, project: { nels_enabled: '1' }
+
+    project.reload
+    assert_redirected_to project
+    assert_nil project.nels_enabled
+  end
+
+  test 'site administrator can enable NeLS integration' do
+    project_administrator = Factory(:admin)
+    project = project_administrator.projects.first
+    assert_nil project.nels_enabled
+
+    login_as(project_administrator.user)
+
+    get :edit, id: project.id
+
+    assert_select '#project_nels_enabled', count: 1
+    assert_select '#project_nels_enabled[checked]', count: 0
+
+    put :update, id: project.id, project: { nels_enabled: '1' }
+
+    project.reload
+    assert_redirected_to project
+    assert_equal true, project.nels_enabled
+  end
+
+  test 'site administrator can disable NeLS integration' do
+    project_administrator = Factory(:admin)
+    project = project_administrator.projects.first
+    project.nels_enabled = true
+    assert_equal true, project.nels_enabled
+
+    login_as(project_administrator.user)
+
+    get :edit, id: project.id
+
+    assert_select '#project_nels_enabled', count: 1
+    assert_select '#project_nels_enabled[checked]', count: 1
+
+    put :update, id: project.id, project: { nels_enabled: '0' }
+
+    project.reload
+    assert_redirected_to project
+    assert_equal false, project.nels_enabled
   end
 
   private

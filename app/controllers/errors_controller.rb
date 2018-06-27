@@ -20,9 +20,9 @@ class ErrorsController < ApplicationController
     end
   end
 
-  def error_500
+  def error_503
     respond_with do |format|
-      format.html
+      format.html { render template: "errors/error_503", layout: 'layouts/errors', locals: {exception: Exception} }
     end
   end
 end

@@ -6,22 +6,33 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
     login_as_test_user 'http://www.example.com'
   end
 
-  test 'should timeout after 15 minutes' do
-    assert_equal 15.minutes, Rails.application.config.session_options[:expire_after]
+  test 'should timeout after 30 minutes' do
+
+    # test initializer sets the config to 30 minutes (normal defaut is 1 hour)
+    # cannot test with `with_config_value` due to being too late after the tests start
+
+    assert_equal 30.minutes, Rails.application.config.session_options[:expire_after]
     df = Factory :data_file, contributor: User.current_user
     User.current_user = nil
     get "/data_files/#{df.id}"
     assert_response :success
 
-    pretend_now_is(14.minutes.from_now) do
+    pretend_now_is(29.minutes.from_now) do
       get "/data_files/#{df.id}"
       assert_response :success
     end
 
-    pretend_now_is(30.minutes.from_now) do
+    pretend_now_is(60.minutes.from_now) do
       get "/data_files/#{df.id}"
       assert_response :forbidden
     end
+
+    # check there is a config option
+    assert_equal 30.minutes, Seek::Config.session_store_timeout
+    with_config_value(:session_store_timeout, 2.hours) do
+      assert_equal 2.hours, Seek::Config.session_store_timeout
+    end
+
   end
 
   test 'should forbid the unauthorized page' do
@@ -45,7 +56,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
     assert_response :success
     logout 'http://www.example.com/sops'
 
-    data_file = Factory :data_file, contributor: User.current_user, policy: Factory(:public_policy)
+    data_file = Factory :data_file, policy: Factory(:public_policy)
     get "/data_files/#{data_file.id}"
     assert_response :success
 

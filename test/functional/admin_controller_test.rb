@@ -84,6 +84,47 @@ class AdminControllerTest < ActionController::TestCase
     end
   end
 
+  test 'update SMTP settings' do
+    with_config_value(:email_enabled, false) do
+      with_config_value(:smtp, { address: '255.255.255.255', 'address' => '0.0.0.0' }) do
+        assert_equal 'Hash', Seek::Config.smtp.class.name
+
+        post :update_features_enabled, email_enabled: '1',
+             address: '127.0.0.1',
+             port: '25',
+             domain: 'email.example.com',
+             authentication: 'plain',
+             smtp_user_name: '',
+             smtp_password: '',
+             enable_starttls_auto: '1'
+
+        assert_equal 'ActiveSupport::HashWithIndifferentAccess', Seek::Config.smtp.class.name
+        assert Seek::Config.email_enabled
+
+        mailer_settings = ActionMailer::Base.smtp_settings
+        assert_equal '127.0.0.1', mailer_settings[:address]
+        assert_equal '25', mailer_settings[:port]
+        assert_equal 'email.example.com', mailer_settings[:domain]
+        assert_equal 'plain', mailer_settings[:authentication]
+        assert_nil mailer_settings[:user_name]
+        assert_nil mailer_settings[:password]
+        assert mailer_settings[:enable_starttls_auto]
+      end
+    end
+  end
+
+  test 'should read SMTP setting as a HashWithIndifferentAccess' do
+    with_config_value(:smtp, { address: '255.255.255.255', 'domain' => 'email.example.com' }) do
+      assert_equal 'Hash', Seek::Config.smtp.class.name
+
+      get :features_enabled
+
+      assert_response :success
+      assert_select '#address[value=?]', '255.255.255.255'
+      assert_select '#domain[value=?]', 'email.example.com'
+    end
+  end
+
   test 'update visible tags and threshold' do
     Seek::Config.max_visible_tags = 2
     Seek::Config.tag_threshold = 2
@@ -264,5 +305,46 @@ class AdminControllerTest < ActionController::TestCase
 
     xml_http_request :get, :get_stats, page:  'snapshot_and_doi_stats'
     assert_response :success
+  end
+
+  test 'clear failed jobs' do
+    
+    Delayed::Job.destroy_all
+    ContentBlobCleanerJob.new.queue_job
+    job = Delayed::Job.last
+    job.update_column(:failed_at,Time.now)
+    ContentBlobCleanerJob.new.queue_job
+    assert_equal 2,Delayed::Job.count
+    assert_difference('Delayed::Job.count',-1) do
+      post :clear_failed_jobs, format: 'json'
+    end
+
+    assert_equal 1,Delayed::Job.count
+    assert_equal 0,Delayed::Job.where('failed_at IS NOT NULL').count
+  end
+
+  test 'admin required to clear failed jobs' do
+    logout
+    person = Factory(:person)
+
+    Delayed::Job.destroy_all
+    ContentBlobCleanerJob.new.queue_job
+    job = Delayed::Job.last
+    job.update_column(:failed_at,Time.now)
+    ContentBlobCleanerJob.new.queue_job
+    assert_equal 2,Delayed::Job.count
+
+    assert_no_difference('Delayed::Job.count') do
+      post :clear_failed_jobs, format: 'json'
+    end
+
+    login_as(person)
+
+    assert_no_difference('Delayed::Job.count') do
+      post :clear_failed_jobs, format: 'json'
+    end
+
+    assert_equal 2,Delayed::Job.count
+    assert_equal 1,Delayed::Job.where('failed_at IS NOT NULL').count
   end
 end

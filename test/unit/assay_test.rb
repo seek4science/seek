@@ -176,12 +176,10 @@ class AssayTest < ActiveSupport::TestCase
     assay.associate Factory(:model, contributor: user)
     assert !assay.can_delete?
 
-    pal = Factory :pal
+    pal = Factory(:pal)
+    another_project_person = Factory(:person, project: pal.projects.first)
     # create an assay with projects = to the projects for which the pal is a pal
-    assay = Factory(:assay,
-                    study: Factory(:study,
-                                   investigation: Factory(:investigation,
-                                                          projects: pal.projects)))
+    assay = Factory(:assay, contributor: another_project_person)
     assert !assay.can_delete?(pal.user)
 
     assert !assays(:assay_with_a_publication).can_delete?(users(:model_owner))
@@ -456,7 +454,7 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'destroy' do
-    a = Factory(:assay, study: Factory(:study))
+    a = Factory(:assay)
     refute_nil a.study
     refute_empty a.projects
     assert_difference('Assay.count', -1) do
@@ -489,12 +487,11 @@ class AssayTest < ActiveSupport::TestCase
     sample2 = Factory(:sample)
     sample3 = Factory(:sample)
     df = Factory(:data_file)
-    aa1 = AssayAsset.new assay: assay, asset: sample1, direction: AssayAsset::Direction::INCOMING
-    aa1.save!
-    aa2 = AssayAsset.new assay: assay, asset: sample2, direction: AssayAsset::Direction::INCOMING
-    aa2.save!
-    aa3 = AssayAsset.new assay: assay, asset: df, direction: AssayAsset::Direction::NODIRECTION
-    aa3.save!
+    disable_authorization_checks do
+      AssayAsset.create! assay: assay, asset: sample1, direction: AssayAsset::Direction::INCOMING
+      AssayAsset.create! assay: assay, asset: sample2, direction: AssayAsset::Direction::INCOMING
+      AssayAsset.create! assay: assay, asset: df, direction: AssayAsset::Direction::NODIRECTION
+    end
 
     assay = assay.reload
     assert_includes assay.samples, sample1
@@ -523,16 +520,18 @@ class AssayTest < ActiveSupport::TestCase
     sample_nodir1 = Factory(:sample)
 
     df = Factory(:data_file)
-    AssayAsset.create assay: assay, asset: df_in1, direction: AssayAsset::Direction::INCOMING
-    AssayAsset.create assay: assay, asset: df_in2, direction: AssayAsset::Direction::INCOMING
-    AssayAsset.create assay: assay, asset: sample_in1, direction: AssayAsset::Direction::INCOMING
+    disable_authorization_checks do
+      AssayAsset.create! assay: assay, asset: df_in1, direction: AssayAsset::Direction::INCOMING
+      AssayAsset.create! assay: assay, asset: df_in2, direction: AssayAsset::Direction::INCOMING
+      AssayAsset.create! assay: assay, asset: sample_in1, direction: AssayAsset::Direction::INCOMING
 
-    AssayAsset.create assay: assay, asset: df_out1, direction: AssayAsset::Direction::OUTGOING
-    AssayAsset.create assay: assay, asset: df_out2, direction: AssayAsset::Direction::OUTGOING
-    AssayAsset.create assay: assay, asset: sample_out1, direction: AssayAsset::Direction::OUTGOING
+      AssayAsset.create! assay: assay, asset: df_out1, direction: AssayAsset::Direction::OUTGOING
+      AssayAsset.create! assay: assay, asset: df_out2, direction: AssayAsset::Direction::OUTGOING
+      AssayAsset.create! assay: assay, asset: sample_out1, direction: AssayAsset::Direction::OUTGOING
 
-    AssayAsset.create assay: assay, asset: df_nodir1, direction: AssayAsset::Direction::NODIRECTION
-    AssayAsset.create assay: assay, asset: sample_nodir1, direction: AssayAsset::Direction::NODIRECTION
+      AssayAsset.create! assay: assay, asset: df_nodir1, direction: AssayAsset::Direction::NODIRECTION
+      AssayAsset.create! assay: assay, asset: sample_nodir1, direction: AssayAsset::Direction::NODIRECTION
+    end
 
     #sanity check
     assert_equal 5,assay.data_files.count
@@ -549,8 +548,10 @@ class AssayTest < ActiveSupport::TestCase
     df_2 = Factory(:data_file,title:'not validation')
 
     validation_type= RelationshipType.where(key:RelationshipType::VALIDATION).first || Factory(:validation_data_relationship_type)
-    AssayAsset.create assay: assay, asset: df_1, relationship_type: validation_type
-    AssayAsset.create assay: assay, asset: df_2
+    disable_authorization_checks do
+      AssayAsset.create! assay: assay, asset: df_1, relationship_type: validation_type
+      AssayAsset.create! assay: assay, asset: df_2
+    end
 
     assert_equal 2,assay.data_files.count
     assert_equal [df_1],assay.validation_assets
@@ -562,8 +563,10 @@ class AssayTest < ActiveSupport::TestCase
     df_2 = Factory(:data_file,title:'not simulation')
 
     validation_type= RelationshipType.where(key:RelationshipType::SIMULATION).first || Factory(:simulation_data_relationship_type)
-    AssayAsset.create assay: assay, asset: df_1, relationship_type: validation_type
-    AssayAsset.create assay: assay, asset: df_2
+    disable_authorization_checks do
+      AssayAsset.create! assay: assay, asset: df_1, relationship_type: validation_type
+      AssayAsset.create! assay: assay, asset: df_2
+    end
 
     assert_equal 2,assay.data_files.count
     assert_equal [df_1],assay.simulation_assets
@@ -575,8 +578,10 @@ class AssayTest < ActiveSupport::TestCase
     df_2 = Factory(:data_file,title:'not construction')
 
     validation_type= RelationshipType.where(key:RelationshipType::CONSTRUCTION).first || Factory(:construction_data_relationship_type)
-    AssayAsset.create assay: assay, asset: df_1, relationship_type: validation_type
-    AssayAsset.create assay: assay, asset: df_2
+    disable_authorization_checks do
+      AssayAsset.create! assay: assay, asset: df_1, relationship_type: validation_type
+      AssayAsset.create! assay: assay, asset: df_2
+    end
 
     assert_equal 2,assay.data_files.count
     assert_equal [df_1],assay.construction_assets

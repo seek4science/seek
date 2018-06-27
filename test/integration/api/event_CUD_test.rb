@@ -22,7 +22,7 @@ class EventCUDTest < ActionDispatch::IntegrationTest
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: event.id})
   end
 
-  def populate_extra_relationships
+  def populate_extra_relationships(hash = nil)
     extra_relationships = {}
     extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
     extra_relationships.with_indifferent_access
@@ -36,7 +36,8 @@ class EventCUDTest < ActionDispatch::IntegrationTest
 
     assert_no_difference("#{@clz.classify}.count") do
       post "/#{@plural_clz}.json", @to_post
-      #assert_response :unprocessable_entity
+      # assert_response :unprocessable_entity
+      # validate_json_against_fragment response.body, '#/definitions/errors'
     end
 
     h = JSON.parse(response.body)

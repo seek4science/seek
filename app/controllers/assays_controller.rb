@@ -137,15 +137,13 @@ class AssaysController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { render :action => "new" }
+        format.html { render :action => "new", status: :unprocessable_entity }
         format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
       end
     end
   end
 
   def update
-    set_assay_organisms_from_json if json_api_request?
-
     update_assay_organisms @assay, params
     update_annotations(params[:tag_list], @assay)
     update_scales @assay
@@ -163,14 +161,14 @@ class AssaysController < ApplicationController
         format.html { redirect_to(@assay) }
         format.json {render json: @assay}
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => "edit", status: :unprocessable_entity }
         format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
       end
     end
   end
 
   def update_assay_organisms assay,params
-    organisms             = params[:assay_organism_ids] || []
+    organisms             = params[:assay_organism_ids] || params[:assay][:organism_ids] || []
     assay.assay_organisms = []
     Array(organisms).each do |text|
       o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")
@@ -184,6 +182,7 @@ class AssaysController < ApplicationController
     data_files            = params[:data_files] || []
     model_ids             = params[:model_ids] || []
     samples               = params[:samples] || []
+    document_ids          = params[:document_ids] || []
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
     data_files.each do |data_file|
@@ -199,6 +198,10 @@ class AssaysController < ApplicationController
     Array(sop_ids).each do |id|
       s = Sop.find(id)
       assay_assets_to_keep << assay.associate(s) if s.can_view?
+    end
+    Array(document_ids).each do |id|
+      d = Document.find(id)
+      assay_assets_to_keep << assay.associate(d) if d.can_view?
     end
     samples.each do |sample|
       s = Sample.find(sample[:id])
@@ -229,13 +232,6 @@ class AssaysController < ApplicationController
   end
 
   private
-
-  def set_assay_organisms_from_json
-    if !(params[:assay][:assay_organism_ids].nil?)
-      params[:assay_organism_ids] = params[:assay][:assay_organism_ids]
-      params[:assay].delete :assay_organism_ids
-    end
-  end
 
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id,

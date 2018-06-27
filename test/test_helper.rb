@@ -38,6 +38,22 @@ end
 include UploadHelper
 include PasswordHelper
 
+FactoryGirl.define do
+  trait :with_project_contributor do
+    contributor { nil }
+    after_build do |resource|
+      if resource.contributor.nil?
+        if resource.projects.none?
+          resource.projects = [Factory(:project)]
+        end
+        resource.contributor = Factory(:person, project: resource.projects.first)
+      elsif resource.projects.none?
+        resource.projects = [resource.contributor.person.projects.first]
+      end
+    end
+  end
+end
+
 FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
 FactoryGirl.class_eval do
@@ -146,8 +162,10 @@ class ActiveSupport::TestCase
   end
 
   def add_avatar_to_test_object(obj)
-    obj.avatar = Factory(:avatar, owner: obj)
-    obj.save
+    disable_authorization_checks do
+      obj.avatar = Factory(:avatar, owner: obj)
+      obj.save!
+    end
   end
 
   def add_tags_to_test_object(obj)
@@ -160,8 +178,10 @@ class ActiveSupport::TestCase
   end
 
   def add_creator_to_test_object(obj)
-    obj.creators = [Factory(:person)]
-    obj.save
+    disable_authorization_checks do
+      obj.creators = [Factory(:person)]
+      obj.save!
+    end
   end
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
@@ -285,6 +305,12 @@ end
 VCR.configure do |config|
   config.cassette_library_dir = 'test/vcr_cassettes'
   config.hook_into :webmock
+
+  # ignore sparql requests, for some of the RDF integration tests
+  # fixme: in the future it would be good to make the sparql data consistent enough to work with VCR
+  config.ignore_request do |request|
+    request.uri =~ /sparql-auth/
+  end
 end
 
 WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line out when running VCRs for the first time

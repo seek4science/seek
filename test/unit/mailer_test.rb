@@ -95,7 +95,8 @@ class MailerTest < ActionMailer::TestCase
 
   test 'request publish approval' do
     gatekeeper = Factory(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
-    resources = [Factory(:data_file, projects: gatekeeper.projects, title: 'Picture'), Factory(:teusink_model, projects: gatekeeper.projects, title: 'Teusink')]
+    person = Factory(:person, project: gatekeeper.projects.first)
+    resources = [Factory(:data_file, projects: gatekeeper.projects, title: 'Picture', contributor:person), Factory(:teusink_model, projects: gatekeeper.projects, title: 'Teusink', contributor:person)]
     requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
 
     @expected.subject = 'A Sysmo SEEK member requested your approval to publish some items.'
@@ -136,7 +137,8 @@ class MailerTest < ActionMailer::TestCase
 
   test 'gatekeeper approval feedback' do
     gatekeeper = Factory(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
-    item = Factory(:data_file, projects: gatekeeper.projects, title: 'Picture')
+    person = Factory(:person, project: gatekeeper.projects.first)
+    item = Factory(:data_file, projects: gatekeeper.projects, title: 'Picture', contributor:person)
     items_and_comments = [{ item: item, comment: nil }]
     requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
     @expected.subject = 'A Sysmo SEEK gatekeeper approved your publishing requests.'
@@ -155,7 +157,8 @@ class MailerTest < ActionMailer::TestCase
 
   test 'gatekeeper reject feedback' do
     gatekeeper = Factory(:asset_gatekeeper, first_name: 'Gatekeeper', last_name: 'Last')
-    item = Factory(:data_file, projects: gatekeeper.projects, title: 'Picture')
+    person = Factory(:person, project: gatekeeper.projects.first)
+    item = Factory(:data_file, projects: gatekeeper.projects, title: 'Picture',contributor:person)
     items_and_comments = [{ item: item, comment: 'not ready' }]
 
     requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
@@ -254,6 +257,33 @@ class MailerTest < ActionMailer::TestCase
     params[:other_institutions] = 'Another Institute'
 
     @expected.body = read_fixture('contact_project_administrator_new_user')
+
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!('-pr_name-', admin_project.title)
+    expected_text.gsub!('-pr_id-', admin_project.id.to_s)
+    expected_text.gsub!('-person_id-', users(:aaron).person.id.to_s)
+    actual_text = encode_mail(Mailer.contact_project_administrator_new_user(project_administrator, params, users(:aaron)))
+
+    assert_equal expected_text, actual_text
+  end
+
+  test 'contact_project_administrator_new_user no other institutions' do
+    project_administrator = Factory(:project_administrator)
+    admin_project = project_administrator.projects.first
+
+    assert project_administrator.is_project_administrator?(admin_project)
+    @expected.subject = 'Sysmo SEEK member signed up, please assign this person to the projects of which you are Project Administrator'
+    @expected.to = project_administrator.email_with_name
+    @expected.from = 'no-reply@sysmo-db.org'
+    @expected.reply_to = 'Aaron Spiggle <aaron@email.com>'
+
+    params = {}
+    params[:projects] = [Factory(:project, title: 'Project X').id.to_s, admin_project.id.to_s]
+    params[:institutions] = [Factory(:institution, title: 'The Institute').id.to_s]
+    params[:other_projects] = ''
+    params[:other_institutions] = ''
+
+    @expected.body = read_fixture('contact_project_administrator_new_user_no_other')
 
     expected_text = encode_mail(@expected)
     expected_text.gsub!('-pr_name-', admin_project.title)

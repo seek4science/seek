@@ -5,8 +5,8 @@ class SubMailerTest < ActionMailer::TestCase
   test 'send digest' do
     p = Factory :person
     p2 = Factory :person
-    df = Factory :data_file, projects: p.projects
-    model = Factory :model, projects: p.projects
+    df = Factory :data_file, projects: p.projects, contributor:p
+    model = Factory :model, projects: p.projects, contributor: p
 
     log = Factory :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files', created_at: 2.hour.ago, culprit: p2.user
 
@@ -40,7 +40,7 @@ class SubMailerTest < ActionMailer::TestCase
   test 'send immediate email' do
     p = Factory :person
     p2 = Factory :person
-    df = Factory :data_file, projects: p.projects
+    df = Factory :data_file, projects: p.projects, contributor:p
     log = Factory :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files', created_at: 2.hour.ago, culprit: p2.user
 
     email = nil

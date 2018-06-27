@@ -4,6 +4,7 @@ require 'libxml'
 require 'openbis_test_helper'
 
 class DataFilesControllerTest < ActionController::TestCase
+
   fixtures :all
 
   include AuthenticatedTestHelper
@@ -22,6 +23,10 @@ class DataFilesControllerTest < ActionController::TestCase
     @object = data_files(:picture)
     @object.tag_with 'tag1'
     @object
+  end
+
+  def test_json_content
+    super
   end
 
   def test_title
@@ -73,12 +78,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'correct title and text for associating an assay for new' do
     login_as(Factory(:user))
     as_virtualliver do
-      get :new
+      register_content_blob
       assert_response :success
       assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
     end
     as_not_virtualliver do
-      get :new
+      register_content_blob
       assert_response :success
       assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
     end
@@ -654,7 +659,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'div#publications_fold_content', true
 
-    get :new
+    register_content_blob
     assert_response :success
     assert_select 'div#publications_fold_content', true
   end
@@ -704,7 +709,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'download', al.action
     assert_equal df, al.activity_loggable
     assert_equal "attachment; filename=\"rightfield.xls\"", @response.header['Content-Disposition']
-    assert_equal 'application/excel', @response.header['Content-Type']
+    assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '9216', @response.header['Content-Length']
   end
 
@@ -714,7 +719,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     assert_response :success
     assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"", @response.header['Content-Disposition']
-    assert_equal 'application/excel', @response.header['Content-Type']
+    assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '7168', @response.header['Content-Length']
   end
 
@@ -970,7 +975,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'adding_new_conditions_to_different_versions' do
-    d = data_files(:editable_data_file)
+    d = Factory(:data_file, contributor: User.current_user.person)
+    assert d.can_edit?
     sf = StudiedFactor.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
                               start_value: 1, end_value: 2, data_file_id: d.id, data_file_version: d.version)
     assert_difference('DataFile::Version.count', 1) do
@@ -1068,9 +1074,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should not be able to update sharing without manage rights' do
-    login_as(:quentin)
-    user = users(:quentin)
-    df = data_files(:editable_data_file)
+    refute_nil user = User.current_user
+    df = Factory(:data_file,policy: Factory(:editing_public_policy))
 
     assert df.can_edit?(user), 'data file should be editable but not manageable for this test'
     assert !df.can_manage?(user), 'data file should be editable but not manageable for this test'
@@ -1087,11 +1092,11 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should not be able to update sharing permission without manage rights' do
-    login_as(:quentin)
-    user = users(:quentin)
-    df = data_files(:editable_data_file)
+
+    refute_nil user = User.current_user
+    df = Factory(:data_file,policy: Factory(:editing_public_policy))
     assert df.can_edit?(user), 'data file should be editable but not manageable for this test'
-    assert !df.can_manage?(user), 'data file should be editable but not manageable for this test'
+    refute df.can_manage?(user), 'data file should be editable but not manageable for this test'
     assert_equal Policy::EDITING, df.policy.access_type, 'data file should have an initial policy with access type for editing'
     assert_difference('ActivityLog.count') do
       put :update, id: df, data_file: { title: 'new title' },
@@ -1113,8 +1118,10 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'owner should be able to update sharing' do
-    user = users(:datafile_owner)
-    df = data_files(:editable_data_file)
+    refute_nil user = User.current_user
+
+    df = Factory(:data_file, policy: Factory(:editing_public_policy),contributor: user.person)
+
 
     assert df.can_edit?(user), 'data file should be editable and manageable for this test'
     assert df.can_manage?(user), 'data file should be editable and manageable for this test'
@@ -1215,7 +1222,6 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should create sharing permissions 'with your project and with all SysMO members'" do
     mock_http
     data_file, blob = valid_data_file_with_http_url
-    login_as(:quentin)
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -1238,16 +1244,20 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "should update sharing permissions 'with your project and with all SysMO members'" do
-    login_as(:datafile_owner)
-    df = data_files(:editable_data_file)
+    # login_as(:datafile_owner)
+    # df = data_files(:editable_data_file)
+
+    refute_nil user = User.current_user
+    df = Factory(:data_file, contributor: user.current_user, policy: Factory(:editing_public_policy, permissions:[Factory(:permission)]))
+
     assert df.can_manage?
     assert_equal Policy::EDITING, df.policy.access_type
     assert_equal df.policy.permissions.length, 1
 
     permission = df.policy.permissions.first
-    assert_equal permission.contributor_type, 'FavouriteGroup'
+    assert_equal permission.contributor_type, 'Person'
     assert_equal permission.policy_id, df.policy_id
-    assert_equal permission.access_type, Policy::DETERMINED_BY_GROUP
+    assert_equal permission.access_type, Policy::NO_ACCESS
     assert_difference('ActivityLog.count') do
       put :update, id: df, data_file: { title: df.title },
                    policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING)
@@ -1605,15 +1615,15 @@ class DataFilesControllerTest < ActionController::TestCase
   # end
 
   test 'you should not subscribe to the asset created by the person whose projects overlap with you' do
-    proj = Factory(:project)
     current_person = User.current_user.person
+    proj = current_person.projects.first
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     a_person = Factory(:person)
     a_person.project_subscriptions.create project: a_person.projects.first, frequency: 'weekly'
     current_person.group_memberships << Factory(:group_membership, work_group: Factory(:work_group, project: a_person.projects.first))
     assert current_person.save
     assert current_person.reload.projects.include?(a_person.projects.first)
-    assert Subscription.all.empty?
+    assert_empty Subscription.all
 
     df_param = { title: 'Test', project_ids: [proj.id] }
     blob = { data: file_for_upload }
@@ -1625,7 +1635,7 @@ class DataFilesControllerTest < ActionController::TestCase
     SetSubscriptionsForItemJob.new(df, df.projects).perform
 
     assert df.subscribed?(current_person)
-    assert !df.subscribed?(a_person)
+    refute df.subscribed?(a_person)
     assert_equal 1, current_person.subscriptions.count
     assert_equal proj, current_person.subscriptions.first.project_subscription.project
   end
@@ -1727,8 +1737,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'input#tag_list', count: 1
   end
 
-  test 'new should include tags element' do
-    get :new
+  test 'register form should include tags element' do
+    register_content_blob
     assert_response :success
     assert_select 'div.panel-heading', text: /Tags/, count: 1
     assert_select 'input#tag_list', count: 1
@@ -1745,9 +1755,9 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'new should not include tags element when tags disabled' do
+  test 'register form should not include tags element when tags disabled' do
     with_config_value :tagging_enabled, false do
-      get :new, class: :experimental
+      register_content_blob
       assert_response :success
       assert_select 'div.panel-heading', text: /Tags/, count: 0
       assert_select 'input#tag_list', count: 0
@@ -2136,9 +2146,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should update license' do
-    user = users(:datafile_owner)
-    login_as(user)
-    df = data_files(:editable_data_file)
+    refute_nil user = User.current_user
+    df = Factory(:data_file, contributor: user.person)
 
     assert_nil df.license
 
@@ -2164,7 +2173,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#license-select option[selected=?]', 'selected', text: 'License Not Specified'
 
-    get :new
+    register_content_blob
     assert_response :success
     assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution 4.0'
   end
@@ -2207,7 +2216,7 @@ class DataFilesControllerTest < ActionController::TestCase
     d3 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'banana')
     d4 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'no samples')
     [d1, d2, d3].each do |data_file|
-      Factory(:sample, originating_data_file_id: data_file.id)
+      Factory(:sample, originating_data_file_id: data_file.id, contributor: person)
     end
     login_as(person.user)
 
@@ -2483,7 +2492,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.save!
     extracted_sample = Factory(:sample, data: { full_name: 'John Wayne' },
                                         sample_type: sample_type,
-                                        originating_data_file: data_file)
+                                        originating_data_file: data_file, contributor: person),
 
     assert_no_difference('Sample.count') do
       post :extract_samples, id: data_file, confirm: 'true'
@@ -2572,8 +2581,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'cannot upload new version if samples have been extracted' do
-    data_file = Factory(:data_file, contributor: User.current_user)
-    Factory(:sample, originating_data_file: data_file)
+    data_file = Factory(:data_file, contributor: User.current_user.person)
+    Factory(:sample, originating_data_file: data_file, contributor: User.current_user.person)
 
     assert_no_difference('DataFile::Version.count') do
       post :new_version, id: data_file.id, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }],
@@ -2607,25 +2616,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df, assigns(:data_file)
     assert_select 'div#openbis-details-properties', count: 1
     assert_select 'div#openbis-details-properties label', text: 'SEEK_DATAFILE_ID:', count: 1
-  end
-
-  test 'get data_file as json gives openbis details' do
-    skip('json endpoint underdeveloppment, has changed since my edit')
-    mock_openbis_calls
-    login_as(Factory(:person))
-    df = openbis_linked_data_file
-    get :show, id: df, format: 'json'
-    assert_response :success
-    json = JSON.parse(response.body)
-    assert_equal df.id, json['id']
-    assert_equal 'OpenBIS 20160210130454955-23', json['title']
-    #assert_equal nil, json['description']
-    assert_equal df.version, json['version']
-    bis = json['openbis_dataset']
-    assert_not_nil bis
-    assert_equal 'DataFile_3', bis['properties']['SEEK_DATAFILE_ID']
-    assert_equal '20151216143716562-2', bis['experiment']
-
   end
 
   test "associated assays don't cause 500 error if create fails" do
@@ -2763,8 +2753,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should unset policy sharing scope when updated' do
-    login_as(:datafile_owner)
-    df = data_files(:editable_data_file)
+    refute_nil user=User.current_user
+    df = Factory(:data_file, contributor: user.person)
     df.policy.update_column(:sharing_scope, Policy::ALL_USERS)
 
     assert_equal df.reload.policy.sharing_scope, Policy::ALL_USERS
@@ -2782,9 +2772,10 @@ class DataFilesControllerTest < ActionController::TestCase
     Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory(:data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                        policy: Factory(:private_policy), contributor: person.user)
-    assay_asset1 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::INCOMING)
-    assay_asset2 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::OUTGOING)
+                        policy: Factory(:private_policy), contributor: person)
+
+    assay_asset1 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::INCOMING,assay:Factory(:assay,contributor:person))
+    assay_asset2 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::OUTGOING,assay:Factory(:assay,contributor:person))
 
     sample_type = SampleType.new(title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id])
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
@@ -2801,6 +2792,539 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_equal [assay_asset1.assay], sample.assays
       assert_equal assay_asset1.direction, sample.assay_assets.first.direction
     end
+  end
+
+  test 'create content blob' do
+    person = Factory(:person)
+    login_as(person)
+    blob = {data: file_for_upload}
+    assert_difference('ContentBlob.count') do
+      post :create_content_blob, content_blobs: [blob]
+    end
+    assert_response :success
+    assert df = assigns(:data_file)
+    refute_nil df.content_blob
+    assert_equal df.content_blob.id,session[:uploaded_content_blob_id]
+  end
+
+  test 'create content blob requires login' do
+    logout
+    blob = {data: file_for_upload}
+    assert_no_difference('ContentBlob.count') do
+      post :create_content_blob, content_blobs: [blob]
+    end
+    assert_response :redirect
+  end
+
+  test 'rightfield extraction extracts from template' do
+    person = Factory(:person)
+    login_as(person)
+    content_blob = Factory(:rightfield_master_template_with_assay)
+
+    session[:uploaded_content_blob_id] = content_blob.id.to_s
+
+    post :rightfield_extraction_ajax, content_blob_id:content_blob.id.to_s,format:'js'
+
+    assert_response :success
+    assert data_file = assigns(:data_file)
+    assert assay = assigns(:assay)
+
+    assert_equal 'My Title', data_file.title
+    assert_equal 'My Description', data_file.description
+
+    assert_equal 'My Assay Title', assay.title
+    assert_equal 'My Assay Description', assay.description
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response', assay.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#2-hybrid_system', assay.technology_type_uri
+
+  end
+
+  test 'create metadata' do
+    person = Factory(:person)
+    login_as(person)
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    project = person.projects.last
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    }, policy_attributes: valid_sharing,
+              content_blob_id: blob.id.to_s,
+              assay_ids:[]
+    }
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_no_difference('Assay.count') do
+          assert_no_difference('AssayAsset.count') do
+            post :create_metadata, params
+          end
+        end
+      end
+    end
+
+    assert (df = assigns(:data_file))
+
+    assert_redirected_to df
+
+    assert_equal [project], df.projects
+    assert_equal blob, df.content_blob
+    assert_equal 'Small File', df.title
+    assert_equal person.user, df.contributor
+    assert_empty df.assays
+
+    al = ActivityLog.last
+    assert_equal 'create',al.action
+    assert_equal df, al.activity_loggable
+    assert_equal person.user, al.culprit
+
+    assert_nil session[:uploaded_content_blob_id]
+
+  end
+
+  test 'create metadata with associated assay' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay,contributor:person)
+    assert assay.can_edit?
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    project = person.projects.last
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id],
+    }, policy_attributes: valid_sharing,
+              content_blob_id: blob.id.to_s,
+              assay_ids:[assay.id]
+    }
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_no_difference('Assay.count') do
+          assert_difference('AssayAsset.count') do
+            post :create_metadata, params
+          end
+        end
+      end
+    end
+
+    assert (df = assigns(:data_file))
+
+    assert_redirected_to df
+
+    assert_equal [assay],df.assays
+
+  end
+
+  test 'create metadata with associated assay ignores assay if not editable' do
+    assay = Factory(:assay)
+    person = Factory(:person)
+    login_as(person)
+    refute assay.can_edit?
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    project = person.projects.last
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id],
+    }, policy_attributes: valid_sharing,
+        content_blob_id: blob.id.to_s,
+        assay_ids:[assay.id]
+    }
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_no_difference('Assay.count') do
+          assert_no_difference('AssayAsset.count') do
+            post :create_metadata, params
+          end
+        end
+      end
+    end
+
+    assert (df = assigns(:data_file))
+    assert_empty df.assays
+  end
+
+  test 'create metadata fails if content blob not on session' do
+    person = Factory(:person)
+    login_as(person)
+
+    blob = Factory(:content_blob)
+    session.delete(:uploaded_content_blob_id)
+    project = person.projects.last
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    }, policy_attributes: valid_sharing,
+              content_blob_id: blob.id.to_s
+    }
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        post :create_metadata, params
+      end
+    end
+
+    assert_response :unprocessable_entity
+
+    refute_empty (df = assigns(:data_file)).errors
+    assert_equal ["The file uploaded doesn't match"],df.errors[:base]
+
+
+  end
+
+  test 'create metadata fails if content blob mismatched id on session' do
+    person = Factory(:person)
+    login_as(person)
+
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = Factory(:content_blob).id
+    project = person.projects.last
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    }, policy_attributes: valid_sharing,
+              content_blob_id: blob.id.to_s
+    }
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        post :create_metadata, params
+      end
+    end
+
+    assert_response :unprocessable_entity
+
+    refute_empty (df = assigns(:data_file)).errors
+    assert_equal ["The file uploaded doesn't match"],df.errors[:base]
+
+
+  end
+
+  test 'create metadata with validation failure' do
+    person = Factory(:person)
+    login_as(person)
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    project = person.projects.last
+    params = {data_file: {
+        project_ids: [project.id]
+    }, policy_attributes: valid_sharing,
+              content_blob_id: blob.id
+    }
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        post :create_metadata, params
+      end
+    end
+
+    assert_response :unprocessable_entity
+
+    assert (df = assigns(:data_file))
+    assert_equal [project], df.projects
+    assert_equal blob, df.content_blob
+    assert_nil df.title
+    refute_empty df.errors
+  end
+
+  test 'create metadata requires login' do
+    logout
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    project = Factory(:project)
+    params = {data_file: {
+        project_ids: [project.id]
+    }, policy_attributes: valid_sharing,
+              content_blob_id: blob.id
+    }
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        post :create_metadata, params
+      end
+    end
+
+    assert_response :redirect
+
+  end
+
+  test 'create metadata filters projects' do
+    # won't associate to projects the current_user isn't a member of
+    person = Factory(:person)
+    login_as(person)
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    project = Factory(:project)
+    refute_includes person.projects, project
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    }, policy_attributes: valid_sharing,
+              content_blob_id: blob.id
+    }
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        post :create_metadata, params
+      end
+    end
+
+    assert_response :unprocessable_entity
+
+    assert (df = assigns(:data_file))
+    assert_empty df.projects
+  end
+
+  test 'create metadata together with new assay' do
+    person = Factory(:person)
+    login_as(person)
+
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+
+    project = person.projects.last
+    assay_class = AssayClass.experimental
+    study = Factory(:study,investigation:Factory(:investigation,contributor:person), contributor:person)
+    assert study.can_edit?
+    sop = Factory(:sop,projects:[project],contributor:person)
+    assert sop.can_view?
+
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    }, assay: {
+        create_assay: true,
+        assay_class_id: assay_class.id,
+        title: 'my wonderful assay',
+        description: 'assay description',
+        study_id: study.id,
+        sop_id: sop.id,
+        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
+        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
+    },
+              policy_attributes: valid_sharing,
+              content_blob_id: blob.id.to_s
+    }
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('Assay.count') do
+          assert_difference('AssayAsset.count',2) do
+            post :create_metadata, params
+          end
+        end
+      end
+    end
+
+    assert (df = assigns(:data_file))
+    assert_equal 1,df.assays.count
+    assay = df.assays.first
+    assert_equal 'my wonderful assay',assay.title
+    assert_equal 'assay description',assay.description
+    assert_equal study,assay.study
+    assert assay.assay_class.is_experimental?
+    assert_equal [project],assay.projects
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',assay.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Binding',assay.technology_type_uri
+    assert_equal [sop],assay.sops
+  end
+
+  test 'new assay adopts datafile policy' do
+    person = Factory(:person)
+    manager = Factory(:person)
+    other_project = Factory(:project)
+    login_as(person)
+
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+
+    project = person.projects.last
+    assay_class = AssayClass.experimental
+    investigation = Factory(:investigation,projects:[project], contributor:person)
+    study = Factory(:study,investigation:investigation, contributor:person)
+    assert study.can_edit?
+
+    sharing = {
+        access_type: Policy::PRIVATE,
+        permissions_attributes: {
+            '0' => {
+                contributor_type: 'Person',
+                contributor_id: manager.id,
+                access_type: Policy::MANAGING
+            },
+            '1' => {
+                contributor_type: 'Project',
+                contributor_id: other_project.id,
+                access_type: Policy::VISIBLE
+            }
+        }
+    }
+
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    }, assay: {
+        create_assay: true,
+        assay_class_id: assay_class.id,
+        title: 'my wonderful assay',
+        description: 'assay description',
+        study_id: study.id,
+        sop_id: nil,
+        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
+        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
+    },
+              policy_attributes: sharing,
+              content_blob_id: blob.id.to_s
+    }
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('Assay.count') do
+          assert_difference('Policy.count',2) do
+            assert_difference('Permission.count',4) do
+              post :create_metadata, params
+            end
+          end
+        end
+      end
+    end
+
+    assert (df = assigns(:data_file))
+    assert_equal Policy::PRIVATE,df.policy.access_type
+    assert_equal 2,df.policy.permissions.count
+    assert_equal manager,df.policy.permissions[0].contributor
+    assert_equal Policy::MANAGING,df.policy.permissions[0].access_type
+    assert_equal other_project,df.policy.permissions[1].contributor
+    assert_equal Policy::VISIBLE,df.policy.permissions[1].access_type
+
+    assay = df.assays.first
+    refute_equal df.policy.id,assay.policy.id
+    assert_equal Policy::PRIVATE,assay.policy.access_type
+    assert_equal 2,assay.policy.permissions.count
+    assert_equal manager,assay.policy.permissions[0].contributor
+    assert_equal Policy::MANAGING,assay.policy.permissions[0].access_type
+    assert_equal other_project,assay.policy.permissions[1].contributor
+    assert_equal Policy::VISIBLE,assay.policy.permissions[1].access_type
+
+  end
+
+  test 'create metadata with new assay fails if study not editable' do
+    person = Factory(:person)
+    project = person.projects.last
+    another_person = Factory(:person,project:project)
+    investigation = Factory(:investigation,projects:[project],contributor:another_person)
+    study = Factory(:study, contributor:another_person,investigation:investigation)
+
+    login_as(person)
+
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+
+    assay_class = AssayClass.experimental
+    refute study.can_edit?
+
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    }, assay: {
+        create_assay: true,
+        assay_class_id: assay_class.id,
+        title: 'my wonderful assay',
+        description: 'assay description',
+        study_id: study.id,
+        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
+        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
+    },
+              policy_attributes: valid_sharing,
+              content_blob_id: blob.id.to_s
+    }
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        assert_no_difference('Assay.count') do
+          assert_no_difference('AssayAsset.count') do
+            post :create_metadata, params
+          end
+        end
+      end
+    end
+
+    assert_response :unprocessable_entity
+  end
+
+  test 'when updating, assay linked to must be editable' do
+    person = Factory(:person)
+    login_as(person)
+    data_file = Factory(:data_file,contributor:person,projects:person.projects)
+    assert data_file.can_edit?
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+
+    investigation = Factory(:investigation,contributor:person,projects:person.projects)
+
+    study = Factory(:study, contributor:person, investigation:investigation)
+
+    good_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:editing_public_policy))
+    bad_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:publicly_viewable_policy))
+
+    assert good_assay.can_edit?
+    refute bad_assay.can_edit?
+
+    assert_no_difference('AssayAsset.count') do
+      put :update, id: data_file.id, data_file: { title: data_file.title }, assay_ids: [bad_assay.id.to_s]
+    end
+    # FIXME: currently just skips the bad assay, but ideally should respond with an error status
+    #assert_response :unprocessable_entity
+    #
+    data_file.reload
+    assert_empty data_file.assays
+
+    assert_difference('AssayAsset.count') do
+      put :update, id: data_file.id, data_file: { title: data_file.title }, assay_ids: [good_assay.id.to_s]
+    end
+    data_file.reload
+    assert_equal [good_assay], data_file.assays
+
+  end
+
+  test 'when creating, assay linked to must be editable' do
+    person = Factory(:person)
+    login_as(person)
+
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+
+    investigation = Factory(:investigation,contributor:person,projects:person.projects)
+
+    study = Factory(:study, contributor:person, investigation:investigation)
+
+    good_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:editing_public_policy))
+    bad_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:publicly_viewable_policy))
+
+    assert good_assay.can_edit?
+    refute bad_assay.can_edit?
+
+    data_file, blob = valid_data_file
+
+    assert_no_difference('AssayAsset.count') do
+      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [bad_assay.id.to_s]
+    end
+
+    # FIXME: currently just skips the bad assay, but ideally should respond with an error status
+    assert_empty assigns(:data_file).assays
+    #assert_response :unprocessable_entity
+
+    data_file, blob = valid_data_file
+
+    assert_difference('AssayAsset.count') do
+      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [good_assay.id.to_s]
+    end
+    data_file = assigns(:data_file)
+    assert_equal [good_assay],data_file.assays
   end
 
   def edit_max_object(df)
@@ -2888,7 +3412,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   def valid_data_file
-    [{ title: 'Test',simulation_data:'0', project_ids: [projects(:sysmo_project).id] }, { data: file_for_upload }]
+    [{ title: 'Test',simulation_data:'0', project_ids: [User.current_user.person.projects.first.id]}, { data: file_for_upload }]
   end
 
   def valid_data_file_with_http_url
@@ -2946,5 +3470,19 @@ class DataFilesControllerTest < ActionController::TestCase
     parsed_response = JSON.parse(@response.body)
     assert_not parsed_response['data']['attributes'].has_key?('policy')
     logout
+  end
+
+  # registers a new content blob, and triggers the javascript 'rightfield_extraction_ajax' call, and results in the metadata form HTML in the response
+  # this replicates the old behaviour and result of calling #new
+  def register_content_blob
+
+    blob = {data: file_for_upload}
+    assert_difference('ContentBlob.count') do
+      post :create_content_blob, content_blobs: [blob]
+    end
+    content_blob_id = assigns(:data_file).content_blob.id
+    session[:uploaded_content_blob_id] = content_blob_id.to_s
+    post :rightfield_extraction_ajax,content_blob_id:content_blob_id.to_s,format:'js'
+    get :provide_metadata
   end
 end
