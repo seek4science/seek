@@ -1,8 +1,6 @@
 <%
-  include_parents ||= false
-  deep ||= false
-  depth ||= 1
-  hash =  Seek::IsaGraphGenerator.new(root_item).generate({ deep: deep, depth: depth, include_parents: include_parents })
+  options ||= { depth: 1, parent_depth: 1 }
+  hash =  Seek::IsaGraphGenerator.new(root_item).generate(options)
   elements = cytoscape_elements(hash)
 
   #show only current node and connected nodes

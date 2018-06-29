@@ -62,14 +62,12 @@ a.graph_toggle {
 
 #cy {
   flex-grow: 1;
-  max-height: 600px !important;
-  min-height: 400px;
+  height: 600px !important;
 }
 
 #jstree {
   background-color: #fff;
-  max-height: 600px !important;
-  min-height: 400px;
+  height: 600px !important;
   width: 300px;
   flex-shrink: 0;
   border-left: 1px solid $panel-default-border;

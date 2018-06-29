@@ -53,26 +53,26 @@ module Seek
       @object = object
     end
 
-    def generate(depth: 1, deep: false, include_parents: false, include_self: true, auth: true)
+    def generate(depth: 1, parent_depth: 1, include: { self: true }, auth: true)
       @auth = auth
       hash = { nodes: [], edges: [] }
+      parent_depth = 1 if parent_depth == 0 && include[:siblings] # Need to include parents to show siblings
 
-      depth = deep ? nil : depth
-
-      # Parents and siblings...
-      if include_parents
-        parents(@object).each do |parent|
-          merge_hashes(hash, descendants(parent, depth))
+      if parent_depth.nil? || parent_depth > 0
+        if include[:siblings] # Parents and siblings...
+          parents(@object).each do |parent|
+            merge_hashes(hash, descendants(parent, 2))
+          end
         end
 
-        # All ancestors...
-        merge_hashes(hash, ancestors(@object, nil))
+        # Ancestors...
+        merge_hashes(hash, ancestors(@object, parent_depth))
       end
 
       # Self and descendants...
       merge_hashes(hash, descendants(@object, depth))
 
-      hash[:nodes].delete_if { |n| n.object == @object } unless include_self
+      hash[:nodes].delete_if { |n| n.object == @object } unless include[:self]
 
       hash
     end
@@ -121,7 +121,7 @@ module Seek
         end
       end
 
-      if max_depth.nil? || (depth < max_depth) || children.count == 1
+      if max_depth.nil? || depth < max_depth
         children.each do |child|
           hash = traverse(method, child, max_depth, depth + 1)
           nodes += hash[:nodes]
