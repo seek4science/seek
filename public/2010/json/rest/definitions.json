@@ -4534,7 +4534,7 @@
                   "$ref": "#/definitions/nullableUriString"
                 },
                 "pubmed_id": {
-                  "type": "#/definitions/nullableInteger"
+                  "$ref": "#/definitions/nullableInteger"
                 },
                 "abstract": {
                   "$ref": "#/definitions/nullableNonEmptyString"
