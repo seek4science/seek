@@ -25,10 +25,6 @@ class DataFilesControllerTest < ActionController::TestCase
     @object
   end
 
-  def test_json_content
-    super
-  end
-
   def test_title
     get :index
     assert_response :success

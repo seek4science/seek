@@ -194,7 +194,7 @@ SEEK::Application.routes.draw do
       get :isa_children
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
-              :publications,:events,:samples,:specimens,:strains,:search, :only=>[:index]
+              :publications,:events,:samples,:specimens,:strains,:search, :documents, :only=>[:index]
     resources :openbis_endpoints do
       member do
         post :add_dataset
