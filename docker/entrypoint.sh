@@ -23,7 +23,7 @@ fi
 
 # Start Rails
 echo "STARTING SEEK"
-bundle exec puma -C config/puma.rb -d
+bundle exec puma -C docker/puma.rb -d
 
 # Workers
 if [ -z $NO_ENTRYPOINT_WORKERS ] #Don't start if flag set, for use with docker-compose
@@ -33,7 +33,7 @@ then
 fi
 
 
-tail -f log/production.log &
+tail -f log/puma.out log/puma.err log/production.log &
 
 echo "STARTING NGINX"
 nginx -g 'daemon off;'
