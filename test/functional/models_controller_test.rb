@@ -64,7 +64,7 @@ class ModelsControllerTest < ActionController::TestCase
     end
     assert_response :success
     assert_equal "attachment; filename=\"cronwright.xml\"", @response.header['Content-Disposition']
-    assert_equal 'text/xml', @response.header['Content-Type']
+    assert_equal 'application/xml', @response.header['Content-Type']
     assert_equal '5933', @response.header['Content-Length']
   end
 

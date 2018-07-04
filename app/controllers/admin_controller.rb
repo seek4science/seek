@@ -439,6 +439,14 @@ class AdminController < ApplicationController
     end
   end
 
+  # this destroys any failed Delayed::Jobs
+  def clear_failed_jobs
+    Delayed::Job.where('failed_at IS NOT NULL').destroy_all
+    respond_to do |format|
+      format.json{ render text:'',status: :ok}
+    end
+  end
+
   private
 
   def created_at_data_for_model(model)
@@ -527,4 +535,5 @@ class AdminController < ApplicationController
     end
     redirect_to action: :show
   end
+
 end

@@ -311,6 +311,41 @@ class UsersControllerTest < ActionController::TestCase
     assert_equal 'Your password reset code has expired', flash[:error]
   end
 
+  test 'terms and conditions checkbox' do
+    with_config_value :terms_enabled,true do
+      assert User.any?
+      get :new
+      assert_response :success
+      assert_select "form.new_user input#tc_agree[type=checkbox]", count:1
+      assert_select "form.new_user input.btn[type=submit][disabled]", count:1
+      assert_select "form.new_user input.btn[type=submit]:not([disabled])", count:0
+    end
+  end
+
+  # First user is the admin user that sets it up, so no T & C's to agree to
+  test 'no terms and conditions checkbox for first user' do
+    with_config_value :terms_enabled,true do
+      User.destroy_all
+      refute User.any?
+      get :new
+      assert_response :success
+      assert_select "form.new_user input#tc_agree[type=checkbox]", count:0
+      assert_select "form.new_user input.btn[type=submit][disabled]", count:0
+      assert_select "form.new_user input.btn[type=submit]:not([disabled])", count:1
+    end
+  end
+
+  test "no terms and conditions if disabled" do
+    with_config_value :terms_enabled,false do
+      assert User.any?
+      get :new
+      assert_response :success
+      assert_select "form.new_user input#tc_agree[type=checkbox]", count:0
+      assert_select "form.new_user input.btn[type=submit][disabled]", count:0
+      assert_select "form.new_user input.btn[type=submit]:not([disabled])", count:1
+    end
+  end
+
   protected
 
   def create_user(options = {})

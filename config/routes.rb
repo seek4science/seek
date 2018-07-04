@@ -50,6 +50,7 @@ SEEK::Application.routes.draw do
       post :delete_tag
       post :edit_tag
       post :update_imprint_setting
+      post :clear_failed_jobs
     end
   end
 
@@ -193,7 +194,7 @@ SEEK::Application.routes.draw do
       get :isa_children
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
-              :publications,:events,:samples,:specimens,:strains,:search, :only=>[:index]
+              :publications,:events,:samples,:specimens,:strains,:search, :documents, :only=>[:index]
     resources :openbis_endpoints do
       collection do
         get :test_endpoint

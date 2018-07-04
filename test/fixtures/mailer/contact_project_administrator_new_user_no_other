@@ -1,0 +1,21 @@
+Hi,
+
+The new user Aaron Spiggle just signed up and indicated that they are a member of the following projects and/or institutions:
+
+Project: Project X
+Project: -pr_name-
+Institution: The Institute
+
+If you know this person is a genuine member of a project you administer, you can add them by:
+    - following the link to the project shown below
+    - select the Administration menu
+    - select the Administer Project members button
+
+Links to these projects are:
+
+    -pr_name- - http://localhost:3000/projects/-pr_id-
+
+More details about adding people to projects can be found at https://docs.seek4science.org/help/user-guide/administer-project-members.html
+
+If you need to contact the person, their details can be found at: http://localhost:3000/people/-person_id-, and their email address is aaron@email.com .
+-- end --

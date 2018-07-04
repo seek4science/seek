@@ -1163,4 +1163,71 @@ class PersonTest < ActiveSupport::TestCase
     p.add_to_project_and_institution(Factory(:project,title:'wobble'),p.institutions.first)
     assert_equal 'wibble, wobble',p.typeahead_hint
   end
+
+  test 'publication authors updated with name when person deleted' do
+    person = Factory(:person, first_name: "Zak", last_name: "Bloggs")
+    pub1 = Factory(:publication, publication_authors:[Factory(:publication_author, person:person, last_name:nil, first_name:nil)])
+    pub2 = Factory(:publication, publication_authors:[Factory(:publication_author)])
+    pub3 = Factory(:publication, publication_authors:[Factory(:publication_author,person:person),Factory(:publication_author,person:Factory(:person))])
+
+    assert_equal 1,pub1.publication_authors.count
+    assert_equal 1,pub2.publication_authors.count
+    assert_equal 2,pub3.publication_authors.count
+
+    assert_nil pub1.publication_authors.first.first_name
+    assert_nil pub1.publication_authors.first.last_name
+    refute_nil pub1.publication_authors.first.person
+
+    refute_nil pub2.publication_authors.first.first_name
+    refute_nil pub2.publication_authors.first.last_name
+    assert_nil pub2.publication_authors.first.person
+
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[0].first_name
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[0].last_name
+    refute_equal "Zak",pub3.publication_authors.sort_by(&:first_name)[0].first_name
+    refute_equal "Bloggs",pub3.publication_authors.sort_by(&:first_name)[0].last_name
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[0].person
+
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[1].first_name
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[1].last_name
+    refute_equal "Zak",pub3.publication_authors.sort_by(&:first_name)[1].first_name
+    refute_equal "Bloggs",pub3.publication_authors.sort_by(&:first_name)[1].last_name
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[1].person
+
+    disable_authorization_checks{person.destroy}
+
+    pub1.reload
+    pub2.reload
+    pub3.reload
+
+    assert_equal 1,pub1.publication_authors.count
+    assert_equal 1,pub2.publication_authors.count
+    assert_equal 2,pub3.publication_authors.count
+
+    refute_nil pub1.publication_authors.first.first_name
+    refute_nil pub1.publication_authors.first.last_name
+    assert_nil pub1.publication_authors.first.person
+    assert_equal "Zak",pub1.publication_authors.first.first_name
+    assert_equal "Bloggs",pub1.publication_authors.first.last_name
+
+    #unaffected
+    refute_nil pub2.publication_authors.first.first_name
+    refute_nil pub2.publication_authors.first.last_name
+    assert_nil pub2.publication_authors.first.person
+
+
+    #only one person affected, the last after sorting
+    refute_nil pub3.publication_authors[1].first_name
+    refute_nil pub3.publication_authors[1].last_name
+    assert_equal "Zak",pub3.publication_authors.sort_by(&:first_name)[1].first_name
+    assert_equal "Bloggs",pub3.publication_authors.sort_by(&:first_name)[1].last_name
+    assert_nil pub3.publication_authors.sort_by(&:first_name)[1].person
+
+    refute_nil pub3.publication_authors[0].first_name
+    refute_nil pub3.publication_authors[0].last_name
+    refute_equal "Zak",pub3.publication_authors.sort_by(&:first_name)[0].first_name
+    refute_equal "Bloggs",pub3.publication_authors.sort_by(&:first_name)[0].last_name
+    refute_nil pub3.publication_authors.sort_by(&:first_name)[0].person
+
+  end
 end

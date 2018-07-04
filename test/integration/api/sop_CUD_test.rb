@@ -54,6 +54,7 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     permissions = [
         Factory(:permission, policy: policy, contributor: Factory(:person), access_type: Policy::MANAGING),
         Factory(:permission, policy: policy, contributor: Factory(:project), access_type: Policy::ACCESSIBLE),
+        Factory(:permission, policy: policy, contributor: Factory(:programme), access_type: Policy::VISIBLE),
         Factory(:permission, policy: policy, contributor: Factory(:institution), access_type: Policy::VISIBLE),
         Factory(:permission, policy: policy, contributor: Factory(:work_group), access_type: Policy::EDITING),
         Factory(:permission, policy: policy, contributor: Factory(:favourite_group), access_type: Policy::MANAGING)

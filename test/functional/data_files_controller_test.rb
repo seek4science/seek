@@ -707,7 +707,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'download', al.action
     assert_equal df, al.activity_loggable
     assert_equal 'attachment; filename="rightfield.xls"', @response.header['Content-Disposition']
-    assert_equal 'application/excel', @response.header['Content-Type']
+    assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '9216', @response.header['Content-Length']
   end
 
@@ -717,7 +717,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     assert_response :success
     assert_equal 'attachment; filename="small-test-spreadsheet.xls"', @response.header['Content-Disposition']
-    assert_equal 'application/excel', @response.header['Content-Type']
+    assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '7168', @response.header['Content-Length']
   end
 
@@ -2005,7 +2005,8 @@ class DataFilesControllerTest < ActionController::TestCase
                  data_url: 'http://mockedlocation.com/big.txt',
                  make_local_copy: '1'
                }],
-               policy_attributes: valid_sharing }
+               policy_attributes: valid_sharing
+    }
 
     assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
       assert_difference('DataFile.count') do
@@ -2500,13 +2501,13 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, id: data_file
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count: 0
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
 
-    data_file.latest_version.update_attribute(:doi, 'doi:10.1.1.1/xxx')
+    data_file.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
     get :show, id: data_file
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count: 1
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
   end
 
   test 'resource count stats' do
@@ -2825,6 +2826,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'My Assay Description', assay.description
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response', assay.assay_type_uri
     assert_equal 'http://jermontology.org/ontology/JERMOntology#2-hybrid_system', assay.technology_type_uri
+
   end
 
   test 'create metadata' do
@@ -2866,6 +2868,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal person.user, al.culprit
 
     assert_nil session[:uploaded_content_blob_id]
+
   end
 
   test 'create metadata with associated assay' do
@@ -3022,6 +3025,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_response :redirect
+
   end
 
   test 'create metadata filters projects' do
@@ -3131,7 +3135,6 @@ class DataFilesControllerTest < ActionController::TestCase
           contributor_id: other_project.id,
           access_type: Policy::VISIBLE
         }
-      }
     }
 
     params = { data_file: {
