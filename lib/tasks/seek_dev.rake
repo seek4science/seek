@@ -410,4 +410,17 @@ namespace :seek_dev do
 
   end
 
+  task :strains_to_csv => :environment do
+
+    CSV.open(Rails.root.join('strains.csv'),"w+",:force_quotes=> true, :write_headers => true, :headers => [ "id", "title", "organism_id", "organism_ncbi", "parent_id", "provider id", "provider name", "synonym", "comment", "genotypes","phenotypes","project_ids","assay_ids"]) do |csv|
+      Strain.all.each do |strain|
+        row = [strain.id,strain.title,strain.organism_id,strain.organism.try(:ncbi_id),strain.parent_id,strain.provider_id,strain.provider_name,strain.synonym,strain.comment]
+        row = row + [strain.genotype_info,strain.phenotype_info,strain.projects.collect(&:id).join(","),strain.assays.collect(&:id).join(",")]
+        csv << row
+      end
+    end
+
+
+  end
+
 end
