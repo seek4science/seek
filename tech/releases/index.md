@@ -9,6 +9,18 @@ layout: page
 
 Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
+If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html) 
+
+## Version 1.6.2
+
+Release date: _July 5th 2018_
+
+  * Fixed a bug when viewing a Project page that has more that 5 visible Documents associated with it.
+  * Avoid warning about missing projects when uploading a standard Excel file, being mistaken as RightField template.
+  * When running SEEK through Docker, write the Puma output and error logs to files.
+  
+A full list of changes included in this release can be found in the [SEEK v1.6.2 release notes](release-notes-1.6.2.html).  
+
 ## Version 1.6.1
 
 Release date: _June 20th 2018_
@@ -25,7 +37,7 @@ Bugfixes and some small improvements, in particular
 There have also been a few other smaller fixes and improvements, a full list of changes included in this release can be found in 
 the [SEEK v1.6.1 release notes](release-notes-1.6.1.html).
                                                                   
-If you have any comments or feedback then please [Contact Us](/contacting-us.html)  
+ 
 
 ## Version 1.6.0
 
