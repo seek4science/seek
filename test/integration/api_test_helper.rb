@@ -316,7 +316,11 @@ module ApiTestHelper
       assert_equal source.length, result.length, "#{key} length of #{result.length} was not equal to #{source.length}"
       sorter = proc { |e|
           if e.is_a?(Hash)
-            e.key?('id') || e.values.first
+            if e.key?('id')
+              e['id']
+            else
+              e.values.select { |v| v.is_a?(String) }.first
+            end
           else
             e
           end
