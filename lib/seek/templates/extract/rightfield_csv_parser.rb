@@ -22,6 +22,10 @@ module Seek
           values_for_entity_uri(Seek::Rdf::JERMVocab[property], type)
         end
 
+        def contains_rightfield_elements?
+          @csv.reject { |row| row[7] == 'None' }.count > 1
+        end
+
         private
 
         def values_for_entity_uri(uri, type)
