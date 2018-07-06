@@ -62,7 +62,7 @@ The remaining packages are:
 
 Installing these packages now will make installing Ruby easier later on:
 
-    sudo apt install libyaml-dev libsqlite3-dev sqlite3 autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev
+    sudo apt install curl libyaml-dev libsqlite3-dev sqlite3 autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev
 
 ## Development or Production?
 
