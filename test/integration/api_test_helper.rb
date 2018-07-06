@@ -314,8 +314,15 @@ module ApiTestHelper
     elsif source.is_a?(Array)
       assert result.is_a?(Array), "#{key} was not an Array"
       assert_equal source.length, result.length, "#{key} length of #{result.length} was not equal to #{source.length}"
-      sorted_result = result.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
-      sorted_source = source.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
+      sorter = proc { |e|
+          if e.is_a?(Hash)
+            e.key?('id') || e.values.first
+          else
+            e
+          end
+      }
+      sorted_result = result.sort_by(&sorter)
+      sorted_source = source.sort_by(&sorter)
       sorted_source.each_with_index do |sub_value, index|
         deep_comparison(sub_value, sorted_result[index], "#{key}[#{index}]")
       end
