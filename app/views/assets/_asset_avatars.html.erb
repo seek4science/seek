@@ -1,9 +1,8 @@
 <%
    creators = []
    creators = creators + resource.creators if resource.respond_to? :creators
-   contributor = resource.contributor
-   contributor = contributor.person if contributor.respond_to? :person
-   creators << contributor if resource.contributor_credited? and contributor
+   contributors = resource.contributors.map { |c| c.try(:person) }.compact.uniq
+   creators += contributors if resource.contributor_credited?
    creators = creators.uniq
    creators = creators.select &:can_view?
    cache_key = creators.collect{|c| c.cache_key}.join("")

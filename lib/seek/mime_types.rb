@@ -12,6 +12,7 @@ module Seek
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => { name: 'Word document', icon_key: 'doc_file', extensions: ['docx'] },
       'application/vnd.openxmlformats-officedocument.presentationml.presentation' => { name: 'PowerPoint presentation', icon_key: 'ppt_file', extensions: ['pptx'] },
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => { name: 'Spreadsheet', icon_key: 'xls_file', extensions: ['xlsx'] },
+      'application/vnd.ms-excel.sheet.macroEnabled.12' => { name: 'Spreadsheet (macro enabled)', icon_key: 'xls_file', extensions: ['xlsm']},
       'application/vnd.ms-powerpoint' => { name: 'PowerPoint presentation', icon_key: 'ppt_file', extensions: ['ppt'] },
       'application/zip' => { name: 'Zip file', icon_key: 'zip_file', extensions: ['zip'] },
       'image/gif' => { name: 'GIF image', icon_key: 'gif_file', extensions: ['gif'] },
