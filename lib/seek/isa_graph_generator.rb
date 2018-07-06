@@ -53,15 +53,22 @@ module Seek
       @object = object
     end
 
-    def generate(depth: 1, parent_depth: 1, include: { self: true }, auth: true)
+    # depth: number of levels of child resources to show (0 = none, nil = all)
+    # parent_depth: number of levels of parent resources to show (0 = none, nil = all)
+    # sibling_depth: number of levels of sibling resources (other children of immediate parent)to show (0 = none, nil = all)
+    # include_self: include the root resource in the tree?
+    def generate(depth: 1, parent_depth: 0, sibling_depth: 0, include_self: true, auth: true)
       @auth = auth
       hash = { nodes: [], edges: [] }
-      parent_depth = 1 if parent_depth == 0 && include[:siblings] # Need to include parents to show siblings
 
-      if parent_depth.nil? || parent_depth > 0
-        if include[:siblings] # Parents and siblings...
+      if sibling_depth != 0 # Need to include parents to show siblings
+        parent_depth = 1 if parent_depth == 0
+      end
+
+      if parent_depth != 0
+        if sibling_depth != 0 # Parents and siblings...
           parents(@object).each do |parent|
-            merge_hashes(hash, descendants(parent, 2))
+            merge_hashes(hash, descendants(parent, sibling_depth))
           end
         end
 
@@ -72,7 +79,7 @@ module Seek
       # Self and descendants...
       merge_hashes(hash, descendants(@object, depth))
 
-      hash[:nodes].delete_if { |n| n.object == @object } unless include[:self]
+      hash[:nodes].delete_if { |n| puts n.object; puts @object, n.object == @object } unless include_self
 
       hash
     end

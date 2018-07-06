@@ -1,5 +1,5 @@
 <%
-  options ||= { depth: 1, parent_depth: 1 }
+  options ||= { depth: 1, parent_depth: 1, include_self: true }
   hash =  Seek::IsaGraphGenerator.new(root_item).generate(options)
   elements = cytoscape_elements(hash)
 
