@@ -3135,6 +3135,7 @@ class DataFilesControllerTest < ActionController::TestCase
           contributor_id: other_project.id,
           access_type: Policy::VISIBLE
         }
+      }
     }
 
     params = { data_file: {
