@@ -419,6 +419,18 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal 'text/html', @response.content_type
   end
 
+  test 'should fetch csv content blob as csv' do
+    df = Factory(:data_file, content_blob: Factory(:csv_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    assert_response :success
+
+    assert @response.content_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(1,2,3,4,5))
+
+  end
+
   test 'can view content of an image file' do
     df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
                              content_blob: Factory(:image_content_blob))

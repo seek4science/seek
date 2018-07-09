@@ -45,23 +45,23 @@ class ContentBlobsController < ApplicationController
     end
   end
 
-  def view_csv_content
-    mime_extensions = mime_extensions(@content_blob.content_type)
-    if !(%w(csv) & mime_extensions).empty?
-      render text: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
-    elsif !(%w(xls xlsx) & mime_extensions).empty?
-      sheet = params[:sheet] || 1
-      trim = params[:trim] || false
-      file = open(@content_blob.filepath)
-      render text: spreadsheet_to_csv(file, sheet, trim), content_type: 'text/csv'
-    else
-      respond_to do |format|
-        flash[:error] = 'Unable to view contents of this data file'
-        format.html { redirect_to @data_file, format: 'html' }
+  def csv_data
+    if !@content_blob.no_content?
+      mime_extensions = mime_extensions(@content_blob.content_type)
+      if !(%w(csv) & mime_extensions).empty?
+        render text: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
+      elsif !(%w(xls xlsx) & mime_extensions).empty?
+        sheet = params[:sheet] || 1
+        trim = params[:trim] || false
+        file = open(@content_blob.filepath)
+        render text: spreadsheet_to_csv(file, sheet, trim), content_type: 'text/csv'
+      else
+        render text, 'Unable to view contents of this data file,', content_type: 'text/csv', status: :not_acceptable
       end
+    else
+      render text: 'No content, Content blob does not have content', content_type: 'text/csv', status: :not_found
     end
   end
-
 
 
   def show
@@ -70,7 +70,7 @@ class ContentBlobsController < ApplicationController
       format.html { render text: 'Format not supported', status: :not_acceptable }
       format.xml { render text: 'Format not supported', status: :not_acceptable }
       format.rdf { render text: 'Format not supported', status: :not_acceptable }
-      format.csv { view_csv_content }
+      format.csv { csv_data }
     end
   end
 
