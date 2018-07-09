@@ -1,5 +1,6 @@
 ---
 layout: page
+title: Front page
 ---
 
 ## About FAIRDOM
