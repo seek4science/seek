@@ -542,7 +542,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :disassociate_authors
     end
-    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :events,:only=>[:index]
   end
 
   resources :events do
@@ -617,7 +617,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       get :isa_children
     end
-    resources :people,:projects,:assays, :studies, :investigations, :data_files, :documents, :publications, only:[:index]
+    resources :people,:projects,:assays, :studies, :investigations, :data_files, :publications, only:[:index]
   end
 
   ### SAMPLE TYPES ###
@@ -669,7 +669,7 @@ SEEK::Application.routes.draw do
       get :mint_doi_confirm
       get :isa_children
     end
-    resources :people,:projects, :programmes, :investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:only=>[:index]
   end
 
   ### ASSAY AND TECHNOLOGY TYPES ###
