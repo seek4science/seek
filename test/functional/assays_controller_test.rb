@@ -1381,6 +1381,23 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  test "document assays through nested routing" do
+    assert_routing 'documents/2/assays', controller: 'assays', action: 'index', document_id: '2'
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor:person)
+    assay2 = Factory(:assay, contributor:person)
+    document = Factory(:document,assays:[assay],contributor:person)
+
+    get :index, document_id: document.id
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', assay_path(assay), text: assay.title
+      assert_select 'a[href=?]', assay_path(assay2), text: assay2.title, count: 0
+    end
+  end
+
   test 'should show NeLS button for NeLS-enabled project' do
     person = Factory(:person)
     login_as(person.user)
