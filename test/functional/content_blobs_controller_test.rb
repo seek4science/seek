@@ -419,7 +419,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal 'text/html', @response.content_type
   end
 
-  test 'should fetch csv content blob as csv' do
+  test 'can fetch csv content blob as csv' do
     df = Factory(:data_file, content_blob: Factory(:csv_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
     get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
     assert_response :success
@@ -430,6 +430,43 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert csv.include?(%(1,2,3,4,5))
 
   end
+
+  test 'can fetch excel content blob as csv' do
+    df = Factory(:data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    assert_response :success
+
+    assert @response.content_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(,"some stuff"))
+
+  end
+
+  test 'cannot fetch binary content blob as csv' do
+    df = Factory(:data_file, content_blob: Factory(:binary_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    assert_response :not_acceptable
+
+    assert @response.content_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(Unable to view))
+
+  end
+
+  test 'cannot fetch empty content blob as csv' do
+    df = Factory(:data_file, content_blob: Factory(:blank_pdf_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    assert_response :not_found
+
+    assert @response.content_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(No content))
+
+  end
+
 
   test 'can view content of an image file' do
     df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
