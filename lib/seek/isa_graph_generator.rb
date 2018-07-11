@@ -79,7 +79,9 @@ module Seek
       # Self and descendants...
       merge_hashes(hash, descendants(@object, depth))
 
-      hash[:nodes].delete_if { |n| puts n.object; puts @object, n.object == @object } unless include_self
+      unless include_self
+        hash[:nodes] = hash[:nodes].reject { |n| n.object == @object }
+      end
 
       hash
     end
