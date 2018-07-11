@@ -1,7 +1,8 @@
 <%
   options ||= { depth: 1, parent_depth: 1, include_self: true }
-  hash =  Seek::IsaGraphGenerator.new(root_item).generate(options)
-  elements = cytoscape_elements(hash)
+  graph_hash = Seek::IsaGraphGenerator.new(root_item).generate(options)
+  tree_hash = Seek::IsaGraphGenerator.new(root_item).generate(options.merge(parent_depth: nil))
+  elements = cytoscape_elements(graph_hash)
 
   #show only current node and connected nodes
   #if set force_max_node to true, show only max_node_number if (current node + connected nodes) is bigger then max_node_number

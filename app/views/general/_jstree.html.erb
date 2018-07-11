@@ -16,7 +16,10 @@
           ISA.loadChildren(childCountNode);
         }
       } else {
-        ISA.selectNode(ISA.getNode(data.node.li_attr['data-node-id']));
+        var node = ISA.getNode(data.node.li_attr['data-node-id']);
+        if (node.length) {
+          ISA.selectNode(node);
+        }
       }
     })
   });
