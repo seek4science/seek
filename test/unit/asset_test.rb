@@ -174,7 +174,7 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal 1, sop.managers.count
     assert sop.managers.include?(person)
 
-    df = Factory(:data_file, contributor: user)
+    df = Factory(:data_file, contributor: user.person)
     assert_equal 1, df.managers.count
     assert df.managers.include?(user.person)
 

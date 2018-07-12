@@ -10,11 +10,10 @@ class ChangeUserContributorsToPerson < ActiveRecord::Migration
         sql = "UPDATE #{type.table_name} SET contributor_id = #{person_id}, contributor_type='Person' WHERE id = #{id}"
         ActiveRecord::Base.connection.execute(sql)
       end
-
     end
   end
 
   def down
-
+    # not reversible
   end
 end

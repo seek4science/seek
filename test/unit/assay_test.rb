@@ -165,15 +165,15 @@ class AssayTest < ActiveSupport::TestCase
     assert Factory(:assay, contributor: user.person).can_delete?
 
     assay = Factory(:assay, contributor: user.person)
-    assay.associate Factory(:data_file, contributor: user)
+    assay.associate Factory(:data_file, contributor: user.person)
     assert !assay.can_delete?
 
     assay = Factory(:assay, contributor: user.person)
-    assay.associate Factory(:sop, contributor: user)
+    assay.associate Factory(:sop, contributor: user.person)
     assert !assay.can_delete?
 
     assay = Factory(:assay, contributor: user.person)
-    assay.associate Factory(:model, contributor: user)
+    assay.associate Factory(:model, contributor: user.person)
     assert !assay.can_delete?
 
     pal = Factory(:pal)
