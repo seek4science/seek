@@ -41,6 +41,11 @@ Factory.define(:rightfield_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :rightfield_content_blob
 end
 
+Factory.define(:blank_rightfield_master_template_data_file, parent: :data_file) do |f|
+  f.association :content_blob, factory: :blank_rightfield_master_template
+end
+
+
 Factory.define(:rightfield_annotated_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :rightfield_annotated_content_blob
 end
@@ -51,6 +56,10 @@ end
 
 Factory.define(:xlsx_spreadsheet_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :xlsx_content_blob
+end
+
+Factory.define(:xlsm_spreadsheet_datafile, parent: :data_file) do |f|
+  f.association :content_blob, factory: :xlsm_content_blob
 end
 
 Factory.define(:small_test_spreadsheet_datafile, parent: :data_file) do |f|

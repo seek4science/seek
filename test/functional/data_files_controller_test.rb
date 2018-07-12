@@ -25,10 +25,6 @@ class DataFilesControllerTest < ActionController::TestCase
     @object
   end
 
-  def test_json_content
-    super
-  end
-
   def test_title
     get :index
     assert_response :success
@@ -710,7 +706,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'download', al.action
     assert_equal df, al.activity_loggable
     assert_equal "attachment; filename=\"rightfield.xls\"", @response.header['Content-Disposition']
-    assert_equal 'application/excel', @response.header['Content-Type']
+    assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '9216', @response.header['Content-Length']
   end
 
@@ -720,7 +716,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     assert_response :success
     assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"", @response.header['Content-Disposition']
-    assert_equal 'application/excel', @response.header['Content-Type']
+    assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '7168', @response.header['Content-Length']
   end
 
@@ -897,19 +893,6 @@ class DataFilesControllerTest < ActionController::TestCase
     xml = @response.body
     schema_path = File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'spreadsheet.xsd')
     validate_xml_against_schema(xml, schema_path)
-  end
-
-  test 'should fetch data content as csv' do
-    login_as(:model_owner)
-    get :data, id: data_files(:downloadable_data_file), format: 'csv'
-    assert_response :success
-    csv = @response.body
-    assert csv.include?(%(,,"fish","bottle","ggg,gg"))
-
-    get :data, id: data_files(:downloadable_data_file), format: 'csv', trim: true, sheet: '2'
-    assert_response :success
-    csv = @response.body
-    assert csv.include?(%("a",1,TRUE,,FALSE))
   end
 
   test 'should not expose non downloadable spreadsheet' do

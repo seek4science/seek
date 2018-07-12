@@ -39,24 +39,24 @@ Factory.define(:image_content_blob, parent: :content_blob) do |f|
 end
 
 Factory.define(:rightfield_content_blob, parent: :content_blob) do |f|
-  f.content_type 'application/excel'
+  f.content_type 'application/vnd.ms-excel'
   f.original_filename 'rightfield.xls'
   f.data { File.new("#{Rails.root}/test/fixtures/files/rightfield-test.xls", 'rb').read }
 end
 
 Factory.define(:spreadsheet_content_blob, parent: :content_blob) do |f|
-  f.content_type 'application/excel'
+  f.content_type 'application/vnd.ms-excel'
   f.original_filename 'test.xls'
 end
 
 Factory.define(:rightfield_annotated_content_blob, parent: :content_blob) do |f|
-  f.content_type 'application/excel'
+  f.content_type 'application/vnd.ms-excel'
   f.original_filename 'simple_populated_rightfield.xls'
   f.data { File.new("#{Rails.root}/test/fixtures/files/simple_populated_rightfield.xls", 'rb').read }
 end
 
 Factory.define(:small_test_spreadsheet_content_blob, parent: :content_blob) do |f|
-  f.content_type 'application/excel'
+  f.content_type 'application/vnd.ms-excel'
   f.original_filename 'small-test-spreadsheet.xls'
   f.data { File.new("#{Rails.root}/test/fixtures/files/small-test-spreadsheet.xls", 'rb').read }
 end
@@ -73,14 +73,20 @@ Factory.define(:xlsx_content_blob, parent: :content_blob) do |f|
   f.data { File.new("#{Rails.root}/test/fixtures/files/lihua_column_index_error.xlsx", 'rb').read }
 end
 
+Factory.define(:xlsm_content_blob, parent: :content_blob) do |f|
+  f.content_type 'application/vnd.ms-excel.sheet.macroEnabled.12'
+  f.original_filename 'test.xlsm'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/test.xlsm", 'rb').read }
+end
+
 Factory.define(:cronwright_model_content_blob, parent: :content_blob) do |f|
-  f.content_type 'text/xml'
+  f.content_type 'application/xml'
   f.original_filename 'cronwright.xml'
   f.data { File.new("#{Rails.root}/test/fixtures/files/cronwright.xml", 'rb').read }
 end
 
 Factory.define(:teusink_model_content_blob, parent: :content_blob) do |f|
-  f.content_type 'text/xml'
+  f.content_type 'application/xml'
   f.original_filename 'teusink.xml'
   f.data { File.new("#{Rails.root}/test/fixtures/files/Teusink.xml", 'rb').read }
 end
@@ -278,6 +284,12 @@ Factory.define(:rightfield_master_template_with_assay_with_sop, parent: :content
   f.original_filename 'populated-master-template-with-assay-and-sop.xlsx'
   f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   f.data { File.new("#{Rails.root}/test/fixtures/files/populated_templates/populated-master-template-with-assay-and-sop.xlsx", 'rb').read }
+end
+
+Factory.define(:blank_rightfield_master_template, parent: :content_blob) do |f|
+  f.original_filename 'populated-master-template-with-assay-no-df-title.xlsx'
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/blank-master-template.xlsx", 'rb').read }
 end
 
 Factory.define(:blank_content_blob, class: ContentBlob) do |f|

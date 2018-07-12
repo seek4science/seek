@@ -197,7 +197,6 @@ class DataFilesController < ApplicationController
       respond_to do |format|
         format.html # currently complains about a missing template, but we don't want people using this for now - its purely XML
         format.xml { render xml: spreadsheet_to_xml(file, memory_allocation = Seek::Config.jvm_memory_allocation) }
-        format.csv { render text: spreadsheet_to_csv(file, sheet, trim) }
       end
     else
       respond_to do |format|
@@ -413,6 +412,11 @@ class DataFilesController < ApplicationController
   def provide_metadata
     @data_file ||= session[:processed_datafile]
     @assay ||= session[:processed_assay]
+
+    #this perculiar line avoids a no method error when calling super later on, when there are no assays in the database
+    # this I believe is caused by accessing the unmarshalled @assay before the Assay class has been encountered. Adding this line
+    # avoids the error
+    Assay.new
     @warnings ||= session[:processing_warnings] || []
     @exception_message ||= session[:extraction_exception_message]
     @create_new_assay = @assay && @assay.new_record?

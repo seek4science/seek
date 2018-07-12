@@ -96,23 +96,19 @@ module AssetsHelper
   end
 
   def show_resource_path(resource)
-    path = ''
-    path = if resource.class.name.include?('::Version')
-             polymorphic_path(resource.parent, version: resource.version)
-           else
-             polymorphic_path(resource)
-           end
-    path
+    if resource.class.name.include?('::Version')
+      polymorphic_path(resource.parent, version: resource.version)
+    else
+      polymorphic_path(resource)
+    end
   end
 
   def edit_resource_path(resource)
-    path = ''
-    path = if resource.class.name.include?('::Version')
-             edit_polymorphic_path(resource.parent)
-           else
-             edit_polymorphic_path(resource)
-           end
-    path
+    if resource.class.name.include?('::Version')
+      edit_polymorphic_path(resource.parent)
+    else
+      edit_polymorphic_path(resource)
+    end
   end
 
   # provides a list of assets, according to the class, that are authorized according the 'action' which defaults to view

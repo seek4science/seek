@@ -1,0 +1,49 @@
+<%= button_link_to('Share with a programme', 'add', '#', id: 'add-programme-permission-button') %>
+
+<%= modal(id: 'add-programme-permission-modal', size: 'm') do %>
+    <%= modal_header('Share with programmes') %>
+    <%= modal_body do %>
+        <div class="form-group">
+          <label>The following programmes...</label>
+          <%= objects_input('permission-programmes-ids', [], typeahead: { values: Programme.all.map { |p| { id: p.id, name: p.title } } }, name: nil) -%>
+          <p class="help-block">Start typing a programme's title and select from the list that appears. You can select multiple programmes.</p>
+        </div>
+        <div class="form-group">
+          <label>can...</label>
+          <% if object.kind_of?(Project)%>
+              <%= select_tag('permission-programmes-access-type', project_policy_selection_options(nil, object, Policy::ACCESSIBLE), name: nil, class: 'form-control') -%>
+          <% else %>
+              <%= select_tag('permission-programmes-access-type', policy_selection_options(nil, object, Policy::ACCESSIBLE), name: nil, class: 'form-control') -%>
+          <% end %>
+        </div>
+    <% end %>
+    <%= modal_footer do %>
+        <%= link_to('Add', '#', id: 'permission-programmes-confirm', class: 'btn btn-primary pull-right', 'data-dismiss' => 'modal') %>
+    <% end %>
+<% end %>
+
+<script>
+  // Display programme modal
+  $j('#add-programme-permission-button').click(function () {
+    $j('#add-programme-permission-modal').modal('show');
+    $j('#permission-programmes-ids').tagsinput('focus');
+
+    return false;
+  });
+
+  // Add a programme permission to the table
+  $j('#permission-programmes-confirm').click(function () {
+    var programmes = $j('#permission-programmes-ids').tagsinput('items');
+
+    programmes.forEach(function (programme, index) {
+      Sharing.addPermission(
+          { contributor_type: 'Programme',
+            contributor_id: parseInt(programme.id),
+            title: programme.name,
+            access_type: parseInt($j('#permission-programmes-access-type').val()) });
+    });
+
+    // Reset form
+    $j('#permission-programmes-ids').tagsinput('removeAll');
+  });
+</script>
