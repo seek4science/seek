@@ -26,7 +26,6 @@ class Assay < ActiveRecord::Base
   belongs_to :institution
 
   belongs_to :study
-  belongs_to :contributor, class_name: 'Person'
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
   has_many :organisms, through: :assay_organisms, inverse_of: :assays
