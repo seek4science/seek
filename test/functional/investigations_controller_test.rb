@@ -219,7 +219,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy investigation' do
-    i = Factory(:investigation, contributor: User.current_user)
+    i = Factory(:investigation, contributor: User.current_user.person)
     assert_difference('Investigation.count', -1) do
       delete :destroy, id: i.id
     end
@@ -247,7 +247,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'option to delete investigation without study' do
-    get :show, id: Factory(:investigation, contributor: User.current_user).id
+    get :show, id: Factory(:investigation, contributor: User.current_user.person).id
     assert_select 'a', text: /Delete #{I18n.t('investigation')}/i, count: 1
   end
 
