@@ -16,7 +16,7 @@ module Acts #:nodoc:
 
     module ClassMethods
       def acts_as_versioned_resource
-        belongs_to :contributor, polymorphic: true
+        belongs_to :contributor, class_name: 'Person'
 
         include Seek::ProjectAssociation
 
