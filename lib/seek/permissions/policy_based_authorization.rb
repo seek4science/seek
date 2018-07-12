@@ -354,7 +354,7 @@ module Seek
       end
 
       def default_contributor
-        User.current_user
+        User.current_user.try(:person)
       end
 
       def has_advanced_permissions?
