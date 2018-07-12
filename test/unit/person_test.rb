@@ -140,9 +140,9 @@ class PersonTest < ActiveSupport::TestCase
     refute_nil person.user
     assert_empty person.contributed_items
 
-    df = Factory(:data_file, contributor: person.user)
-    inv = Factory(:investigation, contributor:person.user)
-    study = Factory(:study, contributor: person.user,investigation:inv)
+    df = Factory(:data_file, contributor: person)
+    inv = Factory(:investigation, contributor:person)
+    study = Factory(:study, contributor: person,investigation:inv)
     as = Factory(:assay, contributor: person,study:study)
 
 
@@ -769,7 +769,7 @@ class PersonTest < ActiveSupport::TestCase
   test 'should retrieve the list of people who have the manage right on the item' do
     user = Factory(:user)
     person = user.person
-    data_file = Factory(:data_file, contributor: user)
+    data_file = Factory(:data_file, contributor: user.person)
     people_can_manage = data_file.people_can_manage
     assert_equal 1, people_can_manage.count
     assert_equal person.id, people_can_manage.first[0]
@@ -792,13 +792,13 @@ class PersonTest < ActiveSupport::TestCase
       AssetsCreator.create asset: Factory(:data_file), creator: person
       AssetsCreator.create asset: Factory(:model), creator: person
       AssetsCreator.create asset: Factory(:sop), creator: person
-      Factory :event, contributor: user
+      event = Factory :event, contributor: person
       AssetsCreator.create asset: Factory(:presentation), creator: person
       AssetsCreator.create asset: Factory(:publication), creator: person
       assert_equal person.created_data_files, person.related_data_files
       assert_equal person.created_models, person.related_models
       assert_equal person.created_sops, person.related_sops
-      assert_equal user.events, person.related_events
+      assert_equal [event], person.related_events
       assert_equal person.created_presentations, person.related_presentations
       assert_equal person.created_publications, person.related_publications
     end
@@ -822,18 +822,16 @@ class PersonTest < ActiveSupport::TestCase
 
   test 'get the correct investigations and studies' do
     p = Factory(:person)
-    u = p.user
 
     inv1 = Factory(:investigation, contributor: p)
-    inv2 = Factory(:investigation, contributor: u)
 
     study1 = Factory(:study, contributor: p, investigation:inv1)
-    study2 = Factory(:study, contributor: u, investigation:inv2)
+    study2 = Factory(:study, contributor: p, investigation:inv1)
     p = Person.find(p.id)
 
     assert_equal [study1, study2], p.studies.sort_by(&:id)
 
-    assert_equal [inv1, inv2], p.investigations.sort_by(&:id)
+    assert_equal [inv1], p.investigations
   end
 
   test 'should be able to remove the workgroup whose project is not subcribed' do

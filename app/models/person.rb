@@ -49,6 +49,7 @@ class Person < ActiveRecord::Base
 
   has_many :presentations_for_person, as: :contributor, class_name: 'Presentation'
   has_many :samples_for_person, as: :contributor, class_name: 'Sample'
+  has_many :events_for_person, as: :contributor, class_name: 'Event'
 
   has_one :user, dependent: :destroy
 
@@ -145,27 +146,19 @@ class Person < ActiveRecord::Base
   end
 
   def studies
-    result = studies_for_person
-    result = (result | user.studies).compact if user
-    result.uniq
+    studies_for_person
   end
 
   def investigations
-    result = investigations_for_person
-    result = (result | user.investigations).compact if user
-    result.uniq
+    investigations_for_person
   end
 
   def presentations
-    result = presentations_for_person
-    result = (result | user.investigations).compact if user
-    result.uniq
+    presentations_for_person
   end
 
   def related_samples
-    result = samples_for_person | created_samples
-    result = (result | user.samples).compact if user
-    result
+    samples_for_person | created_samples
   end
 
   def programmes
@@ -325,12 +318,9 @@ class Person < ActiveRecord::Base
 
   # all items, assets, ISA, samples and events that are linked to this person as a contributor
   def contributed_items
-    assays = Assay.where(contributor_id: id) # assays contributor is not polymorphic
-    [Study, Investigation, DataFile, Document, Sop, Presentation, Model, Sample, Publication, Event].collect do |type|
-      assets = type.where("contributor_type = 'Person' AND contributor_id=?",id)
-      assets |= type.where("contributor_type = 'User' AND contributor_id=?",user.id) unless user.nil?
-      assets
-    end.flatten.uniq.compact | assays
+    [Assay, Study, Investigation, DataFile, Document, Sop, Presentation, Model, Sample, Publication, Event].collect do |type|
+      type.where(contributor_id:id)
+    end.flatten.uniq.compact
   end
 
   # can be edited by:

@@ -10,7 +10,7 @@ class AssayAssetTest < ActiveSupport::TestCase
   end
 
   test 'create explicit version' do
-    sop = Factory :sop, contributor: User.current_user
+    sop = Factory :sop, contributor: User.current_user.person
     sop.save_as_new_version
     assay = Factory :assay, contributor: User.current_user.person
 

@@ -9,17 +9,6 @@ class User < ActiveRecord::Base
 
   belongs_to :person
 
-  has_many :sops, as: :contributor
-  has_many :data_files, as: :contributor
-  has_many :models, as: :contributor
-  has_many :presentations, as: :contributor
-  has_many :events, as: :contributor
-  has_many :publications, as: :contributor
-  has_many :samples, as: :contributor
-
-  has_many :investigations, as: :contributor
-  has_many :studies, as: :contributor
-
   has_many :oauth_sessions, dependent: :destroy
 
   # restful_authentication plugin generated code ...

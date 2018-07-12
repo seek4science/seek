@@ -57,7 +57,7 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'can subscribe to someone elses subscribable' do
-    s = Factory(:subscribable, contributor: Factory(:user))
+    s = Factory(:subscribable, contributor: Factory(:person))
     assert !s.subscribed?
     disable_authorization_checks { s.subscribe }
     assert s.save

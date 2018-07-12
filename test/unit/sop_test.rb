@@ -113,7 +113,7 @@ class SopTest < ActiveSupport::TestCase
   def test_version_from_fixtures
     sop_version = sop_versions(:my_first_sop_v1)
     assert_equal 1, sop_version.version
-    assert_equal users(:owner_of_my_first_sop), sop_version.contributor
+    assert_equal users(:owner_of_my_first_sop).person, sop_version.contributor
     assert_equal content_blobs(:content_blob_with_little_file2), sop_version.content_blob
 
     sop = sops(:my_first_sop)
@@ -179,21 +179,21 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'versions destroyed as dependent' do
-    sop = sops(:my_first_sop)
+    sop = Factory(:sop)
     assert_equal 1, sop.versions.size, 'There should be 1 version of this SOP'
     assert_difference(['Sop.count', 'Sop::Version.count'], -1) do
-      User.current_user = sop.contributor
+      User.current_user = sop.contributor.user
       sop.destroy
     end
   end
 
   test 'make sure content blob is preserved after deletion' do
-    sop = sops(:my_first_sop)
+    sop = Factory(:sop)
     assert_not_nil sop.content_blob, 'Must have an associated content blob for this test to work'
     cb = sop.content_blob
     assert_difference('Sop.count', -1) do
       assert_no_difference('ContentBlob.count') do
-        User.current_user = sop.contributor
+        User.current_user = sop.contributor.user
         sop.destroy
       end
     end
@@ -227,15 +227,15 @@ class SopTest < ActiveSupport::TestCase
     sop = Factory(:sop, policy: Factory(:public_policy))
     User.current_user = user
 
-    assert_not_equal user, sop.contributor
+    assert_not_equal user, sop.contributor.user
 
     assert_difference('Sop::Version.count') do
       sop.save_as_new_version
     end
 
     version = sop.reload.versions.last
-    assert_equal user, version.contributor
-    assert_not_equal user, sop.contributor
+    assert_equal user, version.contributor.user
+    assert_not_equal user, sop.contributor.user
   end
 
   test 'contributors method on versioned asset' do
@@ -243,7 +243,7 @@ class SopTest < ActiveSupport::TestCase
     sop = Factory(:sop, policy: Factory(:public_policy))
     User.current_user = user
 
-    assert_not_equal user, sop.contributor
+    assert_not_equal user, sop.contributor.user
 
     assert_difference('Sop::Version.count') do
       sop.save_as_new_version
@@ -251,6 +251,6 @@ class SopTest < ActiveSupport::TestCase
 
     assert_equal 2, sop.reload.contributors.length
     assert_includes sop.contributors, sop.contributor
-    assert_includes sop.contributors, user
+    assert_includes sop.contributors, user.person
   end
 end
