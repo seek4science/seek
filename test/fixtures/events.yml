@@ -11,7 +11,7 @@ event_with_no_files:
   title: MyString
   projects: [sysmo_project]
   policy: managing_for_all_sysmo_users_policy
-  contributor: datafile_owner (User)
+  contributor: person_for_datafile_owner
 
 private_event:
   start_date: 2011-01-25 14:11:43
@@ -24,4 +24,4 @@ private_event:
   title: MyString
   projects: [sysmo_project]
   policy: private_policy
-  contributor: datafile_owner (User)
+  contributor: person_for_datafile_owner

@@ -477,7 +477,7 @@ class ProjectsControllerTest < ActionController::TestCase
     user = Factory :user
     project = user.person.projects.first
     login_as(user)
-    sop = Factory :sop, description: 'http://news.bbc.co.uk', project_ids: [project.id], contributor: user
+    sop = Factory :sop, description: 'http://news.bbc.co.uk', project_ids: [project.id], contributor: user.person
     get :show, id: project
     assert_response :success
 
@@ -490,7 +490,7 @@ class ProjectsControllerTest < ActionController::TestCase
     user = Factory :user
     project = user.person.projects.first
     login_as(user)
-    df = Factory :data_file, description: 'http://news.bbc.co.uk', project_ids: [project.id], contributor: user
+    df = Factory :data_file, description: 'http://news.bbc.co.uk', project_ids: [project.id], contributor: user.person
     get :show, id: project
     assert_response :success
 
@@ -503,7 +503,7 @@ class ProjectsControllerTest < ActionController::TestCase
     user = Factory :user
     project = user.person.projects.first
     login_as(user)
-    model = Factory :model, description: 'http://news.bbc.co.uk', project_ids: [project.id], contributor: user
+    model = Factory :model, description: 'http://news.bbc.co.uk', project_ids: [project.id], contributor: user.person
     get :show, id: project
 
     assert_select 'div.list_item  div.list_item_desc' do

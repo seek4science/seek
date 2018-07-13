@@ -25,7 +25,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
-    assert_equal sop.contributor, publish_log.user
+    assert_equal sop.contributor.user, publish_log.user
   end
 
   test 'log when creating item and request publish it' do
@@ -37,7 +37,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
-    assert_equal sop.contributor, publish_log.user
+    assert_equal sop.contributor.user, publish_log.user
   end
 
   test 'dont log when creating the non-public item' do
@@ -53,7 +53,7 @@ class LogPublishingTest < ActionController::TestCase
     owner = Factory(:person)
     login_as(owner.user)
 
-    sop = Factory(:sop, contributor: owner.user)
+    sop = Factory(:sop, contributor: owner)
     assert_equal Policy::NO_ACCESS, sop.policy.access_type
     assert sop.can_publish?
 
@@ -64,7 +64,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
-    assert_equal sop.contributor, publish_log.user
+    assert_equal sop.contributor.user, publish_log.user
   end
 
   test 'log when sending the publish request approval during updating a non-public item' do
@@ -88,7 +88,7 @@ class LogPublishingTest < ActionController::TestCase
   test 'dont log when updating an item with the not-related public sharing' do
     owner = Factory(:person)
     login_as(owner.user)
-    sop = Factory(:sop, contributor: owner.user)
+    sop = Factory(:sop, contributor: owner)
     assert_equal Policy::NO_ACCESS, sop.policy.access_type
 
     assert_no_difference ('ResourcePublishLog.count') do
@@ -100,7 +100,7 @@ class LogPublishingTest < ActionController::TestCase
     owner = Factory(:person)
     login_as(owner.user)
 
-    sop = Factory(:sop, contributor: owner.user, policy: Factory(:public_policy))
+    sop = Factory(:sop, contributor: owner, policy: Factory(:public_policy))
     assert_not_equal Policy::NO_ACCESS, sop.policy.access_type
 
     # create a published log for the published sop
@@ -113,7 +113,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal ResourcePublishLog::UNPUBLISHED, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
-    assert_equal sop.contributor, publish_log.user
+    assert_equal sop.contributor.user, publish_log.user
   end
 
   test 'log when approving publishing an item' do

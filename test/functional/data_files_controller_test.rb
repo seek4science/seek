@@ -262,7 +262,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
@@ -281,7 +281,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
@@ -320,7 +320,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
     assert_equal 'txt_test.txt', assigns(:data_file).content_blob.original_filename
     assert_equal 'text/plain', assigns(:data_file).content_blob.content_type
@@ -342,7 +342,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
     assert_equal 'txt_test.txt', assigns(:data_file).content_blob.original_filename
     assert_equal 'text/plain', assigns(:data_file).content_blob.content_type
@@ -520,7 +520,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     refute assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     refute assigns(:data_file).content_blob.file_exists?
@@ -543,7 +543,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     refute assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     refute assigns(:data_file).content_blob.file_exists?
@@ -566,7 +566,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
@@ -759,7 +759,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     refute assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     refute assigns(:data_file).content_blob.file_exists?
@@ -784,7 +784,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     refute assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     refute assigns(:data_file).content_blob.file_exists?
@@ -809,7 +809,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     refute assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     refute assigns(:data_file).content_blob.file_exists?
@@ -833,7 +833,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     refute assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     refute assigns(:data_file).content_blob.file_exists?
@@ -2195,10 +2195,10 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'filtering for sample association form' do
     person = Factory(:person)
-    d1 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'fish')
-    d2 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'frog')
-    d3 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'banana')
-    d4 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'no samples')
+    d1 = Factory(:data_file, projects: person.projects, contributor: person, policy: Factory(:public_policy), title: 'fish')
+    d2 = Factory(:data_file, projects: person.projects, contributor: person, policy: Factory(:public_policy), title: 'frog')
+    d3 = Factory(:data_file, projects: person.projects, contributor: person, policy: Factory(:public_policy), title: 'banana')
+    d4 = Factory(:data_file, projects: person.projects, contributor: person, policy: Factory(:public_policy), title: 'no samples')
     [d1, d2, d3].each do |data_file|
       Factory(:sample, originating_data_file_id: data_file.id, contributor: person)
     end
@@ -2557,7 +2557,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'extract samples confirmation not accessible if not can_delete?' do
     login_as(Factory(:person))
-    df = data_file_with_extracted_samples(Factory(:person).user)
+    df = data_file_with_extracted_samples(Factory(:person))
     refute df.can_delete?
     get :destroy_samples_confirm, id: df.id
     assert_redirected_to data_file_path(df)

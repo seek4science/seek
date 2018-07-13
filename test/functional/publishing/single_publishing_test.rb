@@ -356,7 +356,7 @@ class SinglePublishingTest < ActionController::TestCase
     df1 = Factory(:data_file)
     published_items << "#{df1.class.name},#{df1.id}"
 
-    df2 = Factory(:data_file, contributor: User.current_user)
+    df2 = Factory(:data_file, contributor: User.current_user.person)
     waiting_for_publish_items = ["#{df2.class.name},#{df2.id}"]
 
     assert df.can_view?, 'This datafile must be viewable for the test to succeed'
@@ -381,7 +381,7 @@ class SinglePublishingTest < ActionController::TestCase
   private
 
   def data_file_for_publishing(owner = users(:datafile_owner))
-    Factory(:data_file, contributor: owner)
+    Factory(:data_file, contributor: owner.person)
   end
 
   def data_with_isa
@@ -390,7 +390,7 @@ class SinglePublishingTest < ActionController::TestCase
     assay = Factory :experimental_assay, contributor: df.contributor.person,
                                          study: Factory(:study, contributor: df.contributor.person,
                                                                 investigation: Factory(:investigation, contributor: df.contributor.person))
-    other_persons_data_file = Factory(:data_file, contributor: other_user, policy: Factory(:policy, access_type: Policy::VISIBLE))
+    other_persons_data_file = Factory(:data_file, contributor: other_user.person, policy: Factory(:policy, access_type: Policy::VISIBLE))
     assay.associate(df)
     assay.associate(other_persons_data_file)
     assert !other_persons_data_file.can_manage?

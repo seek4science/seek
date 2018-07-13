@@ -263,8 +263,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     assert_equal 'attachment; filename="ms_word_test.pdf"', @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
-    # assert_equal 16235, @response.header['Content-Length'].to_i
-    assert_includes 9200..16_300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 9200-9300 bytes'
+
+    assert_includes 8000..9300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 8000-9300 bytes'
 
     assert File.exist?(ms_word_sop.content_blob.filepath)
     assert File.exist?(pdf_path)
@@ -331,8 +331,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal 'attachment; filename="ms_word_test.pdf"', @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
-    # assert_equal 16235, @response.header['Content-Length'].to_i
-    assert_includes 9200..16_300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 9200-9300 bytes'
+    assert_includes 8000..9300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 8000-9300 bytes'
 
     assert File.exist?(doc_sop.content_blob.filepath)
     assert File.exist?(doc_sop.content_blob.filepath('pdf')), 'the generated PDF file should remain'
@@ -505,7 +504,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should download' do
-    df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user
+    df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person
     assert_difference('ActivityLog.count') do
       get :download, data_file_id: df, id: df.content_blob
     end
@@ -516,7 +515,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should not log download for inline view intent' do
-    df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user
+    df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person
     assert_no_difference('ActivityLog.count') do
       get :download, data_file_id: df, id: df.content_blob, intent: :inline_view
     end
@@ -586,7 +585,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'activity correctly logged' do
-    model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user
+    model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user.person
     first_content_blob = model.content_blobs.first
     assert_difference('ActivityLog.count') do
       get :download, model_id: model.id, id: first_content_blob.id
@@ -601,7 +600,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should download identical file from file list' do
-    model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user
+    model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user.person
     first_content_blob = model.content_blobs.first
     assert_difference('ActivityLog.count') do
       get :download, model_id: model.id, id: first_content_blob.id

@@ -174,7 +174,7 @@ class PoliciesControllerTest < ActionController::TestCase
     gatekeeper = Factory(:asset_gatekeeper)
     a_person = Factory(:person)
     login_as(gatekeeper.user)
-    item = Factory(:sop, contributor: gatekeeper.user, policy: Factory(:public_policy), project_ids: gatekeeper.projects.collect(&:id))
+    item = Factory(:sop, contributor: gatekeeper, policy: Factory(:public_policy), project_ids: gatekeeper.projects.collect(&:id))
     Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
     item.reload
 

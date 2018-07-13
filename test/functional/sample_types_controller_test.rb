@@ -336,7 +336,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'a#add-attribute', count: 1
 
-    sample = Factory(:patient_sample, contributor: @person.user,
+    sample = Factory(:patient_sample, contributor: @person,
                                       sample_type: Factory(:patient_sample_type, project_ids: @project_ids))
     type = sample.sample_type
     refute_empty type.samples

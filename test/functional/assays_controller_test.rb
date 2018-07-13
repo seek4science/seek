@@ -756,13 +756,13 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should create with associated model sop data file and publication' do
-    user = Factory :user
-    login_as(user)
-    sop = Factory :sop, policy: Factory(:public_policy), contributor: user
-    model = Factory :model, policy: Factory(:public_policy), contributor: user
-    df = Factory :data_file, policy: Factory(:public_policy), contributor: user
-    pub = Factory :publication, contributor: user
-    study = Factory :study, policy: Factory(:public_policy), contributor: user
+    person = Factory :person
+    login_as(person.user)
+    sop = Factory :sop, policy: Factory(:public_policy), contributor: person
+    model = Factory :model, policy: Factory(:public_policy), contributor: person
+    df = Factory :data_file, policy: Factory(:public_policy), contributor: person
+    pub = Factory :publication, contributor: person
+    study = Factory :study, policy: Factory(:public_policy), contributor: person
     rel = RelationshipType.first
 
     assert_difference('ActivityLog.count') do
