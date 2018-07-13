@@ -96,6 +96,11 @@ class Person < ActiveRecord::Base
   after_commit :queue_update_auth_table
 
   after_destroy :update_publication_authors_after_destroy
+  
+  # to make it look like a User
+  def person
+    self
+  end    
 
   # not registered profiles that match this email
   def self.not_registered_with_matching_email(email)
