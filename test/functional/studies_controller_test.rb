@@ -476,7 +476,7 @@ class StudiesControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert study.creators.empty?
 
-    put :update, id: study.id, study: { title: study.title }, creators: [[creator.name, creator.id]].to_json
+    put :update, id: study.id, study: { title: study.title, creator_ids: [creator.id] }
     assert_redirected_to study_path(study)
 
     assert study.creators.include?(creator)
@@ -489,7 +489,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'p#creators_list'
     assert_select "input[type='text'][name='creator-typeahead']"
-    assert_select "input[type='hidden'][name='creators']"
+    # assert_select "input[type='hidden'][name='creators']" This is set via JS
     assert_select "input[type='text'][name='study[other_creators]']"
   end
 

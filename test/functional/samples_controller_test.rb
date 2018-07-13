@@ -47,8 +47,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference('Sample.count') do
       post :create, sample: { sample_type_id: type.id,
                               __sample_data_full_name: 'Fred Smith', __sample_data_age: '22', __sample_data_weight: '22.1', __sample_data_postcode: 'M13 9PL' ,
-                              project_ids: [person.projects.first.id], other_creators:'frank, mary' },
-           creators: [[creator.name, creator.id]].to_json
+                              project_ids: [person.projects.first.id], other_creators:'frank, mary', creator_ids: [creator.id] }
     end
     assert assigns(:sample)
     sample = assigns(:sample)
@@ -73,8 +72,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference('Sample.count') do
       post :create, sample: { sample_type_id: type.id,
                               data: { full_name: 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
-                              project_ids: [person.projects.first.id] },
-                    creators: [[creator.name, creator.id]].to_json
+                              project_ids: [person.projects.first.id], creator_ids: [creator.id] }
     end
     assert assigns(:sample)
     sample = assigns(:sample)
@@ -176,8 +174,8 @@ class SamplesControllerTest < ActionController::TestCase
     assert_empty sample.creators
 
     assert_no_difference('Sample.count') do
-      put :update, id: sample.id, sample: { __sample_data_full_name: 'Jesus Jones', __sample_data_age: '47', __sample_data_postcode: 'M13 9QL' },
-          creators: [[creator.name, creator.id]].to_json
+      put :update, id: sample.id, sample: { __sample_data_full_name: 'Jesus Jones', __sample_data_age: '47', __sample_data_postcode: 'M13 9QL',
+          creator_ids: [creator.id] }
       assert_equal [creator], sample.creators
     end
 
@@ -204,8 +202,8 @@ class SamplesControllerTest < ActionController::TestCase
     assert_empty sample.creators
 
     assert_no_difference('Sample.count') do
-      put :update, id: sample.id, sample: { data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' } },
-                   creators: [[creator.name, creator.id]].to_json
+      put :update, id: sample.id, sample: { data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' },
+                                            creator_ids: [creator.id] }
       assert_equal [creator], sample.creators
     end
 

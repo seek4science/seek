@@ -11,7 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20180712121837) do
+=======
+ActiveRecord::Schema.define(version: 20180612090557) do
+>>>>>>> master
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -317,8 +321,6 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.text     "other_creators",    limit: 65535
     t.string   "uuid",              limit: 255
     t.integer  "policy_id",         limit: 4
-    t.boolean  "is_with_sample"
-    t.string   "template_name",     limit: 255,   default: "none"
     t.string   "doi",               limit: 255
     t.string   "license",           limit: 255
     t.boolean  "simulation_data",                 default: false
@@ -346,8 +348,6 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.text     "other_creators",   limit: 65535
     t.string   "uuid",             limit: 255
     t.integer  "policy_id",        limit: 4
-    t.boolean  "is_with_sample"
-    t.string   "template_name",    limit: 255,   default: "none"
     t.string   "doi",              limit: 255
     t.string   "license",          limit: 255
     t.boolean  "simulation_data",                default: false

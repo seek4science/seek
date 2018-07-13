@@ -1,4 +1,5 @@
 <div>
-    {{name}} ({{projects}})
-    <a title="Remove" class="delete clickable" data-object-id="{{id}}">(remove)</a>
+    {{creator.name}} ({{creator.projects}})
+    <a title="Remove" class="delete clickable" data-object-id="{{creator.id}}">(remove)</a>
+    <input type="hidden" value="{{creator.id}}" name="{{prefix}}[creator_ids][]"/>
 </div>

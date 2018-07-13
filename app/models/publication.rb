@@ -18,18 +18,20 @@ class Publication < ActiveRecord::Base
     end
   end
 
+  has_many :inverse_relationships, class_name: 'Relationship', as: :other_object, dependent: :destroy,
+           inverse_of: :other_object
+
+  has_many :data_files, through: :inverse_relationships, source: :subject, source_type: 'DataFile'
+  has_many :models, through: :inverse_relationships, source: :subject, source_type: 'Model'
+  has_many :assays, through: :inverse_relationships, source: :subject, source_type: 'Assay'
+  has_many :studies, through: :inverse_relationships, source: :subject, source_type: 'Study'
+  has_many :investigations, through: :inverse_relationships, source: :subject, source_type: 'Investigation'
+  has_many :presentations, through: :inverse_relationships, source: :subject, source_type: 'Presentation'
+
   acts_as_asset
 
   has_many :publication_authors, dependent: :destroy, autosave: true
   has_many :persons, through: :publication_authors
-
-  has_many :backwards_relationships,
-           class_name: 'Relationship',
-           as: :other_object,
-           dependent: :destroy
-
-  has_many :presentations,through: :backwards_relationships, source: :subject, source_type:'Presentation'
-
 
   VALID_DOI_REGEX = /\A(10[.][0-9]{4,}(?:[.][0-9]+)*\/(?:(?!["&\'<>])\S)+)\z/
   VALID_PUBMED_REGEX = /\A(([1-9])([0-9]{0,7}))\z/
@@ -169,37 +171,14 @@ class Publication < ActiveRecord::Base
     end
   end
 
-  def data_files
-    backwards_relationships.select { |a| a.subject_type == 'DataFile' }.collect(&:subject)
-  end
-
-  def models
-    backwards_relationships.select { |a| a.subject_type == 'Model' }.collect(&:subject)
-  end
-
-  def assays
-    backwards_relationships.select { |a| a.subject_type == 'Assay' }.collect(&:subject)
-  end
-
-  def studies
-    backwards_relationships.select { |a| a.subject_type == 'Study' }.collect(&:subject)
-  end
-
-  def investigations
-    backwards_relationships.select { |a| a.subject_type == 'Investigation' }.collect(&:subject)
-  end
-
-  # def presentations
-  #   backwards_relationships.select { |a| a.subject_type == 'Presentation' }.collect(&:subject)
-  # end
-
   def associate(item)
     clause = { subject_type: item.class.name,
                subject_id: item.id,
                predicate: Relationship::RELATED_TO_PUBLICATION,
                other_object_type: 'Publication',
                other_object_id: id }
-    Relationship.create(clause) unless Relationship.where(clause).any?
+
+    inverse_relationships.where(clause).first_or_create!
   end
 
   # includes those related directly, or through an assay

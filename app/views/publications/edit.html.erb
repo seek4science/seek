@@ -29,11 +29,14 @@
 
     <%= render :partial => "assets/associate_study", :locals=>{:resource => @publication} -%>
 
-    <%= render :partial => "assays/associate_assays", :locals=>{:resource => @publication} -%>
+    <%= fancy_multiselect @publication, :assays, { hidden: @publication.assays.empty?,
+                                                   other_projects_checkbox: true,
+                                                   group_options_by: ->(a) { a.study.try(:title) },
+                                                   name: 'assay_ids' } %>
 
     <%= render :partial => "assets/associate_data_file", :locals=>{:resource => @publication} -%>
 
-    <%= render :partial => "assets/associate_model", :locals=>{:resource => @publication} -%>
+    <%= fancy_multiselect @publication, :models, other_projects_checkbox: true %>
 
     <%= render :partial => "assets/associate_presentation", :locals=>{:resource => @publication} -%>
 

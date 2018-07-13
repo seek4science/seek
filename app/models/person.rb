@@ -1,4 +1,7 @@
 class Person < ActiveRecord::Base
+
+  acts_as_annotation_source
+
   include Seek::Rdf::RdfGeneration
   include Seek::Taggable
   include Seek::Roles::AdminDefinedRoles
@@ -65,6 +68,9 @@ class Person < ActiveRecord::Base
   has_many :created_investigations, through: :assets_creators, source: :asset, source_type: 'Investigation'
   has_many :created_studies, through: :assets_creators, source: :asset, source_type: 'Study'
   has_many :created_assays, through: :assets_creators, source: :asset, source_type: 'Assay'
+
+  has_annotation_type :expertise, method_name: :expertise
+  has_annotation_type :tool
 
   has_many :publication_authors
 
@@ -362,30 +368,6 @@ class Person < ActiveRecord::Base
 
   def title_is_public?
     true
-  end
-
-  def expertise=(tags)
-    if tags.is_a? Hash
-      tag_annotations tags[:expertise_list], 'expertise'
-    else
-      tag_with tags, 'expertise'
-    end
-  end
-
-  def tools=(tags)
-    if tags.is_a? Hash
-      tag_annotations tags[:tool_list], 'tool'
-    else
-      tag_with tags, 'tool'
-    end
-  end
-
-  def expertise
-    annotations_with_attribute('expertise').collect(&:value)
-  end
-
-  def tools
-    annotations_with_attribute('tool').collect(&:value)
   end
 
   def recent_activity(limit = 10)

@@ -416,7 +416,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_files: [{ id: df.id.to_s }]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_files: [{ asset_id: df.id.to_s }]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -428,7 +428,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert df.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_file_ids: []
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_files: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -446,7 +446,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, model_ids: [model.id.to_s]
+    put :update, id: p, publication: { abstract: p.abstract, model_ids: [model.id.to_s] }, author: {}
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -586,9 +586,8 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should keep model and data associations after update' do
     p = publications(:pubmed_2)
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, assay_ids: [],
-                 data_files: p.data_files.map { |df| { id: df.id } },
-                 model_ids: p.models.collect { |m| m.id.to_s }
+    put :update, id: p, publication: { abstract: p.abstract, model_ids: p.models.collect { |m| m.id.to_s } },
+        author: {}, assay_ids: [], data_files: p.data_files.map { |df| { asset_id: df.id } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -779,11 +778,11 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_not_includes response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
     # This will be slow!
 
-    # 3 for events 'fancy_multiselect'
-    assert_equal 3, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
-    # 8 = 2 each for investigations, studies, assays, models (using bespoke association forms) - datafiles loaded asynchronously
+    # 9 = 3 each for for events, assays and models 'fancy_multiselect'
     # plus an extra 2 for the study optgroups in the assay association
-    assert_equal 10, response.body.scan('\u003cscript\u003ealert(\"xss\")\u003c/script\u003e \u0026').count
+    assert_equal 11, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
+    # 4 = 2 each for investigations, studies (using bespoke association forms) - datafiles loaded asynchronously
+    assert_equal 4, response.body.scan('\u003cscript\u003ealert(\"xss\")\u003c/script\u003e \u0026').count
   end
 
   test 'programme publications through nested routing' do

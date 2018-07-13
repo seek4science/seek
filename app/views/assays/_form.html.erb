@@ -78,7 +78,7 @@
     <%  existing_creators = @assay.creators
         existing_creators =  [current_user.person] if existing_creators.blank?
     %>
-    <%= render :partial => "assets/author_form", :locals => {:resource_type => t('assays.assay'), # this is only for presentation, not for any processing
+    <%= render :partial => "assets/author_form", :locals => {:form => f,
                                                              :existing_creators => existing_creators,
                                                              :other_creators => @assay.other_creators} -%>
 
@@ -86,11 +86,10 @@
       <%= render :partial=>"samples/associate_sample",:locals=>{:f=>f, :resource => @assay} %>
     <% end %>
 
-
-    <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} %>
+    <%= f.fancy_multiselect :sops, other_projects_checkbox: true %>
 
     <%  if @assay.is_modelling? -%>
-        <%= render :partial=>"assets/associate_model",:locals=>{:f=>f, :resource => @assay} %>
+        <%= f.fancy_multiselect :models, other_projects_checkbox: true %>
     <% end -%>
 
     <%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,
@@ -115,36 +114,6 @@
                  :onclick => "javascript: $('assay_submit_btn').form.submit();return(false);", :class => 'btn btn-primary' -%>
 <% end %>
  or <%= cancel_button(@assay.id ? assay_path(@assay.id) : assays_path) -%>
-
-<script type="text/javascript">
-    function hide_organism_form(){
-        Effect.Fade('add_organism_form');
-    }
-
-    function check_show_organism_form() {
-        if ($F('assay_sample_ids') && $F('assay_sample_ids').length > 0) {
-            Effect.Fade('add_organism_form');
-        }
-        else {
-            Effect.Appear('add_organism_form');
-        }
-    }
-
-    function check_show_sample_form() {
-        if ($F('assay_organism_ids') && $F('assay_organism_ids').length > 0) {
-            Effect.Fade('add_samples_form');
-        } else {
-            Effect.Appear('add_samples_form');
-        }
-    }
-
-    <%if @assay.is_modelling?%>
-    Event.observe(window, 'load', function() {
-        $('assay_sample_ids').fire('fancySelect:update');
-        updateOrganisms();
-    });
-    <% end %>
-</script>
 
 <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                     select_id: '#assay_study_id',
