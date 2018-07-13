@@ -45,14 +45,14 @@ class Person < ActiveRecord::Base
   has_many :favourite_group_memberships, dependent: :destroy
   has_many :favourite_groups, through: :favourite_group_memberships
 
-  has_many :studies_for_person, as: :contributor, class_name: 'Study'
+  has_many :studies_for_person, foreign_key: :contributor_id, class_name: 'Study'
   has_many :assays_for_person, foreign_key: :contributor_id, class_name: 'Assay'
   alias assays assays_for_person
-  has_many :investigations_for_person, as: :contributor, class_name: 'Investigation'
+  has_many :investigations_for_person, foreign_key: :contributor_id, class_name: 'Investigation'
 
-  has_many :presentations_for_person, as: :contributor, class_name: 'Presentation'
-  has_many :samples_for_person, as: :contributor, class_name: 'Sample'
-  has_many :events_for_person, as: :contributor, class_name: 'Event'
+  has_many :presentations_for_person, foreign_key: :contributor_id, class_name: 'Presentation'
+  has_many :samples_for_person, foreign_key: :contributor_id, class_name: 'Sample'
+  has_many :events_for_person, foreign_key: :contributor_id, class_name: 'Event'
 
   has_one :user, dependent: :destroy
 
@@ -196,7 +196,6 @@ class Person < ActiveRecord::Base
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type}" do
       user_items = []
-      user_items = user.try(:send, type) if user.respond_to?(type)
       user_items |= send("created_#{type}".to_sym) if respond_to? "created_#{type}".to_sym
       user_items |= send("#{type}_for_person".to_sym) if respond_to? "#{type}_for_person".to_sym
       user_items.uniq
