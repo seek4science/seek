@@ -201,7 +201,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     ec_array = []
     user = Factory(:user)
     login_as(user)
-    sop = Factory(:sop, contributor: user)
+    sop = Factory(:sop, contributor: user.person)
     assert_equal sop.experimental_conditions.count, 0
     # create bunch of ECes which are different
     i = 0
