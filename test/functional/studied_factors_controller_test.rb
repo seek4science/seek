@@ -331,8 +331,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     <name type='Recommended'>CTP</name>
   </Names>
 </Compound>)
-    stub_request(:get, 'http://sabiork.h-its.org/sabioRestWebServices/compounds?compoundName=CTP')
-      .with(headers: { 'Accept' => '*/*; q=0.5, application/xml', 'Accept-Encoding' => 'gzip, deflate', 'User-Agent' => 'Ruby' })
+    stub_request(:get, 'http://sabiork.h-its.org/sabioRestWebServices/compounds?compoundName=CTP')     
       .to_return(status: 200, body: body, headers: {})
   end
 end
