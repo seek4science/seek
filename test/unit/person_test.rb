@@ -777,7 +777,7 @@ class PersonTest < ActiveSupport::TestCase
   test 'should retrieve the list of people who have the manage right on the item' do
     user = Factory(:user)
     person = user.person
-    data_file = Factory(:data_file, contributor: user.person)
+    data_file = Factory(:data_file, contributor: person)
     people_can_manage = data_file.people_can_manage
     assert_equal 1, people_can_manage.count
     assert_equal person.id, people_can_manage.first[0]

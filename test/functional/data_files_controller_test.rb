@@ -1767,9 +1767,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :forbidden
     assert_select 'h2', text: /The #{I18n.t('data_file')} is not visible to you./
 
-    assert !df.can_see_hidden_item?(User.current_user.person)
-    contributor_person = df.contributor.person
-    assert_select 'a[href=?]', person_path(contributor_person), count: 0
+    refute df.can_see_hidden_item?(User.current_user.person)
+    assert_select 'a[href=?]', person_path(df.contributor), count: 0
   end
 
   test 'landing page for hidden private_item with the contributor contact' do
@@ -1789,8 +1788,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :forbidden
     assert_select 'h2', text: /The #{I18n.t('data_file')} is not visible to you./
 
-    contributor_person = df.contributor.person
-    assert_select 'a[href=?]', person_path(contributor_person)
+    assert_select 'a[href=?]', person_path(df.contributor)
   end
 
   test 'landing page for hidden private_item which DOI was minted' do

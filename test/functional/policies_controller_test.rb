@@ -55,7 +55,7 @@ class PoliciesControllerTest < ActionController::TestCase
     contributor = study.contributor
     post :preview_permissions, policy_attributes: { access_type: Policy::VISIBLE }, is_new_file: 'false', contributor_id: contributor.user.id, resource_name: 'study'
 
-    assert_select 'div.access-type-manage li', text: "#{contributor.person.name}", count: 1
+    assert_select 'div.access-type-manage li', text: "#{contributor.name}", count: 1
   end
 
   test 'should show notice message when an item is requested to be published' do

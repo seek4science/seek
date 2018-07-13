@@ -103,7 +103,7 @@ class Publication < ActiveRecord::Base
     end
     # Add contributor
     c = contributor || default_contributor
-    policy.permissions << Permission.create(contributor: c.person, policy: policy, access_type: Policy::MANAGING) if c
+    policy.permissions << Permission.create(contributor: c, policy: policy, access_type: Policy::MANAGING) if c
     policy
   end
 

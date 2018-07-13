@@ -149,7 +149,7 @@ module ResourceListItemHelper
     if resource.respond_to?(:contributors) && resource.contributors.length > 1
       list_item_person_list(resource.contributors.map(&:person), nil, key.pluralize)
     else
-      list_item_authorized_attribute key, resource.contributor.person
+      list_item_authorized_attribute key, resource.contributor
     end
   end
 

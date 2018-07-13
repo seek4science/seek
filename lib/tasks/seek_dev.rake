@@ -91,20 +91,6 @@ namespace :seek_dev do
     pp types
   end
 
-  desc "display user contributors without people"
-  task(:contributors_without_people=>:environment) do
-    matches = Seek::Util.user_creatable_types.collect do |type|
-      type.all.select do |thing|
-        thing.respond_to?(:contributor_type) && thing.contributor.is_a?(User) && thing.contributor.person.nil?
-      end
-    end.flatten
-    pp "#{matches.size} items found with a user contributor and no person"
-    matches.each do |match|
-      pp "\t#{match.class.name} - #{match.id}"
-    end
-
-  end
-
   desc "Generate an XMI db/schema.xml file describing the current DB as seen by AR. Produces XMI 1.1 for UML 1.3 Rose Extended, viewable e.g. by StarUML"
   task :xmi => :environment do
     require 'uml_dumper.rb'

@@ -67,7 +67,7 @@ module Seek
           contributor = d.contributor
           { 'id' => d.id,
             'title' => h(d.title),
-            'contributor' => contributor.nil? ? '' : 'by ' + h(contributor.person.name),
+            'contributor' => contributor.nil? ? '' : 'by ' + h(contributor.name),
             'type' => name
           }
         end

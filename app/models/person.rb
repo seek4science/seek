@@ -125,11 +125,6 @@ class Person < ActiveRecord::Base
     !user.nil?
   end
 
-  # to allow you to call .person on a Person or User to avoid having to check its type
-  def person
-    self
-  end
-
   def email_uri
     URI.escape('mailto:' + email)
   end
@@ -343,7 +338,7 @@ class Person < ActiveRecord::Base
 
   # admin can administer other people, project manager can administer other people except other admins and themself
   def can_be_administered_by?(user)
-    person = user.try(:person)
+    person = user.is_a?(User) ? user.person : user
     return false unless user && person
     is_proj_or_prog_admin = person.is_project_administrator_of_any_project? || person.is_programme_administrator_of_any_programme?
     user.is_admin? || (is_proj_or_prog_admin && (is_admin? || self != person))

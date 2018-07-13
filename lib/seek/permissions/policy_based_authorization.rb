@@ -387,15 +387,13 @@ module Seek
       def managers
         # FIXME: how to handle projects as contributors - return all people or just specific people (pals or other role)?
         people = []
-        unless contributor.nil?
-          people << contributor.person if contributor.is_a?(User)
-          people << contributor if contributor.is_a?(Person)
-        end
+
+        people << contributor unless contributor.nil?
+
 
         policy.permissions.each do |perm|
           unless perm.contributor.nil? || perm.access_type != Policy::MANAGING
             people << perm.contributor if perm.contributor.is_a?(Person)
-            people << perm.contributor.person if perm.contributor.is_a?(User)
           end
         end
         people.uniq

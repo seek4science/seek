@@ -376,7 +376,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_routing 'people/2/studies', controller: 'studies', action: 'index', person_id: '2'
     study = Factory(:study, policy: Factory(:public_policy))
     study2 = Factory(:study, policy: Factory(:public_policy))
-    person = study.contributor.person
+    person = study.contributor
     refute_equal study.contributor, study2.contributor
     assert person.is_a?(Person)
     get :index, person_id: person.id

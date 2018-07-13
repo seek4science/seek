@@ -149,7 +149,7 @@ class PublicationsController < ApplicationController
           @publication.policy.permissions << Permission.create(contributor: author, policy: @publication.policy, access_type: Policy::MANAGING)
         end
         # Add contributor
-        @publication.policy.permissions << Permission.create(contributor: @publication.contributor.person, policy: @publication.policy, access_type: Policy::MANAGING)
+        @publication.policy.permissions << Permission.create(contributor: @publication.contributor, policy: @publication.policy, access_type: Policy::MANAGING)
 
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
