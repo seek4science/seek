@@ -777,7 +777,7 @@ GEM
       crack (>= 0.3.2)
       hashdiff
     webrobots (0.1.2)
-    will_paginate (3.0.12)
+    will_paginate (3.1.6)
     yaml_db (0.5.0)
       rails (>= 3.0, < 5.1)
       rake (>= 0.8.7)
@@ -916,7 +916,7 @@ DEPENDENCIES
   webmock
   white_list!
   white_list_formatted_content!
-  will_paginate (~> 3.0.4)
+  will_paginate (~> 3.1)
   yaml_db
   zenodo-client!
 
