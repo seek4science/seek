@@ -899,7 +899,6 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_difference('PublicationAuthor.count', 0) do
       assert_difference('AssetsCreator.count', 2) do
         assert_difference('Permission.count', 2) do
-          puts 'updating'
           put :update, id: p.id, publication: { abstract: p.abstract },
               author: { p.publication_authors[1].id => seek_author2.id,
                         p.publication_authors[0].id => seek_author1.id }
