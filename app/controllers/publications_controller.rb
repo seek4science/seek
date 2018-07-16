@@ -103,7 +103,7 @@ class PublicationsController < ApplicationController
   def update
     valid = true
     unless params[:author].blank?
-      person_ids = params[:author].values.reject { |id_string| id_string == '' }
+      person_ids = params[:author].values.reject(&:blank?)
       if person_ids.uniq.size == person_ids.size
         params[:author].keys.sort.each do |author_id|
           author_assoc = params[:author][author_id]
@@ -136,20 +136,6 @@ class PublicationsController < ApplicationController
         create_or_update_associations data_files.map { |df| df['asset_id'] }, 'DataFile', 'view'
         create_or_update_associations model_ids, 'Model', 'view'
         create_or_update_associations presentation_ids, 'Presentation', 'view'
-
-        # Create policy if not present (should be)
-        if @publication.policy.nil?
-          @publication.policy = Policy.create(name: 'publication_policy', access_type: Policy::VISIBLE)
-          @publication.save
-        end
-
-        # Update policy so current authors have manage permissions
-        @publication.creators.each do |author|
-          @publication.policy.permissions.clear
-          @publication.policy.permissions << Permission.create(contributor: author, policy: @publication.policy, access_type: Policy::MANAGING)
-        end
-        # Add contributor
-        @publication.policy.permissions << Permission.create(contributor: @publication.contributor.person, policy: @publication.policy, access_type: Policy::MANAGING)
 
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }

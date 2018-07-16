@@ -47,6 +47,7 @@ class Publication < ActiveRecord::Base
 
   validate :check_uniqueness_within_project, unless: 'Seek::Config.is_virtualliver'
 
+  before_save :update_permissions_for_creators
   after_update :update_creators_from_publication_authors
 
   # http://bioruby.org/rdoc/Bio/Reference.html#method-i-format
@@ -64,6 +65,19 @@ class Publication < ActiveRecord::Base
 
   def update_creators_from_publication_authors
     self.creators = seek_authors.map(&:person)
+  end
+
+  def update_permissions_for_creators
+    self.policy ||= default_policy
+
+    policy.permissions.clear
+    seek_authors.map(&:person).each do |author|
+      policy.permissions.create!(contributor: author, access_type: Policy::MANAGING)
+    end
+    # Add contributor
+    policy.permissions.create!(contributor: contributor.person, access_type: Policy::MANAGING)
+
+    policy.permissions
   end
 
   if Seek::Config.events_enabled
@@ -96,15 +110,15 @@ class Publication < ActiveRecord::Base
   end
 
   def default_policy
-    policy = Policy.new(name: 'publication_policy', access_type: Policy::VISIBLE)
-    # add managers (authors + contributor)
-    creators.each do |author|
-      policy.permissions << Permissions.create(contributor: author, policy: policy, access_type: Policy::MANAGING)
+    Policy.new(name: 'publication_policy', access_type: Policy::VISIBLE).tap do |policy|
+      # add managers (authors + contributor)
+      creators.each do |author|
+        policy.permissions << Permissions.create(contributor: author, policy: policy, access_type: Policy::MANAGING)
+      end
+      # Add contributor
+      c = contributor || default_contributor
+      policy.permissions << Permission.create(contributor: c.person, policy: policy, access_type: Policy::MANAGING) if c
     end
-    # Add contributor
-    c = contributor || default_contributor
-    policy.permissions << Permission.create(contributor: c.person, policy: policy, access_type: Policy::MANAGING) if c
-    policy
   end
 
   scope :default_order, -> { order('published_date DESC') }

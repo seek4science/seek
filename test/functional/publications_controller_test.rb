@@ -883,7 +883,36 @@ class PublicationsControllerTest < ActionController::TestCase
     pub.associate(df)
     pub.associate(model)
     pub.associate(pr)
+  end
 
+  test 'should give authors permissions' do
+    person = Factory(:person)
+    login_as person.user
+    p = Factory(:publication, contributor: person, publication_authors: [Factory(:publication_author), Factory(:publication_author)])
+    seek_author1 = Factory(:person)
+    seek_author2 = Factory(:person)
+
+    assert p.can_manage?(p.contributor.user)
+    refute p.can_manage?(seek_author1.user)
+    refute p.can_manage?(seek_author2.user)
+
+    assert_difference('PublicationAuthor.count', 0) do
+      assert_difference('AssetsCreator.count', 2) do
+        assert_difference('Permission.count', 2) do
+          puts 'updating'
+          put :update, id: p.id, publication: { abstract: p.abstract },
+              author: { p.publication_authors[1].id => seek_author2.id,
+                        p.publication_authors[0].id => seek_author1.id }
+        end
+      end
+    end
+
+    assert_redirected_to publication_path(p)
+
+    p = assigns(:publication)
+    assert p.can_manage?(p.contributor.user)
+    assert p.can_manage?(seek_author1.user)
+    assert p.can_manage?(seek_author2.user)
   end
 
   private
