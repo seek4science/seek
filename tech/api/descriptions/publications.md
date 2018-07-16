@@ -1,4 +1,4 @@
-A **Publication** is a publication about a [**Project**](#tag/projects.md), It normally has a [DOI](http://www.doi.org/) or [PubMed ID](https://en.wikipedia.org/wiki/Wikipedia:PMID).
+<a name="publications"></a>A **Publication** is a publication about a <a href="#projects">**Project**</a>, It normally has a [DOI](http://www.doi.org/) or [PubMed ID](https://en.wikipedia.org/wiki/Wikipedia:PMID).
 
 The response to a read of a **Publication** includes the following information:
 
@@ -10,15 +10,15 @@ The response to a read of a **Publication** includes the following information:
 * **A link to the Publication**
 * The DOI of the **Publication**
 * A list of strings for the authors
-* The sharing [**Policy**](#section/Policy) for the **Publication**
-* References to the [**People**](#tag/people) who wrote the **Publication**
-* References to the [**Projects**](#tag/projects) described in the **Publication**
-* References to the [**Investigations**](#tag/investigations) described in the **Publication**
-* References to the [**Studies**](#tag/studies) described in the **Publication**
-* References to the [**Assays**](#tag/assays) described in the **Publication**
-* References to [**DataFiles**](#tag/dataFiles) that were used in the work described in the **Publication**
-* References to [**Models**](#tag/models) that were used in the work described in the **Publication**
+* The sharing <a href="#Policy">**Policy**</a> for the **Publication**
+* References to the <a href="#people">**People**</a> who wrote the **Publication**
+* References to the <a href="#projects">**Projects**</a> described in the **Publication**
+* References to the <a href="#investigations">**Investigations**</a> described in the **Publication**
+* References to the <a href="#studies">**Studies**</a> described in the **Publication**
+* References to the <a href="#assays">**Assays**</a> described in the **Publication**
+* References to <a href="#dataFiles">**DataFiles**</a> that were used in the work described in the **Publication**
+* References to <a href="#models">**Models**</a> that were used in the work described in the **Publication**
 * References to related **Publications**
-* References to [**Presentations**](#tag/presentations) associated with the **Publication**
-* References to [**Events**](#tag/events) associated with the **Publication**
+* References to <a href="#presentations">**Presentations**</a> associated with the **Publication**
+* References to <a href="#events">**Events**</a> associated with the **Publication**
 

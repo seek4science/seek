@@ -582,6 +582,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/documentResponse'
+          examples:
+            application/json:
+              $ref: ../examples/documentResponse.yml
     patch:
       operationId: updateDocument
       description:
@@ -738,6 +741,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/eventResponse'
+          examples:
+            application/json:
+              $ref: ../examples/eventResponse.yml
     patch:
       operationId: updateEvent
       description:
@@ -932,6 +938,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/investigationResponse'
+          examples:
+            application/json:
+              $ref: ../examples/investigationResponse.yml
     patch:
       operationId: updateInvestigation
       description:
@@ -1034,6 +1043,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/modelResponse'
+          examples:
+            application/json:
+              $ref: ../examples/modelResponse.yml
     patch:
       operationId: updateModel
       description:
@@ -1335,6 +1347,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/presentationResponse'
+          examples:
+            application/json:
+              $ref: ../examples/presentationResponse.yml
     patch:
       operationId: updatePresentation
       description:
@@ -1491,6 +1506,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/programmeResponse'
+          examples:
+            application/json:
+              $ref: ../examples/programmeResponse.yml
     patch:
       operationId: updateProgramme
       description:
@@ -1586,6 +1604,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/projectResponse'
+          examples:
+            application/json:
+              $ref: ../examples/projectResponse.yml
     patch:
       operationId: updateProject
       description:
@@ -1746,6 +1767,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/sopResponse'
+          examples:
+            application/json:
+              $ref: ../examples/sopResponse.yml
     patch:
       operationId: updateSop
       description:
@@ -1902,6 +1926,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/studyResponse'
+          examples:
+            application/json:
+              $ref: ../examples/studyResponse.yml
     patch:
       operationId: updateStudy
       description:

@@ -40,10 +40,31 @@ It should only be necessary to run *bundle install* and the *db:migrate* rake
 task. Using *seek:upgrade* should still work, but could take a lot of
 unnecessary time. 
 
-## Steps to upgrade from 1.4.x to 1.5.x
+## Steps to upgrade from 1.5.x to 1.6.x
+
+### Updating Java
+
+This version requires at least **Java 8**. Please make sure this is installed by trying:
+
+    java --version
+    
+which should report java version 1.8.0 or greater. If not, install with:
+
+    sudo apt install openjdk-8-jdk
+    java --version
+
+if this still doesn't report the correct version you may need to do:
+   
+    sudo update-alternatives --config java
+    
+.. and select the _java-8_ version
+
+You can also use the Oracle version of Java 8. This can be easily installed with Apt, through the 
+[Oracle PPA](https://medium.com/coderscorner/installing-oracle-java-8-in-ubuntu-16-10-845507b13343)
 
 
 ### Set RAILS_ENV
+              
 
 **If upgrading a production instance of SEEK, remember to set the RAILS_ENV first**
 
@@ -60,18 +81,18 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.5.2
+    git checkout v1.6.2
 
 ### Updating using the tarball
 
 
 You can download the file from
-<https://bitbucket.org/fairdom/seek/downloads/seek-1.5.2.tar.gz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.6.2.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.5.2.tar.gz
+    tar zxvf seek-1.6.2.tar.gz
     mv seek seek-previous
-    mv seek-1.5.2 seek
+    mv seek-1.6.2 seek
     cd seek/
 
 and then copy across your existing filestore and database configuration file
@@ -80,11 +101,6 @@ database configuration file you would need to copy is _config/database.yml_,
 and the filestore is simply _filestore/_
 
 If you have a modified _config/sunspot.yml_ you will also need to copy that across.
-
-### Update RVM and Ruby
-
-    rvm get stable
-    rvm install $(cat .ruby-version) 
 
 ### Doing the upgrade
 
@@ -96,11 +112,7 @@ content.
     gem install bundler
     bundle install --deployment
     bundle exec rake seek:upgrade
-    bundle exec rake assets:precompile # this task will take a while
-    
-**Note**: During the upgrade, and items that previously were shared with _All registered users_ have had their permissions updated,
-and this permission has been transferred to its associated projects. An audit CSV file is created, tmp/all-users-policy-update-audit-<timestamp>.csv .
-This file contains a list of all the items affected, along with the contributor and project ids.    
+    bundle exec rake assets:precompile # this task will take a while       
        
 
 ### Restarting services

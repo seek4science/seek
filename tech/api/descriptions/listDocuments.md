@@ -1,1 +1,1 @@
-The **listDocuments** operation returns a JSON object containing a list of all the [**Documents**](#tag/documents) to which the authenticated user has accesss.
+<a name="listDocuments"></a>The **listDocuments** operation returns a JSON object containing a list of all the <a href="#documents">**Documents**</a> to which the authenticated user has accesss.

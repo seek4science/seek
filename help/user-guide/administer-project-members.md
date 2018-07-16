@@ -12,7 +12,7 @@ These are actions that can be carried out by a SEEK administrator, [Project Admi
 Part of administering a project will involve adding to or removing people from it. You can do this if you are a [Project Administrator](roles.html#project-administrator) or you are
 a [Programme Administrator](roles.html#programme-administrator) of a Programme that Project falls under.
 
-Before adding people to the project, you should check that their [profiles](adding-admin-items.html#creating-profiles) and [Institutions](adding-admin-items.html#creating-institutions) have been created first.
+Before adding people to the project, you should check that their [profiles](adding-admin-items.html#creating-profiles) and [Institutions](adding-admin-items.html#creating-institutions) have been created first. If you were notified by email that a new user signed up, the email will include details about whether they requested a new Institution. Before creating the new institution, double check that it doesn't already exist, perhaps with a slightly different name (e.g _University of Manchester_ instead of _Manchester University_). You can use the search box to check.
 
 From the Administer menu on the Project page, select "Administer Project Members". There are some explanations on that page. To add people you type their name in the right hand panel, and also select the Institution they are associated with for this Project from their list. You can add multiple people to an
 institution in one action.

@@ -1,4 +1,4 @@
-An **Event** is an event that is associated with one or more [**Projects**](#tag/projects), happening on specified dates and at a specific, actual or virtual, location.
+<a name="events"></a>An **Event** is an event that is associated with one or more <a href="#projects">**Projects**</a>, happening on specified dates and at a specific, actual or virtual, location.
 
 An **Event** has the following associated information:
 
@@ -10,12 +10,12 @@ An **Event** has the following associated information:
 * The name of the city where the **Event** takes place
 * The address within the city where the **Event** takes place
 * The end date of the **Event**
-* The sharing [**Policy**](#section/Policy) for the **Event**
-* **References to the [Projects](#tag/projects) associated with the Event**
-* References to any [**DataFiles**](#tag/dataFiles)  associated with the **Event**
-* References to any [**Publications**](#tag/publications)  associated with the **Event**
-* References to any [**Presentations**](#tag/presentations)  associated with the **Event**
+* The sharing <a href="#Policy">**Policy**</a> for the **Event**
+* **References to the <a href="#projects">Projects</a> associated with the Event**
+* References to any <a href="#dataFiles">**DataFiles**</a>  associated with the **Event**
+* References to any <a href="#publications">**Publications**</a>  associated with the **Event**
+* References to any <a href="#presentations">**Presentations**</a>  associated with the **Event**
 
-A response for an **Event** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
+A response for an **Event** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
 
-* Reference to the [**Person**](#tag/people) who submitted the **Event**
+* Reference to the <a href="#people">**Person**</a> who submitted the **Event**

@@ -23,7 +23,3 @@ For details on how to upgrade an existing SEEK installation please refer to our 
 ## Docker
 
 SEEK can also be deployed using [Docker](http://docker.com), for which we provide Docker images. Please read our [Docker guide](/tech/docker.html).
-
-## Virtual Box
-
-We also provide Virtual Machine Images, available for [Virtual Box](http://www.virtualbox.org/). To download and for information on how to setup please refer to our [Virtual Image Guide](http://seek4science.org/seek-vm).

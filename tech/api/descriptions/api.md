@@ -1,19 +1,16 @@
-The JSON API to FAIRDOM SEEK is a [JSON API](http://jsonapi.org)
-specification describing how to read and write to a SEEK instance.
+<a name="api"></a>The JSON API to FAIRDOM SEEK is a [JSON API](http://jsonapi.org) specification describing how to read and write to a SEEK instance.
 
-The API is defined in the [OpenAPI
-specification](https://swagger.io/specification) currently in [version
-2](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
+The API is defined in the [OpenAPI specification](https://swagger.io/specification) currently in [version 2](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
 
-Example IPython notebooks showing use of the API are available on [GitHub](https://github.com/hleonov/ipython_for_SEEK-API).
+Example IPython notebooks showing use of the API are available on [GitHub](https://github.com/seek4science/seekAPIexamples)
 
 ===
 
 ## Policy
+<a name="Policy"></a>
+A Policy specifies the visibility of an object to people using SEEK. A <a href="#projects">**Project**</a> may specify the default policy for objects belonging to that <a href="#projects">**Project**</a>
 
-A Policy specifies the visibility of an object to people using SEEK. A [**Project**](#tag/projects) may specify the default policy for objects belonging to that [**Project**](#tag/projects)
-
-The **Policy** specifies the visibility of the object to non-registered people or [**People**](#tag/people) not allowed special access.
+The **Policy** specifies the visibility of the object to non-registered people or <a href="#people">**People**</a> not allowed special access.
 
 The access may be one of (in order of increasing "power"):
 
@@ -23,13 +20,13 @@ The access may be one of (in order of increasing "power"):
 * edit
 * manage
 
-In addition a **Policy** may give special access to specific [**People**](#tag/people), People working at an [**Institution**](#tag/institutions) or working on a [**Project**](#tag/projects).
+In addition a **Policy** may give special access to specific <a href="#people">**People**</a>, People working at an <a href="#institutions">**Institution**</a> or working on a <a href="#projects">**Project**</a>.
 
 ===
 
 ## License
-
-The license specifies the license that will apply to any [**DataFiles**](#tag/dataFiles), [**Models**](#tag/models), [**SOPs**](#tag/sops), [**Documents**](#tag/documents) and [**Presentations**](#tag/presentations) associated with a [**Project**](#tag/projects).
+<a name="License"></a>
+The license specifies the license that will apply to any <a href="#dataFiles">**DataFiles**</a>, <a href="#models">**Models**</a>, <a href="#sops">**SOPs**</a>, <a href="#documents">**Documents**</a> and <a href="#presentations">**Presentations**</a> associated with a <a href="#projects">**Project**</a>.
 
 The license can currently be:
 
@@ -68,8 +65,8 @@ The license can currently be:
 ===
 
 ## ContentBlob
-
-The content of a [**DataFile**](#tag/dataFiles), [**Document**](#tag/documents), [**Model**](#tag/models), [**SOP**](#tag/sops) or [**Presentation**](#tag/presentations) is specified as a set of **ContentBlobs**.
+<a name="ContentBlob"></a>
+The content of a <a href="#dataFiles">**DataFile**</a>, <a href="#documents">**Document**</a>, <a href="#models">**Model**</a>, <a href="#sops">**SOP**</a> or <a href="#presentations">**Presentation**</a> is specified as a set of **ContentBlobs**.
 
 When a resource with content is created, it is possible to specify a ContentBlob either as:
 
@@ -95,7 +92,7 @@ A placeholder can then be satisfied by uploading a file to the location URI. For
 ],
 ```
 
-may be satisfied by uploading a file to http://www.fairdomhub.org/data_files/57/content_blobs/313 using the [uploadDataFileContent](#operation/uploadDataFileContent) operation
+may be satisfied by uploading a file to http://www.fairdomhub.org/data_files/57/content_blobs/313 using the <a href="#uploadDataFileContent">uploadDataFileContent</a> operation
 
 The content of a resource may be downloaded by first *reading* the resource and then *downloading* the ContentBlobs from their URI.
 

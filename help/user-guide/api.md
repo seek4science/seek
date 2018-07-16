@@ -5,11 +5,15 @@ layout: page
 
 # API introduction
 
-This version of SEEK includes a [JSON](https://www.json.org/) Application
+SEEK includes a [JSON](https://www.json.org/) Application
 Programming Interface (API) that allows the **searching,
-listing and reading** of assets described in SEEK, as well as
-their attributes. The API is described on [SwaggerHub](https://app.swaggerhub.com/apis/FAIRDOM/SEEK/0.1) where
-the API can also be tested out.
+listing, reading, updating and creating** of many items in SEEK, 
+along with their attributes.
+  
+Technical details about the JSON stuctures and available endpoints
+ can be found in the [JSON API Overview](/tech/api/index.html); 
+ and also on [SwaggerHub](https://app.swaggerhub.com/apis/FAIRDOM/SEEK/0.1) 
+ where some aspects of the API can be tested out.
 
 The API conforms to the [JSON API](http://jsonapi.org) specification which
 describes a standard way of representing APIs in JSON.
@@ -27,6 +31,7 @@ The JSON API can also be used without any authentication,
 in which case only publicly viewable information will
 be returned.
 
+<!--
 # Excluded assets
 
 The JSON API currently allows the searching, listing and
@@ -37,9 +42,10 @@ the reading of
 * Samples
 * Strains
 
+
 # Future work
 
 The SEEK team are currently working on extending the API
 to include create, update and delete capabilities as well
 as to cover currently excluded assets and attributes.
-
+-->

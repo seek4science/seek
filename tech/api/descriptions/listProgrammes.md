@@ -1,1 +1,1 @@
-The **listProgrammes** operation returns a JSON object containing a list of all the [**Programmes**](#tag/programmes) to which the authenticated user has accesss.
+<a name="listProgrammes"></a>The **listProgrammes** operation returns a JSON object containing a list of all the <a href="#programmes">**Programmes**</a> to which the authenticated user has accesss.

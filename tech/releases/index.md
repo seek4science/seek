@@ -9,6 +9,64 @@ layout: page
 
 Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
+If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html) 
+
+## Version 1.6.2
+
+Release date: _July 5th 2018_
+
+  * Fixed a bug when viewing a Project page that has more that 5 visible Documents associated with it.
+  * Avoid warning about missing projects when uploading a standard Excel file, being mistaken as RightField template.
+  * When running SEEK through Docker, write the Puma output and error logs to files.
+  
+A full list of changes included in this release can be found in the [SEEK v1.6.2 release notes](release-notes-1.6.2.html).  
+
+## Version 1.6.1
+
+Release date: _June 20th 2018_
+
+Bugfixes and some small improvements, in particular
+
+  * Fixed an error when uploading a DataFile with no Assays in the database (only seemed to affect Docker)
+  * Fixed a mime type problem when uploading files, in particular CSV files being incorrectly treated as Excel
+  * When using the DataFile upload wizard, the arrow keys no longer affect navigation whilst editing a field
+  * Recognise and handle Excel (macro-enabled), XLSM, files as standard Excel files.
+  * Within the admin area, when showing the queued jobs, there is no a button to clear failed jobs. 
+  * You no longer have to accept the (blank) Terms and Conditions when setting up the first user for a new SEEK installation.
+  
+There have also been a few other smaller fixes and improvements, a full list of changes included in this release can be found in 
+the [SEEK v1.6.1 release notes](release-notes-1.6.1.html).
+                                                                  
+ 
+
+## Version 1.6.0
+
+Release date: _June 8th 2018_
+
+Major changes include:
+
+  * Interlinking the [**ELIXIR Norwegian e-Infrastructure for Life Sciences (NeLS)**](https://nels.bioinfo.no/) with the SEEK platform. 
+ This will provide NeLS and SEEK users with unprecedented opportunities for storing, sharing, 
+ and archiving of data in ways that comply with the FAIR principles.
+  * Our second installment of our [**JSON API**](/help/user-guide/api.html), in particular to include support for **writing** and submitting new entries in SEEK. 
+    Most write abilities are now available through the API including creating Datafiles, SOPs, Models, 
+    Investigation, Studies and Assays and linking them together. More details about the api can be found in the 
+    [API Guide](/help/user-guide/api.html), with more technical details found in the [JSON API Overview](/tech/api/index.html) 
+  * Changes to the  **DataFiles upload workflow**, along with better RightField template support. The flow has been changed such that the 
+ file is registered before providing additional details. This allows information to be extracted and details automatically populated where
+ possible. The supported templates are now provided as part of the templates generated for Sample Types, but will soon be available more widely.
+  * DataFile metadata is now provided through a [**Wizard**](/help/user-guide/data-file-upload-wizard.html), split into logical steps, that can easily be stepped through.
+  * Assays can be created and linked to the DataFile being submitted as part of the same process. This can either be manual or from the details provided within
+ a template.
+  * Support for a new **Document** asset type. This is to represent general documents that do not fit as other asset types - such as
+  reports or meeting minutes.     
+  * Ability to enable and provide **Terms and Conditions**, that need to be accepted as part of the registration process
+  * Creating **DOI's** for individual items has been made clearer and easier to use.    
+
+There have also been many other bug fixes and small improvements.
+A full list of changes included in this release can be found in the [SEEK v1.6.0 release notes](release-notes-1.6.0.html).
+ 
+ 
 ## Version 1.5.2
 
 Release date: _February 20th 2018_
@@ -19,8 +77,7 @@ Bugfix release that includes:
   * Image scaling fix - where some avatars were scaled down, and then expanded causing them to appear blurred.
 
 A full list of changes included in this release can be found in the [SEEK v1.5.2 release notes](release-notes-1.5.2.html).
-
-If you have any comments or feedback then please [Contact Us](/contacting-us.html)  
+  
 
 ## Version 1.5.1
 
@@ -31,6 +88,8 @@ Bugfix patch release that in particular fixes:
   * An error that prevented people entries being deleted in some cases.
   * An error turning exception emails on or off in the admin settings
   * An error that prevented a Programme submission being rejected
+  
+A full list of changes included in this release can be found in the [SEEK v1.5.1 release notes](release-notes-1.5.1.html).
   
 
 ## Version 1.5.0

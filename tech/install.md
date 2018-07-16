@@ -46,23 +46,23 @@ Distributions](other-distributions.html) notes.
 
 You should run an update first
 
-    sudo apt-get update
-    sudo apt-get upgrade
+    sudo apt update
+    sudo apt upgrade
 
 Now install the packages:
 
-    sudo apt-get install mysql-server
+    sudo apt install mysql-server
 
 Pay attention to what you use for the 'MySQL root' password when requested -
 you will need this later.
 
 The remaining packages are:
 
-    sudo apt-get install build-essential libssl-dev openssh-server git libreadline-dev libxml++2.6-dev openjdk-8-jdk libgmp-dev libcurl4-gnutls-dev nodejs poppler-utils libreoffice libmysqlclient-dev libmagick++-dev imagemagick libxslt1-dev libpq-dev
+    sudo apt install build-essential libssl-dev openssh-server git libreadline-dev libxml++2.6-dev openjdk-8-jdk libgmp-dev libcurl4-gnutls-dev nodejs poppler-utils libreoffice libmysqlclient-dev libmagick++-dev imagemagick libxslt1-dev libpq-dev
 
 Installing these packages now will make installing Ruby easier later on:
 
-    sudo apt-get install libyaml-dev libsqlite3-dev sqlite3 autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev
+    sudo apt install curl libyaml-dev libsqlite3-dev sqlite3 autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev
 
 ## Development or Production?
 
