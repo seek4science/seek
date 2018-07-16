@@ -313,8 +313,8 @@ module Seek
           end
 
           # Contributor permissions
-          if (contributor_user = (contributor.is_a?(Person) ? contributor.user : contributor))
-            update_lookup([true, true, true, true, true], contributor_user)
+          if contributor && contributor.user
+            update_lookup([true, true, true, true, true], contributor.user)
           end
 
           # Role permissions (Role)
@@ -370,7 +370,7 @@ module Seek
 
       # use request_permission_summary to retrieve who can manage the item
       def people_can_manage
-        contributor = self.contributor.is_a?(Person) ? self.contributor : self.contributor.try(:person)
+        contributor = self.contributor
         return [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]] if policy.blank?
         creators = is_downloadable? ? self.creators : []
         asset_managers = (projects & contributor.former_projects).collect(&:asset_housekeepers).flatten
