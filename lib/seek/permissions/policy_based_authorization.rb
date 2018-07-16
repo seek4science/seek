@@ -385,17 +385,12 @@ module Seek
       # returns a list of the people that can manage this file
       # which will be the contributor, and those that have manage permissions
       def managers
-        # FIXME: how to handle projects as contributors - return all people or just specific people (pals or other role)?
         people = []
 
         people << contributor unless contributor.nil?
 
-
-        policy.permissions.each do |perm|
-          unless perm.contributor.nil? || perm.access_type != Policy::MANAGING
-            people << perm.contributor if perm.contributor.is_a?(Person)
-          end
-        end
+        perms = policy.permissions.where(access_type:Policy::MANAGING, contributor_type:'Person').select{|p| p.contributor}
+        people |= perms.collect(&:contributor)
         people.uniq
       end
 
