@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 class RemoveContributorTypeColumn < ActiveRecord::Migration
   def up
     types.each do |type|
-      remove_column type.table_name.to_sym,:contributor_type
+      remove_column type.table_name.to_sym, :contributor_type
     end
   end
 
   def down
     types.each do |type|
-      add_column type.table_name.to_sym,:contributor_type, :string
+      add_column type.table_name.to_sym, :contributor_type, :string
       ActiveRecord::Base.connection.execute("UPDATE #{type.table_name} SET contributor_type = 'Person'")
     end
   end
