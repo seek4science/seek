@@ -1,13 +1,12 @@
 <%
-   if f ||= nil
-     resource_class ||= f.object.class
-     resource_type ||= resource_class.name
-     existing_attributions ||= f.try(:object).respond_to?(:attributions_objects) ? f.object.attributions_objects.select(&:can_view?) : nil
-     existing_creators ||= f.object.try(:creators)
-     existing_creators =  [current_user.person] if existing_creators.blank?
-     other_creators ||= f.object.try :other_creators
-     related_publications ||= f.try(:object).respond_to?(:publications) ? f.object.publications : nil
-   end
+   resource_class ||= f.object.class
+   resource_type ||= resource_class.name
+   existing_attributions ||= f.try(:object).respond_to?(:attributions_objects) ? f.object.attributions_objects.select(&:can_view?) : nil
+   existing_creators ||= f.object.try(:creators)
+   existing_creators =  [current_user.person] if existing_creators.blank?
+   other_creators ||= f.object.try :other_creators
+   related_publications ||= f.try(:object).respond_to?(:publications) ? f.object.publications : nil
+
    existing_attributions||=[]
    existing_creators||=[current_user.person]
    related_publications||=[]
@@ -34,7 +33,7 @@
 <% end %>
 
 <% if creators_enable %>
-    <%= render :partial => "assets/author_form", :locals => {:resource_type => resource_type, # this is only for presentation, not for any processing
+    <%= render :partial => "assets/author_form", :locals => {:form => f,
                                                              :existing_creators => existing_creators,
                                                              :other_creators => other_creators} -%>
 <% end %>

@@ -1,6 +1,6 @@
 
 <%
-   name = "scale_ids"
+   name = "#{object.class.name.underscore}[scales]"
    possibilities ||= Scale.all
    selected ||= object.scales.map(&:id)
    intro ||= "The following #{t('scale').pluralize} are associated with this #{t('model')}:"
@@ -13,11 +13,13 @@
 
 
    default_choice = [default_choice_text, 0]
-   collection_id = name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
+   collection_id = 'scale_ids'
    possibilities_collection_id = "possible_#{collection_id}"
    possibilities_options ||= {}
-   possibilities_options[:onchange]="javascript:possibilities_selection_changed();"
+   possibilities_options[:onchange] = "javascript:possibilities_selection_changed();"
 %>
+
+<%= selected %>
 
 <%= javascript_include_tag "scales/scales_selection" %>
 
@@ -45,11 +47,12 @@
             Unit: <%= text_field_tag 'choose_unit_for_scale_id' -%>
         </span>
         <%= hidden_field_tag "#{name}[]", "" %>
-        <%= select_tag 'scale_ids_and_params',[],{:multiple=>true, :style=>"display:none"} -%>
+        <%= select_tag "#{object.class.name.underscore}[scale_extra_params]", [],
+                       { multiple: true, style: "display:none;", id: 'scale_ids_and_params' } -%>
 
         <%= select_tag name,
                        options_from_collection_for_select(possibilities, value_method, text_method, selected),
-                       {:multiple => true, :style => "display:none;"} -%>
+                       { multiple: true, style: "display:none;", id: collection_id } -%>
         <%= association_step_content -%>
       </div>
 

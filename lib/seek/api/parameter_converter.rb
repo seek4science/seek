@@ -35,10 +35,6 @@ module Seek
             end
           },
 
-          creator_ids: ->(value) {
-            value.map { |id| ['', id.to_i] }.to_json
-          },
-
           publication_ids: ->(value) {
             value.map { |id| "#{id}," }
           },
@@ -82,7 +78,11 @@ module Seek
           },
 
           data_file_ids: ->(value) {
-            value.map { |i| { 'id' => i }.with_indifferent_access }
+            value.map { |i| { 'asset_id' => i }.with_indifferent_access }
+          },
+
+          assay_ids: ->(value) {
+            value.map { |i| { assay_id: i } }
           }
       }
       CONVERSIONS[:default_policy] = CONVERSIONS[:policy]
@@ -93,7 +93,6 @@ module Seek
           tags: :tag_list,
           policy: :policy_attributes,
           default_policy: :policy_attributes,
-          creator_ids: :creators,
           publication_ids: :related_publication_ids,
           assay_class: :assay_class_id,
           assay_type: :assay_type_uri,
@@ -102,17 +101,17 @@ module Seek
           model_type: :model_type_id,
           model_format: :model_format_id,
           environment: :recommended_environment_id,
-          data_file_ids: :data_files,
-          sop_ids: :assay_sop_ids,
+          data_file_ids: :data_files_attributes,
+          assay_ids: :assay_assets_attributes,
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.
       ELEVATE = %i[tag_list expertise_list tool_list policy_attributes content_blobs
-       assay_ids related_publication_ids revision_comments creators data_files assay_sop_ids document_ids model_ids].freeze
+       related_publication_ids revision_comments].freeze
 
-      def initialize(controller_name)
+      def initialize(controller_name, options = {})
         @controller_name = controller_name
-
+        @options = options
       end
 
       def convert(parameters)
@@ -139,7 +138,7 @@ module Seek
 
       def convert_parameters
         attributes.each do |key, value|
-          unless (conversion = CONVERSIONS[key.to_sym]).nil?
+          unless (conversion = CONVERSIONS[key.to_sym]).nil? || exclude?(:convert, key)
             attributes[key] = conversion.call(value)
           end
         end
@@ -147,7 +146,7 @@ module Seek
 
       def rename_parameters
         RENAME.each do |key, new_key|
-          if attributes.key?(key)
+          if attributes.key?(key) && !exclude?(:rename, key)
             attributes[new_key] = attributes.delete(key)
           end
         end
@@ -155,7 +154,7 @@ module Seek
 
       def elevate_parameters
         ELEVATE.each do |key|
-          if attributes.key?(key)
+          if attributes.key?(key) && !exclude?(:elevate, key)
             @parameters[key] = attributes.delete(key)
           end
         end
@@ -163,6 +162,11 @@ module Seek
 
       def attributes
         @parameters[@controller_name.singularize.to_sym] || {}
+      end
+
+      def exclude?(type, key)
+        (@options[:skip] || []).include?(key.to_sym) ||
+        (@options["skip_#{type}".to_sym] || []).include?(key.to_sym)
       end
     end
   end

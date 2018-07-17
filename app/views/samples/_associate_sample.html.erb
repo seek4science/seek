@@ -2,21 +2,16 @@
   return unless Seek::Config.samples_enabled
   resource_text ||= text_for_resource(resource)
 
-  assay_assets = resource.assay_assets.where(asset_type: 'Sample').includes(:asset)
+  assay_assets = resource.assay_assets.select { |aa| aa.asset_type == 'Sample' }
 
   samples = Sample.joins(:projects).where(projects: { id: current_user.person.projects.map(&:id) }).limit(100).order('updated_at DESC')
   authorized_samples = Sample.authorize_asset_collection(samples, :view)
 
   data_files = DataFile.with_extracted_samples.all_authorized_for('view').select { |d| d.extracted_samples.any? }.first(20)
 
-  if params[:samples] && params[:samples].any?
-    collapse_panel = false
-    associated_samples_json = associations_json_from_params(Sample, params[:samples])
-  else
-    collapse_panel = assay_assets.empty?
-    associated_samples_json = associations_json_from_assay_assets(assay_assets)
-  end
-
+  field_name = "#{resource.class.name.underscore}[samples_attributes]"
+  collapse_panel = assay_assets.empty?
+  associated_samples_json = associations_json_from_assay_assets(assay_assets, fieldName: field_name)
 -%>
 
 <%= folding_panel("Samples", collapse_panel, :body_options => {:id => 'associate_sample_fold_content'},
@@ -30,18 +25,21 @@
             <h3>Incoming</h3>
             <%= associations_list('incoming-sample-list', 'associations/sample', '',
                                   empty_text: 'No incoming samples',
+                                  'data-field-name' => field_name,
                                   'data-multilist-group-value' => AssayAsset::Direction::INCOMING) %>
           </div>
           <div class="col-md-4">
             <h3>Outgoing</h3>
             <%= associations_list('outgoing-sample-list', 'associations/sample', '',
                                   empty_text: 'No outgoing samples',
+                                  'data-field-name' => field_name,
                                   'data-multilist-group-value' => AssayAsset::Direction::OUTGOING) %>
           </div>
           <div class="col-md-4">
             <h3>No direction</h3>
             <%= associations_list('other-sample-list', 'associations/sample', '',
                                   empty_text: 'No other samples',
+                                  'data-field-name' => field_name,
                                   'data-multilist-group-value' => AssayAsset::Direction::NODIRECTION) %>
           </div>
         </div>

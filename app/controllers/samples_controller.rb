@@ -106,15 +106,17 @@ class SamplesController < ApplicationController
 
   def sample_params(sample_type)
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:hash_key).collect(&:to_sym) | sample_type.sample_attributes.map(&:method_name).collect(&:to_sym) : []
-    params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] }, { data: sample_type_param_keys },
+    params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
+                                   { data: sample_type_param_keys }, { creator_ids: [] },
                                    { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] }, sample_type_param_keys)
   end
 
   def update_sample_with_params
-    @sample.update_attributes(sample_params(@sample.sample_type))
+    @sample.attributes = sample_params(@sample.sample_type)
     update_sharing_policies @sample
     update_annotations(params[:tag_list], @sample)
     update_relationships(@sample, params)
+    @sample.save
   end
 
   def find_index_assets

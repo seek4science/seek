@@ -11,10 +11,10 @@
 
 class Relationship < ActiveRecord::Base
 
-  validates_presence_of :subject_id, :other_object_id
+  validates_presence_of :subject, :other_object
   
-  belongs_to :subject , :polymorphic => true
-  belongs_to :other_object, :polymorphic => true
+  belongs_to :subject , polymorphic: true, inverse_of: :relationships
+  belongs_to :other_object, polymorphic: true, inverse_of: :inverse_relationships
 
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :subject
@@ -35,8 +35,7 @@ class Relationship < ActiveRecord::Base
   # it will make sure that if some attributions are to have the same data as
   # before, then these will not get deleted (and re-created afterwards, but
   # will be kept intact in first place)
-  def self.create_or_update_attributions(resource, attributions_from_params, predicate = Relationship::ATTRIBUTED_TO)
-
+  def self.set_attributions(resource, attributions_from_params, predicate = Relationship::ATTRIBUTED_TO)
     # added this branching on .nil? because of the danger of loosing all attributions for a model (for example) if due to an incomplete post request attributions is nil
     # the former code interpreted a nil parameter as an empty list => remove all attributions from an asset
     unless attributions_from_params.nil?
@@ -47,41 +46,32 @@ class Relationship < ActiveRecord::Base
          received_attributions = (attributions_from_params.blank? ? [] : attributions_from_params)
       end
 
-
-
       # build a more convenient hash structure with attribution parameters
       # (this will be classified by resource type)
       new_attributions = {}
       received_attributions.each do |a|
-        new_attributions[a[0]] = [] unless new_attributions[a[0]]
+        new_attributions[a[0]] ||= []
         new_attributions[a[0]] << a[1]
       end
 
       # --- Perform the full synchronisation of attributions ---
 
       # first delete any old attributions that are no longer valid
-      changes_made = false
       resource.relationships.each do |a|
-      if (a.predicate==predicate) && !(new_attributions["#{a.other_object_type}"] && new_attributions["#{a.other_object_type}"].include?(a.other_object_id))
-          a.destroy
-          changes_made = true
+        if (a.predicate==predicate) && !(new_attributions["#{a.other_object_type}"] && new_attributions["#{a.other_object_type}"].include?(a.other_object_id))
+          a.mark_for_destruction
         end
       end
-      # this is required to leave the association of "resource" with its attributions in the correct state; otherwise exception is thrown
-      resource.reload if changes_made
 
       # attributions don't have any attributes to update, hence proceed straight to the final phase -
       # add any remaining new attributions
-      new_attributions.each_key do |attributable_type|
-        new_attributions["#{attributable_type}"].each do |attributable_id|
-          unless (found = Relationship.where(:subject_type => resource.class.name, :subject_id => resource.id, :predicate => predicate, :other_object_type => attributable_type, :other_object_id => attributable_id ).first)
-            resource.relationships.create(:predicate => predicate, :other_object_type => attributable_type, :other_object_id => attributable_id)
-          end
+      new_attributions.each do |attributable_type, attributable_ids|
+        attributable_ids.uniq.each do |attributable_id|
+          resource.relationships.where(predicate: predicate,
+                                       other_object_type: attributable_type,
+                                       other_object_id: attributable_id).first_or_initialize
         end
       end
-
-      # --- Synchronisation is Finished ---
     end
-    
   end
 end

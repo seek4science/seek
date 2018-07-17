@@ -39,16 +39,11 @@ class DocumentsController < ApplicationController
   # PUT /documents/1
   def update
     update_annotations(params[:tag_list], @document) if params.key?(:tag_list)
-    update_scales @document
-
-    @document.attributes = document_params
-
     update_sharing_policies @document
+    update_relationships(@document,params)
 
     respond_to do |format|
-      if @document.save
-        update_relationships(@document,params)
-        update_assay_assets(@document,params[:assay_ids])
+      if @document.update_attributes(document_params)
         flash[:notice] = "#{t('document')} metadata was successfully updated."
         format.html { redirect_to document_path(@document) }
         format.json { render json: @document }
@@ -63,7 +58,8 @@ class DocumentsController < ApplicationController
 
   def document_params
     params.require(:document).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
-                                { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+                                { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                                { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] })
   end
 
   alias_method :asset_params, :document_params

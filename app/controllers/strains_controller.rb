@@ -76,11 +76,11 @@ class StrainsController < ApplicationController
   end
 
   def update
+    @strain.attributes = strain_params
     update_annotations(params[:tag_list], @strain)
     if params[:policy_attributes]
       @strain.policy.set_attributes_with_sharing(params[:policy_attributes])
     end
-    @strain.attributes = strain_params
     if @strain.save
       respond_to do |format|
         flash[:notice] = 'Strain was successfully updated.'

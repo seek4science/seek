@@ -1,10 +1,10 @@
 class AssayAsset < ActiveRecord::Base
-  belongs_to :asset, polymorphic: true
-  belongs_to :assay
+  belongs_to :asset, polymorphic: true, inverse_of: :assay_assets
+  belongs_to :assay, inverse_of: :assay_assets
 
   belongs_to :relationship_type
 
-  before_save :check_version
+  before_save :set_version
 
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :assay
@@ -19,11 +19,10 @@ class AssayAsset < ActiveRecord::Base
   enforce_authorization_on_association :assay, :edit
   enforce_authorization_on_association :asset, :view
 
-  def check_version
-    return unless asset.respond_to?(:latest_version)
-    if version.nil? && !asset.nil? && (asset.class.name.end_with?('::Version') || (!asset.latest_version.nil? && asset.latest_version.class.name.end_with?('::Version')))
-      self.version = asset.version
-    end
+  def set_version
+    return if destroyed?
+    return unless asset && asset.respond_to?(:latest_version) && asset.latest_version
+    self.version = asset.version
   end
 
   def incoming_direction?

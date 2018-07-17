@@ -104,8 +104,8 @@ class DocumentsControllerTest < ActionController::TestCase
     assert document.assays.empty?
 
     assert_difference('ActivityLog.count') do
-      put :update, id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id]},
-          assay_ids: [assay.id]
+      put :update, id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id],
+                                                assay_assets_attributes: [{ assay_id: assay.id }] }
     end
 
     assert_redirected_to document_path(assigns(:document))
