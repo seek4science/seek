@@ -350,34 +350,38 @@ class PublicationsController < ApplicationController
     params.require(:publication).permit(:pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,
                                         :published_date, :bibtex_file, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
-                                        { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
-                                        { scales: [] }).tap do |pub_params|
-      pub_params[:assay_ids].select! { |id| Assay.find_by_id(id).try(:can_edit?) } if pub_params.key?(:assay_ids)
-      pub_params[:study_ids].select! { |id| Study.find_by_id(id).try(:can_view?) } if pub_params.key?(:study_ids)
-      pub_params[:investigation_ids].select! { |id| Investigation.find_by_id(id).try(:can_view?) } if pub_params.key?(:investigation_ids)
-
-      pub_params[:data_files_attributes].select! { |dfa| DataFile.find_by_id(dfa['asset_id']).try(:can_view?) } if pub_params.key?(:data_files_attributes)
-      pub_params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if pub_params.key?(:model_ids)
-      pub_params[:presentation_ids].select! { |id| Presentation.find_by_id(id).try(:can_view?) } if pub_params.key?(:presentation_ids)
+                                        { data_file_ids: [] }, { scales: [] }).tap do |pub_params|
+      filter_association_params(pub_params, :assay_ids, Assay, :can_edit?)
+      filter_association_params(pub_params, :study_ids, Study, :can_view?)
+      filter_association_params(pub_params, :investigation_ids, Investigation, :can_view?)
+      filter_association_params(pub_params, :data_file_ids, DataFile, :can_view?)
+      filter_association_params(pub_params, :model_ids, Model, :can_view?)
+      filter_association_params(pub_params, :presentation_ids, Presentation, :can_view?)
     end
+  end
+
+  def filter_association_params(params, key, type, check)
+    if params.key?(key)
+      # Strip out anything that the user does not have permission to add
+      params[key].select! { |id| type.find_by_id(id).try(check) }
+
+      # Re-add anything that the user does not have permission to remove
+      if @publication
+        missing = @publication.send(key).map(&:to_i) - params[key].map(&:to_i)
+        missing.reject! { |id| type.find_by_id(id).try(check) }
+
+        params[key] += missing
+      end
+    end
+
+    params[key]
   end
 
   # the original way of creating a bublication by either doi or pubmedid, where all data is set server-side
   def register_publication
-    result = get_data(@publication, @publication.pubmed_id, @publication.doi)
-    assay_ids = params[:assay_ids] || []
+    get_data(@publication, @publication.pubmed_id, @publication.doi)
 
     if @publication.save
-      result.authors.each_with_index do |author, index|
-        pa = PublicationAuthor.new
-        pa.publication = @publication
-        pa.first_name = author.first_name
-        pa.last_name = author.last_name
-        pa.author_index = index
-        pa.save
-      end
-
-      create_or_update_associations assay_ids, 'Assay', 'edit'
       if !@publication.parent_name.blank?
         render partial: 'assets/back_to_fancy_parent', locals: { child: @publication, parent_name: @publication.parent_name }
       else

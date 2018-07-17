@@ -47,7 +47,7 @@ class Publication < ActiveRecord::Base
 
   validate :check_uniqueness_within_project, unless: 'Seek::Config.is_virtualliver'
 
-  before_save :update_permissions_for_creators
+  before_save :update_permissions_for_creators, on: :update
   after_update :update_creators_from_publication_authors
 
   # http://bioruby.org/rdoc/Bio/Reference.html#method-i-format
@@ -68,8 +68,6 @@ class Publication < ActiveRecord::Base
   end
 
   def update_permissions_for_creators
-    self.policy ||= default_policy
-
     policy.permissions.clear
     seek_authors.map(&:person).each do |author|
       policy.permissions.create!(contributor: author, access_type: Policy::MANAGING)
@@ -140,6 +138,12 @@ class Publication < ActiveRecord::Base
       extract_pubmed_metadata(reference)
     else
       extract_doi_metadata(reference)
+    end
+
+    reference.authors.each_with_index do |author, index|
+      publication_authors.build(first_name: author.first_name,
+                                last_name: author.last_name,
+                                author_index: index)
     end
   end
 

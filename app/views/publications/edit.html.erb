@@ -25,18 +25,15 @@
         <%= render :partial => "assets/associate_event", :locals=>{:resource => @publication} -%>
     <% end -%>
 
-    <%= fancy_multiselect @publication, :investigations, { hidden: @publication.investigations.empty?,
-                                                    other_projects_checkbox: true } %>
+    <%= fancy_multiselect @publication, :investigations, other_projects_checkbox: true %>
 
-    <%= fancy_multiselect @publication, :studies, { hidden: @publication.studies.empty?,
-                                                    other_projects_checkbox: true,
+    <%= fancy_multiselect @publication, :studies, { other_projects_checkbox: true,
                                                     group_options_by: ->(s) { s.investigation.try(:title) }  } %>
 
-    <%= fancy_multiselect @publication, :assays, { hidden: @publication.assays.empty?,
-                                                       other_projects_checkbox: true,
-                                                       group_options_by: ->(a) { a.study.try(:title) }  } %>
+    <%= fancy_multiselect @publication, :assays, { other_projects_checkbox: true,
+                                                   group_options_by: ->(a) { a.study.try(:title) }  } %>
 
-    <%= render :partial => "assets/associate_data_file", :locals=>{:resource => @publication} -%>
+    <%= fancy_multiselect @publication, :data_files, other_projects_checkbox: true %>
 
     <%= fancy_multiselect @publication, :models, other_projects_checkbox: true %>
 

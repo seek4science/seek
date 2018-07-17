@@ -37,7 +37,7 @@ class PublicationsControllerTest < ActionController::TestCase
     mock_pubmed(content_file: 'pubmed_1.txt')
     assay = assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id] }, assay_ids: [assay.id.to_s]
+      post :create, publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s] }
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -50,7 +50,7 @@ class PublicationsControllerTest < ActionController::TestCase
     login_as(:model_owner) # can edit assay
     assay = assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id] }, assay_ids: [assay.id.to_s]
+      post :create, publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s] }
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -392,7 +392,7 @@ class PublicationsControllerTest < ActionController::TestCase
     new_assay = assays(:metabolomics_assay)
     assert new_assay.publications.empty?
 
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, assay_ids: [new_assay.id.to_s]
+    put :update, id: p, publication: { abstract: p.abstract, assay_ids: [new_assay.id.to_s] }, author: {}
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -415,8 +415,10 @@ class PublicationsControllerTest < ActionController::TestCase
     assert !df.publications.include?(p)
 
     login_as(p.contributor)
+
+    assert df.can_view?
     # add association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_files: [{ asset_id: df.id.to_s }]
+    put :update, id: p, publication: { abstract: p.abstract, data_file_ids: [df.id.to_s] }, author: {}
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -428,7 +430,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert df.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_files: []
+    put :update, id: p, publication: { abstract: p.abstract, data_file_ids: [] }, author: {}
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -459,7 +461,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert model.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, model_ids: []
+    put :update, id: p, publication: { abstract: p.abstract, model_ids: [] }, author: {}
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -477,7 +479,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, investigation_ids: [investigation.id.to_s]
+    put :update, id: p, publication: { abstract: p.abstract, investigation_ids: [investigation.id.to_s] }, author: {}
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -489,7 +491,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert investigation.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, investigation_ids: []
+    put :update, id: p, publication: { abstract: p.abstract, investigation_ids: [] }, author: {}
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -507,7 +509,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, study_ids: [study.id.to_s]
+    put :update, id: p, publication: { abstract: p.abstract, study_ids: [study.id.to_s] }, author: {}
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -519,7 +521,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert study.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, study_ids: []
+    put :update, id: p, publication: { abstract: p.abstract, study_ids: [] }, author: {}
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -549,7 +551,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert presentation.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract, presentation_ids:[] }, author: {}
+    put :update, id: p, publication: { abstract: p.abstract, presentation_ids: [] }, author: {}
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -568,7 +570,8 @@ class PublicationsControllerTest < ActionController::TestCase
     new_assay = assays(:metabolomics_assay)
     assert new_assay.publications.empty?
 
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, assay_ids: [new_assay.id.to_s]
+    # Should not add the new assay and should not remove the old one
+    put :update, id: p, publication: { abstract: p.abstract, assay_ids: [new_assay.id] }, author: {}
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -586,8 +589,9 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should keep model and data associations after update' do
     p = publications(:pubmed_2)
-    put :update, id: p, publication: { abstract: p.abstract, model_ids: p.models.collect { |m| m.id.to_s } },
-        author: {}, assay_ids: [], data_files: p.data_files.map { |df| { asset_id: df.id } }
+    put :update, id: p, publication: { abstract: p.abstract, model_ids: p.models.collect { |m| m.id.to_s },
+                                       data_file_ids: p.data_files.map(&:id), assay_ids: [] },
+        author: {}
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -650,6 +654,9 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should destroy publication' do
     publication = Factory(:publication, published_date: Date.new(2013, 6, 4))
+
+    login_as(publication.contributor)
+
     assert_difference('Publication.count', -1) do
       delete :destroy, id: publication.id
     end
@@ -768,6 +775,7 @@ class PublicationsControllerTest < ActionController::TestCase
     i = Factory(:investigation, title: '<script>alert("xss")</script> &', projects: [project], contributor: c)
     s = Factory(:study, title: '<script>alert("xss")</script> &', investigation: i, contributor: c)
     a = Factory(:assay, title: '<script>alert("xss")</script> &', study: s, contributor: c)
+    pres = Factory(:presentation, title: '<script>alert("xss")</script> &', contributor: c)
     p = Factory(:publication, projects: [project], contributor: c)
 
     login_as(p.contributor)
@@ -778,11 +786,9 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_not_includes response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
     # This will be slow!
 
-    # 9 = 3 each for for events, assays and models 'fancy_multiselect'
-    # plus an extra 2 for the study optgroups in the assay association
-    assert_equal 11, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
-    # 4 = 2 each for investigations, studies (using bespoke association forms) - datafiles loaded asynchronously
-    assert_equal 4, response.body.scan('\u003cscript\u003ealert(\"xss\")\u003c/script\u003e \u0026').count
+    # 21 = 3 * 7 (investigations, studies, assays, events, presentations, data files and models)
+    # plus an extra 4 * 2 for the study optgroups in the assay and study associations
+    assert_equal 25, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
   end
 
   test 'programme publications through nested routing' do
