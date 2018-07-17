@@ -548,8 +548,7 @@ class PublicationsController < ApplicationController
     end
 
     # Destroy asset relationship that aren't needed
-    associate_relationships = Relationship.where(other_object_id: @publication.id, subject_type: asset_type)
-    associate_relationships.each do |associate_relationship|
+    @publication.relationships.where(subject_type: asset_type).each do |associate_relationship|
       asset = associate_relationship.subject
       if asset.send("can_#{required_action}?") && !asset_ids.include?(asset.id.to_s)
         associate_relationship.destroy
