@@ -4,7 +4,7 @@
   collection_id = name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
   possibilities_collection_id = "possible_#{collection_id}"
   possibilities_options ||= {}
-  possibilities_options.merge!(:class => 'form-control')
+  possibilities_options.reverse_merge!({ class: 'form-control', prompt: "Select #{association_text}..." })
   title ||= association_text.pluralize
   title += '<span class="required">*</span>'.html_safe if required
 
