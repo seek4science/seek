@@ -15,7 +15,7 @@ class RemoveContributorTypeColumn < ActiveRecord::Migration
   private
 
   def types
-    [DataFile, Document, Investigation, Model, Presentation, Publication, Sample, Sop, Strain, Study] +
+    [DataFile, Document, Event, Investigation, Model, Presentation, Publication, Sample, Sop, Strain, Study] +
       [DataFile::Version, Document::Version, Model::Version, Presentation::Version, Sop::Version]
   end
 end

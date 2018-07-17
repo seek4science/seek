@@ -606,19 +606,18 @@ ActiveRecord::Schema.define(version: 20180717085420) do
   create_table "events", force: :cascade do |t|
     t.datetime "start_date"
     t.datetime "end_date"
-    t.text     "address",          limit: 65535
-    t.string   "city",             limit: 255
-    t.string   "country",          limit: 255
-    t.string   "url",              limit: 255
-    t.text     "description",      limit: 65535
-    t.string   "title",            limit: 255
-    t.integer  "policy_id",        limit: 4
-    t.integer  "contributor_id",   limit: 4
+    t.text     "address",        limit: 65535
+    t.string   "city",           limit: 255
+    t.string   "country",        limit: 255
+    t.string   "url",            limit: 255
+    t.text     "description",    limit: 65535
+    t.string   "title",          limit: 255
+    t.integer  "policy_id",      limit: 4
+    t.integer  "contributor_id", limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "contributor_type", limit: 255
-    t.string   "first_letter",     limit: 1
-    t.string   "uuid",             limit: 255
+    t.string   "first_letter",   limit: 1
+    t.string   "uuid",           limit: 255
   end
 
   create_table "events_presentations", id: false, force: :cascade do |t|
