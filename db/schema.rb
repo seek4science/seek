@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180717085420) do
+ActiveRecord::Schema.define(version: 20180717094323) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -347,7 +347,7 @@ ActiveRecord::Schema.define(version: 20180717085420) do
     t.boolean  "simulation_data",               default: false
   end
 
-  add_index "data_files", ["contributor_id"], name: "index_data_files_on_contributor_id_and_contributor_type", using: :btree
+  add_index "data_files", ["contributor_id"], name: "index_data_files_on_contributor", using: :btree
 
   create_table "data_files_events", id: false, force: :cascade do |t|
     t.integer "data_file_id", limit: 4
@@ -553,7 +553,7 @@ ActiveRecord::Schema.define(version: 20180717085420) do
     t.text     "other_creators",    limit: 65535
   end
 
-  add_index "document_versions", ["contributor_id"], name: "index_document_versions_on_contributor_type_and_contributor_id", using: :btree
+  add_index "document_versions", ["contributor_id"], name: "index_document_versions_on_contributor", using: :btree
   add_index "document_versions", ["document_id"], name: "index_document_versions_on_document_id", using: :btree
 
   create_table "document_versions_projects", force: :cascade do |t|
@@ -580,7 +580,7 @@ ActiveRecord::Schema.define(version: 20180717085420) do
     t.text     "other_creators", limit: 65535
   end
 
-  add_index "documents", ["contributor_id"], name: "index_documents_on_contributor_type_and_contributor_id", using: :btree
+  add_index "documents", ["contributor_id"], name: "index_documents_on_contributor", using: :btree
 
   create_table "documents_projects", force: :cascade do |t|
     t.integer "document_id", limit: 4
@@ -891,7 +891,7 @@ ActiveRecord::Schema.define(version: 20180717085420) do
     t.string   "license",                    limit: 255
   end
 
-  add_index "model_versions", ["contributor_id"], name: "index_model_versions_on_contributor_id_and_contributor_type", using: :btree
+  add_index "model_versions", ["contributor_id"], name: "index_model_versions_on_contributor", using: :btree
   add_index "model_versions", ["model_id"], name: "index_model_versions_on_model_id", using: :btree
 
   create_table "model_versions_projects", id: false, force: :cascade do |t|
@@ -922,7 +922,7 @@ ActiveRecord::Schema.define(version: 20180717085420) do
     t.string   "license",                    limit: 255
   end
 
-  add_index "models", ["contributor_id"], name: "index_models_on_contributor_id_and_contributor_type", using: :btree
+  add_index "models", ["contributor_id"], name: "index_models_on_contributor", using: :btree
 
   create_table "models_projects", id: false, force: :cascade do |t|
     t.integer "project_id", limit: 4
@@ -1283,7 +1283,7 @@ ActiveRecord::Schema.define(version: 20180717085420) do
     t.string   "citation",         limit: 255
   end
 
-  add_index "publications", ["contributor_id"], name: "index_publications_on_contributor_id_and_contributor_type", using: :btree
+  add_index "publications", ["contributor_id"], name: "index_publications_on_contributor", using: :btree
 
   create_table "recommended_model_environments", force: :cascade do |t|
     t.string   "title",      limit: 255
@@ -1540,7 +1540,7 @@ ActiveRecord::Schema.define(version: 20180717085420) do
     t.string   "license",           limit: 255
   end
 
-  add_index "sop_versions", ["contributor_id"], name: "index_sop_versions_on_contributor_id_and_contributor_type", using: :btree
+  add_index "sop_versions", ["contributor_id"], name: "index_sop_versions_on_contributor", using: :btree
   add_index "sop_versions", ["sop_id"], name: "index_sop_versions_on_sop_id", using: :btree
 
   create_table "sops", force: :cascade do |t|
@@ -1559,7 +1559,7 @@ ActiveRecord::Schema.define(version: 20180717085420) do
     t.string   "license",        limit: 255
   end
 
-  add_index "sops", ["contributor_id"], name: "index_sops_on_contributor_id_and_contributor_type", using: :btree
+  add_index "sops", ["contributor_id"], name: "index_sops_on_contributor", using: :btree
 
   create_table "special_auth_codes", force: :cascade do |t|
     t.string   "code",            limit: 255
