@@ -47,7 +47,8 @@ class Publication < ActiveRecord::Base
 
   validate :check_uniqueness_within_project, unless: 'Seek::Config.is_virtualliver'
 
-  before_save :update_permissions_for_creators, on: :update
+  attr_writer :refresh_policy
+  before_save :refresh_policy, on: :update
   after_update :update_creators_from_publication_authors
 
   # http://bioruby.org/rdoc/Bio/Reference.html#method-i-format
@@ -67,15 +68,14 @@ class Publication < ActiveRecord::Base
     self.creators = seek_authors.map(&:person)
   end
 
-  def update_permissions_for_creators
-    policy.permissions.clear
-    seek_authors.map(&:person).each do |author|
-      policy.permissions.create!(contributor: author, access_type: Policy::MANAGING)
-    end
-    # Add contributor
-    policy.permissions.create!(contributor: contributor.person, access_type: Policy::MANAGING)
+  def refresh_policy
+    if @refresh_policy
+      policy.permissions.clear
 
-    policy.permissions
+      populate_policy_from_authors(policy)
+
+      policy.save
+    end
   end
 
   if Seek::Config.events_enabled
@@ -109,13 +109,7 @@ class Publication < ActiveRecord::Base
 
   def default_policy
     Policy.new(name: 'publication_policy', access_type: Policy::VISIBLE).tap do |policy|
-      # add managers (authors + contributor)
-      creators.each do |author|
-        policy.permissions << Permissions.create(contributor: author, policy: policy, access_type: Policy::MANAGING)
-      end
-      # Add contributor
-      c = contributor || default_contributor
-      policy.permissions << Permission.create(contributor: c.person, policy: policy, access_type: Policy::MANAGING) if c
+      populate_policy_from_authors(policy)
     end
   end
 
@@ -260,6 +254,18 @@ class Publication < ActiveRecord::Base
   end
 
   private
+
+  def populate_policy_from_authors(pol)
+    # add managers (authors + contributor)
+    (creators | seek_authors.map(&:person)).each do |author|
+      pol.permissions.build(contributor: author, access_type: Policy::MANAGING)
+    end
+    # Add contributor
+    c = contributor || default_contributor
+    pol.permissions.build(contributor: c.person, access_type: Policy::MANAGING) if c
+
+    pol.permissions
+  end
 
   def pubmed_entry
     if pubmed_id

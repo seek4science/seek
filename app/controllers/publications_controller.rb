@@ -109,6 +109,7 @@ class PublicationsController < ApplicationController
           author_assoc = params[:author][author_id]
           unless author_assoc.blank?
             @publication.publication_authors.detect { |pa| pa.id == author_id.to_i }.person = Person.find(author_assoc)
+            @publication.refresh_policy = true
           end
         end
       else
