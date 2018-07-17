@@ -113,7 +113,7 @@ class PublicationsController < ApplicationController
         end
       else
         @publication.errors[:base] << 'Multiple authors cannot be associated with the same SEEK person.'
-        valid = false
+        valid = false # TODO: Do this as a model validation
       end
     end
 
@@ -121,22 +121,6 @@ class PublicationsController < ApplicationController
 
     respond_to do |format|
       if valid && @publication.update_attributes(publication_params)
-
-        # Update association
-        investigation_ids = params[:investigation_ids] || []
-        study_ids = params[:study_ids] || []
-        assay_ids = params[:assay_ids] || []
-        data_files = params[:data_files] || []
-        model_ids = (params[:publication][:model_ids] || []).reject(&:blank?)
-        presentation_ids = (params[:publication][:presentation_ids] || []).reject(&:blank?)
-
-        create_or_update_associations investigation_ids, 'Investigation', 'view'
-        create_or_update_associations study_ids, 'Study', 'view'
-        create_or_update_associations assay_ids, 'Assay', 'edit'
-        create_or_update_associations data_files.map { |df| df['asset_id'] }, 'DataFile', 'view'
-        create_or_update_associations model_ids, 'Model', 'view'
-        create_or_update_associations presentation_ids, 'Presentation', 'view'
-
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
         format.xml  { head :ok }
@@ -364,8 +348,18 @@ class PublicationsController < ApplicationController
 
   def publication_params
     params.require(:publication).permit(:pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,
-                                        :published_date, :bibtex_file, { project_ids: [] }, { event_ids: [] },
-                                        { scales: [] })
+                                        :published_date, :bibtex_file, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
+                                        { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
+                                        { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
+                                        { scales: [] }).tap do |pub_params|
+      pub_params[:assay_ids].select! { |id| Assay.find_by_id(id).try(:can_edit?) } if pub_params.key?(:assay_ids)
+      pub_params[:study_ids].select! { |id| Study.find_by_id(id).try(:can_view?) } if pub_params.key?(:study_ids)
+      pub_params[:investigation_ids].select! { |id| Investigation.find_by_id(id).try(:can_view?) } if pub_params.key?(:investigation_ids)
+
+      pub_params[:data_files_attributes].select! { |dfa| DataFile.find_by_id(dfa['asset_id']).try(:can_view?) } if pub_params.key?(:data_files_attributes)
+      pub_params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if pub_params.key?(:model_ids)
+      pub_params[:presentation_ids].select! { |id| Presentation.find_by_id(id).try(:can_view?) } if pub_params.key?(:presentation_ids)
+    end
   end
 
   # the original way of creating a bublication by either doi or pubmedid, where all data is set server-side

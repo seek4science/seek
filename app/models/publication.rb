@@ -18,15 +18,15 @@ class Publication < ActiveRecord::Base
     end
   end
 
-  has_many :inverse_relationships, class_name: 'Relationship', as: :other_object, dependent: :destroy,
-           inverse_of: :other_object
+  has_many :related_relationships, -> { where(predicate: Relationship::RELATED_TO_PUBLICATION) },
+           class_name: 'Relationship', as: :other_object, dependent: :destroy, inverse_of: :other_object
 
-  has_many :data_files, through: :inverse_relationships, source: :subject, source_type: 'DataFile'
-  has_many :models, through: :inverse_relationships, source: :subject, source_type: 'Model'
-  has_many :assays, through: :inverse_relationships, source: :subject, source_type: 'Assay'
-  has_many :studies, through: :inverse_relationships, source: :subject, source_type: 'Study'
-  has_many :investigations, through: :inverse_relationships, source: :subject, source_type: 'Investigation'
-  has_many :presentations, through: :inverse_relationships, source: :subject, source_type: 'Presentation'
+  has_many :data_files, through: :related_relationships, source: :subject, source_type: 'DataFile'
+  has_many :models, through: :related_relationships, source: :subject, source_type: 'Model'
+  has_many :assays, through: :related_relationships, source: :subject, source_type: 'Assay'
+  has_many :studies, through: :related_relationships, source: :subject, source_type: 'Study'
+  has_many :investigations, through: :related_relationships, source: :subject, source_type: 'Investigation'
+  has_many :presentations, through: :related_relationships, source: :subject, source_type: 'Presentation'
 
   acts_as_asset
 
@@ -192,7 +192,7 @@ class Publication < ActiveRecord::Base
                other_object_type: 'Publication',
                other_object_id: id }
 
-    inverse_relationships.where(clause).first_or_create!
+    related_relationships.where(clause).first_or_create!
   end
 
   # includes those related directly, or through an assay
