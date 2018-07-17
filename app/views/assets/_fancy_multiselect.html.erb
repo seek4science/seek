@@ -2,9 +2,10 @@
   selected ||= nil
   default_choice = [default_choice_text, 0]
   collection_id = name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
+  select_prompt = "Select #{association_text}..."
   possibilities_collection_id = "possible_#{collection_id}"
   possibilities_options ||= {}
-  possibilities_options.reverse_merge!({ class: 'form-control', prompt: "Select #{association_text}..." })
+  possibilities_options.reverse_merge!({ class: 'form-control', prompt: select_prompt })
   title ||= association_text.pluralize
   title += '<span class="required">*</span>'.html_safe if required
 
@@ -58,7 +59,7 @@
                                 :onchange => "swapSelectListContents('possible_#{object_type.underscore}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');",
                                 :style => "margin-top:0.5em;" -%>
               Associate <%= association_text.pluralize -%> from other <%= t('project').pluralize -%>?
-              <%= select_tag "alternative_#{association.to_s.singularize}_ids", unscoped_select_options, style: 'display: none;' %>
+              <%= select_tag "alternative_#{association.to_s.singularize}_ids", unscoped_select_options, prompt: select_prompt, style: 'display: none;' %>
           <% end %>
         </div>
 
