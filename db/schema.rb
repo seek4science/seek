@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180712121837) do
+ActiveRecord::Schema.define(version: 20180717085420) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -305,7 +305,6 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.integer  "data_file_id",      limit: 4
     t.integer  "version",           limit: 4
     t.text     "revision_comments", limit: 65535
-    t.string   "contributor_type",  limit: 255
     t.integer  "contributor_id",    limit: 4
     t.string   "title",             limit: 255
     t.text     "description",       limit: 65535
@@ -322,7 +321,7 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.boolean  "simulation_data",                 default: false
   end
 
-  add_index "data_file_versions", ["contributor_id", "contributor_type"], name: "index_data_file_versions_contributor", using: :btree
+  add_index "data_file_versions", ["contributor_id"], name: "index_data_file_versions_contributor", using: :btree
   add_index "data_file_versions", ["data_file_id"], name: "index_data_file_versions_on_data_file_id", using: :btree
 
   create_table "data_file_versions_projects", id: false, force: :cascade do |t|
@@ -331,25 +330,24 @@ ActiveRecord::Schema.define(version: 20180712121837) do
   end
 
   create_table "data_files", force: :cascade do |t|
-    t.string   "contributor_type", limit: 255
-    t.integer  "contributor_id",   limit: 4
-    t.string   "title",            limit: 255
-    t.text     "description",      limit: 65535
-    t.integer  "template_id",      limit: 4
+    t.integer  "contributor_id",  limit: 4
+    t.string   "title",           limit: 255
+    t.text     "description",     limit: 65535
+    t.integer  "template_id",     limit: 4
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",          limit: 4,     default: 1
-    t.string   "first_letter",     limit: 1
-    t.text     "other_creators",   limit: 65535
-    t.string   "uuid",             limit: 255
-    t.integer  "policy_id",        limit: 4
-    t.string   "doi",              limit: 255
-    t.string   "license",          limit: 255
-    t.boolean  "simulation_data",                default: false
+    t.integer  "version",         limit: 4,     default: 1
+    t.string   "first_letter",    limit: 1
+    t.text     "other_creators",  limit: 65535
+    t.string   "uuid",            limit: 255
+    t.integer  "policy_id",       limit: 4
+    t.string   "doi",             limit: 255
+    t.string   "license",         limit: 255
+    t.boolean  "simulation_data",               default: false
   end
 
-  add_index "data_files", ["contributor_id", "contributor_type"], name: "index_data_files_on_contributor_id_and_contributor_type", using: :btree
+  add_index "data_files", ["contributor_id"], name: "index_data_files_on_contributor_id_and_contributor_type", using: :btree
 
   create_table "data_files_events", id: false, force: :cascade do |t|
     t.integer "data_file_id", limit: 4
@@ -544,7 +542,6 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.text     "title",             limit: 65535
     t.text     "description",       limit: 65535
     t.integer  "contributor_id",    limit: 4
-    t.string   "contributor_type",  limit: 255
     t.string   "first_letter",      limit: 1
     t.string   "uuid",              limit: 255
     t.integer  "policy_id",         limit: 4
@@ -556,7 +553,7 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.text     "other_creators",    limit: 65535
   end
 
-  add_index "document_versions", ["contributor_type", "contributor_id"], name: "index_document_versions_on_contributor_type_and_contributor_id", using: :btree
+  add_index "document_versions", ["contributor_id"], name: "index_document_versions_on_contributor_type_and_contributor_id", using: :btree
   add_index "document_versions", ["document_id"], name: "index_document_versions_on_document_id", using: :btree
 
   create_table "document_versions_projects", force: :cascade do |t|
@@ -568,23 +565,22 @@ ActiveRecord::Schema.define(version: 20180712121837) do
   add_index "document_versions_projects", ["version_id", "project_id"], name: "index_document_versions_projects_on_version_id_and_project_id", using: :btree
 
   create_table "documents", force: :cascade do |t|
-    t.text     "title",            limit: 65535
-    t.text     "description",      limit: 65535
-    t.integer  "contributor_id",   limit: 4
-    t.string   "contributor_type", limit: 255
-    t.integer  "version",          limit: 4
-    t.string   "first_letter",     limit: 1
-    t.string   "uuid",             limit: 255
-    t.integer  "policy_id",        limit: 4
-    t.string   "doi",              limit: 255
-    t.string   "license",          limit: 255
+    t.text     "title",          limit: 65535
+    t.text     "description",    limit: 65535
+    t.integer  "contributor_id", limit: 4
+    t.integer  "version",        limit: 4
+    t.string   "first_letter",   limit: 1
+    t.string   "uuid",           limit: 255
+    t.integer  "policy_id",      limit: 4
+    t.string   "doi",            limit: 255
+    t.string   "license",        limit: 255
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "other_creators",   limit: 65535
+    t.text     "other_creators", limit: 65535
   end
 
-  add_index "documents", ["contributor_type", "contributor_id"], name: "index_documents_on_contributor_type_and_contributor_id", using: :btree
+  add_index "documents", ["contributor_id"], name: "index_documents_on_contributor_type_and_contributor_id", using: :btree
 
   create_table "documents_projects", force: :cascade do |t|
     t.integer "document_id", limit: 4
@@ -781,16 +777,15 @@ ActiveRecord::Schema.define(version: 20180712121837) do
   add_index "investigation_auth_lookup", ["user_id", "can_view"], name: "index_investigation_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "investigations", force: :cascade do |t|
-    t.string   "title",            limit: 255
-    t.text     "description",      limit: 65535
+    t.string   "title",          limit: 255
+    t.text     "description",    limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "first_letter",     limit: 1
-    t.string   "uuid",             limit: 255
-    t.integer  "policy_id",        limit: 4
-    t.integer  "contributor_id",   limit: 4
-    t.string   "contributor_type", limit: 255
-    t.text     "other_creators",   limit: 65535
+    t.string   "first_letter",   limit: 1
+    t.string   "uuid",           limit: 255
+    t.integer  "policy_id",      limit: 4
+    t.integer  "contributor_id", limit: 4
+    t.text     "other_creators", limit: 65535
   end
 
   create_table "investigations_projects", id: false, force: :cascade do |t|
@@ -876,7 +871,6 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.integer  "model_id",                   limit: 4
     t.integer  "version",                    limit: 4
     t.text     "revision_comments",          limit: 65535
-    t.string   "contributor_type",           limit: 255
     t.integer  "contributor_id",             limit: 4
     t.string   "title",                      limit: 255
     t.text     "description",                limit: 65535
@@ -898,7 +892,7 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.string   "license",                    limit: 255
   end
 
-  add_index "model_versions", ["contributor_id", "contributor_type"], name: "index_model_versions_on_contributor_id_and_contributor_type", using: :btree
+  add_index "model_versions", ["contributor_id"], name: "index_model_versions_on_contributor_id_and_contributor_type", using: :btree
   add_index "model_versions", ["model_id"], name: "index_model_versions_on_model_id", using: :btree
 
   create_table "model_versions_projects", id: false, force: :cascade do |t|
@@ -907,7 +901,6 @@ ActiveRecord::Schema.define(version: 20180712121837) do
   end
 
   create_table "models", force: :cascade do |t|
-    t.string   "contributor_type",           limit: 255
     t.integer  "contributor_id",             limit: 4
     t.string   "title",                      limit: 255
     t.text     "description",                limit: 65535
@@ -930,7 +923,7 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.string   "license",                    limit: 255
   end
 
-  add_index "models", ["contributor_id", "contributor_type"], name: "index_models_on_contributor_id_and_contributor_type", using: :btree
+  add_index "models", ["contributor_id"], name: "index_models_on_contributor_id_and_contributor_type", using: :btree
 
   create_table "models_projects", id: false, force: :cascade do |t|
     t.integer "project_id", limit: 4
@@ -1098,7 +1091,6 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.integer  "presentation_id",   limit: 4
     t.integer  "version",           limit: 4
     t.text     "revision_comments", limit: 65535
-    t.string   "contributor_type",  limit: 255
     t.integer  "contributor_id",    limit: 4
     t.string   "title",             limit: 255
     t.text     "description",       limit: 65535
@@ -1118,19 +1110,18 @@ ActiveRecord::Schema.define(version: 20180712121837) do
   end
 
   create_table "presentations", force: :cascade do |t|
-    t.string   "contributor_type", limit: 255
-    t.integer  "contributor_id",   limit: 4
-    t.string   "title",            limit: 255
-    t.text     "description",      limit: 65535
+    t.integer  "contributor_id", limit: 4
+    t.string   "title",          limit: 255
+    t.text     "description",    limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",          limit: 4,     default: 1
-    t.string   "first_letter",     limit: 1
-    t.text     "other_creators",   limit: 65535
-    t.string   "uuid",             limit: 255
-    t.integer  "policy_id",        limit: 4
-    t.string   "license",          limit: 255
+    t.integer  "version",        limit: 4,     default: 1
+    t.string   "first_letter",   limit: 1
+    t.text     "other_creators", limit: 65535
+    t.string   "uuid",           limit: 255
+    t.integer  "policy_id",      limit: 4
+    t.string   "license",        limit: 255
   end
 
   create_table "presentations_projects", id: false, force: :cascade do |t|
@@ -1282,7 +1273,6 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.date     "published_date"
     t.string   "journal",          limit: 255
     t.string   "first_letter",     limit: 1
-    t.string   "contributor_type", limit: 255
     t.integer  "contributor_id",   limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -1294,7 +1284,7 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.string   "citation",         limit: 255
   end
 
-  add_index "publications", ["contributor_id", "contributor_type"], name: "index_publications_on_contributor_id_and_contributor_type", using: :btree
+  add_index "publications", ["contributor_id"], name: "index_publications_on_contributor_id_and_contributor_type", using: :btree
 
   create_table "recommended_model_environments", force: :cascade do |t|
     t.string   "title",      limit: 255
@@ -1425,7 +1415,6 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.string   "uuid",                     limit: 255
     t.integer  "contributor_id",           limit: 4
     t.integer  "policy_id",                limit: 4
-    t.string   "contributor_type",         limit: 255
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
     t.string   "first_letter",             limit: 1
@@ -1538,7 +1527,6 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.integer  "sop_id",            limit: 4
     t.integer  "version",           limit: 4
     t.text     "revision_comments", limit: 65535
-    t.string   "contributor_type",  limit: 255
     t.integer  "contributor_id",    limit: 4
     t.string   "title",             limit: 255
     t.text     "description",       limit: 65535
@@ -1553,27 +1541,26 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.string   "license",           limit: 255
   end
 
-  add_index "sop_versions", ["contributor_id", "contributor_type"], name: "index_sop_versions_on_contributor_id_and_contributor_type", using: :btree
+  add_index "sop_versions", ["contributor_id"], name: "index_sop_versions_on_contributor_id_and_contributor_type", using: :btree
   add_index "sop_versions", ["sop_id"], name: "index_sop_versions_on_sop_id", using: :btree
 
   create_table "sops", force: :cascade do |t|
-    t.string   "contributor_type", limit: 255
-    t.integer  "contributor_id",   limit: 4
-    t.string   "title",            limit: 255
-    t.text     "description",      limit: 65535
+    t.integer  "contributor_id", limit: 4
+    t.string   "title",          limit: 255
+    t.text     "description",    limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",          limit: 4,     default: 1
-    t.string   "first_letter",     limit: 1
-    t.text     "other_creators",   limit: 65535
-    t.string   "uuid",             limit: 255
-    t.integer  "policy_id",        limit: 4
-    t.string   "doi",              limit: 255
-    t.string   "license",          limit: 255
+    t.integer  "version",        limit: 4,     default: 1
+    t.string   "first_letter",   limit: 1
+    t.text     "other_creators", limit: 65535
+    t.string   "uuid",           limit: 255
+    t.integer  "policy_id",      limit: 4
+    t.string   "doi",            limit: 255
+    t.string   "license",        limit: 255
   end
 
-  add_index "sops", ["contributor_id", "contributor_type"], name: "index_sops_on_contributor_id_and_contributor_type", using: :btree
+  add_index "sops", ["contributor_id"], name: "index_sops_on_contributor_id_and_contributor_type", using: :btree
 
   create_table "special_auth_codes", force: :cascade do |t|
     t.string   "code",            limit: 255
@@ -1603,21 +1590,20 @@ ActiveRecord::Schema.define(version: 20180712121837) do
   end
 
   create_table "strains", force: :cascade do |t|
-    t.string   "title",            limit: 255
-    t.integer  "organism_id",      limit: 4
+    t.string   "title",          limit: 255
+    t.integer  "organism_id",    limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "parent_id",        limit: 4
-    t.string   "synonym",          limit: 255
-    t.text     "comment",          limit: 65535
-    t.string   "provider_id",      limit: 255
-    t.string   "provider_name",    limit: 255
-    t.boolean  "is_dummy",                       default: false
-    t.string   "contributor_type", limit: 255
-    t.integer  "contributor_id",   limit: 4
-    t.integer  "policy_id",        limit: 4
-    t.string   "uuid",             limit: 255
-    t.string   "first_letter",     limit: 255
+    t.integer  "parent_id",      limit: 4
+    t.string   "synonym",        limit: 255
+    t.text     "comment",        limit: 65535
+    t.string   "provider_id",    limit: 255
+    t.string   "provider_name",  limit: 255
+    t.boolean  "is_dummy",                     default: false
+    t.integer  "contributor_id", limit: 4
+    t.integer  "policy_id",      limit: 4
+    t.string   "uuid",           limit: 255
+    t.string   "first_letter",   limit: 255
   end
 
   create_table "studied_factor_links", force: :cascade do |t|
@@ -1656,7 +1642,6 @@ ActiveRecord::Schema.define(version: 20180712121837) do
     t.string   "uuid",                  limit: 255
     t.integer  "policy_id",             limit: 4
     t.integer  "contributor_id",        limit: 4
-    t.string   "contributor_type",      limit: 255
     t.text     "other_creators",        limit: 65535
   end
 
