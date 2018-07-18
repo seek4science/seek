@@ -9,7 +9,7 @@ class PublicationsController < ApplicationController
 
   before_filter :find_assets, only: [:index]
   before_filter :find_and_authorize_requested_item, only: %i[show edit update destroy]
-  before_filter :associate_authors, only: %i[edit update]
+  before_filter :suggest_authors, only: :edit
 
   include Seek::BreadCrumbs
 
@@ -101,32 +101,17 @@ class PublicationsController < ApplicationController
   # PUT /publications/1
   # PUT /publications/1.xml
   def update
-    valid = true
-    unless params[:author].blank?
-      person_ids = params[:author].values.reject(&:blank?)
-      if person_ids.uniq.size == person_ids.size
-        params[:author].keys.sort.each do |author_id|
-          author_assoc = params[:author][author_id]
-          unless author_assoc.blank?
-            @publication.publication_authors.detect { |pa| pa.id == author_id.to_i }.person = Person.find(author_assoc)
-            @publication.refresh_policy = true
-          end
-        end
-      else
-        @publication.errors[:base] << 'Multiple authors cannot be associated with the same SEEK person.'
-        valid = false # TODO: Do this as a model validation
-      end
-    end
-
     update_annotations(params[:tag_list], @publication)
 
-    respond_to do |format|
-      if valid && @publication.update_attributes(publication_params)
+    if @publication.update_attributes(publication_params)
+      respond_to do |format|
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
         format.xml  { head :ok }
         format.json { render json: @publication, status: :ok}
-      else
+      end
+    else
+      respond_to do |format|
         format.html { render action: 'edit' }
         format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json { render json: @publication.errors, status: :unprocessable_entity }
@@ -262,19 +247,10 @@ class PublicationsController < ApplicationController
   end
 
   # Try and relate non_seek_authors to people in SEEK based on name and project
-  def associate_authors
-    publication = @publication
-
-    association = {}
-    publication.publication_authors.each do |author|
-      association[author.id] = if author.person
-                                 author.person
-                               else
-                                 find_person_for_author author, @publication.projects
-                               end
+  def suggest_authors
+    @publication.publication_authors.each do |author|
+      author.suggested_person = find_person_for_author(author, @publication.projects)
     end
-
-    @author_associations = association
   end
 
   def disassociate_authors
@@ -351,7 +327,8 @@ class PublicationsController < ApplicationController
     params.require(:publication).permit(:pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,
                                         :published_date, :bibtex_file, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
-                                        { data_file_ids: [] }, { scales: [] }).tap do |pub_params|
+                                        { data_file_ids: [] }, { scales: [] },
+                                        { publication_authors_attributes: [:person_id, :id] }).tap do |pub_params|
       filter_association_params(pub_params, :assay_ids, Assay, :can_edit?)
       filter_association_params(pub_params, :study_ids, Study, :can_view?)
       filter_association_params(pub_params, :investigation_ids, Investigation, :can_view?)

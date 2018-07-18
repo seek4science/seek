@@ -614,9 +614,10 @@ class PublicationsControllerTest < ActionController::TestCase
     as_virtualliver do
       assert_difference('PublicationAuthor.count', 0) do
         assert_difference('AssetsCreator.count', 2) do
-          put :update, id: p.id, publication: { abstract: p.abstract },
-                       author: { p.publication_authors[1].id => seek_author2.id,
-                                 p.publication_authors[0].id => seek_author1.id }
+          put :update, id: p.id, publication: {
+              abstract: p.abstract,
+              publication_authors_attributes: { '0' => { id: p.publication_authors[0].id, person_id: seek_author1.id },
+                                                '1' => { id: p.publication_authors[1].id, person_id: seek_author2.id } } }
         end
       end
     end
@@ -693,9 +694,10 @@ class PublicationsControllerTest < ActionController::TestCase
     as_virtualliver do
       assert_difference('publication.non_seek_authors.count', -2) do
         assert_difference('AssetsCreator.count', 2) do
-          put :update, id: publication.id, publication: { abstract: publication.abstract },
-                       author: { publication.non_seek_authors[12].id => seek_author1.id,
-                                 publication.non_seek_authors[15].id => seek_author2.id }
+          put :update, id: publication.id, publication: {
+              abstract: publication.abstract,
+              publication_authors_attributes: { '0' => { id: publication.non_seek_authors[12].id, person_id: seek_author1.id },
+                                                '1' => { id: publication.non_seek_authors[15].id, person_id: seek_author2.id } } }
         end
       end
     end
@@ -737,9 +739,10 @@ class PublicationsControllerTest < ActionController::TestCase
     # Associate a non-seek author to a seek person
     assert_difference('publication.non_seek_authors.count', -2) do
       assert_difference('AssetsCreator.count', 2) do
-        put :update, id: publication.id, publication: { abstract: publication.abstract },
-                     author: { publication.non_seek_authors[12].id => seek_author1.id,
-                               publication.non_seek_authors[15].id => seek_author2.id }
+        put :update, id: publication.id, publication: {
+            abstract: publication.abstract,
+            publication_authors_attributes: { '0' => { id: publication.non_seek_authors[12].id, person_id: seek_author1.id },
+                                              '1' => { id: publication.non_seek_authors[15].id, person_id: seek_author2.id } } }
       end
     end
     publication.reload
@@ -905,9 +908,10 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_difference('PublicationAuthor.count', 0) do
       assert_difference('AssetsCreator.count', 2) do
         assert_difference('Permission.count', 2) do
-          put :update, id: p.id, publication: { abstract: p.abstract },
-              author: { p.publication_authors[1].id => seek_author2.id,
-                        p.publication_authors[0].id => seek_author1.id }
+          put :update, id: p.id, publication: {
+              abstract: p.abstract,
+              publication_authors_attributes: { '0' => { id: p.publication_authors[0].id, person_id: seek_author1.id },
+                                                '1' => { id: p.publication_authors[1].id, person_id: seek_author2.id } } }
         end
       end
     end

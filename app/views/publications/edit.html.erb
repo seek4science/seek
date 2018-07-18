@@ -1,7 +1,7 @@
 <h1>Edit publication: <%= link_to(h(@publication.title), publication_path(@publication)) -%></h1>
 <%= error_messages_for('publication', :message => nil) %>
 
-<%= form_tag publication_path(@publication), :method => :put do %>
+<%= form_for @publication do |f| %>
     <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => Seek::Config.is_virtualliver }%>
 
     <% if @publication.pubmed_id.nil? && @publication.doi %>
@@ -15,56 +15,30 @@
         </div>
     <% end %>
 
-    <%= render :partial => 'associate_authors_form', :locals => {:publication => @publication} %>
+    <%= render partial: 'associate_authors_form', locals: { publication: @publication, f: f } %>
 
-    <%= render :partial => "scales/scales_selector",:locals=>{:object=>@publication} if show_scales?%>
+    <%= render partial: 'scales/scales_selector', locals: { object: @publication } if show_scales?%>
 
-    <%= render :partial => "assets/select_tags" -%>
+    <%= render partial: 'assets/select_tags' -%>
 
     <% if Seek::Config.events_enabled -%>
-        <%= render :partial => "assets/associate_event", :locals=>{:resource => @publication} -%>
+      <%= f.fancy_multiselect :events, other_projects_checkbox: true %>
     <% end -%>
 
-    <%= fancy_multiselect @publication, :investigations, other_projects_checkbox: true %>
+    <%= f.fancy_multiselect :investigations, other_projects_checkbox: true %>
 
-    <%= fancy_multiselect @publication, :studies, { other_projects_checkbox: true,
+    <%= f.fancy_multiselect :studies, { other_projects_checkbox: true,
                                                     group_options_by: ->(s) { s.investigation.try(:title) }  } %>
 
-    <%= fancy_multiselect @publication, :assays, { other_projects_checkbox: true,
+    <%= f.fancy_multiselect :assays, { other_projects_checkbox: true,
                                                    group_options_by: ->(a) { a.study.try(:title) }  } %>
 
-    <%= fancy_multiselect @publication, :data_files, other_projects_checkbox: true %>
+    <%= f.fancy_multiselect :data_files, other_projects_checkbox: true %>
 
-    <%= fancy_multiselect @publication, :models, other_projects_checkbox: true %>
+    <%= f.fancy_multiselect :models, other_projects_checkbox: true %>
 
-    <%= fancy_multiselect @publication, :presentations, other_projects_checkbox: true %>
+    <%= f.fancy_multiselect :presentations, other_projects_checkbox: true %>
 
-    <%= submit_tag 'Update',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
+    <%= f.submit  'Update',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
     or <%= cancel_button(publication_path(@publication)) %>
 <% end %>
-
-<script type="text/javascript">
-    var project_ids = <%= @publication.projects.collect{ |p| p.id } %>
-    <% @publication.non_seek_authors.each do |author| %>
-    var select_element = $('author_' + '<%= author.id %>');
-    var options = select_element.options;
-    for (var i=0; i<options.length; i++){
-        var option = options[i];
-        if ('<%= @author_associations[author.id].try(:id) %>' == options[i].value){
-            var parent_node = option.parentNode;
-            if (project_ids.length == 0){
-                option.selected = true;
-                break;
-            }else{
-                for (var j=0; j<project_ids.length; j++){
-                    if (project_ids[j].toString() == parent_node.id){
-                        option.selected = true;
-                        break;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    <% end %>
-</script>

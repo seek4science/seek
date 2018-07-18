@@ -51,6 +51,8 @@ class Publication < ActiveRecord::Base
   before_save :refresh_policy, on: :update
   after_update :update_creators_from_publication_authors
 
+  accepts_nested_attributes_for :publication_authors
+
   # http://bioruby.org/rdoc/Bio/Reference.html#method-i-format
   # key for the file-extension and format used in the route
   # value contains the format used by bioruby that name for the view and mimetype for the response
@@ -68,6 +70,11 @@ class Publication < ActiveRecord::Base
     self.creators = seek_authors.map(&:person)
   end
 
+  def publication_authors_attributes=(*args)
+    self.refresh_policy = true
+    super(*args)
+  end
+
   def refresh_policy
     if @refresh_policy
       policy.permissions.clear
@@ -75,6 +82,8 @@ class Publication < ActiveRecord::Base
       populate_policy_from_authors(policy)
 
       policy.save
+
+      self.refresh_policy = false
     end
   end
 
