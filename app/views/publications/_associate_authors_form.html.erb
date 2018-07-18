@@ -1,18 +1,16 @@
 <%= folding_panel('Associate authors') do %>
-    Using the form below, you can link the authors to people registered in SEEK.<br/><br/>
-
-    SEEK will try and suggest the correct person based on the author's name.
-    If this suggestion is incorrect, please select the correct person from the dropdown menu, or choose "None" if this person isn't a member of SEEK.<br/><br/>
-
-    To reset the author list to those listed on the publication, click the "Disassociate All Authors" button.<br/>
-
     <div class="row">
-      <div class="col-md-9">
-        <h4>
-          Authors
-          <%= button_link_to("Disassociate All Authors", 'destroy', disassociate_authors_publication_url(publication),
-                             { class: 'btn-xs', data: { confirm: "This will reset the publication's links to people in SEEK, are you sure you wish to do this?" }, :method => :post}) -%>
-        </h4>
+      <div class="col-md-4 col-md-push-8">
+        <div class="alert alert-info">
+          Using this form you can link the authors listed on the publication to people registered in SEEK.<br/><br/>
+
+          SEEK will try and suggest the correct person based on the author's name.
+          If this suggestion is incorrect, please select the correct person from the dropdown menu, or choose "None" if this person isn't a member of SEEK.<br/><br/>
+
+          To reset the author list to those listed on the publication, click the "Disassociate All Authors" button.<br/>
+        </div>
+      </div>
+      <div class="col-md-8 col-md-pull-4">
         <% unless publication.publication_authors.empty? %>
           <div class="form-horizontal">
             <% publication.publication_authors.each do |author| %>
@@ -28,7 +26,11 @@
                 </div>
               <% end %>
             <% end %>
-            </div>
+          </div>
+          <div>
+            <%= button_link_to("Disassociate All Authors", 'destroy', disassociate_authors_publication_url(publication),
+                               { class: 'btn-xs pull-right', data: { confirm: "This will reset the publication's links to people in SEEK, are you sure you wish to do this?" }, :method => :post}) -%>
+          </div>
         <% else %>
             <span class="none_text">No authors listed</span>
         <% end %>
