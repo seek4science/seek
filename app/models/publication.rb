@@ -85,6 +85,8 @@ class Publication < ActiveRecord::Base
 
       self.refresh_policy = false
     end
+
+    true
   end
 
   if Seek::Config.events_enabled
