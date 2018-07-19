@@ -7,11 +7,11 @@ class PublicationTest < ActiveSupport::TestCase
 
   test 'create publication from hash' do
     publication_hash = {
-      title: 'SEEK publication',
-      journal: 'The testing journal',
-      published_date: Date.new(2011, 12, 24),
-      pubmed_id: nil,
-      doi: nil
+        title: 'SEEK publication',
+        journal: 'The testing journal',
+        published_date: Date.new(2011, 12, 24),
+        pubmed_id: nil,
+        doi: nil
     }
     publication = Publication.new(publication_hash)
     assert_equal publication_hash[:title], publication.title
@@ -23,11 +23,11 @@ class PublicationTest < ActiveSupport::TestCase
 
   test 'create publication from metadata doi' do
     publication_hash = {
-      title: 'SEEK publication',
-      journal: 'The testing journal',
-      pub_date: Date.new(2011, 12, 24),
-      pubmed_id: nil,
-      doi: nil
+        title: 'SEEK publication',
+        journal: 'The testing journal',
+        pub_date: Date.new(2011, 12, 24),
+        pubmed_id: nil,
+        doi: nil
     }
     doi_record = DOI::Record.new(publication_hash)
     publication = Publication.new
@@ -41,10 +41,10 @@ class PublicationTest < ActiveSupport::TestCase
 
   test 'create publication from metadata pubmed' do
     publication_hash = {
-      'title'   => 'SEEK publication\\r', # test required? chomp
-      'journal' => 'The testing journal',
-      'pubmed' => nil,
-      'doi' => nil
+        'title'   => 'SEEK publication\\r', # test required? chomp
+        'journal' => 'The testing journal',
+        'pubmed' => nil,
+        'doi' => nil
     }
     bio_reference = Bio::Reference.new(publication_hash)
     publication = Publication.new
@@ -154,17 +154,14 @@ class PublicationTest < ActiveSupport::TestCase
   test 'assay association' do
     publication = publications(:pubmed_2)
     assay = assays(:modelling_assay_with_data_and_relationship)
-    User.current_user = assay.contributor.user
-    assay_asset = assay_assets(:metabolomics_assay_asset1)
-    assert_not_equal assay_asset.asset, publication
-    assert_not_equal assay_asset.assay, assay
-    assay_asset.asset = publication
-    assay_asset.assay = assay
-    User.with_current_user(assay.contributor.user) { assay_asset.save! }
-    assay_asset.reload
-    assert assay_asset.valid?
-    assert_equal assay_asset.asset, publication
-    assert_equal assay_asset.assay, assay
+
+    assert_not_includes publication.assays, assay
+
+    assert_difference('Relationship.count') do
+      User.with_current_user(assay.contributor.user) { publication.associate(assay) }
+    end
+
+    assert_includes publication.assays, assay
   end
 
   test 'publication date from pubmed' do

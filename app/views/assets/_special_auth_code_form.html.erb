@@ -10,7 +10,7 @@
         <%= f.fields_for :special_auth_codes, f.object.special_auth_codes + [SpecialAuthCode.new.tap(&:mark_for_destruction)] do |sub_form|%>
             <fieldset <%= sub_form.object.new_record? ? "id='new_temporary_link_form' style='display: none'".html_safe : ''%> >
               <div class="form-group">
-                <% temporary_link = url_for :action => :show, :only_path => false, :code => sub_form.object.code %>
+                <% temporary_link = polymorphic_url(f.object, code: sub_form.object.code) %>
                 Visitors (with no login) can access this <%= f.object.class.name.underscore.humanize %> with:
                 <%= text_field_tag 'temp_link', temporary_link, class: 'form-control' -%>
                 <p class='help-block'>This link will not be active until you click 'Update'.</p>

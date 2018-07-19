@@ -197,8 +197,8 @@ module Seek
         redirected_url = polymorphic_path(@asset_version.parent, version: @asset_version.version)
         return_file_or_redirect_to redirected_url, error_message
       else
-        error_message = "There is a problem downloading this file. Error code #{code}"
-        redirected_url = polymorphic_path(@asset_version.parent, version: @asset_version.version)
+        error_message = "There is a problem downloading this file. HTTP status code: #{info[:code]}"
+        redirected_url = polymorphic_path(@asset_version.parent, { version: @asset_version.version })
         return_file_or_redirect_to redirected_url, error_message
       end
     end

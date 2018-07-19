@@ -34,6 +34,8 @@ class SampleType < ActiveRecord::Base
 
   grouped_pagination
 
+  has_annotation_type :sample_type_tag, method_name: :tags
+
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
     fail UnknownAttributeException.new("Unknown attribute #{attribute_name}") unless attribute
@@ -60,14 +62,6 @@ class SampleType < ActiveRecord::Base
   def resolve_inconsistencies
     resolve_controlled_vocabs_inconsistencies
     resolve_seek_samples_inconsistencies
-  end
-
-  def tags=(tags)
-    tag_annotations(tags, 'sample_type_tags')
-  end
-
-  def tags
-    annotations_with_attribute('sample_type_tags').collect(&:value_content)
   end
 
   def can_download?

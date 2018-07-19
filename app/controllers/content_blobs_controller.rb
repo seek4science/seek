@@ -56,7 +56,7 @@ class ContentBlobsController < ApplicationController
         file = open(@content_blob.filepath)
         render text: spreadsheet_to_csv(file, sheet, trim), content_type: 'text/csv'
       else
-        render text, 'Unable to view contents of this data file,', content_type: 'text/csv', status: :not_acceptable
+        render text: 'Unable to view contents of this data file,', content_type: 'text/csv', status: :not_acceptable
       end
     else
       render text: 'No content, Content blob does not have content', content_type: 'text/csv', status: :not_found

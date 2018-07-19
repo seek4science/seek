@@ -8,14 +8,6 @@ module FancyMultiselectHelper
     # - SetDefaultsWithReflection
     set_defaults_with_reflection(association, object, options)
 
-    # Disable preview if no controller or controller class does not define a preview method
-    controller = begin
-                   "#{association.to_s.classify.pluralize}Controller".constantize
-                 rescue
-                   nil
-                 end
-    options[:preview_disabled] = options[:preview_disabled] || controller.nil? || !controller.method_defined?(:preview)
-
     # Set onchange options for select
     options[:possibilities_options][:onchange] = select_onchange_options(association, options)
 
@@ -40,30 +32,31 @@ module FancyMultiselectHelper
     # set default values for locals being sent to the partial
 
     hidden = object.send(association).blank?
-    object_type_text = determine_object_type_text(object, options[:object_type_text])
+    object_type_text = options[:object_type_text] || t(object.class.name.underscore)
+    association_text = t(association.to_s.singularize)
+    association_controller = "#{association.to_s.classify.pluralize}Controller".constantize rescue nil
+
     {
-      intro: "The following #{association.to_s.singularize.humanize.pluralize.downcase} are associated with this #{object_type_text.downcase}:",
-      default_choice_text: "Select #{association.to_s.singularize.humanize} ...",
+      intro: "The following #{association_text.pluralize} are associated with this #{object_type_text.downcase}:",
+      default_choice_text: "Select #{association_text} ...",
       name: "#{object.class.name.underscore}[#{association.to_s.singularize}_ids]",
       possibilities: nil,
       unscoped_possibilities: [],
+      group_options_by: nil,
       value_method: :id,
       text_method: :title,
       with_new_link: false,
       object_type_text: object_type_text,
+      association_text: association_text,
       association: association,
       other_projects_checkbox: false,
       object_type: object.class.name,
       possibilities_options: {},
       hidden: hidden,
       required: false,
-      title: nil
+      title: nil,
+      preview_disabled: association_controller.nil? || !association_controller.method_defined?(:preview)
     }
-  end
-
-  def determine_object_type_text(object, object_type_text)
-    object_type_text ||= object.class.name.underscore.humanize
-    object_type_text
   end
 
   def select_onchange_options(association, options)
