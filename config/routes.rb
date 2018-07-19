@@ -62,6 +62,7 @@ SEEK::Application.routes.draw do
       post :send_feedback
       get :imprint
       get :terms
+      get :privacy
       get :about
     end
   end

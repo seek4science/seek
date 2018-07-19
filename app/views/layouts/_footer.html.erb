@@ -20,6 +20,12 @@
           <% end %>
           <%= link_to 'Funding and Programmes', funding_home_path, :target => '_blank' -%> |
           <%= link_to 'Credits', Seek::Help::HelpDictionary.instance.help_link(:credits), :target => '_blank' -%>
+          <% if Seek::Config.terms_enabled %>
+              | <%= link_to("Terms & Conditions", terms_home_path) %>
+          <% end %>
+          <% if Seek::Config.privacy_enabled %>
+              | <%= link_to("Privacy Policy", privacy_home_path) %>
+          <% end %>
           <% if Seek::Config.imprint_enabled %>
               | <%= link_to("Imprint", imprint_home_path) %>
           <% end %>

@@ -472,7 +472,41 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
-  def uri_to_guardian_feed
+  test 'can get privacy page' do
+    with_config_value :privacy_enabled, true do
+      with_config_value :privacy_page, '<h1>Privacy Policy</h1>' do
+        get :privacy
+        assert_response :success
+        assert_select 'h1', text: 'Privacy Policy'
+      end
+    end
+  end
+
+  test 'imprint link in footer' do
+    with_config_value :imprint_enabled, true do
+      get :index
+      assert_response :success
+      assert_select 'div.ft-info a[href=?]', imprint_home_path, text: /Imprint/
+    end
+  end
+
+  test 'terms link in footer' do
+    with_config_value :terms_enabled, true do
+      get :index
+      assert_response :success
+      assert_select 'div.ft-info a[href=?]', terms_home_path, text: /Terms & Conditions/
+    end
+  end
+
+  test 'privacy link in footer' do
+    with_config_value :privacy_enabled, true do
+      get :index
+      assert_response :success
+      assert_select 'div.ft-info a[href=?]', privacy_home_path, text: /Privacy Policy/
+    end
+  end
+
+  def uri_to_guardian_feedtest
     uri_to_feed 'guardian_atom.xml'
   end
 
