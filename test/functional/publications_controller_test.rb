@@ -392,7 +392,7 @@ class PublicationsControllerTest < ActionController::TestCase
     new_assay = assays(:metabolomics_assay)
     assert new_assay.publications.empty?
 
-    put :update, id: p, publication: { abstract: p.abstract, assay_ids: [new_assay.id.to_s] }, author: {}
+    put :update, id: p, publication: { abstract: p.abstract, assay_ids: [new_assay.id.to_s] }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -418,7 +418,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert df.can_view?
     # add association
-    put :update, id: p, publication: { abstract: p.abstract, data_file_ids: [df.id.to_s] }, author: {}
+    put :update, id: p, publication: { abstract: p.abstract, data_file_ids: [df.id.to_s] }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -430,7 +430,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert df.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract, data_file_ids: [] }, author: {}
+    put :update, id: p, publication: { abstract: p.abstract, data_file_ids: [] }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -448,7 +448,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract, model_ids: [model.id.to_s] }, author: {}
+    put :update, id: p, publication: { abstract: p.abstract, model_ids: [model.id.to_s] }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -461,7 +461,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert model.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract, model_ids: [] }, author: {}
+    put :update, id: p, publication: { abstract: p.abstract, model_ids: [] }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -479,7 +479,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract, investigation_ids: [investigation.id.to_s] }, author: {}
+    put :update, id: p, publication: { abstract: p.abstract, investigation_ids: [investigation.id.to_s] }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -491,7 +491,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert investigation.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract, investigation_ids: [] }, author: {}
+    put :update, id: p, publication: { abstract: p.abstract, investigation_ids: [] }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -509,7 +509,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract, study_ids: [study.id.to_s] }, author: {}
+    put :update, id: p, publication: { abstract: p.abstract, study_ids: [study.id.to_s] }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -521,7 +521,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert study.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract, study_ids: [] }, author: {}
+    put :update, id: p, publication: { abstract: p.abstract, study_ids: [] }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -539,7 +539,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract, presentation_ids:[presentation.id.to_s] }, author: {}
+    put :update, id: p, publication: { abstract: p.abstract, presentation_ids:[presentation.id.to_s] }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -551,7 +551,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert presentation.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract, presentation_ids: [] }, author: {}
+    put :update, id: p, publication: { abstract: p.abstract, presentation_ids: [] }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -571,7 +571,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert new_assay.publications.empty?
 
     # Should not add the new assay and should not remove the old one
-    put :update, id: p, publication: { abstract: p.abstract, assay_ids: [new_assay.id] }, author: {}
+    put :update, id: p, publication: { abstract: p.abstract, assay_ids: [new_assay.id] }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -590,8 +590,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should keep model and data associations after update' do
     p = publications(:pubmed_2)
     put :update, id: p, publication: { abstract: p.abstract, model_ids: p.models.collect { |m| m.id.to_s },
-                                       data_file_ids: p.data_files.map(&:id), assay_ids: [] },
-        author: {}
+                                       data_file_ids: p.data_files.map(&:id), assay_ids: [] }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -647,7 +646,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should update project' do
     p = publications(:one)
     assert_equal projects(:sysmo_project), p.projects.first
-    put :update, id: p.id, author: {}, publication: { project_ids: [projects(:one).id] }
+    put :update, id: p.id, publication: { project_ids: [projects(:one).id] }
     assert_redirected_to publication_path(p)
     p.reload
     assert_equal [projects(:one)], p.projects
