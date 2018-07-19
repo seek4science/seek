@@ -563,6 +563,20 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+  test 'should gracefully handle other error codes' do
+    mock_http
+    df = Factory :data_file,
+                 policy: Factory(:all_sysmo_downloadable_policy),
+                 content_blob: Factory(:url_content_blob,
+                                       url: 'http://mocked500.com',
+                                       uuid: UUID.generate)
+
+    get :download, data_file_id: df, id: df.content_blob
+    assert_redirected_to data_file_path(df, version: df.version)
+    assert_not_nil flash[:error]
+    assert_includes flash[:error], '500'
+  end
+
   test 'should handle inline download when specify the inline disposition' do
     data = File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb').read
     df = Factory :data_file,
@@ -642,6 +656,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     stub_request(:any, 'http://www.mocked302.com').to_return(status: 200)
     stub_request(:any, 'http://mocked401.com').to_return(status: 401)
     stub_request(:any, 'http://mocked404.com').to_return(status: 404)
+    stub_request(:any, 'http://mocked500.com').to_return(status: 500)
 
     stub_request(:any, 'http://unknownhost.com/pic.png').to_raise(SocketError)
   end

@@ -181,7 +181,7 @@ class SopsControllerTest < ActionController::TestCase
 
     refute_includes new_assay.sops, s
 
-    put :update, id: s.id, sop: { title: s.title }, assay_ids: [new_assay.id.to_s]
+    put :update, id: s.id, sop: { title: s.title, assay_assets_attributes: [{ assay_id: new_assay.id }] }
 
     assert_redirected_to sop_path(s)
 
@@ -198,9 +198,8 @@ class SopsControllerTest < ActionController::TestCase
     assay = Factory(:assay, contributor: User.current_user.person)
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, sop: sop, content_blobs: [blob],
-             policy_attributes: valid_sharing,
-             assay_ids: [assay.id.to_s]
+        post :create, sop: sop.merge(assay_assets_attributes: [{ assay_id: assay.id }]),
+             content_blobs: [blob], policy_attributes: valid_sharing
       end
     end
 
@@ -1097,7 +1096,7 @@ class SopsControllerTest < ActionController::TestCase
     refute bad_assay.can_edit?
 
     assert_no_difference('AssayAsset.count') do
-      put :update, id: sop.id, sop: { title: sop.title }, assay_ids: [bad_assay.id.to_s]
+      put :update, id: sop.id, sop: { title: sop.title, assay_assets_attributes: [{ assay_id: bad_assay.id }] }
     end
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
     # assert_response :unprocessable_entity
@@ -1106,7 +1105,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_empty sop.assays
 
     assert_difference('AssayAsset.count') do
-      put :update, id: sop.id, sop: { title: sop.title }, assay_ids: [good_assay.id.to_s]
+      put :update, id: sop.id, sop: { title: sop.title, assay_assets_attributes: [{ assay_id: good_assay.id }] }
     end
     sop.reload
     assert_equal [good_assay], sop.assays
@@ -1133,7 +1132,8 @@ class SopsControllerTest < ActionController::TestCase
     sop, blob = valid_sop
 
     assert_no_difference('AssayAsset.count') do
-      post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [bad_assay.id.to_s]
+      post :create, sop: sop.merge(assay_assets_attributes: [{ assay_id: bad_assay.id }]), content_blobs: [blob],
+           policy_attributes: valid_sharing
     end
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
     #assert_response :unprocessable_entity
@@ -1142,7 +1142,8 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_difference('Sop.count') do
       assert_difference('AssayAsset.count') do
-        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [good_assay.id.to_s]
+        post :create, sop: sop.merge(assay_assets_attributes: [{ assay_id: good_assay.id }]), content_blobs: [blob],
+             policy_attributes: valid_sharing
       end
     end
     sop = assigns(:sop)

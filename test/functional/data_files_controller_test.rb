@@ -197,7 +197,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     refute_includes new_assay.data_files, d
     assert_difference('ActivityLog.count') do
-      put :update, id: d, data_file: { title: d.title }, assay_ids: [new_assay.id.to_s]
+      put :update, id: d, data_file: { title: d.title, assay_assets_attributes: [{ assay_id: new_assay.id.to_s }] }
     end
 
     assert_redirected_to data_file_path(d)
@@ -371,7 +371,8 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_difference('DataFile::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [assay.id.to_s]
+            post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: assay.id }]),
+                 content_blobs: [blob], policy_attributes: valid_sharing
           end
         end
       end
@@ -2609,8 +2610,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('DataFile.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing,
-             assay_ids: [assay.id]
+        post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: assay.id }]),
+             content_blobs: [blob], policy_attributes: valid_sharing
+
       end
     end
 
@@ -2876,9 +2878,9 @@ class DataFilesControllerTest < ActionController::TestCase
     params = {data_file: {
         title: 'Small File',
         project_ids: [project.id],
+        assay_assets_attributes: [{ assay_id: assay.id }]
     }, policy_attributes: valid_sharing,
-              content_blob_id: blob.id.to_s,
-              assay_ids:[assay.id]
+       content_blob_id: blob.id.to_s
     }
 
     assert_difference('ActivityLog.count') do
@@ -2910,9 +2912,9 @@ class DataFilesControllerTest < ActionController::TestCase
     params = {data_file: {
         title: 'Small File',
         project_ids: [project.id],
+        assay_assets_attributes: [{ assay_id: assay.id }]
     }, policy_attributes: valid_sharing,
-        content_blob_id: blob.id.to_s,
-        assay_ids:[assay.id]
+       content_blob_id: blob.id.to_s
     }
 
     assert_difference('ActivityLog.count') do
@@ -3257,7 +3259,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute bad_assay.can_edit?
 
     assert_no_difference('AssayAsset.count') do
-      put :update, id: data_file.id, data_file: { title: data_file.title }, assay_ids: [bad_assay.id.to_s]
+      put :update, id: data_file.id, data_file: { title: data_file.title, assay_assets_attributes: [{ assay_id: bad_assay.id }] }
     end
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
     #assert_response :unprocessable_entity
@@ -3266,7 +3268,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_empty data_file.assays
 
     assert_difference('AssayAsset.count') do
-      put :update, id: data_file.id, data_file: { title: data_file.title }, assay_ids: [good_assay.id.to_s]
+      put :update, id: data_file.id, data_file: { title: data_file.title, assay_assets_attributes: [{ assay_id: good_assay.id }] }
     end
     data_file.reload
     assert_equal [good_assay], data_file.assays
@@ -3294,7 +3296,8 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file, blob = valid_data_file
 
     assert_no_difference('AssayAsset.count') do
-      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [bad_assay.id.to_s]
+      post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: bad_assay.id }]), content_blobs: [blob], 
+                    policy_attributes: valid_sharing
     end
 
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
@@ -3304,7 +3307,8 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file, blob = valid_data_file
 
     assert_difference('AssayAsset.count') do
-      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [good_assay.id.to_s]
+      post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: good_assay.id }]), content_blobs: [blob], 
+                    policy_attributes: valid_sharing
     end
     data_file = assigns(:data_file)
     assert_equal [good_assay],data_file.assays

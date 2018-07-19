@@ -217,6 +217,7 @@ class SopsAnnotationTest < ActionController::TestCase
     end
 
     sop.tag_with %w(fish sparrow sprocket)
+    sop.save!
 
     get :show, id: sop
     assert_response :success

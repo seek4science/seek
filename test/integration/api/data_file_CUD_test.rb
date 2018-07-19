@@ -115,6 +115,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
   end
 
   test 'returns sensible error objects' do
+    skip 'Errors are a WIP'
     template_file = File.join(ApiTestHelper.template_dir, 'post_bad_data_file.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))

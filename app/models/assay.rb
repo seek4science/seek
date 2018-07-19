@@ -33,13 +33,14 @@ class Assay < ActiveRecord::Base
   has_many :strains, through: :assay_organisms
   has_many :tissue_and_cell_types, through: :assay_organisms
 
-  has_many :assay_assets, dependent: :destroy, autosave: true # change this to validate: true in the future
+  before_save { assay_assets.each(&:set_version) }
+  has_many :assay_assets, dependent: :destroy, inverse_of: :assay, autosave: true
 
-  has_many :data_files, through: :assay_assets, source: :asset, source_type: 'DataFile'
-  has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop'
-  has_many :models, through: :assay_assets, source: :asset, source_type: 'Model'
-  has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample'
-  has_many :documents, through: :assay_assets, source: :asset, source_type: 'Document'
+  has_many :data_files, through: :assay_assets, source: :asset, source_type: 'DataFile', inverse_of: :assays
+  has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop', inverse_of: :assays
+  has_many :models, through: :assay_assets, source: :asset, source_type: 'Model', inverse_of: :assays
+  has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample', inverse_of: :assays
+  has_many :documents, through: :assay_assets, source: :asset, source_type: 'Document', inverse_of: :assays
 
   has_one :investigation, through: :study
 
@@ -188,5 +189,36 @@ class Assay < ActiveRecord::Base
   # overides that from Seek::RDF::RdfGeneration, as Assay entity depends upon the AssayClass (modelling, or experimental) of the Assay
   def rdf_type_entity_fragment
     { 'EXP' => 'Experimental_assay', 'MODEL' => 'Modelling_analysis' }[assay_class.key]
+  end
+
+  def samples_attributes= attributes
+    set_assay_assets_for('Sample', attributes)
+  end
+
+  def data_files_attributes= attributes
+    set_assay_assets_for('DataFile', attributes)
+  end
+
+  private
+
+  def set_assay_assets_for(type, attributes)
+    type_assay_assets, other_assay_assets = self.assay_assets.partition { |aa| aa.asset_type == type }
+    new_type_assay_assets = []
+
+    attributes.each do |attrs|
+      attrs.merge!(asset_type: type)
+      existing = type_assay_assets.detect { |aa| aa.asset_id.to_s == attrs['asset_id'] }
+      if existing
+        new_type_assay_assets << existing.tap { |e| e.assign_attributes(attrs) }
+      else
+        aa = self.assay_assets.build(attrs)
+        if aa.asset && aa.asset.can_view?
+          new_type_assay_assets << aa
+        end
+      end
+    end
+
+    self.assay_assets = (other_assay_assets + new_type_assay_assets)
+    self.assay_assets
   end
 end

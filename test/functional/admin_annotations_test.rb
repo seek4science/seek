@@ -75,13 +75,14 @@ class AdminAnnotationsTest < ActionController::TestCase
     login_as(:quentin)
     person = Factory :person
     person.tools = %w(linux ruby fishing)
+    person.save!
     person.expertise = ['fishing']
     person.save!
 
     updated_at = person.updated_at
 
-    assert_equal %w(fishing linux ruby), person.tools.collect(&:text).uniq.sort
-    assert_equal ['fishing'], person.expertise.collect(&:text).uniq
+    assert_equal %w(fishing linux ruby), person.tools.uniq.sort
+    assert_equal ['fishing'], person.expertise.uniq
 
     sleep(2) # for timestamp test
 
@@ -96,8 +97,8 @@ class AdminAnnotationsTest < ActionController::TestCase
     expected_expertise = %w(golf microbiology spanish)
 
     person.reload
-    assert_equal expected_tools, person.tools.collect(&:text).uniq.sort
-    assert_equal expected_expertise, person.expertise.collect(&:text).uniq.sort
+    assert_equal expected_tools, person.tools.uniq.sort
+    assert_equal expected_expertise, person.expertise.uniq.sort
 
     assert_equal updated_at.to_s, person.updated_at.to_s, "timestamps were modified for taggable and shouldn't have been"
 
@@ -108,11 +109,12 @@ class AdminAnnotationsTest < ActionController::TestCase
     login_as(:quentin)
     person = Factory :person
     person.tools = %w(linux ruby fishing)
+    person.save!
     person.expertise = ['fishing']
     person.save!
 
-    assert_equal %w(fishing linux ruby), person.tools.collect(&:text).uniq.sort
-    assert_equal ['fishing'], person.expertise.collect(&:text).uniq
+    assert_equal %w(fishing linux ruby), person.tools.uniq.sort
+    assert_equal ['fishing'], person.expertise.uniq
 
     golf = Factory(:tag, annotatable: person, source: User.current_user, value: 'golf')
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
@@ -127,8 +129,8 @@ class AdminAnnotationsTest < ActionController::TestCase
     expected_expertise = %w(fishing golf spanish)
 
     person.reload
-    assert_equal expected_tools, person.tools.collect(&:text).uniq.sort
-    assert_equal expected_expertise, person.expertise.collect(&:text).uniq.sort
+    assert_equal expected_tools, person.tools.uniq.sort
+    assert_equal expected_expertise, person.expertise.uniq.sort
 
     assert !person.annotations_with_attribute('expertise').select { |a| a.value.text == 'fishing' }.blank?
   end
@@ -137,11 +139,12 @@ class AdminAnnotationsTest < ActionController::TestCase
     login_as(:quentin)
     person = Factory :person
     person.tools = %w(linux ruby fishing)
+    person.save!
     person.expertise = ['fishing']
     person.save!
 
-    assert_equal %w(fishing linux ruby), person.tools.collect(&:text).uniq.sort
-    assert_equal ['fishing'], person.expertise.collect(&:text).uniq
+    assert_equal %w(fishing linux ruby), person.tools.uniq.sort
+    assert_equal ['fishing'], person.expertise.uniq
 
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
     assert_not_nil fishing
@@ -157,19 +160,20 @@ class AdminAnnotationsTest < ActionController::TestCase
     expected_expertise = ['sparrow']
 
     person.reload
-    assert_equal expected_tools, person.tools.collect(&:text).uniq.sort
-    assert_equal expected_expertise, person.expertise.collect(&:text).uniq
+    assert_equal expected_tools, person.tools.uniq.sort
+    assert_equal expected_expertise, person.expertise.uniq
   end
 
   test 'edit tag to blank' do
     login_as(:quentin)
     person = Factory :person
     person.tools = %w(linux ruby fishing)
+    person.save!
     person.expertise = ['fishing']
     person.save!
 
-    assert_equal %w(fishing linux ruby), person.tools.collect(&:text).uniq.sort
-    assert_equal ['fishing'], person.expertise.collect(&:text).uniq
+    assert_equal %w(fishing linux ruby), person.tools.uniq.sort
+    assert_equal ['fishing'], person.expertise.uniq
 
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
     assert_not_nil fishing
@@ -183,7 +187,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     expected_expertise = []
 
     person.reload
-    assert_equal expected_tools, person.tools.collect(&:text).uniq.sort
+    assert_equal expected_tools, person.tools.uniq.sort
     assert_equal expected_expertise, person.expertise.collect(&:text)
   end
 
@@ -191,11 +195,12 @@ class AdminAnnotationsTest < ActionController::TestCase
     login_as(:quentin)
     person = Factory :person
     person.tools = %w(linux ruby fishing)
+    person.save!
     person.expertise = ['fishing']
     person.save!
 
-    assert_equal %w(fishing linux ruby), person.tools.collect(&:text).uniq.sort
-    assert_equal ['fishing'], person.expertise.collect(&:text).uniq
+    assert_equal %w(fishing linux ruby), person.tools.uniq.sort
+    assert_equal ['fishing'], person.expertise.uniq
 
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
     assert_not_nil fishing
@@ -210,8 +215,8 @@ class AdminAnnotationsTest < ActionController::TestCase
     expected_expertise = ['golf']
 
     person.reload
-    assert_equal expected_tools, person.tools.collect(&:text).uniq.sort
-    assert_equal expected_expertise, person.expertise.collect(&:text).uniq
+    assert_equal expected_tools, person.tools.uniq.sort
+    assert_equal expected_expertise, person.expertise.uniq
   end
 
   test 'delete_tag' do
@@ -219,11 +224,12 @@ class AdminAnnotationsTest < ActionController::TestCase
 
     person = Factory :person
     person.tools = ['fishing']
+    person.save!
     person.expertise = ['fishing']
     person.save!
 
-    assert_equal ['fishing'], person.tools.collect(&:text).uniq
-    assert_equal ['fishing'], person.expertise.collect(&:text).uniq
+    assert_equal ['fishing'], person.tools.uniq
+    assert_equal ['fishing'], person.expertise.uniq
 
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
     assert_not_nil fishing

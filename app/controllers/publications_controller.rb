@@ -119,26 +119,22 @@ class PublicationsController < ApplicationController
 
     update_annotations(params[:tag_list], @publication)
 
-    investigation_ids = params[:investigation_ids] || []
-    study_ids = params[:study_ids] || []
-    assay_ids = params[:assay_ids] || []
-    data_files = params[:data_files] || []
-    model_ids = params[:model_ids] || []
-    presentation_ids = params[:publication][:presentation_ids] || []
-
     respond_to do |format|
       if valid && @publication.update_attributes(publication_params)
 
         # Update association
+        investigation_ids = params[:investigation_ids] || []
+        study_ids = params[:study_ids] || []
+        assay_ids = params[:assay_ids] || []
+        data_files = params[:data_files] || []
+        model_ids = (params[:publication][:model_ids] || []).reject(&:blank?)
+        presentation_ids = (params[:publication][:presentation_ids] || []).reject(&:blank?)
+
         create_or_update_associations investigation_ids, 'Investigation', 'view'
         create_or_update_associations study_ids, 'Study', 'view'
         create_or_update_associations assay_ids, 'Assay', 'edit'
-
-        data_files = data_files.map { |df| df['id'] }
-        create_or_update_associations data_files, 'DataFile', 'view'
-
+        create_or_update_associations data_files.map { |df| df['asset_id'] }, 'DataFile', 'view'
         create_or_update_associations model_ids, 'Model', 'view'
-
         create_or_update_associations presentation_ids, 'Presentation', 'view'
 
         # Create policy if not present (should be)
@@ -154,8 +150,6 @@ class PublicationsController < ApplicationController
         end
         # Add contributor
         @publication.policy.permissions << Permission.create(contributor: @publication.contributor.person, policy: @publication.policy, access_type: Policy::MANAGING)
-
-        update_scales @publication
 
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
@@ -384,7 +378,8 @@ class PublicationsController < ApplicationController
 
   def publication_params
     params.require(:publication).permit(:pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,
-                                        :published_date, :bibtex_file, { project_ids: [] }, event_ids: [])
+                                        :published_date, :bibtex_file, { project_ids: [] }, { event_ids: [] },
+                                        { scales: [] })
   end
 
   # the original way of creating a bublication by either doi or pubmedid, where all data is set server-side
@@ -393,7 +388,6 @@ class PublicationsController < ApplicationController
     assay_ids = params[:assay_ids] || []
 
     if @publication.save
-      update_scales @publication
       result.authors.each_with_index do |author, index|
         pa = PublicationAuthor.new
         pa.publication = @publication
@@ -438,8 +432,6 @@ class PublicationsController < ApplicationController
     end
 
     if @publication.save
-      update_scales @publication
-
       create_or_update_associations assay_ids, 'Assay', 'edit'
       if !@publication.parent_name.blank?
         render partial: 'assets/back_to_fancy_parent', locals: { child: @publication, parent_name: @publication.parent_name }
@@ -574,6 +566,7 @@ class PublicationsController < ApplicationController
         @publication.associate(asset)
       end
     end
+
     # Destroy asset relationship that aren't needed
     associate_relationships = Relationship.where(other_object_id: @publication.id, subject_type: asset_type)
     associate_relationships.each do |associate_relationship|
