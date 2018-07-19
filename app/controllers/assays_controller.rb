@@ -187,10 +187,10 @@ class AssaysController < ApplicationController
                                   { scales: [] }, { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
-                                  ).tap do |params|
-      params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if params.key?(:document_ids)
-      params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if params.key?(:sop_ids)
-      params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if params.key?(:model_ids)
+                                  ).tap do |assay_params|
+      assay_params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if assay_params.key?(:document_ids)
+      assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)
+      assay_params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if assay_params.key?(:model_ids)
     end
   end
 end
