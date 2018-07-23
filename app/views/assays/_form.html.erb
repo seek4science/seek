@@ -96,8 +96,7 @@
                                                                   :has_relationships => @assay.is_modelling?,
                                                                   :has_direction => !@assay.is_modelling?} -%>
 
-    <%= render :partial => "assets/associate_publication", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')),
-                                                                        :related_publications => @assay.publications} -%>
+    <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
     <%= f.fancy_multiselect :documents, { other_projects_checkbox: true } %>
 <% end -%>

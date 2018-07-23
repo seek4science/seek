@@ -46,8 +46,7 @@
 
 <%= render :seek_partial=>"sharing/form" if @study.can_manage? -%>
 
-<%= render :partial => "assets/associate_publication", :locals => { :resource_type => t('study'),
-                                                                        :related_publications => @study.publications} -%>
+<%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
 <script type="text/javascript">
     var CREATE_INVESTIGATION_LINK = "<%= create_investigation_url %>";

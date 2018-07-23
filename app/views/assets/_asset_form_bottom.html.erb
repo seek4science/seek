@@ -45,6 +45,5 @@
 <% end %>
 
 <% if show_publications -%>
-    <%= render :partial => "assets/associate_publication", :locals => {:resource_type => resource_type,
-                                                                           :related_publications => related_publications} -%>
+  <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 <% end -%>

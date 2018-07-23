@@ -75,7 +75,7 @@ class PresentationsController < ApplicationController
     params.require(:presentation).permit(:title, :description, :other_creators, :license, :parent_name,
                                          { event_ids: [] }, { project_ids: [] },
                                          { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                         { creator_ids: [] })
+                                         { creator_ids: [] }, { publication_ids: [] })
   end
 
   alias_method :asset_params, :presentation_params

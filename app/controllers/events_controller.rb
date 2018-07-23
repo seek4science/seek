@@ -54,9 +54,6 @@ class EventsController < ApplicationController
   def handle_update_or_create(is_new)
     @new = is_new
 
-    publication_ids = params.delete(:related_publication_ids) || []
-    @event.publications = Publication.find(publication_ids)
-
     update_sharing_policies @event
 
     respond_to do | format |
@@ -77,7 +74,7 @@ class EventsController < ApplicationController
     params.require(:event).permit(:title, :description, :start_date, :end_date, :url, :address, :city, :country,
                                   { project_ids: [] }, { publication_ids: [] }, { presentation_ids: [] },
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                  { data_file_ids: [] })
+                                  { data_file_ids: [] }, { publication_ids: [] })
   end
 
   def param_converter_options

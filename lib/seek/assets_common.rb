@@ -24,12 +24,6 @@ module Seek
 
     def update_relationships(asset, params)
       Relationship.set_attributions(asset, params[:attributions])
-
-      # update related publications
-      publication_params = (params[:related_publication_ids] || []).collect do |id|
-        ['Publication', id.split(',').first]
-      end
-      Relationship.set_attributions(asset, publication_params, Relationship::RELATED_TO_PUBLICATION)
     end
 
     def request_resource

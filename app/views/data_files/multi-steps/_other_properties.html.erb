@@ -5,8 +5,7 @@
   <div class='panel-body'>
     <%= render :partial => 'assets/attribution_form', :locals => {:resource_class => DataFile,
                                                                   :existing_attributions => [], collapsed: false} -%>
-    <%= render :partial => 'assets/associate_publication', :locals => {:resource_type => 'DataFile',
-                                                                       :related_publications => [], collapsed: false} -%>
+    <%= f.fancy_multiselect :publications, { hidden: false, other_projects_checkbox: true } %>
 
     <%= fancy_multiselect @data_file, :events, { hidden: false, other_projects_checkbox: true } if Seek::Config.events_enabled %>
 
