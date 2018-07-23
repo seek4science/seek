@@ -22,7 +22,6 @@
 //= require assays
 //= require models
 //= require sharing
-//= require associate_events
 //= require attribution
 //= require creators
 //= require resource

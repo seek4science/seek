@@ -7,9 +7,9 @@
                                                                   :existing_attributions => [], collapsed: false} -%>
     <%= render :partial => 'assets/associate_publication', :locals => {:resource_type => 'DataFile',
                                                                        :related_publications => [], collapsed: false} -%>
-    <% if Seek::Config.events_enabled %>
-        <%= render :partial => 'assets/associate_event', :locals => {:resource => @data_file, collapsed: false} -%>
-    <% end -%>
+
+    <%= fancy_multiselect @data_file, :events, { hidden: false, other_projects_checkbox: true } if Seek::Config.events_enabled %>
+
     <div class='multi-step-buttons'>
       <%= multi_step_start_button %>
       <%= multi_step_back_button %>
