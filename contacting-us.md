@@ -23,6 +23,11 @@ You can also contact us through [FAIRDOM](http://fair-dom.org) using our [Contac
 
 This should be used if your query or feedback is of a more confidential nature. Remember to provide your email address.
 
+## Email
+
+For general support you can contact us through [support@fair-dom.org](mailto:support@fair-dom.org).
+
+For community related questions, you can use [community@fair-dom.org](mailto:community@fair-dom.org)
 
 ## Reporting bugs and feature requests
 
