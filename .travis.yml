@@ -1,10 +1,9 @@
 language: ruby
 
-rvm:
-  - 2.4.0
-
-before_install:
-  - sudo update-ca-certificates
+addons:
+  apt:
+    packages:
+    - libcurl4-openssl-dev
 
 sudo: false
 
