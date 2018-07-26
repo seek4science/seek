@@ -3,6 +3,9 @@ language: ruby
 rvm:
   - 2.4.0
 
+before_install:
+  - sudo update-ca-certificates
+
 sudo: false
 
 cache: bundler
