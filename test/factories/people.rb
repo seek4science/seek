@@ -112,6 +112,12 @@ Factory.define(:asset_gatekeeper, parent: :person) do |f|
   end
 end
 
+Factory.define(:former_project_person, parent: :person) do |f|
+  f.after_build do |p|
+    p.group_memberships.first.time_left_at = 1.day.ago
+  end
+end
+
 # AssetsCreator
 Factory.define :assets_creator do |f|
   f.association :asset, factory: :data_file
