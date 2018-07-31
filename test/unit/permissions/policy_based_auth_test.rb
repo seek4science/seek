@@ -179,4 +179,24 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
     refute data.can_view?(person)
     refute data.can_edit?(person)
   end
+
+  test 'people flagged as leaving a project in the future can still see project-shared items' do
+    person = Factory(:future_former_project_person)
+    project = person.projects.first
+    active_person = Factory(:person, project: project)
+
+    assert_includes person.current_projects, project
+    assert_empty person.former_projects
+    assert_includes active_person.current_projects, project
+    assert_includes project.current_people, person
+    assert_includes project.current_people, active_person
+
+    data = Factory(:data_file, policy: Factory(:private_policy,
+                                               permissions: [Factory(:edit_permission, contributor: project)]))
+
+    assert data.can_view?(active_person)
+    assert data.can_edit?(active_person)
+    assert data.can_view?(person)
+    assert data.can_edit?(person)
+  end
 end

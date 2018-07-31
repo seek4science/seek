@@ -118,6 +118,12 @@ Factory.define(:former_project_person, parent: :person) do |f|
   end
 end
 
+Factory.define(:future_former_project_person, parent: :person) do |f|
+  f.after_build do |p|
+    p.group_memberships.first.time_left_at = 1.week.from_now
+  end
+end
+
 # AssetsCreator
 Factory.define :assets_creator do |f|
   f.association :asset, factory: :data_file
