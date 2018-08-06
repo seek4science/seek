@@ -12,7 +12,7 @@ class ContentBlobsController < ApplicationController
 
   def update
     if @content_blob.no_content?
-      @content_blob.tmp_io_object = request.body
+      @content_blob.tmp_io_object = get_request_payload
       @content_blob.save
       @asset.touch
       respond_to do |format|
@@ -261,6 +261,15 @@ class ContentBlobsController < ApplicationController
         error('Unable to find asset version', 'is invalid')
         return false
       end
+    end
+  end
+
+  def get_request_payload
+    if request.content_type == 'multipart/form-data'
+      # "Unwrap" multipart requests to get at the content.
+      params.values.detect { |v| v.is_a?(ActionDispatch::Http::UploadedFile) }
+    else
+      request.body
     end
   end
 end
