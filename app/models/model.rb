@@ -51,6 +51,9 @@ class Model < ActiveRecord::Base
     belongs_to :model_type
     belongs_to :model_format
 
+    has_many :content_blobs, -> (r) { where('content_blobs.asset_version = ? AND content_blobs.asset_type = ?', r.version, r.parent.class.name) },
+            primary_key: :model_id, foreign_key: :asset_id
+
     def model_format
       if read_attribute(:model_format_id).nil? && contains_sbml?
         ModelFormat.sbml.first
@@ -58,11 +61,6 @@ class Model < ActiveRecord::Base
         super
       end
     end
-
-    def content_blobs
-      ContentBlob.where(["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
-    end
-
   end
 
   def organism_terms
