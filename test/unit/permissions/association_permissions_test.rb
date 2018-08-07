@@ -187,8 +187,8 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
     User.with_current_user(@user) do
       other_project = Factory(:project)
 
-      good_inv = Factory.build(:investigation, contributor: User.current_user, projects: [@project])
-      bad_inv = Factory.build(:investigation, contributor: User.current_user, projects: [other_project])
+      good_inv = Factory.build(:investigation, contributor: User.current_user.person, projects: [@project])
+      bad_inv = Factory.build(:investigation, contributor: User.current_user.person, projects: [other_project])
 
       assert good_inv.save
       refute bad_inv.save

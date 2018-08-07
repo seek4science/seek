@@ -84,4 +84,23 @@ module AvatarsHelper
               class: css_class,
               onclick: onclick_options
   end
+
+  def the_jerm_contributor_contributor_icon(options = {size: 50 })
+    contributor_icon('jerm_logo','jerm_harvester_name',options)
+  end
+
+  def deleted_contributor_contributor_icon(options = {size: 50 })
+    contributor_icon('deleted_contributor_icon','deleted_contributor_name',options)
+  end
+
+  def contributor_icon icon_key, text_key, options
+    logo_filename = icon_filename_for_key(icon_key)
+    size = options[:size]
+    image_tag logo_filename,
+              alt: t(text_key),
+              size: "#{size}x#{size}",
+              class: 'framed',
+              style: 'padding: 2px;',
+              title: t(text_key)
+  end
 end

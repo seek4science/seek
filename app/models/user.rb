@@ -9,17 +9,6 @@ class User < ActiveRecord::Base
 
   belongs_to :person
 
-  has_many :sops, as: :contributor
-  has_many :data_files, as: :contributor
-  has_many :models, as: :contributor
-  has_many :presentations, as: :contributor
-  has_many :events, as: :contributor
-  has_many :publications, as: :contributor
-  has_many :samples, as: :contributor
-
-  has_many :investigations, as: :contributor
-  has_many :studies, as: :contributor
-
   has_many :oauth_sessions, dependent: :destroy
 
   # restful_authentication plugin generated code ...
@@ -76,11 +65,6 @@ class User < ActiveRecord::Base
 
   def check_email_present?
     !!@check_email_present
-  end
-
-  # to allow you to call .user on a Person or User and avoid having to check its type
-  def user
-    self
   end
 
   def self.admin_logged_in?
@@ -280,7 +264,7 @@ class User < ActiveRecord::Base
 
   def reset_password
     self.reset_password_code_until = 1.day.from_now
-    self.reset_password_code = Digest::SHA1.hexdigest("#{user.login}#{Time.now.to_s.split(//).sort_by { rand }.join}")
+    self.reset_password_code = Digest::SHA1.hexdigest("#{login}#{Time.now.to_s.split(//).sort_by { rand }.join}")
   end
 
   # indicates whether the user has completed the registration process, and is associated with a profile and link has been saved

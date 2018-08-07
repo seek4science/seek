@@ -48,7 +48,7 @@ FactoryGirl.define do
         end
         resource.contributor = Factory(:person, project: resource.projects.first)
       elsif resource.projects.none?
-        resource.projects = [resource.contributor.person.projects.first]
+        resource.projects = [resource.contributor.projects.first]
       end
     end
   end

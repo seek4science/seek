@@ -58,7 +58,7 @@ class ActivityLogTest < ActiveSupport::TestCase
 
   test 'should only create activity log for viewable item' do
     user = Factory(:user)
-    df = Factory(:data_file, contributor: user)
+    df = Factory(:data_file, contributor: user.person)
     assert !df.can_view?(nil)
     # activitylog can not be created if cannot_view
     ac = ActivityLog.create(action: 'create', activity_loggable: df, culprit: user)

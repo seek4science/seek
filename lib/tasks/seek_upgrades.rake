@@ -14,6 +14,7 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     convert_organism_concept_uris
+    update_deleted_contributors
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -50,6 +51,22 @@ namespace :seek do
       organism.convert_concept_uri
       if organism.bioportal_concept && organism.bioportal_concept.changed?
         organism.save(validate:false)
+      end
+    end
+  end
+
+  task(update_deleted_contributors: :environment) do
+    types = [Assay, DataFile, Document, Event, Investigation, Model, Presentation, Publication, Sample, Sop, Strain, Study,
+     DataFile::Version, Document::Version, Model::Version, Presentation::Version, Sop::Version]
+    types.each do |type|
+      puts "processing deleted contributors for #{type.table_name}"
+      #items where the deleted_contributor hasn't been set, the contributor id can be found, but the contributor doesn't exist
+      items = type.where('deleted_contributor IS NULL AND contributor_id IS NOT NULL').select{|i| i.contributor.nil?}
+      bar = ProgressBar.new(items.count)
+      items.each do |item|
+        item.update_column(:deleted_contributor,"Person:#{item.contributor_id}")
+        item.update_column(:contributor_id,nil)
+        bar.increment!
       end
     end
   end

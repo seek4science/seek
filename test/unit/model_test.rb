@@ -230,7 +230,7 @@ class ModelTest < ActiveSupport::TestCase
 
   test 'versions destroyed as dependent' do
     model = models(:teusink)
-    User.with_current_user model.contributor do
+    User.with_current_user model.contributor.user do
       assert_equal 2, model.versions.size, 'There should be 2 versions of this Model'
       assert_difference('Model.count', -1) do
         assert_difference('Model::Version.count', -2) do
