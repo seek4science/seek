@@ -3312,6 +3312,57 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal [good_assay],data_file.assays
   end
 
+  test 'create assay should be checked with new assay containing title' do
+    df = Factory.build(:data_file, content_blob:Factory(:txt_content_blob))
+    refute_nil df.content_blob
+
+    # creating a new assay should be selected if an unsaved assay if present, with a populated title
+    assay_to_be_created = Factory.build(:assay,title:'new assay')
+    session[:processed_datafile]=df
+    session[:processed_assay]=assay_to_be_created
+
+    get :provide_metadata
+
+    assert_response :success
+    refute_nil assigns(:create_new_assay)
+    assert assigns(:create_new_assay)
+    assert_select "input#assay_create_assay[checked=checked]", count:1
+
+  end
+
+  test 'create assay should not be checked with not title' do
+    df = Factory.build(:data_file, content_blob:Factory(:txt_content_blob))
+
+    # creating a new assay should be selected if an unsaved assay if present, with a populated title
+    assay_no_title = Factory.build(:assay,title:'')
+    session[:processed_datafile]=df
+
+    assert assay_no_title.title.blank?
+    session[:processed_assay]=assay_no_title
+    get :provide_metadata
+
+    assert_response :success
+    refute_nil assigns(:create_new_assay)
+    refute assigns(:create_new_assay)
+    assert_select "input#assay_create_assay[checked=checked]", count:0
+  end
+
+  test 'create assay should not be checked with existing assay' do
+    df = Factory.build(:data_file, content_blob:Factory(:txt_content_blob))
+
+    # creating a new assay should be selected if an unsaved assay if present, with a populated title
+    existing_assay = Factory(:assay)
+    session[:processed_datafile]=df
+
+    session[:processed_assay]=existing_assay
+    get :provide_metadata
+
+    assert_response :success
+    refute_nil assigns(:create_new_assay)
+    refute assigns(:create_new_assay)
+    assert_select "input#assay_create_assay[checked=checked]", count:0
+  end
+
   def edit_max_object(df)
     add_tags_to_test_object(df)
     add_creator_to_test_object(df)
