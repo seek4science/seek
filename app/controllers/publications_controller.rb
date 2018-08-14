@@ -9,7 +9,7 @@ class PublicationsController < ApplicationController
 
   before_filter :find_assets, only: [:index]
   before_filter :find_and_authorize_requested_item, only: %i[show edit update destroy]
-  before_filter :associate_authors, only: %i[edit update]
+  before_filter :suggest_authors, only: :edit
 
   include Seek::BreadCrumbs
 
@@ -101,61 +101,17 @@ class PublicationsController < ApplicationController
   # PUT /publications/1
   # PUT /publications/1.xml
   def update
-    valid = true
-    unless params[:author].blank?
-      person_ids = params[:author].values.reject { |id_string| id_string == '' }
-      if person_ids.uniq.size == person_ids.size
-        params[:author].keys.sort.each do |author_id|
-          author_assoc = params[:author][author_id]
-          unless author_assoc.blank?
-            @publication.publication_authors.detect { |pa| pa.id == author_id.to_i }.person = Person.find(author_assoc)
-          end
-        end
-      else
-        @publication.errors[:base] << 'Multiple authors cannot be associated with the same SEEK person.'
-        valid = false
-      end
-    end
-
     update_annotations(params[:tag_list], @publication)
 
-    respond_to do |format|
-      if valid && @publication.update_attributes(publication_params)
-
-        # Update association
-        investigation_ids = params[:investigation_ids] || []
-        study_ids = params[:study_ids] || []
-        assay_ids = params[:assay_ids] || []
-        data_files = params[:data_files] || []
-        model_ids = (params[:publication][:model_ids] || []).reject(&:blank?)
-        presentation_ids = (params[:publication][:presentation_ids] || []).reject(&:blank?)
-
-        create_or_update_associations investigation_ids, 'Investigation', 'view'
-        create_or_update_associations study_ids, 'Study', 'view'
-        create_or_update_associations assay_ids, 'Assay', 'edit'
-        create_or_update_associations data_files.map { |df| df['asset_id'] }, 'DataFile', 'view'
-        create_or_update_associations model_ids, 'Model', 'view'
-        create_or_update_associations presentation_ids, 'Presentation', 'view'
-
-        # Create policy if not present (should be)
-        if @publication.policy.nil?
-          @publication.policy = Policy.create(name: 'publication_policy', access_type: Policy::VISIBLE)
-          @publication.save
-        end
-
-        # Update policy so current authors have manage permissions
-        @publication.creators.each do |author|
-          @publication.policy.permissions.clear
-          @publication.policy.permissions << Permission.create(contributor: author, policy: @publication.policy, access_type: Policy::MANAGING)
-        end
-        # Add contributor
-        @publication.policy.permissions << Permission.create(contributor: @publication.contributor, policy: @publication.policy, access_type: Policy::MANAGING)
-
+    if @publication.update_attributes(publication_params)
+      respond_to do |format|
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
         format.xml  { head :ok }
         format.json { render json: @publication, status: :ok}
-      else
+      end
+    else
+      respond_to do |format|
         format.html { render action: 'edit' }
         format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json { render json: @publication.errors, status: :unprocessable_entity }
@@ -291,19 +247,10 @@ class PublicationsController < ApplicationController
   end
 
   # Try and relate non_seek_authors to people in SEEK based on name and project
-  def associate_authors
-    publication = @publication
-
-    association = {}
-    publication.publication_authors.each do |author|
-      association[author.id] = if author.person
-                                 author.person
-                               else
-                                 find_person_for_author author, @publication.projects
-                               end
+  def suggest_authors
+    @publication.publication_authors.each do |author|
+      author.suggested_person = find_person_for_author(author, @publication.projects)
     end
-
-    @author_associations = association
   end
 
   def disassociate_authors
@@ -378,26 +325,41 @@ class PublicationsController < ApplicationController
 
   def publication_params
     params.require(:publication).permit(:pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,
-                                        :published_date, :bibtex_file, { project_ids: [] }, { event_ids: [] },
-                                        { scales: [] })
+                                        :published_date, :bibtex_file, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
+                                        { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
+                                        { data_file_ids: [] }, { scales: [] },
+                                        { publication_authors_attributes: [:person_id, :id] }).tap do |pub_params|
+      filter_association_params(pub_params, :assay_ids, Assay, :can_edit?)
+      filter_association_params(pub_params, :study_ids, Study, :can_view?)
+      filter_association_params(pub_params, :investigation_ids, Investigation, :can_view?)
+      filter_association_params(pub_params, :data_file_ids, DataFile, :can_view?)
+      filter_association_params(pub_params, :model_ids, Model, :can_view?)
+      filter_association_params(pub_params, :presentation_ids, Presentation, :can_view?)
+    end
+  end
+
+  def filter_association_params(params, key, type, check)
+    if params.key?(key)
+      # Strip out anything that the user does not have permission to add
+      params[key].select! { |id| type.find_by_id(id).try(check) }
+
+      # Re-add anything that the user does not have permission to remove
+      if @publication
+        missing = @publication.send(key).map(&:to_i) - params[key].map(&:to_i)
+        missing.reject! { |id| type.find_by_id(id).try(check) }
+
+        params[key] += missing
+      end
+    end
+
+    params[key]
   end
 
   # the original way of creating a bublication by either doi or pubmedid, where all data is set server-side
   def register_publication
-    result = get_data(@publication, @publication.pubmed_id, @publication.doi)
-    assay_ids = params[:assay_ids] || []
+    get_data(@publication, @publication.pubmed_id, @publication.doi)
 
     if @publication.save
-      result.authors.each_with_index do |author, index|
-        pa = PublicationAuthor.new
-        pa.publication = @publication
-        pa.first_name = author.first_name
-        pa.last_name = author.last_name
-        pa.author_index = index
-        pa.save
-      end
-
-      create_or_update_associations assay_ids, 'Assay', 'edit'
       if !@publication.parent_name.blank?
         render partial: 'assets/back_to_fancy_parent', locals: { child: @publication, parent_name: @publication.parent_name }
       else
@@ -568,8 +530,7 @@ class PublicationsController < ApplicationController
     end
 
     # Destroy asset relationship that aren't needed
-    associate_relationships = Relationship.where(other_object_id: @publication.id, subject_type: asset_type)
-    associate_relationships.each do |associate_relationship|
+    @publication.relationships.where(subject_type: asset_type).each do |associate_relationship|
       asset = associate_relationship.subject
       if asset.send("can_#{required_action}?") && !asset_ids.include?(asset.id.to_s)
         associate_relationship.destroy

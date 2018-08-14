@@ -51,6 +51,23 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     assert blob.file_size > 0
   end
 
+  test 'can add content to API-created data file using a multipart/form request' do
+    df = Factory(:api_txt_data_file, contributor: @current_person)
+
+    assert df.content_blob.no_content?
+    assert df.can_download?(@current_user)
+    assert df.can_edit?(@current_user)
+
+    put data_file_content_blob_path(df, df.content_blob),
+        { file: fixture_file_upload('files/txt_test.txt', 'text/plain') },
+        { 'Accept' => 'application/json' }
+
+    assert_response :success
+    blob = df.content_blob.reload
+    refute blob.no_content?
+    assert_equal "This is a txt format\n", blob.read.to_s
+  end
+
   test 'cannot add content to API-created data file without permission' do
     df = Factory(:api_pdf_data_file, policy: Factory(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
 

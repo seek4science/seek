@@ -27,6 +27,10 @@ module HomesHelper
     simple_format(auto_link(Seek::Config.terms_page.html_safe, sanitize: false), {}, sanitize: false)
   end
 
+  def privacy_text
+    simple_format(auto_link(Seek::Config.privacy_page.html_safe, sanitize: false), {}, sanitize: false)
+  end
+
   def show_announcements?
     logged_in_and_registered? && Seek::Config.show_announcements
   end

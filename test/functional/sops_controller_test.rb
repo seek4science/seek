@@ -284,11 +284,11 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:owner_of_my_first_sop)
     get :edit, id: sops(:my_first_sop)
     assert_response :success
-    assert_select 'div#publications_fold_content', false
+    assert_select 'div#add_publications_form', false
 
     get :new
     assert_response :success
-    assert_select 'div#publications_fold_content', false
+    assert_select 'div#add_publications_form', false
   end
 
   test 'should update sop' do

@@ -36,6 +36,7 @@ class Investigation < ActiveRecord::Base
     new_object = dup
     new_object.policy = policy.deep_copy
     new_object.project_ids = project_ids
+    new_object.publications = publications
     new_object
   end
 

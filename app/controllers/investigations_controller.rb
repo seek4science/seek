@@ -128,7 +128,7 @@ class InvestigationsController < ApplicationController
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, :other_creators,
                                           :create_from_asset, :new_link_from_study, { creator_ids: [] },
-                                          { scales: [] })
+                                          { scales: [] }, { publication_ids: [] })
   end
 
 end

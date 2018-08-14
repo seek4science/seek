@@ -775,9 +775,9 @@ class AssaysControllerTest < ActionController::TestCase
                 assay_class_id: assay_classes(:modelling_assay_class).id,
                 sop_ids: ["#{sop.id}"],
                 model_ids: ["#{model.id}"],
-                data_files_attributes: [{ asset_id: df.id, relationship_type_id: rel.id }]
+                data_files_attributes: [{ asset_id: df.id, relationship_type_id: rel.id }],
+                publication_ids: ["#{pub.id}"]
             },
-                 related_publication_ids: ["#{pub.id}"],
                  policy_attributes: valid_sharing # default policy is nil in VLN
           end
         end

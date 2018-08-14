@@ -93,7 +93,6 @@ module Seek
           tags: :tag_list,
           policy: :policy_attributes,
           default_policy: :policy_attributes,
-          publication_ids: :related_publication_ids,
           assay_class: :assay_class_id,
           assay_type: :assay_type_uri,
           technology_type: :technology_type_uri,
@@ -106,8 +105,7 @@ module Seek
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.
-      ELEVATE = %i[tag_list expertise_list tool_list policy_attributes content_blobs
-       related_publication_ids revision_comments].freeze
+      ELEVATE = %i[tag_list expertise_list tool_list policy_attributes content_blobs revision_comments].freeze
 
       def initialize(controller_name, options = {})
         @controller_name = controller_name

@@ -21,8 +21,6 @@ class AssaysController < ApplicationController
   def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])
     @assay = @existing_assay.clone_with_associations
-    params[:data_file_ids]=@existing_assay.data_files.collect{|d|"#{d.id},None"}
-    params[:related_publication_ids]= @existing_assay.publications.collect{|p| "#{p.id},None"}
 
     if @existing_assay.can_view?
       notice_message = ''
@@ -187,10 +185,11 @@ class AssaysController < ApplicationController
                                   { scales: [] }, { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
-                                  ).tap do |params|
-      params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if params.key?(:document_ids)
-      params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if params.key?(:sop_ids)
-      params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if params.key?(:model_ids)
+                                  { publication_ids: [] }
+                                  ).tap do |assay_params|
+      assay_params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if assay_params.key?(:document_ids)
+      assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)
+      assay_params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if assay_params.key?(:model_ids)
     end
   end
 end
