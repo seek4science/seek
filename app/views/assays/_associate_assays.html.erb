@@ -41,7 +41,8 @@
      add_new_assay_title = ""
    end
 
-  collapsed = associated_assays.blank? && params[:assay_ids].blank? if collapsed.nil?
+  collapsed = associated_assays.blank? if collapsed.nil?
+  assay_asset_json = associations_json_from_assay_assets(resource.assay_assets, type: resource.class.name.underscore)
 %>
 
 <%= folding_panel(assay_class_text, collapsed, :body_options => {:id => 'associate_assay_fold_content'},
@@ -52,50 +53,29 @@
         <p style="color: #666666;">
           The following <%= assay_class_text -%> are associated with this <%= resource_text -%>:
         </p>
-        <div id="assay_to_list" class="box_editing_inner" style="line-height: 1.5">
-          <span class="none_text" id="assay_files">Loading ...</span>
-        </div>
+
+        <%= associations_list('assay_asset_list', 'associations/assay', assay_asset_json, empty_text: 'No assays',) %>
+
         <div class="association_step">
+          <hr/>
           <p style="color: #666666;">
             You may select an existing editable <%= single_assay_class_text -%><%= add_new_assay_title -%> to associate with this <%= resource_text -%>.
           </p>
 
+          <div class="form-group">
+            <%= select_tag(:possible_assays, '<option>Loading...</option>', class: 'form-control') -%>
+          </div>
+
           <% if show_relationships -%>
-              <div class="form-group">
-                <%= select_tag :possible_assays, '<option>Loading...</option>',
-                               {:class => 'form-control',:onchange=>"addSelectedAssay();"+remote_function(
-                                       :method=>:get,
-                                       :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
-                                       :with=>"'id='+this.value",
-                                       :before=>"show_ajax_loader('assay_preview')"
-                               )+";check_show_add_assay();selected_assay();return(false);"
-                               } -%>
-              </div>
-              <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
-
-              <div id="relationship" style="display:none;" class="form-group">
-                <%= label_tag "How is the data used in this #{t('assays.modelling_analysis')}" %>
-                <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}),
-                               :class => 'form-control' %>
-              </div>
-
-          <% else %>
-              <div class="form-group">
-                <%= select_tag :possible_assays, '<option>Loading...</option>',
-                               {:class => 'form-control',:onchange=>"addSelectedAssay();"+remote_function(
-                                       :method=>:get,
-                                       :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
-                                       :with=>"'id='+this.value",
-                                       :before=>"show_ajax_loader('assay_preview')"
-                               )+";check_show_add_assay();return(false);"
-                               } -%>
-              </div>
-
-              <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
+            <div id="relationship" style="display:none;" class="form-group">
+              <%= label_tag "How is the data used in this #{t('assays.modelling_analysis')}" %>
+              <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}),
+                             :class => 'form-control' %>
+            </div>
           <% end %>
         </div>
 
-        <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other projects?
+        <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"updateAssaySelectors();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other projects?
       </div>
       <div class="col-md-4">
         <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'assay'}%>
@@ -110,56 +90,73 @@
         all: <%= (all_assays.collect{|assay| {title:assay_selection_dropdown_text(assay).html_safe,id:assay.id,parent_id:assay.study.id,parent_title:assay.study.title}}).to_json.html_safe %>
     };
 
-    function toggle_assay_list() {
-      if ($('include_other_project_assays').checked)
-        $j('#possible_assays').html(nestedOptionsFromJSONArray(assayOptions.all,'<%= "Select #{single_assay_class_text} ..." %>'));
-      else
-        $j('#possible_assays').html(nestedOptionsFromJSONArray(assayOptions.project,'<%= "Select #{single_assay_class_text} ..." %>'));
-    }
+    var resourceType = '<%= resource.class.name.underscore -%>';
+    var assayPreviewPath = '<%= preview_assays_path -%>';
 
-    function selected_assay(){
-        i = $('possible_assays').selectedIndex;
-        id = $('possible_assays').options[i].value;
-        for (var j = 0; j < id_rel_array.length; j++) {
-            if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'true'))  {
-                Effect.Appear('relationship',{duration:0.2});
-            }
-            else if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'false'))  {
-                $('assay_relationship_type').selectedIndex = 0;
-                Effect.Fade('relationship',{duration:0.2});
-            }
+    function updateAssaySelectors() {
+        var associationList = $j('#assay_asset_list').data('associationList');
+        var collection;
+
+        if ($('include_other_project_assays').checked) {
+            collection = assayOptions.all;
+        } else {
+            collection = assayOptions.project;
         }
+
+        var options = [];
+        collection.forEach(function (option) {
+            if (!associationList.exists(function (aa) { return aa.assay.id == option.id; })) {
+                options.push(option);
+            }
+        });
+
+        $j('#possible_assays').html(nestedOptionsFromJSONArray(options, '<%= "Select #{single_assay_class_text} ..." %>'));
     }
 
-    <% associated_assay_ids = resource.assay_assets.collect(&:assay_id) %>
-    <% associated_assay_ids.each do |associated_assay_id|%>
-    <% assay = Assay.find(associated_assay_id) %>
-    <% if assay.try :can_view? -%>
-    assay_id = '<%= assay.id -%>';
-    assay_title = '<%= assay.title %>';
-    relationship_type = '<%= resource.is_a?(DataFile) ? escape_javascript(resource.relationship_type(assay).try(:title) || "None") : 'None'-%>';
-    addAssay(assay_title,assay_id,relationship_type);
-    <% end %>
-    <% end -%>
+    function addSelectedAssay() {
+        var data = { type: resourceType };
+        var element = $j(this);
+        var assayId = element.val();
+        var assayTitle = $j('option:selected', element).text();
+        var associationList = $j('#assay_asset_list').data('associationList');
 
-    <% all_assays.each do |assay|%>
-    assay_id = '<%= assay.id -%>';
-    assay_relationship = '<%=(assay.is_modelling?) -%>';
-    id_rel_array.push([assay_id, assay_relationship])
-    <% end -%>
+        if (!assayId)
+            return;
 
-    <% if params[:assay_ids] %>
-    <% params[:assay_ids].each do |id| -%>
-    <% assay = Assay.find(id) %>
-    <% if assay.can_view?-%>
-    assay_id = '<%= assay.id -%>';
-    assay_title = '<%= escape_javascript(assay.title) -%>';
-    relationship_type = '<%= resource.is_a?(DataFile) ? escape_javascript(resource.relationship_type(assay).try(:title) || "None") : 'None' -%>';
-    addAssay(assay_title, assay_id, relationship_type);
-    <% end -%>
-    <% end -%>
-    <% end -%>
+        if (associationList.exists(function (aa) { return aa.assay.id == assayId; })) {
+            alert('The following item has already been added:\n\n' + assayTitle);
+            return;
+        }
 
-    updateAssays();
-    toggle_assay_list();
+        $j('#assay_preview').spinner('add');
+        $j.ajax('<%= preview_assays_path %>', {
+                type: 'GET',
+                dataType: 'script',
+                data: { id: assayId, element: 'assay_preview' },
+                complete: function () {
+                    $j('#assay_preview').spinner('remove');
+                }
+            }
+        );
+
+        data.assay = { id: assayId,
+                       title: $j('option:selected', element).text() };
+
+        var relationshipTypeElement = $j('#assay_relationship_type');
+        if (relationshipTypeElement.length && relationshipTypeElement.val() != 0) {
+            data.relationship_type = { name: $j('option:selected', relationshipTypeElement).text(),
+                value: relationshipTypeElement.val()
+            };
+        }
+
+        associationList.add(data);
+    }
+
+    $j(document).ready(function () {
+        $j('#possible_assays').change(addSelectedAssay);
+        updateAssaySelectors();
+        var associationList = $j('#assay_asset_list').data('associationList');
+        associationList.onAdd = updateAssaySelectors;
+        associationList.onRemove = updateAssaySelectors;
+    });
 </script>

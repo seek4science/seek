@@ -18,18 +18,20 @@ class Publication < ActiveRecord::Base
     end
   end
 
+  has_many :related_relationships, -> { where(predicate: Relationship::RELATED_TO_PUBLICATION) },
+           class_name: 'Relationship', as: :other_object, dependent: :destroy, inverse_of: :other_object
+
+  has_many :data_files, through: :related_relationships, source: :subject, source_type: 'DataFile'
+  has_many :models, through: :related_relationships, source: :subject, source_type: 'Model'
+  has_many :assays, through: :related_relationships, source: :subject, source_type: 'Assay'
+  has_many :studies, through: :related_relationships, source: :subject, source_type: 'Study'
+  has_many :investigations, through: :related_relationships, source: :subject, source_type: 'Investigation'
+  has_many :presentations, through: :related_relationships, source: :subject, source_type: 'Presentation'
+
   acts_as_asset
 
   has_many :publication_authors, dependent: :destroy, autosave: true
   has_many :persons, through: :publication_authors
-
-  has_many :backwards_relationships,
-           class_name: 'Relationship',
-           as: :other_object,
-           dependent: :destroy
-
-  has_many :presentations,through: :backwards_relationships, source: :subject, source_type:'Presentation'
-
 
   VALID_DOI_REGEX = /\A(10[.][0-9]{4,}(?:[.][0-9]+)*\/(?:(?!["&\'<>])\S)+)\z/
   VALID_PUBMED_REGEX = /\A(([1-9])([0-9]{0,7}))\z/
@@ -45,7 +47,11 @@ class Publication < ActiveRecord::Base
 
   validate :check_uniqueness_within_project, unless: 'Seek::Config.is_virtualliver'
 
+  attr_writer :refresh_policy
+  before_save :refresh_policy, on: :update
   after_update :update_creators_from_publication_authors
+
+  accepts_nested_attributes_for :publication_authors
 
   # http://bioruby.org/rdoc/Bio/Reference.html#method-i-format
   # key for the file-extension and format used in the route
@@ -62,6 +68,25 @@ class Publication < ActiveRecord::Base
 
   def update_creators_from_publication_authors
     self.creators = seek_authors.map(&:person)
+  end
+
+  def publication_authors_attributes=(*args)
+    self.refresh_policy = true
+    super(*args)
+  end
+
+  def refresh_policy
+    if @refresh_policy
+      policy.permissions.clear
+
+      populate_policy_from_authors(policy)
+
+      policy.save
+
+      self.refresh_policy = false
+    end
+
+    true
   end
 
   if Seek::Config.events_enabled
@@ -94,15 +119,9 @@ class Publication < ActiveRecord::Base
   end
 
   def default_policy
-    policy = Policy.new(name: 'publication_policy', access_type: Policy::VISIBLE)
-    # add managers (authors + contributor)
-    creators.each do |author|
-      policy.permissions << Permissions.create(contributor: author, policy: policy, access_type: Policy::MANAGING)
+    Policy.new(name: 'publication_policy', access_type: Policy::VISIBLE).tap do |policy|
+      populate_policy_from_authors(policy)
     end
-    # Add contributor
-    c = contributor || default_contributor
-    policy.permissions << Permission.create(contributor: c.person, policy: policy, access_type: Policy::MANAGING) if c
-    policy
   end
 
   scope :default_order, -> { order('published_date DESC') }
@@ -124,6 +143,12 @@ class Publication < ActiveRecord::Base
       extract_pubmed_metadata(reference)
     else
       extract_doi_metadata(reference)
+    end
+
+    reference.authors.each_with_index do |author, index|
+      publication_authors.build(first_name: author.first_name,
+                                last_name: author.last_name,
+                                author_index: index)
     end
   end
 
@@ -169,37 +194,14 @@ class Publication < ActiveRecord::Base
     end
   end
 
-  def data_files
-    backwards_relationships.select { |a| a.subject_type == 'DataFile' }.collect(&:subject)
-  end
-
-  def models
-    backwards_relationships.select { |a| a.subject_type == 'Model' }.collect(&:subject)
-  end
-
-  def assays
-    backwards_relationships.select { |a| a.subject_type == 'Assay' }.collect(&:subject)
-  end
-
-  def studies
-    backwards_relationships.select { |a| a.subject_type == 'Study' }.collect(&:subject)
-  end
-
-  def investigations
-    backwards_relationships.select { |a| a.subject_type == 'Investigation' }.collect(&:subject)
-  end
-
-  # def presentations
-  #   backwards_relationships.select { |a| a.subject_type == 'Presentation' }.collect(&:subject)
-  # end
-
   def associate(item)
     clause = { subject_type: item.class.name,
                subject_id: item.id,
                predicate: Relationship::RELATED_TO_PUBLICATION,
                other_object_type: 'Publication',
                other_object_id: id }
-    Relationship.create(clause) unless Relationship.where(clause).any?
+
+    related_relationships.where(clause).first_or_create!
   end
 
   # includes those related directly, or through an assay
@@ -263,6 +265,18 @@ class Publication < ActiveRecord::Base
   end
 
   private
+
+  def populate_policy_from_authors(pol)
+    # add managers (authors + contributor)
+    (creators | seek_authors.map(&:person)).each do |author|
+      pol.permissions.build(contributor: author, access_type: Policy::MANAGING)
+    end
+    # Add contributor
+    c = contributor || default_contributor
+    pol.permissions.build(contributor: c.person, access_type: Policy::MANAGING) if c
+
+    pol.permissions
+  end
 
   def pubmed_entry
     if pubmed_id

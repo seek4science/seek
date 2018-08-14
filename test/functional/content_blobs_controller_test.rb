@@ -419,6 +419,55 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal 'text/html', @response.content_type
   end
 
+  test 'can fetch csv content blob as csv' do
+    df = Factory(:data_file, content_blob: Factory(:csv_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    assert_response :success
+
+    assert @response.content_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(1,2,3,4,5))
+
+  end
+
+  test 'can fetch excel content blob as csv' do
+    df = Factory(:data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    assert_response :success
+
+    assert @response.content_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(,"some stuff"))
+
+  end
+
+  test 'cannot fetch binary content blob as csv' do
+    df = Factory(:data_file, content_blob: Factory(:binary_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    assert_response :not_acceptable
+
+    assert @response.content_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(Unable to view))
+
+  end
+
+  test 'cannot fetch empty content blob as csv' do
+    df = Factory(:data_file, content_blob: Factory(:blank_pdf_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    assert_response :not_found
+
+    assert @response.content_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(No content))
+
+  end
+
+
   test 'can view content of an image file' do
     df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
                              content_blob: Factory(:image_content_blob))
@@ -514,6 +563,20 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+  test 'should gracefully handle other error codes' do
+    mock_http
+    df = Factory :data_file,
+                 policy: Factory(:all_sysmo_downloadable_policy),
+                 content_blob: Factory(:url_content_blob,
+                                       url: 'http://mocked500.com',
+                                       uuid: UUID.generate)
+
+    get :download, data_file_id: df, id: df.content_blob
+    assert_redirected_to data_file_path(df, version: df.version)
+    assert_not_nil flash[:error]
+    assert_includes flash[:error], '500'
+  end
+
   test 'should handle inline download when specify the inline disposition' do
     data = File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb').read
     df = Factory :data_file,
@@ -593,6 +656,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     stub_request(:any, 'http://www.mocked302.com').to_return(status: 200)
     stub_request(:any, 'http://mocked401.com').to_return(status: 401)
     stub_request(:any, 'http://mocked404.com').to_return(status: 404)
+    stub_request(:any, 'http://mocked500.com').to_return(status: 500)
 
     stub_request(:any, 'http://unknownhost.com/pic.png').to_raise(SocketError)
   end

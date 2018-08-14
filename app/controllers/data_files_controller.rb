@@ -78,13 +78,6 @@ class DataFilesController < ApplicationController
             new_f.save
           end
           flash[:notice] = "New version uploaded - now on version #{@data_file.version}"
-          if @data_file.is_with_sample?
-            bio_samples = @data_file.bio_samples_population @data_file.samples.first.institution_id if @data_file.samples.first
-            unless bio_samples.errors.blank?
-              flash[:notice] << '<br/> However, Sample database population failed.'
-              flash[:error] = bio_samples.errors.html_safe
-            end
-          end
         else
           flash[:error] = 'Unable to save newflash[:error] version'
         end
@@ -144,39 +137,23 @@ class DataFilesController < ApplicationController
     end
   end
 
-
-
   def create
     @data_file = DataFile.new(data_file_params)
 
     if handle_upload_data
       update_sharing_policies(@data_file)
 
+      update_annotations(params[:tag_list], @data_file)
+      update_relationships(@data_file, params)
+
       if @data_file.save
-        update_annotations(params[:tag_list], @data_file)
-        update_scales @data_file
-
         create_content_blobs
-
-        update_relationships(@data_file, params)
 
         if !@data_file.parent_name.blank?
           render partial: 'assets/back_to_fancy_parent', locals: { child: @data_file, parent_name: @data_file.parent_name, is_not_fancy: true }
         else
           respond_to do |format|
             flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
-            # parse the data file if it is with sample data
-            if @data_file.is_with_sample
-              bio_samples = @data_file.bio_samples_population params[:institution_id]
-
-              unless  bio_samples.errors.blank?
-                flash[:notice] << '<br/> However, Sample database population failed.'
-                flash[:error] = bio_samples.errors.html_safe
-              end
-            end
-            # the assay_id param can also contain the relationship type
-            assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
-            update_assay_assets(@data_file, assay_ids, relationship_types)
             format.html { redirect_to data_file_path(@data_file) }
             format.json { render json: @data_file }
           end
@@ -192,36 +169,13 @@ class DataFilesController < ApplicationController
     end
   end
 
-  def determine_related_assay_ids_and_relationship_types(params)
-    assay_ids = []
-    relationship_types = []
-    (params[:assay_ids] || []).each do |assay_type_text|
-      assay_id, relationship_type = assay_type_text.split(',')
-      assay_ids << assay_id
-      relationship_types << relationship_type
-    end
-    [assay_ids, relationship_types]
-  end
-
   def update
-    if params[:data_file].empty? && !params[:datafile].empty?
-      params[:data_file] = params[:datafile]
-    end	
-    @data_file.assign_attributes(data_file_params)
-
     update_annotations(params[:tag_list], @data_file) if params.key?(:tag_list)
-    update_scales @data_file
+    update_sharing_policies @data_file
+    update_relationships(@data_file, params)
 
     respond_to do |format|
-      update_sharing_policies @data_file
-
-      if @data_file.save
-        update_relationships(@data_file, params)
-
-        # the assay_id param can also contain the relationship type
-        assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
-        update_assay_assets(@data_file, assay_ids, relationship_types)
-
+      if @data_file.update_attributes(data_file_params)
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
         format.json {render json: @data_file}
@@ -243,7 +197,6 @@ class DataFilesController < ApplicationController
       respond_to do |format|
         format.html # currently complains about a missing template, but we don't want people using this for now - its purely XML
         format.xml { render xml: spreadsheet_to_xml(file, memory_allocation = Seek::Config.jvm_memory_allocation) }
-        format.csv { render text: spreadsheet_to_csv(file, sheet, trim) }
       end
     else
       respond_to do |format|
@@ -419,10 +372,8 @@ class DataFilesController < ApplicationController
   # AJAX call to trigger any RightField extraction (if appropriate), and pre-populates the associated @data_file and
   # @assay
   def rightfield_extraction_ajax
-
     @data_file = DataFile.new
     @warnings = nil
-    @assay = Assay.new
     critical_error_msg = nil
     session.delete :extraction_exception_message
 
@@ -468,9 +419,10 @@ class DataFilesController < ApplicationController
     Assay.new
     @warnings ||= session[:processing_warnings] || []
     @exception_message ||= session[:extraction_exception_message]
-    @create_new_assay = !(@assay.title.blank? && @assay.description.blank?)
+    @create_new_assay = @assay && @assay.new_record?
+    @data_file.assay_assets.build(assay_id: @assay.id) if @assay.persisted?
     respond_to do |format|
-      format.html {}
+      format.html
     end
   end
 
@@ -507,7 +459,6 @@ class DataFilesController < ApplicationController
 
     if all_valid
       update_annotations(params[:tag_list], @data_file)
-      update_scales @data_file
 
       update_relationships(@data_file, params)
 
@@ -518,9 +469,7 @@ class DataFilesController < ApplicationController
         # parse the data file if it is with sample data
 
         # the assay_id param can also contain the relationship type
-        assay_ids, _relationship_types = determine_related_assay_ids_and_relationship_types(params)
-        assay_ids = [@assay.id.to_s] if @create_new_assay
-        update_assay_assets(@data_file, assay_ids)
+        @data_file.assays << @assay if @create_new_assay
         format.html { redirect_to data_file_path(@data_file) }
         format.json { render json: @data_file }
       end
@@ -588,15 +537,14 @@ class DataFilesController < ApplicationController
     end
   end
 
-
-
-
   private
 
   def data_file_params
     params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] }, :license, :other_creators,
                                       :parent_name, { event_ids: [] },
-                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
+                                      { scales: [] }, { publication_ids: [] })
   end
 
   def data_file_assay_params

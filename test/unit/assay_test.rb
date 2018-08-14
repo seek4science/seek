@@ -586,4 +586,44 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal 2,assay.data_files.count
     assert_equal [df_1],assay.construction_assets
   end
+
+  test 'clone with associations' do
+    assay = Factory(:modelling_assay, title: '123', description: 'abc', policy: Factory(:publicly_viewable_policy))
+    person = assay.contributor
+    data_file = Factory(:data_file, contributor: person)
+    sample = Factory(:sample, contributor: person)
+    data_file_meta = { asset: data_file, direction: AssayAsset::Direction::INCOMING }
+    sample_meta = { asset: sample, direction: AssayAsset::Direction::OUTGOING }
+    publication = Factory(:publication, contributor: person)
+    model = Factory(:model, contributor: person)
+    sop = Factory(:sop, contributor: person)
+    document = Factory(:document, contributor: person)
+
+    disable_authorization_checks do
+      assay.assay_assets.create!(data_file_meta)
+      assay.assay_assets.create!(sample_meta)
+
+      assay.publications << publication
+      assay.models << model
+      assay.sops << sop
+      assay.documents << document
+    end
+
+    clone = assay.clone_with_associations
+
+    assert_equal assay.title, clone.title
+    assert_equal assay.description, clone.description
+    assert_equal assay.projects, clone.projects
+    assert_equal BaseSerializer.convert_policy(assay.policy), BaseSerializer.convert_policy(clone.policy)
+
+    assay_asset_meta = clone.assay_assets.map { |aa| { asset: aa.asset, direction: aa.direction } }
+    assert_includes assay_asset_meta, data_file_meta
+    assert_includes assay_asset_meta, sample_meta
+    assert_includes clone.publications, publication
+    assert_includes clone.models, model
+    assert_includes clone.sops, sop
+    assert_includes clone.documents, document
+
+    disable_authorization_checks { assert clone.save }
+  end
 end

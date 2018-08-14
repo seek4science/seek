@@ -25,6 +25,14 @@ class Project < ActiveRecord::Base
   # OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
   has_many :people, -> { order('last_name ASC').uniq }, through: :group_memberships
 
+  has_many :former_group_memberships, -> { where('time_left_at IS NOT NULL AND time_left_at <= ?', Time.now) },
+           through: :work_groups, source: :group_memberships
+  has_many :former_people, through: :former_group_memberships, source: :person
+
+  has_many :current_group_memberships, -> { where('time_left_at IS NULL OR time_left_at > ?', Time.now) },
+           through: :work_groups, source: :group_memberships
+  has_many :current_people, through: :current_group_memberships, source: :person
+
   has_many :admin_defined_role_projects
 
   has_many :openbis_endpoints

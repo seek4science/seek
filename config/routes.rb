@@ -62,6 +62,7 @@ SEEK::Application.routes.draw do
       post :send_feedback
       get :imprint
       get :terms
+      get :privacy
       get :about
     end
   end
@@ -168,7 +169,7 @@ SEEK::Application.routes.draw do
       get :select
       get :items
     end
-    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events,:samples,:specimens,:only=>[:index]
+    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:documents, :events,:samples,:specimens,:only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -252,7 +253,7 @@ SEEK::Application.routes.draw do
       post :items_for_result
       post :resource_in_tab
     end
-    resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
+    resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications, :documents, :only=>[:index]
     resources :snapshots, :only => [:show, :new, :create, :destroy] do
       member do
         get :mint_doi_confirm
@@ -298,7 +299,7 @@ SEEK::Application.routes.draw do
       get :published
       get :isa_children
     end
-    resources :people,:projects,:assays,:investigations,:models,:sops,:data_files,:publications,:only=>[:index]
+    resources :people,:projects,:assays,:investigations,:models,:sops,:data_files,:publications, :documents,:only=>[:index]
   end
 
   resources :assays do
@@ -336,7 +337,7 @@ SEEK::Application.routes.draw do
       get :new_object_based_on_existing_one
       get :isa_children
     end
-    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
+    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications, :documents,:strains,:only=>[:index]
   end
 
 
@@ -524,7 +525,7 @@ SEEK::Application.routes.draw do
       get :isa_children
     end
     resources :people,:projects, :institutions, :investigations, :studies, :assays,
-              :data_files, :models, :sops, :presentations, :events, :publications
+              :data_files, :models, :sops, :presentations, :documents, :events, :publications
   end
 
   resources :publications do
@@ -542,7 +543,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :disassociate_authors
     end
-    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :events,:only=>[:index]
   end
 
   resources :events do
@@ -669,7 +670,7 @@ SEEK::Application.routes.draw do
       get :mint_doi_confirm
       get :isa_children
     end
-    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:only=>[:index]
   end
 
   ### ASSAY AND TECHNOLOGY TYPES ###

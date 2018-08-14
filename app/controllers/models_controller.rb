@@ -190,18 +190,11 @@ class ModelsController < ApplicationController
   # PUT /models/1.xml
   def update
     update_annotations(params[:tag_list], @model)
-    update_scales @model
-
-    @model.attributes = model_params
-
     update_sharing_policies @model
+    update_relationships(@model, params)
 
     respond_to do |format|
-      if @model.save
-
-        update_relationships(@model, params)
-        update_assay_assets(@model, params[:assay_ids])
-
+      if @model.update_attributes(model_params)
         flash[:notice] = "#{t('model')} metadata was successfully updated."
         format.html { redirect_to model_path(@model) }
         format.json {render json: @model}
@@ -250,11 +243,10 @@ class ModelsController < ApplicationController
 
   def build_model_image model_object, params_model_image
     # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
-    @model_image = ModelImage.new(params_model_image)
-    @model_image.model_id = model_object.id
-    @model_image.content_type = params_model_image[:image_file].content_type
-    @model_image.original_filename = params_model_image[:image_file].original_filename
-    model_object.model_image = @model_image
+    @model_image = model_object.build_model_image(params_model_image.merge(
+        model: model_object,
+        content_type: params_model_image[:image_file].content_type,
+        original_filename: params_model_image[:image_file].original_filename))
   end
 
   def find_xgmml_doc model
@@ -278,7 +270,9 @@ class ModelsController < ApplicationController
     params.require(:model).permit(:imported_source, :imported_url, :title, :description, { project_ids: [] }, :license,
                                   :model_type_id, :model_format_id, :recommended_environment_id, :organism_id,
                                   :other_creators,
-                                  { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+                                  { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                                  { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
+                                  { scale_extra_params: [] }, { publication_ids: [] })
   end
 
   alias_method :asset_params, :model_params

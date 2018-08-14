@@ -143,4 +143,25 @@ class StudyTest < ActiveSupport::TestCase
     study = Factory(:experimental_assay, assay_assets: assay_assets).study
     assert_equal data_files.sort, study.assets.sort
   end
+
+  test 'clone with associations' do
+    study = Factory(:study, title: '123', description: 'abc', policy: Factory(:publicly_viewable_policy))
+    person = study.contributor
+    publication = Factory(:publication, contributor: person)
+
+    disable_authorization_checks do
+      study.publications << publication
+    end
+
+    clone = study.clone_with_associations
+
+    assert_equal study.title, clone.title
+    assert_equal study.description, clone.description
+    assert_equal study.projects, clone.projects
+    assert_equal BaseSerializer.convert_policy(study.policy), BaseSerializer.convert_policy(clone.policy)
+
+    assert_includes clone.publications, publication
+
+    disable_authorization_checks { assert clone.save }
+  end
 end

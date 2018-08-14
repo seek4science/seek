@@ -23,40 +23,7 @@ module Seek
     end
 
     def update_relationships(asset, params)
-      Relationship.create_or_update_attributions(asset, params[:attributions])
-
-      # update related publications
-      publication_params = (params[:related_publication_ids] || []).collect do |id|
-        ['Publication', id.split(',').first]
-      end
-      Relationship.create_or_update_attributions(asset, publication_params, Relationship::RELATED_TO_PUBLICATION)
-
-      # Add creators
-      AssetsCreator.add_or_update_creator_list(asset, params[:creators])
-    end
-
-    def update_assay_assets(asset, assay_ids, relationship_type_titles = nil)
-      assay_ids ||= []
-      relationship_type_titles ||= Array.new(assay_ids.size)
-      create_assay_assets(asset, assay_ids, relationship_type_titles)
-      destroy_redundant_assay_assets(asset, assay_ids)
-    end
-
-    def destroy_redundant_assay_assets(asset, assay_ids)
-      asset.assay_assets.each do |assay_asset|
-        if assay_asset.assay.can_edit? && !assay_ids.include?(assay_asset.assay_id.to_s)
-          AssayAsset.destroy(assay_asset.id)
-        end
-      end
-    end
-
-    def create_assay_assets(asset, assay_ids, relationship_type_titles)
-      assay_ids.each.with_index do |assay_id, index|
-        if (assay = Assay.find(assay_id)).can_edit?
-          relationship = RelationshipType.find_by_title(relationship_type_titles[index])
-          assay.associate(asset, relationship: relationship)
-        end
-      end
+      Relationship.set_attributions(asset, params[:attributions])
     end
 
     def request_resource

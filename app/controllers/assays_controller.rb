@@ -21,8 +21,6 @@ class AssaysController < ApplicationController
   def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])
     @assay = @existing_assay.clone_with_associations
-    params[:data_file_ids]=@existing_assay.data_files.collect{|d|"#{d.id},None"}
-    params[:related_publication_ids]= @existing_assay.publications.collect{|p| "#{p.id},None"}
 
     if @existing_assay.can_view?
       notice_message = ''
@@ -114,18 +112,10 @@ class AssaysController < ApplicationController
     update_assay_organisms @assay, params
     @assay.contributor=current_person
     update_sharing_policies @assay
-    update_annotations(params[:tag_list], @assay) #this saves the assay
-    update_scales @assay
+    update_annotations(params[:tag_list], @assay)
+    update_relationships(@assay, params)
 
-    a = @assay.present?
-    b = @assay.save
-
-    if a && b
-      update_assets_linked_to_assay @assay, params
-      update_relationships(@assay, params)
-
-      #required to trigger the after_save callback after the assets have been associated
-      @assay.save
+    if @assay.save
       if @assay.create_from_asset =="true"
         render :action => :update_assays_list
       else
@@ -146,17 +136,11 @@ class AssaysController < ApplicationController
   def update
     update_assay_organisms @assay, params
     update_annotations(params[:tag_list], @assay)
-    update_scales @assay
-    @assay.update_attributes(assay_params)
     update_sharing_policies @assay
+    update_relationships(@assay, params)
 
     respond_to do |format|
-      if @assay.save           #should use params (e.g. for creators to be updated)
-        update_assets_linked_to_assay @assay, params
-        update_relationships(@assay, params)
-
-        @assay.save!
-
+      if @assay.update_attributes(assay_params)
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
         format.html { redirect_to(@assay) }
         format.json {render json: @assay}
@@ -174,44 +158,6 @@ class AssaysController < ApplicationController
       o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")
       culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
       assay.associate_organism(o_id, strain_id, culture_growth,t_id,t_title)
-    end
-  end
-
-  def update_assets_linked_to_assay assay,params
-    sop_ids               = params[:assay_sop_ids] || []
-    data_files            = params[:data_files] || []
-    model_ids             = params[:model_ids] || []
-    samples               = params[:samples] || []
-    document_ids          = params[:document_ids] || []
-
-    assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
-    data_files.each do |data_file|
-      d = DataFile.find(data_file[:id])
-      assay_assets_to_keep << assay.associate(d, direction: data_file[:direction],
-                                              relationship: RelationshipType.find_by_id(data_file[:relationship_type])
-      ) if d.can_view?
-    end
-    Array(model_ids).each do |id|
-      m = Model.find(id)
-      assay_assets_to_keep << assay.associate(m) if m.can_view?
-    end
-    Array(sop_ids).each do |id|
-      s = Sop.find(id)
-      assay_assets_to_keep << assay.associate(s) if s.can_view?
-    end
-    Array(document_ids).each do |id|
-      d = Document.find(id)
-      assay_assets_to_keep << assay.associate(d) if d.can_view?
-    end
-    samples.each do |sample|
-      s = Sample.find(sample[:id])
-      assay_assets_to_keep << assay.associate(s, :direction => sample[:direction]) if s.can_view?
-    end
-    #Destroy AssayAssets that aren't needed
-    (assay.assay_assets - assay_assets_to_keep.compact).each do |a|
-      unless a.asset_type == 'Document' # These are cleaned up automatically
-        a.destroy
-      end
     end
   end
 
@@ -234,8 +180,16 @@ class AssaysController < ApplicationController
   private
 
   def assay_params
-    params.require(:assay).permit(:title, :description, :study_id, :assay_class_id,
-                                  :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset,
-                                  { document_ids: []})
+    params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
+                                  :license, :other_creators, :create_from_asset, { document_ids: []}, { creator_ids: [] },
+                                  { scales: [] }, { sop_ids: [] }, { model_ids: [] },
+                                  { samples_attributes: [:asset_id, :direction] },
+                                  { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
+                                  { publication_ids: [] }
+                                  ).tap do |assay_params|
+      assay_params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if assay_params.key?(:document_ids)
+      assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)
+      assay_params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if assay_params.key?(:model_ids)
+    end
   end
 end

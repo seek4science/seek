@@ -53,9 +53,9 @@
           <%= render :partial => "assets/special_auth_code_form", :locals => {:f => f} if !@event.try(:new_record?)-%>
       <% end %>
 
-      <%=  f.fancy_multiselect :publications,:with_new_link=>true,:other_projects_checkbox=>true -%>
+      <%= f.fancy_multiselect :publications,:with_new_link=>true,:other_projects_checkbox=>true -%>
 
-      <%= render :partial => "assets/associate_data_file", :locals=>{:f=>f, :resource => @event } -%>
+      <%= f.fancy_multiselect :data_files, :other_projects_checkbox=>true -%>
 
       <%= f.fancy_multiselect :presentations,:with_new_link=>true,:other_projects_checkbox=>true %>
 

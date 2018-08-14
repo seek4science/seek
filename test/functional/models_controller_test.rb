@@ -237,7 +237,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     refute_includes new_assay.models, m
 
-    put :update, id: m, model: { title: m.title }, assay_ids: [new_assay.id.to_s]
+    put :update, id: m, model: { title: m.title, assay_assets_attributes: [{ assay_id: new_assay.id.to_s }] }
 
     assert_redirected_to model_path(m)
     m.reload
@@ -253,14 +253,14 @@ class ModelsControllerTest < ActionController::TestCase
     model_params = valid_model
 
     assert_difference('Model.count') do
-      post :create, model: model_params, scale_ids: [scale1.id.to_s, scale2.id.to_s], content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
+      post :create, model: model_params.merge(scales: [scale1.id.to_s, scale2.id.to_s]), content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
     end
     m = assigns(:model)
     assert_not_nil m
     assert_equal [scale1, scale2], m.scales
     scale3 = Factory(:scale)
 
-    put :update, id: m.id, model: { title: m.title }, scale_ids: [scale3.id.to_s]
+    put :update, id: m.id, model: { title: m.title, scales: [scale3.id.to_s] }
     m = assigns(:model)
     assert_equal [scale3], m.scales
   end
@@ -273,8 +273,13 @@ class ModelsControllerTest < ActionController::TestCase
                             "{\"scale_id\":\"#{scale2.id}\",\"param\":\"carrot\",\"unit\":\"cm\"}",
                             "{\"scale_id\":\"#{scale1.id}\",\"param\":\"soup\",\"unit\":\"minute\"}"]
 
+    model_and_scale_params = model_params.merge(
+                   scale_extra_params: scale_ids_and_params,
+                   scales: [scale1.id.to_s, scale2.id.to_s]
+    )
+
     assert_difference('Model.count') do
-      post :create, model: model_params, scale_ids: [scale1.id.to_s, scale2.id.to_s], scale_ids_and_params: scale_ids_and_params, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
+      post :create, model: model_and_scale_params, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
     end
     m = assigns(:model)
     assert_not_nil m
@@ -300,7 +305,10 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assay = assays(:modelling_assay)
     assert_difference('Model.count') do
-      post :create, model: valid_model, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, assay_ids: [assay.id.to_s]
+      assert_difference('AssayAsset.count') do
+        post :create, model: valid_model.merge(assay_assets_attributes: [{ assay_id: assay.id}]),
+             content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
+      end
     end
 
     assert_redirected_to model_path(assigns(:model))
@@ -366,11 +374,12 @@ class ModelsControllerTest < ActionController::TestCase
     assert_difference('Model.count') do
       assert_difference('ModelImage.count') do
         post :create, model: valid_model, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+
+        assert_redirected_to model_path(assigns(:model))
       end
     end
 
     model = assigns(:model)
-    assert_redirected_to model_path(model)
     assert_equal 'file_picture.png', model.model_image.original_filename
     assert_equal 'image/png', model.model_image.content_type
   end
@@ -380,11 +389,12 @@ class ModelsControllerTest < ActionController::TestCase
     assert_difference('Model.count') do
       assert_difference('ModelImage.count') do
         post :create, model: valid_model, content_blobs: [], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+
+        assert_redirected_to model_path(assigns(:model))
       end
     end
 
     model = assigns(:model)
-    assert_redirected_to model_path(model)
     assert_equal 'Test', model.title
   end
 
@@ -404,11 +414,10 @@ class ModelsControllerTest < ActionController::TestCase
              content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }],
              revision_comments: 'This is a new revision',
              model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+
+        assert_redirected_to model_path(assigns(:model))
       end
     end
-
-    assert_redirected_to model_path(m)
-    assert assigns(:model)
 
     m = Model.find(m.id)
     assert_equal 2, m.versions.size
@@ -578,11 +587,11 @@ class ModelsControllerTest < ActionController::TestCase
   test 'publications included in form for model' do
     get :edit, id: models(:teusink)
     assert_response :success
-    assert_select 'div#publications_fold_content', true
+    assert_select 'div#add_publications_form', true
 
     get :new
     assert_response :success
-    assert_select 'div#publications_fold_content', true
+    assert_select 'div#add_publications_form', true
   end
 
   test 'should update model' do

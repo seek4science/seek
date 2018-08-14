@@ -53,19 +53,11 @@ class EventsController < ApplicationController
 
   def handle_update_or_create(is_new)
     @new = is_new
-    data_files = params.delete(:data_files) || []
-    data_files.map! { |d| d['id'] }
-    @event.data_files = DataFile.find(data_files)
-
-    publication_ids = params.delete(:related_publication_ids) || []
-    @event.publications = Publication.find(publication_ids)
-
-    @event.attributes = event_params
 
     update_sharing_policies @event
 
     respond_to do | format |
-      if @event.save
+      if @event.update_attributes(event_params)
         flash.now[:notice] = "#{t('event')} was updated successfully." if flash.now[:notice].nil?
         format.html { redirect_to @event }
         format.json { render json: @event }
@@ -81,7 +73,12 @@ class EventsController < ApplicationController
   def event_params
     params.require(:event).permit(:title, :description, :start_date, :end_date, :url, :address, :city, :country,
                                   { project_ids: [] }, { publication_ids: [] }, { presentation_ids: [] },
-                                  { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+                                  { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                                  { data_file_ids: [] }, { publication_ids: [] })
+  end
+
+  def param_converter_options
+    { skip: [:data_file_ids] }
   end
 
 end

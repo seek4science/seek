@@ -128,4 +128,25 @@ class InvestigationTest < ActiveSupport::TestCase
     assert_equal 1, investigation.snapshots.count
     assert_equal investigation.title, snapshot.title
   end
+
+  test 'clone with associations' do
+    investigation = Factory(:investigation, title: '123', description: 'abc', policy: Factory(:publicly_viewable_policy))
+    person = investigation.contributor
+    publication = Factory(:publication, contributor: person)
+
+    disable_authorization_checks do
+      investigation.publications << publication
+    end
+
+    clone = investigation.clone_with_associations
+
+    assert_equal investigation.title, clone.title
+    assert_equal investigation.description, clone.description
+    assert_equal investigation.projects, clone.projects
+    assert_equal BaseSerializer.convert_policy(investigation.policy), BaseSerializer.convert_policy(clone.policy)
+
+    assert_includes clone.publications, publication
+
+    disable_authorization_checks { assert clone.save }
+  end
 end
