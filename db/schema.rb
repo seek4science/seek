@@ -171,6 +171,7 @@ ActiveRecord::Schema.define(version: 20180815104232) do
     t.integer  "suggested_assay_type_id",      limit: 4
     t.integer  "suggested_technology_type_id", limit: 4
     t.text     "other_creators",               limit: 65535
+    t.string   "deleted_contributor",          limit: 255
   end
 
   create_table "assays_deprecated_samples", id: false, force: :cascade do |t|

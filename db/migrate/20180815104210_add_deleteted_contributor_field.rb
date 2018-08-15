@@ -18,7 +18,7 @@ class AddDeletetedContributorField < ActiveRecord::Migration
   end
 
   def types
-    [DataFile, Document, Event, Investigation, Model, Presentation, Publication, Sample, Sop, Strain, Study] +
+    [Assay, DataFile, Document, Event, Investigation, Model, Presentation, Publication, Sample, Sop, Strain, Study] +
         [DataFile::Version, Document::Version, Model::Version, Presentation::Version, Sop::Version]
   end
 end
