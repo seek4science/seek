@@ -15,6 +15,7 @@ class Person < ActiveRecord::Base
 
   before_save :first_person_admin_and_add_to_default_project
   before_destroy :clean_up_and_assign_permissions
+  after_destroy :updated_contributed_items_contributor_after_destroy
 
   acts_as_notifiee
 
@@ -323,7 +324,7 @@ class Person < ActiveRecord::Base
 
   # all items, assets, ISA, samples and events that are linked to this person as a contributor
   def contributed_items
-    [Assay, Study, Investigation, DataFile, Document, Sop, Presentation, Model, Sample, Publication, Event].collect do |type|
+    [Assay, Study, Investigation, DataFile, Document, Sop, Presentation, Model, Sample, Strain, Publication, Event].collect do |type|
       type.where(contributor_id:id)
     end.flatten.uniq.compact
   end
@@ -467,6 +468,19 @@ class Person < ActiveRecord::Base
     publication_authors.each do |author|
       author.update_attribute(:last_name,self.last_name)
       author.update_attribute(:first_name,self.first_name)
+    end
+  end
+
+  def updated_contributed_items_contributor_after_destroy
+    contributed_items.each do |item|
+      item.update_column(:contributor_id,nil)
+      item.update_column(:deleted_contributor,"Person:#{id}")
+      if item.respond_to?(:versions)
+        item.versions.select{|v| v.contributor_id==id}.each do |v|
+          v.update_column(:contributor_id,nil)
+          v.update_column(:deleted_contributor,"Person:#{id}")
+        end
+      end
     end
   end
 

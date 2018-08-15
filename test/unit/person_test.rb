@@ -144,15 +144,19 @@ class PersonTest < ActiveSupport::TestCase
     inv = Factory(:investigation, contributor:person)
     study = Factory(:study, contributor: person,investigation:inv)
     as = Factory(:assay, contributor: person,study:study)
+    strain = Factory(:strain,contributor:person)
+    sample = Factory(:sample,contributor:person)
 
 
     items = person.contributed_items
 
-    assert_equal 4, items.count
+    assert_equal 6, items.count
     assert_includes items, df
     assert_includes items, as
     assert_includes items, study
     assert_includes items, inv
+    assert_includes items, strain
+    assert_includes items, sample
 
     person = Factory(:person_in_project)
     assert_nil person.user
@@ -1236,4 +1240,53 @@ class PersonTest < ActiveSupport::TestCase
     refute_nil pub3.publication_authors.sort_by(&:first_name)[0].person
 
   end
+
+  test 'deleted contributor updated when person deleted' do
+    data_file = Factory(:data_file)
+    person = data_file.contributor
+    person_id = person.id
+    things = [data_file]
+    things << Factory(:model, contributor:person)
+    things << Factory(:sop, contributor:person)
+    things << Factory(:presentation, contributor:person)
+    things << Factory(:investigation, contributor:person)
+    things << Factory(:study, contributor:person)
+    things << Factory(:assay, contributor:person)
+    things << Factory(:sample, contributor:person)
+    things << Factory(:strain, contributor:person)
+    things << Factory(:publication, contributor:person)
+
+
+
+    things.each do |thing|
+      assert_nil thing.deleted_contributor
+      assert_equal person,thing.contributor
+      if thing.respond_to?(:versions)
+        v = thing.versions.last
+        assert_nil v.deleted_contributor
+        assert_equal person,v.contributor
+      end
+    end
+
+    User.with_current_user(Factory(:admin).user) do
+      assert_difference('Person.count',-1) do
+        assert_difference('User.count',-1) do
+          person.destroy
+        end
+      end
+    end
+
+    things.each do |thing|
+      thing.reload
+      assert_nil thing.contributor, "#{thing.class.name} contributor should be nil"
+      refute_nil thing.deleted_contributor, "#{thing.class.name} deleted_contributor shouldn't be nil"
+      assert_equal "Person:#{person_id}",thing.deleted_contributor
+      if thing.respond_to?(:versions)
+        v = thing.versions.last
+        assert_nil v.contributor, "#{v.class.name} contributor should be nil"
+        refute_nil v.deleted_contributor, "#{v.class.name} deleted_contributor shouldn't be nil"
+      end
+    end
+  end
+
 end
