@@ -62,6 +62,7 @@ class Organism < ActiveRecord::Base
   #   - a identifiers.org URI
   # if it doesn't match these rules it is left as it is
   def convert_concept_uri
+    concept_uri.strip! if concept_uri
     case concept_uri
     when /\A\d+\Z/
       self.concept_uri = "http://purl.bioontology.org/ontology/NCBITAXON/#{concept_uri}"
