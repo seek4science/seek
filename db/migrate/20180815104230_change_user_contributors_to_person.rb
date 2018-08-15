@@ -1,7 +1,5 @@
 class ChangeUserContributorsToPerson < ActiveRecord::Migration
   def up
-    types = Seek::Util.authorized_types.select{|t| t.attribute_names.include?('contributor_type')}
-    types = types + [DataFile::Version, Document::Version, Model::Version, Presentation::Version, Sop::Version]
     types.each do |type|
       # the update could potentially be done in one update & join, but would be different for each database type
       sql = "SELECT #{type.table_name}.id, users.person_id FROM #{type.table_name} LEFT JOIN users ON users.id = contributor_id WHERE #{type.table_name}.contributor_type = 'User';"
@@ -16,5 +14,10 @@ class ChangeUserContributorsToPerson < ActiveRecord::Migration
 
   def down
     # not reversible
+  end
+
+  def types
+    [DataFile, Document, Event, Investigation, Model, Presentation, Publication, Sample, Sop, Strain, Study] +
+        [DataFile::Version, Document::Version, Model::Version, Presentation::Version, Sop::Version]
   end
 end
