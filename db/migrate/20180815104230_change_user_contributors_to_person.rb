@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeUserContributorsToPerson < ActiveRecord::Migration
   def up
     types.each do |type|
@@ -5,11 +7,11 @@ class ChangeUserContributorsToPerson < ActiveRecord::Migration
       ActiveRecord::Base.connection.select_all(sql).each do |record|
         id = record['id']
         person_id = record['person_id']
-        unless person_id.blank?
-          sql = "UPDATE #{type.table_name} SET contributor_id = #{person_id}, contributor_type = 'Person' WHERE id = #{id}"
-        else
-          #where the contributor cannot be determined, the deleted_contributor field is updated
+        if person_id.blank?
+          # where the contributor cannot be determined, the deleted_contributor field is updated
           sql = "UPDATE #{type.table_name} SET deleted_contributor = 'User:#{id}', contributor_id = NULL, contributor_type= NULL WHERE id = #{id}"
+        else
+          sql = "UPDATE #{type.table_name} SET contributor_id = #{person_id}, contributor_type = 'Person' WHERE id = #{id}"
         end
         ActiveRecord::Base.connection.execute(sql)
       end
@@ -22,6 +24,6 @@ class ChangeUserContributorsToPerson < ActiveRecord::Migration
 
   def types
     [DataFile, Document, Event, Investigation, Model, Presentation, Publication, Sample, Sop, Strain, Study] +
-        [DataFile::Version, Document::Version, Model::Version, Presentation::Version, Sop::Version]
+      [DataFile::Version, Document::Version, Model::Version, Presentation::Version, Sop::Version]
   end
 end
