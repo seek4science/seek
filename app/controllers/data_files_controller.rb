@@ -91,10 +91,10 @@ class DataFilesController < ApplicationController
   end
 
   def upload_for_tool
-    if handle_upload_data
-      params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
-      @data_file = DataFile.new(data_file_params)
+    params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
+    @data_file = DataFile.new(data_file_params)
 
+    if handle_upload_data
       @data_file.policy = Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
       if @data_file.save
@@ -115,9 +115,8 @@ class DataFilesController < ApplicationController
   def upload_from_email
     if current_user.is_admin? && Seek::Config.admin_impersonation_enabled
       User.with_current_user Person.find(params[:sender_id]).user do
+        @data_file = DataFile.new(data_file_params)
         if handle_upload_data
-          @data_file = DataFile.new(data_file_params)
-
           @data_file.policy = Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
 
           if @data_file.save
@@ -356,8 +355,7 @@ class DataFilesController < ApplicationController
   def create_content_blob
     @data_file = DataFile.new
     respond_to do |format|
-      if handle_upload_data
-        create_content_blobs
+      if handle_upload_data && @data_file.content_blob.save
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
         # assay ids passed forwards, e.g from "Add Datafile" button
         @source_assay_ids = (params[:assay_ids] || [] ).reject(&:blank?)

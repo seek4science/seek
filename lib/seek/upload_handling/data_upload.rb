@@ -32,6 +32,8 @@ module Seek
           end
         end
 
+        set_content_blobs
+
         true
       end
 
@@ -53,6 +55,10 @@ module Seek
       end
 
       def create_content_blobs
+        warn 'remove me'
+      end
+
+      def set_content_blobs
         asset = eval "@#{controller_name.downcase.singularize}"
         version = asset.version
 
@@ -60,9 +66,9 @@ module Seek
           content_blobs_params.each do |item_params|
             attributes = build_attributes_hash_for_content_blob(item_params, version)
             if asset.respond_to?(:content_blobs)
-              asset.content_blobs.create(attributes)
+              asset.content_blobs.build(attributes)
             else
-              asset.create_content_blob(attributes)
+              asset.build_content_blob(attributes)
             end
           end
         end
@@ -103,8 +109,6 @@ module Seek
                                              content_type: blob.content_type,
                                              asset_version: asset.version)
         FileUtils.cp(blob.filepath, new_blob.filepath) if File.exist?(blob.filepath)
-        # need to save after copying the file, coz an after_save on contentblob relies on the file
-        new_blob.save
       end
 
       def process_upload(blob_params)
