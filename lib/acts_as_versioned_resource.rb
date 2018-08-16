@@ -26,6 +26,7 @@ module Acts #:nodoc:
           extend Acts::VersionedResource::SingletonMethods
         end
         include Acts::VersionedResource::InstanceMethods
+        include Seek::Permissions::SpecialContributors
 
         delegate :tag_counts, :scales, :managers, :attributions, :creators, :assets_creators, :is_asset?,
                  :authorization_supported?, :defines_own_avatar?, :use_mime_type_for_avatar?, :avatar_key,

@@ -43,6 +43,7 @@ module Seek #:nodoc:
             include Seek::Permissions::CodeBasedAuthorization
             include Seek::Permissions::StateBasedPermissions
             include Seek::Permissions::PublishingPermissions
+            include Seek::Permissions::SpecialContributors
 
             does_not_require_can_edit :uuid, :first_letter
           end
