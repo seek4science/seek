@@ -61,7 +61,8 @@ namespace :seek do
     types.each do |type|
       puts "processing deleted contributors for #{type.table_name}"
       #items where the deleted_contributor hasn't been set, the contributor id can be found, but the contributor doesn't exist
-      items = type.where('deleted_contributor IS NULL AND contributor_id IS NOT NULL').collect{|i| i.contributor.nil?}
+      items = type.where('deleted_contributor IS NULL AND contributor_id IS NOT NULL').select{|i| i.contributor.nil?}
+      puts items.inspect
       bar = ProgressBar.new(items.count)
       items.each do |item|
         item.update_column(:deleted_contributor,"Person:#{item.contributor_id}")
