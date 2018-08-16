@@ -18,13 +18,16 @@ class SendPeriodicEmailsJob < SeekEmailJob
     raise Exception, "invalid frequency - #{frequency}" unless DELAYS.keys.include?(@frequency)
   end
 
-  def perform_job(_item)
-    logs = activity_logs_since delay_for_frequency.ago
+  def perform_job(logs)
     send_subscription_mails logs
   end
 
   def gather_items
-    [nil]
+    if Seek::Config.email_enabled
+      [find_relevant_logs]
+    else
+      []
+    end
   end
 
   def default_priority
@@ -44,12 +47,6 @@ class SendPeriodicEmailsJob < SeekEmailJob
   end
 
   def send_subscription_mails(logs)
-    if Seek::Config.email_enabled
-      # strip the logs down to those that are relevant
-      logs = logs.to_a.select do |log|
-        log.activity_loggable.try(:subscribable?)
-      end
-
       subscribed_people(logs).each do |person|
         begin
           collect_and_deliver(logs, person)
@@ -57,7 +54,6 @@ class SendPeriodicEmailsJob < SeekEmailJob
           Delayed::Job.logger.error("Error sending subscription emails to person #{person.id} - #{e.message}")
         end
       end
-    end
   end
 
   def collect_and_deliver(logs, person)
@@ -92,7 +88,14 @@ class SendPeriodicEmailsJob < SeekEmailJob
   end
 
   def activity_logs_since(time_point)
-    ActivityLog.where(['created_at>=? and action in (?) and controller_name!=?', time_point, %w[create update], 'sessions'])
+    ActivityLog.where(['created_at >= ? and action in (?) and controller_name != ?', time_point, %w[create update], 'sessions'])
+  end
+
+  def find_relevant_logs
+    # strip the logs down to those that are relevant
+    activity_logs_since(delay_for_frequency.ago).to_a.select do |log|
+      log.activity_loggable.try(:subscribable?)
+    end
   end
 
   # puts the initial jobs on the queue for each period - daily, weekly, monthly - if they do not exist already
