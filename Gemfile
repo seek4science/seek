@@ -58,6 +58,7 @@ gem 'lograge'
 gem 'psych'
 gem 'validate_url'
 gem "attr_encrypted", "~> 3.0.0"
+gem 'app_version'
 
 # gem for BiVeS and BudHat
 gem 'bives'
@@ -69,7 +70,6 @@ gem 'white_list_formatted_content', git: 'https://github.com/SysMO-DB/white_list
 gem 'my_responds_to_parent', git: 'https://github.com/SysMO-DB/my_responds_to_parent.git'
 gem 'bioportal', '>=3.0', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'acts_as_activity_logged', git: 'https://github.com/SysMO-DB/acts_as_activity_logged.git'
-gem 'app_version', git: 'https://github.com/SysMO-DB/app_version.git'
 gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
 gem 'convert_office', git: 'https://github.com/SysMO-DB/convert_office.git', ref: '753f2567dbd625bc89071e1150404efbb562e130'
 gem 'fleximage', git: 'https://github.com/SysMO-DB/fleximage.git', ref: 'bb1182f2716a9bf1b5d85e186d8bb7eec436797b'
