@@ -237,6 +237,10 @@ class OrganismTest < ActiveSupport::TestCase
     org.convert_concept_uri
     assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/5622', org.concept_uri
 
+    org = Factory.build(:organism, concept_uri: ' http://identifiers.org/taxonomy/5622 ')
+    org.convert_concept_uri
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/5622', org.concept_uri
+
     org = Factory.build(:organism, concept_uri: 'wibble')
     org.convert_concept_uri
     assert_equal 'wibble', org.concept_uri
