@@ -49,19 +49,19 @@ class SendPeriodicEmailsJob < SeekEmailJob
   def send_subscription_mails(logs)
       subscribed_people(logs).each do |person|
         begin
-          collect_and_deliver(logs, person)
+          collect_and_deliver_to_person(logs, person)
         rescue Exception => e
           Delayed::Job.logger.error("Error sending subscription emails to person #{person.id} - #{e.message}")
         end
       end
   end
 
-  def collect_and_deliver(logs, person)
-    activity_logs = collect_relevant_logs(logs, person)
+  def collect_and_deliver_to_person(logs, person)
+    activity_logs = collect_relevant_logs_for_person(logs, person)
     SubMailer.send_digest_subscription(person, activity_logs, frequency).deliver_later if activity_logs.any?
   end
 
-  def collect_relevant_logs(logs, person)
+  def collect_relevant_logs_for_person(logs, person)
     # get only the logs for items that are visible to this person
     logs_for_visible_items = logs.select { |log| log.activity_loggable.try(:can_view?, person.user) }
 
