@@ -187,4 +187,16 @@ module AssetsHelper
   def mini_file_download_icon(fileinfo)
     image_tag_for_key('download', polymorphic_path([fileinfo.asset, fileinfo], action: :download, code: params[:code]), 'Download', { title: 'Download this file' }, '')
   end
+
+  def the_jerm_contributor_contributor_icon(options = {size: 50 })
+    logo_filename = icon_filename_for_key('jerm_logo')
+    size = options[:size]
+    image_tag logo_filename,
+              alt: t('jerm_harvester_name'),
+              size: "#{size}x#{size}",
+              class: 'framed',
+              style: 'padding: 2px;',
+              title: t('jerm_harvester_name')
+  end
+
 end

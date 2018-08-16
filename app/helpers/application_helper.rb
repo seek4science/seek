@@ -260,7 +260,7 @@ module ApplicationHelper
   end
 
   def contributor(contributor, avatar = false, size = 100, you_text = false)
-    return jerm_harvester_name unless contributor
+    return unless contributor
 
     if contributor.class.name == 'User'
       # this string will output " (you) " for current user next to the display name, when invoked with 'you_text == true'

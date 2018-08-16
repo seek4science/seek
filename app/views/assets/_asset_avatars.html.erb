@@ -39,9 +39,9 @@
             <% end %>
         <% end %>
     <% else %>
-        <% if !resource.contributor -%>
+        <% if resource.has_jerm_contributor? -%>
             <div class="text-center">
-              <%= the_jerm_contributor_logo :size=>30 -%>
+              <%= the_jerm_contributor_contributor_icon :size=>30 -%>
             </div>
         <% end -%>
     <% end %>

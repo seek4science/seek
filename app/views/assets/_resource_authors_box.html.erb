@@ -16,7 +16,9 @@ creators ||= resource.creators.reject { |c| contributor && (c == contributor) }
       <% if contributor %>
         <%= favouritable_icon(contributor, 50, tooltip_suffix: " (#{t('contributor').capitalize})", corner_icon: 'new') -%>
       <% else %>
-        <%= the_jerm_contributor_logo -%>
+        <% if resource.has_jerm_contributor? %>
+          <%= the_jerm_contributor_contributor_icon -%>
+        <% end %>
       <% end %>
     </span>
     <% creators.shift(4).each do |creator| %>
@@ -30,8 +32,8 @@ creators ||= resource.creators.reject { |c| contributor && (c == contributor) }
 
     <span id='expanded' style="display: none;">
       <% creators.each do |creator| %>
-          <% if creator.nil? or creator.can_view? %>
-              <span class="author_avatar"><%= creator.nil? ? the_jerm : favouritable_icon(creator, 50) -%></span>
+          <% if creator.nil? || creator.can_view? %>
+
           <% elsif creator.title_is_public? %>
               [<%= h(creator.name) %>]
           <% end %>
