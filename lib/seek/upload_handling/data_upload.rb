@@ -104,7 +104,7 @@ module Seek
                                              original_filename: blob.original_filename,
                                              content_type: blob.content_type,
                                              asset_version: asset.version)
-        FileUtils.cp(blob.filepath, new_blob.filepath) if File.exist?(blob.filepath)
+        new_blob.tmp_io_object = File.open(blob.filepath) if File.exist?(blob.filepath)
       end
 
       def process_upload(blob_params)
