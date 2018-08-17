@@ -512,6 +512,9 @@ class DataFilesController < ApplicationController
       update_relationships(@data_file, params)
 
       session.delete(:uploaded_content_blob_id)
+      session.delete(:processed_datafile)
+      session.delete(:processed_assay)
+      session.delete(:processed_warnings)
 
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
