@@ -70,7 +70,7 @@ module Seek
 
     # i.e. @model = item, or @data_file = item - according to the item class name
     def set_shared_item_variable(item)
-      eval("@#{item.class.name.underscore}=item")
+      instance_variable_set("@#{item.class.name.underscore}", item)
     end
 
     # the standard response block after created a new asset
