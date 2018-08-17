@@ -144,8 +144,6 @@ class SampleTypesController < ApplicationController
     @sample_type.uploaded_template = true
 
     handle_upload_data
-    attributes = build_attributes_hash_for_content_blob(content_blobs_params.first, nil)
-    @sample_type.create_content_blob(attributes)
     @sample_type.build_attributes_from_template
   end
 

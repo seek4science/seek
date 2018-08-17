@@ -84,7 +84,7 @@ class ModelsController < ApplicationController
   # GET /models.xml
 
   def new_version
-    if handle_upload_data
+    if handle_upload_data(true)
       comments = params[:revision_comments]
 
       respond_to do |format|
