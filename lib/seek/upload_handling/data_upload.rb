@@ -54,10 +54,6 @@ module Seek
         process_from_url(item_params)
       end
 
-      def create_content_blobs
-        warn 'remove me'
-      end
-
       def set_content_blobs
         asset = eval "@#{controller_name.downcase.singularize}"
         version = asset.version

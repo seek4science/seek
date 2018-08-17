@@ -23,8 +23,6 @@ class SopsController < ApplicationController
       respond_to do |format|
         if @sop.save_as_new_version(comments)
 
-          create_content_blobs
-
           #Duplicate experimental conditions
           conditions = @sop.find_version(@sop.version - 1).experimental_conditions
           conditions.each do |con|

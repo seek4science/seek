@@ -21,7 +21,6 @@ class PresentationsController < ApplicationController
 
       respond_to do |format|
         if @presentation.save_as_new_version(comments)
-          create_content_blobs
           flash[:notice]="New version uploaded - now on version #{@presentation.version}"
         else
           flash[:error]="Unable to save new version"

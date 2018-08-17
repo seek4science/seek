@@ -89,7 +89,6 @@ class ModelsController < ApplicationController
 
       respond_to do |format|
         create_new_version comments
-        create_content_blobs
         create_model_image @model, model_image_params  if model_image_present?
         format.html { redirect_to @model }
       end

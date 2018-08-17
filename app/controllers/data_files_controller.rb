@@ -68,8 +68,6 @@ class DataFilesController < ApplicationController
 
       respond_to do |format|
         if @data_file.save_as_new_version(comments)
-          create_content_blobs
-
           # Duplicate studied factors
           factors = @data_file.find_version(@data_file.version - 1).studied_factors
           factors.each do |f|
@@ -99,7 +97,6 @@ class DataFilesController < ApplicationController
 
       if @data_file.save
         @data_file.creators = [current_person]
-        create_content_blobs
         # send email to the file uploader and receiver
         Mailer.file_uploaded(current_user, Person.find(params[:recipient_id]), @data_file).deliver_later
 
@@ -121,8 +118,6 @@ class DataFilesController < ApplicationController
 
           if @data_file.save
             @data_file.creators = [User.current_user.person]
-            create_content_blobs
-
             flash.now[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
             render text: flash.now[:notice]
           else
@@ -146,8 +141,6 @@ class DataFilesController < ApplicationController
       update_relationships(@data_file, params)
 
       if @data_file.save
-        create_content_blobs
-
         if !@data_file.parent_name.blank?
           render partial: 'assets/back_to_fancy_parent', locals: { child: @data_file, parent_name: @data_file.parent_name, is_not_fancy: true }
         else

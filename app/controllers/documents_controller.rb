@@ -21,8 +21,6 @@ class DocumentsController < ApplicationController
 
       respond_to do |format|
         if @document.save_as_new_version(comments)
-          create_content_blobs
-
           flash[:notice] = "New version uploaded - now on version #{@document.version}"
         else
           flash[:error] = "Unable to save new version"
