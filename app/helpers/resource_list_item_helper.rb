@@ -146,6 +146,7 @@ module ResourceListItemHelper
 
   def list_item_contributors(resource, key = t('contributor').capitalize)
     return "<p class=\"list_item_attribute\"><b>#{key}</b>: #{t('jerm_harvester_name')}</p>".html_safe if resource.has_jerm_contributor?
+    return "<p class=\"list_item_attribute\"><b>#{key}</b>: #{t('deleted_contributor_name')}</p>".html_safe if resource.has_deleted_contributor?
     if resource.respond_to?(:contributors) && resource.contributors.length > 1
       list_item_person_list(resource.contributors.map(&:person), nil, key.pluralize)
     else

@@ -16,7 +16,9 @@ creators ||= resource.creators.reject { |c| contributor && (c == contributor) }
       <% if contributor %>
         <%= favouritable_icon(contributor, 50, tooltip_suffix: " (#{t('contributor').capitalize})", corner_icon: 'new') -%>
       <% else %>
-        <% if resource.has_jerm_contributor? %>
+        <% if resource.has_deleted_contributor? %>
+          <%= deleted_contributor_contributor_icon -%>
+        <% elsif resource.has_jerm_contributor? %>
           <%= the_jerm_contributor_contributor_icon -%>
         <% end %>
       <% end %>
