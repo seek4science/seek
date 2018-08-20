@@ -5,6 +5,7 @@ services:
     container_name: seek-mysql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: always
+    stop_grace_period: 1m30s
     env_file:
       - docker/db.env
     volumes:
