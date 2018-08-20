@@ -129,7 +129,8 @@ class SessionsController < ApplicationController
       check_login
     # there is no such user, should we not create the user?
     elsif !Seek::Config.omniauth_user_create
-      failed_login "the authenticated user: #{info['nickname']} cannot be found"
+      failed_login "the authenticated user: #{info['nickname']} cannot be found; administrators have been informed"
+      Mailer.omniauth_failed_login(auth.to_yaml).deliver_later
     else
       # TODO: Check this code out
       # create the user from the omniauth info
