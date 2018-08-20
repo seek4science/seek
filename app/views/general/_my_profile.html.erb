@@ -22,8 +22,10 @@
         <li class='dynamic_menu_li' onclick="javascript:location.href='<%= edit_person_path(current_person) -%>';">Edit
           profile
         </li>
-        <li class='dynamic_menu_li' onclick="javascript:location.href='<%= edit_user_path(current_user) -%>';">Change password
-        </li>
+        <% if current_user.provider.nil? %>
+          <li class='dynamic_menu_li' onclick="javascript:location.href='<%= edit_user_path(current_user) -%>';">Change password
+          </li>
+        <% end %>
 
         <% unless !include_projects || current_person.projects.empty? %>
             <li class="my_profile_menu_header">
