@@ -46,6 +46,11 @@ class Person < ActiveRecord::Base
   has_many :favourite_group_memberships, dependent: :destroy
   has_many :favourite_groups, through: :favourite_group_memberships
 
+  has_many :data_files_for_person, foreign_key: :contributor_id, class_name: 'DataFile'
+  has_many :sop_for_person, foreign_key: :contributor_id, class_name: 'Sop'
+  has_many :models_for_person, foreign_key: :contributor_id, class_name: 'Model'
+  has_many :publications_for_person, foreign_key: :contributor_id, class_name: 'Publication'
+
   has_many :studies_for_person, foreign_key: :contributor_id, class_name: 'Study'
   has_many :assays_for_person, foreign_key: :contributor_id, class_name: 'Assay'
   alias assays assays_for_person
