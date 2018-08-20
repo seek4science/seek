@@ -8,6 +8,7 @@ rails_best_practices_output.html
 
 db/*.sqlite3
 db/*.sqlite3-journal
+config/secrets.yml
 config/database.yml
 config/initializers/seek_local.rb
 config/environment_local.rb
