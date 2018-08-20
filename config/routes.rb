@@ -1,5 +1,9 @@
 SEEK::Application.routes.draw do
 
+  devise_for :users, :controllers => {
+      :omniauth_callbacks => 'callbacks'
+  }
+
   mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)
   #mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
 
@@ -709,8 +713,8 @@ SEEK::Application.routes.draw do
 
   get '/logout' => 'sessions#destroy', :as => :logout
   get '/login' => 'sessions#new', :as => :login
-  get '/auth/:provider/callback' => 'sessions#create'
-  get '/activate(/:activation_code)' => 'users#activate', :as => :activate
+  get '/create' => 'sessions#create', :as => :create_session
+   get '/activate(/:activation_code)' => 'users#activate', :as => :activate
   get '/forgot_password' => 'users#forgot_password', :as => :forgot_password
   get '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
   get '/fail'=>'fail#index',:as=>:fail
