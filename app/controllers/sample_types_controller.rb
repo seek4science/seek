@@ -43,7 +43,7 @@ class SampleTypesController < ApplicationController
       if @sample_type.errors.empty? && @sample_type.save
         format.html { redirect_to edit_sample_type_path(@sample_type), notice: 'Sample type was successfully created.' }
       else
-        @sample_type.content_blob.destroy if @sample_type.content_blob
+        @sample_type.content_blob.destroy if @sample_type.content_blob.persisted?
         format.html { render action: 'new' }
       end
     end
@@ -144,6 +144,7 @@ class SampleTypesController < ApplicationController
     @sample_type.uploaded_template = true
 
     handle_upload_data
+    @sample_type.content_blob.save! # Need's to be saved so the spreadsheet can be read from disk
     @sample_type.build_attributes_from_template
   end
 
