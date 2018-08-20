@@ -65,7 +65,10 @@ module Seek
             if asset.respond_to?(:content_blobs)
               asset.content_blobs.build(attributes)
             else
+              old_content_blob = asset.content_blob
               asset.build_content_blob(attributes)
+              # asset_id on the previous content blob gets blanked out after the above command is run, so need to do:
+              old_content_blob.update_column(:asset_id, asset.id) if old_content_blob && new_version
             end
           end
         end
