@@ -1,6 +1,6 @@
 #baseurl: /seek
 
-current_seek_version: 1.6.2
+current_seek_version: 1.6.3
 current_docker_tag: 1.6
 
 plugins:
