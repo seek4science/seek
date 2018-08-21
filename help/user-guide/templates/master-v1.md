@@ -40,7 +40,7 @@ _**7.**_  The description for the Assay entry that will be created in SEEK
 
 _**8.**_  The experimental assay type, which needs to be selected from a list of available options
 
-_**9.**_  The Assay technologoy type, which needs to be selected from a list of available options
+_**9.**_  The Assay technology type, which needs to be selected from a list of available options
 
 _**10.**_ If you wish to link the Assay to an existing SOP, this should contain the full SOP SEEK ID<sup>*</sup>.
 
