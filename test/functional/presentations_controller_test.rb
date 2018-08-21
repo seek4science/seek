@@ -13,7 +13,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object = Factory :presentation, contributor: User.current_user
+    @object = Factory :presentation, contributor: User.current_user.person
     @object.tag_with 'tag1'
     @object
   end
@@ -48,20 +48,20 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'can edit' do
-    presentation = Factory :presentation, contributor: User.current_user
+    presentation = Factory :presentation, contributor: User.current_user.person
 
     get :edit, id: presentation
     assert_response :success
   end
 
   test 'can update' do
-    presentation = Factory :presentation, contributor: User.current_user
+    presentation = Factory :presentation, contributor: User.current_user.person
     post :update, id: presentation, presentation: { title: 'updated' }
     assert_redirected_to presentation_path(presentation)
   end
 
   test 'should show presentation' do
-    presentation = Factory :ppt_presentation, contributor: User.current_user
+    presentation = Factory :ppt_presentation, contributor: User.current_user.person
     assert_difference 'ActivityLog.count' do
       get :show, id: presentation
     end
@@ -80,7 +80,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'can upload new version with valid url' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
-    presentation = Factory :presentation, contributor: User.current_user
+    presentation = Factory :presentation, contributor: User.current_user.person
 
     assert_difference 'presentation.version' do
       post :new_version, id: presentation, presentation: {},
@@ -93,7 +93,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'can upload new version with valid filepath' do
     # by default, valid data_url is provided by content_blob in Factory
-    presentation = Factory :presentation, contributor: User.current_user
+    presentation = Factory :presentation, contributor: User.current_user.person
     presentation.content_blob.url = nil
     presentation.content_blob.data = file_for_upload
     presentation.reload
@@ -109,7 +109,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'cannot upload file with invalid url' do
     stub_request(:head, 'http://www.blah.de/images/logo.png').to_raise(SocketError)
-    presentation_attrs = Factory.build(:presentation, contributor: User.current_user).attributes # .symbolize_keys(turn string key to symbol)
+    presentation_attrs = Factory.build(:presentation, contributor: User.current_user.person).attributes # .symbolize_keys(turn string key to symbol)
 
     assert_no_difference 'Presentation.count' do
       post :create, presentation: presentation_attrs, content_blobs: [{ data_url: 'http://www.blah.de/images/logo.png' }]
@@ -119,7 +119,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'cannot upload new version with invalid url' do
     stub_request(:any, 'http://www.blah.de/images/liver-illustration.png').to_raise(SocketError)
-    presentation = Factory :presentation, contributor: User.current_user
+    presentation = Factory :presentation, contributor: User.current_user.person
     new_data_url = 'http://www.blah.de/images/liver-illustration.png'
     assert_no_difference 'presentation.version' do
       post :new_version, id: presentation, presentation: {}, content_blobs: [{ data_url: new_data_url }]
@@ -130,7 +130,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'can destroy' do
-    presentation = Factory :presentation, contributor: User.current_user
+    presentation = Factory :presentation, contributor: User.current_user.person
     content_blob_id = presentation.content_blob.id
     assert_difference('Presentation.count', -1) do
       delete :destroy, id: presentation
@@ -142,7 +142,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'can subscribe' do
-    presentation = Factory :presentation, contributor: User.current_user
+    presentation = Factory :presentation, contributor: User.current_user.person
     assert_difference 'presentation.subscriptions.count' do
       presentation.subscribed = true
       presentation.save
@@ -155,7 +155,7 @@ class PresentationsControllerTest < ActionController::TestCase
     login_as p.user
 
     p2 = Factory :person
-    presentation = Factory :presentation, contributor: p.user
+    presentation = Factory :presentation, contributor: p
 
     assert presentation.annotations.empty?, 'this presentation should have no tags for the test'
 
@@ -194,7 +194,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'should set the other creators ' do
     user = Factory(:user)
-    presentation = Factory(:presentation, contributor: user)
+    presentation = Factory(:presentation, contributor: user.person)
     login_as(user)
     assert presentation.can_manage?, 'The presentation must be manageable for this test to succeed'
     put :update, id: presentation, presentation: { other_creators: 'marry queen' }
@@ -322,7 +322,7 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'should update license' do
     user = Factory(:person).user
     login_as(user)
-    presentation = Factory :presentation, policy: Factory(:public_policy), contributor: user
+    presentation = Factory :presentation, policy: Factory(:public_policy), contributor: user.person
 
     assert_nil presentation.license
 
@@ -352,7 +352,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should return 406 when showing presentation as RDF' do
-    presentation = Factory :ppt_presentation, contributor: User.current_user
+    presentation = Factory :ppt_presentation, contributor: User.current_user.person
 
     get :show, id: presentation, format: :rdf
 

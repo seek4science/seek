@@ -4,7 +4,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
   def setup
     user = Factory :user
     User.current_user = user
-    @resource = Factory :sop, contributor: User.current_user, projects: user.person.projects
+    @resource = Factory :sop, contributor: User.current_user.person, projects: user.person.projects
   end
 
   def teardown

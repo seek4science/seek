@@ -56,7 +56,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal '22', sample.get_attribute(:age)
     assert_equal '22.1', sample.get_attribute(:weight)
     assert_equal 'M13 9PL', sample.get_attribute(:postcode)
-    assert_equal person.user, sample.contributor
+    assert_equal person, sample.contributor
     assert_equal [creator], sample.creators
     assert_equal 'frank, mary',sample.other_creators
 
@@ -81,7 +81,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal '22', sample.get_attribute(:age)
     assert_equal '22.1', sample.get_attribute(:weight)
     assert_equal 'M13 9PL', sample.get_attribute(:postcode)
-    assert_equal person.user, sample.contributor
+    assert_equal person, sample.contributor
     assert_equal [creator], sample.creators
 
     # job should have been triggered
@@ -346,7 +346,7 @@ class SamplesControllerTest < ActionController::TestCase
                               project_ids: [person.projects.first.id] }, policy_attributes: valid_sharing
     end
     assert sample = assigns(:sample)
-    assert_equal person.user, sample.contributor
+    assert_equal person, sample.contributor
     assert sample.can_view?(Factory(:person).user)
   end
 
@@ -361,7 +361,7 @@ class SamplesControllerTest < ActionController::TestCase
                               project_ids: [person.projects.first.id] }, policy_attributes: valid_sharing
     end
     assert sample = assigns(:sample)
-    assert_equal person.user, sample.contributor
+    assert_equal person, sample.contributor
     assert sample.can_view?(Factory(:person).user)
   end
 
@@ -472,9 +472,9 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'filtering for association forms' do
     person = Factory(:person)
-    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: 'fish')
-    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: 'frog')
-    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: 'banana')
+    Factory(:sample, contributor: person, policy: Factory(:public_policy), title: 'fish')
+    Factory(:sample, contributor: person, policy: Factory(:public_policy), title: 'frog')
+    Factory(:sample, contributor: person, policy: Factory(:public_policy), title: 'banana')
     login_as(person.user)
 
     get :filter, filter: ''
