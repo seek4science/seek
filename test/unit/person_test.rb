@@ -841,9 +841,9 @@ class PersonTest < ActiveSupport::TestCase
     study2 = Factory(:study, contributor: p, investigation:inv1)
     p = Person.find(p.id)
 
-    assert_equal [study1, study2], p.studies.sort_by(&:id)
+    assert_equal [study1, study2], p.contributed_studies.sort_by(&:id)
 
-    assert_equal [inv1], p.investigations
+    assert_equal [inv1], p.contributed_investigations
   end
 
   test 'should be able to remove the workgroup whose project is not subcribed' do

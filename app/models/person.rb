@@ -28,6 +28,8 @@ class Person < ActiveRecord::Base
 
   has_and_belongs_to_many :disciplines
 
+  has_one :user, dependent: :destroy
+
   has_many :group_memberships, dependent: :destroy, inverse_of: :person
   has_many :work_groups, through: :group_memberships, inverse_of: :people
 
@@ -46,34 +48,22 @@ class Person < ActiveRecord::Base
   has_many :favourite_group_memberships, dependent: :destroy
   has_many :favourite_groups, through: :favourite_group_memberships
 
-  has_many :data_files_for_person, foreign_key: :contributor_id, class_name: 'DataFile'
-  has_many :sop_for_person, foreign_key: :contributor_id, class_name: 'Sop'
-  has_many :models_for_person, foreign_key: :contributor_id, class_name: 'Model'
-  has_many :publications_for_person, foreign_key: :contributor_id, class_name: 'Publication'
-
-  has_many :studies_for_person, foreign_key: :contributor_id, class_name: 'Study'
-  has_many :assays_for_person, foreign_key: :contributor_id, class_name: 'Assay'
-  alias assays assays_for_person
-  has_many :investigations_for_person, foreign_key: :contributor_id, class_name: 'Investigation'
-
-  has_many :presentations_for_person, foreign_key: :contributor_id, class_name: 'Presentation'
-  has_many :samples_for_person, foreign_key: :contributor_id, class_name: 'Sample'
-  has_many :events_for_person, foreign_key: :contributor_id, class_name: 'Event'
-
-  has_one :user, dependent: :destroy
-
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
-  has_many :created_data_files, through: :assets_creators, source: :asset, source_type: 'DataFile'
-  has_many :created_documents, through: :assets_creators, source: :asset, source_type: 'Document'
-  has_many :created_models, through: :assets_creators, source: :asset, source_type: 'Model'
-  has_many :created_sops, through: :assets_creators, source: :asset, source_type: 'Sop'
-  has_many :created_publications, through: :assets_creators, source: :asset, source_type: 'Publication'
-  has_many :created_presentations, through: :assets_creators, source: :asset, source_type: 'Presentation'
-  has_many :created_samples, through: :assets_creators, source: :asset, source_type: 'Sample'
 
-  has_many :created_investigations, through: :assets_creators, source: :asset, source_type: 'Investigation'
-  has_many :created_studies, through: :assets_creators, source: :asset, source_type: 'Study'
-  has_many :created_assays, through: :assets_creators, source: :asset, source_type: 'Assay'
+  RELATED_RESOURCE_TYPES = %w[DataFile Sop Model Document Publication Presentation
+                              Sample Event Investigation Study Assay Strain].freeze
+
+  RELATED_RESOURCE_TYPES.each do |type|
+    has_many :"contributed_#{type.tableize}", foreign_key: :contributor_id, class_name: type
+    has_many :"created_#{type.tableize}", through: :assets_creators, source: :asset, source_type: type
+  end
+
+  RELATED_RESOURCE_TYPES.collect(&:tableize).each do |type|
+    define_method "related_#{type}" do
+      send("created_#{type}") | send("contributed_#{type}")
+    end
+  end
+
 
   has_annotation_type :expertise, method_name: :expertise
   has_annotation_type :tool
@@ -157,22 +147,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def studies
-    studies_for_person
-  end
-
-  def investigations
-    investigations_for_person
-  end
-
-  def presentations
-    presentations_for_person
-  end
-
-  def related_samples
-    samples_for_person | created_samples
-  end
-
   def programmes
     projects.collect(&:programme).uniq
   end
@@ -197,16 +171,8 @@ class Person < ActiveRecord::Base
     shares_project?(other_item) || shares_programme?(other_item)
   end
 
-  RELATED_RESOURCE_TYPES = %i[data_files documents models sops presentations events publications investigations
-                              studies assays].freeze
-  RELATED_RESOURCE_TYPES.each do |type|
-    define_method "related_#{type}" do
-      user_items = []
-      user_items |= send("created_#{type}".to_sym) if respond_to? "created_#{type}".to_sym
-      user_items |= send("#{type}_for_person".to_sym) if respond_to? "#{type}_for_person".to_sym
-      user_items.uniq
-    end
-  end
+
+
 
   def self.userless_people
     Person.includes(:user).select { |p| p.user.nil? }
