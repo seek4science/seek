@@ -413,13 +413,13 @@ class DataFilesController < ApplicationController
     @data_file ||= session[:processed_datafile]
     @assay ||= session[:processed_assay]
 
-    #this perculiar line avoids a no method error when calling super later on, when there are no assays in the database
+    #this peculiar line avoids a no method error when calling super later on, when there are no assays in the database
     # this I believe is caused by accessing the unmarshalled @assay before the Assay class has been encountered. Adding this line
     # avoids the error
     Assay.new
     @warnings ||= session[:processing_warnings] || []
     @exception_message ||= session[:extraction_exception_message]
-    @create_new_assay = @assay && @assay.new_record?
+    @create_new_assay = @assay && @assay.new_record? && !@assay.title.blank?
     @data_file.assay_assets.build(assay_id: @assay.id) if @assay.persisted?
     respond_to do |format|
       format.html
