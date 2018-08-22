@@ -29,7 +29,7 @@ class Publication < ActiveRecord::Base
   has_many :presentations, through: :related_relationships, source: :subject, source_type: 'Presentation'
 
   acts_as_asset
-  validates :title, length: {maximum: 65535}
+  validates :title, length: { maximum: 65_535 }
 
   has_many :publication_authors, dependent: :destroy, autosave: true
   has_many :persons, through: :publication_authors
