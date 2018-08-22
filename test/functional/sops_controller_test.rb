@@ -1150,6 +1150,50 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal [good_assay],sop.assays
   end
 
+  test 'should not allow sharing with a project that the contributor is not a member of' do
+    sop = Factory(:sop)
+    another_project = Factory(:project)
+    login_as(sop.contributor)
+    assert sop.can_manage?
+
+    put :update, id: sop.id, sop: { title: sop.title, project_ids: sop.project_ids + [another_project.id] }
+
+    refute assigns(:sop).errors.empty?
+  end
+
+  test 'should only validate newly added projects' do
+    sop = Factory(:sop)
+    another_project = Factory(:project)
+    disable_authorization_checks { sop.projects << another_project }
+
+    login_as(sop.contributor)
+    assert sop.can_manage?
+    assert_equal 2, sop.projects.length
+
+    put :update, id: sop.id, sop: { title: sop.title, project_ids: sop.reload.project_ids }
+
+    assert_redirected_to(sop)
+    assert assigns(:sop).errors.empty?
+  end
+
+  test 'should allow association of projects even if the original contributor was not a member' do
+    sop = Factory(:sop)
+    another_manager = Factory(:person)
+    another_project = another_manager.projects.first
+    another_manager.add_to_project_and_institution(sop.projects.first, Factory(:institution))
+    sop.policy.permissions.create!(contributor: another_manager, access_type: Policy::MANAGING)
+
+    login_as(another_manager)
+    assert sop.can_manage?
+    assert_not_includes another_project.people, sop.contributor
+    assert_equal 1, sop.projects.length
+
+    put :update, id: sop.id, sop: { title: sop.title, project_ids: (sop.project_ids + [another_project.id]) }
+
+    assert_redirected_to(sop)
+    assert assigns(:sop).errors.empty?
+  end
+
   private
 
   def doi_citation_mock

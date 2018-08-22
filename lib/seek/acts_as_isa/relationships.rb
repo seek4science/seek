@@ -30,6 +30,8 @@ module Seek
           has_many :publication_relationships, -> { where(predicate: Relationship::RELATED_TO_PUBLICATION) },
                    class_name: 'Relationship', as: :subject, dependent: :destroy, inverse_of: :subject
           has_many :publications, through: :publication_relationships, source: :other_object, source_type: 'Publication'
+
+
         end
 
         private
