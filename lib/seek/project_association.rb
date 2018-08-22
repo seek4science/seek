@@ -10,6 +10,8 @@ module Seek
                                            before_add: :react_to_project_addition,
                                            before_remove: :react_to_project_removal
 
+        after_save -> { @project_additions = [] }
+
         validates :projects, presence: true, unless: proc { |object|
           Seek::Config.is_virtualliver ||
             object.is_a?(Strain)
