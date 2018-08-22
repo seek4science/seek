@@ -24,8 +24,8 @@ module Seek
         scope :default_order, -> { order('title') }
 
         validates :title, presence: true
-        validates :title, length: {maximum: 255}
-        validates :description, length: {maximum: 65535}
+        validates :title, length: { maximum: 255 }
+        validates :description, length: { maximum: 65_535 }
 
         grouped_pagination
 

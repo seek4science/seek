@@ -65,8 +65,8 @@ class Project < ActiveRecord::Base
   validate :lineage_ancestor_cannot_be_self
 
   validates :title, uniqueness: true
-  validates :title, length: {maximum: 255}
-  validates :description, length: {maximum: 65535}
+  validates :title, length: { maximum: 255 }
+  validates :description, length: { maximum: 65_535 }
 
   # a default policy belonging to the project; this is set by a project PAL
   # if the project gets deleted, the default policy needs to be destroyed too
