@@ -26,6 +26,9 @@ class Programme < ActiveRecord::Base
 
   # validations
   validates :title, uniqueness: true
+  validates :title, length: {maximum: 255}
+  validates :description, length: {maximum: 65535}
+
   validates :web_page, url: { allow_nil: true, allow_blank: true }
 
   after_save :handle_administrator_ids, if: '@administrator_ids'

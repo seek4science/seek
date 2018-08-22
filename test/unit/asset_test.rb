@@ -2,6 +2,7 @@ require 'test_helper'
 require 'time_test_helper'
 
 class AssetTest < ActiveSupport::TestCase
+
   fixtures :all
   include ApplicationHelper
 
@@ -390,6 +391,44 @@ class AssetTest < ActiveSupport::TestCase
 
       refute item.has_jerm_contributor?
       assert item2.has_jerm_contributor?
+    end
+  end
+
+  test 'validate title lengths' do
+    long_title = ('a' * 256).freeze
+    ok_title = ('a' * 255).freeze
+    assert long_title.length > 255
+    assert_equal 255, ok_title.length
+    assets = %i[data_file sop model presentation document event assay investigation study]
+    User.with_current_user(Factory(:user)) do
+      assets.each do |asset_key|
+        item = Factory(asset_key, contributor:User.current_user.person)
+        assert item.valid?, "#{asset_key} should be valid"
+        item.title = long_title
+        refute item.valid?, "#{asset_key} should be not be valid with too long title length"
+        item.title=ok_title
+        assert item.valid?, "#{asset_key} should be valid with max title length"
+        item.save!
+      end
+    end
+  end
+
+  test 'validate description lengths' do
+    long_desc = ('a' * 65536).freeze
+    ok_desc = ('a' * 65535).freeze
+    assert long_desc.length > 65535
+    assert_equal 65535, ok_desc.length
+    assets = %i[data_file sop model presentation document event assay investigation study]
+    User.with_current_user(Factory(:user)) do
+      assets.each do |asset_key|
+        item = Factory(asset_key, contributor:User.current_user.person)
+        assert item.valid?, "#{asset_key} should be valid"
+        item.description = long_desc
+        refute item.valid?, "#{asset_key} should be not be valid with too long description length"
+        item.description=ok_desc
+        assert item.valid?, "#{asset_key} should be valid with max description length"
+        item.save!
+      end
     end
   end
 

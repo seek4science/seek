@@ -38,6 +38,10 @@ class Event < ActiveRecord::Base
   end
 
   validates_presence_of :title
+  validates :title, length: {maximum: 255}
+
+  validates :description, length: {maximum: 65535}
+
   validates_presence_of :start_date
 
   # validates_is_url_string :url

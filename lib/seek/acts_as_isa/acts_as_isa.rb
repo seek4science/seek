@@ -22,7 +22,10 @@ module Seek
         attr_accessor :create_from_asset
 
         scope :default_order, -> { order('title') }
+
         validates :title, presence: true
+        validates :title, length: {maximum: 255}
+        validates :description, length: {maximum: 65535}
 
         grouped_pagination
 

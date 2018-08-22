@@ -19,6 +19,24 @@ class ProjectTest < ActiveSupport::TestCase
     assert_nil WorkGroup.find_by_id(wg.id)
   end
 
+  test 'validate title and decription length' do
+    long_desc = ('a' * 65536).freeze
+    ok_desc = ('a' * 65535).freeze
+    long_title = ('a' * 256).freeze
+    ok_title = ('a' * 255).freeze
+    p = Factory(:project)
+    assert p.valid?
+    p.title = long_title
+    refute p.valid?
+    p.title = ok_title
+    assert p.valid?
+    p.description = long_desc
+    refute p.valid?
+    p.description = ok_desc
+    assert p.valid?
+    disable_authorization_checks {p.save!}
+  end
+
   test 'to_rdf' do
     object = Factory :project, web_page: 'http://www.sysmo-db.org',
                                organisms: [Factory(:organism), Factory(:organism)]

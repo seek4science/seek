@@ -55,6 +55,24 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert p.valid?
   end
 
+  test 'validate title and decription length' do
+    long_desc = ('a' * 65536).freeze
+    ok_desc = ('a' * 65535).freeze
+    long_title = ('a' * 256).freeze
+    ok_title = ('a' * 255).freeze
+    p = Factory(:programme)
+    assert p.valid?
+    p.title = long_title
+    refute p.valid?
+    p.title = ok_title
+    assert p.valid?
+    p.description = long_desc
+    refute p.valid?
+    p.description = ok_desc
+    assert p.valid?
+    disable_authorization_checks {p.save!}
+  end
+
   test 'factory' do
     p = Factory :programme
     refute_nil p.title
