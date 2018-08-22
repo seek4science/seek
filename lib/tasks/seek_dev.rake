@@ -91,20 +91,6 @@ namespace :seek_dev do
     pp types
   end
 
-  desc "display user contributors without people"
-  task(:contributors_without_people=>:environment) do
-    matches = Seek::Util.user_creatable_types.collect do |type|
-      type.all.select do |thing|
-        thing.respond_to?(:contributor_type) && thing.contributor.is_a?(User) && thing.contributor.person.nil?
-      end
-    end.flatten
-    pp "#{matches.size} items found with a user contributor and no person"
-    matches.each do |match|
-      pp "\t#{match.class.name} - #{match.id}"
-    end
-
-  end
-
   desc "Generate an XMI db/schema.xml file describing the current DB as seen by AR. Produces XMI 1.1 for UML 1.3 Rose Extended, viewable e.g. by StarUML"
   task :xmi => :environment do
     require 'uml_dumper.rb'
@@ -417,6 +403,37 @@ namespace :seek_dev do
         row = [strain.id,strain.title,strain.organism_id,strain.organism.try(:ncbi_id),strain.parent_id,strain.provider_id,strain.provider_name,strain.synonym,strain.comment]
         row = row + [strain.genotype_info,strain.phenotype_info,strain.projects.collect(&:id).join(","),strain.assays.collect(&:id).join(",")]
         csv << row
+      end
+    end
+
+  end
+
+  task find_unused_images: :environment do
+    root = File.join(Rails.root, 'app', 'assets', 'images')
+    query = File.join(root, '**', '*')
+    files = Dir.glob(query).collect{|p| p.gsub(root+"/",'')}
+    files = files.select{|p| !(p.start_with?('famfamfam') || p.start_with?('crystal_project') || p.start_with?('file_icons'))}
+    files = files.sort
+    dictionary_image_files = Seek::ImageFileDictionary.instance.image_files
+    CSV.open(Rails.root.join('image-usage.csv'),"w+",force_quotes:true,write_headers:true, headers:['image','in dictionary','found with grep']) do |csv|
+      bar = ProgressBar.new(files.count)
+      files.each do |file|
+        row = [file]
+        if dictionary_image_files.include?(file)
+          row << "1"
+          row << "-"
+        else
+          row << "0"
+          cmd = "grep -r '#{file}' app lib config vendor/assets/"
+          result = `#{cmd}`
+          if result.blank?
+            row << "0"
+          else
+            row << "1"
+          end
+        end
+        csv << row
+        bar.increment!
       end
     end
 

@@ -10,12 +10,20 @@ module Seek
                                            before_add: :react_to_project_addition,
                                            before_remove: :react_to_project_removal
 
+        after_save -> { @project_additions = [] }
+
         validates :projects, presence: true, unless: proc { |object|
           Seek::Config.is_virtualliver ||
             object.is_a?(Strain)
         }
 
+        def project_additions
+          @project_additions ||= []
+          @project_additions
+        end
+
         def react_to_project_addition(project)
+          project_additions << project
           SetSubscriptionsForItemJob.new(self, [project]).queue_job if !self.new_record? && self.subscribable?
           update_rdf_on_associated_change(project) if self.respond_to?(:update_rdf_on_associated_change)
         end

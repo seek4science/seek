@@ -63,13 +63,11 @@ class DataFilesController < ApplicationController
   end
 
   def new_version
-    if handle_upload_data
+    if handle_upload_data(true)
       comments = params[:revision_comments]
 
       respond_to do |format|
         if @data_file.save_as_new_version(comments)
-          create_content_blobs
-
           # Duplicate studied factors
           factors = @data_file.find_version(@data_file.version - 1).studied_factors
           factors.each do |f|
@@ -91,15 +89,14 @@ class DataFilesController < ApplicationController
   end
 
   def upload_for_tool
-    if handle_upload_data
-      params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
-      @data_file = DataFile.new(data_file_params)
+    params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
+    @data_file = DataFile.new(data_file_params)
 
+    if handle_upload_data
       @data_file.policy = Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
       if @data_file.save
         @data_file.creators = [current_person]
-        create_content_blobs
         # send email to the file uploader and receiver
         Mailer.file_uploaded(current_user, Person.find(params[:recipient_id]), @data_file).deliver_later
 
@@ -115,15 +112,12 @@ class DataFilesController < ApplicationController
   def upload_from_email
     if current_user.is_admin? && Seek::Config.admin_impersonation_enabled
       User.with_current_user Person.find(params[:sender_id]).user do
+        @data_file = DataFile.new(data_file_params)
         if handle_upload_data
-          @data_file = DataFile.new(data_file_params)
-
           @data_file.policy = Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
 
           if @data_file.save
             @data_file.creators = [User.current_user.person]
-            create_content_blobs
-
             flash.now[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
             render text: flash.now[:notice]
           else
@@ -147,8 +141,6 @@ class DataFilesController < ApplicationController
       update_relationships(@data_file, params)
 
       if @data_file.save
-        create_content_blobs
-
         if !@data_file.parent_name.blank?
           render partial: 'assets/back_to_fancy_parent', locals: { child: @data_file, parent_name: @data_file.parent_name, is_not_fancy: true }
         else
@@ -356,8 +348,7 @@ class DataFilesController < ApplicationController
   def create_content_blob
     @data_file = DataFile.new
     respond_to do |format|
-      if handle_upload_data
-        create_content_blobs
+      if handle_upload_data && @data_file.content_blob.save
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
         # assay ids passed forwards, e.g from "Add Datafile" button
         @source_assay_ids = (params[:assay_ids] || [] ).reject(&:blank?)
@@ -413,13 +404,13 @@ class DataFilesController < ApplicationController
     @data_file ||= session[:processed_datafile]
     @assay ||= session[:processed_assay]
 
-    #this perculiar line avoids a no method error when calling super later on, when there are no assays in the database
+    #this peculiar line avoids a no method error when calling super later on, when there are no assays in the database
     # this I believe is caused by accessing the unmarshalled @assay before the Assay class has been encountered. Adding this line
     # avoids the error
     Assay.new
     @warnings ||= session[:processing_warnings] || []
     @exception_message ||= session[:extraction_exception_message]
-    @create_new_assay = @assay && @assay.new_record?
+    @create_new_assay = @assay && @assay.new_record? && !@assay.title.blank?
     @data_file.assay_assets.build(assay_id: @assay.id) if @assay.persisted?
     respond_to do |format|
       format.html

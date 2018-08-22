@@ -149,4 +149,34 @@ class InvestigationTest < ActiveSupport::TestCase
 
     disable_authorization_checks { assert clone.save }
   end
+
+  test 'has deleted contributor?' do
+    item = Factory(:investigation,deleted_contributor:'Person:99')
+    item.update_column(:contributor_id,nil)
+    item2 = Factory(:investigation)
+    item2.update_column(:contributor_id,nil)
+
+    assert_nil item.contributor
+    assert_nil item2.contributor
+    refute_nil item.deleted_contributor
+    assert_nil item2.deleted_contributor
+
+    assert item.has_deleted_contributor?
+    refute item2.has_deleted_contributor?
+  end
+
+  test 'has jerm contributor?' do
+    item = Factory(:investigation,deleted_contributor:'Person:99')
+    item.update_column(:contributor_id,nil)
+    item2 = Factory(:investigation)
+    item2.update_column(:contributor_id,nil)
+
+    assert_nil item.contributor
+    assert_nil item2.contributor
+    refute_nil item.deleted_contributor
+    assert_nil item2.deleted_contributor
+
+    refute item.has_jerm_contributor?
+    assert item2.has_jerm_contributor?
+  end
 end

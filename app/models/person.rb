@@ -15,6 +15,7 @@ class Person < ActiveRecord::Base
 
   before_save :first_person_admin_and_add_to_default_project
   before_destroy :clean_up_and_assign_permissions
+  after_destroy :updated_contributed_items_contributor_after_destroy
 
   acts_as_notifiee
 
@@ -26,6 +27,8 @@ class Person < ActiveRecord::Base
   validates_uniqueness_of :email, case_sensitive: false
 
   has_and_belongs_to_many :disciplines
+
+  has_one :user, dependent: :destroy
 
   has_many :group_memberships, dependent: :destroy, inverse_of: :person
   has_many :work_groups, through: :group_memberships, inverse_of: :people
@@ -45,28 +48,22 @@ class Person < ActiveRecord::Base
   has_many :favourite_group_memberships, dependent: :destroy
   has_many :favourite_groups, through: :favourite_group_memberships
 
-  has_many :studies_for_person, as: :contributor, class_name: 'Study'
-  has_many :assays_for_person, foreign_key: :contributor_id, class_name: 'Assay'
-  alias assays assays_for_person
-  has_many :investigations_for_person, as: :contributor, class_name: 'Investigation'
-
-  has_many :presentations_for_person, as: :contributor, class_name: 'Presentation'
-  has_many :samples_for_person, as: :contributor, class_name: 'Sample'
-
-  has_one :user, dependent: :destroy
-
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
-  has_many :created_data_files, through: :assets_creators, source: :asset, source_type: 'DataFile'
-  has_many :created_documents, through: :assets_creators, source: :asset, source_type: 'Document'
-  has_many :created_models, through: :assets_creators, source: :asset, source_type: 'Model'
-  has_many :created_sops, through: :assets_creators, source: :asset, source_type: 'Sop'
-  has_many :created_publications, through: :assets_creators, source: :asset, source_type: 'Publication'
-  has_many :created_presentations, through: :assets_creators, source: :asset, source_type: 'Presentation'
-  has_many :created_samples, through: :assets_creators, source: :asset, source_type: 'Sample'
 
-  has_many :created_investigations, through: :assets_creators, source: :asset, source_type: 'Investigation'
-  has_many :created_studies, through: :assets_creators, source: :asset, source_type: 'Study'
-  has_many :created_assays, through: :assets_creators, source: :asset, source_type: 'Assay'
+  RELATED_RESOURCE_TYPES = %w[DataFile Sop Model Document Publication Presentation
+                              Sample Event Investigation Study Assay Strain].freeze
+
+  RELATED_RESOURCE_TYPES.each do |type|
+    has_many :"contributed_#{type.tableize}", foreign_key: :contributor_id, class_name: type
+    has_many :"created_#{type.tableize}", through: :assets_creators, source: :asset, source_type: type
+  end
+
+  RELATED_RESOURCE_TYPES.collect(&:tableize).each do |type|
+    define_method "related_#{type}" do
+      send("created_#{type}") | send("contributed_#{type}")
+    end
+  end
+
 
   has_annotation_type :expertise, method_name: :expertise
   has_annotation_type :tool
@@ -95,6 +92,11 @@ class Person < ActiveRecord::Base
   after_commit :queue_update_auth_table
 
   after_destroy :update_publication_authors_after_destroy
+  
+  # to make it look like a User
+  def person
+    self
+  end    
 
   # not registered profiles that match this email
   def self.not_registered_with_matching_email(email)
@@ -124,11 +126,6 @@ class Person < ActiveRecord::Base
     !user.nil?
   end
 
-  # to allow you to call .person on a Person or User to avoid having to check its type
-  def person
-    self
-  end
-
   def email_uri
     URI.escape('mailto:' + email)
   end
@@ -148,30 +145,6 @@ class Person < ActiveRecord::Base
     else
       obfuscated_email
     end
-  end
-
-  def studies
-    result = studies_for_person
-    result = (result | user.studies).compact if user
-    result.uniq
-  end
-
-  def investigations
-    result = investigations_for_person
-    result = (result | user.investigations).compact if user
-    result.uniq
-  end
-
-  def presentations
-    result = presentations_for_person
-    result = (result | user.investigations).compact if user
-    result.uniq
-  end
-
-  def related_samples
-    result = samples_for_person | created_samples
-    result = (result | user.samples).compact if user
-    result
   end
 
   def programmes
@@ -198,17 +171,8 @@ class Person < ActiveRecord::Base
     shares_project?(other_item) || shares_programme?(other_item)
   end
 
-  RELATED_RESOURCE_TYPES = %i[data_files documents models sops presentations events publications investigations
-                              studies assays].freeze
-  RELATED_RESOURCE_TYPES.each do |type|
-    define_method "related_#{type}" do
-      user_items = []
-      user_items = user.try(:send, type) if user.respond_to?(type)
-      user_items |= send("created_#{type}".to_sym) if respond_to? "created_#{type}".to_sym
-      user_items |= send("#{type}_for_person".to_sym) if respond_to? "#{type}_for_person".to_sym
-      user_items.uniq
-    end
-  end
+
+
 
   def self.userless_people
     Person.includes(:user).select { |p| p.user.nil? }
@@ -331,12 +295,9 @@ class Person < ActiveRecord::Base
 
   # all items, assets, ISA, samples and events that are linked to this person as a contributor
   def contributed_items
-    assays = Assay.where(contributor_id: id) # assays contributor is not polymorphic
-    [Study, Investigation, DataFile, Document, Sop, Presentation, Model, Sample, Publication, Event].collect do |type|
-      assets = type.where("contributor_type = 'Person' AND contributor_id=?",id)
-      assets |= type.where("contributor_type = 'User' AND contributor_id=?",user.id) unless user.nil?
-      assets
-    end.flatten.uniq.compact | assays
+    [Assay, Study, Investigation, DataFile, Document, Sop, Presentation, Model, Sample, Strain, Publication, Event].collect do |type|
+      type.where(contributor_id:id)
+    end.flatten.uniq.compact
   end
 
   # can be edited by:
@@ -354,7 +315,7 @@ class Person < ActiveRecord::Base
 
   # admin can administer other people, project manager can administer other people except other admins and themself
   def can_be_administered_by?(user)
-    person = user.try(:person)
+    person = user.is_a?(User) ? user.person : user
     return false unless user && person
     is_proj_or_prog_admin = person.is_project_administrator_of_any_project? || person.is_programme_administrator_of_any_programme?
     user.is_admin? || (is_proj_or_prog_admin && (is_admin? || self != person))
@@ -478,6 +439,19 @@ class Person < ActiveRecord::Base
     publication_authors.each do |author|
       author.update_attribute(:last_name,self.last_name)
       author.update_attribute(:first_name,self.first_name)
+    end
+  end
+
+  def updated_contributed_items_contributor_after_destroy
+    contributed_items.each do |item|
+      item.update_column(:contributor_id,nil)
+      item.update_column(:deleted_contributor,"Person:#{id}")
+      if item.respond_to?(:versions)
+        item.versions.select{|v| v.contributor_id==id}.each do |v|
+          v.update_column(:contributor_id,nil)
+          v.update_column(:deleted_contributor,"Person:#{id}")
+        end
+      end
     end
   end
 

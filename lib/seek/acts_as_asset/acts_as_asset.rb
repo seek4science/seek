@@ -39,6 +39,9 @@ module Seek
         does_not_require_can_edit :last_used_at
 
         validates :title, presence: true
+        validates :title, length: { maximum: 255 }, unless: -> { is_a?(Publication) }
+        validates :description, length: { maximum: 65_535 }, if: -> { respond_to?(:description) }
+
 
         include Seek::Stats::ActivityCounts
 
@@ -67,7 +70,7 @@ module Seek
           contributor = d.contributor
           { 'id' => d.id,
             'title' => h(d.title),
-            'contributor' => contributor.nil? ? '' : 'by ' + h(contributor.person.name),
+            'contributor' => contributor.nil? ? '' : 'by ' + h(contributor.name),
             'type' => name
           }
         end

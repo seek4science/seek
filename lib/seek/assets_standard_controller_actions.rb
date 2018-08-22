@@ -77,7 +77,6 @@ module Seek
     def create_asset_and_respond(item)
       item = create_asset(item)
       if item.save
-        create_content_blobs
         unless return_to_fancy_parent(item)
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully uploaded and saved."
           respond_to do |format|

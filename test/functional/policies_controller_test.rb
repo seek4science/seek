@@ -55,7 +55,7 @@ class PoliciesControllerTest < ActionController::TestCase
     contributor = study.contributor
     post :preview_permissions, policy_attributes: { access_type: Policy::VISIBLE }, is_new_file: 'false', contributor_id: contributor.user.id, resource_name: 'study'
 
-    assert_select 'div.access-type-manage li', text: "#{contributor.person.name}", count: 1
+    assert_select 'div.access-type-manage li', text: "#{contributor.name}", count: 1
   end
 
   test 'should show notice message when an item is requested to be published' do
@@ -174,7 +174,7 @@ class PoliciesControllerTest < ActionController::TestCase
     gatekeeper = Factory(:asset_gatekeeper)
     a_person = Factory(:person)
     login_as(gatekeeper.user)
-    item = Factory(:sop, contributor: gatekeeper.user, policy: Factory(:public_policy), project_ids: gatekeeper.projects.collect(&:id))
+    item = Factory(:sop, contributor: gatekeeper, policy: Factory(:public_policy), project_ids: gatekeeper.projects.collect(&:id))
     Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
     item.reload
 
