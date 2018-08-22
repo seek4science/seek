@@ -39,7 +39,7 @@ module Seek
         does_not_require_can_edit :last_used_at
 
         validates :title, presence: true
-        validates :title, length: {maximum: 255}
+        validates :title, length: {maximum: 255}, unless: -> {is_a?(Publication)}
         validates :description, length: {maximum: 65535}, if: -> {respond_to?(:description)}
 
 

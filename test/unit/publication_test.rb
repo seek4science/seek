@@ -5,6 +5,19 @@ class PublicationTest < ActiveSupport::TestCase
 
   fixtures :all
 
+  test 'title validation allows long titles' do
+    long_title = ('a' * 65536).freeze
+    ok_title = ('a' * 65535).freeze
+    p = Factory(:publication)
+    assert p.valid?
+    p.title = long_title
+    refute p.valid?
+    p.title = ok_title
+    assert p.valid?
+    disable_authorization_checks{p.save!}
+
+  end
+
   test 'create publication from hash' do
     publication_hash = {
         title: 'SEEK publication',
