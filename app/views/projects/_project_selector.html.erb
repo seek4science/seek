@@ -9,7 +9,7 @@
   resource ||= nil
 
   selected_projects = resource ? resource.projects : []
-  possible_projects = allow_all ? Project.all : (User.current_user.person.projects + resource.try(:projects)).uniq
+  possible_projects = allow_all ? Project.all : (User.current_user.person.projects + resource.try(:projects) + resource.try(:contributor).try(:projects)).uniq
   possible_projects = possible_projects - selected_projects
 
   possible_projects_json, selected_projects_json = [possible_projects, selected_projects].map do |projects|
