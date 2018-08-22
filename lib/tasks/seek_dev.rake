@@ -406,6 +406,37 @@ namespace :seek_dev do
       end
     end
 
+  end
+
+  task find_unused_images: :environment do
+    root = File.join(Rails.root, 'app', 'assets', 'images')
+    query = File.join(root, '**', '*')
+    files = Dir.glob(query).collect{|p| p.gsub(root+"/",'')}
+    files = files.select{|p| !(p.start_with?('famfamfam') || p.start_with?('crystal_project') || p.start_with?('file_icons'))}
+    files = files.sort
+    dictionary_image_files = Seek::ImageFileDictionary.instance.image_files
+    CSV.open(Rails.root.join('image-usage.csv'),"w+",force_quotes:true,write_headers:true, headers:['image','in dictionary','found with grep']) do |csv|
+      bar = ProgressBar.new(files.count)
+      files.each do |file|
+        row = [file]
+        if dictionary_image_files.include?(file)
+          row << "1"
+          row << "-"
+        else
+          row << "0"
+          cmd = "grep -r '#{file}' app lib config vendor/assets/"
+          result = `#{cmd}`
+          if result.blank?
+            row << "0"
+          else
+            row << "1"
+          end
+        end
+        csv << row
+        bar.increment!
+      end
+    end
+
 
   end
 
