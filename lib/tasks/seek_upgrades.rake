@@ -1,4 +1,5 @@
 # encoding: utf-8
+# frozen_string_literal: true
 
 require 'rubygems'
 require 'rake'
@@ -7,7 +8,6 @@ require 'colorize'
 require 'seek/mime_types'
 
 include Seek::MimeTypes
-
 
 namespace :seek do
   # these are the tasks required for this version upgrade
@@ -41,34 +41,30 @@ namespace :seek do
     ensure
       Seek::Config.solr_enabled = solr
     end
-
   end
-
-
 
   task(convert_organism_concept_uris: :environment) do
     Organism.all.each do |organism|
       organism.convert_concept_uri
       if organism.bioportal_concept && organism.bioportal_concept.changed?
-        organism.save(validate:false)
+        organism.save(validate: false)
       end
     end
   end
 
   task(update_deleted_contributors: :environment) do
     types = [Assay, DataFile, Document, Event, Investigation, Model, Presentation, Publication, Sample, Sop, Strain, Study,
-     DataFile::Version, Document::Version, Model::Version, Presentation::Version, Sop::Version]
+             DataFile::Version, Document::Version, Model::Version, Presentation::Version, Sop::Version]
     types.each do |type|
       puts "processing deleted contributors for #{type.table_name}"
-      #items where the deleted_contributor hasn't been set, the contributor id can be found, but the contributor doesn't exist
-      items = type.where('deleted_contributor IS NULL AND contributor_id IS NOT NULL').select{|i| i.contributor.nil?}
+      # items where the deleted_contributor hasn't been set, the contributor id can be found, but the contributor doesn't exist
+      items = type.where('deleted_contributor IS NULL AND contributor_id IS NOT NULL').select { |i| i.contributor.nil? }
       bar = ProgressBar.new(items.count)
       items.each do |item|
-        item.update_column(:deleted_contributor,"Person:#{item.contributor_id}")
-        item.update_column(:contributor_id,nil)
+        item.update_column(:deleted_contributor, "Person:#{item.contributor_id}")
+        item.update_column(:contributor_id, nil)
         bar.increment!
       end
     end
   end
-
 end
