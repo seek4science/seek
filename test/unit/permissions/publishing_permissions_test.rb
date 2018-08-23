@@ -70,7 +70,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
   test 'publishable when item is manageable and is not yet published and gatekeeper is not required' do
     user = Factory(:user)
     User.with_current_user user do
-      df = Factory(:data_file, contributor: User.current_user)
+      df = Factory(:data_file, contributor: user.person)
       assert df.can_manage?, 'This item must be manageable for the test to succeed'
       assert !df.is_published?, 'This item must be not published for the test to succeed'
       assert !df.gatekeeper_required?, 'This item must not require gatekeeper for the test to succeed'
@@ -149,7 +149,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
 
   test 'gatekeeper of asset can publish if they can manage it as well' do
     gatekeeper = Factory(:asset_gatekeeper)
-    datafile = Factory(:data_file, projects: gatekeeper.projects, contributor: gatekeeper.user)
+    datafile = Factory(:data_file, projects: gatekeeper.projects, contributor: gatekeeper)
 
     User.with_current_user gatekeeper.user do
       assert gatekeeper.is_asset_gatekeeper_of?(datafile), 'The gatekeeper must be the gatekeeper of the datafile for the test to succeed'
@@ -204,7 +204,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
   test 'gatekeeper can not publish if the asset is already published' do
     gatekeeper = Factory(:asset_gatekeeper)
     datafile = Factory(:data_file, projects: gatekeeper.projects,
-                                   policy: Factory(:public_policy), contributor: gatekeeper.user)
+                                   policy: Factory(:public_policy), contributor: gatekeeper)
 
     User.with_current_user gatekeeper.user do
       assert datafile.is_published?, 'This datafile must be already published for the test to succeed'
@@ -217,7 +217,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
 
   test 'publish! only when can_publish?' do
     user = Factory(:user)
-    df = Factory(:data_file, contributor: user)
+    df = Factory(:data_file, contributor: user.person)
     User.with_current_user user do
       assert df.can_publish?
       assert df.publish!
@@ -229,7 +229,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
 
   test 'publish! is performed when no gatekeeper is required' do
     user = Factory(:user)
-    df = Factory(:data_file, contributor: user)
+    df = Factory(:data_file, contributor: user.person)
     User.with_current_user user do
       assert df.can_publish?, 'The datafile must be publishable'
       assert !df.gatekeeper_required?, 'The gatekeeper must not be required for the test to succeed'

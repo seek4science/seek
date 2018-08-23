@@ -55,10 +55,10 @@ class Study < ActiveRecord::Base
   end
 
   def clone_with_associations
-    new_object= self.dup
-    new_object.policy = self.policy.deep_copy
-
-    return new_object
+    new_object = dup
+    new_object.policy = policy.deep_copy
+    new_object.publications = publications
+    new_object
   end
 
   def external_asset_search_terms

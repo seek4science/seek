@@ -10,7 +10,7 @@ class AssayAssetTest < ActiveSupport::TestCase
   end
 
   test 'links to latest version' do
-    sop = Factory :sop, contributor: User.current_user
+    sop = Factory :sop, contributor: User.current_user.person
     sop.save_as_new_version
     assay = Factory :assay, contributor: User.current_user.person
 
@@ -60,6 +60,8 @@ class AssayAssetTest < ActiveSupport::TestCase
       refute a.incoming_direction?
       assert a.outgoing_direction?
     end
+
+
   end
 
   test 'sample as asset' do

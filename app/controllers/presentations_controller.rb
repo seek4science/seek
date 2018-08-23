@@ -16,12 +16,11 @@ class PresentationsController < ApplicationController
   include Seek::IsaGraphExtensions
 
   def new_version
-    if handle_upload_data
+    if handle_upload_data(true)
       comments=params[:revision_comments]
 
       respond_to do |format|
         if @presentation.save_as_new_version(comments)
-          create_content_blobs
           flash[:notice]="New version uploaded - now on version #{@presentation.version}"
         else
           flash[:error]="Unable to save new version"
@@ -75,7 +74,7 @@ class PresentationsController < ApplicationController
     params.require(:presentation).permit(:title, :description, :other_creators, :license, :parent_name,
                                          { event_ids: [] }, { project_ids: [] },
                                          { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                         { creator_ids: [] })
+                                         { creator_ids: [] }, { publication_ids: [] })
   end
 
   alias_method :asset_params, :presentation_params

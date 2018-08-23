@@ -15,7 +15,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object = Factory :model_2_files, contributor: User.current_user, policy: Factory(:private_policy), organism: Factory(:organism)
+    @object = Factory :model_2_files, contributor: User.current_user.person, policy: Factory(:private_policy), organism: Factory(:organism)
   end
 
   test 'should get index' do
@@ -47,7 +47,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should download' do
-    model = Factory :model_2_files, title: 'this_model', policy: Factory(:public_policy), contributor: User.current_user
+    model = Factory :model_2_files, title: 'this_model', policy: Factory(:public_policy), contributor: User.current_user.person
     assert_difference('ActivityLog.count') do
       get :download, id: model.id
     end
@@ -58,7 +58,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should download model with a single file' do
-    model = Factory :model, title: 'this_model', policy: Factory(:public_policy), contributor: User.current_user
+    model = Factory :model, title: 'this_model', policy: Factory(:public_policy), contributor: User.current_user.person
     assert_difference('ActivityLog.count') do
       get :download, id: model.id
     end
@@ -70,7 +70,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'should download multiple files with the same name' do
     # 2 files with different names
-    model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user
+    model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user.person
     get :download, id: model.id
     assert_response :success
     assert_equal 'application/zip', @response.header['Content-Type']
@@ -96,7 +96,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should not download zip with only remote files' do
     stub_request(:head, 'http://www.abc.com').to_return(headers: { content_length: 500, content_type: 'text/plain' }, status: 200)
 
-    model = Factory :model_2_remote_files, title: 'this_model', policy: Factory(:public_policy), contributor: User.current_user
+    model = Factory :model_2_remote_files, title: 'this_model', policy: Factory(:public_policy), contributor: User.current_user.person
     assert_difference('ActivityLog.count') do
       get :download, id: model.id
     end
@@ -120,12 +120,12 @@ class ModelsControllerTest < ActionController::TestCase
   test 'creators show in list item' do
     p1 = Factory :person
     p2 = Factory :person
-    model = Factory(:model, title: 'ZZZZZ', creators: [p2], contributor: p1.user, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    model = Factory(:model, title: 'ZZZZZ', creators: [p2], contributor: p1, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
 
     get :index, page: 'Z'
 
     # check the test is behaving as expected:
-    assert_equal p1.user, model.contributor
+    assert_equal p1, model.contributor
     assert model.creators.include?(p2)
     assert_select '.list_item_title a[href=?]', model_path(model), 'ZZZZZ', 'the data file for this test should appear as a list item'
 
@@ -351,7 +351,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_redirected_to model_path(model = assigns(:model))
     assert_equal 'Test Create', model.title
     assert_equal [project], model.projects
-    assert_equal person.user, model.contributor
+    assert_equal person, model.contributor
     assert_equal 3, model.content_blobs.count
     blob1 = model.content_blobs.first
     blob2 = model.content_blobs[1]
@@ -451,7 +451,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_redirected_to model_path(model)
     assert_equal 'BioModels', model.imported_source
     assert_equal 'http://biomodels/model.xml', model.imported_url
-    assert_equal user, model.contributor
+    assert_equal user.person, model.contributor
   end
 
   test 'should create model with url' do
@@ -463,7 +463,7 @@ class ModelsControllerTest < ActionController::TestCase
     end
     model = assigns(:model)
     assert_redirected_to model_path(model)
-    assert_equal users(:model_owner), model.contributor
+    assert_equal users(:model_owner).person, model.contributor
     assert_equal 1, model.content_blobs.count
     assert !model.content_blobs.first.url.blank?
     assert model.content_blobs.first.data_io_object.nil?
@@ -482,7 +482,7 @@ class ModelsControllerTest < ActionController::TestCase
     end
     model = assigns(:model)
     assert_redirected_to model_path(model)
-    assert_equal users(:model_owner), model.contributor
+    assert_equal users(:model_owner).person, model.contributor
     assert_equal 1, model.content_blobs.count
     assert !model.content_blobs.first.url.blank?
     assert_equal 'sysmo-db-logo-grad2.png', model.content_blobs.first.original_filename
@@ -501,7 +501,7 @@ class ModelsControllerTest < ActionController::TestCase
     end
     model = assigns(:model)
     assert_redirected_to model_path(model)
-    assert_equal users(:model_owner), model.contributor
+    assert_equal users(:model_owner).person, model.contributor
     assert_equal 1, model.content_blobs.count
     assert_equal 'http://news.bbc.co.uk', model.content_blobs.first.url
     assert model.content_blobs.first.is_webpage?
@@ -587,11 +587,11 @@ class ModelsControllerTest < ActionController::TestCase
   test 'publications included in form for model' do
     get :edit, id: models(:teusink)
     assert_response :success
-    assert_select 'div#publications_fold_content', true
+    assert_select 'div#add_publications_form', true
 
     get :new
     assert_response :success
-    assert_select 'div#publications_fold_content', true
+    assert_select 'div#add_publications_form', true
   end
 
   test 'should update model' do
@@ -760,7 +760,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert created_model = assigns(:model)
     assert_redirected_to model_path(created_model)
-    assert_equal users(:model_owner), created_model.contributor
+    assert_equal users(:model_owner).person, created_model.contributor
 
     assert_equal Policy::VISIBLE, created_model.policy.access_type
     # check it doesn't create an error when retreiving the index
@@ -771,7 +771,7 @@ class ModelsControllerTest < ActionController::TestCase
   test "owner should be able to choose policy 'share with everyone' when updating a model" do
     login_as(:model_owner)
     user = users(:model_owner)
-    model = Factory(:model, contributor: user)
+    model = Factory(:model, contributor: user.person)
     assert model.can_edit?(user), 'model should be editable and manageable for this test'
     assert model.can_manage?(user), 'model should be editable and manageable for this test'
     assert_equal Policy::NO_ACCESS, model.policy.access_type, 'data file should have an initial policy with access type of no access'
@@ -819,7 +819,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as p.user
 
     p2 = Factory :person
-    model = Factory :model, contributor: p.user
+    model = Factory :model, contributor: p
 
     assert model.annotations.empty?, 'this model should have no tags for the test'
 
@@ -842,7 +842,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'do publish' do
-    model = Factory(:model, contributor: users(:model_owner), policy: Factory(:private_policy))
+    model = Factory(:model, contributor: users(:model_owner).person, policy: Factory(:private_policy))
     assert model.can_manage?, 'The model must be manageable for this test to succeed'
     post :publish, id: model
     assert_response :redirect
@@ -851,7 +851,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'do not publish if not can_manage?' do
-    model = Factory(:model, contributor: users(:model_owner), policy: Factory(:private_policy))
+    model = Factory(:model, contributor: users(:model_owner).person, policy: Factory(:private_policy))
     login_as(:quentin)
     assert !model.can_manage?, 'The model must not be manageable for this test to succeed'
     post :publish, id: model
@@ -861,7 +861,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'removing an asset should not break show pages for items that have attribution relationships referencing it' do
-    model = Factory :model, contributor: User.current_user
+    model = Factory :model, contributor: User.current_user.person
     disable_authorization_checks do
       attribution = Factory :model
       model.relationships.create other_object: attribution, predicate: Relationship::ATTRIBUTED_TO

@@ -6,8 +6,8 @@ class DataFileTest < ActiveSupport::TestCase
 
   test 'associations' do
     datafile_owner = Factory :user
-    datafile = Factory :data_file, policy: Factory(:all_sysmo_viewable_policy), contributor: datafile_owner
-    assert_equal datafile_owner, datafile.contributor
+    datafile = Factory :data_file, policy: Factory(:all_sysmo_viewable_policy), contributor: datafile_owner.person
+    assert_equal datafile_owner.person, datafile.contributor
     datafile.content_blob.destroy unless datafile.content_blob.nil?
 
     blob = Factory.create(:content_blob, original_filename: 'df.ppt', content_type: 'application/ppt', asset: datafile, asset_version: datafile.version) # content_blobs(:picture_blob)
@@ -26,8 +26,8 @@ class DataFileTest < ActiveSupport::TestCase
 
   test 'event association' do
     User.with_current_user Factory(:user) do
-      datafile = Factory :data_file, contributor: User.current_user
-      event = Factory :event, contributor: User.current_user
+      datafile = Factory :data_file, contributor: User.current_user.person
+      event = Factory :event, contributor: User.current_user.person
       datafile.events << event
       assert datafile.valid?
       assert datafile.save
@@ -81,7 +81,7 @@ class DataFileTest < ActiveSupport::TestCase
   test 'version created on save' do
     person = Factory(:person)
     User.with_current_user(person.user) do
-      df = Factory.build(:data_file,title: 'testing versions', policy: Factory(:private_policy), contributor: person.user)
+      df = Factory.build(:data_file,title: 'testing versions', policy: Factory(:private_policy), contributor: person)
       assert df.valid?
       refute df.persisted?
       df.save!
@@ -216,7 +216,7 @@ class DataFileTest < ActiveSupport::TestCase
   test 'fs_search_fields' do
     user = Factory :user
     User.with_current_user user do
-      df = Factory :data_file, contributor: user
+      df = Factory :data_file, contributor: user.person
       sf1 = Factory :studied_factor_link, substance: Factory(:compound, name: 'sugar')
       sf2 = Factory :studied_factor_link, substance: Factory(:compound, name: 'iron')
       comp = sf2.substance
@@ -238,7 +238,7 @@ class DataFileTest < ActiveSupport::TestCase
   test 'fs_search_fields_with_synonym_substance' do
     user = Factory :user
     User.with_current_user user do
-      df = Factory :data_file, contributor: user
+      df = Factory :data_file, contributor: user.person
       suger = Factory(:compound, name: 'sugar')
       iron = Factory(:compound, name: 'iron')
       metal = Factory :synonym, name: 'metal', substance: iron

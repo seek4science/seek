@@ -17,12 +17,13 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
   test 'show delete' do
     ASSETS.each do |type_name|
       if type_name == 'assays'
-        contributor = @current_user.person
         human_name = I18n.t('assays.modelling_analysis').humanize
       else
-        contributor = @current_user
         human_name = type_name.singularize.humanize
       end
+
+      contributor = @current_user.person
+
       item = Factory(type_name.singularize.to_sym, contributor: contributor,
                      policy: Factory(:all_sysmo_viewable_policy))
       assert item.can_delete?, 'This item is deletable for the test to pass'

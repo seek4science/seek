@@ -710,8 +710,6 @@ SEEK::Application.routes.draw do
   get '/tags/:id' => 'tags#show', :as => :show_tag
   get '/tags' => 'tags#index', :as => :all_anns
   get '/tags/:id' => 'tags#show', :as => :show_ann
-  get '/jerm/' => 'jerm#index', :as => :jerm
-  get '/jerm/fetch' => 'jerm#fetch', :as=> :jerm_fetch
   get '/countries/:country_name' => 'countries#show', :as => :country
 
   get '/data_fuse/' => 'data_fuse#show', :as => :data_fuse

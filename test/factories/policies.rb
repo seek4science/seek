@@ -5,6 +5,12 @@ Factory.define(:permission, class: Permission) do |f|
   f.access_type Policy::NO_ACCESS
 end
 
+Factory.define(:edit_permission, class: Permission) do |f|
+  f.association :contributor, factory: :person
+  f.association :policy
+  f.access_type Policy::EDITING
+end
+
 # Policy
 Factory.define(:policy, class: Policy) do |f|
   f.name 'test policy'

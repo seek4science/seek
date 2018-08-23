@@ -29,7 +29,6 @@ class Assay < ActiveRecord::Base
   belongs_to :institution
 
   belongs_to :study
-  belongs_to :contributor, class_name: 'Person'
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
   has_many :organisms, through: :assay_organisms, inverse_of: :assays
@@ -116,8 +115,19 @@ class Assay < ActiveRecord::Base
     end
   end
 
+  def self.simple_associated_asset_types
+    [:models, :sops, :publications, :documents]
+  end
+
+  # Associations where there is additional metadata on the association, i.e. `direction`
+  def self.complex_associated_asset_types
+    [:data_files, :samples]
+  end
+
   def assets
-    data_files + models + sops + publications + samples + documents
+    (self.class.complex_associated_asset_types + self.class.simple_associated_asset_types).inject([]) do |assets, type|
+      assets + send(type)
+    end
   end
 
   def incoming
@@ -148,9 +158,10 @@ class Assay < ActiveRecord::Base
   def clone_with_associations
     new_object = dup
     new_object.policy = policy.deep_copy
-    new_object.sops = try(:sops)
-
-    new_object.models = try(:models)
+    new_object.assay_assets = assay_assets.select { |aa| self.class.complex_associated_asset_types.include?(aa.asset_type.underscore.pluralize.to_sym) }.map(&:dup)
+    self.class.simple_associated_asset_types.each do |type|
+      new_object.send("#{type}=", try(type))
+    end
     new_object.assay_organisms = try(:assay_organisms)
     new_object
   end

@@ -4,7 +4,7 @@ module Seek
       include Seek::UploadHandling::ParameterHandling
       include Seek::UploadHandling::ContentInspection
 
-      def handle_upload_data
+      def handle_upload_data(new_version = false)
         blob_params = params[:content_blobs]
         allow_empty_content_blob = model_image_present? || json_api_request?
 
@@ -32,6 +32,8 @@ module Seek
           end
         end
 
+        set_content_blobs(new_version)
+
         true
       end
 
@@ -52,17 +54,21 @@ module Seek
         process_from_url(item_params)
       end
 
-      def create_content_blobs
+      def set_content_blobs(new_version = false)
         asset = eval "@#{controller_name.downcase.singularize}"
-        version = asset.version
+        version = asset.respond_to?(:version) ? asset.version : nil
+        version += 1 if new_version
 
         unless model_image_present? && params[:content_blobs].blank?
           content_blobs_params.each do |item_params|
             attributes = build_attributes_hash_for_content_blob(item_params, version)
             if asset.respond_to?(:content_blobs)
-              asset.content_blobs.create(attributes)
+              asset.content_blobs.build(attributes)
             else
-              asset.create_content_blob(attributes)
+              old_content_blob = asset.content_blob
+              asset.build_content_blob(attributes)
+              # asset_id on the previous content blob gets blanked out after the above command is run, so need to do:
+              old_content_blob.update_column(:asset_id, asset.id) if old_content_blob && new_version
             end
           end
         end
@@ -72,7 +78,7 @@ module Seek
           raise 'No content-blob defined'
         end
 
-        retain_previous_content_blobs(asset)
+        retain_previous_content_blobs(asset, version) if version && version > 1
       end
 
       def build_attributes_hash_for_content_blob(item_params, version)
@@ -86,25 +92,23 @@ module Seek
           asset_version: version }
       end
 
-      def retain_previous_content_blobs(asset)
+      def retain_previous_content_blobs(asset, new_version)
         retained_ids = retained_content_blob_ids
-        previous_version = asset.find_version(asset.version - 1)
+        previous_version = asset.find_version(new_version - 1)
         if retained_ids.present? && previous_version
           retained_blobs = previous_version.content_blobs.select { |blob| retained_ids.include?(blob.id) }
           retained_blobs.each do |blob|
-            copy_blob_to_asset(asset, blob)
+            copy_blob_to_asset(asset, blob, new_version)
           end
         end
       end
 
-      def copy_blob_to_asset(asset, blob)
+      def copy_blob_to_asset(asset, blob, new_version)
         new_blob = asset.content_blobs.build(url: blob.url,
                                              original_filename: blob.original_filename,
                                              content_type: blob.content_type,
-                                             asset_version: asset.version)
-        FileUtils.cp(blob.filepath, new_blob.filepath) if File.exist?(blob.filepath)
-        # need to save after copying the file, coz an after_save on contentblob relies on the file
-        new_blob.save
+                                             asset_version: new_version)
+        new_blob.tmp_io_object = File.open(blob.filepath) if File.exist?(blob.filepath)
       end
 
       def process_upload(blob_params)

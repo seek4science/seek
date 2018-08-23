@@ -191,4 +191,5 @@ module AssetsHelper
   def mini_file_download_icon(fileinfo)
     image_tag_for_key('download', polymorphic_path([fileinfo.asset, fileinfo], action: :download, code: params[:code]), 'Download', { title: 'Download this file' }, '')
   end
+
 end

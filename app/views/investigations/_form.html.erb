@@ -26,9 +26,7 @@
                                                          :existing_creators => existing_creators,
                                                          :other_creators => @investigation.other_creators} -%>
 
-
-<%= render :partial => "assets/associate_publication", :locals => { :resource_type => t('investigation'),
-                                                                    :related_publications => @investigation.publications} -%>
+<%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
 <%
    button_text=action==:edit ? "Update" : "Create"

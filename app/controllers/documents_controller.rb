@@ -16,13 +16,11 @@ class DocumentsController < ApplicationController
   include Seek::IsaGraphExtensions
 
   def new_version
-    if handle_upload_data
+    if handle_upload_data(true)
       comments = params[:revision_comment]
 
       respond_to do |format|
         if @document.save_as_new_version(comments)
-          create_content_blobs
-
           flash[:notice] = "New version uploaded - now on version #{@document.version}"
         else
           flash[:error] = "Unable to save new version"
@@ -59,7 +57,8 @@ class DocumentsController < ApplicationController
   def document_params
     params.require(:document).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] })
+                                { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
+                                { publication_ids: [] })
   end
 
   alias_method :asset_params, :document_params

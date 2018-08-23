@@ -165,15 +165,15 @@ class AssayTest < ActiveSupport::TestCase
     assert Factory(:assay, contributor: user.person).can_delete?
 
     assay = Factory(:assay, contributor: user.person)
-    assay.associate Factory(:data_file, contributor: user)
+    assay.associate Factory(:data_file, contributor: user.person)
     assert !assay.can_delete?
 
     assay = Factory(:assay, contributor: user.person)
-    assay.associate Factory(:sop, contributor: user)
+    assay.associate Factory(:sop, contributor: user.person)
     assert !assay.can_delete?
 
     assay = Factory(:assay, contributor: user.person)
-    assay.associate Factory(:model, contributor: user)
+    assay.associate Factory(:model, contributor: user.person)
     assert !assay.can_delete?
 
     pal = Factory(:pal)
@@ -585,5 +585,75 @@ class AssayTest < ActiveSupport::TestCase
 
     assert_equal 2,assay.data_files.count
     assert_equal [df_1],assay.construction_assets
+  end
+
+  test 'clone with associations' do
+    assay = Factory(:modelling_assay, title: '123', description: 'abc', policy: Factory(:publicly_viewable_policy))
+    person = assay.contributor
+    data_file = Factory(:data_file, contributor: person)
+    sample = Factory(:sample, contributor: person)
+    data_file_meta = { asset: data_file, direction: AssayAsset::Direction::INCOMING }
+    sample_meta = { asset: sample, direction: AssayAsset::Direction::OUTGOING }
+    publication = Factory(:publication, contributor: person)
+    model = Factory(:model, contributor: person)
+    sop = Factory(:sop, contributor: person)
+    document = Factory(:document, contributor: person)
+
+    disable_authorization_checks do
+      assay.assay_assets.create!(data_file_meta)
+      assay.assay_assets.create!(sample_meta)
+
+      assay.publications << publication
+      assay.models << model
+      assay.sops << sop
+      assay.documents << document
+    end
+
+    clone = assay.clone_with_associations
+
+    assert_equal assay.title, clone.title
+    assert_equal assay.description, clone.description
+    assert_equal assay.projects, clone.projects
+    assert_equal BaseSerializer.convert_policy(assay.policy), BaseSerializer.convert_policy(clone.policy)
+
+    assay_asset_meta = clone.assay_assets.map { |aa| { asset: aa.asset, direction: aa.direction } }
+    assert_includes assay_asset_meta, data_file_meta
+    assert_includes assay_asset_meta, sample_meta
+    assert_includes clone.publications, publication
+    assert_includes clone.models, model
+    assert_includes clone.sops, sop
+    assert_includes clone.documents, document
+
+    disable_authorization_checks { assert clone.save }
+  end
+
+  test 'has deleted contributor?' do
+    item = Factory(:assay,deleted_contributor:'Person:99')
+    item.update_column(:contributor_id,nil)
+    item2 = Factory(:assay)
+    item2.update_column(:contributor_id,nil)
+
+    assert_nil item.contributor
+    assert_nil item2.contributor
+    refute_nil item.deleted_contributor
+    assert_nil item2.deleted_contributor
+
+    assert item.has_deleted_contributor?
+    refute item2.has_deleted_contributor?
+  end
+
+  test 'has jerm contributor?' do
+    item = Factory(:assay,deleted_contributor:'Person:99')
+    item.update_column(:contributor_id,nil)
+    item2 = Factory(:assay)
+    item2.update_column(:contributor_id,nil)
+
+    assert_nil item.contributor
+    assert_nil item2.contributor
+    refute_nil item.deleted_contributor
+    assert_nil item2.deleted_contributor
+
+    refute item.has_jerm_contributor?
+    assert item2.has_jerm_contributor?
   end
 end

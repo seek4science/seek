@@ -756,13 +756,13 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should create with associated model sop data file and publication' do
-    user = Factory :user
-    login_as(user)
-    sop = Factory :sop, policy: Factory(:public_policy), contributor: user
-    model = Factory :model, policy: Factory(:public_policy), contributor: user
-    df = Factory :data_file, policy: Factory(:public_policy), contributor: user
-    pub = Factory :publication, contributor: user
-    study = Factory :study, policy: Factory(:public_policy), contributor: user
+    person = Factory :person
+    login_as(person.user)
+    sop = Factory :sop, policy: Factory(:public_policy), contributor: person
+    model = Factory :model, policy: Factory(:public_policy), contributor: person
+    df = Factory :data_file, policy: Factory(:public_policy), contributor: person
+    pub = Factory :publication, contributor: person
+    study = Factory :study, policy: Factory(:public_policy), contributor: person
     rel = RelationshipType.first
 
     assert_difference('ActivityLog.count') do
@@ -775,9 +775,9 @@ class AssaysControllerTest < ActionController::TestCase
                 assay_class_id: assay_classes(:modelling_assay_class).id,
                 sop_ids: ["#{sop.id}"],
                 model_ids: ["#{model.id}"],
-                data_files_attributes: [{ asset_id: df.id, relationship_type_id: rel.id }]
+                data_files_attributes: [{ asset_id: df.id, relationship_type_id: rel.id }],
+                publication_ids: ["#{pub.id}"]
             },
-                 related_publication_ids: ["#{pub.id}"],
                  policy_attributes: valid_sharing # default policy is nil in VLN
           end
         end

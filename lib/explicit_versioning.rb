@@ -188,7 +188,7 @@ module Jits
           rev.send("#{self.class.revision_comments_column}=", revision_comments)
           rev.send("#{self.class.versioned_foreign_key}=", id)
           if rev.version > 1 && rev.respond_to?(:contributor) && User.current_user
-            rev.contributor = User.current_user
+            rev.contributor = User.current_user.person
           end
           rev.projects = projects
           saved = rev.save

@@ -5,6 +5,19 @@ class PublicationTest < ActiveSupport::TestCase
 
   fixtures :all
 
+  test 'title validation allows long titles' do
+    long_title = ('a' * 65536).freeze
+    ok_title = ('a' * 65535).freeze
+    p = Factory(:publication)
+    assert p.valid?
+    p.title = long_title
+    refute p.valid?
+    p.title = ok_title
+    assert p.valid?
+    disable_authorization_checks{p.save!}
+
+  end
+
   test 'create publication from hash' do
     publication_hash = {
         title: 'SEEK publication',
@@ -434,6 +447,36 @@ class PublicationTest < ActiveSupport::TestCase
 
     pub.doi = 'www.example.com/10.5072/abc'
     refute pub.valid?
+  end
+
+  test 'has deleted contributor?' do
+    item = Factory(:publication,deleted_contributor:'Person:99')
+    item.update_column(:contributor_id,nil)
+    item2 = Factory(:publication)
+    item2.update_column(:contributor_id,nil)
+
+    assert_nil item.contributor
+    assert_nil item2.contributor
+    refute_nil item.deleted_contributor
+    assert_nil item2.deleted_contributor
+
+    assert item.has_deleted_contributor?
+    refute item2.has_deleted_contributor?
+  end
+
+  test 'has jerm contributor?' do
+    item = Factory(:publication,deleted_contributor:'Person:99')
+    item.update_column(:contributor_id,nil)
+    item2 = Factory(:publication)
+    item2.update_column(:contributor_id,nil)
+
+    assert_nil item.contributor
+    assert_nil item2.contributor
+    refute_nil item.deleted_contributor
+    assert_nil item2.deleted_contributor
+
+    refute item.has_jerm_contributor?
+    assert item2.has_jerm_contributor?
   end
 
 end

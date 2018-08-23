@@ -15,14 +15,12 @@
 //= require application_shared
 //= require tagging
 //= require autocompleter_advanced
-//= require publication
 //= require top_menu
 //= require dropMenu
 //= require dynamic_menu
 //= require assays
 //= require models
 //= require sharing
-//= require associate_events
 //= require attribution
 //= require creators
 //= require resource

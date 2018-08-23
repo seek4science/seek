@@ -62,7 +62,7 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
       Sop.delete_all
       user = Factory(:person).user
       other_user = Factory :user
-      sop = Factory :sop, contributor: user, policy: Factory(:editing_public_policy)
+      sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
       Sop.clear_lookup_table
 
       sop.update_lookup_table(user)
@@ -88,7 +88,7 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
     with_config_value :auth_lookup_enabled, true do
       user = Factory :user
       other_user = Factory :user
-      sop = Factory :sop, contributor: user, policy: Factory(:editing_public_policy)
+      sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
       Sop.clear_lookup_table
       # check using the standard
       assert sop.authorized_for_view?(user)
@@ -158,5 +158,45 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
         assert_equal 2,Sop.connection.select_one('select count(*) from sop_auth_lookup;').values[0].to_i
       end
     end
+  end
+
+  test 'people flagged as having left a project cannot see project-shared items' do
+    person = Factory(:former_project_person)
+    project = person.projects.first
+    active_person = Factory(:person, project: project)
+
+    assert person.current_projects.empty?
+    assert_includes person.former_projects, project
+    assert_includes active_person.current_projects, project
+    assert_includes project.former_people, person
+    assert_includes project.current_people, active_person
+
+    data = Factory(:data_file, policy: Factory(:private_policy,
+                                               permissions: [Factory(:edit_permission, contributor: project)]))
+
+    assert data.can_view?(active_person)
+    assert data.can_edit?(active_person)
+    refute data.can_view?(person)
+    refute data.can_edit?(person)
+  end
+
+  test 'people flagged as leaving a project in the future can still see project-shared items' do
+    person = Factory(:future_former_project_person)
+    project = person.projects.first
+    active_person = Factory(:person, project: project)
+
+    assert_includes person.current_projects, project
+    assert_empty person.former_projects
+    assert_includes active_person.current_projects, project
+    assert_includes project.current_people, person
+    assert_includes project.current_people, active_person
+
+    data = Factory(:data_file, policy: Factory(:private_policy,
+                                               permissions: [Factory(:edit_permission, contributor: project)]))
+
+    assert data.can_view?(active_person)
+    assert data.can_edit?(active_person)
+    assert data.can_view?(person)
+    assert data.can_edit?(person)
   end
 end
