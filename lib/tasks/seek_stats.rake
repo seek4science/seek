@@ -5,6 +5,7 @@ require 'rake'
 require 'active_record/fixtures'
 
 namespace :seek_stats do
+
   task(activity: :environment) do
     actions = %w[download create]
     types = %w[Model Sop DataFile]

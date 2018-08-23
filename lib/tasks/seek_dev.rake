@@ -37,7 +37,6 @@ namespace :seek_dev do
     puts output.read
   end
 
-  desc('Dump auth lookup tables')
   task(dump_auth_lookup: :environment) do
     tables = Seek::Util.authorized_types.map(&:lookup_table_name)
 
@@ -62,7 +61,6 @@ namespace :seek_dev do
     puts 'Done'
   end
 
-  desc 'A simple task for quickly setting up a project and institution, and assigned the first user to it. This is useful for quickly setting up the database when testing. Need to create a default user before running this task'
   task(initial_membership: :environment) do
     p = Person.first
     raise Exception, 'Need to register a person first' if p.nil? || p.user.nil?
@@ -77,7 +75,6 @@ namespace :seek_dev do
     end
   end
 
-  desc 'create 50 randomly named unlinked projects'
   task(random_projects: :environment) do
     (0...50).to_a.each do
       title = ('A'..'Z').to_a[rand(26)] + UUID.generate
@@ -86,7 +83,6 @@ namespace :seek_dev do
     end
   end
 
-  desc 'Lists all publicly available assets'
   task list_public_assets: :environment do
     [Investigation, Study, Assay, DataFile, Model, Sop, Publication].each do |assets|
       assets.find_each do |asset|
