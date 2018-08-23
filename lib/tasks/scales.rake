@@ -3,47 +3,6 @@ require 'rake'
 require 'active_record/fixtures'
 
 namespace :seek_scales do
-  desc("adds the scales defined by Virtual Liver")
-  task(:vl_scales => :environment) do
-    # Scale.destroy_all
-    Seek::Config.scales.each_with_index do |scale_title,index|
-      scale = Scale.find_by_title scale_title
-
-      if scale
-        scale.title = scale_title.capitalize
-        scale.key = scale_title
-        scale.pos = 5 - index
-        scale.image_name = "vl-scales/#{scale_title}.png"
-
-        if scale_title =="liverLobule"
-          scale.title = "Liver lobule"
-          scale.image_name = "vl-scales/#{scale_title}.jpg"
-        end
-        disable_authorization_checks do
-          scale.save!
-        end
-      end
-    end
-
-  end
-
-  desc("transfer vl scalings to annotations")
-    task(:scalings_to_annotations => :environment) do
-      disable_authorization_checks do
-        Scaling.find_each do |s|
-           annotation = Annotation.new(
-              :source => s.person.user,
-              :annotatable => s.scalable,
-              :attribute_name => "scale",
-              :value => s.scale
-          )
-          annotation.save!
-        end
-      end
-
-    end
-
-
   desc("adds scales passed on to us by Afsaneh for AirProm demo")
   task(:airprom=>:environment) do
     Scale.destroy_all
