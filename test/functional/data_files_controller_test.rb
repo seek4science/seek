@@ -3111,17 +3111,18 @@ class DataFilesControllerTest < ActionController::TestCase
     assert study.can_edit?
 
     sharing = {
-      access_type: Policy::PRIVATE,
-      permissions_attributes: {
-        '0' => {
-          contributor_type: 'Person',
-          contributor_id: manager.id,
-          access_type: Policy::MANAGING
-        },
-        '1' => {
-          contributor_type: 'Project',
-          contributor_id: other_project.id,
-          access_type: Policy::VISIBLE
+        access_type: Policy::PRIVATE,
+        permissions_attributes: {
+            '0' => {
+                contributor_type: 'Person',
+                contributor_id: manager.id,
+                access_type: Policy::MANAGING
+            },
+            '1' => {
+                contributor_type: 'Project',
+                contributor_id: other_project.id,
+                access_type: Policy::VISIBLE
+            }
         }
     }
 
