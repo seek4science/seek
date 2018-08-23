@@ -457,7 +457,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     df = assigns(:data_file)
     df.reload
-    assert_equal users(:datafile_owner), df.contributor
+    assert_equal users(:datafile_owner).person, df.contributor
 
     assert !df.content_blob.data_io_object.read.nil?
     assert df.content_blob.url.blank?
@@ -522,7 +522,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     refute assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     refute assigns(:data_file).content_blob.file_exists?
@@ -2845,7 +2845,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal [project], df.projects
     assert_equal blob, df.content_blob
     assert_equal 'Small File', df.title
-    assert_equal person.user, df.contributor
+    assert_equal person, df.contributor
     assert_empty df.assays
 
     al = ActivityLog.last

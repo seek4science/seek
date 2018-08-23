@@ -53,7 +53,7 @@ module Seek
         datafile_params[:license] ||= openbis_endpoint.project.default_license
         df = DataFile.new(datafile_params)
 
-        df.contributor = creator
+        df.contributor = creator.person
         df.policy = openbis_endpoint.policy.deep_copy
         df.external_asset = obis_asset
 
