@@ -40,7 +40,12 @@ module Seek
         if Seek::Config.allow_private_address_access
           p.call
         else
-          PrivateAddressCheck.only_public_connections { p.call }
+          begin
+            PrivateAddressCheck.only_public_connections { p.call }
+          rescue Errno::ECONNREFUSED, SocketError
+            raise PrivateAddressCheck::PrivateConnectionAttemptedError if PrivateAddressCheck.resolves_to_private_address?(uri.host)
+            raise
+          end
         end
       end
 
