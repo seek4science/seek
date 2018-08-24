@@ -177,7 +177,7 @@ module RestTestCases
 
   def edit_max_object(object); end
 
-  def test_AAA_json_content
+  def test_json_content
     check_for_json_type_skip
     ['min','max'].each do |m|
       object = get_test_object(m)
