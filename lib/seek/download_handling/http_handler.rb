@@ -59,8 +59,12 @@ module Seek
           if Seek::Config.allow_private_address_access
             p.call
           else
-            raise PrivateAddressCheck::PrivateConnectionAttemptedError if PrivateAddressCheck.resolves_to_private_address?(URI.parse(url).host)
-            PrivateAddressCheck.only_public_connections { p.call }
+            begin
+              PrivateAddressCheck.only_public_connections { p.call }
+            rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+              raise PrivateAddressCheck::PrivateConnectionAttemptedError if PrivateAddressCheck.resolves_to_private_address?(URI.parse(url).host)
+              raise
+            end
           end
         rescue PrivateAddressCheck::PrivateConnectionAttemptedError
           code = 490 # A made up error code to be handled internally by SEEK
