@@ -177,7 +177,7 @@ module RestTestCases
 
   def edit_max_object(object); end
 
-  def test_json_content
+  def test_AAA_json_content
     check_for_json_type_skip
     ['min','max'].each do |m|
       object = get_test_object(m)
@@ -222,7 +222,7 @@ module RestTestCases
     end
 
     diff.delete_if {
-        |el| el["path"] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|md5sum|sha1sum|project_id|position_id/
+        |el| el["path"] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|md5sum|sha1sum|project_id|tags|position_id/
     }
 
 
