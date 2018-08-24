@@ -59,6 +59,7 @@ module Seek
           if Seek::Config.allow_private_address_access
             p.call
           else
+            raise PrivateAddressCheck::PrivateConnectionAttemptedError if PrivateAddressCheck.resolves_to_private_address?(URI.parse(url).host)
             PrivateAddressCheck.only_public_connections { p.call }
           end
         rescue PrivateAddressCheck::PrivateConnectionAttemptedError
