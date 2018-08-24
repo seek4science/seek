@@ -175,7 +175,10 @@ module RelatedItemsHelper
 
   def collect_related_items(resource)
     related = relatable_types
-    related.delete('Person') if resource.class == 'Person' # to avoid the same person showing up
+    related.delete('Person') if resource.is_a?(Person) # to avoid the same person showing up
+    if !resource.is_a?(Sample)
+      related.delete('Organism')
+    end
 
     answerable = {}
     related.each_key do |type|
