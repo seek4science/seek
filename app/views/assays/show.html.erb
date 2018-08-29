@@ -95,7 +95,7 @@
           <% end %>
         </div>
     <% end %>
-    <%= render partial: 'general/isa_graph', locals: { root_item: @assay } %>
+    <%= render partial: 'general/isa_graph', locals: { root_item: @assay, options: { depth: 2 } } %>
   </div>
 
   <div class="col-md-3 col-sm-4">

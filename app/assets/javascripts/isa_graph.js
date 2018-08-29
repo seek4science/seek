@@ -140,7 +140,8 @@ var ISA = {
                     //animate the current node
                     ISA.originNode = cy.nodes('[id=\'' + current_element_id + '\']')[0];
                     ISA.originNode.select();
-                    cy.animate({ zoom: 0.8, center: {eles: ISA.originNode}, duration: ISA.defaults.animationDuration });
+                    var immediateConnections = ISA.originNode.incomers().union(ISA.originNode.outgoers());
+                    cy.animate({ zoom: 0.8, fit: { eles: immediateConnections, padding: 40 }, duration: ISA.defaults.animationDuration });
                 } else {
                     $j('#isa-graph').hide();
                 }
@@ -324,6 +325,10 @@ var ISA = {
                     // Need to do this due to a little hack we used when drawing the tree
                     //  (to show a node as "openable" despite having no children)
                     tree.redraw_node(this.id);
+                });
+
+                $j('li[data-node-id=' + ISA.originNode.data('id') +']').each(function () {
+                    $j(this).addClass('isa-highlight');
                 });
 
                 cy.resize();

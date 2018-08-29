@@ -1,6 +1,6 @@
 <%
   options ||= { depth: 1, parent_depth: 1, include_self: true }
-  graph_hash = Seek::IsaGraphGenerator.new(root_item).generate(options)
+  graph_hash = Seek::IsaGraphGenerator.new(root_item).generate(options.merge(parent_depth: nil))
   tree_hash = Seek::IsaGraphGenerator.new(root_item).generate(options.merge(parent_depth: nil))
   elements = cytoscape_elements(graph_hash)
 
@@ -14,29 +14,29 @@
     <div id="isa-graph" class="panel panel-default">
       <a href="#" id="exit-fullscreen-btn" aria-label="Close">&times;</a>
       <div id="node_info"></div>
-      <div class="isa-wrapper">
-        <div id="cy"></div>
-        <%= render partial: 'general/jstree', locals: { hash: tree_hash } %>
-      </div>
       <div class="isa-footer">
-        <button class="btn btn-default pull-left" id="toggle-fullscreen-btn">
-          <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
-          Toggle fullscreen
-        </button>
         <div id="isa-view-controls">
-          View:
           <div class="btn-group" data-toggle="buttons">
-            <label class="btn btn-default active" id="isa-split-view-btn">
+            <label class="btn btn-default btn-xs active" id="isa-tree-view-btn" >
+              <input type="radio" name="options" autocomplete="off"> Tree
+            </label>
+            <label class="btn btn-default btn-xs" id="isa-split-view-btn">
               <input type="radio" name="options" autocomplete="off" checked> Split
             </label>
-            <label class="btn btn-default" id="isa-graph-view-btn" >
+            <label class="btn btn-default btn-xs" id="isa-graph-view-btn" >
               <input type="radio" name="options" autocomplete="off"> Graph
-            </label>
-            <label class="btn btn-default" id="isa-tree-view-btn" >
-              <input type="radio" name="options" autocomplete="off"> Tree
             </label>
           </div>
         </div>
+        <br/>
+        <button class="btn btn-default btn-xs" id="toggle-fullscreen-btn">
+          <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+          Toggle fullscreen
+        </button>
+      </div>
+      <div class="isa-wrapper">
+        <div id="cy"></div>
+        <%= render partial: 'general/jstree', locals: { hash: tree_hash } %>
       </div>
     </div>
 
@@ -72,6 +72,7 @@
             $j(this).button('toggle');
             $j('#cy').show();
             $j('#jstree').show();
+            $j('#node_info').show();
             $j('#jstree').css('width', '300px');
             cy.resize();
             return false;
@@ -80,6 +81,7 @@
         $j('#isa-graph-view-btn').click(function () {
             $j(this).button('toggle');
             $j('#cy').show();
+            $j('#node_info').show();
             $j('#jstree').hide();
             cy.resize();
         });
@@ -87,6 +89,7 @@
         $j('#isa-tree-view-btn').click(function () {
             $j(this).button('toggle');
             $j('#cy').hide();
+            $j('#node_info').hide();
             $j('#jstree').show();
             $j('#jstree').css('width', '100%');
         });
@@ -106,5 +109,10 @@
                 ISA.fullscreen(false);
             }
         });
+
+        $j('#cy').hide();
+        $j('#jstree').show();
+        $j('#node_info').hide();
+        $j('#jstree').css('width', '100%');
     });
 </script>

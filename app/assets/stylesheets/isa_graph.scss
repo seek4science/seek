@@ -2,7 +2,7 @@
 @import 'mixins';
 
 #isa-graph {
-  overflow: hidden;
+  //overflow: hidden;
 
   &.fullscreen{
     position: fixed;
@@ -20,11 +20,11 @@
     }
 
     .isa-footer {
-      position: absolute;
-      width: 100%;
-      bottom: 0px;
-      margin-top: 10px;
-      height: 60px;
+      //position: absolute;
+      //width: 100%;
+      //bottom: 0px;
+      //margin-top: 10px;
+      //height: 60px;
     }
 
     #cy {
@@ -68,14 +68,19 @@ a.graph_toggle {
 
 #jstree {
   background-color: #fff;
-  height: 600px !important;
+  //height: 600px !important;
   width: 300px;
   flex-shrink: 0;
   border-left: 1px solid $panel-default-border;
-  padding-left: 5px;
-  padding-bottom: 60px;
-  overflow-y: scroll;
-  overflow-x: hidden;
+  margin-left: -1px;
+  padding: 10px 0 10px 5px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+
+  //padding-bottom: 60px;
+  //overflow-y: scroll;
+  //overflow-x: hidden;
   .jstree-themeicon {
     background-size: 24px !important;
   }
@@ -86,7 +91,8 @@ a.graph_toggle {
     }
   }
   .child-count-leaf {
-    color: $link-color;
+    color: #999;
+    font-size: small;
     &:hover {
       color: $link-hover-color;
       text-decoration: underline;
@@ -98,17 +104,21 @@ a.graph_toggle {
 }
 
 .isa-footer {
-  border-top: 1px solid $panel-default-border;
+  //border-top: 1px solid $panel-default-border;
   padding: 10px;
-  background-color: $panel-footer-bg;
+  //background-color: $panel-footer-bg;
   overflow: auto;
-
+  z-index: 20000;
+  position: absolute;
+  right: 10px;
+  top: 0;
   #isa-view-controls {
-    float: right;
+    display: inline-block;
   }
 }
 
 #exit-fullscreen-btn {
+  display: none;
   font-size: 40px;
   color: inherit;
   position: absolute;
@@ -118,5 +128,18 @@ a.graph_toggle {
 
   &:hover {
     text-decoration: none;
+  }
+}
+
+.isa-highlight {
+  background-color: rgba(190, 235, 255, 0.5) !important;
+
+  & > a {
+    font-weight: bold;
+  }
+
+  > ul {
+    background-color: rgba(255, 255, 255, 0.5) !important;
+
   }
 }

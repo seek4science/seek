@@ -2,8 +2,12 @@
 
 <script type="text/javascript">
   $j(document).ready(function () {
-    $j('#jstree').bind('loaded.jstree', function() {
-      $j(this).jstree(true).select_node(ISA.originNode.data('id'));
+    $j('#jstree').bind('loaded.jstree', function(event, data) {
+      $j('li[data-node-id=' + ISA.originNode.data('id') +']').each(function () {
+        $j(this).addClass('isa-highlight');
+        data.instance.select_node(this.id);
+        data.instance.open_node(this.id);
+      });
     }).jstree({ 'core' : {
       'check_callback': true,
       'force_text': true,
@@ -16,11 +20,20 @@
           ISA.loadChildren(childCountNode);
         }
       } else {
+        data.instance.open_node(data.node); // Open the branch if it is collapsed
         var node = ISA.getNode(data.node.li_attr['data-node-id']);
         if (node.length) {
           ISA.selectNode(node);
         }
       }
-    })
+    }).on('dblclick.jstree', function (event) {
+        var id = $j(event.target).closest('li').data('nodeId');
+        var node = ISA.getNode(id);
+        ISA.visitNode(node);
+    }).on('redraw.jstree', function (event) {
+        $j('li[data-node-id=' + ISA.originNode.data('id') +']').each(function () {
+            $j(this).addClass('isa-highlight');
+        });
+    });
   });
 </script>

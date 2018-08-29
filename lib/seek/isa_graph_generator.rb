@@ -38,7 +38,7 @@ module Seek
     end
 
     def avatar_key
-      "#{@type.to_s.singularize}_avatar"
+      @type.to_s.pluralize
     end
 
     def initialize(object, type, children)
@@ -184,10 +184,15 @@ module Seek
         }
       when Assay
         {
-          children: [:data_files, :models, :sops, :publications, :documents],
+          #children: [:models, :sops, :publications, :documents],
           parents: [:study],
-          related: [:publications],
-          aggregated_children: { samples: :samples }
+          # related: [:publications],
+          aggregated_children: { samples: :samples,
+                                 data_files: :data_files,
+                                 models: :models,
+                                 sops: :sops,
+                                 documents: :documents,
+                                 publications: :publications }
         }
       when Publication
         {

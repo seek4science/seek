@@ -187,6 +187,8 @@ module ISAHelper
       entry[:a_attr] = { class: 'hidden-leaf none_text' }
     end
 
+    entry[:children] += child_edges.map { |c| tree_node(hash, c[1]) }
+
     if node.child_count > 0
       if node.child_count > child_edges.count
         entry[:children] << {
@@ -203,8 +205,6 @@ module ISAHelper
     else
       entry[:state] = { opened: false }
     end
-
-    entry[:children] += child_edges.map { |c| tree_node(hash, c[1]) }
 
     entry
   end
