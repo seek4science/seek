@@ -104,8 +104,8 @@ class DocumentsControllerTest < ActionController::TestCase
     assert document.assays.empty?
 
     assert_difference('ActivityLog.count') do
-      put :update, id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id]},
-          assay_ids: [assay.id]
+      put :update, id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id],
+                                                assay_assets_attributes: [{ assay_id: assay.id }] }
     end
 
     assert_redirected_to document_path(assigns(:document))
@@ -133,6 +133,96 @@ class DocumentsControllerTest < ActionController::TestCase
     get :show, id: doc.id
     assert_response :success
     assert_select 'a', text: /View content/, count: 1
+  end
+
+  test "assay documents through nested routing" do
+    assert_routing 'assays/2/documents', controller: 'documents', action: 'index', assay_id: '2'
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor:person)
+    document = Factory(:document,assays:[assay],contributor:person)
+    document2 = Factory(:document,contributor:person)
+
+
+    get :index, assay_id: assay.id
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', document_path(document), text: document.title
+      assert_select 'a[href=?]', document_path(document2), text: document2.title, count: 0
+    end
+  end
+
+  test "studies documents through nested routing" do
+    assert_routing 'studies/2/documents', controller: 'documents', action: 'index', study_id: '2'
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor:person)
+    document = Factory(:document,assays:[assay],contributor:person)
+    document2 = Factory(:document,contributor:person)
+
+
+    get :index, study_id: assay.study.id
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', document_path(document), text: document.title
+      assert_select 'a[href=?]', document_path(document2), text: document2.title, count: 0
+    end
+  end
+
+  test "investigation documents through nested routing" do
+    assert_routing 'investigations/2/documents', controller: 'documents', action: 'index', investigation_id: '2'
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor:person)
+    document = Factory(:document,assays:[assay],contributor:person)
+    document2 = Factory(:document,contributor:person)
+
+
+    get :index, investigation_id: assay.study.investigation.id
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', document_path(document), text: document.title
+      assert_select 'a[href=?]', document_path(document2), text: document2.title, count: 0
+    end
+  end
+
+  test "people documents through nested routing" do
+    assert_routing 'people/2/documents', controller: 'documents', action: 'index', person_id: '2'
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor:person)
+    document = Factory(:document,assays:[assay],contributor:person)
+    document2 = Factory(:document,policy: Factory(:public_policy),contributor:Factory(:person))
+
+
+    get :index, person_id: person.id
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', document_path(document), text: document.title
+      assert_select 'a[href=?]', document_path(document2), text: document2.title, count: 0
+    end
+  end
+
+  test "project documents through nested routing" do
+    assert_routing 'projects/2/documents', controller: 'documents', action: 'index', project_id: '2'
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor:person)
+    document = Factory(:document,assays:[assay],contributor:person)
+    document2 = Factory(:document,policy: Factory(:public_policy),contributor:Factory(:person))
+
+
+    get :index, project_id: person.projects.first.id
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', document_path(document), text: document.title
+      assert_select 'a[href=?]', document_path(document2), text: document2.title, count: 0
+    end
   end
 
   private

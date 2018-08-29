@@ -21,6 +21,6 @@ Factory.define(:max_study, parent: :min_study) do |f|
   f.experimentalists "Wet lab people"
   f.other_creators "Marie Curie"
   f.after_build do |s|
-    s.assays = [Factory(:max_assay, contributor: s.contributor.person, policy: Factory(:public_policy))]
+    s.assays = [Factory(:max_assay, contributor: s.contributor, policy: Factory(:public_policy))]
   end
 end

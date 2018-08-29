@@ -4,10 +4,12 @@ module Seek
       # populates a data file with the metadata that can be found in Rightfield template
       class DataFileRightFieldExtractor < RightfieldExtractor
         def populate(data_file)
-          data_file.title = title
-          data_file.description = description
-          data_file.projects = [project] if project
-          data_file.assay_assets.build(assay:assay) if assay
+          if contains_rightfield_elements?
+            data_file.title = title
+            data_file.description = description
+            data_file.projects = [project] if project
+            data_file.assay_assets.build(assay: assay) if assay
+          end
           warnings
         end
 

@@ -22,7 +22,7 @@ module Seek
           attr_reader :extra_info
 
           VALID_PROBLEMS = %i[no_permission not_a_project_member no_project not_in_db
-                              id_not_a_valid_match id_not_match_host no_study duplicate_assay].freeze
+                              id_not_a_valid_uri id_not_match_host no_study duplicate_assay].freeze
 
           def initialize(problem, value, extra_info)
             @value = value

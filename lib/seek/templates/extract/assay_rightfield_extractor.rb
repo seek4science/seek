@@ -4,9 +4,11 @@ module Seek
       # populates an Assay with the metadata that can be found in a Rightfield Template
       class AssayRightfieldExtractor < RightfieldExtractor
         def populate(assay)
-          unless title.blank?
-            populate_assay(assay)
-            check_for_duplicate_assay(assay)
+          if contains_rightfield_elements?
+            unless title.blank?
+              populate_assay(assay)
+              check_for_duplicate_assay(assay)
+            end
           end
           warnings
         end

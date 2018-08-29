@@ -63,8 +63,8 @@ class PoliciesController < ApplicationController
 
   def preview_permissions
       contributor_person = (params['is_new_file'] == 'false') ?  User.find_by_id(params['contributor_id'].to_i).try(:person) : current_person
-      creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
-      creators.collect!{|c| Person.find(c[1])}
+      creators = (params[:creators] || '').split(',').compact.uniq
+      creators = Person.find(creators)
 
       resource_class = params[:resource_name].camelize.constantize
       resource = resource_class.find_by_id(params[:resource_id]) || resource_class.new

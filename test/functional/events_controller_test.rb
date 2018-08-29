@@ -29,7 +29,7 @@ class EventsControllerTest < ActionController::TestCase
 
   test 'should have no avatar element in list' do
     e = Factory :event,
-                contributor: Factory(:user, person: Factory(:person, first_name: 'Dont', last_name: 'Display Person')),
+                contributor: Factory(:person, first_name: 'Dont', last_name: 'Display Person'),
                 project_ids: [Factory(:project, title: 'Dont Display Project').id],
                 policy: Factory(:public_policy)
     get :index
@@ -42,7 +42,7 @@ class EventsControllerTest < ActionController::TestCase
 
   test 'index should not show contributor or project' do
     e = Factory :event,
-                contributor: Factory(:user, person: Factory(:person, first_name: 'Dont', last_name: 'Display Person')),
+                contributor: Factory(:person, first_name: 'Dont', last_name: 'Display Person'),
                 project_ids: [Factory(:project, title: 'Dont Display Project').id],
                 policy: Factory(:public_policy)
     get :index
@@ -177,7 +177,7 @@ class EventsControllerTest < ActionController::TestCase
   test 'should create event with associated data file' do
     data_file = Factory(:data_file)
     assert_difference('Event.count', 1) do
-      post :create, event: valid_event, sharing: valid_sharing, data_files: [{ id: data_file.id }]
+      post :create, event: valid_event.merge(data_file_ids: [data_file.id]), sharing: valid_sharing
     end
 
     assert_includes assigns(:event).data_files, data_file

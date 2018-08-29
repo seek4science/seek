@@ -2,6 +2,7 @@ require 'test_helper'
 require 'time_test_helper'
 
 class AssetTest < ActiveSupport::TestCase
+
   fixtures :all
   include ApplicationHelper
 
@@ -174,12 +175,12 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal 1, sop.managers.count
     assert sop.managers.include?(person)
 
-    df = Factory(:data_file, contributor: user)
+    df = Factory(:data_file, contributor: user.person)
     assert_equal 1, df.managers.count
     assert df.managers.include?(user.person)
 
     policy = Factory(:private_policy)
-    policy.permissions << Factory(:permission, contributor: user, access_type: Policy::MANAGING, policy: policy)
+    policy.permissions << Factory(:permission, contributor: user.person, access_type: Policy::MANAGING, policy: policy)
     policy.permissions << Factory(:permission, contributor: person, access_type: Policy::EDITING, policy: policy)
     assay = Factory(:assay, policy: policy, contributor: person2)
     assert_equal 2, assay.managers.count
@@ -355,4 +356,80 @@ class AssetTest < ActiveSupport::TestCase
     assert Factory(:model).respond_to?(:doi_identifiers)
     assert Factory(:sop).respond_to?(:doi_identifiers)
   end
+
+  test 'has deleted contributor?' do
+    assets = [:data_file,:sop, :model, :presentation,:document, :event, :data_file_version,:sop_version, :model_version, :presentation_version,:document_version]
+    assets.each do |asset_type|
+      item = Factory(asset_type,deleted_contributor:'Person:99')
+      item.update_column(:contributor_id,nil)
+      item2 = Factory(asset_type)
+      item2.update_column(:contributor_id,nil)
+
+      assert_nil item.contributor
+      assert_nil item2.contributor
+      refute_nil item.deleted_contributor
+      assert_nil item2.deleted_contributor
+
+      assert item.has_deleted_contributor?
+      refute item2.has_deleted_contributor?
+    end
+
+  end
+
+  test 'has jerm contributor?' do
+    assets = [:data_file,:sop, :model, :presentation, :event, :data_file_version,:sop_version, :model_version, :presentation_version,:document_version]
+    assets.each do |asset_type|
+      item = Factory(asset_type,deleted_contributor:'Person:99')
+      item.update_column(:contributor_id,nil)
+      item2 = Factory(asset_type)
+      item2.update_column(:contributor_id,nil)
+
+      assert_nil item.contributor
+      assert_nil item2.contributor
+      refute_nil item.deleted_contributor
+      assert_nil item2.deleted_contributor
+
+      refute item.has_jerm_contributor?
+      assert item2.has_jerm_contributor?
+    end
+  end
+
+  test 'validate title lengths' do
+    long_title = ('a' * 256).freeze
+    ok_title = ('a' * 255).freeze
+    assert long_title.length > 255
+    assert_equal 255, ok_title.length
+    assets = %i[data_file sop model presentation document event assay investigation study]
+    User.with_current_user(Factory(:user)) do
+      assets.each do |asset_key|
+        item = Factory(asset_key, contributor:User.current_user.person)
+        assert item.valid?, "#{asset_key} should be valid"
+        item.title = long_title
+        refute item.valid?, "#{asset_key} should be not be valid with too long title length"
+        item.title=ok_title
+        assert item.valid?, "#{asset_key} should be valid with max title length"
+        item.save!
+      end
+    end
+  end
+
+  test 'validate description lengths' do
+    long_desc = ('a' * 65536).freeze
+    ok_desc = ('a' * 65535).freeze
+    assert long_desc.length > 65535
+    assert_equal 65535, ok_desc.length
+    assets = %i[data_file sop model presentation document event assay investigation study]
+    User.with_current_user(Factory(:user)) do
+      assets.each do |asset_key|
+        item = Factory(asset_key, contributor:User.current_user.person)
+        assert item.valid?, "#{asset_key} should be valid"
+        item.description = long_desc
+        refute item.valid?, "#{asset_key} should be not be valid with too long description length"
+        item.description=ok_desc
+        assert item.valid?, "#{asset_key} should be valid with max description length"
+        item.save!
+      end
+    end
+  end
+
 end

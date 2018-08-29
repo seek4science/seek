@@ -4,7 +4,7 @@ function updateCreatorSettings() {
 
     for(var i = 0; i < creators.length; i++) {
         var creator = creators[i];
-        html += HandlebarsTemplates['creator'](creator);
+        html += HandlebarsTemplates['creator']({ creator: creator, prefix: resourceType });
         creators_arr.push([creator.name, creator.id]);
     }
 
@@ -15,9 +15,6 @@ function updateCreatorSettings() {
     else {
         $j('#creators_list').html(html);
     }
-
-    // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
-    $j('#creators').val(Object.toJSON(creators_arr));
 
     $j('#creators_list .delete').click(function () {
         var id = $j(this).data('objectId');

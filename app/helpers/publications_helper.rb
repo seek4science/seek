@@ -1,17 +1,16 @@
 require 'doi/record'
 
 module PublicationsHelper
-  def people_by_project_options(projects)
-    options = ''
-    projects.each do |project|
-      project_options = "<optgroup id=#{project.id} title=\"#{h project.title}\" label=\"#{h truncate(project.title)}\">"
-      project.people.each do |person|
-        project_options << "<option value=\"#{person.id}\" title=\"#{h person.name}\">#{h truncate(person.name)}</option>"
-      end
-      project_options << '</optgroup>'
-      options += project_options unless project.people.empty?
+  def author_to_person_options(selected_id, suggestion)
+    projects = Project.includes(:people)
+    grouped = projects.map do |p|
+      [
+          p.title,
+          p.people.map { |m| ["#{m.name}#{' (suggested)' if !selected_id && suggestion == m}", m.id] }
+      ]
     end
-    options.html_safe
+
+    grouped_options_for_select(grouped,  selected_id || suggestion.try(:id))
   end
 
   def publication_type_text(type)

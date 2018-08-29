@@ -5,13 +5,26 @@ class PublicationTest < ActiveSupport::TestCase
 
   fixtures :all
 
+  test 'title validation allows long titles' do
+    long_title = ('a' * 65536).freeze
+    ok_title = ('a' * 65535).freeze
+    p = Factory(:publication)
+    assert p.valid?
+    p.title = long_title
+    refute p.valid?
+    p.title = ok_title
+    assert p.valid?
+    disable_authorization_checks{p.save!}
+
+  end
+
   test 'create publication from hash' do
     publication_hash = {
-      title: 'SEEK publication',
-      journal: 'The testing journal',
-      published_date: Date.new(2011, 12, 24),
-      pubmed_id: nil,
-      doi: nil
+        title: 'SEEK publication',
+        journal: 'The testing journal',
+        published_date: Date.new(2011, 12, 24),
+        pubmed_id: nil,
+        doi: nil
     }
     publication = Publication.new(publication_hash)
     assert_equal publication_hash[:title], publication.title
@@ -23,11 +36,11 @@ class PublicationTest < ActiveSupport::TestCase
 
   test 'create publication from metadata doi' do
     publication_hash = {
-      title: 'SEEK publication',
-      journal: 'The testing journal',
-      pub_date: Date.new(2011, 12, 24),
-      pubmed_id: nil,
-      doi: nil
+        title: 'SEEK publication',
+        journal: 'The testing journal',
+        pub_date: Date.new(2011, 12, 24),
+        pubmed_id: nil,
+        doi: nil
     }
     doi_record = DOI::Record.new(publication_hash)
     publication = Publication.new
@@ -41,10 +54,10 @@ class PublicationTest < ActiveSupport::TestCase
 
   test 'create publication from metadata pubmed' do
     publication_hash = {
-      'title'   => 'SEEK publication\\r', # test required? chomp
-      'journal' => 'The testing journal',
-      'pubmed' => nil,
-      'doi' => nil
+        'title'   => 'SEEK publication\\r', # test required? chomp
+        'journal' => 'The testing journal',
+        'pubmed' => nil,
+        'doi' => nil
     }
     bio_reference = Bio::Reference.new(publication_hash)
     publication = Publication.new
@@ -154,17 +167,14 @@ class PublicationTest < ActiveSupport::TestCase
   test 'assay association' do
     publication = publications(:pubmed_2)
     assay = assays(:modelling_assay_with_data_and_relationship)
-    User.current_user = assay.contributor.user
-    assay_asset = assay_assets(:metabolomics_assay_asset1)
-    assert_not_equal assay_asset.asset, publication
-    assert_not_equal assay_asset.assay, assay
-    assay_asset.asset = publication
-    assay_asset.assay = assay
-    User.with_current_user(assay.contributor.user) { assay_asset.save! }
-    assay_asset.reload
-    assert assay_asset.valid?
-    assert_equal assay_asset.asset, publication
-    assert_equal assay_asset.assay, assay
+
+    assert_not_includes publication.assays, assay
+
+    assert_difference('Relationship.count') do
+      User.with_current_user(assay.contributor.user) { publication.associate(assay) }
+    end
+
+    assert_includes publication.assays, assay
   end
 
   test 'publication date from pubmed' do
@@ -437,6 +447,36 @@ class PublicationTest < ActiveSupport::TestCase
 
     pub.doi = 'www.example.com/10.5072/abc'
     refute pub.valid?
+  end
+
+  test 'has deleted contributor?' do
+    item = Factory(:publication,deleted_contributor:'Person:99')
+    item.update_column(:contributor_id,nil)
+    item2 = Factory(:publication)
+    item2.update_column(:contributor_id,nil)
+
+    assert_nil item.contributor
+    assert_nil item2.contributor
+    refute_nil item.deleted_contributor
+    assert_nil item2.deleted_contributor
+
+    assert item.has_deleted_contributor?
+    refute item2.has_deleted_contributor?
+  end
+
+  test 'has jerm contributor?' do
+    item = Factory(:publication,deleted_contributor:'Person:99')
+    item.update_column(:contributor_id,nil)
+    item2 = Factory(:publication)
+    item2.update_column(:contributor_id,nil)
+
+    assert_nil item.contributor
+    assert_nil item2.contributor
+    refute_nil item.deleted_contributor
+    assert_nil item2.deleted_contributor
+
+    refute item.has_jerm_contributor?
+    assert item2.has_jerm_contributor?
   end
 
 end

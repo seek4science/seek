@@ -12,7 +12,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
     # cannot test with `with_config_value` due to being too late after the tests start
 
     assert_equal 30.minutes, Rails.application.config.session_options[:expire_after]
-    df = Factory :data_file, contributor: User.current_user
+    df = Factory :data_file, contributor: User.current_user.person
     User.current_user = nil
     get "/data_files/#{df.id}"
     assert_response :success
@@ -36,7 +36,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
   end
 
   test 'should forbid the unauthorized page' do
-    data_file = Factory :data_file, contributor: User.current_user
+    data_file = Factory :data_file, contributor: User.current_user.person
     get "/data_files/#{data_file.id}", {}, 'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}"
     assert_response :success
 
@@ -66,7 +66,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
 
   test 'should go to last visited page(except search) after browsing a forbidden page, accessible page, then login' do
     with_config_value :internal_help_enabled, true do
-      data_file = Factory :data_file, contributor: User.current_user
+      data_file = Factory :data_file, contributor: User.current_user.person
 
       logout 'http://www.example.com/'
       get "/data_files/#{data_file.id}", {}, 'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}"

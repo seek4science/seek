@@ -42,7 +42,7 @@ module SampleTypesHelper
   end
 
   def sample_type_tags_list(sample_type)
-    list_item_tags_list(sample_type.annotations_with_attribute('sample_type_tags').collect(&:value), type: 'sample_type_tags')
+    list_item_tags_list(sample_type.tag_annotations.collect(&:value), type: 'sample_type_tags')
   end
 
   def all_sample_type_tags

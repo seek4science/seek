@@ -376,7 +376,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_routing 'people/2/studies', controller: 'studies', action: 'index', person_id: '2'
     study = Factory(:study, policy: Factory(:public_policy))
     study2 = Factory(:study, policy: Factory(:public_policy))
-    person = study.contributor.person
+    person = study.contributor
     refute_equal study.contributor, study2.contributor
     assert person.is_a?(Person)
     get :index, person_id: person.id
@@ -476,7 +476,7 @@ class StudiesControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert study.creators.empty?
 
-    put :update, id: study.id, study: { title: study.title }, creators: [[creator.name, creator.id]].to_json
+    put :update, id: study.id, study: { title: study.title, creator_ids: [creator.id] }
     assert_redirected_to study_path(study)
 
     assert study.creators.include?(creator)
@@ -489,7 +489,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'p#creators_list'
     assert_select "input[type='text'][name='creator-typeahead']"
-    assert_select "input[type='hidden'][name='creators']"
+    # assert_select "input[type='hidden'][name='creators']" This is set via JS
     assert_select "input[type='text'][name='study[other_creators]']"
   end
 

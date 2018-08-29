@@ -25,10 +25,6 @@ class DataFilesControllerTest < ActionController::TestCase
     @object
   end
 
-  def test_json_content
-    super
-  end
-
   def test_title
     get :index
     assert_response :success
@@ -164,12 +160,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'creators show in list private_item' do
     p1 = Factory :person
     p2 = Factory :person
-    df = Factory(:data_file, title: 'ZZZZZ', creators: [p2], contributor: p1.user, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    df = Factory(:data_file, title: 'ZZZZZ', creators: [p2], contributor: p1, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
 
     get :index, page: 'Z'
 
     # check the test is behaving as expected:
-    assert_equal p1.user, df.contributor
+    assert_equal p1, df.contributor
     assert df.creators.include?(p2)
     assert_select '.list_item_title a[href=?]', data_file_path(df), 'ZZZZZ', 'the data file for this test should appear as a list private_item'
 
@@ -201,7 +197,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     refute_includes new_assay.data_files, d
     assert_difference('ActivityLog.count') do
-      put :update, id: d, data_file: { title: d.title }, assay_ids: [new_assay.id.to_s]
+      put :update, id: d, data_file: { title: d.title, assay_assets_attributes: [{ assay_id: new_assay.id.to_s }] }
     end
 
     assert_redirected_to data_file_path(d)
@@ -266,7 +262,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
@@ -285,7 +281,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
@@ -324,7 +320,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
     assert_equal 'txt_test.txt', assigns(:data_file).content_blob.original_filename
     assert_equal 'text/plain', assigns(:data_file).content_blob.content_type
@@ -346,7 +342,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
     assert_equal 'txt_test.txt', assigns(:data_file).content_blob.original_filename
     assert_equal 'text/plain', assigns(:data_file).content_blob.content_type
@@ -375,13 +371,14 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_difference('DataFile::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [assay.id.to_s]
+            post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: assay.id }]),
+                 content_blobs: [blob], policy_attributes: valid_sharing
           end
         end
       end
     end
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
 
     assert !assigns(:data_file).content_blob.data_io_object.read.nil?
     assert assigns(:data_file).content_blob.url.blank?
@@ -432,7 +429,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     df = assigns(:data_file)
     df.reload
-    assert_equal users(:datafile_owner), df.contributor
+    assert_equal users(:datafile_owner).person, df.contributor
 
     assert !df.content_blob.data_io_object.read.nil?
     assert df.content_blob.url.blank?
@@ -458,7 +455,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     df = assigns(:data_file)
     df.reload
-    assert_equal users(:datafile_owner), df.contributor
+    assert_equal users(:datafile_owner).person, df.contributor
 
     assert !df.content_blob.data_io_object.read.nil?
     assert df.content_blob.url.blank?
@@ -481,7 +478,7 @@ class DataFilesControllerTest < ActionController::TestCase
         end
       end
       assert_redirected_to data_file_path(assigns(:data_file))
-      assert_equal users(:datafile_owner), assigns(:data_file).contributor
+      assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
       assert assigns(:data_file)
       df = assigns(:data_file)
       assert_equal Policy::NO_ACCESS, df.policy.access_type
@@ -523,7 +520,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     refute assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     refute assigns(:data_file).content_blob.file_exists?
@@ -546,7 +543,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     refute assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     refute assigns(:data_file).content_blob.file_exists?
@@ -569,7 +566,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
@@ -657,11 +654,11 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'publications included in form for datafile' do
     get :edit, id: data_files(:picture)
     assert_response :success
-    assert_select 'div#publications_fold_content', true
+    assert_select 'div#add_publications_form', true
 
     register_content_blob
     assert_response :success
-    assert_select 'div#publications_fold_content', true
+    assert_select 'div#add_publications_form', true
   end
 
   test 'dont show download button or count for website/external_link data file' do
@@ -715,7 +712,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'should download' do
     assert_difference('ActivityLog.count') do
-      get :download, id: Factory(:small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user).id
+      get :download, id: Factory(:small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person).id
     end
     assert_response :success
     assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"", @response.header['Content-Disposition']
@@ -762,7 +759,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     refute assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     refute assigns(:data_file).content_blob.file_exists?
@@ -787,7 +784,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     refute assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     refute assigns(:data_file).content_blob.file_exists?
@@ -812,7 +809,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     refute assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     refute assigns(:data_file).content_blob.file_exists?
@@ -836,7 +833,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner), assigns(:data_file).contributor
+    assert_equal users(:datafile_owner).person, assigns(:data_file).contributor
     refute assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     refute assigns(:data_file).content_blob.file_exists?
@@ -898,19 +895,6 @@ class DataFilesControllerTest < ActionController::TestCase
     validate_xml_against_schema(xml, schema_path)
   end
 
-  test 'should fetch data content as csv' do
-    login_as(:model_owner)
-    get :data, id: data_files(:downloadable_data_file), format: 'csv'
-    assert_response :success
-    csv = @response.body
-    assert csv.include?(%(,,"fish","bottle","ggg,gg"))
-
-    get :data, id: data_files(:downloadable_data_file), format: 'csv', trim: true, sheet: '2'
-    assert_response :success
-    csv = @response.body
-    assert csv.include?(%("a",1,TRUE,,FALSE))
-  end
-
   test 'should not expose non downloadable spreadsheet' do
     login_as(:model_owner)
     get :data, id: data_files(:viewable_data_file), format: 'xml'
@@ -953,7 +937,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should be possible to delete one version of data file' do
     Seek::Config.delete_asset_version_enabled = true
     # upload a data file
-    df = Factory :data_file, contributor: User.current_user
+    df = Factory :data_file, contributor: User.current_user.person
     # upload new version 1 of the data file
     post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 1'
     # upload new version 2 of the data file
@@ -1173,7 +1157,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as p.user
 
     p2 = Factory :person
-    df = Factory :data_file, contributor: p.user
+    df = Factory :data_file, contributor: p
 
     assert df.annotations.empty?, 'this data file should have no tags for the test'
 
@@ -1248,7 +1232,7 @@ class DataFilesControllerTest < ActionController::TestCase
     # df = data_files(:editable_data_file)
 
     refute_nil user = User.current_user
-    df = Factory(:data_file, contributor: user.current_user, policy: Factory(:editing_public_policy, permissions:[Factory(:permission)]))
+    df = Factory(:data_file, contributor: user.person, policy: Factory(:editing_public_policy, permissions:[Factory(:permission)]))
 
     assert df.can_manage?
     assert_equal Policy::EDITING, df.policy.access_type
@@ -1415,7 +1399,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'uploader can publish the private_item when projects associated with the private_item have no gatekeeper' do
-    uploader = Factory(:user)
+    uploader = Factory(:person)
     data_file = Factory(:data_file, contributor: uploader)
     assert_equal Policy::NO_ACCESS, data_file.policy.access_type
     login_as(uploader)
@@ -1542,7 +1526,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should not show private data file to another user' do
-    df = Factory :data_file, contributor: Factory(:user)
+    df = Factory :data_file, contributor: Factory(:person)
     get :show, id: df
     assert_response :forbidden
   end
@@ -1783,9 +1767,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :forbidden
     assert_select 'h2', text: /The #{I18n.t('data_file')} is not visible to you./
 
-    assert !df.can_see_hidden_item?(User.current_user.person)
-    contributor_person = df.contributor.person
-    assert_select 'a[href=?]', person_path(contributor_person), count: 0
+    refute df.can_see_hidden_item?(User.current_user.person)
+    assert_select 'a[href=?]', person_path(df.contributor), count: 0
   end
 
   test 'landing page for hidden private_item with the contributor contact' do
@@ -1805,8 +1788,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :forbidden
     assert_select 'h2', text: /The #{I18n.t('data_file')} is not visible to you./
 
-    contributor_person = df.contributor.person
-    assert_select 'a[href=?]', person_path(contributor_person)
+    assert_select 'a[href=?]', person_path(df.contributor)
   end
 
   test 'landing page for hidden private_item which DOI was minted' do
@@ -2184,7 +2166,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                    policy: Factory(:private_policy), contributor: person.user
+                                    policy: Factory(:private_policy), contributor: person
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2211,10 +2193,10 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'filtering for sample association form' do
     person = Factory(:person)
-    d1 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'fish')
-    d2 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'frog')
-    d3 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'banana')
-    d4 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'no samples')
+    d1 = Factory(:data_file, projects: person.projects, contributor: person, policy: Factory(:public_policy), title: 'fish')
+    d2 = Factory(:data_file, projects: person.projects, contributor: person, policy: Factory(:public_policy), title: 'frog')
+    d3 = Factory(:data_file, projects: person.projects, contributor: person, policy: Factory(:public_policy), title: 'banana')
+    d4 = Factory(:data_file, projects: person.projects, contributor: person, policy: Factory(:public_policy), title: 'no samples')
     [d1, d2, d3].each do |data_file|
       Factory(:sample, originating_data_file_id: data_file.id, contributor: person)
     end
@@ -2247,10 +2229,10 @@ class DataFilesControllerTest < ActionController::TestCase
     person2 = Factory(:person)
     project2 = person2.projects.first
 
-    d1 = Factory(:data_file, projects: [project1], contributor: person.user, policy: Factory(:public_policy), title: 'datax1a')
-    d2 = Factory(:data_file, projects: [project1], contributor: person.user, policy: Factory(:public_policy), title: 'datax1b')
-    d3 = Factory(:data_file, projects: [project2], contributor: person2.user, policy: Factory(:public_policy), title: 'datax2a')
-    d4 = Factory(:data_file, projects: [project2], contributor: person2.user, policy: Factory(:public_policy), title: 'datax2b', simulation_data: true)
+    d1 = Factory(:data_file, projects: [project1], contributor: person, policy: Factory(:public_policy), title: 'datax1a')
+    d2 = Factory(:data_file, projects: [project1], contributor: person, policy: Factory(:public_policy), title: 'datax1b')
+    d3 = Factory(:data_file, projects: [project2], contributor: person2, policy: Factory(:public_policy), title: 'datax2a')
+    d4 = Factory(:data_file, projects: [project2], contributor: person2, policy: Factory(:public_policy), title: 'datax2b', simulation_data: true)
 
     login_as(person.user)
 
@@ -2326,7 +2308,7 @@ class DataFilesControllerTest < ActionController::TestCase
     another_person = Factory(:person)
     login_as(person)
 
-    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:private_policy), contributor: person.user
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:private_policy), contributor: person
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2354,7 +2336,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
 
     data_file = Factory :data_file, content_blob: Factory(:strain_sample_data_content_blob),
-                                    policy: Factory(:private_policy), contributor: person.user
+                                    policy: Factory(:private_policy), contributor: person
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2384,7 +2366,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                    policy: Factory(:private_policy), contributor: person.user
+                                    policy: Factory(:private_policy), contributor: person
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2421,7 +2403,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                    policy: Factory(:private_policy), contributor: person.user
+                                    policy: Factory(:private_policy), contributor: person
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2454,7 +2436,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                    policy: Factory(:private_policy), contributor: person.user
+                                    policy: Factory(:private_policy), contributor: person
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2482,7 +2464,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy),
-                                    contributor: person.user
+                                    contributor: person
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2573,7 +2555,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'extract samples confirmation not accessible if not can_delete?' do
     login_as(Factory(:person))
-    df = data_file_with_extracted_samples(Factory(:person).user)
+    df = data_file_with_extracted_samples(Factory(:person))
     refute df.can_delete?
     get :destroy_samples_confirm, id: df.id
     assert_redirected_to data_file_path(df)
@@ -2626,8 +2608,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('DataFile.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing,
-             assay_ids: [assay.id]
+        post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: assay.id }]),
+             content_blobs: [blob], policy_attributes: valid_sharing
+
       end
     end
 
@@ -2870,7 +2853,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal [project], df.projects
     assert_equal blob, df.content_blob
     assert_equal 'Small File', df.title
-    assert_equal person.user, df.contributor
+    assert_equal person, df.contributor
     assert_empty df.assays
 
     al = ActivityLog.last
@@ -2893,9 +2876,9 @@ class DataFilesControllerTest < ActionController::TestCase
     params = {data_file: {
         title: 'Small File',
         project_ids: [project.id],
+        assay_assets_attributes: [{ assay_id: assay.id }]
     }, policy_attributes: valid_sharing,
-              content_blob_id: blob.id.to_s,
-              assay_ids:[assay.id]
+       content_blob_id: blob.id.to_s
     }
 
     assert_difference('ActivityLog.count') do
@@ -2927,9 +2910,9 @@ class DataFilesControllerTest < ActionController::TestCase
     params = {data_file: {
         title: 'Small File',
         project_ids: [project.id],
+        assay_assets_attributes: [{ assay_id: assay.id }]
     }, policy_attributes: valid_sharing,
-        content_blob_id: blob.id.to_s,
-        assay_ids:[assay.id]
+       content_blob_id: blob.id.to_s
     }
 
     assert_difference('ActivityLog.count') do
@@ -3274,7 +3257,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute bad_assay.can_edit?
 
     assert_no_difference('AssayAsset.count') do
-      put :update, id: data_file.id, data_file: { title: data_file.title }, assay_ids: [bad_assay.id.to_s]
+      put :update, id: data_file.id, data_file: { title: data_file.title, assay_assets_attributes: [{ assay_id: bad_assay.id }] }
     end
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
     #assert_response :unprocessable_entity
@@ -3283,7 +3266,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_empty data_file.assays
 
     assert_difference('AssayAsset.count') do
-      put :update, id: data_file.id, data_file: { title: data_file.title }, assay_ids: [good_assay.id.to_s]
+      put :update, id: data_file.id, data_file: { title: data_file.title, assay_assets_attributes: [{ assay_id: good_assay.id }] }
     end
     data_file.reload
     assert_equal [good_assay], data_file.assays
@@ -3311,7 +3294,8 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file, blob = valid_data_file
 
     assert_no_difference('AssayAsset.count') do
-      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [bad_assay.id.to_s]
+      post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: bad_assay.id }]), content_blobs: [blob], 
+                    policy_attributes: valid_sharing
     end
 
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
@@ -3321,10 +3305,62 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file, blob = valid_data_file
 
     assert_difference('AssayAsset.count') do
-      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [good_assay.id.to_s]
+      post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: good_assay.id }]), content_blobs: [blob], 
+                    policy_attributes: valid_sharing
     end
     data_file = assigns(:data_file)
     assert_equal [good_assay],data_file.assays
+  end
+
+  test 'create assay should be checked with new assay containing title' do
+    df = Factory.build(:data_file, content_blob:Factory(:txt_content_blob))
+    refute_nil df.content_blob
+
+    # creating a new assay should be selected if an unsaved assay if present, with a populated title
+    assay_to_be_created = Factory.build(:assay,title:'new assay')
+    session[:processed_datafile]=df
+    session[:processed_assay]=assay_to_be_created
+
+    get :provide_metadata
+
+    assert_response :success
+    refute_nil assigns(:create_new_assay)
+    assert assigns(:create_new_assay)
+    assert_select "input#assay_create_assay[checked=checked]", count:1
+
+  end
+
+  test 'create assay should not be checked with not title' do
+    df = Factory.build(:data_file, content_blob:Factory(:txt_content_blob))
+
+    # creating a new assay should be selected if an unsaved assay if present, with a populated title
+    assay_no_title = Factory.build(:assay,title:'')
+    session[:processed_datafile]=df
+
+    assert assay_no_title.title.blank?
+    session[:processed_assay]=assay_no_title
+    get :provide_metadata
+
+    assert_response :success
+    refute_nil assigns(:create_new_assay)
+    refute assigns(:create_new_assay)
+    assert_select "input#assay_create_assay[checked=checked]", count:0
+  end
+
+  test 'create assay should not be checked with existing assay' do
+    df = Factory.build(:data_file, content_blob:Factory(:txt_content_blob))
+
+    # creating a new assay should be selected if an unsaved assay if present, with a populated title
+    existing_assay = Factory(:assay)
+    session[:processed_datafile]=df
+
+    session[:processed_assay]=existing_assay
+    get :provide_metadata
+
+    assert_response :success
+    refute_nil assigns(:create_new_assay)
+    refute assigns(:create_new_assay)
+    assert_select "input#assay_create_assay[checked=checked]", count:0
   end
 
   def edit_max_object(df)
@@ -3334,7 +3370,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   private
 
-  def data_file_with_extracted_samples(contributor = User.current_user)
+  def data_file_with_extracted_samples(contributor = User.current_user.person)
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: contributor
     sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
@@ -3433,12 +3469,12 @@ class DataFilesControllerTest < ActionController::TestCase
                    policy: private_policy,
                    title: 'some title',
                    description: 'some description',
-                   contributor: owner.user)
+                   contributor: owner)
     visible_item = Factory(:data_file,
                            policy: visible_policy,
                            title: 'some title',
                            description: 'some description',
-                           contributor: owner.user)
+                           contributor: owner)
 
    login_as owner.user
 

@@ -1,18 +1,18 @@
 <%# This partial is expecting 3 parameters to be defined: -%>
-<%# - resource_type - type of resource for which the creators form is displayed (required because various types of resources have different requirements for attributions) -%>
+<%# - form - the form object -%>
 <%# - existing_creators - list of creators for the current resource (this should be collection of Person objects) -%>
 <%# - other_creators - list of non-SEEK creators for the current resource (this should be a string) -%>
 
 <%
-  original_resource_type = resource_type
-  resource_type = text_for_resource(resource_type)
+  resource_type = form.object.class.name.underscore
+  resource_type_text = text_for_resource(form.object)
   collapsed = existing_creators.blank? if collapsed.nil?
 %>
 
 <%= folding_panel(t('creator').capitalize.pluralize, collapsed, :body_options => {:id => 'creator_fold_content'},
-                  :help_text => "Here you attribute this #{resource_type} to other people.") do %>
+                  :help_text => "Here you attribute this #{resource_type_text} to other people.") do %>
   <p>
-    If this <%= resource_type %> was contributed by, or together with, other members, please list their names below.
+    If this <%= resource_type_text %> was contributed by, or together with, other members, please list their names below.
     <br/>
     <strong>
       The <%= t('creator').pluralize -%> you specify will have permissions to 'view and edit summary and contents'.
@@ -30,23 +30,22 @@
   </p>
   <p>
     <%= objects_input('creator-typeahead', [], :typeahead => {:query_url => typeahead_people_path + '?query=%QUERY'}) -%>
-    <%# this hidden input will submit all permission data with the form -%>
-    <%= hidden_field_tag "creators", "" -%>
   </p>
 
   <%#= render :partial => 'assets/advanced_creator_select' %>
 
   <p>
     If anyone not registered with <%= Seek::Config.application_name %> assisted with the contribution of
-    this <%= resource_type %>, you can specify them below.
+    this <%= resource_type_text %>, you can specify them below.
   </p>
   <p>
-    <%= text_field_tag original_resource_type.underscore + "[other_creators]", other_creators, :class => 'form-control' %>
+    <%= text_field_tag "#{resource_type}[other_creators]", other_creators, :class => 'form-control' %>
   </p>
 
 <% end %>
 
 <script type="text/javascript">
+    var resourceType = "<%= resource_type -%>";
     // recreate internal store of attributions..
     var creators = <%= existing_creators.map do |c|
     {   id: c.id,

@@ -140,19 +140,23 @@ class PersonTest < ActiveSupport::TestCase
     refute_nil person.user
     assert_empty person.contributed_items
 
-    df = Factory(:data_file, contributor: person.user)
-    inv = Factory(:investigation, contributor:person.user)
-    study = Factory(:study, contributor: person.user,investigation:inv)
+    df = Factory(:data_file, contributor: person)
+    inv = Factory(:investigation, contributor:person)
+    study = Factory(:study, contributor: person,investigation:inv)
     as = Factory(:assay, contributor: person,study:study)
+    strain = Factory(:strain,contributor:person)
+    sample = Factory(:sample,contributor:person)
 
 
     items = person.contributed_items
 
-    assert_equal 4, items.count
+    assert_equal 6, items.count
     assert_includes items, df
     assert_includes items, as
     assert_includes items, study
     assert_includes items, inv
+    assert_includes items, strain
+    assert_includes items, sample
 
     person = Factory(:person_in_project)
     assert_nil person.user
@@ -411,7 +415,7 @@ class PersonTest < ActiveSupport::TestCase
     Factory :expertise, value: 'golf', annotatable: p
     Factory :tool, value: 'sbml', annotatable: p
     assert_equal 1, p.expertise.size
-    assert_equal 'golf', p.expertise[0].text
+    assert_equal 'golf', p.expertise[0]
   end
 
   def test_tools
@@ -426,7 +430,7 @@ class PersonTest < ActiveSupport::TestCase
     Factory :tool, value: 'sbml', annotatable: p
     Factory :expertise, value: 'fishing', annotatable: p
     assert_equal 1, p.tools.size
-    assert_equal 'sbml', p.tools[0].text
+    assert_equal 'sbml', p.tools[0]
   end
 
   def test_assign_expertise
@@ -436,26 +440,29 @@ class PersonTest < ActiveSupport::TestCase
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
           p.expertise = %w[golf fishing]
+          p.save!
         end
       end
 
       assert_equal 2, p.expertise.size
-      assert p.expertise.collect(&:text).include?('golf')
-      assert p.expertise.collect(&:text).include?('fishing')
+      assert p.expertise.include?('golf')
+      assert p.expertise.include?('fishing')
 
       assert_difference('Annotation.count', -1) do
         assert_no_difference('TextValue.count') do
           p.expertise = ['golf']
+          p.save!
         end
       end
 
       assert_equal 1, p.expertise.size
-      assert_equal 'golf', p.expertise[0].text
+      assert_equal 'golf', p.expertise[0]
 
       p2 = Factory :person
       assert_difference('Annotation.count') do
         assert_no_difference('TextValue.count') do
           p2.expertise = ['golf']
+          p2.save!
         end
       end
     end
@@ -468,26 +475,29 @@ class PersonTest < ActiveSupport::TestCase
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
           p.tools = %w[golf fishing]
+          p.save!
         end
       end
 
       assert_equal 2, p.tools.size
-      assert p.tools.collect(&:text).include?('golf')
-      assert p.tools.collect(&:text).include?('fishing')
+      assert p.tools.include?('golf')
+      assert p.tools.include?('fishing')
 
       assert_difference('Annotation.count', -1) do
         assert_no_difference('TextValue.count') do
           p.tools = ['golf']
+          p.save!
         end
       end
 
       assert_equal 1, p.tools.size
-      assert_equal 'golf', p.tools[0].text
+      assert_equal 'golf', p.tools[0]
 
       p2 = Factory :person
       assert_difference('Annotation.count') do
         assert_no_difference('TextValue.count') do
           p2.tools = ['golf']
+          p2.save!
         end
       end
     end
@@ -500,14 +510,14 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal 2, p.tools.size
       p.tools = ['three']
       assert_equal 1, p.tools.size
-      assert_equal 'three', p.tools[0].text
+      assert_equal 'three', p.tools[0]
 
       p = Factory :person
       p.expertise = %w[aaa bbb]
       assert_equal 2, p.expertise.size
       p.expertise = ['ccc']
       assert_equal 1, p.expertise.size
-      assert_equal 'ccc', p.expertise[0].text
+      assert_equal 'ccc', p.expertise[0]
     end
   end
 
@@ -517,12 +527,14 @@ class PersonTest < ActiveSupport::TestCase
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
           p.tools = %w[golf fishing]
+          p.save!
         end
       end
 
       assert_difference('Annotation.count', 2) do
         assert_no_difference('TextValue.count') do
           p.expertise = %w[golf fishing]
+          p.save!
         end
       end
     end
@@ -769,7 +781,7 @@ class PersonTest < ActiveSupport::TestCase
   test 'should retrieve the list of people who have the manage right on the item' do
     user = Factory(:user)
     person = user.person
-    data_file = Factory(:data_file, contributor: user)
+    data_file = Factory(:data_file, contributor: person)
     people_can_manage = data_file.people_can_manage
     assert_equal 1, people_can_manage.count
     assert_equal person.id, people_can_manage.first[0]
@@ -792,13 +804,13 @@ class PersonTest < ActiveSupport::TestCase
       AssetsCreator.create asset: Factory(:data_file), creator: person
       AssetsCreator.create asset: Factory(:model), creator: person
       AssetsCreator.create asset: Factory(:sop), creator: person
-      Factory :event, contributor: user
+      event = Factory :event, contributor: person
       AssetsCreator.create asset: Factory(:presentation), creator: person
       AssetsCreator.create asset: Factory(:publication), creator: person
       assert_equal person.created_data_files, person.related_data_files
       assert_equal person.created_models, person.related_models
       assert_equal person.created_sops, person.related_sops
-      assert_equal user.events, person.related_events
+      assert_equal [event], person.related_events
       assert_equal person.created_presentations, person.related_presentations
       assert_equal person.created_publications, person.related_publications
     end
@@ -822,18 +834,16 @@ class PersonTest < ActiveSupport::TestCase
 
   test 'get the correct investigations and studies' do
     p = Factory(:person)
-    u = p.user
 
     inv1 = Factory(:investigation, contributor: p)
-    inv2 = Factory(:investigation, contributor: u)
 
     study1 = Factory(:study, contributor: p, investigation:inv1)
-    study2 = Factory(:study, contributor: u, investigation:inv2)
+    study2 = Factory(:study, contributor: p, investigation:inv1)
     p = Person.find(p.id)
 
-    assert_equal [study1, study2], p.studies.sort_by(&:id)
+    assert_equal [study1, study2], p.contributed_studies.sort_by(&:id)
 
-    assert_equal [inv1, inv2], p.investigations.sort_by(&:id)
+    assert_equal [inv1], p.contributed_investigations
   end
 
   test 'should be able to remove the workgroup whose project is not subcribed' do
@@ -1230,4 +1240,53 @@ class PersonTest < ActiveSupport::TestCase
     refute_nil pub3.publication_authors.sort_by(&:first_name)[0].person
 
   end
+
+  test 'deleted contributor updated when person deleted' do
+    data_file = Factory(:data_file)
+    person = data_file.contributor
+    person_id = person.id
+    things = [data_file]
+    things << Factory(:model, contributor:person)
+    things << Factory(:sop, contributor:person)
+    things << Factory(:presentation, contributor:person)
+    things << Factory(:investigation, contributor:person)
+    things << Factory(:study, contributor:person)
+    things << Factory(:assay, contributor:person)
+    things << Factory(:sample, contributor:person)
+    things << Factory(:strain, contributor:person)
+    things << Factory(:publication, contributor:person)
+
+
+
+    things.each do |thing|
+      assert_nil thing.deleted_contributor
+      assert_equal person,thing.contributor
+      if thing.respond_to?(:versions)
+        v = thing.versions.last
+        assert_nil v.deleted_contributor
+        assert_equal person,v.contributor
+      end
+    end
+
+    User.with_current_user(Factory(:admin).user) do
+      assert_difference('Person.count',-1) do
+        assert_difference('User.count',-1) do
+          person.destroy
+        end
+      end
+    end
+
+    things.each do |thing|
+      thing.reload
+      assert_nil thing.contributor, "#{thing.class.name} contributor should be nil"
+      refute_nil thing.deleted_contributor, "#{thing.class.name} deleted_contributor shouldn't be nil"
+      assert_equal "Person:#{person_id}",thing.deleted_contributor
+      if thing.respond_to?(:versions)
+        v = thing.versions.last
+        assert_nil v.contributor, "#{v.class.name} contributor should be nil"
+        refute_nil v.deleted_contributor, "#{v.class.name} deleted_contributor shouldn't be nil"
+      end
+    end
+  end
+
 end
