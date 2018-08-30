@@ -221,8 +221,17 @@ var ISA = {
     },
 
     fullscreen: function (state) {
+        var viewPos = cy.pan();
+        var origWidth = cy.width();
+        var origHeight = cy.height();
         $j('#isa-graph').toggleClass('fullscreen', state);
         cy.resize();
+        // Re-centre cytoscape view
+        viewPos.x += ((cy.width() - origWidth) / 2);
+        viewPos.y += ((cy.height() - origHeight) / 2);
+        cy.pan(viewPos);
+        // Scroll to ISA graph
+        $j('#isa-graph').get(0).scrollIntoView();
     },
 
     recentlyClickedNode: null,
