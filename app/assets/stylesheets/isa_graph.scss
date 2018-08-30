@@ -23,10 +23,6 @@
       margin-bottom: 70px;
     }
 
-    #exit-fullscreen-btn {
-      display: inline;
-    }
-
     #jstree {
       height: auto !important;
       max-height: none !important;
@@ -93,28 +89,14 @@ a.graph_toggle {
 }
 
 .isa-footer {
-  padding: 10px;
   overflow: auto;
   z-index: 20000;
   position: absolute;
-  right: 10px;
-  top: 0;
+  right: 20px;
+  top: 5px;
+  text-align: right;
   #isa-view-controls {
     display: inline-block;
-  }
-}
-
-#exit-fullscreen-btn {
-  display: none;
-  font-size: 40px;
-  color: inherit;
-  position: absolute;
-  right: 10px;
-  top: 0;
-  display: none;
-
-  &:hover {
-    text-decoration: none;
   }
 }
 

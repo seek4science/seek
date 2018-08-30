@@ -8,7 +8,6 @@
 <div class="row">
   <div class="col-sm-12 hidden-xs">
     <div id="isa-graph" class="panel panel-default">
-      <a href="#" id="exit-fullscreen-btn" aria-label="Close">&times;</a>
       <div id="node_info"></div>
       <div class="isa-footer">
         <div id="isa-view-controls">
@@ -95,10 +94,6 @@
         ISA.view[ISA.view.default](); // Apply the default view on page load
 
         // Fullscreen
-        $j('#exit-fullscreen-btn').click(function () {
-            ISA.fullscreen(false);
-            return false;
-        });
         $j('#toggle-fullscreen-btn').click(function () {
             ISA.fullscreen();
             return false;
