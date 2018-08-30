@@ -2,8 +2,6 @@
 @import 'mixins';
 
 #isa-graph {
-  //overflow: hidden;
-
   &.fullscreen{
     position: fixed;
     width: 100%;
@@ -17,14 +15,6 @@
     .isa-wrapper {
       position: relative;
       height: 100%;
-    }
-
-    .isa-footer {
-      //position: absolute;
-      //width: 100%;
-      //bottom: 0px;
-      //margin-top: 10px;
-      //height: 60px;
     }
 
     #cy {
@@ -68,7 +58,6 @@ a.graph_toggle {
 
 #jstree {
   background-color: #fff;
-  //height: 600px !important;
   width: 300px;
   flex-shrink: 0;
   border-left: 1px solid $panel-default-border;
@@ -78,18 +67,17 @@ a.graph_toggle {
   text-overflow: ellipsis;
   overflow: hidden;
 
-  //padding-bottom: 60px;
-  //overflow-y: scroll;
-  //overflow-x: hidden;
   .jstree-themeicon {
     background-size: 24px !important;
   }
+
   .hidden-leaf {
     color: gray;
     > i {
       display: none;
     }
   }
+
   .child-count-leaf {
     color: #999;
     font-size: small;
@@ -97,6 +85,7 @@ a.graph_toggle {
       color: $link-hover-color;
       text-decoration: underline;
     }
+
     > i {
       display: none;
     }
@@ -104,9 +93,7 @@ a.graph_toggle {
 }
 
 .isa-footer {
-  //border-top: 1px solid $panel-default-border;
   padding: 10px;
-  //background-color: $panel-footer-bg;
   overflow: auto;
   z-index: 20000;
   position: absolute;

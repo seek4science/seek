@@ -57,7 +57,7 @@ module Seek
     # parent_depth: number of levels of parent resources to show (0 = none, nil = all)
     # sibling_depth: number of levels of sibling resources (other children of immediate parent)to show (0 = none, nil = all)
     # include_self: include the root resource in the tree?
-    def generate(depth: 1, parent_depth: 0, sibling_depth: 0, include_self: true, auth: true)
+    def generate(depth: 1, parent_depth: nil, sibling_depth: 0, include_self: true, auth: true)
       @auth = auth
       hash = { nodes: [], edges: [] }
 

@@ -1,12 +1,8 @@
 <%
-  options ||= { depth: 1, parent_depth: 1, include_self: true }
-  graph_hash = Seek::IsaGraphGenerator.new(root_item).generate(options.merge(parent_depth: nil))
-  tree_hash = Seek::IsaGraphGenerator.new(root_item).generate(options.merge(parent_depth: nil))
-  elements = cytoscape_elements(graph_hash)
-
-  #show only current node and connected nodes
-  #if set force_max_node to true, show only max_node_number if (current node + connected nodes) is bigger then max_node_number
-  # reduced_elements = reduced_elements(elements, max_node_number, force_max_node, root_item)
+  options ||= { depth: 1, parent_depth: nil, include_self: true }
+  hash = Seek::IsaGraphGenerator.new(root_item).generate(options)
+  elements = cytoscape_elements(hash)
+  default_view ||= 'tree'
 %>
 
 <div class="row">
@@ -17,13 +13,13 @@
       <div class="isa-footer">
         <div id="isa-view-controls">
           <div class="btn-group" data-toggle="buttons">
-            <label class="btn btn-default btn-xs active" id="isa-tree-view-btn" >
+            <label class="btn btn-default btn-xs" id="isa-tree-view-btn">
               <input type="radio" name="options" autocomplete="off"> Tree
             </label>
             <label class="btn btn-default btn-xs" id="isa-split-view-btn">
-              <input type="radio" name="options" autocomplete="off" checked> Split
+              <input type="radio" name="options" autocomplete="off"> Split
             </label>
-            <label class="btn btn-default btn-xs" id="isa-graph-view-btn" >
+            <label class="btn btn-default btn-xs" id="isa-graph-view-btn">
               <input type="radio" name="options" autocomplete="off"> Graph
             </label>
           </div>
@@ -36,7 +32,7 @@
       </div>
       <div class="isa-wrapper">
         <div id="cy"></div>
-        <%= render partial: 'general/jstree', locals: { hash: tree_hash } %>
+        <%= render partial: 'general/jstree', locals: { hash: hash } %>
       </div>
     </div>
 
@@ -45,74 +41,72 @@
 </div>
 
 <script type="text/javascript">
-    var isaGraph = $j('.isa_graph')[0];
+    var isaGraph = $j('#isa-graph')[0];
     var elements = <%= elements.to_json.html_safe %>;
-    var originElementId = '<%= node_id(root_item) -%>';
 
     if (elements.error === 'error') {
         isaGraph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
         isaGraph.style['text-align'] = 'center';
-    }
-    else if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)) {
+    } else if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)) {
         isaGraph.innerHTML = "<div class='none_text'>Unable to display the graph for this browser version. Please upgrade your browser.</div>";
         isaGraph.style['text-align'] = 'center';
     } else {
         ISA.decodeHTMLForElements(elements);
-        ISA.drawGraph(elements, originElementId);
+        ISA.drawGraph(elements, '<%= node_id(root_item) -%>');
     }
 
-    $j(document).ready(function () {
-        $j('#toggle-isa-sidebar-btn').click(function () {
-            $j('#jstree').toggle();
+    ISA.view = {
+        tree: function () {
+            $j('#isa-tree-view-btn').button('toggle');
+            $j('#cy').hide();
+            $j('#node_info').hide();
+            $j('#jstree').show();
+            $j('#jstree').css('width', '100%');
+            return false;
+        },
+
+        graph: function () {
+            $j('#isa-graph-view-btn').button('toggle');
+            $j('#cy').show();
+            $j('#node_info').show();
+            $j('#jstree').hide();
             cy.resize();
             return false;
-        });
+        },
 
-        $j('#isa-split-view-btn').click(function () {
-            $j(this).button('toggle');
+        split: function () {
+            $j('#isa-split-view-btn').button('toggle');
             $j('#cy').show();
             $j('#jstree').show();
             $j('#node_info').show();
             $j('#jstree').css('width', '300px');
             cy.resize();
             return false;
-        });
+        },
 
-        $j('#isa-graph-view-btn').click(function () {
-            $j(this).button('toggle');
-            $j('#cy').show();
-            $j('#node_info').show();
-            $j('#jstree').hide();
-            cy.resize();
-        });
+        default: '<%= default_view -%>'
+    };
 
-        $j('#isa-tree-view-btn').click(function () {
-            $j(this).button('toggle');
-            $j('#cy').hide();
-            $j('#node_info').hide();
-            $j('#jstree').show();
-            $j('#jstree').css('width', '100%');
-        });
+    $j(document).ready(function () {
+        // View buttons
+        $j('#isa-split-view-btn').click(ISA.view.split);
+        $j('#isa-graph-view-btn').click(ISA.view.graph);
+        $j('#isa-tree-view-btn').click(ISA.view.tree);
+        ISA.view[ISA.view.default](); // Apply the default view on page load
 
+        // Fullscreen
         $j('#exit-fullscreen-btn').click(function () {
             ISA.fullscreen(false);
             return false;
         });
-
         $j('#toggle-fullscreen-btn').click(function () {
             ISA.fullscreen();
             return false;
         });
-
         $j(document).keyup(function(e) {
             if (e.keyCode == 27) { // Escape key
                 ISA.fullscreen(false);
             }
         });
-
-        $j('#cy').hide();
-        $j('#jstree').show();
-        $j('#node_info').hide();
-        $j('#jstree').css('width', '100%');
     });
 </script>
