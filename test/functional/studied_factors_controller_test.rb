@@ -234,7 +234,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     fs_array = []
     user = Factory(:user)
     login_as(user)
-    d = Factory(:data_file, contributor: user)
+    d = Factory(:data_file, contributor: user.person)
     assert_equal d.studied_factors.count, 0
     # create bunch of FSes which are different
     i = 0

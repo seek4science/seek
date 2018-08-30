@@ -7,7 +7,7 @@ class SampleExtractorTest < ActiveSupport::TestCase
     User.current_user = @person.user
     create_sample_attribute_type
     @data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                     policy: Factory(:private_policy), contributor: @person.user
+                                     policy: Factory(:private_policy), contributor: @person
     @sample_type = SampleType.new title: 'from template', project_ids: [@person.projects.first.id]
     @sample_type.content_blob = Factory(:sample_type_template_content_blob)
     @sample_type.build_attributes_from_template
@@ -43,7 +43,7 @@ class SampleExtractorTest < ActiveSupport::TestCase
 
   test 'blank rows are ignored from sample spreadsheets' do
     @data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_blank_rows_content_blob),
-                                     policy: Factory(:private_policy), contributor: @person.user
+                                     policy: Factory(:private_policy), contributor: @person
     @extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
 
     accepted, rejected = @extractor.extract.partition(&:valid?)

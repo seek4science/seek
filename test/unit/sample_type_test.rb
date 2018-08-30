@@ -41,6 +41,24 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute sample_type.valid?
   end
 
+  test 'validate title and decription length' do
+    long_desc = ('a' * 65536).freeze
+    ok_desc = ('a' * 65535).freeze
+    long_title = ('a' * 256).freeze
+    ok_title = ('a' * 255).freeze
+    st = Factory(:simple_sample_type)
+    assert st.valid?
+    st.title = long_title
+    refute st.valid?
+    st.title = ok_title
+    assert st.valid?
+    st.description = long_desc
+    refute st.valid?
+    st.description = ok_desc
+    assert st.valid?
+    disable_authorization_checks {st.save!}
+  end
+
   test 'is favouritable?' do
     type = Factory(:simple_sample_type, project_ids: @project_ids)
     assert type.is_favouritable?

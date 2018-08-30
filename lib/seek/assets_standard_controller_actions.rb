@@ -70,14 +70,13 @@ module Seek
 
     # i.e. @model = item, or @data_file = item - according to the item class name
     def set_shared_item_variable(item)
-      eval("@#{item.class.name.underscore}=item")
+      instance_variable_set("@#{item.class.name.underscore}", item)
     end
 
     # the standard response block after created a new asset
     def create_asset_and_respond(item)
       item = create_asset(item)
       if item.save
-        create_content_blobs
         unless return_to_fancy_parent(item)
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully uploaded and saved."
           respond_to do |format|

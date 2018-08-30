@@ -139,11 +139,11 @@ class AttributionsTest < ActionController::TestCase
   end
 
   test 'should display attributions' do
-    u = Factory :user
-    login_as(u)
-    sop1 = Factory :sop, policy: (Factory :public_policy), contributor: u
-    sop2 = Factory :sop, policy: (Factory :public_policy), contributor: u
-    sop3 = Factory :sop, policy: (Factory :public_policy), contributor: u
+    p = Factory :person
+    login_as(p.user)
+    sop1 = Factory :sop, policy: (Factory :public_policy), contributor: p
+    sop2 = Factory :sop, policy: (Factory :public_policy), contributor: p
+    sop3 = Factory :sop, policy: (Factory :public_policy), contributor: p
     Relationship.create subject: sop1, other_object: sop2, predicate: Relationship::ATTRIBUTED_TO
     sop1.reload
     sop2.reload

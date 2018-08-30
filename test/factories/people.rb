@@ -16,7 +16,7 @@ Factory.define(:max_person, class: Person) do |f|
   f.association :user, factory: :activated_user
   f.group_memberships { [Factory.build(:group_membership)] }
   f.after_create do |p|
-    p.assays_for_person = [Factory(:min_assay, contributor: p, policy: Factory(:public_policy))]
+    p.contributed_assays = [Factory(:min_assay, contributor: p, policy: Factory(:public_policy))]
     p.created_sops = [Factory(:sop, contributor: p, policy: Factory(:public_policy))]
     p.created_models = [Factory(:model, contributor: p, policy: Factory(:public_policy))]
     p.created_presentations = [Factory(:presentation, contributor: p, policy: Factory(:public_policy))]
@@ -109,6 +109,18 @@ Factory.define(:asset_gatekeeper, parent: :person) do |f|
   f.after_build do |gk|
     Factory(:admin_defined_role_project, project: gk.projects.first, person: gk, role_mask: 16)
     gk.roles_mask = 16
+  end
+end
+
+Factory.define(:former_project_person, parent: :person) do |f|
+  f.after_build do |p|
+    p.group_memberships.first.time_left_at = 1.day.ago
+  end
+end
+
+Factory.define(:future_former_project_person, parent: :person) do |f|
+  f.after_build do |p|
+    p.group_memberships.first.time_left_at = 1.week.from_now
   end
 end
 

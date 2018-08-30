@@ -78,7 +78,7 @@ class AuthLookupJobTest < ActiveSupport::TestCase
     Sop.delete_all
     user = Factory :user
     other_user = Factory :user
-    sop = Factory :sop, contributor: user, policy: Factory(:editing_public_policy)
+    sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
     AuthLookupUpdateQueue.destroy_all
     AuthLookupUpdateJob.new.add_items_to_queue sop
     Sop.clear_lookup_table

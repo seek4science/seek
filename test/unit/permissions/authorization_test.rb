@@ -10,7 +10,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   def test_auth_on_asset_version
     user1 = Factory :user
     user2 = Factory :user
-    sop = Factory :sop, contributor: user1, policy: Factory(:private_policy)
+    sop = Factory :sop, contributor: user1.person, policy: Factory(:private_policy)
     sop.policy.permissions << Factory(:permission, policy: sop.policy, contributor: user2.person, access_type: Policy::VISIBLE)
     assert_equal 1, sop.versions.count
     sop_v = sop.versions.first
@@ -524,11 +524,11 @@ class AuthorizationTest < ActiveSupport::TestCase
     leaving_project_member = Factory(:person, group_memberships: [Factory(:group_membership,
                                                                           time_left_at: 10.day.from_now,
                                                                           work_group: work_group)])
-    datafile1 = Factory(:data_file, contributor: project_member.user,
+    datafile1 = Factory(:data_file, contributor: project_member,
                                     projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
-    datafile2 = Factory(:data_file, contributor: project_member.user,
+    datafile2 = Factory(:data_file, contributor: project_member,
                                     projects: asset_manager.projects, policy: Factory(:private_policy))
-    datafile3 = Factory(:data_file, contributor: leaving_project_member.user,
+    datafile3 = Factory(:data_file, contributor: leaving_project_member,
                                     projects: asset_manager.projects, policy: Factory(:private_policy))
 
     refute Seek::Permissions::Authorization.authorized_by_role?('manage', datafile1, asset_manager)
@@ -546,9 +546,9 @@ class AuthorizationTest < ActiveSupport::TestCase
     asset_manager = Factory(:asset_housekeeper)
     work_group = asset_manager.work_groups.first
     former_project_member = Factory(:person, group_memberships: [Factory(:group_membership, has_left: true, work_group: work_group)])
-    datafile1 = Factory(:data_file, contributor: former_project_member.user,
+    datafile1 = Factory(:data_file, contributor: former_project_member,
                                     projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
-    datafile2 = Factory(:data_file, contributor: former_project_member.user,
+    datafile2 = Factory(:data_file, contributor: former_project_member,
                                     projects: asset_manager.projects, policy: Factory(:private_policy))
 
     assert Seek::Permissions::Authorization.authorized_by_role?('manage', datafile1, asset_manager)
@@ -625,15 +625,11 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     # resources are not entirely private
     datafile = Factory(:data_file, contributor: former_project_member, projects: asset_manager.projects, policy: policy)
-    datafile2 = Factory(:data_file, contributor: former_project_member.user, projects: asset_manager.projects, policy: policy2)
     investigation = Factory(:investigation, contributor: former_project_member, projects: asset_manager.projects, policy: policy)
-    investigation2 = Factory(:investigation, contributor: former_project_member.user, projects: asset_manager.projects, policy: policy2)
 
     User.with_current_user asset_manager.user do
       assert datafile.can_manage?
-      assert datafile2.can_manage?
       assert investigation.can_manage?
-      assert investigation2.can_manage?
     end
   end
 
@@ -657,7 +653,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   test 'can not delete for the asset which doi is minted' do
     User.current_user = Factory :user
-    df = Factory :data_file, contributor: User.current_user
+    df = Factory :data_file, contributor: User.current_user.person
     assert df.can_delete?(User.current_user)
 
     version = df.latest_version

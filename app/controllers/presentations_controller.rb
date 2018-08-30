@@ -16,12 +16,11 @@ class PresentationsController < ApplicationController
   include Seek::IsaGraphExtensions
 
   def new_version
-    if handle_upload_data
+    if handle_upload_data(true)
       comments=params[:revision_comments]
 
       respond_to do |format|
         if @presentation.save_as_new_version(comments)
-          create_content_blobs
           flash[:notice]="New version uploaded - now on version #{@presentation.version}"
         else
           flash[:error]="Unable to save new version"

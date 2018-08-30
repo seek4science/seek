@@ -5,7 +5,7 @@ Factory.define(:sample) do |f|
   f.association :contributor, factory: :person
 
   f.after_build do |sample|
-    sample.projects = [sample.contributor.person.projects.first] if sample.projects.empty?
+    sample.projects = [sample.contributor.projects.first] if sample.projects.empty?
   end
   f.after_build do |sample|
     sample.set_attribute(:the_title, sample.title) if sample.data.key?(:the_title)

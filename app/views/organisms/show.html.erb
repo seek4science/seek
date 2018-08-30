@@ -24,8 +24,11 @@
     <h2>Details about this organism</h2>
     <%= render :partial=>"bioportal_concept_details",:locals=>{:concept=>@organism.concept} -%>
     <br/>
-    <%= link_to_ncbi_taxonomy_browser @organism,"NCBI taxonomy browser",:popup=>true %>
   <% end -%>
+
+  <% if @organism.ncbi_id %>
+    <%= link_to_ncbi_taxonomy_browser @organism,"NCBI taxonomy browser",:popup=>true %>
+  <% end %>
 
   <h2>Strain details</h2>
   <table class="strain_list" style="width:100%;">

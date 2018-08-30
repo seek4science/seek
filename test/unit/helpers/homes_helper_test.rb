@@ -4,7 +4,7 @@ class HomesHelperTest < ActionView::TestCase
   test 'should retrieve recently added/downloaded items in the chronological order' do
     n = 5
     user = Factory :user
-    item = Factory(:data_file, policy: Factory(:public_policy), contributor: user)
+    item = Factory(:data_file, policy: Factory(:public_policy), contributor: user.person)
 
     create_logs = []
 
@@ -13,7 +13,7 @@ class HomesHelperTest < ActionView::TestCase
     create_logs << Factory(:activity_log, action: :create, activity_loggable: private, created_at: 9.day.ago, culprit: user)
     download_logs = []
     (0...n).to_a.each do |i|
-      item2 = Factory(:data_file, policy: Factory(:public_policy), contributor: user)
+      item2 = Factory(:data_file, policy: Factory(:public_policy), contributor: user.person)
       create_logs << Factory(:activity_log, action: 'create', activity_loggable: item2, created_at: i.day.ago, culprit: user)
       download_logs << Factory(:activity_log, action: 'download', activity_loggable: item2, created_at: i.day.ago, culprit: user)
       download_logs << Factory(:activity_log, action: 'download', activity_loggable: item, created_at: i.hour.ago, culprit: user)

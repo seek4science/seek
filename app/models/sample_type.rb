@@ -27,6 +27,8 @@ class SampleType < ActiveRecord::Base
   has_many :linked_sample_attributes, class_name: 'SampleAttribute', foreign_key: 'linked_sample_type_id'
 
   validates :title, presence: true
+  validates :title, length: { maximum: 255 }
+  validates :description, length: { maximum: 65_535 }
 
   validate :validate_one_title_attribute_present, :validate_attribute_title_unique
 

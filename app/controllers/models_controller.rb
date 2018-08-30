@@ -84,12 +84,11 @@ class ModelsController < ApplicationController
   # GET /models.xml
 
   def new_version
-    if handle_upload_data
+    if handle_upload_data(true)
       comments = params[:revision_comments]
 
       respond_to do |format|
         create_new_version comments
-        create_content_blobs
         create_model_image @model, model_image_params  if model_image_present?
         format.html { redirect_to @model }
       end

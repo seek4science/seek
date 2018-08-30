@@ -71,7 +71,7 @@ class BatchPublishingTest < ActionController::TestCase
 
   test 'do not have not-publishable items in batch_publishing_preview' do
     published_item = Factory(:data_file,
-                             contributor: User.current_user,
+                             contributor: User.current_user.person,
                              policy: Factory(:public_policy))
     assert !published_item.can_publish?, 'This data file must not be publishable for the test to succeed'
 
@@ -83,7 +83,7 @@ class BatchPublishingTest < ActionController::TestCase
   end
 
   test 'do not have not_publishable_type item in batch_publishing_preview' do
-    item = Factory(:publication, contributor: User.current_user)
+    item = Factory(:publication, contributor: User.current_user.person)
     refute item.can_publish?, 'This item must not be publishable for the test to be meaningful'
 
     get :batch_publishing_preview, id: User.current_user.person.id
@@ -173,7 +173,7 @@ class BatchPublishingTest < ActionController::TestCase
 
   test 'get waiting_approval_assets' do
     df, model, sop = waiting_approval_assets_for User.current_user
-    not_requested_df = Factory(:data_file, contributor: User.current_user)
+    not_requested_df = Factory(:data_file, contributor: User.current_user.person)
 
     get :waiting_approval_assets, id: User.current_user.person
 
@@ -195,7 +195,7 @@ class BatchPublishingTest < ActionController::TestCase
   def create_publish_immediately_assets
     publishable_types = Seek::Util.authorized_types.select { |c| c.first.try(:is_in_isa_publishable?) }
     publishable_types.collect do |klass|
-      Factory(klass.name.underscore.to_sym, contributor: User.current_user)
+      Factory(klass.name.underscore.to_sym, contributor: User.current_user.person)
     end
   end
 
@@ -205,7 +205,7 @@ class BatchPublishingTest < ActionController::TestCase
       gatekeeper = Factory(:asset_gatekeeper)
       gatekept_project = gatekeeper.projects.first
       @user.person.add_to_project_and_institution(gatekept_project, Factory(:institution))
-      Factory(klass.name.underscore.to_sym, contributor: @user, projects: [gatekept_project])
+      Factory(klass.name.underscore.to_sym, contributor: @user.person, projects: [gatekept_project])
     end
   end
 
@@ -214,12 +214,12 @@ class BatchPublishingTest < ActionController::TestCase
     gatekept_project = gatekeeper.projects.first
     user.person.add_to_project_and_institution(gatekept_project, Factory(:institution))
 
-    df = Factory(:data_file, contributor: user, projects: [gatekept_project])
-    df.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: df.contributor)
-    model = Factory(:model, contributor: user, projects: [gatekept_project])
-    model.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: model.contributor)
-    sop = Factory(:sop, contributor: user, projects: [gatekept_project])
-    sop.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: sop.contributor)
+    df = Factory(:data_file, contributor: user.person, projects: [gatekept_project])
+    df.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: user)
+    model = Factory(:model, contributor: user.person, projects: [gatekept_project])
+    model.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: user)
+    sop = Factory(:sop, contributor: user.person, projects: [gatekept_project])
+    sop.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: user)
     [df, model, sop]
   end
 end
