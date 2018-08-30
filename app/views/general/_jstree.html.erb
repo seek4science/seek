@@ -12,6 +12,7 @@
       'check_callback': true,
       'force_text': true,
       'multiple': true,
+      'dblclick_toggle': false,
       'data' : <%= tree_json(hash).html_safe -%>
     }}).on('activate_node.jstree', function (e, data) {
       if (data.node.data && data.node.data.child_count) {
