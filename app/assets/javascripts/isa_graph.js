@@ -140,8 +140,8 @@ var ISA = {
                     //animate the current node
                     ISA.originNode = cy.nodes('[id=\'' + current_element_id + '\']')[0];
                     ISA.originNode.select();
-                    var immediateConnections = ISA.originNode.incomers().union(ISA.originNode.outgoers());
-                    cy.animate({ zoom: 0.8, fit: { eles: immediateConnections, padding: 40 }, duration: ISA.defaults.animationDuration });
+                    var immediateConnections = ISA.originNode.incomers().union(ISA.originNode.outgoers()).union(ISA.originNode);
+                    cy.animate({ zoom: 0.8, fit: { eles: immediateConnections, padding: 20 }, duration: ISA.defaults.animationDuration });
                 } else {
                     $j('#isa-graph').hide();
                 }
