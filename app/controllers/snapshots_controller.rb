@@ -21,6 +21,12 @@ class SnapshotsController < ApplicationController
   end
 
   def show
+    respond_to do |format|
+      format.html
+      format.xml
+      format.json { render json: @snapshot }
+    end
+
   end
 
   def new
