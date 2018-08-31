@@ -184,15 +184,16 @@ module Seek
         }
       when Assay
         {
-          #children: [:models, :sops, :publications, :documents],
+          children: [:data_files, :models, :sops, :publications, :documents],
           parents: [:study],
           # related: [:publications],
           aggregated_children: { samples: :samples,
-                                 data_files: :data_files,
-                                 models: :models,
-                                 sops: :sops,
-                                 documents: :documents,
-                                 publications: :publications }
+                                 #data_files: :data_files,
+                                 #models: :models,
+                                 #sops: :sops,
+                                 #documents: :documents,
+                                 #publications: :publications
+                               }
         }
       when Publication
         {
