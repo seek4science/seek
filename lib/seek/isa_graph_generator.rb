@@ -65,19 +65,12 @@ module Seek
         parent_depth = 1 if parent_depth == 0
       end
 
-      if parent_depth != 0
-        if sibling_depth != 0 # Parents and siblings...
-          parents(@object).each do |parent|
-            merge_hashes(hash, descendants(parent, sibling_depth))
-          end
-        end
-
-        # Ancestors...
-        merge_hashes(hash, ancestors(@object, parent_depth))
-      end
-
       # Self and descendants...
       merge_hashes(hash, descendants(@object, depth))
+
+      if parent_depth != 0
+        hash = parents_and_siblings(hash,parents(@object),parent_depth, sibling_depth)
+      end
 
       unless include_self
         hash[:nodes] = hash[:nodes].reject { |n| n.object == @object }
@@ -87,6 +80,16 @@ module Seek
     end
 
     private
+
+    def parents_and_siblings(hash, parents, parent_depth, sibling_depth, depth = 0)
+      if parent_depth.nil? || depth < parent_depth
+        parents.each do |parent|
+          merge_hashes(hash, descendants(parent, sibling_depth))
+          hash = parents_and_siblings(hash, parents(parent), parent_depth, sibling_depth, depth + 1)
+        end
+      end
+      hash
+    end
 
     def merge_hashes(hash1, hash2)
       hash1[:nodes] = (hash1[:nodes] + hash2[:nodes]).uniq(&:object)
