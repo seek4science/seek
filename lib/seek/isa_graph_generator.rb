@@ -173,7 +173,6 @@ module Seek
       when Investigation
         {
           children: [:studies],
-          parents: [:projects],
           related: [:publications]
         }
       when Study
