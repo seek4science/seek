@@ -194,6 +194,40 @@
         }
       ]
     },
+    "snapshotSkeleton": {
+      "type": "object",
+      "properties": {
+        "snapshot": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "url": {
+          "$ref": "#/definitions/uriString"
+        }
+      },
+      "required": [
+        "snapshot",
+        "url"
+        ]
+    },
+    "nonEmptySnapshotsList": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/snapshotSkeleton"
+      }
+    },
+    "nullableSnapshotsList": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/nonEmptySnapshotsList"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+
     "nullableNonEmptyStringList": {
       "oneOf": [
         {
@@ -1623,6 +1657,9 @@
             "attributes": {
               "type": "object",
               "properties": {
+                "snapshots" : {
+                  "$ref": "#/definitions/nullableSnapshotsList"
+                },
                 "tags": {
                   "$ref": "#/definitions/nullableNonEmptyStringList"
                 },
@@ -2989,6 +3026,9 @@
             "attributes": {
               "type": "object",
               "properties": {
+                "snapshots" : {
+                  "$ref": "#/definitions/nullableSnapshotsList"
+                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -4876,6 +4916,9 @@
             "attributes": {
               "type": "object",
               "properties": {
+                "snapshots" : {
+                  "$ref": "#/definitions/nullableSnapshotsList"
+                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
