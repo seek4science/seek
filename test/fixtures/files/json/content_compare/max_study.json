@@ -3,6 +3,7 @@
     "id": "1039986486",
     "type": "studies",
     "attributes": {
+      "snapshots": null,
       "policy":
       {
         "access":"no_access",
