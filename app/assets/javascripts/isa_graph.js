@@ -140,8 +140,8 @@ var ISA = {
                     //animate the current node
                     ISA.originNode = cy.nodes('[id=\'' + current_element_id + '\']')[0];
                     ISA.originNode.select();
-                    var immediateConnections = ISA.originNode.incomers().union(ISA.originNode.outgoers()).union(ISA.originNode);
-                    cy.animate({ zoom: 0.8, fit: { eles: immediateConnections, padding: 20 }, duration: ISA.defaults.animationDuration });
+                    //var immediateConnections = ISA.originNode.incomers().union(ISA.originNode.outgoers()).union(ISA.originNode);
+                    //cy.animate({ fit: { eles: immediateConnections, padding: 20 }, duration: ISA.defaults.animationDuration });
                 } else {
                     $j('#isa-graph').hide();
                 }
@@ -182,7 +182,8 @@ var ISA = {
         $j('li[data-node-id=' + node.data('id') +']').each(function () {
             jsTree.select_node(this.id);
         });
-        ISA.animateNode(node, 0.8);
+        //ISA.animateNode(node, 0);
+        ISA.highlightNode(node);
         ISA.displayNodeInfo(node);
     },
 
@@ -204,10 +205,10 @@ var ISA = {
     animateNode: function (node, zoom) {
         ISA.highlightNode(node);
         // Center the view on the node
-        opts = { center: { eles: node }, duration: ISA.defaults.animationDuration };
-        if (zoom)
-            opts.zoom = zoom;
-        cy.animate(opts);
+        // opts = { center: { eles: node }, duration: ISA.defaults.animationDuration };
+        // if (zoom)
+        //     opts.zoom = zoom;
+        // cy.animate(opts);
     },
 
     displayNodeInfo: function (node) {
@@ -301,8 +302,8 @@ var ISA = {
                         animationDuration: ISA.defaults.animationDuration,
                         stop: function () {
                             ISA.highlightNode(node);
-                            cy.animate({ fit: { eles: node.union(node.outgoers().targets()), padding: 40 },
-                                duration: ISA.defaults.animationDuration });
+                            // cy.animate({ fit: { eles: node.union(node.outgoers().targets()), padding: 40 },
+                            //     duration: ISA.defaults.animationDuration });
                         }
                     }, ISA.defaults.layout)
                 );
