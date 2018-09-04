@@ -1,9 +1,10 @@
 <%
-  options ||= { depth: 1, parent_depth: nil, include_self: true }
+  options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true }
   hash = Seek::IsaGraphGenerator.new(root_item).generate(options)
   elements = cytoscape_elements(hash)
   default_view ||= 'graph'
 %>
+
 
 <div class="row">
   <div class="col-sm-12 hidden-xs">
