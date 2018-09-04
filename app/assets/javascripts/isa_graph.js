@@ -37,7 +37,7 @@ var ISA = {
                     css: {
                         'shape': 'roundrectangle',
                         'border-color': 'data(borderColor)',
-                        'border-width': 2,
+                        'border-width': 1,
                         'das': 'mapData(weight, 40, 80, 20, 60)',
                         'content': 'data(name)',
                         'text-valign': 'center',
@@ -56,6 +56,29 @@ var ISA = {
                         'text-wrap': 'wrap',
                         'text-max-width': ISA.defaults.textMaxWidth,
                         'opacity': 0.6
+                    }
+                },
+                {
+                    selector: 'node.resource-small',
+                    css: {
+                        'shape': 'roundrectangle',
+                        'border-color': 'data(borderColor)',
+                        'border-width': 1,
+                        'das': 'mapData(weight, 40, 80, 20, 60)',
+                        'content': 'data(name)',
+                        'text-valign': 'center',
+                        'text-outline-width': 1,
+                        'text-outline-color': 'data(faveColor)',
+                        'background-color': 'data(faveColor)',
+                        'color': ISA.defaults.color,
+                        'width': 40,
+                        'height': 40,
+                        'font-size': 0,
+                        'text-wrap': 'wrap',
+                        'text-max-width': ISA.defaults.textMaxWidth,
+                        'opacity': 1,
+                        'padding-left': 0,
+                        'padding-right': 0
                     }
                 },
                 {
@@ -126,7 +149,12 @@ var ISA = {
                         'height': ISA.defaults.nodeHeight + 15,
                         'transition-property': 'width, height',
                         'transition-duration': 300,
-                        'opacity': 1
+                        'opacity': 1,
+                        'font-size': function (el) {
+                            return el.data('name').length > 60 ? ISA.defaults.smallerFontSize : ISA.defaults.fontSize;
+                        },
+                        'padding-left': ISA.defaults.backgroundImageSize + 10,
+                        'padding-right': ISA.defaults.backgroundImageSize + 10
                     }
                 }
             ],
@@ -142,6 +170,7 @@ var ISA = {
                     ISA.originNode.select();
                     //var immediateConnections = ISA.originNode.incomers().union(ISA.originNode.outgoers()).union(ISA.originNode);
                     //cy.animate({ fit: { eles: immediateConnections, padding: 20 }, duration: ISA.defaults.animationDuration });
+                    cy.fit(70);
                 } else {
                     $j('#isa-graph').hide();
                 }
@@ -185,6 +214,7 @@ var ISA = {
         //ISA.animateNode(node, 0);
         ISA.highlightNode(node);
         ISA.displayNodeInfo(node);
+        node.connectedEdges().connectedNodes('node.resource').addClass('selected');
     },
 
     highlightNode: function (node) {

@@ -79,7 +79,12 @@ module ISAHelper
         data['borderColor'] = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
       end
 
-      elements << { group: 'nodes', data: data, classes: 'resource' }
+      if node == hash[:nodes].first
+        elements << { group: 'nodes', data: data, classes: 'resource'}
+      else
+        elements << { group: 'nodes', data: data, classes: 'resource resource-small' }
+      end
+
 
       # If this node has children, but they aren't included in the set of nodes, create an info node that will load the children
       #  when clicked
