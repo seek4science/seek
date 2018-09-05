@@ -2,9 +2,9 @@ var cy;
 
 var ISA = {
     originNode: null,
-    graphPadding: 60,
 
     defaults: {
+        padding: 70,
         nodeWidth: 200,
         nodeHeight: 65,
         fontSize: 16,
@@ -168,7 +168,7 @@ var ISA = {
                     //animate the current node
                     ISA.originNode = cy.nodes('[id=\'' + current_element_id + '\']')[0];
                     ISA.originNode.select();
-                    cy.fit(ISA.graphPadding);
+                    cy.fit(ISA.defaults.padding);
                 } else {
                     $j('#isa-graph').hide();
                 }
@@ -246,7 +246,7 @@ var ISA = {
 
     fullscreen: function (state) {
         $j('#isa-graph').toggleClass('fullscreen', state);
-        cy.fit(ISA.graphPadding);
+        cy.fit(ISA.defaults.padding);
         cy.userZoomingEnabled(!cy.userZoomingEnabled());
         cy.resize();
     },
@@ -313,7 +313,7 @@ var ISA = {
 
                 // Adjust the cytoscape layout to fit in the new nodes
                 cy.layout($j.extend({
-                        fit: false,
+                        fit: true,
                         animate: true,
                         animationDuration: ISA.defaults.animationDuration,
                         stop: function () {

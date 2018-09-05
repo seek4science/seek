@@ -70,7 +70,7 @@
             $j('#cy').show();
             $j('#node_info').show();
             $j('#jstree').hide();
-            cy.fit(ISA.graphPadding);
+            cy.fit(ISA.defaults.padding);
             cy.resize();
             return false;
         },
@@ -81,7 +81,7 @@
             $j('#jstree').show();
             $j('#node_info').show();
             $j('#jstree').css('width', '300px');
-            cy.fit(ISA.graphPadding);
+            cy.fit(ISA.defaults.padding);
             cy.resize();
             return false;
         },
