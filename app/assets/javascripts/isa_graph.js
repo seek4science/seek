@@ -2,6 +2,7 @@ var cy;
 
 var ISA = {
     originNode: null,
+    graphPadding: 60,
 
     defaults: {
         nodeWidth: 200,
@@ -14,8 +15,7 @@ var ISA = {
         layout: {
             name: 'breadthfirst',
             directed: true,
-            spacingFactor: 1.25,
-            padding: 50
+            spacingFactor: 1.25
         },
         animationDuration: 300
     },
@@ -168,9 +168,7 @@ var ISA = {
                     //animate the current node
                     ISA.originNode = cy.nodes('[id=\'' + current_element_id + '\']')[0];
                     ISA.originNode.select();
-                    //var immediateConnections = ISA.originNode.incomers().union(ISA.originNode.outgoers()).union(ISA.originNode);
-                    //cy.animate({ fit: { eles: immediateConnections, padding: 20 }, duration: ISA.defaults.animationDuration });
-                    cy.fit(70);
+                    cy.fit(ISA.graphPadding);
                 } else {
                     $j('#isa-graph').hide();
                 }
@@ -234,11 +232,6 @@ var ISA = {
 
     animateNode: function (node, zoom) {
         ISA.highlightNode(node);
-        // Center the view on the node
-        // opts = { center: { eles: node }, duration: ISA.defaults.animationDuration };
-        // if (zoom)
-        //     opts.zoom = zoom;
-        // cy.animate(opts);
     },
 
     displayNodeInfo: function (node) {
@@ -253,7 +246,7 @@ var ISA = {
 
     fullscreen: function (state) {
         $j('#isa-graph').toggleClass('fullscreen', state);
-        cy.fit(75);
+        cy.fit(ISA.graphPadding);
         cy.userZoomingEnabled(!cy.userZoomingEnabled());
         cy.resize();
     },

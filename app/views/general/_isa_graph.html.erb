@@ -2,7 +2,7 @@
   options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true }
   hash = Seek::IsaGraphGenerator.new(root_item).generate(options)
   elements = cytoscape_elements(hash)
-  default_view ||= 'tree'
+  default_view ||= 'graph'
 %>
 
 
@@ -70,7 +70,7 @@
             $j('#cy').show();
             $j('#node_info').show();
             $j('#jstree').hide();
-            cy.fit(20);
+            cy.fit(ISA.graphPadding);
             cy.resize();
             return false;
         },
@@ -81,7 +81,7 @@
             $j('#jstree').show();
             $j('#node_info').show();
             $j('#jstree').css('width', '300px');
-            cy.fit(20);
+            cy.fit(ISA.graphPadding);
             cy.resize();
             return false;
         },
