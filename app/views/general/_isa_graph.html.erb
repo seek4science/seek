@@ -70,6 +70,7 @@
             $j('#cy').show();
             $j('#node_info').show();
             $j('#jstree').hide();
+            cy.fit(20);
             cy.resize();
             return false;
         },
@@ -80,6 +81,7 @@
             $j('#jstree').show();
             $j('#node_info').show();
             $j('#jstree').css('width', '300px');
+            cy.fit(20);
             cy.resize();
             return false;
         },
