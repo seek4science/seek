@@ -1,40 +1,61 @@
 <div id="jstree"></div>
 
 <script type="text/javascript">
-  $j(document).ready(function () {
-    $j('#jstree').bind('loaded.jstree', function(event, data) {
-      $j('li[data-node-id=' + ISA.originNode.data('id') +']').each(function () {
-        $j(this).addClass('isa-highlight');
-        data.instance.select_node(this.id);
-        data.instance.open_node(this.id);
-      });
-    }).jstree({ 'core' : {
-      'check_callback': true,
-      'force_text': true,
-      'multiple': true,
-      'dblclick_toggle': false,
-      'data' : <%= tree_json(hash).html_safe -%>
-    }}).on('activate_node.jstree', function (e, data) {
-      if (data.node.data && data.node.data.child_count) {
-        var childCountNode = ISA.getNode(data.node.li_attr['data-node-id']);
-        if (childCountNode.length) {
-          ISA.loadChildren(childCountNode);
-        }
-      } else {
-        data.instance.open_node(data.node); // Open the branch if it is collapsed
-        var node = ISA.getNode(data.node.li_attr['data-node-id']);
-        if (node.length) {
-          ISA.selectNode(node);
-        }
-      }
-    }).on('dblclick.jstree', function (event) {
-        var id = $j(event.target).closest('li').data('nodeId');
-        var node = ISA.getNode(id);
-        ISA.visitNode(node);
-    }).on('redraw.jstree', function (event) {
-        $j('li[data-node-id=' + ISA.originNode.data('id') +']').each(function () {
-            $j(this).addClass('isa-highlight');
+    $j(document).ready(function () {
+
+        $j('#jstree').bind('loaded.jstree', function (event, data) {
+            var nodes = $j("#jstree").jstree(true)._model.data;
+
+            //find the current node id
+            var current_node_id = null;
+            for (var i in nodes) {
+                if (i != '#') {
+                    if (nodes[i].li_attr["data-node-id"] == ISA.originNode.data('id')) {
+                        current_node_id = nodes[i].id;
+                        break;
+                    }
+                }
+            }
+
+            //expand up to and below the current node
+            if (current_node_id != null) {
+                data.instance._open_to(current_node_id);
+                data.instance.open_all(current_node_id);
+                data.instance.select_node(current_node_id);
+            }
+
+            // highlight the relevant part of the tree
+            $j('li#' + current_node_id).addClass('isa-highlight');
+
+        }).jstree({
+            'core': {
+                'check_callback': true,
+                'force_text': true,
+                'multiple': true,
+                'dblclick_toggle': false,
+                'data': <%= tree_json(hash, root_item).html_safe -%>
+            }
+        }).on('activate_node.jstree', function (e, data) {
+            if (data.node.data && data.node.data.child_count) {
+                var childCountNode = ISA.getNode(data.node.li_attr['data-node-id']);
+                if (childCountNode.length) {
+                    ISA.loadChildren(childCountNode);
+                }
+            } else {
+                data.instance.open_node(data.node); // Open the branch if it is collapsed
+                var node = ISA.getNode(data.node.li_attr['data-node-id']);
+                if (node.length) {
+                    ISA.selectNode(node);
+                }
+            }
+        }).on('dblclick.jstree', function (event) {
+            var id = $j(event.target).closest('li').data('nodeId');
+            var node = ISA.getNode(id);
+            ISA.visitNode(node);
+        }).on('redraw.jstree', function (event) {
+            $j('li[data-node-id=' + ISA.originNode.data('id') + ']').each(function () {
+                $j(this).addClass('isa-highlight');
+            });
         });
     });
-  });
 </script>

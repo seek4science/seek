@@ -2,7 +2,7 @@
   options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true }
   hash = Seek::IsaGraphGenerator.new(root_item).generate(options)
   elements = cytoscape_elements(hash)
-  default_view ||= 'graph'
+  default_view ||= 'tree'
 %>
 
 
@@ -32,7 +32,7 @@
       </div>
       <div class="isa-wrapper">
         <div id="cy"></div>
-        <%= render partial: 'general/jstree', locals: { hash: hash } %>
+        <%= render partial: 'general/jstree', locals: { hash: hash, root_item: root_item } %>
       </div>
     </div>
 

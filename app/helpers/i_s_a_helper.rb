@@ -157,7 +157,8 @@ module ISAHelper
     label_data.join(', ')
   end
 
-  def tree_json(hash)
+  def tree_json(hash, root_item)
+    puts hash
     objects = hash[:nodes].map(&:object)
     real_edges = hash[:edges].select { |e| objects.include?(e[0]) }
 
@@ -165,12 +166,12 @@ module ISAHelper
       real_edges.none? { |_parent, child| child == n.object }
     end
 
-    nodes = roots.map { |root| tree_node(hash, root.object) }.flatten
+    nodes = roots.map { |root| tree_node(hash, root.object, root_item) }.flatten
 
     nodes.to_json
   end
 
-  def tree_node(hash, object)
+  def tree_node(hash, object, root_item=nil)
     child_edges = hash[:edges].select do |parent, _child|
       parent == object
     end
@@ -192,7 +193,7 @@ module ISAHelper
       entry[:a_attr] = { class: 'hidden-leaf none_text' }
     end
 
-    entry[:children] += child_edges.map { |c| tree_node(hash, c[1]) }
+    entry[:children] += child_edges.map { |c| tree_node(hash, c[1], root_item) }
 
     if node.child_count > 0
       if node.child_count > child_edges.count
@@ -206,7 +207,7 @@ module ISAHelper
         }
       end
 
-      entry[:state] = { opened: true }
+      entry[:state] = { opened: false }
     else
       entry[:state] = { opened: false }
     end
