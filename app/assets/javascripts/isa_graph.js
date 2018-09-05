@@ -23,7 +23,8 @@ var ISA = {
     drawGraph: function (elements, current_element_id) {
         cy = window.cy = cytoscape({
             container: document.getElementById('cy'),
-
+            fit: true,
+            wheelSensitivity: 0.25,
             userZoomingEnabled: false,
             panningEnabled: true,
             userPanningEnabled: true,
@@ -131,7 +132,7 @@ var ISA = {
                         'text-border-color': '#ccccdd',
                         'text-border-opacity': 0.7,
                         'font-size': ISA.defaults.fontSize,
-                        'opacity': 0.5
+                        'opacity': 0.3
                     }
                 },
                 {
