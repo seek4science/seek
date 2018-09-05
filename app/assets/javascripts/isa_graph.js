@@ -207,9 +207,10 @@ var ISA = {
     selectNode: function (node) {
         var jsTree = $j('#jstree').jstree(true);
         jsTree.deselect_all();
-        $j('li[data-node-id=' + node.data('id') +']').each(function () {
-            jsTree.select_node(this.id);
-        });
+        // $j('li[data-node-id=' + node.data('id') +']').each(function () {
+        //     jsTree.select_node(this.id);
+        // });
+        ISA.expandNodeByDataNodeId(node.data('id'));
         //ISA.animateNode(node, 0);
         ISA.highlightNode(node);
         ISA.displayNodeInfo(node);
@@ -267,6 +268,28 @@ var ISA = {
     visitNode: function (node) {
         if (node != ISA.originNode && node.data('url')) {
             window.location = node.data('url');
+        }
+    },
+
+    findNodeIdForDataNodeId: function(dataId) {
+        var id = null;
+        var nodes = $j('#jstree').jstree(true)._model.data;
+        for (var i in nodes) {
+            if (i != '#') {
+                if (nodes[i].li_attr["data-node-id"] == dataId) {
+                    return nodes[i].id;
+                }
+            }
+        }
+    },
+
+    expandNodeByDataNodeId: function(dataId) {
+      var id = ISA.findNodeIdForDataNodeId(dataId);
+        if (id != null) {
+            var tree = $j('#jstree').jstree(true);
+            tree._open_to(id);
+            tree.open_all(id);
+            tree.select_node(id);
         }
     },
 

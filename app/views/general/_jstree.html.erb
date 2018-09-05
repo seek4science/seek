@@ -4,28 +4,14 @@
     $j(document).ready(function () {
 
         $j('#jstree').bind('loaded.jstree', function (event, data) {
-            var nodes = $j("#jstree").jstree(true)._model.data;
 
-            //find the current node id
-            var current_node_id = null;
-            for (var i in nodes) {
-                if (i != '#') {
-                    if (nodes[i].li_attr["data-node-id"] == ISA.originNode.data('id')) {
-                        current_node_id = nodes[i].id;
-                        break;
-                    }
-                }
-            }
 
-            //expand up to and below the current node
-            if (current_node_id != null) {
-                data.instance._open_to(current_node_id);
-                data.instance.open_all(current_node_id);
-                data.instance.select_node(current_node_id);
-            }
+            // expand the current node (above and children)
+            ISA.expandNodeByDataNodeId(ISA.originNode.data('id'));
+
 
             // highlight the relevant part of the tree
-            $j('li#' + current_node_id).addClass('isa-highlight');
+            $j('li[data-node-id=' + ISA.originNode.data('id') + ']').addClass('isa-highlight');
 
         }).jstree({
             'core': {
