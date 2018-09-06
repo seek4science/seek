@@ -2,9 +2,11 @@ var cy;
 
 var ISA = {
     originNode: null,
+    recentlyClickedNode: null,
+    currentSelectedNode: null,
 
     defaults: {
-        padding: 70,
+        padding: 85,
         nodeWidth: 200,
         nodeHeight: 65,
         fontSize: 16,
@@ -211,16 +213,21 @@ var ISA = {
         $j('li[data-node-id=' + node.data('id') +']').each(function () {
             jsTree.select_node(this.id);
         });
-        //ISA.animateNode(node, 0);
+
         ISA.highlightNode(node);
+
         ISA.displayNodeInfo(node);
         node.connectedEdges().connectedNodes('node.resource').addClass('selected');
+        ISA.currentSelectedNode = node;
     },
 
     highlightNode: function (node) {
         //first normalizing all nodes and fading all nodes and edges
+
         cy.$('node.connected').removeClass('connected');
         cy.$('edge.connected').removeClass('connected');
+
+
 
         //then appearing the chosen node and the connected nodes and edges
         node.addClass('connected');
@@ -228,7 +235,9 @@ var ISA = {
         node.connectedEdges().connectedNodes().addClass('connected');
 
         // Animate the selected node
-        cy.$('node.selected').removeClass('selected');
+        if (!ISA.view.isShowGraphNodesActive()) {
+            cy.$('node.selected').removeClass('selected');
+        }
         node.addClass('selected');
     },
 
@@ -253,7 +262,7 @@ var ISA = {
         cy.resize();
     },
 
-    recentlyClickedNode: null,
+
     rememberFirstClick: function (target) {
         ISA.recentlyClickedNode = target;
         setTimeout(function () {

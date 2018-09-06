@@ -30,7 +30,7 @@
           Toggle fullscreen
         </button>
         <button class="btn btn-default btn-xs" id="show-all-nodes-btn">
-          Show all nodes
+          All expanded
         </button>
       </div>
       <div class="isa-wrapper">
@@ -92,6 +92,10 @@
             return false;
         },
 
+        isShowGraphNodesActive: function() {
+            return $j('#show-all-nodes-btn').hasClass('active');
+        },
+
         default: '<%= default_view -%>'
     };
 
@@ -104,13 +108,25 @@
 
         // Fullscreen
         $j('#toggle-fullscreen-btn').click(function () {
+            $j('#toggle-fullscreen-btn').button('toggle');
             ISA.fullscreen();
             return false;
         });
 
         // Expand all graph nodes
-        $j('#show-all-nodes-btn').click(function () {
-          cy.$('node.resource').addClass('selected');
+          $j('#show-all-nodes-btn').click(function () {
+          $j('#show-all-nodes-btn').button('toggle');
+          if (ISA.view.isShowGraphNodesActive()) {
+              cy.$('node.resource').addClass('selected');
+          }
+          else {
+              cy.$('node.resource').removeClass('selected');
+              if (ISA.currentSelectedNode) {
+                  ISA.selectNode(ISA.currentSelectedNode);
+              }
+
+          }
+
           return false;
         });
 
