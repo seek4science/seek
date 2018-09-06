@@ -29,6 +29,9 @@
           <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
           Toggle fullscreen
         </button>
+        <button class="btn btn-default btn-xs" id="show-all-nodes-btn">
+          Show all nodes
+        </button>
       </div>
       <div class="isa-wrapper">
         <div id="cy"></div>
@@ -62,6 +65,7 @@
             $j('#node_info').hide();
             $j('#jstree').show();
             $j('#jstree').css('width', '100%');
+            $j('#show-all-nodes-btn').hide();
             return false;
         },
 
@@ -70,6 +74,7 @@
             $j('#cy').show();
             $j('#node_info').show();
             $j('#jstree').hide();
+            $j('#show-all-nodes-btn').show();
             cy.fit(ISA.defaults.padding);
             cy.resize();
             return false;
@@ -80,6 +85,7 @@
             $j('#cy').show();
             $j('#jstree').show();
             $j('#node_info').show();
+            $j('#show-all-nodes-btn').show();
             $j('#jstree').css('width', '300px');
             cy.fit(ISA.defaults.padding);
             cy.resize();
@@ -101,10 +107,18 @@
             ISA.fullscreen();
             return false;
         });
+
+        // Expand all graph nodes
+        $j('#show-all-nodes-btn').click(function () {
+          cy.$('node.resource').addClass('selected');
+          return false;
+        });
+
         $j(document).keyup(function(e) {
             if (e.keyCode == 27) { // Escape key
                 ISA.fullscreen(false);
             }
         });
+
     });
 </script>
