@@ -202,7 +202,7 @@ var ISA = {
         });
 
         cy.on('select', 'node.child-count', function (event) {
-           ISA.loadChildren(event.cyTarget);
+            ISA.loadChildren(event.cyTarget);
         });
     },
 
@@ -210,7 +210,7 @@ var ISA = {
         var jsTree = $j('#jstree').jstree(true);
         jsTree.deselect_all();
         ISA.expandNodeByDataNodeId(node.data('id'));
-        $j('li[data-node-id=' + node.data('id') +']').each(function () {
+        $j('li[data-node-id=' + node.data('id') + ']').each(function () {
             jsTree.select_node(this.id);
         });
 
@@ -228,21 +228,16 @@ var ISA = {
         cy.$('edge.connected').removeClass('connected');
 
 
-
         //then appearing the chosen node and the connected nodes and edges
         node.addClass('connected');
         node.connectedEdges().addClass('connected');
         node.connectedEdges().connectedNodes().addClass('connected');
 
         // Animate the selected node
-        if (!ISA.view.isShowGraphNodesActive()) {
+        if (!ISA.isShowGraphNodesActive()) {
             cy.$('node.selected').removeClass('selected');
         }
         node.addClass('selected');
-    },
-
-    animateNode: function (node, zoom) {
-        ISA.highlightNode(node);
     },
 
     displayNodeInfo: function (node) {
@@ -280,30 +275,34 @@ var ISA = {
         }
     },
 
-    findNodeIdForDataNodeId: function(dataId) {
+    findNodeForDataNodeId: function (dataId) {
         var id = null;
         var nodes = $j('#jstree').jstree(true)._model.data;
         for (var i in nodes) {
             if (i != '#') {
                 if (nodes[i].li_attr["data-node-id"] == dataId) {
-                    return nodes[i].id;
+                    return nodes[i];
                 }
             }
         }
     },
 
-    expandNodeByDataNodeId: function(dataId) {
-      var id = ISA.findNodeIdForDataNodeId(dataId);
-        if (id != null) {
+    expandNodeByDataNodeId: function (dataId) {
+        var node = ISA.findNodeForDataNodeId(dataId);
+        if (node != null) {
             var tree = $j('#jstree').jstree(true);
-            tree._open_to(id);
-            tree.open_all(id);
-            tree.select_node(id);
+            tree._open_to(node.id);
+            tree.open_all(node.id);
+            tree.select_node(node.id);
         }
     },
 
+    isShowGraphNodesActive: function () {
+        return $j('#show-all-nodes-btn').hasClass('active');
+    },
+
     eachTreeNodeElement: function (id, callback) {
-        $j('li[data-node-id=' + id +']').each(callback);
+        $j('li[data-node-id=' + id + ']').each(callback);
     },
 
     eachTreeNode: function (id, callback) {
@@ -375,7 +374,7 @@ var ISA = {
                         var childNode = data.jstree[i];
 
                         // Only add the node to the tree if its not already there
-                        if (!$j('li[data-node-id=' + childNode.li_attr['data-node-id'] +']', this).length) {
+                        if (!$j('li[data-node-id=' + childNode.li_attr['data-node-id'] + ']', this).length) {
                             childNode.id = childNode.id + index; // To stop dupes!
                             tree.create_node(treeNode, childNode);
                         }
@@ -386,7 +385,7 @@ var ISA = {
                     tree.redraw_node(this.id);
                 });
 
-                $j('li[data-node-id=' + ISA.originNode.data('id') +']').each(function () {
+                $j('li[data-node-id=' + ISA.originNode.data('id') + ']').each(function () {
                     $j(this).addClass('isa-highlight');
                 });
 

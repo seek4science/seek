@@ -92,10 +92,6 @@
             return false;
         },
 
-        isShowGraphNodesActive: function() {
-            return $j('#show-all-nodes-btn').hasClass('active');
-        },
-
         default: '<%= default_view -%>'
     };
 
@@ -116,7 +112,7 @@
         // Expand all graph nodes
           $j('#show-all-nodes-btn').click(function () {
           $j('#show-all-nodes-btn').button('toggle');
-          if (ISA.view.isShowGraphNodesActive()) {
+          if (ISA.isShowGraphNodesActive()) {
               cy.$('node.resource').addClass('selected');
           }
           else {
