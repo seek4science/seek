@@ -62,7 +62,6 @@
         tree: function () {
             $j('#isa-tree-view-btn').button('toggle');
             $j('#cy').hide();
-            $j('#node_info').hide();
             $j('#jstree').show();
             $j('#jstree').css('width', '100%');
             $j('#show-all-nodes-btn').hide();
@@ -72,7 +71,6 @@
         graph: function () {
             $j('#isa-graph-view-btn').button('toggle');
             $j('#cy').show();
-            $j('#node_info').show();
             $j('#jstree').hide();
             $j('#show-all-nodes-btn').show();
             cy.fit(ISA.defaults.padding);
@@ -84,7 +82,6 @@
             $j('#isa-split-view-btn').button('toggle');
             $j('#cy').show();
             $j('#jstree').show();
-            $j('#node_info').show();
             $j('#show-all-nodes-btn').show();
             $j('#jstree').css('width', '300px');
             cy.fit(ISA.defaults.padding);
