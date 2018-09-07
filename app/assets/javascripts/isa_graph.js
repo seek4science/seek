@@ -242,6 +242,7 @@ var ISA = {
 
     displayNodeInfo: function (node) {
         $j('#node_info').html(HandlebarsTemplates['isa/item_info'](node.data()));
+        bindTooltips('#node_info');
     },
 
     decodeHTMLForElements: function (elements) {

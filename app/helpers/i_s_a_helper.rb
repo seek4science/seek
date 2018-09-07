@@ -181,7 +181,7 @@ module ISAHelper
     entry = {
       id: unique_node_id(object),
       data: { loadable: false },
-      li_attr: { 'data-node-id' => node_id(object) },
+      li_attr: { 'data-node-id' => node_id(object)},
       children: []
     }
 

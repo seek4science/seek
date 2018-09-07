@@ -36,7 +36,7 @@ module Seek
     def title
       pluralize(@count, @type.to_s.humanize.singularize.downcase)
     end
-
+    
     def avatar_key
       @type.to_s.pluralize
     end

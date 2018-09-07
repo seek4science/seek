@@ -3,9 +3,10 @@
         <strong>Selected:</strong>
         {{#if url}}
             <span>
-                <a href="{{url}}" title="{{{description}}}">{{{fullName}}}</a>
+                <a href="{{url}}" data-tooltip="{{{fullName}}}">{{ truncate fullName 120 }}</a> ({{type}})
             </span><br/>
-            <strong>Type:</strong> {{type}}
+            <strong>Description:</strong>
+            <span data-tooltip="{{description}}">{{ truncate description 120 }}</span><br/>
         {{else}}
             <span class="none_text">Hidden item</span>
         {{/if}}

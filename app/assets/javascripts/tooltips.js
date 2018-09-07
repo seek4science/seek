@@ -1,5 +1,9 @@
 $j(document).ready(function () {
-    $j('[data-tooltip]').popover({
+    bindTooltips('body')
+});
+
+function bindTooltips(root_tag) {
+    $j(root_tag + ' [data-tooltip]').popover({
         html: false,
         animation: false,
         trigger: 'hover',
@@ -9,4 +13,4 @@ $j(document).ready(function () {
             return $j(this).data('tooltip');
         }
     });
-});
+}
