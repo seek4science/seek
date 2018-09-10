@@ -158,7 +158,6 @@ module ISAHelper
   end
 
   def tree_json(hash, root_item)
-    puts hash
     objects = hash[:nodes].map(&:object)
     real_edges = hash[:edges].select { |e| objects.include?(e[0]) }
 
