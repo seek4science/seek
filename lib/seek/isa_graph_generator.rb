@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Seek
   class IsaGraphNode
     attr_accessor :object, :child_count, :can_view
@@ -69,7 +71,7 @@ module Seek
       merge_hashes(hash, descendants(@object, depth))
 
       if parent_depth != 0
-        hash = parents_and_siblings(hash,parents(@object),parent_depth, sibling_depth)
+        hash = parents_and_siblings(hash, parents(@object), parent_depth, sibling_depth)
       end
 
       unless include_self
@@ -123,13 +125,12 @@ module Seek
       if method == :children
         associations(object)[:aggregated_children].each do |type, method|
           associations = resolve_association(object, method)
-          if associations.any?
-            agg = Seek::ObjectAggregation.new(object, type, associations)
-            agg_node = Seek::IsaGraphNode.new(agg)
-            agg_node.can_view = true
-            nodes << agg_node
-            edges << [object, agg]
-          end
+          next unless associations.any?
+          agg = Seek::ObjectAggregation.new(object, type, associations)
+          agg_node = Seek::IsaGraphNode.new(agg)
+          agg_node.can_view = true
+          nodes << agg_node
+          edges << [object, agg]
         end
       end
 
@@ -186,34 +187,33 @@ module Seek
         }
       when Assay
         {
-          children: [:data_files, :models, :sops, :publications, :documents],
+          children: %i[data_files models sops publications documents],
           parents: [:study],
           # related: [:publications],
-          aggregated_children: { samples: :samples,
-                                 #data_files: :data_files,
-                                 #models: :models,
-                                 #sops: :sops,
-                                 #documents: :documents,
-                                 #publications: :publications
-                               }
+          aggregated_children: { samples: :samples }
+          # data_files: :data_files,
+          # models: :models,
+          # sops: :sops,
+          # documents: :documents,
+          # publications: :publications
         }
       when Publication
         {
-          parents: [:assays, :studies, :investigations, :data_files, :models, :presentations],
+          parents: %i[assays studies investigations data_files models presentations],
           related: [:events]
         }
       when DataFile, Document, Model, Sop, Sample, Presentation
         {
           parents: [:assays],
-          related: [:publications, :events],
-          aggregated_children: { samples: :extracted_samples },
+          related: %i[publications events],
+          aggregated_children: { samples: :extracted_samples }
         }
       when Event
         {
-          parents: [:presentations, :publications, :data_files],
+          parents: %i[presentations publications data_files]
         }
       else
-        { }
+        {}
       end.reverse_merge!(parents: [], children: [], related: [], aggregated_children: {})
     end
   end

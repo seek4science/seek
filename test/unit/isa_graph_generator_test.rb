@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class IsaGraphGeneratorTest < ActiveSupport::TestCase
@@ -12,7 +14,7 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     # Shallow
     shallow_result = generator.generate
 
-    assert_equal 2, shallow_result[:nodes].map(&:object).length  # Investigation, Study
+    assert_equal 2, shallow_result[:nodes].map(&:object).length # Investigation, Study
     assert_equal 1, shallow_result[:edges].length
 
     assert_includes shallow_result[:nodes].map(&:object), investigation
@@ -80,7 +82,6 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     end
 
     result = Seek::IsaGraphGenerator.new(assay).generate(parent_depth: nil, sibling_depth: nil)
-
 
     assert_equal 7, result[:nodes].length # Investigation, Study, 2 Assays, DataFile, Model, Sop
     assert_equal 6, result[:edges].length

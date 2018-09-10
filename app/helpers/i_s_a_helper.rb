@@ -1,3 +1,5 @@
+
+
 require 'tempfile'
 
 module ISAHelper
@@ -43,11 +45,11 @@ module ISAHelper
       data = { id: node_id(item) }
 
       if node.can_view?
-        if item.respond_to?(:description)
-          data['description'] = truncate(h(item.description), length: 500)
-        else
-          data['description'] = ''
-        end
+        data['description'] = if item.respond_to?(:description)
+                                truncate(h(item.description), length: 500)
+                              else
+                                ''
+                              end
 
         if data['description'].blank?
           data['description'] = item.is_a?(Publication) ? 'No abstract' : 'No description'
@@ -79,12 +81,11 @@ module ISAHelper
         data['borderColor'] = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
       end
 
-      if node == hash[:nodes].first
-        elements << { group: 'nodes', data: data, classes: 'resource'}
-      else
-        elements << { group: 'nodes', data: data, classes: 'resource resource-small' }
-      end
-
+      elements << if node == hash[:nodes].first
+                    { group: 'nodes', data: data, classes: 'resource' }
+                  else
+                    { group: 'nodes', data: data, classes: 'resource resource-small' }
+                  end
 
       # If this node has children, but they aren't included in the set of nodes, create an info node that will load the children
       #  when clicked
@@ -119,8 +120,7 @@ module ISAHelper
                             source: source,
                             target: target,
                             faveColor: BORDER_COLOURS.default },
-                    classes: 'resource-edge'
-      }
+                    classes: 'resource-edge' }
     end
     elements
   end
@@ -131,8 +131,7 @@ module ISAHelper
               name: name,
               source: source,
               target: target,
-              faveColor: fave_color }
-    }
+              faveColor: fave_color } }
   end
 
   def edge_label(source, target)
@@ -170,7 +169,7 @@ module ISAHelper
     nodes.to_json
   end
 
-  def tree_node(hash, object, root_item=nil)
+  def tree_node(hash, object, root_item = nil)
     child_edges = hash[:edges].select do |parent, _child|
       parent == object
     end
@@ -180,7 +179,7 @@ module ISAHelper
     entry = {
       id: unique_node_id(object),
       data: { loadable: false },
-      li_attr: { 'data-node-id' => node_id(object)},
+      li_attr: { 'data-node-id' => node_id(object) },
       children: []
     }
 
