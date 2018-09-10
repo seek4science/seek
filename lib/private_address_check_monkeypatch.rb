@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # This monkey patch is to solve a change in PrivateAddressCheck following a change in behaviour.
-#  the patch applies a suggested fix presented as a pull request but not yet applied: https://github.com/jtdowney/private_address_check/pull/6/commits/2c08f06541a2db303faa330e1852572be24ceb71
+#  the patch applies a suggested fix presented as a pull request but not yet applied: https://github.com/jtdowney/private_address_check/pull/6
 #
 #  # The problem was caused by attempting to connect before checking if the address is private, resulting in a different exception, that could also potentially be used to determine what services are running on the server
 #  FIXME: review this in the future to see if a new version of PrivateAddressCheck has been updated (I've set myself a reminder)

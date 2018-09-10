@@ -54,11 +54,19 @@ module Seek
           },
 
           tags: ->(value) {
-            value.join(', ')
+            if value
+              value.join(', ')
+            else
+              ''
+            end
           },
 
           funding_codes: ->(value) {
-            value.join(', ')
+            if value
+              value.join(', ')
+            else
+              ''
+            end
           },
 
           programme_ids: ->(value) {
