@@ -32,6 +32,9 @@
         <button class="btn btn-default btn-xs" id="show-all-nodes-btn">
           All expanded
         </button>
+        <button class="btn btn-default btn-xs" id="export-png-btn" data-toggle="modal" data-target="#modal-exported-png">
+          Export PNG
+        </button>
       </div>
       <div class="isa-wrapper">
         <div id="cy"></div>
@@ -42,6 +45,9 @@
     <span id="ruler" style="visibility: hidden"></span>
   </div>
 </div>
+
+<%= modal_isa_png %>
+<img id="exported-png2"/>
 
 <script type="text/javascript">
     var isaGraph = $j('#isa-graph')[0];
@@ -65,6 +71,7 @@
             $j('#jstree').show();
             $j('#jstree').css('width', '100%');
             $j('#show-all-nodes-btn').hide();
+            $j('#export-png-btn').hide();
             return false;
         },
 
@@ -73,6 +80,7 @@
             $j('#cy').show();
             $j('#jstree').hide();
             $j('#show-all-nodes-btn').show();
+            $j('#export-png-btn').show();
             cy.fit(ISA.defaults.padding);
             cy.resize();
             return false;
@@ -83,6 +91,7 @@
             $j('#cy').show();
             $j('#jstree').show();
             $j('#show-all-nodes-btn').show();
+            $j('#export-png-btn').show();
             $j('#jstree').css('width', '300px');
             cy.fit(ISA.defaults.padding);
             cy.resize();
@@ -107,23 +116,40 @@
         });
 
         // Expand all graph nodes
-          $j('#show-all-nodes-btn').click(function () {
-          $j('#show-all-nodes-btn').button('toggle');
-          if (ISA.isShowGraphNodesActive()) {
-              cy.$('node.resource').addClass('selected');
-          }
-          else {
-              cy.$('node.resource').removeClass('selected');
-              if (ISA.currentSelectedNode) {
-                  ISA.selectNode(ISA.currentSelectedNode);
-              }
+        $j('#show-all-nodes-btn').click(function () {
+            $j('#show-all-nodes-btn').button('toggle');
+            if (ISA.isShowGraphNodesActive()) {
+                cy.$('node.resource').addClass('selected');
+            }
+            else {
+                cy.$('node.resource').removeClass('selected');
+                if (ISA.currentSelectedNode) {
+                    ISA.selectNode(ISA.currentSelectedNode);
+                }
 
-          }
+            }
 
-          return false;
+            return false;
         });
 
-        $j(document).keyup(function(e) {
+        // display the PNG when the modal box appears
+        $j('#modal-exported-png').on('show.bs.modal', function (event) {
+            var png = cy.png({bg:'white',scale:2});
+            $j('#exported-png').attr('src', png);
+        });
+
+        $j('#save-exported-png').click(function() {
+          var src =  $j('#exported-png').attr('src');
+          var a  = document.createElement('a');
+          a.href = src;
+          a.download = 'isa-graph.png';
+          a.click();
+
+        });
+
+
+
+        $j(document).keyup(function (e) {
             if (e.keyCode == 27) { // Escape key
                 ISA.fullscreen(false);
             }

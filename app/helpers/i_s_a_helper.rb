@@ -35,7 +35,22 @@ module ISAHelper
     { error: 'error' }
   end
 
-  private
+  def modal_isa_png()
+    modal_options = {id: 'modal-exported-png', size: 'xl', 'data-role' => 'modal-isa-graph-png'}
+
+    modal_title = 'Export PNG'
+
+    modal(modal_options) do
+      modal_header(modal_title) +
+          modal_body do
+            #content_tag(:button, 'save',id:'save-exported-png') +
+            content_tag(:p,'Click below to download a copy of the image') +
+            button_link_to('Download', 'download', '#', id:'save-exported-png') +
+            content_tag(:br) +
+            content_tag(:img, '',id: 'exported-png', style:'max-width:1200px')
+          end
+    end
+  end
 
   def cytoscape_node_elements(hash)
     elements = []
