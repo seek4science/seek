@@ -17,8 +17,8 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
 
     assert_includes shallow_result[:nodes].map(&:object), investigation
     assert_includes shallow_result[:nodes].map(&:object), study
-    assert_not_includes shallow_result[:nodes].map(&:object), assay
-    assert_not_includes shallow_result[:nodes].map(&:object), assay2
+    refute_includes shallow_result[:nodes].map(&:object), assay
+    refute_includes shallow_result[:nodes].map(&:object), assay2
 
     assert_includes shallow_result[:edges], [investigation, study]
 
@@ -38,36 +38,6 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     assert_includes deep_result[:edges], [study, assay2]
   end
 
-  test 'sibling assets are collapsed' do
-    assay = Factory(:assay)
-    data_file = Factory(:data_file, policy: Factory(:publicly_viewable_policy))
-    model = Factory(:model, policy: Factory(:publicly_viewable_policy))
-    sop = Factory(:sop, policy: Factory(:publicly_viewable_policy))
-
-    User.with_current_user(assay.contributor.user) do
-      AssayAsset.create!(assay: assay, asset: data_file)
-      AssayAsset.create!(assay: assay, asset: model)
-      AssayAsset.create!(assay: assay, asset: sop)
-    end
-
-    result = Seek::IsaGraphGenerator.new(data_file).generate(parent_depth: nil)
-
-    assert_equal 5, result[:nodes].length # Project, Investigation, Study, Assay, DataFile
-    assert_equal 4, result[:edges].length
-
-    assert_includes result[:nodes].map(&:object), assay
-    assert_includes result[:nodes].map(&:object), data_file
-    assert_not_includes result[:nodes].map(&:object), model
-    assert_not_includes result[:nodes].map(&:object), sop
-    assert_equal 3, result[:nodes].detect { |n| n.object == assay }.child_count
-    assert_includes result[:nodes].map(&:object), assay.study
-    assert_includes result[:nodes].map(&:object), assay.study.investigation
-    assert_includes result[:nodes].map(&:object), assay.study.investigation.projects.first
-
-    assert_includes result[:edges], [assay, data_file]
-    assert_includes result[:edges], [assay.study, assay]
-  end
-
   test "does not show sibling's children" do
     assay = Factory(:assay)
     study = assay.study
@@ -84,15 +54,15 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
 
     result = Seek::IsaGraphGenerator.new(assay).generate(parent_depth: nil, sibling_depth: 1)
 
-    assert_equal 6, result[:nodes].length # Project, Investigation, Study, 2 Assays, DataFile
-    assert_equal 5, result[:edges].length
+    assert_equal 5, result[:nodes].length # Investigation, Study, 2 Assays, DataFile
+    assert_equal 4, result[:edges].length
 
     assert_includes result[:nodes].map(&:object), assay
     assert_includes result[:nodes].map(&:object), data_file
     assert_includes result[:nodes].map(&:object), sibling_assay
     assert_equal 2, result[:nodes].detect { |n| n.object == sibling_assay }.child_count
-    assert_not_includes result[:nodes].map(&:object), nephew_model
-    assert_not_includes result[:nodes].map(&:object), niece_sop
+    refute_includes result[:nodes].map(&:object), nephew_model
+    refute_includes result[:nodes].map(&:object), niece_sop
   end
 
   test "can show sibling's children" do
@@ -111,8 +81,9 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
 
     result = Seek::IsaGraphGenerator.new(assay).generate(parent_depth: nil, sibling_depth: nil)
 
-    assert_equal 8, result[:nodes].length # Project, Investigation, Study, 2 Assays, DataFile, Model, Sop
-    assert_equal 7, result[:edges].length
+
+    assert_equal 7, result[:nodes].length # Investigation, Study, 2 Assays, DataFile, Model, Sop
+    assert_equal 6, result[:edges].length
 
     assert_includes result[:nodes].map(&:object), assay
     assert_includes result[:nodes].map(&:object), data_file
@@ -132,8 +103,8 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     study_node = result[:nodes].detect { |n| n.object == study }
 
     assert_equal 2, study_node.child_count
-    assert_not_includes result[:nodes].map(&:object), assay
-    assert_not_includes result[:nodes].map(&:object), assay2
+    refute_includes result[:nodes].map(&:object), assay
+    refute_includes result[:nodes].map(&:object), assay2
   end
 
   test 'counts child assets of all ancestors' do
@@ -152,15 +123,17 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     result = generator.generate(parent_depth: nil)
 
     investigation_node = result[:nodes].detect { |n| n.object == investigation }
-    project_node = result[:nodes].detect { |n| n.object == project }
+
+    refute_nil investigation_node
 
     assert_equal 4, investigation_node.child_count
-    assert_equal 3, project_node.child_count
 
-    assert_not_includes result[:nodes].map(&:object), investigation2
-    assert_not_includes result[:nodes].map(&:object), investigation3
-    assert_not_includes result[:nodes].map(&:object), study2
-    assert_not_includes result[:nodes].map(&:object), study3
-    assert_not_includes result[:nodes].map(&:object), study4
+    assert_includes result[:nodes].map(&:object), investigation
+    assert_includes result[:nodes].map(&:object), study2
+    assert_includes result[:nodes].map(&:object), study3
+    assert_includes result[:nodes].map(&:object), study4
+
+    refute_includes result[:nodes].map(&:object), investigation2
+    refute_includes result[:nodes].map(&:object), investigation3
   end
 end
