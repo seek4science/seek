@@ -9,6 +9,7 @@ function bindTooltips(root_tag) {
         trigger: 'hover',
         placement: 'auto right',
         container: 'body',
+        delay: 500,
         content: function () {
             return $j(this).data('tooltip');
         }
