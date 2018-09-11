@@ -13,26 +13,26 @@
       <div class="isa-controls">
         <div id="isa-view-controls">
           <div class="btn-group" data-toggle="buttons">
-            <label class="btn btn-default btn-xs" id="isa-tree-view-btn">
+            <label class="btn btn-default btn-xs" id="isa-tree-view-btn" data-tooltip="Display with a folder like tree view">
               <input type="radio" name="options" autocomplete="off"> Tree
             </label>
-            <label class="btn btn-default btn-xs" id="isa-split-view-btn">
+            <label class="btn btn-default btn-xs" id="isa-split-view-btn"  data-tooltip="Show both the tree and the graph view">
               <input type="radio" name="options" autocomplete="off"> Split
             </label>
-            <label class="btn btn-default btn-xs" id="isa-graph-view-btn">
+            <label class="btn btn-default btn-xs" id="isa-graph-view-btn"  data-tooltip="Display as a graph, showing the overall ISA structure">
               <input type="radio" name="options" autocomplete="off"> Graph
             </label>
           </div>
-          <button class="btn btn-default btn-xs" id="export-png-btn" data-toggle="modal" data-target="#modal-exported-png" data-tooltip="Export PNG">
+          <button class="btn btn-default btn-xs" id="export-png-btn" data-toggle="modal" data-target="#modal-exported-png" data-tooltip="Convert to an image, which can be downloaded as a PNG file">
             <%= image('picture') %>
           </button>
         </div>
         <br/>
-        <button class="btn btn-default btn-xs" id="toggle-fullscreen-btn">
+        <button class="btn btn-default btn-xs" id="toggle-fullscreen-btn"  data-tooltip="Toggle between fullscreen and normal size">
           <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
           Fullscreen
         </button>
-        <button class="btn btn-default btn-xs" id="show-all-nodes-btn">
+        <button class="btn btn-default btn-xs" id="show-all-nodes-btn"  data-tooltip="Toggle between expanding all nodes in the graph, or showing just the nearest neighbours">
           <%= image('graph_nodes') %>
           All nodes
         </button>
