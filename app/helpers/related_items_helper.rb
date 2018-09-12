@@ -88,7 +88,7 @@ module RelatedItemsHelper
 
     # Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
-      if limit && related[key][:items].size > limit && %w[Project Investigation Study Assay Person Specimen Sample].include?(resource.class.name)
+      if limit && related[key][:items].size > limit && %w[Project Investigation Study Assay Person Specimen Sample Snapshot].include?(resource.class.name)
         related[key][:extra_count] = related[key][:items].size - limit
         related[key][:items] = related[key][:items][0...limit]
       end
