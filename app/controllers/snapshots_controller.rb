@@ -22,11 +22,10 @@ class SnapshotsController < ApplicationController
 
   def show
     respond_to do |format|
-      format.html
-      format.xml
+      format.html # show.html.erb
+      format.rdf { render template: 'rdf/show' }
       format.json { render json: @snapshot }
     end
-
   end
 
   def new

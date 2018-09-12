@@ -1,7 +1,21 @@
 class SnapshotSerializer < BaseSerializer
-  attributes :snapshot_number, :title, :description, :md5sum, :sha1sum, :doi_identifier
+
+  attributes :md5sum, :sha1sum, :snapshot_number
+  attributes :title, :description
+
+  has_one :contributor
+  has_many :people
 
   def self_link
-    polymorphic_path([object.resource, object])
+    polymorphic_path([object.parent, object])
   end
+
+  def download_link
+    "#{self_link}/download"
+  end
+
+  def _links
+    { self: self_link, download: download_link }
+  end
+
 end
