@@ -1,9 +1,11 @@
-version: '2'
+version: '3'
 services:
   db: # Database implementation, in this case MySQL
     image: mysql:5.7
     container_name: seek-mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: always
+    stop_grace_period: 1m30s
     env_file:
       - docker/db.env
     volumes:
@@ -11,7 +13,7 @@ services:
 
   seek: # The SEEK application
     #build: .
-    image: fairdom/seek:master
+    image: fairdom/seek:openbis-1.7
     container_name: seek
     command: docker/entrypoint.sh
     restart: always
@@ -37,7 +39,7 @@ services:
 
   seek_workers: # The SEEK delayed job workers
       #build: .
-      image: fairdom/seek:master
+      image: fairdom/seek:openbis-1.7
       container_name: seek-workers
       command: docker/start_workers.sh
       restart: always
