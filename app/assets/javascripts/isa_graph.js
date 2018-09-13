@@ -272,7 +272,11 @@ var ISA = {
 
     visitNode: function (node) {
         if (node != ISA.originNode && node.data('url')) {
-            window.location = node.data('url');
+            var url = node.data('url') + '?graph_view=' + ISA.view.current;
+            if (ISA.isFullscreen()) {
+                url = url + "&fullscreen";
+            }
+            window.location = url;
         }
     },
 
@@ -300,6 +304,10 @@ var ISA = {
 
     isShowGraphNodesActive: function () {
         return $j('#show-all-nodes-btn').hasClass('active');
+    },
+
+    isFullscreen: function ()  {
+        return $j('#isa-graph').hasClass('fullscreen');
     },
 
     eachTreeNodeElement: function (id, callback) {

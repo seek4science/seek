@@ -3,6 +3,8 @@
   hash = Seek::IsaGraphGenerator.new(root_item).generate(options)
   elements = cytoscape_elements(hash)
   default_view ||= 'tree'
+  view = params[:graph_view] || default_view
+  is_full_screen = params.key?(:fullscreen).present?
 %>
 
 
@@ -73,6 +75,7 @@
             $j('#jstree').css('width', '100%');
             $j('#show-all-nodes-btn').hide();
             $j('#export-png-btn').hide();
+            ISA.view.current = 'tree';
             return false;
         },
 
@@ -84,6 +87,7 @@
             $j('#export-png-btn').show();
             cy.fit(ISA.defaults.padding);
             cy.resize();
+            ISA.view.current = 'graph'
             return false;
         },
 
@@ -96,10 +100,12 @@
             $j('#jstree').css('width', '300px');
             cy.fit(ISA.defaults.padding);
             cy.resize();
+            ISA.view.current = 'split'
             return false;
         },
 
-        default: '<%= default_view -%>'
+        default: '<%= view -%>',
+        current: '<%= view -%>'
     };
 
     $j(document).ready(function () {
@@ -148,6 +154,10 @@
 
         });
 
+        //click the full screen button if fullscreen param present. calling ISA.fullscreen causes the button to be out of sync.
+        if (<%= is_full_screen %>) {
+          $j('#toggle-fullscreen-btn').click();
+        }
 
 
         $j(document).keyup(function (e) {
