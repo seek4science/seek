@@ -57,7 +57,7 @@ services:
         - solr
 
   openbis:
-      image: openbis/debian-openbis:16.05.2
+      image: openbis/debian-openbis:18.06.0
       container_name: openbis
       restart: always
       volumes:
