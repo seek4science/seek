@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180815104232) do
+ActiveRecord::Schema.define(version: 20180913123624) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 20180815104232) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "http_referer",           limit: 255
-    t.string   "user_agent",             limit: 255
+    t.text     "user_agent",             limit: 65535
     t.text     "data",                   limit: 16777215
     t.string   "controller_name",        limit: 255
   end

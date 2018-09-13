@@ -412,6 +412,15 @@ class DataFilesController < ApplicationController
     @exception_message ||= session[:extraction_exception_message]
     @create_new_assay = @assay && @assay.new_record? && !@assay.title.blank?
     @data_file.assay_assets.build(assay_id: @assay.id) if @assay.persisted?
+
+    # associate any assays passed through with :assay_ids param
+    if params[:assay_ids]
+      assays = Assay.authorize_asset_collection(Assay.find(params[:assay_ids]),:edit)
+      assays.each do |assay|
+        @data_file.assay_assets.build(assay_id: assay.id)
+      end
+    end
+
     respond_to do |format|
       format.html
     end
