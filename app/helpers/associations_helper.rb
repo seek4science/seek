@@ -2,10 +2,10 @@ module AssociationsHelper
 
   def associations_list(id, template_name, existing, options = {})
     empty_text = options.delete(:empty_text) || 'No items'
-    options.reverse_merge!(:id => id, 'data-role' => 'seek-associations-list', 'data-template-name' => template_name)
+    options.reverse_merge!(:id => id, 'data-role' => 'seek-associations-list', 'data-template-name' => template_name,class:'box_editing_inner')
 
     content_tag(:div, options) do
-      content_tag(:ul, '', class: 'associations-list') +
+      content_tag(:ul, '', class: 'associations-list related_asset_list') +
         content_tag(:span, empty_text, class: 'none_text no-item-text') +
         content_tag(:script, existing.html_safe, :type => 'application/json', 'data-role' => 'seek-existing-associations')
     end

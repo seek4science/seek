@@ -45,6 +45,7 @@ require 'site_announcements'
 require 'seek/title_trimmer'
 require 'seek/grouped_pagination'
 require 'explicit_versioning'
+require 'private_address_check_monkeypatch'
 
 SEEK::Application.configure do
   ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']

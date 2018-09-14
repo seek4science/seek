@@ -8,5 +8,7 @@
         <input type="hidden" name="{{fieldName}}[][relationship_type_id]" value="{{relationship_type.value}}"/>
         <small>({{relationship_type.text}})</small>
     {{/if}}
-    <a class="remove-association clickable" title="Remove sample">&times;</a>
+    <a class="remove-association clickable" title="Remove sample">
+        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+    </a>
 </li>

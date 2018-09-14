@@ -100,7 +100,7 @@ module RelatedItemsHelper
   def relatable_types
     { 'Person' => {}, 'Project' => {}, 'Institution' => {}, 'Investigation' => {},
       'Study' => {}, 'Assay' => {}, 'DataFile' => {}, 'Document' => {},
-      'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {},
+      'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {}, 'Organism' => {},
       'Strain' => {}, 'Sample' => {} }
   end
 
@@ -164,7 +164,9 @@ module RelatedItemsHelper
         end
       else
         total = res[:items]
-        res[:items] = key.constantize.authorize_asset_collection res[:items], 'view', User.current_user
+        if key.constantize.method_defined? :policy
+          res[:items] = key.constantize.authorize_asset_collection res[:items], 'view', User.current_user
+        end
         res[:hidden_count] = total_count - res[:items].size
         res[:hidden_items] = total - res[:items]
       end

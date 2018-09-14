@@ -3363,6 +3363,66 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "input#assay_create_assay[checked=checked]", count:0
   end
 
+  test 'should select assay ids when passed to provide metadata' do
+    assay1 = Factory(:assay, contributor:User.current_user.person)
+    assay2 = Factory(:assay, contributor:User.current_user.person)
+
+
+    assert assay1.can_edit?
+    assert assay2.can_edit?
+
+
+    register_content_blob(skip_provide_metadata:true)
+
+    get :provide_metadata,assay_ids:[assay1.id]
+    assert_response :success
+
+    assert df=assigns(:data_file)
+    assert_includes df.assay_assets.collect(&:assay),assay1
+    refute_includes df.assay_assets.collect(&:assay),assay2
+  end
+
+  test 'should select multiple assay ids when passed to provide metadata' do
+    assay1 = Factory(:assay, contributor:User.current_user.person)
+    assay2 = Factory(:assay, contributor:User.current_user.person)
+    assay3 = Factory(:assay, contributor:User.current_user.person)
+
+    assert assay1.can_edit?
+    assert assay2.can_edit?
+    assert assay3.can_edit?
+
+    register_content_blob(skip_provide_metadata:true)
+
+    get :provide_metadata,assay_ids:[assay1.id,assay2.id]
+    assert_response :success
+
+    assert df=assigns(:data_file)
+    assert_includes df.assay_assets.collect(&:assay),assay1
+    assert_includes df.assay_assets.collect(&:assay),assay2
+    refute_includes df.assay_assets.collect(&:assay),assay3
+  end
+
+  test 'should not select non editable assay ids when passed to provide metadata' do
+    assay1 = Factory(:assay, contributor:User.current_user.person)
+    assay2 = Factory(:assay, contributor:User.current_user.person)
+    assay3 = Factory(:assay, contributor:Factory(:person))
+
+    assert assay1.can_edit?
+    assert assay2.can_edit?
+    refute assay3.can_edit?
+
+    register_content_blob(skip_provide_metadata:true)
+
+    get :provide_metadata,assay_ids:[assay3.id]
+    assert_response :success
+
+    #assay 3 is not allowed
+    assert df=assigns(:data_file)
+    refute_includes df.assay_assets.collect(&:assay),assay1
+    refute_includes df.assay_assets.collect(&:assay),assay2
+    refute_includes df.assay_assets.collect(&:assay),assay3
+  end
+
   def edit_max_object(df)
     add_tags_to_test_object(df)
     add_creator_to_test_object(df)
@@ -3510,7 +3570,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   # registers a new content blob, and triggers the javascript 'rightfield_extraction_ajax' call, and results in the metadata form HTML in the response
   # this replicates the old behaviour and result of calling #new
-  def register_content_blob
+  def register_content_blob(skip_provide_metadata:false)
 
     blob = {data: file_for_upload}
     assert_difference('ContentBlob.count') do
@@ -3519,6 +3579,6 @@ class DataFilesControllerTest < ActionController::TestCase
     content_blob_id = assigns(:data_file).content_blob.id
     session[:uploaded_content_blob_id] = content_blob_id.to_s
     post :rightfield_extraction_ajax,content_blob_id:content_blob_id.to_s,format:'js'
-    get :provide_metadata
+    get :provide_metadata unless skip_provide_metadata
   end
 end

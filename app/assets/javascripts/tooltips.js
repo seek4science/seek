@@ -9,4 +9,17 @@ $j(document).ready(function () {
             return $j(this).data('tooltip');
         }
     });
+
+    $j('label.required, span.required').popover({
+        html: false,
+        animation: false,
+        delay: {
+            show: 500,
+            hide: 100
+        },
+        trigger: 'hover',
+        placement: 'auto right',
+        container: 'body',
+        content: 'This field is required.'
+    });
 });

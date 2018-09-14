@@ -4,7 +4,7 @@
 
 <%= panel("#{t('programme')} Details") do %>
     <div class="form-group">
-      <%= f.label :title -%><span class="required">*</span>
+      <%= f.label :title, class: 'required' -%>
       <%= f.text_field :title, :class=>"form-control" -%>
     </div>
 

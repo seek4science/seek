@@ -92,7 +92,7 @@ ul.nav-tabs {
 
 .field_with_errors, .fieldWithErrors {
   @extend .has-error;
-  .form-control {
+  .form-control, label {
     color: $state-danger-text;
   }
 }

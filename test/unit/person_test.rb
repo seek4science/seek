@@ -651,6 +651,19 @@ class PersonTest < ActiveSupport::TestCase
     assert p.valid?
   end
 
+  test 'sensible validation error for no name' do
+    assert Factory(:person,first_name:'').valid?
+    assert Factory(:person,last_name:'').valid?
+    p = Factory.build(:person,first_name:'',last_name:'')
+    refute p.valid?
+    assert_equal 1,p.errors.full_messages.count
+    assert_equal "Full name can't be blank",p.errors.full_messages.first
+
+    
+
+
+  end
+
   def test_email_with_capitalise_valid
     p = people(:quentin_person)
     assert p.valid?
