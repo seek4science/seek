@@ -1323,7 +1323,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :edit, id: assay.id
     assert_response :success
 
-    assert_select 'p#creators_list'
+    assert_select '#creators_list'
     assert_select "input[type='text'][name='creator-typeahead']"
     # assert_select "input[type='hidden'][name='creators']" This is set via JS
     assert_select "input[type='text'][name='assay[other_creators]']"

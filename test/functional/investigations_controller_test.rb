@@ -326,7 +326,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     get :edit, id: investigation.id
     assert_response :success
-    assert_select 'p#creators_list'
+    assert_select '#creators_list'
     assert_select "input[type='text'][name='creator-typeahead']"
     # assert_select "input[type='hidden'][name='investigation[creator_ids][]']" This is set via JS
     assert_select "input[type='text'][name='investigation[other_creators]']"
