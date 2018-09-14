@@ -660,7 +660,7 @@ GEM
       ruby_parser (~> 3.8)
       virtus (~> 1.0)
     rubyntlm (0.3.4)
-    rubyzip (1.2.1)
+    rubyzip (1.2.2)
     safe_yaml (1.0.4)
     sample-template-generator (0.5.1)
       rdoc (~> 6.0)
@@ -887,6 +887,7 @@ DEPENDENCIES
   rubocop
   ruby-prof (>= 0.16.0)
   rubycritic
+  rubyzip (~> 1.2.2)
   sample-template-generator (~> 0.5)
   sass-rails
   savon (= 1.1.0)
