@@ -9,7 +9,7 @@
       <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@model} -%>
 
       <div class="form-group">
-        <label>Title <span class="required">*</span></label>
+        <label class="required">Title</label>
         <% model_title_value = (params[:model].blank? || params[:model][:title].blank?) ? nil : params[:model][:title] -%>
         <%= text_field_tag 'model[title]', model_title_value, :class=>"form-control" -%>
       </div>
