@@ -259,7 +259,7 @@ GEM
       curb (~> 0.8)
       loofah (~> 2.0)
       sax-machine (~> 1.0)
-    ffi (1.9.18)
+    ffi (1.9.25)
     flay (2.9.0)
       erubis (~> 2.7.0)
       path_expander (~> 1.0)
