@@ -1,7 +1,7 @@
 <%= f.error_messages -%>
 
 <div class="form-group">
-  <%= f.label :title -%><span class="required">*</span>
+  <%= f.label :title, class: 'required' -%>
   <%= f.text_field :title, :class=>"form-control" -%>
 </div>
 
@@ -21,7 +21,7 @@
 </div>
 
 <div class="form-group">
-  <%= f.label :country -%><span class="required">*</span>
+  <%= f.label :country, class: 'required' -%>
   <%= f.country_select :country, nil, { :include_blank => 'Please select...' }, :class=>"form-control" -%>
 </div>
 
