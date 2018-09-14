@@ -47,9 +47,11 @@
       <div class="box_editing_inner">
         <ul class="related_asset_list">
           <span v-if="selected.length == 0" class="none_text">None</span>
-          <li v-for="(project, index) in selected">
+          <li class="association-list-item" v-for="(project, index) in selected">
             <span :title="project.title">{{ project.title }}</span>
-            <a class="remove-association clickable" @click="remove(project, index)">&times;</a>
+            <a class="remove-association clickable" @click="remove(project, index)">
+              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </a>
             <input type="hidden" name="<%= field_name -%>" v-model="project.id"/>
           </li>
         </ul>
