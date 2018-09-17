@@ -500,16 +500,19 @@ class SampleTypesControllerTest < ActionController::TestCase
     person = Factory(:person)
     st1 = Factory(:simple_sample_type,projects:person.projects)
     st2 = Factory(:simple_sample_type)
+    st3 = Factory(:sample,policy:Factory(:public_policy)).sample_type # type with a public sample associated
     login_as(person.user)
 
     assert st1.can_view?
     refute st2.can_view?
+    assert st3.can_view?
 
     get :index
 
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item_title a[href=?]',sample_type_path(st1)
       assert_select 'div.list_item_title a[href=?]',sample_type_path(st2),count:0
+      assert_select 'div.list_item_title a[href=?]',sample_type_path(st3)
     end
 
   end

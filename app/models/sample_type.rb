@@ -94,7 +94,8 @@ class SampleType < ActiveRecord::Base
   end
 
   def can_view?(user = User.current_user)
-    user && user.person && (user.person.projects & projects).any?
+    project_membership = (user && user.person && (user.person.projects & projects).any?)
+    project_membership || public_samples?
   end
 
   # ducktyping to behave like a Policy based authorized item, in particular the index view
@@ -108,6 +109,11 @@ class SampleType < ActiveRecord::Base
   end
 
   private
+
+  #whether it is assocaited with any public samples
+  def public_samples?
+    samples.joins(:policy).where('policies.access_type >= ?',Policy::VISIBLE).any?
+  end
 
   # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
   # this is to help when a controlled vocab has been selected in the form, but then the type has been changed

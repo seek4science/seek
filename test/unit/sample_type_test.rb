@@ -61,6 +61,24 @@ class SampleTypeTest < ActiveSupport::TestCase
       assert st.can_view?
     end
 
+    # can view if it has a public sample
+    public_sample = Factory(:sample,policy:Factory(:public_policy))
+    private_sample = Factory(:sample,policy:Factory(:private_policy))
+
+    assert public_sample.can_view?
+    st = public_sample.sample_type
+    assert st.can_view?
+    assert st.can_view?(@person)
+    assert_empty st.projects & @person.projects
+
+    refute private_sample.can_view?
+    st = private_sample.sample_type
+    refute st.can_view?
+    refute st.can_view?(@person)
+    refute st.can_view?(@person)
+    assert_empty st.projects & @person.projects
+
+
   end
 
   test 'validate title and decription length' do
