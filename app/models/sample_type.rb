@@ -93,9 +93,9 @@ class SampleType < ActiveRecord::Base
       end.nil?
   end
 
-  def can_view?(user = User.current_user)
+  def can_view?(user = User.current_user, referring_sample = nil)
     project_membership = (user && user.person && (user.person.projects & projects).any?)
-    project_membership || public_samples?
+    project_membership || public_samples? || check_referring_sample_permission(user,referring_sample)
   end
 
   # ducktyping to behave like a Policy based authorized item, in particular the index view
@@ -109,6 +109,11 @@ class SampleType < ActiveRecord::Base
   end
 
   private
+
+  # whether the referring sample is valid and gives permission to view
+  def check_referring_sample_permission(user,referring_sample)
+    referring_sample.try(:sample_type)==self && referring_sample.can_view?(user)
+  end
 
   #whether it is assocaited with any public samples
   def public_samples?

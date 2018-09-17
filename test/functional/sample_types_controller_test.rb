@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleTypesControllerTest < ActionController::TestCase
+  
   include RestTestCases
   include AuthenticatedTestHelper
 
@@ -517,6 +518,8 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   end
 
+
+
   test 'cannot view private sample type' do
     st = Factory(:simple_sample_type)
     refute st.can_view?
@@ -526,6 +529,28 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_response :forbidden
 
     assert_select 'h2.forbidden', text:/The Sample type is not visible to you/
+
+  end
+
+  test 'visible with referring sample' do
+    person = Factory(:person)
+    sample = Factory(:sample,policy:Factory(:private_policy,permissions:[Factory(:permission,contributor:person, access_type:Policy::VISIBLE)]))
+    sample_type = sample.sample_type
+    login_as(person.user)
+
+    assert sample.can_view?
+    refute sample_type.can_view?
+    assert sample_type.can_view?(person.user, sample)
+
+    get :show, id:sample_type.id
+    assert_response :forbidden
+
+    get :show, id:sample_type.id, referring_sample_id:sample.id
+    assert_response :success
+
+    #sample type must match
+    get :show, id:Factory(:simple_sample_type).id, referring_sample_id:sample.id
+    assert_response :forbidden
 
   end
 

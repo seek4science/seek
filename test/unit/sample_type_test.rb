@@ -81,6 +81,22 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   end
 
+  test 'can view with a referring sample' do
+    person = Factory(:person)
+    sample = Factory(:sample,policy:Factory(:private_policy,permissions:[Factory(:permission,contributor:person, access_type:Policy::VISIBLE)]))
+    sample_type = sample.sample_type
+
+    assert sample.can_view?(person.user)
+    refute sample.can_view?
+    refute sample_type.can_view?
+    refute sample_type.can_view?(person.user)
+
+    assert sample_type.can_view?(person.user,sample)
+
+    # doesn't give access to a different sample type
+    refute Factory(:simple_sample_type).can_view?(person.user,sample)
+  end
+
   test 'validate title and decription length' do
     long_desc = ('a' * 65536).freeze
     ok_desc = ('a' * 65535).freeze

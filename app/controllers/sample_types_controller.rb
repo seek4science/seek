@@ -10,8 +10,7 @@ class SampleTypesController < ApplicationController
   before_filter :auth_to_create, only: [:new, :create]
   before_filter :project_membership_required, only: [:create, :new, :select, :filter_for_select]
 
-  # these checks are mostly coverered by the #check_no_created_samples filter, but will give an additional check based on can_xxx? methods
-  before_filter :find_and_authorize_requested_item, except: [:index, :new, :create]
+  before_filter :authorize_requested_sample_type, except: [:index, :new, :create]
 
   # GET /sample_types/1  ,'sample_attributes','linked_sample_attributes'
   # GET /sample_types/1.json
@@ -148,8 +147,23 @@ class SampleTypesController < ApplicationController
     @sample_type.build_attributes_from_template
   end
 
+  private
+
   def find_sample_type
     @sample_type = SampleType.find(params[:id])
+  end
+
+  #intercepts the standard 'find_and_authorize_requested_item' for additional special check for a referring_sample_id
+  def authorize_requested_sample_type
+    privilege = Seek::Permissions::Translator.translate(action_name)
+    return if privilege.nil?
+
+    if privilege == :view && params[:referring_sample_id].present?
+      @sample_type.can_view?(User.current_user,Sample.find_by_id(params[:referring_sample_id])) || find_and_authorize_requested_item
+    else
+      find_and_authorize_requested_item
+    end
+
   end
 
   def check_no_created_samples
