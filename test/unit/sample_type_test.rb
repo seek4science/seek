@@ -95,6 +95,16 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     # doesn't give access to a different sample type
     refute Factory(:simple_sample_type).can_view?(person.user,sample)
+
+    # an already visible sample type isn't hidden by passing a hidden sample
+    sample_type = Factory(:simple_sample_type,projects:[@project])
+    assert sample_type.can_view?(@person.user)
+    sample = Factory(:sample,sample_type:sample_type)
+    refute sample.can_view?(@person.user)
+    assert_equal sample_type, sample.sample_type
+    assert sample_type.can_view?(@person.user,sample)
+
+
   end
 
   test 'validate title and decription length' do

@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class SampleTypesControllerTest < ActionController::TestCase
-  
+
   include RestTestCases
   include AuthenticatedTestHelper
 
