@@ -368,6 +368,22 @@
       ],
       "additionalProperties": false
     },
+    "downloadableLinksType": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "$ref": "#/definitions/uriString"
+        },
+        "download": {
+          "$ref": "#/definitions/uriString"
+        }
+      },
+      "required": [
+        "self",
+        "download"
+      ],
+      "additionalProperties": false
+    },
     "metaType": {
       "type": "object",
       "properties": {
@@ -2044,71 +2060,6 @@
       },
       "required": [
         "data"
-      ],
-      "additionalProperties": false
-    },
-    "getContentBlobsResponse": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "$ref": "#/definitions/nonEmptyString"
-            },
-            "type": {
-              "$ref": "#/definitions/nonEmptyString"
-            },
-            "attributes": {
-              "type": "object",
-              "properties": {
-                "original_filename": {
-                  "$ref": "#/definitions/nonEmptyString"
-                },
-                "url": {
-                  "$ref": "#/definitions/nullableUriString"
-                },
-                "md5sum": {
-                  "$ref": "#/definitions/md5sumString"
-                },
-                "sha1sum": {
-                  "$ref": "#/definitions/sha1sumString"
-                },
-                "content_type": {
-                  "$ref": "#/definitions/contentBlobType"
-                }
-              },
-              "required": [
-                "original_filename",
-                "md5sum",
-                "sha1sum",
-                "content_type"
-              ],
-              "additionalProperties": false
-            },
-            "links": {
-              "$ref": "#/definitions/linksType"
-            },
-            "meta": {
-              "$ref": "#/definitions/metaType"
-            }
-          },
-          "required": [
-            "id",
-            "type",
-            "attributes",
-            "links",
-            "meta"
-          ],
-          "additionalProperties": false
-        },
-        "jsonapi": {
-          "$ref": "#/definitions/JsonApiVersion"
-        }
-      },
-      "required": [
-        "data",
-        "jsonapi"
       ],
       "additionalProperties": false
     },
@@ -6194,7 +6145,7 @@
               "additionalProperties": false
             },
             "links": {
-              "$ref": "#/definitions/linksType"
+              "$ref": "#/definitions/downloadableLinksType"
             },
             "meta": {
               "$ref": "#/definitions/metaType"
