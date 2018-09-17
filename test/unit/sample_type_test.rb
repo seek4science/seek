@@ -41,6 +41,28 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute sample_type.valid?
   end
 
+  test 'can_view?' do
+
+    # can't view if not a project member
+    st = Factory(:simple_sample_type)
+    assert_empty st.projects & @person.projects
+
+    refute st.can_view?(@person.user)
+    User.with_current_user(@person.user) do
+      refute st.can_view?
+    end
+
+    # can view if in project
+    person2 = Factory(:person,project:@project)
+    st = Factory(:simple_sample_type,projects:[@project])
+    assert_equal [@project],st.projects & @person.projects
+    assert st.can_view?(@person.user)
+    User.with_current_user(@person.user) do
+      assert st.can_view?
+    end
+
+  end
+
   test 'validate title and decription length' do
     long_desc = ('a' * 65536).freeze
     ok_desc = ('a' * 65535).freeze

@@ -93,6 +93,16 @@ class SampleType < ActiveRecord::Base
       end.nil?
   end
 
+  def can_view?(user = User.current_user)
+    user && user.person && (user.person.projects & projects).any?
+  end
+
+  # ducktyping to behave like a Policy based authorized item, in particular the index view
+  def self.all_authorized_for action, user = User.current_user
+    action = "can_#{action.to_s}?"
+    SampleType.all.select{|st| st.send(action,user)}
+  end
+
   def editing_constraints
     Seek::Samples::SampleTypeEditingConstraints.new(self)
   end

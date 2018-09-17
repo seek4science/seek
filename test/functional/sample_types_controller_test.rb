@@ -496,6 +496,36 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal cv,attr.sample_controlled_vocab
   end
 
+  test 'only visible sample types are listed' do
+    person = Factory(:person)
+    st1 = Factory(:simple_sample_type,projects:person.projects)
+    st2 = Factory(:simple_sample_type)
+    login_as(person.user)
+
+    assert st1.can_view?
+    refute st2.can_view?
+
+    get :index
+
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item_title a[href=?]',sample_type_path(st1)
+      assert_select 'div.list_item_title a[href=?]',sample_type_path(st2),count:0
+    end
+
+  end
+
+  test 'cannot view private sample type' do
+    st = Factory(:simple_sample_type)
+    refute st.can_view?
+
+    get :show, id:st.id
+
+    assert_response :forbidden
+
+    assert_select 'h2.forbidden', text:/The Sample type is not visible to you/
+
+  end
+
   private
 
   def template_for_upload
