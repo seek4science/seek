@@ -280,21 +280,59 @@ class DataFileTest < ActiveSupport::TestCase
   test 'sample template?' do
     create_sample_attribute_type
 
+    person = Factory(:person)
+
+    User.with_current_user(person.user) do
+      data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:public_policy)
+      refute data_file.sample_template?
+      assert_empty data_file.possible_sample_types
+
+      sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
+      sample_type.content_blob = Factory(:sample_type_template_content_blob)
+      sample_type.build_attributes_from_template
+      disable_authorization_checks { sample_type.save! }
+
+      assert data_file.sample_template?
+      assert_includes data_file.possible_sample_types, sample_type
+
+      #doesn't match
+      data_file = Factory :data_file, content_blob: Factory(:small_test_spreadsheet_content_blob), policy: Factory(:public_policy)
+      refute data_file.sample_template?
+      assert_empty data_file.possible_sample_types
+
+    end
+  end
+
+  test 'possible sample type ignore hidden' do
+    create_sample_attribute_type
+
+    person = Factory(:person)
+
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:public_policy)
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [Factory(:project).id]
-    sample_type.content_blob = Factory(:sample_type_template_content_blob)
-    sample_type.build_attributes_from_template
-    disable_authorization_checks { sample_type.save! }
+    #visible
+    sample_type1 = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id)
+    sample_type1.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type1.build_attributes_from_template
+    disable_authorization_checks { sample_type1.save! }
 
-    assert data_file.sample_template?
-    assert_includes data_file.possible_sample_types, sample_type
+    #hidden
+    sample_type2 = SampleType.new title: 'hidden', uploaded_template: true, project_ids:[Factory(:project).id]
+    sample_type2.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type2.build_attributes_from_template
+    disable_authorization_checks { sample_type2.save! }
 
-    data_file = Factory :data_file, content_blob: Factory(:small_test_spreadsheet_content_blob), policy: Factory(:public_policy)
-    refute data_file.sample_template?
-    assert_empty data_file.possible_sample_types
+    User.with_current_user(person.user) do
+      assert sample_type1.can_view?
+      refute sample_type2.can_view?
+
+      possible = data_file.possible_sample_types
+      refute_empty possible
+      assert_includes possible,sample_type1
+      refute_includes possible,sample_type2
+    end
   end
 
   test 'factory test' do

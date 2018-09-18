@@ -2170,25 +2170,40 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
+    sample_type = SampleType.new title: 'visible1', uploaded_template: true, project_ids: [person.projects.first.id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
     sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
     sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
+    assert sample_type.can_view?
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
+    sample_type = SampleType.new title: 'visible2', uploaded_template: true, project_ids: [person.projects.first.id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
     sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
     sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
+    assert sample_type.can_view?
+
+    # this is a private one, from another project, and shouldn't show up
+    sample_type = SampleType.new title: 'private', uploaded_template: true, project_ids: [Factory(:project).id]
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    # this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    disable_authorization_checks{sample_type.save!}
+    refute sample_type.can_view?
 
     get :select_sample_type, id: data_file
 
     assert_select 'select[name=sample_type_id] option', count: 2
+    assert_select 'select[name=sample_type_id] option', text:'visible1'
+    assert_select 'select[name=sample_type_id] option', text:'visible2'
+    assert_select 'select[name=sample_type_id] option', text:'private',count:0
   end
 
   test 'filtering for sample association form' do

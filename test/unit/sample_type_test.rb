@@ -364,21 +364,35 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'sample_types_matching_content_blob' do
     create_sample_attribute_type
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids
+    person = Factory(:person)
+    sample_type = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id)
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
 
-    sample_type2 = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids
+    sample_type2 = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id)
     sample_type2.content_blob = Factory(:sample_type_template_content_blob2)
     sample_type2.build_attributes_from_template
-    disable_authorization_checks { sample_type.save! }
+    disable_authorization_checks { sample_type2.save! }
+
+    # matches template but not visible
+    sample_type3 = SampleType.new title: 'visible', uploaded_template: true, project_ids: [Factory(:project).id]
+    sample_type3.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type3.build_attributes_from_template
+    disable_authorization_checks { sample_type3.save! }
 
     template_blob = Factory(:sample_type_populated_template_content_blob)
     non_template1 = Factory(:rightfield_content_blob)
 
-    assert_empty SampleType.sample_types_matching_content_blob(non_template1)
-    assert_equal [sample_type], SampleType.sample_types_matching_content_blob(template_blob)
+    User.with_current_user(person.user) do
+      assert sample_type.can_view?
+      assert sample_type2.can_view?
+      refute sample_type3.can_view?
+
+      assert_empty SampleType.sample_types_matching_content_blob(non_template1)
+      assert_equal [sample_type], SampleType.sample_types_matching_content_blob(template_blob)
+    end
+
   end
 
   test 'build samples from template' do
