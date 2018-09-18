@@ -16,6 +16,8 @@ class SampleType < ActiveRecord::Base
 
   include Seek::Taggable
 
+  include Seek::Permissions::SpecialContributors
+
   acts_as_uniquely_identifiable
 
   acts_as_favouritable
@@ -26,9 +28,12 @@ class SampleType < ActiveRecord::Base
 
   has_many :linked_sample_attributes, class_name: 'SampleAttribute', foreign_key: 'linked_sample_type_id'
 
+  belongs_to :contributor, class_name: 'Person'
+
   validates :title, presence: true
   validates :title, length: { maximum: 255 }
   validates :description, length: { maximum: 65_535 }
+  validates :contributor, presence: true
 
   validate :validate_one_title_attribute_present, :validate_attribute_title_unique
 
@@ -42,6 +47,10 @@ class SampleType < ActiveRecord::Base
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
     fail UnknownAttributeException.new("Unknown attribute #{attribute_name}") unless attribute
     attribute.validate_value?(value)
+  end
+
+  def contributors
+    [contributor]
   end
 
   # refreshes existing samples following a change to the sample type. For example when changing the title field

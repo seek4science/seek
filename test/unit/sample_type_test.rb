@@ -9,7 +9,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'validation' do
-    sample_type = SampleType.new title: 'fish', project_ids: @project_ids
+    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: @person
     refute sample_type.valid?
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
 
@@ -20,25 +20,32 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute sample_type.valid?
 
     # needs to have a project
-    sample_type = SampleType.new title: 'fish'
+    sample_type = SampleType.new title: 'fish', contributor: @person
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
     refute sample_type.valid?
     sample_type.projects = [Factory(:project)]
     assert sample_type.valid?
 
     # cannot have 2 attributes with the same name
-    sample_type = SampleType.new title: 'fish', project_ids: @project_ids
+    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: @person
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'a', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'a', is_title: false, sample_type: sample_type)
     refute sample_type.valid?
 
     # uniqueness check should be case insensitive
-    sample_type = SampleType.new title: 'fish', project_ids: @project_ids
+    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: @person
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'aaa', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'aAA', is_title: false, sample_type: sample_type)
     refute sample_type.valid?
+
+    #needs to have a contributor
+    sample_type = SampleType.new title: 'fish', project_ids: @project_ids
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
+    refute sample_type.valid?
+    sample_type.contributor = @person
+    assert sample_type.valid?
   end
 
   test 'can_view?' do
@@ -148,7 +155,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'associate sample attribute default order' do
-    sample_type = SampleType.new title: 'sample type', project_ids: @project_ids
+    sample_type = SampleType.new title: 'sample type', project_ids: @project_ids, contributor: @person
     attribute1 = Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
     attribute2 = Factory(:simple_string_sample_attribute, sample_type: sample_type)
     sample_type.sample_attributes << attribute1
@@ -161,7 +168,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'associate sample attribute specify order' do
-    sample_type = SampleType.new title: 'sample type', project_ids: @project_ids
+    sample_type = SampleType.new title: 'sample type', project_ids: @project_ids, contributor: @person
     attribute3 = Factory(:simple_string_sample_attribute, pos: 3, sample_type: sample_type)
     attribute2 = Factory(:simple_string_sample_attribute, pos: 2, sample_type: sample_type)
     attribute1 = Factory(:simple_string_sample_attribute, pos: 1, is_title: true, sample_type: sample_type)
@@ -242,7 +249,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'must have one title attribute' do
-    sample_type = SampleType.new title: 'No title', project_ids: @project_ids
+    sample_type = SampleType.new title: 'No title', project_ids: @project_ids, contributor: @person
     sample_type.sample_attributes << Factory(:sample_attribute, title: 'full name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: false, sample_type: sample_type)
 
     refute sample_type.valid?
@@ -258,7 +265,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'build from template' do
     default_type = create_sample_attribute_type
 
-    sample_type = SampleType.new title: 'from template', project_ids: @project_ids
+    sample_type = SampleType.new title: 'from template', project_ids: @project_ids, contributor: @person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     refute_nil sample_type.template
 
@@ -286,7 +293,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'build from template2' do
     default_type = create_sample_attribute_type
 
-    sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
+    sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id], contributor: @person
     sample_type.content_blob = Factory(:sample_type_template_content_blob2)
     refute_nil sample_type.template
 
@@ -352,7 +359,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     non_template2 = Factory(:binary_content_blob)
 
     create_sample_attribute_type
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids, contributor: @person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
@@ -365,18 +372,18 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'sample_types_matching_content_blob' do
     create_sample_attribute_type
     person = Factory(:person)
-    sample_type = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id)
+    sample_type = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: @person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
 
-    sample_type2 = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id)
+    sample_type2 = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: @person
     sample_type2.content_blob = Factory(:sample_type_template_content_blob2)
     sample_type2.build_attributes_from_template
     disable_authorization_checks { sample_type2.save! }
 
     # matches template but not visible
-    sample_type3 = SampleType.new title: 'visible', uploaded_template: true, project_ids: [Factory(:project).id]
+    sample_type3 = SampleType.new title: 'visible', uploaded_template: true, project_ids: [Factory(:project).id], contributor: @person
     sample_type3.content_blob = Factory(:sample_type_template_content_blob)
     sample_type3.build_attributes_from_template
     disable_authorization_checks { sample_type3.save! }
@@ -397,7 +404,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'build samples from template' do
     create_sample_attribute_type
-    sample_type = SampleType.new title: 'from template', project_ids: @project_ids
+    sample_type = SampleType.new title: 'from template', project_ids: @project_ids, contributor: @person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
@@ -419,7 +426,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     with_config_value :project_admin_sample_type_restriction, false do
       User.with_current_user(@person.user) do
         create_sample_attribute_type
-        sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids
+        sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids, contributor: @person
         sample_type.content_blob = Factory(:sample_type_template_content_blob)
         sample_type.build_attributes_from_template
         sample_type.save!

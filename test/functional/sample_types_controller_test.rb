@@ -59,6 +59,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute_nil type=assigns(:sample_type)
     assert_redirected_to sample_type_path(type)
 
+    assert_equal @person, type.contributor
     assert_equal 'Hello!',type.title
     assert_equal 'The description!!',type.description
     assert_equal @project_ids.sort,type.project_ids.sort

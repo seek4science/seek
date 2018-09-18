@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180913123624) do
+ActiveRecord::Schema.define(version: 20180918132758) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -1417,6 +1417,7 @@ ActiveRecord::Schema.define(version: 20180913123624) do
     t.string   "first_letter",      limit: 1
     t.text     "description",       limit: 65535
     t.boolean  "uploaded_template",               default: false
+    t.integer  "contributor_id",    limit: 4
   end
 
   create_table "samples", force: :cascade do |t|

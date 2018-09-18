@@ -35,6 +35,7 @@ class SampleTypesController < ApplicationController
 
   def create_from_template
     build_sample_type_from_template
+    @sample_type.contributor = User.current_user.person
 
     @tab = 'from-template'
 
@@ -59,6 +60,7 @@ class SampleTypesController < ApplicationController
     # because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
     tags = params[:sample_type].delete(:tags)
     @sample_type = SampleType.new(sample_type_params)
+    @sample_type.contributor = User.current_user.person
 
     # removes controlled vocabularies or linked seek samples where the type may differ
     @sample_type.resolve_inconsistencies

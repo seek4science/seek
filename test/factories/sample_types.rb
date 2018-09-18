@@ -1,7 +1,8 @@
 # SampleType
 Factory.define(:sample_type) do |f|
   f.sequence(:title) { |n| "SampleType #{n}" }
-  f.projects { [Factory.build(:project)] }
+  f.with_project_contributor
+  #f.projects { [Factory.build(:project)] }
 end
 
 Factory.define(:patient_sample_type, parent: :sample_type) do |f|
