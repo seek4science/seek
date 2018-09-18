@@ -29,7 +29,7 @@
     <%= render :partial => "assets/license_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
 <% end %>
 
-<%= render :partial => "assets/usage_info_box",:locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
+<%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
 
 <% if resource.class.is_taggable? && current_user-%>
     <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>

@@ -483,6 +483,33 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_select '#snapshot-citation', text: /error occurred/
   end
 
+  test 'logs activities' do
+    create_investigation_snapshot
+    login_as(@user)
+
+    assert_difference('ActivityLog.count') do
+      get :show, investigation_id: @investigation, id: @snapshot
+      assert_response :success
+    end
+
+    activity = ActivityLog.last
+    assert_equal @snapshot, activity.activity_loggable
+    assert_equal @investigation, activity.referenced
+    assert_equal @user, activity.culprit
+    assert_equal 'show', activity.action
+
+    assert_difference('ActivityLog.count') do
+      get :download, investigation_id: @investigation, id: @snapshot
+      assert_response :success
+    end
+
+    activity = ActivityLog.last
+    assert_equal @snapshot, activity.activity_loggable
+    assert_equal @investigation, activity.referenced
+    assert_equal @user, activity.culprit
+    assert_equal 'download', activity.action
+  end
+
   private
 
   def create_investigation_snapshot
