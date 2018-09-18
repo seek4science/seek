@@ -409,6 +409,16 @@ class ApplicationController < ActionController::Base
                              data: object.title,
                              user_agent: user_agent)
         end
+      when 'snapshots'
+        if %(show create mint_doi_confirm download export_submit).include?(action)
+          ActivityLog.create(action: action,
+                             culprit: current_user,
+                             referenced: object.resource,
+                             controller_name: controller_name,
+                             activity_loggable: object,
+                             data: object.title,
+                             user_agent: user_agent)
+        end
       end
 
       expire_activity_fragment_cache(controller_name, action)
