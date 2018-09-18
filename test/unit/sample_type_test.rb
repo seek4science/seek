@@ -23,7 +23,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type = SampleType.new title: 'fish', contributor: @person
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
     refute sample_type.valid?
-    sample_type.projects = [Factory(:project)]
+    sample_type.projects = [@project]
     assert sample_type.valid?
 
     # cannot have 2 attributes with the same name
@@ -42,6 +42,13 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     #needs to have a contributor
     sample_type = SampleType.new title: 'fish', project_ids: @project_ids
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
+    refute sample_type.valid?
+    sample_type.contributor = @person
+    assert sample_type.valid?
+
+    #contributor must belong in the same project
+    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: Factory(:person)
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
     refute sample_type.valid?
     sample_type.contributor = @person
@@ -293,7 +300,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'build from template2' do
     default_type = create_sample_attribute_type
 
-    sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id], contributor: @person
+    sample_type = SampleType.new title: 'from template', project_ids: @project_ids, contributor: @person
     sample_type.content_blob = Factory(:sample_type_template_content_blob2)
     refute_nil sample_type.template
 
@@ -347,6 +354,9 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute_empty sample_type.projects
 
     project2 = Factory(:project)
+    #contributor must be added to project to be valid
+    sample_type.contributor.add_to_project_and_institution(project2,Institution.first)
+
     sample_type.projects = [project2]
     sample_type.save!
     sample_type.reload
@@ -372,18 +382,18 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'sample_types_matching_content_blob' do
     create_sample_attribute_type
     person = Factory(:person)
-    sample_type = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: @person
+    sample_type = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
 
-    sample_type2 = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: @person
+    sample_type2 = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: person
     sample_type2.content_blob = Factory(:sample_type_template_content_blob2)
     sample_type2.build_attributes_from_template
     disable_authorization_checks { sample_type2.save! }
 
     # matches template but not visible
-    sample_type3 = SampleType.new title: 'visible', uploaded_template: true, project_ids: [Factory(:project).id], contributor: @person
+    sample_type3 = SampleType.new title: 'hidden', uploaded_template: true, project_ids: @project_ids, contributor: @person
     sample_type3.content_blob = Factory(:sample_type_template_content_blob)
     sample_type3.build_attributes_from_template
     disable_authorization_checks { sample_type3.save! }

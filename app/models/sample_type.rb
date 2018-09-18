@@ -37,6 +37,8 @@ class SampleType < ActiveRecord::Base
 
   validate :validate_one_title_attribute_present, :validate_attribute_title_unique
 
+  validates :projects, presence: true, projects: { self: true }
+
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
 
   grouped_pagination
