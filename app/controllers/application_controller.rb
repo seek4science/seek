@@ -347,6 +347,8 @@ class ApplicationController < ActionController::Base
       # don't log if the object is not valid or has not been saved, as this will a validation error on update or create
       return if object_invalid_or_unsaved?(object)
 
+      user_agent = request.env['HTTP_USER_AGENT']
+
       case controller_name
       when 'sessions'
         if %w(create destroy).include?(action)
@@ -354,7 +356,7 @@ class ApplicationController < ActionController::Base
                              culprit: current_user,
                              controller_name: controller_name,
                              activity_loggable: object,
-                             user_agent: request.env['HTTP_USER_AGENT'])
+                             user_agent: user_agent)
         end
       when 'people', 'projects', 'institutions'
         if %w(show create update destroy).include?(action)
@@ -363,14 +365,14 @@ class ApplicationController < ActionController::Base
                              controller_name: controller_name,
                              activity_loggable: object,
                              data: object.title,
-                             user_agent: request.env['HTTP_USER_AGENT'])
+                             user_agent: user_agent)
         end
       when 'search'
         if action == 'index'
           ActivityLog.create(action: 'index',
                              culprit: current_user,
                              controller_name: controller_name,
-                             user_agent: request.env['HTTP_USER_AGENT'],
+                             user_agent: user_agent,
                              data: { search_query: object, result_count: @results.count })
         end
       when 'content_blobs'
@@ -390,7 +392,7 @@ class ApplicationController < ActionController::Base
                              referenced: object,
                              controller_name: controller_name,
                              activity_loggable: activity_loggable,
-                             user_agent: request.env['HTTP_USER_AGENT'],
+                             user_agent: user_agent,
                              data: activity_loggable.title)
         end
       when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } # TODO: Find a nicer way of doing this...
@@ -405,7 +407,17 @@ class ApplicationController < ActionController::Base
                              controller_name: controller_name,
                              activity_loggable: object,
                              data: object.title,
-                             user_agent: request.env['HTTP_USER_AGENT'])
+                             user_agent: user_agent)
+        end
+      when 'snapshots'
+        if %(show create mint_doi_confirm download export_submit).include?(action)
+          ActivityLog.create(action: action,
+                             culprit: current_user,
+                             referenced: object.resource,
+                             controller_name: controller_name,
+                             activity_loggable: object,
+                             data: object.title,
+                             user_agent: user_agent)
         end
       end
 
