@@ -493,46 +493,58 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'can edit' do
     with_config_value :project_admin_sample_type_restriction, false do
-      refute_nil @project
-      another_person = Factory(:person)
-      type = Factory(:simple_sample_type, project_ids: @project_ids)
-
-      refute_includes another_person.projects, @project
-
-      assert type.can_edit?(@person.user)
-      User.with_current_user(@person.user) do
-        assert type.can_edit?
+      # project admin can edit
+      person = Factory(:project_administrator)
+      sample_type = Factory(:simple_sample_type,projects:person.projects)
+      refute_equal person,sample_type.contributor
+      assert sample_type.can_edit?(person.user)
+      User.with_current_user(person.user) do
+        assert sample_type.can_edit?
       end
 
-      refute type.can_edit?(another_person.user)
-      User.with_current_user(another_person.user) do
-        refute type.can_edit?
+      # contributor can edit, even if not an proj admin
+      person = Factory(:person)
+      sample_type = Factory(:simple_sample_type,projects:person.projects, contributor:person)
+      assert_equal person,sample_type.contributor
+      assert sample_type.can_edit?(person.user)
+      User.with_current_user(person.user) do
+        assert sample_type.can_edit?
       end
 
-      refute type.can_edit?
-      refute type.can_edit?(nil)
-    end
-    with_config_value :project_admin_sample_type_restriction, true do
-      refute @project.can_be_administered_by?(@person)
-      type = Factory(:simple_sample_type, project_ids: @project_ids)
-      User.with_current_user(@person.user) do
-        refute type.can_edit?
+      # project member, but not contributor or proj admin cannot edit
+      person = Factory(:person)
+      sample_type = Factory(:simple_sample_type,projects:person.projects)
+      refute_equal person,sample_type.contributor
+      refute sample_type.can_edit?(person.user)
+      User.with_current_user(person.user) do
+        refute sample_type.can_edit?
       end
-      project_admin = Factory(:project_administrator)
-      another_project_admin = Factory(:project_administrator)
-      admin = Factory(:admin)
-      type = Factory(:simple_sample_type, project_ids: [project_admin.projects.first.id])
-      assert type.can_edit?(project_admin.user)
-      refute type.can_edit?(another_project_admin.user)
-      User.with_current_user(project_admin.user) do
-        assert type.can_edit?
+
+      # member of other project, even if proj admin, cannot edit
+      person = Factory(:project_administrator)
+      sample_type = Factory(:simple_sample_type,projects:[Factory(:project)])
+      refute_equal person,sample_type.contributor
+      assert_empty sample_type.projects & person.projects
+      refute sample_type.can_edit?(person.user)
+      User.with_current_user(person.user) do
+        refute sample_type.can_edit?
       end
-      User.with_current_user(another_project_admin.user) do
-        refute type.can_edit?
+
+      # seek admin can edit
+      person = Factory(:admin)
+      sample_type = Factory(:simple_sample_type,projects:[Factory(:project)])
+      refute_equal person,sample_type.contributor
+      assert_empty sample_type.projects & person.projects
+      assert sample_type.can_edit?(person.user)
+      User.with_current_user(person.user) do
+        assert sample_type.can_edit?
       end
-      assert type.can_edit?(admin)
-      User.with_current_user(admin.user) do
-        assert type.can_edit?
+
+      #anonymous user cannot edit
+      sample_type = Factory(:simple_sample_type,projects:[Factory(:project)])
+      refute sample_type.can_edit?(nil)
+      User.with_current_user(nil) do
+        refute sample_type.can_edit?
       end
     end
   end
