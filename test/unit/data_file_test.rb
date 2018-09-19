@@ -287,7 +287,7 @@ class DataFileTest < ActiveSupport::TestCase
       refute data_file.sample_template?
       assert_empty data_file.possible_sample_types
 
-      sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
+      sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
       sample_type.content_blob = Factory(:sample_type_template_content_blob)
       sample_type.build_attributes_from_template
       disable_authorization_checks { sample_type.save! }
@@ -313,13 +313,14 @@ class DataFileTest < ActiveSupport::TestCase
     assert_empty data_file.possible_sample_types
 
     #visible
-    sample_type1 = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id)
+    sample_type1 = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: person
     sample_type1.content_blob = Factory(:sample_type_template_content_blob)
     sample_type1.build_attributes_from_template
     disable_authorization_checks { sample_type1.save! }
 
     #hidden
-    sample_type2 = SampleType.new title: 'hidden', uploaded_template: true, project_ids:[Factory(:project).id]
+    person2 = Factory(:person)
+    sample_type2 = SampleType.new title: 'hidden', uploaded_template: true, project_ids:person2.projects.collect(&:id), contributor: person2
     sample_type2.content_blob = Factory(:sample_type_template_content_blob)
     sample_type2.build_attributes_from_template
     disable_authorization_checks { sample_type2.save! }
