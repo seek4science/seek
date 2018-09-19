@@ -52,7 +52,7 @@ Factory.define(:linked_sample_type, parent: :sample_type) do |f|
   f.sequence(:title) { |n| "linked sample type #{n}" }
   f.after_build do |type|
     type.sample_attributes << Factory.build(:sample_attribute, title: 'title', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
-    type.sample_attributes << Factory.build(:sample_sample_attribute, title: 'patient', linked_sample_type: Factory(:patient_sample_type,project_ids:type.projects.collect(&:id)), required: true, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_sample_attribute, title: 'patient', linked_sample_type: Factory(:patient_sample_type,projects:type.projects,contributor:type.contributor), required: true, sample_type: type)
   end
 end
 

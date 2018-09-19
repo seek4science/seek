@@ -587,78 +587,78 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'can delete' do
     with_config_value :project_admin_sample_type_restriction, false do
-      type = Factory(:simple_sample_type, project_ids: @project_ids)
-      refute type.can_delete?
-      assert type.can_delete?(@person.user)
-      User.with_current_user(@person.user) do
-        assert type.can_delete?
-
-        # cannot delete with samples
-        type = Factory(:patient_sample, project_ids: @project_ids, contributor:@person).sample_type
-        refute type.can_delete?
-
-        # double check the type has been saved (due to an issue when running all tests together)
-        refute type.new_record?
-
-        # cannot delete if linked from another sample type
-        linked_sample_type = Factory(:linked_sample_type, project_ids: @project_ids)
-        linked_attribute = linked_sample_type.sample_attributes.last
-        type = linked_attribute.linked_sample_type
-
-        # some sanity checking
-        assert_empty type.samples
-        assert_includes type.projects, @project
-        assert type.can_edit?
-        refute_equal linked_sample_type, type
-        refute type.can_delete?
-
-        assert_no_difference('SampleType.count') do
-          assert_difference('SampleAttribute.count', -1) do
-            linked_attribute.destroy
-          end
-        end
-
-        type.reload
-        assert type.can_delete?
-
-        # however, can delete if linked to itself
-        type = Factory(:linked_sample_type_to_self, project_ids: @project_ids)
-        assert_equal type, type.sample_attributes.last.linked_sample_type
-        assert type.can_delete?
-      end
-      another_person = Factory(:person)
-      refute_includes another_person.projects, @project
-      type = Factory(:simple_sample_type, project_ids: @project_ids)
-      refute type.can_delete?(another_person.user)
-      User.with_current_user(another_person.user) do
-        refute type.can_delete?
-      end
-    end
-
-    with_config_value :project_admin_sample_type_restriction, true do
-      project_admin = Factory(:project_administrator)
-      another_project_admin = Factory(:project_administrator)
-      seek_admin = Factory(:admin)
-      type = Factory(:simple_sample_type, project_ids: [project_admin.projects.first.id])
-      refute type.can_delete?
-      refute type.can_delete?(@person.user)
-      User.with_current_user(@person.user) do
-        refute type.can_delete?
+      # project admin can delete
+      person = Factory(:project_administrator)
+      sample_type = Factory(:simple_sample_type,projects:person.projects)
+      refute_equal person,sample_type.contributor
+      assert sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        assert sample_type.can_delete?
       end
 
-      refute type.can_delete?(another_project_admin.user)
-      User.with_current_user(another_project_admin.user) do
-        refute type.can_delete?
+      # contributor can delete, even if not an proj admin
+      person = Factory(:person)
+      sample_type = Factory(:simple_sample_type,projects:person.projects, contributor:person)
+      assert_equal person,sample_type.contributor
+      assert sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        assert sample_type.can_delete?
       end
 
-      assert type.can_delete?(project_admin.user)
-      User.with_current_user(project_admin.user) do
-        assert type.can_delete?
+      # project member, but not contributor or proj admin cannot delete
+      person = Factory(:person)
+      sample_type = Factory(:simple_sample_type,projects:person.projects)
+      refute_equal person,sample_type.contributor
+      refute sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        refute sample_type.can_delete?
       end
 
-      assert type.can_delete?(seek_admin.user)
-      User.with_current_user(seek_admin.user) do
-        assert type.can_delete?
+      # member of other project, even if proj admin, cannot delete
+      person = Factory(:project_administrator)
+      sample_type = Factory(:simple_sample_type,projects:[Factory(:project)])
+      refute_equal person,sample_type.contributor
+      assert_empty sample_type.projects & person.projects
+      refute sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        refute sample_type.can_delete?
+      end
+
+      # seek admin can delete
+      person = Factory(:admin)
+      sample_type = Factory(:simple_sample_type,projects:[Factory(:project)])
+      refute_equal person,sample_type.contributor
+      assert_empty sample_type.projects & person.projects
+      assert sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        assert sample_type.can_delete?
+      end
+
+      #anonymous user cannot delete
+      sample_type = Factory(:simple_sample_type,projects:[Factory(:project)])
+      refute sample_type.can_delete?(nil)
+      User.with_current_user(nil) do
+        refute sample_type.can_delete?
+      end
+
+      # cannot delete with samples associated
+      person = Factory(:project_administrator)
+      sample = Factory(:patient_sample,projects:person.projects,contributor:person,sample_type:Factory(:patient_sample_type, contributor:person,projects:person.projects))
+      sample_type = sample.sample_type
+
+      refute sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        refute sample_type.can_delete?
+      end
+
+      # cannot delete with linked sample type
+      linked_sample_type = Factory(:linked_sample_type, projects:person.projects,contributor:person)
+      sample_type = linked_sample_type.sample_attributes.last.linked_sample_type
+      refute_empty sample_type.projects & person.projects
+      assert_equal person, sample_type.contributor
+      refute sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        refute sample_type.can_delete?
       end
     end
   end
@@ -782,7 +782,8 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'dependant attributes destroyed' do
     with_config_value :project_admin_sample_type_restriction, false do
       User.with_current_user(@person.user) do
-        type = Factory(:patient_sample_type, project_ids: @project_ids)
+        type = Factory(:patient_sample_type, contributor:@person)
+        assert type.can_delete?
         attribute_count = type.sample_attributes.count
 
         assert_difference('SampleAttribute.count', -attribute_count) do
