@@ -78,7 +78,8 @@ namespace :seek do
         puts "setting #{contributor.name} as the contributor for sample type #{sample_type.id}"
         sample_type.update_column(:contributor_id,project_admins.first.id)
       else
-        puts "no project admins found for sample_type #{sample_type.id}, leaving contributor nil".red
+        puts "no project admins found for sample_type #{sample_type.id}, leaving contributor nil, marking as deleted_contributor".red
+        sample_type.update_column(:deleted_contributor,'cannot be determined')
       end
     end
   end

@@ -1268,6 +1268,7 @@ class PersonTest < ActiveSupport::TestCase
     things << Factory(:sample, contributor:person)
     things << Factory(:strain, contributor:person)
     things << Factory(:publication, contributor:person)
+    things << Factory(:simple_sample_type, contributor:person)
 
 
 
