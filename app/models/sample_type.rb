@@ -77,8 +77,8 @@ class SampleType < ActiveRecord::Base
     resolve_seek_samples_inconsistencies
   end
 
-  def can_download?
-    true
+  def can_download?(user = User.current_user)
+    can_view?(user)
   end
 
   def self.user_creatable?

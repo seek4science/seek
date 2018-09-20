@@ -2,6 +2,7 @@ require 'test_helper'
 require 'time_test_helper'
 
 class SampleTypeTest < ActiveSupport::TestCase
+
   def setup
     @person = Factory(:person)
     @project = @person.projects.first
@@ -82,16 +83,21 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert public_sample.can_view?
     st = public_sample.sample_type
     assert st.can_view?
-    assert st.can_view?(@person)
+    assert st.can_view?(@person.user)
+    User.with_current_user(@person.user) do
+      assert st.can_view?
+    end
     assert_empty st.projects & @person.projects
 
     refute private_sample.can_view?
     st = private_sample.sample_type
     refute st.can_view?
-    refute st.can_view?(@person)
-    refute st.can_view?(@person)
-    assert_empty st.projects & @person.projects
+    refute st.can_view?(@person.user)
+    User.with_current_user(@person.user) do
+      refute st.can_view?
+    end
 
+    assert_empty st.projects & @person.projects
 
   end
 
@@ -117,8 +123,45 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute sample.can_view?(@person.user)
     assert_equal sample_type, sample.sample_type
     assert sample_type.can_view?(@person.user,sample)
+  end
 
+  test 'can download?' do
+    # essentially the same as can_view?
 
+    # can't download if not a project member
+    st = Factory(:simple_sample_type)
+    assert_empty st.projects & @person.projects
+
+    refute st.can_download?(@person.user)
+    User.with_current_user(@person.user) do
+      refute st.can_download?
+    end
+
+    # can download if in project
+    person2 = Factory(:person,project:@project)
+    st = Factory(:simple_sample_type,projects:[@project])
+    assert_equal [@project],st.projects & @person.projects
+    assert st.can_download?(@person.user)
+    User.with_current_user(@person.user) do
+      assert st.can_download?
+    end
+
+    # can download if it has a public sample
+    public_sample = Factory(:sample,policy:Factory(:public_policy))
+    private_sample = Factory(:sample,policy:Factory(:private_policy))
+
+    assert public_sample.can_download?
+    st = public_sample.sample_type
+    assert st.can_download?
+    assert st.can_download?(@person.user)
+    assert_empty st.projects & @person.projects
+
+    refute private_sample.can_download?
+    st = private_sample.sample_type
+    refute st.can_download?
+    refute st.can_download?(@person.user)
+    refute st.can_download?(@person.user)
+    assert_empty st.projects & @person.projects
   end
 
   test 'validate title and decription length' do
