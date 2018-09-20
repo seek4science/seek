@@ -2,8 +2,11 @@ var cy;
 
 var ISA = {
     originNode: null,
+    recentlyClickedNode: null,
+    currentSelectedNode: null,
 
     defaults: {
+        padding: 85,
         nodeWidth: 200,
         nodeHeight: 65,
         fontSize: 16,
@@ -14,8 +17,7 @@ var ISA = {
         layout: {
             name: 'breadthfirst',
             directed: true,
-            spacingFactor: 1.25,
-            padding: 50
+            spacingFactor: 1.25
         },
         animationDuration: 300
     },
@@ -23,7 +25,8 @@ var ISA = {
     drawGraph: function (elements, current_element_id) {
         cy = window.cy = cytoscape({
             container: document.getElementById('cy'),
-
+            fit: true,
+            wheelSensitivity: 0.25,
             userZoomingEnabled: false,
             panningEnabled: true,
             userPanningEnabled: true,
@@ -37,7 +40,7 @@ var ISA = {
                     css: {
                         'shape': 'roundrectangle',
                         'border-color': 'data(borderColor)',
-                        'border-width': 2,
+                        'border-width': 1,
                         'das': 'mapData(weight, 40, 80, 20, 60)',
                         'content': 'data(name)',
                         'text-valign': 'center',
@@ -56,6 +59,29 @@ var ISA = {
                         'text-wrap': 'wrap',
                         'text-max-width': ISA.defaults.textMaxWidth,
                         'opacity': 0.6
+                    }
+                },
+                {
+                    selector: 'node.resource-small',
+                    css: {
+                        'shape': 'roundrectangle',
+                        'border-color': 'data(borderColor)',
+                        'border-width': 1,
+                        'das': 'mapData(weight, 40, 80, 20, 60)',
+                        'content': 'data(name)',
+                        'text-valign': 'center',
+                        'text-outline-width': 1,
+                        'text-outline-color': 'data(faveColor)',
+                        'background-color': 'data(faveColor)',
+                        'color': ISA.defaults.color,
+                        'width': 40,
+                        'height': 40,
+                        'font-size': 0,
+                        'text-wrap': 'wrap',
+                        'text-max-width': ISA.defaults.textMaxWidth,
+                        'opacity': 1,
+                        'padding-left': 0,
+                        'padding-right': 0
                     }
                 },
                 {
@@ -108,7 +134,7 @@ var ISA = {
                         'text-border-color': '#ccccdd',
                         'text-border-opacity': 0.7,
                         'font-size': ISA.defaults.fontSize,
-                        'opacity': 0.5
+                        'opacity': 0.3
                     }
                 },
                 {
@@ -126,7 +152,12 @@ var ISA = {
                         'height': ISA.defaults.nodeHeight + 15,
                         'transition-property': 'width, height',
                         'transition-duration': 300,
-                        'opacity': 1
+                        'opacity': 1,
+                        'font-size': function (el) {
+                            return el.data('name').length > 60 ? ISA.defaults.smallerFontSize : ISA.defaults.fontSize;
+                        },
+                        'padding-left': ISA.defaults.backgroundImageSize + 10,
+                        'padding-right': ISA.defaults.backgroundImageSize + 10
                     }
                 }
             ],
@@ -140,7 +171,7 @@ var ISA = {
                     //animate the current node
                     ISA.originNode = cy.nodes('[id=\'' + current_element_id + '\']')[0];
                     ISA.originNode.select();
-                    cy.animate({ zoom: 0.8, center: {eles: ISA.originNode}, duration: ISA.defaults.animationDuration });
+                    cy.fit(ISA.defaults.padding);
                 } else {
                     $j('#isa-graph').hide();
                 }
@@ -171,24 +202,31 @@ var ISA = {
         });
 
         cy.on('select', 'node.child-count', function (event) {
-           ISA.loadChildren(event.cyTarget);
+            ISA.loadChildren(event.cyTarget);
         });
     },
 
     selectNode: function (node) {
         var jsTree = $j('#jstree').jstree(true);
         jsTree.deselect_all();
-        $j('li[data-node-id=' + node.data('id') +']').each(function () {
+        ISA.expandNodeByDataNodeId(node.data('id'));
+        $j('li[data-node-id=' + node.data('id') + ']').each(function () {
             jsTree.select_node(this.id);
         });
-        ISA.animateNode(node, 0.8);
+
+        ISA.highlightNode(node);
+
         ISA.displayNodeInfo(node);
+        node.connectedEdges().connectedNodes('node.resource').addClass('selected');
+        ISA.currentSelectedNode = node;
     },
 
     highlightNode: function (node) {
         //first normalizing all nodes and fading all nodes and edges
+
         cy.$('node.connected').removeClass('connected');
         cy.$('edge.connected').removeClass('connected');
+
 
         //then appearing the chosen node and the connected nodes and edges
         node.addClass('connected');
@@ -196,21 +234,15 @@ var ISA = {
         node.connectedEdges().connectedNodes().addClass('connected');
 
         // Animate the selected node
-        cy.$('node.selected').removeClass('selected');
+        if (!ISA.isShowGraphNodesActive()) {
+            cy.$('node.selected').removeClass('selected');
+        }
         node.addClass('selected');
-    },
-
-    animateNode: function (node, zoom) {
-        ISA.highlightNode(node);
-        // Center the view on the node
-        opts = { center: { eles: node }, duration: ISA.defaults.animationDuration };
-        if (zoom)
-            opts.zoom = zoom;
-        cy.animate(opts);
     },
 
     displayNodeInfo: function (node) {
         $j('#node_info').html(HandlebarsTemplates['isa/item_info'](node.data()));
+        bindTooltips('#node_info');
     },
 
     decodeHTMLForElements: function (elements) {
@@ -221,10 +253,12 @@ var ISA = {
 
     fullscreen: function (state) {
         $j('#isa-graph').toggleClass('fullscreen', state);
+        cy.fit(ISA.defaults.padding);
+        cy.userZoomingEnabled(!cy.userZoomingEnabled());
         cy.resize();
     },
 
-    recentlyClickedNode: null,
+
     rememberFirstClick: function (target) {
         ISA.recentlyClickedNode = target;
         setTimeout(function () {
@@ -238,12 +272,46 @@ var ISA = {
 
     visitNode: function (node) {
         if (node != ISA.originNode && node.data('url')) {
-            window.location = node.data('url');
+            var url = node.data('url') + '?graph_view=' + ISA.view.current;
+            if (ISA.isFullscreen()) {
+                url = url + "&fullscreen";
+            }
+            window.location = url;
         }
     },
 
+    findNodeForDataNodeId: function (dataId) {
+        var id = null;
+        var nodes = $j('#jstree').jstree(true)._model.data;
+        for (var i in nodes) {
+            if (i != '#') {
+                if (nodes[i].li_attr["data-node-id"] == dataId) {
+                    return nodes[i];
+                }
+            }
+        }
+    },
+
+    expandNodeByDataNodeId: function (dataId) {
+        var node = ISA.findNodeForDataNodeId(dataId);
+        if (node != null) {
+            var tree = $j('#jstree').jstree(true);
+            tree._open_to(node.id);
+            tree.open_all(node.id);
+            tree.select_node(node.id);
+        }
+    },
+
+    isShowGraphNodesActive: function () {
+        return $j('#show-all-nodes-btn').hasClass('active');
+    },
+
+    isFullscreen: function ()  {
+        return $j('#isa-graph').hasClass('fullscreen');
+    },
+
     eachTreeNodeElement: function (id, callback) {
-        $j('li[data-node-id=' + id +']').each(callback);
+        $j('li[data-node-id=' + id + ']').each(callback);
     },
 
     eachTreeNode: function (id, callback) {
@@ -286,13 +354,13 @@ var ISA = {
 
                 // Adjust the cytoscape layout to fit in the new nodes
                 cy.layout($j.extend({
-                        fit: false,
+                        fit: true,
                         animate: true,
                         animationDuration: ISA.defaults.animationDuration,
                         stop: function () {
                             ISA.highlightNode(node);
-                            cy.animate({ fit: { eles: node.union(node.outgoers().targets()), padding: 40 },
-                                duration: ISA.defaults.animationDuration });
+                            // cy.animate({ fit: { eles: node.union(node.outgoers().targets()), padding: 40 },
+                            //     duration: ISA.defaults.animationDuration });
                         }
                     }, ISA.defaults.layout)
                 );
@@ -315,7 +383,7 @@ var ISA = {
                         var childNode = data.jstree[i];
 
                         // Only add the node to the tree if its not already there
-                        if (!$j('li[data-node-id=' + childNode.li_attr['data-node-id'] +']', this).length) {
+                        if (!$j('li[data-node-id=' + childNode.li_attr['data-node-id'] + ']', this).length) {
                             childNode.id = childNode.id + index; // To stop dupes!
                             tree.create_node(treeNode, childNode);
                         }
@@ -324,6 +392,10 @@ var ISA = {
                     // Need to do this due to a little hack we used when drawing the tree
                     //  (to show a node as "openable" despite having no children)
                     tree.redraw_node(this.id);
+                });
+
+                $j('li[data-node-id=' + ISA.originNode.data('id') + ']').each(function () {
+                    $j(this).addClass('isa-highlight');
                 });
 
                 cy.resize();
