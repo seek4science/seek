@@ -100,4 +100,24 @@ module SamplesHelper
       content_tag(:span, 'Not specified', class: 'none_text')
     end
   end
+
+  # link for the sample type for the provided sample. Handles a referring_sample_id if required
+  def sample_type_link(sample, user=User.current_user)
+    if (sample.sample_type.can_view?(user))
+      link_to sample.sample_type.title,sample.sample_type
+    else
+      link_to sample.sample_type.title,sample_type_path(sample.sample_type, referring_sample_id:sample.id)
+    end
+  end
+
+  def sample_type_list_item_attribute(attribute, sample)
+    value = sample_type_link(sample)
+    html = content_tag(:p,class:'list_item_attribute') do
+      content_tag(:b) do
+        "#{attribute}: "
+      end + value
+    end
+    html.html_safe
+  end
+
 end

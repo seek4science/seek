@@ -1,3 +1,5 @@
+
+
 require 'tempfile'
 
 module ISAHelper
@@ -33,7 +35,22 @@ module ISAHelper
     { error: 'error' }
   end
 
-  private
+  def modal_isa_png()
+    modal_options = {id: 'modal-exported-png', size: 'xl', 'data-role' => 'modal-isa-graph-png'}
+
+    modal_title = 'Export PNG'
+
+    modal(modal_options) do
+      modal_header(modal_title) +
+          modal_body do
+            #content_tag(:button, 'save',id:'save-exported-png') +
+            content_tag(:p,'Click below to download a copy of the image') +
+            button_link_to('Download', 'download', '#', id:'save-exported-png') +
+            content_tag(:br) +
+            content_tag(:img, '',id: 'exported-png', style:'max-width:1200px')
+          end
+    end
+  end
 
   def cytoscape_node_elements(hash)
     elements = []
@@ -43,11 +60,11 @@ module ISAHelper
       data = { id: node_id(item) }
 
       if node.can_view?
-        if item.respond_to?(:description)
-          data['description'] = truncate(h(item.description), length: 500)
-        else
-          data['description'] = ''
-        end
+        data['description'] = if item.respond_to?(:description)
+                                truncate(h(item.description), length: 500)
+                              else
+                                ''
+                              end
 
         if data['description'].blank?
           data['description'] = item.is_a?(Publication) ? 'No abstract' : 'No description'
@@ -79,7 +96,11 @@ module ISAHelper
         data['borderColor'] = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
       end
 
-      elements << { group: 'nodes', data: data, classes: 'resource' }
+      elements << if node == hash[:nodes].first
+                    { group: 'nodes', data: data, classes: 'resource' }
+                  else
+                    { group: 'nodes', data: data, classes: 'resource resource-small' }
+                  end
 
       # If this node has children, but they aren't included in the set of nodes, create an info node that will load the children
       #  when clicked
@@ -114,8 +135,7 @@ module ISAHelper
                             source: source,
                             target: target,
                             faveColor: BORDER_COLOURS.default },
-                    classes: 'resource-edge'
-      }
+                    classes: 'resource-edge' }
     end
     elements
   end
@@ -126,8 +146,7 @@ module ISAHelper
               name: name,
               source: source,
               target: target,
-              faveColor: fave_color }
-    }
+              faveColor: fave_color } }
   end
 
   def edge_label(source, target)
@@ -152,7 +171,7 @@ module ISAHelper
     label_data.join(', ')
   end
 
-  def tree_json(hash)
+  def tree_json(hash, root_item)
     objects = hash[:nodes].map(&:object)
     real_edges = hash[:edges].select { |e| objects.include?(e[0]) }
 
@@ -160,12 +179,12 @@ module ISAHelper
       real_edges.none? { |_parent, child| child == n.object }
     end
 
-    nodes = roots.map { |root| tree_node(hash, root.object) }.flatten
+    nodes = roots.map { |root| tree_node(hash, root.object, root_item) }.flatten
 
     nodes.to_json
   end
 
-  def tree_node(hash, object)
+  def tree_node(hash, object, root_item = nil)
     child_edges = hash[:edges].select do |parent, _child|
       parent == object
     end
@@ -187,6 +206,8 @@ module ISAHelper
       entry[:a_attr] = { class: 'hidden-leaf none_text' }
     end
 
+    entry[:children] += child_edges.map { |c| tree_node(hash, c[1], root_item) }
+
     if node.child_count > 0
       if node.child_count > child_edges.count
         entry[:children] << {
@@ -199,12 +220,10 @@ module ISAHelper
         }
       end
 
-      entry[:state] = { opened: true }
+      entry[:state] = { opened: false }
     else
       entry[:state] = { opened: false }
     end
-
-    entry[:children] += child_edges.map { |c| tree_node(hash, c[1]) }
 
     entry
   end

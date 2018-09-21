@@ -20,6 +20,9 @@ class Snapshot < ActiveRecord::Base
   acts_as_doi_mintable(proxy: :resource)
   acts_as_zenodo_depositable(&:content_blob)
 
+  include Seek::ActsAsAsset::ContentBlobs::InstanceMethods
+  include Seek::Stats::ActivityCounts
+
   def to_param
     snapshot_number.to_s
   end

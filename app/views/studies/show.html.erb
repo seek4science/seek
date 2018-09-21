@@ -39,7 +39,7 @@
           </div>
         </div>
     <% end %>
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @study, :deep => false, :include_parents => true} %>
+    <%= render partial: 'general/isa_graph', locals: { root_item: @study, options: { depth: 4 } } %>
   </div>
 
   <div class="col-md-3 col-sm-4">

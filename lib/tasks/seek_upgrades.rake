@@ -15,6 +15,7 @@ namespace :seek do
     environment
     convert_organism_concept_uris
     update_deleted_contributors
+    set_sample_type_contributors
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -64,6 +65,21 @@ namespace :seek do
         item.update_column(:deleted_contributor, "Person:#{item.contributor_id}")
         item.update_column(:contributor_id, nil)
         bar.increment!
+      end
+    end
+  end
+
+  task(set_sample_type_contributors: :environment) do
+    SampleType.where('contributor_id IS NULL').each do |sample_type|
+      project_admins = sample_type.projects.collect(&:project_administrators).flatten.uniq
+      unless project_admins.empty?
+        #just take the first
+        contributor = project_admins.first
+        puts "setting #{contributor.name} as the contributor for sample type #{sample_type.id}"
+        sample_type.update_column(:contributor_id,project_admins.first.id)
+      else
+        puts "no project admins found for sample_type #{sample_type.id}, leaving contributor nil, marking as deleted_contributor".red
+        sample_type.update_column(:deleted_contributor,'cannot be determined')
       end
     end
   end

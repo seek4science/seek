@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180913123624) do
+ActiveRecord::Schema.define(version: 20180919143203) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -1435,13 +1435,15 @@ ActiveRecord::Schema.define(version: 20180913123624) do
   add_index "sample_resource_links", ["sample_id"], name: "index_sample_resource_links_on_sample_id", using: :btree
 
   create_table "sample_types", force: :cascade do |t|
-    t.string   "title",             limit: 255
-    t.string   "uuid",              limit: 255
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
-    t.string   "first_letter",      limit: 1
-    t.text     "description",       limit: 65535
-    t.boolean  "uploaded_template",               default: false
+    t.string   "title",               limit: 255
+    t.string   "uuid",                limit: 255
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
+    t.string   "first_letter",        limit: 1
+    t.text     "description",         limit: 65535
+    t.boolean  "uploaded_template",                 default: false
+    t.integer  "contributor_id",      limit: 4
+    t.string   "deleted_contributor", limit: 255
   end
 
   create_table "samples", force: :cascade do |t|

@@ -341,7 +341,8 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'json metadata with awkward attributes' do
-    sample_type = SampleType.new title: 'with awkward attributes', project_ids: [Factory(:project).id]
+    person = Factory(:person)
+    sample_type = SampleType.new title: 'with awkward attributes', projects: person.projects, contributor: person
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title', is_title: true, sample_type: sample_type)
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'updated_at', is_title: false, sample_type: sample_type)
     assert sample_type.valid?
@@ -468,7 +469,8 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'sample with clashing attribute names' do
-    sample_type = SampleType.new title: 'with awkward attributes', project_ids: [Factory(:project).id]
+    person = Factory(:person)
+    sample_type = SampleType.new title: 'with awkward attributes', projects: person.projects, contributor: person
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'freeze', is_title: true, sample_type: sample_type)
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'updated_at', is_title: false, sample_type: sample_type)
     assert sample_type.valid?
@@ -489,7 +491,8 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'sample with clashing attribute names with private methods' do
-    sample_type = SampleType.new title: 'with awkward attributes', project_ids: [Factory(:project).id]
+    person = Factory(:person)
+    sample_type = SampleType.new title: 'with awkward attributes', projects: person.projects, contributor: person
     sample_type.sample_attributes << Factory.build(:any_string_sample_attribute, title: 'format', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     disable_authorization_checks { sample_type.save! }
@@ -507,7 +510,8 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'sample with clashing attribute names with dynamic rails methods' do
-    sample_type = SampleType.new title: 'with awkward attributes', project_ids: [Factory(:project).id]
+    person = Factory(:person)
+    sample_type = SampleType.new title: 'with awkward attributes', projects: person.projects, contributor: person
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title_was', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     disable_authorization_checks { sample_type.save! }
@@ -698,7 +702,8 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'sample responds to correct methods' do
-    sample_type = SampleType.new(title: 'Custom', project_ids: [Factory(:project).id])
+    person = Factory(:person)
+    sample_type = SampleType.new(title: 'Custom', projects: person.projects, contributor: person)
     attribute1 = Factory(:any_string_sample_attribute, title: 'banana_type',
                                                        is_title: true, sample_type: sample_type)
     attribute2 = Factory(:any_string_sample_attribute, title: 'license',
@@ -791,7 +796,7 @@ class SampleTest < ActiveSupport::TestCase
     create_sample_attribute_type
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor:person
-    sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
+    sample_type = SampleType.new title: 'from template', projects: person.projects, contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
@@ -818,7 +823,8 @@ class SampleTest < ActiveSupport::TestCase
     create_sample_attribute_type
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy)
-    sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
+    person = Factory(:person)
+    sample_type = SampleType.new title: 'from template', projects: person.projects, contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
@@ -860,7 +866,7 @@ class SampleTest < ActiveSupport::TestCase
 
       assert_equal 4, source_type.samples.count
 
-      type = SampleType.new(title: 'Sample type linked to other', project_ids: project_ids)
+      type = SampleType.new(title: 'Sample type linked to other', project_ids: project_ids, contributor: person)
       type.sample_attributes << Factory.build(:sample_attribute, title: 'title', template_column_index: 1,
                                               sample_attribute_type: Factory(:string_sample_attribute_type),
                                               required: true, is_title: true, sample_type: type)

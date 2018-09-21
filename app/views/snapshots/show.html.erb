@@ -54,9 +54,10 @@
 
   </div>
   <div class="col-md-3 col-sm-4">
-    <%= render :partial => "assets/citation_box", locals: { doi: @snapshot.doi } unless @snapshot.doi.blank? %>
-    <%= render :partial => "snapshots/snapshots", :locals => { :snapshots => @resource.snapshots,
-                                                              :selected => @snapshot,
-                                                              :resource => @resource } %>
+    <%= render partial: 'assets/citation_box', locals: { doi: @snapshot.doi } unless @snapshot.doi.blank? %>
+    <%= render partial: 'snapshots/snapshots', locals: { snapshots: @resource.snapshots,
+                                                         selected: @snapshot,
+                                                         resource: @resource } %>
+    <%= render partial: 'assets/usage_info_box', locals: { resource: @snapshot } -%>
   </div>
 </div>

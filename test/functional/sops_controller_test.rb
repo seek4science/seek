@@ -305,11 +305,14 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should destroy sop' do
     login_as(:owner_of_my_first_sop)
-    assert_difference('Sop.count', -1) do
-      assert_no_difference('ContentBlob.count') do
-        delete :destroy, id: sops(:my_first_sop)
+    assert_difference('ActivityLog.count') do
+      assert_difference('Sop.count', -1) do
+        assert_no_difference('ContentBlob.count') do
+          delete :destroy, id: sops(:my_first_sop)
+        end
       end
     end
+
     assert_redirected_to sops_path
   end
 

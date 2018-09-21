@@ -21,6 +21,7 @@ en:
   event: "Event"
 
   sample: "Sample"
+  sample_type: "Sample type"
   strain: "Strain"
   scale: "Scale"
 

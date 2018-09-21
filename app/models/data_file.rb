@@ -111,8 +111,8 @@ class DataFile < ActiveRecord::Base
     possible_sample_types.any?
   end
 
-  def possible_sample_types
-    content_blob.present? ? SampleType.sample_types_matching_content_blob(content_blob) : []
+  def possible_sample_types(user = User.current_user)
+    content_blob.present? ? SampleType.sample_types_matching_content_blob(content_blob,user) : []
   end
 
   # a simple container for handling the matching results returned from #matching_data_files

@@ -19,7 +19,7 @@ module NelsTestHelper
     @reference = 'xMTEyMzEyMjoxMTIzNTI4OnJlYWRz'
 
     disable_authorization_checks do
-      @nels_sample_type = SampleType.new(title: 'NeLS FASTQ Paired', uploaded_template: true, project_ids: [@project.id])
+      @nels_sample_type = SampleType.new(title: 'NeLS FASTQ Paired', uploaded_template: true, project_ids: [@project.id], contributor: @user.person)
       @nels_sample_type.content_blob = Factory(:nels_fastq_paired_template_content_blob)
       @nels_sample_type.build_attributes_from_template
       @nels_sample_type.save!
