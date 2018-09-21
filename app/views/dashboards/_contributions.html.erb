@@ -1,0 +1,51 @@
+<div style="width: 75%">
+  <canvas id="canvas"></canvas>
+</div>
+<% assets = @project.assets.select { |a| a.created_at > 12.months.ago } %>
+<% by_month = assets.group_by { |a| a.created_at.strftime('%B') } %>
+<% by_type = assets.group_by { |a| a.class } %>
+<script>
+    var barChartData = {
+        labels: <%= by_month.keys.to_json.html_safe %>,
+        datasets: <%= by_type.keys.map do |type|
+        {
+            label: type.name.humanize,
+            backgroundColor: ISAHelper::FILL_COLOURS[type.name],
+            data: by_month.to_a.map { |month, assets| assets.select { |a| a.class == type }.count }
+        }
+        end.to_json.html_safe %>
+    };
+    var ctx = document.getElementById('canvas').getContext('2d');
+    var myBar = new Chart(ctx, {
+        type: 'bar',
+        data: barChartData,
+        options: {
+            title: {
+                display: false,
+                text: 'Contributions'
+            },
+            tooltips: {
+                mode: 'index',
+                filter: function (x) { return x.yLabel > 0 }, // Hide asset types with 0 contributions in that month
+                intersect: false
+            },
+            responsive: true,
+            scales: {
+                xAxes: [{
+                    stacked: true,
+                }],
+                yAxes: [{
+                    ticks: { // This whole block is just to avoid and protoype.js bug that breaks the whole chart
+                        beginAtZero:true,
+                        userCallback: function(label, index) {
+                            if (Math.floor(label) === label) {
+                                return label;
+                            }
+                        }
+                    },
+                    stacked: true
+                }]
+            }
+        }
+    });
+</script>

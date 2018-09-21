@@ -1,4 +1,4 @@
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 
 <%= render partial: 'general/page_title', locals: { title: "#{t('project').capitalize} Dashboard" } %>
 
@@ -12,7 +12,7 @@
   </div>
   <div class="col-sm-8">
     <div>
-      <%= dashboard_panel('Published data', 'published_data') do %><% end %>
+      <%= dashboard_panel('Contributions', 'contributions') do %><% end %>
     </div>
     <div class="row">
       <div class="col-sm-6">
