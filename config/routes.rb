@@ -190,7 +190,6 @@ SEEK::Application.routes.draw do
       get :admin_members
       get :admin_member_roles
       get :storage_report
-      get :dashboard
       post :update_members
       post :request_membership
       get :isa_children
@@ -228,6 +227,11 @@ SEEK::Application.routes.draw do
         post :create_folder
         post :set_project_folder_title
         post :set_project_folder_description
+      end
+    end
+    resource :dashboard, only: [:show] do
+      collection do
+        get :most_viewed
       end
     end
   end

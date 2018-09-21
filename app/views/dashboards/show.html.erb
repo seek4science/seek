@@ -1,0 +1,53 @@
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>-->
+
+<%= render partial: 'general/page_title', locals: { title: "#{t('project').capitalize} Dashboard" } %>
+
+<% project_assets = @project.assets %>
+<div class="row">
+  <div class="col-sm-4">
+    <%= panel('Top contributors') do %>
+      <% assets = project_assets.group_by(&:contributor) %>
+      <% assets.each_key { |cont| assets[cont] = assets[cont].length } %>
+      <% a = assets.to_a.sort_by { |x| -x[1] }.first(10) %>
+      <ul>
+        <% a.reject { |c,_| c.nil? }.each do |contributor, asset_count| %>
+          <li><%= link_to(contributor.name, contributor, target: :_blank) %> (<%= asset_count -%>)</li>
+        <% end %>
+      </ul>
+    <% end %>
+    <%= panel('Latest DOIs') do %>
+      <% project_assets.select { |a| a.doi.present? }.sort_by(&:updated_at) %>
+    <% end %>
+    <%= panel('Most viewed assets') do %>
+      <% most_viewed = ActivityLog.where(referenced_id: 1, referenced_type: 'Project', action: 'show').
+          group(:activity_loggable_type, :activity_loggable_id).count.to_a.
+          select { |(type, id), views| type.constantize.find_by_id(id)}.
+          sort_by { |x| -x[1] }.first(10) %>
+      <ul>
+        <% most_viewed.each do |(type, id), views| %>
+          <% asset = type.constantize.find(id) %>
+          <li><%= link_to(asset.title, asset, target: :_blank) %> (<%= views -%>)</li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+  <div class="col-sm-8">
+    <div>
+      <%= panel('Published data') do %>
+
+      <% end %>
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        <%= panel('???') do %>
+
+        <% end %>
+      </div>
+      <div class="col-sm-6">
+        <%= panel('?????') do %>
+
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
