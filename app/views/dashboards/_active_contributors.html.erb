@@ -1,0 +1,11 @@
+<% cache "project_dashboard_#{@project.id}_active_contributors" do %>
+  <% project_assets = @project.assets %>
+  <% assets = project_assets.group_by(&:contributor) %>
+  <% assets.each_key { |cont| assets[cont] = assets[cont].length } %>
+  <% a = assets.to_a.sort_by { |x| -x[1] }.first(10) %>
+  <ul>
+    <% a.reject { |c,_| c.nil? }.each do |contributor, asset_count| %>
+      <li><%= link_to(contributor.name, contributor, target: :_blank) %> (<%= asset_count -%>)</li>
+    <% end %>
+  </ul>
+<% end %>

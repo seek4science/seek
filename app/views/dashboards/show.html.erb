@@ -2,52 +2,61 @@
 
 <%= render partial: 'general/page_title', locals: { title: "#{t('project').capitalize} Dashboard" } %>
 
-<% project_assets = @project.assets %>
 <div class="row">
   <div class="col-sm-4">
-    <%= panel('Top contributors') do %>
-      <% assets = project_assets.group_by(&:contributor) %>
-      <% assets.each_key { |cont| assets[cont] = assets[cont].length } %>
-      <% a = assets.to_a.sort_by { |x| -x[1] }.first(10) %>
-      <ul>
-        <% a.reject { |c,_| c.nil? }.each do |contributor, asset_count| %>
-          <li><%= link_to(contributor.name, contributor, target: :_blank) %> (<%= asset_count -%>)</li>
-        <% end %>
-      </ul>
-    <% end %>
-    <%= panel('Latest DOIs') do %>
-      <% project_assets.select { |a| a.doi.present? }.sort_by(&:updated_at) %>
-    <% end %>
-    <%= panel('Most viewed assets') do %>
-      <% most_viewed = ActivityLog.where(referenced_id: 1, referenced_type: 'Project', action: 'show').
-          group(:activity_loggable_type, :activity_loggable_id).count.to_a.
-          select { |(type, id), views| type.constantize.find_by_id(id)}.
-          sort_by { |x| -x[1] }.first(10) %>
-      <ul>
-        <% most_viewed.each do |(type, id), views| %>
-          <% asset = type.constantize.find(id) %>
-          <li><%= link_to(asset.title, asset, target: :_blank) %> (<%= views -%>)</li>
-        <% end %>
-      </ul>
-    <% end %>
+    <%= dashboard_panel('Active contributors', 'active_contributors') do %><% end %>
+
+    <%= dashboard_panel('Latest DOIs', 'latest_doi') do %><% end %>
+
+    <%= dashboard_panel('Most viewed assets', 'most_viewed') do %><% end %>
   </div>
   <div class="col-sm-8">
     <div>
-      <%= panel('Published data') do %>
-
-      <% end %>
+      <%= dashboard_panel('Published data', 'published_data') do %><% end %>
     </div>
     <div class="row">
       <div class="col-sm-6">
-        <%= panel('???') do %>
-
-        <% end %>
+        <%= dashboard_panel('???', 'thing1') do %><% end %>
       </div>
       <div class="col-sm-6">
-        <%= panel('?????') do %>
-
-        <% end %>
+        <%= dashboard_panel('?????', 'thing2') do %><% end %>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+    $j(document).ready(function () {
+        var getPage = function (page, element, refresh) {
+            element.spinner('add');
+            var data = { query: page };
+            if (refresh) {
+                data.refresh = true;
+            }
+            $j.ajax({ url: '<%= stats_project_dashboard_path(@project) -%>',
+                data: { query: page },
+                success: function (resp) {
+                    element.html(resp);
+                },
+                error: function () {
+                    element.html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
+                },
+                complete: function () {
+                    element.spinner('remove');
+                }
+            })
+        };
+
+        $j('.dashboard-panel').each(function () {
+            var panel = this;
+            var panelBody = $j(this).find('.panel-body');
+
+            getPage(panel.id, panelBody);
+
+            $j(panel).find('.dashboard-refresh-btn').click(function () {
+                getPage(panel.id, panelBody, true);
+            })
+        });
+
+    });
+</script>

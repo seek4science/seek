@@ -1,0 +1,12 @@
+<% cache "project_dashboard_#{@project.id}_most_viewed" do %>
+  <% most_viewed = ActivityLog.where(referenced_id: 1, referenced_type: 'Project', action: 'show').
+      group(:activity_loggable_type, :activity_loggable_id).count.to_a.
+      select { |(type, id), views| type.constantize.find_by_id(id)}.
+      sort_by { |x| -x[1] }.first(10) %>
+  <ul>
+    <% most_viewed.each do |(type, id), views| %>
+      <% asset = type.constantize.find(id) %>
+      <li><%= link_to(asset.title, asset, target: :_blank) %> (<%= views -%>)</li>
+    <% end %>
+  </ul>
+<% end %>

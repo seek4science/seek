@@ -1,6 +1,7 @@
 class DashboardsController < ApplicationController
   before_filter :find_project
   before_filter :member_of_this_project
+  before_filter :expire_fragment_check, except: :show
 
   include Seek::BreadCrumbs
 
@@ -8,10 +9,8 @@ class DashboardsController < ApplicationController
 
   end
 
-  def most_viewed
-    respond_to do |format|
-      format.all { render text: '' }
-    end
+  def stats
+    render partial: "dashboards/#{params[:query]}"
   end
 
   private
@@ -33,5 +32,9 @@ class DashboardsController < ApplicationController
       redirect_to project_path(@project)
       false
     end
+  end
+
+  def expire_fragment_check
+    expire_fragment("project_dashboard_#{@project.id}_#{action_name}") if params[:refresh]
   end
 end

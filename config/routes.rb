@@ -231,7 +231,7 @@ SEEK::Application.routes.draw do
     end
     resource :dashboard, only: [:show] do
       collection do
-        get :most_viewed
+        get :stats
       end
     end
   end
