@@ -1,14 +1,5 @@
 $j(document).ready(function () {
-    $j('[data-tooltip]').popover({
-        html: false,
-        animation: false,
-        trigger: 'hover',
-        placement: 'auto right',
-        container: 'body',
-        content: function () {
-            return $j(this).data('tooltip');
-        }
-    });
+    bindTooltips('body');
 
     $j('label.required, span.required').popover({
         html: false,
@@ -23,3 +14,23 @@ $j(document).ready(function () {
         content: 'This field is required.'
     });
 });
+
+function bindTooltips(root_tag) {
+    $j(root_tag + ' [data-tooltip]').popover({
+        html: false,
+        animation: false,
+        trigger: 'hover',
+        placement: 'auto right',
+        container: 'body',
+        delay: {
+            show: 500,
+            hide: 100
+        },
+        content: function () {
+            return $j(this).data('tooltip');
+        }
+    });
+};
+
+
+

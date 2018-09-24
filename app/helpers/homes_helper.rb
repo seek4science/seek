@@ -107,7 +107,7 @@ module HomesHelper
 
   def recently_downloaded_item_logs_hash(time = 1.month.ago, number_of_item = 10)
     Rails.cache.fetch("download_activity_#{current_user_id}") do
-      activity_logs = ActivityLog.no_spider.where(['action = ? AND created_at > ?', 'download', time]).order('created_at DESC')
+      activity_logs = ActivityLog.no_spider.where(['action = ? AND created_at > ? AND activity_loggable_type != ?', 'download', time, 'Snapshot']).order('created_at DESC')
       selected_activity_logs = []
       activity_logs.each do |activity_log|
         included = selected_activity_logs.index { |log| log.activity_loggable == activity_log.activity_loggable }

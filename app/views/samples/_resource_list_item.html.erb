@@ -1,3 +1,3 @@
-<%= list_item_attribute 'Type', resource.sample_type.title, resource.sample_type %>
+<%= sample_type_list_item_attribute('Type',resource) %>
 
 <%= render :partial=>"assets/resource_list_item_contributor_and_creators",:object=>resource -%>

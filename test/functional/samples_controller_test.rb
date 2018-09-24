@@ -586,6 +586,59 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select 'div.related-items a[href=?]', sample_path(sample), text: /#{sample.title}/
   end
 
+  test 'referring sample id is added to sample type link, if necessary' do
+    person = Factory(:person)
+    sample = Factory(:sample,policy:Factory(:private_policy,permissions:[Factory(:permission,contributor:person, access_type:Policy::VISIBLE)]))
+    sample_type = sample.sample_type
+    login_as(person.user)
+
+    assert sample.can_view?
+    refute sample_type.can_view?
+
+    get :show,id:sample.id
+    assert_response :success
+
+    assert_select 'a[href=?]',sample_type_path(sample_type,referring_sample_id:sample.id),text:/#{sample_type.title}/
+
+    sample2 = Factory(:sample,policy:Factory(:public_policy))
+    sample_type2 = sample2.sample_type
+
+    assert sample2.can_view?
+    assert sample_type2.can_view?
+
+    get :show,id:sample2.id
+    assert_response :success
+
+    # no referring sample required
+    assert_select 'a[href=?]',sample_type_path(sample_type2),text:/#{sample_type2.title}/
+
+  end
+
+  test 'referring sample id is added to sample type links in list items' do
+    person = Factory(:person)
+    sample = Factory(:sample,policy:Factory(:private_policy,permissions:[Factory(:permission,contributor:person, access_type:Policy::VISIBLE)]))
+    sample_type = sample.sample_type
+    sample2 = Factory(:sample,policy:Factory(:public_policy))
+    sample_type2 = sample2.sample_type
+    login_as(person.user)
+
+    assert sample.can_view?
+    refute sample_type.can_view?
+
+    assert sample2.can_view?
+    assert sample_type2.can_view?
+
+    get :index
+
+    assert_select 'a[href=?]',sample_type_path(sample_type,referring_sample_id:sample.id),text:/#{sample_type.title}/
+
+    # no referring sample required, ST is already visible
+    assert_select 'a[href=?]',sample_type_path(sample_type2),text:/#{sample_type2.title}/
+
+  end
+
+
+
   private
 
   def populated_patient_sample
