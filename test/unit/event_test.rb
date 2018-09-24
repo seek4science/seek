@@ -85,4 +85,13 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 1, event.contributors.length
     assert_includes event.contributors, event.contributor
   end
+
+  test 'link to documents' do
+    event = Factory(:event)
+    assert_empty event.documents
+    doc = Factory(:document)
+    event = Factory(:event,documents:[doc])
+    refute_empty event.documents
+    assert_equal [doc],event.documents
+  end
 end

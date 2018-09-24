@@ -175,4 +175,13 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal document.contributor.user, document.contributing_user
     assert_equal document.contributor.user, document.latest_version.contributing_user
   end
+
+  test 'link to events' do
+    doc = Factory(:document)
+    assert_empty doc.events
+    event = Factory(:event)
+    doc = Factory(:document, events:[event])
+    refute_empty doc.events
+    assert_equal [event],doc.events
+  end
 end
