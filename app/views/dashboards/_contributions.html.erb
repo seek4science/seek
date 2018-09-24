@@ -1,6 +1,6 @@
 <canvas id="contributions-canvas"></canvas>
 
-<% assets = (@project.assets + @project.investigations + @project.studies + @project.assays).select { |a| a.created_at > 12.months.ago } %>
+<% assets = (@project.assets + @project.investigations + @project.studies + @project.assays + @project.samples).select { |a| a.created_at > 12.months.ago } %>
 <% by_month = assets.group_by { |a| a.created_at.strftime('%B') } %>
 <% by_type = assets.group_by { |a| a.class } %>
 <script>
