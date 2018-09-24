@@ -62,6 +62,8 @@ services:
       image: openbis/debian-openbis:18.06.0
       container_name: openbis
       restart: always
+      environment:
+        SERVER_HOST_PORT: "localhost:4000"
       volumes:
         - openbis-state:/home/openbis/openbis_state
       ports:
