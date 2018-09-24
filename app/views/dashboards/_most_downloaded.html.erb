@@ -1,0 +1,3 @@
+<% cache "project_dashboard_#{@project.id}_most_downloaded" do %>
+  <%= render partial: 'dashboards/most', locals: { action: 'download' } %>
+<% end %>
