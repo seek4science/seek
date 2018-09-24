@@ -3,15 +3,56 @@
 require 'tempfile'
 
 module ISAHelper
-  FILL_COLOURS = { 'Sop' => '#7ac5cd', # cadetblue3
-                   'Model' => '#cdcd00', # yellow3
-                   'DataFile' => '#eec591', # burlywood2
-                   'Investigation' => '#E6E600',
-                   'Study' => '#B8E62E',
-                   'Assay' => { 'EXP' => '#64b466', 'MODEL' => '#92CD00' },
-                   'Publication' => '#84B5FD',
-                   'Presentation' => '#8ee5ee', # cadetblue2
-                   'HiddenItem' => '#d3d3d3' } # lightgray
+  OLD_FILL_COLOURS = { 'Sop' => '#7ac5cd', # cadetblue3
+                       'Model' => '#cdcd00', # yellow3
+                       'DataFile' => '#eec591', # burlywood2
+                       'Investigation' => '#E6E600',
+                       'Study' => '#B8E62E',
+                       'Assay' =>'#64b466',
+                       'Assay-EXP' => '#64b466',
+                       'Assay-MODEL' => '#92CD00',
+                       'Publication' => '#84B5FD',
+                       'Presentation' => '#8ee5ee', # cadetblue2
+                       'HiddenItem' => '#d3d3d3' } # lightgray
+
+  NEW_FILL_COLOURS2 = {
+      'Programme' => '#90a8ff',
+      'Project' => '#85d6ff',
+      'Investigation' => '#ff918e',
+      'Study' => '#ffea4e',
+      'Assay' => '#7adb38',
+      'Assay-EXP' => '#7adb38',
+      'Assay-MODEL' => '#7cef88',
+      'Publication' => '#cbb8ff',
+      'DataFile' => '#ffc382',
+      'Document' => '#d3d0ff',
+      'Model' => '#fff8ac',
+      'Sop' => '#cce5ff',
+      'Sample' => '#fff2d5',
+      'Presentation' => '#ffb2e4',
+      'Event' => '#e6acfc'
+  }
+
+  NEW_FILL_COLOURS = {
+      'Programme' => '#90a8ff',
+      'Project' => '#85d6ff',
+      'Investigation' => '#E6E600',
+      'Study' => '#B8E62E',
+      'Assay' =>'#64b466',
+      'Assay-EXP' => '#64b466',
+      'Assay-MODEL' => '#92CD00',
+      'Publication' => '#cbb8ff',
+      'DataFile' => '#ffc382',
+      'Document' => '#d5c8a8',
+      'Model' => '#fff8ac',
+      'Sop' => '#cce5ff',
+      'Sample' => '#fff2d5',
+      'Presentation' => '#ffb2e4',
+      'Event' => '#ff918e'
+  }
+
+
+  FILL_COLOURS = NEW_FILL_COLOURS
 
   BORDER_COLOURS = { 'Sop' => '#619da4',
                      'Model' => '#a4a400',
@@ -76,17 +117,12 @@ module ISAHelper
         data['imageUrl'] = asset_path(avatar)
         data['url'] = item.is_a?(Seek::ObjectAggregation) ? polymorphic_path([item.object, item.type]) : polymorphic_path(item)
 
-        if item.is_a?(Assay) # distinquish two assay classes
-          assay_class_title = item.assay_class.title
-          assay_class_key = item.assay_class.key
-          data['type'] = assay_class_title
-          data['faveColor'] = FILL_COLOURS[item_type][assay_class_key] || FILL_COLOURS.default
-          data['borderColor'] = BORDER_COLOURS[item_type][assay_class_key] || BORDER_COLOURS.default
-        else
-          data['type'] = item_type.humanize
-          data['faveColor'] = FILL_COLOURS[item_type] || FILL_COLOURS.default
-          data['borderColor'] = BORDER_COLOURS[item_type] || BORDER_COLOURS.default
-        end
+        colour_type = item.class.name
+        colour_type = item.type.to_s.singularize.capitalize if item.is_a?(Seek::ObjectAggregation)
+        colour_type = "#{item.class.name}-#{item.assay_class.key}" if item.is_a?(Assay)
+        data['type'] = item.is_a?(Assay) ? item.assay_class.title : item_type.humanize
+        data['faveColor'] = FILL_COLOURS[colour_type] || FILL_COLOURS.default
+        data['borderColor'] = BORDER_COLOURS[colour_type] || BORDER_COLOURS.default
       else
         data['name'] = 'Hidden item'
         data['fullName'] = data['name']

@@ -40,7 +40,7 @@ var ISA = {
                     css: {
                         'shape': 'roundrectangle',
                         'border-color': 'data(borderColor)',
-                        'border-width': 1,
+                        'border-width': 0,
                         'das': 'mapData(weight, 40, 80, 20, 60)',
                         'content': 'data(name)',
                         'text-valign': 'center',
@@ -66,7 +66,7 @@ var ISA = {
                     css: {
                         'shape': 'roundrectangle',
                         'border-color': 'data(borderColor)',
-                        'border-width': 1,
+                        'border-width': 0,
                         'das': 'mapData(weight, 40, 80, 20, 60)',
                         'content': 'data(name)',
                         'text-valign': 'center',

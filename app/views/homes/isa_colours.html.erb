@@ -1,0 +1,56 @@
+<style>
+  .isa_block {
+    width: 200px;
+    height: 65px;
+    border-radius: 6px;
+    border: 2px solid #ccc;
+    display: inline-block;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    line-height: 60px;
+    background-color: #8ee5ee;
+  }
+
+  .new-colours {
+    border: 0px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .old-colours {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<% types = [Programme, Project, Investigation, Study, Assay, Publication, DataFile, Document, Model, Sop, Sample, Presentation, Event].map(&:name) %>
+<div class="row">
+  <div class="col-md-6">
+    <h2>Old</h2>
+    <% types.each do |type| %>
+      <% a = [{ type: type, style: ISAHelper::OLD_FILL_COLOURS[type] }] %>
+      <% if type == 'Assay' %>
+        <% a = [{ type: 'Assay (Experimental)', style: ISAHelper::OLD_FILL_COLOURS['Assay-EXP'] },
+                { type: 'Assay (Modelling)', style: ISAHelper::OLD_FILL_COLOURS['Assay-MODEL'] }] %>
+      <% end %>
+      <% a.each do |x| %>
+        <div class="isa_block old-colours" style="background-color: <%= x[:style] -%>;">
+          <%= x[:type].titleize %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+  <div class="col-md-6">
+    <h2>New</h2>
+    <% types.each do |type| %>
+      <% a = [{ type: type, style: ISAHelper::NEW_FILL_COLOURS[type] }] %>
+      <% if type == 'Assay' %>
+        <% a = [{ type: 'Assay (Experimental)', style: ISAHelper::NEW_FILL_COLOURS['Assay-EXP'] },
+                { type: 'Assay (Modelling)', style: ISAHelper::NEW_FILL_COLOURS['Assay-MODEL'] }] %>
+      <% end %>
+      <% a.each do |x| %>
+        <div class="isa_block new-colours" style="background-color: <%= x[:style] -%>;">
+          <%= x[:type].titleize %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
