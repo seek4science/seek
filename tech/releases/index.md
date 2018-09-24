@@ -11,6 +11,18 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html) 
 
+## Version 1.6.3
+
+Release date: _August 21st 2018_
+
+  * Fix to prevent users flagged as having left a project being able to access items shared with that project 
+  (they can still access their own items, or items also shared within them in other ways)
+  * Fix to an error occuring when a large number of Documents are associated with an Assay
+  * Fix to manually adding an organism manually through its NCBI ID, when the ID URL is provided with surrounding spaces.
+
+
+A full list of changes included in this release can be found in the [SEEK v1.6.3 release notes](release-notes-1.6.3.html).
+
 ## Version 1.6.2
 
 Release date: _July 5th 2018_

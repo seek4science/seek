@@ -1,7 +1,9 @@
 language: ruby
 
-rvm:
-  - 2.4.0
+addons:
+  apt:
+    packages:
+    - libcurl4-openssl-dev
 
 sudo: false
 

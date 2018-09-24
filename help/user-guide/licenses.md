@@ -18,7 +18,7 @@ This short video gives a good introduction of the benefits of licensing your dat
 ## Recommended
 
 The following licenses are recommended by [Open Knowledge](https://okfn.org/) due to their compatibility with
-other licenses and widespread use. See [http://opendefinition.org/licenses/](http://opendefinition.org/licenses/)
+other licenses and widespread use. See [https://opendefinition.org/licenses/](https://opendefinition.org/licenses/)
 for more information.
 
 <table>
@@ -38,13 +38,13 @@ for more information.
         <td>Creative Commons Attribution Share-Alike 4.0</td><td><a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">https://creativecommons.org/licenses/by-sa/4.0/</a></td>
     </tr>
     <tr>
-        <td>Open Data Commons Attribution License 1.0</td><td><a href="http://www.opendefinition.org/licenses/odc-by" target="_blank">http://www.opendefinition.org/licenses/odc-by</a></td>
+        <td>Open Data Commons Attribution License 1.0</td><td><a href="https://opendefinition.org/licenses/odc-by" target="_blank">https://opendefinition.org/licenses/odc-by</a></td>
     </tr>
     <tr>
-        <td>Open Data Commons Open Database License 1.0</td><td><a href="http://www.opendefinition.org/licenses/odc-odbl" target="_blank">http://www.opendefinition.org/licenses/odc-odbl</a></td>
+        <td>Open Data Commons Open Database License 1.0</td><td><a href="https://opendefinition.org/licenses/odc-odbl" target="_blank">https://opendefinition.org/licenses/odc-odbl</a></td>
     </tr>
     <tr>
-        <td>Open Data Commons Public Domain Dedication and Licence 1.0</td><td><a href="http://www.opendefinition.org/licenses/odc-pddl" target="_blank">http://www.opendefinition.org/licenses/odc-pddl</a></td>
+        <td>Open Data Commons Public Domain Dedication and Licence 1.0</td><td><a href="https://opendefinition.org/licenses/odc-pddl" target="_blank">https://opendefinition.org/licenses/odc-pddl</a></td>
     </tr>
 </tbody>
 </table>
@@ -64,7 +64,7 @@ These additional licenses are also available to be used in SEEK.
         <td>Academic Free License 3.0</td><td><a href="http://www.opensource.org/licenses/AFL-3.0" target="_blank">http://www.opensource.org/licenses/AFL-3.0</a></td>
     </tr>
     <tr>
-        <td>Against DRM</td><td><a href="https://www.opendefinition.org/licenses/against-drm" target="_blank">https://www.opendefinition.org/licenses/against-drm</a></td>
+        <td>Against DRM</td><td><a href="https://opendefinition.org/licenses/against-drm" target="_blank">https://opendefinition.org/licenses/against-drm</a></td>
     </tr>
     <tr>
         <td>Creative Commons Attribution-NonCommercial 4.0</td><td><a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">https://creativecommons.org/licenses/by-nc/4.0/</a></td>
