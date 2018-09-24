@@ -10,7 +10,7 @@ module DashboardsHelper
         end + title
       end +
       content_tag(:div, class: 'panel-body') do
-        yield
+        yield if block_given?
       end
     end
   end
