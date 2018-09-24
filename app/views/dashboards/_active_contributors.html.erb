@@ -3,9 +3,9 @@
   <% assets = project_assets.group_by(&:contributor) %>
   <% assets.each_key { |cont| assets[cont] = assets[cont].length } %>
   <% a = assets.to_a.sort_by { |x| -x[1] }.first(10) %>
-  <ul>
+  <ul class="mini-resource-list">
     <% a.reject { |c,_| c.nil? }.each do |contributor, asset_count| %>
-      <li><%= link_to(contributor.name, contributor, target: :_blank) %> (<%= asset_count -%>)</li>
+      <li><%= resource_with_count(contributor, asset_count) %></li>
     <% end %>
   </ul>
 <% end %>

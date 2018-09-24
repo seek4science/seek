@@ -3,10 +3,10 @@
       group(:activity_loggable_type, :activity_loggable_id).count.to_a.
       select { |(type, id), views| type.constantize.find_by_id(id)}.
       sort_by { |x| -x[1] }.first(10) %>
-  <ul>
+  <ul class="mini-resource-list">
     <% most_viewed.each do |(type, id), views| %>
       <% asset = type.constantize.find(id) %>
-      <li><%= link_to(asset.title, asset, target: :_blank) %> (<%= views -%>)</li>
+      <li><%= resource_with_count(asset, views) %></li>
     <% end %>
   </ul>
 <% end %>
