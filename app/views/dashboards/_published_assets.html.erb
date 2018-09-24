@@ -2,6 +2,8 @@
 
 <% assets = @project.assets %>
 <% published_count = assets.count { |a| a.is_published? } %>
+<% private_count = assets.count { |a| a.private? } %>
+<% misc_permissions = assets.count - (published_count + private_count) %>
 <script>
     var config = {
         type: 'pie',
@@ -9,17 +11,20 @@
             datasets: [{
                 data: [
                     <%= published_count %>,
-                    <%= assets.count - published_count %>
+                    <%= misc_permissions %>,
+                    <%= private_count %>
                 ],
                 backgroundColor: [
-                    '#80ff64',
+                    '#a6ff6a',
+                    '#ffe46e',
                     '#ff8a60'
                 ],
                 label: 'Dataset 1'
             }],
             labels: [
                 'Published',
-                'Not published'
+                'Restricted',
+                'Private'
             ]
         },
         options: {
