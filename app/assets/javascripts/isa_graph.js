@@ -39,7 +39,8 @@ var ISA = {
                     selector: 'node.resource',
                     css: {
                         'shape': 'roundrectangle',
-                        'border-color': 'data(borderColor)',
+                        'border-color': '#000',
+                        'border-opacity': 0.2,
                         'border-width': 0,
                         'das': 'mapData(weight, 40, 80, 20, 60)',
                         'content': 'data(name)',
@@ -65,7 +66,8 @@ var ISA = {
                     selector: 'node.resource-small',
                     css: {
                         'shape': 'roundrectangle',
-                        'border-color': 'data(borderColor)',
+                        'border-color': '#000',
+                        'border-opacity': 0.2,
                         'border-width': 0,
                         'das': 'mapData(weight, 40, 80, 20, 60)',
                         'content': 'data(name)',
