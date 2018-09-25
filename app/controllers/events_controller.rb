@@ -74,7 +74,7 @@ class EventsController < ApplicationController
     params.require(:event).permit(:title, :description, :start_date, :end_date, :url, :address, :city, :country,
                                   { project_ids: [] }, { publication_ids: [] }, { presentation_ids: [] },
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                  { data_file_ids: [] }, { publication_ids: [] })
+                                  { data_file_ids: [] },{document_ids: []}, { publication_ids: [] })
   end
 
   def param_converter_options

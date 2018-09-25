@@ -210,7 +210,7 @@ module Seek
         }
       when Event
         {
-          parents: %i[presentations publications data_files]
+          parents: %i[presentations publications data_files documents]
         }
       else
         {}
