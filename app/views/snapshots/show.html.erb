@@ -58,6 +58,9 @@
     <%= render partial: 'snapshots/snapshots', locals: { snapshots: @resource.snapshots,
                                                          selected: @snapshot,
                                                          resource: @resource } %>
-    <%= render partial: 'assets/usage_info_box', locals: { resource: @snapshot } -%>
+    <%#logging for snapshots didnt start until ~september (dates will vary depending on update time, but is to give a rough indication only) %>
+    <%= render partial: 'assets/usage_info_box', locals: { resource: @snapshot,
+                                                           logging_start_date: Date.parse('01-09-2018')  }
+    -%>
   </div>
 </div>

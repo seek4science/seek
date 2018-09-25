@@ -1,33 +1,41 @@
 <%
-   show_downloads = resource.respond_to?(:contains_downloadable_items?) && resource.contains_downloadable_items?
+  logging_start_date ||= nil
+  show_downloads = resource.respond_to?(:contains_downloadable_items?) && resource.contains_downloadable_items?
 %>
 
 <%= panel("Activity") do %>
 
-    <p id="usage_count">
-      <strong>Views:</strong> <%= resource.view_count -%>
-      <% if show_downloads -%>
-          <span style="width: 2em">&nbsp;</span>
-          <strong>Downloads:</strong> <%= resource.download_count -%>
-      <% end -%>
+  <p id="usage_count">
+    <strong>Views:</strong> <%= resource.view_count -%>
+    <% if show_downloads -%>
+      <span style="width: 2em">&nbsp;</span>
+      <strong>Downloads:</strong> <%= resource.download_count -%>
+    <% end -%>
+  </p>
+
+  <div id="usage_timestamps">
+
+    <p>
+      <strong>Created</strong>: <%= date_as_string(resource.created_at, true) -%>
     </p>
-
-    <div id="usage_timestamps">
-
+    <% unless resource.created_at == resource.updated_at -%>
       <p>
-        <strong>Created</strong>: <%= date_as_string(resource.created_at, true) -%>
+        <strong>Last updated</strong>: <%= date_as_string(resource.updated_at, true) -%>
       </p>
-      <% unless resource.created_at == resource.updated_at -%>
-          <p>
-            <strong>Last updated</strong>: <%= date_as_string(resource.updated_at, true) -%>
-          </p>
-      <% end -%>
+    <% end -%>
 
-      <% unless @last_used_before_now.blank? -%>
-          <p>
-          <strong>Last used</strong>: <%= date_as_string(@last_used_before_now, true) -%>
-          </p>
-      <% end -%>
-    </div>
+    <% unless @last_used_before_now.blank? -%>
+      <p>
+        <strong>Last used</strong>: <%= date_as_string(@last_used_before_now, true) -%>
+      </p>
+    <% end -%>
+  </div>
+
+  <%# for items created before we started collecting logs %>
+  <% if logging_start_date && @resource.created_at <= logging_start_date %>
+    <p id="logging_started">
+      (Since <%= logging_start_date.strftime('%B %Y') %>)
+    </p>
+  <% end %>
 
 <% end %>
