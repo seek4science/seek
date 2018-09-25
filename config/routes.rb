@@ -232,6 +232,7 @@ SEEK::Application.routes.draw do
     resource :dashboard, only: [:show] do
       collection do
         get :stats
+        get :contributions
       end
     end
   end

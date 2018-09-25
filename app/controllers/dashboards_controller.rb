@@ -13,6 +13,15 @@ class DashboardsController < ApplicationController
     render partial: "dashboards/#{params[:query]}"
   end
 
+  def contributions
+    @start_date = Date.parse(params[:start_date])
+    @interval = params[:interval] || 'months'
+
+    respond_to do |format|
+      format.json
+    end
+  end
+
   private
 
   def find_project

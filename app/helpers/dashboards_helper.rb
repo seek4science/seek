@@ -26,16 +26,31 @@ module DashboardsHelper
     end
   end
 
-  def months_between(start_date, end_date)
-    start_month = Date.parse("#{start_date.strftime('%Y-%m')}-01")
-    end_month = Date.parse("#{end_date.strftime('%Y-%m')}-01")
-    month = start_month
-    a = []
-    while month <= end_month
-      a << month
-      month = month >> 1 # Add one month
+  def dates_between(start_date, end_date, interval = 'month')
+    case interval
+    when 'year'
+      transform = -> (date) { Date.parse("#{date.strftime('%Y')}-01-01") }
+      increment = -> (date) { date >> 12 }
+    when 'month'
+      transform = -> (date) { Date.parse("#{date.strftime('%Y-%m')}-01") }
+      increment = -> (date) { date >> 1 }
+    when 'day'
+      transform = -> (date) { date }
+      increment = -> (date) { date + 1 }
+    else
+      raise 'Invalid interval. Valid intervals: year, month, day'
     end
 
-    a
+    start_date = transform.call(start_date)
+    end_date = transform.call(end_date)
+    date = start_date
+    dates = []
+
+    while date <= end_date
+      dates << date
+      date = increment.call(date)
+    end
+
+    dates
   end
 end
