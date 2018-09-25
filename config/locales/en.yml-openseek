@@ -16,6 +16,9 @@ en:
   document: "Document"
   model: "Model"
   sop: "SOP"
+  workflow: "Workflow"
+  workflows:
+    workflow: "Workflow"
   publication: "Publication"
   presentation: "Presentation"
   event: "Event"

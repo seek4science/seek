@@ -1,0 +1,37 @@
+<h1>New <%= t('workflow') %></h1>
+
+<%= form_tag({:action => :create}, :multipart => true) do -%>
+    <div class="asset_form">
+      <%= error_messages_for :workflow -%>
+
+      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@workflow} -%>
+
+      <div class="form-group">
+        <label>Title <span class="required">*</span></label>
+        <% workflow_title_value = (params[:workflow].blank? || params[:workflow][:title].blank?) ? nil : params[:workflow][:title] -%>
+        <%= text_field_tag 'workflow[title]', workflow_title_value, :class=>"form-control" -%>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <% workflow_description_value = (params[:workflow].blank? || params[:workflow][:description].blank?) ? nil : params[:workflow][:description] -%>
+        <%= text_area_tag 'workflow[description]', workflow_description_value, :class=>"form-control" -%>
+      </div>
+
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @workflow, :allow_nil => Seek::Config.is_virtualliver } -%>
+
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @workflow } %>
+
+      <%= fields_for(@workflow) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
+
+      <%= render :partial => "assays/associate_assays", :locals=>{:resource => @workflow} -%>
+
+      <div>
+        <%= preview_permission_popup_link(@workflow)-%>
+        <%= create_button :id => "workflow_submit_btn",
+                       :onclick => "validateResourceFields(true,'workflow',true); return(false);",
+                       :class => 'btn btn-primary' -%>
+        or <%= cancel_button(workflows_path) -%>
+      </div>
+    </div>
+<% end -%>

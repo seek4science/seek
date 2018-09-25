@@ -38,7 +38,7 @@
         <% end -%>
 
         <% if display_asset.single_content_blob && !display_asset.single_content_blob.show_as_external_link? %>
-            <%= view_content_button display_asset %>
+             <%= view_content_button display_asset %>
         <%   end -%>
     <% end -%>
     <% if logged_in? && !can_download_asset?(asset, params[:code]) %>

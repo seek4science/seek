@@ -28,6 +28,8 @@ class ContentBlobsController < ApplicationController
   def view_content
     if @content_blob.is_text?
       view_text_content
+    elsif @content_blob.is_cwl?
+      view_text_content
     else
       @pdf_url = pdf_url
       render action: :view_pdf_content, layout: false

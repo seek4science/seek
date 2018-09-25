@@ -1,4 +1,4 @@
-class SopsController < ApplicationController
+class WorkflowsController < ApplicationController
   
   include Seek::IndexPager
 
@@ -21,55 +21,48 @@ class SopsController < ApplicationController
 
 
       respond_to do |format|
-        if @sop.save_as_new_version(comments)
+        if @workflow.save_as_new_version(comments)
 
-          #Duplicate experimental conditions
-          conditions = @sop.find_version(@sop.version - 1).experimental_conditions
-          conditions.each do |con|
-            new_con = con.dup
-            new_con.sop_version = @sop.version
-            new_con.save
-          end
-          flash[:notice]="New version uploaded - now on version #{@sop.version}"
+          flash[:notice]="New version uploaded - now on version #{@workflow.version}"
         else
           flash[:error]="Unable to save new version"          
         end
-        format.html {redirect_to @sop }
+        format.html {redirect_to @workflow }
       end
     else
       flash[:error]=flash.now[:error] 
-      redirect_to @sop
+      redirect_to @workflow
     end
-    /workflows/new
+    
   end
 
-  # PUT /sops/1
+  # PUT /Workflows/1
   def update
-    update_annotations(params[:tag_list], @sop) if params.key?(:tag_list)
-    update_sharing_policies @sop
-    update_relationships(@sop,params)
+    update_annotations(params[:tag_list], @workflow) if params.key?(:tag_list)
+    update_sharing_policies @workflow
+    update_relationships(@workflow,params)
 
     respond_to do |format|
-      if @sop.update_attributes(sop_params)
-        flash[:notice] = "#{t('sop')} metadata was successfully updated."
-        format.html { redirect_to sop_path(@sop) }
-        format.json { render json: @sop }
+      if @workflow.update_attributes(workflow_params)
+        flash[:notice] = "#{t('Workflow')} metadata was successfully updated."
+        format.html { redirect_to workflow_path(@workflow) }
+        format.json { render json: @workflow }
       else
         format.html { render action: 'edit' }
-        format.json { render json: json_api_errors(@sop), status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@workflow), status: :unprocessable_entity }
       end
     end
   end
 
   private
 
-  def sop_params
-    params.require(:sop).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
+  def workflow_params
+    params.require(:workflow).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                 { publication_ids: [] })
   end
 
-  alias_method :asset_params, :sop_params
+  alias_method :asset_params, :workflow_params
 
 end

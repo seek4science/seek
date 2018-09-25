@@ -95,7 +95,7 @@ module Seek
 
     def self.inline_viewable_content_types
       # FIXME: needs to be discovered rather than hard-code classes here
-      [DataFile, Document, Model, Presentation, Sop]
+      [DataFile, Document, Model, Presentation, Sop, Workflow]
     end
 
     def self.multi_files_asset_types
