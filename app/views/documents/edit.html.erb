@@ -27,6 +27,8 @@
           <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
 
           <%= render :partial => "assays/associate_assays", :locals=>{:resource => @document} -%>
+sdfsdf
+          <%= fancy_multiselect @document, :events, { other_projects_checkbox: true } if Seek::Config.events_enabled %>
       <% end -%>
 
       <div>

@@ -13,8 +13,22 @@ class Document < ActiveRecord::Base
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, -> (r) { where('content_blobs.asset_version = ?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
-  has_and_belongs_to_many :events
-  before_destroy {events.clear}
+  if Seek::Config.events_enabled
+    has_and_belongs_to_many :events
+    before_destroy {events.clear}
+  else
+    def events
+      []
+    end
+
+    def event_ids
+      []
+    end
+
+    def event_ids= events_ids
+
+    end
+  end
 
   explicit_versioning(:version_column => "version") do
     acts_as_doi_mintable(proxy: :parent)
