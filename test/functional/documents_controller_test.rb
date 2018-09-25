@@ -112,6 +112,20 @@ class DocumentsControllerTest < ActionController::TestCase
 
   end
 
+  test 'should not create event with link to none visible event' do
+    person = Factory(:person)
+    login_as(person)
+
+    event = Factory(:event)
+    refute event.can_view?
+
+    assert_no_difference('Document.count') do
+      post :create, document: { title: 'Document', project_ids: [person.projects.first.id],event_ids:[event.id.to_s]},
+           content_blobs: [valid_content_blob], policy_attributes: valid_sharing
+    end
+
+  end
+
   test 'should update document' do
     person = Factory(:person)
     document = Factory(:document, contributor: person)

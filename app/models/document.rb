@@ -16,6 +16,7 @@ class Document < ActiveRecord::Base
   if Seek::Config.events_enabled
     has_and_belongs_to_many :events
     before_destroy {events.clear}
+    enforce_authorization_on_association :events, :view
   else
     def events
       []

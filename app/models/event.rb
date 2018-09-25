@@ -6,6 +6,8 @@ class Event < ActiveRecord::Base
 
   before_destroy {documents.clear}
 
+  enforce_authorization_on_association :documents, :view
+
   include Seek::Subscribable
   include Seek::Search::CommonFields
   include Seek::Search::BackgroundReindexing

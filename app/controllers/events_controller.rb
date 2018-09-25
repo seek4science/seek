@@ -57,7 +57,7 @@ class EventsController < ApplicationController
     update_sharing_policies @event
 
     respond_to do | format |
-      if @event.update_attributes(event_params)
+      if @event.update(event_params) && @event.save
         flash.now[:notice] = "#{t('event')} was updated successfully." if flash.now[:notice].nil?
         format.html { redirect_to @event }
         format.json { render json: @event }

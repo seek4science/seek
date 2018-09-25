@@ -177,11 +177,31 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test 'link to events' do
-    doc = Factory(:document)
-    assert_empty doc.events
-    event = Factory(:event)
-    doc = Factory(:document, events:[event])
-    refute_empty doc.events
-    assert_equal [event],doc.events
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      doc = Factory(:document, contributor:person)
+      assert_empty doc.events
+      event = Factory(:event, contributor:person)
+      doc = Factory(:document, events:[event], contributor:person)
+      refute_empty doc.events
+      assert_equal [event],doc.events
+    end
+  end
+
+  test 'fails to link to none visible events' do
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      event = Factory(:event)
+      refute event.can_view?
+      doc = Factory.build(:document,events:[event], contributor:person)
+
+      refute doc.save
+
+      doc = Factory(:document, contributor:person)
+
+      doc.events << event
+
+      refute doc.save
+    end
   end
 end

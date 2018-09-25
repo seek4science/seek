@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class EventsControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
   include RestTestCases
   include GeneralAuthorizationTestCases
@@ -128,8 +129,8 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   # test "should not add invisible data_file" do
-  #  e = Factory :event, :contributor => User.current_user
-  #  df = Factory :data_file, :contributor => Factory(:user), :policy => Factory(:private_policy)
+  #  e = Factory :event, :contributor => User.current_user.person
+  #  df = Factory :data_file, :contributor => Factory(:person), :policy => Factory(:private_policy)
   #  put :update, :id => e.id, :data_file_ids => ["#{df.id}"], :event => {}
   #
   #  assert_redirected_to e
@@ -195,6 +196,16 @@ class EventsControllerTest < ActionController::TestCase
     assert_equal [doc],event.documents
   end
 
+  test 'should not create event with link to none visible document' do
+    doc = Factory(:document)
+    refute doc.can_view?
+
+    assert_no_difference('Event.count') do
+      post :create, event: valid_event.merge(document_ids: [doc.id.to_s]), sharing: valid_sharing
+    end
+
+  end
+
   test 'should update with link to document' do
     person = User.current_user.person
     doc = Factory(:document, contributor:person)
@@ -205,5 +216,6 @@ class EventsControllerTest < ActionController::TestCase
     assert event = assigns(:event)
     assert_equal [doc],event.documents
   end
+
 
 end
