@@ -410,7 +410,10 @@ div.isa_graph {
 a.remove-association {
   text-decoration: none;
   font-weight: bold;
-  font-size: 21px;
+  font-size: 20px;
+  vertical-align: middle;
+  padding-top: 3px;
+  display:inline-block;
   color: $brand-danger;
   &:hover {
     text-decoration: none;
@@ -572,16 +575,6 @@ img.avatar-corner-icon {
     &:hover {
       cursor: pointer;
     }
-  }
-}
-
-a.remove-button {
-  text-decoration: none;
-  font-weight: bold;
-  vertical-align: text-top;
-  color: $brand-danger;
-  &:hover {
-    text-decoration: none;
   }
 }
 
