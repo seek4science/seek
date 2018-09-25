@@ -1,24 +1,54 @@
+<div class="form-group">
+  <select class="form-control" autocomplete="off" id="contributions-range-select">
+    <option value="recent" selected="selected">last 12 months</option>
+    <option value="all">since project began</option>
+  </select>
+</div>
+
 <canvas id="contributions-canvas"></canvas>
 
-<% assets = (@project.assets + @project.investigations + @project.studies + @project.assays + @project.samples).select { |a| a.created_at > 12.months.ago } %>
-<% by_month = assets.group_by { |a| a.created_at.strftime('%B') } %>
-<% by_type = assets.group_by { |a| a.class } %>
+<p class="help-block">
+  Mouse over a bar to see the breakdown of contributions for that month.
+  Clicking on a type in the legend will hide it from the chart.
+</p>
+
+<% all_assets = (@project.investigations + @project.studies + @project.assays + @project.assets + @project.samples) %>
+<% all_by_month = all_assets.group_by { |a| a.created_at.strftime('%B %Y') } %>
+<% all_types = all_assets.map(&:class).uniq %>
+<% all_months = months_between(@project.created_at, Date.today) %>
+<% recent_assets = all_assets.select { |a| a.created_at > 12.months.ago } %>
+<% recent_by_month = recent_assets.group_by { |a| a.created_at.strftime('%B %Y') } %>
+<% recent_types = recent_assets.map(&:class).uniq %>
+<% recent_months = months_between(1.year.ago, Date.today) %>
 <script>
-    var barChartData = {
-        labels: <%= by_month.keys.to_json.html_safe %>,
-        datasets: <%= by_type.keys.map do |type|
+    var allTimeData = {
+        labels: <%= all_months.map { |d| d.strftime('%B %Y') }.to_json.html_safe %>,
+        datasets: <%= all_types.map do |type|
         {
             label: type.name.humanize,
             backgroundColor: ISAHelper::FILL_COLOURS[type.name],
-            data: by_month.to_a.map { |month, assets| assets.select { |a| a.class == type }.count }
+            data: all_months.map { |month| (all_by_month[month.strftime('%B %Y')] || []).select { |a| a.class == type }.count }
+        }
+        end.to_json.html_safe %>
+    };
+    var recentData = {
+        labels: <%= recent_months.map { |d| d.strftime('%B %Y') }.to_json.html_safe %>,
+        datasets: <%= recent_types.map do |type|
+        {
+            label: type.name.humanize,
+            backgroundColor: ISAHelper::FILL_COLOURS[type.name],
+            data: recent_months.map { |month| (recent_by_month[month.strftime('%B %Y')] || []).select { |a| a.class == type }.count }
         }
         end.to_json.html_safe %>
     };
     var ctx = document.getElementById('contributions-canvas').getContext('2d');
-    var myBar = new Chart(ctx, {
+    var contributionChart = new Chart(ctx, {
         type: 'bar',
-        data: barChartData,
+        data: recentData,
         options: {
+            legend: {
+                position: 'right'
+            },
             title: {
                 display: false,
                 text: 'Contributions'
@@ -47,4 +77,14 @@
             }
         }
     });
+
+    $j('#contributions-range-select').change(function () {
+        if ($j(this).val() == 'recent') {
+            contributionChart.data = recentData;
+        } else if ($j(this).val() == 'all') {
+            contributionChart.data = allTimeData;
+        }
+
+        contributionChart.update();
+    })
 </script>

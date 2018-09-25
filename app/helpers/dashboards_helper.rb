@@ -25,4 +25,17 @@ module DashboardsHelper
       content_tag(:span, count, class: 'mini-resource-list-count')
     end
   end
+
+  def months_between(start_date, end_date)
+    start_month = Date.parse("#{start_date.strftime('%Y-%m')}-01")
+    end_month = Date.parse("#{end_date.strftime('%Y-%m')}-01")
+    month = start_month
+    a = []
+    while month <= end_month
+      a << month
+      month = month >> 1 # Add one month
+    end
+
+    a
+  end
 end
