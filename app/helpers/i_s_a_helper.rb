@@ -1,71 +1,37 @@
-
-
 require 'tempfile'
 
 module ISAHelper
-  OLD_FILL_COLOURS = { 'Sop' => '#7ac5cd', # cadetblue3
-                       'Model' => '#cdcd00', # yellow3
-                       'DataFile' => '#eec591', # burlywood2
-                       'Investigation' => '#E6E600',
-                       'Study' => '#B8E62E',
-                       'Assay' =>'#64b466',
-                       'Assay-EXP' => '#64b466',
-                       'Assay-MODEL' => '#92CD00',
-                       'Publication' => '#84B5FD',
-                       'Presentation' => '#8ee5ee', # cadetblue2
-                       'HiddenItem' => '#d3d3d3' } # lightgray
-
-  NEW_FILL_COLOURS2 = {
-      'Programme' => '#90a8ff',
-      'Project' => '#85d6ff',
-      'Investigation' => '#ff918e',
-      'Study' => '#ffea4e',
-      'Assay' => '#7adb38',
-      'Assay-EXP' => '#7adb38',
-      'Assay-MODEL' => '#7cef88',
-      'Publication' => '#cbb8ff',
-      'DataFile' => '#ffc382',
-      'Document' => '#d3d0ff',
-      'Model' => '#fff8ac',
-      'Sop' => '#cce5ff',
-      'Sample' => '#fff2d5',
-      'Presentation' => '#ffb2e4',
-      'Event' => '#e6acfc'
-  }
-
-  NEW_FILL_COLOURS = {
-      'Programme' => '#90a8ff',
-      'Project' => '#85d6ff',
+  OLD_FILL_COLOURS = {
+      'Sop' => '#7AC5CD', # cadetblue3
+      'Model' => '#CDCD00', # yellow3
+      'DataFile' => '#EEC591', # burlywood2
       'Investigation' => '#E6E600',
       'Study' => '#B8E62E',
-      'Assay' =>'#64b466',
-      'Assay-EXP' => '#64b466',
-      'Assay-MODEL' => '#92CD00',
-      'Publication' => '#cbb8ff',
-      'DataFile' => '#ffc382',
-      'Document' => '#d5c8a8',
-      'Model' => '#fff8ac',
-      'Sop' => '#cce5ff',
-      'Sample' => '#fff2d5',
-      'Presentation' => '#ffb2e4',
-      'Event' => '#ff918e'
+      'Assay' =>'#64B466',
+      'Publication' => '#84B5FD',
+      'Presentation' => '#8EE5EE', # cadetblue2
+      'HiddenItem' => '#D3D3D3'
+  } # lightgray
+
+  NEW_FILL_COLOURS = {
+      'Programme' => '#90A8FF',
+      'Project' => '#85D6FF',
+      'Investigation' => '#D6FF00',
+      'Study' => '#96ED29',
+      'Assay' =>'#52D155',
+      'Publication' => '#CBB8FF',
+      'DataFile' => '#FFC382',
+      'Document' => '#D5C8A8',
+      'Model' => '#F9EB57',
+      'Sop' => '#CCE5FF',
+      'Sample' => '#FFF2D5',
+      'Presentation' => '#FFB2E4',
+      'Event' => '#FF918E',
+      'HiddenItem' => '#D3D3D3'
   }
 
-
   FILL_COLOURS = NEW_FILL_COLOURS
-
-  BORDER_COLOURS = { 'Sop' => '#619da4',
-                     'Model' => '#a4a400',
-                     'DataFile' => '#be9d74',
-                     'Investigation' => '#9fba99',
-                     'Study' => '#74a06f',
-                     'Assay' => { 'EXP' => '#509051', 'MODEL' => '#74a400' },
-                     'Publication' => '#6990ca',
-                     'Presentation' => '#71b7be', # cadetblue2
-                     'HiddenItem' => '#a8a8a8' }
-
-  FILL_COLOURS.default = '#8ee5ee' # cadetblue2
-  BORDER_COLOURS.default = '#71b7be'
+  FILL_COLOURS.default = '#8EE5EE' # cadetblue2
 
   def cytoscape_elements(elements_hash)
     cytoscape_edge_elements(elements_hash) + cytoscape_node_elements(elements_hash)
@@ -116,20 +82,14 @@ module ISAHelper
         avatar = resource_avatar_path(item) || icon_filename_for_key("#{item.class.name.downcase}_avatar")
         data['imageUrl'] = asset_path(avatar)
         data['url'] = item.is_a?(Seek::ObjectAggregation) ? polymorphic_path([item.object, item.type]) : polymorphic_path(item)
-
-        colour_type = item.class.name
-        colour_type = item.type.to_s.singularize.capitalize if item.is_a?(Seek::ObjectAggregation)
-        colour_type = "#{item.class.name}-#{item.assay_class.key}" if item.is_a?(Assay)
         data['type'] = item.is_a?(Assay) ? item.assay_class.title : item_type.humanize
-        data['faveColor'] = FILL_COLOURS[colour_type] || FILL_COLOURS.default
-        data['borderColor'] = BORDER_COLOURS[colour_type] || BORDER_COLOURS.default
+        data['faveColor'] = FILL_COLOURS[item.is_a?(Seek::ObjectAggregation) ? item.type.to_s.singularize.capitalize : item.class.name] || FILL_COLOURS.default
       else
         data['name'] = 'Hidden item'
         data['fullName'] = data['name']
         data['type'] = 'Hidden'
         data['description'] = 'Hidden item'
-        data['faveColor'] = FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default
-        data['borderColor'] = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
+        data['faveColor'] = FILL_COLOURS['HiddenItem']
       end
 
       elements << if node == hash[:nodes].first
@@ -170,7 +130,7 @@ module ISAHelper
                             name: name,
                             source: source,
                             target: target,
-                            faveColor: BORDER_COLOURS.default },
+                            faveColor: FILL_COLOURS.default },
                     classes: 'resource-edge' }
     end
     elements
