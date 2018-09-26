@@ -23,6 +23,8 @@ class Snapshot < ActiveRecord::Base
   include Seek::ActsAsAsset::ContentBlobs::InstanceMethods
   include Seek::Stats::ActivityCounts
 
+  acts_as_favouritable
+
   def to_param
     snapshot_number.to_s
   end
