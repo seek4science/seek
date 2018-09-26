@@ -1,11 +1,17 @@
 <% cache "project_dashboard_#{@project.id}_active_contributors" do %>
-  <% project_assets = @project.assets %>
-  <% assets = project_assets.group_by(&:contributor) %>
-  <% assets.each_key { |cont| assets[cont] = assets[cont].length } %>
-  <% a = assets.to_a.sort_by { |x| -x[1] }.first(10) %>
+  <% active_contributor =
+         ActivityLog.
+             where(referenced_id: @project.id,
+                   referenced_type: 'Project',
+                   action: ['update', 'create']).
+             group(:culprit_type, :culprit_id).count.to_a.
+             select { |(type, id), _| type.constantize.find_by_id(id) rescue false }.
+             sort_by { |x| -x[1] }.
+             first(10) %>
   <ul class="mini-resource-list">
-    <% a.reject { |c,_| c.nil? }.each do |contributor, asset_count| %>
-      <li><%= resource_with_count(contributor, asset_count) %></li>
+    <% active_contributor.each do |(type, id), count| %>
+      <% person = type.constantize.find(id).person %>
+      <li><%= resource_with_count(person, count) %></li>
     <% end %>
   </ul>
 <% end %>
