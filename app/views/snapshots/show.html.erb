@@ -2,7 +2,7 @@
     <%= @snapshot.title -%>
     <small>(snapshot <%= @snapshot.snapshot_number -%>)</small>
 <% end %>
-<%= render :partial => "general/page_title", :locals => {:title => title, :buttons_partial => 'snapshots/buttons'} %>
+<%= render :partial => "general/item_title", :locals => {:item=>@snapshot, :buttons_partial => 'snapshots/buttons'} %>
 
 <div class="row">
   <div class="col-md-9 col-sm-8">
