@@ -1,29 +1,39 @@
-
-
 require 'tempfile'
 
 module ISAHelper
-  FILL_COLOURS = { 'Sop' => '#7ac5cd', # cadetblue3
-                   'Model' => '#cdcd00', # yellow3
-                   'DataFile' => '#eec591', # burlywood2
-                   'Investigation' => '#E6E600',
-                   'Study' => '#B8E62E',
-                   'Assay' => { 'EXP' => '#64b466', 'MODEL' => '#92CD00' },
-                   'Publication' => '#84B5FD',
-                   'Presentation' => '#8ee5ee', # cadetblue2
-                   'HiddenItem' => '#d3d3d3' } # lightgray
+  OLD_FILL_COLOURS = {
+      'Sop' => '#7AC5CD', # cadetblue3
+      'Model' => '#CDCD00', # yellow3
+      'DataFile' => '#EEC591', # burlywood2
+      'Investigation' => '#E6E600',
+      'Study' => '#B8E62E',
+      'Assay' =>'#64B466',
+      'Publication' => '#84B5FD',
+      'Presentation' => '#8EE5EE', # cadetblue2
+      'HiddenItem' => '#D3D3D3'
+  } # lightgray
 
-  BORDER_COLOURS = { 'Sop' => '#619da4',
-                     'Model' => '#a4a400',
-                     'DataFile' => '#be9d74',
-                     'Investigation' => '#9fba99',
-                     'Study' => '#74a06f',
-                     'Assay' => { 'EXP' => '#509051', 'MODEL' => '#74a400' },
-                     'Publication' => '#6990ca',
-                     'Presentation' => '#71b7be', # cadetblue2
-                     'HiddenItem' => '#a8a8a8' }
+  NEW_FILL_COLOURS = {
+      'Programme' => '#90A8FF',
+      'Project' => '#85D6FF',
+      'Investigation' => '#D6FF00',
+      'Study' => '#96ED29',
+      'Assay' =>'#52D155',
+      'Publication' => '#CBB8FF',
+      'DataFile' => '#FFC382',
+      'Document' => '#D5C8A8',
+      'Model' => '#F9EB57',
+      'Sop' => '#CCE5FF',
+      'Sample' => '#FFF2D5',
+      'Presentation' => '#FFB2E4',
+      'Event' => '#FF918E',
+      'HiddenItem' => '#D3D3D3'
+  }
 
-  FILL_COLOURS.default = '#8ee5ee' # cadetblue2
+  FILL_COLOURS = NEW_FILL_COLOURS
+  FILL_COLOURS.default = '#8EE5EE' # cadetblue2
+
+  BORDER_COLOURS = { }
   BORDER_COLOURS.default = '#71b7be'
 
   def cytoscape_elements(elements_hash)
@@ -75,25 +85,14 @@ module ISAHelper
         avatar = resource_avatar_path(item) || icon_filename_for_key("#{item.class.name.downcase}_avatar")
         data['imageUrl'] = asset_path(avatar)
         data['url'] = item.is_a?(Seek::ObjectAggregation) ? polymorphic_path([item.object, item.type]) : polymorphic_path(item)
-
-        if item.is_a?(Assay) # distinquish two assay classes
-          assay_class_title = item.assay_class.title
-          assay_class_key = item.assay_class.key
-          data['type'] = assay_class_title
-          data['faveColor'] = FILL_COLOURS[item_type][assay_class_key] || FILL_COLOURS.default
-          data['borderColor'] = BORDER_COLOURS[item_type][assay_class_key] || BORDER_COLOURS.default
-        else
-          data['type'] = item_type.humanize
-          data['faveColor'] = FILL_COLOURS[item_type] || FILL_COLOURS.default
-          data['borderColor'] = BORDER_COLOURS[item_type] || BORDER_COLOURS.default
-        end
+        data['type'] = item.is_a?(Assay) ? item.assay_class.title : item_type.humanize
+        data['faveColor'] = FILL_COLOURS[item.is_a?(Seek::ObjectAggregation) ? item.type.to_s.singularize.capitalize : item.class.name] || FILL_COLOURS.default
       else
         data['name'] = 'Hidden item'
         data['fullName'] = data['name']
         data['type'] = 'Hidden'
         data['description'] = 'Hidden item'
-        data['faveColor'] = FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default
-        data['borderColor'] = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
+        data['faveColor'] = FILL_COLOURS['HiddenItem']
       end
 
       elements << if node == hash[:nodes].first

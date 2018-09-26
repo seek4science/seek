@@ -2,7 +2,7 @@
     <%= @snapshot.title -%>
     <small>(snapshot <%= @snapshot.snapshot_number -%>)</small>
 <% end %>
-<%= render :partial => "general/page_title", :locals => {:title => title, :buttons_partial => 'snapshots/buttons'} %>
+<%= render :partial => "general/item_title", :locals => {:item=>@snapshot, :buttons_partial => 'snapshots/buttons'} %>
 
 <div class="row">
   <div class="col-md-9 col-sm-8">
@@ -58,6 +58,9 @@
     <%= render partial: 'snapshots/snapshots', locals: { snapshots: @resource.snapshots,
                                                          selected: @snapshot,
                                                          resource: @resource } %>
-    <%= render partial: 'assets/usage_info_box', locals: { resource: @snapshot } -%>
+    <%#logging for snapshots didnt start until ~september (dates will vary depending on update time, but is to give a rough indication only) %>
+    <%= render partial: 'assets/usage_info_box', locals: { resource: @snapshot,
+                                                           logging_start_date: Date.parse('01-09-2018')  }
+    -%>
   </div>
 </div>

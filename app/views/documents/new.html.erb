@@ -26,6 +26,8 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @document} -%>
 
+      <%= fancy_multiselect @document, :events, { other_projects_checkbox: true } if Seek::Config.events_enabled %>
+
       <div>
         <%= preview_permission_popup_link(@document)-%>
         <%= create_button :id => "document_submit_btn",

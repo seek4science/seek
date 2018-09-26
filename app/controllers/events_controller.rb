@@ -57,7 +57,7 @@ class EventsController < ApplicationController
     update_sharing_policies @event
 
     respond_to do | format |
-      if @event.update_attributes(event_params)
+      if @event.update(event_params) && @event.save
         flash.now[:notice] = "#{t('event')} was updated successfully." if flash.now[:notice].nil?
         format.html { redirect_to @event }
         format.json { render json: @event }
@@ -74,7 +74,7 @@ class EventsController < ApplicationController
     params.require(:event).permit(:title, :description, :start_date, :end_date, :url, :address, :city, :country,
                                   { project_ids: [] }, { publication_ids: [] }, { presentation_ids: [] },
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                  { data_file_ids: [] }, { publication_ids: [] })
+                                  { data_file_ids: [] },{document_ids: []}, { publication_ids: [] })
   end
 
   def param_converter_options

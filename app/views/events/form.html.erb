@@ -59,6 +59,8 @@
 
       <%= f.fancy_multiselect :presentations,:with_new_link=>true,:other_projects_checkbox=>true %>
 
+      <%= f.fancy_multiselect :documents, other_projects_checkbox: true %>
+
       <%
          button_text=@new ? "Create" : "Update"
          disabled_text=@new ? "Creating..." : "Updating..."

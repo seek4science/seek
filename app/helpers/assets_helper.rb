@@ -98,6 +98,8 @@ module AssetsHelper
   def show_resource_path(resource)
     if resource.class.name.include?('::Version')
       polymorphic_path(resource.parent, version: resource.version)
+    elsif resource.is_a?(Snapshot)
+      polymorphic_path([resource.resource,resource])
     else
       polymorphic_path(resource)
     end

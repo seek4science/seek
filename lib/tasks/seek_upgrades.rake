@@ -70,7 +70,7 @@ namespace :seek do
   end
 
   task(set_sample_type_contributors: :environment) do
-    SampleType.where('contributor_id IS NULL').each do |sample_type|
+    SampleType.where('contributor_id IS NULL AND deleted_contributor IS NULL').each do |sample_type|
       project_admins = sample_type.projects.collect(&:project_administrators).flatten.uniq
       unless project_admins.empty?
         #just take the first

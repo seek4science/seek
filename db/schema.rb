@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180919143203) do
+ActiveRecord::Schema.define(version: 20180924152253) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -586,6 +586,14 @@ ActiveRecord::Schema.define(version: 20180919143203) do
   end
 
   add_index "documents", ["contributor_id"], name: "index_documents_on_contributor", using: :btree
+
+  create_table "documents_events", id: false, force: :cascade do |t|
+    t.integer "document_id", limit: 4, null: false
+    t.integer "event_id",    limit: 4, null: false
+  end
+
+  add_index "documents_events", ["document_id", "event_id"], name: "index_documents_events_on_document_id_and_event_id", using: :btree
+  add_index "documents_events", ["event_id", "document_id"], name: "index_documents_events_on_event_id_and_document_id", using: :btree
 
   create_table "documents_projects", force: :cascade do |t|
     t.integer "document_id", limit: 4
