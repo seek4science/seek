@@ -58,7 +58,7 @@ class DocumentsController < ApplicationController
     params.require(:document).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                { publication_ids: [] })
+                                { publication_ids: [] }, { event_ids: [] })
   end
 
   alias_method :asset_params, :document_params

@@ -138,6 +138,7 @@ module HomesHelper
   end
 
   def convert_logs_to_hash(logs)
+    logs = logs.reject{|log| log.activity_loggable.is_a?(Snapshot)}
     logs.collect do |log|
       item = log.activity_loggable
       {
