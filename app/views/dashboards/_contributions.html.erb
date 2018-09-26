@@ -1,18 +1,38 @@
-<div class="form-group pull-right">
-  <select class="form-control" autocomplete="off" id="contributions-range-select">
-    <option value="<%= 1.months.ago.strftime('%Y-%m-%d') -%>">last month</option>
-    <option value="<%= 3.months.ago.strftime('%Y-%m-%d') -%>">last 3 months</option>
-    <option value="<%= 12.months.ago.strftime('%Y-%m-%d') -%>" selected="selected">last 12 months</option>
-    <option value="<%= @project.created_at.strftime('%Y-%m-%d') -%>">since project began</option>
-  </select>
+<div class="pull-right">
+  <a href="#" id="contributions-update-btn" class="btn btn-primary btn-sm" style="margin-left: 5px;">Update</a>
 </div>
-<div class="form-group pull-right">
-  <select class="form-control" autocomplete="off" id="contributions-interval-select">
-    <option value="year">by year</option>
-    <option value="month" selected="selected">by month</option>
-    <option value="day">by day</option>
-  </select>
+<div class="pull-right text-right">
+  <div class="form-inline">
+    <div class="form-group">
+      <label>Interval</label>
+      <select class="form-control input-sm" autocomplete="off" id="contributions-interval-select">
+        <option value="year">Year</option>
+        <option value="month" selected="selected">Month</option>
+        <option value="day">Day</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Range</label>
+      <select class="form-control input-sm" autocomplete="off" id="contributions-range-select">
+        <option value="<%= 1.months.ago.strftime('%Y-%m-%d') -%>">last month</option>
+        <option value="<%= 3.months.ago.strftime('%Y-%m-%d') -%>">last 3 months</option>
+        <option value="<%= 12.months.ago.strftime('%Y-%m-%d') -%>" selected="selected">last 12 months</option>
+        <option value="<%= @project.created_at.strftime('%Y-%m-%d') -%>">since project began</option>
+        <option value="custom">Custom range</option>
+      </select>
+    </div>
+    <br/>
+    <div class="form-group custom-range-field" style="display: none; margin-top: 5px;">
+      <label>Start</label>
+      <input id="contributions-range-start" size="8" type="text" class="form-control input-sm" value="<%= 1.month.ago.strftime('%Y-%m-%d')-%>">
+    </div>
+    <div class="form-group custom-range-field" style="display: none; margin-top: 5px;">
+      <label>End</label>
+      <input id="contributions-range-end" size="8" type="text" class="form-control input-sm" value="<%= Date.today.strftime('%Y-%m-%d')-%>">
+    </div>
+  </div>
 </div>
+
 
 <canvas id="contributions-canvas"></canvas>
 
@@ -22,6 +42,12 @@
 </p>
 
 <script>
+    $j('#contributions-range-start, #contributions-range-end').each(function () {
+        $j(this).datetimepicker({
+            format: 'YYYY-MM-DD'
+        });
+    });
+
     var ctx = document.getElementById('contributions-canvas').getContext('2d');
     var contributionChart = new Chart(ctx, {
         type: 'bar',
@@ -60,13 +86,18 @@
     });
 
     function getContributionStats() {
-        var startDate = $j('#contributions-range-select').val();
+        var startDate = $j('#contributions-range-start').val();
+        var endDate = $j('#contributions-range-end').val();
         var interval = $j('#contributions-interval-select').val();
 
         $j('#contributions-canvas').spinner('add');
 
         $j.ajax({ url: '<%= contributions_project_dashboard_path(@project) -%>',
-            data: { start_date: startDate, interval: interval },
+            data: {
+                start_date: startDate,
+                end_date: endDate,
+                interval: interval
+            },
             success: function (resp) {
                 contributionChart.data = resp;
                 contributionChart.update();
@@ -78,10 +109,20 @@
                 $j('#contributions-canvas').spinner('remove');
             }
         });
+
+        return false;
     }
 
-    $j('#contributions-range-select').change(getContributionStats);
-    $j('#contributions-interval-select').change(getContributionStats);
+    $j('#contributions-update-btn').click(getContributionStats);
+    $j('#contributions-range-select').change(function () {
+        if ($j(this).val() === 'custom') {
+            $j('.custom-range-field').fadeIn();
+        } else {
+            $j('.custom-range-field').fadeOut();
+            $j('#contributions-range-start').val($j(this).val());
+            $j('#contributions-range-end').val(new Date().toISOString().substr(0,10));
+        }
+    });
 
     getContributionStats();
 </script>

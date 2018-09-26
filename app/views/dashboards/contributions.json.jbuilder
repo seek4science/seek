@@ -7,10 +7,10 @@ strft = case @interval
           '%Y-%m-%d'
         end
 
-assets = (@project.investigations + @project.studies + @project.assays + @project.assets + @project.samples).select { |a| a.created_at > @start_date }
+assets = (@project.investigations + @project.studies + @project.assays + @project.assets + @project.samples).select { |a| a.created_at >= @start_date && a.created_at <= @end_date }
 date_grouped = assets.group_by { |a| a.created_at.strftime(strft) }
 types = assets.map(&:class).uniq
-dates = dates_between(@start_date, Date.today, @interval)
+dates = dates_between(@start_date, @end_date, @interval)
 
 json.labels dates.map { |d| d.strftime(strft) }
 json.datasets do

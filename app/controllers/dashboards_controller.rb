@@ -15,6 +15,7 @@ class DashboardsController < ApplicationController
 
   def contributions
     @start_date = Date.parse(params[:start_date])
+    @end_date = Date.parse(params[:end_date])
     @interval = params[:interval] || 'months'
 
     respond_to do |format|
