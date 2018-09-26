@@ -1,5 +1,3 @@
-
-
 require 'tempfile'
 
 module ISAHelper
@@ -87,25 +85,14 @@ module ISAHelper
         avatar = resource_avatar_path(item) || icon_filename_for_key("#{item.class.name.downcase}_avatar")
         data['imageUrl'] = asset_path(avatar)
         data['url'] = item.is_a?(Seek::ObjectAggregation) ? polymorphic_path([item.object, item.type]) : polymorphic_path(item)
-
-        if item.is_a?(Assay) # distinquish two assay classes
-          assay_class_title = item.assay_class.title
-          assay_class_key = item.assay_class.key
-          data['type'] = assay_class_title
-          data['faveColor'] = FILL_COLOURS[item_type][assay_class_key] || FILL_COLOURS.default
-          data['borderColor'] = BORDER_COLOURS[item_type][assay_class_key] || BORDER_COLOURS.default
-        else
-          data['type'] = item_type.humanize
-          data['faveColor'] = FILL_COLOURS[item_type] || FILL_COLOURS.default
-          data['borderColor'] = BORDER_COLOURS[item_type] || BORDER_COLOURS.default
-        end
+        data['type'] = item.is_a?(Assay) ? item.assay_class.title : item_type.humanize
+        data['faveColor'] = FILL_COLOURS[item.is_a?(Seek::ObjectAggregation) ? item.type.to_s.singularize.capitalize : item.class.name] || FILL_COLOURS.default
       else
         data['name'] = 'Hidden item'
         data['fullName'] = data['name']
         data['type'] = 'Hidden'
         data['description'] = 'Hidden item'
-        data['faveColor'] = FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default
-        data['borderColor'] = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
+        data['faveColor'] = FILL_COLOURS['HiddenItem']
       end
 
       elements << if node == hash[:nodes].first
