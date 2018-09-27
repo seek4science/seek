@@ -35,5 +35,17 @@ class Workflow < ActiveRecord::Base
   def self.user_creatable?
     true
   end
+
+  def is_github_cwl?
+    return (!content_blob.url.nil?) && (content_blob.url.include? 'github.com') && (content_blob.url.end_with? 'cwl')
+  end
+
+  def is_myexperiment?
+    return (!content_blob.url.nil?) && (content_blob.url.include? 'myexperiment.org')
+  end
+
+  def cwl_viewer_url
+    return content_blob.url.sub('https://', 'https://view.commonwl.org/workflows/')
+  end
     
 end

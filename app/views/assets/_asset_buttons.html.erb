@@ -37,7 +37,7 @@
             <%= button_link_to('Explore', 'spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code => params[:code])) %>
         <% end -%>
 
-        <% if display_asset.single_content_blob && !display_asset.single_content_blob.show_as_external_link? %>
+        <% if display_asset.single_content_blob && (asset.is_a? (Workflow) || !display_asset.single_content_blob.show_as_external_link?) %>
              <%= view_content_button display_asset %>
         <%   end -%>
     <% end -%>
