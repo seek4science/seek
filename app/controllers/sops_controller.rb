@@ -40,7 +40,7 @@ class SopsController < ApplicationController
       flash[:error]=flash.now[:error] 
       redirect_to @sop
     end
-    /workflows/new
+
   end
 
   # PUT /sops/1
