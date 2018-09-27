@@ -48,8 +48,7 @@
         });
     });
 
-    var ctx = document.getElementById('contributions-canvas').getContext('2d');
-    var contributionChart = new Chart(ctx, {
+    var contributionChart = new Chart(document.getElementById('contributions-canvas').getContext('2d'), {
         type: 'bar',
         data: {},
         options: {
@@ -92,7 +91,7 @@
 
         $j('#contributions-canvas').spinner('add');
 
-        $j.ajax({ url: '<%= contributions_project_dashboard_path(@project) -%>',
+        $j.ajax({ url: '<%= contributions_project_stats_path(@project) -%>',
             data: {
                 start_date: startDate,
                 end_date: endDate,

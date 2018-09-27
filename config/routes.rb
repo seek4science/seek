@@ -193,6 +193,7 @@ SEEK::Application.routes.draw do
       post :update_members
       post :request_membership
       get :isa_children
+      get :dashboard
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:search, :documents, :only=>[:index]
@@ -229,7 +230,7 @@ SEEK::Application.routes.draw do
         post :set_project_folder_description
       end
     end
-    resource :dashboard, only: [:show] do
+    resource :stats, controller: :project_stats, only: [] do
       collection do
         get :stats
         get :contributions

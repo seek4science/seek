@@ -8,13 +8,13 @@ class ProjectsController < ApplicationController
   include ApiHelper
 
   before_filter :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
-                                               admin_member_roles update_members storage_report request_membership]
+                                               admin_member_roles update_members storage_report request_membership dashboard]
   before_filter :find_assets, only: [:index]
   before_filter :auth_to_create, only: %i[new create]
   before_filter :is_user_admin_auth, only: %i[manage destroy]
   before_filter :editable_by_user, only: %i[edit update]
   before_filter :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report]
-  before_filter :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
+  before_filter :member_of_this_project, only: [:asset_report, :dashboard], unless: :admin_logged_in?
   before_filter :login_required, only: [:request_membership]
   before_filter :allow_request_membership, only: [:request_membership]
 
@@ -308,6 +308,10 @@ class ProjectsController < ApplicationController
     respond_with do |format|
       format.html{redirect_to(@project)}
     end
+  end
+
+  def dashboard
+
   end
 
   private

@@ -1,0 +1,69 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+
+<%= render partial: 'general/page_title', locals: { title: "#{t('project').capitalize} Dashboard" } %>
+
+<div class="row">
+  <div class="col-sm-4">
+    <%= panel('Most viewed assets', id: 'most_viewed') do %>
+      <%= render partial: 'projects/dashboard/most', locals: { action: 'show' } %>
+    <% end %>
+    <%= panel('Most downloaded assets', id: 'most_downloaded') do %>
+      <%= render partial: 'projects/dashboard/most', locals: { action: 'download' } %>
+    <% end %>
+    <%= panel('Most active contributors', id: 'active_contributors') do %>
+      <%= render partial: 'projects/dashboard/active_contributors' %>
+    <% end %>
+  </div>
+  <div class="col-sm-8">
+    <div>
+      <%= panel('Contributions', id: 'contributions') do %>
+        <%= render partial: 'projects/dashboard/contributions' %>
+      <% end %>
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        <%= panel('Contributions', id: 'contributions') do %>
+          <%= render partial: 'projects/dashboard/published_assets' %>
+        <% end %>
+      </div>
+      <div class="col-sm-6">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    //$j(document).ready(function () {
+    //    var getPage = function (page, element, refresh) {
+    //        element.spinner('add');
+    //        var data = { query: page };
+    //        if (refresh) {
+    //            data.refresh = true;
+    //        }
+    //        $j.ajax({ url: '<%# stats_project_dashboard_path(@project) -%>',
+    //            data: { query: page },
+    //            success: function (resp) {
+    //                element.html(resp);
+    //            },
+    //            error: function () {
+    //                element.html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
+    //            },
+    //            complete: function () {
+    //                element.spinner('remove');
+    //            }
+    //        })
+    //    };
+//
+    //    $j('.dashboard-panelid: ').each(function () {
+    //        var panel = this;
+    //        var panelBody = $j(this).find('.panel-body');
+//
+    //        getPage(panel.id, panelBody);
+//
+    //        $j(panel).find('.dashboard-refresh-btn').click(function () {
+    //            getPage(panel.id, panelBody, true);
+    //        })
+    //    });
+//
+    //});
+</script>

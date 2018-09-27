@@ -1,4 +1,4 @@
-<% cache "project_dashboard_#{@project.id}_active_contributors" do %>
+<% cache "project_dashboard_#{@project.id}_active_contributors", expires_in: 1.day do %>
   <% active_contributor =
          ActivityLog.
              where(referenced_id: @project.id,
