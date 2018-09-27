@@ -4,12 +4,15 @@ class ProjectStatsController < ApplicationController
 
   include DashboardsHelper
 
-  def most_activity
+  def asset_activity
     @activity = params[:activity]
     resource_types = params[:types] || Seek::Util.asset_types.map(&:name)
+    start_date = Date.parse(params[:start_date])
+    end_date = Date.parse(params[:end_date])
 
     @most_activity = ActivityLog.
         where(referenced_id: @project.id, referenced_type: 'Project', action: @activity).
+        where('created_at > ? AND created_at < ?', start_date, end_date).
         where(activity_loggable_type: resource_types).
         group(:activity_loggable_type, :activity_loggable_id).count.to_a.
         map { |(type, id), count| [type.constantize.find_by_id(id), count] }.
@@ -17,7 +20,27 @@ class ProjectStatsController < ApplicationController
         sort_by { |x| -x[1] }.first(10)
 
     respond_to do |format|
-      format.json { render 'projects/stats/most_activity' }
+      format.json { render 'projects/stats/activity' }
+    end
+  end
+
+  def contributors
+    @activity = 'contributors'
+    start_date = Date.parse(params[:start_date])
+    end_date = Date.parse(params[:end_date])
+
+    @most_activity = ActivityLog.
+        where(referenced_id: @project.id,
+              referenced_type: 'Project',
+              action: ['update', 'create']).
+        where('created_at > ? AND created_at < ?', start_date, end_date).
+        group(:culprit_type, :culprit_id).count.to_a.
+        map { |(type, id), count| [type.constantize.find_by_id(id).try(:person), count] }.
+        sort_by { |x| -x[1] }.
+        first(10)
+
+    respond_to do |format|
+      format.json { render 'projects/stats/activity' }
     end
   end
 

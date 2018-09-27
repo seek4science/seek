@@ -1,38 +1,16 @@
-<div class="pull-right">
-  <a href="#" id="contributions-update-btn" class="btn btn-primary btn-sm" style="margin-left: 5px;">Update</a>
-</div>
 <div class="pull-right text-right">
   <div class="form-inline">
     <div class="form-group">
       <label>Interval</label>
-      <select class="form-control input-sm" autocomplete="off" id="contributions-interval-select">
+      <select class="form-control input-sm" autocomplete="off" data-dashboard-field="interval-select">
         <option value="year">Year</option>
         <option value="month" selected="selected">Month</option>
         <option value="day">Day</option>
       </select>
     </div>
-    <div class="form-group">
-      <label>Range</label>
-      <select class="form-control input-sm" autocomplete="off" id="contributions-range-select">
-        <option value="<%= 1.months.ago.strftime('%Y-%m-%d') -%>">last month</option>
-        <option value="<%= 3.months.ago.strftime('%Y-%m-%d') -%>">last 3 months</option>
-        <option value="<%= 12.months.ago.strftime('%Y-%m-%d') -%>" selected="selected">last 12 months</option>
-        <option value="<%= @project.created_at.strftime('%Y-%m-%d') -%>">since project began</option>
-        <option value="custom">Custom range</option>
-      </select>
-    </div>
-    <br/>
-    <div class="form-group custom-range-field" style="display: none; margin-top: 5px;">
-      <label>Start</label>
-      <input id="contributions-range-start" size="8" type="text" class="form-control input-sm" value="<%= 1.month.ago.strftime('%Y-%m-%d')-%>">
-    </div>
-    <div class="form-group custom-range-field" style="display: none; margin-top: 5px;">
-      <label>End</label>
-      <input id="contributions-range-end" size="8" type="text" class="form-control input-sm" value="<%= Date.today.strftime('%Y-%m-%d')-%>">
-    </div>
+    <%= render partial: 'projects/dashboard/time_controls' -%>
   </div>
 </div>
-
 
 <canvas id="contributions-canvas"></canvas>
 
@@ -42,12 +20,6 @@
 </p>
 
 <script>
-    $j('#contributions-range-start, #contributions-range-end').each(function () {
-        $j(this).datetimepicker({
-            format: 'YYYY-MM-DD'
-        });
-    });
-
     var contributionChart = new Chart(document.getElementById('contributions-canvas').getContext('2d'), {
         type: 'bar',
         data: {},
@@ -85,9 +57,10 @@
     });
 
     function getContributionStats() {
-        var startDate = $j('#contributions-range-start').val();
-        var endDate = $j('#contributions-range-end').val();
-        var interval = $j('#contributions-interval-select').val();
+        var container = $j('#contributions');
+        var startDate = container.find('[data-dashboard-field="period-start"]').val();
+        var endDate = container.find('[data-dashboard-field="period-end"]').val();
+        var interval = container.find('[data-dashboard-field="interval-select"]').val();
 
         $j('#contributions-canvas').spinner('add');
 
@@ -112,18 +85,14 @@
         return false;
     }
 
-    $j('#contributions-update-btn').click(getContributionStats);
-    $j('#contributions-range-select').change(function () {
-        if ($j(this).val() === 'custom') {
-            $j('.custom-range-field').fadeIn();
-        } else {
-            $j('.custom-range-field').fadeOut();
-            $j('#contributions-range-start').val($j(this).val());
-            $j('#contributions-range-end').val(new Date().toISOString().substr(0,10));
+    $j('#contributions [data-dashboard-field="period-select"]').change(function () {
+        if ($j(this).val() !== 'custom') {
+            setTimeout(getContributionStats, 200);
         }
     });
+    $j('#contributions [data-dashboard-field="interval-select"]').change(getContributionStats);
+    $j('#contributions [data-dashboard-period-btn]').click(function () { getContributionStats(); return false; });
 
     // Set the initial state
-    $j('#contributions-range-select').change();
-    getContributionStats();
+    //getContributionStats();
 </script>
