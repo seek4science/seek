@@ -4,7 +4,12 @@
     <option value="<%= 1.months.ago.strftime('%Y-%m-%d') -%>">last month</option>
     <option value="<%= 3.months.ago.strftime('%Y-%m-%d') -%>">last 3 months</option>
     <option value="<%= 12.months.ago.strftime('%Y-%m-%d') -%>" selected="selected">last 12 months</option>
-    <option value="<%= @project.created_at.strftime('%Y-%m-%d') -%>">since project began</option>
+    <% if @project %>
+      <option value="<%= @project.created_at.strftime('%Y-%m-%d') -%>">since project began</option>
+    <% else %>
+      <option value="<%= User.first.created_at -%>">all time</option>
+    <% end %>
+
     <option value="custom">Custom range</option>
   </select>
 </div>

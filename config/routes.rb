@@ -38,6 +38,7 @@ SEEK::Application.routes.draw do
       get :get_stats
       get :registration_form
       get :edit_tag
+      get :dashboard
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
@@ -51,6 +52,13 @@ SEEK::Application.routes.draw do
       post :edit_tag
       post :update_imprint_setting
       post :clear_failed_jobs
+    end
+    resource :stats, controller: :stats, only: [] do
+      collection do
+        get :contributions
+        get :asset_activity
+        get :contributors
+      end
     end
   end
 

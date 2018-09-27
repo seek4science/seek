@@ -451,6 +451,10 @@ class AdminController < ApplicationController
     end
   end
 
+  def dashboard
+
+  end
+
   private
 
   def created_at_data_for_model(model)

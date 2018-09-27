@@ -1,23 +1,23 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 
-<%= render partial: 'general/page_title', locals: { title: "#{t('project').capitalize} Dashboard" } %>
+<%= render partial: 'general/page_title', locals: { title: 'SEEK Dashboard' } %>
 
 <div class="row">
   <div class="col-sm-4">
     <%= panel('Most viewed assets', id: 'most_viewed') do %>
-      <%= render partial: 'dashboard/most', locals: { url: asset_activity_project_stats_path(@project, activity: 'show') } %>
+      <%= render partial: 'dashboard/most', locals: { url: asset_activity_admin_stats_path(activity: 'show') } %>
     <% end %>
     <%= panel('Most downloaded assets', id: 'most_downloaded') do %>
-      <%= render partial: 'dashboard/most', locals: { url: asset_activity_project_stats_path(@project, activity: 'download') } %>
+      <%= render partial: 'dashboard/most', locals: { url: asset_activity_admin_stats_path(activity: 'download') } %>
     <% end %>
     <%= panel('Most active contributors', id: 'active_contributors') do %>
-      <%= render partial: 'dashboard/most', locals: { url: contributors_project_stats_path(@project) } %>
+      <%= render partial: 'dashboard/most', locals: { url: contributors_admin_stats_path } %>
     <% end %>
   </div>
   <div class="col-sm-8">
     <div>
       <%= panel('Contributions', id: 'contributions') do %>
-        <%= render partial: 'dashboard/contributions', locals: { url: contributions_project_stats_path(@project) } %>
+        <%= render partial: 'dashboard/contributions', locals: { url: contributions_admin_stats_path } %>
       <% end %>
     </div>
     <div class="row">

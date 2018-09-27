@@ -1,6 +1,6 @@
 <canvas id="published-canvas"></canvas>
 
-<% assets = @project.assets %>
+<% assets = @project ? @project.assets : Seek::Util.asset_types.map(&:all).flatten %>
 <% published_count = assets.count { |a| a.is_published? } %>
 <% private_count = assets.count { |a| a.private? } %>
 <% misc_permissions = assets.count - (published_count + private_count) %>

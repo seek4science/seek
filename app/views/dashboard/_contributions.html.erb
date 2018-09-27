@@ -8,7 +8,7 @@
         <option value="day">Day</option>
       </select>
     </div>
-    <%= render partial: 'projects/dashboard/time_controls' -%>
+    <%= render partial: 'dashboard/time_controls' -%>
   </div>
 </div>
 
@@ -64,7 +64,7 @@
 
         $j('#contributions-canvas').spinner('add');
 
-        $j.ajax({ url: '<%= contributions_project_stats_path(@project) -%>',
+        $j.ajax({ url: '<%= url -%>',
             data: {
                 start_date: startDate,
                 end_date: endDate,
