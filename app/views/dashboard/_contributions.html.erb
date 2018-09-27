@@ -62,6 +62,14 @@
         var endDate = container.find('[data-dashboard-field="period-end"]').val();
         var interval = container.find('[data-dashboard-field="interval-select"]').val();
 
+        // Store type visibility
+        var hidden = {};
+        if (contributionChart.data.datasets) {
+            contributionChart.data.datasets.forEach(function (dataset, index) {
+                hidden[dataset.label] = !contributionChart.isDatasetVisible(index);
+            });
+        }
+
         $j('#contributions-canvas').spinner('add');
 
         $j.ajax({ url: '<%= url -%>',
@@ -71,7 +79,14 @@
                 interval: interval
             },
             success: function (resp) {
+                // Re-apply visibility settings
+                resp.datasets.forEach(function (dataset, index) {
+                    if (hidden[dataset.label] !== null) {
+                        resp.datasets[index].hidden = hidden[dataset.label];
+                    }
+                });
                 contributionChart.data = resp;
+
                 contributionChart.update();
             },
             error: function () {
