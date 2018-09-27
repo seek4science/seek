@@ -33,7 +33,31 @@
 </div>
 
 <script>
-    //$j(document).ready(function () {
+    $j(document).ready(function () {
+        $j('.most-activity').each(function () {
+            var container = $j(this);
+            container.spinner('add');
+
+            $j.ajax({ url: '<%= most_activity_project_stats_path(@project) -%>',
+                data: {
+                    activity: container.data('activity')
+                },
+                success: function (resp) {
+                    var list = container.find('ul.mini-resource-list');
+                    list.html('');
+                    resp.forEach(function (activity) {
+                        list.append(HandlebarsTemplates['projects/dashboard/activity_listing'](activity));
+                    });
+                },
+                error: function () {
+                    container.html('<div class="alert alert-danger">An error occurred whilst fetching stats.</div>');
+                },
+                complete: function () {
+                    container.spinner('remove');
+                }
+            });
+        });
+    });
     //    var getPage = function (page, element, refresh) {
     //        element.spinner('add');
     //        var data = { query: page };

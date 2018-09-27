@@ -1,12 +1,3 @@
-<% cache "project_dashboard_#{@project.id}_most_#{action}", expires_in: 1.day do %>
-  <% most_actioned = ActivityLog.where(referenced_id: @project.id, referenced_type: 'Project', action: action).
-      group(:activity_loggable_type, :activity_loggable_id).count.to_a.
-      select { |(type, id), _| type.constantize.find_by_id(id) rescue false }.
-      sort_by { |x| -x[1] }.first(10) %>
-  <ul class="mini-resource-list">
-    <% most_actioned.each do |(type, id), count| %>
-      <% asset = type.constantize.find(id) %>
-      <li><%= resource_with_count(asset, count) %></li>
-    <% end %>
-  </ul>
-<% end %>
+<div class="most-activity" data-activity="<%= action -%>">
+  <ul class="mini-resource-list"></ul>
+</div>

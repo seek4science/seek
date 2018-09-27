@@ -232,8 +232,8 @@ SEEK::Application.routes.draw do
     end
     resource :stats, controller: :project_stats, only: [] do
       collection do
-        get :stats
         get :contributions
+        get :most_activity
       end
     end
   end
