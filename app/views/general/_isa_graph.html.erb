@@ -141,7 +141,11 @@
 
         // display the PNG when the modal box appears
         $j('#modal-exported-png').on('show.bs.modal', function (event) {
-            var png = cy.png({bg:'white',scale:2});
+            var scale = 3;
+            if (!ISA.isFullscreen()) {
+                scale *= 2;
+            }
+            var png = cy.png({bg:'white',scale:scale});
             $j('#exported-png').attr('src', png);
         });
 
