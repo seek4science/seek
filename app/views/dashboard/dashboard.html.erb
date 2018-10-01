@@ -10,7 +10,7 @@
       <%= render partial: 'dashboard/asset_activity', locals: { url: polymorphic_path([:asset_activity, scope, :stats], activity: 'show') } %>
     <% end %>
     <%= panel('Most downloaded assets', id: 'most_downloaded') do %>
-      <%= render partial: 'dashboard/asset_activity', locals: { url: polymorphic_path([:asset_activity, scope, :stats], activity: 'download') } %>
+      <%= render partial: 'dashboard/asset_activity', locals: { url: polymorphic_path([:asset_activity, scope, :stats], activity: 'download'), type_options: Seek::Util.asset_types.sort_by { |t| t.name }  } %>
     <% end %>
     <%= panel('Most active contributors', id: 'active_contributors') do %>
       <%= render partial: 'dashboard/activity', locals: { url: polymorphic_path([:contributors, scope, :stats]) } %>

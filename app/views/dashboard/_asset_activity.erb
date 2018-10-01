@@ -1,10 +1,12 @@
+<% type_options ||= Seek::Util.authorized_types.sort_by { |t| t.name } %>
+
 <div class="most-activity" data-stats-url="<%= url -%>">
   <div class="form-inline text-right">
     <div class="form-group">
       <label>Type</label>
       <select class="form-control input-sm" autocomplete="off" data-dashboard-field="type">
         <option value="all" selected="selected">All</option>
-        <% Seek::Util.asset_types.sort_by { |t| t.name }.each do |type| %>
+        <% type_options.each do |type| %>
           <option value="<%= type.name -%>"><%= t(type.name.underscore).pluralize -%></option>
         <% end %>
       </select>
