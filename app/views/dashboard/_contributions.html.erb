@@ -8,7 +8,6 @@
         <option value="day">Day</option>
       </select>
     </div>
-    <%= render partial: 'dashboard/time_controls' -%>
   </div>
 </div>
 
@@ -58,8 +57,8 @@
 
     function getContributionStats() {
         var container = $j('#contributions');
-        var startDate = container.find('[data-dashboard-field="period-start"]').val();
-        var endDate = container.find('[data-dashboard-field="period-end"]').val();
+        var startDate = $j('#dashboard-controls [data-dashboard-field="period-start"]').val();
+        var endDate = $j('#dashboard-controls [data-dashboard-field="period-end"]').val();
         var interval = container.find('[data-dashboard-field="interval-select"]').val();
 
         // Store type visibility
@@ -100,14 +99,7 @@
         return false;
     }
 
-    $j('#contributions [data-dashboard-field="period-select"]').change(function () {
-        if ($j(this).val() !== 'custom') {
-            setTimeout(getContributionStats, 200);
-        }
-    });
-    $j('#contributions [data-dashboard-field="interval-select"]').change(getContributionStats);
-    $j('#contributions [data-dashboard-period-btn]').click(function () { getContributionStats(); return false; });
+    Dashboard.updateCallbacks.push(getContributionStats);
 
-    // Set the initial state
-    //getContributionStats();
+    $j('#contributions [data-dashboard-field="interval-select"]').change(getContributionStats);
 </script>
