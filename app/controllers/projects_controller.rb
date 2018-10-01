@@ -311,7 +311,9 @@ class ProjectsController < ApplicationController
   end
 
   def dashboard
-
+    respond_to do |format|
+      format.html { render 'dashboard/dashboard' }
+    end
   end
 
   private
