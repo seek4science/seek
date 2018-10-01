@@ -5,7 +5,7 @@ class StatsController < ApplicationController
 
   def asset_activity
     @activity = params[:activity]
-    resource_types = params[:types] || Seek::Util.asset_types.map(&:name)
+    resource_types = params[:type] || Seek::Util.asset_types.map(&:name)
     start_date = Date.parse(params[:start_date])
     end_date = Date.parse(params[:end_date])
 

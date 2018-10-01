@@ -7,13 +7,13 @@
 <div class="row">
   <div class="col-sm-4">
     <%= panel('Most viewed assets', id: 'most_viewed') do %>
-      <%= render partial: 'dashboard/most', locals: { url: polymorphic_path([:asset_activity, scope, :stats], activity: 'show') } %>
+      <%= render partial: 'dashboard/asset_activity', locals: { url: polymorphic_path([:asset_activity, scope, :stats], activity: 'show') } %>
     <% end %>
     <%= panel('Most downloaded assets', id: 'most_downloaded') do %>
-      <%= render partial: 'dashboard/most', locals: { url: polymorphic_path([:asset_activity, scope, :stats], activity: 'download') } %>
+      <%= render partial: 'dashboard/asset_activity', locals: { url: polymorphic_path([:asset_activity, scope, :stats], activity: 'download') } %>
     <% end %>
     <%= panel('Most active contributors', id: 'active_contributors') do %>
-      <%= render partial: 'dashboard/most', locals: { url: polymorphic_path([:contributors, scope, :stats]) } %>
+      <%= render partial: 'dashboard/activity', locals: { url: polymorphic_path([:contributors, scope, :stats]) } %>
     <% end %>
   </div>
   <div class="col-sm-8">
@@ -58,16 +58,18 @@
         $j('.most-activity').each(function () {
             var container = $j(this);
             var getStats = function () {
-                var startDate = container.find('[data-dashboard-field="period-start"]').val();
-                var endDate = container.find('[data-dashboard-field="period-end"]').val();
+                var data = {};
+                data.start_date  = container.find('[data-dashboard-field="period-start"]').val();
+                data.end_date = container.find('[data-dashboard-field="period-end"]').val();
+                var typeField = container.find('[data-dashboard-field="type"]');
+                if (typeField.length && typeField.val() !== 'all') {
+                  data.type = typeField.val();
+                }
 
                 container.spinner('add');
 
                 $j.ajax({ url: container.data('statsUrl'),
-                    data: {
-                        start_date: startDate,
-                        end_date: endDate,
-                    },
+                    data: data,
                     success: function (resp) {
                         var list = container.find('ul.mini-resource-list');
                         list.html('');
@@ -89,6 +91,7 @@
                     getStats();
                 }
             });
+            $j('[data-dashboard-field="type"]', container).change(getStats);
             $j('[data-dashboard-period-btn]', container).click(function () { getStats(); return false; });
             $j('[data-dashboard-field="period-select"]', container).change(); // triggers initial load
         });
