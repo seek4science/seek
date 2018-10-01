@@ -72,7 +72,7 @@
                         var list = container.find('ul.mini-resource-list');
                         list.html('');
                         resp.forEach(function (activity) {
-                            list.append(HandlebarsTemplates['dashboard/activity_listing'](activity));
+                            list.append(HandlebarsTemplates['dashboard/resource_listing'](activity));
                         });
                     },
                     error: function () {
