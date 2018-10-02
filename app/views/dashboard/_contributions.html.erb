@@ -37,7 +37,10 @@
             tooltips: {
                 mode: 'index',
                 filter: function (x) { return x.yLabel > 0 }, // Hide asset types with 0 contributions in that month
-                intersect: false
+                intersect: false,
+                itemSort: function(a, b) {
+                    return b.datasetIndex - a.datasetIndex
+                }
             },
             responsive: true,
             scales: {
