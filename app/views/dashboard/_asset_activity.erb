@@ -1,19 +1,21 @@
 <% type_options ||= Seek::Util.authorized_types.sort_by { |t| t.name } %>
 
-<div class="most-activity" data-stats-url="<%= url -%>">
-  <div class="form-inline text-right">
-    <div class="form-group">
-      <label>Type</label>
-      <select class="form-control input-sm" autocomplete="off" data-dashboard-field="type">
-        <option value="all" selected="selected">All</option>
-        <% type_options.each do |type| %>
-          <option value="<%= type.name -%>"><%= t(type.name.underscore).pluralize -%></option>
-        <% end %>
-      </select>
+<div class="panel panel-default dashboard-panel most-activity" data-stats-url="<%= url -%>">
+  <div class="panel-heading">
+    <div class="form-inline pull-right">
+      <div class="form-group">
+        <label>Type</label>
+        <select class="form-control input-sm" autocomplete="off" data-dashboard-field="type">
+          <option value="all" selected="selected">All</option>
+          <% type_options.each do |type| %>
+            <option value="<%= type.name -%>"><%= t(type.name.underscore).pluralize -%></option>
+          <% end %>
+        </select>
+      </div>
     </div>
+    <%= title %>
   </div>
-
-  <hr/>
-
-  <ul class="mini-resource-list"></ul>
+  <div class="panel-body">
+    <ul class="mini-resource-list"></ul>
+  </div>
 </div>

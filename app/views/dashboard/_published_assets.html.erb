@@ -1,4 +1,6 @@
-<canvas id="published-canvas"></canvas>
+<%= panel('Asset accessibility', type: 'panel-default dashboard-panel most-activity') do %>
+  <canvas id="published-canvas"></canvas>
+<% end %>
 
 <% assets = @project ? @project.assets : Seek::Util.asset_types.map(&:all).flatten %>
 <% published_count = assets.count { |a| a.is_published? } %>

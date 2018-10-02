@@ -1,22 +1,26 @@
-<div class="pull-right text-right">
-  <div class="form-inline">
-    <div class="form-group">
-      <label>Interval</label>
-      <select class="form-control input-sm" autocomplete="off" data-dashboard-field="interval-select">
-        <option value="year">Year</option>
-        <option value="month" selected="selected">Month</option>
-        <option value="day">Day</option>
-      </select>
+<div class="panel panel-default dashboard-panel" id="contributions">
+  <div class="panel-heading">
+    <div class="form-inline pull-right">
+      <div class="form-group">
+        <label>Interval</label>
+        <select class="form-control input-sm" autocomplete="off" data-dashboard-field="interval-select">
+          <option value="year">Year</option>
+          <option value="month" selected="selected">Month</option>
+          <option value="day">Day</option>
+        </select>
+      </div>
     </div>
+    Contributions
+  </div>
+  <div class="panel-body">
+    <canvas id="contributions-canvas"></canvas>
+
+    <p class="help-block">
+      Mouse over a bar to see the breakdown of contributions for that month.
+      Clicking on a type in the legend will hide it from the chart.
+    </p>
   </div>
 </div>
-
-<canvas id="contributions-canvas"></canvas>
-
-<p class="help-block">
-  Mouse over a bar to see the breakdown of contributions for that month.
-  Clicking on a type in the legend will hide it from the chart.
-</p>
 
 <script>
     var contributionChart = new Chart(document.getElementById('contributions-canvas').getContext('2d'), {
@@ -38,7 +42,7 @@
             responsive: true,
             scales: {
                 xAxes: [{
-                    stacked: true,
+                    stacked: true
                 }],
                 yAxes: [{
                     ticks: { // This whole block is just to avoid and protoype.js bug that breaks the whole chart

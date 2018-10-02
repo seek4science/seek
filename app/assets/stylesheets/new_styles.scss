@@ -737,3 +737,9 @@ span.required, label.required::after {
     display: block;
   }
 }
+
+.dashboard-panel {
+  .panel-heading {
+    line-height: 2.5;
+  }
+}
