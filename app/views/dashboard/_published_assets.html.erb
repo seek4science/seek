@@ -1,4 +1,4 @@
-<%= panel('Asset accessibility', type: 'panel-default dashboard-panel most-activity') do %>
+<%= panel('Asset accessibility', type: 'panel-default dashboard-panel') do %>
   <canvas id="published-canvas"></canvas>
 <% end %>
 
@@ -30,7 +30,10 @@
                 ]
             },
             options: {
-                responsive: true
+                responsive: true,
+                legend: {
+                    position: 'right'
+                }
             }
         });
 </script>
