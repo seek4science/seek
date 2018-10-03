@@ -350,4 +350,67 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_nil assigns(:organism).concept_uri
   end
 
+  test 'project organisms through nested route' do
+    assert_routing 'projects/3/organisms', controller: 'organisms', action: 'index', project_id: '3'
+
+    o1 = Factory(:organism)
+    o2 = Factory(:organism)
+
+    p1 = Factory(:project,organisms:[o1])
+    p2 = Factory(:project,organisms:[o2])
+
+    refute_includes p1.organisms,o2
+
+    o1.reload
+    assert_includes o1.projects,p1
+    refute_includes o1.projects,p2
+
+    o2.reload
+    assert_includes o2.projects,p2
+    refute_includes o2.projects,p1
+
+    get :index,project_id:p1.id
+
+    assert_response :success
+
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', organism_path(o1), text: o1.title
+      assert_select 'a[href=?]', organism_path(o2), text: o2.title, count: 0
+    end
+
+  end
+
+  test 'programme organisms through nested route' do
+    assert_routing 'programmes/3/organisms', controller: 'organisms', action: 'index', programme_id: '3'
+
+    o1 = Factory(:organism)
+    o2 = Factory(:organism)
+
+    p1 = Factory(:project,organisms:[o1],programme:Factory(:programme))
+    p2 = Factory(:project,organisms:[o2],programme:Factory(:programme))
+
+    refute_includes p1.organisms,o2
+
+    o1.reload
+    assert_includes o1.projects,p1
+    refute_includes o1.projects,p2
+
+    o2.reload
+    assert_includes o2.projects,p2
+    refute_includes o2.projects,p1
+
+    refute_nil p1.programme
+    refute_nil p2.programme
+
+    get :index,programme_id:p1.programme.id
+
+    assert_response :success
+
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', organism_path(o1), text: o1.title
+      assert_select 'a[href=?]', organism_path(o2), text: o2.title, count: 0
+    end
+
+  end
+
 end
