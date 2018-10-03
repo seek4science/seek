@@ -5,12 +5,8 @@ class ProjectStatsController < StatsController
 
   private
 
-  def scoped_activities
-    ActivityLog.where(referenced_id: @project.id, referenced_type: 'Project')
-  end
-
-  def scoped_resources
-    (@project.investigations + @project.studies + @project.assays + @project.assets + @project.samples)
+  def stats
+    Seek::Stats::DashboardStats.new(@project)
   end
 
   def find_project
