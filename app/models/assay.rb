@@ -4,10 +4,7 @@ class Assay < ActiveRecord::Base
   include Seek::Taggable
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-  # needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
-  def projects
-    study.try(:projects) || []
-  end
+
 
   # needs to before acts_as_isa - otherwise auto_index=>false is overridden by Seek::Search::CommonFields
   if Seek::Config.solr_enabled
@@ -20,17 +17,22 @@ class Assay < ActiveRecord::Base
     end
   end
 
+  # needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
+  belongs_to :study
+  has_many :projects, through: :study
+
   acts_as_isa
   acts_as_snapshottable
 
   belongs_to :institution
 
-  belongs_to :study
+
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
   has_many :organisms, through: :assay_organisms, inverse_of: :assays
   has_many :strains, through: :assay_organisms
   has_many :tissue_and_cell_types, through: :assay_organisms
+
 
   before_save { assay_assets.each(&:set_version) }
   has_many :assay_assets, dependent: :destroy, inverse_of: :assay, autosave: true
@@ -55,10 +57,6 @@ class Assay < ActiveRecord::Base
   attr_reader :pending_related_assets
 
   enforce_authorization_on_association :study, :view
-
-  def project_ids
-    projects.map(&:id)
-  end
 
   def default_contributor
     User.current_user.try :person
