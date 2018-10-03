@@ -1,6 +1,6 @@
 class Organism < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
-  include ProgrammeCompat
+  include Seek::ProgrammeCompat
 
   acts_as_favouritable
   grouped_pagination
