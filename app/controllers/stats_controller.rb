@@ -1,7 +1,11 @@
 class StatsController < ApplicationController
   before_filter :is_user_admin_auth
 
-  include DashboardsHelper
+  def dashboard
+    respond_to do |format|
+      format.html { render 'dashboard/dashboard' }
+    end
+  end
 
   def asset_activity
     start_date = Date.parse(params[:start_date])

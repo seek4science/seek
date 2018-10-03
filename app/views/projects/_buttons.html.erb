@@ -5,7 +5,7 @@
     <%= button_link_to("Browse openBIS", :openbis_square, browse_project_openbis_endpoints_path(item),{icon_options:{height:'18px'}}) %>
 <% end %>
 <% if item.try(:has_member?,current_user) %>
-    <%= button_link_to("Dashboard", 'project_dashboard', dashboard_project_path(item)) -%>
+    <%= button_link_to("Dashboard", 'project_dashboard', dashboard_project_stats_path(item)) -%>
 <% end -%>
 <% if item.try(:has_member?,current_user) || admin_logged_in? -%>
     <% tooltip_text="This will present you with a short report about the items that have been shared outside of your #{t('project')}" %>
