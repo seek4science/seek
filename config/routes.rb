@@ -337,7 +337,7 @@ SEEK::Application.routes.draw do
       get :new_object_based_on_existing_one
       get :isa_children
     end
-    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications, :documents,:strains,:only=>[:index]
+    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications, :documents,:strains, :organisms, :only=>[:index]
   end
 
 
