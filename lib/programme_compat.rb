@@ -2,9 +2,7 @@ module ProgrammeCompat
   def self.included(klass)
     klass.class_eval do
 
-      def programmes
-        projects.map { |p| p.programme }
-      end
+      has_many :programmes, through: :projects
 
     end
   end
