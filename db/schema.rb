@@ -1016,8 +1016,8 @@ ActiveRecord::Schema.define(version: 20180924152253) do
     t.string   "space_perm_id",         limit: 255
     t.string   "username",              limit: 255
     t.integer  "project_id",            limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
     t.string   "dss_endpoint",          limit: 255
     t.string   "web_endpoint",          limit: 255
     t.integer  "refresh_period_mins",   limit: 4,   default: 120
