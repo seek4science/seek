@@ -413,4 +413,26 @@ class OrganismsControllerTest < ActionController::TestCase
 
   end
 
+  test 'assay organisms through nested route' do
+    assert_routing 'assays/3/organisms', controller: 'organisms', action: 'index', assay_id: '3'
+
+    o1 = Factory(:organism)
+    o2 = Factory(:organism)
+
+
+    a1 = Factory(:assay,organisms:[o1])
+    a2 = Factory(:assay,organisms:[o2])
+
+
+    get :index,assay_id:a1
+
+    assert_response :success
+
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', organism_path(o1), text: o1.title
+      assert_select 'a[href=?]', organism_path(o2), text: o2.title, count: 0
+    end
+
+  end
+
 end
