@@ -1,6 +1,5 @@
 <% scope = @project || :admin %>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 <script>
     var Dashboard = {
         updateCallbacks: [],
@@ -59,7 +58,8 @@
                     data.type = typeField.val();
                 }
 
-                container.spinner('add');
+                var body = $j('.panel-body', container);
+                body.spinner('add');
 
                 $j.ajax({ url: container.data('statsUrl'),
                     data: data,
@@ -71,10 +71,10 @@
                         });
                     },
                     error: function () {
-                        container.html('<div class="alert alert-danger">An error occurred whilst fetching stats.</div>');
+                        body.html('<div class="alert alert-danger">An error occurred whilst fetching stats.</div>');
                     },
                     complete: function () {
-                        container.spinner('remove');
+                        body.spinner('remove');
                     }
                 });
             };
@@ -102,6 +102,9 @@
         });
 
         $j('[data-dashboard-period-btn]').click(function () { Dashboard.refreshAll(); return false; });
+
+        Dashboard.updateCallbacks.push(getContributionStats);
+
         $j('[data-dashboard-field="period-select"]').change();
     });
 </script>
