@@ -16,6 +16,7 @@ namespace :seek do
     convert_organism_concept_uris
     update_deleted_contributors
     set_sample_type_contributors
+    update_matlab_mimetypes
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -81,6 +82,13 @@ namespace :seek do
         puts "no project admins found for sample_type #{sample_type.id}, leaving contributor nil, marking as deleted_contributor".red
         sample_type.update_column(:deleted_contributor,'cannot be determined')
       end
+    end
+  end
+
+  task(update_matlab_mimetypes: :environment) do
+    ContentBlob.where('original_filename LIKE "%.m" OR original_filename LIKE "%.mat"').each do |blob|
+      blob.send(:update_content_mime_type)
+      blob.update_column(:content_type,blob.content_type)
     end
   end
 end
