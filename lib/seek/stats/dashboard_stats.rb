@@ -60,6 +60,16 @@ module Seek
         end
       end
 
+      def asset_accessibility(start_date, end_date)
+        Rails.cache.fetch("#{cache_key_base}_asset_accessibility_#{start_date}_#{end_date}", expires_in: 3.hours) do
+          assets = scoped_assets.select { |a| a.created_at >= start_date && a.created_at <= end_date }
+          published_count = assets.count { |a| a.is_published? }
+          private_count = assets.count { |a| a.private? }
+          misc_permissions = assets.count - (published_count + private_count)
+          { published: published_count, restricted: misc_permissions, private: private_count }
+        end
+      end
+
       private
 
       def cache_key_base
@@ -72,18 +82,26 @@ module Seek
 
       def scoped_activities
         @activities ||= if @scope
-          ActivityLog.where(referenced_id: @scope.id, referenced_type: @scope.class.name)
-        else
-          ActivityLog
-        end
+                          ActivityLog.where(referenced_id: @scope.id, referenced_type: @scope.class.name)
+                        else
+                          ActivityLog
+                        end
       end
 
       def scoped_resources
-        @resources ||= if @scope
-          (@scope.investigations + @scope.studies + @scope.assays + @scope.assets + @scope.samples)
-        else
-          (Programme.all + Project.all + Investigation.all + Study.all + Assay.all + Seek::Util.asset_types.map(&:all).flatten)
-        end
+        @resources ||= scoped_assets + if @scope
+                         (@scope.investigations + @scope.studies + @scope.assays + @scope.assets + @scope.samples)
+                       else
+                         (Programme.all + Project.all + Investigation.all + Study.all + Assay.all + Seek::Util.asset_types.map(&:all).flatten)
+                       end
+      end
+
+      def scoped_assets
+        @assets ||= if @scope
+                      (@scope.assets + @scope.samples)
+                    else
+                      Seek::Util.asset_types.map(&:all).flatten
+                    end
       end
 
       def dates_between(start_date, end_date, interval = 'month')

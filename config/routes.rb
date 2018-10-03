@@ -22,6 +22,7 @@ SEEK::Application.routes.draw do
         get :contributions
         get :asset_activity
         get :contributors
+        get :asset_accessibility
       end
     end
   end

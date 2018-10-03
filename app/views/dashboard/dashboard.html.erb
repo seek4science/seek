@@ -37,7 +37,7 @@
         <%= render partial: 'dashboard/contributions', locals: { url: polymorphic_path([:contributions, scope, :stats]) } %>
       </div>
       <div class="col-sm-6">
-        <%= render partial: 'dashboard/published_assets' %>
+        <%= render partial: 'dashboard/published_assets', locals: { url: polymorphic_path([:asset_accessibility, scope, :stats]) } %>
       </div>
       <div class="col-sm-6">
       </div>
@@ -104,6 +104,7 @@
         $j('[data-dashboard-period-btn]').click(function () { Dashboard.refreshAll(); return false; });
 
         Dashboard.updateCallbacks.push(getContributionStats);
+        Dashboard.updateCallbacks.push(getAccessibilityStats);
 
         $j('[data-dashboard-field="period-select"]').change();
     });

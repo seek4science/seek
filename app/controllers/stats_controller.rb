@@ -38,6 +38,16 @@ class StatsController < ApplicationController
     end
   end
 
+  def asset_accessibility
+    start_date = Date.parse(params[:start_date])
+    end_date = Date.parse(params[:end_date])
+    @asset_accessibility_stats = stats.asset_accessibility(start_date, end_date)
+
+    respond_to do |format|
+      format.json { render 'stats/asset_accessibility' }
+    end
+  end
+
   private
 
   def stats
