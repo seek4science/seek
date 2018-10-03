@@ -100,4 +100,15 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     assert !blob.is_sbml?
     assert blob.is_jws_dat?
   end
+
+  test 'matlab files recognised' do
+    blob1 = Factory(:content_blob, original_filename:'file.mat')
+    blob2 = Factory(:content_blob, original_filename:'file.mat')
+
+    [blob1,blob2].each do |blob|
+      assert_equal 'Matlab file',blob.human_content_type, "wrong human name for #{blob.original_filename}"
+      assert_equal 'application/matlab',blob.content_type, "wrong human name for #{blob.original_filename}"
+      assert blob.is_text?
+    end
+  end
 end

@@ -23,10 +23,11 @@ class MimeTypesHelperTest < ActionView::TestCase
   RTF = %w(application/rtf)
   HTML = %w(text/html)
   SBML = %w(application/sbml+xml)
+  MATLAB = %w(application/matlab)
   MP4_IN_MIME_MAGIC = %w(video/mp4)
 
   def test_recognised
-    supported_types = MISC + EXCEL + EXCELX + EXCELM + DOC + DOCX + PPT + PDF + IMAGE + TEXT + CSV + XML + ODP + FODP + ODT + FODT + RTF + HTML
+    supported_types = MISC + EXCEL + EXCELX + EXCELM + DOC + DOCX + PPT + PDF + IMAGE + TEXT + CSV + XML + ODP + FODP + ODT + FODT + RTF + HTML + MATLAB
     supported_types.each do |type|
       assert_not_equal 'Unknown file type', mime_nice_name(type), "Didn't recognise mime type #{type}"
     end
@@ -150,6 +151,13 @@ class MimeTypesHelperTest < ActionView::TestCase
       assert mime_extensions(type).include?('html')
       assert_equal 'HTML document', mime_nice_name(type)
       assert_equal icon_filename_for_key('html_file'), mime_icon_url(type)
+    end
+
+    MATLAB.each do |type|
+      assert mime_extensions(type).include?('m')
+      assert mime_extensions(type).include?('mat')
+      assert_equal 'Matlab file', mime_nice_name(type)
+      assert_equal icon_filename_for_key('misc_file'), mime_icon_url(type)
     end
   end
 
