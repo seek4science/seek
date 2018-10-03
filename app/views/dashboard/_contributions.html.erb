@@ -1,0 +1,110 @@
+<div class="panel panel-default dashboard-panel" id="contributions">
+  <div class="panel-heading">
+    <div class="form-inline pull-right">
+      <div class="form-group">
+        <label>Interval</label>
+        <select class="form-control input-sm" autocomplete="off" data-dashboard-field="interval-select">
+          <option value="year">Year</option>
+          <option value="month" selected="selected">Month</option>
+          <option value="day">Day</option>
+        </select>
+      </div>
+    </div>
+    Contributions
+  </div>
+  <div class="panel-body">
+    <canvas id="contributions-canvas"></canvas>
+
+    <p class="help-block">
+      Mouse over a bar to see the breakdown of contributions for that month.
+      Clicking on a type in the legend will hide it from the chart.
+    </p>
+  </div>
+</div>
+
+<script>
+    var contributionChart = new Chart(document.getElementById('contributions-canvas').getContext('2d'), {
+        type: 'bar',
+        data: {},
+        options: {
+            legend: {
+                position: 'right'
+            },
+            title: {
+                display: false,
+                text: 'Contributions'
+            },
+            tooltips: {
+                mode: 'index',
+                filter: function (x) { return x.yLabel > 0 }, // Hide asset types with 0 contributions in that month
+                intersect: false,
+                itemSort: function(a, b) {
+                    return b.datasetIndex - a.datasetIndex
+                }
+            },
+            responsive: true,
+            scales: {
+                xAxes: [{
+                    stacked: true
+                }],
+                yAxes: [{
+                    ticks: { // This whole block is just to avoid and protoype.js bug that breaks the whole chart
+                        beginAtZero:true,
+                        userCallback: function(label, index) {
+                            if (Math.floor(label) === label) {
+                                return label;
+                            }
+                        }
+                    },
+                    stacked: true
+                }]
+            }
+        }
+    });
+
+    function getContributionStats() {
+        var container = $j('#contributions');
+        var startDate = $j('#dashboard-controls [data-dashboard-field="period-start"]').val();
+        var endDate = $j('#dashboard-controls [data-dashboard-field="period-end"]').val();
+        var interval = container.find('[data-dashboard-field="interval-select"]').val();
+
+        // Store type visibility
+        var hidden = {};
+        if (contributionChart.data.datasets) {
+            contributionChart.data.datasets.forEach(function (dataset, index) {
+                hidden[dataset.label] = !contributionChart.isDatasetVisible(index);
+            });
+        }
+
+        $j('#contributions-canvas').spinner('add');
+
+        $j.ajax({ url: '<%= url -%>',
+            data: {
+                start_date: startDate,
+                end_date: endDate,
+                interval: interval
+            },
+            success: function (resp) {
+                // Re-apply visibility settings
+                resp.datasets.forEach(function (dataset, index) {
+                    if (hidden[dataset.label] !== null) {
+                        resp.datasets[index].hidden = hidden[dataset.label];
+                    }
+                });
+                contributionChart.data = resp;
+
+                contributionChart.update();
+            },
+            error: function () {
+                $j('#contributions-canvas').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
+            },
+            complete: function () {
+                $j('#contributions-canvas').spinner('remove');
+            }
+        });
+
+        return false;
+    }
+
+    $j('#contributions [data-dashboard-field="interval-select"]').change(getContributionStats);
+</script>

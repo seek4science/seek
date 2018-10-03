@@ -451,6 +451,12 @@ class AdminController < ApplicationController
     end
   end
 
+  def dashboard
+    respond_to do |format|
+      format.html { render 'dashboard/dashboard' }
+    end
+  end
+
   private
 
   def created_at_data_for_model(model)

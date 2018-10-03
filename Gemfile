@@ -132,6 +132,7 @@ source 'https://rails-assets.org' do
   gem 'rails-assets-vue', '~> 2.1.8'
   gem 'rails-assets-eonasdan-bootstrap-datetimepicker', '~> 4.17.42'
   gem 'rails-assets-x-editable', '~> 1.5.1'
+  gem 'rails-assets-chartjs', '~> 2.7.2'
 end
 
 group :production do

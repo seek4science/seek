@@ -38,6 +38,7 @@ SEEK::Application.routes.draw do
       get :get_stats
       get :registration_form
       get :edit_tag
+      get :dashboard
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
@@ -51,6 +52,13 @@ SEEK::Application.routes.draw do
       post :edit_tag
       post :update_imprint_setting
       post :clear_failed_jobs
+    end
+    resource :stats, controller: :stats, only: [] do
+      collection do
+        get :contributions
+        get :asset_activity
+        get :contributors
+      end
     end
   end
 
@@ -193,6 +201,7 @@ SEEK::Application.routes.draw do
       post :update_members
       post :request_membership
       get :isa_children
+      get :dashboard
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:search, :documents, :only=>[:index]
@@ -227,6 +236,13 @@ SEEK::Application.routes.draw do
         post :create_folder
         post :set_project_folder_title
         post :set_project_folder_description
+      end
+    end
+    resource :stats, controller: :project_stats, only: [] do
+      collection do
+        get :contributions
+        get :asset_activity
+        get :contributors
       end
     end
   end
@@ -733,4 +749,6 @@ SEEK::Application.routes.draw do
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.
   # match ':controller(/:action(/:id))(.:format)'
+  #
+   get '/home/isa_colours' => 'homes#isa_colours'
 end
