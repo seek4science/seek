@@ -10,7 +10,7 @@ class HelpAttachmentsController < ApplicationController
 
   def create
     @help_document = HelpDocument.find(params[:help_attachment][:help_document_id])
-    @help_attachment = HelpAttachment.new(params[:help_attachment])
+    @help_attachment = HelpAttachment.new(help_attachment_params)
     if @help_attachment.save
       @error_text = []
     else
@@ -36,5 +36,11 @@ class HelpAttachmentsController < ApplicationController
       page.visual_effect :highlight, 'attachment_list'
     end
   end
-  
+
+  private
+
+  def help_attachment_params
+    params.require(:help_attachment).permit(:title, :help_document_id, :uploaded_data )
+  end
+
 end
