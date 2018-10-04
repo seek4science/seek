@@ -22,13 +22,13 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
 
     # value through multiple associations
     value_for_contributor = value_for_key common_facet_config['contributor'], item
-    assert_equal [item.contributor.person.name], value_for_contributor
+    assert_equal [item.contributor.name], value_for_contributor
 
     # value from multiple places
     a_person = Factory(:person)
     item.creators = [a_person]
     value_for_multiple_contributors = value_for_key common_facet_config['contributor'], item
-    assert_includes(value_for_multiple_contributors, item.contributor.person.name)
+    assert_includes(value_for_multiple_contributors, item.contributor.name)
     assert_includes(value_for_multiple_contributors, a_person.name)
   end
 
@@ -40,7 +40,7 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
       if item.is_a?(Assay)
         assert_equal [item.contributor.name], contributor_value
       elsif item.respond_to?(:contributor)
-        assert_equal [item.contributor.person.name], contributor_value
+        assert_equal [item.contributor.name], contributor_value
       else
         assert_equal '(Missing value)', contributor_value
       end
@@ -79,7 +79,7 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     assert_equal '(Missing value)', exhibit_item['assay_type']
     assert_equal '(Missing value)', exhibit_item['technology_type']
     assert_equal [df.created_at.year], exhibit_item['created_at']
-    assert_equal df.creators.collect(&:name) + [df.contributor.person.name], exhibit_item['contributor']
+    assert_equal df.creators.collect(&:name) + [df.contributor.name], exhibit_item['contributor']
     assert_equal '(Missing value)', exhibit_item['tag']
   end
 
@@ -119,7 +119,7 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     assert_equal '(Missing value)', exhibit_item['assay_type']
     assert_equal '(Missing value)', exhibit_item['technology_type']
     assert_equal [df.created_at.year], exhibit_item['created_at']
-    assert_equal df.creators.collect(&:name) + [df.contributor.person.name], exhibit_item['contributor']
+    assert_equal df.creators.collect(&:name) + [df.contributor.name], exhibit_item['contributor']
     assert_equal '(Missing value)', exhibit_item['tag']
   end
 

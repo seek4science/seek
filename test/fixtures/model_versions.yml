@@ -1,5 +1,5 @@
 teusink_v1:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Teusink
   description: Teusink from JWS Online
   recommended_environment: jws
@@ -10,7 +10,7 @@ teusink_v1:
   policy: policy_for_test_with_projects_institutions  
 
 teusink_v2:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Teusink
   description: Teusink from JWS Online
   recommended_environment: jws
@@ -21,7 +21,7 @@ teusink_v2:
   policy: policy_for_test_with_projects_institutions
 
 teusink_with_space_v1:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Teusink with space
   description: Teusink from JWS Online
   recommended_environment: jws
@@ -32,7 +32,7 @@ teusink_with_space_v1:
   policy: policy_for_test_with_projects_institutions
   
 jws_model_v1:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Model in JWS Dat format
   description: Model in JWS Dat format
   recommended_environment: jws
@@ -43,7 +43,7 @@ jws_model_v1:
   policy: fully_public_policy  
   
 francos_model_v1:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Francos model
   description: Problematic BioModels model that Franco gave as a test
   recommended_environment: jws
@@ -54,7 +54,7 @@ francos_model_v1:
   policy: policy_for_test_with_projects_institutions    
 
 model_with_format_and_type_v1:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Model with format and type
   description: Teusink from JWS Online
   recommended_environment: jws
@@ -67,7 +67,7 @@ model_with_format_and_type_v1:
   policy: fully_public_policy
 
 model_with_links_in_description_v1:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Links in my desc
   description: Visit my site http://www.google.com
   recommended_environment: jws
@@ -78,7 +78,7 @@ model_with_links_in_description_v1:
   policy: sysmo_member_edit
   
 model_with_different_owner_v1:
-  contributor: pal_user (User)
+  contributor: pal
   title: Model with different Owner
   description: Visit my site http://www.google.com
   recommended_environment: jws
@@ -119,7 +119,7 @@ non_sbml_xml_v1:
   policy: policy_for_test_with_projects_institutions  
   
 invalid_sbml_xml_v1:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Invalid SBML XML
   description: An XML file that is not SBML
   model: invalid_sbml_xml

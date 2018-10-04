@@ -14,19 +14,18 @@ module Seek
 
     module InstanceMethods
       def scales=(scales, source = User.current_user)
-        scales = resolve_types(scales)
+        # handles scales passed as Id's, invalid or blank ids, or a single item
+        scales = Array(scales).map { |scale| scale.is_a?(Scale) ? scale : Scale.find_by_id(scale) }.compact
 
         remove = self.scales - scales
         add = scales - self.scales
 
         add.each do |scale|
-          annotation = Annotation.new(
+          self.annotations.build(
             source: source,
-            annotatable: self,
             attribute_name: 'scale',
             value: scale
           )
-          annotation.save
         end
 
         scale_annotations = annotations_with_attribute('scale')
@@ -41,31 +40,23 @@ module Seek
         annotations_with_attribute('scale', true).collect(&:value).sort_by(&:pos)
       end
 
-      private
-
-      # handles scales passed as Id's, invalid or blank ids, or a single item
-      def resolve_types(scales)
-        scales = Array(scales).collect do |scale|
-          if scale.is_a?(Numeric) || scale.is_a?(String)
-            scale = Scale.find_by_id(scale)
-          end
-          scale
-        end.compact
+      def scale_extra_params=(params_array)
+        params_array.each do |json|
+          data = JSON.parse(json)
+          attach_additional_scale_info data['scale_id'], param: data['param'], unit: data['unit']
+        end
       end
     end
 
     module WithParamsInstanceMethods
       def attach_additional_scale_info(scale_id, other_info = {}, source = User.current_user)
         other_info[:scale_id] = scale_id.to_s
-        value = TextValue.new
-        value.text = other_info.to_json
-        annotation = Annotation.new(
+
+        self.annotations.build(
           source: source,
-          annotatable: self,
           attribute_name: 'additional_scale_info',
-          value: value
+          value: other_info.to_json
         )
-        annotation.save
       end
 
       def fetch_additional_scale_info(scale_id)

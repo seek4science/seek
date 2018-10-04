@@ -1,25 +1,16 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-
-# one:
-#   column: value
-#
-# two:
-#   column: value
+# Relationships
 
 assay_and_publication:
-    subject: assay_with_a_publication (Assay)
-    other_object: taverna_paper_pubmed (Publication)
-    predicate: Relationship::RELATED_TO_PUBLICATION
+  subject: assay_with_a_publication (Assay)
+  other_object: taverna_paper_pubmed (Publication)
+  predicate: <%= Relationship::RELATED_TO_PUBLICATION %>
 
 model_and_publication:
-    subject: teusink (Model)
-    other_object: pubmed_2 (Publication)
-    predicate: Relationship::RELATED_TO_PUBLICATION
+  subject: teusink (Model)
+  other_object: pubmed_2 (Publication)
+  predicate: <%= Relationship::RELATED_TO_PUBLICATION %>
 
 datafile_and_publication:
-    subject: picture (DataFile)
-    other_object: pubmed_2 (Publication)
-    predicate: Relationship::RELATED_TO_PUBLICATION
-
-
-
+  subject: picture (DataFile)
+  other_object: pubmed_2 (Publication)
+  predicate: <%= Relationship::RELATED_TO_PUBLICATION %>

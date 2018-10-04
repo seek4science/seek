@@ -11,6 +11,7 @@ require 'seek/acts_as_fleximage_extension'
 require 'seek/acts_as_favouritable'
 require 'seek/acts_as_asset/acts_as_asset'
 require 'seek/acts_as_cached_tree'
+require 'seek/acts_as_annotatable_extensions'
 require 'seek/permissions/authorization_enforcement'
 require 'seek/permissions/acts_as_authorized'
 require 'seek/doi/acts_as_doi_parent'
@@ -44,6 +45,7 @@ require 'site_announcements'
 require 'seek/title_trimmer'
 require 'seek/grouped_pagination'
 require 'explicit_versioning'
+require 'private_address_check_monkeypatch'
 
 SEEK::Application.configure do
   ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']

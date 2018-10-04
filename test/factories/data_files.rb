@@ -41,6 +41,11 @@ Factory.define(:rightfield_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :rightfield_content_blob
 end
 
+Factory.define(:blank_rightfield_master_template_data_file, parent: :data_file) do |f|
+  f.association :content_blob, factory: :blank_rightfield_master_template
+end
+
+
 Factory.define(:rightfield_annotated_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :rightfield_annotated_content_blob
 end
@@ -113,4 +118,8 @@ end
 
 Factory.define(:api_pdf_data_file, parent: :data_file) do |f|
   f.association :content_blob, factory: :blank_pdf_content_blob
+end
+
+Factory.define(:api_txt_data_file, parent: :data_file) do |f|
+  f.association :content_blob, factory: :blank_txt_content_blob
 end

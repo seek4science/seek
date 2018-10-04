@@ -1,13 +1,174 @@
 <%
-  include_parents ||= false
-  deep ||= false
-  depth ||= 1
-  hash =  Seek::IsaGraphGenerator.new(root_item).generate({ deep: deep, depth: depth, include_parents: include_parents })
+  options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true }
+  hash = Seek::IsaGraphGenerator.new(root_item).generate(options)
   elements = cytoscape_elements(hash)
-
-  #show only current node and connected nodes
-  #if set force_max_node to true, show only max_node_number if (current node + connected nodes) is bigger then max_node_number
-  # reduced_elements = reduced_elements(elements, max_node_number, force_max_node, root_item)
+  default_view ||= 'tree'
+  view = params[:graph_view] || default_view
+  is_full_screen = params.key?(:fullscreen).present?
 %>
 
-<%= render partial: 'general/cytoscape_graph', locals: { elements: elements, root_item: root_item, hash: hash } %>
+
+<div class="row">
+  <div class="col-sm-12 hidden-xs">
+    <div id="isa-graph" class="panel panel-default">
+      <div id="node_info"></div>
+      <div class="isa-controls">
+        <div id="isa-view-controls">
+          <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-default btn-xs" id="isa-tree-view-btn" data-tooltip="Display with a folder like tree view">
+              <input type="radio" name="options" autocomplete="off"> Tree
+            </label>
+            <label class="btn btn-default btn-xs" id="isa-split-view-btn"  data-tooltip="Show both the tree and the graph view">
+              <input type="radio" name="options" autocomplete="off"> Split
+            </label>
+            <label class="btn btn-default btn-xs" id="isa-graph-view-btn"  data-tooltip="Display as a graph, showing the overall ISA structure">
+              <input type="radio" name="options" autocomplete="off"> Graph
+            </label>
+          </div>
+          <button class="btn btn-default btn-xs" id="export-png-btn" data-toggle="modal" data-target="#modal-exported-png" data-tooltip="Convert the current view to an image, which can be downloaded as a PNG file">
+            <%= image('picture') %>
+          </button>
+        </div>
+        <br/>
+        <button class="btn btn-default btn-xs" id="toggle-fullscreen-btn"  data-tooltip="Toggle between fullscreen and normal size">
+          <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+          Fullscreen
+        </button>
+        <button class="btn btn-default btn-xs" id="show-all-nodes-btn"  data-tooltip="Toggle between expanding all nodes in the graph, or showing just the nearest neighbours">
+          <%= image('graph_nodes') %>
+          All nodes
+        </button>
+      </div>
+      <div class="isa-wrapper">
+        <div id="cy"></div>
+        <%= render partial: 'general/jstree', locals: { hash: hash, root_item: root_item } %>
+      </div>
+    </div>
+
+    <span id="ruler" style="visibility: hidden"></span>
+  </div>
+</div>
+
+<%= modal_isa_png %>
+<img id="exported-png2"/>
+
+<script type="text/javascript">
+    var isaGraph = $j('#isa-graph')[0];
+    var elements = <%= elements.to_json.html_safe %>;
+
+    if (elements.error === 'error') {
+        isaGraph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
+        isaGraph.style['text-align'] = 'center';
+    } else if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)) {
+        isaGraph.innerHTML = "<div class='none_text'>Unable to display the graph for this browser version. Please upgrade your browser.</div>";
+        isaGraph.style['text-align'] = 'center';
+    } else {
+        ISA.decodeHTMLForElements(elements);
+        ISA.drawGraph(elements, '<%= node_id(root_item) -%>');
+    }
+
+    ISA.view = {
+        tree: function () {
+            $j('#isa-tree-view-btn').button('toggle');
+            $j('#cy').hide();
+            $j('#jstree').show();
+            $j('#jstree').css('width', '100%');
+            $j('#show-all-nodes-btn').hide();
+            $j('#export-png-btn').hide();
+            ISA.view.current = 'tree';
+            return false;
+        },
+
+        graph: function () {
+            $j('#isa-graph-view-btn').button('toggle');
+            $j('#cy').show();
+            $j('#jstree').hide();
+            $j('#show-all-nodes-btn').show();
+            $j('#export-png-btn').show();
+            cy.fit(ISA.defaults.padding);
+            cy.resize();
+            ISA.view.current = 'graph'
+            return false;
+        },
+
+        split: function () {
+            $j('#isa-split-view-btn').button('toggle');
+            $j('#cy').show();
+            $j('#jstree').show();
+            $j('#show-all-nodes-btn').show();
+            $j('#export-png-btn').show();
+            $j('#jstree').css('width', '300px');
+            cy.fit(ISA.defaults.padding);
+            cy.resize();
+            ISA.view.current = 'split'
+            return false;
+        },
+
+        default: '<%= view -%>',
+        current: '<%= view -%>'
+    };
+
+    $j(document).ready(function () {
+        // View buttons
+        $j('#isa-split-view-btn').click(ISA.view.split);
+        $j('#isa-graph-view-btn').click(ISA.view.graph);
+        $j('#isa-tree-view-btn').click(ISA.view.tree);
+        ISA.view[ISA.view.default](); // Apply the default view on page load
+
+        // Fullscreen
+        $j('#toggle-fullscreen-btn').click(function () {
+            $j('#toggle-fullscreen-btn').button('toggle');
+            ISA.fullscreen();
+            return false;
+        });
+
+        // Expand all graph nodes
+        $j('#show-all-nodes-btn').click(function () {
+            $j('#show-all-nodes-btn').button('toggle');
+            if (ISA.isShowGraphNodesActive()) {
+                cy.$('node.resource').addClass('selected');
+            }
+            else {
+                cy.$('node.resource').removeClass('selected');
+                if (ISA.currentSelectedNode) {
+                    ISA.selectNode(ISA.currentSelectedNode);
+                }
+
+            }
+
+            return false;
+        });
+
+        // display the PNG when the modal box appears
+        $j('#modal-exported-png').on('show.bs.modal', function (event) {
+            var scale = 3;
+            if (!ISA.isFullscreen()) {
+                scale *= 2;
+            }
+            var png = cy.png({bg:'white',scale:scale});
+            $j('#exported-png').attr('src', png);
+        });
+
+        $j('#save-exported-png').click(function() {
+          var src =  $j('#exported-png').attr('src');
+          var a  = document.createElement('a');
+          a.href = src;
+          a.download = 'isa-graph.png';
+          a.click();
+
+        });
+
+        //click the full screen button if fullscreen param present. calling ISA.fullscreen causes the button to be out of sync.
+        if (<%= is_full_screen %>) {
+          $j('#toggle-fullscreen-btn').click();
+        }
+
+
+        $j(document).keyup(function (e) {
+            if (e.keyCode == 27) { // Escape key
+                ISA.fullscreen(false);
+            }
+        });
+
+    });
+</script>

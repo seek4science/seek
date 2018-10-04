@@ -9,7 +9,7 @@
       <div class="col-md-6">
         <p>
           <label>Sample type:</label>
-          <%= link_to @sample.sample_type.title,@sample.sample_type %>
+          <%= sample_type_link(@sample) %>
         </p>
         <% if @sample.originating_data_file %>
             <p>
@@ -20,7 +20,6 @@
         <%= render :partial => "attribute_values", :locals => {:sample => @sample} %>
       </div>
     </div>
-    <%# render :partial => "samples/samples_graph", :locals => {:sample => @sample} %>
   </div>
 
   <div class="col-md-3 col-sm-4">

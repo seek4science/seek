@@ -9,8 +9,6 @@
 *= require autocompleter_advanced
 *= require site_announcements
 *= require tabnav
-*= require top_menu
-*= require dynamic_menu
 *= require easytabs
 *= require projects
 *= require jquery.bxslider

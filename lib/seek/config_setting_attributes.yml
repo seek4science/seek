@@ -182,6 +182,8 @@ about_page_enabled:
 about_page:
 terms_enabled:
 terms_page:
+privacy_enabled:
+privacy_page:
 nels_enabled:
 nels_client_id:
 nels_client_secret:

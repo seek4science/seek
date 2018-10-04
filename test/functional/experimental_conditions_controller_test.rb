@@ -201,7 +201,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     ec_array = []
     user = Factory(:user)
     login_as(user)
-    sop = Factory(:sop, contributor: user)
+    sop = Factory(:sop, contributor: user.person)
     assert_equal sop.experimental_conditions.count, 0
     # create bunch of ECes which are different
     i = 0
@@ -284,7 +284,6 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
   </Names>
 </Compound>)
     stub_request(:get, 'http://sabiork.h-its.org/sabioRestWebServices/compounds?compoundName=ATP')
-      .with(headers: { 'Accept' => '*/*; q=0.5, application/xml', 'Accept-Encoding' => 'gzip, deflate', 'User-Agent' => 'Ruby' })
       .to_return(status: 200, body: body, headers: {})
   end
 end

@@ -88,14 +88,15 @@ class AssaysControllerTest < ActionController::TestCase
     sop = sops(:sop_with_all_sysmo_users_policy)
     assert !assay.sops.include?(sop.latest_version)
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay_sop_ids: [sop.id], assay: { title: assay.title }
+      put :update, id: assay, assay: { sop_ids: [sop.id], title: assay.title }
+      assert_redirected_to assay_path(assay)
     end
 
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
 
     assay.reload
-    stored_sop_assay_asset = assay.assay_assets.detect { |aa| aa.asset_id = sop.id }
+    stored_sop_assay_asset = assay.assay_assets.detect { |aa| aa.asset == sop }
     assert_equal sop.version, stored_sop_assay_asset.version
 
     login_as sop.contributor
@@ -103,12 +104,12 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:model_owner)
 
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay_sop_ids: [sop.id], assay: { title: assay.title }
+      put :update, id: assay, assay: { sop_ids: [sop.id], title: assay.title }
+      assert_redirected_to assay_path(assay)
     end
 
     assay.reload
-    stored_sop_assay_asset = assay.assay_assets.detect { |aa| aa.asset_id = sop.id }
-    assert_equal sop.version, stored_sop_assay_asset.version
+    assert_equal sop.version, stored_sop_assay_asset.reload.version
   end
 
   test 'should update timestamp when associating sop' do
@@ -120,7 +121,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.sops.include?(sop.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay_sop_ids: [sop.id], assay: { title: assay.title }
+      put :update, id: assay, assay: { sop_ids: [sop.id], title: assay.title }
     end
 
     assert_redirected_to assay_path(assay)
@@ -140,8 +141,7 @@ class AssaysControllerTest < ActionController::TestCase
     sleep(1)
     assert_difference('ActivityLog.count') do
       put :update, id: assay,
-                   data_files: [{ id: df.id, relationship_type: RelationshipType.find_by_title('Test data').id }],
-                   assay: { title: assay.title }
+                   assay: { data_file_attributes: [{ asset_id: df.id, relationship_type_id: RelationshipType.find_by_title('Test data').id }], title: assay.title }
     end
 
     assert_redirected_to assay_path(assay)
@@ -160,7 +160,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.models.include?(model.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, model_ids: [model.id], assay: { title: assay.title }
+      put :update, id: assay, assay: { model_ids: [model.id], title: assay.title }
     end
 
     assert_redirected_to assay_path(assay)
@@ -737,38 +737,32 @@ class AssaysControllerTest < ActionController::TestCase
             technology_type_uri: 'http://some-uri#tech',
             assay_type_uri: 'http://some-uri#assay',
             study_id: studies(:metabolomics_study).id,
-            assay_class_id: assay_classes(:modelling_assay_class).id
-          }, policy_attributes: valid_sharing,
-                        assay_sop_ids: ["#{sop.id}"],
-                        model_ids: ["#{model.id}"],
-                        data_files: [{ id: datafile.id, relationship_type: rel.id }]
+            assay_class_id: assay_classes(:modelling_assay_class).id,
+            sop_ids: ["#{sop.id}"],
+            model_ids: ["#{model.id}"],
+            data_files_attributes: [{ asset_id: datafile.id, relationship_type_id: rel.id }]
+          }, policy_attributes: valid_sharing
         end
       end
     end
 
-    # since the items are added to the UI by manipulating the DOM with javascript, we can't do assert_select on the HTML elements to check they are there.
-    # so instead check for the relevant generated lines of javascript
-    assert_select 'script', text: /sop_title = '#{sop.title}'/, count: 1
-    assert_select 'script', text: /sop_id = '#{sop.id}'/, count: 1
-    assert_select 'script', text: /model_title = '#{model.title}'/, count: 1
-    assert_select 'script', text: /model_id = '#{model.id}'/, count: 1
+    assert_select "#assay_sop_ids option[selected][value='#{sop.id}']", text: sop.title
+    assert_select "#assay_model_ids option[selected][value='#{model.id}']", text: model.title
     df_json = JSON.parse(select_node_contents('#data_file_to_list script'))
     assert_equal 1, df_json.length
     assert_equal datafile.title, df_json[0]['title']
     assert_equal datafile.id, df_json[0]['id']
-    assert_equal rel.id.to_s, df_json[0]['relationship_type']['value']
-    assert_select 'script', text: /addSop/, count: 1
-    assert_select 'script', text: /addModel/, count: 1
+    assert_equal rel.id, df_json[0]['relationship_type']['value']
   end
 
   test 'should create with associated model sop data file and publication' do
-    user = Factory :user
-    login_as(user)
-    sop = Factory :sop, policy: Factory(:public_policy), contributor: user
-    model = Factory :model, policy: Factory(:public_policy), contributor: user
-    df = Factory :data_file, policy: Factory(:public_policy), contributor: user
-    pub = Factory :publication, contributor: user
-    study = Factory :study, policy: Factory(:public_policy), contributor: user
+    person = Factory :person
+    login_as(person.user)
+    sop = Factory :sop, policy: Factory(:public_policy), contributor: person
+    model = Factory :model, policy: Factory(:public_policy), contributor: person
+    df = Factory :data_file, policy: Factory(:public_policy), contributor: person
+    pub = Factory :publication, contributor: person
+    study = Factory :study, policy: Factory(:public_policy), contributor: person
     rel = RelationshipType.first
 
     assert_difference('ActivityLog.count') do
@@ -776,15 +770,15 @@ class AssaysControllerTest < ActionController::TestCase
         assert_difference('AssayAsset.count', 3) do
           assert_difference('Relationship.count') do
             post :create, assay: {
-              title: 'fish',
-              study_id: study.id,
-              assay_class_id: assay_classes(:modelling_assay_class).id
+                title: 'fish',
+                study_id: study.id,
+                assay_class_id: assay_classes(:modelling_assay_class).id,
+                sop_ids: ["#{sop.id}"],
+                model_ids: ["#{model.id}"],
+                data_files_attributes: [{ asset_id: df.id, relationship_type_id: rel.id }],
+                publication_ids: ["#{pub.id}"]
             },
-                          assay_sop_ids: ["#{sop.id}"],
-                          model_ids: ["#{model.id}"],
-                          data_files: [{ id: df.id, relationship_type: rel.id }],
-                          related_publication_ids: ["#{pub.id}"],
-                          policy_attributes: valid_sharing # default policy is nil in VLN
+                 policy_attributes: valid_sharing # default policy is nil in VLN
           end
         end
       end
@@ -812,35 +806,35 @@ class AssaysControllerTest < ActionController::TestCase
     assert assay.data_files.empty?
 
     sop = sops(:sop_with_all_sysmo_users_policy)
+    assert sop.can_view?
     model = models(:model_with_links_in_description)
+    assert model.can_view?
     datafile = data_files(:downloadable_data_file)
+    assert datafile.can_view?
+
     rel = RelationshipType.first
 
     assert_no_difference('ActivityLog.count') do
-      assert_no_difference('Assay.count', 'Should not have added assay because the title is blank') do
-        assert_no_difference('AssayAsset.count', 'Should not have added assay assets because the assay validation failed') do
+      assert_no_difference('AssayAsset.count', 'Should not have added assay assets because the assay validation failed') do
+        assert_no_difference('Assay.count', 'Should not have added assay because the title is blank') do
           # title is blank, so should fail validation
-          put :update, id: assay, assay: { title: '', assay_class_id: assay_classes(:modelling_assay_class).id },
-                       assay_sop_ids: ["#{sop.id}"],
-                       model_ids: ["#{model.id}"],
-                       data_files: [{ id: datafile.id, relationship_type: rel.id }]
+          put :update, id: assay, assay: { title: '',
+                                           assay_class_id: assay_classes(:modelling_assay_class).id,
+                                           sop_ids: ["#{sop.id}"],
+                                           model_ids: ["#{model.id}"],
+                                           data_files_attributes: [{ asset_id: datafile.id, relationship_type_id: rel.id }]
+          }
         end
       end
     end
 
-    # since the items are added to the UI by manipulating the DOM with javascript, we can't do assert_select on the HTML elements to check they are there.
-    # so instead check for the relevant generated lines of javascript
-    assert_select 'script', text: /sop_title = '#{sop.title}'/, count: 1
-    assert_select 'script', text: /sop_id = '#{sop.id}'/, count: 1
-    assert_select 'script', text: /model_title = '#{model.title}'/, count: 1
-    assert_select 'script', text: /model_id = '#{model.id}'/, count: 1
+    assert_select "#assay_sop_ids option[selected][value='#{sop.id}']", text: sop.title
+    assert_select "#assay_model_ids option[selected][value='#{model.id}']", text: model.title
     df_json = JSON.parse(select_node_contents('#data_file_to_list script'))
     assert_equal 1, df_json.length
     assert_equal datafile.title, df_json[0]['title']
     assert_equal datafile.id, df_json[0]['id']
-    assert_equal rel.id.to_s, df_json[0]['relationship_type']['value']
-    assert_select 'script', text: /addSop/, count: 1
-    assert_select 'script', text: /addModel/, count: 1
+    assert_equal rel.id, df_json[0]['relationship_type']['value']
   end
 
   def check_fixtures_for_authorization_of_sops_and_datafiles_links
@@ -1317,7 +1311,7 @@ class AssaysControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert assay.creators.empty?
 
-    put :update, id: assay.id, assay: { title: assay.title }, creators: [[creator.name, creator.id]].to_json
+    put :update, id: assay.id, assay: { title: assay.title, creator_ids: [creator.id] }
     assert_redirected_to assay_path(assay)
 
     assert assay.creators.include?(creator)
@@ -1329,9 +1323,9 @@ class AssaysControllerTest < ActionController::TestCase
     get :edit, id: assay.id
     assert_response :success
 
-    assert_select 'p#creators_list'
+    assert_select '#creators_list'
     assert_select "input[type='text'][name='creator-typeahead']"
-    assert_select "input[type='hidden'][name='creators']"
+    # assert_select "input[type='hidden'][name='creators']" This is set via JS
     assert_select "input[type='text'][name='assay[other_creators]']"
   end
 
@@ -1373,6 +1367,23 @@ class AssaysControllerTest < ActionController::TestCase
     assay2 = Factory(:assay, study: study2, policy: Factory(:public_policy),contributor:other_person)
 
     get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', assay_path(assay), text: assay.title
+      assert_select 'a[href=?]', assay_path(assay2), text: assay2.title, count: 0
+    end
+  end
+
+  test "document assays through nested routing" do
+    assert_routing 'documents/2/assays', controller: 'assays', action: 'index', document_id: '2'
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor:person)
+    assay2 = Factory(:assay, contributor:person)
+    document = Factory(:document,assays:[assay],contributor:person)
+
+    get :index, document_id: document.id
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -1544,13 +1555,148 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_not_includes assay.documents, document
 
-    assert_difference('AssayAsset.count') do
+    assert_difference('AssayAsset.count', 1) do
       put :update, id: assay, assay: { title: assay.title, document_ids: [document.id] }
     end
 
     assert_redirected_to assay_path(assay)
     assert_includes assigns(:assay).documents, document
     assert_not_equal timestamp, assigns(:assay).updated_at
+  end
+
+  test 'should not associate private document' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor: person)
+    document = Factory(:document, policy: Factory(:private_policy))
+
+    assert_not_includes assay.documents, document
+    refute document.can_view?(person.user)
+
+    assert_no_difference('AssayAsset.count') do
+      put :update, id: assay, assay: { title: assay.title, document_ids: [document.id] }
+    end
+
+    assert_redirected_to assay_path(assay)
+    assert_not_includes assigns(:assay).documents, document
+  end
+
+  test 'should disassociate document' do
+    person = Factory(:person)
+    login_as(person)
+    document = Factory(:document, contributor: person)
+    assay = Factory(:assay, contributor: person, documents: [document])
+
+    assert_includes assay.documents, document
+
+    assert_difference('AssayAsset.count', -1) do
+      put :update, id: assay, assay: { title: assay.title, document_ids: [] }
+    end
+
+    assert_redirected_to assay_path(assay)
+    assert_not_includes assigns(:assay).documents, document
+  end
+
+  test 'should associate sop' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor: person)
+    sop = Factory(:sop, contributor: person)
+    timestamp = assay.updated_at
+
+    assert_not_includes assay.sops, sop
+
+    assert_difference('AssayAsset.count', 1) do
+      put :update, id: assay, assay: { title: assay.title, sop_ids: [sop.id] }
+    end
+
+    assert_redirected_to assay_path(assay)
+    assert_includes assigns(:assay).sops, sop
+    assert_not_equal timestamp, assigns(:assay).updated_at
+  end
+
+  test 'should not associate private sop' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor: person)
+    sop = Factory(:sop, policy: Factory(:private_policy))
+
+    assert_not_includes assay.sops, sop
+    refute sop.can_view?(person.user)
+
+    assert_no_difference('AssayAsset.count') do
+      put :update, id: assay, assay: { title: assay.title, sop_ids: [sop.id] }
+    end
+
+    assert_redirected_to assay_path(assay)
+    assert_not_includes assigns(:assay).sops, sop
+  end
+
+  test 'should disassociate sop' do
+    person = Factory(:person)
+    login_as(person)
+    sop = Factory(:sop, contributor: person)
+    assay = Factory(:assay, contributor: person, sops: [sop])
+
+    assert_includes assay.sops, sop
+
+    assert_difference('AssayAsset.count', -1) do
+      put :update, id: assay, assay: { title: assay.title, sop_ids: [] }
+    end
+
+    assert_redirected_to assay_path(assay)
+    assert_not_includes assigns(:assay).sops, sop
+  end
+
+  test 'should associate model' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor: person)
+    model = Factory(:model, contributor: person)
+    timestamp = assay.updated_at
+
+    assert_not_includes assay.models, model
+
+    assert_difference('AssayAsset.count', 1) do
+      put :update, id: assay, assay: { title: assay.title, model_ids: [model.id] }
+    end
+
+    assert_redirected_to assay_path(assay)
+    assert_includes assigns(:assay).models, model
+    assert_not_equal timestamp, assigns(:assay).updated_at
+  end
+
+  test 'should not associate private model' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor: person)
+    model = Factory(:model, policy: Factory(:private_policy))
+
+    assert_not_includes assay.models, model
+    refute model.can_view?(person.user)
+
+    assert_no_difference('AssayAsset.count') do
+      put :update, id: assay, assay: { title: assay.title, model_ids: [model.id] }
+    end
+
+    assert_redirected_to assay_path(assay)
+    assert_not_includes assigns(:assay).models, model
+  end
+
+  test 'should disassociate model' do
+    person = Factory(:person)
+    login_as(person)
+    model = Factory(:model, contributor: person)
+    assay = Factory(:assay, contributor: person, models: [model])
+
+    assert_includes assay.models, model
+
+    assert_difference('AssayAsset.count', -1) do
+      put :update, id: assay, assay: { title: assay.title, model_ids: [] }
+    end
+
+    assert_redirected_to assay_path(assay)
+    assert_not_includes assigns(:assay).models, model
   end
 
   test 'cannot create with link to study in another project' do
@@ -1637,7 +1783,7 @@ class AssaysControllerTest < ActionController::TestCase
     refute bad_sop.can_view?
 
     assert_no_difference('AssayAsset.count') do
-      put :update, id: assay, assay_sop_ids: [bad_sop.id], assay: { title: assay.title }
+      put :update, id: assay, assay: { title: assay.title, sop_ids: [bad_sop.id] }
     end
     #FIXME: it currently ignores the bad asset, but ideally should respond with an error
     #assert_response :unprocessable_entity
@@ -1645,7 +1791,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_empty assay.sops
 
     assert_difference('AssayAsset.count') do
-      put :update, id: assay, assay_sop_ids: [good_sop.id], assay: { title: assay.title }
+      put :update, id: assay, assay: { title: assay.title, sop_ids: [good_sop.id] }
     end
     assay.reload
     assert_equal [good_sop],assay.sops
@@ -1666,7 +1812,11 @@ class AssaysControllerTest < ActionController::TestCase
     refute bad_sop.can_view?
 
     assert_no_difference('AssayAsset.count') do
-      post :create, assay_sop_ids: [bad_sop.id], assay: { title: 'testing', assay_class_id:AssayClass.experimental.id, study_id:study.id },policy_attributes: valid_sharing
+      post :create, assay: { title: 'testing',
+                             assay_class_id: AssayClass.experimental.id,
+                             study_id: study.id,
+                             sop_ids: [bad_sop.id] },
+           policy_attributes: valid_sharing
     end
     #FIXME: it currently ignores the bad asset, but ideally should respond with an error
     #assert_response :unprocessable_entity
@@ -1674,7 +1824,11 @@ class AssaysControllerTest < ActionController::TestCase
 
 
     assert_difference('AssayAsset.count') do
-      post :create, assay_sop_ids: [good_sop.id], assay: { title: 'testing', assay_class_id:AssayClass.experimental.id,study_id:study.id },policy_attributes: valid_sharing
+      post :create, assay: { title: 'testing',
+                             assay_class_id: AssayClass.experimental.id,
+                             study_id: study.id,
+                             sop_ids: [good_sop.id] },
+           policy_attributes: valid_sharing
     end
     assay = assigns(:assay)
     assert_equal [good_sop],assay.sops

@@ -10,6 +10,10 @@ class AttributionsTest < ActionController::TestCase
   include SharingFormTestHelper
   def setup
     login_as(:owner_of_my_first_sop)
+
+    @sop1 = Factory(:sop)
+    @sop2 = Factory(:sop)
+    @sop3 = Factory(:sop)
   end
 
   def test_should_create_attribution_when_creating_new_sop
@@ -19,9 +23,9 @@ class AttributionsTest < ActionController::TestCase
     assert_difference ['Sop.count', 'Relationship.count'] do
       post :create, sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] },
                     content_blobs: [{ data: file_for_upload }],
-                    sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', 1]])
+                    sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id]])
+      assert_redirected_to sop_path(assigns(:sop))
     end
-    assert_redirected_to sop_path(assigns(:sop))
   end
 
   def test_shouldnt_create_duplicated_attribution
@@ -29,26 +33,27 @@ class AttributionsTest < ActionController::TestCase
     # (two identical attributions will be posted, but only one needs to be created)
     assert_difference ['Sop.count', 'Relationship.count'] do
       post :create, sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] },
-                    content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', 1], ['Sop', 1]])
+                    content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id], ['Sop', @sop1.id]])
+      assert_redirected_to sop_path(assigns(:sop))
     end
-    assert_redirected_to sop_path(assigns(:sop))
   end
 
   def test_should_remove_attribution_on_update
     # create a SOP / attribution first
     assert_difference ['Sop.count', 'Relationship.count'] do
       post :create, sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] },
-                    content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', 1]])
+                    content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id]])
+      assert_redirected_to sop_path(assigns(:sop))
     end
-    assert_redirected_to sop_path(assigns(:sop))
 
     # update the SOP, but supply no data about attributions - these should be removed
     assert_no_difference('Sop.count') do
       assert_difference('Relationship.count', -1) do
         put :update, id: assigns(:sop).id, sop: { title: 'edited_title', project_ids: [projects(:myexperiment_project).id] }, sharing: valid_sharing, attributions: [] # NB! no attributions supplied - should remove if any existed for the sop
+
+        assert_redirected_to sop_path(assigns(:sop))
       end
     end
-    assert_redirected_to sop_path(assigns(:sop))
   end
 
   def test_attributions_will_get_destroyed_when_master_sop_is_destroyed
@@ -56,10 +61,11 @@ class AttributionsTest < ActionController::TestCase
     assert_difference('Sop.count') do
       assert_difference('Relationship.count', +2) do
         post :create, sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] },
-                      content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', 111], ['Sop', 222]])
+                      content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id], ['Sop', @sop2.id]])
+
+        assert_redirected_to sop_path(assigns(:sop))
       end
     end
-    assert_redirected_to sop_path(assigns(:sop))
 
     # destroy the new sop and verify that the attributions get destroyed too
     sop_instance = Sop.find(assigns(:sop).id)
@@ -82,28 +88,24 @@ class AttributionsTest < ActionController::TestCase
     assert_difference('Sop.count') do
       assert_difference('Relationship.count', +2) do
         post :create, sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] },
-                      content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', 1], ['Sop', 2]])
+                      content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id], ['Sop', @sop2.id]])
+        assert_redirected_to sop_path(assigns(:sop))
       end
     end
-    assert_redirected_to sop_path(assigns(:sop))
 
     # store IDs of created attribution for further checks
     sop_id = assigns(:sop).id
     sop_instance = Sop.find(sop_id)
 
     assert_equal 2, sop_instance.attributions.length
-    if sop_instance.attributions[0].other_object_id == 1
-      attr_to_sop_one = sop_instance.attributions[0]
-      attr_to_sop_two = sop_instance.attributions[1]
-    else
-      attr_to_sop_one = sop_instance.attributions[1]
-      attr_to_sop_two = sop_instance.attributions[0]
-    end
+    attr_to_sop_one = sop_instance.attributions.where(other_object_id: @sop1.id).first
+    attr_to_sop_two = sop_instance.attributions.where(other_object_id: @sop2.id).first
 
     # update the SOP: attributions data will add a new attribution, remove one old and keep one old unchanged -
     # this leaves the total number of attributions unchaged
     assert_no_difference ['Sop.count', 'Relationship.count'] do
-      put :update, id: assigns(:sop).id, sop: { title: 'edited_title' }, sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', 44], ['Sop', 2]])
+      put :update, id: assigns(:sop).id, sop: { title: 'edited_title' }, sharing: valid_sharing,
+          attributions: ActiveSupport::JSON.encode([['Sop', @sop3.id], ['Sop', @sop2.id]])
     end
     assert_redirected_to sop_path(assigns(:sop))
 
@@ -131,17 +133,17 @@ class AttributionsTest < ActionController::TestCase
     # (we have already checked that the total number of attributions after running the test
     #  is correct - one removed, one added, one left unchanged: total - unchanged)
     new_attr = Relationship.where(subject_id: sop_id, subject_type: sop_instance.class.name,
-                                  predicate: Relationship::ATTRIBUTED_TO, other_object_id: 44,
+                                  predicate: Relationship::ATTRIBUTED_TO, other_object_id: @sop3.id,
                                   other_object_type: 'Sop').first
     assert (!new_attr.nil?), "new attribution shouldn't be nil - nil means that it wasn't created"
   end
 
   test 'should display attributions' do
-    u = Factory :user
-    login_as(u)
-    sop1 = Factory :sop, policy: (Factory :public_policy), contributor: u
-    sop2 = Factory :sop, policy: (Factory :public_policy), contributor: u
-    sop3 = Factory :sop, policy: (Factory :public_policy), contributor: u
+    p = Factory :person
+    login_as(p.user)
+    sop1 = Factory :sop, policy: (Factory :public_policy), contributor: p
+    sop2 = Factory :sop, policy: (Factory :public_policy), contributor: p
+    sop3 = Factory :sop, policy: (Factory :public_policy), contributor: p
     Relationship.create subject: sop1, other_object: sop2, predicate: Relationship::ATTRIBUTED_TO
     sop1.reload
     sop2.reload

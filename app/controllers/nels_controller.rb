@@ -65,15 +65,14 @@ class NelsController < ApplicationController
 
     title = [dataset['name'], params[:subtype_name]].reject(&:blank?).join(' - ')
 
-    @content_blob = ContentBlob.create(url: url.chomp)
     @data_file = DataFile.new(title: title)
-    @data_file.content_blob = @content_blob
+    @content_blob = @data_file.create_content_blob(url: url.chomp)
 
     session[:uploaded_content_blob_id] = @content_blob.id
     session[:processed_datafile] = @data_file
-    session[:processed_assay] = Assay.new
+    session[:processed_assay] = @assay
 
-    redirect_to provide_metadata_data_files_path(assay_ids: [@assay.id], project_ids: @assay.project_ids)
+    redirect_to provide_metadata_data_files_path(project_ids: @assay.project_ids)
   end
 
   private

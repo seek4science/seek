@@ -33,6 +33,9 @@ module Seek
         options ||= {}
         reorder = options[:reorder].nil? ? true : options[:reorder]
 
+        # only reorder if there are items and they respond to updated_at
+        reorder = reorder && collection.first && collection.first.respond_to?(:updated_at)
+
         @latest_limit = options[:latest_limit] || @latest_limit
         @default_page = options[:default_page] || @default_page
 

@@ -7,7 +7,7 @@
       <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@sop} -%>
 
       <div class="form-group">
-        <label>Title <span class="required">*</span></label>
+        <label class="required">Title</label>
         <% sop_title_value = (params[:sop].blank? || params[:sop][:title].blank?) ? nil : params[:sop][:title] -%>
         <%= text_field_tag 'sop[title]', sop_title_value, :class=>"form-control" -%>
       </div>

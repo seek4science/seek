@@ -5,32 +5,32 @@
     <%= f.hidden_field :project_id, :class=>"login-credential" %>
 
     <div class="form-group">
-      <label>Main Web URL</label><span class="required">*</span>
+      <label class="required">Main Web URL</label>
       <%= f.text_field :web_endpoint, :class=>"form-control login-credential"-%>
     </div>
 
     <div class="form-group">
-      <label>Application Server Endpoint</label><span class="required">*</span>
+      <label class="required">Application Server Endpoint</label>
       <%= f.text_field :as_endpoint, :class=>"form-control login-credential"-%>
     </div>
 
     <div class="form-group">
-      <label>DataStore Server Endpoint</label><span class="required">*</span>
+      <label class="required">DataStore Server Endpoint</label>
       <%= f.text_field :dss_endpoint, :class=>"form-control login-credential"-%>
     </div>
 
     <div class="form-group">
-      <%= f.label :username -%><span class="required">*</span>
+      <%= f.label :username, class: 'required' -%>
       <%= f.text_field :username, :class=>"form-control login-credential"-%>
     </div>
 
     <div class="form-group">
-      <%= f.label :password -%><span class="required">*</span>
+      <%= f.label :password, class: 'required' -%>
       <%= f.password_field :password, :class=>"form-control login-credential"-%>
     </div>
 
     <div class="form-group">
-      <%= f.label 'Automated refresh period (hours)' %><span class="required">*</span>
+      <%= f.label 'Automated refresh period (hours)', class: 'required' %>
       <%= f.select :refresh_period_mins,(1..24).collect{|x| [x,x*60]},{},class:"form-control" %>
     </div>
 
@@ -67,16 +67,16 @@
           data: $j('input.login-credential').serialize(),
           success: function (data) {
             if (data.result==true) {
-              $j('#check-result').html('Authentication succeeded')
+              $j('#check-result').html('Authentication succeeded');
               fetchSpaces();
             }
             else {
-              $j('#check-result').html('Authentication failed!')
+              $j('#check-result').html('Authentication failed!');
               $j('#submit-button').prop('disabled', true);
             }
           },
           beforeSend: function () {
-            $j('#spaces').html('')
+            $j('#spaces').html('');
             $j('#check-result').html('<%= image('spinner') %> Checking authentication');
           }
         }

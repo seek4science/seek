@@ -15,6 +15,18 @@ SEEK::Application.routes.draw do
     end
   end
 
+  concern :has_dashboard do |stats_options|
+    resources :stats, stats_options.reverse_merge(only: []) do
+      collection do
+        get :dashboard
+        get :contributions
+        get :asset_activity
+        get :contributors
+        get :asset_accessibility
+      end
+    end
+  end
+
   resources :scales do
     collection do
       post :search
@@ -53,6 +65,7 @@ SEEK::Application.routes.draw do
       post :update_imprint_setting
       post :clear_failed_jobs
     end
+    concerns :has_dashboard, controller: :stats
   end
 
   resource :home do
@@ -63,6 +76,7 @@ SEEK::Application.routes.draw do
       post :send_feedback
       get :imprint
       get :terms
+      get :privacy
       get :about
     end
   end
@@ -169,7 +183,7 @@ SEEK::Application.routes.draw do
       get :select
       get :items
     end
-    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events,:samples,:specimens,:only=>[:index]
+    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:documents, :events,:samples,:specimens,:only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -195,7 +209,7 @@ SEEK::Application.routes.draw do
       get :isa_children
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
-              :publications,:events,:samples,:specimens,:strains,:search, :only=>[:index]
+              :publications,:events,:samples,:specimens,:strains,:search,:organisms, :documents, :only=>[:index]
     resources :openbis_endpoints do
       member do
         post :add_dataset
@@ -229,6 +243,7 @@ SEEK::Application.routes.draw do
         post :set_project_folder_description
       end
     end
+    concerns :has_dashboard, controller: :project_stats
   end
 
   resources :institutions do
@@ -253,7 +268,7 @@ SEEK::Application.routes.draw do
       post :items_for_result
       post :resource_in_tab
     end
-    resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
+    resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications, :documents, :only=>[:index]
     resources :snapshots, :only => [:show, :new, :create, :destroy] do
       member do
         get :mint_doi_confirm
@@ -299,7 +314,7 @@ SEEK::Application.routes.draw do
       get :published
       get :isa_children
     end
-    resources :people,:projects,:assays,:investigations,:models,:sops,:data_files,:publications,:only=>[:index]
+    resources :people,:projects,:assays,:investigations,:models,:sops,:data_files,:publications, :documents,:only=>[:index]
   end
 
   resources :assays do
@@ -337,7 +352,7 @@ SEEK::Application.routes.draw do
       get :new_object_based_on_existing_one
       get :isa_children
     end
-    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
+    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications, :documents,:strains, :organisms, :only=>[:index]
   end
 
 
@@ -525,7 +540,7 @@ SEEK::Application.routes.draw do
       get :isa_children
     end
     resources :people,:projects, :institutions, :investigations, :studies, :assays,
-              :data_files, :models, :sops, :presentations, :events, :publications
+              :data_files, :models, :sops, :presentations, :documents, :events, :publications, :organisms
   end
 
   resources :publications do
@@ -543,7 +558,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :disassociate_authors
     end
-    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :events,:only=>[:index]
   end
 
   resources :events do
@@ -670,7 +685,7 @@ SEEK::Application.routes.draw do
       get :mint_doi_confirm
       get :isa_children
     end
-    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:only=>[:index]
   end
 
   ### ASSAY AND TECHNOLOGY TYPES ###
@@ -692,8 +707,6 @@ SEEK::Application.routes.draw do
   get '/tags/:id' => 'tags#show', :as => :show_tag
   get '/tags' => 'tags#index', :as => :all_anns
   get '/tags/:id' => 'tags#show', :as => :show_ann
-  get '/jerm/' => 'jerm#index', :as => :jerm
-  get '/jerm/fetch' => 'jerm#fetch', :as=> :jerm_fetch
   get '/countries/:country_name' => 'countries#show', :as => :country
 
   get '/data_fuse/' => 'data_fuse#show', :as => :data_fuse
@@ -735,4 +748,6 @@ SEEK::Application.routes.draw do
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.
   # match ':controller(/:action(/:id))(.:format)'
+  #
+   get '/home/isa_colours' => 'homes#isa_colours'
 end

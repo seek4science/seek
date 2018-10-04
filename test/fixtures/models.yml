@@ -1,7 +1,7 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 teusink:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Teusink
   description: Teusink from JWS Online
   recommended_environment: jws
@@ -11,7 +11,7 @@ teusink:
   policy: policy_for_test_with_projects_institutions
 
 teusink_with_project_without_gatekeeper:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Teusink
   description: Teusink from JWS Online
   recommended_environment: jws
@@ -21,7 +21,7 @@ teusink_with_project_without_gatekeeper:
   policy: sysmo_member_edit
 
 teusink_with_space:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Teusink with space
   description: Teusink from JWS Online
   recommended_environment: jws
@@ -31,7 +31,7 @@ teusink_with_space:
   policy: policy_for_test_with_projects_institutions
   
 jws_model:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Model in JWS Dat format
   description: Model in JWS Dat format
   recommended_environment: jws
@@ -41,7 +41,7 @@ jws_model:
   policy: fully_public_policy
   
 francos_model:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Francos model
   description: Problematic BioModels model that Franco gave as a test
   recommended_environment: jws
@@ -51,7 +51,7 @@ francos_model:
   policy: policy_for_test_with_projects_institutions  
   
 non_sbml_xml:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Non SBML XML
   description: An XML file that is not SBML
   recommended_environment: jws
@@ -61,7 +61,7 @@ non_sbml_xml:
   policy: policy_for_test_with_projects_institutions   
   
 invalid_sbml_xml:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Invalid SBML XML
   description: An XML file that is not SBML
   recommended_environment: jws
@@ -71,7 +71,7 @@ invalid_sbml_xml:
   policy: policy_for_test_with_projects_institutions   
   
 non_jws_dat:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Non JWS Online Dat file
   description: An Dat file that is not JWS Online format
   recommended_environment: jws
@@ -81,7 +81,7 @@ non_jws_dat:
   policy: policy_for_test_with_projects_institutions   
 
 model_with_format_and_type:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Model with format and type
   description: Teusink from JWS Online
   recommended_environment: jws
@@ -94,7 +94,7 @@ model_with_format_and_type:
   policy: fully_public_policy
 
 model_with_links_in_description:
-  contributor: model_owner (User)
+  contributor: person_for_model_owner
   title: Links in my desc
   description: Visit my site http://www.google.com
   recommended_environment: jws
@@ -104,7 +104,7 @@ model_with_links_in_description:
   policy: sysmo_member_edit
 
 model_with_different_owner:
-  contributor: pal_user (User)
+  contributor: pal
   title: Model with different Owner
   description: Visit my site http://www.google.com
   recommended_environment: jws

@@ -1,7 +1,7 @@
 class ModelImage < ActiveRecord::Base
   DEFAULT_SIZE = '200x200'
   LARGE_SIZE = '1000x1000'
-  belongs_to :model
+  belongs_to :model, inverse_of: :model_image
 
   acts_as_fleximage do
     image_directory Seek::Config.model_image_filestore_path

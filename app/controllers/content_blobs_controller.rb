@@ -8,9 +8,11 @@ class ContentBlobsController < ApplicationController
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
 
+  include SysMODB::SpreadsheetExtractor
+
   def update
     if @content_blob.no_content?
-      @content_blob.tmp_io_object = request.body
+      @content_blob.tmp_io_object = get_request_payload
       @content_blob.save
       @asset.touch
       respond_to do |format|
@@ -43,12 +45,32 @@ class ContentBlobsController < ApplicationController
     end
   end
 
+  def csv_data
+    if !@content_blob.no_content?
+      mime_extensions = mime_extensions(@content_blob.content_type)
+      if !(%w(csv) & mime_extensions).empty?
+        render text: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
+      elsif !(%w(xls xlsx) & mime_extensions).empty?
+        sheet = params[:sheet] || 1
+        trim = params[:trim] || false
+        file = open(@content_blob.filepath)
+        render text: spreadsheet_to_csv(file, sheet, trim), content_type: 'text/csv'
+      else
+        render text: 'Unable to view contents of this data file,', content_type: 'text/csv', status: :not_acceptable
+      end
+    else
+      render text: 'No content, Content blob does not have content', content_type: 'text/csv', status: :not_found
+    end
+  end
+
+
   def show
     respond_to do |format|
       format.json { render json: @content_blob }
       format.html { render text: 'Format not supported', status: :not_acceptable }
       format.xml { render text: 'Format not supported', status: :not_acceptable }
       format.rdf { render text: 'Format not supported', status: :not_acceptable }
+      format.csv { csv_data }
     end
   end
 
@@ -239,6 +261,15 @@ class ContentBlobsController < ApplicationController
         error('Unable to find asset version', 'is invalid')
         return false
       end
+    end
+  end
+
+  def get_request_payload
+    if request.content_type == 'multipart/form-data'
+      # "Unwrap" multipart requests to get at the content.
+      params.values.detect { |v| v.is_a?(ActionDispatch::Http::UploadedFile) }
+    else
+      request.body
     end
   end
 end

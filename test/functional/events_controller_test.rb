@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class EventsControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
   include RestTestCases
   include GeneralAuthorizationTestCases
@@ -29,7 +30,7 @@ class EventsControllerTest < ActionController::TestCase
 
   test 'should have no avatar element in list' do
     e = Factory :event,
-                contributor: Factory(:user, person: Factory(:person, first_name: 'Dont', last_name: 'Display Person')),
+                contributor: Factory(:person, first_name: 'Dont', last_name: 'Display Person'),
                 project_ids: [Factory(:project, title: 'Dont Display Project').id],
                 policy: Factory(:public_policy)
     get :index
@@ -42,7 +43,7 @@ class EventsControllerTest < ActionController::TestCase
 
   test 'index should not show contributor or project' do
     e = Factory :event,
-                contributor: Factory(:user, person: Factory(:person, first_name: 'Dont', last_name: 'Display Person')),
+                contributor: Factory(:person, first_name: 'Dont', last_name: 'Display Person'),
                 project_ids: [Factory(:project, title: 'Dont Display Project').id],
                 policy: Factory(:public_policy)
     get :index
@@ -128,8 +129,8 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   # test "should not add invisible data_file" do
-  #  e = Factory :event, :contributor => User.current_user
-  #  df = Factory :data_file, :contributor => Factory(:user), :policy => Factory(:private_policy)
+  #  e = Factory :event, :contributor => User.current_user.person
+  #  df = Factory :data_file, :contributor => Factory(:person), :policy => Factory(:private_policy)
   #  put :update, :id => e.id, :data_file_ids => ["#{df.id}"], :event => {}
   #
   #  assert_redirected_to e
@@ -177,10 +178,44 @@ class EventsControllerTest < ActionController::TestCase
   test 'should create event with associated data file' do
     data_file = Factory(:data_file)
     assert_difference('Event.count', 1) do
-      post :create, event: valid_event, sharing: valid_sharing, data_files: [{ id: data_file.id }]
+      post :create, event: valid_event.merge(data_file_ids: [data_file.id]), sharing: valid_sharing
     end
 
     assert_includes assigns(:event).data_files, data_file
   end
+
+  test 'should create event and link to document' do
+    person = User.current_user.person
+    doc = Factory(:document, contributor:person)
+
+    assert_difference('Event.count', 1) do
+      post :create, event: valid_event.merge(document_ids: [doc.id.to_s]), sharing: valid_sharing
+    end
+
+    assert event = assigns(:event)
+    assert_equal [doc],event.documents
+  end
+
+  test 'should not create event with link to none visible document' do
+    doc = Factory(:document)
+    refute doc.can_view?
+
+    assert_no_difference('Event.count') do
+      post :create, event: valid_event.merge(document_ids: [doc.id.to_s]), sharing: valid_sharing
+    end
+
+  end
+
+  test 'should update with link to document' do
+    person = User.current_user.person
+    doc = Factory(:document, contributor:person)
+    event = Factory(:event,documents:[Factory(:document,contributor:person)],contributor:person)
+    refute_empty event.documents
+    refute_includes event.documents, doc
+    put :update, id: event.id, event: {document_ids:[doc.id.to_s]}
+    assert event = assigns(:event)
+    assert_equal [doc],event.documents
+  end
+
 
 end

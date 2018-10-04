@@ -4,7 +4,7 @@
 <%= f.hidden_field :new_link_from_assay -%>
 
 <div class="form-group">
-  <label>Title <span class="required">*</span></label>
+  <label class="required">Title</label>
   <%= f.text_field :title,:class=>"form-control" %>
 </div>
 
@@ -19,7 +19,7 @@
 </div>
 
 <%= folding_panel("#{t('investigation')} details") do %>
-    <label><%= t('investigation') %></label><span class="required">*</span>
+    <label class="required"><%= t('investigation') %></label>
     <%=link_to "New #{t('investigation')}?",new_investigation_path(:new_link_from_study=>true), :onclick => "window.open(this.href);return false;"%><br/>
     <div id="investigation_collection">
       <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
@@ -36,7 +36,7 @@
     existing_creators =  [current_user.person] if existing_creators.blank?
 %>
 
-<%= render :partial => "assets/author_form", :locals => {:resource_type => t('study'), # this is only for presentation, not for any processing
+<%= render :partial => "assets/author_form", :locals => {:form => f,
                                                          :existing_creators => existing_creators,
                                                          :other_creators => @study.other_creators} -%>
 
@@ -46,8 +46,7 @@
 
 <%= render :seek_partial=>"sharing/form" if @study.can_manage? -%>
 
-<%= render :partial => "assets/associate_publication", :locals => { :resource_type => t('study'),
-                                                                        :related_publications => @study.publications} -%>
+<%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
 <script type="text/javascript">
     var CREATE_INVESTIGATION_LINK = "<%= create_investigation_url %>";

@@ -17,7 +17,7 @@ gem 'RedCloth', '4.2.9'
 gem 'simple-spreadsheet-extractor', '~>0.16.0'
 gem 'sample-template-generator', '~>0.5'
 gem 'rmagick', '2.15.2'
-gem 'rest-client'
+gem 'rest-client', '~>2.0'
 gem 'factory_girl', '2.6.4'
 gem 'bio', '~> 1.5.1'
 gem 'sunspot_rails', '~>2.2.0'
@@ -35,6 +35,7 @@ gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'
 gem 'json-schema'
 gem 'json-diff'
+gem 'rubyzip', '~> 1.2.2'
 
 gem 'equivalent-xml'
 gem 'breadcrumbs_on_rails'
@@ -46,7 +47,7 @@ gem 'acts-as-taggable-on', '3.0.1'
 gem 'acts_as_list'
 gem 'acts_as_tree'
 gem 'country_select'
-gem 'will_paginate', '~> 3.0.4'
+gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
@@ -58,6 +59,7 @@ gem 'lograge'
 gem 'psych'
 gem 'validate_url'
 gem "attr_encrypted", "~> 3.0.0"
+gem 'app_version'
 
 # gem for BiVeS and BudHat
 gem 'bives'
@@ -69,7 +71,6 @@ gem 'white_list_formatted_content', git: 'https://github.com/SysMO-DB/white_list
 gem 'my_responds_to_parent', git: 'https://github.com/SysMO-DB/my_responds_to_parent.git'
 gem 'bioportal', '>=3.0', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'acts_as_activity_logged', git: 'https://github.com/SysMO-DB/acts_as_activity_logged.git'
-gem 'app_version', git: 'https://github.com/SysMO-DB/app_version.git'
 gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
 gem 'convert_office', git: 'https://github.com/SysMO-DB/convert_office.git', ref: '753f2567dbd625bc89071e1150404efbb562e130'
 gem 'fleximage', git: 'https://github.com/SysMO-DB/fleximage.git', ref: 'bb1182f2716a9bf1b5d85e186d8bb7eec436797b'
@@ -84,8 +85,6 @@ gem 'metainspector'
 gem 'mechanize'
 gem 'mimemagic'
 gem 'auto_strip_attributes'
-
-gem 'datacite_doi_ify', '~>1.1.0'
 
 gem 'bootstrap-sass'
 gem 'sass-rails'
@@ -133,6 +132,7 @@ source 'https://rails-assets.org' do
   gem 'rails-assets-vue', '~> 2.1.8'
   gem 'rails-assets-eonasdan-bootstrap-datetimepicker', '~> 4.17.42'
   gem 'rails-assets-x-editable', '~> 1.5.1'
+  gem 'rails-assets-chartjs', '~> 2.7.2'
 end
 
 group :production do

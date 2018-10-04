@@ -47,14 +47,14 @@ end
 
     <div role="tabpanel" class="tab-pane <%= 'active'.html_safe unless url_from_params -%>" id="local-file">
       <div class="form-group">
-        <label>File to upload<span class="required">*</span></label>
+        <label class="required">File to upload</label>
         <%= file_field_tag "content_blobs[][data]", { "data-batch-upload" => batch } -%>
       </div>
     </div>
 
     <div role="tabpanel" class="tab-pane <%= 'active'.html_safe if url_from_params -%>" id="remote-url">
       <div class="form-group">
-        <label>URL<span class="required">*</span></label>
+        <label class="required">URL</label>
 
         <div class="row">
           <div class="col-sm-8">

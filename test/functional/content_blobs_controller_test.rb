@@ -186,6 +186,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     begin
       # Need to allow the request through so that `private_address_check` can catch it.
       WebMock.allow_net_connect!
+      assert PrivateAddressCheck.resolves_to_private_address?('192.168.0.1')
       VCR.turned_off do
         xml_http_request :get, :examine_url, data_url: 'http://192.168.0.1/config'
         assert_response :success
@@ -263,8 +264,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     assert_equal 'attachment; filename="ms_word_test.pdf"', @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
-    # assert_equal 16235, @response.header['Content-Length'].to_i
-    assert_includes 9200..16_300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 9200-9300 bytes'
+
+    assert_includes 8000..9300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 8000-9300 bytes'
 
     assert File.exist?(ms_word_sop.content_blob.filepath)
     assert File.exist?(pdf_path)
@@ -331,8 +332,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal 'attachment; filename="ms_word_test.pdf"', @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
-    # assert_equal 16235, @response.header['Content-Length'].to_i
-    assert_includes 9200..16_300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 9200-9300 bytes'
+    assert_includes 8000..9300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 8000-9300 bytes'
 
     assert File.exist?(doc_sop.content_blob.filepath)
     assert File.exist?(doc_sop.content_blob.filepath('pdf')), 'the generated PDF file should remain'
@@ -419,6 +419,55 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal 'text/html', @response.content_type
   end
 
+  test 'can fetch csv content blob as csv' do
+    df = Factory(:data_file, content_blob: Factory(:csv_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    assert_response :success
+
+    assert @response.content_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(1,2,3,4,5))
+
+  end
+
+  test 'can fetch excel content blob as csv' do
+    df = Factory(:data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    assert_response :success
+
+    assert @response.content_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(,"some stuff"))
+
+  end
+
+  test 'cannot fetch binary content blob as csv' do
+    df = Factory(:data_file, content_blob: Factory(:binary_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    assert_response :not_acceptable
+
+    assert @response.content_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(Unable to view))
+
+  end
+
+  test 'cannot fetch empty content blob as csv' do
+    df = Factory(:data_file, content_blob: Factory(:blank_pdf_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
+    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    assert_response :not_found
+
+    assert @response.content_type, 'text/csv'
+
+    csv = @response.body
+    assert csv.include?(%(No content))
+
+  end
+
+
   test 'can view content of an image file' do
     df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
                              content_blob: Factory(:image_content_blob))
@@ -456,7 +505,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should download' do
-    df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user
+    df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person
     assert_difference('ActivityLog.count') do
       get :download, data_file_id: df, id: df.content_blob
     end
@@ -467,7 +516,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should not log download for inline view intent' do
-    df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user
+    df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person
     assert_no_difference('ActivityLog.count') do
       get :download, data_file_id: df, id: df.content_blob, intent: :inline_view
     end
@@ -514,6 +563,20 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+  test 'should gracefully handle other error codes' do
+    mock_http
+    df = Factory :data_file,
+                 policy: Factory(:all_sysmo_downloadable_policy),
+                 content_blob: Factory(:url_content_blob,
+                                       url: 'http://mocked500.com',
+                                       uuid: UUID.generate)
+
+    get :download, data_file_id: df, id: df.content_blob
+    assert_redirected_to data_file_path(df, version: df.version)
+    assert_not_nil flash[:error]
+    assert_includes flash[:error], '500'
+  end
+
   test 'should handle inline download when specify the inline disposition' do
     data = File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb').read
     df = Factory :data_file,
@@ -524,6 +587,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response :success
     assert @response.header['Content-Disposition'].include?('inline')
   end
+
+
 
   test 'should handle normal attachment download' do
     data = File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb').read
@@ -537,7 +602,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'activity correctly logged' do
-    model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user
+    model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user.person
     first_content_blob = model.content_blobs.first
     assert_difference('ActivityLog.count') do
       get :download, model_id: model.id, id: first_content_blob.id
@@ -552,7 +617,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should download identical file from file list' do
-    model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user
+    model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user.person
     first_content_blob = model.content_blobs.first
     assert_difference('ActivityLog.count') do
       get :download, model_id: model.id, id: first_content_blob.id
@@ -582,6 +647,36 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response :not_found
   end
 
+  test 'download sample type template blob' do
+    person = User.current_user.person
+    sample_type = Factory(:strain_sample_type, contributor:person)
+    refute_nil sample_type.template
+    assert sample_type.can_view?
+    assert sample_type.can_download?
+    assert_difference('ActivityLog.count') do
+      get :download, sample_type_id:sample_type.id, id:sample_type.template.id
+    end
+
+    assert_response :success
+    assert_equal "attachment; filename=\"#{sample_type.template.original_filename}\"", @response.header['Content-Disposition']
+
+    assert_equal sample_type, ActivityLog.last.activity_loggable
+    assert_equal 'download',ActivityLog.last.action
+  end
+
+  test 'cannot download sample type template you cannot view' do
+    login_as(Factory(:person))
+    sample_type = Factory(:strain_sample_type, contributor:Factory(:person))
+    refute_nil sample_type.template
+    refute sample_type.can_view?
+    refute sample_type.can_download?
+    assert_no_difference('ActivityLog.count') do
+      get :download, sample_type_id:sample_type.id, id:sample_type.template.id
+    end
+
+    assert_response :redirect
+  end
+
   private
 
   def mock_http
@@ -593,6 +688,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     stub_request(:any, 'http://www.mocked302.com').to_return(status: 200)
     stub_request(:any, 'http://mocked401.com').to_return(status: 401)
     stub_request(:any, 'http://mocked404.com').to_return(status: 404)
+    stub_request(:any, 'http://mocked500.com').to_return(status: 500)
 
     stub_request(:any, 'http://unknownhost.com/pic.png').to_raise(SocketError)
   end

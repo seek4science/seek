@@ -184,6 +184,10 @@ class AdminController < ApplicationController
     Seek::Config.terms_enabled = string_to_boolean params[:terms_enabled]
     Seek::Config.terms_page = params[:terms_page]
 
+
+    Seek::Config.privacy_enabled = string_to_boolean params[:privacy_enabled]
+    Seek::Config.privacy_page = params[:privacy_page]
+
     update_redirect_to true, 'rebrand'
   end
 

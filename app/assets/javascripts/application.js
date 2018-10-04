@@ -15,16 +15,12 @@
 //= require application_shared
 //= require tagging
 //= require autocompleter_advanced
-//= require publication
-//= require investigation
-//= require study
 //= require top_menu
 //= require dropMenu
 //= require dynamic_menu
 //= require assays
 //= require models
 //= require sharing
-//= require associate_events
 //= require attribution
 //= require creators
 //= require resource
@@ -71,4 +67,5 @@
 //= require bives
 //= require asset_report
 //= require uri
+//= require chartjs
 //= require_tree ./templates

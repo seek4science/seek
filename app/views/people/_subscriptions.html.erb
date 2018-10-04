@@ -8,45 +8,62 @@
    end
 %>
 <%= folding_panel("Subscriptions", false, :help_text => info_text) do %>
-    <span class="none_text"> The following <%= t('project').pluralize %> are subscribed to by you, you may click it to view or edit the subscription: </span>
-    <ul id="project_subscription_list">
-
-      <span class="none_text" id="no_project_text" style="display: <%= project_subscriptions.empty? ? 'block' : 'none' %>">None</span>
-      <% project_subscriptions.each do |ps| %>
+  <div class="row">
+    <div class="col-md-6">
+      You are subscribed to the following <%= t('project').pluralize %>:
+      <ul id="project_subscription_list">
+        <span class="none_text" id="no_project_text" style="display: <%= project_subscriptions.empty? ? 'block' : 'none' %>">None</span>
+        <% project_subscriptions.each do |ps| %>
           <li id="<%= ps.project_id %>_li">
             <%= link_to_function h(ps.project.title), "$('select_project_subscription').value = #{ps.project.id};show_project_subscription();$('select_project_subscription').value =0;return false;" %>
           </li>
-      <% end %>
-    </ul>
-    <br/>
-     <span class="none_text"> You can subscribe other <%= t('project').pluralize %>: </span> <br/>
-    <%= select_tag :select_project_subscription,
-                   options_for_select([["Select #{t('project')} ...", 0]]|projects.collect { |p| [truncate(h(p.title), :length=>select_truncate_length), p.id] }),
-                   {:style=>"width:90%",
-                    :onchange=>"show_project_subscription();return(false);"} -%>
+        <% end %>
+      </ul>
+      <p class="help-block">
+        Click to view or edit the subscription.
+      </p>
 
-    <br/>
+      <hr/>
+      <div class="form-group">
+        <label>Subscribe to additional <%= t('project').pluralize %>:</label>
+        <%= select_tag :select_project_subscription,
+                       options_for_select([["Select #{t('project')} ...", 0]]|projects.collect { |p| [truncate(h(p.title), length: select_truncate_length), p.id] }),
+                       { class: 'form-control',
+                         onchange: "show_project_subscription(); return(false);"} -%>
+      </div>
+    </div>
 
-    <%= f.fields_for :project_subscriptions, project_subscriptions_with_unsubscribed do |sub_form| %>
+    <div class="col-md-6">
+      <%= f.fields_for :project_subscriptions, project_subscriptions_with_unsubscribed do |sub_form| %>
         <% project_subscription = sub_form.object %>
         <div id="subscription<%= project_subscription.project_id %>" style="display:none;">
-          <fieldset>
+          <%= panel "Subscription to: #{h(project_subscription.project.title)}" do %>
             <%= sub_form.hidden_field :id unless sub_form.object.new_record? %>
-            <legend> <%= t('project') %>: <%= h(project_subscription.project.title) %></legend>
             <%= sub_form.hidden_field :project_id %>
-            <br/>
-
-            Check to subscribe: <%= sub_form.check_box :_destroy, {:checked => !sub_form.object.marked_for_destruction?,:onclick=>"updateSubscribedProjectsList(this,#{project_subscription.project_id},'#{project_subscription.project.title}');"}, 0, 1 %>
-            <br/>
-            <p> Would you like to receive emails:
-              <% Subscription::FREQUENCIES.each do |freq| %>
-                  <%= sub_form.radio_button :frequency, freq %> <%= "#{freq.capitalize}" %>
-              <% end %>
-
+            <div class="checkbox">
+              <label>
+                <%= sub_form.check_box :_destroy, {:checked => !sub_form.object.marked_for_destruction?,:onclick=>"updateSubscribedProjectsList(this,#{project_subscription.project_id},'#{project_subscription.project.title}');"}, 0, 1 %>
+                <strong>Subscription active?</strong>
+              </label>
+            </div>
+            <p class="help-block">
+              Uncheck to disable your subscription.
             </p>
-          </fieldset>
+
+            <strong>Receive emails:</strong>
+            <% Subscription::FREQUENCIES.each do |freq| %>
+              <div class="radio">
+                <label>
+                  <%= sub_form.radio_button :frequency, freq %>
+                  <%= "#{freq.capitalize}" %>
+                </label>
+              </div>
+            <% end %>
+          <% end %>
         </div>
-    <% end %>
+      <% end %>
+    </div>
+  </div>
 <% end %>
 
 <script type="text/javascript">
@@ -99,7 +116,7 @@
 
         //hide/display -None-
         if ($('project_subscription_list').getElementsByTagName('li').length > 0)
-           $('no_project_text').style['display'] = 'none'
+           $('no_project_text').style['display'] = 'none';
         else
            $('no_project_text').style['display'] = 'block'
     }

@@ -6,7 +6,7 @@
       <%= f.error_messages %>
 
       <div class="form-group">
-        <label>Title <span class="required">*</span></label>
+        <label class="required">Title</label>
         <%= f.text_field :title, :class=>"form-control" -%>
       </div>
 
@@ -37,9 +37,7 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file} -%>
 
-      <% if Seek::Config.events_enabled -%>
-          <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
-      <% end -%>
+      <%= fancy_multiselect @data_file, :events, { other_projects_checkbox: true } if Seek::Config.events_enabled %>
 
       <div>
 

@@ -7,6 +7,7 @@ class OrganismsController < ApplicationController
   before_filter :login_required,:except=>[:show,:index,:visualise]
   before_filter :can_manage?,:only=>[:edit,:update]
   before_filter :auth_to_create, :only=>[:new,:create, :destroy]
+  before_filter :find_assets, only: [:index]
 
   skip_before_filter :project_membership_required
   
@@ -27,7 +28,6 @@ class OrganismsController < ApplicationController
   end
 
   def index
-    @organisms = Organism.order('title ASC').to_a
 
     if request.format.symbol == :html
       super

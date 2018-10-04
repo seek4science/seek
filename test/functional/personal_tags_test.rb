@@ -55,24 +55,24 @@ class PersonalTagsTest < ActionController::TestCase
     p.expertise = %w(one two three)
     p.tools = ['four']
     assert p.save
-    assert_equal %w(one three two), p.expertise.collect(&:text).sort
-    assert_equal ['four'], p.tools.collect(&:text).sort
+    assert_equal %w(one three two), p.expertise.sort
+    assert_equal ['four'], p.tools.sort
 
     p = Person.find(p.id)
-    assert_equal %w(one three two), p.expertise.collect(&:text).sort
-    assert_equal ['four'], p.tools.collect(&:text).sort
+    assert_equal %w(one three two), p.expertise.sort
+    assert_equal ['four'], p.tools.sort
 
-    expertise_annotations = p.expertise.sort_by(&:text)
+    expertise_annotations = p.expertise.sort
     one = expertise_annotations[0]
     two = expertise_annotations[2]
     three = expertise_annotations[1]
     four = p.tools.first
-    post :update, id: p.id, person: { email: p.email }, expertise_list: [one.text, two.text, 'five'].join(','), tool_list: [four.text, 'three'].join(',')
+    post :update, id: p.id, person: { email: p.email }, expertise_list: [one, two, 'five'].join(','), tool_list: [four, 'three'].join(',')
     assert_redirected_to p
     p = Person.find(p.id)
 
-    assert_equal %w(five one two), p.expertise.collect(&:text).sort
-    assert_equal %w(four three), p.tools.collect(&:text).sort
+    assert_equal %w(five one two), p.expertise.sort
+    assert_equal %w(four three), p.tools.sort
   end
 
   test 'expertise and tools do not appear in personal tag cloud' do
