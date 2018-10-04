@@ -1,0 +1,42 @@
+<style>
+  .isa_block {
+    width: 200px;
+    height: 65px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    line-height: 60px;
+    background-color: #8ee5ee;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+
+  .isa_block img {
+    width: 40px;
+    position: absolute;
+    left: 12px;
+    top: 12px;
+  }
+
+  .new-colours { border-width: 0 }
+</style>
+
+<% groups = [[Programme, Project], [Investigation, Study, Assay], [DataFile, Model, Sop, Sample, Publication, Document], [Presentation, Event]].map { |a| a.map(&:name) } + [['HiddenItem']] %>
+<div class="row">
+  <% ['Old', 'New'].each do |gen| %>
+    <div class="col-md-6">
+      <h2><%= gen %></h2>
+      <% groups.each do |group| %>
+        <% group.each do |type| %>
+          <div class="isa_block <%= gen.downcase -%>-colours" style="background-color: <%= ISAHelper.const_get("#{gen.upcase}_FILL_COLOURS")[type] -%>;">
+            <%= image_tag(asset_path(icon_filename_for_key("#{type.downcase}_avatar") || icon_filename_for_key('misc_file'))) unless type == 'HiddenItem' %>
+            <%= type.titleize %>
+          </div>
+        <% end %>
+        <hr/>
+      <% end %>
+    </div>
+  <% end %>
+</div>

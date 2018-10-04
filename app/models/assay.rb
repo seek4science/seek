@@ -4,9 +4,6 @@ class Assay < ActiveRecord::Base
   include Seek::Taggable
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-  # for single table inheritance
-  # self.inheritance_column = 'class_type'
-
   # needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
   def projects
     study.try(:projects) || []
@@ -23,12 +20,16 @@ class Assay < ActiveRecord::Base
     end
   end
 
+  # needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
+  belongs_to :study
+  has_many :projects, through: :study
+
   acts_as_isa
   acts_as_snapshottable
 
   belongs_to :institution
 
-  belongs_to :study
+
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
   has_many :organisms, through: :assay_organisms, inverse_of: :assays
@@ -59,10 +60,6 @@ class Assay < ActiveRecord::Base
   attr_reader :pending_related_assets
 
   enforce_authorization_on_association :study, :view
-
-  def project_ids
-    projects.map(&:id)
-  end
 
   def default_contributor
     User.current_user.try :person

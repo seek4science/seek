@@ -37,28 +37,28 @@ class SubscriptionTest < ActiveSupport::TestCase
   test 'subscribing and unsubscribing toggle subscribed?' do
     s = Factory(:subscribable)
 
-    assert !s.subscribed?
+    refute s.subscribed?
     disable_authorization_checks { s.subscribe }
     s.reload
     assert s.subscribed?
 
     disable_authorization_checks { s.unsubscribe }
     s.reload
-    assert !s.subscribed?
+    refute s.subscribed?
 
     another_person = Factory(:person)
-    assert !s.subscribed?(another_person)
+    refute s.subscribed?(another_person)
     disable_authorization_checks { s.subscribe(another_person) }
     s.reload
     assert s.subscribed?(another_person)
     disable_authorization_checks { s.unsubscribe(another_person) }
     s.reload
-    assert !s.subscribed?(another_person)
+    refute s.subscribed?(another_person)
   end
 
   test 'can subscribe to someone elses subscribable' do
     s = Factory(:subscribable, contributor: Factory(:person))
-    assert !s.subscribed?
+    refute s.subscribed?
     disable_authorization_checks { s.subscribe }
     assert s.save
     assert s.subscribed?
@@ -125,7 +125,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     current_person.notifiee_info.save!
     current_person.reload
 
-    assert !current_person.receive_notifications?
+    refute current_person.receive_notifications?
 
     proj = Factory(:project)
     person = Factory(:person,project:proj)
@@ -223,7 +223,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     RemoveSubscriptionsForItemJob.new(assay, [proj]).perform
 
     assay.reload
-    assert !assay.subscribed?(current_person)
+    refute assay.subscribed?(current_person)
     assert study.subscribed?(current_person)
     assert investigation.subscribed?(current_person)
   end
@@ -234,8 +234,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     s1 = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:person)
     s2 = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:person)
 
-    assert !s1.subscribed?(current_person)
-    assert !s2.subscribed?(current_person)
+    refute s1.subscribed?(current_person)
+    refute s2.subscribed?(current_person)
 
     project_subscription = current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     ProjectSubscriptionJob.new(project_subscription.id).perform
@@ -292,7 +292,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert SetSubscriptionsForItemJob.new(s, s.projects).exists?
     SetSubscriptionsForItemJob.new(s, s.projects).perform
 
-    assert !s.subscribed?(current_person)
+    refute s.subscribed?(current_person)
 
     # changing projects associated with the item
     proj = Factory(:project)
@@ -315,7 +315,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal 1, s.projects.count
     project = s.projects.first
 
-    assert !s.subscribed?(current_person)
+    refute s.subscribed?(current_person)
 
     # changing projects associated with the item
     proj1 = Factory(:project)
@@ -378,9 +378,9 @@ class SubscriptionTest < ActiveSupport::TestCase
     investigation.reload
     study.reload
     assay.reload
-    assert !investigation.subscribed?(current_person)
-    assert !study.subscribed?(current_person)
-    assert !assay.subscribed?(current_person)
+    refute investigation.subscribed?(current_person)
+    refute study.subscribed?(current_person)
+    refute assay.subscribed?(current_person)
   end
 
   test 'should add subscriptions when updating the projects associating to an investigation' do
@@ -402,9 +402,9 @@ class SubscriptionTest < ActiveSupport::TestCase
     SetSubscriptionsForItemJob.new(study, study.projects).perform
     SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
 
-    assert !investigation.subscribed?(current_person)
-    assert !study.subscribed?(current_person)
-    assert !assay.subscribed?(current_person)
+    refute investigation.subscribed?(current_person)
+    refute study.subscribed?(current_person)
+    refute assay.subscribed?(current_person)
 
     # changing projects associated with the investigation
     investigation.reload
@@ -458,7 +458,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     assert RemoveSubscriptionsForItemJob.new(assay, [proj]).exists?
     assert RemoveSubscriptionsForItemJob.new(study, [proj]).exists?
-    assert !RemoveSubscriptionsForItemJob.new(investigation, [proj]).exists?
+    refute RemoveSubscriptionsForItemJob.new(investigation, [proj]).exists?
     RemoveSubscriptionsForItemJob.new(assay, [proj]).perform
     RemoveSubscriptionsForItemJob.new(study, [proj]).perform
 
@@ -466,8 +466,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     study.reload
     assay.reload
     assert investigation.subscribed?(current_person)
-    assert !study.subscribed?(current_person)
-    assert !assay.subscribed?(current_person)
+    refute study.subscribed?(current_person)
+    refute assay.subscribed?(current_person)
   end
 
   test 'should add subscriptions for a study and an assay associated with this study when updating the investigation associating with this study' do
@@ -491,15 +491,18 @@ class SubscriptionTest < ActiveSupport::TestCase
     SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
 
     assert investigation.subscribed?(current_person)
-    assert !study.subscribed?(current_person)
-    assert !assay.subscribed?(current_person)
+    refute study.subscribed?(current_person)
+    refute assay.subscribed?(current_person)
 
     # changing investigation associated with the study
     study.reload
     disable_authorization_checks do
       study.investigation = investigation
-      study.save
+      study.save!
     end
+
+    investigation.reload
+    assay.reload
 
     assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
     assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
