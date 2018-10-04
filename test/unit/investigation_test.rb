@@ -128,4 +128,55 @@ class InvestigationTest < ActiveSupport::TestCase
     assert_equal 1, investigation.snapshots.count
     assert_equal investigation.title, snapshot.title
   end
+
+  test 'clone with associations' do
+    investigation = Factory(:investigation, title: '123', description: 'abc', policy: Factory(:publicly_viewable_policy))
+    person = investigation.contributor
+    publication = Factory(:publication, contributor: person)
+
+    disable_authorization_checks do
+      investigation.publications << publication
+    end
+
+    clone = investigation.clone_with_associations
+
+    assert_equal investigation.title, clone.title
+    assert_equal investigation.description, clone.description
+    assert_equal investigation.projects, clone.projects
+    assert_equal BaseSerializer.convert_policy(investigation.policy), BaseSerializer.convert_policy(clone.policy)
+
+    assert_includes clone.publications, publication
+
+    disable_authorization_checks { assert clone.save }
+  end
+
+  test 'has deleted contributor?' do
+    item = Factory(:investigation,deleted_contributor:'Person:99')
+    item.update_column(:contributor_id,nil)
+    item2 = Factory(:investigation)
+    item2.update_column(:contributor_id,nil)
+
+    assert_nil item.contributor
+    assert_nil item2.contributor
+    refute_nil item.deleted_contributor
+    assert_nil item2.deleted_contributor
+
+    assert item.has_deleted_contributor?
+    refute item2.has_deleted_contributor?
+  end
+
+  test 'has jerm contributor?' do
+    item = Factory(:investigation,deleted_contributor:'Person:99')
+    item.update_column(:contributor_id,nil)
+    item2 = Factory(:investigation)
+    item2.update_column(:contributor_id,nil)
+
+    assert_nil item.contributor
+    assert_nil item2.contributor
+    refute_nil item.deleted_contributor
+    assert_nil item2.deleted_contributor
+
+    refute item.has_jerm_contributor?
+    assert item2.has_jerm_contributor?
+  end
 end

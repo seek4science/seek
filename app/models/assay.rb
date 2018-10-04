@@ -4,10 +4,7 @@ class Assay < ActiveRecord::Base
   include Seek::Taggable
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-  # needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
-  def projects
-    study.try(:projects) || []
-  end
+
 
   # needs to before acts_as_isa - otherwise auto_index=>false is overridden by Seek::Search::CommonFields
   if Seek::Config.solr_enabled
@@ -20,26 +17,31 @@ class Assay < ActiveRecord::Base
     end
   end
 
+  # needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
+  belongs_to :study
+  has_many :projects, through: :study
+
   acts_as_isa
   acts_as_snapshottable
 
   belongs_to :institution
 
-  belongs_to :study
-  belongs_to :contributor, class_name: 'Person'
+
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
   has_many :organisms, through: :assay_organisms, inverse_of: :assays
   has_many :strains, through: :assay_organisms
   has_many :tissue_and_cell_types, through: :assay_organisms
 
-  has_many :assay_assets, dependent: :destroy, autosave: true # change this to validate: true in the future
 
-  has_many :data_files, through: :assay_assets, source: :asset, source_type: 'DataFile'
-  has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop'
-  has_many :models, through: :assay_assets, source: :asset, source_type: 'Model'
-  has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample'
-  has_many :documents, through: :assay_assets, source: :asset, source_type: 'Document'
+  before_save { assay_assets.each(&:set_version) }
+  has_many :assay_assets, dependent: :destroy, inverse_of: :assay, autosave: true
+
+  has_many :data_files, through: :assay_assets, source: :asset, source_type: 'DataFile', inverse_of: :assays
+  has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop', inverse_of: :assays
+  has_many :models, through: :assay_assets, source: :asset, source_type: 'Model', inverse_of: :assays
+  has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample', inverse_of: :assays
+  has_many :documents, through: :assay_assets, source: :asset, source_type: 'Document', inverse_of: :assays
 
   has_one :investigation, through: :study
 
@@ -55,10 +57,6 @@ class Assay < ActiveRecord::Base
   attr_reader :pending_related_assets
 
   enforce_authorization_on_association :study, :view
-
-  def project_ids
-    projects.map(&:id)
-  end
 
   def default_contributor
     User.current_user.try :person
@@ -111,8 +109,19 @@ class Assay < ActiveRecord::Base
     end
   end
 
+  def self.simple_associated_asset_types
+    [:models, :sops, :publications, :documents]
+  end
+
+  # Associations where there is additional metadata on the association, i.e. `direction`
+  def self.complex_associated_asset_types
+    [:data_files, :samples]
+  end
+
   def assets
-    data_files + models + sops + publications + samples + documents
+    (self.class.complex_associated_asset_types + self.class.simple_associated_asset_types).inject([]) do |assets, type|
+      assets + send(type)
+    end
   end
 
   def incoming
@@ -143,9 +152,10 @@ class Assay < ActiveRecord::Base
   def clone_with_associations
     new_object = dup
     new_object.policy = policy.deep_copy
-    new_object.sops = try(:sops)
-
-    new_object.models = try(:models)
+    new_object.assay_assets = assay_assets.select { |aa| self.class.complex_associated_asset_types.include?(aa.asset_type.underscore.pluralize.to_sym) }.map(&:dup)
+    self.class.simple_associated_asset_types.each do |type|
+      new_object.send("#{type}=", try(type))
+    end
     new_object.assay_organisms = try(:assay_organisms)
     new_object
   end
@@ -188,5 +198,36 @@ class Assay < ActiveRecord::Base
   # overides that from Seek::RDF::RdfGeneration, as Assay entity depends upon the AssayClass (modelling, or experimental) of the Assay
   def rdf_type_entity_fragment
     { 'EXP' => 'Experimental_assay', 'MODEL' => 'Modelling_analysis' }[assay_class.key]
+  end
+
+  def samples_attributes= attributes
+    set_assay_assets_for('Sample', attributes)
+  end
+
+  def data_files_attributes= attributes
+    set_assay_assets_for('DataFile', attributes)
+  end
+
+  private
+
+  def set_assay_assets_for(type, attributes)
+    type_assay_assets, other_assay_assets = self.assay_assets.partition { |aa| aa.asset_type == type }
+    new_type_assay_assets = []
+
+    attributes.each do |attrs|
+      attrs.merge!(asset_type: type)
+      existing = type_assay_assets.detect { |aa| aa.asset_id.to_s == attrs['asset_id'] }
+      if existing
+        new_type_assay_assets << existing.tap { |e| e.assign_attributes(attrs) }
+      else
+        aa = self.assay_assets.build(attrs)
+        if aa.asset && aa.asset.can_view?
+          new_type_assay_assets << aa
+        end
+      end
+    end
+
+    self.assay_assets = (other_assay_assets + new_type_assay_assets)
+    self.assay_assets
   end
 end

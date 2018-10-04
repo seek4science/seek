@@ -433,7 +433,7 @@ class PeopleControllerTest < ActionController::TestCase
     person = Factory(:person_in_project, group_memberships: [Factory(:group_membership, work_group: work_group)])
     user = Factory(:user, person: person)
     # create a datafile that this person is the contributor
-    data_file = Factory(:data_file, contributor: user, project_ids: [project.id])
+    data_file = Factory(:data_file, contributor: user.person, project_ids: [project.id])
     # create pi
     position = ProjectPosition.find_by_name('PI')
     pi = Factory(:person_in_project, group_memberships: [Factory(:group_membership, work_group: work_group)])
@@ -463,7 +463,7 @@ class PeopleControllerTest < ActionController::TestCase
     person = Factory(:person_in_project, group_memberships: [Factory(:group_membership, work_group: work_group)])
     user = Factory(:user, person: person)
     # create a datafile that this person is the contributor and with the same project
-    data_file = Factory(:data_file, contributor: user, project_ids: [project.id])
+    data_file = Factory(:data_file, contributor: user.person, project_ids: [project.id])
     # create pal
     position = ProjectPosition.find_by_name('Sysmo-DB Pal')
     pal = Factory(:person_in_project, group_memberships: [Factory(:group_membership, work_group: work_group)])
@@ -1818,7 +1818,7 @@ class PeopleControllerTest < ActionController::TestCase
     Factory :expertise, value: 'golf', annotatable: person
     Factory :expertise, value: 'fishing', annotatable: person
     Factory :tool, value: 'fishing rod', annotatable: person
-    Factory(:event, contributor: person.user, policy: Factory(:public_policy))
+    Factory(:event, contributor: person, policy: Factory(:public_policy))
     position = ProjectPosition.find_by_name('PI')
     person.group_memberships.first.project_positions << position
     #person.save

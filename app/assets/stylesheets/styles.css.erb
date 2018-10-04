@@ -607,16 +607,6 @@ img.badge {
     padding-top: 3px;
 }
 
-#topbar {
-    text-align: center;
-    height: 20px;
-    background-image: url("<%= asset_path('searchfade-repeat.png') %>");
-    background-repeat: repeat-x;
-    background-position: top center;
-    padding: 10px 0;
-    border-top: 0px;
-}
-
 #topbar * {
     vertical-align: middle;
 }
@@ -681,7 +671,7 @@ ul.related_asset_list {
     margin-bottom: 0;
 }
 
-ul.related_asset_list li{
+ul.related_asset_list li, li.association-list-item {
     white-space: normal;
     list-style-type: none;
     list-style-position: inside;
@@ -1212,10 +1202,20 @@ li.fileinfo_container div.fileinfo {
     font-size: smaller;
     text-align: center;
 }
+
 #usage_timestamps p {
     margin: 0em;
     padding: 0em;
 }
+
+p#logging_started {
+  color: #555;
+
+  text-align: center;
+  font-style: italic;
+  margin-top: 1em;
+}
+
 
 #usage_count {
     margin-bottom: 0.5em;
@@ -1464,12 +1464,6 @@ div#version_box ul#version_list {
 }
 div#version_box .compare {
     font-size:smaller;
-}
-
-.required {
-    color: red;
-    font-weight: bold;
-    padding-left: 0.25em;
 }
 
 .large_text_entry {

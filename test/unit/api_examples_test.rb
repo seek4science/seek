@@ -1,4 +1,5 @@
 require 'test_helper'
+require "minitest/autorun"
 
 class ApiExamplesTest < ActiveSupport::TestCase
 
@@ -11,34 +12,31 @@ class ApiExamplesTest < ActiveSupport::TestCase
               'definitions.json')
   end
 
-  def examples_path
-    File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'examples')
-  end
-
-  def validate_json_against_fragment (json, fragment)
+  def validate_json_against_fragment (item, json, fragment)
     if File.readable?(definitions_path)
       errors = JSON::Validator.fully_validate_json(definitions_path,
                                                    json,
                                                    {:fragment => fragment})
       unless errors.empty?
-        msg = ""
+        msg = 'item: '
         errors.each do |e|
           msg += e + "\n"
         end
-        raise Minitest::Assertion, msg
+        assert false, msg
       end
     end
   end
 
-  test 'dummy_test' do
+  examples_path = File.join(Rails.root, 'test', 'examples')
+
     Dir.foreach(examples_path) do |item|
       next if item == '.' or item == '..'
-      puts item
       example = YAML.load_file(examples_path + '/' + item)
       fragment = '#/definitions/' + item.chomp(".yml")
       fragment = fragment.sub('PostResponse', 'Response')
       fragment = fragment.sub('PatchResponse', 'Response')
-      validate_json_against_fragment(example.to_json, fragment)
+      define_method("test_#{item.sub('.', '_')}") do
+        validate_json_against_fragment(item, example.to_json, fragment)
+      end
     end
-  end
 end

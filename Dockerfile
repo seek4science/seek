@@ -1,21 +1,22 @@
-FROM ruby:2.2
+FROM ruby:2.4
 
 MAINTAINER Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall
 
 ENV APP_DIR /seek
 ENV RAILS_ENV=production
 
-# NB: jessie-backports required to get openjdk-8-jdk
-RUN echo "deb http://http.debian.net/debian jessie-backports main" >> /etc/apt/sources.list && \
-    apt-get update -qq && \
+# need to set the locale, otherwise some gems file to install
+ENV LANG="en_US.UTF-8" LANGUAGE="en_US:UTF-8" LC_ALL="C.UTF-8"
+
+RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends build-essential git \
 		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
-		libxslt1-dev mysql-client nginx nodejs poppler-utils \
-		postgresql-client sqlite3 links telnet vim-tiny && \
-	apt-get install -y -t jessie-backports openjdk-8-jdk && \
+		libxslt1-dev locales mysql-client nginx nodejs openjdk-8-jdk \
+		poppler-utils postgresql-client sqlite3 links telnet vim-tiny  && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    locale-gen en_US.UTF-8
 
 RUN mkdir -p $APP_DIR
 RUN chown www-data $APP_DIR

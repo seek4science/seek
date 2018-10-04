@@ -286,6 +286,12 @@ Factory.define(:rightfield_master_template_with_assay_with_sop, parent: :content
   f.data { File.new("#{Rails.root}/test/fixtures/files/populated_templates/populated-master-template-with-assay-and-sop.xlsx", 'rb').read }
 end
 
+Factory.define(:blank_rightfield_master_template, parent: :content_blob) do |f|
+  f.original_filename 'populated-master-template-with-assay-no-df-title.xlsx'
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/blank-master-template.xlsx", 'rb').read }
+end
+
 Factory.define(:blank_content_blob, class: ContentBlob) do |f|
   f.url nil
   f.data nil
@@ -299,4 +305,9 @@ end
 Factory.define(:blank_xml_content_blob, parent: :blank_content_blob) do |f|
   f.original_filename 'model.xml'
   f.content_type 'application/xml'
+end
+
+Factory.define(:blank_txt_content_blob, parent: :blank_content_blob) do |f|
+  f.original_filename 'a_txt_file.txt'
+  f.content_type 'text/plain'
 end

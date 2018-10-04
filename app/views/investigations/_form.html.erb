@@ -4,7 +4,7 @@
 <%= f.hidden_field :new_link_from_study -%>
 
 <div class="form-group">
-  <label>Title <span class="required">*</span></label>
+  <label class="required">Title</label>
   <%= f.text_field :title, :class=>"form-control" -%>
 </div>
 
@@ -22,13 +22,11 @@
 <%  existing_creators = @investigation.creators
     existing_creators =  [current_user.person] if existing_creators.blank?
 %>
-<%= render :partial => "assets/author_form", :locals => {:resource_type => t('investigation'), # this is only for presentation, not for any processing
+<%= render :partial => "assets/author_form", :locals => {:form => f,
                                                          :existing_creators => existing_creators,
                                                          :other_creators => @investigation.other_creators} -%>
 
-
-<%= render :partial => "assets/associate_publication", :locals => { :resource_type => t('investigation'),
-                                                                    :related_publications => @investigation.publications} -%>
+<%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
 <%
    button_text=action==:edit ? "Update" : "Create"

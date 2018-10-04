@@ -20,11 +20,19 @@
     function insertFancyListItem(multiselect, displaylist, option) {
         var text = option.text;
         var title_span = '<span title="' + text.escapeHTML() + '">' + text.truncate(100).escapeHTML() + '</span>';
-        var remove_link = '<a href="" onclick="javascript:removeFromFancy(';
-        remove_link += "'" + $(multiselect).id + "','";
-        remove_link += option.value + "'";
-        remove_link += '); return(false);">remove</a>';
-        displaylist.insert('<li>' + title_span +'&nbsp;&nbsp;<small style="vertical-align: middle;">[' + remove_link + ']</small></li>');
+        // var remove_link = '<a href="" onclick="javascript:removeFromFancy(';
+        // remove_link += "'" + $(multiselect).id + "','";
+        // remove_link += option.value + "'";
+        // remove_link += '); return(false);">fish</a>';
+        var remove_link = removeLink(multiselect,option);
+        displaylist.insert('<li class="assocation-list-item">' + title_span +'&nbsp;&nbsp;' + remove_link + '</li>');
+    }
+
+    function removeLink(multiselect, option) {
+        var action = 'removeFromFancy(';
+        action += "'" + $(multiselect).id + "','" + option.value + "'); return (false);"
+        var link = '<a class="remove-association clickable" onclick="javascript:' + action + '"'+'><span aria-hidden="true" class="glyphicon glyphicon-remove"></span></a>'
+        return link;
     }
 
     function updateFancyMultiselect(multiselect) {

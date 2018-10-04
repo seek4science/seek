@@ -29,9 +29,13 @@
 
             $j('#permissions_spinner').show();
 
+            var creator_ids = creators.map(function (x) {
+                return x.id
+            }).join(',');
+
             var data = {
                 project_ids: project_ids, // Controller expects this to be a string containing IDs separated by a comma
-                creators: $j('#creators').val(),
+                creators: creator_ids, // Controller expects this to be a string containing IDs separated by a comma
                 contributor_id: '<%= contributor_id -%>',
                 resource_name: '<%= resource_name -%>',
                 resource_id: '<%= resource_id -%>',

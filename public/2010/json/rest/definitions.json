@@ -1791,6 +1791,9 @@
             "attributes": {
               "type": "object",
               "properties": {
+                "tags": {
+                  "$ref": "#/definitions/nullableNonEmptyStringList"
+                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -1910,6 +1913,9 @@
             "attributes": {
               "type": "object",
               "properties": {
+                "tags": {
+                  "$ref": "#/definitions/nullableNonEmptyStringList"
+                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -4534,7 +4540,7 @@
                   "$ref": "#/definitions/nullableUriString"
                 },
                 "pubmed_id": {
-                  "type": "#/definitions/nullableInteger"
+                  "$ref": "#/definitions/nullableInteger"
                 },
                 "abstract": {
                   "$ref": "#/definitions/nullableNonEmptyString"

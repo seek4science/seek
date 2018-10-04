@@ -22,7 +22,10 @@ module Seek
         attr_accessor :create_from_asset
 
         scope :default_order, -> { order('title') }
+
         validates :title, presence: true
+        validates :title, length: { maximum: 255 }
+        validates :description, length: { maximum: 65_535 }
 
         grouped_pagination
 
@@ -34,7 +37,7 @@ module Seek
         include Seek::Subscribable
         include Seek::ResearchObjects::Packaging
         include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
-        include ProgrammeCompat
+        include Seek::ProgrammeCompat
 
         extend Seek::ActsAsISA::SingletonMethods
       end

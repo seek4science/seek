@@ -5,12 +5,6 @@ GIT
     acts_as_activity_logged (0.3.3)
 
 GIT
-  remote: https://github.com/SysMO-DB/app_version.git
-  revision: 773b6ae72d9cba038fce1a3502feb5de2f2b75a3
-  specs:
-    app_version (1.0.0)
-
-GIT
   remote: https://github.com/SysMO-DB/bioportal.git
   revision: 0f80b4281af3f71234a425d40981b1185a3e5d0b
   specs:
@@ -56,10 +50,10 @@ GIT
 
 GIT
   remote: https://github.com/myGrid/annotations.git
-  revision: d92de1007d1c61487fd7a2ea9ff7ba22a1d58077
+  revision: 401f831c3e0ace82b109dd649d8d7b0820f58032
   branch: rails4.2
   specs:
-    my_annotations (0.7.0)
+    my_annotations (0.8.1)
 
 GIT
   remote: https://github.com/myGrid/search_biomodel.git
@@ -84,11 +78,11 @@ GIT
 
 GIT
   remote: https://github.com/seek4science/zenodo-client.git
-  revision: 5c300cf4b74f8c09ca8265b2b6567472147d8e24
+  revision: 3b5484cd7e5668f8a62eb111439b10a6dc999d69
   specs:
     zenodo-client (0.1.1)
       json (~> 1.8)
-      rest-client (~> 1.7)
+      rest-client (~> 2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -155,6 +149,8 @@ GEM
     api_smith (1.3.0)
       hashie (>= 1.0, < 3.0)
       httparty
+    app_version (0.2.4)
+      rails (~> 4.2)
     arel (6.0.4)
     ast (2.3.0)
     attr_encrypted (3.0.3)
@@ -221,8 +217,6 @@ GEM
     curb (0.9.3)
     daemons (1.1.9)
     database_cleaner (1.5.3)
-    datacite_doi_ify (1.1.0)
-      rest-client (~> 1.7)
     delayed_job (4.1.2)
       activesupport (>= 3.0, < 5.1)
     delayed_job_active_record (4.1.1)
@@ -232,7 +226,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     diff-lcs (1.3)
     docsplit (0.7.6)
-    domain_name (0.5.20170404)
+    domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
     dynamic_form (1.1.4)
     ebnf (0.3.9)
@@ -265,7 +259,7 @@ GEM
       curb (~> 0.8)
       loofah (~> 2.0)
       sax-machine (~> 1.0)
-    ffi (1.9.18)
+    ffi (1.9.25)
     flay (2.9.0)
       erubis (~> 2.7.0)
       path_expander (~> 1.0)
@@ -403,7 +397,9 @@ GEM
       nesty (~> 1.0)
       nokogiri (~> 1.7)
     method_source (0.9.0)
-    mime-types (2.99.3)
+    mime-types (3.1)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2016.0521)
     mimemagic (0.3.2)
     mini_portile2 (2.3.0)
     minitest (5.10.3)
@@ -457,7 +453,7 @@ GEM
     pothoven-attachment_fu (3.3.0)
     powerpack (0.1.1)
     pr_geohash (1.0.0)
-    private_address_check (0.4.1)
+    private_address_check (0.5.0)
     progress_bar (1.1.0)
       highline (~> 1.6)
       options (~> 2.3.0)
@@ -499,6 +495,7 @@ GEM
       rails-assets-jquery (>= 1.11.0)
     rails-assets-bootstrap-tagsinput (0.8.0)
       rails-assets-jquery (~> 2.1.1)
+    rails-assets-chartjs (2.7.2)
     rails-assets-clipboard (1.5.16)
     rails-assets-eonasdan-bootstrap-datetimepicker (4.17.47)
       rails-assets-jquery (>= 1.8.3)
@@ -614,10 +611,10 @@ GEM
     require_all (1.3.3)
     responders (2.3.0)
       railties (>= 4.2.0, < 5.1)
-    rest-client (1.8.0)
+    rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
-      mime-types (>= 1.16, < 3.0)
-      netrc (~> 0.7)
+      mime-types (>= 1.16, < 4.0)
+      netrc (~> 0.8)
     rfc-822 (0.4.1)
     rmagick (2.15.2)
     ro-bundle (0.2.3)
@@ -664,7 +661,7 @@ GEM
       ruby_parser (~> 3.8)
       virtus (~> 1.0)
     rubyntlm (0.3.4)
-    rubyzip (1.2.1)
+    rubyzip (1.2.2)
     safe_yaml (1.0.4)
     sample-template-generator (0.5.1)
       rdoc (~> 6.0)
@@ -747,7 +744,7 @@ GEM
       execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.4)
+    unf_ext (0.0.7.5)
     unicode (0.4.4.4)
     unicode-display_width (1.2.1)
     unicode_utils (1.4.0)
@@ -777,7 +774,7 @@ GEM
       crack (>= 0.3.2)
       hashdiff
     webrobots (0.1.2)
-    will_paginate (3.0.12)
+    will_paginate (3.1.6)
     yaml_db (0.5.0)
       rails (>= 3.0, < 5.1)
       rake (>= 0.8.7)
@@ -796,7 +793,7 @@ DEPENDENCIES
   acts_as_activity_logged!
   acts_as_list
   acts_as_tree
-  app_version!
+  app_version
   attr_encrypted (~> 3.0.0)
   auto_strip_attributes
   bibtex-ruby (~> 4.4.2)
@@ -815,7 +812,6 @@ DEPENDENCIES
   csl-styles (~> 1.0.1.7)
   daemons
   database_cleaner
-  datacite_doi_ify (~> 1.1.0)
   delayed_job_active_record
   docsplit
   doi_query_tool!
@@ -869,6 +865,7 @@ DEPENDENCIES
   rails (~> 4.2.9)
   rails-assets-bootstrap-multiselect (~> 0.9.13)!
   rails-assets-bootstrap-tagsinput (~> 0.8.0)!
+  rails-assets-chartjs (~> 2.7.2)!
   rails-assets-clipboard (~> 1.5.12)!
   rails-assets-eonasdan-bootstrap-datetimepicker (~> 4.17.42)!
   rails-assets-typeahead.js (~> 0.10.5)!
@@ -884,7 +881,7 @@ DEPENDENCIES
   recaptcha (~> 4.1.0)
   request-log-analyzer
   responders (~> 2.0)
-  rest-client
+  rest-client (~> 2.0)
   rfc-822
   rmagick (= 2.15.2)
   ro-bundle
@@ -892,6 +889,7 @@ DEPENDENCIES
   rubocop
   ruby-prof (>= 0.16.0)
   rubycritic
+  rubyzip (~> 1.2.2)
   sample-template-generator (~> 0.5)
   sass-rails
   savon (= 1.1.0)
@@ -917,9 +915,9 @@ DEPENDENCIES
   webmock
   white_list!
   white_list_formatted_content!
-  will_paginate (~> 3.0.4)
+  will_paginate (~> 3.1)
   yaml_db
   zenodo-client!
 
 BUNDLED WITH
-   1.16.1
+   1.16.2

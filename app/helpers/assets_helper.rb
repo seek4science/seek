@@ -98,6 +98,8 @@ module AssetsHelper
   def show_resource_path(resource)
     if resource.class.name.include?('::Version')
       polymorphic_path(resource.parent, version: resource.version)
+    elsif resource.is_a?(Snapshot)
+      polymorphic_path([resource.resource,resource])
     else
       polymorphic_path(resource)
     end
@@ -187,4 +189,5 @@ module AssetsHelper
   def mini_file_download_icon(fileinfo)
     image_tag_for_key('download', polymorphic_path([fileinfo.asset, fileinfo], action: :download, code: params[:code]), 'Download', { title: 'Download this file' }, '')
   end
+
 end

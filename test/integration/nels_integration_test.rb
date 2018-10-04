@@ -22,12 +22,12 @@ class NelsIntegrationTest < ActionDispatch::IntegrationTest
             VCR.use_cassette('nels/get_persistent_url') do
               post register_assay_nels_path(assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype)
 
-              assert_redirected_to provide_metadata_data_files_path(assay_ids: [@assay.id], project_ids: projects.map(&:id))
+              assert_redirected_to provide_metadata_data_files_path(project_ids: projects.map(&:id))
               follow_redirect!
 
               assert_select '#data_file_title[value=?]', 'Illumina-sequencing-dataset - reads'
 
-              selected_assay_ids = select_node_contents('#associate-assays-script').scan(/assay_id = '([0-9]+)'\;/).flatten.map(&:to_i)
+              selected_assay_ids = JSON.parse(select_node_contents('#assay_asset_list script')).map { |aa| aa['assay']['id'] }
               assert_includes selected_assay_ids, @assay.id
 
               selected_project_ids = select_node_contents('#project-selector-script').scan(/Sharing\.projectsSelector\.add\(([0-9]+), true\);/).flatten.map(&:to_i)

@@ -66,7 +66,7 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy' do
-    s = Factory :strain, contributor: User.current_user
+    s = Factory :strain, contributor: User.current_user.person
     assert_difference('Strain.count', -1, 'A strain should be deleted') do
       delete :destroy, id: s.id
     end
@@ -105,7 +105,7 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'contributor can delete strain' do
-    s = Factory :strain, contributor: User.current_user
+    s = Factory :strain, contributor: User.current_user.person
     assert_difference('Strain.count', -1, 'A strain should be deleted') do
       delete :destroy, id: s.id
     end
@@ -247,7 +247,7 @@ class StrainsControllerTest < ActionController::TestCase
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
     strain = assigns(:strain)
     assert_equal strain, publish_log.resource
-    assert_equal strain.contributor, publish_log.user
+    assert_equal strain.contributor.user, publish_log.user
   end
 
   test 'should fill in the based-on strain if chosen' do

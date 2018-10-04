@@ -219,7 +219,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy investigation' do
-    i = Factory(:investigation, contributor: User.current_user)
+    i = Factory(:investigation, contributor: User.current_user.person)
     assert_difference('Investigation.count', -1) do
       delete :destroy, id: i.id
     end
@@ -247,7 +247,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'option to delete investigation without study' do
-    get :show, id: Factory(:investigation, contributor: User.current_user).id
+    get :show, id: Factory(:investigation, contributor: User.current_user.person).id
     assert_select 'a', text: /Delete #{I18n.t('investigation')}/i, count: 1
   end
 
@@ -315,8 +315,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert investigation.creators.empty?
 
-    put :update, id: investigation.id, investigation: { title: investigation.title },
-        creators: [[creator.name, creator.id]].to_json
+    put :update, id: investigation.id, investigation: { title: investigation.title, creator_ids: [creator.id] }
     assert_redirected_to investigation_path(investigation)
 
     assert investigation.creators.include?(creator)
@@ -327,9 +326,9 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     get :edit, id: investigation.id
     assert_response :success
-    assert_select 'p#creators_list'
+    assert_select '#creators_list'
     assert_select "input[type='text'][name='creator-typeahead']"
-    assert_select "input[type='hidden'][name='creators']"
+    # assert_select "input[type='hidden'][name='investigation[creator_ids][]']" This is set via JS
     assert_select "input[type='text'][name='investigation[other_creators]']"
   end
 

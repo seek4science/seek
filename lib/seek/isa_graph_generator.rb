@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Seek
   class IsaGraphNode
     attr_accessor :object, :child_count, :can_view
@@ -38,7 +40,7 @@ module Seek
     end
 
     def avatar_key
-      "#{@type.to_s.singularize}_avatar"
+      @type.to_s.pluralize
     end
 
     def initialize(object, type, children)
@@ -53,31 +55,43 @@ module Seek
       @object = object
     end
 
-    def generate(depth: 1, deep: false, include_parents: false, include_self: true, auth: true)
+    # depth: number of levels of child resources to show (0 = none, nil = all)
+    # parent_depth: number of levels of parent resources to show (0 = none, nil = all)
+    # sibling_depth: number of levels of sibling resources (other children of immediate parent)to show (0 = none, nil = all)
+    # include_self: include the root resource in the tree?
+    def generate(depth: 1, parent_depth: nil, sibling_depth: nil, include_self: true, auth: true)
       @auth = auth
       hash = { nodes: [], edges: [] }
 
-      depth = deep ? nil : depth
-
-      # Parents and siblings...
-      if include_parents
-        parents(@object).each do |parent|
-          merge_hashes(hash, descendants(parent, depth))
-        end
-
-        # All ancestors...
-        merge_hashes(hash, ancestors(@object, nil))
+      if sibling_depth != 0 # Need to include parents to show siblings
+        parent_depth = 1 if parent_depth == 0
       end
 
       # Self and descendants...
       merge_hashes(hash, descendants(@object, depth))
 
-      hash[:nodes].delete_if { |n| n.object == @object } unless include_self
+      if parent_depth != 0
+        hash = parents_and_siblings(hash, parents(@object), parent_depth, sibling_depth)
+      end
+
+      unless include_self
+        hash[:nodes] = hash[:nodes].reject { |n| n.object == @object }
+      end
 
       hash
     end
 
     private
+
+    def parents_and_siblings(hash, parents, parent_depth, sibling_depth, depth = 0)
+      if parent_depth.nil? || depth < parent_depth
+        parents.each do |parent|
+          merge_hashes(hash, descendants(parent, sibling_depth))
+          hash = parents_and_siblings(hash, parents(parent), parent_depth, sibling_depth, depth + 1)
+        end
+      end
+      hash
+    end
 
     def merge_hashes(hash1, hash2)
       hash1[:nodes] = (hash1[:nodes] + hash2[:nodes]).uniq(&:object)
@@ -111,17 +125,16 @@ module Seek
       if method == :children
         associations(object)[:aggregated_children].each do |type, method|
           associations = resolve_association(object, method)
-          if associations.any?
-            agg = Seek::ObjectAggregation.new(object, type, associations)
-            agg_node = Seek::IsaGraphNode.new(agg)
-            agg_node.can_view = true
-            nodes << agg_node
-            edges << [object, agg]
-          end
+          next unless associations.any?
+          agg = Seek::ObjectAggregation.new(object, type, associations)
+          agg_node = Seek::IsaGraphNode.new(agg)
+          agg_node.can_view = true
+          nodes << agg_node
+          edges << [object, agg]
         end
       end
 
-      if max_depth.nil? || (depth < max_depth) || children.count == 1
+      if max_depth.nil? || depth < max_depth
         children.each do |child|
           hash = traverse(method, child, max_depth, depth + 1)
           nodes += hash[:nodes]
@@ -164,7 +177,6 @@ module Seek
       when Investigation
         {
           children: [:studies],
-          parents: [:projects],
           related: [:publications]
         }
       when Study
@@ -175,28 +187,33 @@ module Seek
         }
       when Assay
         {
-          children: [:data_files, :models, :sops, :publications, :documents],
+          children: %i[data_files models sops publications documents],
           parents: [:study],
-          related: [:publications],
+          # related: [:publications],
           aggregated_children: { samples: :samples }
+          # data_files: :data_files,
+          # models: :models,
+          # sops: :sops,
+          # documents: :documents,
+          # publications: :publications
         }
       when Publication
         {
-          parents: [:assays, :studies, :investigations, :data_files, :models, :presentations],
+          parents: %i[assays studies investigations data_files models presentations],
           related: [:events]
         }
       when DataFile, Document, Model, Sop, Sample, Presentation
         {
           parents: [:assays],
-          related: [:publications, :events],
-          aggregated_children: { samples: :extracted_samples },
+          related: %i[publications events],
+          aggregated_children: { samples: :extracted_samples }
         }
       when Event
         {
-          parents: [:presentations, :publications, :data_files],
+          parents: %i[presentations publications data_files documents]
         }
       else
-        { }
+        {}
       end.reverse_merge!(parents: [], children: [], related: [], aggregated_children: {})
     end
   end

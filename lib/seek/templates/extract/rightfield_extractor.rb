@@ -19,6 +19,10 @@ module Seek
 
         attr_reader :warnings
 
+        def contains_rightfield_elements?
+          @parser.contains_rightfield_elements?
+        end
+
         def project
           project = item_for_type(Project)
           if project && !current_user.person.member_of?(project)
@@ -26,9 +30,7 @@ module Seek
             project = nil
           end
 
-          unless project
-            add_warning(:no_project)
-          end
+          add_warning(:no_project) unless project
           project
         end
 
@@ -62,9 +64,7 @@ module Seek
         def seek_id_uris
           values_for_property(:seekID, :literal).select do |uri|
             valid = uri =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]
-            unless valid || uri.blank?
-              add_warning(:id_not_a_valid_uri, uri)
-            end
+            add_warning(:id_not_a_valid_uri, uri) unless valid || uri.blank?
             valid
           end
         end

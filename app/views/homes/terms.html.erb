@@ -1,3 +1,5 @@
-
-<%= terms_and_conditions_text %>
-<%= link_to( 'Close'.html_safe, '#', :onclick=> 'window.close();') %>
+<% if Seek::Config.terms_enabled %>
+   <%= terms_and_conditions_text %>
+<% else %>
+    <h4>The Terms and Conditions page is disabled</h4>
+<% end %>

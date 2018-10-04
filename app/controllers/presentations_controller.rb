@@ -16,12 +16,11 @@ class PresentationsController < ApplicationController
   include Seek::IsaGraphExtensions
 
   def new_version
-    if handle_upload_data
+    if handle_upload_data(true)
       comments=params[:revision_comments]
 
       respond_to do |format|
         if @presentation.save_as_new_version(comments)
-          create_content_blobs
           flash[:notice]="New version uploaded - now on version #{@presentation.version}"
         else
           flash[:error]="Unable to save new version"
@@ -38,20 +37,15 @@ class PresentationsController < ApplicationController
  # PUT /presentations/1
   # PUT /presentations/1.xml
   def update
-    update_annotations(params[:tag_list], @presentation) if params.key?(:tag_list)
-    update_scales @presentation
-
     @presentation.attributes = presentation_params
-
+    update_annotations(params[:tag_list], @presentation) if params.key?(:tag_list)
     update_sharing_policies @presentation
+    update_relationships(@presentation,params)
 
-    assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @presentation.save
-
-        update_relationships(@presentation,params)
-
         # Update new assay_asset
+        assay_ids = params[:assay_ids] || []
         Assay.find(assay_ids).each do |assay|
           if assay.can_edit?
             assay.relate(@presentation)
@@ -79,7 +73,8 @@ class PresentationsController < ApplicationController
   def presentation_params
     params.require(:presentation).permit(:title, :description, :other_creators, :license, :parent_name,
                                          { event_ids: [] }, { project_ids: [] },
-                                         { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+                                         { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                                         { creator_ids: [] }, { publication_ids: [] })
   end
 
   alias_method :asset_params, :presentation_params

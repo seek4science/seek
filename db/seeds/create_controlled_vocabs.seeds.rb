@@ -20,9 +20,6 @@ ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_d
 
 puts "Seeded disciplines"
 
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "organisms")
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "bioportal_concepts")
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "strains")
 disable_authorization_checks do
   #create policy for strains
   Strain.find_each do |strain|
