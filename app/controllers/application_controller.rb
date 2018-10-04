@@ -395,15 +395,25 @@ class ApplicationController < ActionController::Base
                              user_agent: user_agent,
                              data: activity_loggable.title)
         end
-      when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } # TODO: Find a nicer way of doing this...
-        action = 'create' if action == 'upload_for_tool' || action == 'create_metadata'
+      when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
+        action = 'create' if action == 'upload_for_tool' || action == 'create_metadata' || action == 'create_from_template'
         action = 'update' if action == 'new_version'
         action = 'inline_view' if action == 'explore'
         if %w(show create update destroy download inline_view).include?(action)
           check_log_exists(action, controller_name, object)
-          ActivityLog.create(action: action,
+            ActivityLog.create(action: action,
                              culprit: current_user,
                              referenced: object.projects.first,
+                             controller_name: controller_name,
+                             activity_loggable: object,
+                             data: object.title,
+                             user_agent: user_agent)
+        end
+      when 'snapshots'
+        if %(show create mint_doi_confirm download export_submit).include?(action)
+          ActivityLog.create(action: action,
+                             culprit: current_user,
+                             referenced: object.resource,
                              controller_name: controller_name,
                              activity_loggable: object,
                              data: object.title,

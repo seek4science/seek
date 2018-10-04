@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180913123624) do
+ActiveRecord::Schema.define(version: 20180924152253) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -587,6 +587,14 @@ ActiveRecord::Schema.define(version: 20180913123624) do
 
   add_index "documents", ["contributor_id"], name: "index_documents_on_contributor", using: :btree
 
+  create_table "documents_events", id: false, force: :cascade do |t|
+    t.integer "document_id", limit: 4, null: false
+    t.integer "event_id",    limit: 4, null: false
+  end
+
+  add_index "documents_events", ["document_id", "event_id"], name: "index_documents_events_on_document_id_and_event_id", using: :btree
+  add_index "documents_events", ["event_id", "document_id"], name: "index_documents_events_on_event_id_and_document_id", using: :btree
+
   create_table "documents_projects", force: :cascade do |t|
     t.integer "document_id", limit: 4
     t.integer "project_id",  limit: 4
@@ -1008,8 +1016,8 @@ ActiveRecord::Schema.define(version: 20180913123624) do
     t.string   "space_perm_id",         limit: 255
     t.string   "username",              limit: 255
     t.integer  "project_id",            limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
     t.string   "dss_endpoint",          limit: 255
     t.string   "web_endpoint",          limit: 255
     t.integer  "refresh_period_mins",   limit: 4,   default: 120
@@ -1410,13 +1418,15 @@ ActiveRecord::Schema.define(version: 20180913123624) do
   add_index "sample_resource_links", ["sample_id"], name: "index_sample_resource_links_on_sample_id", using: :btree
 
   create_table "sample_types", force: :cascade do |t|
-    t.string   "title",             limit: 255
-    t.string   "uuid",              limit: 255
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
-    t.string   "first_letter",      limit: 1
-    t.text     "description",       limit: 65535
-    t.boolean  "uploaded_template",               default: false
+    t.string   "title",               limit: 255
+    t.string   "uuid",                limit: 255
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
+    t.string   "first_letter",        limit: 1
+    t.text     "description",         limit: 65535
+    t.boolean  "uploaded_template",                 default: false
+    t.integer  "contributor_id",      limit: 4
+    t.string   "deleted_contributor", limit: 255
   end
 
   create_table "samples", force: :cascade do |t|

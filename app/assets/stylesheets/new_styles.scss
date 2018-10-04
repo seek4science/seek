@@ -704,3 +704,43 @@ span.required, label.required::after {
   font-weight: bold;
   margin-left: 0.2em;
 }
+
+.mini-resource-list {
+  padding: 0;
+
+  li {
+    list-style: none;
+  }
+}
+
+.mini-resource-list-item {
+  display: flex;
+
+  .mini-resource-list-avatar {
+    width: 24px;
+    margin-right: 5px;
+    flex-shrink: 0;
+  }
+  .mini-resource-list-title { }
+  .mini-resource-list-text {
+    flex-grow: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .mini-resource-list-count {
+    flex-shrink: 0;
+    color: #999;
+  }
+  .mini-resource-list-type {
+    color: #999;
+    display: block;
+  }
+}
+
+.dashboard-panel {
+  .panel-heading {
+    line-height: 2.5;
+    padding: 5px 10px;
+  }
+}

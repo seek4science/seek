@@ -1,0 +1,68 @@
+<%= panel('Asset accessibility', type: 'panel-default dashboard-panel') do %>
+  <canvas id="asset-accessibility-canvas"></canvas>
+<% end %>
+
+<script>
+    var publishedAssetsChart = new Chart(document.getElementById('asset-accessibility-canvas').getContext('2d'), {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: [],
+                    backgroundColor: [
+                        '#a6ff6a',
+                        '#ffe46e',
+                        '#ff8a60'
+                    ],
+                    label: 'Dataset 1'
+                }],
+                labels: [
+                    'Published',
+                    'Restricted',
+                    'Private'
+                ]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: 'right',
+                    labels: {
+                        generateLabels: function(chart) {
+                            var labels = Chart.defaults.pie.legend.labels.generateLabels(chart);
+                            labels.forEach(function (label) {
+                                label.text = label.text + ' (' + chart.data.datasets[0].data[label.index] + ')';
+                                return label;
+                            });
+
+                            return labels;
+                        }
+                    },
+                }
+            }
+        });
+
+    function getAccessibilityStats() {
+        var startDate = $j('#dashboard-controls [data-dashboard-field="period-start"]').val();
+        var endDate = $j('#dashboard-controls [data-dashboard-field="period-end"]').val();
+
+        $j('#asset-accessibility-canvas').spinner('add');
+
+        $j.ajax({ url: '<%= url -%>',
+            data: {
+                start_date: startDate,
+                end_date: endDate,
+            },
+            success: function (resp) {
+                publishedAssetsChart.data.datasets[0].data = [resp.published_count, resp.restricted_count, resp.private_count];
+                publishedAssetsChart.update();
+            },
+            error: function () {
+                $j('#asset-accessibility-canvas').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
+            },
+            complete: function () {
+                $j('#asset-accessibility-canvas').spinner('remove');
+            }
+        });
+
+        return false;
+    }
+</script>
