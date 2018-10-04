@@ -20,6 +20,17 @@ The screenshots that follow are taken from the example at https://demo.seek4scie
 
 To help identify the ISA elements, below is a summary of the icons used.
 
+{::options parse_block_html="true" /}
+<div id='isa-overview-avatar-legend'>
+
+| ![Investigation](/images/user-guide/isa-overview/avatar-investigation.svg) Investigation | ![Study](/images/user-guide/isa-overview/avatar-study.svg) Study | ![Assay](/images/user-guide/isa-overview/avatar-assay.svg) Assay | ![Model analysis](/images/user-guide/isa-overview/avatar-model-analysis.svg) Modelling analysis |
+| ![Event](/images/user-guide/isa-overview/avatar-event.svg) Event | ![Model](/images/user-guide/isa-overview/avatar-model.svg) Model | ![Publication](/images/user-guide/isa-overview/avatar-publication.svg) Publication | &nbsp; |
+
+</div>
+
+<br/>
+SOPs, Data files, Documents and Presentations have icons according to their filetype.
+
 ## Tree view
 
 ![Tree view](/images/user-guide/isa-overview/tree-general.png){:.screenshot}

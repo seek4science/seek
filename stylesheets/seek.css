@@ -98,3 +98,13 @@ img.screenshot {
 thead > tr {
     background-color: #f8f8f8;
 }
+
+div#isa-overview-avatar-legend {
+    width: 50em;
+    margin: 0 auto;
+}
+
+div#isa-overview-avatar-legend td {
+    min-width:12em;
+    text-align: center;
+}
