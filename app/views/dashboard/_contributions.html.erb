@@ -95,6 +95,8 @@
             });
         }
 
+        var body = $j('#contributions .panel-body');
+        body.addClass('loading');
         $j('#contributions-canvas').spinner('add');
 
         $j.ajax({ url: '<%= url -%>',
@@ -118,7 +120,7 @@
                 $j('#contributions-canvas').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
             },
             complete: function () {
-                $j('#contributions-canvas').spinner('remove');
+                body.removeClass('loading');
             }
         });
 

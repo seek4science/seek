@@ -69,7 +69,8 @@
             data.type = typeField.val();
         }
 
-        $j('#asset-accessibility-canvas').spinner('add');
+        var body = $j('#asset-accessibility .panel-body');
+        body.addClass('loading');
 
         $j.ajax({ url: '<%= url -%>',
             data: data,
@@ -81,7 +82,7 @@
                 $j('#asset-accessibility-canvas').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
             },
             complete: function () {
-                $j('#asset-accessibility-canvas').spinner('remove');
+                body.removeClass('loading');
             }
         });
 
