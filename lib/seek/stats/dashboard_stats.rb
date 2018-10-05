@@ -43,7 +43,8 @@ module Seek
                     '%Y-%m-%d'
                   end
 
-          assets = scoped_resources.select { |a| a.created_at >= start_date && a.created_at <= end_date }
+          assets = (@scope.nil? ? (Programme.all + Project.all) : []) + scoped_resources
+          assets.select! { |a| a.created_at >= start_date && a.created_at <= end_date }
           date_grouped = assets.group_by { |a| a.created_at.strftime(strft) }
           types = assets.map(&:class).uniq
           dates = dates_between(start_date, end_date, interval)
@@ -62,7 +63,7 @@ module Seek
 
       def asset_accessibility(start_date, end_date, type: nil)
         Rails.cache.fetch("#{cache_key_base}_#{type || 'all'}_asset_accessibility_#{start_date}_#{end_date}", expires_in: 3.hours) do
-          assets = scoped_assets
+          assets = scoped_resources
           assets.select! { |a| a.class.name == type } if type
           assets.select! { |a| a.created_at >= start_date && a.created_at <= end_date }
           published_count = assets.count { |a| a.is_published? }
@@ -91,11 +92,7 @@ module Seek
       end
 
       def scoped_resources
-        @resources ||= scoped_assets + if @scope
-                         (@scope.investigations + @scope.studies + @scope.assays + @scope.assets + @scope.samples)
-                       else
-                         (Programme.all + Project.all + Investigation.all + Study.all + Assay.all + Seek::Util.asset_types.map(&:all).flatten)
-                       end
+        @resources ||= (scoped_isa + scoped_assets)
       end
 
       def scoped_assets
@@ -104,6 +101,14 @@ module Seek
                     else
                       Seek::Util.asset_types.map(&:all).flatten
                     end
+      end
+
+      def scoped_isa
+        @isa ||= if @scope
+                   @scope.investigations + @scope.studies + @scope.assays
+                 else
+                   Investigation.all + Study.all + Assay.all
+                 end
       end
 
       def dates_between(start_date, end_date, interval = 'month')
