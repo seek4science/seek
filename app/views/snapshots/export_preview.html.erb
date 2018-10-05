@@ -85,7 +85,8 @@
 </div>
 
 <script>
-    zenodoExport.creatorList = <%= @snapshot.all_related_people.map {|p| {name: "#{p.last_name}, #{p.first_name}"} }.sort.to_json.html_safe %>;
+    zenodoExport.creatorList = <%= @snapshot.all_related_people.map {|p| { name: "#{p.last_name}, #{p.first_name}" } }.
+                                                                sort_by { |p| p[:name] }.to_json.html_safe %>;
 
     $j(document).ready(function () {
         $j('#license-select').change(zenodoExport.setLicenseUrl);
