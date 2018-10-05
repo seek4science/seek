@@ -60,9 +60,11 @@ module Seek
         end
       end
 
-      def asset_accessibility(start_date, end_date)
-        Rails.cache.fetch("#{cache_key_base}_asset_accessibility_#{start_date}_#{end_date}", expires_in: 3.hours) do
-          assets = scoped_assets.select { |a| a.created_at >= start_date && a.created_at <= end_date }
+      def asset_accessibility(start_date, end_date, type: nil)
+        Rails.cache.fetch("#{cache_key_base}_#{type || 'all'}_asset_accessibility_#{start_date}_#{end_date}", expires_in: 3.hours) do
+          assets = scoped_assets
+          assets.select! { |a| a.class.name == type } if type
+          assets.select! { |a| a.created_at >= start_date && a.created_at <= end_date }
           published_count = assets.count { |a| a.is_published? }
           private_count = assets.count { |a| a.private? }
           misc_permissions = assets.count - (published_count + private_count)

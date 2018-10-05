@@ -1,6 +1,25 @@
-<%= panel('Asset accessibility', type: 'panel-default dashboard-panel') do %>
-  <canvas id="asset-accessibility-canvas"></canvas>
-<% end %>
+<% type_options ||= Seek::Util.authorized_types.sort_by { |t| t.name } %>
+
+<div class="panel panel-default dashboard-panel" id="asset-accessibility">
+  <div class="panel-heading">
+    <div class="form-inline pull-right">
+      <div class="form-group">
+        <label>Type</label>
+        <select class="form-control input-sm" autocomplete="off" data-dashboard-field="type">
+          <option value="all" selected="selected">All</option>
+          <% type_options.each do |type| %>
+            <option value="<%= type.name -%>"><%= t(type.name.underscore).pluralize -%></option>
+          <% end %>
+        </select>
+      </div>
+    </div>
+    Asset accessibility
+  </div>
+  <div class="panel-body">
+    <canvas id="asset-accessibility-canvas"></canvas>
+  </div>
+</div>
+
 
 <script>
     var publishedAssetsChart = new Chart(document.getElementById('asset-accessibility-canvas').getContext('2d'), {
@@ -41,16 +60,19 @@
         });
 
     function getAccessibilityStats() {
-        var startDate = $j('#dashboard-controls [data-dashboard-field="period-start"]').val();
-        var endDate = $j('#dashboard-controls [data-dashboard-field="period-end"]').val();
+        var data = {
+            start_date: $j('#dashboard-controls [data-dashboard-field="period-start"]').val(),
+            end_date: $j('#dashboard-controls [data-dashboard-field="period-end"]').val(),
+        };
+        var typeField = $j('#asset-accessibility [data-dashboard-field="type"]');
+        if (typeField.length && typeField.val() !== 'all') {
+            data.type = typeField.val();
+        }
 
         $j('#asset-accessibility-canvas').spinner('add');
 
         $j.ajax({ url: '<%= url -%>',
-            data: {
-                start_date: startDate,
-                end_date: endDate,
-            },
+            data: data,
             success: function (resp) {
                 publishedAssetsChart.data.datasets[0].data = [resp.published_count, resp.restricted_count, resp.private_count];
                 publishedAssetsChart.update();
@@ -65,4 +87,6 @@
 
         return false;
     }
+
+    $j('#asset-accessibility [data-dashboard-field="type"]').change(getAccessibilityStats);
 </script>
