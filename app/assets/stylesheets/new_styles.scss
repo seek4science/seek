@@ -756,3 +756,11 @@ span.required, label.required::after {
     background: center center no-repeat url(asset-path("ajax-loader-large.gif")) rgba(255,255,255,0.6);
   }
 }
+
+#dashboard-controls {
+  margin-bottom: 5px;
+
+  .form-group, .btn {
+    margin-top: 5px;
+  }
+}
