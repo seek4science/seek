@@ -6,8 +6,7 @@
   view = params[:graph_view] || default_view
   is_full_screen = params.key?(:fullscreen).present?
 %>
-
-
+<div style="float:right"><%= help_link :isa_overview, include_icon: true, link_text:'Help' %></div>
 <div class="row">
   <div class="col-sm-12 hidden-xs">
     <div id="isa-graph" class="panel panel-default">
@@ -44,9 +43,9 @@
         <%= render partial: 'general/jstree', locals: { hash: hash, root_item: root_item } %>
       </div>
     </div>
-
     <span id="ruler" style="visibility: hidden"></span>
   </div>
+
 </div>
 
 <%= modal_isa_png %>
