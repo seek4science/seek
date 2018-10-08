@@ -28,7 +28,26 @@
         data: {},
         options: {
             legend: {
-                position: 'right'
+                position: 'right',
+                onClick: function(e, legendItem) {
+                    setTimeout(function () { contributionChart.nextClickIsDouble = false; }, 300);
+                    var index = legendItem.datasetIndex;
+                    var ci = this.chart;
+                    var meta = ci.getDatasetMeta(index);
+
+                    // If it was a double click, hide all OTHER datasets
+                    if (contributionChart.nextClickIsDouble) {
+                        contributionChart.data.datasets.forEach(function (dataset, i) {
+                            ci.getDatasetMeta(i).hidden = (i !== index);
+                        });
+                        contributionChart.nextClickIsDouble = false;
+                    } else { // Otherwise just hide this one
+                      meta.hidden = meta.hidden === null? !ci.data.datasets[index].hidden : null;
+                      contributionChart.nextClickIsDouble = true;
+                    }
+
+                    ci.update();
+                }
             },
             title: {
                 display: false,
@@ -76,6 +95,8 @@
             });
         }
 
+        var body = $j('#contributions .panel-body');
+        body.addClass('loading');
         $j('#contributions-canvas').spinner('add');
 
         $j.ajax({ url: '<%= url -%>',
@@ -99,7 +120,7 @@
                 $j('#contributions-canvas').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
             },
             complete: function () {
-                $j('#contributions-canvas').spinner('remove');
+                body.removeClass('loading');
             }
         });
 
