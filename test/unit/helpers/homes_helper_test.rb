@@ -1,10 +1,16 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class HomesHelperTest < ActionView::TestCase
+  def setup
+    ActivityLog.destroy_all
+  end
+
   test 'should retrieve recently added/downloaded items in the chronological order' do
     n = 5
     user = Factory :user
-    item = Factory(:data_file, policy: Factory(:public_policy), contributor: user)
+    item = Factory(:data_file, policy: Factory(:public_policy), contributor: user.person)
 
     create_logs = []
 
@@ -13,7 +19,7 @@ class HomesHelperTest < ActionView::TestCase
     create_logs << Factory(:activity_log, action: :create, activity_loggable: private, created_at: 9.day.ago, culprit: user)
     download_logs = []
     (0...n).to_a.each do |i|
-      item2 = Factory(:data_file, policy: Factory(:public_policy), contributor: user)
+      item2 = Factory(:data_file, policy: Factory(:public_policy), contributor: user.person)
       create_logs << Factory(:activity_log, action: 'create', activity_loggable: item2, created_at: i.day.ago, culprit: user)
       download_logs << Factory(:activity_log, action: 'download', activity_loggable: item2, created_at: i.day.ago, culprit: user)
       download_logs << Factory(:activity_log, action: 'download', activity_loggable: item, created_at: i.hour.ago, culprit: user)
@@ -50,5 +56,28 @@ class HomesHelperTest < ActionView::TestCase
     recently_downloaded_item_logs = recently_downloaded_item_logs.select { |log| log[:title] == item.title }
     assert_equal 1, recently_downloaded_item_logs.count
     assert_equal recently_downloaded_item_logs[0][:log_id], download_logs.first.id
+  end
+
+  test 'should handle snapshots for download and recently added' do
+    person = Factory(:person)
+    snapshot1 = Factory(:investigation, contributor: person).create_snapshot
+    snapshot2 = Factory(:assay, contributor: person).create_snapshot
+    Factory(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
+    Factory(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)
+
+    added_hash = recently_added_item_logs_hash(1.year.ago)
+    downloaded_hash = recently_downloaded_item_logs_hash(1.year.ago)
+
+    assert_equal 1, added_hash.count
+    added = added_hash.first
+    assert_equal 'Snapshot', added[:type]
+    assert_equal snapshot1.resource.title.to_s, added[:title]
+    assert_equal investigation_snapshot_path(snapshot1.resource, snapshot1), added[:url]
+
+    assert_equal 1, downloaded_hash.count
+    downloaded = downloaded_hash.first
+    assert_equal 'Snapshot', downloaded[:type]
+    assert_equal snapshot2.resource.title.to_s, downloaded[:title]
+    assert_equal assay_snapshot_path(snapshot2.resource, snapshot2), downloaded[:url]
   end
 end

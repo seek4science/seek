@@ -77,5 +77,10 @@ module SEEK
     config.active_record.raise_in_transactional_callbacks = true
 
     config.active_job.queue_adapter = Rails.env.test? ? :test : :delayed_job
+
+    # load and set the application version from /config/version.yml
+    if defined?(Rails.root.to_s) && File.exists?("#{(Rails.root.to_s)}/config/version.yml")
+      APP_VERSION = App::Version.load "#{(Rails.root.to_s)}/config/version.yml"
+    end
   end
 end

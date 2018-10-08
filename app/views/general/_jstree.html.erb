@@ -1,23 +1,49 @@
+
 <div id="jstree"></div>
 
+
 <script type="text/javascript">
-  $j(document).ready(function () {
-    $j('#jstree').bind('loaded.jstree', function() {
-      $j(this).jstree(true).select_node(ISA.originNode.data('id'));
-    }).jstree({ 'core' : {
-      'check_callback': true,
-      'force_text': true,
-      'multiple': true,
-      'data' : <%= tree_json(hash).html_safe -%>
-    }}).on('activate_node.jstree', function (e, data) {
-      if (data.node.data && data.node.data.child_count) {
-        var childCountNode = ISA.getNode(data.node.li_attr['data-node-id']);
-        if (childCountNode.length) {
-          ISA.loadChildren(childCountNode);
-        }
-      } else {
-        ISA.selectNode(ISA.getNode(data.node.li_attr['data-node-id']));
-      }
-    })
-  });
+    $j(document).ready(function () {
+
+        $j('#jstree').bind('loaded.jstree', function (event, data) {
+
+
+            // expand the current node (above and children)
+            ISA.expandNodeByDataNodeId(ISA.originNode.data('id'));
+
+
+            // highlight the relevant part of the tree
+            $j('li[data-node-id=' + ISA.originNode.data('id') + ']').addClass('isa-highlight');
+
+        }).jstree({
+            'core': {
+                'check_callback': true,
+                'force_text': true,
+                'multiple': true,
+                'dblclick_toggle': false,
+                'data': <%= tree_json(hash, root_item).html_safe -%>
+            }
+        }).on('activate_node.jstree', function (e, data) {
+            if (data.node.data && data.node.data.child_count) {
+                var childCountNode = ISA.getNode(data.node.li_attr['data-node-id']);
+                if (childCountNode.length) {
+                    ISA.loadChildren(childCountNode);
+                }
+            } else {
+                data.instance.open_node(data.node); // Open the branch if it is collapsed
+                var node = ISA.getNode(data.node.li_attr['data-node-id']);
+                if (node.length) {
+                    ISA.selectNode(node);
+                }
+            }
+        }).on('dblclick.jstree', function (event) {
+            var id = $j(event.target).closest('li').data('nodeId');
+            var node = ISA.getNode(id);
+            ISA.visitNode(node);
+        }).on('redraw.jstree', function (event) {
+            $j('li[data-node-id=' + ISA.originNode.data('id') + ']').each(function () {
+                $j(this).addClass('isa-highlight');
+            });
+        });
+    });
 </script>

@@ -16,14 +16,12 @@ class SopsController < ApplicationController
   include Seek::IsaGraphExtensions
 
   def new_version
-    if handle_upload_data
+    if handle_upload_data(true)
       comments=params[:revision_comments]
 
 
       respond_to do |format|
         if @sop.save_as_new_version(comments)
-
-          create_content_blobs
 
           #Duplicate experimental conditions
           conditions = @sop.find_version(@sop.version - 1).experimental_conditions
@@ -48,15 +46,11 @@ class SopsController < ApplicationController
   # PUT /sops/1
   def update
     update_annotations(params[:tag_list], @sop) if params.key?(:tag_list)
-
-    @sop.attributes = sop_params
-
     update_sharing_policies @sop
+    update_relationships(@sop,params)
 
     respond_to do |format|
-      if @sop.save
-        update_relationships(@sop,params)
-        update_assay_assets(@sop,params[:assay_ids])
+      if @sop.update_attributes(sop_params)
         flash[:notice] = "#{t('sop')} metadata was successfully updated."
         format.html { redirect_to sop_path(@sop) }
         format.json { render json: @sop }
@@ -71,7 +65,9 @@ class SopsController < ApplicationController
 
   def sop_params
     params.require(:sop).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
-                                { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+                                { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                                { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
+                                { publication_ids: [] })
   end
 
   alias_method :asset_params, :sop_params

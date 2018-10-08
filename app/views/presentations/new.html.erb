@@ -7,7 +7,7 @@
       <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@presentation} -%>
 
       <div class="form-group">
-        <label>Title <span class="required">*</span></label>
+        <label class="required">Title</label>
         <% presentation_title_value = (params[:presentation].blank? || params[:presentation][:title].blank?) ? nil : params[:presentation][:title] -%>
         <%= text_field_tag "presentation[title]", presentation_title_value, :class=>"form-control" -%>
       </div>
@@ -28,10 +28,7 @@
 
       <%= fields_for(@presentation) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
 
-      <% if Seek::Config.events_enabled -%>
-          <%= render :partial => "assets/associate_event", :locals=>{:resource => @presentation} -%>
-      <% end -%>
-
+      <%= fancy_multiselect @presentation, :events, { other_projects_checkbox: true } if Seek::Config.events_enabled %>
       <div>
         <%= preview_permission_popup_link(@presentation)-%>
         <%= create_button :id => "presentation_submit_btn",

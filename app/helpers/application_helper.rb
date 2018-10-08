@@ -260,14 +260,13 @@ module ApplicationHelper
   end
 
   def contributor(contributor, avatar = false, size = 100, you_text = false)
-    return jerm_harvester_name unless contributor
+    return unless contributor
 
     if contributor.class.name == 'User'
       # this string will output " (you) " for current user next to the display name, when invoked with 'you_text == true'
       you_string = you_text && logged_in? && user.id == current_user.id ? "<small style='vertical-align: middle; color: #666666; margin-left: 0.5em;'>(you)</small>" : ''
-      contributor_person = contributor.person
-      contributor_name = h(contributor_person.name)
-      contributor_url = person_path(contributor_person.id)
+      contributor_name = h(contributor.name)
+      contributor_url = person_path(contributor)
       contributor_name_link = link_to(contributor_name, contributor_url)
 
       if avatar

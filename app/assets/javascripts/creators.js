@@ -4,20 +4,17 @@ function updateCreatorSettings() {
 
     for(var i = 0; i < creators.length; i++) {
         var creator = creators[i];
-        html += HandlebarsTemplates['creator'](creator);
+        html += HandlebarsTemplates['creator']({ creator: creator, prefix: resourceType });
         creators_arr.push([creator.name, creator.id]);
     }
 
     // update the page
     if(html.length == 0) {
-        $j('#creators_list').html('<span class="subtle">No creators</span>');
+        $j('#creators_list').html('<li><span class="none_text">No creators</span></li>');
     }
     else {
         $j('#creators_list').html(html);
     }
-
-    // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
-    $j('#creators').val(Object.toJSON(creators_arr));
 
     $j('#creators_list .delete').click(function () {
         var id = $j(this).data('objectId');

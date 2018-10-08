@@ -248,7 +248,16 @@ class Policy < ActiveRecord::Base
   # return the hash: key is access_type, value is the array of people
   def summarize_permissions(creators = [User.current_user.try(:person)], asset_housekeepers = [], contributor = User.current_user.try(:person))
     # build the hash containing contributor_type as key and the people in these groups as value,exception:'Public' holds the access_type as the value
-    people_in_group = { 'Person' => [], 'FavouriteGroup' => [], 'WorkGroup' => [], 'Project' => [], 'Institution' => [], 'WhiteList' => [], 'BlackList' => [], 'Network' => [], 'Public' => 0 }
+    people_in_group = { 'Person' => [],
+                        'FavouriteGroup' => [],
+                        'WorkGroup' => [],
+                        'Project' => [],
+                        'Programme' => [],
+                        'Institution' => [],
+                        'WhiteList' => [],
+                        'BlackList' => [],
+                        'Network' => [],
+                        'Public' => 0 }
     # the result return: a hash contain the access_type as key, and array of people as value
     grouped_people_by_access_type = {}
 
@@ -260,11 +269,13 @@ class Policy < ActiveRecord::Base
     people_in_group['FavouriteGroup'] = remove_duplicate(people_in_group['FavouriteGroup'])
     people_in_group['WorkGroup'] = remove_duplicate(people_in_group['WorkGroup'])
     people_in_group['Project'] = remove_duplicate(people_in_group['Project'])
+    people_in_group['Programme'] = remove_duplicate(people_in_group['Programme'])
     people_in_group['Institution'] = remove_duplicate(people_in_group['Institution'])
 
     # Now process precedence with the order [network, institution, project, wg, fg, person]
     filtered_people = people_in_group['Network']
     filtered_people = precedence(filtered_people, people_in_group['Institution'])
+    filtered_people = precedence(filtered_people, people_in_group['Programme'])
     filtered_people = precedence(filtered_people, people_in_group['Project'])
     filtered_people = precedence(filtered_people, people_in_group['WorkGroup'])
     filtered_people = precedence(filtered_people, people_in_group['FavouriteGroup'])
@@ -311,40 +322,19 @@ class Policy < ActiveRecord::Base
     permissions.each do |permission|
       contributor_id = permission.contributor_id
       access_type = permission.access_type
-      case permission.contributor_type
-      when 'Person'
-        person = get_person contributor_id, access_type
-        people_in_group['Person'] << person unless person.blank?
-      when 'FavouriteGroup'
-        people_in_FG = get_people_in_FG nil, contributor_id
-        people_in_group['FavouriteGroup'] |= people_in_FG unless people_in_FG.blank?
-      when 'WorkGroup'
-        people_in_WG = get_people_in_WG contributor_id, access_type
-        people_in_group['WorkGroup'] |= people_in_WG unless people_in_WG.blank?
-      when 'Project'
-        people_in_project = get_people_in_project contributor_id, access_type
-        people_in_group['Project'] |= people_in_project unless people_in_project.blank?
-      when 'Institution'
-        people_in_institution = get_people_in_institution contributor_id, access_type
-        people_in_group['Institution'] |= people_in_institution unless people_in_institution.blank?
 
-       end
+      if permission.contributor_type == 'FavouriteGroup'
+        details = get_people_in_FG nil, contributor_id
+      else
+        details = permission.affected_people.collect do |person|
+          [person.id, person.name.to_s, access_type] unless person.blank?
+        end.compact
+      end
+
+      people_in_group[permission.contributor_type] |= details unless details.blank?
     end
+
     people_in_group
-  end
-
-  def get_person(person_id, access_type)
-    person = begin
-      Person.find(person_id)
-    rescue ActiveRecord::RecordNotFound
-      nil
-    end
-    return [person.id, person.name.to_s, access_type] if person
-  end
-
-  # REVIEW: people WG
-  def get_people_in_WG(wg_id, access_type)
-    collect_people_details(WorkGroup.find(wg_id), access_type)
   end
 
   # REVIEW: people in black list, white list and normal workgroup
@@ -364,36 +354,10 @@ class Policy < ActiveRecord::Base
     end
   end
 
-  # REVIEW: people in project
-  def get_people_in_project(project_id, access_type)
-    collect_people_details(Project.find(project_id), access_type)
-  end
-
-  # REVIEW: people in institution
-  def get_people_in_institution(institution_id, access_type)
-    collect_people_details(Institution.find(institution_id), access_type)
-  end
-
   def collect_people_details(resource, access_type)
     resource.people.collect do |person|
       [person.id, person.name.to_s, access_type] unless person.blank?
     end.compact
-  end
-
-  # REVIEW: people in network
-  def get_people_in_network(access_type)
-    people_in_network = [] # id, name, access_type
-    projects = Project.all
-    projects.each do |project|
-      project.people.each do |person|
-        unless person.blank?
-          person_identification = [person.id, person.name.to_s]
-          people_in_network.push person_identification unless people_in_network.include? person_identification
-        end
-      end
-    end
-    people_in_network.collect! { |person| person.push access_type }
-    people_in_network
   end
 
   # remove duplicate by taking the one with the highest access_type

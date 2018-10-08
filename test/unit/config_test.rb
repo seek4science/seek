@@ -438,8 +438,8 @@ class ConfigTest < ActiveSupport::TestCase
       with_config_value(:hard_max_cachable_size, '2000') do
         assert_equal 1000, Seek::Config.max_cachable_size
         assert_equal 2000, Seek::Config.hard_max_cachable_size
-        assert_equal Fixnum, Seek::Config.max_cachable_size.class
-        assert_equal Fixnum, Seek::Config.hard_max_cachable_size.class
+        assert_equal Integer, Seek::Config.max_cachable_size.class
+        assert_equal Integer, Seek::Config.hard_max_cachable_size.class
       end
     end
   end

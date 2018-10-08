@@ -52,7 +52,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
     DOIABLE_ASSETS.each do |type|
       login_as(@user)
-      asset = Factory(type.to_sym, policy: Factory(:private_policy), contributor: User.current_user)
+      asset = Factory(type.to_sym, policy: Factory(:private_policy), contributor: User.current_user.person)
       refute asset.is_published?
       assert asset.can_manage?
       assert asset.find_version(asset.version).can_mint_doi?
@@ -117,7 +117,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'should show doi attribute on minted version' do
     DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym, contributor: User.current_user)
+      asset = Factory(type.to_sym, contributor: User.current_user.person)
 
       asset.save_as_new_version
 
@@ -191,7 +191,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'after DOI is minted, the -Delete- button is disabled' do
     DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym, contributor: User.current_user, policy: Factory(:private_policy))
+      asset = Factory(type.to_sym, contributor: User.current_user.person, policy: Factory(:private_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
@@ -205,7 +205,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'can not delete asset after DOI is minted' do
     DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym, contributor: User.current_user, policy: Factory(:private_policy))
+      asset = Factory(type.to_sym, contributor: User.current_user.person, policy: Factory(:private_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save

@@ -77,4 +77,41 @@ class EventTest < ActiveSupport::TestCase
       event.presentations << [Factory(:presentation, policy: Factory(:public_policy))]
     end
   end
+
+  test 'contributors method non non-versioned asset' do
+    event = Factory(:event)
+
+    refute event.respond_to?(:versions)
+    assert_equal 1, event.contributors.length
+    assert_includes event.contributors, event.contributor
+  end
+
+  test 'link to documents' do
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      event = Factory(:event, contributor:person)
+      assert_empty event.documents
+      doc = Factory(:document, contributor:person)
+      event = Factory(:event,documents:[doc])
+      refute_empty event.documents
+      assert_equal [doc],event.documents
+    end
+  end
+
+  test 'fails to link to none visible document' do
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      doc = Factory(:document)
+      refute doc.can_view?
+      event = Factory.build(:event,documents:[doc], contributor:person)
+
+      refute event.save
+
+      event = Factory(:event,contributor:person)
+      assert event.valid?
+      event.documents << doc
+
+      refute event.save
+    end
+  end
 end

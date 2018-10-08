@@ -6,8 +6,8 @@ class DataFileTest < ActiveSupport::TestCase
 
   test 'associations' do
     datafile_owner = Factory :user
-    datafile = Factory :data_file, policy: Factory(:all_sysmo_viewable_policy), contributor: datafile_owner
-    assert_equal datafile_owner, datafile.contributor
+    datafile = Factory :data_file, policy: Factory(:all_sysmo_viewable_policy), contributor: datafile_owner.person
+    assert_equal datafile_owner.person, datafile.contributor
     datafile.content_blob.destroy unless datafile.content_blob.nil?
 
     blob = Factory.create(:content_blob, original_filename: 'df.ppt', content_type: 'application/ppt', asset: datafile, asset_version: datafile.version) # content_blobs(:picture_blob)
@@ -26,8 +26,8 @@ class DataFileTest < ActiveSupport::TestCase
 
   test 'event association' do
     User.with_current_user Factory(:user) do
-      datafile = Factory :data_file, contributor: User.current_user
-      event = Factory :event, contributor: User.current_user
+      datafile = Factory :data_file, contributor: User.current_user.person
+      event = Factory :event, contributor: User.current_user.person
       datafile.events << event
       assert datafile.valid?
       assert datafile.save
@@ -81,7 +81,7 @@ class DataFileTest < ActiveSupport::TestCase
   test 'version created on save' do
     person = Factory(:person)
     User.with_current_user(person.user) do
-      df = Factory.build(:data_file,title: 'testing versions', policy: Factory(:private_policy),contributor:person)
+      df = Factory.build(:data_file,title: 'testing versions', policy: Factory(:private_policy), contributor: person)
       assert df.valid?
       refute df.persisted?
       df.save!
@@ -216,7 +216,7 @@ class DataFileTest < ActiveSupport::TestCase
   test 'fs_search_fields' do
     user = Factory :user
     User.with_current_user user do
-      df = Factory :data_file, contributor: user
+      df = Factory :data_file, contributor: user.person
       sf1 = Factory :studied_factor_link, substance: Factory(:compound, name: 'sugar')
       sf2 = Factory :studied_factor_link, substance: Factory(:compound, name: 'iron')
       comp = sf2.substance
@@ -238,7 +238,7 @@ class DataFileTest < ActiveSupport::TestCase
   test 'fs_search_fields_with_synonym_substance' do
     user = Factory :user
     User.with_current_user user do
-      df = Factory :data_file, contributor: user
+      df = Factory :data_file, contributor: user.person
       suger = Factory(:compound, name: 'sugar')
       iron = Factory(:compound, name: 'iron')
       metal = Factory :synonym, name: 'metal', substance: iron
@@ -280,21 +280,60 @@ class DataFileTest < ActiveSupport::TestCase
   test 'sample template?' do
     create_sample_attribute_type
 
+    person = Factory(:person)
+
+    User.with_current_user(person.user) do
+      data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:public_policy)
+      refute data_file.sample_template?
+      assert_empty data_file.possible_sample_types
+
+      sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
+      sample_type.content_blob = Factory(:sample_type_template_content_blob)
+      sample_type.build_attributes_from_template
+      disable_authorization_checks { sample_type.save! }
+
+      assert data_file.sample_template?
+      assert_includes data_file.possible_sample_types, sample_type
+
+      #doesn't match
+      data_file = Factory :data_file, content_blob: Factory(:small_test_spreadsheet_content_blob), policy: Factory(:public_policy)
+      refute data_file.sample_template?
+      assert_empty data_file.possible_sample_types
+
+    end
+  end
+
+  test 'possible sample type ignore hidden' do
+    create_sample_attribute_type
+
+    person = Factory(:person)
+
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:public_policy)
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [Factory(:project).id]
-    sample_type.content_blob = Factory(:sample_type_template_content_blob)
-    sample_type.build_attributes_from_template
-    disable_authorization_checks { sample_type.save! }
+    #visible
+    sample_type1 = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: person
+    sample_type1.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type1.build_attributes_from_template
+    disable_authorization_checks { sample_type1.save! }
 
-    assert data_file.sample_template?
-    assert_includes data_file.possible_sample_types, sample_type
+    #hidden
+    person2 = Factory(:person)
+    sample_type2 = SampleType.new title: 'hidden', uploaded_template: true, project_ids:person2.projects.collect(&:id), contributor: person2
+    sample_type2.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type2.build_attributes_from_template
+    disable_authorization_checks { sample_type2.save! }
 
-    data_file = Factory :data_file, content_blob: Factory(:small_test_spreadsheet_content_blob), policy: Factory(:public_policy)
-    refute data_file.sample_template?
-    assert_empty data_file.possible_sample_types
+    User.with_current_user(person.user) do
+      assert sample_type1.can_view?
+      refute sample_type2.can_view?
+
+      possible = data_file.possible_sample_types
+      refute_empty possible
+      assert_includes possible,sample_type1
+      refute_includes possible,sample_type2
+    end
   end
 
   test 'factory test' do

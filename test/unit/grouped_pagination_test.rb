@@ -186,13 +186,12 @@ class GroupedPaginationTest < ActiveSupport::TestCase
 
   def test_post_fetch_pagination
     user = Factory :user
-    Factory :sop, contributor: user
-    Factory :sop, contributor: user
+    Factory :sop, contributor: user.person
+    Factory :sop, contributor: user.person
     sops = Sop.all
     assert !sops.empty?
     sops.each { |s| User.current_user = s.contributor; s.save if s.valid? } # Set first letters
-    result = Sop.paginate_after_fetch(sops)
-    assert !result.empty? # Check there's something on the first page
+    refute_empty Sop.paginate_after_fetch(sops) # Check there's something on the first page
   end
 
   test 'pagination for default page using rails-setting plugin' do

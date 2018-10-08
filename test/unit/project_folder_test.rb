@@ -227,7 +227,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
     project = user.person.projects.first
     another_user = Factory(:person,project:project).user
     model = Factory :model, projects: [project], policy: Factory(:public_policy),contributor:user.person
-    hidden_model = Factory :model, projects: [project], policy: Factory(:private_policy),contributor:another_user
+    hidden_model = Factory :model, projects: [project], policy: Factory(:private_policy),contributor:another_user.person
     viewable_sop = Factory :sop, projects: [project], policy: Factory(:all_sysmo_viewable_policy),contributor:user.person
     folder = Factory :project_folder, project: project
 

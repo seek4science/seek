@@ -306,3 +306,8 @@ Factory.define(:blank_xml_content_blob, parent: :blank_content_blob) do |f|
   f.original_filename 'model.xml'
   f.content_type 'application/xml'
 end
+
+Factory.define(:blank_txt_content_blob, parent: :blank_content_blob) do |f|
+  f.original_filename 'a_txt_file.txt'
+  f.content_type 'text/plain'
+end

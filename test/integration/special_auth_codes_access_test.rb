@@ -135,12 +135,12 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
     test "should display unexpired temporary link of #{type_name} for manager" do
       user = Factory(:user)
       User.with_current_user user do
-        item = Factory(type_name.singularize.to_sym, policy: Factory(:private_policy), contributor: user)
+        item = Factory(type_name.singularize.to_sym, policy: Factory(:private_policy), contributor: user.person)
         disable_authorization_checks do
           item.special_auth_codes << Factory(:special_auth_code, asset: item)
         end
 
-        post '/session', login: item.contributor.login, password: item.contributor.password
+        post '/session', login: user.login, password: user.password
 
         get "/#{type_name}/#{item.id}"
 
@@ -154,7 +154,7 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
     test "should not display unexpired temporary link of #{type_name} for non-manager" do
       user = Factory(:user)
       User.with_current_user user do
-        item = Factory(type_name.singularize.to_sym, policy: Factory(:publicly_viewable_policy), contributor: user)
+        item = Factory(type_name.singularize.to_sym, policy: Factory(:publicly_viewable_policy), contributor: user.person)
         item.special_auth_codes << Factory(:special_auth_code, asset: item)
         user = Factory(:user)
 

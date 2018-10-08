@@ -8,7 +8,7 @@ module Seek
         attr_accessor :permission_for
         klass.extend AuthLookupClassMethods
         klass.class_eval do
-          belongs_to :contributor, polymorphic: true unless method_defined? :contributor
+          belongs_to :contributor, class_name: 'Person' unless method_defined? :contributor
           after_initialize :contributor_or_default_if_new
 
           # checks a policy exists, and if missing resorts to using a private policy
@@ -313,8 +313,8 @@ module Seek
           end
 
           # Contributor permissions
-          if (contributor_user = (contributor.is_a?(Person) ? contributor.user : contributor))
-            update_lookup([true, true, true, true, true], contributor_user)
+          if contributor && contributor.user
+            update_lookup([true, true, true, true, true], contributor.user)
           end
 
           # Role permissions (Role)
@@ -354,7 +354,7 @@ module Seek
       end
 
       def default_contributor
-        User.current_user
+        User.current_user.try(:person)
       end
 
       def has_advanced_permissions?
@@ -370,7 +370,7 @@ module Seek
 
       # use request_permission_summary to retrieve who can manage the item
       def people_can_manage
-        contributor = self.contributor.is_a?(Person) ? self.contributor : self.contributor.try(:person)
+        contributor = self.contributor
         return [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]] if policy.blank?
         creators = is_downloadable? ? self.creators : []
         asset_managers = (projects & contributor.former_projects).collect(&:asset_housekeepers).flatten
@@ -385,19 +385,12 @@ module Seek
       # returns a list of the people that can manage this file
       # which will be the contributor, and those that have manage permissions
       def managers
-        # FIXME: how to handle projects as contributors - return all people or just specific people (pals or other role)?
         people = []
-        unless contributor.nil?
-          people << contributor.person if contributor.is_a?(User)
-          people << contributor if contributor.is_a?(Person)
-        end
 
-        policy.permissions.each do |perm|
-          unless perm.contributor.nil? || perm.access_type != Policy::MANAGING
-            people << perm.contributor if perm.contributor.is_a?(Person)
-            people << perm.contributor.person if perm.contributor.is_a?(User)
-          end
-        end
+        people << contributor unless contributor.nil?
+
+        perms = policy.permissions.where(access_type:Policy::MANAGING, contributor_type:'Person').select{|p| p.contributor}
+        people |= perms.collect(&:contributor)
         people.uniq
       end
 
@@ -420,9 +413,15 @@ module Seek
         ActiveRecord::Base.connection.select_one(sql).values[0].to_i
       end
 
+      def contributors
+        a = [contributor]
+        a += versions.map(&:contributor) if respond_to?(:versions)
+        a.compact.uniq
+      end
+
       private
 
-      # Note, nil user means ALL users, not anonymous user. Anon user is represented with ;anonymous
+      # Note, nil user means ALL users, not anonymous user. Anon user is represented with `:anonymous`
       def update_lookup(permission, user = nil, overwrite = true)
         if permission.is_a?(Array)
           can_view, can_edit, can_download, can_manage, can_delete = *permission

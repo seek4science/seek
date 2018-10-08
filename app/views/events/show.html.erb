@@ -11,7 +11,7 @@
     <% unless @event.contributor.nil? then %>
         <p>
           <label>Created by:</label>
-          <%= link_to @event.contributor.person.name, @event.contributor.person -%>
+          <%= link_to @event.contributor.name, @event.contributor -%>
         </p>
     <% end %>
     <p>

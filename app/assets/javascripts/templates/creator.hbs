@@ -1,4 +1,7 @@
-<div>
-    {{name}} ({{projects}})
-    <a title="Remove" class="delete clickable" data-object-id="{{id}}">(remove)</a>
-</div>
+<li class="association-list-item">
+    {{creator.name}} ({{creator.projects}})
+    <a title="Remove creator" class="remove-association delete clickable" data-object-id="{{creator.id}}">
+        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+    </a>
+    <input type="hidden" value="{{creator.id}}" name="{{prefix}}[creator_ids][]"/>
+</li>

@@ -16,6 +16,8 @@ class SampleType < ActiveRecord::Base
 
   include Seek::Taggable
 
+  include Seek::Permissions::SpecialContributors
+
   acts_as_uniquely_identifiable
 
   acts_as_favouritable
@@ -26,18 +28,31 @@ class SampleType < ActiveRecord::Base
 
   has_many :linked_sample_attributes, class_name: 'SampleAttribute', foreign_key: 'linked_sample_type_id'
 
+  belongs_to :contributor, class_name: 'Person'
+
   validates :title, presence: true
+  validates :title, length: { maximum: 255 }
+  validates :description, length: { maximum: 65_535 }
+  validates :contributor, presence: true
 
   validate :validate_one_title_attribute_present, :validate_attribute_title_unique
+
+  validates :projects, presence: true, projects: { self: true }
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
 
   grouped_pagination
 
+  has_annotation_type :sample_type_tag, method_name: :tags
+
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
     fail UnknownAttributeException.new("Unknown attribute #{attribute_name}") unless attribute
     attribute.validate_value?(value)
+  end
+
+  def contributors
+    [contributor]
   end
 
   # refreshes existing samples following a change to the sample type. For example when changing the title field
@@ -62,16 +77,8 @@ class SampleType < ActiveRecord::Base
     resolve_seek_samples_inconsistencies
   end
 
-  def tags=(tags)
-    tag_annotations(tags, 'sample_type_tags')
-  end
-
-  def tags
-    annotations_with_attribute('sample_type_tags').collect(&:value_content)
-  end
-
-  def can_download?
-    true
+  def can_download?(user = User.current_user)
+    can_view?(user)
   end
 
   def self.user_creatable?
@@ -84,9 +91,9 @@ class SampleType < ActiveRecord::Base
   end
 
   def can_edit?(user = User.current_user)
-    return true if user && user.is_admin? && Seek::Config.samples_enabled
-    can = user && user.person && ((projects & user.person.projects).any?) && Seek::Config.samples_enabled
-    can && (!Seek::Config.project_admin_sample_type_restriction || projects.detect { |project| project.can_be_administered_by?(user) })
+    return false if user.nil? || user.person.nil? || !Seek::Config.samples_enabled
+    return true if user.is_admin?
+    contributor == user.person || projects.detect { |project| project.can_be_administered_by?(user)}.present?
   end
 
   def can_delete?(user = User.current_user)
@@ -97,11 +104,32 @@ class SampleType < ActiveRecord::Base
       end.nil?
   end
 
+  def can_view?(user = User.current_user, referring_sample = nil)
+    project_membership = (user && user.person && (user.person.projects & projects).any?)
+    project_membership || public_samples? || check_referring_sample_permission(user,referring_sample)
+  end
+
+  # ducktyping to behave like a Policy based authorized item, in particular the index view
+  def self.all_authorized_for action, user = User.current_user
+    action = "can_#{action.to_s}?"
+    SampleType.all.select{|st| st.send(action,user)}
+  end
+
   def editing_constraints
     Seek::Samples::SampleTypeEditingConstraints.new(self)
   end
 
   private
+
+  # whether the referring sample is valid and gives permission to view
+  def check_referring_sample_permission(user,referring_sample)
+    referring_sample.try(:sample_type)==self && referring_sample.can_view?(user)
+  end
+
+  #whether it is assocaited with any public samples
+  def public_samples?
+    samples.joins(:policy).where('policies.access_type >= ?',Policy::VISIBLE).any?
+  end
 
   # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
   # this is to help when a controlled vocab has been selected in the form, but then the type has been changed

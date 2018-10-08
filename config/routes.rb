@@ -195,7 +195,7 @@ SEEK::Application.routes.draw do
       get :isa_children
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
-              :publications,:events,:samples,:specimens,:strains,:search, :documents, :only=>[:index]
+              :publications,:events,:samples,:specimens,:strains,:search,:organisms, :documents, :only=>[:index]
     resources :openbis_endpoints do
       member do
         post :add_dataset
@@ -337,7 +337,7 @@ SEEK::Application.routes.draw do
       get :new_object_based_on_existing_one
       get :isa_children
     end
-    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications, :documents,:strains,:only=>[:index]
+    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications, :documents,:strains, :organisms, :only=>[:index]
   end
 
 
@@ -525,7 +525,7 @@ SEEK::Application.routes.draw do
       get :isa_children
     end
     resources :people,:projects, :institutions, :investigations, :studies, :assays,
-              :data_files, :models, :sops, :presentations, :documents, :events, :publications
+              :data_files, :models, :sops, :presentations, :documents, :events, :publications, :organisms
   end
 
   resources :publications do
@@ -692,8 +692,6 @@ SEEK::Application.routes.draw do
   get '/tags/:id' => 'tags#show', :as => :show_tag
   get '/tags' => 'tags#index', :as => :all_anns
   get '/tags/:id' => 'tags#show', :as => :show_ann
-  get '/jerm/' => 'jerm#index', :as => :jerm
-  get '/jerm/fetch' => 'jerm#fetch', :as=> :jerm_fetch
   get '/countries/:country_name' => 'countries#show', :as => :country
 
   get '/data_fuse/' => 'data_fuse#show', :as => :data_fuse

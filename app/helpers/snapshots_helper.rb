@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SnapshotsHelper
   def list_item_snapshot_list(resource)
     content_tag :p, class: :list_item_attribute do

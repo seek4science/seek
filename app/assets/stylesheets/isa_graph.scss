@@ -2,7 +2,7 @@
 @import 'mixins';
 
 #isa-graph {
-  overflow: hidden;
+  min-height: 60px;
 
   &.fullscreen{
     position: fixed;
@@ -19,25 +19,14 @@
       height: 100%;
     }
 
-    .isa-footer {
-      position: absolute;
-      width: 100%;
-      bottom: 0px;
-      margin-top: 10px;
-      height: 60px;
-    }
-
     #cy {
       height: 100% !important;
       max-height: none !important;
       margin-bottom: 70px;
     }
 
-    #exit-fullscreen-btn {
-      display: inline;
-    }
-
     #jstree {
+      height: auto !important;
       max-height: none !important;
     }
   }
@@ -62,57 +51,67 @@ a.graph_toggle {
 
 #cy {
   flex-grow: 1;
-  max-height: 600px !important;
-  min-height: 400px;
+  height: 600px !important;
 }
 
 #jstree {
   background-color: #fff;
-  max-height: 600px !important;
   width: 300px;
   flex-shrink: 0;
   border-left: 1px solid $panel-default-border;
-  padding-left: 5px;
-  padding-bottom: 60px;
-  overflow-y: scroll;
+  margin-left: -1px;
+  padding: 10px 0 10px 5px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-y: auto;
   overflow-x: hidden;
+  max-height: 50em;
+
   .jstree-themeicon {
     background-size: 24px !important;
   }
+
   .hidden-leaf {
     color: gray;
     > i {
       display: none;
     }
   }
+
   .child-count-leaf {
-    color: $link-color;
+    color: #999;
+    font-size: small;
     &:hover {
       color: $link-hover-color;
       text-decoration: underline;
     }
+
     > i {
       display: none;
     }
   }
 }
 
-.isa-footer {
+.isa-controls {
+  overflow: auto;
+  position: absolute;
+  right: 20px;
+  top: 5px;
   text-align: right;
-  border-top: 1px solid $panel-default-border;
-  padding: 10px;
-  background-color: $panel-footer-bg;
+  #isa-view-controls {
+    display: inline-block;
+  }
 }
 
-#exit-fullscreen-btn {
-  font-size: 40px;
-  color: inherit;
-  position: absolute;
-  right: 10px;
-  top: 0;
-  display: none;
+.isa-highlight {
+  background-color: rgba(190, 235, 255, 0.5) !important;
 
-  &:hover {
-    text-decoration: none;
+  & > a {
+    font-weight: bold;
+  }
+
+  > ul {
+    background-color: rgba(255, 255, 255, 0.5) !important;
+
   }
 }

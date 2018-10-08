@@ -10,7 +10,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   def test_auth_on_asset_version
     user1 = Factory :user
     user2 = Factory :user
-    sop = Factory :sop, contributor: user1, policy: Factory(:private_policy)
+    sop = Factory :sop, contributor: user1.person, policy: Factory(:private_policy)
     sop.policy.permissions << Factory(:permission, policy: sop.policy, contributor: user2.person, access_type: Policy::VISIBLE)
     assert_equal 1, sop.versions.count
     sop_v = sop.versions.first
@@ -524,11 +524,11 @@ class AuthorizationTest < ActiveSupport::TestCase
     leaving_project_member = Factory(:person, group_memberships: [Factory(:group_membership,
                                                                           time_left_at: 10.day.from_now,
                                                                           work_group: work_group)])
-    datafile1 = Factory(:data_file, contributor: project_member.user,
+    datafile1 = Factory(:data_file, contributor: project_member,
                                     projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
-    datafile2 = Factory(:data_file, contributor: project_member.user,
+    datafile2 = Factory(:data_file, contributor: project_member,
                                     projects: asset_manager.projects, policy: Factory(:private_policy))
-    datafile3 = Factory(:data_file, contributor: leaving_project_member.user,
+    datafile3 = Factory(:data_file, contributor: leaving_project_member,
                                     projects: asset_manager.projects, policy: Factory(:private_policy))
 
     refute Seek::Permissions::Authorization.authorized_by_role?('manage', datafile1, asset_manager)
@@ -546,9 +546,9 @@ class AuthorizationTest < ActiveSupport::TestCase
     asset_manager = Factory(:asset_housekeeper)
     work_group = asset_manager.work_groups.first
     former_project_member = Factory(:person, group_memberships: [Factory(:group_membership, has_left: true, work_group: work_group)])
-    datafile1 = Factory(:data_file, contributor: former_project_member.user,
+    datafile1 = Factory(:data_file, contributor: former_project_member,
                                     projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
-    datafile2 = Factory(:data_file, contributor: former_project_member.user,
+    datafile2 = Factory(:data_file, contributor: former_project_member,
                                     projects: asset_manager.projects, policy: Factory(:private_policy))
 
     assert Seek::Permissions::Authorization.authorized_by_role?('manage', datafile1, asset_manager)
@@ -625,15 +625,11 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     # resources are not entirely private
     datafile = Factory(:data_file, contributor: former_project_member, projects: asset_manager.projects, policy: policy)
-    datafile2 = Factory(:data_file, contributor: former_project_member.user, projects: asset_manager.projects, policy: policy2)
     investigation = Factory(:investigation, contributor: former_project_member, projects: asset_manager.projects, policy: policy)
-    investigation2 = Factory(:investigation, contributor: former_project_member.user, projects: asset_manager.projects, policy: policy2)
 
     User.with_current_user asset_manager.user do
       assert datafile.can_manage?
-      assert datafile2.can_manage?
       assert investigation.can_manage?
-      assert investigation2.can_manage?
     end
   end
 
@@ -657,7 +653,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   test 'can not delete for the asset which doi is minted' do
     User.current_user = Factory :user
-    df = Factory :data_file, contributor: User.current_user
+    df = Factory :data_file, contributor: User.current_user.person
     assert df.can_delete?(User.current_user)
 
     version = df.latest_version
@@ -682,25 +678,13 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert_equal false, Seek::Permissions::Authorization.is_authorized?("view",df,nil)
   end
 
-  private 
-
-  def actions
-    [:view, :edit, :download, :delete, :manage]
-  end
-
-  # To save me re-writing lots of tests. Code copied from authorization.rb
-  # Mimics how authorized_by_policy method used to work, but with my changes.
-  def temp_authorized_by_policy?(_policy, thing, action, user, _not_used_2)
-    Seek::Permissions::Authorization.send(:authorized_by_policy?, action, thing,user)
-  end
-
   test 'all users scope overrides more restrictive permissions' do
     person = Factory(:person)
 
     user = person.user
 
     sop = Factory(:sop, policy: Factory(:public_policy, permissions: [
-      Factory(:permission, contributor: person, access_type: Policy::NO_ACCESS)
+        Factory(:permission, contributor: person, access_type: Policy::NO_ACCESS)
     ]))
     assert sop.can_view?(nil)
     assert sop.can_download?(nil)
@@ -711,8 +695,8 @@ class AuthorizationTest < ActiveSupport::TestCase
     user2 = person2.user
 
     sop = Factory(:sop, policy: Factory(:publicly_viewable_policy, permissions: [
-      Factory(:permission, contributor: person, access_type: Policy::NO_ACCESS),
-      Factory(:permission, contributor: person2, access_type: Policy::ACCESSIBLE)
+        Factory(:permission, contributor: person, access_type: Policy::NO_ACCESS),
+        Factory(:permission, contributor: person2, access_type: Policy::ACCESSIBLE)
     ]))
 
     assert sop.can_view?(nil)
@@ -774,6 +758,82 @@ class AuthorizationTest < ActiveSupport::TestCase
     User.with_current_user(person.user) do
       assert public_item.can_view?
     end
+  end
+
+  test 'programme permissions' do
+    programme = Factory(:programme)
+
+    project1 = Factory(:project, programme: programme)
+    project2 = Factory(:project, programme: programme)
+    project3 = Factory(:project)
+
+    person1 = Factory(:person, project: project1)
+    person2 = Factory(:person, project: project2)
+    person3 = Factory(:person, project: project3)
+
+    sop = Factory(:sop, contributor: person1, policy: Factory(:private_policy))
+    sop.reload
+
+    assert sop.can_view?(person1.user)
+    refute sop.can_view?(person2.user)
+    refute sop.can_view?(person3.user)
+
+    sop.policy.permissions.create!(contributor: programme, access_type: Policy::ACCESSIBLE)
+    sop = Sop.find(sop.id) # HAve to do this to clear authorization "cache"
+
+    assert sop.can_view?(person1.user)
+    assert sop.can_view?(person2.user)
+    refute sop.can_view?(person3.user)
+
+    # All other users
+    ([nil] + User.includes(:person).all.reject { |u| u.person.nil? || u.person.programmes.include?(programme) }).each do |user|
+      refute sop.can_view?(user)
+    end
+  end
+
+  test 'programme permissions precedence' do
+    programme = Factory(:programme)
+
+    project1 = Factory(:project, programme: programme)
+    project2 = Factory(:project, programme: programme)
+    project3 = Factory(:project)
+
+    person1 = Factory(:person, project: project1)
+    person2 = Factory(:person, project: project2)
+    person3 = Factory(:person, project: project3)
+
+    sop = Factory(:sop, contributor: person1, policy: Factory(:private_policy))
+    sop.policy.permissions.create!(contributor: programme, access_type: Policy::VISIBLE)
+    sop.reload
+
+    assert sop.can_view?(person1.user)
+    assert sop.can_view?(person2.user)
+    refute sop.can_view?(person3.user)
+    assert sop.can_download?(person1.user)
+    refute sop.can_download?(person2.user)
+    refute sop.can_download?(person3.user)
+
+    sop.policy.permissions.create!(contributor: project2, access_type: Policy::ACCESSIBLE)
+    sop = Sop.find(sop.id) # Have to do this to clear authorization "cache"
+
+    assert sop.can_view?(person1.user)
+    assert sop.can_view?(person2.user)
+    refute sop.can_view?(person3.user)
+    assert sop.can_download?(person1.user)
+    assert sop.can_download?(person2.user)
+    refute sop.can_download?(person3.user)
+  end
+
+  private 
+
+  def actions
+    [:view, :edit, :download, :delete, :manage]
+  end
+
+  # To save me re-writing lots of tests. Code copied from authorization.rb
+  # Mimics how authorized_by_policy method used to work, but with my changes.
+  def temp_authorized_by_policy?(_policy, thing, action, user, _not_used_2)
+    Seek::Permissions::Authorization.send(:authorized_by_policy?, action, thing,user)
   end
 
   def temp_get_group_permissions(policy)

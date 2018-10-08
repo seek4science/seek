@@ -45,7 +45,7 @@ class SopsAnnotationTest < ActionController::TestCase
     login_as p.user
 
     p2 = Factory :person
-    sop = Factory :sop, contributor: p.user
+    sop = Factory :sop, contributor: p
 
     assert sop.annotations.empty?, 'this sop should have no tags for the test'
 
@@ -184,7 +184,7 @@ class SopsAnnotationTest < ActionController::TestCase
     p = Factory :person
     login_as p.user
 
-    another_sop = Factory :sop, contributor: p.user
+    another_sop = Factory :sop, contributor: p
     golf = Factory :tag, source: p.user, annotatable: another_sop, value: 'golf'
 
     sop = { title: 'Test', project_ids: [p.projects.first.id] }
@@ -202,7 +202,7 @@ class SopsAnnotationTest < ActionController::TestCase
   test 'tag cloud shown on show page' do
     p = Factory :person
     login_as p.user
-    sop = Factory :sop, contributor: p.user
+    sop = Factory :sop, contributor: p
 
     get :show, id: sop
     assert_response :success
@@ -217,6 +217,7 @@ class SopsAnnotationTest < ActionController::TestCase
     end
 
     sop.tag_with %w(fish sparrow sprocket)
+    sop.save!
 
     get :show, id: sop
     assert_response :success
@@ -237,7 +238,7 @@ class SopsAnnotationTest < ActionController::TestCase
     p = Factory :person
     p2 = Factory :person
     login_as p.user
-    sop = Factory :sop, contributor: p.user
+    sop = Factory :sop, contributor: p
 
     coffee = Factory :tag, source: p.user, annotatable: sop, value: 'coffee'
     Factory :tag, source: p2.user, annotatable: sop, value: coffee.value
@@ -257,7 +258,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_response :success
     assert_select 'input#tag_list'
 
-    sop = Factory :sop, contributor: p.user
+    sop = Factory :sop, contributor: p
     get :edit, id: sop
     assert_response :success
     assert_select 'input#tag_list'

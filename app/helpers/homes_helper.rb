@@ -1,4 +1,6 @@
 
+
+
 module HomesHelper
   include UsersHelper
   include AssetsHelper
@@ -101,13 +103,13 @@ module HomesHelper
     entry_date = determine_entry_date(entry)
     entry_summary = truncate(strip_tags(entry.summary || entry.content), length: 500)
     # TODO: Try removing .to_str when running Rails 4.2
-    tt = tooltip("#{CGI.unescapeHTML(entry_summary.to_str)} (#{entry_date.strftime('%c') unless entry_date.nil?})")
+    tt = tooltip("#{CGI.unescapeHTML(entry_summary.to_str)} (#{entry_date&.strftime('%c')})")
     [entry_date, entry_title, feed_title, tt]
   end
 
   def recently_downloaded_item_logs_hash(time = 1.month.ago, number_of_item = 10)
     Rails.cache.fetch("download_activity_#{current_user_id}") do
-      activity_logs = ActivityLog.no_spider.where(['action = ? AND created_at > ? AND activity_loggable_type != ?', 'download', time, 'Snapshot']).order('created_at DESC')
+      activity_logs = ActivityLog.no_spider.where(['action = ? AND created_at > ?', 'download', time]).order('created_at DESC')
       selected_activity_logs = []
       activity_logs.each do |activity_log|
         included = selected_activity_logs.index { |log| log.activity_loggable == activity_log.activity_loggable }
@@ -123,7 +125,7 @@ module HomesHelper
 
   def recently_added_item_logs_hash(time = 1.month.ago, number_of_item = 10)
     Rails.cache.fetch("create_activity_#{current_user_id}") do
-      item_types = Seek::Util.user_creatable_types.collect(&:name) | [Project, Programme].collect(&:name)
+      item_types = Seek::Util.user_creatable_types.collect(&:name) | [Project, Programme, Snapshot].collect(&:name)
       activity_logs = ActivityLog.where(['action = ? AND created_at > ? AND activity_loggable_type in (?)', 'create', time, item_types]).order('created_at DESC')
       selected_activity_logs = []
       activity_logs.each do |log|
@@ -183,11 +185,11 @@ module HomesHelper
     link_to(text, session_path(login: 'guest', password: 'guest'), method: :post)
   end
 
-  def frontpage_button(link, image_path, &block)
+  def frontpage_button(link, image_path)
     link_to link, class: 'seek-homepage-button', target: :_blank do
       image_tag(image_path) +
         content_tag(:span) do
-          block.call
+          yield
         end
     end
   end

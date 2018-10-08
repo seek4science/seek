@@ -1,8 +1,46 @@
-To cite SEEK in your publication please use:
+To cite SEEK in your publication please use either:
 
-Katherine Wolstencroft, Stuart Owen, Olga Krebs, Quyen Nguyen, Natalie J Stanford, Martin Golebiewski, Andreas Weidemann, Meik Bittkowski, Lihua An, David Shockley, Jacky L. Snoep, Wolfgang Mueller and Carole Goble (2015):
+Katherine Wolstencroft, Stuart Owen, Olga Krebs, Quyen Nguyen, Natalie J Stanford, Martin Golebiewski, Andreas Weidemann, Meik Bittkowski, Lihua An, David Shockley, Jacky L. Snoep, Wolfgang Müller and Carole Goble (2015):
 SEEK: a systems biology data and model management platform
 BMC Systems Biology  2015 9:33
 doi:10.1186/s12918-015-0174-y
 https://doi.org/10.1186/s12918-015-0174-y
+
+@article{SEEK2015,
+  author   = {Wolstencroft, Katherine and Owen, Stuart and Krebs, Olga and Nguyen, Quyen and Stanford, Natalie J. and Golebiewski, Martin and Weidemann, Andreas and Bittkowski, Meik and An, Lihua and Shockley, David and Snoep, Jacky L. and Müller, Wolfgang and Goble, Carole},
+  title    = {SEEK: a systems biology data and model management platform},
+  journal  = {BMC Systems Biology},
+  year     = {2015},
+  month    = {Jul},
+  day      = {11},
+  volume   = {9},
+  number   = {1},
+  pages    = {33},
+  abstract = {Systems biology research typically involves the integration and analysis of heterogeneous data types in order to model and predict biological processes. Researchers therefore require tools and resources to facilitate the sharing and integration of data, and for linking of data to systems biology models.},
+  issn     = {1752-0509},
+  doi      = {10.1186/s12918-015-0174-y},
+  url      = {https://doi.org/10.1186/s12918-015-0174-y}
+}
+
+
+Or:
+
+Katherine Wolstencroft, Olga Krebs, Jacky L. Snoep, Natalie J. Stanford, Finn Bacall, Martin Golebiewski, Rostyk Kuzyakiv, Quyen Nguyen, Stuart Owen, Stian Soiland-Reyes, Straszewski Jakub, David D. van Niekerk, Alan R. Williams, Lars Malmström, Bernd Rinn, Wolfgang Müller and Carole Goble (2017):
+FAIRDOMHub: a repository and collaboration environment for sharing systems biology research
+Nucleic Acids Research, Volume 45, Issue D1, 4 January 2017, Pages D404–D407
+doi:10.1093/nar/gkw1032
+https://doi.org/10.1093/nar/gkw1032
+
+@article{FAIRDOMHub2017,
+  author   = {Wolstencroft, Katherine and Krebs, Olga and Snoep, Jacky L. and Stanford, Natalie J. and Bacall, Finn and Golebiewski, Martin and Kuzyakiv, Rostyk and Nguyen, Quyen and Owen, Stuart and Soiland-Reyes, Stian and Straszewski, Jakub and van Niekerk, David D. and Williams, Alan R. and Malmström, Lars and Rinn, Bernd and Müller, Wolfgang and Goble, Carole},
+  title    = {FAIRDOMHub: a repository and collaboration environment for sharing systems biology research},
+  journal  = {Nucleic Acids Research},
+  volume   = {45},
+  number   = {D1},
+  pages    = {D404-D407},
+  year     = {2017},
+  doi      = {10.1093/nar/gkw1032},
+  url      = {http://dx.doi.org/10.1093/nar/gkw1032},
+  eprint   = {/oup/backfile/content_public/journal/nar/45/d1/10.1093_nar_gkw1032/3/gkw1032.pdf}
+}
 

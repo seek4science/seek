@@ -4,7 +4,7 @@ Factory.define(:presentation) do |f|
   f.association :contributor, factory: :person
 
   f.after_build do |presentation|
-    presentation.projects = [presentation.contributor.person.projects.first] if presentation.projects.empty?
+    presentation.projects = [presentation.contributor.projects.first] if presentation.projects.empty?
   end
 
   f.after_create do |presentation|

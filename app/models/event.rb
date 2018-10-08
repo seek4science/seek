@@ -2,6 +2,11 @@ class Event < ActiveRecord::Base
   has_and_belongs_to_many :data_files, -> { uniq }
   has_and_belongs_to_many :publications, -> { uniq }
   has_and_belongs_to_many :presentations, -> { uniq }
+  has_and_belongs_to_many :documents, -> { uniq }
+
+  before_destroy {documents.clear}
+
+  enforce_authorization_on_association :documents, :view
 
   include Seek::Subscribable
   include Seek::Search::CommonFields
@@ -38,6 +43,10 @@ class Event < ActiveRecord::Base
   end
 
   validates_presence_of :title
+  validates :title, length: { maximum: 255 }
+
+  validates :description, length: { maximum: 65_535 }
+
   validates_presence_of :start_date
 
   # validates_is_url_string :url

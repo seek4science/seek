@@ -1,27 +1,39 @@
 require 'tempfile'
 
 module ISAHelper
-  FILL_COLOURS = { 'Sop' => '#7ac5cd', # cadetblue3
-                   'Model' => '#cdcd00', # yellow3
-                   'DataFile' => '#eec591', # burlywood2
-                   'Investigation' => '#E6E600',
-                   'Study' => '#B8E62E',
-                   'Assay' => { 'EXP' => '#64b466', 'MODEL' => '#92CD00' },
-                   'Publication' => '#84B5FD',
-                   'Presentation' => '#8ee5ee', # cadetblue2
-                   'HiddenItem' => '#d3d3d3' } # lightgray
+  OLD_FILL_COLOURS = {
+      'Sop' => '#7AC5CD', # cadetblue3
+      'Model' => '#CDCD00', # yellow3
+      'DataFile' => '#EEC591', # burlywood2
+      'Investigation' => '#E6E600',
+      'Study' => '#B8E62E',
+      'Assay' =>'#64B466',
+      'Publication' => '#84B5FD',
+      'Presentation' => '#8EE5EE', # cadetblue2
+      'HiddenItem' => '#D3D3D3'
+  } # lightgray
 
-  BORDER_COLOURS = { 'Sop' => '#619da4',
-                     'Model' => '#a4a400',
-                     'DataFile' => '#be9d74',
-                     'Investigation' => '#9fba99',
-                     'Study' => '#74a06f',
-                     'Assay' => { 'EXP' => '#509051', 'MODEL' => '#74a400' },
-                     'Publication' => '#6990ca',
-                     'Presentation' => '#71b7be', # cadetblue2
-                     'HiddenItem' => '#a8a8a8' }
+  NEW_FILL_COLOURS = {
+      'Programme' => '#90A8FF',
+      'Project' => '#85D6FF',
+      'Investigation' => '#D6FF00',
+      'Study' => '#96ED29',
+      'Assay' =>'#52D155',
+      'Publication' => '#CBB8FF',
+      'DataFile' => '#FFC382',
+      'Document' => '#D5C8A8',
+      'Model' => '#F9EB57',
+      'Sop' => '#CCE5FF',
+      'Sample' => '#FFF2D5',
+      'Presentation' => '#FFB2E4',
+      'Event' => '#FF918E',
+      'HiddenItem' => '#D3D3D3'
+  }
 
-  FILL_COLOURS.default = '#8ee5ee' # cadetblue2
+  FILL_COLOURS = NEW_FILL_COLOURS
+  FILL_COLOURS.default = '#8EE5EE' # cadetblue2
+
+  BORDER_COLOURS = { }
   BORDER_COLOURS.default = '#71b7be'
 
   def cytoscape_elements(elements_hash)
@@ -33,7 +45,22 @@ module ISAHelper
     { error: 'error' }
   end
 
-  private
+  def modal_isa_png()
+    modal_options = {id: 'modal-exported-png', size: 'xl', 'data-role' => 'modal-isa-graph-png'}
+
+    modal_title = 'Export PNG'
+
+    modal(modal_options) do
+      modal_header(modal_title) +
+          modal_body do
+            #content_tag(:button, 'save',id:'save-exported-png') +
+            content_tag(:p,'Click below to download a copy of the image') +
+            button_link_to('Download', 'download', '#', id:'save-exported-png') +
+            content_tag(:br) +
+            content_tag(:img, '',id: 'exported-png', style:'max-width:1200px')
+          end
+    end
+  end
 
   def cytoscape_node_elements(hash)
     elements = []
@@ -43,11 +70,11 @@ module ISAHelper
       data = { id: node_id(item) }
 
       if node.can_view?
-        if item.respond_to?(:description)
-          data['description'] = truncate(h(item.description), length: 500)
-        else
-          data['description'] = ''
-        end
+        data['description'] = if item.respond_to?(:description)
+                                truncate(h(item.description), length: 500)
+                              else
+                                ''
+                              end
 
         if data['description'].blank?
           data['description'] = item.is_a?(Publication) ? 'No abstract' : 'No description'
@@ -58,28 +85,21 @@ module ISAHelper
         avatar = resource_avatar_path(item) || icon_filename_for_key("#{item.class.name.downcase}_avatar")
         data['imageUrl'] = asset_path(avatar)
         data['url'] = item.is_a?(Seek::ObjectAggregation) ? polymorphic_path([item.object, item.type]) : polymorphic_path(item)
-
-        if item.is_a?(Assay) # distinquish two assay classes
-          assay_class_title = item.assay_class.title
-          assay_class_key = item.assay_class.key
-          data['type'] = assay_class_title
-          data['faveColor'] = FILL_COLOURS[item_type][assay_class_key] || FILL_COLOURS.default
-          data['borderColor'] = BORDER_COLOURS[item_type][assay_class_key] || BORDER_COLOURS.default
-        else
-          data['type'] = item_type.humanize
-          data['faveColor'] = FILL_COLOURS[item_type] || FILL_COLOURS.default
-          data['borderColor'] = BORDER_COLOURS[item_type] || BORDER_COLOURS.default
-        end
+        data['type'] = item.is_a?(Assay) ? item.assay_class.title : item_type.humanize
+        data['faveColor'] = FILL_COLOURS[item.is_a?(Seek::ObjectAggregation) ? item.type.to_s.singularize.capitalize : item.class.name] || FILL_COLOURS.default
       else
         data['name'] = 'Hidden item'
         data['fullName'] = data['name']
         data['type'] = 'Hidden'
         data['description'] = 'Hidden item'
-        data['faveColor'] = FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default
-        data['borderColor'] = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
+        data['faveColor'] = FILL_COLOURS['HiddenItem']
       end
 
-      elements << { group: 'nodes', data: data, classes: 'resource' }
+      elements << if node == hash[:nodes].first
+                    { group: 'nodes', data: data, classes: 'resource' }
+                  else
+                    { group: 'nodes', data: data, classes: 'resource resource-small' }
+                  end
 
       # If this node has children, but they aren't included in the set of nodes, create an info node that will load the children
       #  when clicked
@@ -114,8 +134,7 @@ module ISAHelper
                             source: source,
                             target: target,
                             faveColor: BORDER_COLOURS.default },
-                    classes: 'resource-edge'
-      }
+                    classes: 'resource-edge' }
     end
     elements
   end
@@ -126,8 +145,7 @@ module ISAHelper
               name: name,
               source: source,
               target: target,
-              faveColor: fave_color }
-    }
+              faveColor: fave_color } }
   end
 
   def edge_label(source, target)
@@ -152,7 +170,7 @@ module ISAHelper
     label_data.join(', ')
   end
 
-  def tree_json(hash)
+  def tree_json(hash, root_item)
     objects = hash[:nodes].map(&:object)
     real_edges = hash[:edges].select { |e| objects.include?(e[0]) }
 
@@ -160,12 +178,12 @@ module ISAHelper
       real_edges.none? { |_parent, child| child == n.object }
     end
 
-    nodes = roots.map { |root| tree_node(hash, root.object) }.flatten
+    nodes = roots.map { |root| tree_node(hash, root.object, root_item) }.flatten
 
     nodes.to_json
   end
 
-  def tree_node(hash, object)
+  def tree_node(hash, object, root_item = nil)
     child_edges = hash[:edges].select do |parent, _child|
       parent == object
     end
@@ -187,6 +205,8 @@ module ISAHelper
       entry[:a_attr] = { class: 'hidden-leaf none_text' }
     end
 
+    entry[:children] += child_edges.map { |c| tree_node(hash, c[1], root_item) }
+
     if node.child_count > 0
       if node.child_count > child_edges.count
         entry[:children] << {
@@ -199,12 +219,10 @@ module ISAHelper
         }
       end
 
-      entry[:state] = { opened: true }
+      entry[:state] = { opened: false }
     else
       entry[:state] = { opened: false }
     end
-
-    entry[:children] += child_edges.map { |c| tree_node(hash, c[1]) }
 
     entry
   end

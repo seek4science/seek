@@ -47,8 +47,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference('Sample.count') do
       post :create, sample: { sample_type_id: type.id,
                               __sample_data_full_name: 'Fred Smith', __sample_data_age: '22', __sample_data_weight: '22.1', __sample_data_postcode: 'M13 9PL' ,
-                              project_ids: [person.projects.first.id], other_creators:'frank, mary' },
-           creators: [[creator.name, creator.id]].to_json
+                              project_ids: [person.projects.first.id], other_creators:'frank, mary', creator_ids: [creator.id] }
     end
     assert assigns(:sample)
     sample = assigns(:sample)
@@ -57,7 +56,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal '22', sample.get_attribute(:age)
     assert_equal '22.1', sample.get_attribute(:weight)
     assert_equal 'M13 9PL', sample.get_attribute(:postcode)
-    assert_equal person.user, sample.contributor
+    assert_equal person, sample.contributor
     assert_equal [creator], sample.creators
     assert_equal 'frank, mary',sample.other_creators
 
@@ -73,8 +72,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference('Sample.count') do
       post :create, sample: { sample_type_id: type.id,
                               data: { full_name: 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
-                              project_ids: [person.projects.first.id] },
-                    creators: [[creator.name, creator.id]].to_json
+                              project_ids: [person.projects.first.id], creator_ids: [creator.id] }
     end
     assert assigns(:sample)
     sample = assigns(:sample)
@@ -83,7 +81,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal '22', sample.get_attribute(:age)
     assert_equal '22.1', sample.get_attribute(:weight)
     assert_equal 'M13 9PL', sample.get_attribute(:postcode)
-    assert_equal person.user, sample.contributor
+    assert_equal person, sample.contributor
     assert_equal [creator], sample.creators
 
     # job should have been triggered
@@ -176,8 +174,8 @@ class SamplesControllerTest < ActionController::TestCase
     assert_empty sample.creators
 
     assert_no_difference('Sample.count') do
-      put :update, id: sample.id, sample: { __sample_data_full_name: 'Jesus Jones', __sample_data_age: '47', __sample_data_postcode: 'M13 9QL' },
-          creators: [[creator.name, creator.id]].to_json
+      put :update, id: sample.id, sample: { __sample_data_full_name: 'Jesus Jones', __sample_data_age: '47', __sample_data_postcode: 'M13 9QL',
+          creator_ids: [creator.id] }
       assert_equal [creator], sample.creators
     end
 
@@ -204,8 +202,8 @@ class SamplesControllerTest < ActionController::TestCase
     assert_empty sample.creators
 
     assert_no_difference('Sample.count') do
-      put :update, id: sample.id, sample: { data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' } },
-                   creators: [[creator.name, creator.id]].to_json
+      put :update, id: sample.id, sample: { data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' },
+                                            creator_ids: [creator.id] }
       assert_equal [creator], sample.creators
     end
 
@@ -348,7 +346,7 @@ class SamplesControllerTest < ActionController::TestCase
                               project_ids: [person.projects.first.id] }, policy_attributes: valid_sharing
     end
     assert sample = assigns(:sample)
-    assert_equal person.user, sample.contributor
+    assert_equal person, sample.contributor
     assert sample.can_view?(Factory(:person).user)
   end
 
@@ -363,7 +361,7 @@ class SamplesControllerTest < ActionController::TestCase
                               project_ids: [person.projects.first.id] }, policy_attributes: valid_sharing
     end
     assert sample = assigns(:sample)
-    assert_equal person.user, sample.contributor
+    assert_equal person, sample.contributor
     assert sample.can_view?(Factory(:person).user)
   end
 
@@ -474,9 +472,9 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'filtering for association forms' do
     person = Factory(:person)
-    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: 'fish')
-    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: 'frog')
-    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: 'banana')
+    Factory(:sample, contributor: person, policy: Factory(:public_policy), title: 'fish')
+    Factory(:sample, contributor: person, policy: Factory(:public_policy), title: 'frog')
+    Factory(:sample, contributor: person, policy: Factory(:public_policy), title: 'banana')
     login_as(person.user)
 
     get :filter, filter: ''
@@ -587,6 +585,59 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_select 'div.related-items a[href=?]', sample_path(sample), text: /#{sample.title}/
   end
+
+  test 'referring sample id is added to sample type link, if necessary' do
+    person = Factory(:person)
+    sample = Factory(:sample,policy:Factory(:private_policy,permissions:[Factory(:permission,contributor:person, access_type:Policy::VISIBLE)]))
+    sample_type = sample.sample_type
+    login_as(person.user)
+
+    assert sample.can_view?
+    refute sample_type.can_view?
+
+    get :show,id:sample.id
+    assert_response :success
+
+    assert_select 'a[href=?]',sample_type_path(sample_type,referring_sample_id:sample.id),text:/#{sample_type.title}/
+
+    sample2 = Factory(:sample,policy:Factory(:public_policy))
+    sample_type2 = sample2.sample_type
+
+    assert sample2.can_view?
+    assert sample_type2.can_view?
+
+    get :show,id:sample2.id
+    assert_response :success
+
+    # no referring sample required
+    assert_select 'a[href=?]',sample_type_path(sample_type2),text:/#{sample_type2.title}/
+
+  end
+
+  test 'referring sample id is added to sample type links in list items' do
+    person = Factory(:person)
+    sample = Factory(:sample,policy:Factory(:private_policy,permissions:[Factory(:permission,contributor:person, access_type:Policy::VISIBLE)]))
+    sample_type = sample.sample_type
+    sample2 = Factory(:sample,policy:Factory(:public_policy))
+    sample_type2 = sample2.sample_type
+    login_as(person.user)
+
+    assert sample.can_view?
+    refute sample_type.can_view?
+
+    assert sample2.can_view?
+    assert sample_type2.can_view?
+
+    get :index
+
+    assert_select 'a[href=?]',sample_type_path(sample_type,referring_sample_id:sample.id),text:/#{sample_type.title}/
+
+    # no referring sample required, ST is already visible
+    assert_select 'a[href=?]',sample_type_path(sample_type2),text:/#{sample_type2.title}/
+
+  end
+
+
 
   private
 

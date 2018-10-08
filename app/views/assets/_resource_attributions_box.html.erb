@@ -12,7 +12,7 @@
       <% for item in attributed_to.first(main_list_section_length) -%>
 				<% if item -%>
 				  <% item_type = item.class.name -%>
-                                        <% by_text = item.contributor.nil? ? "" : " by #{h(item.contributor.person.name)}" %>
+                                        <% by_text = item.contributor.nil? ? "" : " by #{h(item.contributor.name)}" %>
 					<% tooltip_txt = "<b>#{item_type.humanize}:</b> \"#{h(item.title)}\"#{by_text}" -%>
 				  <%= list_item_with_icon(item_type.underscore, item, item.title, truncate_to, tooltip_txt, 34) -%>
 				<% else -%>

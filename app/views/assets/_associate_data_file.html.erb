@@ -7,12 +7,14 @@
     collapse_panel = false
     associated_data_files_json = associations_json_from_params(DataFile, params[:data_files])
   elsif resource.respond_to?(:assay_assets)
-    assay_assets = resource.assay_assets.where(asset_type: 'DataFile').includes(:asset, :relationship_type)
+    assay_assets = resource.assay_assets.select { |aa| aa.asset_type == 'DataFile' }
+    field_name = "#{resource.class.name.underscore}[data_files_attributes]"
     collapse_panel = assay_assets.empty?
-    associated_data_files_json = associations_json_from_assay_assets(assay_assets)
+    associated_data_files_json = associations_json_from_assay_assets(assay_assets, fieldName: field_name)
   else
+    field_name = "data_files"
     collapse_panel = resource.data_files.empty?
-    associated_data_files_json = associations_json_from_relationship(resource.data_files)
+    associated_data_files_json = associations_json_from_relationship(resource.data_files, fieldName: field_name)
   end
 -%>
 
@@ -28,24 +30,28 @@
                 <h3>Incoming</h3>
                 <%= associations_list('incoming-data-file-list', 'associations/data_file', '',
                                       empty_text: 'No incoming data',
+                                      'data-field-name' => field_name,
                                       'data-multilist-group-value' => AssayAsset::Direction::INCOMING) %>
               </div>
               <div class="col-md-4">
                 <h3>Outgoing</h3>
                 <%= associations_list('outgoing-data-file-list', 'associations/data_file', '',
                                       empty_text: 'No outgoing data',
+                                      'data-field-name' => field_name,
                                       'data-multilist-group-value' => AssayAsset::Direction::OUTGOING) %>
               </div>
               <div class="col-md-4">
                 <h3>No direction</h3>
                 <%= associations_list('other-data-file-list', 'associations/data_file', '',
                                       empty_text: 'No other data',
+                                      'data-field-name' => field_name,
                                       'data-multilist-group-value' => AssayAsset::Direction::NODIRECTION) %>
               </div>
             </div>
         <% end %>
     <% else %>
         <%= associations_list('data_file_to_list', 'associations/data_file', associated_data_files_json,
+                              'data-field-name' => field_name,
                               empty_text: 'No data files') %>
     <% end %>
 

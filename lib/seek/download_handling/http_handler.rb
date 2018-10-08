@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rest-client'
 require 'private_address_check'
 require 'private_address_check/tcpsocket_ext'
@@ -22,11 +24,11 @@ module Seek
         p = proc do
           begin
             response = RestClient.head(url, accept: '*/*')
-            if is_slideshare_url?
-              content_type = 'text/html'
-            else
-              content_type = response.headers[:content_type]
-            end
+            content_type = if is_slideshare_url?
+                             'text/html'
+                           else
+                             response.headers[:content_type]
+                           end
             content_length = response.headers[:content_length]
             file_name = determine_filename_from_disposition(response.headers[:content_disposition])
             code = response.code
@@ -69,10 +71,10 @@ module Seek
         content_type ||= content_type_from_filename(file_name)
 
         {
-            code: code,
-            file_size: content_length.present? ? content_length.try(:to_i) : nil,
-            content_type: content_type,
-            file_name: file_name
+          code: code,
+          file_size: content_length.present? ? content_length.try(:to_i) : nil,
+          content_type: content_type,
+          file_name: file_name
         }
       end
 

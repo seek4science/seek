@@ -4,7 +4,6 @@ class Project < ActiveRecord::Base
 
   acts_as_yellow_pages
   title_trimmer
-  validates :title, uniqueness: true
 
   has_and_belongs_to_many :investigations
 
@@ -49,10 +48,6 @@ class Project < ActiveRecord::Base
   after_save :handle_pal_ids, if: '@pal_ids'
   after_save :handle_asset_housekeeper_ids, if: '@asset_housekeeper_ids'
 
-  # FIXME: temporary handler, projects need to support multiple programmes
-  def programmes
-    [programme].compact
-  end
 
   # SEEK projects suffer from having 2 types of ancestor and descendant,that were added separately - those from the historical lineage of the project, and also from
   # the hierarchical tree structure that can be. For this reason and to avoid the clash, these anscestors and descendants have been renamed.
@@ -69,6 +64,10 @@ class Project < ActiveRecord::Base
 
   validate :lineage_ancestor_cannot_be_self
 
+  validates :title, uniqueness: true
+  validates :title, length: { maximum: 255 }
+  validates :description, length: { maximum: 65_535 }
+
   # a default policy belonging to the project; this is set by a project PAL
   # if the project gets deleted, the default policy needs to be destroyed too
   # (no links to the default policy will be made from elsewhere; instead, when
@@ -78,6 +77,12 @@ class Project < ActiveRecord::Base
   belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
   has_many :settings, class_name: 'Settings', as: :target, dependent: :destroy
+
+  # FIXME: temporary handler, projects need to support multiple programmes
+  def programmes
+    [programme].compact
+  end
+
 
   def group_memberships_empty?(institution)
     work_group = WorkGroup.where(['project_id=? AND institution_id=?', id, institution.id]).first

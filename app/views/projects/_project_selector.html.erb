@@ -9,7 +9,17 @@
   resource ||= nil
 
   selected_projects = resource ? resource.projects : []
-  possible_projects = allow_all ? Project.all : (User.current_user.person.projects + resource.try(:projects)).uniq
+  if allow_all
+    possible_projects = Project.all
+  else
+    possible_projects = []
+    possible_projects |= User.current_user.person.projects
+    if resource
+      possible_projects |= resource.projects
+      possible_projects |= resource.contributor.projects if resource.respond_to?(:contributor) && resource.contributor
+    end
+  end
+
   possible_projects = possible_projects - selected_projects
 
   possible_projects_json, selected_projects_json = [possible_projects, selected_projects].map do |projects|
@@ -37,9 +47,9 @@
       <div class="box_editing_inner">
         <ul class="related_asset_list">
           <span v-if="selected.length == 0" class="none_text">None</span>
-          <li v-for="(project, index) in selected">
+          <li class="association-list-item" v-for="(project, index) in selected">
             <span :title="project.title">{{ project.title }}</span>
-            <a class="clickable remove-button" @click="remove(project, index)">
+            <a class="remove-association clickable" @click="remove(project, index)">
               <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
             </a>
             <input type="hidden" name="<%= field_name -%>" v-model="project.id"/>

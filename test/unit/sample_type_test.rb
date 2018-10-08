@@ -2,6 +2,7 @@ require 'test_helper'
 require 'time_test_helper'
 
 class SampleTypeTest < ActiveSupport::TestCase
+
   def setup
     @person = Factory(:person)
     @project = @person.projects.first
@@ -9,7 +10,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'validation' do
-    sample_type = SampleType.new title: 'fish', project_ids: @project_ids
+    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: @person
     refute sample_type.valid?
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
 
@@ -20,25 +21,165 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute sample_type.valid?
 
     # needs to have a project
-    sample_type = SampleType.new title: 'fish'
+    sample_type = SampleType.new title: 'fish', contributor: @person
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
     refute sample_type.valid?
-    sample_type.projects = [Factory(:project)]
+    sample_type.projects = [@project]
     assert sample_type.valid?
 
     # cannot have 2 attributes with the same name
-    sample_type = SampleType.new title: 'fish', project_ids: @project_ids
+    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: @person
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'a', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'a', is_title: false, sample_type: sample_type)
     refute sample_type.valid?
 
     # uniqueness check should be case insensitive
-    sample_type = SampleType.new title: 'fish', project_ids: @project_ids
+    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: @person
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'aaa', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'aAA', is_title: false, sample_type: sample_type)
     refute sample_type.valid?
+
+    #needs to have a contributor
+    sample_type = SampleType.new title: 'fish', project_ids: @project_ids
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
+    refute sample_type.valid?
+    sample_type.contributor = @person
+    assert sample_type.valid?
+
+    #contributor must belong in the same project
+    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: Factory(:person)
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
+    refute sample_type.valid?
+    sample_type.contributor = @person
+    assert sample_type.valid?
+  end
+
+  test 'can_view?' do
+
+    # can't view if not a project member
+    st = Factory(:simple_sample_type)
+    assert_empty st.projects & @person.projects
+
+    refute st.can_view?(@person.user)
+    User.with_current_user(@person.user) do
+      refute st.can_view?
+    end
+
+    # can view if in project
+    person2 = Factory(:person,project:@project)
+    st = Factory(:simple_sample_type,projects:[@project])
+    assert_equal [@project],st.projects & @person.projects
+    assert st.can_view?(@person.user)
+    User.with_current_user(@person.user) do
+      assert st.can_view?
+    end
+
+    # can view if it has a public sample
+    public_sample = Factory(:sample,policy:Factory(:public_policy))
+    private_sample = Factory(:sample,policy:Factory(:private_policy))
+
+    assert public_sample.can_view?
+    st = public_sample.sample_type
+    assert st.can_view?
+    assert st.can_view?(@person.user)
+    User.with_current_user(@person.user) do
+      assert st.can_view?
+    end
+    assert_empty st.projects & @person.projects
+
+    refute private_sample.can_view?
+    st = private_sample.sample_type
+    refute st.can_view?
+    refute st.can_view?(@person.user)
+    User.with_current_user(@person.user) do
+      refute st.can_view?
+    end
+
+    assert_empty st.projects & @person.projects
+
+  end
+
+  test 'can view with a referring sample' do
+    person = Factory(:person)
+    sample = Factory(:sample,policy:Factory(:private_policy,permissions:[Factory(:permission,contributor:person, access_type:Policy::VISIBLE)]))
+    sample_type = sample.sample_type
+
+    assert sample.can_view?(person.user)
+    refute sample.can_view?
+    refute sample_type.can_view?
+    refute sample_type.can_view?(person.user)
+
+    assert sample_type.can_view?(person.user,sample)
+
+    # doesn't give access to a different sample type
+    refute Factory(:simple_sample_type).can_view?(person.user,sample)
+
+    # an already visible sample type isn't hidden by passing a hidden sample
+    sample_type = Factory(:simple_sample_type,projects:[@project])
+    assert sample_type.can_view?(@person.user)
+    sample = Factory(:sample,sample_type:sample_type)
+    refute sample.can_view?(@person.user)
+    assert_equal sample_type, sample.sample_type
+    assert sample_type.can_view?(@person.user,sample)
+  end
+
+  test 'can download?' do
+    # essentially the same as can_view?
+
+    # can't download if not a project member
+    st = Factory(:simple_sample_type)
+    assert_empty st.projects & @person.projects
+
+    refute st.can_download?(@person.user)
+    User.with_current_user(@person.user) do
+      refute st.can_download?
+    end
+
+    # can download if in project
+    person2 = Factory(:person,project:@project)
+    st = Factory(:simple_sample_type,projects:[@project])
+    assert_equal [@project],st.projects & @person.projects
+    assert st.can_download?(@person.user)
+    User.with_current_user(@person.user) do
+      assert st.can_download?
+    end
+
+    # can download if it has a public sample
+    public_sample = Factory(:sample,policy:Factory(:public_policy))
+    private_sample = Factory(:sample,policy:Factory(:private_policy))
+
+    assert public_sample.can_download?
+    st = public_sample.sample_type
+    assert st.can_download?
+    assert st.can_download?(@person.user)
+    assert_empty st.projects & @person.projects
+
+    refute private_sample.can_download?
+    st = private_sample.sample_type
+    refute st.can_download?
+    refute st.can_download?(@person.user)
+    refute st.can_download?(@person.user)
+    assert_empty st.projects & @person.projects
+  end
+
+  test 'validate title and decription length' do
+    long_desc = ('a' * 65536).freeze
+    ok_desc = ('a' * 65535).freeze
+    long_title = ('a' * 256).freeze
+    ok_title = ('a' * 255).freeze
+    st = Factory(:simple_sample_type)
+    assert st.valid?
+    st.title = long_title
+    refute st.valid?
+    st.title = ok_title
+    assert st.valid?
+    st.description = long_desc
+    refute st.valid?
+    st.description = ok_desc
+    assert st.valid?
+    disable_authorization_checks {st.save!}
   end
 
   test 'is favouritable?' do
@@ -64,7 +205,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'associate sample attribute default order' do
-    sample_type = SampleType.new title: 'sample type', project_ids: @project_ids
+    sample_type = SampleType.new title: 'sample type', project_ids: @project_ids, contributor: @person
     attribute1 = Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
     attribute2 = Factory(:simple_string_sample_attribute, sample_type: sample_type)
     sample_type.sample_attributes << attribute1
@@ -77,7 +218,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'associate sample attribute specify order' do
-    sample_type = SampleType.new title: 'sample type', project_ids: @project_ids
+    sample_type = SampleType.new title: 'sample type', project_ids: @project_ids, contributor: @person
     attribute3 = Factory(:simple_string_sample_attribute, pos: 3, sample_type: sample_type)
     attribute2 = Factory(:simple_string_sample_attribute, pos: 2, sample_type: sample_type)
     attribute1 = Factory(:simple_string_sample_attribute, pos: 1, is_title: true, sample_type: sample_type)
@@ -158,7 +299,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'must have one title attribute' do
-    sample_type = SampleType.new title: 'No title', project_ids: @project_ids
+    sample_type = SampleType.new title: 'No title', project_ids: @project_ids, contributor: @person
     sample_type.sample_attributes << Factory(:sample_attribute, title: 'full name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: false, sample_type: sample_type)
 
     refute sample_type.valid?
@@ -174,7 +315,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'build from template' do
     default_type = create_sample_attribute_type
 
-    sample_type = SampleType.new title: 'from template', project_ids: @project_ids
+    sample_type = SampleType.new title: 'from template', project_ids: @project_ids, contributor: @person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     refute_nil sample_type.template
 
@@ -202,7 +343,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'build from template2' do
     default_type = create_sample_attribute_type
 
-    sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
+    sample_type = SampleType.new title: 'from template', project_ids: @project_ids, contributor: @person
     sample_type.content_blob = Factory(:sample_type_template_content_blob2)
     refute_nil sample_type.template
 
@@ -256,6 +397,9 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute_empty sample_type.projects
 
     project2 = Factory(:project)
+    #contributor must be added to project to be valid
+    sample_type.contributor.add_to_project_and_institution(project2,Institution.first)
+
     sample_type.projects = [project2]
     sample_type.save!
     sample_type.reload
@@ -268,7 +412,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     non_template2 = Factory(:binary_content_blob)
 
     create_sample_attribute_type
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids, contributor: @person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
@@ -280,26 +424,40 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'sample_types_matching_content_blob' do
     create_sample_attribute_type
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids
+    person = Factory(:person)
+    sample_type = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
 
-    sample_type2 = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids
+    sample_type2 = SampleType.new title: 'visible', uploaded_template: true, project_ids: person.projects.collect(&:id), contributor: person
     sample_type2.content_blob = Factory(:sample_type_template_content_blob2)
     sample_type2.build_attributes_from_template
-    disable_authorization_checks { sample_type.save! }
+    disable_authorization_checks { sample_type2.save! }
+
+    # matches template but not visible
+    sample_type3 = SampleType.new title: 'hidden', uploaded_template: true, project_ids: @project_ids, contributor: @person
+    sample_type3.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type3.build_attributes_from_template
+    disable_authorization_checks { sample_type3.save! }
 
     template_blob = Factory(:sample_type_populated_template_content_blob)
     non_template1 = Factory(:rightfield_content_blob)
 
-    assert_empty SampleType.sample_types_matching_content_blob(non_template1)
-    assert_equal [sample_type], SampleType.sample_types_matching_content_blob(template_blob)
+    User.with_current_user(person.user) do
+      assert sample_type.can_view?
+      assert sample_type2.can_view?
+      refute sample_type3.can_view?
+
+      assert_empty SampleType.sample_types_matching_content_blob(non_template1)
+      assert_equal [sample_type], SampleType.sample_types_matching_content_blob(template_blob)
+    end
+
   end
 
   test 'build samples from template' do
     create_sample_attribute_type
-    sample_type = SampleType.new title: 'from template', project_ids: @project_ids
+    sample_type = SampleType.new title: 'from template', project_ids: @project_ids, contributor: @person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
@@ -321,7 +479,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     with_config_value :project_admin_sample_type_restriction, false do
       User.with_current_user(@person.user) do
         create_sample_attribute_type
-        sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids
+        sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids, contributor: @person
         sample_type.content_blob = Factory(:sample_type_template_content_blob)
         sample_type.build_attributes_from_template
         sample_type.save!
@@ -378,46 +536,58 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'can edit' do
     with_config_value :project_admin_sample_type_restriction, false do
-      refute_nil @project
-      another_person = Factory(:person)
-      type = Factory(:simple_sample_type, project_ids: @project_ids)
-
-      refute_includes another_person.projects, @project
-
-      assert type.can_edit?(@person.user)
-      User.with_current_user(@person.user) do
-        assert type.can_edit?
+      # project admin can edit
+      person = Factory(:project_administrator)
+      sample_type = Factory(:simple_sample_type,projects:person.projects)
+      refute_equal person,sample_type.contributor
+      assert sample_type.can_edit?(person.user)
+      User.with_current_user(person.user) do
+        assert sample_type.can_edit?
       end
 
-      refute type.can_edit?(another_person.user)
-      User.with_current_user(another_person.user) do
-        refute type.can_edit?
+      # contributor can edit, even if not an proj admin
+      person = Factory(:person)
+      sample_type = Factory(:simple_sample_type,projects:person.projects, contributor:person)
+      assert_equal person,sample_type.contributor
+      assert sample_type.can_edit?(person.user)
+      User.with_current_user(person.user) do
+        assert sample_type.can_edit?
       end
 
-      refute type.can_edit?
-      refute type.can_edit?(nil)
-    end
-    with_config_value :project_admin_sample_type_restriction, true do
-      refute @project.can_be_administered_by?(@person)
-      type = Factory(:simple_sample_type, project_ids: @project_ids)
-      User.with_current_user(@person.user) do
-        refute type.can_edit?
+      # project member, but not contributor or proj admin cannot edit
+      person = Factory(:person)
+      sample_type = Factory(:simple_sample_type,projects:person.projects)
+      refute_equal person,sample_type.contributor
+      refute sample_type.can_edit?(person.user)
+      User.with_current_user(person.user) do
+        refute sample_type.can_edit?
       end
-      project_admin = Factory(:project_administrator)
-      another_project_admin = Factory(:project_administrator)
-      admin = Factory(:admin)
-      type = Factory(:simple_sample_type, project_ids: [project_admin.projects.first.id])
-      assert type.can_edit?(project_admin.user)
-      refute type.can_edit?(another_project_admin.user)
-      User.with_current_user(project_admin.user) do
-        assert type.can_edit?
+
+      # member of other project, even if proj admin, cannot edit
+      person = Factory(:project_administrator)
+      sample_type = Factory(:simple_sample_type,projects:[Factory(:project)])
+      refute_equal person,sample_type.contributor
+      assert_empty sample_type.projects & person.projects
+      refute sample_type.can_edit?(person.user)
+      User.with_current_user(person.user) do
+        refute sample_type.can_edit?
       end
-      User.with_current_user(another_project_admin.user) do
-        refute type.can_edit?
+
+      # seek admin can edit
+      person = Factory(:admin)
+      sample_type = Factory(:simple_sample_type,projects:[Factory(:project)])
+      refute_equal person,sample_type.contributor
+      assert_empty sample_type.projects & person.projects
+      assert sample_type.can_edit?(person.user)
+      User.with_current_user(person.user) do
+        assert sample_type.can_edit?
       end
-      assert type.can_edit?(admin)
-      User.with_current_user(admin.user) do
-        assert type.can_edit?
+
+      #anonymous user cannot edit
+      sample_type = Factory(:simple_sample_type,projects:[Factory(:project)])
+      refute sample_type.can_edit?(nil)
+      User.with_current_user(nil) do
+        refute sample_type.can_edit?
       end
     end
   end
@@ -460,78 +630,78 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'can delete' do
     with_config_value :project_admin_sample_type_restriction, false do
-      type = Factory(:simple_sample_type, project_ids: @project_ids)
-      refute type.can_delete?
-      assert type.can_delete?(@person.user)
-      User.with_current_user(@person.user) do
-        assert type.can_delete?
-
-        # cannot delete with samples
-        type = Factory(:patient_sample, project_ids: @project_ids, contributor:@person).sample_type
-        refute type.can_delete?
-
-        # double check the type has been saved (due to an issue when running all tests together)
-        refute type.new_record?
-
-        # cannot delete if linked from another sample type
-        linked_sample_type = Factory(:linked_sample_type, project_ids: @project_ids)
-        linked_attribute = linked_sample_type.sample_attributes.last
-        type = linked_attribute.linked_sample_type
-
-        # some sanity checking
-        assert_empty type.samples
-        assert_includes type.projects, @project
-        assert type.can_edit?
-        refute_equal linked_sample_type, type
-        refute type.can_delete?
-
-        assert_no_difference('SampleType.count') do
-          assert_difference('SampleAttribute.count', -1) do
-            linked_attribute.destroy
-          end
-        end
-
-        type.reload
-        assert type.can_delete?
-
-        # however, can delete if linked to itself
-        type = Factory(:linked_sample_type_to_self, project_ids: @project_ids)
-        assert_equal type, type.sample_attributes.last.linked_sample_type
-        assert type.can_delete?
-      end
-      another_person = Factory(:person)
-      refute_includes another_person.projects, @project
-      type = Factory(:simple_sample_type, project_ids: @project_ids)
-      refute type.can_delete?(another_person.user)
-      User.with_current_user(another_person.user) do
-        refute type.can_delete?
-      end
-    end
-
-    with_config_value :project_admin_sample_type_restriction, true do
-      project_admin = Factory(:project_administrator)
-      another_project_admin = Factory(:project_administrator)
-      seek_admin = Factory(:admin)
-      type = Factory(:simple_sample_type, project_ids: [project_admin.projects.first.id])
-      refute type.can_delete?
-      refute type.can_delete?(@person.user)
-      User.with_current_user(@person.user) do
-        refute type.can_delete?
+      # project admin can delete
+      person = Factory(:project_administrator)
+      sample_type = Factory(:simple_sample_type,projects:person.projects)
+      refute_equal person,sample_type.contributor
+      assert sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        assert sample_type.can_delete?
       end
 
-      refute type.can_delete?(another_project_admin.user)
-      User.with_current_user(another_project_admin.user) do
-        refute type.can_delete?
+      # contributor can delete, even if not an proj admin
+      person = Factory(:person)
+      sample_type = Factory(:simple_sample_type,projects:person.projects, contributor:person)
+      assert_equal person,sample_type.contributor
+      assert sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        assert sample_type.can_delete?
       end
 
-      assert type.can_delete?(project_admin.user)
-      User.with_current_user(project_admin.user) do
-        assert type.can_delete?
+      # project member, but not contributor or proj admin cannot delete
+      person = Factory(:person)
+      sample_type = Factory(:simple_sample_type,projects:person.projects)
+      refute_equal person,sample_type.contributor
+      refute sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        refute sample_type.can_delete?
       end
 
-      assert type.can_delete?(seek_admin.user)
-      User.with_current_user(seek_admin.user) do
-        assert type.can_delete?
+      # member of other project, even if proj admin, cannot delete
+      person = Factory(:project_administrator)
+      sample_type = Factory(:simple_sample_type,projects:[Factory(:project)])
+      refute_equal person,sample_type.contributor
+      assert_empty sample_type.projects & person.projects
+      refute sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        refute sample_type.can_delete?
+      end
+
+      # seek admin can delete
+      person = Factory(:admin)
+      sample_type = Factory(:simple_sample_type,projects:[Factory(:project)])
+      refute_equal person,sample_type.contributor
+      assert_empty sample_type.projects & person.projects
+      assert sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        assert sample_type.can_delete?
+      end
+
+      #anonymous user cannot delete
+      sample_type = Factory(:simple_sample_type,projects:[Factory(:project)])
+      refute sample_type.can_delete?(nil)
+      User.with_current_user(nil) do
+        refute sample_type.can_delete?
+      end
+
+      # cannot delete with samples associated
+      person = Factory(:project_administrator)
+      sample = Factory(:patient_sample,projects:person.projects,contributor:person,sample_type:Factory(:patient_sample_type, contributor:person,projects:person.projects))
+      sample_type = sample.sample_type
+
+      refute sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        refute sample_type.can_delete?
+      end
+
+      # cannot delete with linked sample type
+      linked_sample_type = Factory(:linked_sample_type, projects:person.projects,contributor:person)
+      sample_type = linked_sample_type.sample_attributes.last.linked_sample_type
+      refute_empty sample_type.projects & person.projects
+      assert_equal person, sample_type.contributor
+      refute sample_type.can_delete?(person.user)
+      User.with_current_user(person.user) do
+        refute sample_type.can_delete?
       end
     end
   end
@@ -655,7 +825,8 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'dependant attributes destroyed' do
     with_config_value :project_admin_sample_type_restriction, false do
       User.with_current_user(@person.user) do
-        type = Factory(:patient_sample_type, project_ids: @project_ids)
+        type = Factory(:patient_sample_type, contributor:@person)
+        assert type.can_delete?
         attribute_count = type.sample_attributes.count
 
         assert_difference('SampleAttribute.count', -attribute_count) do

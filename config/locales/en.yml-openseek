@@ -21,6 +21,7 @@ en:
   event: "Event"
 
   sample: "Sample"
+  sample_type: "Sample type"
   strain: "Strain"
   scale: "Scale"
 
@@ -71,3 +72,11 @@ en:
   contributor: 'contributor' # A person who submitted the resource to SEEK
   creator: 'creator' # A person who was involved with the creation of the resource
   person_responsible: 'person responsible'
+
+  jerm_harvester_name: 'The JERM Harvester'
+  deleted_contributor_name: 'Deleted contributor'
+
+  activerecord:
+      attributes:
+        person:
+          title: "Full name"

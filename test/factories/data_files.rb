@@ -119,3 +119,7 @@ end
 Factory.define(:api_pdf_data_file, parent: :data_file) do |f|
   f.association :content_blob, factory: :blank_pdf_content_blob
 end
+
+Factory.define(:api_txt_data_file, parent: :data_file) do |f|
+  f.association :content_blob, factory: :blank_txt_content_blob
+end

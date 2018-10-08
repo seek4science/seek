@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'private_address_check'
 require 'private_address_check/tcpsocket_ext'
 
@@ -31,7 +33,7 @@ module Seek
               elsif response.code == '301' || response.code == '302'
                 follow_redirect(uri, response, redirect_count, block)
               else
-                fail BadResponseCodeException.new(response)
+                raise BadResponseCodeException, response
               end
             end
           end
@@ -49,7 +51,7 @@ module Seek
 
         response.read_body do |chunk|
           total_size += chunk.size
-          fail SizeLimitExceededException.new(total_size) if @size_limit && (total_size > @size_limit)
+          raise SizeLimitExceededException, total_size if @size_limit && (total_size > @size_limit)
           block.call(chunk)
         end
 
@@ -58,7 +60,7 @@ module Seek
 
       def follow_redirect(uri, response, redirect_count, block)
         if redirect_count >= REDIRECT_LIMIT
-          fail RedirectLimitExceededException.new(redirect_count)
+          raise RedirectLimitExceededException, redirect_count
         else
           new_uri = URI(response.header['location'])
           new_uri = URI(uri) + new_uri if new_uri.relative?
@@ -68,8 +70,8 @@ module Seek
       end
     end
 
-    class RedirectLimitExceededException < Exception; end
-    class SizeLimitExceededException < Exception; end
-    class BadResponseCodeException < Exception; end
+    class RedirectLimitExceededException < RuntimeError; end
+    class SizeLimitExceededException < RuntimeError; end
+    class BadResponseCodeException < RuntimeError; end
   end
 end

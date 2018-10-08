@@ -4,7 +4,10 @@
 <% authors_title||=nil %>
 
 <% if creators || resource.respond_to?("creators") %>
-    <%= render :partial => "assets/resource_authors_box", :locals => { :resource => resource, :truncate_to => truncate_length_for_boxes,:creators=>creators,:title=>authors_title } -%>
+    <%= render partial: 'assets/resource_authors_box', locals: { resource: versioned_resource,
+                                                                 truncate_to: truncate_length_for_boxes,
+                                                                 creators: creators,
+                                                                 title: authors_title } -%>
 <% end -%>
 
 <% if resource.respond_to?(:snapshots)  %>

@@ -395,13 +395,13 @@ class ApplicationController < ActionController::Base
                              user_agent: user_agent,
                              data: activity_loggable.title)
         end
-      when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } # TODO: Find a nicer way of doing this...
-        action = 'create' if action == 'upload_for_tool' || action == 'create_metadata'
+      when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
+        action = 'create' if action == 'upload_for_tool' || action == 'create_metadata' || action == 'create_from_template'
         action = 'update' if action == 'new_version'
         action = 'inline_view' if action == 'explore'
         if %w(show create update destroy download inline_view).include?(action)
           check_log_exists(action, controller_name, object)
-          ActivityLog.create(action: action,
+            ActivityLog.create(action: action,
                              culprit: current_user,
                              referenced: object.projects.first,
                              controller_name: controller_name,
@@ -583,7 +583,7 @@ class ApplicationController < ActionController::Base
   end
 
   def convert_json_params
-    Seek::Api::ParameterConverter.new(controller_name).convert(params)
+    Seek::Api::ParameterConverter.new(controller_name, param_converter_options).convert(params)
   end
 
   def json_api_request?
@@ -608,5 +608,9 @@ class ApplicationController < ActionController::Base
     end
 
     hash
+  end
+
+  def param_converter_options
+    {}
   end
 end

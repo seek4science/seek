@@ -62,7 +62,7 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
       Sop.delete_all
       user = Factory(:person).user
       other_user = Factory :user
-      sop = Factory :sop, contributor: user, policy: Factory(:editing_public_policy)
+      sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
       Sop.clear_lookup_table
 
       sop.update_lookup_table(user)
@@ -88,7 +88,7 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
     with_config_value :auth_lookup_enabled, true do
       user = Factory :user
       other_user = Factory :user
-      sop = Factory :sop, contributor: user, policy: Factory(:editing_public_policy)
+      sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
       Sop.clear_lookup_table
       # check using the standard
       assert sop.authorized_for_view?(user)

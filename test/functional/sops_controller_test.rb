@@ -50,12 +50,12 @@ class SopsControllerTest < ActionController::TestCase
   test 'creators do not show in list item' do
     p1 = Factory :person
     p2 = Factory :person
-    sop = Factory(:sop, title: 'ZZZZZ', creators: [p2], contributor: p1.user, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    sop = Factory(:sop, title: 'ZZZZZ', creators: [p2], contributor: p1, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
 
     get :index, page: 'Z'
 
     # check the test is behaving as expected:
-    assert_equal p1.user, sop.contributor
+    assert_equal p1, sop.contributor
     assert sop.creators.include?(p2)
     assert_select '.list_item_title a[href=?]', sop_path(sop), 'ZZZZZ', 'the data file for this test should appear as a list item'
 
@@ -127,7 +127,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not show private sop to another user' do
-    sop = Factory :sop, contributor: Factory(:user)
+    sop = Factory :sop, contributor: Factory(:person)
     get :show, id: sop
     assert_response :forbidden
   end
@@ -181,7 +181,7 @@ class SopsControllerTest < ActionController::TestCase
 
     refute_includes new_assay.sops, s
 
-    put :update, id: s.id, sop: { title: s.title }, assay_ids: [new_assay.id.to_s]
+    put :update, id: s.id, sop: { title: s.title, assay_assets_attributes: [{ assay_id: new_assay.id }] }
 
     assert_redirected_to sop_path(s)
 
@@ -198,9 +198,8 @@ class SopsControllerTest < ActionController::TestCase
     assay = Factory(:assay, contributor: User.current_user.person)
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, sop: sop, content_blobs: [blob],
-             policy_attributes: valid_sharing,
-             assay_ids: [assay.id.to_s]
+        post :create, sop: sop.merge(assay_assets_attributes: [{ assay_id: assay.id }]),
+             content_blobs: [blob], policy_attributes: valid_sharing
       end
     end
 
@@ -222,7 +221,7 @@ class SopsControllerTest < ActionController::TestCase
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
-    assert_equal users(:quentin), assigns(:sop).contributor
+    assert_equal users(:quentin).person, assigns(:sop).contributor
     assert !assigns(:sop).content_blob.url.blank?
     assert assigns(:sop).content_blob.data_io_object.nil?
     assert !assigns(:sop).content_blob.file_exists?
@@ -239,7 +238,7 @@ class SopsControllerTest < ActionController::TestCase
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
-    assert_equal users(:quentin), assigns(:sop).contributor
+    assert_equal users(:quentin).person, assigns(:sop).contributor
     assert !assigns(:sop).content_blob.url.blank?
     assert_equal 'sysmo-db-logo-grad2.png', assigns(:sop).content_blob.original_filename
     assert_equal 'image/png', assigns(:sop).content_blob.content_type
@@ -285,11 +284,11 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:owner_of_my_first_sop)
     get :edit, id: sops(:my_first_sop)
     assert_response :success
-    assert_select 'div#publications_fold_content', false
+    assert_select 'div#add_publications_form', false
 
     get :new
     assert_response :success
-    assert_select 'div#publications_fold_content', false
+    assert_select 'div#add_publications_form', false
   end
 
   test 'should update sop' do
@@ -306,11 +305,14 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should destroy sop' do
     login_as(:owner_of_my_first_sop)
-    assert_difference('Sop.count', -1) do
-      assert_no_difference('ContentBlob.count') do
-        delete :destroy, id: sops(:my_first_sop)
+    assert_difference('ActivityLog.count') do
+      assert_difference('Sop.count', -1) do
+        assert_no_difference('ContentBlob.count') do
+          delete :destroy, id: sops(:my_first_sop)
+        end
       end
     end
+
     assert_redirected_to sops_path
   end
 
@@ -322,7 +324,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_show_version
-    s = Factory(:sop, contributor: @user)
+    s = Factory(:sop, contributor: @user.person)
 
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
@@ -365,7 +367,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_create_new_version
-    s = Factory(:sop, contributor: @user)
+    s = Factory(:sop, contributor: @user.person)
 
     assert_difference('Sop::Version.count', 1) do
       post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision'
@@ -406,7 +408,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_duplicate_conditions_for_new_version
-    s = Factory :sop, contributor: User.current_user
+    s = Factory :sop, contributor: User.current_user.person
     condition1 = ExperimentalCondition.create(unit_id: units(:gram).id, measured_item_id: measured_items(:weight).id,
                                               start_value: 1, sop_id: s.id, sop_version: s.version)
     condition1.save!
@@ -532,7 +534,7 @@ class SopsControllerTest < ActionController::TestCase
     user = Factory(:user)
     login_as(user)
 
-    sop = Factory :sop, contributor: User.current_user, policy: Factory(:policy, access_type: Policy::EDITING)
+    sop = Factory :sop, contributor: User.current_user.person, policy: Factory(:policy, access_type: Policy::EDITING)
 
     put :update, id: sop, sop: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS }
     assert_redirected_to sop_path(sop)
@@ -748,7 +750,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'dont send publish approval request if can_publish' do
     gatekeeper = Factory(:asset_gatekeeper)
-    sop = Factory(:sop, contributor: gatekeeper.user, project_ids: gatekeeper.projects.collect(&:id))
+    sop = Factory(:sop, contributor: gatekeeper, project_ids: gatekeeper.projects.collect(&:id))
 
     # request publish
     login_as(sop.contributor)
@@ -830,7 +832,7 @@ class SopsControllerTest < ActionController::TestCase
     permission = Factory(:permission, contributor: a_person, access_type: Policy::MANAGING)
     policy.permissions = [permission]
     policy.save
-    sop = Factory :sop, contributor: User.current_user, policy: policy
+    sop = Factory :sop, contributor: User.current_user.person, policy: policy
     assert sop.can_manage?
 
     put :update, id: sop.id, sop: { title: sop.title },
@@ -907,7 +909,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should update license' do
-    sop = Factory(:sop, contributor: @user, license: nil)
+    sop = Factory(:sop, contributor: @user.person, license: nil)
 
     assert_nil sop.license
 
@@ -936,7 +938,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'permission popup setting set in sharing form' do
-    sop = Factory :sop, contributor: User.current_user
+    sop = Factory :sop, contributor: User.current_user.person
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_ON_CHANGE do
       get :edit, id: sop
     end
@@ -1097,7 +1099,7 @@ class SopsControllerTest < ActionController::TestCase
     refute bad_assay.can_edit?
 
     assert_no_difference('AssayAsset.count') do
-      put :update, id: sop.id, sop: { title: sop.title }, assay_ids: [bad_assay.id.to_s]
+      put :update, id: sop.id, sop: { title: sop.title, assay_assets_attributes: [{ assay_id: bad_assay.id }] }
     end
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
     # assert_response :unprocessable_entity
@@ -1106,7 +1108,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_empty sop.assays
 
     assert_difference('AssayAsset.count') do
-      put :update, id: sop.id, sop: { title: sop.title }, assay_ids: [good_assay.id.to_s]
+      put :update, id: sop.id, sop: { title: sop.title, assay_assets_attributes: [{ assay_id: good_assay.id }] }
     end
     sop.reload
     assert_equal [good_assay], sop.assays
@@ -1133,7 +1135,8 @@ class SopsControllerTest < ActionController::TestCase
     sop, blob = valid_sop
 
     assert_no_difference('AssayAsset.count') do
-      post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [bad_assay.id.to_s]
+      post :create, sop: sop.merge(assay_assets_attributes: [{ assay_id: bad_assay.id }]), content_blobs: [blob],
+           policy_attributes: valid_sharing
     end
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
     #assert_response :unprocessable_entity
@@ -1142,11 +1145,56 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_difference('Sop.count') do
       assert_difference('AssayAsset.count') do
-        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [good_assay.id.to_s]
+        post :create, sop: sop.merge(assay_assets_attributes: [{ assay_id: good_assay.id }]), content_blobs: [blob],
+             policy_attributes: valid_sharing
       end
     end
     sop = assigns(:sop)
     assert_equal [good_assay],sop.assays
+  end
+
+  test 'should not allow sharing with a project that the contributor is not a member of' do
+    sop = Factory(:sop)
+    another_project = Factory(:project)
+    login_as(sop.contributor)
+    assert sop.can_manage?
+
+    put :update, id: sop.id, sop: { title: sop.title, project_ids: sop.project_ids + [another_project.id] }
+
+    refute assigns(:sop).errors.empty?
+  end
+
+  test 'should only validate newly added projects' do
+    sop = Factory(:sop)
+    another_project = Factory(:project)
+    disable_authorization_checks { sop.projects << another_project }
+
+    login_as(sop.contributor)
+    assert sop.can_manage?
+    assert_equal 2, sop.projects.length
+
+    put :update, id: sop.id, sop: { title: sop.title, project_ids: sop.reload.project_ids }
+
+    assert_redirected_to(sop)
+    assert assigns(:sop).errors.empty?
+  end
+
+  test 'should allow association of projects even if the original contributor was not a member' do
+    sop = Factory(:sop)
+    another_manager = Factory(:person)
+    another_project = another_manager.projects.first
+    another_manager.add_to_project_and_institution(sop.projects.first, Factory(:institution))
+    sop.policy.permissions.create!(contributor: another_manager, access_type: Policy::MANAGING)
+
+    login_as(another_manager)
+    assert sop.can_manage?
+    assert_not_includes another_project.people, sop.contributor
+    assert_equal 1, sop.projects.length
+
+    put :update, id: sop.id, sop: { title: sop.title, project_ids: (sop.project_ids + [another_project.id]) }
+
+    assert_redirected_to(sop)
+    assert assigns(:sop).errors.empty?
   end
 
   private
