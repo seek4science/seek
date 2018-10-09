@@ -9,6 +9,9 @@ module HomesHelper
 
   RECENT_SIZE = 5
 
+  DOWNLOAD_ACTIVITY_CACHE_PREFIX = 'download_activity_'.freeze
+  CREATE_ACTIVITY_CACHE_PREFIX = 'create_activity_'.freeze
+
   def home_description_text
     Seek::Config.home_description.html_safe
   end
@@ -108,7 +111,7 @@ module HomesHelper
   end
 
   def recently_downloaded_item_logs_hash(time = 1.month.ago, number_of_item = 10)
-    Rails.cache.fetch("download_activity_#{current_user_id}") do
+    selected_activity_logs = Rails.cache.fetch("#{DOWNLOAD_ACTIVITY_CACHE_PREFIX}#{current_user_id}") do
       activity_logs = ActivityLog.no_spider.where(['action = ? AND created_at > ?', 'download', time]).order('created_at DESC')
       selected_activity_logs = []
       activity_logs.each do |activity_log|
@@ -118,25 +121,25 @@ module HomesHelper
         end
         break if selected_activity_logs.length >= number_of_item
       end
-      return convert_logs_to_hash selected_activity_logs
-    end
-    convert_logs_to_hash []
+      selected_activity_logs
+    end || []
+    convert_logs_to_hash selected_activity_logs
   end
 
   def recently_added_item_logs_hash(time = 1.month.ago, number_of_item = 10)
-    Rails.cache.fetch("create_activity_#{current_user_id}") do
+    selected_activity_logs = Rails.cache.fetch("#{CREATE_ACTIVITY_CACHE_PREFIX}#{current_user_id}") do
       item_types = Seek::Util.user_creatable_types.collect(&:name) | [Project, Programme, Snapshot].collect(&:name)
       activity_logs = ActivityLog.where(['action = ? AND created_at > ? AND activity_loggable_type in (?)', 'create', time, item_types]).order('created_at DESC')
       selected_activity_logs = []
-      activity_logs.each do |log|
+      activity_logs.find_each(batch_size:50) do |log|
         if log.activity_loggable && item_types.include?(log.activity_loggable_type) && log.activity_loggable.can_view?
           selected_activity_logs << log
         end
         break if selected_activity_logs.length >= number_of_item
       end
-      return convert_logs_to_hash selected_activity_logs
-    end
-    convert_logs_to_hash []
+      selected_activity_logs
+    end || []
+    convert_logs_to_hash selected_activity_logs
   end
 
   def convert_logs_to_hash(logs)
