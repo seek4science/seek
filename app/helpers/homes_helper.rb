@@ -131,7 +131,7 @@ module HomesHelper
       item_types = Seek::Util.user_creatable_types.collect(&:name) | [Project, Programme, Snapshot].collect(&:name)
       activity_logs = ActivityLog.where(['action = ? AND created_at > ? AND activity_loggable_type in (?)', 'create', time, item_types]).order('created_at DESC')
       selected_activity_logs = []
-      activity_logs.find_each(batch_size:50) do |log|
+      activity_logs.each do |log|
         if log.activity_loggable && item_types.include?(log.activity_loggable_type) && log.activity_loggable.can_view?
           selected_activity_logs << log
         end
