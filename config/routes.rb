@@ -543,7 +543,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :disassociate_authors
     end
-    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :events,:only=>[:index]
   end
 
   resources :events do
