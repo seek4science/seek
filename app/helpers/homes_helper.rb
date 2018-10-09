@@ -140,19 +140,18 @@ module HomesHelper
   end
 
   def convert_logs_to_hash(logs)
-    logs = logs.reject{|log| log.activity_loggable.is_a?(Snapshot)}
     logs.collect do |log|
       item = log.activity_loggable
       {
-        type: text_for_resource(item),
-        title: item.title,
-        action: log.action,
-        description: item.respond_to?(:description) ? item.description : nil,
-        abstract: item.respond_to?(:abstract) ? item.abstract : nil,
-        created_at: log.created_at,
-        avatar_image: avatar(item, nil, true, nil, nil, true, 'home_asset_icon'),
-        url: show_resource_path(item),
-        log_id: log.id
+          type: text_for_resource(item),
+          title: item.title,
+          action: log.action,
+          description: item.respond_to?(:description) ? item.description : nil,
+          abstract: item.respond_to?(:abstract) ? item.abstract : nil,
+          created_at: log.created_at,
+          avatar_image: avatar(item, nil, true, nil, nil, true, 'home_asset_icon'),
+          url: show_resource_path(item),
+          log_id: log.id
       }
     end
   end
@@ -188,9 +187,9 @@ module HomesHelper
   def frontpage_button(link, image_path)
     link_to link, class: 'seek-homepage-button', target: :_blank do
       image_tag(image_path) +
-        content_tag(:span) do
-          yield
-        end
+          content_tag(:span) do
+            yield
+          end
     end
   end
 end
