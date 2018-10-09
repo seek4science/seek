@@ -259,7 +259,7 @@ GEM
       curb (~> 0.8)
       loofah (~> 2.0)
       sax-machine (~> 1.0)
-    ffi (1.9.18)
+    ffi (1.9.25)
     flay (2.9.0)
       erubis (~> 2.7.0)
       path_expander (~> 1.0)
@@ -495,6 +495,7 @@ GEM
       rails-assets-jquery (>= 1.11.0)
     rails-assets-bootstrap-tagsinput (0.8.0)
       rails-assets-jquery (~> 2.1.1)
+    rails-assets-chartjs (2.7.2)
     rails-assets-clipboard (1.5.16)
     rails-assets-eonasdan-bootstrap-datetimepicker (4.17.47)
       rails-assets-jquery (>= 1.8.3)
@@ -660,7 +661,7 @@ GEM
       ruby_parser (~> 3.8)
       virtus (~> 1.0)
     rubyntlm (0.3.4)
-    rubyzip (1.2.1)
+    rubyzip (1.2.2)
     safe_yaml (1.0.4)
     sample-template-generator (0.5.1)
       rdoc (~> 6.0)
@@ -864,6 +865,7 @@ DEPENDENCIES
   rails (~> 4.2.9)
   rails-assets-bootstrap-multiselect (~> 0.9.13)!
   rails-assets-bootstrap-tagsinput (~> 0.8.0)!
+  rails-assets-chartjs (~> 2.7.2)!
   rails-assets-clipboard (~> 1.5.12)!
   rails-assets-eonasdan-bootstrap-datetimepicker (~> 4.17.42)!
   rails-assets-typeahead.js (~> 0.10.5)!
@@ -887,6 +889,7 @@ DEPENDENCIES
   rubocop
   ruby-prof (>= 0.16.0)
   rubycritic
+  rubyzip (~> 1.2.2)
   sample-template-generator (~> 0.5)
   sass-rails
   savon (= 1.1.0)

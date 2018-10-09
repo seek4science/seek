@@ -11,6 +11,7 @@ class Person < ActiveRecord::Base
   alias_attribute :title, :name
 
   acts_as_yellow_pages
+
   scope :default_order, -> { order('last_name, first_name') }
 
   before_save :first_person_admin_and_add_to_default_project
@@ -295,7 +296,7 @@ class Person < ActiveRecord::Base
 
   # all items, assets, ISA, samples and events that are linked to this person as a contributor
   def contributed_items
-    [Assay, Study, Investigation, DataFile, Document, Sop, Presentation, Model, Sample, Strain, Publication, Event].collect do |type|
+    [Assay, Study, Investigation, DataFile, Document, Sop, Presentation, Model, Sample, Strain, Publication, Event, SampleType].collect do |type|
       type.where(contributor_id:id)
     end.flatten.uniq.compact
   end
@@ -374,8 +375,8 @@ class Person < ActiveRecord::Base
     # remove the permissions which are set on this person
     remove_permissions
 
-    # retrieve the items that this person is contributor (owner for assay)
-    person_related_items = contributed_items
+    # retrieve the items that this person is contributor (owner for assay), and that also has policy authorization
+    person_related_items = contributed_items.select{|item| item.respond_to?(:policy)}
 
     # check if anyone has manage right on the related_items
     # if not or if only the contributor then assign the manage right to pis||pals

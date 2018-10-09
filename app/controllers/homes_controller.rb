@@ -22,6 +22,12 @@ class HomesController < ApplicationController
     end
   end
 
+  def isa_colours
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def send_feedback
     @subject = params[:subject]
     @anon = params[:anon] == 'true'

@@ -8,7 +8,7 @@
 <%= f.hidden_field :create_from_asset %>
 
 <div class="form-group">
-  <label>Title <span class="required">*</span></label>
+  <label class="required">Title</label>
   <%= f.text_field :title, :class=>"form-control" -%>
 </div>
 
@@ -26,7 +26,7 @@
 
 
 <div class="form-group">
-  <label><%= t('study') -%></label><span class="required">*</span>
+  <label class="required"><%= t('study') -%></label>
   <%= link_to " New #{t('study')}?",new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %>
 
   <%= assay_study_selection('assay[study_id]',@assay.study) %>

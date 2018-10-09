@@ -60,7 +60,7 @@
       <% if @sample_type.new_record? %>
           <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'from-template' -%>" id="from-template">
             <div class="form-group">
-              <label>File to upload<span class="required">*</span></label>
+              <label class="required">File to upload</label>
               <%= file_field_tag "content_blobs[][data]", { "data-batch-upload" => false } -%>
             </div>
           </div>

@@ -1,3 +1,5 @@
+
+
 require 'test_helper'
 
 class HomesControllerTest < ActionController::TestCase
@@ -107,7 +109,7 @@ class HomesControllerTest < ActionController::TestCase
     login_as(Factory(:person))
     get :index
     assert_select 'li#create-menu ul.dropdown-menu', count: 1 do
-      assert_select 'li>a', text: "#{I18n.t('sop')}", count: 1
+      assert_select 'li>a', text: I18n.t('sop').to_s, count: 1
     end
   end
 
@@ -268,7 +270,7 @@ class HomesControllerTest < ActionController::TestCase
 
     df = Factory :data_file, title: 'A new data file', contributor: person, policy: Factory(:public_policy)
     assert_difference 'ActivityLog.count' do
-      log = Factory :activity_log, activity_loggable: df, controller_name: 'data_files', culprit: person.user
+      Factory :activity_log, activity_loggable: df, controller_name: 'data_files', culprit: person.user
     end
 
     get :index
@@ -280,11 +282,26 @@ class HomesControllerTest < ActionController::TestCase
     person = Factory(:person_in_project)
 
     presentation = Factory :presentation, title: 'A new presentation', contributor: person, policy: Factory(:public_policy)
-    log = Factory :activity_log, activity_loggable: presentation, controller_name: 'presentations', culprit: person.user
+    Factory :activity_log, activity_loggable: presentation, controller_name: 'presentations', culprit: person.user
 
     get :index
     assert_response :success
     assert_select 'div#recently_added ul>li>a[href=?]', presentation_path(presentation), text: /A new presentation/
+  end
+
+  test 'recently added and download should include snapshot' do
+    person = Factory(:person)
+    snapshot1 = Factory(:investigation, title: 'inv with snap', contributor: person).create_snapshot
+    snapshot2 = Factory(:assay, title: 'assay with snap', contributor: person).create_snapshot
+    assert_difference 'ActivityLog.count', 2 do
+      Factory(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
+      Factory(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)
+    end
+
+    get :index
+    assert_response :success
+    assert_select 'div#recently_added ul>li>a[href=?]', investigation_snapshot_path(snapshot1.resource, snapshot1), text: /inv with snap/
+    assert_select 'div#recently_downloaded ul>li>a[href=?]', assay_snapshot_path(snapshot2.resource, snapshot2), text: /assay with snap/
   end
 
   test 'should show headline announcement' do
@@ -403,28 +420,32 @@ class HomesControllerTest < ActionController::TestCase
     df = Factory :data_file, title: 'A new data file', contributor: person, policy: Factory(:public_policy)
     sop = Factory :sop, title: 'A new sop', contributor: person, policy: Factory(:public_policy)
     assay = Factory :assay, title: 'A new assay', contributor: person, policy: Factory(:public_policy)
+    snapshot = assay.create_snapshot
 
     Factory :activity_log, activity_loggable: df, controller_name: 'data_files', culprit: person.user
     Factory :activity_log, activity_loggable: sop, controller_name: 'sops', culprit: person.user
     Factory :activity_log, activity_loggable: assay, controller_name: 'assays', culprit: person.user
+    Factory :activity_log, activity_loggable: snapshot, controller_name: 'snapshots', culprit: person.user
 
     get :index
     assert_response :success
 
-    assert_select 'div#my-recent-contributions .panel-body ul li', 3
+    assert_select 'div#my-recent-contributions .panel-body ul li', 4
     assert_select 'div#my-recent-contributions .panel-body ul>li a[href=?]', data_file_path(df), text: /A new data file/
     assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', sop_path(sop), text: /A new sop/
     assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', assay_path(assay), text: /A new assay/
+    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
 
     sop.update_attributes(title: 'An old sop')
     Factory :activity_log, activity_loggable: sop, controller_name: 'assays', culprit: person.user, action: 'update'
 
     get :index
     assert_response :success
-    assert_select 'div#my-recent-contributions .panel-body ul li', 3
+    assert_select 'div#my-recent-contributions .panel-body ul li', 4
     assert_select 'div#my-recent-contributions .panel-body ul>li a[href=?]', sop_path(sop), text: /An old sop/
     assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', data_file_path(df), text: /A new data file/
     assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', assay_path(assay), text: /A new assay/
+    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
     assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', sop_path(sop), text: /A new sop/, count: 0
   end
 

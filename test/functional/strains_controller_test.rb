@@ -236,6 +236,23 @@ class StrainsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'strains filtered by person through nested route' do
+    assert_routing 'people/5/strains', controller: 'strains', action: 'index', person_id: '5'
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    strain1 = Factory(:strain, policy: Factory(:public_policy),contributor:person1)
+    strain2 = Factory(:strain, policy: Factory(:public_policy),contributor:person2)
+
+
+    get :index, person_id: person1.id
+    assert_response :success
+
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', strain_path(strain1), text: strain1.title
+      assert_select 'a[href=?]', strain_path(strain2), text: strain2.title, count: 0
+    end
+  end
+
   test 'should create log and send email to gatekeeper when request to publish a strain' do
     strain_in_gatekept_project = { title: 'Test', project_ids: [Factory(:asset_gatekeeper).projects.first.id], organism_id: Factory(:organism).id }
     assert_difference ('ResourcePublishLog.count') do

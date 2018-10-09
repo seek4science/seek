@@ -2,13 +2,13 @@ module Seek
   module MimeTypes
     # IF YOU ADD NEW MIME-TYPES, PLEASE ALSO UPDATE THE TEST AT test/units/helpers/mime_types_helper.rb FOR THAT TYPE.
     MIME_MAP = {
-      'application/excel' => { name: 'Spreadsheet', icon_key: 'xls_file', extensions: ['xls'] },
       'application/msword' => { name: 'Word document', icon_key: 'doc_file', extensions: ['doc'] },
       'application/octet-stream' => { name: 'Binary file', icon_key: 'misc_file', extensions: [''] },
       'application/pdf' => { name: 'PDF document', icon_key: 'pdf_file', extensions: ['pdf'] },
+      'application/vnd.ms-excel' => { name: 'Spreadsheet', icon_key: 'xls_file', extensions: ['xls'] },
       'application/vnd.excel' => { name: 'Spreadsheet', icon_key: 'xls_file', extensions: ['xls'] },
       'application/msexcel' => { name: 'Spreadsheet', icon_key: 'xls_file', extensions: ['xls'] },
-      'application/vnd.ms-excel' => { name: 'Spreadsheet', icon_key: 'xls_file', extensions: ['xls'] },
+      'application/excel' => { name: 'Spreadsheet', icon_key: 'xls_file', extensions: ['xls'] },
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => { name: 'Word document', icon_key: 'doc_file', extensions: ['docx'] },
       'application/vnd.openxmlformats-officedocument.presentationml.presentation' => { name: 'PowerPoint presentation', icon_key: 'ppt_file', extensions: ['pptx'] },
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => { name: 'Spreadsheet', icon_key: 'xls_file', extensions: ['xlsx'] },
@@ -24,8 +24,8 @@ module Seek
       'text/csv' => { name: 'Comma-separated values document', icon_key: 'misc_file', extensions: ['csv'] },
       'text/x-comma-separated-values' => { name: 'Comma-separated values document', icon_key: 'misc_file', extensions: ['csv'] },
       'text/tab-separated-values' => { name: 'Tab-separated values document', icon_key: 'misc_file', extensions: ['tsv'] },
-      'application/sbml+xml' => { name: 'SBML and XML document', icon_key: 'xml_file', extensions: ['xml'] },
       'application/xml' => { name: 'XML document', icon_key: 'xml_file', extensions: ['xml'] },
+      'application/sbml+xml' => { name: 'SBML and XML document', icon_key: 'xml_file', extensions: ['xml'] },
       'text/xml' => { name: 'XML document', icon_key: 'xml_file', extensions: ['xml'] },
       'text/x-objcsrc' => { name: 'Objective C file', icon_key: 'misc_file', extensions: ['objc'] },
       'application/vnd.oasis.opendocument.presentation' => { name: 'PowerPoint presentation', icon_key: 'ppt_file', extensions: ['odp'] },
@@ -35,7 +35,8 @@ module Seek
       'application/vnd.oasis.opendocument.spreadsheet' => { name: 'Spreadsheet', icon_key: 'xls_file', extensions: ['ods'] },
       'application/rtf' => { name: 'RTF document', icon_key: 'rtf_file', extensions: ['rtf'] },
       'text/html' => { name: 'HTML document', icon_key: 'html_file', extensions: ['html'] },
-      'application/json' => { name: 'JSON document', icon_key: 'misc_file', extensions: ['json'] }
+      'application/json' => { name: 'JSON document', icon_key: 'misc_file', extensions: ['json'] },
+      'application/matlab' => { name: 'Matlab file', icon_key: 'misc_file', extensions: ['m','mat']}
     }
 
     # Get a nice, human readable name for the MIME type

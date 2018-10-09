@@ -1,0 +1,112 @@
+<% scope = @project || :admin %>
+
+<script>
+    var Dashboard = {
+        updateCallbacks: [],
+        refreshAll: function () {
+            this.updateCallbacks.forEach(function (f) {
+                f();
+            })
+        }
+    };
+</script>
+
+<div class="row">
+  <div class="col-sm-8">
+    <%= render partial: 'general/page_title', locals: { title: "#{@project ? t('project').capitalize : 'SEEK'} Dashboard" } %>
+  </div>
+  <div class="col-sm-4">
+    <div id="dashboard-controls" class="form-inline text-right">
+      <%= render partial: 'dashboard/time_controls' -%>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-4">
+    <%= render partial: 'dashboard/asset_activity', locals: { title: 'Most viewed assets',
+                                                              url: polymorphic_path([:asset_activity, scope, :stats], activity: 'show') } %>
+    <%= render partial: 'dashboard/asset_activity', locals: { title: 'Most downloaded assets',
+                                                              url: polymorphic_path([:asset_activity, scope, :stats], activity: 'download'),
+                                                              type_options: Seek::Util.asset_types.sort_by { |t| t.name }  } %>
+    <%= render partial: 'dashboard/activity', locals: { title: 'Most active contributors', url: polymorphic_path([:contributors, scope, :stats]) } %>
+  </div>
+  <div class="col-sm-8">
+    <div class="row">
+      <div class="col-sm-12">
+        <%= render partial: 'dashboard/contributions', locals: { url: polymorphic_path([:contributions, scope, :stats]) } %>
+      </div>
+      <div class="col-sm-6">
+        <%= render partial: 'dashboard/published_assets', locals: { url: polymorphic_path([:asset_accessibility, scope, :stats]) } %>
+      </div>
+      <div class="col-sm-6">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    $j(document).ready(function () {
+        $j('.most-activity').each(function () {
+            var container = $j(this);
+            var body = $j('.panel-body', container);
+
+            var getStats = function () {
+                var data = {};
+                data.start_date  = $j('#dashboard-controls [data-dashboard-field="period-start"]').val();
+                data.end_date = $j('#dashboard-controls [data-dashboard-field="period-end"]').val();
+                var typeField = container.find('[data-dashboard-field="type"]');
+                if (typeField.length && typeField.val() !== 'all') {
+                    data.type = typeField.val();
+                }
+
+                body.addClass('loading');
+
+                $j.ajax({ url: container.data('statsUrl'),
+                    data: data,
+                    success: function (resp) {
+                        var list = container.find('ul.mini-resource-list');
+                        list.html('');
+                        resp.forEach(function (activity) {
+                            list.append(HandlebarsTemplates['dashboard/resource_listing'](activity));
+                        });
+                    },
+                    error: function () {
+                        body.html('<div class="alert alert-danger">An error occurred whilst fetching stats.</div>');
+                    },
+                    complete: function () {
+                        body.removeClass('loading');
+                    }
+                });
+            };
+            Dashboard.updateCallbacks.push(getStats);
+
+            $j('[data-dashboard-field="type"]', container).change(getStats);
+        });
+
+        $j('[data-dashboard-field="period-start"], [data-dashboard-field="period-end"]').each(function () {
+            $j(this).datetimepicker({
+                format: 'YYYY-MM-DD'
+            });
+        });
+
+        $j('[data-dashboard-field="period-select"]').change(function () {
+            var wrapper = $j(this).parent().parent();
+            if ($j(this).val() === 'custom') {
+                $j('.custom-range-field', wrapper).fadeIn();
+            } else {
+                $j('.custom-range-field', wrapper).fadeOut();
+                $j('[data-dashboard-field="period-start"]', wrapper).val($j(this).val());
+                $j('[data-dashboard-field="period-end"]', wrapper).val(new Date().toISOString().substr(0,10));
+                Dashboard.refreshAll();
+            }
+        });
+
+        $j('[data-dashboard-period-btn]').click(function () { Dashboard.refreshAll(); return false; });
+
+        Dashboard.updateCallbacks.push(getContributionStats);
+        Dashboard.updateCallbacks.push(getAccessibilityStats);
+
+        $j('[data-dashboard-field="period-select"]').change();
+    });
+</script>

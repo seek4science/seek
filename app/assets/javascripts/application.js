@@ -67,4 +67,5 @@
 //= require bives
 //= require asset_report
 //= require uri
+//= require chartjs
 //= require_tree ./templates

@@ -10,8 +10,7 @@ class SampleTypesController < ApplicationController
   before_filter :auth_to_create, only: [:new, :create]
   before_filter :project_membership_required, only: [:create, :new, :select, :filter_for_select]
 
-  # these checks are mostly coverered by the #check_no_created_samples filter, but will give an additional check based on can_xxx? methods
-  before_filter :find_and_authorize_requested_item, except: [:index, :new, :create]
+  before_filter :authorize_requested_sample_type, except: [:index, :new, :create]
 
   # GET /sample_types/1  ,'sample_attributes','linked_sample_attributes'
   # GET /sample_types/1.json
@@ -36,6 +35,7 @@ class SampleTypesController < ApplicationController
 
   def create_from_template
     build_sample_type_from_template
+    @sample_type.contributor = User.current_user.person
 
     @tab = 'from-template'
 
@@ -60,6 +60,7 @@ class SampleTypesController < ApplicationController
     # because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
     tags = params[:sample_type].delete(:tags)
     @sample_type = SampleType.new(sample_type_params)
+    @sample_type.contributor = User.current_user.person
 
     # removes controlled vocabularies or linked seek samples where the type may differ
     @sample_type.resolve_inconsistencies
@@ -148,8 +149,23 @@ class SampleTypesController < ApplicationController
     @sample_type.build_attributes_from_template
   end
 
+  private
+
   def find_sample_type
     @sample_type = SampleType.find(params[:id])
+  end
+
+  #intercepts the standard 'find_and_authorize_requested_item' for additional special check for a referring_sample_id
+  def authorize_requested_sample_type
+    privilege = Seek::Permissions::Translator.translate(action_name)
+    return if privilege.nil?
+
+    if privilege == :view && params[:referring_sample_id].present?
+      @sample_type.can_view?(User.current_user,Sample.find_by_id(params[:referring_sample_id])) || find_and_authorize_requested_item
+    else
+      find_and_authorize_requested_item
+    end
+
   end
 
   def check_no_created_samples

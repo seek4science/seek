@@ -4,7 +4,7 @@
         <%= f.error_messages -%>
 
         <div class="form-group">
-          <%= f.label :display_name -%><span class="required">*</span>
+          <%= f.label :display_name, class: 'required' -%>
           <%= f.text_field :title, :class => "form-control" -%>
         </div>
         <%= f.hidden_field :ontology_id -%>

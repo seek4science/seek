@@ -3,11 +3,6 @@ class Study < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-  #FIXME: needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
-  def projects
-    investigation.try(:projects) || []
-  end
-
   searchable(:auto_index => false) do
     text :experimentalists
     text :person_responsible do
@@ -15,12 +10,16 @@ class Study < ActiveRecord::Base
     end
   end if Seek::Config.solr_enabled
 
+  belongs_to :investigation
+  has_many :projects, through: :investigation
+
+  #FIXME: needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
   acts_as_isa
   acts_as_snapshottable
 
   attr_accessor :new_link_from_assay
 
-  belongs_to :investigation
+
   has_many :assays
   belongs_to :person_responsible, :class_name => "Person"
 
@@ -44,9 +43,6 @@ class Study < ActiveRecord::Base
     related_data_files + related_sops + related_models + related_publications + related_documents
   end
 
-  def project_ids
-    projects.map(&:id)
-  end
 
   def state_allows_delete? *args
     assays.empty? && super

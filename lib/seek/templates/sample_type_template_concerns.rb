@@ -88,8 +88,8 @@ module Seek
       private :template_reader, :validate_template_file, :content_blob_search_terms
 
       module ClassMethods
-        def sample_types_matching_content_blob(content_blob)
-          SampleType.all.select do |type|
+        def sample_types_matching_content_blob(content_blob, user = User.current_user)
+          SampleType.all.select{|st| st.can_view?(user)}.select do |type|
             type.matches_content_blob?(content_blob)
           end
         end

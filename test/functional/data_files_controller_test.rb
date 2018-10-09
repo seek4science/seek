@@ -2170,25 +2170,41 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
+    sample_type = SampleType.new title: 'visible1', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
     sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
     sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
+    assert sample_type.can_view?
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
+    sample_type = SampleType.new title: 'visible2', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
     sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
     sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
+    assert sample_type.can_view?
+
+    # this is a private one, from another project, and shouldn't show up
+    person2 = Factory(:person)
+    sample_type = SampleType.new title: 'private', uploaded_template: true, projects: person2.projects,contributor:person2
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    # this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    disable_authorization_checks{sample_type.save!}
+    refute sample_type.can_view?
 
     get :select_sample_type, id: data_file
 
     assert_select 'select[name=sample_type_id] option', count: 2
+    assert_select 'select[name=sample_type_id] option', text:'visible1'
+    assert_select 'select[name=sample_type_id] option', text:'visible2'
+    assert_select 'select[name=sample_type_id] option', text:'private',count:0
   end
 
   test 'filtering for sample association form' do
@@ -2312,7 +2328,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title: 'from template', project_ids: [person.projects.first.id]
+    sample_type = SampleType.new title: 'from template', project_ids: [person.projects.first.id], contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
@@ -2340,7 +2356,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
     sample_type.content_blob = Factory(:strain_sample_data_content_blob)
     sample_type.build_attributes_from_template
     attribute_type = sample_type.sample_attributes[-2]
@@ -2370,7 +2386,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
@@ -2407,7 +2423,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
@@ -2415,7 +2431,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
@@ -2440,7 +2456,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
@@ -2468,7 +2484,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     sample_type.save!
@@ -2760,7 +2776,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assay_asset1 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::INCOMING,assay:Factory(:assay,contributor:person))
     assay_asset2 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::OUTGOING,assay:Factory(:assay,contributor:person))
 
-    sample_type = SampleType.new(title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id])
+    sample_type = SampleType.new(title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person)
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     sample_type.save!
@@ -3433,7 +3449,7 @@ class DataFilesControllerTest < ActionController::TestCase
   def data_file_with_extracted_samples(contributor = User.current_user.person)
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: contributor
-    sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
+    sample_type = SampleType.new title: 'from template', projects: contributor.projects, contributor:contributor
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     create_sample_attribute_type
     sample_type.build_attributes_from_template

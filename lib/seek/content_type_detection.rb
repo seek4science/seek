@@ -11,7 +11,7 @@ module Seek
     PDF_CONVERTABLE_FORMAT = %w(doc docx ppt pptx odt odp rtf xls xlsx)
     PDF_VIEWABLE_FORMAT = PDF_CONVERTABLE_FORMAT - %w(xls xlsx) + %w(pdf)
     IMAGE_VIEWABLE_FORMAT = %w(gif jpeg png jpg bmp svg)
-    TEXT_MIME_TYPES = %w(text/plain text/csv text/x-comma-separated-values text/tab-separated-values application/sbml+xml application/xml text/xml application/json text/x-python)
+    TEXT_MIME_TYPES = %w(text/plain text/csv text/x-comma-separated-values text/tab-separated-values application/sbml+xml application/xml text/xml application/json text/x-python application/matlab)
 
     def is_text?(blob = self)
       TEXT_MIME_TYPES.include?(blob.content_type)
@@ -146,13 +146,14 @@ module Seek
     end
 
     def find_or_keep_type_with_mime_magic
-      mime = MimeMagic.by_extension(file_extension)
-      if mime.nil? && file_exists?
+      detected_mime_type = mime_types_for_extension(file_extension).first
+
+      if detected_mime_type.nil? && file_exists?
         io = File.open(filepath)
-        mime ||= MimeMagic.by_magic(io) if file_exists?
+        detected_mime_type ||= MimeMagic.by_magic(io).try(:type) if file_exists?
         io.close
       end
-      mime.try(:type) || content_type
+      detected_mime_type || content_type
     end
 
     def set_content_type_according_to_file

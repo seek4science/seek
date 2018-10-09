@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 20180925103340) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "http_referer",           limit: 255
-    t.string   "user_agent",             limit: 255
+    t.text     "user_agent",             limit: 65535
     t.text     "data",                   limit: 16777215
     t.string   "controller_name",        limit: 255
   end
@@ -587,6 +587,14 @@ ActiveRecord::Schema.define(version: 20180925103340) do
 
   add_index "documents", ["contributor_id"], name: "index_documents_on_contributor", using: :btree
 
+  create_table "documents_events", id: false, force: :cascade do |t|
+    t.integer "document_id", limit: 4, null: false
+    t.integer "event_id",    limit: 4, null: false
+  end
+
+  add_index "documents_events", ["document_id", "event_id"], name: "index_documents_events_on_document_id_and_event_id", using: :btree
+  add_index "documents_events", ["event_id", "document_id"], name: "index_documents_events_on_event_id_and_document_id", using: :btree
+
   create_table "documents_projects", force: :cascade do |t|
     t.integer "document_id", limit: 4
     t.integer "project_id",  limit: 4
@@ -1008,8 +1016,8 @@ ActiveRecord::Schema.define(version: 20180925103340) do
     t.string   "space_perm_id",         limit: 255
     t.string   "username",              limit: 255
     t.integer  "project_id",            limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
     t.string   "dss_endpoint",          limit: 255
     t.string   "web_endpoint",          limit: 255
     t.integer  "refresh_period_mins",   limit: 4,   default: 120
@@ -1420,13 +1428,15 @@ ActiveRecord::Schema.define(version: 20180925103340) do
   add_index "sample_resource_links", ["sample_id"], name: "index_sample_resource_links_on_sample_id", using: :btree
 
   create_table "sample_types", force: :cascade do |t|
-    t.string   "title",             limit: 255
-    t.string   "uuid",              limit: 255
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
-    t.string   "first_letter",      limit: 1
-    t.text     "description",       limit: 65535
-    t.boolean  "uploaded_template",               default: false
+    t.string   "title",               limit: 255
+    t.string   "uuid",                limit: 255
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
+    t.string   "first_letter",        limit: 1
+    t.text     "description",         limit: 65535
+    t.boolean  "uploaded_template",                 default: false
+    t.integer  "contributor_id",      limit: 4
+    t.string   "deleted_contributor", limit: 255
   end
 
   create_table "samples", force: :cascade do |t|
@@ -1815,8 +1825,8 @@ ActiveRecord::Schema.define(version: 20180925103340) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "workflow_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_workflow_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
-  add_index "workflow_auth_lookup", ["user_id", "can_view"], name: "index_workflow_auth_lookup_on_user_id_and_can_view", using: :btree
+  add_index "workflow_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
+  add_index "workflow_auth_lookup", ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "workflow_versions", force: :cascade do |t|
     t.integer  "workflow_id",         limit: 4

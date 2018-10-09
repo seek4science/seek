@@ -8,7 +8,7 @@
   <div class="row">
     <div class="col-sm-6">
       <div class="form-group">
-        <%= label_tag 'Name' %><span class="required">*</span>
+        <%= label_tag 'Name' , nil, class: 'required' %>
         <%= f.text_field :title, :class => 'form-control' %>
       </div>
 
@@ -42,7 +42,7 @@
   </div>
 
   <div class="form-group">
-    <%= f.label "Organism" -%><span class="required">*</span>
+    <%= f.label "Organism", class: 'required' -%>
     <%= f.select :organism_id,
                  options_for_select([["Not specified", ""]] + Organism.order(:title).map { |o| [o.title, o.id] }, @strain.organism.try(:id) || current_user.try(:person).try(:projects).try(:first).try(:organism_ids).try(:first)), {},
                  :onchange => "show_ajax_loader('strains_of_selected_organism');strains_of_selected_organism(this.value,'strain_parent_id', 'strain[parent_id]');",

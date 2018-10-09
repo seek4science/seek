@@ -6,7 +6,7 @@
       <%= f.error_messages %>
 
       <div class="form-group">
-        <label>Title <span class="required">*</span></label>
+        <label class="required">Title</label>
         <%= f.text_field :title, :class=>"form-control" -%>
       </div>
 
@@ -16,7 +16,7 @@
       </div>
 
       <div class="form-group">
-        <%= f.label :start_date %><span class="required">*</span>
+        <%= f.label :start_date, class: 'required' %>
         <%= f.text_field :start_date, data: { calendar: 'mixed' }, class: 'calendar form-control' %>
       </div>
 
@@ -58,6 +58,8 @@
       <%= f.fancy_multiselect :data_files, :other_projects_checkbox=>true -%>
 
       <%= f.fancy_multiselect :presentations,:with_new_link=>true,:other_projects_checkbox=>true %>
+
+      <%= f.fancy_multiselect :documents, other_projects_checkbox: true %>
 
       <%
          button_text=@new ? "Create" : "Update"

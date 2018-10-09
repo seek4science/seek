@@ -95,6 +95,37 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_redirected_to document_path(assigns(:document))
   end
 
+  test 'should create and link to event' do
+    person = Factory(:person)
+    login_as(person)
+    event = Factory(:event,contributor:person)
+    event2 = Factory(:event,contributor:person)
+    assert_difference('Document.count') do
+      post :create, document: { title: 'Document', project_ids: [person.projects.first.id],event_ids:[event.id.to_s,event2.id.to_s]},
+           content_blobs: [valid_content_blob], policy_attributes: valid_sharing
+    end
+
+    assert (doc = assigns(:document))
+    assert_redirected_to document_path(doc)
+
+    assert_equal [event,event2].sort,doc.events.sort
+
+  end
+
+  test 'should not create event with link to none visible event' do
+    person = Factory(:person)
+    login_as(person)
+
+    event = Factory(:event)
+    refute event.can_view?
+
+    assert_no_difference('Document.count') do
+      post :create, document: { title: 'Document', project_ids: [person.projects.first.id],event_ids:[event.id.to_s]},
+           content_blobs: [valid_content_blob], policy_attributes: valid_sharing
+    end
+
+  end
+
   test 'should update document' do
     person = Factory(:person)
     document = Factory(:document, contributor: person)
@@ -111,6 +142,25 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_redirected_to document_path(assigns(:document))
     assert_equal 'Different title', assigns(:document).title
     assert_includes assigns(:document).assays, assay
+  end
+
+  test 'should update and link to event' do
+    person = Factory(:person)
+    document = Factory(:document, contributor: person)
+    assert_empty document.events
+
+    login_as(person)
+
+    event = Factory(:event,contributor:person)
+
+    assert_difference('ActivityLog.count') do
+      put :update, id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id],
+                                                event_ids:['',event.id.to_s] }
+    end
+
+    assert (doc = assigns(:document))
+    assert_redirected_to document_path(doc)
+    assert_equal [event],doc.events
   end
 
   test 'should destroy document' do
