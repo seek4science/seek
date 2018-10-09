@@ -502,14 +502,14 @@ class ApplicationController < ActionController::Base
 
   def detect_for_filter(filter, resource, value)
     case
-    when resource.respond_to?(filter.pluralize)
-      resource.send(filter.pluralize).include? value
-    when resource.respond_to?("related_#{filter.pluralize}")
-      resource.send("related_#{filter.pluralize}").include?(value)
-    when resource.respond_to?(filter)
-      resource.send(filter) == value
-    else
-      false
+      when resource.respond_to?(filter.pluralize)
+        resource.send(filter.pluralize).include? value
+      when resource.respond_to?("related_#{filter.pluralize}")
+        resource.send("related_#{filter.pluralize}").include?(value)
+      when resource.respond_to?(filter)
+        resource.send(filter) == value
+      else
+        false
     end
   end
 
