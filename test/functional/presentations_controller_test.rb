@@ -310,6 +310,7 @@ class PresentationsControllerTest < ActionController::TestCase
     end
   end
 
+
   test 'should display null license text' do
     presentation = Factory :presentation, policy: Factory(:public_policy)
 
