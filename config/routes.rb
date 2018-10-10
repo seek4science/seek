@@ -209,7 +209,7 @@ SEEK::Application.routes.draw do
       get :isa_children
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:data_files,:presentations,
-              :publications,:events,:samples,:specimens,:strains,:search, :documents, :only=>[:index]
+              :publications,:events,:samples,:specimens,:strains,:search,:organisms,:documents, :only=>[:index]
 
     resources :openbis_endpoints do
       member do
