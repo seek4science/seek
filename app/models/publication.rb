@@ -228,9 +228,7 @@ class Publication < ActiveRecord::Base
 
   # returns a list of related organisms, related through either the assay or the model
   def related_organisms
-    organisms = assays.collect(&:organisms).flatten
-    organisms |= models.collect(&:organism).flatten
-    organisms.uniq.compact
+    (assays.collect(&:organisms).flatten | models.collect(&:organism).flatten).uniq
   end
 
   def self.subscribers_are_notified_of?(action)

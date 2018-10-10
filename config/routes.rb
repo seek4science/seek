@@ -543,7 +543,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :disassociate_authors
     end
-    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :events,:only=>[:index]
   end
 
   resources :events do
@@ -583,7 +583,7 @@ SEEK::Application.routes.draw do
       post :search_ajax
       post :resource_in_tab
     end
-    resources :projects,:assays,:studies,:models,:strains,:specimens,:samples,:only=>[:index]
+    resources :projects, :assays, :studies, :models, :strains, :specimens, :samples, :publications, :only=>[:index]
     member do
       get :visualise
     end
