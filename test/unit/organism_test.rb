@@ -290,5 +290,16 @@ class OrganismTest < ActiveSupport::TestCase
     refute o2.valid?
   end
 
+  test 'related_publications' do
+    o1 = Factory(:organism)
+    a1 = Factory(:assay,organisms:[o1])
+    a2 = Factory(:assay,organisms:[o1])
+    m1 = Factory(:model,organism:o1)
+    pub1 = Factory(:publication, assays:[a1,a2])
+    pub2 = Factory(:publication, models:[m1])
+
+    o1.reload
+    assert_equal [pub1,pub2].sort,o1.related_publications.sort
+  end
 
 end
