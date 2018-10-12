@@ -57,6 +57,10 @@ class Organism < ActiveRecord::Base
     "http://purl.bioontology.org/ontology/NCBITAXON/#{ncbi_id}"
   end
 
+  def related_publications
+    assays.collect(&:publications).flatten | models.collect(&:publications).flatten
+  end
+
   # converts the concept uri into a common form of http://purl.bioontology.org/ontology/NCBITAXON/<Number> if:
   #   - it is just a number
   #   - of the form NCBITaxon:<Number>

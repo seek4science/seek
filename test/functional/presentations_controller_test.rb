@@ -288,6 +288,29 @@ class PresentationsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'filter by publications using nested routes' do
+    assert_routing 'publications/7/presentations', controller: 'presentations', action: 'index', publication_id: '7'
+
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+
+    pub1 = Factory(:publication)
+    pub2 = Factory(:publication)
+
+    pres1 = Factory(:presentation, policy: Factory(:public_policy), publications:[pub1])
+    pres2 = Factory(:presentation, policy: Factory(:public_policy), publications:[pub2])
+ p
+
+    get :index, publication_id: pub1.id
+    assert_response :success
+
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', presentation_path(pres1), text: pres1.title
+      assert_select 'a[href=?]', presentation_path(pres2), text: pres2.title, count: 0
+    end
+  end
+
+
   test 'should display null license text' do
     presentation = Factory :presentation, policy: Factory(:public_policy)
 

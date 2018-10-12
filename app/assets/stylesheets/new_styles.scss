@@ -739,8 +739,28 @@ span.required, label.required::after {
 }
 
 .dashboard-panel {
+  position: relative;
+
   .panel-heading {
     line-height: 2.5;
     padding: 5px 10px;
+  }
+
+  .panel-body.loading::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background: center center no-repeat url(asset-path("ajax-loader-large.gif")) rgba(255,255,255,0.6);
+  }
+}
+
+#dashboard-controls {
+  margin-bottom: 5px;
+
+  .form-group, .btn {
+    margin-top: 5px;
   }
 }
