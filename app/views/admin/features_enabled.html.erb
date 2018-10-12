@@ -23,9 +23,13 @@
                              "User creation of #{t('programme').pluralize} enabled", "Controls whether standard users can create their own #{t('programme').pluralize}. If disabled only full administrators will be able to create #{t('programme').pluralize}. If enabled a full administrator is still required to allow and activate the #{t('programme')}") %>
     </div>
     <%= admin_checkbox_setting(:samples_enabled, 1, Seek::Config.samples_enabled,
-                               "Samples enabled", "Whether the Samples framework is enabled. The framework allows users to create their own custom Sample types to describe their biological samples and other metadata.") %>
+                               "Samples enabled", "Whether the Samples framework is enabled. The framework allows users to create their own custom Sample types to describe their biological samples and other metadata.",:onchange=>toggle_appear_javascript('sample_type_pa_only')) %>
 
-    <%#= admin_checkbox_setting(:delete_asset_version_enabled, 1, Seek::Config.delete_asset_version_enabled,
+    <div id="sample_type_pa_only" class="additional_settings" style="<%= show_or_hide_block Seek::Config.samples_enabled -%>">
+      <%= admin_checkbox_setting(:project_admin_sample_type_restriction, 1, Seek::Config.project_admin_sample_type_restriction,
+                             "Sample Type creation restricted to Project Administrators","If set, then only Project Administrators will have the ability to create new Sample Types for the Project. If unset, any Project member is able to.") %>
+    </div>
+  <%#= admin_checkbox_setting(:delete_asset_version_enabled, 1, Seek::Config.delete_asset_version_enabled,
                                "Delete asset version enabled", "Whether delete of one version of the versioned asset is enabled. It allows to delete previous (older) versions without deleting the complete asset") %>
 
     <%= admin_checkbox_setting(:internal_help_enabled, 1, Seek::Config.internal_help_enabled,
