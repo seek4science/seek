@@ -808,6 +808,31 @@ class PublicationsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'organism publications through nested route' do
+    assert_routing 'organisms/2/publications', controller: 'publications', action: 'index', organism_id: '2'
+
+    o1 = Factory(:organism)
+    o2 = Factory(:organism)
+    a1 = Factory(:assay,organisms:[o1])
+    a2 = Factory(:assay,organisms:[o2])
+
+    publication1 = Factory(:publication, assays:[a1])
+    publication2 = Factory(:publication, assays:[a2])
+
+    o1.reload
+    assert_equal [publication1],o1.related_publications
+
+    get :index, organism_id: o1.id
+
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', publication_path(publication1), text: publication1.title
+      assert_select 'a[href=?]', publication_path(publication2), text: publication2.title, count: 0
+    end
+
+  end
+
   test 'query single authors for typeahead' do
     query = 'Bloggs'
     get :query_authors_typeahead, format: :json, full_name: query

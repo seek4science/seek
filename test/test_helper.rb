@@ -16,8 +16,6 @@ require 'authenticated_test_helper'
 require 'mock_helper'
 require 'html_helper'
 require 'nels_test_helper'
-require 'upload_helper'
-require 'password_helper'
 require 'minitest/reporters'
 require 'minitest'
 require 'ostruct'
@@ -33,39 +31,7 @@ module ActionView
   end
 end
 
-include UploadHelper
-include PasswordHelper
-
-FactoryGirl.define do
-  trait :with_project_contributor do
-    contributor { nil }
-    after_build do |resource|
-      if resource.contributor.nil?
-        if resource.projects.none?
-          resource.projects = [Factory(:project)]
-        end
-        resource.contributor = Factory(:person, project: resource.projects.first)
-      elsif resource.projects.none?
-        resource.projects = [resource.contributor.projects.first]
-      end
-    end
-  end
-end
-
 FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
-
-FactoryGirl.class_eval do
-  def self.create_with_privileged_mode(*args)
-    disable_authorization_checks { create_without_privileged_mode(*args) }
-  end
-
-  def self.build_with_privileged_mode(*args)
-    disable_authorization_checks { build_without_privileged_mode(*args) }
-  end
-
-  class_alias_method_chain :create, :privileged_mode
-  class_alias_method_chain :build, :privileged_mode
-end
 
 Kernel.class_eval do
   def as_virtualliver

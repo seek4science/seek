@@ -182,7 +182,7 @@ SEEK::Application.routes.draw do
       get :select
       get :items
     end
-    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:documents, :events,:samples,:specimens,:only=>[:index]
+    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -557,7 +557,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :disassociate_authors
     end
-    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :events,:only=>[:index]
   end
 
   resources :events do
@@ -597,7 +597,7 @@ SEEK::Application.routes.draw do
       post :search_ajax
       post :resource_in_tab
     end
-    resources :projects,:assays,:studies,:models,:strains,:specimens,:samples,:only=>[:index]
+    resources :projects, :assays, :studies, :models, :strains, :specimens, :samples, :publications, :only=>[:index]
     member do
       get :visualise
     end
