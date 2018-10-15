@@ -13,7 +13,7 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 ## Version 1.7.0
 
-Release date: _October XX 2018_
+Release date: _October 15th 2018_
 
 A full list of changes included in this release can be found in the [SEEK v1.7.0 release notes](release-notes-1.7.0.html)
 
