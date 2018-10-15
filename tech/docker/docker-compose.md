@@ -64,7 +64,7 @@ like the following:
     
 ## Backup and Restore
 
-To backup, the mysql database and seek filestore, you will need to mount the volumes into a temporary container. Don't try backing up by copying the volumes directly from the host system. 
+To backup the MySQL database and seek filestore, you will need to mount the volumes into a temporary container. Don't try backing up by copying the volumes directly from the host system. 
 The following gives an example of a basic procedure, but we recommend you read [Backup, restore, or migrate data volumes](https://docs.docker.com/storage/volumes/#backup-restore-or-migrate-data-volumes)
  and are familiar with what the steps mean.
 
@@ -73,11 +73,11 @@ The following gives an example of a basic procedure, but we recommend you read [
     docker run --rm --volumes-from seek-mysql -v $(pwd):/backup ubuntu tar cvf /backup/seek-mysql-db.tar /var/lib/mysql
     docker-compose start -d
     
-and to restore:
+and to restore into new volumes:
         
     docker-compose down
     docker volume rm seek-filestore # this and the next step only necessary if you want to recreate existing volumes
-    docker volume rm seek-mysql-db
+    docker volume rm seek-mysql-db     
     docker volume create --name=seek-filestore
     docker volume create --name=seek-mysql-db
     docker-compose up --no-start
