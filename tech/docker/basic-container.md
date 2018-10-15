@@ -7,9 +7,9 @@ layout: page
 
 ## Running a basic container
 
-A single container is available for SEEK that runs on the SQLite3 database, which can only support a small number of concurrent users. 
+This is a single container is available for SEEK that runs on the SQLite3 database, which can only support a small number of concurrent users. 
 
-This can be a good way to try out your own local installation of SEEK, and for testing or trying out new features.
+**This isn't recommended for a production deployment**, but is a good quick way to try out SEEK, and for testing or checking out new features.
  
 For production deployments see [Docker compose](docker-compose.html)
 
@@ -57,11 +57,7 @@ but is not suitable for a production deployment of SEEK.
 If running a container for other than basic testing, you will want the stored data to be preserved when updating images. 
 (However, if this is case you should be thinking about using [Docker compose](docker-compose.html)).
 
-It is possible to do so by mounting a directory on the host machine for the database and filestore. E.g. to use /data/seek-filestore and /data/seek-db:
-
-    docker run -d -p 3000:3000 -v /data/seek-filestore:/seek/filestore -v /data/seek-db:/seek/sqlite3-db --name seek fairdom/seek:{{ site.current_docker_tag }}
-
-Alternatively you can tell the Docker container to use named _data volumes_ for the database and filestore:
+The recommended way to achieve persistance is to use named _data volumes_ for the database and filestore:
   
   
     docker run -d -p 3000:3000 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:{{ site.current_docker_tag }}
@@ -73,6 +69,12 @@ this will create 2 volumes called _seek-filestore_ and _seek-db_, which you can 
 By using volumes the container can be thrown away and recreated (say, for a newer image) without losing your data.
     
 For more detailed information about Volumes please read [Manage data in containers](https://docs.docker.com/engine/tutorials/dockervolumes/)    
+
+
+It is possible to do so by mounting a directory on the host machine for the database and filestore. E.g. to use /data/seek-filestore and /data/seek-db:
+
+    docker run -d -p 3000:3000 -v /data/seek-filestore:/seek/filestore -v /data/seek-db:/seek/sqlite3-db --name seek fairdom/seek:{{ site.current_docker_tag }}
+
 
 ### Upgrades
 

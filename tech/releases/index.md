@@ -15,6 +15,17 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 Release date: _October 15th 2018_
 
+  * **Programme wide sharing permissions** have been added.  The sharing options now include the ability to share across a whole Programme.
+  * **ISA graph improvements** - we spent some time revisiting the ISA graph, fixing some underlying issues and making it more usable. It now defaults to showing the tree view, and 
+  the graphical view is simplified and highlights the current item and its nearest neighbours. It no longer includes the associated Project and Programmes to avoid unnecessary interlinking 
+  and complexity. The intention is that the graph view should provide a quick visual indication of the place of the current item within the ISA network, and provide the ability to explore and navigate 
+  over the graph. A separate export function has been provided to all easy generation and download of PNG files for inclusion in reports or presentations. 
+  * A dedicated **NCBI ID sample attribute type** has been added, which accepts a number and displays as an identifier URI. If the NCBI id matches an Organism present in SEEK then the link will automatically be made.   
+  * Restrictions to **Sample Type visibility** have been added. Sample types are now initially only visible to members of the Project they are associated with, until it starts having Samples associated with it. 
+  The Sample Type will become visible outside of the project, and to external users, once one or more samples associated with that Sample type have been made public. This allows more freedom to allow all project members to create
+  Sample Types, without the difficulties of having full sharing permissions on Sample types, whilst restricting the Sample Types exposed outside of the Project. 
+  * The ability to link **Documents to Events**, and vice versa, has been added.
+
 A full list of changes included in this release can be found in the [SEEK v1.7.0 release notes](release-notes-1.7.0.html)
 
 ## Version 1.6.3

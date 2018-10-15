@@ -1,0 +1,96 @@
+
+Release Notes - SEEK - Version 1.7.0
+
+
+
+
+
+<h2>        New Feature
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1776'>OPSK-1776</a>] -         Automatically link sample ncbi-ids to organisms
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1538'>OPSK-1538</a>] -         Allowing Programme wide sharing permissions.
+    </li>
+</ul>
+
+
+<h2>        Improvement
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-696'>OPSK-696</a>] -         Refactor out polymorphic nature of contributor and always make it a person
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1008'>OPSK-1008</a>] -         Add NCBI taxonomy attribute type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1694'>OPSK-1694</a>] -         Change and document the route to get data as CSV
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1744'>OPSK-1744</a>] -         Remove default organisms and strains
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1751'>OPSK-1751</a>] -         split up the XML and JSON test modules, for less skip messages
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1768'>OPSK-1768</a>] -         Update Docker build to use 2.4 Ruby base container
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1770'>OPSK-1770</a>] -         Add link to terms and conditions into footer
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1774'>OPSK-1774</a>] -         Refactor publication associations/author linkage
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1793'>OPSK-1793</a>] -         Add whoami route
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1797'>OPSK-1797</a>] -         Handle multipart requests when uploading content blob data to the API
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1798'>OPSK-1798</a>] -         Update asset contributor when people and users are deleted
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1801'>OPSK-1801</a>] -         Switch to the rubygems version of app_version
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1805'>OPSK-1805</a>] -         Project validation prevents assets being updated if contributor was removed from a project
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1806'>OPSK-1806</a>] -         clean up unused image assets
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1807'>OPSK-1807</a>] -         clean up unused rake tasks
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1810'>OPSK-1810</a>] -         Sample Type visibility for project members vs anonymous
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1812'>OPSK-1812</a>] -         ISA graph and tree improvements
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1825'>OPSK-1825</a>] -         possibility to link document to event
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1826'>OPSK-1826</a>] -         &quot;Required&quot; asterisk breaks onto newline when field has errors
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1838'>OPSK-1838</a>] -         Show start time for Snapshot activity
+    </li>
+</ul>
+
+<h2>        Bug
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1562'>OPSK-1562</a>] -         &quot;Title can&#39;t be blank&quot; error when leaving Person name&#39;s blank
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1762'>OPSK-1762</a>] -         user_agent field in activity_logs is too short
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1771'>OPSK-1771</a>] -         compounds link in Admin fails
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1777'>OPSK-1777</a>] -         Assay&#39;s &quot;new_object_based_on_existing_one&quot; doesn&#39;t copy all associations
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1795'>OPSK-1795</a>] -         Tags in Assay JSON
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1796'>OPSK-1796</a>] -         Empty arrays converted to null
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1799'>OPSK-1799</a>] -         Always seems to select &quot;create new assay&quot; when uploading a data file
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1803'>OPSK-1803</a>] -         add validations for length for title and descriptions
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1809'>OPSK-1809</a>] -         Selecting &quot;Add data file&quot; for assay no longer automatically selects the assay
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1839'>OPSK-1839</a>] -         Error with Snapshot recent downloads
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1840'>OPSK-1840</a>] -         Error showing user activity for snapshots
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1841'>OPSK-1841</a>] -         should use the red X for fancy multi-select associations
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1842'>OPSK-1842</a>] -         snapshots need an icon
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1844'>OPSK-1844</a>] -         Programme missed organisms path
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1846'>OPSK-1846</a>] -         matlab files are shown as objective C
+    </li>
+</ul>
