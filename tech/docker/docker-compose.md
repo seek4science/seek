@@ -62,6 +62,8 @@ like the following:
         }
     }
     
+You would also want to configure for HTTPS (port 443), and would strongly recommend using [Lets Encrypt](https://letsencrypt.org/) for free SSL certificates. 
+    
 ## Backup and Restore
 
 To backup the MySQL database and seek filestore, you will need to mount the volumes into a temporary container. Don't try backing up by copying the volumes directly from the host system. 
