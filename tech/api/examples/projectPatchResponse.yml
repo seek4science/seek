@@ -12,14 +12,17 @@ data:
     default_policy:
       access: no_access
       permissions:
-      - resource_type: people
-        resource_id: '1296'
+      - resource:
+          type: people
+          id: '1296'
         access: manage
-      - resource_type: projects
-        resource_id: '1956'
+      - resource:
+          type: projects
+          id: '1956'
         access: download
-      - resource_type: institutions
-        resource_id: '1321'
+      - resource:
+          type: institutions
+          id: '1321'
         access: view
   relationships:
     organisms:

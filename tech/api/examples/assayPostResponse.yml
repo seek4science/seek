@@ -6,8 +6,9 @@ data:
     policy:
       access: download
       permissions:
-      - resource_type: projects
-        resource_id: '442'
+      - resource:
+          type: projects
+          id: '442'
         access: manage
     title: A Maximal experimental Assay
     description: A Western Blot Assay
@@ -22,10 +23,6 @@ data:
     technology_type:
       label: 
       uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
-    tags:
-    - Assay-tag1
-    - Assay-tag2
-    - Assay-tag3
   relationships:
     creators:
       data:

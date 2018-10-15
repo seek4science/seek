@@ -7,11 +7,13 @@ data:
     policy:
       access: download
       permissions:
-      - resource_id: '1293'
-        resource_type: projects
+      - resource:
+          id: '1293'
+          type: projects
         access: manage
-      - resource_id: '1343'
-        resource_type: projects
+      - resource:
+          id: '1343'
+          type: projects
         access: manage
     description: This is a more complex investigation
     other_creators: Max Blumenthal, Ed Snowden

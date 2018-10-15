@@ -3,7 +3,6 @@ data:
   id: '138'
   type: studies
   attributes:
-    tags: 
     title: Model analysis
     description: 
     experimentalists: 
@@ -61,6 +60,8 @@ data:
         type: publications
       - id: '268'
         type: publications
+    documents:
+      data: []
   links:
     self: "/studies/138"
   meta:

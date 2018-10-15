@@ -237,6 +237,8 @@ data:
       data: []
     events:
       data: []
+    documents:
+      data: []
   links:
     self: "/programmes/3"
   meta:

@@ -15,7 +15,7 @@ data:
   type: institutions
   attributes:
     title: CSIC Granada
-    links: 
+  links:
     self: "/institutions/3"
 jsonapi:
   version: '1.0'

@@ -6,8 +6,9 @@ data:
     policy:
       access: download
       permissions:
-      - resource_type: projects
-        resource_id: '2058'
+      - resource:
+          type: projects
+          id: '2058'
         access: edit
     title: A Maximal Data File
     description: This is the description

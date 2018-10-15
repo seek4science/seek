@@ -11,6 +11,12 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html) 
 
+## Version 1.7.0
+
+Release date: _October XX 2018_
+
+A full list of changes included in this release can be found in the [SEEK v1.7.0 release notes](release-notes-1.7.0.html)
+
 ## Version 1.6.3
 
 Release date: _August 21st 2018_

@@ -6,8 +6,9 @@ data:
     policy:
       access: view
       permissions:
-      - resource_type: projects
-        resource_id: '242'
+      - resource:
+          id: '242'
+          type: projects
         access: edit
     title: A Maximal Event
     description: This is the description

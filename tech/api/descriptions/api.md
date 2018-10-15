@@ -4,7 +4,7 @@ The API is defined in the [OpenAPI specification](https://swagger.io/specificati
 
 Example IPython notebooks showing use of the API are available on [GitHub](https://github.com/seek4science/seekAPIexamples)
 
-___
+===
 
 ## Policy
 <a name="Policy"></a>
@@ -22,7 +22,7 @@ The access may be one of (in order of increasing "power"):
 
 In addition a **Policy** may give special access to specific <a href="#people">**People**</a>, People working at an <a href="#institutions">**Institution**</a> or working on a <a href="#projects">**Project**</a>.
 
-___
+===
 
 ## License
 <a name="License"></a>
@@ -62,7 +62,7 @@ The license can currently be:
 * ukcrown-withrights - UK Crown Copyright with data.gov.uk rights
 * [ukpsi](http://www.opendefinition.org/licenses/ukpsi) - UK PSI Public Sector Information
 
-___
+===
 
 ## ContentBlob
 <a name="ContentBlob"></a>
@@ -96,4 +96,4 @@ may be satisfied by uploading a file to http://www.fairdomhub.org/data_files/57/
 
 The content of a resource may be downloaded by first *reading* the resource and then *downloading* the ContentBlobs from their URI.
 
-___
+===

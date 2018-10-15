@@ -18,100 +18,6 @@ info:
     2](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
 
     Example IPython notebooks showing use of the API are available on [GitHub](https://github.com/hleonov/ipython_for_SEEK-API).
-
-    ===
-
-    ## Policy
-
-    A Policy specifies the visibility of an object to people using SEEK. A [**Project**](#tag/projects) may specify the default policy for objects belonging to that [**Project**](#tag/projects)
-
-    The **Policy** specifies the visibility of the object to non-registered people or [**People**](#tag/people) not allowed special access.
-
-    The access may be one of (in order of increasing "power"):
-
-    * no_access
-    * view
-    * download
-    * edit
-    * manage
-
-    In addition a **Policy** may give special access to specific [**People**](#tag/people), People working at an [**Institution**](#tag/institutions) or working on a [**Project**](#tag/projects).
-
-    ===
-
-    ## License
-
-    The license specifies the license that will apply to any [**DataFiles**](#tag/dataFiles), [**Models**](#tag/models), [**SOPs**](#tag/sops), [**Documents**](#tag/documents) and [**Presentations**](#tag/presentations) associated with a [**Project**](#tag/projects).
-
-    The license can currently be:
-
-    * [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/) - CC0 1.0
-    * [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/) - Creative Commons Attribution 4.0
-    * [CC-BY-SA-4.0](https://creativecommons.org/licenses/by-sa/4.0/) - Creative Commons Attribution Share-Alike 4.0
-    * [ODC-BY-1.0](http://www.opendefinition.org/licenses/odc-by) - Open Data Commons Attribution License 1.0
-    * [ODbL-1.0](http://www.opendefinition.org/licenses/odc-odbl) - Open Data Commons Open Database License 1.0
-    * [ODC-PDDL-1.0](http://www.opendefinition.org/licenses/odc-pddl) - Open Data Commons Public Domain Dedication and Licence 1.0
-    * notspecified - License Not Specified
-    * other-at - Other (Attribution)
-    * other-open - Other (Open)
-    * other-pd - Other (Public Domain)
-    * [AFL-3.0](http://www.opensource.org/licenses/AFL-3.0) - Academic Free License 3.0
-    * [Against-DRM](http://www.opendefinition.org/licenses/against-drm) - Against DRM
-    * [CC-BY-NC-4.0](https://creativecommons.org/licenses/by-nc/4.0/) - Creative Commons Attribution-NonCommercial 4.0
-    * [DSL](http://www.opendefinition.org/licenses/dsl) - Design Science License
-    * [FAL-1.3](http://www.opendefinition.org/licenses/fal) - Free Art License 1.3
-    * [GFDL-1.3-no-cover-texts-no-invariant-sections](http://www.opendefinition.org/licenses/gfdl) - GNU Free Documentation License 1.3 with no cover texts and no invariant sections
-    * [geogratis](http://geogratis.gc.ca/geogratis/licenceGG) - Geogratis
-    * [hesa-withrights](http://www.hesa.ac.uk/index.php?option=com_content&amp;task=view&amp;id=2619&amp;Itemid=209) - Higher Education Statistics Agency Copyright with data.gov.uk rights
-    * localauth-withrights - Local Authority Copyright with data.gov.uk rights
-    * [MirOS](http://www.opensource.org/licenses/MirOS) - MirOS Licence
-    * [NPOSL-3.0](http://www.opensource.org/licenses/NPOSL-3.0) - Non-Profit Open Software License 3.0
-    * [OGL-UK-1.0](http://reference.data.gov.uk/id/open-government-licence) - Open Government Licence 1.0 (United Kingdom)
-    * [OGL-UK-2.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/) - Open Government Licence 2.0 (United Kingdom)
-    * [OGL-UK-3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/) - Open Government Licence 3.0 (United Kingdom)
-    * [OGL-Canada-2.0](http://data.gc.ca/eng/open-government-licence-canada) - Open Government License 2.0 (Canada)
-    * [OSL-3.0](http://www.opensource.org/licenses/OSL-3.0) - Open Software License 3.0
-    * [dli-model-use](http://data.library.ubc.ca/datalib/geographic/DMTI/license.html) - Statistics Canada: Data Liberation Initiative (DLI) - Model Data Use Licence
-    * [Talis](http://www.opendefinition.org/licenses/tcl) - Talis Community License
-    * ukclickusepsi - UK Click Use PSI
-    * ukcrown-withrights - UK Crown Copyright with data.gov.uk rights
-    * [ukpsi](http://www.opendefinition.org/licenses/ukpsi) - UK PSI Public Sector Information
-
-    ===
-
-    ## ContentBlob
-
-    The content of a [**DataFile**](#tag/dataFiles), [**Document**](#tag/documents), [**Model**](#tag/models), [**SOP**](#tag/sops) or [**Presentation**](#tag/presentations) is specified as a set of **ContentBlobs**.
-
-    When a resource with content is created, it is possible to specify a ContentBlob either as:
-
-    * A remote ContentBlob with:
-      * **URI to the content's location**
-      * The original filename for the content
-      * The content type of the remote content as a [MIME media type](https://en.wikipedia.org/wiki/Media_type)
-    * A placeholder that will be filled with uploaded content
-      * **The original filename for the content**
-      * **The content type of the content as a [MIME media type](https://en.wikipedia.org/wiki/Media_type)**
-
-    The creation of the resource will return a JSON document containing ContentBlobs corresponding to the remote ContentBlob and to the ContentBlob placeholder. The blobs contain a URI to their location.
-
-    A placeholder can then be satisfied by uploading a file to the location URI. For example by a placeholder such as 
-
-    ```
-    "content_blobs": [
-      {
-        "original_filename": "a_pdf_file.pdf",
-        "content_type": "application/pdf",
-        "link": "http://www.fairdomhub.org/data_files/57/content_blobs/313"
-      }
-    ],
-    ```
-
-    may be satisfied by uploading a file to http://www.fairdomhub.org/data_files/57/content_blobs/313 using the [uploadDataFileContent](#operation/uploadDataFileContent) operation
-
-    The content of a resource may be downloaded by first *reading* the resource and then *downloading* the ContentBlobs from their URI.
-
-    ===
   x-logo:
     url: ./definitions/seek.png
     backgroundColor: '#FFFFFF'
@@ -198,429 +104,66 @@ tags:
     * 403 Forbidden
     * 404 Not found
   x-traitTag: true
-- name: upload
-  description: |
-    **Upload** operations are used to satisfy the required content of previously created resources such as [**DataFile**](#tag/dataFiles), [**Document**](#tag/documents), [**Model**](#tag/models), [**SOP**](#tag/sops) or [**Presentation**](#tag/presentations). See [**ContentBlob**](#section/ContentBlob) for more details.
-  x-traitTag: true
-- name: download
-  description: |
-    **Download** operations are used to retrieve the content of resources such as [**DataFile**](#tag/dataFiles), [**Document**](#tag/documents), [**Model**](#tag/models), [**SOP**](#tag/sops) or [**Presentation**](#tag/presentations). See [**ContentBlob**](#section/ContentBlob) for more details.
-  x-traitTag: true
 
 - name: search
   description: |
 - name: institutions
-  description: |
+  description: |-
     An **Institition** in SEEK is where someone is employed or works. It is normal for an **Institution** to have a physical location - a set of buildings in which [**People**](#tag/people) work.
 
     SEEK does not impose any constraints on the granularity of the **Institution** so it may represent a whole university or company, or be limited to a specific site.
-
-    An **Institution** has the following associated information:
-
-    * **The title of the Institution**
-    * A reference to an avatar / logo for the **Institution**
-    * The two letter country code
-    * The name of the city where the **Institution** has its headquarters
-    * The address of the **Institution** within the city
-    * A URI to the webpage for the **Institution**
-
-    A response for an **Institution** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
-
-    * References to registered [**People**](#tag/people) who work at the **Institution**
-    * References to the [**Projects**](#tag/projects) in which the **Institution** is a partner.
 - name: people
-  description: |-
+  description: |
     A **Person** in SEEK is someone who participates directly or indirectly in the scientific research described within SEEK. A person may:
 
     * work at one or more [**Institutions**](#tag/institutions)
     * work on one or more [**Projects**](#tag/projects)
 
     A **Person** can have helped to carry out [**Investigations**](#tag/investigatioons), [**Studies**](#tag/studies) and [**Assays**](#tag/assays), and to have been involved in the creation of resources such as [**DataFles**](#tag/dataFiles).
-
-    A **Person** has the following associated information:
-
-    * **The person's first name**
-    * **The person's last name**
-    * A personal description
-    * An email address for the **Person**
-    * A URI to a webpage about the **Person**
-    * The [ORCID](https://orcid.org/) for the **Person**
-    * A list of strings describing the expertise of the **Person**
-    * A list of strings describing the tools that the **Person** uses
-    * The telephone number of the **Person**, including country code
-    * The [Skype](https://www.skype.com) name of the **Person**
-
-    A response for a **Person** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
-
-    * A URI to an image used as the **Person's** avatar
-    * The **Person's** title, made from their first and last name
-    * A list of the [**Project**](#tag/projects) positions held by the **Person**
-
-    * References to the [**Projects**](#tag/projects) in which the **Person** is involved
-    * References to the [**Institutions**](#tag/institution) where the **Person** works
-    * References to the [**Investigations**](#tag/investigation) in which the **Person** is involved
-    * References to the [**Studies**](#tag/study) in which the **Person** is involved
-    * References to the [**Assays**](#tag/assay) in which the **Person** is involved
-    * References to the [**DataFiles**](#tag/dataFile) associated with the **Person**
-    * References to the [**Documents**](#tag/document) associated with the **Person**
-    * References to the [**Models**](#tag/model) associated with the **Person**
-    * References to the [**SOPs**](#tag/sop) associated with the **Person**
-    * References to the [**Publications**](#tag/publication) associated with the **Person**
-    * References to the [**Presentations**](#tag/presentation) associated with the **Person**
-    * References to the [**Events**](#tag/event) associated with the **Person**
-
-    **Note that in the Person response the email address is encoded in mbox_sha1sum**
 - name: programmes
-  description: |
+  description: |-
     **Programmes** are an umbrella group for one or more [**Projects**](#tag/projects). They are usually, but not always, associated with a particular funded piece of research.
-
-    A **Programme** has the following associated information:
-
-    * ** The title of the Programme **
-    * A description of the **Programme**
-    * A URI to a webpage about the **Programme**
-    * A string containing details about the funding of the **Programme**
-    * A list of the funding codes for the **Programme**
-
-    * References to the [**People**](#tag/people) who are administrators for the **Programme**
-    * References to [**Projects**](#tag/peojects) that are part of the **Programme**
-
-    A response for a **Programme** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
-
-    * References to [**People**](#tag/people) who work on the **Programme** and are not administrators
-    * References to [**Institutions**](#tag/institutions) that are involved in the **Programme**
-    * References to [**Investigations**](#tag/investigations) that are part of the **Programme**
-    * References to [**Studies**](#tag/studies) that are part of the **Programme**
-    * References to [**Assays**](#tag/assays) that are part of the **Programme**
-    * References to [**DataFiles**](#tag/dataFiles) that belong to [**Projects**](#tag/projects) that are part of the **Programme**
-    * References to [**Documents**](#tag/documents) that belong to [**Projects**](#tag/projects) that are part of the **Programme**
-    * References to [**Models**](#tag/models) that belong to [**Projects**](#tag/projects) that are part of the **Programme**
-    * References to [**Sops**](#tag/sops) that belong to [**Projects**](#tag/projects) that are part of the **Programme**
-    * References to [**Publications**](#tag/publications) that belong to [**Projects**](#tag/projects) that are part of the **Programme**
-    * References to [**Presentations**](#tag/presentations) that belong to [**Projects**](#tag/projects) that are part of the **Programme**
-    * References to [**Events**](#tag/events) that are held by or attended by [**Projects**](#tag/projects) that are part of the **Programme**
 - name: projects
-  description: |
+  description: |-
     A **Project** is an area of research carried out as part of a [**Programme**](#tag/programmes) and consisting of one or more [**Investigations**](#tag/investigations).
-
-    A **Project** has the following associated information:
-
-    * **The title of the Project**
-    * A reference to an avatar / logo for the **Project**
-    * A description of the **Project**
-    * A URI to a webpage about the **Project**
-    * A URI to the wiki of the **Project**
-    * The default [**Policy**](#section/Policy) applied to objects belonging to the **Project**
-    * The default [**License**](#section/License) applied to objects belonging to the **Project**
-
-    * References to the [**Programmes**](#tag/programmes) that the **Project** is part of
-    * References to the [**Organisms**](#tag/organisms) studied by the **Project**
-
-    A response for a **Project** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
-
-    * References to [**People**](#tag/people) who work on the **Project**
-    * References to [**Institutions**](#tag/institutions) that are involved in the **Project**
-    * References to [**Investigations**](#tag/investigations) that are part of the **Project**
-    * References to [**Studies**](#tag/studies) that are part of the **Project**
-    * References to [**Assays**](#tag/assays) that are part of the **Project**
-    * References to [**DataFiles**](#tag/dataFiles) that belong to the [**Project**](#tag/projects)
-    * References to [**Documents**](#tag/documents) that belong to the [**Project**](#tag/projects)
-    * References to [**Models**](#tag/models) that belong to the [**Project**](#tag/projects)
-    * References to [**Sops**](#tag/sops) that belong to the [**Project**](#tag/projects)
-    * References to [**Publications**](#tag/publications) that belong to the [**Project**](#tag/projects)
-    * References to [**Presentations**](#tag/presentations) that belong to the [**Project**](#tag/projects)
-    * References to [**Events**](#tag/events) that are held by or attended by the [**Project**](#tag/projects)
 - name: investigations
   description: |
     **Investigations** are high level descriptions of the research carried out by a particular [**Project**](#tag/projects). They typically reflect the general aims of the [**Project**](#tag/projects), for example, carbon metabolism or anaerobic/aerobic transitions.
-
-    An **Investigation** has the following associated information:
-
-    * **The title of the Investigation**
-    * A description of the **Investigation**
-    * A string listing other creators of the **Investigation**
-    * The sharing [**Policy**](#section/Policy) of the **Investigation**
-    * References to the [**People**](#tag/people) who created the **Investigation**
-    * References to the [**Projects**](#tag/projects) which the **Investigation** is part of
-    * References to [**Publications**](#tag/publications) about the **Investigation**
-
-    A response for an **Investigation** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
-
-    * A reference to the [**Person**](#tag/people) who registered (submitted) the **Investigation** into SEEK
-    * References to [**Studies**](#tag/studies) that are part of the **Investigation**
-    * References to [**Assays**](#tag/assays) that are part of the **Investigation**
-    * References to [**DataFiles**](#tag/dataFiles) that belong to the **Investigation**
-    * References to [**Documents**](#tag/documents) that belong to the **Investigation**
-    * References to [**Models**](#tag/models) that belong to the **Investigation**
-    * References to [**Sops**](#tag/sops) that belong to the **Investigation**
-    * References to [**Publications**](#tag/publications) that belong to the **Investigation**
 - name: studies
-  description: |
+  description: |-
     A **Study** is a series of experiments (or [**Assays**](#tag/assays) ) which can be combined to answer a particular biological question. These experiments might be a series of the same type of [**Assay**](#tag/assays) (for example, microarrays for different conditions), or they may be a collection of different types of [**Assay**](#tag/assays) (e.g. a combination of array and mass spec measurements).
-
-    A **Study** has the following associated information:
-
-    * **The title of the Study**
-    * A description of the **Study**
-    * A string listing experimentalists of the **Study**
-    * A string listing other creators of the **Study**
-    * A string containing the id of the [**Person**](#tag/people) responsible for the **Study**
-    * The sharing [**Policy**](#section/Policy) of the **Study**
-    * References to the [**People**](#tag/people) who created the **Study**
-    ** A reference to the [Investigation](#tag/investigations) containing the Study**
-    * References to [**Publications**](#tag/publications) about the **Study**
-
-    A response for a **Study** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
-
-    * A reference to the [**Person**](#tag/people) who registered (submitted) the **Study** into SEEK
-    * References to the [**Projects**](#tag/projects) that indirectly contain the **Study**
-    * References to the [**Assays**](#tag/assays) that belong to the **Stuady**
-    * References to [**DataFiles**](#tag/dataFiles) that belong to the **Study**
-    * References to [**Documents**](#tag/documents) that belong to the **Study**
-    * References to [**Models**](#tag/models) that belong to the **Study**
-    * References to [**Sops**](#tag/sops) that belong to the **Study**
-    * References to [**Publications**](#tag/publications) that belong to the **Study**
 - name: assays
-  description: |
+  description: |-
     An **Assay** describes a particular experiment. It allows you to associate [**DataFiles**](#tag/dataFiles), [**SOPs**](#tag/sops) and [**Models**](#tag/models) together as well as describing the type of **Assay** and any technology required to perform the experiment.
-
-    An **Assay** has the following associated information:
-
-    * **The title of the Assay**
-    * A description of the **Assay**
-    * A string listing other creators of the **Assay**
-    * A string containing the abbreviated form of the kind of **Assay** - normally *EXP* for experimental or *MOD* for modelling
-    * A URI to the type of **Assay** resolving to an entry in the [JERM ontology](http://www.mygrid.org.uk/ontology/JERMOntology)
-    * A URI to the technology used in the **Assay** resolving to an entry in the [JERM ontology](http://www.mygrid.org.uk/ontology/JERMOntology)
-    * The sharing [**Policy**](#section/Policy) of the **Assay**
-    * References to the [**People**](#tag/people) who created the **Assay**
-    * A singleton reference to the [**Study**](#tag/studies) which the **Assay** is part of
-    * References to [**Publications**](#tag/publications) about the **Assay**
-    * References to [**DataFiles**](#tag/dataFiles) that belong to the **Assay**
-    * References to [**Documents**](#tag/documents) that belong to the **Assay**
-    * References to [**Models**](#tag/models) that belong to the **Assay**
-    * References to [**Sops**](#tag/sops) that belong to the **Assay**
-    * References to the [**Organisms**](#tag/organisms) studied in the **Assay**
-
-    A response for an **Assay** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
-
-    * A singleton reference to the [**Investigation**](#tag/investigations) which the **Assay** is part of
-    * References to the [**Projects**](#tag/projects) that indirectly contain the **Assay**
 - name: dataFiles
   description: |
     A **dataFile** can be any file containing data relevant to the [**Assay**](#tag/assays) (raw data, processed data, calibration information etc). They can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc).
-
-    **Although dataFiles are versioned, this is out of scope for the current release of the API.**
-
-    A **DataFile** has the following associated information:
-
-    * **The title of the DataFile**
-    * **The specification for the [ContentBlobs](#section/ContentBlob) in the DataFile**
-    * **References to the [Projects](#tag/projects) documented**
-    * A string containing a list of tags for the **DataFile**
-    * A description of the **DataFile**
-    * The [**License**](#section/Licence) applied to the **DataFile**
-    * The sharing [**Policy**](#section/Policy) applied to the **DataFile**
-    * A string listing other creators of the **DataFile**
-    * References to the [**People**](#tag/people) who wrote the **DataFile**
-    * References to the [**Assays**](#tag/assays) associated with the **DataFile**
-    * References to the [**Publications**](#tag/publications) associated with the **DataFile**
-    * References to the [**Events**](#tag/events) associated with the **DataFile**
-
-    A response for a **DataFile** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
-
-    * ** An array of the versions of the DataFile**
-    * ** A number indicating the latest version**
-    * ** The time when the DataFile was created**
-    * ** The last time the DataFile was updated**
-    * A reference to the [**Person**](#tag/people) who submitted the **DataFile**
-    * References to the [**Investigations**](#tag/investigations) associated with the **DataFile**
-    * References to the [**Studies**](#tag/studies) associated with the **DataFile**
 - name: documents
   description: |
     A **Document** is any documentation that describes an [**Investigation**](#tag/investigations), [**Study**](#tag/studies) or [**Assay**](#tag/assays). The content of a **Document** is descriptive and it must not contain any data that is consumed or produced by an [**Assay**](#tag/assays).
-
-    **Although documents are versioned, this is out of scope for the current release of the API.**
-
-    A **Document** has the following associated information:
-
-    * **The title of the Document**
-    * **The specification for the [ContentBlobs](#section/ContentBlob) in the Document**
-    * **References to the [Projects](#tag/projects) documented**
-    * A string containing a list of tags for the **Document**
-    * A description of the **Document**
-    * The [**License**](#section/Licence) applied to the **Document**
-    * The sharing [**Policy**](#section/Policy) applied to the **Document**
-    * A string listing other creators of the **Document**
-    * References to the [**People**](#tag/people) who wrote the **Document**
-    * References to the [**Assays**](#tag/assays) documented
-
-    A response for a **Document** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
-
-    * ** An array of the versions of the Document**
-    * ** A number indicating the latest version**
-    * ** The time when the Document was created**
-    * ** The last time the Document was updated**
-    * A reference to the [**Person**](#tag/people) who submitted the **Document**
-    * References to the [**Investigations**](#tag/investigations) associated with the **Document**
-    * References to the [**Studies**](#tag/studies) associated with the **Document**
-    * References to the [**Publications**](#tag/publications) associated with the **Document**
 - name: models
-  description: |
+  description: |-
     A **Model** is a computer model of a biological or biochemical network or process.Some **Models** may be simulated using the JWSOnline system.
-
-    **Although models are versioned, this is out of scope for the current release of the API.**
-
-    A **Model** has the following associated information:
-
-    * **The title of the Model**
-    * **The specification for the [ContentBlobs](#section/ContentBlob) in the Model**
-    * **References to the [Projects](#tag/projects) documented**
-    * A string containing a list of tags for the **Model**
-    * A description of the **Model**
-    * The [**License**](#section/Licence) applied to the **Model**
-    * The sharing [**Policy**](#section/Policy) applied to the **Model**
-    * A string listing other creators of the **Model**
-    * A string specifying the **Model** type
-    * A string specifying the **Model** format
-    * A string specifying the execution environment of the **Model**
-    * References to the [**People**](#tag/people) who wrote the **Model**
-    * References to the [**Assays**](#tag/assays) associated with the **Model**
-    * References to the [**Publications**](#tag/publications) associated with the **Model**
-
-    A response for a **Model** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
-
-    * ** An array of the versions of the Model**
-    * ** A number indicating the latest version**
-    * ** The time when the Model was created**
-    * ** The last time the Model was updated**
-    * A reference to the [**Person**](#tag/people) who submitted the **Model**
-    * References to the [**Investigations**](#tag/investigations) associated with the **Model**
-    * References to the [**Studies**](#tag/studies) associated with the **Model**
 - name: publications
   description: |
-    A **Publication** is a publication about a [**Project**](#tag/projects.md), It normally has a [DOI](http://www.doi.org/) or [PubMed ID](https://en.wikipedia.org/wiki/Wikipedia:PMID).
-
-    The response to a read of a **Publication** includes the following information:
-
-    * **The title of the Publication**
-    * **The journal in which the Publication is published**
-    * **A string containing the date of publication**
-    * **The PubMed ID**
-    * **The preferred string for citing the Publication**
-    * **A link to the Publication**
-    * The DOI of the **Publication**
-    * A list of strings for the authors
-    * The sharing [**Policy**](#section/Policy) for the **Publication**
-    * References to the [**People**](#tag/people) who wrote the **Publication**
-    * References to the [**Projects**](#tag/projects) described in the **Publication**
-    * References to the [**Investigations**](#tag/investigations) described in the **Publication**
-    * References to the [**Studies**](#tag/studies) described in the **Publication**
-    * References to the [**Assays**](#tag/assays) described in the **Publication**
-    * References to [**DataFiles**](#tag/dataFiles) that were used in the work described in the **Publication**
-    * References to [**Models**](#tag/models) that were used in the work described in the **Publication**
-    * References to related **Publications**
-    * References to [**Presentations**](#tag/presentations) associated with the **Publication**
-    * References to [**Events**](#tag/events) associated with the **Publication**
+    A **Publication** is a publication about a [**Project**](#tag/projects.md), It normally has a DOI or PubMed ID.
 - name: sops
-  description: |
-    **SOPs** are standard operating procedures which describe the protocol required to reproduce an [**Assay**](#tag/assays). They can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc). Relevant **SOPs** can be linked directly to the [**Assay**](#tag/assays).
-
-    **Although SOPs are versioned, this is out of scope for the current release of the API.**
-
-    A **SOP** has the following associated information:
-
-    * **The title of the SOP**
-    * **The specification for the [ContentBlobs](#section/ContentBlob) in the SOP**
-    * **References to the [Projects](#tag/projects) relevant to the SOP**
-    * A string containing a list of tags for the **SOP**
-    * A description of the **SOP**
-    * The [**License**](#section/Licence) applied to the **SOP**
-    * The sharing [**Policy**](#section/Policy) applied to the **SOP**
-    * A string listing other creators of the **SOP**
-    * References to the [**People**](#tag/people) who wrote the **SOP**
-    * References to the [**Assays**](#tag/assays) relevant to the SOP
-
-    A response for a **SOP** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
-
-    * ** An array of the versions of the SOP**
-    * ** A number indicating the latest version**
-    * ** The time when the SOP was created**
-    * ** The last time the SOP was updated**
-    * A reference to the [**Person**](#tag/people) who submitted the **SOP**
-    * References to the [**Investigations**](#tag/investigations) associated with the **SOP**
-    * References to the [**Studies**](#tag/studies) associated with the **SOP**
-    * References to the [**Publications**](#tag/publications) associated with the **SOP**
-- name: events
   description: |-
+    **SOPs** are standard operating procedures which describe the protocol required to reproduce an [**Assay**](#tag/assays). They can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc). Relevant **SOPs** can be linked directly to the [**Assay**](#tag/assays).
+- name: events
+  description: |
     An **Event** is an event that is associated with one or more [**Projects**](#tag/projects), happening on specified dates and at a specific, actual or virtual, location.
 
-    An **Event** has the following associated information:
-
-    * **The title of the Event**
-    * **The start date of the Event**
-    * A description of the **Event**
-    * A URI to a webpage about the **Event**
-    * The two letter country code for where the **Event** is
-    * The name of the city where the **Event** takes place
-    * The address within the city where the **Event** takes place
-    * The end date of the **Event**
-    * The sharing [**Policy**](#section/Policy) for the **Event**
-    * **References to the [Projects](#tag/projects) associated with the Event**
-    * References to any [**DataFiles**](#tag/dataFiles)  associated with the **Event**
-    * References to any [**Publications**](#tag/publications)  associated with the **Event**
-    * References to any [**Presentations**](#tag/presentations)  associated with the **Event**
-
-    A response for an **Event** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
-
-    * Reference to the [**Person**](#tag/people) who submitted the **Event**
+    An **Event** may have one or more [**Publications**](#tag/publications), [**DataFiles**](#tag/dataFiles) or [**Presentations**](#tag/presentations) which are presented at, or are outcomes of, the **Event**.
 - name: presentations
-  description: |-
-    A **Presentation** is a presentation about one or more [**Projects**](#tag/projects).
-
-    **Although presentations are versioned, this is out of scope for the current release of the API.**
-
-    A **Presentation** has the following associated information:
-
-    * **The title of the Presentation**
-    * **The specification for the [ContentBlobs](#section/ContentBlob) in the Presentation**
-    * **References to the [Projects](#tag/projects) documented**
-    * A string containing a list of tags for the **Presentation**
-    * A description of the **Presentation**
-    * The [**License**](#section/Licence) applied to the **Presentation**
-    * The sharing [**Policy**](#section/Policy) applied to the **Presentation**
-    * A string listing other creators of the **Presentation**
-    * References to the [**People**](#tag/people) who wrote the **Presentation**
-    * References to the [**Assays**](#tag/assays) associated with the **Presentation**
-    * References to the [**Publications**](#tag/publications) associated with the **Presentation**
-    * References to the [**Events**](#tag/events) associated with the **Presentation**
-
-    A response for a **Presentation** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
-
-    * ** An array of the versions of the Presentation**
-    * ** A number indicating the latest version**
-    * ** The time when the Presentation was created**
-    * ** The last time the Presentation was updated**
-    * A reference to the [**Person**](#tag/people) who submitted the **Presentation**
-    * References to the [**Investigations**](#tag/investigations) associated with the **Presentation**
-    * References to the [**Studies**](#tag/studies) associated with the **Presentation**
-- name: organisms
   description: |
+    A **Presentation** is a presentation about one or more [**Projects**](#tag/projects).
+- name: organisms
+  description: |-
     An **Organism** is a organism as identified by an entry in the [NCBI ontology](http://www.ncbi.nlm.nih.gov/taxonomy).
-
-    The response to a read of an **Organism** includes the following information:
-
-    * **The title of the Organism**
-    * **A URI referencing an ontology entry describing the Organism**
-    * **The common abbreviation for the ontology**
-    * **References to [Projects](#tag/projects) that use the Organism**
-    * **References to [Assays](#tag/assays) that use the Organism**
-    * **References to [Models](#tag/models) that simulate the Organism**
 - name: sampleTypes
   description: |
     A **SampleType** is a definition of the information that is held about a physical or virtual sample.
-
-    **In the current release of the API it is only possible to list references to the SampleTypes. Additional functionality will be available in future versions.**
 x-tagGroups:
 - name: operation types
   tags:
@@ -629,8 +172,6 @@ x-tagGroups:
   - read
   - update
   - delete
-  - upload
-  - download
 
 - name: Search
   tags:
@@ -772,17 +313,18 @@ paths:
                 type: data_files
                 attributes:
                   title: Lactate flux inhibition data
-                links:
-                  self: /data_files/1213
+                  links:
+                    self: /data_files/1213
               - id: '70'
                 type: data_files
                 attributes:
                   title: Characterization of kinetics of the lactate dehydrogenase
                     of S. pyogenes
-                links:
-                  self: /data_files/70
+                  links:
+                    self: /data_files/70
               jsonapi:
                 version: '1.0'
+                links: {}
               meta:
                 base_url: https://fairdomhub.org
                 api_version: '0.1'
@@ -856,9 +398,8 @@ paths:
                   policy:
                     access: download
                     permissions:
-                    - resource:
-                        type: projects
-                        id: '442'
+                    - resource_type: projects
+                      resource_id: '442'
                       access: manage
                   title: A Maximal experimental Assay
                   description: A Western Blot Assay
@@ -873,6 +414,10 @@ paths:
                   technology_type:
                     label:
                     uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
+                  tags:
+                  - Assay-tag1
+                  - Assay-tag2
+                  - Assay-tag3
                 relationships:
                   creators:
                     data:
@@ -970,9 +515,8 @@ paths:
                   policy:
                     access: download
                     permissions:
-                    - resource:
-                        type: projects
-                        id: '585'
+                    - resource_type: projects
+                      resource_id: '585'
                       access: manage
                   title: A Maximal Assay
                   description: A Western Blot Assay
@@ -987,6 +531,10 @@ paths:
                   technology_type:
                     label:
                     uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
+                  tags:
+                  - Assay-tag1
+                  - Assay-tag2
+                  - Assay-tag3
                 relationships:
                   creators:
                     data:
@@ -1067,6 +615,7 @@ paths:
                 id: '267'
                 type: assays
                 attributes:
+                  tags:
                   title: Culturing and synchronisation of P. falciparum
                   description:
                   assay_class:
@@ -1111,8 +660,6 @@ paths:
                   sops:
                     data: []
                   publications:
-                    data: []
-                  documents:
                     data: []
                 links:
                   self: /assays/267
@@ -1192,12 +739,6 @@ paths:
       tags:
       - create
       - dataFiles
-      parameters:
-      - in: body
-        name: dataFile
-        description: The dataFile to create.
-        schema:
-          $ref: '#/definitions/dataFilePost'
       responses:
         <<: *CreateType
         '201':
@@ -1213,9 +754,8 @@ paths:
                   policy:
                     access: download
                     permissions:
-                    - resource:
-                        type: projects
-                        id: '2058'
+                    - resource_type: projects
+                      resource_id: '2058'
                       access: edit
                   title: A Maximal Data File
                   description: This is the description
@@ -1339,7 +879,7 @@ paths:
                   - version: 2
                     revision_comments:
                     url: https://fairdomhub.org/data_files/1152?version=2
-                  version: 2
+                  version: '2'
                   revision_comments:
                   created_at: '2014-12-08T17:25:32.000Z'
                   updated_at: '2015-05-07T12:16:24.000Z'
@@ -1531,7 +1071,7 @@ paths:
       produces:
       - '*/*'
       tags:
-      - upload
+      - update
       - dataFiles
       responses:
         '200':
@@ -1557,7 +1097,7 @@ paths:
       produces:
       - '*/*'
       tags:
-      - download
+      - read
       - dataFiles
       responses:
         <<: *ReadType
@@ -1610,8 +1150,6 @@ paths:
         <<: *CreateType
         '201':
           description: Created
-          schema:
-            $ref: '#/definitions/documentResponse'
           examples:
             application/json:
               data:
@@ -1621,9 +1159,8 @@ paths:
                   policy:
                     access: download
                     permissions:
-                    - resource:
-                        id: '359'
-                        type: projects
+                    - resource_type: projects
+                      resource_id: '359'
                       access: edit
                   title: A Maximal Document
                   description: This is the description
@@ -1817,67 +1354,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
-  /documents/{id}/content_blobs/{blob_id}:
-    put:
-      operationId: uploadDocumentContent
-      description: |-
-        Description of Document Content upload
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: The document content to upload
-        type: integer
-        default: 1152
-      - name: blob_id
-        in: path
-        required: true
-        description: The content identifier to upload
-        type: integer
-        default: 1831
-      - in: body
-        name: blobContent
-        description: The blob content to upload
-        schema:
-          type: string
-          format: binary
-      consumes:
-      - application/octet-stream
-      produces:
-      - '*/*'
-      tags:
-      - upload
-      - documents
-      responses:
-        '200':
-          description: Success
-  /documents/{id}/content_blobs/{blob_id}/download:
-    parameters:
-    - name: id
-      in: path
-      required: true
-      description: The document to fetch
-      type: integer
-      default: 1152
-    - name: blob_id
-      in: path
-      required: true
-      description: The blob to download
-      type: integer
-      default: 1831
-    get:
-      operationId: downloadDocumentContent
-      description: |-
-        Description of Document Content download
-      produces:
-      - '*/*'
-      tags:
-      - download
-      - documents
-      responses:
-        <<: *ReadType
-        '200':
-          description: Success
   /events:
     get:
       operationId: listEvents
@@ -1954,9 +1430,8 @@ paths:
                   policy:
                     access: view
                     permissions:
-                    - resource:
-                        id: '242'
-                        type: projects
+                    - resource_type: projects
+                      resource_id: '242'
                       access: edit
                   title: A Maximal Event
                   description: This is the description
@@ -2129,7 +1604,7 @@ paths:
                 type: institutions
                 attributes:
                   title: CSIC Granada
-                links:
+                  links:
                   self: /institutions/3
               jsonapi:
                 version: '1.0'
@@ -2372,13 +1847,11 @@ paths:
                   policy:
                     access: download
                     permissions:
-                    - resource:
-                        id: '809'
-                        type: projects
+                    - resource_type: projects
+                      resource_id: '809'
                       access: manage
-                    - resource:
-                        id: '859'
-                        type: projects
+                    - resource_type: projects
+                      resource_id: '859'
                       access: manage
                   title: A Maximal Investigation
                   description: This is a more complex investigation
@@ -2481,13 +1954,11 @@ paths:
                   policy:
                     access: download
                     permissions:
-                    - resource:
-                        id: '1293'
-                        type: projects
+                    - resource_type: projects
+                      resource_id: '1293'
                       access: manage
-                    - resource:
-                        id: '1343'
-                        type: projects
+                    - resource_type: projects
+                      resource_id: '1343'
                       access: manage
                   title: A Maximal Investigation
                   description: This is a more complex investigation
@@ -2628,9 +2099,8 @@ paths:
                   policy:
                     access: download
                     permissions:
-                    - resource:
-                        id: '1548'
-                        type: projects
+                    - resource_type: projects
+                      resource_id: '1548'
                       access: edit
                   title: A Maximal Model
                   description: This is the description
@@ -2846,40 +2316,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
-  /models/{id}/content_blobs/{blob_id}:
-    put:
-      operationId: uploadModelContent
-      description: |-
-        Description of Model Content upload
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: The model content to upload
-        type: integer
-        default: 1152
-      - name: blob_id
-        in: path
-        required: true
-        description: The content identifier to upload
-        type: integer
-        default: 1831
-      - in: body
-        name: blobContent
-        description: The blob content to upload
-        schema:
-          type: string
-          format: binary
-      consumes:
-      - application/octet-stream
-      produces:
-      - '*/*'
-      tags:
-      - upload
-      - models
-      responses:
-        '200':
-          description: Success
   /models/{id}/content_blobs/{blob_id}/download:
     parameters:
     - name: id
@@ -2895,9 +2331,9 @@ paths:
       type: integer
       default: 1850
     get:
-      operationId: downloadModelContent
-      description: |-
-        Description of Model Content download
+      operationId: readModelContent
+#      description:
+#        $ref: ../descriptions/readModelContent.md
       tags:
       - read
       - models
@@ -2975,46 +2411,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/organismResponse'
-          examples:
-            application/json:
-              data:
-                id: '1933753696'
-                type: organisms
-                attributes:
-                  title: Plasmodium falciparum
-                  concept_uri: http://purl.bioontology.org/ontology/NCBITAXON/5833
-                  ontology_id: NCBITAXON
-                relationships:
-                  projects:
-                    data:
-                    - id: '17'
-                      type: projects
-                  assays:
-                    data:
-                    - id: '294'
-                      type: assays
-                    - id: '295'
-                      type: assays
-                    - id: '296'
-                      type: assays
-                  models:
-                    data:
-                    - id: '175'
-                      type: models
-                    - id: '176'
-                      type: models
-                    - id: '177'
-                      type: models
-                links:
-                  self: /organisms/1933753696
-                meta:
-                  created: '2015-03-03T09:52:07.000Z'
-                  modified: '2015-03-03T09:52:07.000Z'
-                  api_version: '0.1'
-                  uuid: 335d74e0-a6be-0135-6773-549f350973c0
-                  base_url: https://fairdomhub.org
-              jsonapi:
-                version: '1.0'
   /people:
     get:
       operationId: listPeople
@@ -3160,148 +2556,145 @@ paths:
             $ref: '#/definitions/personResponse'
           examples:
             application/json:
-              data:
-                id: '132'
-                type: people
-                attributes:
-                  avatar: /people/132/avatars/4
-                  title: Katy Wolstencroft
-                  description: I am a Research Fellow at the University of Manchester,
-                    working in Bioinformatics and Computer Science. I am also a guest
-                    researcher at the Vrije Universiteit.My research interests include
-                    scientific workflows, semantic discovery, and applying ontology
-                    technologies to biological data
-                  first_name: Katy
-                  last_name: Wolstencroft
-                  web_page:
-                  orcid:
-                  mbox_sha1sum: 3dabdf312876f4b139507ce80b36e872e10164ae
-                  phone: '48229'
-                  skype_name:
-                  expertise:
-                  - Biochemistry
-                  - Bioinformatics
-                  - Data Management
-                  tools:
-                  - Data Management
-                  - Databases
-                  - Ontologies
-                  - Taverna
-                  - Transcriptomics
-                  - Web services
-                  - Workflows
-                  project_positions:
-                relationships:
-                  projects:
-                    data:
-                    - id: '12'
-                      type: projects
-                    - id: '15'
-                      type: projects
-                  institutions:
-                    data:
-                    - id: '7'
-                      type: institutions
-                    - id: '62'
-                      type: institutions
-                  investigations:
-                    data:
-                    - id: '2'
-                      type: investigations
-                    - id: '4'
-                      type: investigations
-                  studies:
-                    data:
-                    - id: '4'
-                      type: studies
-                    - id: '7'
-                      type: studies
-                  assays:
-                    data:
-                    - id: '2'
-                      type: assays
-                    - id: '3'
-                      type: assays
-                    - id: '4'
-                      type: assays
-                    - id: '6'
-                      type: assays
-                    - id: '10'
-                      type: assays
-                    - id: '11'
-                      type: assays
-                    - id: '12'
-                      type: assays
-                    - id: '13'
-                      type: assays
-                  data_files:
-                    data:
-                    - id: '4'
-                      type: data_files
-                    - id: '5'
-                      type: data_files
-                    - id: '6'
-                      type: data_files
-                    - id: '8'
-                      type: data_files
-                    - id: '15'
-                      type: data_files
-                    - id: '17'
-                      type: data_files
-                  models:
-                    data:
-                    - id: '19'
-                      type: models
-                    - id: '20'
-                      type: models
-                  sops:
-                    data:
-                    - id: '13'
-                      type: sops
-                    - id: '15'
-                      type: sops
-                  publications:
-                    data:
-                    - id: '3'
-                      type: publications
-                    - id: '5'
-                      type: publications
-                    - id: '7'
-                      type: publications
-                    - id: '9'
-                      type: publications
-                    - id: '11'
-                      type: publications
-                    - id: '13'
-                      type: publications
-                    - id: '14'
-                      type: publications
-                    - id: '15'
-                      type: publications
-                    - id: '34'
-                      type: publications
-                    - id: '38'
-                      type: publications
-                    - id: '39'
-                      type: publications
-                  presentations:
-                    data:
-                    - id: '7'
-                      type: presentations
-                  events:
-                    data: []
-                  documents:
-                    data: []
-                links:
-                  self: /people/132
-                meta:
-                  created: '2009-01-15T12:24:02.000Z'
-                  modified: '2014-04-09T11:24:47.000Z'
-                  api_version: '0.1'
-                  uuid: 7989c509-5ac4-47bf-b161-30193b131379
-                  base_url: https://testing.sysmo-db.org
-              jsonapi:
-                version: '1.0'
+              id: '132'
+              type: people
+              attributes:
+                avatar: /people/132/avatars/4
+                title: Katy Wolstencroft
+                description: I am a Research Fellow at the University of Manchester,
+                  working in Bioinformatics and Computer Science. I am also a guest
+                  researcher at the Vrije Universiteit.My research interests include
+                  scientific workflows, semantic discovery, and applying ontology
+                  technologies to biological data
+                first_name: Katy
+                last_name: Wolstencroft
+                web_page:
+                orcid:
+                mbox_sha1sum: 3dabdf312876f4b139507ce80b36e872e10164ae
+                phone: '48229'
+                skype_name:
+                expertise:
+                - Biochemistry
+                - Bioinformatics
+                - Data Management
+                tools:
+                - Data Management
+                - Databases
+                - Ontologies
+                - Taverna
+                - Transcriptomics
+                - Web services
+                - Workflows
+                project_positions:
+              relationships:
+                projects:
+                  data:
+                  - id: '12'
+                    type: projects
+                  - id: '15'
+                    type: projects
+                institutions:
+                  data:
+                  - id: '7'
+                    type: institutions
+                  - id: '62'
+                    type: institutions
+                investigations:
+                  data:
+                  - id: '2'
+                    type: investigations
+                  - id: '4'
+                    type: investigations
+                studies:
+                  data:
+                  - id: '4'
+                    type: studies
+                  - id: '7'
+                    type: studies
+                assays:
+                  data:
+                  - id: '2'
+                    type: assays
+                  - id: '3'
+                    type: assays
+                  - id: '4'
+                    type: assays
+                  - id: '6'
+                    type: assays
+                  - id: '10'
+                    type: assays
+                  - id: '11'
+                    type: assays
+                  - id: '12'
+                    type: assays
+                  - id: '13'
+                    type: assays
+                data_files:
+                  data:
+                  - id: '4'
+                    type: data_files
+                  - id: '5'
+                    type: data_files
+                  - id: '6'
+                    type: data_files
+                  - id: '8'
+                    type: data_files
+                  - id: '15'
+                    type: data_files
+                  - id: '17'
+                    type: data_files
+                models:
+                  data:
+                  - id: '19'
+                    type: models
+                  - id: '20'
+                    type: models
+                sops:
+                  data:
+                  - id: '13'
+                    type: sops
+                  - id: '15'
+                    type: sops
+                publications:
+                  data:
+                  - id: '3'
+                    type: publications
+                  - id: '5'
+                    type: publications
+                  - id: '7'
+                    type: publications
+                  - id: '9'
+                    type: publications
+                  - id: '11'
+                    type: publications
+                  - id: '13'
+                    type: publications
+                  - id: '14'
+                    type: publications
+                  - id: '15'
+                    type: publications
+                  - id: '34'
+                    type: publications
+                  - id: '38'
+                    type: publications
+                  - id: '39'
+                    type: publications
+                presentations:
+                  data:
+                  - id: '7'
+                    type: presentations
+                events:
+                  data: []
+                documents:
+                  data: []
+              links:
+                self: /people/132
+              meta:
+                created: '2009-01-15T12:24:02.000Z'
+                modified: '2014-04-09T11:24:47.000Z'
+                api_version: '0.1'
+                uuid: 7989c509-5ac4-47bf-b161-30193b131379
+                base_url: https://testing.sysmo-db.org
     patch:
       operationId: updatePerson
       description: |
@@ -3477,9 +2870,8 @@ paths:
                   policy:
                     access: download
                     permissions:
-                    - resource:
-                        id: '1836'
-                        type: projects
+                    - resource_type: projects
+                      resource_id: '1836'
                       access: edit
                   title: A Maximal Presentation
                   description: This is the description
@@ -3682,40 +3074,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
-  /presentations/{id}/content_blobs/{blob_id}:
-    put:
-      operationId: uploadPresentationContent
-      description: |-
-        Description of Presentation Content upload
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: The presentation content to upload
-        type: integer
-        default: 1152
-      - name: blob_id
-        in: path
-        required: true
-        description: The content identifier to upload
-        type: integer
-        default: 1831
-      - in: body
-        name: blobContent
-        description: The blob content to upload
-        schema:
-          type: string
-          format: binary
-      consumes:
-      - application/octet-stream
-      produces:
-      - '*/*'
-      tags:
-      - upload
-      - presentations
-      responses:
-        '200':
-          description: Success
   /presentations/{id}/content_blobs/{blob_id}/download:
     parameters:
     - name: id
@@ -3731,11 +3089,11 @@ paths:
       type: integer
       default: 3215
     get:
-      operationId: downloadPresentationContent
-      description: |-
-        Description of Presentation Content download
+      operationId: readPresentationContent
+#      description:
+#        $ref: ../descriptions/readPresentationContent.md
       tags:
-      - download
+      - read
       - presentations
       responses:
         <<: *ReadType
@@ -4011,6 +3369,621 @@ paths:
                   title: SUMO
                 links:
                   self: /projects/3
+              - id: '4'
+                type: projects
+                attributes:
+                  title: KOSMOBAC
+                links:
+                  self: /projects/4
+              - id: '5'
+                type: projects
+                attributes:
+                  title: SysMO-LAB
+                links:
+                  self: /projects/5
+              - id: '6'
+                type: projects
+                attributes:
+                  title: PSYSMO
+                links:
+                  self: /projects/6
+              - id: '7'
+                type: projects
+                attributes:
+                  title: SCaRAB
+                links:
+                  self: /projects/7
+              - id: '8'
+                type: projects
+                attributes:
+                  title: MOSES
+                links:
+                  self: /projects/8
+              - id: '9'
+                type: projects
+                attributes:
+                  title: TRANSLUCENT
+                links:
+                  self: /projects/9
+              - id: '10'
+                type: projects
+                attributes:
+                  title: STREAM
+                links:
+                  self: /projects/10
+              - id: '11'
+                type: projects
+                attributes:
+                  title: SulfoSys
+                links:
+                  self: /projects/11
+              - id: '12'
+                type: projects
+                attributes:
+                  title: SysMO DB
+                links:
+                  self: /projects/12
+              - id: '13'
+                type: projects
+                attributes:
+                  title: SysMO Funders
+                links:
+                  self: /projects/13
+              - id: '14'
+                type: projects
+                attributes:
+                  title: SilicoTryp
+                links:
+                  self: /projects/14
+              - id: '15'
+                type: projects
+                attributes:
+                  title: Noisy-Strep
+                links:
+                  self: /projects/15
+              - id: '16'
+                type: projects
+                attributes:
+                  title: SulfoSys - Biotec
+                links:
+                  self: /projects/16
+              - id: '17'
+                type: projects
+                attributes:
+                  title: Whole body modelling of glucose metabolism in malaria patients
+                links:
+                  self: /projects/17
+              - id: '18'
+                type: projects
+                attributes:
+                  title: Manchester Institute for Biotechnology
+                links:
+                  self: /projects/18
+              - id: '19'
+                type: projects
+                attributes:
+                  title: FAIRDOM
+                links:
+                  self: /projects/19
+              - id: '20'
+                type: projects
+                attributes:
+                  title: SysVirDrug
+                links:
+                  self: /projects/20
+              - id: '21'
+                type: projects
+                attributes:
+                  title: SysMilk
+                links:
+                  self: /projects/21
+              - id: '22'
+                type: projects
+                attributes:
+                  title: SysMetEx
+                links:
+                  self: /projects/22
+              - id: '23'
+                type: projects
+                attributes:
+                  title: MetApp
+                links:
+                  self: /projects/23
+              - id: '24'
+                type: projects
+                attributes:
+                  title: IMOMESIC
+                links:
+                  self: /projects/24
+              - id: '25'
+                type: projects
+                attributes:
+                  title: WineSys
+                links:
+                  self: /projects/25
+              - id: '26'
+                type: projects
+                attributes:
+                  title: CropClock
+                links:
+                  self: /projects/26
+              - id: '27'
+                type: projects
+                attributes:
+                  title: ICYSB 2015 - International Practical Course in Systems Biology
+                links:
+                  self: /projects/27
+              - id: '28'
+                type: projects
+                attributes:
+                  title: Embryonic bodies derived cell types
+                links:
+                  self: /projects/28
+              - id: '29'
+                type: projects
+                attributes:
+                  title: SYSTERACT
+                links:
+                  self: /projects/29
+              - id: '30'
+                type: projects
+                attributes:
+                  title: XyloCut
+                links:
+                  self: /projects/30
+              - id: '31'
+                type: projects
+                attributes:
+                  title: RootBook
+                links:
+                  self: /projects/31
+              - id: '32'
+                type: projects
+                attributes:
+                  title: ROBUSTYEAST
+                links:
+                  self: /projects/32
+              - id: '33'
+                type: projects
+                attributes:
+                  title: LEANPROT
+                links:
+                  self: /projects/33
+              - id: '34'
+                type: projects
+                attributes:
+                  title: GenoSysFat
+                links:
+                  self: /projects/34
+              - id: '35'
+                type: projects
+                attributes:
+                  title: de.NBI-SysBio
+                links:
+                  self: /projects/35
+              - id: '36'
+                type: projects
+                attributes:
+                  title: ExtremoPharm
+                links:
+                  self: /projects/36
+              - id: '37'
+                type: projects
+                attributes:
+                  title: ZucAt
+                links:
+                  self: /projects/37
+              - id: '38'
+                type: projects
+                attributes:
+                  title: DigiSal
+                links:
+                  self: /projects/38
+              - id: '39'
+                type: projects
+                attributes:
+                  title: Molecular Systems Biology
+                links:
+                  self: /projects/39
+              - id: '40'
+                type: projects
+                attributes:
+                  title: Early Metabolic Injury (LiSyM-EMI - Pillar I)
+                links:
+                  self: /projects/40
+              - id: '41'
+                type: projects
+                attributes:
+                  title: Chronic Liver Disease Progression (LiSyM-DP - Pillar II)
+                links:
+                  self: /projects/41
+              - id: '42'
+                type: projects
+                attributes:
+                  title: Regeneration and Repair in Acute-on-Chronic Liver Failure
+                    (LiSyM-ACLF - Pillar III)
+                links:
+                  self: /projects/42
+              - id: '43'
+                type: projects
+                attributes:
+                  title: LiSyM Core Infrastructure and Management (LiSyM-PD)
+                links:
+                  self: /projects/43
+              - id: '44'
+                type: projects
+                attributes:
+                  title: Liver Function Diagnostics (LiSyM-LiFuDi - Pillar IV)
+                links:
+                  self: /projects/44
+              - id: '45'
+                type: projects
+                attributes:
+                  title: Model Guided Pharmacotherapy In Chronic Liver Disease (LiSyM-MGP)
+                links:
+                  self: /projects/45
+              - id: '46'
+                type: projects
+                attributes:
+                  title: Multi-Scale Models for Personalized Liver Function Tests
+                    (LiSyM-MM-PLF)
+                links:
+                  self: /projects/46
+              - id: '47'
+                type: projects
+                attributes:
+                  title: The Hedgehog Signalling Pathway (LiSyM-JGMMS)
+                links:
+                  self: /projects/47
+              - id: '48'
+                type: projects
+                attributes:
+                  title: Molecular Steatosis - Imaging & Modeling (LiSyM-MSIM)
+                links:
+                  self: /projects/48
+              - id: '49'
+                type: projects
+                attributes:
+                  title: Kinetics on the move - Workshop 2016
+                links:
+                  self: /projects/49
+              - id: '50'
+                type: projects
+                attributes:
+                  title: Example use cases
+                links:
+                  self: /projects/50
+              - id: '51'
+                type: projects
+                attributes:
+                  title: FAIRDOM user meeting
+                links:
+                  self: /projects/51
+              - id: '52'
+                type: projects
+                attributes:
+                  title: ErasysApp Funders
+                links:
+                  self: /projects/52
+              - id: '53'
+                type: projects
+                attributes:
+                  title: HUMET Startup
+                links:
+                  self: /projects/53
+              - id: '54'
+                type: projects
+                attributes:
+                  title: SBEpo - Systems Biology of Erythropoietin
+                links:
+                  self: /projects/54
+              - id: '55'
+                type: projects
+                attributes:
+                  title: INBioPharm
+                links:
+                  self: /projects/55
+              - id: '56'
+                type: projects
+                attributes:
+                  title: HYp - Spatiotemporal analysis of hypersensitive response
+                    to Potato virus Y in potato
+                links:
+                  self: /projects/56
+              - id: '57'
+                type: projects
+                attributes:
+                  title: pISA-tree
+                links:
+                  self: /projects/57
+              - id: '58'
+                type: projects
+                attributes:
+                  title: EmPowerPutida
+                links:
+                  self: /projects/58
+              - id: '59'
+                type: projects
+                attributes:
+                  title: Millar group
+                links:
+                  self: /projects/59
+              - id: '60'
+                type: projects
+                attributes:
+                  title: Systems toxicology of Atlantic cod
+                links:
+                  self: /projects/60
+              - id: '61'
+                type: projects
+                attributes:
+                  title: Systo models
+                links:
+                  self: /projects/61
+              - id: '62'
+                type: projects
+                attributes:
+                  title: Service to Milano-Bicocca with respect to their ATP-ROS model
+                    (Active NOW)
+                links:
+                  self: /projects/62
+              - id: '63'
+                type: projects
+                attributes:
+                  title: 'M4 service for Milano: ATP model'
+                links:
+                  self: /projects/63
+              - id: '64'
+                type: projects
+                attributes:
+                  title: Make Me My Model
+                links:
+                  self: /projects/64
+              - id: '65'
+                type: projects
+                attributes:
+                  title: Service to University of Lisbon (Portugal) with respect to
+                    their CFTR maturation model (Active NOW)
+                links:
+                  self: /projects/65
+              - id: '66'
+                type: projects
+                attributes:
+                  title: "Service to LCSB (Luxembourg)  with respect to ROS management\
+                    \ in Parkinson\u2019s disease and cancer model (Active NOW)"
+                links:
+                  self: /projects/66
+              - id: '67'
+                type: projects
+                attributes:
+                  title: Service to URV Tarragona, Spain with respect to their Safety
+                    Assessment of Endocrine Disrupting Chemicals model (Active NOW)
+                links:
+                  self: /projects/67
+              - id: '68'
+                type: projects
+                attributes:
+                  title: "Service to Universidade Cat\xF3lica Portugues with respect\
+                    \ to their Molecular Insight into Autism Spectrum Disorder (ASD)\
+                    \ model (Active NOW)"
+                links:
+                  self: /projects/68
+              - id: '69'
+                type: projects
+                attributes:
+                  title: Service to Slovenia with respect to their Protease signaling
+                    network in neurodegeneration model (Active NOW)
+                links:
+                  self: /projects/69
+              - id: '70'
+                type: projects
+                attributes:
+                  title: 'Service to University of Duisburg- Essen (Germany): with
+                    respect to their The Yin-Yang of Metabolism; Endometatoxicity
+                    (YYME) model (Active NOW)'
+                links:
+                  self: /projects/70
+              - id: '71'
+                type: projects
+                attributes:
+                  title: 'Service to Sheffield University (UK): with respect to Mitochondrial
+                    perfect adaptation model (Active NOW)'
+                links:
+                  self: /projects/71
+              - id: '72'
+                type: projects
+                attributes:
+                  title: 'Service to Sanquin (Amsterdam): with respect to Modelling
+                    of acute and chronic inflammation (Prospective)'
+                links:
+                  self: /projects/72
+              - id: '73'
+                type: projects
+                attributes:
+                  title: 'Service to Munich (Germany): with respect toCharged peptide
+                    to charged membrane binding model (Prospective)'
+                links:
+                  self: /projects/73
+              - id: '74'
+                type: projects
+                attributes:
+                  title: MycoSynVac - Engineering Mycoplasma pneumoniae as a broad-spectrum
+                    animal vaccine
+                links:
+                  self: /projects/74
+              - id: '75'
+                type: projects
+                attributes:
+                  title: SEEK tutorial for DigiSal
+                links:
+                  self: /projects/75
+              - id: '76'
+                type: projects
+                attributes:
+                  title: Training Hunfeld
+                links:
+                  self: /projects/76
+              - id: '77'
+                type: projects
+                attributes:
+                  title: WG Infrastructure for Translational Research
+                links:
+                  self: /projects/77
+              - id: '78'
+                type: projects
+                attributes:
+                  title: CausalDB
+                links:
+                  self: /projects/78
+              - id: '80'
+                type: projects
+                attributes:
+                  title: WURSynBio
+                links:
+                  self: /projects/80
+              - id: '81'
+                type: projects
+                attributes:
+                  title: Colosys
+                links:
+                  self: /projects/81
+              - id: '83'
+                type: projects
+                attributes:
+                  title: MS_DILI
+                links:
+                  self: /projects/83
+              - id: '84'
+                type: projects
+                attributes:
+                  title: Glycon proposal preparation
+                links:
+                  self: /projects/84
+              - id: '85'
+                type: projects
+                attributes:
+                  title: TID - Dynamics of tolerant potato-potato virus Y interaction
+                links:
+                  self: /projects/85
+              - id: '86'
+                type: projects
+                attributes:
+                  title: BioZEment 2.0
+                links:
+                  self: /projects/86
+              - id: '87'
+                type: projects
+                attributes:
+                  title: SAFE-Aqua
+                links:
+                  self: /projects/87
+              - id: '88'
+                type: projects
+                attributes:
+                  title: 'PHYTOCAL: Phytochrome Control of Resource Allocation and
+                    Growth in Arabidopsis and in Brassicaceae crops'
+                links:
+                  self: /projects/88
+              - id: '90'
+                type: projects
+                attributes:
+                  title: COMBINE Multicellular Modelling
+                links:
+                  self: /projects/90
+              - id: '91'
+                type: projects
+                attributes:
+                  title: FAIRDOM & LiSyM & de.NBI Data Structuring Training
+                links:
+                  self: /projects/91
+              - id: '92'
+                type: projects
+                attributes:
+                  title: TiMet
+                links:
+                  self: /projects/92
+              - id: '93'
+                type: projects
+                attributes:
+                  title: OXYMOD
+                links:
+                  self: /projects/93
+              - id: '95'
+                type: projects
+                attributes:
+                  title: POP - the Parameter Optimisation Problem
+                links:
+                  self: /projects/95
+              - id: '96'
+                type: projects
+                attributes:
+                  title: Tobacco as sustainable production platform of the natural
+                    biopolymer cyanophycin as co-product to oil and protein
+                links:
+                  self: /projects/96
+              - id: '97'
+                type: projects
+                attributes:
+                  title: Test
+                links:
+                  self: /projects/97
+              - id: '98'
+                type: projects
+                attributes:
+                  title: Mathematical modelling of the antibiotic-induced morphological
+                    transition of Pseudomonas aeruginosa
+                links:
+                  self: /projects/98
+              - id: '99'
+                type: projects
+                attributes:
+                  title: MESI-STRAT
+                links:
+                  self: /projects/99
+              - id: '100'
+                type: projects
+                attributes:
+                  title: INCOME
+                links:
+                  self: /projects/100
+              - id: '101'
+                type: projects
+                attributes:
+                  title: Multiscale modelling of state transitions in the host-microbiome-brain
+                    network
+                links:
+                  self: /projects/101
+              - id: '102'
+                type: projects
+                attributes:
+                  title: Crossover Research 2.0
+                links:
+                  self: /projects/102
+              - id: '103'
+                type: projects
+                attributes:
+                  title: NTNU Health Druglogics
+                links:
+                  self: /projects/103
+              - id: '104'
+                type: projects
+                attributes:
+                  title: ROS detailed model for MSB manucript
+                links:
+                  self: /projects/104
+              - id: '105'
+                type: projects
+                attributes:
+                  title: BESTER
+                links:
+                  self: /projects/105
+              - id: '106'
+                type: projects
+                attributes:
+                  title: SUSPHIRE - Sustainable Bioproduction of Pheromones for Insect
+                    Pest Control in Agriculture
+                links:
+                  self: /projects/106
               jsonapi:
                 version: '1.0'
               meta:
@@ -4052,17 +4025,14 @@ paths:
                   default_policy:
                     access: no_access
                     permissions:
-                    - resource:
-                        id: '1273'
-                        type: people
+                    - resource_type: people
+                      resource_id: '1273'
                       access: manage
-                    - resource:
-                        id: '1924'
-                        type: projects
+                    - resource_type: projects
+                      resource_id: '1924'
                       access: download
-                    - resource:
-                        id: '1297'
-                        type: institutions
+                    - resource_type: institutions
+                      resource_id: '1297'
                       access: view
                 relationships:
                   organisms:
@@ -4166,17 +4136,14 @@ paths:
                   default_policy:
                     access: no_access
                     permissions:
-                    - resource:
-                        type: people
-                        id: '1296'
+                    - resource_type: people
+                      resource_id: '1296'
                       access: manage
-                    - resource:
-                        type: projects
-                        id: '1956'
+                    - resource_type: projects
+                      resource_id: '1956'
                       access: download
-                    - resource:
-                        type: institutions
-                        id: '1321'
+                    - resource_type: institutions
+                      resource_id: '1321'
                       access: view
                 relationships:
                   organisms:
@@ -4314,90 +4281,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/publicationResponse'
-          examples:
-            application/json:
-              data:
-                id: '240'
-                type: publications
-                attributes:
-                  title: |-
-                    Construction and validation of a detailed kinetic model of glycolysis in
-                                  Plasmodium falciparum
-                  journal: FEBS J
-                  published_date: '2015-04-01'
-                  doi: 10.1111/febs.13237
-                  pubmed_id:
-                  abstract: "The enzymes in the Embden\u2013Meyerhof\u2013Parnas pathway\
-                    \ of Plasmodium falciparum trophozoites were kinetically characterized\
-                    \ and their integrated activities analyzed in a mathematical model.\
-                    \ For validation of the model, we compared model predictions for\
-                    \ steady-state fluxes and metabolite concentrations of the hexose\
-                    \ phosphates with experimental values for intact parasites. The\
-                    \ model, which is completely based on kinetic parameters that\
-                    \ were measured for the individual enzymes, gives an accurate\
-                    \ prediction of the steady-state fluxes and intermediate concentrations.\
-                    \ This is the first detailed kinetic model for glucose metabolism\
-                    \ in P. falciparum, one of the most prolific malaria-causing protozoa,\
-                    \ and the high predictive power of the model makes it a strong\
-                    \ tool for future drug target identification studies. The modelling\
-                    \ workflow is transparent and reproducible, and completely documented\
-                    \ in the SEEK platform, where all experimental data and model\
-                    \ files are available for download."
-                  citation: 'FEBS J 282(8) : 1481'
-                  link_to_pub: https://www.ncbi.nlm.nih.gov/pubmed/
-                  authors:
-                  - Gerald Penkler
-                  - Francois du Toit
-                  - Waldo Adams
-                  - Marina Rautenbach
-                  - Daniel C. Palm
-                  - Dawie Van Niekerk
-                  - Jacky Snoep
-                relationships:
-                  people:
-                    data:
-                    - id: '49'
-                      type: people
-                    - id: '411'
-                      type: people
-                  projects:
-                    data:
-                    - id: '17'
-                      type: projects
-                  investigations:
-                    data:
-                    - id: '56'
-                      type: investigations
-                  studies:
-                    data:
-                    - id: '118'
-                      type: studies
-                    - id: '119'
-                      type: studies
-                    - id: '138'
-                      type: studies
-                  assays:
-                    data: []
-                  data_files:
-                    data: []
-                  models:
-                    data: []
-                  publications:
-                    data: []
-                  presentations:
-                    data: []
-                  events:
-                    data: []
-                links:
-                  self: /publications/240
-                meta:
-                  created: '2015-07-09T15:30:55.000Z'
-                  modified: '2016-09-19T13:34:11.000Z'
-                  api_version: '0.1'
-                  uuid: 69bebf90-087d-0133-36e3-549f350973c0
-                  base_url: https://fairdomhub.org
-              jsonapi:
-                version: '1.0'
   /sample_types:
     get:
       operationId: listSampleTypes
@@ -4528,9 +4411,8 @@ paths:
                   policy:
                     access: download
                     permissions:
-                    - resource:
-                        id: '1973'
-                        type: projects
+                    - resource_type: projects
+                      resource_id: '1973'
                       access: edit
                   title: A Maximal SOP
                   description: This is the description
@@ -4731,40 +4613,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
-  /sops/{id}/content_blobs/{blob_id}:
-    put:
-      operationId: uploadSopContent
-      description: |-
-        Description of Sop Content upload
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: The sop content to upload
-        type: integer
-        default: 1152
-      - name: blob_id
-        in: path
-        required: true
-        description: The content identifier to upload
-        type: integer
-        default: 1831
-      - in: body
-        name: blobContent
-        description: The blob content to upload
-        schema:
-          type: string
-          format: binary
-      consumes:
-      - application/octet-stream
-      produces:
-      - '*/*'
-      tags:
-      - upload
-      - sops
-      responses:
-        '200':
-          description: Success
   /sops/{id}/content_blobs/{blob_id}/download:
     parameters:
     - name: id
@@ -4780,11 +4628,11 @@ paths:
       type: integer
       default: 1806
     get:
-      operationId: downloadSopContent
-      description: |-
-        Description of Sop Content download
+      operationId: readSopContent
+#      description:
+#        $ref: ../descriptions/readSopContent.md
       tags:
-      - download
+      - read
       - sops
       responses:
         <<: *ReadType
@@ -4862,9 +4710,8 @@ paths:
                   policy:
                     access: download
                     permissions:
-                    - resource:
-                        id: '1672'
-                        type: projects
+                    - resource_type: projects
+                      resource_id: '1672'
                       access: view
                   title: A Maximal Study
                   description: The Study of many things
@@ -4969,9 +4816,8 @@ paths:
                   policy:
                     access: download
                     permissions:
-                    - resource:
-                        id: '1777'
-                        type: projects
+                    - resource_type: projects
+                      resource_id: '1777'
                       access: view
                   title: A Maximal Study
                   description: The Study of many things
@@ -5065,53 +4911,6 @@ definitions:
     properties:
       errors:
         $ref: '#/definitions/errors_array'
-  ok:
-    type: object
-    properties:
-      status:
-        $ref: '#/definitions/nonEmptyString'
-    required:
-    - status
-    additionalProperties: false
-    example:
-      status: ok
-  not_implemented:
-    type: object
-    properties:
-      errors:
-        $ref: '#/definitions/errors_array'
-  unprocessable_entity:
-    type: object
-    properties:
-      errors:
-        $ref: '#/definitions/errors_array'
-    example:
-      errors:
-      - detail: id specified by the PUT request does not match object-id in the JSON
-          input
-  bad_request:
-    type: object
-    properties:
-      errors:
-        $ref: '#/definitions/errors_array'
-    example:
-      errors:
-      - title: You do not have permission
-        detail: No permission
-  forbidden:
-    type: object
-    properties:
-      errors:
-        $ref: '#/definitions/errors_array'
-  not_found:
-    type: object
-    properties:
-      errors:
-        $ref: '#/definitions/errors_array'
-    example:
-      errors:
-      - title: Not found
-        detail: Couldn't find Institution with 'id'=[70]
   dateTimeString:
     type: string
     minLength: 1
@@ -5260,6 +5059,56 @@ definitions:
     - base_url
     - api_version
     additionalProperties: false
+
+  ok:
+    type: object
+    properties:
+      status:
+        $ref: '#/definitions/nonEmptyString'
+    required:
+    - status
+    additionalProperties: false
+    example:
+      status: ok
+
+  not_implemented:
+    type: object
+    properties:
+      errors:
+        $ref: '#/definitions/errors_array'
+  unprocessable_entity:
+    type: object
+    properties:
+      errors:
+        $ref: '#/definitions/errors_array'
+    example:
+      errors:
+      - detail: id specified by the PUT request does not match object-id in the JSON
+          input
+  bad_request:
+    type: object
+    properties:
+      errors:
+        $ref: '#/definitions/errors_array'
+    example:
+      errors:
+      - title: You do not have permission
+        detail: No permission
+  forbidden:
+    type: object
+    properties:
+      errors:
+        $ref: '#/definitions/errors_array'
+  not_found:
+    type: object
+    properties:
+      errors:
+        $ref: '#/definitions/errors_array'
+    example:
+      errors:
+      - title: Not found
+        detail: Couldn't find Institution with 'id'=[70]
+
   policy:
     type: object
     properties:
@@ -5271,12 +5120,15 @@ definitions:
         uniqueItems: true
         items:
           properties:
-            resource:
-              $ref: '#/definitions/permissionResource'
+            resource_type:
+              $ref: '#/definitions/nonEmptyString'
+            resource_id:
+              $ref: '#/definitions/nonEmptyString'
             access:
               $ref: '#/definitions/accessType'
           required:
-          - resource
+          - resource_type
+          - resource_id
           - access
           additionalProperties: false
     required:
@@ -5301,7 +5153,6 @@ definitions:
     - data_files
     - documents
     - events
-    - institutions
     - models
     - organisms
     - people
@@ -5312,23 +5163,6 @@ definitions:
     - sample_types
     - sops
     - studies
-  permissionResource:
-    properties:
-      type:
-        $ref: '#/definitions/permissionResourceType'
-      id:
-        $ref: '#/definitions/nonEmptyString'
-    additionalProperties: false
-  permissionResourceType:
-    type: string
-    minLength: 1
-    enum:
-    - people
-    - favourite_groups
-    - work_groups
-    - projects
-    - programmes
-    - institutions
   contributedTypeAttributes:
     type: object
     properties:
@@ -6115,11 +5949,13 @@ definitions:
         $ref: '#/definitions/anySkeletons'
       jsonapi:
         $ref: '#/definitions/JsonApiVersion'
+      links: {}
       meta:
         $ref: '#/definitions/baseMetaType'
     required:
     - data
     - jsonapi
+    - links
     - meta
     additionalProperties: false
   assayResponse:
@@ -6254,6 +6090,8 @@ definitions:
           attributes:
             type: object
             properties:
+              tags:
+                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -6333,14 +6171,17 @@ definitions:
             uri: http://www.mygrid.org.uk/ontology/JERMOntology#Transcriptomics
           technology_type:
             uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
+          tags:
+          - Assay-tag1
+          - Assay-tag2
+          - Assay-tag3
           other_creators: Anonymous creator
           description: A Western Blot Assay
           policy:
             access: download
             permissions:
-            - resource:
-                id: '442'
-                type: projects
+            - resource_id: '442'
+              resource_type: projects
               access: manage
         relationships:
           study:
@@ -6388,6 +6229,8 @@ definitions:
           attributes:
             type: object
             properties:
+              tags:
+                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -6460,14 +6303,17 @@ definitions:
             uri: http://www.mygrid.org.uk/ontology/JERMOntology#Transcriptomics
           technology_type:
             uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
+          tags:
+          - Assay-tag1
+          - Assay-tag2
+          - Assay-tag3
           other_creators: Anonymous creator
           description: A Western Blot Assay
           policy:
             access: download
             permissions:
-            - resource:
-                id: '585'
-                type: projects
+            - resource_id: '585'
+              resource_type: projects
               access: manage
         relationships:
           study:
@@ -6680,9 +6526,8 @@ definitions:
           policy:
             access: download
             permissions:
-            - resource:
-                id: '2058'
-                type: projects
+            - resource_id: '2058'
+              resource_type: projects
               access: edit
         relationships:
           creators:
@@ -6883,9 +6728,8 @@ definitions:
           policy:
             access: download
             permissions:
-            - resource:
-                id: '359'
-                type: projects
+            - resource_id: '359'
+              resource_type: projects
               access: edit
         relationships:
           creators:
@@ -7087,9 +6931,8 @@ definitions:
           policy:
             access: view
             permissions:
-            - resource:
-                id: '242'
-                type: projects
+            - resource_id: '242'
+              resource_type: projects
               access: edit
           url: http://www.example.com/events/123
           address: Sofienstr 2
@@ -7412,6 +7255,8 @@ definitions:
           attributes:
             type: object
             properties:
+              tags:
+                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -7447,13 +7292,11 @@ definitions:
           policy:
             access: download
             permissions:
-            - resource:
-                id: '1293'
-                type: projects
+            - resource_id: '1293'
+              resource_type: projects
               access: manage
-            - resource:
-                id: '1343'
-                type: projects
+            - resource_id: '1343'
+              resource_type: projects
               access: manage
           description: This is a more complex investigation
           other_creators: Max Blumenthal, Ed Snowden
@@ -7483,6 +7326,8 @@ definitions:
           attributes:
             type: object
             properties:
+              tags:
+                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -7522,13 +7367,11 @@ definitions:
           policy:
             access: download
             permissions:
-            - resource:
-                id: '809'
-                type: projects
+            - resource_id: '809'
+              resource_type: projects
               access: manage
-            - resource:
-                id: '859'
-                type: projects
+            - resource_id: '859'
+              resource_type: projects
               access: manage
           description: This is a more complex investigation
           other_creators: Max Blumenthal, Ed Snowden
@@ -7682,9 +7525,8 @@ definitions:
           policy:
             access: download
             permissions:
-            - resource:
-                id: '1548'
-                type: projects
+            - resource_id: '1548'
+              resource_type: projects
               access: edit
           model_type: Linear equations
           model_format: SBML
@@ -8180,9 +8022,8 @@ definitions:
           policy:
             access: download
             permissions:
-            - resource:
-                id: '1836'
-                type: projects
+            - resource_id: '1836'
+              resource_type: projects
               access: edit
         relationships:
           creators:
@@ -8359,7 +8200,6 @@ definitions:
                 $ref: '#/definitions/peopleReferenceList'
               projects:
                 $ref: '#/definitions/projectReferencesList'
-            additionalProperties: false
         required:
         - type
         - attributes
@@ -8420,7 +8260,6 @@ definitions:
                 $ref: '#/definitions/peopleReferenceList'
               projects:
                 $ref: '#/definitions/projectReferencesList'
-            additionalProperties: false
         required:
         - id
         - type
@@ -8581,7 +8420,6 @@ definitions:
                 $ref: '#/definitions/programmeReferencesList'
               organisms:
                 $ref: '#/definitions/organismReferencesList'
-            additionalProperties: false
         required:
         - id
         - type
@@ -8603,17 +8441,14 @@ definitions:
           default_policy:
             access: no_access
             permissions:
-            - resource:
-                id: '1296'
-                type: people
+            - resource_id: '1296'
+              resource_type: people
               access: manage
-            - resource:
-                id: '1956'
-                type: projects
+            - resource_id: '1956'
+              resource_type: projects
               access: download
-            - resource:
-                id: '1321'
-                type: institutions
+            - resource_id: '1321'
+              resource_type: institutions
               access: view
         relationships:
           programmes:
@@ -8659,7 +8494,6 @@ definitions:
                 $ref: '#/definitions/programmeReferencesList'
               organisms:
                 $ref: '#/definitions/organismReferencesList'
-            additionalProperties: false
         required:
         - type
         - attributes
@@ -8680,17 +8514,14 @@ definitions:
           default_policy:
             access: no_access
             permissions:
-            - resource:
-                id: '1273'
-                type: people
+            - resource_id: '1273'
+              resource_type: people
               access: manage
-            - resource:
-                id: '1924'
-                type: projects
+            - resource_id: '1924'
+              resource_type: projects
               access: download
-            - resource:
-                id: '1297'
-                type: institutions
+            - resource_id: '1297'
+              resource_type: institutions
               access: view
         relationships:
           programmes:
@@ -8723,7 +8554,7 @@ definitions:
               doi:
                 $ref: '#/definitions/nullableUriString'
               pubmed_id:
-                type: '#/definitions/nullableInteger'
+                type: number
               abstract:
                 $ref: '#/definitions/nullableNonEmptyString'
               citation:
@@ -8920,9 +8751,8 @@ definitions:
           policy:
             access: download
             permissions:
-            - resource:
-                id: '1973'
-                type: projects
+            - resource_id: '1973'
+              resource_type: projects
               access: edit
         relationships:
           creators:
@@ -9082,6 +8912,8 @@ definitions:
           attributes:
             type: object
             properties:
+              tags:
+                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -9129,9 +8961,8 @@ definitions:
           policy:
             access: download
             permissions:
-            - resource:
-                id: '1672'
-                type: projects
+            - resource_id: '1672'
+              resource_type: projects
               access: view
         relationships:
           investigation:
@@ -9159,6 +8990,8 @@ definitions:
           attributes:
             type: object
             properties:
+              tags:
+                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -9202,9 +9035,8 @@ definitions:
           policy:
             access: download
             permissions:
-            - resource:
-                id: '1777'
-                type: projects
+            - resource_id: '1777'
+              resource_type: projects
               access: view
         relationships:
           investigation:

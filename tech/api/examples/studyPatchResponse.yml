@@ -6,8 +6,9 @@ data:
     policy:
       access: download
       permissions:
-      - resource_type: projects
-        resource_id: '1777'
+      - resource:
+          id: '1777'
+          type: projects
         access: view
     title: A Maximal Study
     description: The Study of many things
