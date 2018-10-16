@@ -1,9 +1,5 @@
-
-<%= javascript_include_tag 'jquery.ui.all', 'spreadsheet_explorer','spreadsheet_explorer_plot',
-                           'flot/index' %>
-
-<%= stylesheet_link_tag 'spreadsheet_explorer','jquery.ui.resizable' -%>
-
+<%= stylesheet_link_tag 'spreadsheet_explorer' -%>
+<%= javascript_include_tag 'jquery-ui/all', 'spreadsheet_explorer', 'spreadsheet_explorer_plot', 'flot/index' %>
 
 <div class="contribution_title">
   <h1><%= t('data_file').pluralize %> that contain data that may be relevant to <%= link_to @model.title, @model -%></h1>
