@@ -7,9 +7,9 @@
     <% is_inline_viewable = content_blob.is_content_viewable? %>
     <% if asset.is_a?(Workflow)%>
       <% if asset.is_github_cwl? %>
-        <%= button_link_to('View content', "show", asset.cwl_viewer_url) %>
+        <%= button_link_to('View content', "show", asset.cwl_viewer_url, html_options = {:target=>'_blank'} ) %>
       <% elsif asset.is_myexperiment? %>
-        <%= button_link_to('View content', "show", content_blob.url) %>
+        <%= button_link_to('View content', "show", content_blob.url, html_options = {:target=>'_blank'} ) %>
       <% else %>
         <%= button_link_to('View content', "show", 'http://www.reddit.com') %>
       <% end %>

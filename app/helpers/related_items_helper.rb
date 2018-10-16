@@ -101,7 +101,8 @@ module RelatedItemsHelper
     { 'Person' => {}, 'Project' => {}, 'Institution' => {}, 'Investigation' => {},
       'Study' => {}, 'Assay' => {}, 'DataFile' => {}, 'Document' => {},
       'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {}, 'Organism' => {},
-      'Strain' => {}, 'Sample' => {} }
+      'Strain' => {}, 'Sample' => {},
+      'Workflow' => {} }
   end
 
   def related_items_method(resource, item_type)

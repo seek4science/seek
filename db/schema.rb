@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180925103340) do
+ActiveRecord::Schema.define(version: 20181011134514) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -1016,8 +1016,8 @@ ActiveRecord::Schema.define(version: 20180925103340) do
     t.string   "space_perm_id",         limit: 255
     t.string   "username",              limit: 255
     t.integer  "project_id",            limit: 4
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "dss_endpoint",          limit: 255
     t.string   "web_endpoint",          limit: 255
     t.integer  "refresh_period_mins",   limit: 4,   default: 120
@@ -1596,6 +1596,14 @@ ActiveRecord::Schema.define(version: 20180925103340) do
 
   add_index "sops", ["contributor_id"], name: "index_sops_on_contributor", using: :btree
 
+  create_table "sops_workflows", id: false, force: :cascade do |t|
+    t.integer "workflow_id", limit: 4, null: false
+    t.integer "sop_id",      limit: 4, null: false
+  end
+
+  add_index "sops_workflows", ["sop_id"], name: "index_sops_workflows_on_sop_id", using: :btree
+  add_index "sops_workflows", ["workflow_id"], name: "index_sops_workflows_on_workflow_id", using: :btree
+
   create_table "special_auth_codes", force: :cascade do |t|
     t.string   "code",            limit: 255
     t.date     "expiration_date"
@@ -1825,8 +1833,8 @@ ActiveRecord::Schema.define(version: 20180925103340) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "workflow_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
-  add_index "workflow_auth_lookup", ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view", using: :btree
+  add_index "workflow_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_workflow_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
+  add_index "workflow_auth_lookup", ["user_id", "can_view"], name: "index_workflow_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "workflow_versions", force: :cascade do |t|
     t.integer  "workflow_id",         limit: 4

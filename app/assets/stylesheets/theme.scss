@@ -1,0 +1,10 @@
+$navbar-default-bg: #0c1a8c;
+$navbar-default-border: darken($navbar-default-bg, 6.5%);
+$navbar-default-link-active-bg: darken($navbar-default-bg, 6.5%);
+$navbar-default-link-color: #cce6f3;
+$navbar-default-link-active-color: lighten($navbar-default-link-color, 30%);
+$navbar-default-link-hover-color: lighten($navbar-default-link-color, 40%);
+
+.logo_link > img {
+  height: 50px;
+};
