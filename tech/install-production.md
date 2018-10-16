@@ -143,6 +143,10 @@ If you wish to restart SEEK, maybe after an upgrade, without restarting Apache
 you can do so by running (as www-data)
 
     touch /srv/rails/seek/tmp/restart.txt
+    
+### Configuring for HTTPS
+
+We would strongly recommend using [Lets Encrypt](https://letsencrypt.org/) for free SSL certificates.     
 
 ### Setting up the services
 

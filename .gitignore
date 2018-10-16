@@ -20,3 +20,7 @@ log/
 public/
 solr/
 tmp/
+.bundle/
+db/
+filestore
+vendor/

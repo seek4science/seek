@@ -15,7 +15,10 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| Further integration with openBIS, with improved metadata mappings | Summer 2018  |
+| Programme wide sharing permissions | Summer 2018  |
+| ISA graph improvements | Summer 2018  |
+| Further integration with openBIS, with improved metadata mappings | Autumn 2018  |
+| Project dashboard, showing details and graphs for projects | Autumn 2018  |
 | Metadata search and querying | Winter 2018  |
 
 <br/>

@@ -62,6 +62,35 @@ like the following:
         }
     }
     
+You would also want to configure for HTTPS (port 443), and would strongly recommend using [Lets Encrypt](https://letsencrypt.org/) for free SSL certificates. 
+    
+## Backup and Restore
+
+To backup the MySQL database and seek filestore, you will need to mount the volumes into a temporary container. Don't try backing up by copying the volumes directly from the host system. 
+The following gives an example of a basic procedure, but we recommend you read [Backup, restore, or migrate data volumes](https://docs.docker.com/storage/volumes/#backup-restore-or-migrate-data-volumes)
+ and are familiar with what the steps mean.
+
+    docker-compose stop
+    docker run --rm --volumes-from seek -v $(pwd):/backup ubuntu tar cvf /backup/seek-filestore.tar /seek/filestore
+    docker run --rm --volumes-from seek-mysql -v $(pwd):/backup ubuntu tar cvf /backup/seek-mysql-db.tar /var/lib/mysql
+    docker-compose start -d
+    
+and to restore into new volumes:
+        
+    docker-compose down
+    docker volume rm seek-filestore # this and the next step only necessary if you want to recreate existing volumes
+    docker volume rm seek-mysql-db     
+    docker volume create --name=seek-filestore
+    docker volume create --name=seek-mysql-db
+    docker-compose up --no-start
+    docker run --rm --volumes-from seek -v $(pwd):/backup ubuntu bash -c "tar xfv /backup/seek-filestore.tar"
+    docker run --rm --volumes-from seek-mysql -v $(pwd):/backup ubuntu bash -c "tar xfv /backup/seek-mysql-db.tar"
+    docker-compose up -d        
+    
+Note that the cache and solr index don't need backing up. Once up and running, if necessary the solr index can be regenerated with:
+
+    docker exec seek bundle exec rake reindex:all
+        
 ## Upgrading between versions    
 
 The process is very similar to [Upgrading a Basic Container](basic-container.html#upgrades).
