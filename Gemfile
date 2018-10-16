@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.9'
+gem 'rails', '~> 5.0.7'
 gem 'rdoc'
 
 #database adaptors
@@ -20,12 +20,11 @@ gem 'rmagick', '2.15.2'
 gem 'rest-client', '~>2.0'
 gem 'factory_girl', '2.6.4'
 gem 'bio', '~> 1.5.1'
-gem 'sunspot_rails', '~>2.2.0'
+gem 'sunspot_rails', '~>2.2.7'
 gem 'sunspot_solr', '~>2.2.0'
 gem 'progress_bar'
 gem 'savon', '1.1.0'
 gem 'dynamic_form'
-gem 'prototype-rails', git: 'https://github.com/rails/prototype-rails', branch: '4.2'
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'linkeddata'
@@ -43,7 +42,7 @@ gem 'docsplit'
 gem 'pothoven-attachment_fu'
 gem 'exception_notification'
 gem 'fssm'
-gem 'acts-as-taggable-on', '3.0.1'
+gem 'acts-as-taggable-on'
 gem 'acts_as_list'
 gem 'acts_as_tree'
 gem 'country_select'
@@ -59,7 +58,6 @@ gem 'lograge'
 gem 'psych'
 gem 'validate_url'
 gem "attr_encrypted", "~> 3.0.0"
-gem 'app_version'
 
 # gem for BiVeS and BudHat
 gem 'bives'
@@ -78,8 +76,8 @@ gem 'search_biomodel', '2.2.1', git: 'https://github.com/myGrid/search_biomodel.
 gem 'my_annotations', git: 'https://github.com/myGrid/annotations.git', branch: 'rails4.2'
 
 
-gem 'jquery-rails', '~> 3'
-gem 'jquery-ui-rails', '~>3'
+gem 'jquery-rails', '~> 4.2.2'
+gem 'jquery-ui-rails'
 gem 'recaptcha', '~> 4.1.0'
 gem 'metainspector'
 gem 'mechanize'
@@ -87,8 +85,8 @@ gem 'mimemagic'
 gem 'auto_strip_attributes'
 
 gem 'bootstrap-sass'
-gem 'sass-rails'
-gem 'sprockets-rails', '~> 3.2'
+gem 'sass-rails', '~> 5.0'
+gem 'sprockets-rails'
 
 gem 'ro-bundle'
 gem 'handlebars_assets'
@@ -110,8 +108,6 @@ gem 'omniauth-ldap', '~> 1.0.5'
 gem 'ransack', '~> 1.8.2'
 
 gem 'uglifier'
-
-gem 'coffee-rails', '~> 4.1.0'
 
 # Rails 4 upgrade
 gem 'activerecord-session_store'
@@ -150,7 +146,6 @@ group :development do
   gem 'rubycritic', require: false
   gem 'guard-rubycritic', require: false
   gem 'rails_best_practices'
-  gem 'quiet_assets'
   #gem 'ruby-debug-ide', '>= 0.6.1.beta2', require: false
   #gem 'debase', '>= 0.2.2.beta8', require: false
 end
