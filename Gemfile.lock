@@ -501,6 +501,10 @@ GEM
     rails-assets-vue (2.1.10)
     rails-assets-x-editable (1.5.1)
       rails-assets-jquery (>= 1.6)
+    rails-controller-testing (1.0.2)
+      actionpack (~> 5.x, >= 5.0.1)
+      actionview (~> 5.x, >= 5.0.1)
+      activesupport (~> 5.x)
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
@@ -836,7 +840,6 @@ DEPENDENCIES
   mechanize
   metainspector
   mimemagic
-  minitest
   minitest-reporters
   my_annotations!
   my_responds_to_parent!
@@ -865,6 +868,7 @@ DEPENDENCIES
   rails-assets-typeahead.js (~> 0.10.5)!
   rails-assets-vue (~> 2.1.8)!
   rails-assets-x-editable (~> 1.5.1)!
+  rails-controller-testing
   rails-observers
   rails-perftest
   rails_autolink
