@@ -29,7 +29,7 @@ gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'linkeddata'
 gem 'openseek-api'
-gem 'jbuilder', '~> 2.0'
+gem 'jbuilder', '~> 2.5'
 gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'
 gem 'json-schema'
@@ -83,7 +83,7 @@ gem 'metainspector'
 gem 'mechanize'
 gem 'mimemagic'
 gem 'auto_strip_attributes'
-
+gem 'coffee-rails', '~> 4.2'
 gem 'bootstrap-sass'
 gem 'sass-rails', '~> 5.0'
 gem 'sprockets-rails'
@@ -151,7 +151,6 @@ group :development do
 end
 
 group :test do
-  gem 'test_after_commit'
   gem 'ruby-prof', '>= 0.16.0'
   gem 'test-prof'
   gem 'rails-perftest'
