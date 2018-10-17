@@ -396,7 +396,7 @@ GEM
     mimemagic (0.3.2)
     mini_mime (1.0.1)
     mini_portile2 (2.3.0)
-    minitest (5.11.3)
+    minitest (5.10.3)
     minitest-reporters (1.1.14)
       ansi
       builder
@@ -840,6 +840,7 @@ DEPENDENCIES
   mechanize
   metainspector
   mimemagic
+  minitest (= 5.10.3)
   minitest-reporters
   my_annotations!
   my_responds_to_parent!
@@ -917,4 +918,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.16.5
+   1.16.6
