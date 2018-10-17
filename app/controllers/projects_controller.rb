@@ -8,7 +8,7 @@ class ProjectsController < ApplicationController
   include ApiHelper
 
   before_filter :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
-                                               admin_member_roles update_members storage_report request_membership]
+                                               admin_member_roles update_members storage_report request_membership overview]
   before_filter :find_assets, only: [:index]
   before_filter :auth_to_create, only: %i[new create]
   before_filter :is_user_admin_auth, only: %i[manage destroy]
@@ -308,6 +308,10 @@ class ProjectsController < ApplicationController
     respond_with do |format|
       format.html{redirect_to(@project)}
     end
+  end
+
+  def overview
+
   end
 
   private
