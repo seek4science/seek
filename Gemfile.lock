@@ -438,7 +438,7 @@ GEM
       pyu-ruby-sasl (~> 0.0.3.2)
       rubyntlm (~> 0.3.4)
     open4 (1.3.0)
-    openseek-api (0.17.1)
+    openseek-api (0.17.2)
       terrapin
     options (2.3.2)
     parser (2.4.0.0)
