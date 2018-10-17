@@ -4,6 +4,7 @@
 <% if can_browse_openbis?(item) %>
     <%= button_link_to("Browse openBIS", :openbis_square, browse_project_openbis_endpoints_path(item),{icon_options:{height:'18px'}}) %>
 <% end %>
+<%= button_link_to('Overview', 'graph_nodes', overview_project_path(item)) -%>
 <% if item.try(:has_member?,current_user) || admin_logged_in? -%>
     <% tooltip_text="This will present you with a short report about the items that have been shared outside of your #{t('project')}" %>
     <%= button_link_to("Asset report", 'report', asset_report_project_path(item), 'data-tooltip' => tooltip(tooltip_text)) -%>

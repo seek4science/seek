@@ -193,6 +193,7 @@ SEEK::Application.routes.draw do
       post :update_members
       post :request_membership
       get :isa_children
+      get :overview
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:search,:organisms, :documents, :only=>[:index]
