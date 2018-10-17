@@ -23,7 +23,7 @@
         <%= form_tag({controller:'openbis_endpoints'}, {method: 'get'} ) do %>
             <div class="form-group"><label>Endpoint:</label>
               <%= select_tag :openbis_endpoint, options_for_select(@openbis_endpoints.map{ |e| [e.title, e.id]}, @openbis_endpoint.id),
-                             id: 'openbis_endpoint', class: 'form-control1', :onchange => 'javascript:changeEndpoint(this);' %></div>
+                             id: 'openbis_endpoint', class: 'form-control', :onchange => 'javascript:changeEndpoint(this);' %></div>
         <% end %>
 
         <div class="form-group"><label>Project:</label> <%= @project.title %></div>

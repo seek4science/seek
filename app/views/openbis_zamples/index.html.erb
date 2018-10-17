@@ -10,9 +10,9 @@
         <div class="form-group"><label>Project:</label> <%= @project.title %></div>
         <div class="form-group"><label>Endpoint:</label> <%= @openbis_endpoint.title %></div>
         <div class="form-group"><label>Entities like:</label> <%= @seek_type.capitalize %></div>
-        <div class="form-group"><label>OpenBIS Type</label>
+        <div class="form-group"><label>OpenBIS Type:</label>
           <%= select_tag :entity_type, options_for_select(@entity_type_options, @entity_type),
-                         id: 'zample_type', class: 'form-control1', :onchange => 'this.form.submit();' %></div>
+                         id: 'zample_type', class: 'form-control', :onchange => 'this.form.submit();' %></div>
         <div class="form-group"><label>Samples:</label> <%= @entities.length %></div>
     <% end %>
   </div>
