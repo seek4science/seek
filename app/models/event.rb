@@ -25,16 +25,9 @@ class Event < ActiveRecord::Base
   # load the configuration for the pagination
   grouped_pagination
 
-  # FIXME: Move to Libs
-  Array.class_eval do
-    def contains_duplicates?
-      uniq.size != size
-    end
-  end
-
   validate :validate_data_files
   def validate_data_files
-    errors.add(:data_files, 'May only contain one association to each data file') if data_files.contains_duplicates?
+    errors.add(:data_files, 'May only contain one association to each data file') unless (data_files.size == data_files.uniq.size)
   end
 
   validate :validate_end_date
