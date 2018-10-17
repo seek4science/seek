@@ -7,6 +7,7 @@
 <% if item.try(:has_member?,current_user) %>
     <%= button_link_to("Dashboard", 'project_dashboard', dashboard_project_stats_path(item)) -%>
 <% end -%>
+<%= button_link_to('Overview', 'graph_nodes', overview_project_path(item)) -%>
 <% if item.try(:has_member?,current_user) || admin_logged_in? -%>
     <% tooltip_text="This will present you with a short report about the items that have been shared outside of your #{t('project')}" %>
     <%= button_link_to("Asset report", 'report', asset_report_project_path(item), 'data-tooltip' => tooltip(tooltip_text)) -%>
