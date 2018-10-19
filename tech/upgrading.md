@@ -106,6 +106,9 @@ content.
 
     bundle exec rake sunspot:solr:start
     bundle exec rake seek:workers:start                
+
+    touch tmp/restart.txt
+    bundle exec rake tmp:clear
             
     
 ---
