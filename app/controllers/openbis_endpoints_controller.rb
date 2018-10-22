@@ -5,15 +5,15 @@ class OpenbisEndpointsController < ApplicationController
 
   include Seek::DestroyHandling
 
-  before_filter :openbis_enabled?
+  before_action :openbis_enabled?
 
-  before_filter :get_project
-  before_filter :project_required, except: [:show_dataset_files]
-  before_filter :project_member?, except: [:show_dataset_files]
-  before_filter :project_can_admin?, except: [:browse, :add_dataset, :show_dataset_files, :show_items, :show_item_count]
-  before_filter :authorise_show_dataset_files, only: [:show_dataset_files]
-  before_filter :get_endpoints, only: [:index, :browse]
-  before_filter :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_metadata_store, :destroy]
+  before_action :get_project
+  before_action :project_required, except: [:show_dataset_files]
+  before_action :project_member?, except: [:show_dataset_files]
+  before_action :project_can_admin?, except: [:browse, :add_dataset, :show_dataset_files, :show_items, :show_item_count]
+  before_action :authorise_show_dataset_files, only: [:show_dataset_files]
+  before_action :get_endpoints, only: [:index, :browse]
+  before_action :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_metadata_store, :destroy]
 
   def index
     respond_with(@project, @openbis_endpoints)
@@ -161,7 +161,7 @@ class OpenbisEndpointsController < ApplicationController
     end
   end
 
-  # overides the after_filter callback from application_controller, as the behaviour needs to be
+  # overides the after_action callback from application_controller, as the behaviour needs to be
   # slightly different
   def log_event
     action = action_name.downcase

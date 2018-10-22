@@ -7,8 +7,8 @@ class AdminController < ApplicationController
   RESTART_MSG = "Your settings have been updated. If you changed some settings e.g. search, you need to restart some processes.
                  Please see the buttons and explanations below.".freeze
 
-  before_filter :login_required
-  before_filter :is_user_admin_auth
+  before_action :login_required
+  before_action :is_user_admin_auth
 
   def index
     respond_to do |format|

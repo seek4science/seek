@@ -6,20 +6,20 @@ class PeopleController < ApplicationController
   include Seek::DestroyHandling
   include Seek::AdminBulkAction
 
-  before_filter :find_and_authorize_requested_item, only: %i[show edit update destroy items]
-  before_filter :current_user_exists, only: %i[register create new]
-  before_filter :is_during_registration, only: [:register]
-  before_filter :is_user_admin_auth, only: [:destroy]
-  before_filter :auth_to_create, only: %i[new create]
-  before_filter :administerable_by_user, only: %i[admin administer_update]
-  before_filter :do_projects_belong_to_project_administrator_projects?, only: [:administer_update]
-  before_filter :editable_by_user, only: %i[edit update]
+  before_action :find_and_authorize_requested_item, only: %i[show edit update destroy items]
+  before_action :current_user_exists, only: %i[register create new]
+  before_action :is_during_registration, only: [:register]
+  before_action :is_user_admin_auth, only: [:destroy]
+  before_action :auth_to_create, only: %i[new create]
+  before_action :administerable_by_user, only: %i[admin administer_update]
+  before_action :do_projects_belong_to_project_administrator_projects?, only: [:administer_update]
+  before_action :editable_by_user, only: %i[edit update]
 
-  skip_before_filter :partially_registered?, only: %i[register create]
-  skip_before_filter :project_membership_required, only: %i[create new]
-  skip_after_filter :request_publish_approval, :log_publishing, only: %i[create update]
+  skip_before_action :partially_registered?, only: %i[register create]
+  skip_before_action :project_membership_required, only: %i[create new]
+  skip_after_action :request_publish_approval, :log_publishing, only: %i[create update]
 
-  after_filter :reset_notifications, only: [:administer_update]
+  after_action :reset_notifications, only: [:administer_update]
 
   cache_sweeper :people_sweeper, only: %i[update create destroy]
   include Seek::BreadCrumbs

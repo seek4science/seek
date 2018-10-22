@@ -1,7 +1,7 @@
 class HelpAttachmentsController < ApplicationController
 
-  before_filter :documentation_enabled?
-  before_filter :is_user_admin_auth, :except => [:download]
+  before_action :documentation_enabled?
+  before_action :is_user_admin_auth, :except => [:download]
   
   def download
     @help_attachment = HelpAttachment.find(params[:id])

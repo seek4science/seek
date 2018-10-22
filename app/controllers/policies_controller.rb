@@ -1,7 +1,7 @@
 class PoliciesController < ApplicationController
   include WhiteListHelper
   
-  before_filter :login_required
+  before_action :login_required
   
   def send_policy_data
     request_type = white_list(params[:policy_type])

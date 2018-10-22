@@ -2,14 +2,14 @@ class OrganismsController < ApplicationController
 
   include Seek::DestroyHandling
 
-  before_filter :organisms_enabled?
-  before_filter :find_requested_item, :only=>[:show,:edit,:more_ajax,:visualise,:destroy, :update]
-  before_filter :login_required,:except=>[:show,:index,:visualise]
-  before_filter :can_manage?,:only=>[:edit,:update]
-  before_filter :auth_to_create, :only=>[:new,:create, :destroy]
-  before_filter :find_assets, only: [:index]
+  before_action :organisms_enabled?
+  before_action :find_requested_item, :only=>[:show,:edit,:more_ajax,:visualise,:destroy, :update]
+  before_action :login_required,:except=>[:show,:index,:visualise]
+  before_action :can_manage?,:only=>[:edit,:update]
+  before_action :auth_to_create, :only=>[:new,:create, :destroy]
+  before_action :find_assets, only: [:index]
 
-  skip_before_filter :project_membership_required
+  skip_before_action :project_membership_required
   
   cache_sweeper :organisms_sweeper,:only=>[:update,:create,:destroy]
 

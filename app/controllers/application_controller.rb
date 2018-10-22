@@ -11,27 +11,27 @@ class ApplicationController < ActionController::Base
 
   include CommonSweepers
 
-  before_filter :log_extra_exception_data
+  before_action :log_extra_exception_data
 
   # if the logged in user is currently partially registered, force the continuation of the registration process
-  before_filter :partially_registered?
+  before_action :partially_registered?
 
-  after_filter :log_event
+  after_action :log_event
 
   include AuthenticatedSystem
 
-  around_filter :with_current_user
+  around_action :with_current_user
 
   rescue_from 'ActiveRecord::RecordNotFound', with: :render_not_found_error
   rescue_from 'ActiveRecord::UnknownAttributeError', with: :render_unknown_attribute_error
   rescue_from NotImplementedError, with: :render_not_implemented_error
 
-  before_filter :project_membership_required, only: [:create, :new]
+  before_action :project_membership_required, only: [:create, :new]
 
-  before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
+  before_action :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
 
-  before_filter :check_json_id_type, only: [:create, :update], if: :json_api_request?
-  before_filter :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
+  before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
+  before_action :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
 
   helper :all
 
@@ -58,7 +58,7 @@ class ApplicationController < ActionController::Base
     # will be named xml. Turns a params hash like.. {:xml => {:param_one => "val", :param_two => "val2"}}
     # into {:param_one => "val", :param_two => "val2"}
 
-    # This should probably be used with prepend_before_filter, since some filters might need this to happen so they can check params.
+    # This should probably be used with prepend_before_action, since some filters might need this to happen so they can check params.
     # see sessions controller for an example usage
     params[:xml].each { |k, v| params[k] = v } if request.format.xml? && params[:xml]
   end

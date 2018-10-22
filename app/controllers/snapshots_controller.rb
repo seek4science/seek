@@ -2,13 +2,13 @@ require 'zenodo/oauth2/client'
 require 'zenodo-client'
 
 class SnapshotsController < ApplicationController
-  before_filter :find_resource
-  before_filter :auth_resource, only: [:mint_doi_confirm, :mint_doi, :new, :create, :export_preview, :export_submit, :destroy]
-  before_filter :check_resource_permitted_for_ro, only: [:new, :create]
-  before_filter :find_snapshot, only: [:show, :mint_doi_confirm, :mint_doi, :download, :export_preview, :export_submit, :destroy]
-  before_filter :doi_minting_enabled?, only: [:mint_doi_confirm, :mint_doi]
-  before_filter :zenodo_oauth_client
-  before_filter :zenodo_oauth_session, only: [:export_submit]
+  before_action :find_resource
+  before_action :auth_resource, only: [:mint_doi_confirm, :mint_doi, :new, :create, :export_preview, :export_submit, :destroy]
+  before_action :check_resource_permitted_for_ro, only: [:new, :create]
+  before_action :find_snapshot, only: [:show, :mint_doi_confirm, :mint_doi, :download, :export_preview, :export_submit, :destroy]
+  before_action :doi_minting_enabled?, only: [:mint_doi_confirm, :mint_doi]
+  before_action :zenodo_oauth_client
+  before_action :zenodo_oauth_session, only: [:export_submit]
 
   include Seek::BreadCrumbs
   include Zenodo::Oauth2::SessionHelper

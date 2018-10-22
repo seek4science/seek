@@ -3,10 +3,10 @@ class ExperimentalConditionsController < ApplicationController
   include Seek::AnnotationCommon
   include Seek::AssetsCommon
 
-  before_filter :login_required
-  before_filter :find_and_auth_sop  
-  before_filter :create_new_condition, :only=>[:index]
-  before_filter :no_comma_for_decimal, :only=>[:create, :update]
+  before_action :login_required
+  before_action :find_and_auth_sop
+  before_action :create_new_condition, :only=>[:index]
+  before_action :no_comma_for_decimal, :only=>[:create, :update]
 
   include Seek::BreadCrumbs
 

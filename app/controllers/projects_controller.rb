@@ -7,18 +7,18 @@ class ProjectsController < ApplicationController
   include Seek::DestroyHandling
   include ApiHelper
 
-  before_filter :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
+  before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
                                                admin_member_roles update_members storage_report request_membership]
-  before_filter :find_assets, only: [:index]
-  before_filter :auth_to_create, only: %i[new create]
-  before_filter :is_user_admin_auth, only: %i[manage destroy]
-  before_filter :editable_by_user, only: %i[edit update]
-  before_filter :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report]
-  before_filter :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
-  before_filter :login_required, only: [:request_membership]
-  before_filter :allow_request_membership, only: [:request_membership]
+  before_action :find_assets, only: [:index]
+  before_action :auth_to_create, only: %i[new create]
+  before_action :is_user_admin_auth, only: %i[manage destroy]
+  before_action :editable_by_user, only: %i[edit update]
+  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report]
+  before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
+  before_action :login_required, only: [:request_membership]
+  before_action :allow_request_membership, only: [:request_membership]
 
-  skip_before_filter :project_membership_required
+  skip_before_action :project_membership_required
 
   cache_sweeper :projects_sweeper, only: %i[update create destroy]
   include Seek::BreadCrumbs

@@ -1,7 +1,7 @@
 class HelpImagesController < ApplicationController
   
-  before_filter :login_required
-  before_filter :is_user_admin_auth, :except => [:download]
+  before_action :login_required
+  before_action :is_user_admin_auth, :except => [:download]
 
   def create
     @help_document = HelpDocument.find(params[:help_image][:help_document_id])

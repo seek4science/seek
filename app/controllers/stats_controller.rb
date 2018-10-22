@@ -1,5 +1,5 @@
 class StatsController < ApplicationController
-  before_filter :is_user_admin_auth
+  before_action :is_user_admin_auth
 
   def dashboard
     respond_to do |format|

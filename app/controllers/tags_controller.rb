@@ -1,6 +1,6 @@
 class TagsController < ApplicationController
-  before_filter :find_tag, only: [:show]
-  before_filter :find_tagged_objects, only: [:show]
+  before_action :find_tag, only: [:show]
+  before_action :find_tagged_objects, only: [:show]
 
   def show
     if @tagged_objects.empty?

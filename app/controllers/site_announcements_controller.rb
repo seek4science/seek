@@ -1,9 +1,9 @@
 class SiteAnnouncementsController < ApplicationController
   include Seek::BreadCrumbs
 
-  before_filter :login_required, except: %i[feed notification_settings update_notification_settings]
+  before_action :login_required, except: %i[feed notification_settings update_notification_settings]
 
-  before_filter :check_manage_announcements, only: %i[new create edit update destroy]
+  before_action :check_manage_announcements, only: %i[new create edit update destroy]
 
   def feed
     limit = params[:limit]

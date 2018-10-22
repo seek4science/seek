@@ -3,11 +3,11 @@ class StudiedFactorsController < ApplicationController
   include Seek::AnnotationCommon
   include Seek::AssetsCommon
 
-  before_filter :login_required, except: [:show]
-  before_filter :find_data_file_edit_auth, except: [:show]
-  before_filter :find_data_file_view_auth, only: [:show]
-  before_filter :create_new_studied_factor, only: [:index]
-  before_filter :no_comma_for_decimal, only: %i[create update]
+  before_action :login_required, except: [:show]
+  before_action :find_data_file_edit_auth, except: [:show]
+  before_action :find_data_file_view_auth, only: [:show]
+  before_action :create_new_studied_factor, only: [:index]
+  before_action :no_comma_for_decimal, only: %i[create update]
 
   include Seek::BreadCrumbs
 

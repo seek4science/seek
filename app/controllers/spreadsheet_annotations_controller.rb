@@ -1,7 +1,7 @@
 class SpreadsheetAnnotationsController < ApplicationController
 
-  before_filter :login_required
-  before_filter :auth
+  before_action :login_required
+  before_action :auth
 
   def create
     content = params[:annotation_content].strip

@@ -1,6 +1,6 @@
 class SearchController < ApplicationController
 
-  before_filter :set_default_search_params
+  before_action :set_default_search_params
 
   include Seek::ExternalSearch
   include Seek::FacetedBrowsing

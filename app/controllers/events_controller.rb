@@ -2,11 +2,11 @@ class EventsController < ApplicationController
   include Seek::PreviewHandling
   include Seek::AssetsStandardControllerActions
 
-  before_filter :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
+  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
 
-  before_filter :find_assets
+  before_action :find_assets
 
-  before_filter :events_enabled?
+  before_action :events_enabled?
 
   include Seek::IndexPager
 

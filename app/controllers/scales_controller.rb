@@ -1,7 +1,7 @@
 class ScalesController < ApplicationController
   include Seek::IndexPager
 
-  before_filter :find_assets,:only => [:index]
+  before_action :find_assets,:only => [:index]
 
 
   def index

@@ -1,5 +1,5 @@
 class UuidsController < ApplicationController
-  before_filter :login_required
+  before_action :login_required
   
   @@uuid_models = nil
   

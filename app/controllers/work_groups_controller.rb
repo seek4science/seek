@@ -1,7 +1,7 @@
 class WorkGroupsController < ApplicationController
   include WhiteListHelper
   
-  before_filter :login_required
+  before_action :login_required
   
   
   # GET /groups

@@ -1,6 +1,6 @@
 class OauthSessionsController < ApplicationController
 
-  before_filter :find_and_check_user
+  before_action :find_and_check_user
 
   def index
     @oauth_sessions = @user.oauth_sessions

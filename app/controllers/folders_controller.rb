@@ -1,12 +1,12 @@
 
 
 class FoldersController < ApplicationController
-  before_filter :login_required
-  before_filter :check_project
-  before_filter :browser_enabled
-  before_filter :get_folder, :only=>[:create_folder, :destroy, :display_contents,:remove_asset]
-  before_filter :get_folders,:only=>[:index,:move_asset_to,:create_folder]
-  before_filter :get_asset, :only=>[:move_asset_to,:remove_asset]
+  before_action :login_required
+  before_action :check_project
+  before_action :browser_enabled
+  before_action :get_folder, :only=>[:create_folder, :destroy, :display_contents,:remove_asset]
+  before_action :get_folders,:only=>[:index,:move_asset_to,:create_folder]
+  before_action :get_asset, :only=>[:move_asset_to,:remove_asset]
 
   include Seek::BreadCrumbs
 

@@ -1,7 +1,7 @@
 class ModelImagesController < ApplicationController
-  before_filter :check_model_specified
-  before_filter :find_model_images, only: [:index]
-  before_filter :find_model_image_auth, only: %i[show select edit update destroy]
+  before_action :check_model_specified
+  before_action :find_model_images, only: [:index]
+  before_action :find_model_image_auth, only: %i[show select edit update destroy]
 
   def new
     @model_image = ModelImage.new

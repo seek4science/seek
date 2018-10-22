@@ -3,11 +3,11 @@ class StrainsController < ApplicationController
   include Seek::AnnotationCommon
   include Seek::DestroyHandling
 
-  before_filter :organisms_enabled?
-  before_filter :find_assets, only: [:index]
-  before_filter :find_and_authorize_requested_item, only: [:show, :edit, :update, :destroy]
+  before_action :organisms_enabled?
+  before_action :find_assets, only: [:index]
+  before_action :find_and_authorize_requested_item, only: [:show, :edit, :update, :destroy]
 
-  before_filter :get_strains_for_organism, only: [:existing_strains_for_assay_organism]
+  before_action :get_strains_for_organism, only: [:existing_strains_for_assay_organism]
 
   include Seek::Publishing::PublishingCommon
 

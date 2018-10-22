@@ -7,11 +7,11 @@ class ModelsController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
 
-  before_filter :models_enabled?
-  before_filter :find_assets, :only => [:index]
-  before_filter :find_and_authorize_requested_item, :except => [:build, :index, :new, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only => [:show, :download, :execute, :matching_data, :visualise, :export_as_xgmml, :compare_versions]
-  before_filter :find_other_version, :only => [:compare_versions]
+  before_action :models_enabled?
+  before_action :find_assets, :only => [:index]
+  before_action :find_and_authorize_requested_item, :except => [:build, :index, :new, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_display_asset, :only => [:show, :download, :execute, :matching_data, :visualise, :export_as_xgmml, :compare_versions]
+  before_action :find_other_version, :only => [:compare_versions]
 
   include Seek::Jws::Simulator
   include Seek::Publishing::PublishingCommon

@@ -5,11 +5,11 @@ class PublicationsController < ApplicationController
   include Seek::AssetsCommon
   include Seek::PreviewHandling
 
-  before_filter :publications_enabled?
+  before_action :publications_enabled?
 
-  before_filter :find_assets, only: [:index]
-  before_filter :find_and_authorize_requested_item, only: %i[show edit update destroy]
-  before_filter :suggest_authors, only: :edit
+  before_action :find_assets, only: [:index]
+  before_action :find_and_authorize_requested_item, only: %i[show edit update destroy]
+  before_action :suggest_authors, only: :edit
 
   include Seek::BreadCrumbs
 

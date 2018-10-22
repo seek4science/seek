@@ -1,9 +1,9 @@
 class CompoundsController < ApplicationController
 
-  before_filter :find_requested_item, :only=>[:show,:edit,:update,:destroy]
-  before_filter :login_required
-  before_filter :is_user_admin_auth
-  before_filter :find_all_compounds
+  before_action :find_requested_item, :only=>[:show,:edit,:update,:destroy]
+  before_action :login_required
+  before_action :is_user_admin_auth
+  before_action :find_all_compounds
 
   include Seek::FactorStudied
   include Seek::BreadCrumbs

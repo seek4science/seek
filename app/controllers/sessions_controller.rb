@@ -1,11 +1,11 @@
 # This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
 
-  before_filter :redirect_to_sign_up_when_no_user,:only=>:new
-  skip_before_filter :restrict_guest_user
-  skip_before_filter :project_membership_required
-  skip_before_filter :partially_registered?,:only=>[:create,:new]
-  prepend_before_filter :strip_root_for_xml_requests
+  before_action :redirect_to_sign_up_when_no_user,:only=>:new
+  skip_before_action :restrict_guest_user
+  skip_before_action :project_membership_required
+  skip_before_action :partially_registered?,:only=>[:create,:new]
+  prepend_before_action :strip_root_for_xml_requests
 
   # render new.html.erb
   def new

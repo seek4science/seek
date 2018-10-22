@@ -4,13 +4,13 @@ class InstitutionsController < ApplicationController
   include CommonSweepers
   include Seek::DestroyHandling
 
-  before_filter :find_requested_item, only: [:show, :edit, :update, :destroy]
-  before_filter :find_assets, only: [:index]
-  before_filter :is_user_admin_auth, only: [:destroy]
-  before_filter :editable_by_user, only: [:edit, :update]
-  before_filter :auth_to_create, only: [:new, :create]
+  before_action :find_requested_item, only: [:show, :edit, :update, :destroy]
+  before_action :find_assets, only: [:index]
+  before_action :is_user_admin_auth, only: [:destroy]
+  before_action :editable_by_user, only: [:edit, :update]
+  before_action :auth_to_create, only: [:new, :create]
 
-  skip_before_filter :project_membership_required
+  skip_before_action :project_membership_required
 
   cache_sweeper :institutions_sweeper, only: [:update, :create, :destroy]
   include Seek::BreadCrumbs

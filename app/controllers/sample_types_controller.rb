@@ -3,14 +3,14 @@ class SampleTypesController < ApplicationController
   include Seek::UploadHandling::DataUpload
   include Seek::IndexPager
 
-  before_filter :samples_enabled?
-  before_filter :find_sample_type, only: [:show, :edit, :update, :destroy, :template_details]
-  before_filter :check_no_created_samples, only: [:destroy]
-  before_filter :find_assets, only: [:index]
-  before_filter :auth_to_create, only: [:new, :create]
-  before_filter :project_membership_required, only: [:create, :new, :select, :filter_for_select]
+  before_action :samples_enabled?
+  before_action :find_sample_type, only: [:show, :edit, :update, :destroy, :template_details]
+  before_action :check_no_created_samples, only: [:destroy]
+  before_action :find_assets, only: [:index]
+  before_action :auth_to_create, only: [:new, :create]
+  before_action :project_membership_required, only: [:create, :new, :select, :filter_for_select]
 
-  before_filter :authorize_requested_sample_type, except: [:index, :new, :create]
+  before_action :authorize_requested_sample_type, except: [:index, :new, :create]
 
   # GET /sample_types/1  ,'sample_attributes','linked_sample_attributes'
   # GET /sample_types/1.json

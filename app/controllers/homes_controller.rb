@@ -1,6 +1,6 @@
 class HomesController < ApplicationController
-  before_filter :redirect_to_sign_up_when_no_user
-  before_filter :login_required, only: %i[feedback send_feedback]
+  before_action :redirect_to_sign_up_when_no_user
+  before_action :login_required, only: %i[feedback send_feedback]
 
   respond_to :html, only: [:index]
 

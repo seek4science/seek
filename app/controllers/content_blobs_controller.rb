@@ -1,9 +1,9 @@
 class ContentBlobsController < ApplicationController
-  before_filter :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download show update]
-  before_filter :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download show update]
-  before_filter :set_asset_version, only: %i[get_pdf download]
+  before_action :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download show update]
+  before_action :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download show update]
+  before_action :set_asset_version, only: %i[get_pdf download]
 
-  skip_before_filter :check_json_id_type, only: [:update]
+  skip_before_action :check_json_id_type, only: [:update]
 
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl

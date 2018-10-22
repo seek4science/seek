@@ -1,11 +1,11 @@
 class AvatarsController < ApplicationController
 
-  skip_before_filter :project_membership_required
+  skip_before_action :project_membership_required
 
-  before_filter :login_required, :except => [ :show ]
-  before_filter :check_owner_specified
-  before_filter :find_avatars, :only => [ :index ]
-  before_filter :find_avatar_auth, :only => [ :show, :select, :edit, :update, :destroy ]
+  before_action :login_required, :except => [ :show ]
+  before_action :check_owner_specified
+  before_action :find_avatars, :only => [ :index ]
+  before_action :find_avatar_auth, :only => [ :show, :select, :edit, :update, :destroy ]
   
   cache_sweeper :avatars_sweeper,:only=>[:destroy,:select,:create]
   
@@ -67,7 +67,7 @@ class AvatarsController < ApplicationController
   end
   
   # GET /users/1/avatars/1
-  # GET /avatars/1 -> denied by before_filter
+  # GET /avatars/1 -> denied by before_action
   def show
     params[:size] ||= "200x200"
     if params[:size] == "large"
@@ -93,7 +93,7 @@ class AvatarsController < ApplicationController
   end
 
   # GET /users/1/avatars
-  # GET /avatars -> denied by before_filter
+  # GET /avatars -> denied by before_action
   def index
     respond_to do |format|
       format.html # index.rhtml
@@ -102,7 +102,7 @@ class AvatarsController < ApplicationController
   
   
   # DELETE /users/1/avatars/1
-  # DELETE /avatars/1 -> denied by before_filter
+  # DELETE /avatars/1 -> denied by before_action
   def destroy
     owner = @avatar.owner
     
@@ -115,7 +115,7 @@ class AvatarsController < ApplicationController
   
   
   # GET /users/1/avatars/1/select
-  # GET /avatars/1/select -> denied by before_filter
+  # GET /avatars/1/select -> denied by before_action
   def select
     if @avatar.select!
       ## IN CONTRAST TO myExperiment SysMO WILL NOT STORE PICTURE SELECTIONS (AT LEAST FOR NOW)
