@@ -1,4 +1,4 @@
-class ProjectFolder < ActiveRecord::Base
+class ProjectFolder < ApplicationRecord
   before_destroy :deletable?
   before_destroy :unsort_assets_and_remove_children
 

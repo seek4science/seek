@@ -1,4 +1,4 @@
-class HelpAttachment < ActiveRecord::Base
+class HelpAttachment < ApplicationRecord
   
   has_attachment :max_size => 20.megabyte
   

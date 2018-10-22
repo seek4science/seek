@@ -5,7 +5,7 @@ require 'tmpdir'
 require 'docsplit'
 require 'rest-client'
 
-class ContentBlob < ActiveRecord::Base
+class ContentBlob < ApplicationRecord
   include Seek::ContentTypeDetection
   include Seek::ContentExtraction
   include Seek::UrlValidation

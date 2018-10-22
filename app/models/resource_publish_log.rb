@@ -1,4 +1,4 @@
-class ResourcePublishLog < ActiveRecord::Base
+class ResourcePublishLog < ApplicationRecord
   belongs_to :resource, polymorphic: true # , :required_access => false
   belongs_to :user # , :required_access => false
 

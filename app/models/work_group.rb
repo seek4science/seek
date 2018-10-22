@@ -1,4 +1,4 @@
-class WorkGroup < ActiveRecord::Base
+class WorkGroup < ApplicationRecord
   belongs_to :institution, inverse_of: :work_groups
   belongs_to :project, inverse_of: :work_groups
   has_many :group_memberships, dependent: :destroy, inverse_of: :work_group

@@ -1,7 +1,7 @@
 require 'zip'
 
 # Investigation "snapshot"
-class Snapshot < ActiveRecord::Base
+class Snapshot < ApplicationRecord
   belongs_to :resource, polymorphic: true
   has_one :content_blob, as: :asset, foreign_key: :asset_id
 

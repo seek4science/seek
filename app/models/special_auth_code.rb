@@ -1,4 +1,4 @@
-class SpecialAuthCode < ActiveRecord::Base
+class SpecialAuthCode < ApplicationRecord
   belongs_to :asset, polymorphic: true
   default_scope -> { where('expiration_date > ?', Date.today) }
 

@@ -1,4 +1,4 @@
-class HelpImage < ActiveRecord::Base
+class HelpImage < ApplicationRecord
   
   has_attachment :max_size => 2.megabyte,
                  :thumbnails => { :thumb => '64x64>' },

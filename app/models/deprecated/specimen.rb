@@ -1,5 +1,5 @@
 module Deprecated
-  class Specimen < ActiveRecord::Base
+  class Specimen < ApplicationRecord
     self.table_name = 'deprecated_specimens'
 
     has_many :deprecated_samples, class_name: 'Deprecated::Sample', foreign_key: 'deprecated_specimen_id'

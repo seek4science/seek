@@ -1,4 +1,4 @@
-class Project < ActiveRecord::Base
+class Project < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::Rdf::ReactToAssociatedChange
 

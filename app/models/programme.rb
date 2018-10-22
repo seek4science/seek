@@ -1,4 +1,4 @@
-class Programme < ActiveRecord::Base
+class Programme < ApplicationRecord
   include Seek::Taggable
   include Seek::Rdf::RdfGeneration
 

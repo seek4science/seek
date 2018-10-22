@@ -1,5 +1,5 @@
 # represents the details to connect to an openbis space
-class OpenbisEndpoint < ActiveRecord::Base
+class OpenbisEndpoint < ApplicationRecord
   belongs_to :project
   belongs_to :policy, autosave: true
   attr_encrypted :password, key: :password_key

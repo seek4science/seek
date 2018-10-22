@@ -1,6 +1,6 @@
 require_dependency 'seek/util'
 
-class DataFile < ActiveRecord::Base
+class DataFile < ApplicationRecord
   include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
 

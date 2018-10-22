@@ -1,4 +1,4 @@
-class GroupMembership < ActiveRecord::Base
+class GroupMembership < ApplicationRecord
   belongs_to :person, inverse_of: :group_memberships
   belongs_to :work_group, inverse_of: :group_memberships
   has_one :project, through: :work_group, inverse_of: :group_memberships

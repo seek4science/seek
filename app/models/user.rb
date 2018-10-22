@@ -1,6 +1,6 @@
 require 'digest/sha1'
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   MIN_PASSWORD_LENGTH=10
 
   acts_as_annotation_source

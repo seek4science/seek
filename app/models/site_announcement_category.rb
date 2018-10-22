@@ -1,4 +1,4 @@
-class SiteAnnouncementCategory < ActiveRecord::Base
+class SiteAnnouncementCategory < ApplicationRecord
   has_many :site_announcements
 end
 

@@ -1,4 +1,4 @@
-class AssayClass < ActiveRecord::Base
+class AssayClass < ApplicationRecord
 
   #this returns an instance of AssayClass according to one of the types "experimental" or "modelling"
   #if there is not a match nil is returned

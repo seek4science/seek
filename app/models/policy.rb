@@ -1,4 +1,4 @@
-class Policy < ActiveRecord::Base
+class Policy < ApplicationRecord
   has_many :permissions, -> { order('created_at ASC') },
            dependent: :destroy,
            autosave: true,

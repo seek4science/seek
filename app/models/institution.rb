@@ -1,4 +1,4 @@
-class Institution < ActiveRecord::Base
+class Institution < ApplicationRecord
 
   acts_as_yellow_pages
   title_trimmer

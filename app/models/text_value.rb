@@ -1,8 +1,4 @@
-# This extends the AnnotationAttribute model defined in the Annotations gem.
-
-require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','models','text_value')
-
-class TextValue < ActiveRecord::Base
+class TextValue < ApplicationRecord
 
   TAG_TYPES=["tag","expertise","tool","sample_type_tags"]
 
@@ -13,5 +9,4 @@ class TextValue < ActiveRecord::Base
   def tag_count
     annotation_count TAG_TYPES
   end
-  
 end

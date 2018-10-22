@@ -1,6 +1,6 @@
 require 'uuid'
 
-class NotifieeInfo < ActiveRecord::Base
+class NotifieeInfo < ApplicationRecord
   belongs_to :notifiee,:polymorphic=>true
   validates_presence_of :notifiee
     

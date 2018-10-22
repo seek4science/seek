@@ -1,5 +1,5 @@
 module Deprecated
-  class SampleAsset < ActiveRecord::Base
+  class SampleAsset < ApplicationRecord
     self.table_name = 'deprecated_sample_assets'
 
     belongs_to :asset, polymorphic: true

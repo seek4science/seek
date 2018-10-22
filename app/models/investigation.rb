@@ -1,4 +1,4 @@
-class Investigation < ActiveRecord::Base
+class Investigation < ApplicationRecord
   include Seek::Rdf::RdfGeneration
 
   acts_as_isa

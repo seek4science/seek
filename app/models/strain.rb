@@ -1,4 +1,4 @@
-class Strain < ActiveRecord::Base
+class Strain < ApplicationRecord
 
   include Seek::Rdf::RdfGeneration
   include Seek::ActsAsCachedTree

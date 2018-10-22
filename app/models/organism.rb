@@ -1,4 +1,4 @@
-class Organism < ActiveRecord::Base
+class Organism < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::ProgrammeCompat
 

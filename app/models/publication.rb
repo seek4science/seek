@@ -1,6 +1,6 @@
 require 'libxml'
 
-class Publication < ActiveRecord::Base
+class Publication < ApplicationRecord
   include Seek::Rdf::RdfGeneration
 
   alias_attribute :description, :abstract

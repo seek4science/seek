@@ -1,7 +1,5 @@
 # frozen_string_literal: true
-
-require_dependency File.join(Gem.loaded_specs['acts_as_activity_logged'].full_gem_path, 'lib', 'activity_log')
-class ActivityLog < ActiveRecord::Base
+class ActivityLog < ApplicationRecord
   serialize :data
 
   scope :no_spider, -> { where("(UPPER(user_agent) NOT LIKE '%SPIDER%' OR user_agent IS NULL)") }

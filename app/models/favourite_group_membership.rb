@@ -1,4 +1,4 @@
-class FavouriteGroupMembership < ActiveRecord::Base
+class FavouriteGroupMembership < ApplicationRecord
   belongs_to :favourite_group
   belongs_to :person
   
