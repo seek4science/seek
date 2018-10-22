@@ -65,7 +65,6 @@ gem 'bives'
 # Linked to SysMO Git repositories
 gem 'gibberish', git: 'https://github.com/SysMO-DB/gibberish.git'
 gem 'white_list', git: 'https://github.com/SysMO-DB/white_list.git'
-gem 'white_list_formatted_content', git: 'https://github.com/SysMO-DB/white_list_formatted_content.git'
 gem 'my_responds_to_parent', git: 'https://github.com/SysMO-DB/my_responds_to_parent.git'
 gem 'bioportal', '>=3.0', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
