@@ -1,5 +1,5 @@
 # reformat the authors
-class Bio::MEDLINE
+module BioMedlineExtensions
   def reference
     reference = super
     reference.published_date = published_date
@@ -38,7 +38,7 @@ class Bio::MEDLINE
   end
 end
 
-class Bio::Reference
+module BioReferenceExtensions
   def authors
     authors_array = super
     reformat_authors = []
@@ -72,4 +72,12 @@ class Author
   def to_s
     last_name + ', ' + first_name
   end
+end
+
+Bio::MEDLINE.class_eval do
+  prepend BioMedlineExtensions
+end
+
+Bio::Reference.class_eval do
+  prepend BioReferenceExtensions
 end
