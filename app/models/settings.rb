@@ -55,32 +55,36 @@ class Settings < ApplicationRecord
     end
   end
 
-  #get a setting value by [] notation
-  def self.[](var_name)
-    fetch(var_name).try(:value)
-  end
+  class << self
+    #get a setting value by [] notation
+    def fetch_value(var_name)
+      fetch(var_name).try(:value)
+    end
+    alias_method :[], :fetch_value
 
-  #set a setting value by [] notation
-  def self.[]=(var_name, value)
-    var_name = var_name.to_s
+    #set a setting value by [] notation
+    def set_value(var_name, value)
+      var_name = var_name.to_s
 
-    record = fetch(var_name) || new(var: var_name)
-    record.value = value
-    record.save!
+      record = fetch(var_name) || new(var: var_name)
+      record.value = value
+      record.save!
 
-    value
-  end
+      value
+    end
+    alias_method :[]=, :set_value
 
-  def self.merge!(var_name, hash_value)
-    raise ArgumentError unless hash_value.is_a?(Hash)
+    def merge!(var_name, hash_value)
+      raise ArgumentError unless hash_value.is_a?(Hash)
 
-    old_value = self[var_name] || {}
-    raise TypeError, "Existing value is not a hash, can't merge!" unless old_value.is_a?(Hash)
+      old_value = self[var_name] || {}
+      raise TypeError, "Existing value is not a hash, can't merge!" unless old_value.is_a?(Hash)
 
-    new_value = old_value.with_indifferent_access.merge(hash_value)
-    self[var_name] = new_value
+      new_value = old_value.with_indifferent_access.merge(hash_value)
+      self[var_name] = new_value
 
-    new_value
+      new_value
+    end
   end
 
   #get the value field, YAML decoded

@@ -1,6 +1,7 @@
 class Project < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::Rdf::ReactToAssociatedChange
+  include HasSettings
 
   acts_as_yellow_pages
   title_trimmer
@@ -75,8 +76,6 @@ class Project < ApplicationRecord
   #  fully copied and assigned to belong to owners of assets, where identical policy
   #  is to be used)
   belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
-
-  has_many :settings, class_name: 'Settings', as: :target, dependent: :destroy
 
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
