@@ -1,5 +1,4 @@
-class TextValue < ApplicationRecord
-
+module TextValueExtensions
   TAG_TYPES=["tag","expertise","tool","sample_type_tags"]
 
   def self.all_tags attributes=TAG_TYPES
@@ -9,4 +8,8 @@ class TextValue < ApplicationRecord
   def tag_count
     annotation_count TAG_TYPES
   end
+end
+
+TextValue.class_eval do
+  include TextValueExtensions
 end
