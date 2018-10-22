@@ -30,7 +30,7 @@ module Seek
     def self.persistent_classes
       cache('persistent_classes') do
         ensure_models_loaded
-        ActiveRecord::Base.descendants
+        ApplicationRecord.descendants
       end
     end
 
