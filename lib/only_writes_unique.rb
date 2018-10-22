@@ -1,16 +1,14 @@
 module OnlyWritesUnique
-
-  def concat_with_ignore_duplicates *args
+  def concat *args
     if @reflection.options[:unique]
       load_target
       args = flatten_deeper(args).reject {|record| target.include? record}.uniq
     end
-    concat_without_ignore_duplicates(*args)
+    super(*args)
   end
 
   def self.included base
     base.class_eval do
-      alias_method_chain :concat, :ignore_duplicates
       alias_method :<<, :concat
       alias_method :push, :concat
     end
@@ -18,7 +16,7 @@ module OnlyWritesUnique
 end
 
 ActiveRecord::Associations::AssociationCollection.class_eval do
-  include OnlyWritesUnique
+  prepend OnlyWritesUnique
 end
 
 ActiveRecord::Associations::ClassMethods.valid_keys_for_has_many_association << :unique

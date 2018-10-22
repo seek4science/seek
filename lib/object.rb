@@ -1,4 +1,3 @@
-
 class Object
   #instead of a and a.b and a.b.c and a.b.c.d?
   #try_block {a.b.c.d?}
@@ -17,14 +16,4 @@ class Object
         raise
      end
   end
-
 end
-
-Module.module_eval do
-  def class_alias_method_chain name, feature
-    singleton_class.instance_eval do
-      alias_method_chain name, feature
-    end
-  end
-end
-

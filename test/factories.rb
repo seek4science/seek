@@ -21,17 +21,12 @@ FactoryGirl.define do
 end
 
 FactoryGirl.class_eval do
-  unless FactoryGirl.respond_to?(:create_with_privileged_mode) # Sometimes this gets executed twice and causes an infinite loop!
-    def self.create_with_privileged_mode *args
-      disable_authorization_checks {create_without_privileged_mode(*args)}
-    end
+  def self.create *args
+    disable_authorization_checks { super(*args) }
+  end
 
-    def self.build_with_privileged_mode *args
-      disable_authorization_checks {build_without_privileged_mode(*args)}
-    end
-
-    class_alias_method_chain :create, :privileged_mode
-    class_alias_method_chain :build, :privileged_mode
+  def self.build *args
+    disable_authorization_checks { super(*args) }
   end
 end
 

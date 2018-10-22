@@ -1,8 +1,7 @@
-Technoweenie::AttachmentFu::InstanceMethods.module_eval do
-
-  def uploaded_data_with_extension=(file_data)
+module AttachmentFuExtension
+  def uploaded_data=(file_data)
     unless self.class == HelpAttachment || self.class == HelpImage #FIXME: This check is an indication that this extension is applied too broadly, I think.
-      upload_results = self.uploaded_data_without_extension=file_data
+      upload_results = super(file_data)
       self.original_filename = file_data.original_filename
 
       uuid_to_use=UUID.generate
@@ -20,10 +19,11 @@ Technoweenie::AttachmentFu::InstanceMethods.module_eval do
 
       return upload_results
     else
-      self.uploaded_data_without_extension=(file_data)
+      super(file_data)
     end
   end
+end
 
-  alias_method_chain :uploaded_data=, :extension
-
+Technoweenie::AttachmentFu::InstanceMethods.module_eval do
+  prepend AttachmentFuExtension
 end
