@@ -1,8 +1,8 @@
 class Event < ApplicationRecord
-  has_and_belongs_to_many :data_files, -> { uniq }
-  has_and_belongs_to_many :publications, -> { uniq }
-  has_and_belongs_to_many :presentations, -> { uniq }
-  has_and_belongs_to_many :documents, -> { uniq }
+  has_and_belongs_to_many :data_files, -> { distinct }
+  has_and_belongs_to_many :publications, -> { distinct }
+  has_and_belongs_to_many :presentations, -> { distinct }
+  has_and_belongs_to_many :documents, -> { distinct }
 
   before_destroy {documents.clear}
 
@@ -27,7 +27,7 @@ class Event < ApplicationRecord
 
   validate :validate_data_files
   def validate_data_files
-    errors.add(:data_files, 'May only contain one association to each data file') unless (data_files.size == data_files.uniq.size)
+    errors.add(:data_files, 'May only contain one association to each data file') unless (data_files.count == data_files.distinct.count)
   end
 
   validate :validate_end_date

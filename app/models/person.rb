@@ -44,7 +44,7 @@ class Person < ApplicationRecord
   has_many :current_work_groups, class_name: 'WorkGroup', through: :current_group_memberships,
                                  source: :work_group
 
-  has_many :institutions, -> { uniq }, through: :work_groups
+  has_many :institutions, -> { distinct }, through: :work_groups
 
   has_many :favourite_group_memberships, dependent: :destroy
   has_many :favourite_groups, through: :favourite_group_memberships
@@ -350,14 +350,14 @@ class Person < ApplicationRecord
                          .where('controller_name != \'people\'')
                          .order('created_at DESC')
                          .limit(limit)
-                         .uniq +
+                         .distinct +
               ActivityLog.group(:id, :activity_loggable_type, :activity_loggable_id)
               .where(culprit_type: 'User', culprit_id: user, action: 'create')
               .where('controller_name != \'sessions\'')
               .where('controller_name != \'people\'')
               .order('created_at DESC')
               .limit(limit)
-              .uniq
+              .distinct
     results.sort_by(&:created_at).reverse.uniq { |r| "#{r.activity_loggable_type}#{r.activity_loggable_id}" }[0...limit]
   end
 
