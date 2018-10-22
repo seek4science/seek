@@ -32,7 +32,3 @@ module Seek #:nodoc:
     end
   end
 end
-
-ActiveRecord::Base.class_eval do
-  include Seek::Favouritable
-end

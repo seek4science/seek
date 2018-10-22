@@ -27,7 +27,3 @@ module Seek
     end
   end
 end
-
-ActiveRecord::Base.class_eval do
-  include Seek::AnnotatableExtensions
-end

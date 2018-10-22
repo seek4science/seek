@@ -1,4 +1,3 @@
-# SysMO: lib/acts_as_versioned_resource.rb
 # Original code borrowed from myExperiment and tailored for SysMO needs.
 
 # ********************************************************************************
@@ -8,7 +7,7 @@
 # * See license.txt for details.
 # ********************************************************************************
 
-module Acts #:nodoc:
+module Seek #:nodoc:
   module VersionedResource #:nodoc:
     def self.included(mod)
       mod.extend(ClassMethods)
@@ -23,9 +22,9 @@ module Acts #:nodoc:
         belongs_to :policy, autosave: true
 
         class_eval do
-          extend Acts::VersionedResource::SingletonMethods
+          extend Seek::VersionedResource::SingletonMethods
         end
-        include Acts::VersionedResource::InstanceMethods
+        include Seek::VersionedResource::InstanceMethods
         include Seek::Permissions::SpecialContributors
 
         delegate :tag_counts, :scales, :managers, :attributions, :creators, :assets_creators, :is_asset?,
@@ -107,8 +106,4 @@ module Acts #:nodoc:
       end
     end
   end
-end
-
-ActiveRecord::Base.class_eval do
-  include Acts::VersionedResource
 end

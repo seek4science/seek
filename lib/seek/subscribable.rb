@@ -119,13 +119,3 @@ module Seek
     end
   end
 end
-
-ActiveRecord::Base.class_eval do
-  def self.subscribable?
-    include? Seek::Subscribable
-  end
-
-  def subscribable?
-    self.class.subscribable?
-  end
-end

@@ -1,6 +1,23 @@
 class ApplicationRecord < ActiveRecord::Base
-
   self.abstract_class = true
+
+  include Seek::AnnotatableExtensions
+  include Seek::VersionedResource
+  include Seek::ExplicitVersioning
+  include Seek::Favouritable
+  include Seek::ActsAsFleximageExtension
+  include Seek::UniquelyIdentifiable
+  include Seek::YellowPages
+  include Seek::GroupedPagination
+  include Seek::Scalable
+  include Seek::TitleTrimmer
+  include Seek::ActsAsAsset
+  include Seek::ActsAsISA
+  include Seek::Doi::ActsAsDoiMintable
+  include Seek::Doi::ActsAsDoiParent
+  include Seek::ResearchObjects::ActsAsSnapshottable
+  include Zenodo::ActsAsZenodoDepositable
+  include SiteAnnouncements
 
   def self.is_taggable?
     false # defaults to false, unless it includes Taggable which will override this and check the configuration
@@ -52,5 +69,21 @@ class ApplicationRecord < ActiveRecord::Base
 
   def rdf_supported?
     self.class.include? Seek::Rdf::RdfGeneration
+  end
+
+  def self.subscribable?
+    include? Seek::Subscribable
+  end
+
+  def subscribable?
+    self.class.subscribable?
+  end
+
+  def self.supports_doi?
+    false
+  end
+
+  def supports_doi?
+    self.class.supports_doi?
   end
 end

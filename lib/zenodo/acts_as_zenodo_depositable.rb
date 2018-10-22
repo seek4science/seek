@@ -115,7 +115,3 @@ module Zenodo
 
   end
 end
-
-ActiveRecord::Base.class_eval do
-  include Zenodo::ActsAsZenodoDepositable
-end

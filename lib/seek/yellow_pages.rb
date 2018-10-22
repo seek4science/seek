@@ -1,7 +1,5 @@
-
-
 module Seek #:nodoc:
-  module Yellow_Pages #:nodoc:
+  module YellowPages #:nodoc:
     def self.included(mod)
       mod.extend(ClassMethods)
     end
@@ -45,14 +43,14 @@ module Seek #:nodoc:
         end if Seek::Config.solr_enabled
 
         class_eval do
-          extend Seek::Yellow_Pages::SingletonMethods
+          extend Seek::YellowPages::SingletonMethods
         end
-        include Seek::Yellow_Pages::InstanceMethods
+        include Seek::YellowPages::InstanceMethods
         include Seek::Search::BackgroundReindexing
       end
 
       def is_yellow_pages?
-        include?(Seek::Yellow_Pages::InstanceMethods)
+        include?(Seek::YellowPages::InstanceMethods)
       end
     end
 
@@ -71,8 +69,4 @@ module Seek #:nodoc:
       end
     end
   end
-end
-
-ActiveRecord::Base.class_eval do
-  include Seek::Yellow_Pages
 end

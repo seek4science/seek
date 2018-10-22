@@ -1,10 +1,4 @@
 GIT
-  remote: https://github.com/SysMO-DB/acts_as_activity_logged.git
-  revision: da0b6d8e4ccabfa231c39aa89522c8ba73f03c0e
-  specs:
-    acts_as_activity_logged (0.3.3)
-
-GIT
   remote: https://github.com/SysMO-DB/bioportal.git
   revision: 0f80b4281af3f71234a425d40981b1185a3e5d0b
   specs:
@@ -791,7 +785,6 @@ DEPENDENCIES
   active_model_serializers (~> 0.10.2)
   activerecord-session_store
   acts-as-taggable-on
-  acts_as_activity_logged!
   acts_as_list
   acts_as_tree
   attr_encrypted (~> 3.0.0)

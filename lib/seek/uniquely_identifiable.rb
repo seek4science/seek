@@ -1,4 +1,3 @@
-
 module Seek
   module UniquelyIdentifiable
     def self.included(mod)
@@ -29,8 +28,4 @@ module Seek
       end
     end
   end
-end
-
-ActiveRecord::Base.class_eval do
-  include Seek::UniquelyIdentifiable
 end
