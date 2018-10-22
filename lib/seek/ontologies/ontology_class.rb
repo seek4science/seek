@@ -1,11 +1,11 @@
 module Seek
   module Ontologies
     class OntologyClass
+      prepend OntologyClassExtensionWithSuggestedType
+
       attr_reader :uri, :description, :label, :subclasses, :parents, :term_type
 
       alias children subclasses
-
-      include OntologyClassExtensionWithSuggestedType
 
       def initialize(uri, label = nil, description = nil, subclasses = [], parents = [], term_type = nil)
         @uri = uri
