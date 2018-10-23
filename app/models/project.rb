@@ -310,5 +310,7 @@ class Project < ApplicationRecord
 
   # should put below at the bottom in order to override methods for hierarchies,
   # Try to find a better way for overriding methods regardless where to include the module
-  include Seek::ProjectHierarchies::ProjectExtension if Seek::Config.project_hierarchy_enabled
+  if Seek::Config.project_hierarchy_enabled
+    include Seek::ProjectHierarchies::ProjectExtension
+  end
 end
