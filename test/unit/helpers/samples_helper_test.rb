@@ -6,7 +6,7 @@ class SamplesHelperTest < ActionView::TestCase
     assert sample.can_view?
     value = { id: sample.id, title: sample.title, type: 'Sample' }.with_indifferent_access
     display = seek_sample_attribute_display(value)
-    tag = HTML::Document.new(display).root.children.first
+    tag = Nokogiri::HTML::DocumentFragment.parse(display).children.first
     assert_equal 'a', tag.name
     assert_equal "/samples/#{sample.id}", tag['href']
     assert_equal sample.title, tag.children.first.content
@@ -16,7 +16,7 @@ class SamplesHelperTest < ActionView::TestCase
     refute sample.can_view?
     value = { id: sample.id, title: sample.title, type: 'Sample' }.with_indifferent_access
     display = seek_sample_attribute_display(value)
-    tag = HTML::Document.new(display).root.children.first
+    tag = Nokogiri::HTML::DocumentFragment.parse(display).children.first
     assert_equal 'span', tag.name
     assert_equal 'none_text', tag['class']
     assert_equal 'Hidden', tag.children.first.content
@@ -24,7 +24,7 @@ class SamplesHelperTest < ActionView::TestCase
     # doesn't exist
     value = { id: (Sample.maximum(:id)+1), title: 'Blah', type: 'Sample' }.with_indifferent_access
     display = seek_sample_attribute_display(value)
-    tag = HTML::Document.new(display).root.children.first
+    tag = Nokogiri::HTML::DocumentFragment.parse(display).children.first
     assert_equal 'span', tag.name
     assert_equal 'none_text', tag['class']
     assert_equal 'Blah', tag.children.first.content
