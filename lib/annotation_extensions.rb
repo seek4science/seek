@@ -8,6 +8,10 @@ module TextValueExtensions
   def tag_count
     annotation_count TAG_TYPES
   end
+
+  def create_new_version?
+    false
+  end
 end
 
 TextValue.class_eval do
