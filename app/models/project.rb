@@ -158,27 +158,27 @@ class Project < ApplicationRecord
   end
 
   def site_password
-    settings['site_password']
+    settings.get('site_password')
   end
 
   def site_password= password
-    settings['site_password'] = password
+    settings.set('site_password', password)
   end
 
   def site_username
-    settings['site_username']
+    settings.get('site_username')
   end
 
   def site_username= username
-    settings['site_username'] = username
+    settings.set('site_username', username)
   end
 
   def nels_enabled
-    settings['nels_enabled']
+    settings.get('nels_enabled')
   end
 
   def nels_enabled= checkbox_value
-    settings['nels_enabled'] = !(checkbox_value == '0' || !checkbox_value)
+    settings.set('nels_enabled', !(checkbox_value == '0' || !checkbox_value))
   end
 
   # indicates whether this project has a person, or associated user, as a member

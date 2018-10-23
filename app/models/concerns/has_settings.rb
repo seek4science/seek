@@ -4,11 +4,11 @@ module HasSettings
   included do
     has_many :settings, class_name: 'Settings', as: :target, dependent: :destroy do
       def [](*args, &block)
-        fetch_value(*args, &block)
+        get(*args, &block)
       end
 
       def []=(*args, &block)
-        set_value(*args, &block)
+        set(*args, &block)
       end
     end
   end

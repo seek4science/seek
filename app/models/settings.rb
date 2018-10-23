@@ -57,13 +57,13 @@ class Settings < ApplicationRecord
 
   class << self
     #get a setting value by [] notation
-    def fetch_value(var_name)
+    def get(var_name)
       fetch(var_name).try(:value)
     end
-    alias_method :[], :fetch_value
+    alias_method :[], :get
 
     #set a setting value by [] notation
-    def set_value(var_name, value)
+    def set(var_name, value)
       var_name = var_name.to_s
 
       record = fetch(var_name) || new(var: var_name)
@@ -72,7 +72,7 @@ class Settings < ApplicationRecord
 
       value
     end
-    alias_method :[]=, :set_value
+    alias_method :[]=, :set
 
     def merge!(var_name, hash_value)
       raise ArgumentError unless hash_value.is_a?(Hash)
