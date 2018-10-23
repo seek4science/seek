@@ -27,7 +27,8 @@ class Event < ApplicationRecord
 
   validate :validate_data_files
   def validate_data_files
-    errors.add(:data_files, 'May only contain one association to each data file') unless (data_files.count == data_files.distinct.count)
+    df = data_files.to_a
+    errors.add(:data_files, 'May only contain one association to each data file') unless (df.count == df.uniq.count)
   end
 
   validate :validate_end_date
