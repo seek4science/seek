@@ -1,8 +1,12 @@
 module TextValueExtensions
+  extend ActiveSupport::Concern
+
   TAG_TYPES=["tag","expertise","tool","sample_type_tags"]
 
-  def self.all_tags attributes=TAG_TYPES
-    self.with_attribute_names(attributes).compact
+  class_methods do
+    def all_tags attributes=TAG_TYPES
+      self.with_attribute_names(attributes).compact
+    end
   end
 
   def tag_count
