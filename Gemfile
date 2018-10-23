@@ -116,6 +116,8 @@ gem 'rack-attack', '~> 5.0.1'
 
 gem 'private_address_check'
 
+gem 'ar_transaction_changes' # TODO: Remove in Rails 5.2 upgrade and use `saved_changes` to access changes from callback
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do
