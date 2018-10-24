@@ -19,7 +19,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     assert ep.can_delete?
 
     assert_difference('OpenbisEndpoint.count', -1) do
-      delete :destroy, id: ep.id, project_id: @project.id
+      delete :destroy, params: { id: ep.id, project_id: @project.id }
       assert_redirected_to project_openbis_endpoints_path(@project)
     end
 
@@ -30,7 +30,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     refute ep.can_delete?
 
     assert_no_difference('OpenbisEndpoint.count') do
-      delete :destroy, id: ep.id, project_id: project.id
+      delete :destroy, params: { id: ep.id, project_id: project.id }
       assert_redirected_to :root
       refute_nil flash[:error]
     end
@@ -46,7 +46,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
     assert_difference('OpenbisEndpoint.count') do
       assert_difference('Delayed::Job.count') do
-        post :create, project_id: @project.id, openbis_endpoint:
+        post :create, params: { project_id: @project.id, openbis_endpoint:
             {
               as_endpoint: 'http://as.com',
               dss_endpoint: 'http://dss.com',
@@ -55,8 +55,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
               password: 'secret',
               refresh_period_mins: '123',
               space_perm_id: 'space-id'
-            },
-                      policy_attributes: policy_attributes
+            }, policy_attributes: policy_attributes }
       end
     end
     assert assigns(:openbis_endpoint)
@@ -89,7 +88,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     policy_attributes = { access_type: Policy::ACCESSIBLE,
                           permissions_attributes: project_permissions([@project], Policy::ACCESSIBLE) }
 
-    put :update, id: ep.id, project_id: @project.id, openbis_endpoint:
+    put :update, params: { id: ep.id, project_id: @project.id, openbis_endpoint:
         {
           as_endpoint: 'http://as.com',
           dss_endpoint: 'http://dss.com',
@@ -98,8 +97,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
           password: 'secret',
           refresh_period_mins: '123',
           space_perm_id: 'space-id'
-        },
-                 policy_attributes: policy_attributes
+        }, policy_attributes: policy_attributes }
 
     assert assigns(:openbis_endpoint)
     ep = assigns(:openbis_endpoint)
@@ -131,7 +129,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     login_as(@project_administrator)
     assert_difference('DataFile.count') do
       assert_difference('ActivityLog.count') do
-        post :add_dataset, id: endpoint.id, project_id: @project.id, dataset_perm_id: perm_id
+        post :add_dataset, params: { id: endpoint.id, project_id: @project.id, dataset_perm_id: perm_id }
         assert_nil flash[:error]
       end
     end
@@ -166,7 +164,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     perm_id = '20160210130454955-23'
     login_as(person)
     assert_difference('DataFile.count') do
-      post :add_dataset, id: endpoint.id, project_id: project.id, dataset_perm_id: perm_id
+      post :add_dataset, params: { id: endpoint.id, project_id: project.id, dataset_perm_id: perm_id }
       assert_nil flash[:error]
     end
 
@@ -178,7 +176,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     perm_id = '20160210130454955-23'
     login_as(person)
     assert_no_difference('DataFile.count') do
-      post :add_dataset, id: endpoint.id, project_id: project.id, dataset_perm_id: perm_id
+      post :add_dataset, params: { id: endpoint.id, project_id: project.id, dataset_perm_id: perm_id }
       refute_nil flash[:error]
     end
   end
@@ -186,7 +184,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   test 'browse' do
     # project admin can browse
     login_as(@project_administrator)
-    get :browse, project_id: @project.id
+    get :browse, params: { project_id: @project.id }
     assert_response :success
 
     logout
@@ -195,7 +193,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     person = Factory(:person)
     project = person.projects.first
     login_as(person)
-    get :browse, project_id: project.id
+    get :browse, params: { project_id: project.id }
     assert_response :success
 
     logout
@@ -203,7 +201,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     # non project member cannot browse
     person = Factory(:person)
     login_as(person)
-    get :browse, project_id: Factory(:project).id
+    get :browse, params: { project_id: Factory(:project).id }
     assert_redirected_to :root
 
     logout
@@ -213,7 +211,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
       project_admin = Factory(:project_administrator)
       project = project_admin.projects.first
       login_as(project_admin)
-      get :browse, project_id: project.id
+      get :browse, params: { project_id: project.id }
       assert_redirected_to :root
     end
   end
@@ -221,7 +219,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   test 'show items' do
     login_as(@project_administrator)
     endpoint = Factory(:openbis_endpoint, project: @project)
-    get :show_items, project_id: @project.id, id: endpoint.id
+    get :show_items, params: { project_id: @project.id, id: endpoint.id }
     assert_response :success
 
     logout
@@ -233,20 +231,20 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
     project = person.projects.first
     endpoint = Factory(:openbis_endpoint, project: project)
-    get :show_items, project_id: project.id, id: endpoint.id
+    get :show_items, params: { project_id: project.id, id: endpoint.id }
     assert_response :success
 
     # none project member cannot
     project = Factory(:project)
     endpoint = Factory(:openbis_endpoint, project: project)
-    get :show_items, project_id: project.id, id: endpoint.id
+    get :show_items, params: { project_id: project.id, id: endpoint.id }
     assert_response :redirect
   end
 
   test 'show item count' do
     login_as(@project_administrator)
     endpoint = Factory(:openbis_endpoint, project: @project)
-    get :show_item_count, project_id: @project.id, id: endpoint.id
+    get :show_item_count, params: { project_id: @project.id, id: endpoint.id }
     assert_response :success
     assert_equal '8 DataSets found', @response.body
 
@@ -259,27 +257,26 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
     project = person.projects.first
     endpoint = Factory(:openbis_endpoint, project: project)
-    get :show_item_count, project_id: project.id, id: endpoint.id
+    get :show_item_count, params: { project_id: project.id, id: endpoint.id }
     assert_response :success
     assert_equal '8 DataSets found', @response.body
 
     # none project member cannot
     project = Factory(:project)
     endpoint = Factory(:openbis_endpoint, project: project)
-    get :show_item_count, project_id: project.id, id: endpoint.id
+    get :show_item_count, params: { project_id: project.id, id: endpoint.id }
     assert_response :redirect
     refute_equal '8 DataSets found', @response.body
   end
 
   test 'fetch spaces' do
     login_as(@project_administrator)
-    post :fetch_spaces, project_id: @project.id,
-         openbis_endpoint: {
+    post :fetch_spaces, params: { project_id: @project.id, openbis_endpoint: {
              as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
              dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
              web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
              username: 'wibble',
-             password: 'wobble' }
+             password: 'wobble' } }
     assert_response :success
     assert @response.body.include?('API-SPACE')
 
@@ -291,35 +288,25 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     login_as(person)
 
     project = person.projects.first
-    post :fetch_spaces, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-                        username: 'wibble',
-                        password: 'wobble'
+    post :fetch_spaces, params: { project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis', dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server', web_endpoint: 'https://openbis-api.fair-dom.org/openbis', username: 'wibble', password: 'wobble' }
     assert_response :redirect
     refute @response.body.include?('API-SPACE')
 
     # none project member cannot
     project = Factory(:project)
-    post :fetch_spaces, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-                        username: 'wibble',
-                        password: 'wobble'
+    post :fetch_spaces, params: { project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis', dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server', web_endpoint: 'https://openbis-api.fair-dom.org/openbis', username: 'wibble', password: 'wobble' }
     assert_response :redirect
     refute @response.body.include?('API-SPACE')
   end
 
   test 'test endpoint' do
     login_as(@project_administrator)
-    get :test_endpoint, project_id: @project.id,
-        openbis_endpoint: {
+    get :test_endpoint, params: { project_id: @project.id, openbis_endpoint: {
             as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
             dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
             web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
             username: 'wibble',
-            password: 'wobble' },
-        format: :json
+            password: 'wobble' }, format: :json }
     assert_response :success
     assert @response.body.include?('true')
 
@@ -331,25 +318,18 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     login_as(person)
 
     project = person.projects.first
-    get :test_endpoint, project_id: project.id,
-        openbis_endpoint: {
+    get :test_endpoint, params: { project_id: project.id, openbis_endpoint: {
             as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
             dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
             web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
             username: 'wibble',
-            password: 'wobble' },
-        format: :json
+            password: 'wobble' }, format: :json }
     assert_response 400
     refute @response.body.include?('true')
 
     # none project member cannot
     project = Factory(:project)
-    get :test_endpoint, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-                        username: 'wibble',
-                        password: 'wobble',
-                        format: :json
+    get :test_endpoint, params: { project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis', dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server', web_endpoint: 'https://openbis-api.fair-dom.org/openbis', username: 'wibble', password: 'wobble', format: :json }
     assert_response 400
     refute @response.body.include?('true')
   end
@@ -363,13 +343,13 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
     project = person.projects.first
     endpoint = Factory(:openbis_endpoint, project: project)
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, perm_id: '20160210130454955-23'
+    get :show_dataset_files, params: { id: endpoint.id, project_id: project.id, perm_id: '20160210130454955-23' }
     assert_response :success
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
 
     logout
     login_as(another_person)
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, perm_id: '20160210130454955-23'
+    get :show_dataset_files, params: { id: endpoint.id, project_id: project.id, perm_id: '20160210130454955-23' }
     assert_response :redirect
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 0
 
@@ -383,20 +363,20 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
       df.save!
     end
     assert df.can_download?
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
+    get :show_dataset_files, params: { id: endpoint.id, project_id: project.id, data_file_id: df.id }
     assert_response :success
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
 
     logout
     login_as(another_person)
     assert df.can_download?
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
+    get :show_dataset_files, params: { id: endpoint.id, project_id: project.id, data_file_id: df.id }
     assert_response :success
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
 
     logout
     assert df.can_download?
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
+    get :show_dataset_files, params: { id: endpoint.id, project_id: project.id, data_file_id: df.id }
     assert_response :success
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
 
@@ -407,20 +387,20 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     end
 
     refute df.can_download?
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
+    get :show_dataset_files, params: { id: endpoint.id, project_id: project.id, data_file_id: df.id }
     assert_response :redirect
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 0
 
     logout
     login_as(another_person)
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
+    get :show_dataset_files, params: { id: endpoint.id, project_id: project.id, data_file_id: df.id }
     assert_response :redirect
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 0
 
     logout
     login_as(person)
     assert df.can_download?
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
+    get :show_dataset_files, params: { id: endpoint.id, project_id: project.id, data_file_id: df.id }
     assert_response :success
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
   end
@@ -428,7 +408,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   test 'refresh metadata store' do
     login_as(@project_administrator)
     endpoint = Factory(:openbis_endpoint, project: @project)
-    post :refresh_metadata_store, id:endpoint.id,project_id: @project.id
+    post :refresh_metadata_store, params: { id:endpoint.id, project_id: @project.id }
     assert_response :success
     assert assigns(:openbis_endpoint)
   end

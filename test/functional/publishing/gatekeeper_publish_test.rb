@@ -14,44 +14,44 @@ class GatekeeperPublishTest < ActionController::TestCase
   end
 
   test 'only gatekeeper can see -Waiting approval assets- button on their profile' do
-    get :show, id: @current_person
+    get :show, params: { id: @current_person }
     assert_response :success
     assert_select 'a', text: /Assets you are Gatekeeping/, count: 0
 
-    get :show, id: @gatekeeper
+    get :show, params: { id: @gatekeeper }
     assert_response :success
     assert_select 'a', text: /Assets you are Gatekeeping/, count: 0
 
     logout
     login_as(@gatekeeper.user)
-    get :show, id: @gatekeeper
+    get :show, params: { id: @gatekeeper }
     assert_response :success
 
     assert_select 'a[href=?]', requested_approval_assets_person_path(@gatekeeper), text: /Assets you are Gatekeeping/, count: 1
   end
 
   test 'gatekeeper authorization for requested_approval_assets' do
-    get :requested_approval_assets, id: @current_person
+    get :requested_approval_assets, params: { id: @current_person }
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
     flash[:error] = nil
     logout
     login_as(@gatekeeper.user)
-    get :requested_approval_assets, id: @gatekeeper
+    get :requested_approval_assets, params: { id: @gatekeeper }
     assert_response :success
     assert_nil flash[:error]
   end
 
   test 'gatekeeper authorization for gatekeeper_decide' do
-    post :gatekeeper_decide, id: @current_person
+    post :gatekeeper_decide, params: { id: @current_person }
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
     flash[:error] = nil
     logout
     login_as(@gatekeeper.user)
-    post :gatekeeper_decide, id: @gatekeeper
+    post :gatekeeper_decide, params: { id: @gatekeeper }
     assert_response :success
     assert_nil flash[:error]
   end
@@ -60,7 +60,7 @@ class GatekeeperPublishTest < ActionController::TestCase
     login_as(@gatekeeper.user)
 
     assert ResourcePublishLog.requested_approval_assets_for(@gatekeeper).empty?
-    get :requested_approval_assets, id: @gatekeeper
+    get :requested_approval_assets, params: { id: @gatekeeper }
     assert_select 'span[class=?]', 'none_text', text: 'There are no items waiting for your approval'
 
     user = Factory(:user)
@@ -74,7 +74,7 @@ class GatekeeperPublishTest < ActionController::TestCase
     requested_approval_assets = ResourcePublishLog.requested_approval_assets_for(@gatekeeper)
     assert_equal 3, requested_approval_assets.count
 
-    get :requested_approval_assets, id: @gatekeeper
+    get :requested_approval_assets, params: { id: @gatekeeper }
 
     assert_select '.type_and_title', count: 3 do
       assert_select 'a[href=?]', data_file_path(df)
@@ -106,7 +106,7 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     assert_difference('ResourcePublishLog.count', 2) do
       assert_enqueued_emails 2 do
-        post :gatekeeper_decide, params.merge(id: @gatekeeper.id)
+        post :gatekeeper_decide, params: params.merge(id: @gatekeeper.id)
       end
     end
 
@@ -141,7 +141,7 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     assert_no_difference('ResourcePublishLog.count') do
       assert_no_enqueued_emails do
-        post :gatekeeper_decide, params.merge(id: @gatekeeper.id)
+        post :gatekeeper_decide, params: params.merge(id: @gatekeeper.id)
       end
     end
 
@@ -162,7 +162,7 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     login_as(@gatekeeper.user)
 
-    post :gatekeeper_decide, params.merge(id: @gatekeeper.id)
+    post :gatekeeper_decide, params: params.merge(id: @gatekeeper.id)
 
     assert_response :success
     assert_select 'ul#published' do

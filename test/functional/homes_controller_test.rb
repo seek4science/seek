@@ -59,7 +59,7 @@ class HomesControllerTest < ActionController::TestCase
   test 'should send feedback for anonymous user' do
     logout
     assert_no_enqueued_emails do
-      post :send_feedback, anon: false, details: 'test feedback', subject: 'test feedback'
+      post :send_feedback, params: { anon: false, details: 'test feedback', subject: 'test feedback' }
     end
   end
 

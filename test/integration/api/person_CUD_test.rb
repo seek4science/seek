@@ -47,7 +47,7 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
   def test_normal_user_cannot_create_person
     user_login(Factory(:person))
     assert_no_difference('Person.count') do
-      post "/people.json", @to_post
+      post "/people.json", params: @to_post
     end
   end
 
@@ -56,7 +56,7 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
     ['min', 'max'].each do |m|
       @to_post["data"]["id"] = "#{other_person.id}"
       @to_post["data"]["attributes"]["email"] = "updateTest@email.com"
-       patch "/people/#{other_person.id}.json", @to_post
+       patch "/people/#{other_person.id}.json", params: @to_post
        assert_response :success
     end
   end

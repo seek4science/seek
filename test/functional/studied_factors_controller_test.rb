@@ -22,7 +22,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
 
   # overides RdfTestCases, due to the nested route
   def invoke_rdf_get(object)
-    get :show, id: object, data_file_id: object.data_file.id, format: 'rdf'
+    get :show, params: { id: object, data_file_id: object.data_file.id, format: 'rdf' }
   end
 
   # overides RdfTestCases, due to the nested route
@@ -31,7 +31,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     id += 1 until StudiedFactor.find_by_id(id).nil?
 
     logout
-    get :show, id: id, data_file_id: 1, format: 'rdf'
+    get :show, params: { id: id, data_file_id: 1, format: 'rdf' }
     assert_response :not_found
   end
 
@@ -43,12 +43,12 @@ class StudiedFactorsControllerTest < ActionController::TestCase
   test 'can only go to factors studied if the user can edit the data file' do
     df = data_files(:editable_data_file)
     df.save
-    get :index, data_file_id: df.id, version: df.version
+    get :index, params: { data_file_id: df.id, version: df.version }
     assert_response :success
 
     df = data_files(:downloadable_data_file)
     df.save
-    get :index, data_file_id: df.id, version: df.version
+    get :index, params: { data_file_id: df.id, version: df.version }
     assert_not_nil flash[:error]
   end
 
@@ -61,7 +61,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     compound_name = 'CTP'
     compound_annotation = Seek::SabiorkWebservices.new.get_compound_annotation(compound_name)
 
-    post :create, studied_factor: fs, data_file_id: df.id, version: df.version, substance_list: compound_name
+    post :create, params: { studied_factor: fs, data_file_id: df.id, version: df.version, substance_list: compound_name }
 
     fs = assigns(:studied_factor)
     assert_not_nil fs
@@ -89,7 +89,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     mi = measured_items(:time)
     unit = units(:gram)
     fs = { measured_item_id: mi.id, start_value: 1, end_value: 10, unit_id: unit.id }
-    post :create, studied_factor: fs, data_file_id: data_file.id, version: data_file.version
+    post :create, params: { studied_factor: fs, data_file_id: data_file.id, version: data_file.version }
     fs = assigns(:studied_factor)
     assert_not_nil fs
     assert fs.valid?
@@ -101,7 +101,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     mi = measured_items(:concentration)
     unit = units(:gram)
     fs = { measured_item_id: mi.id, start_value: 1, end_value: 10, unit_id: unit.id }
-    post :create, studied_factor: fs, data_file_id: df.id, version: df.version
+    post :create, params: { studied_factor: fs, data_file_id: df.id, version: df.version }
     fs = assigns(:studied_factor)
     assert_not_nil fs
     assert !fs.valid?
@@ -113,7 +113,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     cp = compounds(:compound_glucose)
     unit = units(:gram)
     fs = { measured_item_id: mi.id, start_value: 1, end_value: 10, unit_id: unit.id }
-    post :create, studied_factor: fs, data_file_id: df.id, version: df.version, substance_list: cp.name
+    post :create, params: { studied_factor: fs, data_file_id: df.id, version: df.version, substance_list: cp.name }
     fs = assigns(:studied_factor)
     assert_not_nil fs
     assert fs.valid?
@@ -127,7 +127,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     syn = synonyms(:glucose_synonym)
     unit = units(:gram)
     fs = { measured_item_id: mi.id, start_value: 1, end_value: 10, unit_id: unit.id }
-    post :create, studied_factor: fs, data_file_id: df.id, version: df.version, substance_list: syn.name
+    post :create, params: { studied_factor: fs, data_file_id: df.id, version: df.version, substance_list: syn.name }
     fs = assigns(:studied_factor)
     assert_not_nil fs
     assert fs.valid?
@@ -142,7 +142,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal fs.studied_factor_links.first.substance, compounds(:compound_glucose)
 
     mi = measured_items(:time)
-    put :update, id: fs.id, data_file_id: fs.data_file.id, studied_factor: { measured_item_id: mi.id }
+    put :update, params: { id: fs.id, data_file_id: fs.data_file.id, studied_factor: { measured_item_id: mi.id } }
     fs_updated = assigns(:studied_factor)
     assert_not_nil fs_updated
     assert fs_updated.valid?
@@ -158,7 +158,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
 
     mi = measured_items(:concentration)
     cp = compounds(:compound_glucose)
-    put :update, id: fs.id, data_file_id: fs.data_file.id, studied_factor: { measured_item_id: mi.id }, substance_list: cp.name
+    put :update, params: { id: fs.id, data_file_id: fs.data_file.id, studied_factor: { measured_item_id: mi.id }, substance_list: cp.name }
     fs_updated = assigns(:studied_factor)
     assert_not_nil fs_updated
     assert fs_updated.valid?
@@ -173,7 +173,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert fs.studied_factor_links.blank?
 
     mi = measured_items(:pressure)
-    put :update, id: fs.id, data_file_id: fs.data_file.id, studied_factor: { measured_item_id: mi.id }
+    put :update, params: { id: fs.id, data_file_id: fs.data_file.id, studied_factor: { measured_item_id: mi.id } }
     fs_updated = assigns(:studied_factor)
     assert_not_nil fs_updated
     assert fs_updated.valid?
@@ -188,8 +188,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal fs.studied_factor_links.first.substance, compounds(:compound_glucose)
 
     cp = compounds(:compound_glycine)
-    put :update, id: fs.id, data_file_id: fs.data_file.id, studied_factor: { start_value: fs.start_value },
-                 substance_list: cp.name
+    put :update, params: { id: fs.id, data_file_id: fs.data_file.id, studied_factor: { start_value: fs.start_value }, substance_list: cp.name }
     fs_updated = assigns(:studied_factor)
     assert_not_nil fs_updated
     assert fs_updated.valid?
@@ -202,7 +201,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     fs = studied_factors(:studied_factor_time)
     assert_not_nil fs
 
-    put :update, id: fs.id, data_file_id: fs.data_file.id, studied_factor: { start_value: 10.02, end_value: 50, standard_deviation: 0.6 }
+    put :update, params: { id: fs.id, data_file_id: fs.data_file.id, studied_factor: { start_value: 10.02, end_value: 50, standard_deviation: 0.6 } }
     fs_updated = assigns(:studied_factor)
     assert_not_nil fs_updated
     assert fs_updated.valid?
@@ -216,7 +215,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     mi = measured_items(:time)
     unit = units(:gram)
     fs = { measured_item_id: mi.id, start_value: '1,5', end_value: 10, unit_id: unit.id }
-    post :create, studied_factor: fs, data_file_id: data_file.id, version: data_file.version
+    post :create, params: { studied_factor: fs, data_file_id: data_file.id, version: data_file.version }
     fs = assigns(:studied_factor)
     assert_nil fs
   end
@@ -225,7 +224,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     fs = studied_factors(:studied_factor_time)
     assert_not_nil fs
 
-    put :update, id: fs.id, data_file_id: fs.data_file.id, studied_factor: { start_value: '10,02', end_value: 50, standard_deviation: 0.6 }
+    put :update, params: { id: fs.id, data_file_id: fs.data_file.id, studied_factor: { start_value: '10,02', end_value: 50, standard_deviation: 0.6 } }
     fs_updated = assigns(:studied_factor)
     assert_nil fs_updated
   end
@@ -245,7 +244,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
 
     assert d.can_manage?
 
-    post :create_from_existing, :data_file_id => d.id, :version => d.latest_version.version, "checkbox_#{fs_array.first.id}" => fs_array.first.id, "checkbox_#{fs_array[1].id}" => fs_array[1].id, "checkbox_#{fs_array[2].id}" => fs_array[2].id
+    post :create_from_existing, params: { :data_file_id => d.id, :version => d.latest_version.version, "checkbox_#{fs_array.first.id}" => fs_array.first.id, "checkbox_#{fs_array[1].id}" => fs_array[1].id, "checkbox_#{fs_array[2].id}" => fs_array[2].id }
     assert_response :success
 
     d.reload
@@ -269,7 +268,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal fs.measured_item, measured_items(:concentration)
     assert_equal fs.studied_factor_links.first.substance, compounds(:compound_glucose)
 
-    delete :destroy, id: fs.id, data_file_id: data_files(:editable_data_file).id
+    delete :destroy, params: { id: fs.id, data_file_id: data_files(:editable_data_file).id }
 
     assert_nil StudiedFactor.find_by_id(fs.id)
     fs.studied_factor_links.each do |sfl|
@@ -281,7 +280,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     data_file = data_files(:editable_data_file)
     mi = measured_items(:growth_medium)
     fs = { measured_item_id: mi.id }
-    post :create, studied_factor: fs, data_file_id: data_file.id, version: data_file.version, annotation: { annotation_attribute: 'description', value: 'test value' }
+    post :create, params: { studied_factor: fs, data_file_id: data_file.id, version: data_file.version, annotation: { annotation_attribute: 'description', value: 'test value' } }
     fs = assigns(:studied_factor)
     assert_not_nil fs
     assert fs.valid?
@@ -294,8 +293,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal measured_items(:growth_medium), fs.measured_item
     assert_equal 'one value', fs.annotations_with_attribute('description').first.value.text
 
-    put :update, id: fs.id, data_file_id: fs.data_file.id,
-                 annotation: { annotation_attribute: 'description', value: 'update value' }, studied_factor: { start_value: fs.start_value }
+    put :update, params: { id: fs.id, data_file_id: fs.data_file.id, annotation: { annotation_attribute: 'description', value: 'update value' }, studied_factor: { start_value: fs.start_value } }
     fs = assigns(:studied_factor)
     assert_not_nil fs
     assert fs.valid?
@@ -306,7 +304,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
   test 'breadcrumb for factors studied' do
     df = data_files(:editable_data_file)
     assert df.can_edit?
-    get :index, data_file_id: df.id, version: df.version
+    get :index, params: { data_file_id: df.id, version: df.version }
     assert_response :success
     assert_select 'div.breadcrumbs', text: /Home #{I18n.t('data_file').pluralize} Index #{df.title} Factors studied Index/, count: 1 do
       assert_select 'a[href=?]', root_path, count: 1

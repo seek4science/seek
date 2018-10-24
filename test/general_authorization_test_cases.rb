@@ -8,10 +8,10 @@ module GeneralAuthorizationTestCases
 
     logout
 
-    get :show, id: item.id
+    get :show, params: { id: item.id }
     assert_response :forbidden
 
-    get :show, id: item.id, format: 'json'
+    get :show, params: { id: item.id, format: 'json' }
     assert_response :forbidden
   end
 
@@ -23,10 +23,10 @@ module GeneralAuthorizationTestCases
 
     login_as(another_user)
 
-    get :show, id: item.id
+    get :show, params: { id: item.id }
     assert_response :forbidden
 
-    get :show, id: item.id, format: 'json'
+    get :show, params: { id: item.id, format: 'json' }
     assert_response :forbidden
   end
 
@@ -40,11 +40,11 @@ module GeneralAuthorizationTestCases
 
     login_as(contributor)
 
-    get :show, id: item.id
+    get :show, params: { id: item.id }
     assert_response :success
     assert_nil flash[:error]
 
-    get :show, id: item.id, format: 'json'
+    get :show, params: { id: item.id, format: 'json' }
     assert_response :success
   end
 end

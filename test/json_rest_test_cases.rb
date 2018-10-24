@@ -47,7 +47,7 @@ module JsonRestTestCases
     className = object.class.name.dup
     className[0] = className[0].downcase
     fragment = '#/definitions/' + className + 'Response'
-    get :show, rest_show_url_options(object).merge(id: object, format: 'json')
+    get :show, params: rest_show_url_options(object).merge(id: object, format: 'json')
 
     if check_for_501_read_return
       assert_response :not_implemented
@@ -94,7 +94,7 @@ module JsonRestTestCases
 
       edit_max_object(object) if m == 'max'
 
-      get :show, rest_show_url_options(object).merge(id: object, format: 'json')
+      get :show, params: rest_show_url_options(object).merge(id: object, format: 'json')
 
       assert_response :success
       parsed_response = JSON.parse(@response.body)

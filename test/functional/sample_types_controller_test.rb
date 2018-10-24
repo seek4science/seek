@@ -40,7 +40,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_difference('ActivityLog.count') do
       assert_difference('SampleType.count') do
-        post :create, sample_type: { title: 'Hello!',
+        post :create, params: { sample_type: { title: 'Hello!',
                                      project_ids: @project_ids,
                                      description: 'The description!!',
                                      sample_attributes_attributes: {
@@ -54,7 +54,7 @@ class SampleTypesControllerTest < ActionController::TestCase
                                      },
                                      tags: 'fish,golf'
 
-        }
+        } }
       end
     end
 
@@ -84,7 +84,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'should create with linked sample type' do
     linked_sample_type = Factory(:sample_sample_attribute_type)
     assert_difference('SampleType.count') do
-      post :create, sample_type: { title: 'Hello!',
+      post :create, params: { sample_type: { title: 'Hello!',
                                    project_ids: [@project.id],
                                    sample_attributes_attributes: {
                                      '0' => {
@@ -95,7 +95,7 @@ class SampleTypesControllerTest < ActionController::TestCase
                                        sample_attribute_type_id: linked_sample_type.id, linked_sample_type_id: @sample_type.id, _destroy: '0'
                                      }
                                    }
-      }
+      } }
     end
     refute_nil sample_type = assigns(:sample_type)
     assert_redirected_to sample_type_path(sample_type)
@@ -109,7 +109,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'should create with linked sample type of itself' do
     linked_sample_type = Factory(:sample_sample_attribute_type)
     assert_difference('SampleType.count') do
-      post :create, sample_type: { title: 'Hello!',
+      post :create, params: { sample_type: { title: 'Hello!',
                                    project_ids: @project_ids,
                                    sample_attributes_attributes: {
                                      '0' => {
@@ -120,7 +120,7 @@ class SampleTypesControllerTest < ActionController::TestCase
                                        sample_attribute_type_id: linked_sample_type.id, linked_sample_type_id: 'self', _destroy: '0'
                                      }
                                    }
-      }
+      } }
     end
     refute_nil sample_type = assigns(:sample_type)
     assert_redirected_to sample_type_path(sample_type)
@@ -133,7 +133,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'should show sample_type' do
     assert_difference('ActivityLog.count',1) do
-      get :show, id: @sample_type
+      get :show, params: { id: @sample_type }
       assert_response :success
     end
     assert_equal @sample_type,ActivityLog.last.activity_loggable
@@ -141,7 +141,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'should get edit' do
-    get :edit, id: @sample_type
+    get :edit, params: { id: @sample_type }
     assert_response :success
   end
 
@@ -168,10 +168,10 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_difference('ActivityLog.count',1) do
       assert_difference('SampleAttribute.count', -1) do
-        put :update, id: sample_type, sample_type: { title: 'Hello!',
+        put :update, params: { id: sample_type, sample_type: { title: 'Hello!',
                                                      sample_attributes_attributes: sample_attributes_fields,
                                                      tags: "fish,#{golf.value.text}"
-        }
+        } }
       end
     end
     assert_redirected_to sample_type_path(assigns(:sample_type))
@@ -205,9 +205,9 @@ class SampleTypesControllerTest < ActionController::TestCase
         id: attribute.id
       }
     ]
-    put :update, id: sample_type, sample_type: { title: sample_type.title,
+    put :update, params: { id: sample_type, sample_type: { title: sample_type.title,
                                                  sample_attributes_attributes: attribute_fields
-    }
+    } }
     assert_redirected_to sample_type_path(assigns(:sample_type))
     assert_nil flash[:error]
     sample_type = assigns(:sample_type)
@@ -243,9 +243,9 @@ class SampleTypesControllerTest < ActionController::TestCase
         id: attribute.id
       }
     ]
-    put :update, id: sample_type, sample_type: { title: sample_type.title,
+    put :update, params: { id: sample_type, sample_type: { title: sample_type.title,
                                                  sample_attributes_attributes: attribute_fields
-    }
+    } }
     assert_redirected_to sample_type_path(assigns(:sample_type))
     assert_nil flash[:error]
     sample_type = assigns(:sample_type)
@@ -260,7 +260,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute sample_type.can_edit?
 
     assert_no_difference('ActivityLog.count') do
-      put :update, id: sample_type, sample_type: { title: 'Hello!' }
+      put :update, params: { id: sample_type, sample_type: { title: 'Hello!' } }
     end
 
     assert_redirected_to sample_type_path(sample_type)
@@ -272,7 +272,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'other project member cannot edit sample type' do
     sample_type = Factory(:patient_sample_type, project_ids: [Factory(:project).id])
     refute sample_type.can_edit?
-    get :edit, id: sample_type
+    get :edit, params: { id: sample_type }
     assert_redirected_to sample_type_path(sample_type)
     refute_nil flash[:error]
   end
@@ -283,7 +283,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_difference('ActivityLog.count') do
       assert_difference('SampleType.count', -1) do
-        delete :destroy, id: @sample_type
+        delete :destroy, params: { id: @sample_type }
       end
     end
 
@@ -297,7 +297,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('SampleType.count') do
-        delete :destroy, id: @sample_type
+        delete :destroy, params: { id: @sample_type }
       end
     end
 
@@ -311,7 +311,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count',1) do
       assert_difference('SampleType.count', 1) do
         assert_difference('ContentBlob.count', 1) do
-          post :create_from_template, sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob]
+          post :create_from_template, params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
         end
       end
     end
@@ -330,7 +330,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_difference('SampleType.count', 1) do
       assert_difference('ContentBlob.count', 1) do
-        post :create_from_template, sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob]
+        post :create_from_template, params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
       end
     end
 
@@ -344,7 +344,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('SampleType.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create_from_template, sample_type: { title: 'Hello!' }, content_blobs: [blob]
+          post :create_from_template, params: { sample_type: { title: 'Hello!' }, content_blobs: [blob] }
         end
       end
     end
@@ -362,7 +362,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     sample_type_linked_to = linked_attribute.linked_sample_type
     refute_nil sample_type_linked_to
 
-    get :show, id: linked_type.id
+    get :show, params: { id: linked_type.id }
 
     assert_select 'li', text: /patient \(#{linked_attribute.sample_attribute_type.title}/i do
       assert_select 'a[href=?]', sample_type_path(sample_type_linked_to), text: sample_type_linked_to.title
@@ -373,7 +373,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     type = Factory(:simple_sample_type, project_ids: @project_ids)
     assert_empty type.samples
     login_as(@person)
-    get :edit, id: type.id
+    get :edit, params: { id: type.id }
     assert_response :success
     assert_select 'a#add-attribute', count: 1
 
@@ -383,7 +383,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute_empty type.samples
     assert type.can_edit?
 
-    get :edit, id: type.id
+    get :edit, params: { id: type.id }
     assert_response :success
     assert_select 'a#add-attribute', count: 0
   end
@@ -392,7 +392,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     sample_type = Factory(:simple_sample_type)
     login_as(@person.user)
     with_config_value :samples_enabled, false do
-      get :show, id: sample_type.id
+      get :show, params: { id: sample_type.id }
       assert_redirected_to :root
       refute_nil flash[:error]
 
@@ -431,14 +431,14 @@ class SampleTypesControllerTest < ActionController::TestCase
     st3.save!
     st1.save!
 
-    get :filter_for_select, projects: st1.projects.collect(&:id), tags: ['monkey']
+    get :filter_for_select, params: { projects: st1.projects.collect(&:id), tags: ['monkey'] }
     assert_response :success
     assert assigns(:sample_types)
     assert_includes assigns(:sample_types), st1
     refute_includes assigns(:sample_types), st2
     refute_includes assigns(:sample_types), st3
 
-    get :filter_for_select, projects: st2.projects.collect(&:id)
+    get :filter_for_select, params: { projects: st2.projects.collect(&:id) }
     assert_response :success
     assert assigns(:sample_types)
     assert_includes assigns(:sample_types), st2
@@ -450,14 +450,14 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert assigns(:sample_types)
     assert_empty assigns(:sample_types)
 
-    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred mary)
+    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred mary) }
     assert_response :success
     assert assigns(:sample_types)
     assert_includes assigns(:sample_types), st3
     refute_includes assigns(:sample_types), st2
     refute_includes assigns(:sample_types), st1
 
-    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred mary monkey)
+    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred mary monkey) }
 
     assert_includes assigns(:sample_types), st1
     assert_includes assigns(:sample_types), st3
@@ -475,37 +475,37 @@ class SampleTypesControllerTest < ActionController::TestCase
     st2.save!
     st3.save!
 
-    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred bob)
+    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred bob) }
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st1, st2].sort, results
 
-    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred bob), exclusive_tags: '0'
+    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred bob), exclusive_tags: '0' }
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st1, st2].sort, results
 
-    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred bob), exclusive_tags: '1'
+    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred bob), exclusive_tags: '1' }
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st2], results
 
-    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(jane frank), exclusive_tags: '1'
+    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(jane frank), exclusive_tags: '1' }
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st3], results
 
-    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(peter frank jane), exclusive_tags: '1'
+    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(peter frank jane), exclusive_tags: '1' }
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st3], results
 
-    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(frank jane bob), exclusive_tags: '1'
+    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(frank jane bob), exclusive_tags: '1' }
     assert_response :success
     assert results = assigns(:sample_types)
     assert_empty results
@@ -515,7 +515,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     cv = Factory(:apples_sample_controlled_vocab)
     assert_difference('ActivityLog.count',1) do
       assert_difference('SampleType.count') do
-        post :create, sample_type: { title: 'Hello!',
+        post :create, params: { sample_type: { title: 'Hello!',
                                      project_ids: @project_ids,
                                      sample_attributes_attributes: {
                                          '0' => {
@@ -528,7 +528,7 @@ class SampleTypesControllerTest < ActionController::TestCase
                                              destroy: '0'
                                          }
                                      }
-        }
+        } }
       end
     end
 
@@ -568,7 +568,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     st = Factory(:simple_sample_type)
     refute st.can_view?
 
-    get :show, id:st.id
+    get :show, params: { id:st.id }
 
     assert_response :forbidden
 
@@ -586,14 +586,14 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute sample_type.can_view?
     assert sample_type.can_view?(person.user, sample)
 
-    get :show, id:sample_type.id
+    get :show, params: { id:sample_type.id }
     assert_response :forbidden
 
-    get :show, id:sample_type.id, referring_sample_id:sample.id
+    get :show, params: { id:sample_type.id, referring_sample_id:sample.id }
     assert_response :success
 
     #sample type must match
-    get :show, id:Factory(:simple_sample_type).id, referring_sample_id:sample.id
+    get :show, params: { id:Factory(:simple_sample_type).id, referring_sample_id:sample.id }
     assert_response :forbidden
 
   end

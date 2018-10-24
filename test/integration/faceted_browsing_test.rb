@@ -5,14 +5,14 @@ class FacetedBrowsingTest < ActionDispatch::IntegrationTest
 
   def setup
     User.current_user = Factory(:user, login: 'test')
-    post '/session', login: 'test', password: 'blah'
+    post '/session', params: { login: 'test', password: 'blah' }
   end
 
   test 'turn off the faceted browsing' do
     with_config_value :faceted_browsing_enabled, false do
       example_items
       ASSETS_WITH_FACET.each do |type_name|
-        get "/#{type_name}", user_enable_facet: 'true'
+        get "/#{type_name}", params: { user_enable_facet: 'true' }
         assert_select "table[id='exhibit']", count: 0
         assert_select 'div.alphabetical_pagination'
       end
@@ -24,7 +24,7 @@ class FacetedBrowsingTest < ActionDispatch::IntegrationTest
       example_items
       ASSETS_WITH_FACET.each do |type_name|
         with_config_value :facet_enable_for_pages, type_name => true do
-          get "/#{type_name}", user_enable_facet: 'true'
+          get "/#{type_name}", params: { user_enable_facet: 'true' }
           assert_select "div[id='exhibit']"
           assert_select 'div.alphabetical_pagination', count: 0
         end
@@ -49,13 +49,13 @@ class FacetedBrowsingTest < ActionDispatch::IntegrationTest
       assert !facet_disabled_pages.blank?
 
       facet_enabled_pages.keys.each do |type_name|
-        get "/#{type_name}", user_enable_facet: 'true'
+        get "/#{type_name}", params: { user_enable_facet: 'true' }
         assert_select "div[id='exhibit']"
         assert_select 'div.alphabetical_pagination', count: 0
       end
 
       facet_disabled_pages.keys.each do |type_name|
-        get "/#{type_name}", user_enable_facet: 'true'
+        get "/#{type_name}", params: { user_enable_facet: 'true' }
         assert_select "div[id='exhibit']", count: 0
         assert_select 'div.alphabetical_pagination'
       end
@@ -67,7 +67,7 @@ class FacetedBrowsingTest < ActionDispatch::IntegrationTest
       example_items
       ASSETS_WITH_FACET.each do |type_name|
         with_config_value :facet_enable_for_pages, type_name => true do
-          get "/#{type_name}", user_enable_facet: 'true'
+          get "/#{type_name}", params: { user_enable_facet: 'true' }
           assert_select "div[id='exhibit']"
           assert_select 'div.alphabetical_pagination', count: 0
 
@@ -88,7 +88,7 @@ class FacetedBrowsingTest < ActionDispatch::IntegrationTest
           assert_select "a[style='']", text: /Advanced filtering/
           assert_select "a[style='display: none']", text: /Stop filtering/
 
-          get "/#{type_name}", user_enable_facet: 'true'
+          get "/#{type_name}", params: { user_enable_facet: 'true' }
           assert_select "a[style='display: none']", text: /Advanced filtering/
           assert_select "a[style='']", text: /Stop filtering/
         end

@@ -35,7 +35,7 @@ class EventCUDTest < ActionDispatch::IntegrationTest
     @to_post = JSON.parse(template.result(binding))
 
     assert_no_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", @to_post
+      post "/#{@plural_clz}.json", params: @to_post
       # assert_response :unprocessable_entity
       # validate_json_against_fragment response.body, '#/definitions/errors'
     end

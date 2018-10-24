@@ -11,7 +11,7 @@ class TagsControllerTest < ActionController::TestCase
 
   test 'handles invalid tag id' do
     id = 9999
-    get :show, id: id
+    get :show, params: { id: id }
 
     assert_not_nil flash[:error]
     assert_redirected_to all_anns_path
@@ -28,7 +28,7 @@ class TagsControllerTest < ActionController::TestCase
     sf = Factory :studied_factor
     Factory :annotation, attribute_name: 'description', value: exp.value, source: p.user, annotatable: sf
 
-    get :show, id: exp.value
+    get :show, params: { id: exp.value }
 
     assert_response :success
 
@@ -41,7 +41,7 @@ class TagsControllerTest < ActionController::TestCase
   test 'show for expertise tag' do
     p = Factory :person
     exp = Factory :expertise, value: 'golf', source: p.user, annotatable: p
-    get :show, id: exp.value
+    get :show, params: { id: exp.value }
     assert_response :success
     assert_select 'div#notice_flash', text: /1 item tagged with 'golf'/, count: 1
     assert_select 'div.list_items_container' do
@@ -52,7 +52,7 @@ class TagsControllerTest < ActionController::TestCase
   test 'show for tools tag' do
     p = Factory :person
     tool = Factory :tool, value: 'spade', source: p.user, annotatable: p
-    get :show, id: tool.value
+    get :show, params: { id: tool.value }
     assert_response :success
     assert_select 'div.list_items_container' do
       assert_select 'a[href=?]', person_path(p), text: p.name, count: 1
@@ -63,7 +63,7 @@ class TagsControllerTest < ActionController::TestCase
     df = Factory :data_file, policy: Factory(:public_policy)
     private_df = Factory :data_file, policy: Factory(:private_policy)
     tag = Factory :tag, value: 'a tag', source: User.current_user, annotatable: df
-    get :show, id: tag.value
+    get :show, params: { id: tag.value }
     assert_response :success
     assert_select 'div.list_items_container' do
       assert_select 'a', text: df.title, count: 1
@@ -108,7 +108,7 @@ class TagsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    get :show, id: tool.value
+    get :show, params: { id: tool.value }
     assert_response :success
     assert_select 'div.list_items_container' do
       assert_select 'a', text: p.name, count: 1
@@ -141,7 +141,7 @@ class TagsControllerTest < ActionController::TestCase
     df = Factory :data_file, contributor: p
     tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: df
 
-    get :query, format: 'json', query: 'twi'
+    get :query, params: { format: 'json', query: 'twi' }
     assert_response :success
     assert_includes JSON.parse(@response.body), 'twinkle'
   end
@@ -152,7 +152,7 @@ class TagsControllerTest < ActionController::TestCase
     df = Factory :data_file, contributor: p
     tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: df
 
-    get :query, format: 'json', query: 'zzzxxxyyyqqq'
+    get :query, params: { format: 'json', query: 'zzzxxxyyyqqq' }
     assert_response :success
     assert_empty JSON.parse(@response.body)
   end

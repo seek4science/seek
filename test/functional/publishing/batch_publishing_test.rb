@@ -13,21 +13,21 @@ class BatchPublishingTest < ActionController::TestCase
   end
 
   test 'should have the -Publish your assets- only one your own profile' do
-    get :show, id: User.current_user.person
+    get :show, params: { id: User.current_user.person }
     assert_response :success
     assert_select 'a[href=?]', batch_publishing_preview_person_path, text: /Publish your assets/
 
-    get :batch_publishing_preview, id: User.current_user.person.id
+    get :batch_publishing_preview, params: { id: User.current_user.person.id }
     assert_response :success
     assert_nil flash[:error]
 
     # not yourself
     a_person = Factory(:person)
-    get :show, id: a_person
+    get :show, params: { id: a_person }
     assert_response :success
     assert_select 'a', text: /Publish your assets/, count: 0
 
-    get :batch_publishing_preview, id: a_person.id
+    get :batch_publishing_preview, params: { id: a_person.id }
     assert_redirected_to :root
     assert_not_nil flash[:error]
   end
@@ -46,7 +46,7 @@ class BatchPublishingTest < ActionController::TestCase
     end
     total_asset_count = (publish_immediately_assets + gatekeeper_required_assets).count
 
-    get :batch_publishing_preview, id: User.current_user.person.id
+    get :batch_publishing_preview, params: { id: User.current_user.person.id }
     assert_response :success
 
     assert_select '.type_and_title', count: total_asset_count do
@@ -75,7 +75,7 @@ class BatchPublishingTest < ActionController::TestCase
                              policy: Factory(:public_policy))
     assert !published_item.can_publish?, 'This data file must not be publishable for the test to succeed'
 
-    get :batch_publishing_preview, id: User.current_user.person.id
+    get :batch_publishing_preview, params: { id: User.current_user.person.id }
     assert_response :success
 
     assert_select "input[type='checkbox'][id=?]", "publish_#{published_item.class.name}_#{published_item.id}",
@@ -86,7 +86,7 @@ class BatchPublishingTest < ActionController::TestCase
     item = Factory(:publication, contributor: User.current_user.person)
     refute item.can_publish?, 'This item must not be publishable for the test to be meaningful'
 
-    get :batch_publishing_preview, id: User.current_user.person.id
+    get :batch_publishing_preview, params: { id: User.current_user.person.id }
     assert_response :success
 
     assert_select "input[type='checkbox'][id=?]", "publish_#{item.class.name}_#{item.id}",
@@ -117,7 +117,7 @@ class BatchPublishingTest < ActionController::TestCase
 
     assert_difference('ResourcePublishLog.count', total_assets.count) do
       assert_enqueued_emails gatekeeper_required_assets.count do
-        post :publish, params.merge(id: User.current_user.person.id)
+        post :publish, params: params.merge(id: User.current_user.person.id)
       end
     end
     assert_response :redirect
@@ -137,7 +137,7 @@ class BatchPublishingTest < ActionController::TestCase
   test 'get publish redirected' do
     # This is useful because if you logout it redirects to root.
     # If you just published something, that will do a get request to *Controller#publish
-    get :publish, id: User.current_user.person.id
+    get :publish, params: { id: User.current_user.person.id }
     assert_response :redirect
   end
 
@@ -150,23 +150,23 @@ class BatchPublishingTest < ActionController::TestCase
 
     login_as(me)
 
-    get :show, id: another_person
+    get :show, params: { id: another_person }
     assert_response :success
     assert_select 'a', text: /Assets awaiting approval/, count: 0
 
     # yourself
-    get :show, id: User.current_user.person
+    get :show, params: { id: User.current_user.person }
     assert_response :success
     assert_select 'a[href=?]', waiting_approval_assets_person_path, text: /Assets awaiting approval/
   end
 
   test 'authorization for waiting_approval_assets' do
-    get :waiting_approval_assets, id: User.current_user.person
+    get :waiting_approval_assets, params: { id: User.current_user.person }
     assert_response :success
     assert_nil flash[:error]
 
     a_person = Factory(:person)
-    get :waiting_approval_assets, id: a_person
+    get :waiting_approval_assets, params: { id: a_person }
     assert_redirected_to :root
     assert_not_nil flash[:error]
   end
@@ -175,7 +175,7 @@ class BatchPublishingTest < ActionController::TestCase
     df, model, sop = waiting_approval_assets_for User.current_user
     not_requested_df = Factory(:data_file, contributor: User.current_user.person)
 
-    get :waiting_approval_assets, id: User.current_user.person
+    get :waiting_approval_assets, params: { id: User.current_user.person }
 
     assert_select '.type_and_title', count: 3 do
       assert_select 'a[href=?]', data_file_path(df)

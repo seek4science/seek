@@ -63,7 +63,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   def test_should_login_and_redirect
-    post :create, login: 'quentin', password: 'test'
+    post :create, params: { login: 'quentin', password: 'test' }
     assert session[:user_id]
     assert_response :redirect
   end
@@ -84,12 +84,12 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   def test_should_remember_me
-    post :create, login: 'quentin', password: 'test', remember_me: 'on'
+    post :create, params: { login: 'quentin', password: 'test', remember_me: 'on' }
     assert_not_nil @response.cookies['auth_token']
   end
 
   def test_should_not_remember_me
-    post :create, login: 'quentin', password: 'test', remember_me: 'off'
+    post :create, params: { login: 'quentin', password: 'test', remember_me: 'off' }
     assert_nil @response.cookies['auth_token']
   end
 
@@ -124,7 +124,7 @@ class SessionsControllerTest < ActionController::TestCase
 
   def test_non_activated_user_should_redirect_to_new_with_message
     user = Factory(:brand_new_user, person: Factory(:person))
-    post :create, login: user.login, password: user.password
+    post :create, params: { login: user.login, password: user.password }
     assert !session[:user_id]
     assert_redirected_to login_path
     assert_not_nil flash[:error]
@@ -133,7 +133,7 @@ class SessionsControllerTest < ActionController::TestCase
 
   def test_partly_registed_user_should_redirect_to_select_person
     user = Factory(:brand_new_user)
-    post :create, login: user.login, password: user.password
+    post :create, params: { login: user.login, password: user.password }
     assert session[:user_id]
     assert_equal user.id, session[:user_id]
     assert_not_nil flash.now[:notice]
@@ -156,24 +156,24 @@ class SessionsControllerTest < ActionController::TestCase
 
   test 'should redirect to root after logging in from the search result page' do
     @request.env['HTTP_REFERER'] = 'http://test.host/search'
-    post :create, login: 'quentin', password: 'test'
+    post :create, params: { login: 'quentin', password: 'test' }
     assert_redirected_to :root
   end
 
   test 'should redirect to back after logging in from the page excepting search result page' do
     @request.env['HTTP_REFERER'] = 'http://test.host/data_files/'
-    post :create, login: 'quentin', password: 'test'
+    post :create, params: { login: 'quentin', password: 'test' }
     assert_redirected_to :back
   end
 
   test 'should redirect to given path' do
-    post :create, login: 'quentin', password: 'test', called_from: { path: '/data_files' }
+    post :create, params: { login: 'quentin', password: 'test', called_from: { path: '/data_files' } }
     assert session[:user_id]
     assert_redirected_to data_files_path
   end
 
   test 'should not redirect to external url' do
-    post :create, login: 'quentin', password: 'test', called_from: { path: 'http://not.our.domain/data_files' }
+    post :create, params: { login: 'quentin', password: 'test', called_from: { path: 'http://not.our.domain/data_files' } }
 
     assert session[:user_id]
 
@@ -263,7 +263,7 @@ class SessionsControllerTest < ActionController::TestCase
 
     assert_equal User.sha1_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password
 
-    post :create, login: sha1_user.login, password: test_password
+    post :create, params: { login: sha1_user.login, password: test_password }
     assert session[:user_id]
     assert_response :redirect
 

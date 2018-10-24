@@ -12,7 +12,7 @@ class RenderPartialFlippingTest < ActionController::TestCase
     refute_nil project
     refute_nil inst
 
-    get :show, id: person.id
+    get :show, params: { id: person.id }
     assert_response :success
 
     # check the test partial isn't show
@@ -32,7 +32,7 @@ class RenderPartialFlippingTest < ActionController::TestCase
   test 'alternative is empty text using strings' do
     person = Factory(:person)
     with_alternative_rendering({ controller: 'people', seek_partial: 'general/items_related_to' }, '') do
-      get :show, id: person.id
+      get :show, params: { id: person.id }
       assert_response :success
 
       assert_select 'h2', text: /Related items/i, count: 0
@@ -43,7 +43,7 @@ class RenderPartialFlippingTest < ActionController::TestCase
   test 'alternative is empty text using symb' do
     person = Factory(:person)
     with_alternative_rendering({ controller: :people, seek_partial: 'general/items_related_to'.to_sym }, '') do
-      get :show, id: person.id
+      get :show, params: { id: person.id }
       assert_response :success
 
       assert_select 'h2', text: /Related items/i, count: 0
@@ -54,7 +54,7 @@ class RenderPartialFlippingTest < ActionController::TestCase
   test 'alternative is empty text mixed' do
     person = Factory(:person)
     with_alternative_rendering({ controller: :people, seek_partial: 'general/items_related_to' }, '') do
-      get :show, id: person.id
+      get :show, params: { id: person.id }
       assert_response :success
 
       assert_select 'h2', text: /Related items/i, count: 0
@@ -65,7 +65,7 @@ class RenderPartialFlippingTest < ActionController::TestCase
   test 'alternative is empty text mixed2' do
     person = Factory(:person)
     with_alternative_rendering({ controller: :people, seek_partial: 'general/items_related_to' }, '') do
-      get :show, id: person.id
+      get :show, params: { id: person.id }
       assert_response :success
 
       assert_select 'h2', text: /Related items/i, count: 0
@@ -76,7 +76,7 @@ class RenderPartialFlippingTest < ActionController::TestCase
   test 'alternative is empty text no controller' do
     person = Factory(:person)
     with_alternative_rendering({ seek_partial: 'general/items_related_to' }, '') do
-      get :show, id: person.id
+      get :show, params: { id: person.id }
       assert_response :success
 
       assert_select 'h2', text: /Related items/i, count: 0
@@ -87,7 +87,7 @@ class RenderPartialFlippingTest < ActionController::TestCase
   test 'alternative test partial usign strings' do
     person = Factory(:person)
     with_alternative_rendering({ controller: 'people', seek_partial: 'general/items_related_to' }, 'general/test_partial') do
-      get :show, id: person.id
+      get :show, params: { id: person.id }
       assert_response :success
       assert_select 'p', text: /This is a partial for purely testing purposes/i, count: 1
     end
@@ -96,7 +96,7 @@ class RenderPartialFlippingTest < ActionController::TestCase
   test 'alternative test partial usign symbols' do
     person = Factory(:person)
     with_alternative_rendering({ controller: :people, seek_partial: 'general/items_related_to'.to_sym }, 'general/test_partial') do
-      get :show, id: person.id
+      get :show, params: { id: person.id }
       assert_response :success
       assert_select 'p', text: /This is a partial for purely testing purposes/i, count: 1
     end
@@ -105,7 +105,7 @@ class RenderPartialFlippingTest < ActionController::TestCase
   test 'alternative test partial mixed' do
     person = Factory(:person)
     with_alternative_rendering({ controller: :people, seek_partial: 'general/items_related_to' }, 'general/test_partial') do
-      get :show, id: person.id
+      get :show, params: { id: person.id }
       assert_response :success
       assert_select 'p', text: /This is a partial for purely testing purposes/i, count: 1
     end
@@ -114,7 +114,7 @@ class RenderPartialFlippingTest < ActionController::TestCase
   test 'alternative test partial mixed2' do
     person = Factory(:person)
     with_alternative_rendering({ controller: 'people', seek_partial: 'general/items_related_to'.to_sym }, 'general/test_partial') do
-      get :show, id: person.id
+      get :show, params: { id: person.id }
       assert_response :success
       assert_select 'p', text: /This is a partial for purely testing purposes/i, count: 1
     end
@@ -124,7 +124,7 @@ class RenderPartialFlippingTest < ActionController::TestCase
     person = Factory(:person)
     with_alternative_rendering({ seek_partial: 'general/items_related_to' }, '') do
       with_alternative_rendering({ controller: 'people', seek_partial: 'general/items_related_to' }, 'general/test_partial') do
-        get :show, id: person.id
+        get :show, params: { id: person.id }
         assert_response :success
         assert_select 'p', text: /This is a partial for purely testing purposes/i, count: 1
       end

@@ -15,7 +15,7 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'access as member' do
-    get :index, project_id: @project.id
+    get :index, params: { project_id: @project.id }
     assert_response :success
   end
 
@@ -28,7 +28,7 @@ class FoldersControllerTest < ActionController::TestCase
     unsorted_folder = Factory :project_folder, project_id: @project.id, incoming: true
 
     assert_difference('ProjectFolder.count', -2) do
-      delete :destroy, id: folder.id, project_id: @project.id
+      delete :destroy, params: { id: folder.id, project_id: @project.id }
     end
 
     assert_redirected_to :project_folders
@@ -47,7 +47,7 @@ class FoldersControllerTest < ActionController::TestCase
     unsorted_folder = Factory :project_folder, project_id: @project.id, incoming: true
 
     assert_no_difference('ProjectFolder.count') do
-      delete :destroy, id: folder.id, project_id: @project.id
+      delete :destroy, params: { id: folder.id, project_id: @project.id }
     end
 
     assert_redirected_to :project_folders
@@ -70,7 +70,7 @@ class FoldersControllerTest < ActionController::TestCase
     unsorted_folder = Factory :project_folder, project_id: project.id, incoming: true
 
     assert_no_difference('ProjectFolder.count') do
-      delete :destroy, id: folder, project_id: project.id
+      delete :destroy, params: { id: folder, project_id: project.id }
     end
 
     assert_redirected_to :root
@@ -88,7 +88,7 @@ class FoldersControllerTest < ActionController::TestCase
     assert ProjectFolder.root_folders(@project).empty?
 
     assert_difference('ProjectFolderAsset.count', 2) do
-      get :index, project_id: @project.id
+      get :index, params: { project_id: @project.id }
     end
     assert_response :success
     @project.reload
@@ -103,7 +103,7 @@ class FoldersControllerTest < ActionController::TestCase
     folder = Factory :project_folder, project: @project
     assert_equal 1, ProjectFolder.root_folders(@project).count
     assert_no_difference('ProjectFolder.count') do
-      get :index, project_id: @project.id
+      get :index, params: { project_id: @project.id }
     end
     assert_response :success
     assert_equal [folder], ProjectFolder.root_folders(@project)
@@ -111,14 +111,14 @@ class FoldersControllerTest < ActionController::TestCase
 
   test 'blocked access as non member' do
     login_as(Factory(:user))
-    get :index, project_id: @project.id
+    get :index, params: { project_id: @project.id }
     assert_redirected_to root_path
     assert_not_nil flash[:error]
   end
 
   test 'should not show when logged out' do
     logout
-    get :index, project_id: @project.id
+    get :index, params: { project_id: @project.id }
     assert_redirected_to root_path
   end
 
@@ -274,12 +274,12 @@ class FoldersControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay, contributor: @member.person, policy: Factory(:public_policy)
     assay.study.investigation.projects = [@project]
     assay.study.investigation.save!
-    get :index, project_id: @project.id
+    get :index, params: { project_id: @project.id }
     assert_response :success
   end
 
   test 'breadcrumb for project folder' do
-    get :index, project_id: @project.id
+    get :index, params: { project_id: @project.id }
     assert_response :success
     assert_select 'div.breadcrumbs', text: /Home #{I18n.t('project').pluralize} Index #{@project.title} Folders Index/, count: 1 do
       assert_select 'a[href=?]', root_path, count: 1

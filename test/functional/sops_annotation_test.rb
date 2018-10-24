@@ -81,7 +81,7 @@ class SopsAnnotationTest < ActionController::TestCase
     sop.reload
     assert_equal %w(apple fish), sop.annotations.collect { |a| a.value.text }.sort
 
-    put :update, id: sop, tag_list: "soup,#{golf.value.text}", sop: { title: sop.title }, sharing: valid_sharing
+    put :update, params: { id: sop, tag_list: "soup,#{golf.value.text}", sop: { title: sop.title }, sharing: valid_sharing }
     sop.reload
 
     assert_equal %w(golf soup), sop.annotations.collect { |a| a.value.text }.sort
@@ -110,7 +110,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_equal ['apple'], sop.annotations.select { |a| a.source == p3.user }.collect { |a| a.value.text }
     assert_equal %w(apple fish golf), sop.annotations.collect { |a| a.value.text }.uniq.sort
 
-    put :update, id: sop, tag_list: "soup,#{golf.value.text}", sop: { title: sop.title }, sharing: valid_sharing
+    put :update, params: { id: sop, tag_list: "soup,#{golf.value.text}", sop: { title: sop.title }, sharing: valid_sharing }
     sop.reload
 
     assert_equal ['soup'], sop.annotations.select { |a| a.source == p1.user }.collect { |a| a.value.text }
@@ -142,7 +142,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_equal %w(fish golf), sop.annotations.select { |a| a.source == p1.user }.collect { |a| a.value.text }.sort
     assert_equal %w(apple golf), sop.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
-    put :update, id: sop, tag_list: golf.value.text, sop: { title: sop.title }, sharing: valid_sharing
+    put :update, params: { id: sop, tag_list: golf.value.text, sop: { title: sop.title }, sharing: valid_sharing }
     sop.reload
 
     assert_equal ['golf'], sop.annotations.select { |a| a.source == p1.user }.collect { |a| a.value.text }.sort
@@ -172,7 +172,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_equal %w(fish golf), sop.annotations.select { |a| a.source == p1.user }.collect { |a| a.value.text }.sort
     assert_equal %w(fish soup), sop.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
-    put :update, id: sop, tag_list: "fish,#{golf.value.text}", sop: { title: sop.title }, sharing: valid_sharing
+    put :update, params: { id: sop, tag_list: "fish,#{golf.value.text}", sop: { title: sop.title }, sharing: valid_sharing }
 
     sop.reload
 
@@ -191,7 +191,7 @@ class SopsAnnotationTest < ActionController::TestCase
     blob = { data: file_for_upload }
 
     assert_difference('Sop.count') do
-      put :create, sop: sop, content_blobs: [blob], sharing: valid_sharing, tag_list: "fish,#{golf.value.text}"
+      put :create, params: { sop: sop, content_blobs: [blob], sharing: valid_sharing, tag_list: "fish,#{golf.value.text}" }
     end
 
     assert_redirected_to sop_path(assigns(:sop))
@@ -204,7 +204,7 @@ class SopsAnnotationTest < ActionController::TestCase
     login_as p.user
     sop = Factory :sop, contributor: p
 
-    get :show, id: sop
+    get :show, params: { id: sop }
     assert_response :success
 
     assert_select 'div#tags_box' do
@@ -219,7 +219,7 @@ class SopsAnnotationTest < ActionController::TestCase
     sop.tag_with %w(fish sparrow sprocket)
     sop.save!
 
-    get :show, id: sop
+    get :show, params: { id: sop }
     assert_response :success
 
     assert_select 'div#tags_box' do
@@ -243,7 +243,7 @@ class SopsAnnotationTest < ActionController::TestCase
     coffee = Factory :tag, source: p.user, annotatable: sop, value: 'coffee'
     Factory :tag, source: p2.user, annotatable: sop, value: coffee.value
 
-    get :show, id: sop
+    get :show, params: { id: sop }
     assert_response :success
 
     assert_select 'div#tag_cloud' do
@@ -259,7 +259,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_select 'input#tag_list'
 
     sop = Factory :sop, contributor: p
-    get :edit, id: sop
+    get :edit, params: { id: sop }
     assert_response :success
     assert_select 'input#tag_list'
   end

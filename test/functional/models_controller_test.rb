@@ -28,7 +28,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = Factory :model_2_files, policy: Factory(:private_policy)
     assert !model.can_download?(User.current_user)
     assert_no_difference('ActivityLog.count') do
-      get :download, id: model.id
+      get :download, params: { id: model.id }
     end
     assert_redirected_to model_path(model)
     assert_not_nil flash[:error]
@@ -38,7 +38,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = Factory :typeless_model, policy: Factory(:public_policy)
     assert model.can_download?
     assert_difference('ActivityLog.count') do
-      get :download, id: model.id
+      get :download, params: { id: model.id }
     end
     assert_response :success
     assert_equal "attachment; filename=\"file_with_no_extension\"", @response.header['Content-Disposition']
@@ -49,7 +49,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should download' do
     model = Factory :model_2_files, title: 'this_model', policy: Factory(:public_policy), contributor: User.current_user.person
     assert_difference('ActivityLog.count') do
-      get :download, id: model.id
+      get :download, params: { id: model.id }
     end
     assert_response :success
     assert_equal "attachment; filename=\"this_model.zip\"", @response.header['Content-Disposition']
@@ -60,7 +60,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should download model with a single file' do
     model = Factory :model, title: 'this_model', policy: Factory(:public_policy), contributor: User.current_user.person
     assert_difference('ActivityLog.count') do
-      get :download, id: model.id
+      get :download, params: { id: model.id }
     end
     assert_response :success
     assert_equal "attachment; filename=\"cronwright.xml\"", @response.header['Content-Disposition']
@@ -71,7 +71,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should download multiple files with the same name' do
     # 2 files with different names
     model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user.person
-    get :download, id: model.id
+    get :download, params: { id: model.id }
     assert_response :success
     assert_equal 'application/zip', @response.header['Content-Type']
     assert_equal '3024', @response.header['Content-Length']
@@ -83,7 +83,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal first_content_blob.original_filename, third_content_blob.original_filename
     model.content_blobs << third_content_blob
 
-    get :download, id: model.id
+    get :download, params: { id: model.id }
     assert_response :success
     assert_equal 'application/zip', @response.header['Content-Type']
     assert_equal '4023', @response.header['Content-Length']
@@ -98,7 +98,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     model = Factory :model_2_remote_files, title: 'this_model', policy: Factory(:public_policy), contributor: User.current_user.person
     assert_difference('ActivityLog.count') do
-      get :download, id: model.id
+      get :download, params: { id: model.id }
     end
     assert_response :redirect
     assert flash[:error].include?('remote')
@@ -111,7 +111,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, model: { title: 'Test' }, content_blobs: [{ data_url: uri.to_s }], policy_attributes: valid_sharing
+        post :create, params: { model: { title: 'Test' }, content_blobs: [{ data_url: uri.to_s }], policy_attributes: valid_sharing }
       end
     end
     assert_not_nil flash[:error]
@@ -122,7 +122,7 @@ class ModelsControllerTest < ActionController::TestCase
     p2 = Factory :person
     model = Factory(:model, title: 'ZZZZZ', creators: [p2], contributor: p1, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
 
-    get :index, page: 'Z'
+    get :index, params: { page: 'Z' }
 
     # check the test is behaving as expected:
     assert_equal p1, model.contributor
@@ -139,7 +139,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
-    get :index, page: 'all'
+    get :index, params: { page: 'all' }
     assert_response :success
     assert_equal assigns(:models).sort_by(&:id), Model.authorize_asset_collection(assigns(:models), 'view', users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
   end
@@ -172,12 +172,12 @@ class ModelsControllerTest < ActionController::TestCase
     model = Factory :model
     login_as(model.contributor.user)
     as_virtualliver do
-      get :edit, id: model.id
+      get :edit, params: { id: model.id }
       assert_response :success
       assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
     end
     as_not_virtualliver do
-      get :edit, id: model.id
+      get :edit, params: { id: model.id }
       assert_response :success
       assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
     end
@@ -186,7 +186,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'fail gracefullly when trying to access a missing model' do
-    get :show, id: 99_999
+    get :show, params: { id: 99_999 }
     assert_response :not_found
   end
 
@@ -211,7 +211,7 @@ class ModelsControllerTest < ActionController::TestCase
     blob = { data_url: 'http://sdfsdfkh.com/sdfsd.png', original_filename: '', make_local_copy: '0' }
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, model: model, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { model: model, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
     assert_not_nil flash.now[:error]
@@ -221,7 +221,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = { title: 'Test' }
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, model: model, content_blobs: [{}], policy_attributes: valid_sharing
+        post :create, params: { model: model, content_blobs: [{}], policy_attributes: valid_sharing }
       end
     end
     assert_not_nil flash.now[:error]
@@ -237,7 +237,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     refute_includes new_assay.models, m
 
-    put :update, id: m, model: { title: m.title, assay_assets_attributes: [{ assay_id: new_assay.id.to_s }] }
+    put :update, params: { id: m, model: { title: m.title, assay_assets_attributes: [{ assay_id: new_assay.id.to_s }] } }
 
     assert_redirected_to model_path(m)
     m.reload
@@ -253,14 +253,14 @@ class ModelsControllerTest < ActionController::TestCase
     model_params = valid_model
 
     assert_difference('Model.count') do
-      post :create, model: model_params.merge(scales: [scale1.id.to_s, scale2.id.to_s]), content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
+      post :create, params: { model: model_params.merge(scales: [scale1.id.to_s, scale2.id.to_s]), content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing }
     end
     m = assigns(:model)
     assert_not_nil m
     assert_equal [scale1, scale2], m.scales
     scale3 = Factory(:scale)
 
-    put :update, id: m.id, model: { title: m.title, scales: [scale3.id.to_s] }
+    put :update, params: { id: m.id, model: { title: m.title, scales: [scale3.id.to_s] } }
     m = assigns(:model)
     assert_equal [scale3], m.scales
   end
@@ -279,7 +279,7 @@ class ModelsControllerTest < ActionController::TestCase
     )
 
     assert_difference('Model.count') do
-      post :create, model: model_and_scale_params, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
+      post :create, params: { model: model_and_scale_params, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing }
     end
     m = assigns(:model)
     assert_not_nil m
@@ -306,8 +306,7 @@ class ModelsControllerTest < ActionController::TestCase
     assay = assays(:modelling_assay)
     assert_difference('Model.count') do
       assert_difference('AssayAsset.count') do
-        post :create, model: valid_model.merge(assay_assets_attributes: [{ assay_id: assay.id}]),
-             content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
+        post :create, params: { model: valid_model.merge(assay_assets_attributes: [{ assay_id: assay.id}]), content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing }
       end
     end
 
@@ -320,7 +319,7 @@ class ModelsControllerTest < ActionController::TestCase
     with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
       assert_difference('Model.count', 1) do
         assert_difference('ContentBlob.count', 1) do
-          post :create, model: valid_model, content_blobs: [{ data: file_for_upload }]
+          post :create, params: { model: valid_model, content_blobs: [{ data: file_for_upload }] }
         end
       end
 
@@ -344,7 +343,7 @@ class ModelsControllerTest < ActionController::TestCase
     content_blob3 = { data_url: 'http://fair-dom.org/piccy.png', original_filename: '', make_local_copy: '0' }
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count', 3) do
-        post :create, model: { title: 'Test Create', project_ids: [project.id] }, content_blobs: [content_blob1, content_blob2, content_blob3], policy_attributes: valid_sharing
+        post :create, params: { model: { title: 'Test Create', project_ids: [project.id] }, content_blobs: [content_blob1, content_blob2, content_blob3], policy_attributes: valid_sharing }
       end
     end
 
@@ -373,7 +372,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assert_difference('Model.count') do
       assert_difference('ModelImage.count') do
-        post :create, model: valid_model, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+        post :create, params: { model: valid_model, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') } }
 
         assert_redirected_to model_path(assigns(:model))
       end
@@ -388,7 +387,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assert_difference('Model.count') do
       assert_difference('ModelImage.count') do
-        post :create, model: valid_model, content_blobs: [], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+        post :create, params: { model: valid_model, content_blobs: [], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') } }
 
         assert_redirected_to model_path(assigns(:model))
       end
@@ -401,7 +400,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should not create model without image and without content_blob' do
     login_as(:model_owner)
     assert_no_difference('Model.count') do
-      post :create, model: valid_model, content_blobs: [], policy_attributes: valid_sharing
+      post :create, params: { model: valid_model, content_blobs: [], policy_attributes: valid_sharing }
     end
     assert_not_nil flash[:error]
   end
@@ -410,10 +409,7 @@ class ModelsControllerTest < ActionController::TestCase
     m = Factory(:model, contributor: User.current_user.person)
     assert_difference('Model::Version.count', 1) do
       assert_difference('ModelImage.count') do
-        post :new_version, id: m, model: { title: m.title },
-             content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }],
-             revision_comments: 'This is a new revision',
-             model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+        post :new_version, params: { id: m, model: { title: m.title }, content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }], revision_comments: 'This is a new revision', model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') } }
 
         assert_redirected_to model_path(assigns(:model))
       end
@@ -442,10 +438,7 @@ class ModelsControllerTest < ActionController::TestCase
     model_details[:imported_url] = 'http://biomodels/model.xml'
 
     assert_difference('Model.count') do
-      post :create, model: model_details,
-           content_blobs: [{ data: file_for_upload }],
-           policy_attributes: valid_sharing,
-           model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+      post :create, params: { model: model_details, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') } }
     end
     model = assigns(:model)
     assert_redirected_to model_path(model)
@@ -458,7 +451,7 @@ class ModelsControllerTest < ActionController::TestCase
     model, blob = valid_model_with_url
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, model: model, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { model: model, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
     model = assigns(:model)
@@ -477,7 +470,7 @@ class ModelsControllerTest < ActionController::TestCase
     blob[:make_local_copy] = '1'
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, model: model_details, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { model: model_details, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
     model = assigns(:model)
@@ -496,7 +489,7 @@ class ModelsControllerTest < ActionController::TestCase
     model, blob = valid_model_with_url
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, model: model, content_blobs: [{ data_url: 'http://news.bbc.co.uk' }], policy_attributes: valid_sharing
+        post :create, params: { model: model, content_blobs: [{ data_url: 'http://news.bbc.co.uk' }], policy_attributes: valid_sharing }
       end
     end
     model = assigns(:model)
@@ -511,7 +504,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_difference('Model.count') do
       model = valid_model
       model[:recommended_environment_id] = recommended_model_environments(:jws).id
-      post :create, model: model, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
+      post :create, params: { model: model, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing }
     end
 
     m = assigns(:model)
@@ -522,7 +515,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should show model' do
     m = Factory :model, policy: Factory(:public_policy)
     assert_difference('ActivityLog.count') do
-      get :show, id: m
+      get :show, params: { id: m }
     end
 
     assert_response :success
@@ -542,7 +535,7 @@ class ModelsControllerTest < ActionController::TestCase
     m = Factory :model_2_files, policy: Factory(:public_policy)
 
     assert_difference('ActivityLog.count') do
-      get :show, id: m
+      get :show, params: { id: m }
     end
 
     assert_response :success
@@ -561,7 +554,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should show model with import details' do
     m = Factory :model, policy: Factory(:public_policy), imported_source: 'Some place', imported_url: 'http://somewhere/model.xml'
     assert_difference('ActivityLog.count') do
-      get :show, id: m
+      get :show, params: { id: m }
     end
 
     assert_response :success
@@ -574,18 +567,18 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should show model with format and type' do
     m = models(:model_with_format_and_type)
     m.save
-    get :show, id: m
+    get :show, params: { id: m }
     assert_response :success
   end
 
   test 'should get edit' do
-    get :edit, id: models(:teusink)
+    get :edit, params: { id: models(:teusink) }
     assert_response :success
     assert_select 'h1', text: /Editing #{I18n.t('model')}/
   end
 
   test 'publications included in form for model' do
-    get :edit, id: models(:teusink)
+    get :edit, params: { id: models(:teusink) }
     assert_response :success
     assert_select 'div#add_publications_form', true
 
@@ -595,14 +588,14 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should update model' do
-    put :update, id: models(:teusink).id, model: { title: 'a' }
+    put :update, params: { id: models(:teusink).id, model: { title: 'a' } }
     assert_redirected_to model_path(assigns(:model))
   end
 
   test 'should update model with model type and format' do
     type = model_types(:ODE)
     format = model_formats(:SBML)
-    put :update, id: models(:teusink).id, model: { model_type_id: type.id, model_format_id: format.id }
+    put :update, params: { id: models(:teusink).id, model: { model_type_id: type.id, model_format_id: format.id } }
     assert assigns(:model)
     assert_equal type, assigns(:model).model_type
     assert_equal format, assigns(:model).model_format
@@ -611,7 +604,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should destroy model' do
     assert_difference('Model.count', -1) do
       assert_no_difference('ContentBlob.count') do
-        delete :destroy, id: models(:teusink).id
+        delete :destroy, params: { id: models(:teusink).id }
       end
     end
 
@@ -624,7 +617,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     # create new version
     assert_difference('Model::Version.count', 1) do
-      post :new_version, id: m, content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }]
+      post :new_version, params: { id: m, content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }] }
     end
     assert_redirected_to model_path(assigns(:model))
     m = Model.find(m.id)
@@ -633,15 +626,15 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 1, m.versions[0].version
     assert_equal 2, m.versions[1].version
 
-    get :show, id: m
+    get :show, params: { id: m }
     assert_select 'li', text: /little_file.txt/, count: 1
     assert_select 'li', text: /cronwright.xml/, count: 0
 
-    get :show, id: m, version: '2'
+    get :show, params: { id: m, version: '2' }
     assert_select 'li', text: /little_file.txt/, count: 1
     assert_select 'li', text: /cronwright.xml/, count: 0
 
-    get :show, id: m, version: '1'
+    get :show, params: { id: m, version: '1' }
     assert_select 'li', text: /little_file.txt/, count: 0
     assert_select 'li', text: /cronwright.xml/, count: 1
   end
@@ -649,9 +642,7 @@ class ModelsControllerTest < ActionController::TestCase
   def test_should_create_new_version
     m = Factory(:model, contributor:User.current_user.person)
     assert_difference('Model::Version.count', 1) do
-      post :new_version, id: m, model: { title: m.title},
-           content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }],
-           revision_comments: 'This is a new revision'
+      post :new_version, params: { id: m, model: { title: m.title}, content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }], revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to model_path(m)
@@ -671,7 +662,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def test_should_add_nofollow_to_links_in_show_page
-    get :show, id: models(:model_with_links_in_description)
+    get :show, params: { id: models(:model_with_links_in_description) }
     assert_select 'div#description' do
       assert_select 'a[rel="nofollow"]'
     end
@@ -680,7 +671,7 @@ class ModelsControllerTest < ActionController::TestCase
   def test_update_should_not_overwrite_contributor
     login_as(:model_owner) # this user is a member of sysmo, and can edit this model
     model = models(:model_with_no_contributor)
-    put :update, id: model, model: { title: 'blah blah blah blah' }
+    put :update, params: { id: model, model: { title: 'blah blah blah blah' } }
     updated_model = assigns(:model)
     assert_redirected_to model_path(updated_model)
     assert_equal 'blah blah blah blah', updated_model.title, 'Title should have been updated'
@@ -689,31 +680,31 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'filtering by assay' do
     assay = assays(:metabolomics_assay)
-    get :index, filter: { assay: assay.id }
+    get :index, params: { filter: { assay: assay.id } }
     assert_response :success
   end
 
   test 'filtering by study' do
     study = studies(:metabolomics_study)
-    get :index, filter: { study: study.id }
+    get :index, params: { filter: { study: study.id } }
     assert_response :success
   end
 
   test 'filtering by investigation' do
     inv = investigations(:metabolomics_investigation)
-    get :index, filter: { investigation: inv.id }
+    get :index, params: { filter: { investigation: inv.id } }
     assert_response :success
   end
 
   test 'filtering by project' do
     project = projects(:sysmo_project)
-    get :index, filter: { project: project.id }
+    get :index, params: { filter: { project: project.id } }
     assert_response :success
   end
 
   test 'filtering by person' do
     person = people(:person_for_model_owner)
-    get :index, filter: { person: person.id }, page: 'all'
+    get :index, params: { filter: { person: person.id }, page: 'all' }
     assert_response :success
     m = models(:model_with_format_and_type)
     m2 = models(:model_with_different_owner)
@@ -731,7 +722,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.can_edit?(user), 'sop should be editable but not manageable for this test'
     assert !model.can_manage?(user), 'sop should be editable but not manageable for this test'
     assert_equal Policy::EDITING, model.policy.access_type, 'data file should have an initial policy with access type for editing'
-    put :update, id: model, model: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS }
+    put :update, params: { id: model, model: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS } }
     assert_redirected_to model_path(model)
     model.reload
 
@@ -747,7 +738,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.can_edit?(user), 'sop should be editable and manageable for this test'
     assert model.can_manage?(user), 'sop should be editable and manageable for this test'
     assert_equal Policy::EDITING, model.policy.access_type, 'data file should have an initial policy with access type for editing'
-    put :update, id: model, model: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS }
+    put :update, params: { id: model, model: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS } }
     assert_redirected_to model_path(model)
     model.reload
     assert_equal 'new title', model.title
@@ -756,7 +747,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "owner should be able to choose policy 'share with everyone' when creating a model" do
     model = { title: 'Test', project_ids: [User.current_user.person.projects.first.id] }
-    post :create, model: model, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }
+    post :create, params: { model: model, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE } }
 
     assert created_model = assigns(:model)
     assert_redirected_to model_path(created_model)
@@ -775,7 +766,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.can_edit?(user), 'model should be editable and manageable for this test'
     assert model.can_manage?(user), 'model should be editable and manageable for this test'
     assert_equal Policy::NO_ACCESS, model.policy.access_type, 'data file should have an initial policy with access type of no access'
-    put :update, id: model, model: { title: 'new title' }, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, params: { id: model, model: { title: 'new title' }, policy_attributes: { access_type: Policy::VISIBLE } }
     assert_redirected_to model_path(model)
     model.reload
 
@@ -844,7 +835,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'do publish' do
     model = Factory(:model, contributor: users(:model_owner).person, policy: Factory(:private_policy))
     assert model.can_manage?, 'The model must be manageable for this test to succeed'
-    post :publish, id: model
+    post :publish, params: { id: model }
     assert_response :redirect
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
@@ -854,7 +845,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = Factory(:model, contributor: users(:model_owner).person, policy: Factory(:private_policy))
     login_as(:quentin)
     assert !model.can_manage?, 'The model must not be manageable for this test to succeed'
-    post :publish, id: model
+    post :publish, params: { id: model }
     assert_redirected_to :root
     assert_not_nil flash[:error]
     assert_nil flash[:notice]
@@ -869,7 +860,7 @@ class ModelsControllerTest < ActionController::TestCase
       attribution.destroy
     end
 
-    get :show, id: model.id
+    get :show, params: { id: model.id }
     assert_response :success
 
     model.reload
@@ -879,7 +870,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should set the other creators ' do
     model = models(:teusink)
     assert model.can_manage?, 'The sop must be manageable for this test to succeed'
-    put :update, id: model, model: { other_creators: 'marry queen' }
+    put :update, params: { id: model, model: { other_creators: 'marry queen' } }
     model.reload
     assert_equal 'marry queen', model.other_creators
   end
@@ -896,7 +887,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should display cytoscape button for supported models' do
     model = Factory :xgmml_model
     login_as(model.contributor)
-    get :show, id: model.id
+    get :show, params: { id: model.id }
     assert_response :success
     assert_select 'a[href=?]', visualise_model_path(model, version: model.version), text: 'Visualize'
   end
@@ -904,7 +895,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should not display cytoscape button for supported models' do
     model = Factory :teusink_jws_model
     login_as(model.contributor)
-    get :show, id: model.id
+    get :show, params: { id: model.id }
     assert_response :success
     assert_select 'a[href=?]', visualise_model_path(model, version: model.version), count: 0
   end
@@ -912,7 +903,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'visualise with cytoscape' do
     model = Factory :xgmml_model
     login_as(model.contributor)
-    get :visualise, id: model.id, version: model.version
+    get :visualise, params: { id: model.id, version: model.version }
     assert_response :success
   end
 
@@ -920,7 +911,7 @@ class ModelsControllerTest < ActionController::TestCase
     with_config_value :sycamore_enabled, true do
       model = Factory :teusink_model
       login_as(model.contributor)
-      get :show, id: model.id
+      get :show, params: { id: model.id }
       assert_response :success
       assert_select 'a', text: /Simulate #{I18n.t('model')} on Sycamore/
     end
@@ -930,7 +921,7 @@ class ModelsControllerTest < ActionController::TestCase
     with_config_value :sycamore_enabled, true do
       model = Factory :teusink_model
       login_as(model.contributor)
-      post :submit_to_sycamore, id: model.id, version: model.version
+      post :submit_to_sycamore, params: { id: model.id, version: model.version }
       assert_response :success
       assert @response.body.include?('$("sycamore-form").submit()')
     end
@@ -940,7 +931,7 @@ class ModelsControllerTest < ActionController::TestCase
     with_config_value :sycamore_enabled, false do
       model = Factory :teusink_model
       login_as(model.contributor)
-      post :submit_to_sycamore, id: model.id, version: model.version
+      post :submit_to_sycamore, params: { id: model.id, version: model.version }
       assert @response.body.include?('Interaction with Sycamore is currently disabled')
     end
   end
@@ -951,7 +942,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(:quentin)
       assert !model.can_download?
 
-      post :submit_to_sycamore, id: model.id, version: model.version
+      post :submit_to_sycamore, params: { id: model.id, version: model.version }
       assert @response.body.include?("You are not allowed to simulate this #{I18n.t('model')} with Sycamore")
     end
   end
@@ -960,7 +951,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = models(:teusink)
     model.other_creators = 'another creator'
     model.save
-    get :show, id: model
+    get :show, params: { id: model }
 
     assert_select 'div', text: 'another creator', count: 1
   end
@@ -970,8 +961,7 @@ class ModelsControllerTest < ActionController::TestCase
     retained_content_blob = m.content_blobs.first
     login_as(m.contributor)
     assert_difference('Model::Version.count', 1) do
-      post :new_version, id: m, model: { title: m.title }, content_blobs: [{ data: file_for_upload }],
-                         retained_content_blob_ids: [retained_content_blob.id]
+      post :new_version, params: { id: m, model: { title: m.title }, content_blobs: [{ data: file_for_upload }], retained_content_blob_ids: [retained_content_blob.id] }
     end
 
     assert_redirected_to model_path(m)
@@ -991,7 +981,7 @@ class ModelsControllerTest < ActionController::TestCase
       one_file_model = Factory(:doc_model, policy: Factory(:all_sysmo_downloadable_policy))
       assert_equal 1, one_file_model.content_blobs.count
       assert one_file_model.content_blobs.first.is_content_viewable?
-      get :show, id: one_file_model.id
+      get :show, params: { id: one_file_model.id }
       assert_response :success
       assert_select '#buttons a', text: /View content/, count: 1
 
@@ -1000,7 +990,7 @@ class ModelsControllerTest < ActionController::TestCase
                                      policy: Factory(:all_sysmo_downloadable_policy))
       assert_equal 2, multiple_files_model.content_blobs.count
       assert multiple_files_model.content_blobs.first.is_content_viewable?
-      get :show, id: multiple_files_model.id
+      get :show, params: { id: multiple_files_model.id }
       assert_response :success
       assert_select '#buttons a', text: /View content/, count: 0
     end
@@ -1012,7 +1002,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.contains_sbml?, 'model should contain sbml'
     assert model.can_download?, 'should be able to download'
 
-    get :compare_versions, id: model, other_version: model.versions.last.version
+    get :compare_versions, params: { id: model, other_version: model.versions.last.version }
     assert_response :success
     assert_select 'div.bives_output ul li', text: /Both documents have same Level\/Version:/, count: 1
   end
@@ -1021,7 +1011,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = Factory(:model, contributor: Factory(:person), policy: Factory(:publicly_viewable_policy))
     assert model.can_view?, 'should be able to view this model'
     assert !model.can_download?, 'should not be able to download this model'
-    get :compare_versions, id: model, other_version: model.versions.last.version
+    get :compare_versions, params: { id: model, other_version: model.versions.last.version }
     assert_response :redirect
     refute_nil flash[:error]
   end
@@ -1037,7 +1027,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 2, model.version
     assert model.can_download?
     assert_equal 2, model.versions.count(&:contains_sbml?)
-    get :show, id: model
+    get :show, params: { id: model }
     assert_response :success
     (model.versions - [model.latest_version]).each do |version|
       assert_select 'a.btn[href=?]', compare_versions_model_path(model, version: model.version, other_version: version.version)
@@ -1058,7 +1048,7 @@ class ModelsControllerTest < ActionController::TestCase
     refute model.can_download?
 
     assert_equal 2, model.versions.count(&:contains_sbml?)
-    get :show, id: model
+    get :show, params: { id: model }
     assert_response :success
 
     (model.versions - [model.latest_version]).each do |version|
@@ -1071,7 +1061,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.contains_sbml?, 'model should contain sbml'
     assert model.can_download?, 'should be able to download'
 
-    get :compare_versions, id: model
+    get :compare_versions, params: { id: model }
     assert_redirected_to model_path(model, version: model.version)
     refute_nil flash[:error]
   end
@@ -1079,7 +1069,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should show SBML format for model that contains sbml and format not specified' do
     model = Factory(:teusink_model, policy: Factory(:public_policy), model_format: nil)
     assert model.contains_sbml?
-    get :show, id: model.id
+    get :show, params: { id: model.id }
     assert_response :success
     assert_select '#format_info' do
       assert_select '#model_format', text: /SBML/i
@@ -1089,7 +1079,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should display null license text' do
     model = Factory :model, policy: Factory(:public_policy)
 
-    get :show, id: model
+    get :show, params: { id: model }
 
     assert_select '.panel .panel-body span.none_text', text: 'No license specified'
   end
@@ -1097,7 +1087,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should display license' do
     model = Factory :model, license: 'CC-BY-4.0', policy: Factory(:public_policy)
 
-    get :show, id: model
+    get :show, params: { id: model }
 
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
   end
@@ -1108,11 +1098,11 @@ class ModelsControllerTest < ActionController::TestCase
 
     model.update_attributes license: 'CC0-1.0'
 
-    get :show, id: model, version: 1
+    get :show, params: { id: model, version: 1 }
     assert_response :success
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
 
-    get :show, id: model, version: modelv.version
+    get :show, params: { id: model, version: modelv.version }
     assert_response :success
     assert_select '.panel .panel-body a', text: 'CC0 1.0'
   end
@@ -1124,11 +1114,11 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_nil model.license
 
-    put :update, id: model, model: { license: 'CC-BY-SA-4.0' }
+    put :update, params: { id: model, model: { license: 'CC-BY-SA-4.0' } }
 
     assert_response :redirect
 
-    get :show, id: model
+    get :show, params: { id: model }
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share-Alike 4.0'
     assert_equal 'CC-BY-SA-4.0', assigns(:model).license
   end
@@ -1139,7 +1129,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = Factory(:model, projects: programme.projects, policy: Factory(:public_policy))
     model2 = Factory(:model, policy: Factory(:public_policy))
 
-    get :index, programme_id: programme.id
+    get :index, params: { programme_id: programme.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -1154,13 +1144,13 @@ class ModelsControllerTest < ActionController::TestCase
 
     login_as(model.contributor)
 
-    get :show, id: model
+    get :show, params: { id: model }
     assert_response :success
     assert_select '#snapshot-citation', text: /Bacall, F/, count:0
 
     model.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
-    get :show, id: model
+    get :show, params: { id: model }
     assert_response :success
     assert_select '#snapshot-citation', text: /Bacall, F/, count:1
   end

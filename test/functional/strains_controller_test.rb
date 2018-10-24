@@ -30,9 +30,9 @@ class StrainsControllerTest < ActionController::TestCase
 
   test 'should create' do
     assert_difference('Strain.count') do
-      post :create, strain: { title: 'strain 1',
+      post :create, params: { strain: { title: 'strain 1',
                               organism_id: Factory(:organism).id,
-                              project_ids: [Factory(:project).id] }
+                              project_ids: [Factory(:project).id] } }
     end
     s = assigns(:strain)
     assert_redirected_to strain_path(s)
@@ -40,15 +40,15 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test 'should get show' do
-    get :show, id: Factory(:strain,
+    get :show, params: { id: Factory(:strain,
                            title: 'strain 1',
-                           policy: policies(:editing_for_all_sysmo_users_policy))
+                           policy: policies(:editing_for_all_sysmo_users_policy)) }
     assert_response :success
     assert_not_nil assigns(:strain)
   end
 
   test 'should get edit' do
-    get :edit, id: Factory(:strain, policy: policies(:editing_for_all_sysmo_users_policy))
+    get :edit, params: { id: Factory(:strain, policy: policies(:editing_for_all_sysmo_users_policy)) }
     assert_response :success
     assert_not_nil assigns(:strain)
   end
@@ -58,7 +58,7 @@ class StrainsControllerTest < ActionController::TestCase
     project = Factory(:project)
     assert_not_equal 'test', strain.title
     assert !strain.projects.include?(project)
-    put :update, id: strain.id, strain: { title: 'test', project_ids: [project.id] }
+    put :update, params: { id: strain.id, strain: { title: 'test', project_ids: [project.id] } }
     s = assigns(:strain)
     assert_redirected_to strain_path(s)
     assert_equal 'test', s.title
@@ -68,7 +68,7 @@ class StrainsControllerTest < ActionController::TestCase
   test 'should destroy' do
     s = Factory :strain, contributor: User.current_user.person
     assert_difference('Strain.count', -1, 'A strain should be deleted') do
-      delete :destroy, id: s.id
+      delete :destroy, params: { id: s.id }
     end
   end
 
@@ -81,7 +81,7 @@ class StrainsControllerTest < ActionController::TestCase
   test 'unauthorized user cannot edit strain' do
     login_as Factory(:user, person: Factory(:brand_new_person))
     s = Factory :strain, policy: Factory(:private_policy)
-    get :edit, id: s.id
+    get :edit, params: { id: s.id }
     assert_redirected_to strain_path(s)
     assert flash[:error]
   end
@@ -89,7 +89,7 @@ class StrainsControllerTest < ActionController::TestCase
     login_as Factory(:user, person: Factory(:brand_new_person))
     s = Factory :strain, policy: Factory(:private_policy)
 
-    put :update, id: s.id, strain: { title: 'test' }
+    put :update, params: { id: s.id, strain: { title: 'test' } }
     assert_redirected_to strain_path(s)
     assert flash[:error]
   end
@@ -98,7 +98,7 @@ class StrainsControllerTest < ActionController::TestCase
     login_as Factory(:user, person: Factory(:brand_new_person))
     s = Factory :strain, policy: Factory(:private_policy)
     assert_no_difference('Strain.count') do
-      delete :destroy, id: s.id
+      delete :destroy, params: { id: s.id }
     end
     assert flash[:error]
     assert_redirected_to s
@@ -107,12 +107,12 @@ class StrainsControllerTest < ActionController::TestCase
   test 'contributor can delete strain' do
     s = Factory :strain, contributor: User.current_user.person
     assert_difference('Strain.count', -1, 'A strain should be deleted') do
-      delete :destroy, id: s.id
+      delete :destroy, params: { id: s.id }
     end
 
     s = Factory :strain, policy: Factory(:publicly_viewable_policy)
     assert_no_difference('Strain.count') do
-      delete :destroy, id: s.id
+      delete :destroy, params: { id: s.id }
     end
     assert flash[:error]
     assert_redirected_to s
@@ -131,13 +131,12 @@ class StrainsControllerTest < ActionController::TestCase
     new_phenotype_description = 'new phenotype'
     login_as(strain.contributor)
     # [genotype1,genotype2] =>[genotype2,new genotype]
-    put :update, id: strain.id,
-                 strain: {
+    put :update, params: { id: strain.id, strain: {
                    genotypes_attributes: { '0' => { gene_attributes: { title: genotype2.gene.title, id: genotype2.gene.id }, id: genotype2.id, modification_attributes: { title: genotype2.modification.title, id: genotype2.modification.id } },
                                            '2' => { gene_attributes: { title: new_gene_title }, modification_attributes: { title: new_modification_title } },
                                            '1' => { id: genotype1.id, _destroy: 1 } },
                    phenotypes_attributes: { '0' => { description: phenotype2.description, id: phenotype2.id }, '2343243' => { id: phenotype1.id, _destroy: 1 }, '1' => { description: new_phenotype_description } }
-                 }
+                 } }
     assert_redirected_to strain_path(strain)
 
     updated_strain = Strain.find_by_id strain.id
@@ -159,7 +158,7 @@ class StrainsControllerTest < ActionController::TestCase
     assert !strain.can_manage?(user)
 
     login_as(user)
-    put :update, id: strain.id, strain: { title: strain.title }, policy_attributes: { access_type: Policy::MANAGING }
+    put :update, params: { id: strain.id, strain: { title: strain.title }, policy_attributes: { access_type: Policy::MANAGING } }
     assert_redirected_to strain_path(strain)
 
     updated_strain = Strain.find_by_id strain.id
@@ -173,10 +172,9 @@ class StrainsControllerTest < ActionController::TestCase
     assert !strain.can_manage?(user)
 
     login_as(user)
-    put :update, id: strain.id, strain: { title: strain.title },
-                 policy_attributes: { permissions_attributes: {
+    put :update, params: { id: strain.id, strain: { title: strain.title }, policy_attributes: { permissions_attributes: {
                    '1' => { contributor_type: 'Person', contributor_id: user.person.id, access_type: Policy::MANAGING }
-                 } }
+                 } } }
     assert_redirected_to strain_path(strain)
 
     updated_strain = Strain.find_by_id strain.id
@@ -209,7 +207,7 @@ class StrainsControllerTest < ActionController::TestCase
     assert strain1.can_view?
     assert strain2.can_view?
 
-    get :index, assay_id: assay1.id
+    get :index, params: { assay_id: assay1.id }
     assert_response :success
 
     assert_select 'div.list_item_title' do
@@ -227,7 +225,7 @@ class StrainsControllerTest < ActionController::TestCase
     refute_empty strain2.projects
     refute_equal strain1.projects.first, strain2.projects.first
 
-    get :index, project_id: strain1.projects.first.id
+    get :index, params: { project_id: strain1.projects.first.id }
     assert_response :success
 
     assert_select 'div.list_item_title' do
@@ -244,7 +242,7 @@ class StrainsControllerTest < ActionController::TestCase
     strain2 = Factory(:strain, policy: Factory(:public_policy),contributor:person2)
 
 
-    get :index, person_id: person1.id
+    get :index, params: { person_id: person1.id }
     assert_response :success
 
     assert_select 'div.list_item_title' do
@@ -257,7 +255,7 @@ class StrainsControllerTest < ActionController::TestCase
     strain_in_gatekept_project = { title: 'Test', project_ids: [Factory(:asset_gatekeeper).projects.first.id], organism_id: Factory(:organism).id }
     assert_difference ('ResourcePublishLog.count') do
       assert_enqueued_emails 1 do
-        post :create, strain: strain_in_gatekept_project, policy_attributes: { access_type: Policy::VISIBLE }
+        post :create, params: { strain: strain_in_gatekept_project, policy_attributes: { access_type: Policy::VISIBLE } }
       end
     end
     publish_log = ResourcePublishLog.last
@@ -272,7 +270,7 @@ class StrainsControllerTest < ActionController::TestCase
                      genotypes: [Factory(:genotype)],
                      phenotypes: [Factory(:phenotype)])
 
-    get :new, parent_id: strain.id
+    get :new, params: { parent_id: strain.id }
     assert_response :success
 
     assert_select 'input[id=?][value=?]', 'strain_title', strain.title
@@ -295,7 +293,7 @@ class StrainsControllerTest < ActionController::TestCase
                                          policy: Factory(:private_policy))
     assert !unauthorized_parent_strain.can_view?
 
-    get :new, parent_id: unauthorized_parent_strain.id
+    get :new, params: { parent_id: unauthorized_parent_strain.id }
     assert_response :success
 
     assert_select 'input[id=?][value=?]', 'strain_title', unauthorized_parent_strain.title, count: 0
@@ -303,7 +301,7 @@ class StrainsControllerTest < ActionController::TestCase
     authorized_parent_strain = Factory(:strain)
     assert authorized_parent_strain.can_view?
 
-    get :new, parent_id: authorized_parent_strain.id
+    get :new, params: { parent_id: authorized_parent_strain.id }
     assert_response :success
 
     assert_select 'input[id=?][value=?]', 'strain_title', authorized_parent_strain.title
@@ -325,7 +323,7 @@ class StrainsControllerTest < ActionController::TestCase
     end
 
     with_config_value(:related_items_limit, 2) do
-      get :show, id: strain
+      get :show, params: { id: strain }
 
       assert_response :success
 

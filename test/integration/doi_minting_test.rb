@@ -182,7 +182,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       assert latest_version.save
       assert latest_version.has_doi?
 
-      post "/#{type.pluralize}/#{asset.id}/new_version", data_file: {}, content_blobs: [{ data: {} }], revision_comments: 'This is a new revision'
+      post "/#{type.pluralize}/#{asset.id}/new_version", params: { data_file: {}, content_blobs: [{ data: {} }], revision_comments: 'This is a new revision' }
 
       assert_redirected_to :root
       assert_not_nil flash[:error]
@@ -244,7 +244,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
       unpublic_sharing = { access_type: Policy::VISIBLE }
 
-      put "/#{type.pluralize}/#{asset.id}", policy_attributes: unpublic_sharing
+      put "/#{type.pluralize}/#{asset.id}", params: { policy_attributes: unpublic_sharing }
 
       assert_redirected_to :root
       assert_not_nil flash[:error]
@@ -265,6 +265,6 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   def login_as(user)
     User.current_user = user
-    post '/session', login: user.login, password: generate_user_password
+    post '/session', params: { login: user.login, password: generate_user_password }
   end
 end

@@ -79,7 +79,7 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'string to boolean' do
     with_config_value(:events_enabled, false) do
-      post :update_features_enabled, events_enabled: '1'
+      post :update_features_enabled, params: { events_enabled: '1' }
       assert Seek::Config.events_enabled
     end
   end
@@ -89,14 +89,7 @@ class AdminControllerTest < ActionController::TestCase
       with_config_value(:smtp, { address: '255.255.255.255', 'address' => '0.0.0.0' }) do
         assert_equal 'Hash', Seek::Config.smtp.class.name
 
-        post :update_features_enabled, email_enabled: '1',
-             address: '127.0.0.1',
-             port: '25',
-             domain: 'email.example.com',
-             authentication: 'plain',
-             smtp_user_name: '',
-             smtp_password: '',
-             enable_starttls_auto: '1'
+        post :update_features_enabled, params: { email_enabled: '1', address: '127.0.0.1', port: '25', domain: 'email.example.com', authentication: 'plain', smtp_user_name: '', smtp_password: '', enable_starttls_auto: '1' }
 
         assert_equal 'ActiveSupport::HashWithIndifferentAccess', Seek::Config.smtp.class.name
         assert Seek::Config.email_enabled
@@ -128,7 +121,7 @@ class AdminControllerTest < ActionController::TestCase
   test 'update visible tags and threshold' do
     Seek::Config.max_visible_tags = 2
     Seek::Config.tag_threshold = 2
-    post :update_home_settings, tag_threshold: '8', max_visible_tags: '9'
+    post :update_home_settings, params: { tag_threshold: '8', max_visible_tags: '9' }
     assert_equal 8, Seek::Config.tag_threshold
     assert_equal 9, Seek::Config.max_visible_tags
   end
@@ -136,36 +129,36 @@ class AdminControllerTest < ActionController::TestCase
   test 'update default default_associated_projects_access_type permissions' do
     Seek::Config.default_associated_projects_access_type = 0
     assert_equal 0, Seek::Config.default_associated_projects_access_type
-    post :update_settings, default_associated_projects_access_type: '2'
+    post :update_settings, params: { default_associated_projects_access_type: '2' }
     assert_equal 2, Seek::Config.default_associated_projects_access_type
   end
 
   test 'update default default_all_visitors_access_type permissions' do
     Seek::Config.default_all_visitors_access_type = 0
     assert_equal 0, Seek::Config.default_all_visitors_access_type
-    post :update_settings, default_all_visitors_access_type: '2'
+    post :update_settings, params: { default_all_visitors_access_type: '2' }
     assert_equal 2, Seek::Config.default_all_visitors_access_type
   end
 
   test 'update permissions popup' do
     Seek::Config.permissions_popup = Seek::Config::PERMISSION_POPUP_ALWAYS
     assert_equal Seek::Config::PERMISSION_POPUP_ALWAYS, Seek::Config.permissions_popup
-    post :update_settings, permissions_popup: "#{Seek::Config::PERMISSION_POPUP_NEVER}"
+    post :update_settings, params: { permissions_popup: "#{Seek::Config::PERMISSION_POPUP_NEVER}" }
     assert_equal Seek::Config::PERMISSION_POPUP_NEVER, Seek::Config.permissions_popup
   end
 
   test 'invalid email address' do
-    post :update_settings, pubmed_api_email: 'quentin', crossref_api_email: 'quentin@example.com'
+    post :update_settings, params: { pubmed_api_email: 'quentin', crossref_api_email: 'quentin@example.com' }
     assert_not_nil flash[:error]
   end
 
   test 'should input integer' do
-    post :update_home_settings, tag_threshold: '', max_visible_tags: '20'
+    post :update_home_settings, params: { tag_threshold: '', max_visible_tags: '20' }
     assert_not_nil flash[:error]
   end
 
   test 'should input positive integer' do
-    post :update_home_settings, tag_threshold: '1', max_visible_tags: '0'
+    post :update_home_settings, params: { tag_threshold: '1', max_visible_tags: '0' }
     assert_not_nil flash[:error]
   end
 
@@ -176,7 +169,7 @@ class AdminControllerTest < ActionController::TestCase
     assert quentin.is_admin?
     assert !aaron.is_admin?
 
-    post :update_admins, admins: "#{aaron.id}"
+    post :update_admins, params: { admins: "#{aaron.id}" }
 
     quentin.reload
     aaron.reload
@@ -205,7 +198,7 @@ class AdminControllerTest < ActionController::TestCase
     p = Factory(:person)
     model = Factory(:model)
     tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: model
-    get :edit_tag, id: tag.value.id
+    get :edit_tag, params: { id: tag.value.id }
     assert_response :success
   end
 
@@ -214,7 +207,7 @@ class AdminControllerTest < ActionController::TestCase
     p = Factory(:person)
     model = Factory(:model)
     tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: model
-    get :edit_tag, id: tag.value.id
+    get :edit_tag, params: { id: tag.value.id }
     assert_response :redirect
     refute_nil flash[:error]
   end
@@ -246,11 +239,7 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'update home page settings' do
     assert_not_equal 'This is the home description', Seek::Config.home_description
-    post :update_home_settings,
-         home_description: 'This is the home description',
-         news_number_of_entries: '3',
-         news_enabled: '1',
-         news_feed_urls: 'http://fish.com, http://goats.com'
+    post :update_home_settings, params: { home_description: 'This is the home description', news_number_of_entries: '3', news_enabled: '1', news_feed_urls: 'http://fish.com, http://goats.com' }
 
     assert_equal 'This is the home description', Seek::Config.home_description
     assert_equal 'http://fish.com, http://goats.com', Seek::Config.news_feed_urls
@@ -259,37 +248,37 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'update doi locked, should be stored as int' do
-    post :update_features_enabled, time_lock_doi_for: '6'
+    post :update_features_enabled, params: { time_lock_doi_for: '6' }
     assert_equal 6, Seek::Config.time_lock_doi_for
   end
 
   test 'update_redirect_to for update_features_enabled' do
-    post :update_features_enabled, time_lock_doi_for: '1', port: '25'
+    post :update_features_enabled, params: { time_lock_doi_for: '1', port: '25' }
     assert_redirected_to admin_path
     assert_nil flash[:error]
 
-    post :update_features_enabled, time_lock_doi_for: ''
+    post :update_features_enabled, params: { time_lock_doi_for: '' }
     assert_redirected_to features_enabled_admin_path
     assert_not_nil flash[:error]
   end
 
   test 'update_redirect_to for update_home_setting' do
-    post :update_home_settings, news_number_of_entries: '10', tag_threshold: '1', max_visible_tags: '20'
+    post :update_home_settings, params: { news_number_of_entries: '10', tag_threshold: '1', max_visible_tags: '20' }
     assert_redirected_to admin_path
     assert_nil flash[:error]
 
-    post :update_home_settings, news_number_of_entries: '', tag_threshold: '1', max_visible_tags: '20'
+    post :update_home_settings, params: { news_number_of_entries: '', tag_threshold: '1', max_visible_tags: '20' }
     assert_redirected_to home_settings_admin_path
     assert_not_nil flash[:error]
   end
 
   test 'openbis enabled' do
     with_config_value(:openbis_enabled, false) do
-      post :update_features_enabled, openbis_enabled: '1'
+      post :update_features_enabled, params: { openbis_enabled: '1' }
       assert Seek::Config.openbis_enabled
     end
     with_config_value(:openbis_enabled, true) do
-      post :update_features_enabled, openbis_enabled: '0'
+      post :update_features_enabled, params: { openbis_enabled: '0' }
       refute Seek::Config.openbis_enabled
     end
   end

@@ -19,7 +19,7 @@ class PersonalTagsTest < ActionController::TestCase
     cricket = Factory :tag, annotatable: sop, source: p.user, value: 'cricket'
     frog = Factory :tag, annotatable: sop, source: p2.user, value: 'frog'
 
-    get :show, id: p
+    get :show, params: { id: p }
     assert :success
 
     assert_select 'div#personal_tags a[href=?]', show_ann_path(cricket.value), text: 'cricket', count: 1
@@ -33,7 +33,7 @@ class PersonalTagsTest < ActionController::TestCase
     spade = Factory :tool, value: 'spade', source: p, annotatable: p
     fishing_tool = Factory :tool, value: 'fishing', source: p, annotatable: p
 
-    get :show, id: p.id
+    get :show, params: { id: p.id }
     assert_response :success
 
     assert_select 'div' do
@@ -67,7 +67,7 @@ class PersonalTagsTest < ActionController::TestCase
     two = expertise_annotations[2]
     three = expertise_annotations[1]
     four = p.tools.first
-    post :update, id: p.id, person: { email: p.email }, expertise_list: [one, two, 'five'].join(','), tool_list: [four, 'three'].join(',')
+    post :update, params: { id: p.id, person: { email: p.email }, expertise_list: [one, two, 'five'].join(','), tool_list: [four, 'three'].join(',') }
     assert_redirected_to p
     p = Person.find(p.id)
 
@@ -83,7 +83,7 @@ class PersonalTagsTest < ActionController::TestCase
     tool = Factory :tool, source: p.user, annotatable: p, value: 'a_tool'
     tag = Factory :tag, source: p.user, annotatable: p, value: 'a_tag'
 
-    get :show, id: p
+    get :show, params: { id: p }
     assert :success
 
     assert_select 'div#personal_tags a[href=?]', show_ann_path(tag.value), text: 'a_tag', count: 1

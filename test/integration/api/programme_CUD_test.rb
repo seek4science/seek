@@ -28,7 +28,7 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
     a_person = Factory(:person)
     user_login(a_person)
     assert_difference('Programme.count') do
-      post "/programmes.json", @to_post
+      post "/programmes.json", params: @to_post
       assert_response :success
     end
   end
@@ -44,7 +44,7 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
     @to_post["data"]['attributes']['title'] = "Updated programme"
     #change_funding_codes_before_CU("min")
 
-    patch "/programmes/#{prog.id}.json", @to_post
+    patch "/programmes/#{prog.id}.json", params: @to_post
     assert_response :success
   end
 

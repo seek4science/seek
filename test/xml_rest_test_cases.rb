@@ -40,7 +40,7 @@ module XmlRestTestCases
   end
 
   def test_get_rest_api_xml(object = rest_api_test_object)
-    get :show, rest_show_url_options(object).merge(id: object, format: 'xml')
+    get :show, params: rest_show_url_options(object).merge(id: object, format: 'xml')
     perform_api_checks
 
     # check the title, due to an error with it being incorrectly described

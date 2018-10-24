@@ -12,12 +12,12 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
   test 'can only go to the experimental condition if the user can edit the sop' do
     sop = sops(:editable_sop)
     sop.save
-    get :index, sop_id: sop.id, version: sop.version
+    get :index, params: { sop_id: sop.id, version: sop.version }
     assert_response :success
 
     sop = sops(:downloadable_sop)
     sop.save
-    get :index, sop_id: sop.id, version: sop.version
+    get :index, params: { sop_id: sop.id, version: sop.version }
     assert_not_nil flash[:error]
   end
 
@@ -30,7 +30,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     compound_name = 'ATP'
     compound_annotation = Seek::SabiorkWebservices.new.get_compound_annotation(compound_name)
 
-    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version, substance_list: compound_name
+    post :create, params: { experimental_condition: ec, sop_id: sop.id, version: sop.version, substance_list: compound_name }
 
     ec = assigns(:experimental_condition)
     assert_not_nil ec
@@ -58,7 +58,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     mi = measured_items(:concentration)
     unit = units(:gram)
     ec = { measured_item_id: mi.id, start_value: 1, unit_id: unit.id }
-    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version
+    post :create, params: { experimental_condition: ec, sop_id: sop.id, version: sop.version }
     ec = assigns(:experimental_condition)
     assert_not_nil ec
     assert !ec.valid?
@@ -69,7 +69,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     mi = measured_items(:time)
     unit = units(:gram)
     ec = { measured_item_id: mi.id, start_value: 1, unit_id: unit.id }
-    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version
+    post :create, params: { experimental_condition: ec, sop_id: sop.id, version: sop.version }
     ec = assigns(:experimental_condition)
     assert_not_nil ec
     assert ec.valid?
@@ -82,7 +82,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     cp = compounds(:compound_glucose)
     unit = units(:gram)
     ec = { measured_item_id: mi.id, start_value: 1, unit_id: unit.id }
-    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version, substance_list: cp.name
+    post :create, params: { experimental_condition: ec, sop_id: sop.id, version: sop.version, substance_list: cp.name }
     ec = assigns(:experimental_condition)
     assert_not_nil ec
     assert ec.valid?
@@ -96,7 +96,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     syn = synonyms(:glucose_synonym)
     unit = units(:gram)
     ec = { measured_item_id: mi.id, start_value: 1, unit_id: unit.id }
-    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version, substance_list: syn.name
+    post :create, params: { experimental_condition: ec, sop_id: sop.id, version: sop.version, substance_list: syn.name }
     ec = assigns(:experimental_condition)
     assert_not_nil ec
     assert ec.valid?
@@ -111,7 +111,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_equal ec.experimental_condition_links.first.substance, compounds(:compound_glucose)
 
     mi = measured_items(:time)
-    put :update, id: ec.id, sop_id: ec.sop.id, experimental_condition: { measured_item_id: mi.id }
+    put :update, params: { id: ec.id, sop_id: ec.sop.id, experimental_condition: { measured_item_id: mi.id } }
     ec_updated = assigns(:experimental_condition)
     assert_not_nil ec_updated
     assert ec_updated.valid?
@@ -127,7 +127,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
 
     mi = measured_items(:concentration)
     cp = compounds(:compound_glucose)
-    put :update, id: ec.id, sop_id: ec.sop.id, experimental_condition: { measured_item_id: mi.id }, substance_list: cp.name
+    put :update, params: { id: ec.id, sop_id: ec.sop.id, experimental_condition: { measured_item_id: mi.id }, substance_list: cp.name }
     ec_updated = assigns(:experimental_condition)
     assert_not_nil ec_updated
     assert ec_updated.valid?
@@ -142,7 +142,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert ec.experimental_condition_links.blank?
 
     mi = measured_items(:pressure)
-    put :update, id: ec.id, sop_id: ec.sop.id, experimental_condition: { measured_item_id: mi.id }
+    put :update, params: { id: ec.id, sop_id: ec.sop.id, experimental_condition: { measured_item_id: mi.id } }
     ec_updated = assigns(:experimental_condition)
     assert_not_nil ec_updated
     assert ec_updated.valid?
@@ -157,8 +157,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_equal ec.experimental_condition_links.first.substance, compounds(:compound_glucose)
 
     cp = compounds(:compound_glycine)
-    put :update, id: ec.id, sop_id: ec.sop.id, experimental_condition: { measured_item_id: ec.measured_item_id },
-        substance_list: cp.name
+    put :update, params: { id: ec.id, sop_id: ec.sop.id, experimental_condition: { measured_item_id: ec.measured_item_id }, substance_list: cp.name }
     ec_updated = assigns(:experimental_condition)
     assert_not_nil ec_updated
     assert ec_updated.valid?
@@ -171,7 +170,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     ec = experimental_conditions(:experimental_condition_time)
     assert_not_nil ec
 
-    put :update, id: ec.id, sop_id: ec.sop.id, experimental_condition: { start_value: 10.02 }
+    put :update, params: { id: ec.id, sop_id: ec.sop.id, experimental_condition: { start_value: 10.02 } }
     fs_updated = assigns(:experimental_condition)
     assert_not_nil fs_updated
     assert fs_updated.valid?
@@ -183,7 +182,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     mi = measured_items(:time)
     unit = units(:gram)
     ec = { measured_item_id: mi.id, start_value: '1,5', unit_id: unit.id }
-    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version
+    post :create, params: { experimental_condition: ec, sop_id: sop.id, version: sop.version }
     ec = assigns(:experimental_condition)
     assert_nil ec
   end
@@ -192,7 +191,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     ec = experimental_conditions(:experimental_condition_time)
     assert_not_nil ec
 
-    put :update, id: ec.id, sop_id: ec.sop.id, experimental_condition: { start_value: '10,02' }
+    put :update, params: { id: ec.id, sop_id: ec.sop.id, experimental_condition: { start_value: '10,02' } }
     ec_updated = assigns(:experimental_condition)
     assert_nil ec_updated
   end
@@ -210,7 +209,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
       i += 1
     end
 
-    post :create_from_existing, :sop_id => sop.id, :version => sop.latest_version.version, "checkbox_#{ec_array.first.id}" => ec_array.first.id, "checkbox_#{ec_array[1].id}" => ec_array[1].id, "checkbox_#{ec_array[2].id}" => ec_array[2].id
+    post :create_from_existing, params: { :sop_id => sop.id, :version => sop.latest_version.version, "checkbox_#{ec_array.first.id}" => ec_array.first.id, "checkbox_#{ec_array[1].id}" => ec_array[1].id, "checkbox_#{ec_array[2].id}" => ec_array[2].id }
 
     sop.reload
     assert_equal sop.experimental_conditions.count, 3
@@ -233,7 +232,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_equal ec.measured_item, measured_items(:concentration)
     assert_equal ec.experimental_condition_links.first.substance, compounds(:compound_glucose)
 
-    delete :destroy, id: ec.id, sop_id: sops(:editable_sop).id
+    delete :destroy, params: { id: ec.id, sop_id: sops(:editable_sop).id }
 
     assert_nil ExperimentalCondition.find_by_id(ec.id)
     ec.experimental_condition_links.each do |ecl|
@@ -245,7 +244,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     sop = sops(:editable_sop)
     mi = measured_items(:growth_medium)
     ec = { measured_item_id: mi.id }
-    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version, annotation: { annotation_attribute: 'description', value: 'test value' }
+    post :create, params: { experimental_condition: ec, sop_id: sop.id, version: sop.version, annotation: { annotation_attribute: 'description', value: 'test value' } }
     ec = assigns(:experimental_condition)
     assert_not_nil ec
     assert ec.valid?
@@ -258,8 +257,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_equal measured_items(:growth_medium), ec.measured_item
     assert_equal 'one value', ec.annotations_with_attribute('description').first.value.text
 
-    put :update, id: ec.id, sop_id: ec.sop.id, experimental_condition: { measured_item_id: ec.measured_item_id },
-        annotation: { annotation_attribute: 'description', value: 'update value' }
+    put :update, params: { id: ec.id, sop_id: ec.sop.id, experimental_condition: { measured_item_id: ec.measured_item_id }, annotation: { annotation_attribute: 'description', value: 'update value' } }
     ec = assigns(:experimental_condition)
     assert_not_nil ec
     assert ec.valid?
