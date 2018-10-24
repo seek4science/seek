@@ -282,13 +282,6 @@ class DocumentsControllerTest < ActionController::TestCase
   end
 
   def valid_content_blob
-    { data: file_for_upload, data_url: '' }
+    { data: fixture_file_upload('files/a_pdf_file.pdf'), data_url: '' }
   end
-
-  def file_for_upload
-    ActionDispatch::Http::UploadedFile.new(filename: 'doc.pdf',
-                                           content_type: 'application/pdf',
-                                           tempfile: fixture_file_upload('files/a_pdf_file.pdf'))
-  end
-
 end

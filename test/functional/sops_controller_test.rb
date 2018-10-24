@@ -329,7 +329,7 @@ class SopsControllerTest < ActionController::TestCase
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
     # create new version
-    post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload(tempfile_fixture: 'files/little_file_v2.txt', content_type: 'text/plain', filename: 'little_file_v2.txt') }]
+    post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload(tempfile_fixture: 'files/little_file_v2.txt', content_type: 'text/plain') }]
     assert_redirected_to sop_path(assigns(:sop))
 
     s = Sop.find(s.id)
@@ -1214,13 +1214,10 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def file_for_upload(options = {})
-    default = { filename: 'file_picture.png', content_type: 'image/png', tempfile_fixture: 'files/file_picture.png' }
-    options = default.merge(options)
-    ActionDispatch::Http::UploadedFile.new({
-                                             filename: options[:filename],
-                                             content_type: options[:content_type],
-                                             tempfile: fixture_file_upload(options[:tempfile_fixture])
-                                           })
+    options.reverse_merge!({ filename: 'file_picture.png',
+                             content_type: 'image/png',
+                             tempfile_fixture: 'files/file_picture.png' })
+    fixture_file_upload(options[:tempfile_fixture], options[:content_type])
   end
 
   def valid_sop_with_url

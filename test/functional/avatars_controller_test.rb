@@ -143,13 +143,6 @@ class AvatarsControllerTest < ActionController::TestCase
   private
 
   def avatar_payload
-    options = { filename: 'file_picture.png', content_type: 'image/png', tempfile_fixture: 'files/file_picture.png' }
-
-    file = ActionDispatch::Http::UploadedFile.new({
-                                               filename: options[:filename],
-                                               content_type: options[:content_type],
-                                               tempfile: fixture_file_upload(options[:tempfile_fixture])
-                                           })
-    {image_file:file}
+    { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
   end
 end

@@ -3518,9 +3518,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   def file_for_upload
-    ActionDispatch::Http::UploadedFile.new(filename: 'file_picture.png',
-                                           content_type: 'image/png',
-                                           tempfile: fixture_file_upload('files/file_picture.png'))
+    fixture_file_upload('files/file_picture.png', 'image/png')
   end
 
   def valid_data_file

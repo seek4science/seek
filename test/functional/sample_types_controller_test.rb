@@ -601,20 +601,14 @@ class SampleTypesControllerTest < ActionController::TestCase
   private
 
   def template_for_upload
-    ActionDispatch::Http::UploadedFile.new(filename: 'sample-type-example.xlsx',
-                                           content_type: 'application/excel',
-                                           tempfile: fixture_file_upload('files/sample-type-example.xlsx'))
+    fixture_file_upload('files/sample-type-example.xlsx', 'application/excel')
   end
 
   def bad_template_for_upload
-    ActionDispatch::Http::UploadedFile.new(filename: 'small-test-spreadsheet.xls',
-                                           content_type: 'application/excel',
-                                           tempfile: fixture_file_upload('files/small-test-spreadsheet.xls'))
+    fixture_file_upload('files/small-test-spreadsheet.xls', 'application/excel')
   end
 
   def missing_columns_template_for_upload
-    ActionDispatch::Http::UploadedFile.new(filename: 'samples-data-missing-columns.xls',
-                                           content_type: 'application/excel',
-                                           tempfile: fixture_file_upload('files/samples-data-missing-columns.xls'))
+    fixture_file_upload('files/samples-data-missing-columns.xls', 'application/excel')
   end
 end
