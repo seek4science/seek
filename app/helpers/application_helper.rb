@@ -414,6 +414,15 @@ module ApplicationHelper
 
     if referer == search_path && referer != request_uri && request_uri != root_path
       javascript_tag "
+              if (window.history.length > 1){
+                var a = document.createElement('a');
+                a.onclick = function(){ window.history.back(); };
+                a.onmouseover = function(){ this.style.cursor='pointer'; };
+                a.appendChild(document.createTextNode('Return to search'));
+                a.style.textDecoration='underline';
+                document.getElementById('return_to_search').appendChild(a);
+              }
+            "
         if (window.history.length > 1){
           var a = document.createElement('a');
           a.onclick = function(){ window.history.back(); };
@@ -509,6 +518,13 @@ module ApplicationHelper
 
   def using_docker?
     Seek::Docker.using_docker?
+  end
+
+  def link_to_function(name, function, html_options={})
+    onclick = "#{"#{html_options[:onclick]}; " if html_options[:onclick]}#{function}; return false;"
+    href = html_options[:href] || '#'
+
+    content_tag(:a, name, html_options.merge(href: href, onclick: onclick))
   end
 
   private
