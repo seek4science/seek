@@ -22,7 +22,7 @@ class SopsAnnotationTest < ActionController::TestCase
 
     golf = Factory :tag, annotatable: dummy_sop, source: p2, value: 'golf'
 
-    xml_http_request :post, :update_annotations_ajax, id: viewable_sop, tag_list: golf.value.text
+    post :update_annotations_ajax, xhr: true, id: viewable_sop, tag_list: golf.value.text
 
     viewable_sop.reload
 
@@ -33,7 +33,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert !private_sop.can_view?(p.user)
     assert !private_sop.can_edit?(p.user)
 
-    xml_http_request :post, :update_annotations_ajax, id: private_sop, tag_list: golf.value.text
+    post :update_annotations_ajax, xhr: true, id: private_sop, tag_list: golf.value.text
 
     private_sop.reload
     assert private_sop.annotations.empty?
@@ -58,7 +58,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_equal [], sop.annotations.select { |a| a.source == p.user }.collect { |a| a.value.text }.sort
     assert_equal %w(golf sparrow), sop.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
-    xml_http_request :post, :update_annotations_ajax, id: sop, tag_list: "soup,#{golf.value.text}"
+    post :update_annotations_ajax, xhr: true, id: sop, tag_list: "soup,#{golf.value.text}"
 
     sop.reload
 

@@ -787,7 +787,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     golf = Factory :tag, annotatable: dummy_model, source: p2, value: 'golf'
 
-    xml_http_request :post, :update_annotations_ajax, { id: viewable_model, tag_list: golf.value.text }
+    post :update_annotations_ajax, xhr: true, params: { id: viewable_model, tag_list: golf.value.text }
 
     viewable_model.reload
 
@@ -798,7 +798,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert !private_model.can_view?(p.user)
     assert !private_model.can_edit?(p.user)
 
-    xml_http_request :post, :update_annotations_ajax, { id: private_model, tag_list: golf.value.text }
+    post :update_annotations_ajax, xhr: true, params: { id: private_model, tag_list: golf.value.text }
 
     private_model.reload
     assert private_model.annotations.empty?
@@ -823,7 +823,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal [], model.annotations.select { |a| a.source == p.user }.collect { |a| a.value.text }.sort
     assert_equal %w(golf sparrow), model.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
-    xml_http_request :post, :update_annotations_ajax, { id: model, tag_list: "soup,#{golf.value.text}" }
+    post :update_annotations_ajax, xhr: true, params: { id: model, tag_list: "soup,#{golf.value.text}" }
 
     model.reload
 

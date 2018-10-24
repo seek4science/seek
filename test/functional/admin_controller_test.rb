@@ -180,14 +180,14 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'get project content stats' do
-    xml_http_request :get, :get_stats, page:  'content_stats'
+    get :get_stats, xhr: true, page:  'content_stats'
     assert_response :success
   end
 
   test 'The configuration should stay the same after test_email_configuration' do
     smtp_hash = ActionMailer::Base.smtp_settings
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
-    xml_http_request :post, :test_email_configuration, address: '127.0.0.1', port: '25', domain: 'test.com',
+    post :test_email_configuration, xhr: true, address: '127.0.0.1', port: '25', domain: 'test.com',
                                                        authentication: 'plain', enable_starttls_auto: '1', testing_email: 'test@test.com'
     assert_response :success
     assert_equal smtp_hash, ActionMailer::Base.smtp_settings
@@ -218,7 +218,7 @@ class AdminControllerTest < ActionController::TestCase
     dj.created_at = '2010 September 11'
     assert dj.save
 
-    xml_http_request :get, :get_stats, page:  'job_queue'
+    get :get_stats, xhr: true, page:  'job_queue'
     assert_response :success
 
     assert_select 'p', text: 'Total delayed jobs waiting = 1'
@@ -233,7 +233,7 @@ class AdminControllerTest < ActionController::TestCase
   test 'storage usage stats' do
     Factory(:rightfield_datafile)
     Factory(:rightfield_annotated_datafile)
-    xml_http_request :get, :get_stats, page:  'storage_usage_stats'
+    get :get_stats, xhr: true, page:  'storage_usage_stats'
     assert_response :success
   end
 
@@ -292,7 +292,7 @@ class AdminControllerTest < ActionController::TestCase
                        asset_id: investigation.id,
                        action: AssetDoiLog::MINT)
 
-    xml_http_request :get, :get_stats, page:  'snapshot_and_doi_stats'
+    get :get_stats, xhr: true, page:  'snapshot_and_doi_stats'
     assert_response :success
   end
 
