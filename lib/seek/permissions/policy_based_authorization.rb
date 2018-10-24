@@ -179,12 +179,11 @@ module Seek
         # indicates an anonymous user. Returns nil if there is no record available
         def lookup_for_asset(action, user_id, asset_id)
           attribute = "can_#{action}"
-          @@expected_true_value ||= ActiveRecord::Base.connection.quoted_true.delete("'")
           res = ActiveRecord::Base.connection.select_one("select #{attribute} from #{lookup_table_name} where user_id=#{user_id} and asset_id=#{asset_id}")
           if res.nil?
             nil
           else
-            res[attribute].to_s == @@expected_true_value
+            ActiveRecord::Type::Boolean.new.cast(res[attribute])
           end
         end
       end
@@ -197,7 +196,6 @@ module Seek
 
       # allows access to each permission in a single database call (rather than calling can_download? can_edit? etc individually)
       def authorization_permissions(user = User.current_user)
-        @@expected_true_value ||= ActiveRecord::Base.connection.quoted_true.delete("'")
         permissions = AuthPermissions.new
         user_id = user.nil? ? 0 : user.id
         if Seek::Config.auth_lookup_enabled && self.class.lookup_table_consistent?(user_id)
@@ -206,11 +204,11 @@ module Seek
           if res.nil?
             raise 'Expected to find record in auth lookup table'
           else
-            permissions.can_view = res['can_view'].to_s == @@expected_true_value && state_allows_manage?(user)
-            permissions.can_download = res['can_download'].to_s == @@expected_true_value && state_allows_manage?(user)
-            permissions.can_edit = res['can_edit'].to_s == @@expected_true_value && state_allows_manage?(user)
-            permissions.can_manage = res['can_manage'].to_s == @@expected_true_value && state_allows_manage?(user)
-            permissions.can_delete = res['can_delete'].to_s == @@expected_true_value && state_allows_manage?(user)
+            permissions.can_view = ActiveRecord::Type::Boolean.new.cast(res['can_view']) && state_allows_manage?(user)
+            permissions.can_download = ActiveRecord::Type::Boolean.new.cast(res['can_download']) && state_allows_manage?(user)
+            permissions.can_edit = ActiveRecord::Type::Boolean.new.cast(res['can_edit']) && state_allows_manage?(user)
+            permissions.can_manage = ActiveRecord::Type::Boolean.new.cast(res['can_manage']) && state_allows_manage?(user)
+            permissions.can_delete = ActiveRecord::Type::Boolean.new.cast(res['can_delete']) && state_allows_manage?(user)
           end
         else
           permissions.can_view = can_view?
