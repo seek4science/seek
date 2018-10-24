@@ -73,9 +73,6 @@ module SEEK
     # openbis_endpoints/26-20170404142724224014370...
     config.active_record.cache_timestamp_format = :usec
 
-    # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.active_record.raise_in_transactional_callbacks = true
-
     config.active_job.queue_adapter = Rails.env.test? ? :test : :delayed_job
 
     # load and set the application version from /config/version.yml
