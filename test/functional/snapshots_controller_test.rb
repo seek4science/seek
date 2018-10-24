@@ -265,7 +265,12 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'a.btn', text: 'Export to Zenodo', count: 1
 
-    post :export_submit, params: { investigation_id: @investigation, id: @snapshot.snapshot_number, code: 'abc', metadata: { access_type: 'open', license: 'CC-BY-4.0' } }
+    post :export_submit, params: { investigation_id: @investigation, id: @snapshot.snapshot_number, code: 'abc',
+                                   metadata: { access_type: 'open',
+                                               license: 'CC-BY-4.0',
+                                               embargo_date: 3.years.from_now,
+                                               access_conditions: 'Must wear blindfold',
+                                               creators: [{ name: 'Bob' }] } }
 
     assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     assert !assigns(:snapshot).zenodo_deposition_id.nil?

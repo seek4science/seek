@@ -54,10 +54,8 @@ class SnapshotsController < ApplicationController
   def export_submit # Export AND publish
     access_token = @oauth_session.access_token
 
-    metadata = params[:metadata].delete_if { |k,v| v.blank? }
-
-    wrap_service('Zenodo', polymorphic_path([@resource, @snapshot]), rescue_all: true) do
-      if @snapshot.export_to_zenodo(access_token, metadata) && @snapshot.publish_in_zenodo(access_token)
+    wrap_service('Zenodo', polymorphic_path([@resource, @snapshot]), rescue_all: !Rails.env.test?) do
+      if @snapshot.export_to_zenodo(access_token, metadata_params) && @snapshot.publish_in_zenodo(access_token)
         flash[:notice] = "Snapshot successfully exported to Zenodo"
         redirect_to polymorphic_path([@resource, @snapshot])
       else
@@ -114,4 +112,7 @@ class SnapshotsController < ApplicationController
     end
   end
 
+  def metadata_params
+    params.require(:metadata).permit(:access_right, :license, :embargo_date, :access_conditions, creators: [:name]).delete_if { |k,v| v.blank? }
+  end
 end

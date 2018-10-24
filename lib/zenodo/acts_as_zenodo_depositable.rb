@@ -39,9 +39,8 @@ module Zenodo
           return false
         end
 
-        extra_metadata = extra_metadata.deep_symbolize_keys
         metadata = zenodo_metadata
-        metadata.merge!(extra_metadata)
+        metadata.merge!(extra_metadata.to_h.deep_symbolize_keys)
 
         #FIXME: this is a quick hack
         metadata[:description] = 'not set' if metadata[:description].blank?
