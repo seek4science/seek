@@ -223,21 +223,21 @@ class UserTest < ActiveSupport::TestCase
   def test_should_require_login
     assert_no_difference 'User.count' do
       u = create_user(login: nil)
-      assert u.errors.get(:login)
+      assert u.errors[:login]
     end
   end
 
   def test_should_require_password
     assert_no_difference 'User.count' do
       u = create_user(password: nil)
-      assert u.errors.get(:password)
+      assert u.errors[:password]
     end
   end
 
   def test_should_require_password_confirmation
     assert_no_difference 'User.count' do
       u = create_user(password_confirmation: nil)
-      assert u.errors.get(:password_confirmation)
+      assert u.errors[:password_confirmation]
     end
   end
 
