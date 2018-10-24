@@ -467,21 +467,21 @@ class ApplicationController < ActionController::Base
   end
 
   # Strips any unexpected filter, which protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
-  def strip_unpermitted_filters(filters)
+  def permitted_filters(filters)
     # placed this in a separate method so that other controllers could override it if necessary
     permitted = Seek::Util.persistent_classes.select { |c| c.respond_to? :find_by_id }.map { |c| c.name.underscore }
-    filters.select { |filter| permitted.include?(filter.to_s) }
+    filters.permit(*permitted)
   end
 
   def apply_filters(resources)
-    filters = params[:filter] || {}
+    filters = params[:filter] || ActionController::Parameters.new
 
     # translate params that are send as an _id, like project_id=12 - which will usually be a consequence of nested routing
     params.keys.each do |key|
       filters[key.gsub('_id', '')] = params[key] if key.end_with?('_id')
     end
 
-    filters = strip_unpermitted_filters(filters)
+    filters = permitted_filters(filters).to_unsafe_h
 
     if filters.size > 0
       params[:page] ||= 'all'
