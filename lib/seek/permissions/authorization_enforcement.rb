@@ -39,7 +39,7 @@ module Seek
                      authorized_associations_for_action? &&
                      authorized_required_access_for_owner?
           end
-          result
+          throw :abort unless result
         end
 
         def authorization_checks_enabled
@@ -54,7 +54,7 @@ module Seek
               errors.add(:base, "You are not authorized to destroy #{self.class.name.underscore.humanize}-#{id}")
             end
           end
-          result
+          throw :abort unless result
         end
 
         def authorized_changes_to_attributes?
@@ -71,7 +71,7 @@ module Seek
             result = false
             errors.add(:base, "You are not authorized to edit #{self.class.name.underscore.humanize}-#{id}")
           end
-          result
+          throw :abort unless result
         end
 
         def authorized_associations_for_action?
