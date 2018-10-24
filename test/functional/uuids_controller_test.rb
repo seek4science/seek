@@ -19,4 +19,9 @@ class UuidsControllerTest < ActionController::TestCase
     get :show, id: assay.uuid
     assert_redirected_to assay
   end
+
+  test 'not found' do
+    get :show, id: "#{assays(:metabolomics_assay2).uuid}x"
+    assert_includes flash[:error], 'Not Found'
+  end
 end
