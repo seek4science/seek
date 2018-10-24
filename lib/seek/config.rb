@@ -306,7 +306,7 @@ module Seek
       val
     end
 
-    if Settings.table_exists?
+    if Settings.data_source_exists?
       def get_value(setting, conversion = nil)
         result = Settings.global.fetch(setting)
         if result

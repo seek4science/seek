@@ -67,7 +67,7 @@ SEEK::Application.configure do
   ENV['LANG'] = 'en_US.UTF-8'
 
   begin
-    if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
+    if ActiveRecord::Base.connection.data_source_exists?'delayed_jobs'
       SendPeriodicEmailsJob.create_initial_jobs
       NewsFeedRefreshJob.create_initial_job
       OpenbisEndpointCacheRefreshJob.create_initial_jobs
