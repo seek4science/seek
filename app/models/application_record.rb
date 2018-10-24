@@ -18,6 +18,8 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::ResearchObjects::ActsAsSnapshottable
   include Zenodo::ActsAsZenodoDepositable
   include SiteAnnouncements
+  include Seek::Permissions::AuthorizationEnforcement
+  include Seek::Permissions::ActsAsAuthorized
 
   def self.is_taggable?
     false # defaults to false, unless it includes Taggable which will override this and check the configuration

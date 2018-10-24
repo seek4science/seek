@@ -3,4 +3,3 @@ String.class_eval do
      self.end_with?('/') ? self : "#{self}/"
   end
 end
-
