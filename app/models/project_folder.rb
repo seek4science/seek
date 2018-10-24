@@ -1,5 +1,5 @@
 class ProjectFolder < ApplicationRecord
-  before_destroy :deletable?
+  before_destroy -> (folder) { throw :abort unless folder.deletable? }
   before_destroy :unsort_assets_and_remove_children
 
   belongs_to :project

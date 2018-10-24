@@ -71,7 +71,7 @@ module Seek
             result = false
             errors.add(:base, "You are not authorized to edit #{self.class.name.underscore.humanize}-#{id}")
           end
-          throw :abort unless result
+          result
         end
 
         def authorized_associations_for_action?
