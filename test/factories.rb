@@ -1,7 +1,6 @@
-require_relative './upload_helper.rb'
 require_relative './password_helper.rb'
 
-include UploadHelper
+include ActionDispatch::TestProcess::FixtureFile
 include PasswordHelper
 
 FactoryGirl.define do

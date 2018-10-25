@@ -90,11 +90,7 @@ class ActiveSupport::TestCase
   def file_for_upload(options = {})
     default = { filename: 'little_file_v2.txt', content_type: 'text/plain', tempfile_fixture: 'files/little_file_v2.txt' }
     options = default.merge(options)
-    ActionDispatch::Http::UploadedFile.new({
-                                             filename: options[:filename],
-                                             content_type: options[:content_type],
-                                             tempfile: fixture_file_upload(options[:tempfile_fixture])
-                                           })
+    fixture_file_upload(options[:tempfile_fixture], options[:content_type])
   end
 
   def check_for_soffice
