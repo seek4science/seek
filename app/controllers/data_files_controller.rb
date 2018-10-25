@@ -100,10 +100,10 @@ class DataFilesController < ApplicationController
         Mailer.file_uploaded(current_user, Person.find(params[:recipient_id]), @data_file).deliver_later
 
         flash.now[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
-        render text: flash.now[:notice]
+        render plain: flash.now[:notice]
       else
         errors = (@data_file.errors.map { |e| e.join(' ') }.join("\n"))
-        render text: errors, status: 500
+        render plain: errors, status: 500
       end
     end
   end
@@ -118,15 +118,15 @@ class DataFilesController < ApplicationController
           if @data_file.save
             @data_file.creators = [User.current_user.person]
             flash.now[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
-            render text: flash.now[:notice]
+            render plain: flash.now[:notice]
           else
             errors = (@data_file.errors.map { |e| e.join(' ') }.join("\n"))
-            render text: errors, status: 500
+            render plain: errors, status: 500
           end
         end
       end
     else
-      render text: 'This user is not permitted to act on behalf of other users', status: :forbidden
+      render plain: 'This user is not permitted to act on behalf of other users', status: :forbidden
     end
   end
 
@@ -390,9 +390,9 @@ class DataFilesController < ApplicationController
 
     respond_to do |format|
       if critical_error_msg
-        format.js { render text: critical_error_msg, status: :unprocessable_entity }
+        format.js { render plain: critical_error_msg, status: :unprocessable_entity }
       else
-        format.js { render text: 'done', status: :ok }
+        format.js { render plain: 'done', status: :ok }
       end
     end
   end

@@ -340,7 +340,7 @@ class AdminController < ApplicationController
       when 'snapshot_and_doi_stats'
         render partial: 'admin/stats/snapshot_and_doi_stats'
       when 'none'
-        render text: ''
+        render html: ''
       else
         get_user_stats
     end
@@ -386,7 +386,7 @@ class AdminController < ApplicationController
     end
     respond_to do |format|
       if partial == 'none'
-        format.html { render text: '' }
+        format.html { render html: '' }
       else
         locals = { collection: collection, action: action, title: title }.merge(extra_options)
         format.html { render partial: partial, locals: locals }
@@ -448,7 +448,7 @@ class AdminController < ApplicationController
   def clear_failed_jobs
     Delayed::Job.where('failed_at IS NOT NULL').destroy_all
     respond_to do |format|
-      format.json{ render text:'',status: :ok}
+      format.json { head :ok }
     end
   end
 

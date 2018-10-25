@@ -40,12 +40,12 @@ class FoldersController < ApplicationController
       @folder.add_child(title)
       @folder.save!
       respond_to do |format|
-        format.js {render :text=>""}
+        format.js { render plain: '' }
       end
     else
       error_text="The name is too short, it must be 2 or more characters"
       respond_to do |format|
-        format.js {render :text=>error_text,:status=>500}
+        format.js { render plain: error_text, status: 500 }
       end
     end
 
@@ -93,13 +93,13 @@ class FoldersController < ApplicationController
   def set_project_folder_title
     @item = ProjectFolder.find(params[:id])
     @item.update_attribute(:title, params[:value])
-    render text: @item.title
+    render plain: @item.title
   end
 
   def set_project_folder_description
     @item = ProjectFolder.find(params[:id])
     @item.update_attribute(:description, params[:value])
-    render text: @item.description
+    render plain: @item.description
   end
 
   private

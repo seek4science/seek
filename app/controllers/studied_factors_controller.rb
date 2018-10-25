@@ -129,7 +129,7 @@ class StudiedFactorsController < ApplicationController
   def show
     @studied_factor = StudiedFactor.find(params[:id])
     respond_to do |format|
-      format.rdf { render text: 'not yet available',status: :forbidden }
+      format.rdf { render plain: 'not yet available',status: :forbidden }
     end
   end
 
@@ -148,7 +148,7 @@ class StudiedFactorsController < ApplicationController
       respond_to do |format|
         flash[:error] = 'You are not authorized to perform this action'
         format.html { redirect_to data_files_path }
-        format.rdf { render text: 'You are not authorized to perform this action', status: :forbidden }
+        format.rdf { render plain: 'You are not authorized to perform this action', status: :forbidden }
       end
       return false
     end
@@ -156,7 +156,7 @@ class StudiedFactorsController < ApplicationController
     respond_to do |format|
       flash[:error] = "Couldn't find the Data file"
       format.html { redirect_to data_files_path }
-      format.rdf { render text: 'Not found', status: :not_found }
+      format.rdf { render plain: 'Not found', status: :not_found }
     end
     return false
   end

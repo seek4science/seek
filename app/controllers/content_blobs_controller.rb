@@ -16,7 +16,7 @@ class ContentBlobsController < ApplicationController
       @content_blob.save
       @asset.touch
       respond_to do |format|
-        format.all { render text: @content_blob.file_size, status: :ok }
+        format.all { render plain: @content_blob.file_size, status: :ok }
       end
     else
       respond_to do |format|
@@ -35,7 +35,7 @@ class ContentBlobsController < ApplicationController
   end
 
   def view_text_content
-    render text: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/plain'
+    render plain: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/plain'
   end
 
   def view_pdf_content
@@ -49,17 +49,17 @@ class ContentBlobsController < ApplicationController
     if !@content_blob.no_content?
       mime_extensions = mime_extensions(@content_blob.content_type)
       if !(%w(csv) & mime_extensions).empty?
-        render text: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
+        render body: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
       elsif !(%w(xls xlsx) & mime_extensions).empty?
         sheet = params[:sheet] || 1
         trim = params[:trim] || false
         file = open(@content_blob.filepath)
-        render text: spreadsheet_to_csv(file, sheet, trim), content_type: 'text/csv'
+        render body: spreadsheet_to_csv(file, sheet, trim), content_type: 'text/csv'
       else
-        render text: 'Unable to view contents of this data file,', content_type: 'text/csv', status: :not_acceptable
+        render plain: 'Unable to view contents of this data file,', status: :not_acceptable
       end
     else
-      render text: 'No content, Content blob does not have content', content_type: 'text/csv', status: :not_found
+      render plain: 'No content, Content blob does not have content', status: :not_found
     end
   end
 
@@ -67,9 +67,9 @@ class ContentBlobsController < ApplicationController
   def show
     respond_to do |format|
       format.json { render json: @content_blob }
-      format.html { render text: 'Format not supported', status: :not_acceptable }
-      format.xml { render text: 'Format not supported', status: :not_acceptable }
-      format.rdf { render text: 'Format not supported', status: :not_acceptable }
+      format.html { render plain: 'Format not supported', status: :not_acceptable }
+      format.xml { render plain: 'Format not supported', status: :not_acceptable }
+      format.rdf { render plain: 'Format not supported', status: :not_acceptable }
       format.csv { csv_data }
     end
   end

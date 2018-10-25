@@ -239,8 +239,8 @@ class ApplicationController < ActionController::Base
     if object.nil?
       respond_to do |format|
         flash[:error] = "The #{name.humanize} does not exist!"
-        format.rdf { render text: 'Not found', status: :not_found }
-        format.xml { render text: '<error>404 Not found</error>', status: :not_found }
+        format.rdf { render plain: 'Not found', status: :not_found }
+        format.xml { render xml: '<error>404 Not found</error>', status: :not_found }
         format.json { render json: { errors: [{ title: 'Not found',
                                                 detail: "Couldn't find #{name.camelize} with 'id'=[#{params[:id]}]" }] },
                              status: :not_found }
@@ -278,8 +278,8 @@ class ApplicationController < ActionController::Base
             render template: 'general/landing_page_for_hidden_item', locals: { item: object }, status: :forbidden
           end
         end
-        format.rdf { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
-        format.xml { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
+        format.rdf { render plain: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
+        format.xml { render plain: "<error>You may not #{privilege} #{name}:#{params[:id]}</error>", status: :forbidden }
         format.json { render json: { errors: [{ title: 'Forbidden',
                                                 details: "You may not #{privilege} #{name}:#{params[:id]}" }] },
                              status: :forbidden }
@@ -303,8 +303,8 @@ class ApplicationController < ActionController::Base
         end
       end
 
-      format.rdf { render text: 'Not found', status: :not_found }
-      format.xml { render text: '<error>404 Not found</error>', status: :not_found }
+      format.rdf { render plain: 'Not found', status: :not_found }
+      format.xml { render xml: '<error>404 Not found</error>', status: :not_found }
       format.json { render json: { errors: [{ title: 'Not found', detail: e.message }] }, status: :not_found }
     end
     false
@@ -313,14 +313,14 @@ class ApplicationController < ActionController::Base
   def render_unknown_attribute_error(e)
     respond_to do |format|
       format.json { render json: { errors: [{ title: 'Unknown attribute', details: e.message }] }, status: :unprocessable_entity }
-      format.all { render text: e.message, status: :unprocessable_entity }
+      format.all { render plain: e.message, status: :unprocessable_entity }
     end
   end
 
   def render_not_implemented_error(e)
     respond_to do |format|
       format.json { render json: { errors: [{ title: 'Not implemented', details: e.message }] }, status: :not_implemented }
-      format.all { render text: e.message, status: :not_implemented }
+      format.all { render plain: e.message, status: :not_implemented }
     end
   end
 
