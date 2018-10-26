@@ -1019,7 +1019,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay.data_files << private_df
     assay.save!
     login_as Factory(:user)
-    xhr(:get, :preview, id: assay.id)
+    get :preview, xhr: true, params: { id: assay.id }
     assert_response :success
   end
 
@@ -1469,7 +1469,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show, params: { id:assay }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]':assay.id),text:'Add Data file',count:1
+      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]' => assay.id),text:'Add Data file',count:1
     end
 
     assay=Factory(:modelling_assay,contributor:person)
@@ -1477,7 +1477,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show, params: { id:assay }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]':assay.id),text:'Add Data file',count:1
+      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]' => assay.id),text:'Add Data file',count:1
     end
 
     assay=Factory(:experimental_assay,policy:Factory(:publicly_viewable_policy))
@@ -1486,7 +1486,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show, params: { id:assay }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]':assay.id),text:'Add Data file',count:0
+      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]' => assay.id),text:'Add Data file',count:0
     end
   end
 
@@ -1498,7 +1498,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show, params: { id:assay }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]':assay.id),text:'Add Model',count:1
+      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]' => assay.id),text:'Add Model',count:1
     end
 
     assay=Factory(:modelling_assay,policy:Factory(:publicly_viewable_policy))
@@ -1507,7 +1507,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show, params: { id:assay }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]':assay.id),text:'Add Model',count:0
+      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]' => assay.id),text:'Add Model',count:0
     end
 
     #shouldn't show for an experimental assay, even if editable
@@ -1518,7 +1518,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show, params: { id:assay }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]':assay.id),text:'Add Model',count:0
+      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]' => assay.id),text:'Add Model',count:0
     end
   end
 
