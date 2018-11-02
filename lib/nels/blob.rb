@@ -11,7 +11,7 @@ module Nels
     end
 
     def retrieve_from_nels(access_token)
-      rest_client = Nels::Rest::Client.new(access_token)
+      rest_client = Nels::Rest.client_class.new(access_token)
       ref = url.scan(/ref=([^&]+)/).try(:first).try(:first)
 
       self.tmp_io_object = StringIO.new(rest_client.sample_metadata(ref))
