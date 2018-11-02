@@ -567,7 +567,6 @@ class DataFilesController < ApplicationController
   end
 
   def rest_client
-    client_class = Nels::Rest::Client
-    @rest_client = client_class.new(@oauth_session.access_token)
+    @rest_client = Nels::Rest.client_class.new(@oauth_session.access_token)
   end
 end
