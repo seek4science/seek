@@ -67,6 +67,10 @@
               <%= gatekeepers_link_list @project %>
             </p>
         <% end %>
+        <p>
+          <strong><%= t('project') -%> created:</strong>
+          <%= date_as_string(@project.created_at, false) -%>
+        </p>
       </div>
     </div>
     
