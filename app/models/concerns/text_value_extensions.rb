@@ -17,7 +17,3 @@ module TextValueExtensions
     false
   end
 end
-
-TextValue.class_eval do
-  include TextValueExtensions
-end

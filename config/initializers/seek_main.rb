@@ -26,8 +26,6 @@ require 'seek/search/common_fields'
 require 'seek/project_hierarchies/project_extension'
 require 'mimemagic'
 require 'private_address_check_monkeypatch'
-require 'my_annotations'
-require 'annotation_extensions'
 
 SEEK::Application.configure do
   ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
