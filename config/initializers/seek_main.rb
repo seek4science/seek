@@ -26,6 +26,7 @@ require 'seek/search/common_fields'
 require 'seek/project_hierarchies/project_extension'
 require 'mimemagic'
 require 'private_address_check_monkeypatch'
+require 'my_annotations'
 require 'annotation_extensions'
 
 SEEK::Application.configure do
