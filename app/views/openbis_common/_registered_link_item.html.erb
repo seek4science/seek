@@ -1,0 +1,5 @@
+<p class="list_item_attribute">
+  <% if entity.registered_as %>
+      Registered as <%= link_to("#{entity.registered_as.title}", entity.registered_as) %>
+  <% end %>
+</p>

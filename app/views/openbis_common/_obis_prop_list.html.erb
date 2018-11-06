@@ -1,0 +1,9 @@
+<% unless entity.vetted_properties.empty?
+     entity.vetted_properties.each do |key, value|
+%>
+        <div class="list_item_attribute"><p class="list_item_attribute"><b><%= key %></b>:
+          <%= openbis_rich_content_sanitizer(value, 100) %></div>
+    <%
+      end
+      end
+    %>

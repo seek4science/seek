@@ -27,7 +27,7 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
   # title cannot be POSTed or PATCHed
   # email and expertise/tool_list are not as are in the readAPI
   def ignore_non_read_or_write_attributes
-    ['title', 'email', 'expertise_list', 'tool_list', 'mbox_sha1sum']
+    ['title', 'email', 'expertise_list', 'tool_list', 'mbox_sha1sum', 'skype_name', 'phone', 'web_page']
   end
 
   def populate_extra_attributes(hash)

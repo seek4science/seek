@@ -112,12 +112,12 @@
   });
 
   $j(document).ready(function () {
-    <% if params[:project_ids] && resource && resource.new_record? %>
+      <% if params[:project_ids] && resource && resource.new_record? %>
       // Auto select projects from params if this is a new object
       <% params[:project_ids].each do |project_id| %>
-        Sharing.projectsSelector.add(<%= project_id %>, true);
+      Sharing.projectsSelector.add(<%= project_id %>, true);
       <% end %>
-    <% end %>
+      <% end %>
     // Auto select project if there is only one
     if (Sharing.projectsSelector.possibilities.length === 1 &&
         Sharing.projectsSelector.selected.length === 0) {

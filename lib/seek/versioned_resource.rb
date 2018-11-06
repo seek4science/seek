@@ -38,12 +38,13 @@ module Seek #:nodoc:
 
     module InstanceMethods
       def content_type
-        content_blob.content_type if self.respond_to?(:content_blob)
+        content_blob.content_type if respond_to?(:content_blob)
       end
 
       def original_filename
-        content_blob.original_filename  if self.respond_to?(:content_blob)
+        content_blob.original_filename if respond_to?(:content_blob)
       end
+
       # this method will take attributions' association and return a collection of resources,
       # to which the current resource is attributed
       def attributions_objects
@@ -61,13 +62,13 @@ module Seek #:nodoc:
       # assumes all versioned resources are also taggable
 
       def contains_downloadable_items?
-        all_content_blobs.compact.any? { |blob| blob.is_downloadable? }
+        all_content_blobs.compact.any?(&:is_downloadable?)
       end
 
       def all_content_blobs
         blobs = []
-        blobs << content_blob if self.respond_to?(:content_blob)
-        blobs |= content_blobs if self.respond_to?(:content_blobs)
+        blobs << content_blob if respond_to?(:content_blob)
+        blobs |= content_blobs if respond_to?(:content_blobs)
         blobs
       end
 
@@ -100,9 +101,9 @@ module Seek #:nodoc:
 
       # For acts_as_doi_mintable...
       def doi_target_url
-        polymorphic_url(parent, :version => self.version,
-                        :host => Seek::Config.host_with_port,
-                        :protocol => Seek::Config.host_scheme)
+        polymorphic_url(parent, version: version,
+                                host: Seek::Config.host_with_port,
+                                protocol: Seek::Config.host_scheme)
       end
     end
   end

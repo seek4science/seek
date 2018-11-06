@@ -57,4 +57,8 @@ SEEK::Application.configure do
   # Uncomment this to raise exception on unpermitted params:
   # config.action_controller.action_on_unpermitted_parameters = :raise
 
+  # Uncomment this to see ActiveRecord logs in test
+  # ActiveRecord::Base.logger = Logger.new(STDOUT)
+  # ActiveRecord::Base.logger.level = 0
+
 end

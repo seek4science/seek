@@ -1,7 +1,8 @@
 <%
- investigations = investigations | [@study.investigation] if @study.investigation
+ study ||= @study
+ investigations = investigations | [study.investigation] if study.investigation
  investigations = investigations.select &:can_edit?
- investigation_value=(@study && @study.investigation) ? @study.investigation.id : 0
+ investigation_value=(study && study.investigation) ? study.investigation.id : 0
  investigation_options = [["Select an #{t('investigation')}..",0]]|investigations.collect{|t| [h(t.title),t.id]}
 %>
 

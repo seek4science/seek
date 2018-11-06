@@ -49,7 +49,6 @@ SEEK::Application.configure do
 
   # config.log_level = :warn
   # disable SQL logs from active record by TZ
-  # ActiveRecord::Base.logger = Logger.new(STDOUT)
-  # ActiveRecord::Base.logger.level = 1
-
- end
+  ActiveRecord::Base.logger = Logger.new(STDOUT)
+  ActiveRecord::Base.logger.level = 1
+end

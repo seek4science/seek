@@ -643,5 +643,16 @@ class StudiesControllerTest < ActionController::TestCase
     refute_equal investigation,study.investigation
   end
 
-
+  test 'can create with link to investigation in multiple projects' do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    login_as(person)
+    projects = [person.projects.first, another_person.projects.first]
+    assert_includes projects[0].people, person
+    refute_includes projects[1].people, person
+    investigation = Factory(:investigation, contributor: another_person, projects:projects, policy: Factory(:publicly_viewable_policy))
+    assert_difference('Study.count', 1) do
+      post :create, study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing
+    end
+  end
 end

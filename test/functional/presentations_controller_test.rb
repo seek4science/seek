@@ -186,7 +186,7 @@ class PresentationsControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'download', al.action
     assert_equal pres, al.activity_loggable
-    assert_equal "attachment; filename=\"ppt_presentation.ppt\"", @response.header['Content-Disposition']
+    assert_equal 'attachment; filename="ppt_presentation.ppt"', @response.header['Content-Disposition']
     assert_equal 'application/vnd.ms-powerpoint', @response.header['Content-Type']
     assert_equal '82432', @response.header['Content-Length']
   end
@@ -385,5 +385,4 @@ class PresentationsControllerTest < ActionController::TestCase
     add_tags_to_test_object(presentation)
     add_creator_to_test_object(presentation)
   end
-
 end

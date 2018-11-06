@@ -175,6 +175,9 @@ omniauth_user_activate:
 omniauth_providers:
 openbis_enabled:
 openbis_download_limit:
+openbis_debug:
+openbis_autosync:
+openbis_check_new_arrivals:
 default_license:
 about_page_enabled:
 about_page:
@@ -188,5 +191,6 @@ nels_client_secret:
 nels_api_url:
 nels_oauth_url:
 nels_permalink_base:
+nels_use_dummy_client:
 allow_private_address_access:
 session_store_timeout:

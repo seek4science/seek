@@ -22,12 +22,13 @@
       </div>
       <div class="col-sm-2 text-right list_item_actions">
         <% if space.can_edit? %>
-          <%= button_link_to 'Edit', 'edit', edit_project_openbis_endpoint_path(project, space), :class => 'btn-xs' %>
+          <%= button_link_to 'Edit', 'edit', edit_openbis_endpoint_path(space), :class => 'btn-xs' %>
         <% end %>
         <% if space.can_delete? %>
-            <%= button_link_to 'Delete', 'destroy', project_openbis_endpoint_path(project, space), class:'btn-xs', disabled:!space.can_delete?,confirm:"Are you sure?",method: :delete -%>
+            <%= button_link_to 'Delete', 'destroy', openbis_endpoint_path(space), class:'btn-xs', disabled:!space.can_delete?,confirm:"Are you sure?",method: :delete %>
+            <%# button_link_to 'Delete', 'destroy', project_openbis_endpoint_path(project, space), class:'btn-xs', disabled:!space.can_delete?,confirm:"Are you sure?",method: :delete %>
         <% end %>
-        <%= button_link_to 'Browse','openbis_square_small', browse_project_openbis_endpoints_path(project,id:space.id), {class:'btn-xs'} %>
+        <%= button_link_to 'Browse','openbis_square_small', openbis_endpoint_path(space), {class:'btn-xs'} %>
       </div>
     </div>
     <div class="row">
