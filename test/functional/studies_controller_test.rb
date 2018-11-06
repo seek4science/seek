@@ -652,7 +652,7 @@ class StudiesControllerTest < ActionController::TestCase
     refute_includes projects[1].people, person
     investigation = Factory(:investigation, contributor: another_person, projects:projects, policy: Factory(:publicly_viewable_policy))
     assert_difference('Study.count', 1) do
-      post :create, study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing
+      post :create, params: { study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing }
     end
   end
 end

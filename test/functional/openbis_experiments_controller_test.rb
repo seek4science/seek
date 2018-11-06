@@ -33,14 +33,14 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   test 'index gives index view' do
     login_as(@user)
-    get :index, openbis_endpoint_id: @endpoint.id
+    get :index, params: { openbis_endpoint_id: @endpoint.id }
 
     assert_response :success
   end
 
   test 'index sets assay_types and entities' do
     login_as(@user)
-    get :index, openbis_endpoint_id: @endpoint.id
+    get :index, params: { openbis_endpoint_id: @endpoint.id }
 
     assert_response :success
     assert assigns(:entity_types)
@@ -57,12 +57,12 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
   test 'index filters by entity_type' do
     login_as(@user)
 
-    get :index, openbis_endpoint_id: @endpoint.id, entity_type: 'DEFAULT_EXPERIMENT'
+    get :index, params: { openbis_endpoint_id: @endpoint.id, entity_type: 'DEFAULT_EXPERIMENT' }
 
     assert_response :success
     assert_equal 1, assigns(:entities).size
 
-    get :index, openbis_endpoint_id: @endpoint.id, entity_type: 'ALL TYPES'
+    get :index, params: { openbis_endpoint_id: @endpoint.id, entity_type: 'ALL TYPES' }
 
     assert_response :success
     assert_equal 2, assigns(:entities).size
@@ -70,7 +70,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   test 'index renders parents details' do
     login_as(@user)
-    get :index, openbis_endpoint_id: @endpoint.id, entity_type: 'ALL TYPES'
+    get :index, params: { openbis_endpoint_id: @endpoint.id, entity_type: 'ALL TYPES' }
 
     assert_response :success
     assert_select 'div label', 'Project:'
@@ -84,7 +84,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   test 'edit gives edit view' do
     login_as(@user)
-    get :edit, openbis_endpoint_id: @endpoint.id, id: '20171121152132641-51'
+    get :edit, params: { openbis_endpoint_id: @endpoint.id, id: '20171121152132641-51' }
 
     assert_response :success
     assert assigns(:study)
@@ -114,7 +114,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     assert_equal fake.perm_id, asset.content.perm_id
     assert_equal old.to_date, asset.synchronized_at.to_date
 
-    get :refresh, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id
+    get :refresh, params: { openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id }
 
     assert_response :redirect
     assert_redirected_to st
@@ -134,9 +134,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
     sync_options = { 'link_assays' => '1' }
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
-                    study: { investigation_id: investigation.id },
-                    sync_options: sync_options
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, study: { investigation_id: investigation.id }, sync_options: sync_options }
 
     study = assigns(:seek_entity)
     assert_not_nil study
@@ -163,9 +161,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
     sync_options = { 'link_assays' => '0', 'linked_assays' => to_link }
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
-                    study: { investigation_id: investigation.id },
-                    sync_options: sync_options
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, study: { investigation_id: investigation.id }, sync_options: sync_options }
 
     study = assigns(:seek_entity)
     assert_not_nil study
@@ -191,9 +187,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
     sync_options = { 'link_datasets' => '1' }
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
-                    study: { investigation_id: investigation.id },
-                    sync_options: sync_options
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, study: { investigation_id: investigation.id }, sync_options: sync_options }
 
     study = assigns(:seek_entity)
     assert_not_nil study
@@ -221,9 +215,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     to_link = ['20171002190934144-40']
     sync_options = { 'link_datasets' => '0', 'linked_datasets' => to_link }
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
-                    study: { investigation_id: investigation.id },
-                    sync_options: sync_options
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, study: { investigation_id: investigation.id }, sync_options: sync_options }
 
     study = assigns(:seek_entity)
     assert_not_nil study
@@ -249,9 +241,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     to_link_d = ['20171002190934144-40']
     sync_options = { 'link_datasets' => '0', 'linked_datasets' => to_link_d, 'linked_assays' => to_link_s }
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
-                    study: { investigation_id: investigation.id },
-                    sync_options: sync_options
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, study: { investigation_id: investigation.id }, sync_options: sync_options }
 
     study = assigns(:seek_entity)
     assert_not_nil study
@@ -285,9 +275,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     exp_logs = 1 + @experiment.sample_ids.count + @experiment.dataset_ids.count + 1 # extra assay for files
 
     assert_difference('ActivityLog.count', exp_logs) do
-      post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
-                      study: { investigation_id: investigation.id },
-                      sync_options: sync_options
+      post :register, params: { openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, study: { investigation_id: investigation.id }, sync_options: sync_options }
 
       study = assigns(:seek_entity)
       assert_not_nil study
@@ -302,9 +290,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
     sync_options = { 'link_assays' => '1' }
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
-                    study: { xl: true },
-                    sync_options: sync_options
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, study: { xl: true }, sync_options: sync_options }
 
     assert_response :redirect
     assert_redirected_to action: :edit
@@ -331,9 +317,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
     sync_options = { 'link_assays' => '0' }
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
-                    study: { investigation_id: investigation.id },
-                    sync_options: sync_options
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, study: { investigation_id: investigation.id }, sync_options: sync_options }
 
     assert_redirected_to study_path(existing)
 
@@ -353,8 +337,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
       assert_no_difference('Assay.count') do
         assert_no_difference('DataFile.count') do
           assert_difference('ExternalAsset.count', 2) do
-            post :batch_register, openbis_endpoint_id: @endpoint.id,
-                                  seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
+            post :batch_register, params: { openbis_endpoint_id: @endpoint.id, seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids }
           end
         end
       end
@@ -376,8 +359,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     sync_options = { link_dependent: 'false' }
     batch_ids = ['20171121153715264-58', '20171121152132641-51']
 
-    post :batch_register, openbis_endpoint_id: @endpoint.id,
-                          seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
+    post :batch_register, params: { openbis_endpoint_id: @endpoint.id, seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids }
 
     assert_response :success
 
@@ -406,8 +388,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
       assert_difference('Assay.count', assays) do
         assert_difference('DataFile.count', datasets) do
           assert_difference('ExternalAsset.count', externals) do
-            post :batch_register, openbis_endpoint_id: @endpoint.id,
-                                  seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
+            post :batch_register, params: { openbis_endpoint_id: @endpoint.id, seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids }
           end
         end
       end
@@ -437,8 +418,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     exp_logs = batch_ids.size + assays + datasets
 
     assert_difference('ActivityLog.count', exp_logs) do
-      post :batch_register, openbis_endpoint_id: @endpoint.id,
-                            seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
+      post :batch_register, params: { openbis_endpoint_id: @endpoint.id, seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids }
     end
 
     assert_response :success
@@ -466,7 +446,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     assert_not_equal sync_options, asset.sync_options
     assert_not_equal DateTime.now.to_date, asset.synchronized_at.to_date
 
-    post :update, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, sync_options: sync_options
+    post :update, params: { openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, sync_options: sync_options }
 
     study = assigns(:seek_entity)
     assert_not_nil study
@@ -505,7 +485,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     sync_options = { link_assays: '0', linked_assays: to_link }
     assert_not_equal sync_options, asset.sync_options
 
-    post :update, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, sync_options: sync_options
+    post :update, params: { openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, sync_options: sync_options }
 
     study = assigns(:seek_entity)
     assert_not_nil study
@@ -523,45 +503,39 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
   ## permissions ##
   test 'only project members can call actions' do
     logout
-    get :index, openbis_endpoint_id: @endpoint.id
+    get :index, params: { openbis_endpoint_id: @endpoint.id }
     assert_response :redirect
 
-    get :edit, openbis_endpoint_id: @endpoint.id, id: '20171121152132641-51'
+    get :edit, params: { openbis_endpoint_id: @endpoint.id, id: '20171121152132641-51' }
     assert_response :redirect
 
     investigation = Factory :investigation, contributor: @user
     sync_options = {}
     batch_ids = ['20171121153715264-58', '20171121152132641-51']
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
-                    study: { investigation_id: investigation.id },
-                    sync_options: sync_options
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, study: { investigation_id: investigation.id }, sync_options: sync_options }
     assert_response :redirect
     assert_redirected_to :root
 
-    post :batch_register, openbis_endpoint_id: @endpoint.id,
-                          seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
+    post :batch_register, params: { openbis_endpoint_id: @endpoint.id, seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids }
     assert_response :redirect
     assert_redirected_to :root
 
     login_as(@user)
 
-    get :index, openbis_endpoint_id: @endpoint.id
+    get :index, params: { openbis_endpoint_id: @endpoint.id }
     assert_response :success
 
-    get :edit, openbis_endpoint_id: @endpoint.id, id: '20171121152132641-51'
+    get :edit, params: { openbis_endpoint_id: @endpoint.id, id: '20171121152132641-51' }
     assert_response :success
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
-                    study: { investigation_id: investigation.id },
-                    sync_options: sync_options
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, study: { investigation_id: investigation.id }, sync_options: sync_options }
     assert_response :redirect
     seek = assigns(:seek_entity)
     assert_not_nil seek
     assert_redirected_to seek
 
-    post :batch_register, openbis_endpoint_id: @endpoint.id,
-                          seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
+    post :batch_register, params: { openbis_endpoint_id: @endpoint.id, seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids }
     assert_response :success
   end
 

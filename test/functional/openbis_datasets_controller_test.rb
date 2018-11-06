@@ -28,14 +28,14 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
   test 'index gives index view' do
     login_as(@user)
-    get :index, openbis_endpoint_id: @endpoint.id
+    get :index, params: { openbis_endpoint_id: @endpoint.id }
 
     assert_response :success
   end
 
   test 'index renders parents details' do
     login_as(@user)
-    get :index, openbis_endpoint_id: @endpoint.id
+    get :index, params: { openbis_endpoint_id: @endpoint.id }
 
     assert_response :success
     assert_select 'div label', 'Project:'
@@ -47,12 +47,12 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
   test 'index filters by dataset types' do
     login_as(@user)
-    get :index, openbis_endpoint_id: @endpoint.id, entity_type: 'TZ_FAIR_TEST'
+    get :index, params: { openbis_endpoint_id: @endpoint.id, entity_type: 'TZ_FAIR_TEST' }
 
     assert_response :success
     assert_equal 2, assigns(:entities).size
 
-    get :index, openbis_endpoint_id: @endpoint.id, entity_type: 'ALL DATASETS'
+    get :index, params: { openbis_endpoint_id: @endpoint.id, entity_type: 'ALL DATASETS' }
 
     assert_response :success
     assert_equal 3, assigns(:entities).size
@@ -60,7 +60,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
   test 'edit renders edit view' do
     login_as(@user)
-    get :edit, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    get :edit, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id }
 
     assert_response :success
     assert assigns(:entity)
@@ -87,7 +87,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     assert_equal fake.perm_id, asset.content.perm_id
     assert_equal old.to_date, asset.synchronized_at.to_date
 
-    get :refresh, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    get :refresh, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id }
 
     assert_response :redirect
     assert_redirected_to df
@@ -102,7 +102,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
   test 'register registers new DataFile' do
     login_as(@user)
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id }
 
     datafile = assigns(:seek_entity)
     assert_not_nil datafile
@@ -125,8 +125,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
     assay = Factory :assay, contributor: @user
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id,
-                    data_file: { assay_ids: assay.id }
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id, data_file: { assay_ids: assay.id } }
 
     datafile = assigns(:seek_entity)
     assert_not_nil datafile
@@ -149,7 +148,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     existing.external_asset = external
     assert existing.save
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id.to_s
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id.to_s }
 
     assert_redirected_to data_file_path(existing)
 
@@ -169,7 +168,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
     assert_not_equal DateTime.now.to_date, asset.synchronized_at.to_date
 
-    post :update, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    post :update, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id }
 
     datafile = assigns(:seek_entity)
     assert_not_nil datafile
@@ -203,8 +202,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count', 2) do
       assert_difference('ExternalAsset.count', 2) do
-        post :batch_register, openbis_endpoint_id: @endpoint.id,
-                              seek_parent: assay.id, sync_options: sync_options, batch_ids: batch_ids
+        post :batch_register, params: { openbis_endpoint_id: @endpoint.id, seek_parent: assay.id, sync_options: sync_options, batch_ids: batch_ids }
       end
     end
 
@@ -225,8 +223,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     sync_options = {}
     batch_ids = ['20160210130454955-23', '20160215111736723-31']
 
-    post :batch_register, openbis_endpoint_id: @endpoint.id,
-                          seek_parent: assay.id, sync_options: sync_options, batch_ids: batch_ids
+    post :batch_register, params: { openbis_endpoint_id: @endpoint.id, seek_parent: assay.id, sync_options: sync_options, batch_ids: batch_ids }
 
     assert_response :success
 
@@ -241,49 +238,47 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
   ## permissions ##
   test 'only project members can call actions' do
     logout
-    get :index, openbis_endpoint_id: @endpoint.id
+    get :index, params: { openbis_endpoint_id: @endpoint.id }
     assert_response :redirect
 
-    get :edit, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    get :edit, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id }
     assert_response :redirect
 
     assay = Factory :assay
     sync_options = {}
     batch_ids = ['20160210130454955-23', '20160215111736723-31']
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id }
 
     assert_response :redirect
     assert_redirected_to :root
 
-    post :batch_register, openbis_endpoint_id: @endpoint.id,
-                          seek_parent: assay.id, sync_options: sync_options, batch_ids: batch_ids
+    post :batch_register, params: { openbis_endpoint_id: @endpoint.id, seek_parent: assay.id, sync_options: sync_options, batch_ids: batch_ids }
 
     assert_response :redirect
     assert_redirected_to :root
 
     login_as(@user)
 
-    get :index, openbis_endpoint_id: @endpoint.id
+    get :index, params: { openbis_endpoint_id: @endpoint.id }
     assert_response :success
 
-    get :edit, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    get :edit, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id }
     assert_response :success
 
-    post :register, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    post :register, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id }
     assert_response :redirect
     seek = assigns(:seek_entity)
     assert_not_nil seek
     assert_redirected_to seek
 
-    post :batch_register, openbis_endpoint_id: @endpoint.id,
-                          seek_parent: assay.id, sync_options: sync_options, batch_ids: batch_ids
+    post :batch_register, params: { openbis_endpoint_id: @endpoint.id, seek_parent: assay.id, sync_options: sync_options, batch_ids: batch_ids }
     assert_response :success
   end
 
   test 'show dataset files' do
     login_as(@user)
-    get :show_dataset_files, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    get :show_dataset_files, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id }
 
     assert_response :success
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
@@ -292,7 +287,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
     another_person = Factory(:person)
     login_as(another_person)
-    get :show_dataset_files, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    get :show_dataset_files, params: { openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id }
     assert_response :redirect
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 0
   end
