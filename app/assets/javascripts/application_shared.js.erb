@@ -266,10 +266,11 @@ function digValue(object, path) {
   };
 
   // Highlights the selected elements for 1 second. Similar to `Effect.highlight`.
-  $.fn.highlight = function () {
+  $.fn.highlight = function (colour) {
+    var cssClass = colour ? ('js-highlight-' + colour) : 'js-highlight'
     var elements = $(this);
-    elements.addClass('js-highlight');
-    setTimeout(function () { elements.removeClass('js-highlight') }, 1100);
+    elements.addClass(cssClass);
+    setTimeout(function () { elements.removeClass(cssClass) }, 1100);
   };
 }( jQuery ));
 
