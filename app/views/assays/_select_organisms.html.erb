@@ -42,7 +42,7 @@
       <div class="association_step form-group">
         <label>Step 3 - <span class="assay_strain_info">Specify a strain (optional)</span></label>
         <div id="existing_strains_for_assay_organism"></div>
-        <%= link_to_function image("destroy", :alt => "Remove", :title => "Remove this strain", :id => 'destroy_image', :style => 'display:none;'), "removeStrain()" %>
+        <%= link_to image("destroy", alt: "Remove", title: "Remove this strain", id: 'destroy_image', style: 'display:none;'), '#', onclick: "removeStrain()" %>
       </div>
 
       <% if Seek::Config.is_virtualliver %>
@@ -63,10 +63,9 @@
 
 <script type="text/javascript">
     function setSelectedStrain(id,strain_info){
-        $('strain_id').value = id;
-        $('strain_info').value = strain_info;
-        new Effect.Highlight('strain_info');
-        $('destroy_image').style['display']='block';
+        $j('#strain_id').val(id);
+        $j('#strain_info').val(strain_info).highlight();
+        $j('#destroy_image').show();
     }
 
     <% @assay.assay_organisms.each do |o| -%>
@@ -85,13 +84,13 @@
     updateOrganisms();
 
     function check_show_add_organism() {
-        i = $('possible_organisms').selectedIndex;
-        selected_id = $('possible_organisms').options[i].value;
+        var i = $j('#possible_organisms')[0].selectedIndex;
+        var selected_id = $j('#possible_organisms')[0].options[i].value;
         if (selected_id == '0') {
-            Effect.Fade('extra_organism_details');
+            $j('#extra_organism_details').fadeOut();
         }
         else {
-            Effect.Appear('extra_organism_details');
+            $j('#extra_organism_details').fadeIn();
         }
     }
 

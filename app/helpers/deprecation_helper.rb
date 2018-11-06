@@ -1,7 +1,7 @@
 module DeprecationHelper
   def link_to_function(*args, &block)
     warn 'Deprecated `link_to_function` used!'
-    link_to('DEPRECATED LINK TO FUNCTION', '#')
+    link_to('DEPRECATED LINK TO FUNCTION', '#', args.third || {})
     # if block_given?
     #   return link_to_function(capture(&block), *args)
     # end

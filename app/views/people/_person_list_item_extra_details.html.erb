@@ -2,7 +2,7 @@
 <% if person_list_item_extra_details? person -%>
 
   <div id="expand_button">
-    <%= link_to_function(expand_image, visual_effect(:toggle_blind, "extra_details_#{person.id}")) %>
+    <%= link_to(expand_image, '#', onclick: "$j('#extra_details_#{person.id}').slideToggle(); return false") %>
   </div>
 
 

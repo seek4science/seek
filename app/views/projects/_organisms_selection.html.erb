@@ -12,7 +12,7 @@
         <div class="input-group">
           <%= select_tag :possible_organisms,options_for_select( Organism.order(:title).collect{|d| [h("#{d.title}"),d.id]} ),:class => "form-control" %>
           <span class="input-group-btn">
-            <%= link_to_function "Add","addSelectedOrganism(); return(false);", :class => 'btn btn-success' %>
+            <%= link_to 'Add', '#', onclick: 'addSelectedOrganism(); return false;', class: 'btn btn-success' %>
           </span>
         </div>
 
