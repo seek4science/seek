@@ -19,12 +19,6 @@ GIT
     fleximage (0.1)
 
 GIT
-  remote: https://github.com/SysMO-DB/gibberish.git
-  revision: d24c42b9608f39f82e37e757f530d8199049c557
-  specs:
-    gibberish (1.0.0)
-
-GIT
   remote: https://github.com/SysMO-DB/my_responds_to_parent.git
   revision: 5fadfd0cd85a0a70caaddd36f9617cb743047e0b
   specs:
@@ -806,7 +800,6 @@ DEPENDENCIES
   feedjira (~> 1)
   fleximage!
   fssm
-  gibberish!
   google-analytics-rails
   guard-rubycritic
   handlebars_assets
