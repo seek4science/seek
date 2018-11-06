@@ -17,7 +17,7 @@ class FavouritesControllerTest < ActionController::TestCase
     fav = Favourite.find_by_resource_type_and_resource_id('Project', project.id)
     assert_nil fav
 
-    post(:add, xhr: true, resource_type: project.class.name, resource_id: project.id)
+    post(:add, xhr: true, params: { resource_type: project.class.name, resource_id: project.id })
 
     assert_response :created
 
@@ -33,7 +33,7 @@ class FavouritesControllerTest < ActionController::TestCase
     fav = Favourite.find_by_resource_type_and_resource_id_and_user_id('Project', project.id, @person.user.id)
     refute_nil fav
 
-    post(:add, xhr: true, resource_type: project.class.name, resource_id: project.id)
+    post(:add, xhr: true, params: { resource_type: project.class.name, resource_id: project.id })
 
     assert_response :unprocessable_entity
   end
@@ -41,7 +41,7 @@ class FavouritesControllerTest < ActionController::TestCase
   test 'can add favourite search query' do
     assert_difference('Favourite.count', 1) do
       assert_difference('SavedSearch.count', 1) do
-        post(:add, xhr: true, resource_type: 'SavedSearch', search_query: 'fred bloggs', search_type: 'All')
+        post(:add, xhr: true, params: { resource_type: 'SavedSearch', search_query: 'fred bloggs', search_type: 'All' })
       end
     end
     assert_response :success
@@ -56,7 +56,7 @@ class FavouritesControllerTest < ActionController::TestCase
   test 'can add favourite external search query' do
     assert_difference('Favourite.count', 1) do
       assert_difference('SavedSearch.count', 1) do
-        post(:add, xhr: true, resource_type: 'SavedSearch', search_query: 'fred bloggs', search_type: 'All', include_external_search: '1')
+        post(:add, xhr: true, params: { resource_type: 'SavedSearch', search_query: 'fred bloggs', search_type: 'All', include_external_search: '1' })
       end
     end
     assert_response :success
@@ -73,7 +73,7 @@ class FavouritesControllerTest < ActionController::TestCase
     login_as(ss.user)
     assert_no_difference('Favourite.count') do
       assert_no_difference('SavedSearch.count') do
-        post(:add, xhr: true, resource_type: 'SavedSearch', search_query: 'cheese', search_type: 'All')
+        post(:add, xhr: true, params: { resource_type: 'SavedSearch', search_query: 'cheese', search_type: 'All' })
       end
     end
     assert_response :unprocessable_entity
@@ -84,7 +84,7 @@ class FavouritesControllerTest < ActionController::TestCase
     login_as(ss.user)
     assert_difference('Favourite.count', 1) do
       assert_difference('SavedSearch.count', 1) do
-        post(:add, xhr: true, resource_type: 'SavedSearch', search_query: 'cheese', search_type: 'Assays')
+        post(:add, xhr: true, params: { resource_type: 'SavedSearch', search_query: 'cheese', search_type: 'Assays' })
       end
     end
     assert_response :success
@@ -95,7 +95,7 @@ class FavouritesControllerTest < ActionController::TestCase
     login_as(ss.user)
     assert_difference('Favourite.count', 1) do
       assert_difference('SavedSearch.count', 1) do
-        post(:add, xhr: true, resource_type: 'SavedSearch', search_query: 'cheese', search_type: 'All', include_external_search: '1')
+        post(:add, xhr: true, params: { resource_type: 'SavedSearch', search_query: 'cheese', search_type: 'All', include_external_search: '1' })
       end
     end
     assert_response :success
@@ -140,7 +140,7 @@ class FavouritesControllerTest < ActionController::TestCase
     fav = Favourite.find_by_resource_type_and_resource_id('DataFile', -1)
     assert_nil fav
 
-    post(:add, xhr: true, resource_type: 'DataFile', resource_id: -1)
+    post(:add, xhr: true, params: { resource_type: 'DataFile', resource_id: -1 })
 
     assert_response :unprocessable_entity
 
