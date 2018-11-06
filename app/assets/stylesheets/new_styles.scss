@@ -764,3 +764,13 @@ span.required, label.required::after {
     margin-top: 5px;
   }
 }
+
+.js-highlight {
+  animation: js-highlight-fadeout 1s;
+}
+
+@keyframes js-highlight-fadeout
+{
+  0%   { background-color: #ffffcc; }
+  100% { background-color: inherit; }
+}

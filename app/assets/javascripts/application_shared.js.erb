@@ -2,7 +2,7 @@
 // This file is automatically included by javascript_include_tag :defaults
 
 
-var tabber_ids = new Array();
+var tabber_ids = [];
 var tabberOptions = {'onLoad':function() {
     displayTabs();
 }};
@@ -11,10 +11,10 @@ function displayTabs() {
 
     for (var i = 0; i < tabber_ids.length; i++) {
         var tabber_id = tabber_ids[i];
-        var spinner = $(tabber_id + "_spinner");
-        if (spinner != null) {
+        var spinner = $j('#' + tabber_id + '_spinner');
+        if (spinner.length) {
           spinner.hide();
-          Effect.Appear(tabber_id, {duration : 0.5}); 
+          $j('#' + tabber_id).fadeIn();
         }
     }
 }
@@ -98,8 +98,8 @@ function deleteCookie(name, path, domain) {
     }
 }
 
-var fullResourceListItemExpandableText = new Array();
-var truncResourceListItemExpandableText = new Array();
+var fullResourceListItemExpandableText = [];
+var truncResourceListItemExpandableText = [];
 
 function expandResourceListItemExpandableText(objectId){
     link = $('expandableLink'+objectId)
@@ -263,6 +263,13 @@ function digValue(object, path) {
         }
       });
     }
+  };
+
+  // Highlights the selected elements for 1 second. Similar to `Effect.highlight`.
+  $.fn.highlight = function () {
+    var elements = $(this);
+    elements.addClass('js-highlight');
+    setTimeout(function () { elements.removeClass('js-highlight') }, 1100);
   };
 }( jQuery ));
 
