@@ -1,30 +1,37 @@
-<% truncate_length_for_boxes = 30 -%>
-
 <h1><%= flag_icon(@country.titleize) + h(@country).titleize -%></h1>
 
 <div class="row">
   <div class="col-md-9 col-sm-8">
     <% unless @institutions.empty? -%>
-        <% @institutions.each do |i| -%>
-            <div style="margin-top: 1em; padding-left: 2em;">
-              <%= image_tag_for_key(i.class.name.downcase, nil, i.class.name.downcase.camelize, nil, "") -%>
-              <%= link_to i.title, institution_path(i) -%>
-
-              <% inst_members = i.people -%>
-              <% unless inst_members.empty? -%>
-                  <ul class="no-icon">
-                    <% inst_members.each do |p| -%>
-                        <li>
-                          <%= image_tag_for_key(p.class.name.downcase, nil, p.class.name.downcase.camelize, nil, "") -%>
-                          <%= link_to "#{p.first_name} #{p.last_name}", person_path(p) -%>
-                        </li>
-                    <% end -%>
-                  </ul>
-              <% else -%>
-                  <p class="none_text" style="margin-left: 4em;">There are no known members in this institution</p>
+      <ul class="mini-resource-list">
+      <% @institutions.each do |i| -%>
+        <li>
+          <%= link_to(i, title: i.title, class: 'mini-resource-list-item') do %>
+            <span class="mini-resource-list-text">
+              <%= image_tag(icon_filename_for_key('institution_avatar'), class: 'mini-resource-list-avatar') %>
+              <span class="mini-resource-list-title"><%= i.title %></span>
+            </span>
+          <% end %>
+          <% inst_members = i.people %>
+          <% unless inst_members.empty? -%>
+            <ul class="mini-resource-list" style="margin-left: 2em;">
+              <% inst_members.each do |p| -%>
+                <li>
+                  <%= link_to(p, title: p.name, class: 'mini-resource-list-item') do %>
+                    <span class="mini-resource-list-text">
+                      <%= image_tag_for_key('person', nil, 'person', { class: 'mini-resource-list-avatar' }, "") -%>
+                      <span class="mini-resource-list-title"><%= p.name %></span>
+                    </span>
+                  <% end -%>
+                </li>
               <% end -%>
-            </div>
-        <% end -%>
+            </ul>
+          <% else -%>
+            <p class="none_text" style="margin-left: 2em;">There are no known members in this institution</p>
+          <% end -%>
+          </li>
+        <% end %>
+      </ul>
     <% else -%>
         <p class="none_text">
           Couldn't find any institutions for this country
@@ -34,12 +41,18 @@
 
   <div class="col-md-3 col-sm-4">
     <%= panel("Institutions (#{@institutions.length})", :help_text => "Institutions that are situated in this country.") do %>
-        <%= render :partial => "layouts/contribution_section_box_item_list",
-                   :locals => { :collection => @institutions,
-                                :collection_name => "institutions_in_country",
-                                :icon_type => "institution",
-                                :truncate_to => truncate_length_for_boxes,
-                                :main_section_length => 15 } -%>
+      <ul class="mini-resource-list">
+        <% @institutions.each do |i| %>
+          <li>
+            <%= link_to(i, title: i.title, class: 'mini-resource-list-item') do %>
+            <span class="mini-resource-list-text">
+              <%= image_tag(icon_filename_for_key('institution_avatar'), class: 'mini-resource-list-avatar') %>
+              <span class="mini-resource-list-title"><%= i.title %></span>
+            </span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
     <% end %>
   </div>
 </div>
