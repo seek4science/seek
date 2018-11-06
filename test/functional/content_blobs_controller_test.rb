@@ -71,7 +71,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url to file' do
     # test successful request to file
     stub_request(:head, 'http://mockedlocation.com/a-piccy.png').to_return(status: 200, headers: { 'Content-Type' => 'image/png' })
-    get :examine_url, xhr: true, data_url: 'http://mockedlocation.com/a-piccy.png'
+    get :examine_url, xhr: true, params: { data_url: 'http://mockedlocation.com/a-piccy.png' }
     assert_response :success
     assert !@response.body.include?('This is a webpage')
     refute @response.body.include?('disallow_copy_option();')
@@ -84,7 +84,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url to webpage' do
     # successful request to webpage
     stub_request(:any, 'http://somewhere.com').to_return(body: '', status: 200, headers: { 'Content-Type' => 'text/html' })
-    get :examine_url, xhr: true, data_url: 'http://somewhere.com'
+    get :examine_url, xhr: true, params: { data_url: 'http://somewhere.com' }
     assert_response :success
     assert @response.body.include?('This is a webpage')
     assert @response.body.include?('disallow_copy_option();')
@@ -97,7 +97,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url forbidden' do
     # forbidden
     stub_request(:head, 'http://unauth.com/file.pdf').to_return(status: 403, headers: { 'Content-Type' => 'application/pdf' })
-    get :examine_url, xhr: true, data_url: 'http://unauth.com/file.pdf'
+    get :examine_url, xhr: true, params: { data_url: 'http://unauth.com/file.pdf' }
     assert_response :success
     assert @response.body.include?('Access to this link is unauthorized')
     assert @response.body.include?('disallow_copy_option();')
@@ -109,7 +109,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url unauthorized' do
     # unauthorized
     stub_request(:head, 'http://unauth.com/file.pdf').to_return(status: 401, headers: { 'Content-Type' => 'application/pdf' })
-    get :examine_url, xhr: true, data_url: 'http://unauth.com/file.pdf'
+    get :examine_url, xhr: true, params: { data_url: 'http://unauth.com/file.pdf' }
     assert_response :success
     assert @response.body.include?('Access to this link is unauthorized')
     assert @response.body.include?('disallow_copy_option();')
@@ -121,7 +121,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url 404' do
     # 404
     stub_request(:head, 'http://missing.com').to_return(status: 404, headers: { 'Content-Type' => 'text/html' })
-    get :examine_url, xhr: true, data_url: 'http://missing.com'
+    get :examine_url, xhr: true, params: { data_url: 'http://missing.com' }
     assert_response :success
     assert @response.body.include?('Nothing can be found at that URL')
     assert @response.body.include?('disallow_copy_option();')
@@ -133,7 +133,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url host not found' do
     # doesn't exist
     stub_request(:head, 'http://nohost.com').to_raise(SocketError)
-    get :examine_url, xhr: true, data_url: 'http://nohost.com'
+    get :examine_url, xhr: true, params: { data_url: 'http://nohost.com' }
     assert_response :success
     assert @response.body.include?('Nothing can be found at that URL')
     assert @response.body.include?('disallow_copy_option();')
@@ -144,7 +144,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'examine url bad uri' do
     # bad uri
-    get :examine_url, xhr: true, data_url: 'this is not a uri'
+    get :examine_url, xhr: true, params: { data_url: 'this is not a uri' }
     assert_response :success
     assert @response.body.include?('The URL appears to be invalid')
     assert @response.body.include?('disallow_copy_option();')
@@ -154,7 +154,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'examine url unrecognized scheme' do
-    get :examine_url, xhr: true, data_url: 'fish://tuna:1525125151'
+    get :examine_url, xhr: true, params: { data_url: 'fish://tuna:1525125151' }
     assert_response :success
     assert @response.body.include?('Unhandled URL scheme')
     assert @response.body.include?('disallow_copy_option();')
@@ -169,7 +169,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
       # Need to allow the request through so that `private_address_check` can catch it.
       WebMock.allow_net_connect!
       VCR.turned_off do
-        get :examine_url, xhr: true, data_url: 'http://localhost/secrets'
+        get :examine_url, xhr: true, params: { data_url: 'http://localhost/secrets' }
         assert_response :success
         assert @response.body.include?('URL is inaccessible')
         assert @response.body.include?('disallow_copy_option();')
@@ -188,7 +188,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
       WebMock.allow_net_connect!
       assert PrivateAddressCheck.resolves_to_private_address?('192.168.0.1')
       VCR.turned_off do
-        get :examine_url, xhr: true, data_url: 'http://192.168.0.1/config'
+        get :examine_url, xhr: true, params: { data_url: 'http://192.168.0.1/config' }
         assert_response :success
         assert @response.body.include?('URL is inaccessible')
         assert @response.body.include?('disallow_copy_option();')
