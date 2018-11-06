@@ -5,6 +5,9 @@ class OpenbisEndpoint < ApplicationRecord
   attr_encrypted :password, key: :password_key
 
   has_many :external_assets, as: :seek_service # , dependent: :destroy
+  has_many :registered_studies, through: :external_assets, source: :seek_entity, source_type: 'Study'
+  has_many :registered_assays, through: :external_assets, source: :seek_entity, source_type: 'Assay'
+  has_many :registered_datasets, through: :external_assets, source: :seek_entity, source_type: 'DataFile'
 
   validates :as_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :dss_endpoint, url: { allow_nil: true, allow_blank: true }
@@ -105,18 +108,6 @@ class OpenbisEndpoint < ApplicationRecord
     # url = "openbis:#{id}"
     # DataFile.all.select { |df| df.content_blob && df.content_blob.url && df.content_blob.url.start_with?(url) }
     registered_datasets
-  end
-
-  def registered_studies
-    Study.joins(:external_asset).where(external_assets: { seek_service_id: id, seek_service_type: self.class })
-  end
-
-  def registered_assays
-    Assay.joins(:external_asset).where(external_assets: { seek_service_id: id, seek_service_type: self.class })
-  end
-
-  def registered_datasets
-    DataFile.joins(:external_asset).where(external_assets: { seek_service_id: id, seek_service_type: self.class })
   end
 
   def clear_metadata_store
