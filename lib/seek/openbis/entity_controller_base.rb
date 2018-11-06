@@ -11,16 +11,16 @@ module Seek
       DEBUG = Seek::Config.openbis_debug ? true : false
 
       def self.included(base)
-        base.before_filter :endpoint
-        base.before_filter :project
-        base.before_filter :project_member?
+        base.before_action :endpoint
+        base.before_action :project
+        base.before_action :project_member?
 
-        base.before_filter :check_entity, only: %i[show edit register update refresh show_dataset_files]
-        base.before_filter :prepare_asset, only: %i[show edit register update refresh show_dataset_files]
-        base.before_filter :already_registered?, only: [:register]
-        base.before_filter :sync_options, only: %i[register update]
-        base.before_filter :batch_parameters, only: [:batch_register]
-        base.before_filter :batch_sync_options, only: %i[batch_register]
+        base.before_action :check_entity, only: %i[show edit register update refresh show_dataset_files]
+        base.before_action :prepare_asset, only: %i[show edit register update refresh show_dataset_files]
+        base.before_action :already_registered?, only: [:register]
+        base.before_action :sync_options, only: %i[register update]
+        base.before_action :batch_parameters, only: [:batch_register]
+        base.before_action :batch_sync_options, only: %i[batch_register]
       end
 
       def index
@@ -261,7 +261,7 @@ module Seek
         render action: 'index'
       end
 
-      # overides the after_filter callback from application_controller,
+      # overides the after_action callback from application_controller,
       # as the behaviour needs to be slightly different (based on Sturat's code)
       def log_event
         action = action_name.downcase
