@@ -1,6 +1,4 @@
 class PoliciesController < ApplicationController
-  include WhiteListHelper
-  
   before_action :login_required
   
   def send_policy_data

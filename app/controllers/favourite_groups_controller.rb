@@ -1,6 +1,4 @@
 class FavouriteGroupsController < ApplicationController
-  include WhiteListHelper
-
   before_action :login_required
   before_action :find_favourite_group, only: %i[edit update destroy]
   before_action :set_no_layout, only: %i[new edit]

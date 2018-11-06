@@ -1,6 +1,4 @@
 class CountriesController < ApplicationController
-  include WhiteListHelper
-
   # GET /countries/:country_name
   def show
     @country = white_list(params[:country_name])

@@ -2,8 +2,6 @@ require 'libxml'
 require 'bives'
 
 class ModelsController < ApplicationController
-
-  include WhiteListHelper
   include Seek::IndexPager
   include Seek::AssetsCommon
 

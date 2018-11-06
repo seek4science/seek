@@ -31,12 +31,6 @@ GIT
     my_responds_to_parent (1.0.0)
 
 GIT
-  remote: https://github.com/SysMO-DB/white_list.git
-  revision: 3f9798ec54f227e852b944bb14f6f90d05cde893
-  specs:
-    white_list (1.0.0)
-
-GIT
   remote: https://github.com/myGrid/annotations.git
   revision: 401f831c3e0ace82b109dd649d8d7b0820f58032
   branch: rails4.2
@@ -861,6 +855,7 @@ DEPENDENCIES
   rails-assets-vue (~> 2.1.8)!
   rails-assets-x-editable (~> 1.5.1)!
   rails-controller-testing
+  rails-html-sanitizer
   rails-observers
   rails-perftest
   rails_autolink
@@ -902,7 +897,6 @@ DEPENDENCIES
   validate_url
   vcr (~> 2.9)
   webmock
-  white_list!
   will_paginate (~> 3.1)
   yaml_db
   zenodo-client!

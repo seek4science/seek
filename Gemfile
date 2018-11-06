@@ -67,7 +67,6 @@ gem 'bives'
 
 # Linked to SysMO Git repositories
 gem 'gibberish', git: 'https://github.com/SysMO-DB/gibberish.git'
-gem 'white_list', git: 'https://github.com/SysMO-DB/white_list.git'
 gem 'my_responds_to_parent', git: 'https://github.com/SysMO-DB/my_responds_to_parent.git'
 gem 'bioportal', '>=3.0', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
@@ -119,7 +118,9 @@ gem 'rack-attack', '~> 5.0.1'
 
 gem 'private_address_check'
 
+# Rails 5 upgrade
 gem 'ar_transaction_changes' # TODO: Remove in Rails 5.2 upgrade and use `saved_changes` to access changes from callback
+gem 'rails-html-sanitizer'
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
