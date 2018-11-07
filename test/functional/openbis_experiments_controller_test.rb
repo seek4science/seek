@@ -436,7 +436,9 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
     exstudy = Factory :study, contributor: @user
     asset = OpenbisExternalAsset.build(@experiment)
-    asset.synchronized_at = DateTime.now - 2.days
+    asset.synchronized_at = 2.days.ago
+    asset.created_at = 2.days.ago
+    asset.updated_at = 2.days.ago
     exstudy.external_asset = asset
     assert asset.save
     assert exstudy.save

@@ -161,7 +161,9 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
     exdatafile = Factory :data_file
     asset = OpenbisExternalAsset.build(@dataset)
-    asset.synchronized_at = DateTime.now - 2.days
+    asset.synchronized_at = 2.days.ago
+    asset.created_at = 2.days.ago
+    asset.updated_at = 2.days.ago
     exdatafile.external_asset = asset
     assert asset.save
     assert exdatafile.save
