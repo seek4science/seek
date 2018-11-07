@@ -844,7 +844,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     login_as(:quentin)
 
-    put :update, params: { id: project, project: { institution_ids: [] } }
+    put :update, params: { id: project, project: { title: project.title, institution_ids: [] } }
     assert_redirected_to project
     assert_nil flash[:error]
     project.reload
@@ -859,7 +859,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(:quentin)
     # exception is rescued
     assert_no_difference('WorkGroup.count') do
-      post :update, params: { id: project, project: { institution_ids: [] } }
+      post :update, params: { id: project, project: { title: project.title, institution_ids: [] } }
       assert_redirected_to project
       assert_not_nil flash[:error]
     end
@@ -877,7 +877,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert !work_group.people.empty?
 
     assert_no_difference('WorkGroup.count') do
-      post :update, params: { id: project, project: { institution_ids: [] } }
+      post :update, params: { id: project, project: { title: project.title, institution_ids: [] } }
     end
 
     assert_redirected_to project
