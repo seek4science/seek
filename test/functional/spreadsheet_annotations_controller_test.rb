@@ -11,7 +11,7 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
 
   test 'create new annotation' do
     assert_difference('Annotation.count', 1) do
-      xhr :post, :create, { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
+      xhr :post, :create, params: { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
                             annotation_sheet_id: worksheets(:private_worksheet).sheet_number,
                             annotation_cell_coverage: 'A1:B2',
                             annotation_content: 'Annotation!' }
@@ -30,7 +30,7 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
 
   test 'create blank annotation' do
     assert_no_difference('Annotation.count') do
-      xhr :post, :create, { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
+      xhr :post, :create, params: { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
                             annotation_sheet_id: worksheets(:private_worksheet).sheet_number,
                             annotation_cell_coverage: 'A1:B2',
                             annotation_content: '' }
@@ -39,7 +39,7 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_no_difference('Annotation.count') do
-      xhr :post, :create, { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
+      xhr :post, :create, params: { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
                             annotation_sheet_id: worksheets(:private_worksheet).sheet_number,
                             annotation_cell_coverage: 'A1:B2',
                             annotation_content: '   ' }
@@ -52,7 +52,7 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
     login_as(:quentin)
 
     assert_no_difference('Annotation.count') do
-      xhr :post, :create, { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
+      xhr :post, :create, params: { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
                             annotation_sheet_id: worksheets(:private_worksheet).sheet_number,
                             annotation_cell_coverage: 'A1:B2',
                             annotation_content: 'Annotation!' }

@@ -857,12 +857,12 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 0, authors['data'].length
   end
 
-  test 'query authors for initilization' do
+  test 'query authors for initialization' do
     query_authors = {
       '0' => { full_name: 'J Bloggs' },
       '1' => { full_name: 'J Bauers' }
     }
-    get :query_authors, format: :json, as: :json, authors: query_authors
+    get :query_authors, format: :json, as: :json, params: { authors: query_authors }
     assert_response :success
     authors = JSON.parse(@response.body)
     assert_equal 2, authors.length, authors
