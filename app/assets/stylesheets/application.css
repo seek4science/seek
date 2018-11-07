@@ -25,9 +25,7 @@
 *= require publishing
 *= require settings
 *= require new_styles
-*= require jquery-ui-drag-drop
-*= require jquery-ui/resizable
-*= require jquery-ui/datepicker
+*= require jquery-ui
 *= require bootstrap-typeahead
 *= require bootstrap-tagsinput
 *= require bootstrap-multiselect

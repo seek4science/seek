@@ -12,7 +12,6 @@
 //= require builder
 //= require application_shared
 //= require tagging
-//= require autocompleter_advanced
 //= require top_menu
 //= require dropMenu
 //= require dynamic_menu
