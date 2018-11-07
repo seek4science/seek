@@ -1542,7 +1542,7 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should associate document' do
     person = Factory(:person)
     login_as(person)
-    assay = Factory(:assay, contributor: person)
+    assay = Factory(:assay, contributor: person, created_at: 1.day.ago, updated_at: 1.day.ago)
     document = Factory(:document, contributor: person)
     timestamp = assay.updated_at
 
@@ -1593,7 +1593,7 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should associate sop' do
     person = Factory(:person)
     login_as(person)
-    assay = Factory(:assay, contributor: person)
+    assay = Factory(:assay, contributor: person, created_at: 1.day.ago, updated_at: 1.day.ago)
     sop = Factory(:sop, contributor: person)
     timestamp = assay.updated_at
 
@@ -1644,7 +1644,7 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should associate model' do
     person = Factory(:person)
     login_as(person)
-    assay = Factory(:assay, contributor: person)
+    assay = Factory(:assay, contributor: person, created_at: 1.day.ago, updated_at: 1.day.ago)
     model = Factory(:model, contributor: person)
     timestamp = assay.updated_at
 
