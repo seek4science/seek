@@ -12,7 +12,7 @@ class OpenbisFakeJob < SeekJob
 
     item.reload
 
-    sleep item.title.length.even? ? 0.1 : 0.5
+    sleep item.title.length.even? ? 1 : 2
 
     item.touch
 
