@@ -35,7 +35,7 @@ class GatekeeperPublishTest < ActionController::TestCase
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    flash[:error] = nil
+    clear_flash(:error)
     logout
     login_as(@gatekeeper.user)
     get :requested_approval_assets, params: { id: @gatekeeper }
@@ -48,7 +48,7 @@ class GatekeeperPublishTest < ActionController::TestCase
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    flash[:error] = nil
+    clear_flash(:error)
     logout
     login_as(@gatekeeper.user)
     post :gatekeeper_decide, params: { id: @gatekeeper }

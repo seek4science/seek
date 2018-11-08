@@ -257,6 +257,14 @@ class ActiveSupport::TestCase
     f.close
     puts "Written @response.body to #{f.path}"
   end
+
+  def clear_flash(target = nil)
+    if target.nil?
+      @request.session.delete('flash')
+    else
+      @request.session['flash']['flashes'].delete(target.to_s)
+    end
+  end
 end
 
 # Load seed data

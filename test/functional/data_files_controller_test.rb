@@ -1536,7 +1536,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to root_path
     assert_not_nil flash[:error]
 
-    flash[:error] = nil
+    clear_flash(:error)
     get :show, params: { id: published_data_file, version: 2 }
     assert_response :success
     assert_nil flash[:error]
@@ -1546,7 +1546,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to root_path
     assert_not_nil flash[:error]
 
-    flash[:error] = nil
+    clear_flash(:error)
     get :show, params: { id: published_data_file, version: 2 }
     assert_response :success
     assert_nil flash[:error]

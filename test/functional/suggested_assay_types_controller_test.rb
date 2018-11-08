@@ -97,7 +97,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
       delete :destroy, params: { id: suggested_assay_type.id }
     end
     assert_equal 'Admin rights required to manage types', flash[:error]
-    flash[:error] = nil
+    clear_flash(:error)
     logout
     # log in as another user, who is not the owner of the suggested assay type
     login_as Factory(:user)
@@ -106,7 +106,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     end
 
     assert_equal 'Admin rights required to manage types', flash[:error]
-    flash[:error] = nil
+    clear_flash(:error)
     logout
 
     # log in as admin

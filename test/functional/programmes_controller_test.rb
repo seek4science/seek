@@ -674,21 +674,21 @@ class ProgrammesControllerTest < ActionController::TestCase
     get :show, params: { id: programme }
     assert_redirected_to :root
     refute_nil flash[:error]
-    flash[:error] = nil
+    clear_flash(:error)
 
     login_as(programme_administrator)
     get :show, params: { id: programme }
     assert_response :success
     assert_nil flash[:error]
     logout
-    flash[:error] = nil
+    clear_flash(:error)
 
     login_as(Factory(:admin))
     get :show, params: { id: programme }
     assert_response :success
     assert_nil flash[:error]
     logout
-    flash[:error] = nil
+    clear_flash(:error)
 
     login_as(Factory(:person))
     get :show, params: { id: programme }
@@ -739,14 +739,14 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_redirected_to :root
     refute_nil flash[:error]
     logout
-    flash[:error] = nil
+    clear_flash(:error)
 
     login_as(normal)
     get :awaiting_activation
     assert_redirected_to :root
     refute_nil flash[:error]
     logout
-    flash[:error] = nil
+    clear_flash(:error)
   end
 
   test 'can get storage usage' do

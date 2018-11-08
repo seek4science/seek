@@ -90,7 +90,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
       delete :destroy, params: { id: @suggested_technology_type }
     end
     assert_equal 'Admin rights required to manage types', flash[:error]
-    flash[:error] = nil
+    clear_flash(:error)
     logout
     # log in as another user, who is not the owner of the suggested technology type
     login_as Factory(:user)
@@ -99,7 +99,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     end
 
     assert_equal 'Admin rights required to manage types', flash[:error]
-    flash[:error] = nil
+    clear_flash(:error)
     logout
 
     # log in as admin

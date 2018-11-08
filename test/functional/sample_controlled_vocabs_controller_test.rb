@@ -186,13 +186,13 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
       assert_redirected_to :root
       refute_nil flash[:error]
 
-      flash[:error] = nil
+      clear_flash(:error)
 
       get :index
       assert_redirected_to :root
       refute_nil flash[:error]
 
-      flash[:error] = nil
+      clear_flash(:error)
 
       get :new
       assert_redirected_to :root
