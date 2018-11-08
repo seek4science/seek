@@ -554,7 +554,7 @@ class PeopleControllerTest < ActionController::TestCase
 
     assert person.is_asset_housekeeper?(project)
 
-    put :administer_update, params: { id: person.id, person: { work_group_ids: person.work_group_ids }, roles: {} }
+    put :administer_update, params: { id: person.id, person: { work_group_ids: person.work_group_ids }, roles: { asset_housekeeper: [''] } }
 
     person = assigns(:person)
     refute person.is_asset_housekeeper?(project)
@@ -610,18 +610,18 @@ class PeopleControllerTest < ActionController::TestCase
   test 'admin should see the section of assigning roles to a person' do
     person = Factory(:person)
     get :admin, params: { id: person }
-    assert_select 'select#_roles_asset_housekeeper', count: 1
-    assert_select 'select#_roles_project_administrator', count: 1
-    assert_select 'select#_roles_asset_gatekeeper', count: 1
+    assert_select 'select#roles_asset_housekeeper', count: 1
+    assert_select 'select#roles_project_administrator', count: 1
+    assert_select 'select#roles_asset_gatekeeper', count: 1
   end
 
   test 'non-admin should not see the section of assigning roles to a person' do
     login_as(:aaron)
     person = Factory(:person)
     get :admin, params: { id: person }
-    assert_select 'select#_roles_asset_housekeeper', count: 0
-    assert_select 'select#_roles_project_administrator', count: 0
-    assert_select 'select#_roles_asset_gatekeeper', count: 0
+    assert_select 'select#roles_asset_housekeeper', count: 0
+    assert_select 'select#roles_project_administrator', count: 0
+    assert_select 'select#roles_asset_gatekeeper', count: 0
   end
 
   test 'project_administrator should see the section assigning roles for administered project' do
@@ -634,16 +634,16 @@ class PeopleControllerTest < ActionController::TestCase
     managed_person.add_to_project_and_institution(project, institution)
     get :admin, params: { id: managed_person.id }
     assert_response :success
-    assert_select 'select#_roles_asset_housekeeper', count: 1
-    assert_select 'select#_roles_project_administrator', count: 1
-    assert_select 'select#_roles_asset_gatekeeper', count: 1
+    assert_select 'select#roles_asset_housekeeper', count: 1
+    assert_select 'select#roles_project_administrator', count: 1
+    assert_select 'select#roles_asset_gatekeeper', count: 1
 
     non_managed_person = Factory(:person)
     get :admin, params: { id: non_managed_person.id }
     assert_response :success
-    assert_select 'select#_roles_asset_housekeeper', count: 0
-    assert_select 'select#_roles_project_administrator', count: 0
-    assert_select 'select#_roles_asset_gatekeeper', count: 0
+    assert_select 'select#roles_asset_housekeeper', count: 0
+    assert_select 'select#roles_project_administrator', count: 0
+    assert_select 'select#roles_asset_gatekeeper', count: 0
   end
 
   def test_project_administrator_can_administer_others_in_the_same_project

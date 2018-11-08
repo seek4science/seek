@@ -3,7 +3,7 @@
    projects = @person.projects_for_role(role)
    project_list = projects.collect(&:title).collect{|t| "<strong>#{h(t)}</strong>"}.join(", ").html_safe
    project_ids = projects.collect(&:id)
-   select_name = "[roles][#{role}]"
+   select_name = "roles[#{role}]"
    hidden_block = "edit_#{role}"
    ul_block = "project_list_for_#{role}"
    user_selection_id = "possible_project_for_#{role}"
@@ -48,6 +48,7 @@
   </div>
   <br>
 </div>
+<%= hidden_field_tag select_name, '' %>
 <%= select_tag select_name,
                options_from_collection_for_select(Project.all,"id","title",project_ids),
                {:multiple=>true,:style=>"display:none;"} -%>
