@@ -30,7 +30,7 @@ class ContentBlobsController < ApplicationController
       view_text_content
     else
       @pdf_url = pdf_url
-      render action: :view_pdf_content, layout: false
+      view_pdf_content
     end
   end
 
@@ -41,7 +41,7 @@ class ContentBlobsController < ApplicationController
   def view_pdf_content
     @pdf_url = pdf_url
     respond_to do |format|
-      format.html { render layout: false }
+      format.html { render 'view_pdf_content', layout: false }
     end
   end
 
