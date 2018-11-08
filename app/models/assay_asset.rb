@@ -1,6 +1,6 @@
 class AssayAsset < ApplicationRecord
   belongs_to :asset, polymorphic: true, inverse_of: :assay_assets
-  belongs_to :assay, inverse_of: :assay_assets
+  belongs_to :assay, inverse_of: :assay_assets, touch: true
 
   belongs_to :relationship_type
 
