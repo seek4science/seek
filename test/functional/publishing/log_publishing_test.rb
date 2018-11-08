@@ -215,7 +215,7 @@ class LogPublishingTest < ActionController::TestCase
   private
 
   def valid_sop
-    [{ title: 'Test', project_ids: [@gatekeeper_project] }, { data: file_for_upload }]
+    [{ title: 'Test', project_ids: [@gatekeeper_project.id] }, { data: file_for_upload }]
   end
 
   def public_sharing
