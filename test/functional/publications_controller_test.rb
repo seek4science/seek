@@ -430,7 +430,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert df.publications.include?(p)
 
     # remove association
-    put :update, params: { id: p, publication: { abstract: p.abstract, data_file_ids: [] } }
+    put :update, params: { id: p, publication: { abstract: p.abstract, data_file_ids: [''] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -461,7 +461,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert model.publications.include?(p)
 
     # remove association
-    put :update, params: { id: p, publication: { abstract: p.abstract, model_ids: [] } }
+    put :update, params: { id: p, publication: { abstract: p.abstract, model_ids: [''] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -491,7 +491,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert investigation.publications.include?(p)
 
     # remove association
-    put :update, params: { id: p, publication: { abstract: p.abstract, investigation_ids: [] } }
+    put :update, params: { id: p, publication: { abstract: p.abstract, investigation_ids: [''] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -521,7 +521,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert study.publications.include?(p)
 
     # remove association
-    put :update, params: { id: p, publication: { abstract: p.abstract, study_ids: [] } }
+    put :update, params: { id: p, publication: { abstract: p.abstract, study_ids: [''] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -551,7 +551,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert presentation.publications.include?(p)
 
     # remove association
-    put :update, params: { id: p, publication: { abstract: p.abstract, presentation_ids: [] } }
+    put :update, params: { id: p, publication: { abstract: p.abstract, presentation_ids: [''] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -590,7 +590,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should keep model and data associations after update' do
     p = publications(:pubmed_2)
     put :update, params: { id: p, publication: { abstract: p.abstract, model_ids: p.models.collect { |m| m.id.to_s },
-                                       data_file_ids: p.data_files.map(&:id), assay_ids: [] } }
+                                       data_file_ids: p.data_files.map(&:id), assay_ids: [''] } }
 
     assert_redirected_to publication_path(p)
     p.reload

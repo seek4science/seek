@@ -338,12 +338,13 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(person.user)
     project = person.projects.first
     refute_nil project
-    content_blob1 = { data: file_for_upload }
-    content_blob2 = { data_url: 'http://fair-dom.org', original_filename: '', make_local_copy: '0' }
-    content_blob3 = { data_url: 'http://fair-dom.org/piccy.png', original_filename: '', make_local_copy: '0' }
+    content_blob1 = { data: file_for_upload, data_url: '', original_filename: '', make_local_copy: '0' }
+    content_blob2 = { data: '', data_url: 'http://fair-dom.org', original_filename: '', make_local_copy: '0' }
+    content_blob3 = { data: '', data_url: 'http://fair-dom.org/piccy.png', original_filename: '', make_local_copy: '0' }
+    cbs = [content_blob1, content_blob2, content_blob3]
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count', 3) do
-        post :create, params: { model: { title: 'Test Create', project_ids: [project.id] }, content_blobs: [content_blob1, content_blob2, content_blob3], policy_attributes: valid_sharing }
+        post :create, params: { model: { title: 'Test Create', project_ids: [project.id] }, content_blobs: cbs, policy_attributes: valid_sharing }
       end
     end
 

@@ -1240,7 +1240,7 @@ class PeopleControllerTest < ActionController::TestCase
 
     # unassign a person to a project
     assert_difference('ProjectSubscription.count', -1) do
-      put :administer_update, params: { id: person, person: { work_group_ids: [] } }
+      put :administer_update, params: { id: person, person: { work_group_ids: [''] } }
     end
 
     assert_redirected_to person

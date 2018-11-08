@@ -1583,7 +1583,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_includes assay.documents, document
 
     assert_difference('AssayAsset.count', -1) do
-      put :update, params: { id: assay, assay: { title: assay.title, document_ids: [] } }
+      put :update, params: { id: assay, assay: { title: assay.title, document_ids: [''] } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -1634,7 +1634,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_includes assay.sops, sop
 
     assert_difference('AssayAsset.count', -1) do
-      put :update, params: { id: assay, assay: { title: assay.title, sop_ids: [] } }
+      put :update, params: { id: assay, assay: { title: assay.title, sop_ids: [''] } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -1685,7 +1685,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_includes assay.models, model
 
     assert_difference('AssayAsset.count', -1) do
-      put :update, params: { id: assay, assay: { title: assay.title, model_ids: [] } }
+      put :update, params: { id: assay, assay: { title: assay.title, model_ids: [''] } }
     end
 
     assert_redirected_to assay_path(assay)
