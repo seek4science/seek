@@ -38,10 +38,10 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'can create with local file' do
     presentation_attrs = Factory.attributes_for(:presentation,
                                                 contributor: User.current_user,
-                                                project_ids: [@project])
+                                                project_ids: [@project.id])
 
-    assert_difference 'Presentation.count' do
-      assert_difference 'ActivityLog.count' do
+    assert_difference 'ActivityLog.count' do
+      assert_difference 'Presentation.count' do
         post :create, params: { presentation: presentation_attrs, content_blobs: [{ data: file_for_upload }], sharing: valid_sharing }
       end
     end
