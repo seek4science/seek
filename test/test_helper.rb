@@ -87,10 +87,8 @@ class ActiveSupport::TestCase
   setup :clear_rails_cache, :create_initial_person
   teardown :clear_current_user
 
-  def file_for_upload(options = {})
-    default = { filename: 'little_file_v2.txt', content_type: 'text/plain', tempfile_fixture: 'files/little_file_v2.txt' }
-    options = default.merge(options)
-    fixture_file_upload(options[:tempfile_fixture], options[:content_type])
+  def file_for_upload
+    fixture_file_upload('files/little_file_v2.txt', 'text/plain')
   end
 
   def check_for_soffice

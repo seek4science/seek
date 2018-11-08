@@ -617,7 +617,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     # create new version
     assert_difference('Model::Version.count', 1) do
-      post :new_version, params: { id: m, content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }] }
+      post :new_version, params: { id: m, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }] }
     end
     assert_redirected_to model_path(assigns(:model))
     m = Model.find(m.id)
@@ -642,7 +642,7 @@ class ModelsControllerTest < ActionController::TestCase
   def test_should_create_new_version
     m = Factory(:model, contributor:User.current_user.person)
     assert_difference('Model::Version.count', 1) do
-      post :new_version, params: { id: m, model: { title: m.title}, content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }], revision_comments: 'This is a new revision' }
+      post :new_version, params: { id: m, model: { title: m.title}, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }], revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to model_path(m)

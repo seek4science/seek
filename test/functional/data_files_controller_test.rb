@@ -419,7 +419,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         session[:xml_login] = true
-        post :upload_for_tool, params: { data_file: { title: 'Test', project_id: projects(:sysmo_project).id }, content_blobs: [{ data: file_for_upload }], recipient_id: people(:quentin_person).id }
+        post :upload_for_tool, params: { data_file: { title: 'Test', project_id: projects(:sysmo_project).id }, content_blobs: [{ data: picture_file }], recipient_id: people(:quentin_person).id }
       end
     end
 
@@ -444,7 +444,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         session[:xml_login] = true
-        post :upload_from_email, params: { data_file: { title: 'Test', project_ids: [projects(:sysmo_project).id] }, content_blobs: [{ data: file_for_upload }], recipient_ids: [people(:quentin_person).id], sender_id: users(:datafile_owner).person_id }
+        post :upload_from_email, params: { data_file: { title: 'Test', project_ids: [projects(:sysmo_project).id] }, content_blobs: [{ data: picture_file }], recipient_ids: [people(:quentin_person).id], sender_id: users(:datafile_owner).person_id }
       end
     end
 
@@ -935,9 +935,9 @@ class DataFilesControllerTest < ActionController::TestCase
     # upload a data file
     df = Factory :data_file, contributor: User.current_user.person
     # upload new version 1 of the data file
-    post :new_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 1' }
+    post :new_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision 1' }
     # upload new version 2 of the data file
-    post :new_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 2' }
+    post :new_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision 2' }
 
     df.reload
     assert_equal 3, df.versions.length
@@ -961,7 +961,7 @@ class DataFilesControllerTest < ActionController::TestCase
                               start_value: 1, end_value: 2, data_file_id: d.id, data_file_version: d.version)
     assert_difference('DataFile::Version.count', 1) do
       assert_difference('StudiedFactor.count', 1) do
-        post :new_version, params: { id: d, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' } # v2
+        post :new_version, params: { id: d, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
       end
     end
 
@@ -1603,7 +1603,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_empty Subscription.all
 
     df_param = { title: 'Test', project_ids: [proj.id] }
-    blob = { data: file_for_upload }
+    blob = { data: picture_file }
     post :create, params: { data_file: df_param, content_blobs: [blob], policy_attributes: valid_sharing }
 
     df = assigns(:data_file)
@@ -2568,7 +2568,7 @@ class DataFilesControllerTest < ActionController::TestCase
     Factory(:sample, originating_data_file: data_file, contributor: User.current_user.person)
 
     assert_no_difference('DataFile::Version.count') do
-      post :new_version, params: { id: data_file.id, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' }
+      post :new_version, params: { id: data_file.id, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to data_file
@@ -2778,7 +2778,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'create content blob' do
     person = Factory(:person)
     login_as(person)
-    blob = { data: file_for_upload }
+    blob = { data: picture_file }
     assert_difference('ContentBlob.count') do
       post :create_content_blob, params: { content_blobs: [blob] }
     end
@@ -2790,7 +2790,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'create content blob requires login' do
     logout
-    blob = { data: file_for_upload }
+    blob = { data: picture_file }
     assert_no_difference('ContentBlob.count') do
       post :create_content_blob, params: { content_blobs: [blob] }
     end
@@ -3482,12 +3482,12 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:any, 'https://mocked404.com').to_return(status: 404)
   end
 
-  def file_for_upload
+  def picture_file
     fixture_file_upload('files/file_picture.png', 'image/png')
   end
 
   def valid_data_file
-    [{ title: 'Test',simulation_data:'0', project_ids: [User.current_user.person.projects.first.id]}, { data: file_for_upload }]
+    [{ title: 'Test',simulation_data:'0', project_ids: [User.current_user.person.projects.first.id]}, { data: picture_file }]
   end
 
   def valid_data_file_with_http_url
@@ -3552,7 +3552,7 @@ class DataFilesControllerTest < ActionController::TestCase
   # this replicates the old behaviour and result of calling #new
   def register_content_blob(skip_provide_metadata:false)
 
-    blob = {data: file_for_upload}
+    blob = {data: picture_file}
     assert_difference('ContentBlob.count') do
       post :create_content_blob, params: { content_blobs: [blob] }
     end
