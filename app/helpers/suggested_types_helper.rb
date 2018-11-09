@@ -143,11 +143,11 @@ module SuggestedTypesHelper
   end
 
   def descriptive_label(type)
-    if type.is_a?(OntologyClass)
-      type.label
-    else
+    if type.respond_to?(:ontology_parent)
       comment = " - this is a new suggested term that specialises #{type.ontology_parent.try(:label)}"
       (type.label + content_tag('span', comment, class: 'none_text')).html_safe
+    else
+      type.label
     end
   end
 end
