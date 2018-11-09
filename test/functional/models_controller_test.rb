@@ -388,7 +388,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assert_difference('Model.count') do
       assert_difference('ModelImage.count') do
-        post :create, params: { model: valid_model, content_blobs: [], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') } }
+        post :create, params: { model: valid_model, content_blobs: [{ data: ''}], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') } }
 
         assert_redirected_to model_path(assigns(:model))
       end
@@ -401,7 +401,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should not create model without image and without content_blob' do
     login_as(:model_owner)
     assert_no_difference('Model.count') do
-      post :create, params: { model: valid_model, content_blobs: [], policy_attributes: valid_sharing }
+      post :create, params: { model: valid_model, content_blobs: [{ data: ''}], policy_attributes: valid_sharing }
     end
     assert_not_nil flash[:error]
   end
@@ -410,7 +410,10 @@ class ModelsControllerTest < ActionController::TestCase
     m = Factory(:model, contributor: User.current_user.person)
     assert_difference('Model::Version.count', 1) do
       assert_difference('ModelImage.count') do
-        post :new_version, params: { id: m, model: { title: m.title }, content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }], revision_comments: 'This is a new revision', model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') } }
+        post :new_version, params: { id: m, model: { title: m.title },
+                                     content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }],
+                                     revision_comments: 'This is a new revision',
+                                     model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') } }
 
         assert_redirected_to model_path(assigns(:model))
       end
