@@ -21,10 +21,6 @@ module Seek
         @label ||= extract_label_from_uri_fragment
       end
 
-      def descriptive_label
-        label
-      end
-
       # returns an array of all the classes, including this and traversal of the subclasses
       def flatten_hierarchy(clz = self)
         result = [clz]
