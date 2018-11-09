@@ -11,10 +11,10 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
 
   test 'create new annotation' do
     assert_difference('Annotation.count', 1) do
-      xhr :post, :create, params: { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
-                            annotation_sheet_id: worksheets(:private_worksheet).sheet_number,
-                            annotation_cell_coverage: 'A1:B2',
-                            annotation_content: 'Annotation!' }
+      post :create, xhr: true, params: { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
+                                         annotation_sheet_id: worksheets(:private_worksheet).sheet_number,
+                                         annotation_cell_coverage: 'A1:B2',
+                                         annotation_content: 'Annotation!' }
     end
 
     assert_response :success
@@ -30,19 +30,19 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
 
   test 'create blank annotation' do
     assert_no_difference('Annotation.count') do
-      xhr :post, :create, params: { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
-                            annotation_sheet_id: worksheets(:private_worksheet).sheet_number,
-                            annotation_cell_coverage: 'A1:B2',
-                            annotation_content: '' }
+      post :create, xhr: true, params: { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
+                                         annotation_sheet_id: worksheets(:private_worksheet).sheet_number,
+                                         annotation_cell_coverage: 'A1:B2',
+                                         annotation_content: '' }
     end
 
     assert_response :success
 
     assert_no_difference('Annotation.count') do
-      xhr :post, :create, params: { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
-                            annotation_sheet_id: worksheets(:private_worksheet).sheet_number,
-                            annotation_cell_coverage: 'A1:B2',
-                            annotation_content: '   ' }
+      post :create, xhr: true, params: { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
+                                         annotation_sheet_id: worksheets(:private_worksheet).sheet_number,
+                                         annotation_cell_coverage: 'A1:B2',
+                                         annotation_content: '   ' }
     end
 
     assert_response :success
@@ -52,10 +52,10 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
     login_as(:quentin)
 
     assert_no_difference('Annotation.count') do
-      xhr :post, :create, params: { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
-                            annotation_sheet_id: worksheets(:private_worksheet).sheet_number,
-                            annotation_cell_coverage: 'A1:B2',
-                            annotation_content: 'Annotation!' }
+      post :create, xhr: true, params: { annotation_content_blob_id: content_blobs(:private_spreadsheet_blob).id,
+                                         annotation_sheet_id: worksheets(:private_worksheet).sheet_number,
+                                         annotation_cell_coverage: 'A1:B2',
+                                         annotation_content: 'Annotation!' }
     end
 
     assert_response :redirect
@@ -64,8 +64,8 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
   end
 
   test 'update an annotation' do
-    xhr :put, :update, id: annotations(:annotation_1).id,
-                       annotation_content: 'Updated'
+    put :update, xhr: true, params: { id: annotations(:annotation_1).id,
+                                      annotation_content: 'Updated' }
 
     assert_response :success
 
@@ -78,8 +78,8 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
   test "can't update others' annotations" do
     login_as(:quentin)
 
-    xhr :put, :update, id: annotations(:annotation_1).id,
-                       annotation_content: 'Updated'
+    put :update, xhr: true, params: { id: annotations(:annotation_1).id,
+                                      annotation_content: 'Updated' }
 
     assert_response :error
 
@@ -90,7 +90,7 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
 
   test 'delete an annotation' do
     assert_difference('Annotation.count', -1) do
-      xhr :delete, :destroy, id: annotations(:annotation_1).id
+      delete :destroy, xhr: true, params: { id: annotations(:annotation_1).id }
     end
 
     assert_response :success
@@ -100,7 +100,7 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
     login_as(:quentin)
 
     assert_no_difference('Annotation.count') do
-      xhr :delete, :destroy, id: annotations(:annotation_1).id
+      delete :destroy, xhr: true, params: { id: annotations(:annotation_1).id }
     end
 
     assert_response :error
