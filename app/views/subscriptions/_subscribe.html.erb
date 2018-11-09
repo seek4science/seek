@@ -6,6 +6,6 @@
             <%= f.hidden_field :subscribable_id -%>
             <%= f.hidden_field :subscribable_type -%>
         <% end %>
-        <%= image_tag_for_key "subscribe", "$('new_subscription').submit()", nil, {:class => 'btn btn-default'}, 'Subscribe', :function %>
+        <%= image_tag_for_key "subscribe", '#', nil, { onclick: "$('new_subscription').submit(); return false", class:'btn btn-default'}, 'Subscribe' %>
     <% end %>
 <% end %>

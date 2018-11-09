@@ -17,9 +17,7 @@ module ImagesHelper
     inner = "#{img_tag} #{label}".html_safe unless label.blank?
 
     if url
-      inner = if remote == :function
-                link_to_function inner, url, html_options
-              elsif remote
+      inner = if remote
                 link_to(inner, url, html_options.merge(remote: true))
               else
                 link_to(inner, url, html_options)
