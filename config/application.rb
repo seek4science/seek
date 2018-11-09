@@ -51,9 +51,6 @@ module SEEK
         :programme_reindexer,
         :assets_creator_reindexer
 
-    config.action_view.sanitized_allowed_attributes = ['rel']
-    config.action_view.sanitized_allowed_tags = ["u"]
-
     config.middleware.use Rack::Deflater,
                           include: %w(text/html application/xml application/json text/css application/javascript)
 
