@@ -160,7 +160,7 @@ class ApplicationController < ActionController::Base
   def restrict_guest_user
     if current_user && current_user.guest?
       flash[:error] = 'You cannot perform this action as a Guest User. Please sign in or register for an account first.'
-      redirect_to :back, fallback_location: main_app.root_path
+      redirect_back fallback_location: main_app.root_path
     end
   end
 

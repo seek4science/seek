@@ -101,16 +101,6 @@ module AuthenticatedSystem
     clear_return_to
   end
 
-  def redirect_back
-    if request.env['HTTP_REFERER']
-      redirect_to(:back)
-    else
-      redirect_to main_app.root_path
-    end
-
-    session[:return_to] = nil
-  end
-
   # Inclusion hook to make #current_user and #logged_in?
   # available as ActionView helper methods.
   def self.included(base)

@@ -9,7 +9,7 @@ class GroupMembershipsController < ApplicationController
       else
         flash[:error] = "Could not remove person from #{membership_to}"
       end
-      format.html { redirect_to :back, fallback_location: root_path }
+      format.html { redirect_back fallback_location: root_path }
     end
   end
 

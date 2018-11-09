@@ -152,7 +152,7 @@ class UsersController < ApplicationController
       flash[:notice] = 'No email sent. User was already activated.'
     end
 
-    redirect_back
+    redirect_back(fallback_location: root_path)
   end
 
   def activation_required; end

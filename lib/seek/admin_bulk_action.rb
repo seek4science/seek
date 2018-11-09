@@ -9,7 +9,7 @@ module Seek
         model_class = controller_name.classify.constantize
         objects = model_class.find(params['ids'])
         objects.each(&:destroy)
-        redirect_back
+        redirect_back(fallback_location: root_path)
       end
     end
 

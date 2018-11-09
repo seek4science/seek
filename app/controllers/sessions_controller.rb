@@ -37,7 +37,7 @@ class SessionsController < ApplicationController
       if request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == search_url.normalize_trailing_slash
         redirect_to :root
       else
-        redirect_back
+        redirect_back(fallback_location: root_path)
       end
     rescue RedirectBackError
       redirect :controller => :homes, :action => :index

@@ -160,7 +160,7 @@ module Seek
       rescue => e
         msg = seek_util.extract_err_message(e)
         flash[:error] = "Cannot access OBis: #{msg}"
-        redirect_back # fallback_location: @project
+        redirect_back fallback_location: @project
       end
 
       def newly_created
