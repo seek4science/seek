@@ -410,22 +410,13 @@ class AdminController < ApplicationController
       mail = Mailer.test_email(params[:testing_email])
       if params[:deliver_later]
         mail.deliver_later
-        render :update do |page|
-          page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
-          page.alert("Test email to #{params[:testing_email]} was added to the queue.")
-        end
+        render json: { message: "Test email to #{params[:testing_email]} was added to the queue."}, status: :ok
       else
         mail.deliver_now
-        render :update do |page|
-          page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
-          page.alert("Test email sent successfully to #{params[:testing_email]}.")
-        end
+        render json: { message: "Test email sent successfully to #{params[:testing_email]}."}, status: :ok
       end
     rescue => e
-      render :update do |page|
-        page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
-        page.alert("Fail to send test email, #{e.message}")
-      end
+      render json: { error: "Fail to send test email, #{e.message}"}, status: :internal_server_error
     ensure
       ActionMailer::Base.smtp_settings = smtp_hash_old
       ActionMailer::Base.raise_delivery_errors = raise_delivery_errors_setting
