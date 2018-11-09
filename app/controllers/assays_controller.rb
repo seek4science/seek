@@ -171,12 +171,6 @@ class AssaysController < ApplicationController
     end
   end
 
-  def update_types
-    render :update do |page|
-      page.replace_html "favourite_list", :partial=>"favourites/gadget_list"
-    end
-  end
-
   private
 
   def assay_params
