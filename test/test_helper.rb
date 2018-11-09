@@ -261,7 +261,7 @@ class ActiveSupport::TestCase
   def clear_flash(target = nil)
     if target.nil?
       @request.session.delete('flash')
-    else
+    elsif request.session['flash'] && request.session['flash']['flashes']
       @request.session['flash']['flashes'].delete(target.to_s)
     end
   end
