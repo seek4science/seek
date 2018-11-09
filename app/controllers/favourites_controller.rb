@@ -17,7 +17,7 @@ class FavouritesController < ApplicationController
 
     favourite = Favourite.new(user: current_user, resource: resource)
 
-    if resource && resource.is_favouritable? && favourite.save!
+    if resource && resource.is_favouritable? && favourite.save
       render partial: 'favourites/gadget_list', status: :created
     else
       head :unprocessable_entity
