@@ -15,10 +15,10 @@
         <li><%= link_to t("project"), new_project_path %></li>
     <% end %>
     <% if can_create_institutions? %>
-        <li><%= link_to "Institution", new_institution_path %></li>
+        <li><%= link_to t("institution"), new_institution_path %></li>
     <% end %>
     <% if can_create_profiles? %>
-        <li><%= link_to "Profile", new_person_path %></li>
+        <li><%= link_to t("profile"), new_person_path %></li>
     <% end %>
 
     <% if can_create_new_items? %>
@@ -33,8 +33,9 @@
             <li><%= link_to t("model"), new_model_path %></li>
         <% end %>
         <li><%= link_to t("sop"), new_sop_path %></li>
-        <li><%= link_to "Workflow", new_workflow_path %></li>
-        <li><%= link_to "Publication", new_publication_path %></li>
+        <li><%= link_to t("workflow"), new_workflow_path %></li>
+        <li><%= link_to t("node"), new_node_path %></li>
+        <li><%= link_to t("publication"), new_publication_path %></li>
         <li><%= link_to t("document"), new_document_path %></li>
 
         <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
@@ -45,14 +46,14 @@
 
         <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
         <% if Sample.can_create? %>
-            <li><%= link_to("Sample", select_sample_types_path) %></li>
+            <li><%= link_to(t("sample"), select_sample_types_path) %></li>
         <% end %>
         <% if SampleType.can_create? %>
-            <li><%= link_to("Sample Type", new_sample_type_path) %></li>
+            <li><%= link_to(t("sample_type"), new_sample_type_path) %></li>
         <% end %>
-        <li><%= link_to("Strain", new_strain_path) %></li>
+        <li><%= link_to(t("strain"), new_strain_path) %></li>
         <% if can_create_organisms? %>
-            <li><%= link_to "Organism", new_organism_path %></li>
+            <li><%= link_to t("organism"), new_organism_path %></li>
         <% end %>
 
     <% else %>

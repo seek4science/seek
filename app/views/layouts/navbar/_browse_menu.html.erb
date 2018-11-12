@@ -11,8 +11,8 @@
         <li><%= link_to t('programme').pluralize, programmes_path %></li>
     <% end %>
     <li><%= link_to t("project").pluralize, projects_path %></li>
-    <li><%= link_to "Institutions", institutions_path %></li>
-    <li><%= link_to "People", people_path %></li>
+    <li><%= link_to t("institution").pluralize, institutions_path %></li>
+    <li><%= link_to t("person").pluralize, people_path %></li>
 
     <li role="presentation" class="dropdown-header"><%= t("menu.isa") -%></li>
     <li><%= link_to t("investigation").pluralize, investigations_path %></li>
@@ -25,8 +25,9 @@
         <li><%= link_to t("model").pluralize, models_path %></li>
     <% end %>
     <li><%= link_to t("sop").pluralize, sops_path %></li>
-    <li><%= link_to "Workflow".pluralize, workflows_path %></li>
-    <li><%= link_to "Publications", publications_path %></li>
+    <li><%= link_to t("workflow").pluralize, workflows_path %></li>
+    <li><%= link_to t("node").pluralize, nodes_path %></li>
+    <li><%= link_to t("publication").pluralize, publications_path %></li>
     <li><%= link_to t("document").pluralize, documents_path %></li>
 
     <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
@@ -36,10 +37,10 @@
     <% end %>
     <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
     <% if Seek::Config.samples_enabled %>
-      <li><%= link_to("Sample types", sample_types_path) %></li>
+      <li><%= link_to(t("sample_type").pluralize, sample_types_path) %></li>
     <% end %>
     <% if Seek::Config.organisms_enabled %>
-        <li><%= link_to "Organisms", organisms_path %></li>
+        <li><%= link_to t("organism").pluralize, organisms_path %></li>
     <% end %>
   </ul>
 </li>

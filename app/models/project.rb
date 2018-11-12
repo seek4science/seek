@@ -11,6 +11,7 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :models
   has_and_belongs_to_many :sops
   has_and_belongs_to_many :workflows
+  has_and_belongs_to_many :nodes
   has_and_belongs_to_many :publications
   has_and_belongs_to_many :events
   has_and_belongs_to_many :presentations

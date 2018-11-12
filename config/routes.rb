@@ -182,7 +182,7 @@ SEEK::Application.routes.draw do
       get :select
       get :items
     end
-    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :only=>[:index]
+    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :only=>[:index]
     resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :only=>[:index]
     resources :avatars do
       member do
@@ -208,7 +208,7 @@ SEEK::Application.routes.draw do
       post :request_membership
       get :isa_children
     end
-    resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:data_files,:presentations,
+    resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:search,:organisms,:documents, :only=>[:index]
 
     resources :openbis_endpoints do
@@ -269,7 +269,7 @@ SEEK::Application.routes.draw do
       post :items_for_result
       post :resource_in_tab
     end
-    resources :people,:projects,:assays,:studies,:models,:sops,:workflows,:data_files,:publications, :documents, :only=>[:index]
+    resources :people,:projects,:assays,:studies,:models,:sops,:workflows, :nodes,:data_files,:publications, :documents, :only=>[:index]
     resources :snapshots, :only => [:show, :new, :create, :destroy] do
       member do
         get :mint_doi_confirm
@@ -315,7 +315,7 @@ SEEK::Application.routes.draw do
       get :published
       get :isa_children
     end
-    resources :people,:projects,:assays,:investigations,:models,:sops,:workflows,:data_files,:publications, :documents,:only=>[:index]
+    resources :people,:projects,:assays,:investigations,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:only=>[:index]
   end
 
   resources :assays do
@@ -353,7 +353,7 @@ SEEK::Application.routes.draw do
       get :new_object_based_on_existing_one
       get :isa_children
     end
-    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:workflows,:data_files,:publications, :documents,:strains,:organisms, :only=>[:index]
+    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:strains,:organisms, :only=>[:index]
   end
 
 
@@ -541,6 +541,32 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end
 
+  resources :nodes, concerns: [:has_content_blobs] do
+    collection do
+      get :typeahead
+      get :preview
+      post :test_asset_url
+      post :items_for_result
+      post :resource_in_tab
+    end
+    member do
+      post :check_related_items
+      post :check_gatekeeper_required
+      get :download
+      get :published
+      post :publish_related_items
+      post :publish
+      post :request_resource
+      post :update_annotations_ajax
+      post :new_version
+      delete :destroy_version
+      post :mint_doi
+      get :mint_doi_confirm
+      get :isa_children
+    end
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+  end
+
   resources :content_blobs, :except => [:show, :index, :update, :create, :destroy] do
     collection do
       post :examine_url
@@ -567,7 +593,7 @@ SEEK::Application.routes.draw do
       get :isa_children
     end
     resources :people,:projects, :institutions, :investigations, :studies, :assays,
-              :data_files, :models, :sops, :workflows, :presentations, :documents, :events, :publications, :organisms
+              :data_files, :models, :sops, :workflows, :nodes, :presentations, :documents, :events, :publications, :organisms
   end
 
   resources :publications do

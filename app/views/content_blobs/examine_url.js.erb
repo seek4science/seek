@@ -1,6 +1,23 @@
 el = $j('#test_url_result')[0];
 <% content = render(:partial=>'examine_url_result') %>
 el.innerHTML="<%= escape_javascript(content) %>";
+
+h1 = $j('h1')[0];
+
+class_name = h1.innerHTML.replace('New ', '').toLowerCase()
+title_value = "<%= @title %>";
+description_value = "<%= @description %>";
+
+<%if @title %>
+  title_area = $j('#' + class_name + '_title')[0];
+  title_area.value = title_value;
+<% end %>
+
+<%if @description %>
+description_area = $j('#' + class_name + '_description')[0];
+description_area.value = description_value;
+<% end %>
+
 el.show();
 
 <% copy_allowed =
