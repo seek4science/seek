@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181109161058) do
+ActiveRecord::Schema.define(version: 20181113111833) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -1897,8 +1897,8 @@ ActiveRecord::Schema.define(version: 20181109161058) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "workflow_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_workflow_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
-  add_index "workflow_auth_lookup", ["user_id", "can_view"], name: "index_workflow_auth_lookup_on_user_id_and_can_view", using: :btree
+  add_index "workflow_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
+  add_index "workflow_auth_lookup", ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "workflow_versions", force: :cascade do |t|
     t.integer  "workflow_id",         limit: 4
