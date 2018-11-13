@@ -1,4 +1,4 @@
-# Sop
+# Workflow
 Factory.define(:workflow) do |f|
   f.title 'This Workflow'
   f.with_project_contributor
@@ -15,7 +15,7 @@ Factory.define(:workflow) do |f|
   end
 end
 
-Factory.define(:min_workflow, class: Sop) do |f|
+Factory.define(:min_workflow, class: Workflow) do |f|
   f.with_project_contributor
   f.title 'A Minimal Workflow'
   f.projects { [Factory.build(:min_project)] }
@@ -24,7 +24,7 @@ Factory.define(:min_workflow, class: Sop) do |f|
   end
 end
 
-Factory.define(:max_workflow, class: Sop) do |f|
+Factory.define(:max_workflow, class: Workflow) do |f|
   f.with_project_contributor
   f.title 'A Maximal Workflow'
   f.description 'How to run a simulation in GROMACS'
@@ -55,7 +55,7 @@ Factory.define(:url_workflow, parent: :workflow) do |f|
 end
 
 # Workflow::Version
-Factory.define(:workflow_version, class: Sop::Version) do |f|
+Factory.define(:workflow_version, class: Workflow::Version) do |f|
   f.association :workflow
   f.projects { workflow.projects }
   f.after_create do |workflow_version|
