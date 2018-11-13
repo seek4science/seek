@@ -14,6 +14,7 @@
 <% end -%>
   <%= head_extras %>
   <link rel="search" type="application/opensearchdescription+xml" href="http://<%= request.host_with_port %>/open_search.xml" />
+  
 </head>
 <body>
 
@@ -23,10 +24,9 @@
 		<li id="search">
 		<%= form_tag search_all_posts_url, :method => :get do -%>
 			<%= text_field_tag :q, params[:q], :size => 15, :id => :search_box %>
-			<li><%= submit_tag 'Search'[:search_title] %></li>			
+			<li><%= submit_tag 'Search'[:search_title] %></li>
 		<% end -%>
 		</li>
-		<li class="login"><%= beast_user_link %></li>		
+		<li class="login"><%= beast_user_link %></li>
   </ul>
 </div>
-			
