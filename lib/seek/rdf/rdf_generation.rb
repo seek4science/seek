@@ -21,6 +21,21 @@ module Seek
         end
       end
 
+      def to_json_ld
+        rdf_graph = to_rdf_graph
+        context = JSON.parse %(
+        {
+          "@context": #{ns_prefixes.to_json}
+        }
+        )
+
+        compacted = nil
+        JSON::LD::API::fromRdf(rdf_graph) do |expanded|
+          compacted = JSON::LD::API.compact(expanded, context['@context'])
+        end
+        JSON.pretty_generate(compacted)
+      end
+
       def to_rdf_graph
         rdf_graph = RDF::Graph.new
         rdf_graph = describe_type(rdf_graph)

@@ -8,6 +8,10 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 3, p.work_groups.size
   end
 
+  test 'to_json_ld' do
+    puts Factory(:person).to_json_ld
+  end
+
   test "registered user's profile can be edited by" do
     admin = Factory(:admin)
     project_administrator = Factory(:project_administrator)
