@@ -6,8 +6,12 @@ module RdfHelper
   def json_ld_script_block
     resource = eval('@' + controller_name.singularize)
     if resource && resource.rdf_supported?
-      content_tag :script,type:'application/ld+json' do
-        json_ld(resource)
+      begin
+        content_tag :script,type:'application/ld+json' do
+          json_ld(resource)
+        end
+      rescue
+        ''
       end
     end
   end
