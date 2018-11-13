@@ -4,9 +4,11 @@ el.innerHTML="<%= escape_javascript(content) %>";
 
 h1 = $j('h1')[0];
 
-class_name = h1.innerHTML.replace('New ', '').toLowerCase()
-title_value = "<%= @title %>";
-description_value = "<%= @description %>";
+class_name = window.location.pathname.split("/")[1].slice(0,-1).toLowerCase();
+title_value = "<%= raw(@title) %>";
+description_value = "<%= raw(@description) %>";
+alert(title_value);
+alert(description_value);
 
 <%if @title %>
   title_area = $j('#' + class_name + '_title')[0];
@@ -18,6 +20,7 @@ description_area = $j('#' + class_name + '_description')[0];
 description_area.value = description_value;
 <% end %>
 
+alert(class_name);
 el.show();
 
 <% copy_allowed =

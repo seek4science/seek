@@ -4,7 +4,7 @@
 <%= render :partial => "general/item_title",:locals => {:item => @workflow, :version => @display_workflow.version,
                                                         :buttons_partial => 'assets/asset_buttons'} -%>
 
-<%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@workflow} -%>
+<%= render :partial=>"assets/reference_new_version_form", :locals=>{:resource=>@workflow} -%>
 
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
