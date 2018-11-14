@@ -12,6 +12,12 @@ class PersonTest < ActiveSupport::TestCase
     puts Factory(:person).to_json_ld
   end
 
+  test 'to schema ld' do
+    p = Factory(:person)
+    assert p.schema_org_supported?
+    puts p.to_schema_ld
+  end
+
   test "registered user's profile can be edited by" do
     admin = Factory(:admin)
     project_administrator = Factory(:project_administrator)
