@@ -30,7 +30,7 @@ module Seek
         )
 
         compacted = nil
-        JSON::LD::API::fromRdf(rdf_graph) do |expanded|
+        JSON::LD::API.fromRdf(rdf_graph) do |expanded|
           compacted = JSON::LD::API.compact(expanded, context['@context'])
         end
         JSON.pretty_generate(compacted)
@@ -57,7 +57,7 @@ module Seek
       end
 
       def rdf_resource
-        uri = URI.join(Seek::Config.site_base_host + "/", "#{self.class.name.tableize}/","#{id}").to_s
+        uri = URI.join(Seek::Config.site_base_host + '/', "#{self.class.name.tableize}/", id.to_s).to_s
         RDF::Resource.new(uri)
       end
 
