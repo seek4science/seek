@@ -8,7 +8,7 @@ module Seek
         @size = info[:file_size]
         if content_is_webpage?(@content_type)
           @is_webpage = true
-          if (is_myexperiment? url)
+          if (is_myexperiment_url? url)
           else
             page = summarize_webpage(url)
             @title = page.title
@@ -57,13 +57,17 @@ module Seek
         end
       end
 
-      def is_myexperiment? (url)
+      def is_myexperiment_url? (url)
         URI uri = URI(url)
+        @is_workflow = false
         if !uri.hostname.include? "myexperiment"
           return false
         end
         if !uri.path.end_with? ".html"
           return false
+        end
+        if uri.path.include? "/workflow"
+          @is_workflow = true
         end
         begin
           xml_url = url[0..-6] + '.xml'
