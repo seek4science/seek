@@ -197,12 +197,12 @@ class PeopleController < ApplicationController
   end
 
   def notify_admin_and_project_administrators_of_new_user
-    Mailer.contact_admin_new_user(params, current_user).deliver_later
+    Mailer.contact_admin_new_user(notification_params.to_h, current_user).deliver_later
 
     # send mail to project managers
     project_administrators = project_administrators_of_selected_projects params[:projects]
     project_administrators.each do |project_administrator|
-      Mailer.contact_project_administrator_new_user(project_administrator, params, current_user).deliver_later
+      Mailer.contact_project_administrator_new_user(project_administrator, notification_params.to_h, current_user).deliver_later
     end
   end
 
@@ -363,6 +363,10 @@ class PeopleController < ApplicationController
   # Unused...
   def role_params
     params.require(:roles).permit({ pal: [] }, { project_administrator: [] }, { asset_housekeeper: [] }, asset_gatekeeper: [])
+  end
+
+  def notification_params
+    params.permit(:projects, :institutions, :other_projects, :other_institutions)
   end
 
   def set_tools_and_expertise(person, params)
