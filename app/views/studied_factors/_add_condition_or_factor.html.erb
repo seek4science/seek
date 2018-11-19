@@ -2,17 +2,14 @@
   entity=controller_name.singularize
   object=eval("@"+entity)
   display_asset = nil
-  path_to_object = nil
   path_to_create_from_existing = nil
   if asset == "data_file"
     asset_object = @data_file
     display_asset = @display_data_file
-    path_to_object = data_file_path(@data_file).concat("/#{controller_name}")
     path_to_create_from_existing = create_from_existing_data_file_studied_factors_url
   elsif asset == "sop"
     asset_object = @sop
     display_asset = @display_sop
-    path_to_object = sop_path(@sop).concat("/#{controller_name}")
     path_to_create_from_existing = create_from_existing_sop_experimental_conditions_url
   end
 %>
@@ -22,7 +19,7 @@
     <%= render partial: 'studied_factors/condition_or_factor_form', locals: { asset: asset, object: object } %>
   </div>
   <div class="col-md-6">
-    <%= form_tag(path_to_create_from_existing, {:remote => true}) do -%>
+    <%= form_tag(path_to_create_from_existing, { remote: true, id: 'create-from-existing-form' }) do -%>
       <% fses_or_ecs = fses_or_ecs_of_project asset_object, controller_name
          unless fses_or_ecs.blank? %>
         <div class="conditions_or_factors">

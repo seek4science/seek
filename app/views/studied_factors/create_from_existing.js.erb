@@ -6,3 +6,6 @@
 <% @errored_factors.each do |sf| %>
   alert('can not create factor studied: item: <%= try_block { sf.substances.collect { |s| s.title + '/' } } -%> <%= sf.measured_item.title -%>, values: <%= sf.start_value -%>-<%= sf.end_value -%><%= sf.unit.title -%>, SD: <%= sf.standard_deviation -%>')
 <% end %>
+
+$j('#create-from-existing-form')[0].reset();
+$j('.existing_conditions_or_factors').hide();

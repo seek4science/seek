@@ -6,3 +6,6 @@
 <% @errored_conditions.each do |ec| %>
   alert('can not create factor studied: item: <%= try_block{ec.substance.name} -%> <%= ec.measured_item.title -%>, values: <%= ec.start_value -%><%= ec.unit.title -%>')
 <% end %>
+
+$j('#create-from-existing-form')[0].reset();
+$j('.existing_conditions_or_factors').hide();

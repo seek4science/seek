@@ -19,7 +19,7 @@
 
   form_id = object.new_record? ? 'add_condition_or_factor_form' : "edit_condition_or_factor_#{object.id}_form"
   form_class = object.new_record? ? 'add-condition-or-factor-form' : 'edit-condition-or-factor-form'
-  html_options = { id: form_id, class: form_class }
+  html_options = { id: form_id, class: "condition-or-factor-form #{form_class}" }
 %>
 <%= form_for [asset_object, object], remote: true, html: html_options do |f| %>
   <div class="conditions_or_factors">
@@ -31,8 +31,7 @@
           <%= f.collection_select :measured_item_id,
                                   measured_items.sort { |a, b| a.title <=> b.title },
                                   :id, :title, {},
-                                  { onchange: "additionalFieldForItem('add_condition_or_factor_form', '')",
-                                    class: 'form-control' } %>
+                                  { class: 'form-control measured-item-select' } %>
         </div>
       </div>
       <div class="col-sm-3">
@@ -75,19 +74,15 @@
       <div class="col-sm-12">
         <%= hidden_field_tag :version, display_asset.version -%>
 
-        <div id='substance_condition_factor' class="substance_condition_factor" style="display: none">
+        <div class="substance_condition_factor" style="display: none">
           <%= render :partial => "layouts/substances_autocomplete", :locals => (object.new_record? ?
                                                                                     {:name => "substance"} : {:name => "#{object.id}_substance", :resource => object})  -%>
         </div>
-        <div id='growth_medium_or_buffer_description' class="growth_medium_or_buffer_description" style="display: none">
+        <div class="growth_medium_or_buffer_description" style="display: none">
           <%= hidden_field_tag "annotation[attribute_name]", "description" -%>
           Please enter the description:<br/>
           <%= text_area_tag "annotation[value]", (object.new_record? ? nil : try_block { Annotation.for_annotatable(object.class.name, object.id).with_attribute_name('description').first.value.text }), :cols => 45,:class=>"form-control" -%>
         </div>
-
-        <% unless object.new_record? %>
-          <%= javascript_tag "additionalFieldForItem('edit_condition_or_factor_#{object.id}_form', #{object.id} )" -%>
-        <% end %>
 
         <div class="form-group">
           <% if object.new_record? %>

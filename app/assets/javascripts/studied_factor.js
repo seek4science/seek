@@ -1,29 +1,29 @@
 var autocompleters = [];
 
-function additionalFieldForItem(form_id, fs_or_ec_id){
-    var elements =  $(form_id).getElements();
-    var item;
-    for (var i=0;i<elements.length;i++)
-    {
-        var id = elements[i].id;
-        if (id.match('measured_item_id'))
-            item = elements[i];
-    }
+function additionalFieldForItem() {
+    var form = $j(this).parents('.condition-or-factor-form');
+    var text = $j(':selected', $j(this)).text();
 
-    //check if the selected item is concentration
-    var selectedIndex = item.selectedIndex;
-    var option_select = item.options[selectedIndex];
-
-    if (option_select.text == 'concentration'){
-        $j('#' + fs_or_ec_id + 'growth_medium_or_buffer_description').fadeOut();
-        $j('#' + fs_or_ec_id + 'substance_condition_factor').fadeIn();
+    if (text === 'concentration'){
+        $j('.growth_medium_or_buffer_description', form).hide();
+        $j('.substance_condition_factor', form).show();
     }
-    else if (option_select.text == 'growth medium' || option_select.text == 'buffer'){
-        $j('#' + fs_or_ec_id + 'substance_condition_factor').fadeOut();
-        $j('#' + fs_or_ec_id + 'growth_medium_or_buffer_description').fadeIn();
+    else if (text === 'growth medium' || text === 'buffer'){
+        $j('.substance_condition_factor', form).hide();
+        $j('.growth_medium_or_buffer_description', form).show();
     }
     else{
-        $j('#' + fs_or_ec_id + 'substance_condition_factor').fadeOut();
-        $j('#' + fs_or_ec_id + 'growth_medium_or_buffer_description').fadeOut();
+        $j('.substance_condition_factor', form).hide();
+        $j('.growth_medium_or_buffer_description', form).hide();
     }
 }
+
+function resetMeasuredItemSelects() {
+    $j('.measured-item-select').each(function () {
+        additionalFieldForItem.apply(this);
+    })
+}
+$j(document).ready(function () {
+    $j(document).on('change', '.measured-item-select', additionalFieldForItem);
+    resetMeasuredItemSelects();
+});

@@ -18,7 +18,7 @@
 
 <script>
     $j(document).ready(function () {
-        $j(document).on('ajax:error', '#condition-or-factor-table', function (xhr) {
+        $j(document).on('ajax:error', function (xhr) {
             alert(xhr.responseText);
         });
     });
