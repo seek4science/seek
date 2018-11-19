@@ -1129,7 +1129,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     golf = Factory :tag, annotatable: dummy_df, source: p2, value: 'golf'
 
-    post :update_annotations_ajax, xhr: true, id: viewable_df, tag_list: golf.value.text
+    post :update_annotations_ajax, xhr: true, params: { id: viewable_df, tag_list: golf.value.text }
 
     viewable_df.reload
 
@@ -1140,7 +1140,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !private_df.can_view?(p.user)
     assert !private_df.can_edit?(p.user)
 
-    post :update_annotations_ajax, xhr: true, id: private_df, tag_list: golf.value.text
+    post :update_annotations_ajax, xhr: true, params: { id: private_df, tag_list: golf.value.text }
 
     private_df.reload
     assert private_df.annotations.empty?
@@ -1165,7 +1165,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal [], df.annotations.select { |a| a.source == p.user }.collect { |a| a.value.text }.sort
     assert_equal %w[golf sparrow], df.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
-    post :update_annotations_ajax, xhr: true, id: df, tag_list: "soup, #{golf.value.text}"
+    post :update_annotations_ajax, xhr: true, params: { id: df, tag_list: "soup, #{golf.value.text}" }
 
     df.reload
 

@@ -167,7 +167,7 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_equal [], presentation.annotations.select { |a| a.source == p.user }.collect { |a| a.value.text }.sort
     assert_equal %w(golf sparrow), presentation.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
-    post :update_annotations_ajax, xhr: true, id: presentation, tag_list: "soup,#{golf.value.text}"
+    post :update_annotations_ajax, xhr: true, params: { id: presentation, tag_list: "soup,#{golf.value.text}" }
 
     presentation.reload
 
