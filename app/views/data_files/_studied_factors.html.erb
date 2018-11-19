@@ -2,10 +2,7 @@
     <%= folding_panel('Factors Studied') do %>
         <div class="factors-studied clearfix">
           <% unless @display_data_file.studied_factors.empty? -%>
-              <ul>
-                <%= render :partial=>"studied_factors/condition_or_factor_row_headings", :locals=>{:asset => 'data_file', :show_delete=>false} %>
-                <%= render :partial=>"studied_factors/condition_or_factor_row",:collection=>@display_data_file.studied_factors, :locals=>{:asset => 'data_file', :show_delete=>false} %>
-              </ul>
+              <%= render partial: "studied_factors/condition_or_factor_table", locals: { collection: @display_data_file.studied_factors, asset: 'data_file', show_delete: false } %>
           <% else -%>
               <span class="none_text">No factors studied for this <%= t('data_file') %>.</span>
           <% end -%>

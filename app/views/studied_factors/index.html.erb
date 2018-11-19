@@ -1,26 +1,26 @@
-<div class="show_basic">
-    <h1>
-      <%= "Factors studied for #{link_to @data_file.title,data_file_path(@data_file, :version => @display_data_file.version)} version #{@display_data_file.version}".html_safe %>
-    </h1>
+<h1>
+  <%= "Factors studied for #{link_to @data_file.title,data_file_path(@data_file, :version => @display_data_file.version)} version #{@display_data_file.version}".html_safe %>
+</h1>
 
-    <p class="box_standout">
-      Factors Studied are the factors that you deliberately change during the course of your experiment to see the effects.
-      <br/>
-      For example,  if you measure the concentration of compounds at pH 5, 6 & 7, the factor studied is the pH (i.e. it is about the treatment you apply rather than the measurements you make).
-    </p>
+<p class="box_standout">
+  Factors Studied are the factors that you deliberately change during the course of your experiment to see the effects.
+  <br/>
+  For example,  if you measure the concentration of compounds at pH 5, 6 & 7, the factor studied is the pH (i.e. it is about the treatment you apply rather than the measurements you make).
+</p>
 
-    <div class="center-block">
-      <div id="add_condition_or_factor" style="display:block;">
-        <%= render :partial=>"add_condition_or_factor", :locals => {:asset => 'data_file'} %>
-      </div>
-      <ul id="conditions_or_factors" class="conditions_or_factors">
-
-        <%= render :partial=>"condition_or_factor_row_headings", :locals=>{:asset => 'data_file', :show_delete=>true} %>
-
-        <div id="condition_or_factor_rows">
-          <%= render :partial=>"condition_or_factor_row",:collection=>@display_data_file.studied_factors, :locals=>{:asset => 'data_file', :show_delete=>true} %>
-        </div>
-      </ul>
-    </div>
+<div id="add_condition_or_factor" style="display:block;">
+  <%= render partial: 'add_condition_or_factor', locals: { asset: 'data_file'} %>
 </div>
+
+<div id="condition-or-factor-table">
+  <%= render partial: 'condition_or_factor_table', locals: { collection: @display_data_file.studied_factors, asset: 'data_file', show_delete: true}  %>
+</div>
+
+<script>
+    $j(document).ready(function () {
+        $j(document).on('ajax:error', '#condition-or-factor-table', function (xhr) {
+            alert(xhr.responseText);
+        });
+    });
+</script>
 

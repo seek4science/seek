@@ -1,0 +1,31 @@
+<%
+  show_delete||=false
+  show_checkbox||=false
+  asset ||= nil %>
+<table class="table">
+  <thead>
+  <tr>
+    <th id="measured_item">
+      Item
+    </th>
+    <th id="values">
+      Value(s)
+    </th>
+
+    <% if asset == 'data_file' %>
+      <th id="standard_deviation">
+        SD
+      </th>
+    <% end %>
+
+    <% if show_delete %>
+      <th></th>
+    <% end %>
+  </tr>
+  </thead>
+  <tbody>
+  <% collection.each do |condition_or_factor| %>
+    <%= render partial: 'studied_factors/condition_or_factor_row', object: condition_or_factor, locals: { show_delete: show_delete, show_checkbox: show_checkbox, asset: asset } %>
+  <% end %>
+  </tbody>
+</table>

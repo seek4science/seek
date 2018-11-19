@@ -1,0 +1,6 @@
+$j('#condition-or-factor-table tbody').append("<%= escape_javascript(render partial: 'condition_or_factor_row', object: @studied_factor, locals: { asset: 'data_file', show_delete: true }) -%>");
+$j('#condition-or-factor-table tbody:last-child').highlight();
+  autocompleters['<%= @studied_factor.id-%>_substance_autocompleter'].deleteAllTokens();
+$j('#substance_condition_factor').hide();
+$j('#growth_medium_or_buffer_description').hide();
+$j('.edit-condition-modal').modal('hide');

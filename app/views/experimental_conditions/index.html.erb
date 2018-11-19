@@ -2,19 +2,18 @@
   <%= "Experimental conditions for '#{link_to @sop.title,sop_path(@sop, :version => @display_sop.version)}' version #{@display_sop.version}".html_safe %>
 </h1>
 
-<div class="center-block">
-  <div id="add_condition_or_factor" style="display:block;">
-    <%= render :partial=>"studied_factors/add_condition_or_factor", :locals => {:asset => 'sop'} %>
-  </div>
-
-  <ul id="conditions_or_factors" class="conditions_or_factors">
-
-    <%= render :partial=>"studied_factors/condition_or_factor_row_headings", :locals=>{:asset => 'sop', :show_delete=>true} %>
-
-    <div id="condition_or_factor_rows">
-      <%= render :partial=>"studied_factors/condition_or_factor_row",:collection=>@display_sop.experimental_conditions, :locals=>{:asset => 'sop', :show_delete=>true} %>
-    </div>
-  </ul>
-
+<div id="add_condition_or_factor" style="display:block;">
+  <%= render :partial=>"studied_factors/add_condition_or_factor", :locals => {:asset => 'sop'} %>
 </div>
 
+<div id="condition-or-factor-table">
+  <%= render partial: "studied_factors/condition_or_factor_table", locals: { collection: @display_sop.experimental_conditions, asset: 'sop', show_delete: true}  %>
+</div>
+
+<script>
+    $j(document).ready(function () {
+        $j(document).on('ajax:error', '#condition-or-factor-table', function (xhr) {
+            alert(xhr.responseText);
+        });
+    });
+</script>

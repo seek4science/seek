@@ -1,77 +1,62 @@
 <%
-   show_delete||=false
-   show_checkbox||=false
-   asset ||= nil
-   object = condition_or_factor_row
-   asset_object = object.send asset
+  show_delete||=false
+  show_checkbox||=false
+  asset ||= nil
+  object = condition_or_factor_row
+  asset_object = object.send asset
 %>
-<li id="condition_or_factor_row_<%= object.id -%>" >
-  <ul class="condition_or_factor_row">
-    <% if show_checkbox %>
-        <li>
-          <%= check_box_tag("checkbox_#{object.id}", object.id, false)-%>
-        </li>
-
-    <% end %>
-    <li id="measured_item">
-      <%if  object.measured_item.title == 'concentration' %>
-        <% substance = ''
-           link_table_name = "#{object.class.name.underscore}_links"
-           object.send(link_table_name).each do |ltn|
-             substance.concat(try_block{ltn.substance.name}.to_s + '/')
-           end
-           substance.chop!
-        %>
-        <%= h substance + ' ' + object.measured_item.title  %>
-      <%elsif (object.measured_item.title == 'growth medium' || object.measured_item.title == 'buffer')
-         description = try_block{Annotation.for_annotatable(object.class.name, object.id).with_attribute_name('description').first.value.text}
+<tr id="condition_or_factor_row_<%= object.id -%>" >
+  <td class="condition-or-factor-row-measured_item">
+    <%if  object.measured_item.title == 'concentration' %>
+      <% substance = ''
+         link_table_name = "#{object.class.name.underscore}_links"
+         object.send(link_table_name).each do |ltn|
+           substance.concat(try_block{ltn.substance.name}.to_s + '/')
+         end
+         substance.chop!
       %>
-        <%= h object.measured_item.title + (description.blank? ? '' : " (#{description})")  %>
-      <%else%>
-        <%= h object.measured_item.title %>
-      <%end%>
-    </li>
+      <% title = substance + ' ' + object.measured_item.title  %>
+    <%elsif (object.measured_item.title == 'growth medium' || object.measured_item.title == 'buffer')
+        description = try_block{Annotation.for_annotatable(object.class.name, object.id).with_attribute_name('description').first.value.text}
+    %>
+      <% title = object.measured_item.title + (description.blank? ? '' : " (#{description})")  %>
+    <%else%>
+      <% title = object.measured_item.title %>
+    <%end%>
 
-    <li id="values">
-      <!--don't show dimensionless unit-->
-      <%= object.range_text.blank? ? '': (h "#{object.range_text}" + (object.unit.symbol == 'dimensionless' ? '' : "#{object.unit.symbol}"))  %>
-    </li>
-    <% if asset == 'data_file' %>
-      <li id="standard_deviation">
-        <%= h object.standard_deviation %>
-      </li>
+    <% if show_checkbox %>
+      <div class="checkbox">
+        <label>
+          <%= check_box_tag("existing_studied_factor[]", object.id, false, autocomplete: 'off')-%>
+          <%= h title %>
+        </label>
+      </div>
+    <% else %>
+      <%= h title %>
     <% end %>
-    <% if show_delete %>
-        <li id="delete_<%= object.id -%>" class="destroy_condition_or_factor">
-           <%=  link_to(image("destroy",:alt=>"Delete",:title=>"Delete this entry"),
-             {:action => "destroy", :id => object.id, "#{asset}_id"=>asset_object.id},
-                        data: { confirm: 'Are you sure?' }, :remote => true, :method=>:delete)
-           -%>
-        </li>
+  </td>
 
-        <li id="edit_on_<%= object.id -%>" >
-          <%= link_to_function image(("edit"),:title=>"Start editing",:alt=>"Start editing") do |page|
-             page.visual_effect :appear, "edit_condition_or_factor_#{object.id}_form"
-             page["edit_on_#{object.id}"].toggle
-             page["edit_off_#{object.id}"].toggle
-
-            end
-          -%>
-        </li>
-
-        <li id="edit_off_<%= object.id -%>" style="display:none">
-          <%= link_to_function image(("edit_off"),:title=>"Stop editing",:alt=>"Stop editing") do |page|
-             page.visual_effect :fade, "edit_condition_or_factor_#{object.id}_form"
-             page["edit_on_#{object.id}"].toggle
-             page["edit_off_#{object.id}"].toggle
-            end
-          -%>
-        </li>
-    <% end %>
-    </ul>
-</li>
-
-<% if show_delete %>
-    <%= render :partial => "studied_factors/edit_condition_or_factor", :locals => {:asset => asset, :object => object}-%>
-<% end %>
-
+  <td class="condition-or-factor-row-values">
+    <!--don't show dimensionless unit-->
+    <%= object.range_text.blank? ? '': (h "#{object.range_text}" + (object.unit.symbol == 'dimensionless' ? '' : "#{object.unit.symbol}"))  %>
+  </td>
+  <% if asset == 'data_file' %>
+    <td class="condition-or-factor-row-standard_deviation">
+      <%= h object.standard_deviation %>
+    </td>
+  <% end %>
+  <% if show_delete %>
+    <td>
+      <%= link_to(image('destroy', alt: 'Delete', title: 'Delete this entry'),
+                  { action: "destroy", id: object.id, "#{asset}_id" => asset_object.id },
+                  data: { confirm: 'Are you sure?' }, remote: true, method: :delete, id: "delete_#{object.id}", class: 'destroy_condition_or_factor')
+      -%>
+      <%= link_to image('edit', title: 'Start editing', alt: 'Start editing'), '#', 'data-toggle' => 'modal', 'data-target' => "#edit-condition-modal-#{object.id}" %>
+      <%= modal(id: "edit-condition-modal-#{object.id}", class: 'edit-condition-modal', size: 'lg') do %>
+        <%= modal_body do %>
+          <%= render partial: "studied_factors/condition_or_factor_form", locals: { asset: asset, object: object}-%>
+        <% end %>
+      <% end %>
+    </td>
+  <% end %>
+</tr>

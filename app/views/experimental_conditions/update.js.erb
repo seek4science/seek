@@ -1,0 +1,7 @@
+$j('.edit-condition-modal').modal('hide');
+$j('#condition_or_factor_row_<%= @experimental_condition.id -%>').replaceWith("<%= escape_javascript(render partial: 'studied_factors/condition_or_factor_row', object: @experimental_condition, locals: { asset: 'sop', show_delete: true }) -%>");
+$j('#condition-or-factor-table tbody:last-child').highlight();
+if (autocompleters['<%= @experimental_condition.id-%>_substance_autocompleter'])
+  autocompleters['<%= @experimental_condition.id-%>_substance_autocompleter'].deleteAllTokens();
+$j('#substance_condition_factor').hide();
+$j('#growth_medium_or_buffer_description').hide();

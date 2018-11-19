@@ -1,0 +1,8 @@
+<% @saved_conditions.each do |ec| %>
+  $j('#condition-or-factor-table tbody').append("<%= escape_javascript(render partial: 'studied_factors/condition_or_factor_row', object: ec, locals: { asset: 'sop', show_delete: true }) -%>");
+  $j('#condition-or-factor-table tbody:last-child').highlight();
+<% end %>
+
+<% @errored_conditions.each do |ec| %>
+  alert('can not create factor studied: item: <%= try_block{ec.substance.name} -%> <%= ec.measured_item.title -%>, values: <%= ec.start_value -%><%= ec.unit.title -%>')
+<% end %>
