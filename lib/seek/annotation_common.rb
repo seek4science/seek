@@ -11,13 +11,9 @@ module Seek
         update_owned_annotations(entity, current_user, 'tag', params[:tag_list])
         if entity.save
           eval("@#{controller_name.singularize} = entity")
-          render :update do |page|
-            refresh_tag_cloud(entity, page)
-
-            handle_clearing_tag_cloud(page)
-
-            page.visual_effect :highlight, 'tag_cloud'
-            page.visual_effect :highlight, 'sidebar_tag_cloud'
+          @entity = entity
+          respond_to do |format|
+            format.js { render template: 'assets/update_annotations'}
           end
         else
           render nothing: true, status: 400
