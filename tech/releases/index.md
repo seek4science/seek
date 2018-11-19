@@ -9,7 +9,17 @@ layout: page
 
 Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
-If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html) 
+If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
+
+## Version 1.7.1
+
+Release date: _November 19th 2018_
+
+  * Fix to a bug where the session table column was too small. This sometimes led to a datafile upload problem if the user was in a large number of projects.
+  * Show the Project creation date on its _show_ page. (In 1.8 we plan to include the option to specify the project start and end dates).
+  * Fix to a bug where some assets couldn't be edited if shared across multiple projects, and the user only belonged to a subset of those projects.
+     
+A full list of changes included in this release can be found in the [SEEK v1.7.1 release notes](release-notes-1.7.1.html)     
 
 ## Version 1.7.0
 
