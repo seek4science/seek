@@ -450,6 +450,6 @@ Release date: _December 8th 2015_
 
 A full detailed list of changes included in this release can be found in the [SEEK v1.0.0 release notes](release-notes-1.0.0.html).
 
-## Previous releases
+[//]: <>## Previous releases
 
-For previous releases please visit our [Earlier Changelogs](http://seek4science.org/changes).
+[//]: <>For previous releases please visit our [Earlier Changelogs](http://seek4science.org/changes).

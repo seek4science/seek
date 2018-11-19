@@ -14,7 +14,7 @@ both assay and technology types.
 The core types are described in an ontology as a class hierarchy, which by default is the ontology defined in _config/ontologies/JERM-RDFXML.owl_
 
 **Note** that currently, the ontology first needs converting into RDFXML, which can be achieved using [Protégé](http://protege.stanford.edu/). The ontology we use is a RDFXML conversion
-of our [JERM Ontology](http://seek4science.org/jerm)
+of our [JERM Ontology](https://www.jermontology.org)
 
 By default both the Assay and Technology types are defined in the same ontology, but there is no reason why they could not be defined in separate ontologies if necessary.
 
