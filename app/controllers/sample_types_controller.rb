@@ -114,7 +114,7 @@ class SampleTypesController < ApplicationController
 
   # used for ajax call to get the filtered sample types for selection
   def filter_for_select
-    @sample_types = SampleType.joins(:projects).where('projects.id' => params[:projects]).uniq.to_a
+    @sample_types = SampleType.joins(:projects).where('projects.id' => params[:projects]).distinct.to_a
     unless params[:tags].blank?
       @sample_types.select! do |sample_type|
         if params[:exclusive_tags] == '1'
