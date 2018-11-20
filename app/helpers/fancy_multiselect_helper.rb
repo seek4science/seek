@@ -71,11 +71,8 @@ module FancyMultiselectHelper
     # - AjaxPreview
     unless options[:preview_disabled]
       # adds options to the dropdown used to select items to add to the multiselect.
-      onchange += remote_function(
-        method: :get,
-        url: { action: 'preview', controller: "#{association}", element: "#{association}_preview" },
-        with: "'id='+this.value",
-        before: "show_ajax_loader('#{association}_preview')") + ';'
+      onchange += "show_ajax_loader('#{association}_preview');"\
+                  "$j.get('#{url_for({ action: 'preview', controller: "#{association}", element: "#{association}_preview" })}', { id: this.value });"
     end
 
     onchange.html_safe
