@@ -7,7 +7,7 @@ class StudiedFactorsController < ApplicationController
   before_action :find_data_file_edit_auth, except: [:show]
   before_action :find_data_file_view_auth, only: [:show]
   before_action :create_new_studied_factor, only: [:index]
-  before_action :no_comma_for_decimal, only: %i[create update]
+  before_action -> { no_comma_for_decimal(studied_factor_params) }, only: %i[create update]
 
   include Seek::BreadCrumbs
 

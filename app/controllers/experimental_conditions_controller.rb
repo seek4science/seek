@@ -6,7 +6,7 @@ class ExperimentalConditionsController < ApplicationController
   before_action :login_required
   before_action :find_and_auth_sop
   before_action :create_new_condition, :only=>[:index]
-  before_action :no_comma_for_decimal, :only=>[:create, :update]
+  before_action -> { no_comma_for_decimal(experimental_condition_params) }, :only=>[:create, :update]
 
   include Seek::BreadCrumbs
 
