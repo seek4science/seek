@@ -7,43 +7,43 @@
 <% collection_name = "attributions_list_for_resource" %>
 
 <%= panel('Attributions', :help_text => "What other assets have influenced this one?") do %>
-	<% unless attributed_to.blank? -%>
-		<ul class="list">
+  <% unless attributed_to.blank? -%>
+    <ul class="list">
       <% for item in attributed_to.first(main_list_section_length) -%>
-				<% if item -%>
-				  <% item_type = item.class.name -%>
-                                        <% by_text = item.contributor.nil? ? "" : " by #{h(item.contributor.name)}" %>
-					<% tooltip_txt = "<b>#{item_type.humanize}:</b> \"#{h(item.title)}\"#{by_text}" -%>
-				  <%= list_item_with_icon(item_type.underscore, item, item.title, truncate_to, tooltip_txt, 34) -%>
-				<% else -%>
-				  <li><span class="none_text">Private item</span></li>
-				<% end -%>
+        <% if item -%>
+          <% item_type = item.class.name -%>
+          <% by_text = item.contributor.nil? ? "" : " by #{h(item.contributor.name)}" %>
+          <% tooltip_txt = "<b>#{item_type.humanize}:</b> \"#{h(item.title)}\"#{by_text}" -%>
+          <%= list_item_with_icon(item_type.underscore, item, item.title, truncate_to, tooltip_txt, 34) -%>
+        <% else -%>
+          <li><span class="none_text">Private item</span></li>
+        <% end -%>
       <% end  %>
     </ul>
-		
-		<%# if a collection has more than "main_list_section_length" items an "expand" link is provided which opens up the rest of the items -%>
-		<% if attributed_to.length > main_list_section_length -%>
-		  <p id="more_link_<%= collection_name -%>" style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
-				<%= link_to_function("More" + expand_image("0.3em")).html_safe do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
-			</p>
-			
-			<div style="display: none; margin: 0; padding: 0;" id="more_items_<%= collection_name -%>">
-				<ul class="list">
-		      <% for item in attributed_to[main_list_section_length..(attributed_to.length-1)] -%>
-		      	<% if item -%>
+
+    <%# if a collection has more than "main_list_section_length" items an "expand" link is provided which opens up the rest of the items -%>
+    <% if attributed_to.length > main_list_section_length -%>
+      <p id="more_link_<%= collection_name -%>" style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
+        <%= link_to_function("More" + expand_image("0.3em")).html_safe do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
+      </p>
+
+      <div style="display: none; margin: 0; padding: 0;" id="more_items_<%= collection_name -%>">
+        <ul class="list">
+          <% for item in attributed_to[main_list_section_length..(attributed_to.length-1)] -%>
+            <% if item -%>
               <%= list_item_with_icon(item.class.name.underscore, item, item.title, truncate_to, nil, 34) -%>
-						<% else -%>
-						  <li><span class="none_text">Private item</span></li>
-						<% end -%>
-		      <% end -%>
-		    </ul>
-				
-			  <p id="less_link_<%= collection_name -%>" style="display: none; font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
-					<%= link_to_function("Less" + collapse_image("0.3em")).html_safe do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
-				</p>
-			</div>
-		<% end -%>
-	<% else -%>
-	  <p class="none_text">None</p>
-	<% end %>
+            <% else -%>
+              <li><span class="none_text">Private item</span></li>
+            <% end -%>
+          <% end -%>
+        </ul>
+
+        <p id="less_link_<%= collection_name -%>" style="display: none; font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
+          <%= link_to_function("Less" + collapse_image("0.3em")).html_safe do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
+        </p>
+      </div>
+    <% end -%>
+  <% else -%>
+    <p class="none_text">None</p>
+  <% end %>
 <% end %>
