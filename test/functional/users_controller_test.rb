@@ -151,21 +151,21 @@ class UsersControllerTest < ActionController::TestCase
   def test_should_require_login_on_signup
     assert_no_difference 'User.count' do
       create_user(login: nil)
-      assert assigns(:user).errors.get(:login)
+      assert assigns(:user).errors[:login]
     end
   end
 
   def test_should_require_password_on_signup
     assert_no_difference 'User.count' do
       create_user(password: nil)
-      assert assigns(:user).errors.get(:password)
+      assert assigns(:user).errors[:password]
     end
   end
 
   def test_should_require_password_confirmation_on_signup
     assert_no_difference 'User.count' do
       create_user(password_confirmation: nil)
-      assert assigns(:user).errors.get(:password_confirmation)
+      assert assigns(:user).errors[:password_confirmation]
     end
   end
 

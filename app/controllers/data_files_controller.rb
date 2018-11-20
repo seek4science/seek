@@ -477,7 +477,7 @@ class DataFilesController < ApplicationController
       end
 
     else
-      @data_file.errors[:base] = "The file uploaded doesn't match" unless uploaded_blob_matches
+      @data_file.errors.add(:base, "The file uploaded doesn't match") unless uploaded_blob_matches
 
       # this helps trigger the complete validation error messages, as not both may be validated in a single action
       # - want the avoid the user fixing one set of validation only to be presented with a new set

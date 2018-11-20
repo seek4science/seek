@@ -85,7 +85,7 @@ class SpreadsheetAnnotationsController < ApplicationController
         flash[:error] = "You are not permitted to annotate this spreadsheet."
         redirect_to data_file_path(df)
       elsif (!@annotation.nil? && (@annotation.source != current_user))
-        @annotation.errors[:base] << "You may not edit or remove other users' annotations."
+        @annotation.errors.add(:base, "You may not edit or remove other users' annotations.")
       end
     else
       respond_to do |format|
