@@ -81,12 +81,12 @@ class FoldersController < ApplicationController
 
   def display_contents
     begin
-      store_folder_cookie()
+      store_folder_cookie
     rescue Exception=>e
       Rails.logger.error("Error reading cookie for last folder browser - #{e.message}")
     end
-    render :update do |page|
-      page.replace_html "folder_contents",:partial=>"contents",:locals=>{:folder=>@folder}
+    respond_to do |format|
+      format.js
     end
   end
 
