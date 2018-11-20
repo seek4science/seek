@@ -194,9 +194,6 @@ class ModelsControllerTest < ActionController::TestCase
     get :new
     assert_response :success
     assert_select 'h1', text: "New #{I18n.t('model')}"
-
-    # non admins can't edit types
-    assert_select 'span#delete_model_type_icon', count: 0
   end
 
   test 'should get new as admin' do
