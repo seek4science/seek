@@ -1,15 +1,12 @@
 module Seek
   module PreviewHandling
     def preview
-      element = params[:element]
-      item = controller_name.classify.constantize.find_by_id(params[:id])
-      partial = preview_partial
-      render :update do |page|
-        if item.try :can_view?
-          page.replace_html element, partial: partial, locals: { resource: item }
-        else
-          page.replace_html element, text: 'Nothing is selected to preview.'
-        end
+      @element = params[:element]
+      @item = controller_name.classify.constantize.find_by_id(params[:id])
+      @partial = preview_partial
+
+      respond_to do |format|
+        format.js { render template: 'assets/preview' }
       end
     end
 
