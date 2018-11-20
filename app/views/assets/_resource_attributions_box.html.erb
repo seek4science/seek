@@ -3,13 +3,12 @@
 <%# - attributed_to - *pre-authorized* collection of items to which the resource is attributed -%>
 <%# - truncate_to - length of the texts after which truncation is activated -%>
 
-<% main_list_section_length = 5 -%>
-<% collection_name = "attributions_list_for_resource" %>
+<% main_list_section_length = 1 -%>
 
 <%= panel('Attributions', :help_text => "What other assets have influenced this one?") do %>
   <% unless attributed_to.blank? -%>
     <ul class="list">
-      <% for item in attributed_to.first(main_list_section_length) -%>
+      <% attributed_to.first(main_list_section_length).each do |item| -%>
         <% if item -%>
           <% item_type = item.class.name -%>
           <% by_text = item.contributor.nil? ? "" : " by #{h(item.contributor.name)}" %>
@@ -23,13 +22,11 @@
 
     <%# if a collection has more than "main_list_section_length" items an "expand" link is provided which opens up the rest of the items -%>
     <% if attributed_to.length > main_list_section_length -%>
-      <p id="more_link_<%= collection_name -%>" style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
-        <%= link_to_function("More" + expand_image("0.3em")).html_safe do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
-      </p>
+      <%= link_to(("More " + image('expand')).html_safe, '#', id: 'more_link_attributions', class: 'pull-right')-%>
 
-      <div style="display: none; margin: 0; padding: 0;" id="more_items_<%= collection_name -%>">
+      <div style="display: none;" id="more_items_attributions">
         <ul class="list">
-          <% for item in attributed_to[main_list_section_length..(attributed_to.length-1)] -%>
+          <% attributed_to[main_list_section_length..(attributed_to.length-1)].each do |item| -%>
             <% if item -%>
               <%= list_item_with_icon(item.class.name.underscore, item, item.title, truncate_to, nil, 34) -%>
             <% else -%>
@@ -38,12 +35,28 @@
           <% end -%>
         </ul>
 
-        <p id="less_link_<%= collection_name -%>" style="display: none; font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
-          <%= link_to_function("Less" + collapse_image("0.3em")).html_safe do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
-        </p>
+        <%= link_to(("Less " + image('collapse')).html_safe, '#', id: 'less_link_attributions', style: 'display: none', class: 'pull-right')-%>
       </div>
     <% end -%>
   <% else -%>
     <p class="none_text">None</p>
   <% end %>
 <% end %>
+
+<script>
+    $j('#more_link_attributions').click(function () {
+        $j('#more_items_attributions').show();
+        $j('#more_link_attributions').hide();
+        $j('#less_link_attributions').show();
+
+        return false;
+    });
+
+    $j('#less_link_attributions').click(function () {
+        $j('#more_items_attributions').hide();
+        $j('#more_link_attributions').show();
+        $j('#less_link_attributions').hide();
+
+        return false;
+    });
+</script>
