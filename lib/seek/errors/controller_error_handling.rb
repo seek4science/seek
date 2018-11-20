@@ -25,7 +25,7 @@ module Seek
         exception_notification(status, exception)
         respond_to do |format|
           format.html { render template: "errors/error_#{status}", layout: 'layouts/errors', status: status, locals: {exception: exception} }
-          format.all { render nothing: true, status: status }
+          format.all { head status }
         end
       end
 

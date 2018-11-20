@@ -16,10 +16,10 @@ module Seek
             format.js { render template: 'assets/update_annotations'}
           end
         else
-          render nothing: true, status: 400
+          head :bad_request
         end
       else
-        render nothing: true, status: 400
+        head :bad_request
       end
     end
 
