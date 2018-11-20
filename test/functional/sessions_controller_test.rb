@@ -151,7 +151,7 @@ class SessionsControllerTest < ActionController::TestCase
     login_as :quentin
     @request.env['HTTP_REFERER'] = 'http://test.host/data_files/'
     get :destroy
-    assert_redirected_to :back
+    assert_redirected_to 'http://test.host/data_files/'
   end
 
   test 'should redirect to root after logging in from the search result page' do
@@ -163,7 +163,7 @@ class SessionsControllerTest < ActionController::TestCase
   test 'should redirect to back after logging in from the page excepting search result page' do
     @request.env['HTTP_REFERER'] = 'http://test.host/data_files/'
     post :create, params: { login: 'quentin', password: 'test' }
-    assert_redirected_to :back
+    assert_redirected_to 'http://test.host/data_files/'
   end
 
   test 'should redirect to given path' do
