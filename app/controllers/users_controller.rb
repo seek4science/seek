@@ -138,7 +138,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     @user.destroy if @user && !@user.person
     respond_to do |format|
-      format.html { redirect_back }
+      format.html { redirect_back(fallback_location: root_path) }
       format.xml { head :ok }
     end
   end
