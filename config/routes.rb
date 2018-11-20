@@ -30,7 +30,6 @@ SEEK::Application.routes.draw do
   resources :scales do
     collection do
       post :search
-      post :search_and_lazy_load_results
     end
   end
 

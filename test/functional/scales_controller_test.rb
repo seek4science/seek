@@ -12,8 +12,8 @@ class ScalesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'search and lazy load_results' do
-    get :search_and_lazy_load_results, xhr: true, scale_type: 'organism'
+  test 'search' do
+    get :search, xhr: true, scale_type: 'organism'
     assert_response :success
   end
 end

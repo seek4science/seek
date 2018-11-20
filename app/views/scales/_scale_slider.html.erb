@@ -9,15 +9,21 @@
 
     function scales_onclick() {
         $$('#scale_list li').each(function(item){
-            item.onclick = function(){
-                <%= scale_slider_function %>
+            item.onclick = function() {
+                if (!loaded_scales[item.id]) {
+                    show_ajax_loader(item.id + '_results');
+                    $j.post('<%= search_scales_path %>', { scale_type: item.id }).done(function () {
+                      loaded_scales[item.id] = true;
+                      $j('#scaled_items > div').hide();
+                      $j('#' + item.id + '_results').show();
+                    });
+                }
                 if ($('scale')){
                     $('scale').value = this.id
                 }
                 return false;
             };
         });
-
     }
 
     if ($('scale')) {
