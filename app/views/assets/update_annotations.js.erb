@@ -1,9 +1,9 @@
-$j('<%= escape_javascript(render partial: 'tags/tag_cloud',
-                                 locals: { tags: fetch_tags_for_item(@entity)[1],
-                                           show_overall_count: false,
-                                           id: 'tag_cloud',
-                                           tags_smaller: true,
-                                           no_tags_text: 'This item has not yet been tagged.' })-%>');
+$j('#tag_cloud').replaceWith('<%= escape_javascript(render partial: 'tags/tag_cloud',
+                                                           locals: { tags: fetch_tags_for_item(@entity)[1],
+                                                                     show_overall_count: false,
+                                                                     id: 'tag_cloud',
+                                                                     tags_smaller: true,
+                                                                     no_tags_text: 'This item has not yet been tagged.' })-%>');
 $j('#tag_cloud').highlight();
 
 <%# The tag cloud is generation is quite an expensive process and doesn't need to automatically update when filled up already. %>
