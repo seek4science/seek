@@ -7,6 +7,10 @@ module Seek
       include RightField
       include CSVMappingsHandling
 
+      SCHEMA_TYPES={
+          "Person" => "Person"
+      }.freeze
+
       def self.included(base)
         base.after_save :create_rdf_generation_job
         base.before_destroy :remove_rdf
@@ -19,6 +23,43 @@ module Seek
             writer << statement
           end
         end
+      end
+
+      def schema_org_supported?
+        SCHEMA_TYPES.key?(self.class.name)
+      end
+
+      def to_json_ld
+        rdf_graph = to_rdf_graph
+        context = JSON.parse %(
+        {
+          "@context": #{ns_prefixes.to_json}
+        }
+        )
+
+        compacted = nil
+        JSON::LD::API.fromRdf(rdf_graph) do |expanded|
+          compacted = JSON::LD::API.compact(expanded, context['@context'])
+        end
+        JSON.pretty_generate(compacted)
+      end
+
+      def to_schema_ld
+        
+
+        ld = JSON.parse %(
+        {
+          "@context": {
+                "": "http://schema.org/",
+                "bio": "http://bioschemas.org/"
+          },
+          "@type": "#{SCHEMA_TYPES[self.class.name]}",
+          "@id": "#{rdf_resource}",
+          "name": "#{title}"
+        }
+        )
+
+        JSON.pretty_generate(ld)
       end
 
       def to_rdf_graph
@@ -42,7 +83,7 @@ module Seek
       end
 
       def rdf_resource
-        uri = URI.join(Seek::Config.site_base_host + "/", "#{self.class.name.tableize}/","#{id}").to_s
+        uri = URI.join(Seek::Config.site_base_host + '/', "#{self.class.name.tableize}/", id.to_s).to_s
         RDF::Resource.new(uri)
       end
 

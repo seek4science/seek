@@ -8,6 +8,16 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 3, p.work_groups.size
   end
 
+  test 'to_json_ld' do
+    puts Factory(:person).to_json_ld
+  end
+
+  test 'to schema ld' do
+    p = Factory(:person)
+    assert p.schema_org_supported?
+    puts p.to_schema_ld
+  end
+
   test "registered user's profile can be edited by" do
     admin = Factory(:admin)
     project_administrator = Factory(:project_administrator)
