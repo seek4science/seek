@@ -30,7 +30,7 @@ class CompoundsControllerTest < ActionController::TestCase
   test 'should create compound with synonyms and ids' do
     compound = { title: 'ATP', synonyms: "Adenosine triphosphate;Adenosine 5'-triphosphate", sabiork_id: '34',
                  chebi_ids: '30616;15422', kegg_ids: 'C00002' }
-    post :create, params: { compound: compound }
+    post :create, xhr: true, params: { compound: compound }
     created_compound = assigns(:compound)
 
     assert_equal 'ATP', created_compound.title
@@ -50,7 +50,7 @@ class CompoundsControllerTest < ActionController::TestCase
 
   test 'should not create compound which already exist' do
     compound = compounds(:compound_glucose)
-    post :create, params: { compound: { title: compound.title } }
+    post :create, xhr: true, params: { compound: { title: compound.title } }
     created_compound = assigns(:compound)
     assert_nil created_compound
   end
@@ -58,7 +58,7 @@ class CompoundsControllerTest < ActionController::TestCase
   test 'should not create compound with no name' do
     compound = { synonyms: "Adenosine triphosphate;Adenosine 5'-triphosphate", sabiork_id: '34',
                  chebi_ids: '30616;15422', kegg_ids: 'C00002' }
-    post :create, params: { compound: compound }
+    post :create, xhr: true, params: { compound: compound }
     created_compound = assigns(:compound)
     assert_nil created_compound
   end
@@ -69,7 +69,7 @@ class CompoundsControllerTest < ActionController::TestCase
     mapping = Factory(:mapping)
     Factory(:mapping_link, substance: compound, mapping: mapping)
 
-    put :update, params: { :id => compound.id, "#{compound.id}_title" => compound.title, "#{compound.id}_synonyms" => 'glk', "#{compound.id}_sabiork_id" => '1406', "#{compound.id}_chebi_ids" => '17234', "#{compound.id}_kegg_ids" => 'C00293;C00031' }
+    put :update, xhr: true, params: { :id => compound.id, "#{compound.id}_title" => compound.title, "#{compound.id}_synonyms" => 'glk', "#{compound.id}_sabiork_id" => '1406', "#{compound.id}_chebi_ids" => '17234', "#{compound.id}_kegg_ids" => 'C00293;C00031' }
     updated_compound = assigns(:compound)
 
     synonyms = updated_compound.synonyms.collect(&:title)
@@ -87,7 +87,7 @@ class CompoundsControllerTest < ActionController::TestCase
     compound = Factory(:compound)
     assert_equal [], compound.synonyms
     assert_equal [], compound.mappings
-    put :update, params: { :id => compound.id, "#{compound.id}_synonyms" => 'glk', "#{compound.id}_sabiork_id" => '1406', "#{compound.id}_chebi_ids" => '17234', "#{compound.id}_kegg_ids" => 'C00293;C00031' }
+    put :update, xhr: true, params: { :id => compound.id, "#{compound.id}_synonyms" => 'glk', "#{compound.id}_sabiork_id" => '1406', "#{compound.id}_chebi_ids" => '17234', "#{compound.id}_kegg_ids" => 'C00293;C00031' }
 
     updated_compound = assigns(:compound)
     assert_equal [], updated_compound.synonyms

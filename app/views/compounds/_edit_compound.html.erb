@@ -22,59 +22,40 @@
   end
 %>
 
-<div class="modal fade" id='edit_compound_<%= compound.id %>' tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Edit compound</h4>
+<%= modal(id: "edit_compound_#{compound.id}", class: 'edit-compound-modal', size: 'lg') do %>
+  <%= modal_header('Edit compound') %>
+  <%= modal_body({ class: 'clearfix', id: "edit_compound_body_#{compound.id}" }) do %>
+    <%= form_for compound, { id: "edit_compound_form_#{compound.id}", remote: true } do |f| -%>
+      <div class="row">
+        <div class="form-group col-sm-3">
+          <label>Compound Name</label>
+          <%= text_area_tag "#{compound.id}_title", compound.title, rows: 2, class: 'form-control compound-title' %>
+
+          <%= link_to "Search in SabioRK", '#', class: 'btn btn-default btn-xs sabio-rk-search-btn',
+                      'data-compound-id' => compound.id %>
+        </div>
+        <div class="form-group col-sm-3">
+          <label>Synonyms</label>
+          <%= text_area_tag "#{compound.id}_synonyms", synonym_names, { rows: 2, class: 'form-control' }%>
+        </div>
+        <div class="form-group col-sm-2">
+          <label>SabioRK ID</label>
+          <%= text_area_tag "#{compound.id}_sabiork_id", sabiork_id, { rows: 2, class: 'form-control' } %>
+        </div>
+        <div class="form-group col-sm-2">
+          <label>ChEBI IDs</label>
+          <%= text_area_tag "#{compound.id}_chebi_ids", chebi_ids, { rows: 2, class: 'form-control' } %>
+        </div>
+        <div class="form-group col-sm-2">
+          <label>KEGG IDs</label>
+          <%= text_area_tag "#{compound.id}_kegg_ids", kegg_ids, { rows: 2, class: 'form-control' } %>
+        </div>
       </div>
-      <div class="modal-body clearfix" id='edit_compound_body_<%= compound.id %>'>
-        <%= form_for_with_callbacks compound,
-                                    url: compound_path(compound.id),
-                                    before: "$('update_#{compound.id}').disabled=true;",
-                                    loaded: "$('update_#{compound.id}').disabled=false;",
-                                    html: { id: "edit_compound_form_#{compound.id}", method: :put, remote: true } do |f| -%>
 
-            <div class="row">
-              <div class="form-group col-sm-3">
-                <label>Compound Name</label>
-                <%= text_area_tag "#{compound.id}_title", compound.title, rows: 2, class: 'form-control' %>
-
-                <%= button_to_with_callbacks "Search in SabioRK",
-                                             { url: { controller: 'compounds', action: "search_in_sabiork" },
-                                               with: "'compound_name=' + escape($F('#{compound.id}_title')) + '&id=' + '#{compound.id}'",
-                                               before: "$('search_in_sabiork_#{compound.id}').disabled=true;",
-                                               loaded: "$('search_in_sabiork_#{compound.id}').disabled=false;"
-                                             },
-                                             { class: 'btn btn-default btn-xs',
-                                               id: "search_in_sabiork_#{compound.id}",
-                                               remote: true } %>
-              </div>
-              <div class="form-group col-sm-3">
-                <label>Synonyms</label>
-                <%= text_area_tag "#{compound.id}_synonyms", synonym_names, rows: 2, class: 'form-control'%>
-              </div>
-              <div class="form-group col-sm-2">
-                <label>SabioRK ID</label>
-                <%= text_area_tag "#{compound.id}_sabiork_id", sabiork_id, rows: 2, class: 'form-control' %>
-              </div>
-              <div class="form-group col-sm-2">
-                <label>ChEBI IDs</label>
-                <%= text_area_tag "#{compound.id}_chebi_ids", chebi_ids, rows: 2, class: 'form-control' %>
-              </div>
-              <div class="form-group col-sm-2">
-                <label>KEGG IDs</label>
-                <%= text_area_tag "#{compound.id}_kegg_ids", kegg_ids, rows: 2, class: 'form-control' %>
-              </div>
-            </div>
-
-            <div class="pull-right">
-              <%= f.submit "Update", :id => "update_#{compound.id}", class: 'btn btn-primary' %> or
-              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            </div>
-        <% end %>
+      <div class="pull-right">
+        <%= f.submit "Update", :id => "update_#{compound.id}", class: 'btn btn-primary' %> or
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
       </div>
-    </div>
-  </div>
-</div>
+    <% end %>
+  <% end %>
+<% end %>

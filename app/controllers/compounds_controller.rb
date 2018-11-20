@@ -35,26 +35,19 @@ class CompoundsController < ApplicationController
 
              #create new or update synonyms
              @compound = new_or_update_synonyms @compound, compound_annotation
-             render :update do |page|
-               if @compound.save
-                  page.insert_html :before, "compound_rows",:partial=>"compound_row",:object=> @compound
-                  page.insert_html :before, "edit-compound-modals", :partial=>"edit_compound",:object=> @compound, as: 'compound'
-                  page.visual_effect :highlight,"compound_row_#{@compound.id}"
-                  # clear the _add_compound form
-                  page[:add_compound_form].reset
-               else
-                  page.alert(@compound.errors.full_messages)
+
+             if @compound.save
+               respond_to do |format|
+                 format.js
                end
+             else
+               render plain: @compound.errors.full_messages, status: :unprocessable_entity
              end
            else
-             render :update do |page|
-              page.alert("The compound #{compound_name} already exist in SEEK. You can update it from the list of compounds below")
-             end
+             render js: "alert('The compound #{compound_name} already exist in SEEK. You can update it from the list of compounds below');"
            end
         else
-           render :update do |page|
-            page.alert('Please input the compound name')
-           end
+          render js: "alert('Please input the compound name');"
         end
    end
 
@@ -81,20 +74,15 @@ class CompoundsController < ApplicationController
 
          #create new or update synonyms
          @compound = new_or_update_synonyms @compound, compound_annotation
-         render :update do |page|
-           if @compound.save
-              page << "$j('#edit_compound_#{@compound.id}').modal('hide');"
-              page.replace "compound_row_#{@compound.id}", :partial => 'compound_row', :object => @compound
-              page.replace "edit_compound_#{@compound.id}", :partial => 'edit_compound', :object => @compound, as: 'compound'
-              page.visual_effect :highlight,"compound_row_#{@compound.id}"
-           else
-              page.alert(@compound.errors.full_messages)
+         if @compound.save
+           respond_to do |format|
+             format.js
            end
+         else
+           render plain: @compound.errors.full_messages, status: :unprocessable_entity
          end
       else
-         render :update do |page|
-          page.alert('Please input the compound name')
-         end
+        render js: "alert('Please input the compound name');"
       end
    end
 
@@ -110,13 +98,11 @@ class CompoundsController < ApplicationController
       s.experimental_conditions.each{|ec| ec.destroy}
       s.destroy
     end
-    render :update do |page|
-      if @compound.destroy
-         page.visual_effect :fade, "compound_row_#{@compound.id}"
-         page.visual_effect :fade, "edit_compound_#{@compound.id}"
-      else
-         page.alert(@compound.errors.full_messages)
-      end
+
+    if @compound.destroy
+      render js: "$j('#compound_row_#{@compound.id}').fadeOut(); $j('#edit_compound_#{@compound.id}').fadeOut();"
+    else
+      render plain: @compound.errors.full_messages, status: :unprocessable_entity
     end
   end
 
@@ -130,34 +116,23 @@ class CompoundsController < ApplicationController
            chebi_ids.chomp!('; ') unless synonyms.blank?
            kegg_ids = compound_annotation['kegg_ids'].inject{|result, id| result.concat("; #{id}")}
            kegg_ids.chomp!('; ') unless synonyms.blank?
-           unless params[:id].blank?
-             render :update do |page|
-               page["#{params[:id]}_title"].value = compound_annotation["recommended_name"]
-               page["#{params[:id]}_sabiork_id"].value = compound_annotation["sabiork_id"]
-               page["#{params[:id]}_synonyms"].value = synonyms
-               page["#{params[:id]}_chebi_ids"].value = chebi_ids
-               page["#{params[:id]}_kegg_ids"].value = kegg_ids
-               page.visual_effect :highlight, "edit_compound_body_#{params[:id]}"
-             end
-           else
-             render :update do |page|
-               page[:compound_title].value = compound_annotation["recommended_name"]
-               page[:compound_sabiork_id].value = compound_annotation["sabiork_id"]
-               page[:compound_synonyms].value = synonyms
-               page[:compound_chebi_ids].value = chebi_ids
-               page[:compound_kegg_ids].value = kegg_ids
-               page.visual_effect :highlight, "add_compound_form"
-             end
+
+           @results = {
+               title: compound_annotation["recommended_name"],
+               sabiork_id: compound_annotation["sabiork_id"],
+               synonyms: synonyms,
+               chebi_ids: chebi_ids,
+               kegg_ids: kegg_ids
+           }
+
+           respond_to do |format|
+             format.js
            end
        else
-         render :update do |page|
-           page.alert('No result found')
-         end
+         render js: "alert('No result found');"
        end
      else
-        render :update do |page|
-           page.alert('Please input the compound name')
-         end
+       render js: "alert('Please input the compound name');"
      end
   end
 
