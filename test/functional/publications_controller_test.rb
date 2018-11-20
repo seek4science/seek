@@ -948,6 +948,39 @@ class PublicationsControllerTest < ActionController::TestCase
     assert p.can_manage?(seek_author2.user)
   end
 
+  test 'should fetch pubmed preview' do
+    VCR.use_cassette('publications/fairdom_by_pubmed') do
+      with_config_value :pubmed_api_email, 'fred@email.com' do
+        post :fetch_preview, xhr: true, params: { key: '27899646', protocol: 'pubmed', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+      end
+    end
+
+    assert_response :success
+    assert response.body.include?('FAIRDOMHub: a repository')
+  end
+
+  test 'should handle missing pubmed preview' do
+    VCR.use_cassette('publications/missing_by_pubmed') do
+      with_config_value :pubmed_api_email, 'fred@email.com' do
+        post :fetch_preview, xhr: true, params: { key: '40404040404', protocol: 'pubmed', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+      end
+    end
+
+    assert_response :internal_server_error
+    assert response.body.include?('An error has occurred')
+  end
+
+  test 'should fetch doi preview' do
+    VCR.use_cassette('publications/fairdom_by_doi') do
+      with_config_value :pubmed_api_email, 'fred@email.com' do
+        post :fetch_preview, xhr: true, params: { key: '10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+      end
+    end
+
+    assert_response :success
+    assert response.body.include?('FAIRDOMHub: a repository')
+  end
+
   private
 
   def publication_for_export_tests
