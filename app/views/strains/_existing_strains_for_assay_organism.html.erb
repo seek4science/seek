@@ -9,7 +9,8 @@
   <% else -%>
       <p class="none_text">Here are the strains for <b><%= h(organism.title) -%></b> defined for your projects.<br/>If required, please select the appropriate one.</p>
       <%= select_tag :strains,
-                     options_for_select([["No strain".html_safe, 0]]|strains.collect{|strain| [strain.info,strain.id]}) -%>
+                     options_for_select([["No strain".html_safe, 0]]|strains.collect{|strain| [strain.info,strain.id]}),
+                     class: 'form-control'-%>
   <% end -%>
 </div>
 

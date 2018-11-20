@@ -133,9 +133,7 @@ class StudiesController < ApplicationController
 
     people ||= []
 
-    render :update do |page|
-      page.replace_html 'person_responsible_collection', partial: 'studies/person_responsible_list', locals: { people: people }
-    end
+    render partial: 'studies/person_responsible_list', locals: { people: people }
   end
 
   def check_assays_are_not_already_associated_with_another_study

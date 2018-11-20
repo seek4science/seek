@@ -9,13 +9,17 @@
 <%= select_tag :study_investigation_id,
   options_for_select(investigation_options,investigation_value),
   {
-    :disabled=>(investigations.nil? || investigations.empty?),
-    :name=>"study[investigation_id]",
-    :onchange=>remote_function(
-          :url=>investigation_selected_ajax_studies_path,
-          :with=>"'investigation_id='+this.value",
-          :before=>"show_ajax_loader('person_responsible_collection')"
-        ),
-    :class => 'form-control'
+    disabled: (investigations.nil? || investigations.empty?),
+    name: "study[investigation_id]",
+    class: 'form-control'
   }
 -%>
+
+<script>
+  $j('#study_investigation_id').change(function () {
+      show_ajax_loader('person_responsible_collection');
+      $j.post(
+          '<%= investigation_selected_ajax_studies_path -%>',
+          { investigation_id: this.value }).done(function (html) { $j('#person_responsible_collection').html(html) });
+  });
+</script>

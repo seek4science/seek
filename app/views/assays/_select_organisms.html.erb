@@ -21,15 +21,7 @@
       <label>Step 1 - <span class="assay_organism_info">Choose an organism</span></label>
       <%= select_tag :possible_organisms,
                      options_for_select([["Select Organism ...", 0]]|available_organisms.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
-                     {:class=>"form-control",
-                      :onchange=>"if (this.value!='0'){"+remote_function(
-                              :url=>{:action=>"existing_strains_for_assay_organism", :controller=>"strains"},
-                              :with=>"'organism_id='+this.value",
-                              :before=>"show_ajax_loader('existing_strains_for_assay_organism')",
-                              :method=>:get
-                      )+
-                              "};check_show_add_organism();return(false);",
-                     } -%>
+                     { class: 'form-control' } -%>
       <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
     </div>
 
@@ -79,8 +71,6 @@
     addOrganism(organism_title, organism_id, strain_info,strain_id, culture_growth,tissue_and_cell_type_id,tissue_and_cell_type_title);
     <% end -%>
 
-
-
     updateOrganisms();
 
     function check_show_add_organism() {
@@ -95,4 +85,16 @@
     }
 
     check_show_add_organism();
+
+    $j('#possible_organisms').change(function () {
+        if (this.value != '0') {
+            show_ajax_loader('existing_strains_for_assay_organism');
+            $j.get('<%= existing_strains_for_assay_organism_strains_path -%>', {organism_id: this.value}).done(function (html) {
+                $j('#existing_strains_for_assay_organism').html(html);
+            });
+            check_show_add_organism();
+
+            return false;
+        }
+    });
 </script>
