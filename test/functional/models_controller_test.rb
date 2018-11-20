@@ -925,9 +925,9 @@ class ModelsControllerTest < ActionController::TestCase
     with_config_value :sycamore_enabled, true do
       model = Factory :teusink_model
       login_as(model.contributor)
-      post :submit_to_sycamore, params: { id: model.id, version: model.version }
+      post :submit_to_sycamore, xhr: true, params: { id: model.id, version: model.version }
       assert_response :success
-      assert @response.body.include?('$("sycamore-form").submit()')
+      assert @response.body.include?("$j('#sycamore-form')[0].submit();")
     end
   end
 
@@ -935,7 +935,7 @@ class ModelsControllerTest < ActionController::TestCase
     with_config_value :sycamore_enabled, false do
       model = Factory :teusink_model
       login_as(model.contributor)
-      post :submit_to_sycamore, params: { id: model.id, version: model.version }
+      post :submit_to_sycamore, xhr: true, params: { id: model.id, version: model.version }
       assert @response.body.include?('Interaction with Sycamore is currently disabled')
     end
   end
@@ -946,7 +946,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(:quentin)
       assert !model.can_download?
 
-      post :submit_to_sycamore, params: { id: model.id, version: model.version }
+      post :submit_to_sycamore, xhr: true, params: { id: model.id, version: model.version }
       assert @response.body.include?("You are not allowed to simulate this #{I18n.t('model')} with Sycamore")
     end
   end

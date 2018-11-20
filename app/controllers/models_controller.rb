@@ -115,13 +115,12 @@ class ModelsController < ApplicationController
       error_message = "You are not allowed to simulate this #{t('model')} with Sycamore"
     end
 
-    render :update do |page|
-      if error_message.blank?
-        page['sbml_model'].value = IO.read(@display_model.sbml_content_blobs.first.filepath).gsub(/\n/, '')
-        page['sycamore-form'].submit()
-      else
-        page.alert(error_message)
+    if error_message.blank?
+      respond_to do |format|
+        format.js
       end
+    else
+      render js: "alert(#{error_message})"
     end
   end
 
