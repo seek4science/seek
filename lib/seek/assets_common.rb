@@ -32,9 +32,8 @@ module Seek
       mail = Mailer.request_resource(current_user, resource, details)
       mail.deliver_later
 
-      render :update do |page|
-        html = "An email has been sent on your behalf to <b>#{resource.managers_names}</b> requesting the file <b>#{h(resource.title)}</b>."
-        page[:requesting_resource_status].replace_html(html)
+      respond_to do |format|
+        format.js { render js: "$j('#requesting_resource_status').html('An email has been sent on your behalf to <b>#{resource.managers_names}</b> requesting the file <b>#{h(resource.title)}</b>.');"}
       end
     end
 
