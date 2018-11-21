@@ -13,7 +13,7 @@
             <div id="assay_list_collection">
               <%= f.label :available_disciplines %><br/>
               <%= select_tag :possible_disciplines,options_for_select( Discipline.all.collect{|d| [h("#{d.title}"),d.id]} ),:style => "width: 15em;" %>
-              <b><%= link_to_function "Add","addSelectedDiscipline(); return(false);" %></b>
+              <b><%= link_to "Add", '#', onclick: "addSelectedDiscipline(); return false;" %></b>
             </div>
           </td>
           <td id="discipline_to_list" class="box_editing_inner" style="line-height: 1.5; width:60%;text-align:left;">

@@ -26,7 +26,7 @@
         <% search_results.each do |result| %>
             <tr>
               <td>
-                <%= link_to_function(result[:preferred_label], "add_concept('#{result[:preferred_label]}','#{result[:ontology_acronym]}','#{result[:class_id]}');") -%>
+                <%= link_to(result[:preferred_label], '#', onclick: "add_concept('#{result[:preferred_label]}','#{result[:ontology_acronym]}','#{result[:class_id]}'); return false;") -%>
               </td>
               <td><%= h(result[:synonyms].join(", ")) %></td>
               <td><%= result[:class_id] %></td>

@@ -15,7 +15,7 @@
         <span class="none_text" id="no_project_text" style="display: <%= project_subscriptions.empty? ? 'block' : 'none' %>">None</span>
         <% project_subscriptions.each do |ps| %>
           <li id="<%= ps.project_id %>_li">
-            <%= link_to_function h(ps.project.title), "$('select_project_subscription').value = #{ps.project.id};show_project_subscription();$('select_project_subscription').value =0;return false;" %>
+            <%= link_to h(ps.project.title), '#', onclick: "$('select_project_subscription').value = #{ps.project.id};show_project_subscription();$('select_project_subscription').value =0;return false;" %>
           </li>
         <% end %>
       </ul>

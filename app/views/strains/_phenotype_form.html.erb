@@ -12,7 +12,7 @@
                 <td>
                   <%= phenotype_form.text_field :description, :size=>25 %>
                 </td>
-                <td> <%= link_to_function image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_phenotype_#{index}"), "fadePhenotypeRow('#{index}','#{action}')" -%>
+                <td> <%= link_to image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_phenotype_#{index}"), '#', onclick: "fadePhenotypeRow('#{index}','#{action}'); return false" -%>
                 </td>
               </tr>
               <%= phenotype_form.hidden_field :_destroy,{:id => "phenotype_#{index}",:value=>0} %>

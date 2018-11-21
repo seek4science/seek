@@ -25,7 +25,7 @@
                       <%= modification_form.text_field :title, :size => 10 %>
                   <% end %>
                 </td>
-                <td> <%= link_to_function image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_genotype_#{index}"), "fadeGenotypeRow('#{index}','#{action}');" -%>
+                <td> <%= link_to image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_genotype_#{index}"), '#', onclick: "fadeGenotypeRow('#{index}','#{action}'); return false" -%>
                 </td>
               </tr>
               <%= genotype_form.hidden_field :_destroy,{:id => "genotype_#{index}",:value=>0} %>

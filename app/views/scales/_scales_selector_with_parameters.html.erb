@@ -57,7 +57,7 @@
       </div>
 
       <br/>
-      <%= link_to_function(image('new') + "#{button_text}", "addSelectedToFancy2('#{collection_id}', $F('#{possibilities_collection_id}'))", :id => "add_to_#{collection_id}_link", :class => "block_link") %>
+      <%= link_to(image('new') + "#{button_text}", '#', onclick: "addSelectedToFancy2('#{collection_id}', $F('#{possibilities_collection_id}')); return false", :id => "add_to_#{collection_id}_link", :class => "block_link") %>
 
 
     </div>

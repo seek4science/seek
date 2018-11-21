@@ -21,7 +21,7 @@
   <span id='projects_for_<%= role %>'>
     <%= text_or_not_specified(project_list,:none_text=>"No #{t('project').downcase.pluralize} assigned") -%>
     &nbsp;
-    <%= link_to_function "[edit]","Effect.Appear('#{hidden_block}');Effect.Fade('projects_for_#{role}');return(false);" %>
+    <%= link_to "[edit]", '#', onclick: "$j('##{hidden_block}').fadeIn(); $j('#projects_for_#{role}').fadeOut(); return false;" %>
   </span>
 
 </p>
@@ -35,7 +35,7 @@
       <% projects.each do |project| %>
           <li id="<%= role -%>_project_<%= project.id %>">
             <%= project.title -%>
-            <%= link_to_function "[remove]", "removePersonFromAdminDefinedRole('#{role}',#{project.id});return(false);" %>
+            <%= link_to "[remove]", '#', onclick: "removePersonFromAdminDefinedRole('#{role}',#{project.id}); return false;" %>
           </li>
       <% end -%>
     </ul>
@@ -44,7 +44,7 @@
     <% person_direct_projects = Seek::Config.project_hierarchy_enabled ?  @person.direct_projects : @person.projects %>
       <% selection_options = person_direct_projects.sort_by(&:title).collect{|p| [sanitize(p.title),p.id]} -%>
       <%= select_tag user_selection_id, options_for_select(selection_options) -%>
-      &nbsp;<%= link_to_function "Add", "addPersonToAdminDefinedRole('#{role}');return(false);" -%>
+      &nbsp;<%= link_to "Add", '#', onclick: "addPersonToAdminDefinedRole('#{role}'); return false;" -%>
   </div>
   <br>
 </div>
