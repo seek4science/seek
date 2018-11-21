@@ -46,7 +46,7 @@ module SuggestedTypesHelper
 
   def cancel_link
     if is_ajax_request?
-      link_to_function('Cancel', "$j('.modal:visible').modal('toggle');", class: 'btn btn-default')
+      link_to('Cancel', '#', 'data-dismiss' => 'modal', class: 'btn btn-default')
     else
       manage_path = eval "#{controller_name}_path"
       cancel_button(manage_path)
