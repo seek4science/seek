@@ -44,7 +44,10 @@
     <% end -%>
 
     <% if success_update_element -%>
+    // yep
     $j('#<%= id -%>').on("ajax:success", function(data) {
+        console.log('we done');
+        console.log(data);
         $j('#<%= success_update_element -%>').html(data);
     });
     <% end -%>

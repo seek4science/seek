@@ -1190,12 +1190,12 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_select '#request_resource_button > a', text: /Request #{I18n.t('data_file')}/, count: 1
+    assert_select '#request_resource_button', text: /Request #{I18n.t('data_file')}/, count: 1
 
     logout
     get :show, params: { id: df }
     assert_response :success
-    assert_select '#request_resource_button > a', text: /Request #{I18n.t('data_file')}/, count: 0
+    assert_select '#request_resource_button', text: /Request #{I18n.t('data_file')}/, count: 0
   end
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do

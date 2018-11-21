@@ -32,8 +32,9 @@ module Seek
       mail = Mailer.request_resource(current_user, resource, details)
       mail.deliver_later
 
+      @resource = resource
       respond_to do |format|
-        format.js { render js: "$j('#requesting_resource_status').html('An email has been sent on your behalf to <b>#{resource.managers_names}</b> requesting the file <b>#{h(resource.title)}</b>.');"}
+        format.js { render template: 'assets/request_resource' }
       end
     end
 

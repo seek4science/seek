@@ -75,12 +75,12 @@ class SopsControllerTest < ActionController::TestCase
 
     get :show, params: { id: sop }
     assert_response :success
-    assert_select '#request_resource_button > a', text: /Request #{I18n.t('sop')}/, count: 1
+    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 1
 
     logout
     get :show, params: { id: sop }
     assert_response :success
-    assert_select '#request_resource_button > a', text: /Request #{I18n.t('sop')}/, count: 0
+    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 0
   end
 
   test 'fail gracefullly when trying to access a missing sop' do
