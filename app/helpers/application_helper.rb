@@ -486,10 +486,6 @@ class ApplicationFormBuilder < ActionView::Helpers::FormBuilder
   def fancy_multiselect(association, options = {})
     @template.fancy_multiselect object, association, options
   end
-
-  def subform_delete_link(link_text = 'remove', link_options = {}, hidden_field_options = {})
-    hidden_field(:_destroy, hidden_field_options) + @template.link_to_function(link_text, "$(this).previous().value = '1';$(this).up().hide();", link_options)
-  end
 end
 
 ActionView::Base.default_form_builder = ApplicationFormBuilder

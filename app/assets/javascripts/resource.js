@@ -47,14 +47,6 @@ function validateResourceFields(is_new_file, resource_name, is_managed) {
     }
 }
 
-function addTempLink(){
-    $('new_temporary_link_form').show();
-    $('new_temporary_link_form').select('.hidden_destroy_field')[0].setValue('false');
-    $("add_a_temporary_link").hide();
-    $('temp_link').select();
- }
-
-
 function checkProjectExists(prefix) {
     el=prefix+"_project_ids";
     if ($F(el).length < 1) {
