@@ -83,14 +83,6 @@ module MenuHelper
     end.join('').html_safe
   end
 
-  def select_menu(definitions)
-    menu = current_top_level_tab(definitions)
-    unless menu.nil?
-      section_id = menu_section_id(menu[:title])
-      "<script type='text/javascript'>select_menu_item('#{section_id}');</script>".html_safe
-    end
-  end
-
   def current_second_level_section(sections)
     sections.find do |section|
       determine_path(section).end_with?(controller_name)

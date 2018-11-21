@@ -10,10 +10,6 @@ module PeopleHelper
     msg
   end
 
-  def person_list_item_extra_details?(person)
-    !(person.projects.empty? && person.institutions.empty?)
-  end
-
   # tag for displaying an image if person that has no user associated - but is only displayed if the current user is an admin
   def no_user_for_admins_img(person)
     if !person.user && admin_logged_in?
