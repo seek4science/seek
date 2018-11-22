@@ -36,7 +36,7 @@
   snapshot_classes = [Investigation, Study, Assay]
   groups = {}
   classes.each do |c|
-    things_with_dois = c.where('doi IS NOT NULL').uniq
+    things_with_dois = c.where('doi IS NOT NULL').distinct
     groups[c] = things_with_dois if things_with_dois.any?
   end
 
