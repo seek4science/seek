@@ -25,7 +25,6 @@
 //= require fancy_multiselect
 //= require parseuri
 //= require tabber-minimized
-//= require tab_lazy_load
 //= require detect_browser
 //= require easytabs
 //= require favourites

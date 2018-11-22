@@ -10,11 +10,6 @@ module AjaxHelper
     html.html_safe
   end
 
-  def button_to_with_callbacks(name, options = {}, html_options = {})
-    html_options[:type] = 'button'
-    link_to_with_callbacks name, options, html_options
-  end
-
   def form_tag_with_callbacks(url_for_options = {}, options = {}, &block)
     js = form_callback_javascript options
     html = form_tag(url_for_options, options, &block)

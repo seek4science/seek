@@ -121,40 +121,6 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
-  # MERGENOTE - put back for now, but needs modularizing, refactoring, and possibly replacing
-  def resource_in_tab
-    resource_type = params[:resource_type]
-    view_type = params[:view_type]
-    scale_title = params[:scale_title] || ''
-
-    if params[:actions_partial_disable] == 'true'
-      actions_partial_disable = true
-    else
-      actions_partial_disable = false
-    end
-
-    # params[:resource_ids] is passed as string, e.g. "id1, id2, ..."
-    resource_ids = (params[:resource_ids] || '').split(',')
-    clazz = resource_type.constantize
-    resources = clazz.where(id: resource_ids)
-    if clazz.respond_to?(:authorized_partial_asset_collection)
-      authorized_resources = clazz.authorized_partial_asset_collection(resources, 'view')
-    elsif resource_type == 'Project' || resource_type == 'Institution'
-      authorized_resources = resources
-    elsif resource_type == 'Person' && Seek::Config.is_virtualliver && current_user.nil?
-      authorized_resources = []
-    else
-      authorized_resources = resources.select(&:can_view?)
-    end
-
-    render partial: 'assets/resource_in_tab',
-           locals: { resources: resources,
-                     scale_title: scale_title,
-                     authorized_resources: authorized_resources,
-                     view_type: view_type,
-                     actions_partial_disable: actions_partial_disable }
-  end
-
   private
 
   def restrict_guest_user
