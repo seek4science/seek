@@ -165,8 +165,7 @@ $j(document).ready(function ($) {
                     scroll(object);
             });
         }
-    };
-
+    }
     $(document)
         .mouseup(function () {
             if (isMouseDown)
@@ -464,10 +463,7 @@ function toggle_annotation_form(annotation_id) {
     $j(elem + ' div.annotation_text').toggle();
     $j(elem + ' div.annotation_edit_text').toggle();
     $j(elem + ' #annotation_controls').toggle();
-};
-
-
-
+}
 //To display the annotations
 function show_annotation(id,x,y) {
     var annotation_container = $j("#annotation_container");
@@ -764,3 +760,30 @@ function displayRowsPerPage(){
         $('rows_per_page').show();
     }
 }
+
+$j(document).ready(function () {
+    $j('#new_annotation_form').on('ajax:beforeSend', function () {
+        $j('#create_annotation_button')[0].disabled = true;
+    }).on('ajax:complete', function () {
+        $j('#annotation_form').hide();
+        $j('#create_annotation_button')[0].disabled = false;
+    });
+
+    $j('#plot_panel_form').on('ajax:beforeSend', function () {
+        $j('#store_plot_button')[0].disabled = true;
+    }).on('ajax:complete', function () {
+        $j('#plot_panel').hide();
+        $j('#store_plot_button')[0].disabled = false;
+    });
+
+    // Handle updating annotations/displaying of errors when annotations are created/updated/destroyed
+    $j('#spreadsheet-explorer').on('ajax:success', '.spreadsheet-annotation-ctrl', function (_, data) {
+        $j('#annotations').html(data);
+    }).on('ajax:error', '.spreadsheet-annotation-ctrl', function (_, xhr) {
+        $j('#spreadsheet_errors').html(xhr.responseText);
+    }).on('ajax:beforeSend', '.spreadsheet-annotation-ctrl', function () {
+        $j(this).parent().find('.loading-spinner').show();
+    }).on('ajax:complete', '.spreadsheet-annotation-ctrl', function () {
+        $j(this).parent().find('.loading-spinner').hide();
+    });
+});

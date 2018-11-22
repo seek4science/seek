@@ -51,7 +51,7 @@
 
     <% if failure_update_element -%>
     $j('#<%= id -%>').on("ajax:error", function(event, xhr, status, statusText) {
-        $j('#<%= failure_update_element -%>').html(xhr.response);
+        $j('#<%= failure_update_element -%>').html(xhr.responseText);
     });
     <% end -%>
 
