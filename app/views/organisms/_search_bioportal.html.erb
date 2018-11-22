@@ -5,7 +5,10 @@
       Search below for the name of the organism. You can use its official name, or its common name or one of its synonyms.
     </p>
     <%= form_tag_with_callbacks(search_ajax_organisms_path,
-                                {:id => "search_organism", :before => "show_ajax_loader('search_results');", :remote => true}) do -%>
+                                { id: "search_organism",
+                                  before: "show_ajax_loader('search_results');",
+                                  update: { success: 'search_results', error: 'search_results' },
+                                  remote: true }) do -%>
 
         <%= hidden_field_tag :pagenum, 1 -%>
 
@@ -29,7 +32,7 @@
         $j('#organism_concept_uri').val(conc_id);
         //jump to the details tab and highlight the fields
         $j('.nav-tabs a[href="#details"]').tab('show');
-        new Effect.Highlight("organism_title");
-        new Effect.Highlight("organism_concept_uri");
+        $j("#organism_title").highlight();
+        $j("#organism_concept_uri").highlight();
     }
 </script>
