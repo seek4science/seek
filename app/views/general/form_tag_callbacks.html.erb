@@ -44,13 +44,13 @@
     <% end -%>
 
     <% if success_update_element -%>
-    $j('#<%= id -%>').on("ajax:success", function(data) {
+    $j('#<%= id -%>').on("ajax:success", function(event, data, status, xhr) {
         $j('#<%= success_update_element -%>').html(data);
     });
     <% end -%>
 
     <% if failure_update_element -%>
-    $j('#<%= id -%>').on("ajax:error", function(xhr) {
+    $j('#<%= id -%>').on("ajax:error", function(event, xhr, status, statusText) {
         $j('#<%= failure_update_element -%>').html(xhr.response);
     });
     <% end -%>
