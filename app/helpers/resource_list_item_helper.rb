@@ -73,7 +73,8 @@ module ResourceListItemHelper
     end
   end
 
-  def list_item_simple_list(items, attribute)
+  def list_item_simple_list(items, attribute, hide_if_blank=false)
+    return '' if hide_if_blank && items.blank?
     html = "<p class=\"list_item_attribute\"><b>#{attribute}:</b> "
     if items.empty?
       html << "<span class='none_text'>Not specified</span>"
@@ -134,7 +135,8 @@ module ResourceListItemHelper
     html.html_safe
   end
 
-  def list_item_description(text, auto_link = true, length = 500)
+  def list_item_description(text, auto_link = true, length = 500, hide_if_blank=false)
+    return '' if hide_if_blank && text.blank?
     content_tag :div, class: 'list_item_desc' do
       text_or_not_specified(text, description: true, auto_link: auto_link, length: length)
     end.html_safe
