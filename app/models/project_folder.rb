@@ -7,7 +7,7 @@ class ProjectFolder < ApplicationRecord
   has_many :children,-> { order(:title) }, :class_name=>"ProjectFolder",:foreign_key=>:parent_id, :after_add=>:update_child
   has_many :project_folder_assets, :dependent=>:destroy
 
-  scope :root_folders, -> (project) { where(project_id: project.id, parent_id: nil).order('LOWER(title)') }
+  scope :root_folders, -> (project) { where(project_id: project.id, parent_id: nil).order(Arel.sql('LOWER(title)')) }
 
   validates_presence_of :project,:title
 
