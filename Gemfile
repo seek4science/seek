@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 gem 'rails', '~> 5.2.1'
 gem 'rdoc'
@@ -120,6 +121,9 @@ gem 'private_address_check'
 # Rails 5 upgrade
 gem 'ar_transaction_changes' # TODO: Remove in Rails 5.2 upgrade and use `saved_changes` to access changes from callback
 gem 'rails-html-sanitizer'
+
+# Rails 5.2 upgrade
+gem 'bootsnap', '>= 1.1.0', require: false
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
