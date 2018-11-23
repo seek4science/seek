@@ -44,10 +44,10 @@ class Project < ApplicationRecord
 
   # for handling the assignment for roles
   attr_accessor :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids
-  after_save :handle_project_administrator_ids, if: '@project_administrator_ids'
-  after_save :handle_asset_gatekeeper_ids, if: '@asset_gatekeeper_ids'
-  after_save :handle_pal_ids, if: '@pal_ids'
-  after_save :handle_asset_housekeeper_ids, if: '@asset_housekeeper_ids'
+  after_save :handle_project_administrator_ids, if: -> { @project_administrator_ids }
+  after_save :handle_asset_gatekeeper_ids, if: -> { @asset_gatekeeper_ids }
+  after_save :handle_pal_ids, if: -> { @pal_ids }
+  after_save :handle_asset_housekeeper_ids, if: -> { @asset_housekeeper_ids }
 
 
   # SEEK projects suffer from having 2 types of ancestor and descendant,that were added separately - those from the historical lineage of the project, and also from

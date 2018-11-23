@@ -23,7 +23,7 @@ class User < ApplicationRecord
   validates_length_of       :login, within: 3..40
   validates_uniqueness_of   :login, case_sensitive: false
 
-  validates :email, format: { with: RFC822::EMAIL }, if: 'email'
+  validates :email, format: { with: RFC822::EMAIL }, if: -> { email }
   validates :email, presence: true, if: :check_email_present?
   validate :email_available?, if: :check_email_present?
 
