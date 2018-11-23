@@ -1,7 +1,7 @@
 module Seek
   module Roles
     # subclass for handler for Roles that are related to something, for example Projects
-    class RelatedRoles < Roles
+    class RelatedRoles < ::Seek::Roles::Roles
       def self.role_names
         []
       end
