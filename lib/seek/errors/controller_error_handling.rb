@@ -7,7 +7,6 @@ module Seek
         ActionController::RoutingError => 404,
         ActionController::UrlGenerationError => 404,
         ::AbstractController::ActionNotFound => 404,
-        ActionController::UnknownController => 404,
         ActionController::UnknownFormat => 406,
         ActiveRecord::RecordNotFound => 404,
         RSolr::Error::ConnectionRefused => 503
