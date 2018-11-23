@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.0.7'
+gem 'rails', '~> 5.2.1'
 gem 'rdoc'
 
 #database adaptors
@@ -32,7 +32,7 @@ gem 'linkeddata'
 gem 'openseek-api'
 # for fancy content escaping in openbis integration
 gem 'loofah'
-gem 'jbuilder', '~> 2.5'
+gem 'jbuilder'
 gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'
 gem 'json-schema'
@@ -111,7 +111,7 @@ gem 'uglifier'
 # Rails 4 upgrade
 gem 'activerecord-session_store'
 gem 'rails-observers'
-gem 'responders', '~> 2.0'
+gem 'responders'
 
 gem 'rack-attack', '~> 5.0.1'
 
