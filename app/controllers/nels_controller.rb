@@ -66,7 +66,8 @@ class NelsController < ApplicationController
     title = [dataset['name'], params[:subtype_name]].reject(&:blank?).join(' - ')
 
     @data_file = DataFile.new(title: title)
-    @content_blob = @data_file.create_content_blob(url: url.chomp)
+    @content_blob = @data_file.build_content_blob(url: url.chomp)
+    @content_blob.save
 
     session[:uploaded_content_blob_id] = @content_blob.id
     session[:processed_datafile] = @data_file
