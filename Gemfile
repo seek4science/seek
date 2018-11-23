@@ -105,7 +105,7 @@ gem 'bibtex-ruby', '~> 4.4.2'
 gem 'omniauth', '~> 1.3.1'
 gem 'omniauth-ldap', '~> 1.0.5'
 
-gem 'ransack', '~> 1.8.2'
+gem 'ransack'
 
 gem 'uglifier'
 
