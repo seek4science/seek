@@ -37,19 +37,21 @@ module SEEK
     config.filter_parameters += [:password,"rack.request.form_vars"]
 
     # Activate observers that should always be running
-    config.active_record.observers = :annotation_reindexer,
-        :assay_reindexer,
-        :assay_asset_reindexer,
-        :measured_item_reindexer,
-        :studied_factor_reindexer,
-        :experimental_condition_reindexer,
-        :mapping_reindexer,
-        :mapping_link_reindexer,
-        :compound_reindexer,
-        :synonym_reindexer,
-        :person_reindexer,
-        :programme_reindexer,
-        :assets_creator_reindexer
+    if ActiveRecord::Base.connected?
+      config.active_record.observers = :annotation_reindexer,
+          :assay_reindexer,
+          :assay_asset_reindexer,
+          :measured_item_reindexer,
+          :studied_factor_reindexer,
+          :experimental_condition_reindexer,
+          :mapping_reindexer,
+          :mapping_link_reindexer,
+          :compound_reindexer,
+          :synonym_reindexer,
+          :person_reindexer,
+          :programme_reindexer,
+          :assets_creator_reindexer
+    end
 
     config.middleware.use Rack::Deflater,
                           include: %w(text/html application/xml application/json text/css application/javascript)

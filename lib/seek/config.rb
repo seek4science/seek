@@ -306,7 +306,7 @@ module Seek
       val
     end
 
-    if Settings.table_exists?
+    if ActiveRecord::Base.connected? && Settings.table_exists?
       def get_value(setting, conversion = nil)
         result = Settings.global.fetch(setting)
         if result
