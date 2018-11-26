@@ -293,17 +293,6 @@ class PersonTest < ActiveSupport::TestCase
       end
     end
 
-    sorted.each do |p|
-      puts "#{p.id}. #{p.avatar_id} #{p.updated_at}"
-    end
-
-    puts
-    puts
-    Person.active.each do |p|
-      puts "#{p.id}. #{p.avatar_id} #{p.updated_at}"
-    end
-
-
     assert_equal sorted, Person.active
   end
 
