@@ -175,7 +175,7 @@ module Seek
 
       # creates a job to update rdf if the suggested ontology uri changes
       def create_rdf_generation_job
-        return unless changes.include?(:ontology_uri)
+        return unless saved_changes.include?(:ontology_uri)
         assays.each do |assay|
           RdfGenerationJob.new(assay).queue_job
         end
