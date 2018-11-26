@@ -178,6 +178,7 @@ class ExternalAssetTest < ActiveSupport::TestCase
     asset1.external_mod_stamp = 'X'
     assert asset1.needs_reindexing
     asset1.save
+    asset1.reload
 
     asset1.external_mod_stamp = 'X'
     refute asset1.needs_reindexing
@@ -185,6 +186,7 @@ class ExternalAssetTest < ActiveSupport::TestCase
     asset1.external_mod_stamp = 'Y'
     assert asset1.needs_reindexing
     asset1.save
+    asset1.reload
 
     asset1.external_mod_stamp = 'Y'
     refute asset1.needs_reindexing
