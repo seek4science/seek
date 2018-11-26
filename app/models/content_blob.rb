@@ -12,7 +12,7 @@ class ContentBlob < ApplicationRecord
   prepend Seek::Openbis::Blob
   prepend Nels::Blob
 
-  belongs_to :asset, polymorphic: true
+  belongs_to :asset, polymorphic: true, autosave: false
 
   # the actual data value stored in memory. If this could be large, then using :tmp_io_object is preferred
   attr_writer :data
