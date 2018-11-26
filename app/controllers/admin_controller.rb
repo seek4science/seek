@@ -245,10 +245,7 @@ class AdminController < ApplicationController
       rescue SystemExit => e
         Rails.logger.info("Exit code #{e.status}")
       rescue => e
-        error = e.message
-        if Seek::Config.exception_notification_enabled
-          ExceptionNotifier.notify_exception(e, data: { message: 'Problem restarting delayed job' })
-        end
+        forward_exception_notification(e, {message:'Problem restarting delayed job'})
       end
     end
 

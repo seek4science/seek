@@ -17,9 +17,7 @@ class SearchController < ApplicationController
         flash.now[:error] = e.message
       rescue RSolr::Error::ConnectionRefused=>e
         flash.now[:error] = "The search service is currently not running, and we've been notified of the problem. Please try again later"
-        if Seek::Config.exception_notification_enabled
-          ExceptionNotifier.notify_exception(e, data: {message: 'An error with search occurred, SOLR connection refused.'})
-        end
+        forward_exception_notification(e, {message: 'An error with search occurred, SOLR connection refused.'})
         Rails.logger.error(e)
       end
     end
