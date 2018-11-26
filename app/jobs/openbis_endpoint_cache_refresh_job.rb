@@ -31,7 +31,7 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
   end
 
   def follow_on_job?
-    Seek::Config.openbis_enabled && endpoint #don't follow on if the endpoint no longer exists
+    Seek::Config.openbis_enabled && endpoint # don't follow on if the endpoint no longer exists
   end
 
   # overidden to ignore_locked false by default

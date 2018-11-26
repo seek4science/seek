@@ -308,12 +308,11 @@ if automatic synchronization was selected.' }
             end
           end
 
-          #associate with the assay
+          # associate with the assay
           (existing_files | reg_info.created).each do |df|
             assay.associate(df)
           end
         end
-
 
         reg_info
       end
@@ -337,14 +336,14 @@ if automatic synchronization was selected.' }
       end
 
       def extract_requested_assays(entity, sync_options)
-        if sync_options[:link_assays] == '1'
-          sample_ids = entity.sample_ids
-        else
-          sample_ids = (sync_options[:linked_assays] || []) & entity.sample_ids
-        end
+        sample_ids = if sync_options[:link_assays] == '1'
+                       entity.sample_ids
+                     else
+                       (sync_options[:linked_assays] || []) & entity.sample_ids
+                     end
 
         candidates = Seek::Openbis::Zample.new(entity.openbis_endpoint)
-                         .find_by_perm_ids(sample_ids)
+                                          .find_by_perm_ids(sample_ids)
 
         zamples = []
         zamples.concat(filter_assay_like_zamples(candidates, entity.openbis_endpoint)) if sync_options[:link_assays] == '1'
