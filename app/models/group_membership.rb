@@ -27,7 +27,7 @@ class GroupMembership < ApplicationRecord
   end
 
   def remember_previous_person
-    @previous_person_id = person_id_was
+    @previous_person_id = person_id_before_last_save
   end
 
   def queue_update_auth_table
@@ -50,8 +50,8 @@ class GroupMembership < ApplicationRecord
   private
 
   def remove_admin_defined_role_projects
-    project = Project.find_by_id(WorkGroup.find(work_group_id_was).project_id)
-    person = Person.find_by_id(person_id_was)
+    project = Project.find_by_id(WorkGroup.find(work_group_id_before_last_save).project_id)
+    person = Person.find_by_id(person_id_before_last_save)
     if project && person
       Seek::Roles::ProjectRelatedRoles.role_names.each do |role_name|
         person.send("is_#{role_name}=", [false, project])
@@ -61,7 +61,7 @@ class GroupMembership < ApplicationRecord
   end
 
   def destroy_empty_work_group
-    wg = WorkGroup.find_by_id(work_group_id_was)
+    wg = WorkGroup.find_by_id(work_group_id_before_last_save)
 
     wg.destroy if wg && wg.people.empty?
   end
