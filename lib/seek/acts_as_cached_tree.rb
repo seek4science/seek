@@ -20,7 +20,7 @@ module Seek
         if new_record?
           self.ancestors = calculate_ancestors if parent_id
         else
-          if parent_id_changed?
+          if will_save_change_to_parent_id?
             ([self] + descendants).each { |obj| obj.ancestors = obj.calculate_ancestors }
           end
         end

@@ -85,7 +85,7 @@ module Seek
     end
 
     def update_subscription_job_if_study_or_assay
-      if self.is_a?(Study) && self.investigation_id_changed?
+      if self.is_a?(Study) && self.saved_change_to_investigation_id?
         # update subscriptions for study
         old_investigation_id = investigation_id_was
         old_investigation = Investigation.find_by_id old_investigation_id
@@ -96,7 +96,7 @@ module Seek
         assays.each do |assay|
           update_subscriptions_for assay, projects_to_add, projects_to_remove
         end
-      elsif self.is_a?(Assay) && self.study_id_changed?
+      elsif self.is_a?(Assay) && self.saved_change_to_study_id?
         old_study_id = study_id_was
         old_study = Study.find_by_id old_study_id
         projects_to_remove = old_study.nil? ? [] : old_study.projects

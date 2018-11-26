@@ -105,7 +105,7 @@ class ExternalAsset < ActiveRecord::Base
   end
 
   def needs_reindexing
-    content_changed || external_mod_stamp_changed? || new_record?
+    content_changed || saved_change_to_external_mod_stamp? || new_record?
   end
 
   def trigger_reindexing

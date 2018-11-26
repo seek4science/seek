@@ -13,7 +13,7 @@ class Permission < ApplicationRecord
   after_commit :queue_rdf_generation_job
 
   def queue_update_auth_table
-    unless (previous_changes.keys - ["updated_at"]).empty?
+    unless (saved_changes.keys - ["updated_at"]).empty?
       assets = policy.assets
       assets = assets | (Policy.find_by_id(policy_id_was).try(:assets) || []) unless policy_id_was.blank?
       AuthLookupUpdateJob.new.add_items_to_queue assets.compact
@@ -21,7 +21,7 @@ class Permission < ApplicationRecord
   end
 
   def queue_rdf_generation_job
-    unless (previous_changes.keys - ["updated_at"]).empty?
+    unless (saved_changes.keys - ["updated_at"]).empty?
       policy.queue_rdf_generation_job
       Policy.find_by_id(policy_id_was).try(:queue_rdf_generation_job) unless policy_id_was.blank?
     end

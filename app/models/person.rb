@@ -5,7 +5,6 @@ class Person < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::Taggable
   include Seek::Roles::AdminDefinedRoles
-  include ArTransactionChanges # TODO: Remove after Rails 5.2 upgrade
 
   auto_strip_attributes :email, :first_name, :last_name, :web_page
 
@@ -106,7 +105,7 @@ class Person < ApplicationRecord
   end
 
   def queue_update_auth_table
-    if transaction_changed_attributes.keys.include?('roles_mask')
+    if saved_changes.keys.include?('roles_mask')
       AuthLookupUpdateJob.new.add_items_to_queue self
     end
   end

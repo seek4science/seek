@@ -144,6 +144,6 @@ class Settings < ApplicationRecord
   private
 
   def ensure_no_plaintext
-    self[:value] = nil if encrypted_value_changed?
+    self[:value] = nil if will_save_change_to_encrypted_value?
   end
 end

@@ -119,7 +119,6 @@ gem 'rack-attack', '~> 5.0.1'
 gem 'private_address_check'
 
 # Rails 5 upgrade
-gem 'ar_transaction_changes' # TODO: Remove in Rails 5.2 upgrade and use `saved_changes` to access changes from callback
 gem 'rails-html-sanitizer'
 
 # Rails 5.2 upgrade

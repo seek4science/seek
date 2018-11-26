@@ -89,7 +89,7 @@ module Seek
       end
 
       def create_rdf_generation_job(force = false, refresh_dependents = true)
-        unless !force && (changed - %w[updated_at last_used_at]).empty?
+        unless !force && (saved_changes.keys - %w[updated_at last_used_at]).empty?
           RdfGenerationJob.new(self, refresh_dependents).queue_job
         end
       end

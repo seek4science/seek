@@ -106,6 +106,6 @@ class Snapshot < ApplicationRecord
 
   # Need to re-index the parent model to update its' "doi" field
   def reindex_parent_resource
-    ReindexingJob.new.add_items_to_queue(resource) if doi_changed?
+    ReindexingJob.new.add_items_to_queue(resource) if saved_change_to_doi?
   end
 end

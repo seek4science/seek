@@ -36,7 +36,7 @@ class GroupMembership < ApplicationRecord
 
     AuthLookupUpdateJob.new.add_items_to_queue(people.compact.uniq)
 
-    if previous_changes.include?('time_left_at') && project
+    if saved_changes.include?('time_left_at') && project
       ProjectLeavingJob.new(person, project).queue_job(1, self.time_left_at || Time.now)
     end
   end
