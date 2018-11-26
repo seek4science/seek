@@ -299,16 +299,21 @@ if automatic synchronization was selected.' }
                     .select { |es| es.seek_entity.nil? }
                     .map { |es| createObisDataFile(datafile_params.clone, contributor, es) }
 
-        new_files.each do |df|
-          if df.save
-            reg_info.add_created df
-          else
-            reg_info.add_issues df.errors.full_messages
+        User.with_current_user(assay.contributor.user) do
+          new_files.each do |df|
+            if df.save
+              reg_info.add_created df
+            else
+              reg_info.add_issues df.errors.full_messages
+            end
+          end
+
+          #associate with the assay
+          (existing_files | reg_info.created).each do |df|
+            assay.associate(df)
           end
         end
 
-        data_files = existing_files + reg_info.created
-        data_files.each { |df| assay.associate(df) }
 
         reg_info
       end
