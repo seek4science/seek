@@ -158,7 +158,7 @@ group :development do
 end
 
 group :test do
-  gem 'ruby-prof', '>= 0.16.0'
+  gem 'ruby-prof', '0.15.9'
   gem 'test-prof'
   gem 'rails-perftest'
   gem 'minitest', '5.10.3'
