@@ -57,7 +57,7 @@ module Seek
       # FIXME: hard-coded extra types - are are these items now user_creatable?
       # FIXME: remove the reliance on user-creatable, partly by respond_to?(:reindex) but also take into account if it has been enabled or not
       #- could add a searchable? method
-      extras = [Person, Programme, Project, Institution]
+      extras = [Person, Programme, Project, Institution, Organism]
       extras.delete(Programme) unless Seek::Config.programmes_enabled
       cache('searchable_types') { (user_creatable_types | extras).sort_by(&:name) }
     end

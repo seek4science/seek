@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class UtilTest < ActiveSupport::TestCase
-
   test 'creatable types' do
     types = Seek::Util.user_creatable_types
     expected = [DataFile, Document, Model, Presentation, Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain]
@@ -27,7 +26,7 @@ class UtilTest < ActiveSupport::TestCase
 
   test 'searchable types' do
     types = Seek::Util.searchable_types
-    expected = [Assay, DataFile, Document, Event, Institution, Investigation, Model, Person, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study]
+    expected = [Assay, DataFile, Document, Event, Institution, Investigation, Model, Organism, Person, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study]
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map(&:to_s), types.map(&:to_s)
@@ -38,15 +37,13 @@ class UtilTest < ActiveSupport::TestCase
     with_config_value :events_enabled, false do
       Seek::Util.clear_cached
       types = Seek::Util.searchable_types
-      expected = [Assay, DataFile, Document, Institution, Investigation, Model, Person, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study]
-      assert_equal expected.map(&:to_s), types.map(&:to_s)
+      assert_equal (expected - [Event]).map(&:to_s), types.map(&:to_s)
     end
 
     with_config_value :programmes_enabled, false do
       Seek::Util.clear_cached
       types = Seek::Util.searchable_types
-      expected = [Assay, DataFile, Document, Event, Institution, Investigation, Model, Person, Presentation, Project, Publication, Sample, SampleType, Sop, Strain, Study]
-      assert_equal expected.map(&:to_s), types.map(&:to_s)
+      assert_equal (expected - [Programme]).map(&:to_s), types.map(&:to_s)
     end
   end
 
