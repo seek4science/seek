@@ -4,9 +4,9 @@ class ScalableTest < ActiveSupport::TestCase
   def setup
     User.current_user = Factory(:user)
     @model = Factory :model
-    @small_scale = Factory :scale, title: 'small', pos: 1
-    @medium_scale = Factory :scale, title: 'medium', pos: 2
-    @large_scale = Factory :scale, title: 'large', pos: 3
+    @small_scale = Factory :scale, title: 'small', pos: 1, image_name: 'vl-scales/cell.png'
+    @medium_scale = Factory :scale, title: 'medium', pos: 2, image_name: 'vl-scales/liver.png'
+    @large_scale = Factory :scale, title: 'large', pos: 3, image_name: 'vl-scales/organism.png'
   end
 
   test 'models have scales' do
