@@ -1,0 +1,9 @@
+<%
+  parent_id ||= '#openbis-dataset-cards'
+%>
+<%= modal_openbis_file_view('openbis-file-view') %>
+<script>
+    $j( document ).ready(function() {
+        $j('<%="#{parent_id}"%>').on('click', '.view-files-link', OpenBis.showFiles);
+    });
+</script>

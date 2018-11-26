@@ -42,6 +42,10 @@
     background-color: #e8e8e8;
 }
 
+table.spaced td {
+    padding: 0 0.5em;
+}
+
 form#openbis-space-form select#openbis_endpoint_refresh_period_mins {
     max-width: 5em;
 }

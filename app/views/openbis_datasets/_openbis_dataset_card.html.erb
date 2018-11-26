@@ -1,0 +1,50 @@
+<%
+  entity = openbis_dataset_card
+  extra ||= nil
+  extra_params ||= nil
+
+  linking_checkbox ||= false
+  linked ||= []
+  selected ||= []
+  parentType ||= ''
+  is_linked = linked.include?(entity.perm_id)
+  selected_include = selected.include?(entity.perm_id)
+  is_selected = selected_include
+%>
+
+<div class="col-md-3 openbis-card">
+  <div class='panel panel-default'>
+    <div class='openbis-card-heading'>
+       <span>
+        <%= entity.perm_id %>
+       </span>
+    </div>
+    <div class='panel-body'>
+      <%= render partial: 'openbis_common/obis_attr_list', locals: { entity: entity } %>
+      <%= render partial: 'openbis_common/obis_prop_list', locals: { entity: entity } %>
+      <p class="list_item_attribute">
+        <%= openbis_files_modal_link(entity) %>
+      </p>
+      <%= render partial: 'openbis_common/registered_link_item', locals: { entity: entity } %>
+      <p class="list_item_attribute">
+        <%= link_to(entity.registered? ? 'Show/Update' : 'Show/Register', edit_openbis_endpoint_openbis_dataset_path(entity.openbis_endpoint, entity.perm_id)) %>
+      </p>
+
+      <% if linking_checkbox %>
+          <p class="list_item_attribute">
+            <%= check_box_tag('sync_options[linked_datasets][]', entity.perm_id, is_selected,
+                              disabled: is_linked, class: is_linked ? 'linked' : 'unlinked') %>
+            <%# to preserve the manualy selected when already linked, so that tick box is selected between updates %>
+            <%= hidden_field_tag('sync_options[linked_datasets][]', entity.perm_id) if is_selected && is_linked %>
+            <%= label_tag(nil, if is_linked then
+                                 is_selected ? 'manually linked' : 'automatically linked'
+                               else
+                                 "Register with #{parentType}"
+                               end) %>
+          </p>
+      <% end %>
+      <%= render partial: extra, locals: { entity: entity, extra_params: extra_params } if extra %>
+    </div>
+  </div>
+
+</div>

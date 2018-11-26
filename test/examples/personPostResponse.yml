@@ -8,11 +8,8 @@ data:
     description: A person with all possible details
     first_name: Post
     last_name: Last
-    web_page: http://www.website.com
     orcid: http://orcid.org/0000-0001-9842-9718
     mbox_sha1sum: d6b1a16fb3c8678069841a2e47f0f5bdd5103a6e
-    phone: 34-167-552266
-    skype_name: postedSkype
     expertise:
     - modeling
     - programming

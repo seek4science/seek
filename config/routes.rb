@@ -206,21 +206,15 @@ SEEK::Application.routes.draw do
       post :update_members
       post :request_membership
       get :isa_children
+      get :overview
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:search,:organisms, :documents, :only=>[:index]
     resources :openbis_endpoints do
-      member do
-        post :add_dataset
-      end
       collection do
         get :test_endpoint
         get :fetch_spaces
-        get :show_item_count
-        get :show_items
-        get :show_dataset_files
         get :browse
-        post :refresh_metadata_store
       end
     end
     resources :avatars do
@@ -243,6 +237,29 @@ SEEK::Application.routes.draw do
       end
     end
     concerns :has_dashboard, controller: :project_stats
+  end
+
+  resources :openbis_endpoints do
+    get :test_endpoint, on: :member
+    get :fetch_spaces, on: :member
+    get :refresh, on: :member
+    get :reset_fatals, on: :member
+    resources :openbis_experiments do
+      get :refresh, on: :member
+      post :register, on: :member
+      post :batch_register, on: :collection
+    end
+    resources :openbis_zamples do
+      get :refresh, on: :member
+      post :register, on: :member
+      post :batch_register, on: :collection
+    end
+    resources :openbis_datasets do
+      get :refresh, on: :member
+      post :register, on: :member
+      get :show_dataset_files, on: :member
+      post :batch_register, on: :collection
+    end
   end
 
   resources :institutions do
@@ -354,6 +371,8 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications, :documents,:strains, :organisms, :only=>[:index]
   end
 
+  # to be removed as STI does not work in too many places
+  # resources :openbis_assays, controller: 'assays', type: 'OpenbisAssay'
 
    ### ASSAY AND TECHNOLOGY TYPES ###
 

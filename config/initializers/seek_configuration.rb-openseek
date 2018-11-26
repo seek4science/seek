@@ -216,12 +216,16 @@ def load_seek_config_defaults!
   }
   Seek::Config.default :openbis_enabled,false
   Seek::Config.default :openbis_download_limit, 2.gigabytes
+  Seek::Config.default :openbis_debug, false
+  Seek::Config.default :openbis_autosync, true
+  Seek::Config.default :openbis_check_new_arrivals, true
 
   Seek::Config.default :default_license, 'CC-BY-4.0'
 
   Seek::Config.default :nels_api_url, 'https://test-fe.cbu.uib.no/nels-api'
   Seek::Config.default :nels_oauth_url, 'https://test-fe.cbu.uib.no/oauth2'
   Seek::Config.default :nels_permalink_base, 'https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml'
+  Seek::Config.default :nels_use_dummy_client, false
 end
 
 SEEK::Application.configure do

@@ -1,0 +1,3 @@
+{"datasets":[
+  {"dataset_type":{"code":"TZ_FAIR_TEST","description":"For testing API with full metadata"},"modificationDate":"2017-10-04 17:28:24.719729","registerator":"apiuser","code":"20171004182824553-41","modifier":"apiuser","permId":"20171004182824553-41","registrationDate":"2017-10-04 17:28:24.719729","sample":"20171002172111346-37","properties":{"DESCRIPTION":"Not connected","NAME":"Third one"},"samples":["20171002172111346-37"],"tags":[]}
+]}

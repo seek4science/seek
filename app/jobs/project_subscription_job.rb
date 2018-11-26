@@ -46,7 +46,7 @@ class ProjectSubscriptionJob < SeekJob
   def subscribable_types_with_association_table
     # assay and study dont have project association table
     names = Seek::Util.persistent_classes.select(&:subscribable?).collect(&:name)
-    names.reject { |name| name == 'Assay' || name == 'Study' }
+    names.reject { |name| name == 'Assay' || name == 'Study' || name == 'OpenbisAssay' }
   end
 
   def assets_for_project(project, asset_type, assets_projects_table)

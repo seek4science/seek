@@ -27,7 +27,7 @@
     <% if Seek::Config.tagging_enabled %>
         <div id="sidebar_tag_cloud">
           <% cache 'sidebar_tag_cloud', skip_digest: true do -%>
-              <%#= render :partial=>"gadgets/tag_cloud_gadget" %>
+              <%= render :partial=>"gadgets/tag_cloud_gadget" %>
           <% end -%>
         </div>
     <% end %>
