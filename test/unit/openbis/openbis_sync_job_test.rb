@@ -43,28 +43,30 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
       assert mod < asset.updated_at
 
       mod = asset.updated_at
-      travel 1.seconds do
-        # update with same value
-        asset.sync_state = :failed
-        assert asset.save
+    end
 
-        assert mod == asset.updated_at
-        asset.touch
-        asset = ExternalAsset.find(asset.id)
-        assert mod < asset.updated_at
+    travel 2.seconds do
+      # update with same value
+      asset.sync_state = :failed
+      assert asset.save
 
-        mod = asset.updated_at
-        travel 1.seconds do
-          assert asset.save
+      assert mod == asset.updated_at
+      asset.touch
+      asset = ExternalAsset.find(asset.id)
+      assert mod < asset.updated_at
 
-          assert mod == asset.updated_at
-          asset.touch
-          asset = ExternalAsset.find(asset.id)
-          assert mod < asset.updated_at
+      mod = asset.updated_at
+    end
 
-          mod = asset.updated_at
-        end
-      end
+    travel 3.seconds do
+      assert asset.save
+
+      assert mod == asset.updated_at
+      asset.touch
+      asset = ExternalAsset.find(asset.id)
+      assert mod < asset.updated_at
+
+      mod = asset.updated_at
     end
   end
 
@@ -353,16 +355,16 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
       asset.reload
       assert mod < asset.updated_at
 
-      travel 1.second do
-        mod = asset.updated_at
+    end
+    travel 2.second do
+      mod = asset.updated_at
 
-        User.with_current_user(nil) do
-          @job.perform_job(asset)
-        end
-
-        asset.reload
-        assert mod < asset.updated_at
+      User.with_current_user(nil) do
+        @job.perform_job(asset)
       end
+
+      asset.reload
+      assert mod < asset.updated_at
     end
   end
 
@@ -400,17 +402,17 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
       assert asset.failed?
       assert asset.err_msg
       assert mod < asset.updated_at
+    end
 
-      travel 1.second do
-        mod = asset.updated_at
-        User.with_current_user(nil) do
-          @job.perform_job(asset)
-        end
-        asset.reload
-        assert asset.failed?
-        assert asset.err_msg
-        assert mod < asset.updated_at
+    travel 2.second do
+      mod = asset.updated_at
+      User.with_current_user(nil) do
+        @job.perform_job(asset)
       end
+      asset.reload
+      assert asset.failed?
+      assert asset.err_msg
+      assert mod < asset.updated_at
     end
   end
 
