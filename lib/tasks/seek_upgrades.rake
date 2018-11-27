@@ -13,7 +13,7 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
-
+    db:seed:model_formats
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
