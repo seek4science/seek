@@ -49,12 +49,7 @@ Factory.define :scale do |f|
   f.sequence(:title) { |n| "scale #{n}" }
   f.sequence(:pos) { |n| n }
   f.sequence(:key) { |n| "scale_key_#{n}" }
-  f.image_name { %w(airprom/small-airway.jpg airprom/aveoli.jpg airprom/lung.jpg airprom/aveoli.png
-                    airprom/structural-cells.png airprom/genomics.jpg airprom/sub-cellular.jpg
-                    airprom/inflammatory-cells.jpg airprom/airprom.png airprom/organism.jpg airprom/all.jpg
-                    airprom/large-airway.png style_images/ui-icons_222222_256x240.png
+  f.sequence(:image_name) { |n| %w(style_images/ui-icons_222222_256x240.png
                     style_images/ui-bg_flat_75_ffffff_40x100.png style_images/ui-icons_888888_256x240.png
-                    style_images/ui-bg_glass_75_e6e6e6_1x400.png style_images/ui-icons_454545_256x240.png
-                    vl-scales/cell.png vl-scales/liver.png vl-scales/all.png vl-scales/intercellular.png
-                    vl-scales/organism.png vl-scales/liverLobule.jpg).sample }
+                    style_images/ui-bg_glass_75_e6e6e6_1x400.png style_images/ui-icons_454545_256x240.png)[(n % 5) - 1] }
 end
