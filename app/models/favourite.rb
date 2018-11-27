@@ -18,8 +18,8 @@ class Favourite < ApplicationRecord
   private
 
   def destroy_saved_search
-    if resource_type_before_last_save == 'SavedSearch'
-      SavedSearch.find(resource_id_before_last_save).destroy
+    if resource_type == 'SavedSearch'
+      SavedSearch.find(resource_id).try(:destroy)
     end
   end
 end

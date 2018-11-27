@@ -13,7 +13,7 @@ class ScalesControllerTest < ActionController::TestCase
   end
 
   test 'search' do
-    get :search, xhr: true, scale_type: 'organism'
+    get :search, xhr: true, params: { scale_type: 'organism' }
     assert_response :success
   end
 end

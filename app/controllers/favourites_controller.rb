@@ -27,8 +27,7 @@ class FavouritesController < ApplicationController
   def delete
     f = Favourite.find(params[:id])
 
-    if f.user == current_user
-      f.destroy
+    if f.user == current_user && f.destroy
       render partial: 'favourites/gadget_list'
     else
       head :unprocessable_entity
