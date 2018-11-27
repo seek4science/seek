@@ -1,6 +1,5 @@
 class Organism < ApplicationRecord
   include Seek::Rdf::RdfGeneration
-  include Seek::ProgrammeCompat
 
   acts_as_favouritable
   grouped_pagination
@@ -15,6 +14,7 @@ class Organism < ApplicationRecord
   has_many :samples, through: :strains
 
   has_and_belongs_to_many :projects
+  has_many :programmes, through: :projects
 
   before_validation :convert_concept_uri
 
