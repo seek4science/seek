@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'openbis_test_helper'
 
-class OpenbisSynJobTest < ActiveSupport::TestCase
+class OpenbisSyncJobTest < ActiveSupport::TestCase
   def setup
     Factory :experimental_assay_class
     mock_openbis_calls
@@ -293,7 +293,9 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     assert asset.save
     old = asset.synchronized_at
 
-    @job.perform_job(asset)
+    User.with_current_user(nil) do
+      @job.perform_job(asset)
+    end
 
     asset.reload
     assert_equal old.to_date, asset.synchronized_at.to_date
@@ -314,15 +316,16 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
 
     assert asset.save
 
-    assert assay.can_edit?
-
-    @job.perform_job(asset)
+    User.with_current_user(nil) do
+      @job.perform_job(asset)
+    end
 
     asset.reload
     assay.reload
 
     assert asset.synchronized?
     assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
+
     refute_empty assay.data_files
     assert_equal zample.dataset_ids.length, assay.data_files.length
   end
@@ -342,13 +345,21 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
 
     travel 1.second do
       mod = asset.updated_at
-      @job.perform_job(asset)
+
+      User.with_current_user(nil) do
+        @job.perform_job(asset)
+      end
+
       asset.reload
       assert mod < asset.updated_at
 
       travel 1.second do
         mod = asset.updated_at
-        @job.perform_job(asset)
+
+        User.with_current_user(nil) do
+          @job.perform_job(asset)
+        end
+
         asset.reload
         assert mod < asset.updated_at
       end
@@ -382,7 +393,9 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
 
     travel 1.second do
       mod = asset.updated_at
-      @job.perform_job(asset)
+      User.with_current_user(nil) do
+        @job.perform_job(asset)
+      end
       asset.reload
       assert asset.failed?
       assert asset.err_msg
@@ -390,7 +403,9 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
 
       travel 1.second do
         mod = asset.updated_at
-        @job.perform_job(asset)
+        User.with_current_user(nil) do
+          @job.perform_job(asset)
+        end
         asset.reload
         assert asset.failed?
         assert asset.err_msg
@@ -426,7 +441,9 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
 
     assert asset.save
 
-    @job.perform_job(asset)
+    User.with_current_user(nil) do
+      @job.perform_job(asset)
+    end
     asset.reload
 
     assert asset.fatal?

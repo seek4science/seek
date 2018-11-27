@@ -299,16 +299,20 @@ if automatic synchronization was selected.' }
                     .select { |es| es.seek_entity.nil? }
                     .map { |es| createObisDataFile(datafile_params.clone, contributor, es) }
 
-        new_files.each do |df|
-          if df.save
-            reg_info.add_created df
-          else
-            reg_info.add_issues df.errors.full_messages
+        User.with_current_user(assay.contributor.user) do
+          new_files.each do |df|
+            if df.save
+              reg_info.add_created df
+            else
+              reg_info.add_issues df.errors.full_messages
+            end
+          end
+
+          # associate with the assay
+          (existing_files | reg_info.created).each do |df|
+            assay.associate(df)
           end
         end
-
-        data_files = existing_files + reg_info.created
-        data_files.each { |df| assay.associate(df) }
 
         reg_info
       end
@@ -332,14 +336,14 @@ if automatic synchronization was selected.' }
       end
 
       def extract_requested_assays(entity, sync_options)
-        if sync_options[:link_assays] == '1'
-          sample_ids = entity.sample_ids
-        else
-          sample_ids = (sync_options[:linked_assays] || []) & entity.sample_ids
-        end
+        sample_ids = if sync_options[:link_assays] == '1'
+                       entity.sample_ids
+                     else
+                       (sync_options[:linked_assays] || []) & entity.sample_ids
+                     end
 
         candidates = Seek::Openbis::Zample.new(entity.openbis_endpoint)
-                         .find_by_perm_ids(sample_ids)
+                                          .find_by_perm_ids(sample_ids)
 
         zamples = []
         zamples.concat(filter_assay_like_zamples(candidates, entity.openbis_endpoint)) if sync_options[:link_assays] == '1'

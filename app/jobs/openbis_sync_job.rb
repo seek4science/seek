@@ -67,7 +67,7 @@ class OpenbisSyncJob < SeekJob
   def follow_on_delay
     needed = need_sync.count
     Rails.logger.info "OBis syn will follow with #{needed} items" if DEBUG
-    return 1.seconds if need_sync.count > 0
+    return 1.seconds if need_sync.count.positive?
 
     if endpoint
       endpoint.refresh_period_mins.minutes
