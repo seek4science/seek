@@ -5,6 +5,8 @@ module Seek
     # NOTE: the provided params collection will not be affected.
     # Instead, a new hash will be returned.
     def self.remove_rails_special_params_from(params, additional_to_remove = [])
+      # TODO: Refactor me to use strong param filtering
+      params = params.to_unsafe_h if params.is_a?(ActionController::Parameters)
       return {} if params.blank?
 
       special_params = %w[id format controller action commit].concat(additional_to_remove)
