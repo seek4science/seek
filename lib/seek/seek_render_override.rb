@@ -46,7 +46,7 @@ module ActionView
           options[:partial] = options[:seek_partial]
         else
           if value.blank?
-            options[:text] = ''
+            options[:plain] = ''
           else
             options[:partial] = value.to_s
           end
