@@ -33,8 +33,10 @@
             <li><%= link_to t("model"), new_model_path %></li>
         <% end %>
         <li><%= link_to t("sop"), new_sop_path %></li>
-        <li><%= link_to t("workflow"), new_workflow_path %></li>
-        <li><%= link_to t("node"), new_node_path %></li>
+        <% if Seek::Config.workflows_enabled %>
+          <li><%= link_to t("workflow"), new_workflow_path %></li>
+          <li><%= link_to t("node"), new_node_path %></li>
+        <% end %>
         <li><%= link_to t("publication"), new_publication_path %></li>
         <li><%= link_to t("document"), new_document_path %></li>
 

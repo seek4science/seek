@@ -16,12 +16,12 @@ en:
   document: "Document"
   model: "Model"
   sop: "SOP"
-  workflow: "IBISBA Workflow"
+  workflow: "Workflow"
   workflows:
-    workflow: "IBISBA Workflow"
-  node: "IBISBA Workflow Node"
+    workflow: "Workflow"
+  node: "Workflow Node"
   nodes:
-    node: "IBISBA Workflow Node"
+    node: "Workflow Node"
   publication: "Publication"
   presentation: "Presentation"
   event: "Event"

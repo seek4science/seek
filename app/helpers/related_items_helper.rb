@@ -155,6 +155,9 @@ module RelatedItemsHelper
       total_count = res[:items].size
       if key == 'Project' || key == 'Institution' || key == 'SampleType'
         res[:hidden_count] = 0
+      elsif (key == 'Workflow' || key == 'Node') && !Seek::Config.workflows_enabled
+        res[:items] = []
+        res[:hidden_count] = 0
       elsif key == 'Person'
         if Seek::Config.is_virtualliver && User.current_user.nil?
           res[:items] = []

@@ -36,7 +36,11 @@
                              'Help URL', "This is the URL for the external help e.g #{Seek::Config.default_external_help_url}.") %>
     </div>
 
-    <h2>Integrations</h2>
+  <%= admin_checkbox_setting(:workflows_enabled, 1, Seek::Config.workflows_enabled,
+                             "Workflows enabled",
+                             "Whether the Workflow framework is enabled.") %>
+
+  <h2>Integrations</h2>
     <%= admin_checkbox_setting(:jws_enabled, 1, Seek::Config.jws_enabled,
                                "JWS Online enabled", "Whether integration with JWS Online is enabled. Enabling this allows simulation of SBML models with JWS Online.",
                                :onchange=>toggle_appear_javascript('jws_online_details')) %>

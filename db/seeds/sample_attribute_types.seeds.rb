@@ -46,6 +46,11 @@ metanetx_compartment_type = SampleAttributeType.find_or_initialize_by(title:'Met
 metanetx_compartment_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: 'MNX[CD]\\d+',
                                 resolution:'http://identifiers.org/metanetx.compartment/\\0')
 
+inchi_type = SampleAttributeType.find_or_initialize_by(title:'InChI')
+inchi_type.update_attributes(base_type: Seek::Samples::BaseType::STRING,
+                             regexp: '^InChI\\=1S?\\/[A-Za-z0-9\\.]+(\\+[0-9]+)?(\\/[cnpqbtmsih][A-Za-z0-9\\-\\+\\(\\)\\,\\/\\?\\;\\.]+)*$',
+                             resolution:'http://identifiers.org/inchi/\\0')
+
 
 bool_type = SampleAttributeType.find_or_initialize_by(title:'Boolean')
 bool_type.update_attributes(base_type: Seek::Samples::BaseType::BOOLEAN)
