@@ -114,6 +114,19 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal [prog], project.programmes
   end
 
+  test 'create project with start and end dates' do
+    person = Factory(:admin)
+    login_as(person)
+
+    assert_difference('Project.count') do
+      post :create, project: { title: 'proj with dates', start_date:'2018-11-01', end_date:'2018-11-18' }
+    end
+
+    project = assigns(:project)
+    assert_equal Date.parse('2018-11-01'), project.start_date
+    assert_equal Date.parse('2018-11-18'), project.end_date
+  end
+
   test 'create project with blank programme' do
     login_as(Factory(:admin))
 
