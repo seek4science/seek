@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181102134542) do
+ActiveRecord::Schema.define(version: 20181128142428) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -1040,8 +1040,8 @@ ActiveRecord::Schema.define(version: 20181102134542) do
     t.string   "space_perm_id",         limit: 255
     t.string   "username",              limit: 255
     t.integer  "project_id",            limit: 4
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "dss_endpoint",          limit: 255
     t.string   "web_endpoint",          limit: 255
     t.integer  "refresh_period_mins",   limit: 4,     default: 120
@@ -1248,6 +1248,8 @@ ActiveRecord::Schema.define(version: 20181102134542) do
     t.integer  "parent_id",          limit: 4
     t.string   "default_license",    limit: 255,   default: "CC-BY-4.0"
     t.boolean  "use_default_policy",               default: false
+    t.date     "start_date"
+    t.date     "end_date"
   end
 
   create_table "projects_publications", id: false, force: :cascade do |t|
