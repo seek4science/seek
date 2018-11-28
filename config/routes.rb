@@ -619,7 +619,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       get :isa_children
     end
-    resources :people,:projects,:assays, :studies, :investigations, :data_files, :publications, only:[:index]
+    resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples, only:[:index]
   end
 
   ### SAMPLE TYPES ###
