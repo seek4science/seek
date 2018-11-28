@@ -1651,6 +1651,30 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal false, project.nels_enabled
   end
 
+  test 'start date overrides creation date in show page' do
+    p = Factory(:project,start_date:nil, end_date:nil)
+
+    get :show, id:p.id
+    assert_select "p strong",text:'Project created:',count:1
+    assert_select "p strong",text:'Project start date:',count:0
+    assert_select "p strong",text:'Project end date:',count:0
+
+    p = Factory(:project,start_date:DateTime.now, end_date:DateTime.now + 1.day)
+
+    get :show, id:p.id
+    assert_select "p strong",text:'Project created:',count:0
+    assert_select "p strong",text:'Project start date:',count:1
+    assert_select "p strong",text:'Project end date:',count:1
+
+    # end date hidden if not set
+    p = Factory(:project,start_date:DateTime.now, end_date:nil)
+
+    get :show, id:p.id
+    assert_select "p strong",text:'Project created:',count:0
+    assert_select "p strong",text:'Project start date:',count:1
+    assert_select "p strong",text:'Project end date:',count:0
+  end
+
   private
 
   def edit_max_object(project)
