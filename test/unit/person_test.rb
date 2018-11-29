@@ -203,17 +203,17 @@ class PersonTest < ActiveSupport::TestCase
       assert p.valid?
       p.save!
       p.reload
-      assert_equal 'http://orcid.org/0000-0003-2130-0865', p.orcid_uri
+      assert_equal 'https://orcid.org/0000-0003-2130-0865', p.orcid_uri
 
       p.orcid = '0000-0002-1694-233X'
       p.save!
       p.reload
-      assert_equal 'http://orcid.org/0000-0002-1694-233X', p.orcid_uri
+      assert_equal 'https://orcid.org/0000-0002-1694-233X', p.orcid_uri
 
       p.orcid = 'https://orcid.org/0000-0002-1694-233X'
       p.save!
       p.reload
-      assert_equal 'http://orcid.org/0000-0002-1694-233X', p.orcid_uri
+      assert_equal 'https://orcid.org/0000-0002-1694-233X', p.orcid_uri
 
       p.orcid = nil
       p.save!
@@ -227,17 +227,10 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
-  test 'orcid https uri' do
-    p = Factory :person, orcid: 'http://orcid.org/0000-0003-2130-0865'
-    assert_equal 'https://orcid.org/0000-0003-2130-0865', p.orcid_https_uri
-
-    p = Factory :person
-    assert_nil p.orcid_https_uri
-  end
 
   test 'orcid display format' do
     p = Factory :person, orcid: 'http://orcid.org/0000-0003-2130-0865'
-    assert_equal 'orcid.org/0000-0003-2130-0865', p.orcid_display_format
+    assert_equal 'https://orcid.org/0000-0003-2130-0865', p.orcid_display_format
 
     p = Factory :person
     assert_nil p.orcid_display_format
@@ -1106,9 +1099,9 @@ class PersonTest < ActiveSupport::TestCase
     https_orcid = Factory :brand_new_person, email: 'FISH-sOup3@email.com',
                                              orcid: 'https://orcid.org/0000-0002-0048-3300'
 
-    assert_equal 'http://orcid.org/0000-0002-0048-3300', semi_orcid.orcid
-    assert_equal 'http://orcid.org/0000-0002-0048-3300', full_orcid.orcid
-    assert_equal 'http://orcid.org/0000-0002-0048-3300', https_orcid.orcid
+    assert_equal 'https://orcid.org/0000-0002-0048-3300', semi_orcid.orcid
+    assert_equal 'https://orcid.org/0000-0002-0048-3300', full_orcid.orcid
+    assert_equal 'https://orcid.org/0000-0002-0048-3300', https_orcid.orcid
   end
 
   test 'can flag has having left a project' do
