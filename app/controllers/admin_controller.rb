@@ -376,8 +376,6 @@ class AdminController < ApplicationController
       partial = 'user_stats_list'
       collection = Person.pals
       title = 'List of PALs'
-    when 'administrators'
-      partial = 'admin_selection'
     when 'none'
       partial = 'none'
     end
