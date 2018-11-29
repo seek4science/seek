@@ -12,7 +12,7 @@ changes = {
 
 changes.keys.each do |change|
   if (format = ModelFormat.find_by(title:change))
-    format.update_attribute(:title,changes[change])
+    format.update_column(:title,changes[change])
   end
 end
 
