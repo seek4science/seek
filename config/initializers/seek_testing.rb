@@ -16,7 +16,7 @@ SEEK::Application.configure do
       Settings.defaults[:jws_online_root] = "http://jws.sysmo-db.org"
       Settings.defaults[:internal_help_enabled] = false
       Settings.defaults[:external_help_url] = "http://seek4science.github.io/seek/help"
-      Settings.defaults[:workflows_enabled] = false
+      Settings.defaults[:workflows_enabled] = true
 
       Settings.defaults[:email_enabled] = true
       Settings.defaults[:solr_enabled] = false
