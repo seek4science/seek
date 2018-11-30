@@ -7,7 +7,8 @@ titles = YAML.load_file(File.join(Rails.root, 'config/default_data/model_formats
 changes = {
     "Field Modelling Markup Language (FieldML)" => "FieldML",
     "KEGG Markup Language (KGML)" => "KGML",
-    "VCell" => "Virtual Cell Markup Language (VCML)"
+    "VCell" => "Virtual Cell Markup Language (VCML)",
+    "MathML/Smile" => "MathML"
 }
 
 changes.keys.each do |change|

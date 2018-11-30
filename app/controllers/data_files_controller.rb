@@ -364,6 +364,7 @@ class DataFilesController < ApplicationController
   # @assay
   def rightfield_extraction_ajax
     @data_file = DataFile.new
+    @assay = Assay.new
     @warnings = nil
     critical_error_msg = nil
     session.delete :extraction_exception_message
