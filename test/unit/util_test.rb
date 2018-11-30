@@ -26,7 +26,7 @@ class UtilTest < ActiveSupport::TestCase
 
   test 'searchable types' do
     types = Seek::Util.searchable_types
-    expected = [Assay, DataFile, Document, Event, Institution, Investigation, Model, Organism, Person, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study]
+    expected = ["Assay", "DataFile", "Document", "Event", "Institution", "Investigation", "Model", "Node", "Organism", "Person", "Presentation", "Programme", "Project", "Publication", "Sample", "SampleType", "Sop", "Strain", "Study", "Workflow"]
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort
