@@ -13,10 +13,10 @@
     possible_projects = Project.all
   else
     possible_projects = []
-    possible_projects |= User.current_user.person.projects
+    possible_projects |= User.current_user.person.current_projects
     if resource
       possible_projects |= resource.projects
-      possible_projects |= resource.contributor.projects if resource.respond_to?(:contributor) && resource.contributor
+      possible_projects |= resource.contributor.current_projects if resource.respond_to?(:contributor) && resource.contributor
     end
   end
 
