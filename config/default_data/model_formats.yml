@@ -37,6 +37,9 @@ SBML:
 SciLab:
   title: SciLab
 
+Simile:
+  title: "Simile XML v3"
+
 SVG:
   title: SVG
 
@@ -52,8 +55,8 @@ XPP:
 Copasi:
   title: Copasi
 
-MathMLSmile:
-  title: "MathML/Smile"
+MathML:
+  title: "MathML"
 
 XGMML:
   title: XGMML
