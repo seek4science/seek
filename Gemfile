@@ -29,7 +29,11 @@ gem 'prototype-rails', git: 'https://github.com/rails/prototype-rails', branch: 
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'linkeddata'
+
 gem 'openseek-api'
+# for fancy content escaping in openbis integration
+gem 'loofah'
+
 gem 'jbuilder', '~> 2.0'
 gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'

@@ -37,6 +37,34 @@ class ProjectTest < ActiveSupport::TestCase
     disable_authorization_checks {p.save!}
   end
 
+  test 'validate start and end date' do
+    # if start and end date are defined, then the end date must be later
+    p = Factory(:project,start_date:nil, end_date:nil)
+    assert p.valid?
+
+    #just an end date
+    p.end_date = DateTime.now
+    assert p.valid?
+
+    #start date in the future
+    p.start_date = DateTime.now + 1.day
+    refute p.valid?
+
+    #start date in the past
+    p.start_date = 1.day.ago
+    assert p.valid?
+
+    # no end date
+    p.start_date = DateTime.now + 1.day
+    p.end_date = nil
+    assert p.valid?
+
+    # future start and end dates are fine as long as end is later
+    p.start_date = DateTime.now + 1.day
+    p.end_date = DateTime.now + 2.day
+    assert p.valid?
+  end
+
   test 'to_rdf' do
     object = Factory :project, web_page: 'http://www.sysmo-db.org',
                                organisms: [Factory(:organism), Factory(:organism)]

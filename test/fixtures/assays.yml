@@ -155,3 +155,12 @@ assay_with_suggested_assay_type:
   study: metabolomics_study2
   assay_class: experimental_assay_class
   policy: policy_for_viewable_data_file
+
+openbis_assay1:
+  title: Openbis Sample Assay
+  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
+  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
+  study: junk_study
+  contributor: person_for_model_owner
+  assay_class: experimental_assay_class
+  policy: policy_for_viewable_data_file

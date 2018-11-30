@@ -1,0 +1,49 @@
+<%
+  entity = openbis_zample_card
+  extra ||= nil
+  extra_params ||= nil
+
+  linking_checkbox ||= false
+  linked ||= []
+  selected ||= []
+  parentType ||= ''
+  is_linked = linked.include?(entity.perm_id)
+  is_selected = selected.include?(entity.perm_id)
+
+%>
+<div class="col-md-3 openbis-card">
+  <div class='panel panel-default'>
+    <div class='openbis-card-heading'>
+       <span>
+        <%= entity.perm_id %>
+       </span>
+    </div>
+    <div class='panel-body'>
+      <%= render partial: 'openbis_common/obis_attr_list', locals: { entity: entity } %>
+      <%= render partial: 'openbis_common/obis_prop_list', locals: { entity: entity } %>
+
+      <% if entity.dataset_ids %>
+          <%= list_item_attribute('Datasets', text_or_not_specified(entity.dataset_ids.join(', '), none_text: 'None')) %>
+      <% end %>
+      <%= render partial: 'openbis_common/registered_link_item', locals: { entity: entity } %>
+
+      <%= link_to('Show/Register', edit_openbis_endpoint_openbis_zample_path(@openbis_endpoint, entity.perm_id, seek: seek_type)) %>
+
+      <% if linking_checkbox %>
+          <p class="list_item_attribute">
+            <%= check_box_tag('sync_options[linked_assays][]', entity.perm_id, is_selected,
+                              disabled: is_linked, class: is_linked ? 'linked' : 'unlinked') %>
+            <%# to preserve the manualy selected when already linked, so that tick box is selected between updates %>
+            <%= hidden_field_tag('sync_options[linked_assays][]', entity.perm_id) if is_selected && is_linked %>
+            <%= label_tag(nil, if is_linked then
+                                 is_selected ? 'manually linked' : 'automatically linked'
+                               else
+                                 "Register with #{parentType}"
+                               end) %>
+          </p>
+      <% end %>
+      <%= render partial: extra, locals: { entity: entity, extra_params: extra_params } if extra %>
+    </div>
+  </div>
+
+</div>

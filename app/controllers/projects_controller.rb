@@ -8,7 +8,7 @@ class ProjectsController < ApplicationController
   include ApiHelper
 
   before_filter :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
-                                               admin_member_roles update_members storage_report request_membership]
+                                               admin_member_roles update_members storage_report request_membership overview]
   before_filter :find_assets, only: [:index]
   before_filter :auth_to_create, only: %i[new create]
   before_filter :is_user_admin_auth, only: %i[manage destroy]
@@ -310,6 +310,10 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def overview
+
+  end
+
   private
 
   def project_role_params
@@ -326,7 +330,7 @@ class ProjectsController < ApplicationController
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, :programme_id, { organism_ids: [] },
                         { institution_ids: [] }, :default_license, :site_root_uri, :site_username, :site_password,
-                        :parent_id, :use_default_policy, :nels_enabled]
+                        :parent_id, :use_default_policy, :nels_enabled, :start_date, :end_date]
 
     if action_name == 'update'
       restricted_params =

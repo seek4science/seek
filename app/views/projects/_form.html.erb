@@ -22,6 +22,20 @@
   <%= f.text_area :description, :rows => 5, :class=>"form-control" -%>
 </div>
 
+<div class="form-group">
+  <div class="row">
+    <div class="col-md-2">
+    <%= f.label :start_date %>
+    <%= f.text_field :start_date, data: { calendar: 'day' }, class: 'calendar form-control' %>
+    </div>
+    <div class="col-md-2">
+    <%= f.label :end_date %>
+    <%= f.text_field :end_date, data: { calendar: 'day' }, class: 'calendar form-control' %>
+    </div>
+  </div>
+
+</div>
+
 <% if Seek::Config.project_hierarchy_enabled -%>
     <div class="form-group">
       <%= f.label "Parent" -%>

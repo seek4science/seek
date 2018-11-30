@@ -1,0 +1,66 @@
+<div class="modal" role="dialog" tabindex="-1" id="openbis_batch_parent-view" size="xl"
+     data-role="modal_openbis_batch_parent" style="display: none;">
+
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">Select parent for registration</h4>
+      </div>
+
+      <div class="modal-body">
+
+        <%= form_tag do |f| %>
+            <div class="form-group">
+              <label>Register under Investigation </label><span class="required">*</span>
+              <%= render :partial=>"studies/investigation_list",
+                         :locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects},
+                                   :study => Study.new} %>
+
+            </div>
+            <div class="form-group">
+              <%= check_box_tag('link_dependent', 1, true) %>
+              <%= label_tag('link_dependent', 'Automatically recognize dependent entities') %>
+              <div class="help-block">OpenBis entities that can be recognized as Assays or DataSets will be also registered
+              </div>
+            </div>
+            <div class="form-group">
+              <%= check_box_tag('new_arrivals', 1, false, disabled: disable_new_arrivals) %>
+              <%= label_tag('new_arrivals', "Periodically check for new entries #{' (disabled by admin)' if disable_new_arrivals}") %>
+              <div class="help-block">
+                During periodic synchronization new OpenBIS datasets and assays will be linked
+                (it only works if automatic recognition is selected).
+                Use with caution, leave it if you don't expect new entries as it has significant performance impact.
+              </div>
+            </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        <button class="btn btn-primary" onclick="set_registration_parameters()">Register selected</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+    function set_registration_parameters() {
+
+        if ($j('#study_investigation_id').val() > 0) {
+            $j('#seek_parent').val($j('#study_investigation_id').val());
+            $j('#sync_options_link_dependent').val($j('#link_dependent').prop("checked") ? '1' : undefined);
+            $j('#sync_options_new_arrivals').val($j('#new_arrivals').prop("checked") ? '1' : undefined);
+            $j('#openbis_batch_parent-view').modal('hide');
+            if($j('#batch_form input:checkbox:checked').length > 0) {
+                $j('#batch_form').submit();
+            } else {
+                alert('First select elements for batch registration');
+            }
+        } else {
+            alert('Select the parent element');
+        }
+    }
+
+
+</script>

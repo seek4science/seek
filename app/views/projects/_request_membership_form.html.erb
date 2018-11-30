@@ -2,14 +2,15 @@
     <%= modal_header("Request #{t('project')} membership") %>
     <%= modal_body do %>
         <div class="form-group">
-          <%= form_tag(polymorphic_url(project, :action => :request_membership),method: :post,id: 'request-membership-form') do -%>
+          <%= form_tag(polymorphic_url(project, :action => :request_membership), method: :post, id: 'request-membership-form') do -%>
 
               <p>
-                An email will be sent to <%= join_with_and(project.project_administrators.collect{|m| h(m.name)}) -%> to let them know of your interest.<br/>
+                An email will be sent to <%= join_with_and(project.project_administrators.collect { |m| h(m.name) }) -%>
+                to let them know of your interest.<br/>
                 Please provide some extra information you feel may be useful to your request.
               </p>
               <p>
-                <%=  text_area_tag :details,'',:rows=>10,class: 'form-control' %>
+                <%= text_area_tag :details, '', :rows => 10, class: 'form-control' %>
               </p>
               <p>
                 <em>A request can only be made once every <%= (MessageLog::RECENT_PERIOD / 3600).to_i %> hours</em>
@@ -27,7 +28,7 @@
     $j(document).ready(function () {
 
         $j('#submit_request_membership').click(function () {
-           $j('form#request-membership-form').submit();
+            $j('form#request-membership-form').submit();
         });
     });
 

@@ -46,9 +46,7 @@ class PublicationsController < ApplicationController
         begin
           send_data @publication.export(request.format.to_sym), type: request.format.to_sym, filename: "#{@publication.title}.#{request.format.to_sym}"
         rescue StandardError => exception
-          if Seek::Config.exception_notification_enabled
-            ExceptionNotifier.notify_exception(exception, data: { message: "Error exporting publication as #{request.format}" })
-          end
+          forward_exception_notification(exception, { message: "Error exporting publication as #{request.format}" })
 
           flash[:error] = "There was a problem communicating with PubMed to generate the requested #{request.format.to_sym.to_s.upcase}."
           redirect_to @publication
@@ -287,9 +285,7 @@ class PublicationsController < ApplicationController
         raise exception unless Rails.env.production?
         result ||= Bio::Reference.new({})
         @error = 'There was a problem contacting the PubMed query service. Please try again later'
-        if Seek::Config.exception_notification_enabled
-          ExceptionNotifier.notify_exception(exception, data: { message: "Problem accessing ncbi using pubmed id #{pubmed_id}" })
-        end
+        forward_exception_notification(exception, { message: "Problem accessing ncbi using pubmed id #{pubmed_id}" })
       end
     elsif doi
       begin
@@ -303,9 +299,7 @@ class PublicationsController < ApplicationController
         @error = 'The DOI you entered could not be resolved.'
       rescue RuntimeError => exception
         @error = 'There was an problem contacting the DOI query service. Please try again later'
-        if Seek::Config.exception_notification_enabled
-          ExceptionNotifier.notify_exception(exception, data: { message: "Problem accessing crossref using DOI #{doi}" })
-        end
+        forward_exception_notification(exception, { message: "Problem accessing crossref using DOI #{doi}" })
       end
     end
     result

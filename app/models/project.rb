@@ -70,6 +70,8 @@ class Project < ActiveRecord::Base
   validates :title, length: { maximum: 255 }
   validates :description, length: { maximum: 65_535 }
 
+  validate :validate_end_date
+
   # a default policy belonging to the project; this is set by a project PAL
   # if the project gets deleted, the default policy needs to be destroyed too
   # (no links to the default policy will be made from elsewhere; instead, when
@@ -309,6 +311,10 @@ class Project < ActiveRecord::Base
         project_administrators.any? &&
         !has_member?(user) &&
         MessageLog.recent_project_membership_requests(user.try(:person),self).empty?
+  end
+
+  def validate_end_date
+    errors.add(:end_date, 'is before start date.') unless end_date.nil? || start_date.nil? || end_date >= start_date
   end
 
   # should put below at the bottom in order to override methods for hierarchies,

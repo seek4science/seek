@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181113111833) do
+ActiveRecord::Schema.define(version: 20181128142428) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -673,6 +673,30 @@ ActiveRecord::Schema.define(version: 20181113111833) do
 
   add_index "experimental_conditions", ["sop_id"], name: "index_experimental_conditions_on_sop_id", using: :btree
 
+  create_table "external_assets", force: :cascade do |t|
+    t.string   "external_service",   limit: 255,               null: false
+    t.string   "external_id",        limit: 255,               null: false
+    t.string   "external_mod_stamp", limit: 255
+    t.string   "external_type",      limit: 255
+    t.datetime "synchronized_at"
+    t.integer  "sync_state",         limit: 1,     default: 0, null: false
+    t.text     "sync_options_json",  limit: 65535
+    t.integer  "version",            limit: 4,     default: 0, null: false
+    t.integer  "seek_entity_id",     limit: 4
+    t.string   "seek_entity_type",   limit: 255
+    t.integer  "seek_service_id",    limit: 4
+    t.string   "seek_service_type",  limit: 255
+    t.string   "class_type",         limit: 255
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.string   "err_msg",            limit: 255
+    t.integer  "failures",           limit: 4,     default: 0
+  end
+
+  add_index "external_assets", ["external_id", "external_service"], name: "external_assets_by_external_id", unique: true, using: :btree
+  add_index "external_assets", ["seek_entity_type", "seek_entity_id"], name: "index_external_assets_on_seek_entity_type_and_seek_entity_id", using: :btree
+  add_index "external_assets", ["seek_service_type", "seek_service_id"], name: "index_external_assets_on_seek_service_type_and_seek_service_id", using: :btree
+
   create_table "favourite_group_memberships", force: :cascade do |t|
     t.integer  "person_id",          limit: 4
     t.integer  "favourite_group_id", limit: 4
@@ -1084,10 +1108,11 @@ ActiveRecord::Schema.define(version: 20181113111833) do
     t.datetime "updated_at"
     t.string   "dss_endpoint",          limit: 255
     t.string   "web_endpoint",          limit: 255
-    t.integer  "refresh_period_mins",   limit: 4,   default: 120
+    t.integer  "refresh_period_mins",   limit: 4,     default: 120
     t.integer  "policy_id",             limit: 4
     t.string   "encrypted_password",    limit: 255
     t.string   "encrypted_password_iv", limit: 255
+    t.text     "meta_config_json",      limit: 65535
   end
 
   create_table "organisms", force: :cascade do |t|
@@ -1287,6 +1312,8 @@ ActiveRecord::Schema.define(version: 20181113111833) do
     t.integer  "parent_id",          limit: 4
     t.string   "default_license",    limit: 255,   default: "CC-BY-4.0"
     t.boolean  "use_default_policy",               default: false
+    t.date     "start_date"
+    t.date     "end_date"
   end
 
   create_table "projects_publications", id: false, force: :cascade do |t|
@@ -1546,8 +1573,8 @@ ActiveRecord::Schema.define(version: 20181113111833) do
   end
 
   create_table "sessions", force: :cascade do |t|
-    t.string   "session_id", limit: 255,   null: false
-    t.text     "data",       limit: 65535
+    t.string   "session_id", limit: 255,      null: false
+    t.text     "data",       limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end
