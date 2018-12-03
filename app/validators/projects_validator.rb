@@ -16,6 +16,7 @@
 #
 class ProjectsValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
+    return if $authorization_checks_disabled
     return if value.nil?
     return if record.contributor.nil?
     # For new resources, only allow the contributor's CURRENT projects.
