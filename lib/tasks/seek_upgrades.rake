@@ -91,4 +91,34 @@ namespace :seek do
       blob.update_column(:content_type,blob.content_type)
     end
   end
+
+  task(convert_help_attachments: :environment) do
+    count = 0
+    HelpAttachment.all.each do |ha|
+      next if ha.content_blob
+      convert_db_files_to_content_blobs(ha)
+      count += 1
+    end
+
+    puts "#{count} HelpAttachments converted"
+  end
+
+  task(convert_help_images: :environment) do
+    count = 0
+    HelpImage.all.each do |ha|
+      next if ha.content_blob
+      convert_db_files_to_content_blobs(ha)
+      count += 1
+    end
+
+    puts "#{count} HelpImages converted"
+  end
+end
+
+def convert_db_files_to_content_blobs(resource)
+  data = ActiveRecord::Base.connection.select_one("SELECT data FROM db_files WHERE id=#{resource.db_file_id}")['data']
+  ContentBlob.create!(data: data,
+                      content_type: resource.content_type,
+                      original_filename: resource.filename,
+                      asset: resource)
 end

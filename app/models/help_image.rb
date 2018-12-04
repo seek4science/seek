@@ -1,5 +1,4 @@
 class HelpImage < ApplicationRecord
-  #
   # has_attachment :max_size => 2.megabyte,
   #                :thumbnails => { :thumb => '64x64>' },
   #                :content_type => :image,
@@ -7,6 +6,6 @@ class HelpImage < ApplicationRecord
   #
   # validates_as_attachment
   #
+  has_one :content_blob, as: :asset
   belongs_to :help_document
-  
 end
