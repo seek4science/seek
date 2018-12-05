@@ -98,14 +98,22 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
-    resources :images, controller: 'help_images', as: :help_images, only: [:create, :destroy]
+    resources :images, controller: 'help_images', as: :help_images, only: [:create, :destroy] do
+      member do
+        get :view
+      end
+    end
   end
   resources :help_attachments, only: [:create,:destroy] do
     member do
       get :download
     end
   end
-  resources :help_images, only: [:create, :destroy]
+  resources :help_images, only: [:create, :destroy] do
+    member do
+      get :view
+    end
+  end
 
   resources :avatars
   resources :attachments

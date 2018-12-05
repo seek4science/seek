@@ -5,4 +5,12 @@ class HelpAttachment < ApplicationRecord
   #
   has_one :content_blob, as: :asset
   belongs_to :help_document
+
+  def size
+    content_blob.file_size
+  end
+
+  def filename
+    content_blob.original_filename
+  end
 end

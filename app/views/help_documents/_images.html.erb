@@ -1,20 +1,34 @@
-<div id="image_box" class="help_upload_box">
-  <div id="image_list">
-    <%= render :partial => 'image_list', :locals => {:images => @help_document.images} %>
-  </div>
+<% collapsed ||= false %>
 
-  <%= form_for(:help_image, :url => {:controller => :help_images, :action => :create}, :html => { :multipart => true, :target => "image_upload"}) do |f| %>
+<%= folding_panel("Images (<span id='images_count'>#{@help_document.images.size}</span>)".html_safe, collapsed, id: 'help-image-box') do %>
+  <div class="help_upload_box">
+    <% if @error_text.present? %>
+      <div id="errorExplanation">
+        <h5>The following errors prevented your image being uploaded</h5>
+        <ul>
+          <% @error_text.each do |e| %>
+            <% e = "The uploaded image is too large" if e[0..8] == "Size is n" %>
+            <li><%= e %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div id="image_list">
+      <%= render partial: 'help_documents/image_list', locals: { images: @help_document.images } %>
+    </div>
+
+    <h3>Upload new image</h3>
+
+    <form enctype="multipart/form-data" method="post" name="image-form">
       <div class="form-group">
-        <%= label_tag "Image" %>
-        <%= f.file_field :uploaded_data %>
+        <%= label_tag 'Image' %>
+        <%= file_field_tag 'content_blobs[][data]' %>
       </div>
 
-      <%= hidden_field_tag "help_image[help_document_id]", @help_document.id %>
+      <%= submit_tag "Upload", onclick: "$j('#image_spinner').show();", id: 'submit-help-image', class: 'btn btn-primary' %>
 
-      <%= submit_tag "Upload", :onclick => "Element.show('image_spinner')", :class => 'btn btn-primary' %>
-
-      <%= image_tag "ajax-loader.gif", :id => 'image_spinner', :style => 'display:none;' -%>
-  <% end %>
-
-  <iframe id="image_upload" name="image_upload" style="display: none"></iframe>
-</div>
+      <%= image_tag 'ajax-loader.gif', id: 'image_spinner', style: 'display: none;' -%>
+    </form>
+  </div>
+<% end %>

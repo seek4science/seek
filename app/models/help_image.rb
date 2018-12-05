@@ -8,4 +8,22 @@ class HelpImage < ApplicationRecord
   #
   has_one :content_blob, as: :asset
   belongs_to :help_document
+
+  validate :check_is_image
+
+  def size
+    content_blob.file_size
+  end
+
+  def filename
+    content_blob.original_filename
+  end
+
+  private
+
+  def check_is_image
+    unless content_blob.is_image?
+      errors.add(:base, "Not an image file: #{content_blob.content_type}")
+    end
+  end
 end
