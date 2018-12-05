@@ -35,9 +35,9 @@ class HelpImagesController < ApplicationController
     end
 
     @help_document.reload # Ensure unsaved (invalid) images are removed from the collection
-
+    status = @error_text.empty? ? :ok : :bad_request
     respond_to do |format|
-      format.html { render partial: 'help_documents/images' }
+      format.html { render partial: 'help_documents/images', status: status }
     end
   end
   

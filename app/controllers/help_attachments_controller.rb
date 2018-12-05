@@ -26,9 +26,9 @@ class HelpAttachmentsController < ApplicationController
     end
 
     @help_document.reload # Ensure unsaved (invalid) attachments are removed from the collection
-
+    status = @error_text.empty? ? :ok : :bad_request
     respond_to do |format|
-      format.html { render partial: 'help_documents/attachments' }
+      format.html { render partial: 'help_documents/attachments', status: status }
     end
   end
   
