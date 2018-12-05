@@ -314,7 +314,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     # testing content update just by synchronized stamp
     assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
 
-    last_mod = exassay.updated_at
+    last_mod = exassay.reload.updated_at
     assay.reload
     # this test fails??? so asset is save probably due to relations updates
     # for same reason eql, so comparing ind fields does not work even if no update operations are visible in db
