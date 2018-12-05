@@ -113,6 +113,32 @@ namespace :seek do
 
     puts "#{count} HelpImages converted"
   end
+
+  task(update_help_image_links: :environment) do
+    count = 0
+    re = /!\/help_images((\/\d\d\d\d)+)\/[^!]+!/
+    HelpDocument.all.each do |hd|
+      body = hd.body
+      replacements = {}
+      body.scan(re) do |data|
+        old_path = Regexp.last_match[0]
+        next if replacements[old_path]
+        new_path = "!/help_images/#{data[0].tr('/', '').to_i}/view!"
+        replacements[old_path] = new_path
+      end
+
+      if replacements.keys.length > 0
+        replacements.each do |old, new|
+          body.gsub!(old, new)
+        end
+
+        hd.update_column(:body, body)
+        count += 1
+      end
+    end
+
+    puts "#{count} HelpDocuments updated"
+  end
 end
 
 def convert_db_files_to_content_blobs(resource)
