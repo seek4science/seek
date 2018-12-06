@@ -1899,9 +1899,6 @@ ActiveRecord::Schema.define(version: 20181128142428) do
     t.integer  "posts_count",               limit: 4,   default: 0
     t.datetime "last_seen_at"
     t.string   "uuid",                      limit: 255
-    t.string   "last_sign_in_ip",           limit: 255
-    t.string   "provider",                  limit: 255
-    t.string   "uid",                       limit: 255
   end
 
   create_table "work_groups", force: :cascade do |t|
