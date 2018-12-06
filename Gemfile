@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.9'
+gem 'rails', '~> 4.2.11'
 gem 'rdoc'
 
 #database adaptors
