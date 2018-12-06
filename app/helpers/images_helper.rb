@@ -40,7 +40,7 @@ module ImagesHelper
   end
 
   def icon_filename_for_key(key)
-    (@@icon_dictionary ||= Seek::ImageFileDictionary.instance).image_filename_for_key(key)
+    Seek::ImageFileDictionary.instance.image_filename_for_key(key)
   end
 
   def image(key, options = {})

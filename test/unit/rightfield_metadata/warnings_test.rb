@@ -1,8 +1,6 @@
 require 'test_helper'
 
 class WarningsTest < ActiveSupport::TestCase
-  include Seek::Templates::Extract
-
   def setup
     @warnings = Seek::Templates::Extract::Warnings.new
   end
