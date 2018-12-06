@@ -1,6 +1,6 @@
 # Represents content from External Service like for example OpenBIS
 # it provides basic features for tracking state, errors, and serialization
-class ExternalAsset < ActiveRecord::Base
+class ExternalAsset < ApplicationRecord
   self.inheritance_column = 'class_type'
   attr_accessor :sync_options, :content_changed
 
