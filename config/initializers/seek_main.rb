@@ -28,7 +28,10 @@ require 'mimemagic'
 require 'private_address_check_monkeypatch'
 require 'my_annotations'
 
-[Annotation, AnnotationAttribute, AnnotationValueSeed, TextValue, NumberValue] # This is here to eager-load all the annotation related models, since autoloading has changed in Rails 5
+if ActiveRecord::Base.connected?
+  # This is here to eager-load all the annotation related models, since autoloading has changed in Rails 5
+  [Annotation, AnnotationAttribute, AnnotationValueSeed, TextValue, NumberValue]
+end
 
 SEEK::Application.configure do
   ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
