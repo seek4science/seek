@@ -40,7 +40,7 @@ class SopsController < ApplicationController
       flash[:error]=flash.now[:error] 
       redirect_to @sop
     end
-    
+
   end
 
   # PUT /sops/1
@@ -67,7 +67,7 @@ class SopsController < ApplicationController
     params.require(:sop).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                { publication_ids: [] })
+                                { publication_ids: [] }, {workflow_ids: []})
   end
 
   alias_method :asset_params, :sop_params

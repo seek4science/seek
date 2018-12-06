@@ -68,9 +68,20 @@
             </p>
         <% end %>
         <p>
-          <strong><%= t('project') -%> created:</strong>
-          <%= date_as_string(@project.created_at, false) -%>
+          <% if @project.start_date %>
+            <strong><%= t('project') -%> start date:</strong>
+            <%= date_as_string(@project.start_date, false) -%>
+          <% else %>
+            <strong><%= t('project') -%> created:</strong>
+            <%= date_as_string(@project.created_at, false) %>
+          <% end %>
         </p>
+        <% if @project.end_date %>
+          <p>
+            <strong><%= t('project') -%> end date:</strong>
+            <%= date_as_string(@project.end_date, false) -%>
+          </p>
+        <% end %>
       </div>
     </div>
     

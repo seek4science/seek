@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_02_134542) do
+ActiveRecord::Schema.define(version: 2018_11_28_142428) do
 
   create_table "activity_logs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "action"
@@ -957,6 +957,67 @@ ActiveRecord::Schema.define(version: 2018_11_02_134542) do
     t.boolean "active", default: true
   end
 
+  create_table "node_auth_lookup", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_n_auth_lookup_on_user_id_and_asset_id_and_can_view"
+    t.index ["user_id", "can_view"], name: "index_n_auth_lookup_on_user_id_and_can_view"
+  end
+
+  create_table "node_versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "node_id"
+    t.integer "version"
+    t.text "revision_comments"
+    t.integer "contributor_id"
+    t.string "title"
+    t.text "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "last_used_at"
+    t.string "first_letter", limit: 1
+    t.text "other_creators"
+    t.string "uuid"
+    t.integer "policy_id"
+    t.string "doi"
+    t.string "license"
+    t.string "deleted_contributor"
+    t.index ["contributor_id"], name: "index_node_versions_on_contributor"
+    t.index ["node_id"], name: "index_node_versions_on_node_id"
+  end
+
+  create_table "node_versions_projects", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "version_id"
+  end
+
+  create_table "nodes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "contributor_id"
+    t.string "title"
+    t.text "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "last_used_at"
+    t.integer "version", default: 1
+    t.string "first_letter", limit: 1
+    t.text "other_creators"
+    t.string "uuid"
+    t.integer "policy_id"
+    t.string "doi"
+    t.string "license"
+    t.string "deleted_contributor"
+    t.index ["contributor_id"], name: "index_nodes_on_contributor"
+  end
+
+  create_table "nodes_projects", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "node_id"
+  end
+
   create_table "notifiee_infos", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "notifiee_id"
     t.string "notifiee_type"
@@ -1203,6 +1264,8 @@ ActiveRecord::Schema.define(version: 2018_11_02_134542) do
     t.integer "parent_id"
     t.string "default_license", default: "CC-BY-4.0"
     t.boolean "use_default_policy", default: false
+    t.date "start_date"
+    t.date "end_date"
   end
 
   create_table "projects_publications", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
@@ -1237,6 +1300,16 @@ ActiveRecord::Schema.define(version: 2018_11_02_134542) do
   create_table "projects_strains", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "project_id"
     t.integer "strain_id"
+  end
+
+  create_table "projects_workflow_versions", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "version_id"
+  end
+
+  create_table "projects_workflows", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "workflow_id"
   end
 
   create_table "publication_auth_lookup", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
@@ -1553,6 +1626,13 @@ ActiveRecord::Schema.define(version: 2018_11_02_134542) do
     t.index ["contributor_id"], name: "index_sops_on_contributor"
   end
 
+  create_table "sops_workflows", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "workflow_id", null: false
+    t.integer "sop_id", null: false
+    t.index ["sop_id"], name: "index_sops_workflows_on_sop_id"
+    t.index ["workflow_id"], name: "index_sops_workflows_on_workflow_id"
+  end
+
   create_table "special_auth_codes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "code"
     t.date "expiration_date"
@@ -1760,6 +1840,57 @@ ActiveRecord::Schema.define(version: 2018_11_02_134542) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["project_id"], name: "index_work_groups_on_project_id"
+  end
+
+  create_table "workflow_auth_lookup", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_asset_id_and_can_view"
+    t.index ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view"
+  end
+
+  create_table "workflow_versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "workflow_id"
+    t.integer "version"
+    t.text "revision_comments"
+    t.integer "contributor_id"
+    t.string "title"
+    t.text "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "last_used_at"
+    t.string "first_letter", limit: 1
+    t.text "other_creators"
+    t.string "uuid"
+    t.integer "policy_id"
+    t.string "doi"
+    t.string "license"
+    t.string "deleted_contributor"
+    t.index ["contributor_id"], name: "index_workflow_versions_on_contributor"
+    t.index ["workflow_id"], name: "index_workflow_versions_on_workflow_id"
+  end
+
+  create_table "workflows", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "contributor_id"
+    t.string "title"
+    t.text "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "last_used_at"
+    t.integer "version", default: 1
+    t.string "first_letter", limit: 1
+    t.text "other_creators"
+    t.string "uuid"
+    t.integer "policy_id"
+    t.string "doi"
+    t.string "license"
+    t.string "deleted_contributor"
+    t.index ["contributor_id"], name: "index_workflows_on_contributor"
   end
 
   create_table "worksheets", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|

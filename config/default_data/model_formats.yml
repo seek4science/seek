@@ -5,7 +5,7 @@ CellML:
   title: CellML
 
 FieldML:
-  title: Field Modelling Markup Language (FieldML)
+  title: FieldML
 
 GraphML:
   title: GraphML
@@ -14,7 +14,7 @@ Image:
   title: Image
 
 KGML:
-  title: KEGG Markup Language (KGML)
+  title: KGML
 
 Mathematica:
   title: Mathematica
@@ -37,6 +37,9 @@ SBML:
 SciLab:
   title: SciLab
 
+Simile:
+  title: "Simile XML v3"
+
 SVG:
   title: SVG
 
@@ -49,3 +52,14 @@ VCML:
 XPP:
   title: XPP
 
+Copasi:
+  title: Copasi
+
+MathML:
+  title: "MathML"
+
+XGMML:
+  title: XGMML
+
+SBGN-ML PD:
+  title: "SBGN-ML PD"

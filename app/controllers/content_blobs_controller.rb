@@ -28,6 +28,8 @@ class ContentBlobsController < ApplicationController
   def view_content
     if @content_blob.is_text?
       view_text_content
+    elsif @content_blob.is_cwl?
+      view_text_content
     else
       @pdf_url = pdf_url
       view_pdf_content
@@ -78,7 +80,8 @@ class ContentBlobsController < ApplicationController
     # check content type and size
     url = params[:data_url]
     begin
-      case scheme = URI(url).scheme
+      uri = URI(url)
+      case scheme = uri.scheme
       when 'ftp'
         handler = Seek::DownloadHandling::FTPHandler.new(url)
         info = handler.info
@@ -99,6 +102,18 @@ class ContentBlobsController < ApplicationController
       handle_exception_response(e)
     end
   end
+
+  # def is_myexperiment?(uri)
+  #   return uri.host.include? "myexperiment"
+  # end
+  #
+  # def is_myexperiment_workflow?(uri)
+  #   return is_myexperiment?(uri) && (uri.path.include? "workflows")
+  # end
+  #
+  # def myexperiment_data_form(uri)
+  #   return uri.sub '.html' '.xml'
+  # end
 
   def get_pdf
     if @content_blob.file_exists?

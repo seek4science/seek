@@ -1,4 +1,4 @@
-class InvestigationSerializer < PCSSerializer
+class InvestigationSerializer < SnapshottableSerializer
   attributes :title, :description, :other_creators
 
   has_many :people

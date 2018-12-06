@@ -1192,6 +1192,64 @@ class SopsControllerTest < ActionController::TestCase
     assert assigns(:sop).errors.empty?
   end
 
+  test 'should not allow contributing to a project that user has left' do
+    person = Factory(:person_in_multiple_projects)
+    active_project = person.projects.first
+    former_project = person.projects.last
+    login_as(person)
+
+    sop, blob = valid_sop
+    assert_difference('Sop.count') do
+      post :create, sop: sop.merge(project_ids: [active_project.id, former_project.id]), content_blobs: [blob], policy_attributes: valid_sharing
+    end
+
+    gm = person.group_memberships.detect { |gm| gm.project == former_project }
+    gm.has_left = true
+    gm.save!
+    assert_not_includes person.current_projects.to_a, former_project
+    login_as(person.reload)
+
+    sop, blob = valid_sop
+    assert_no_difference('Sop.count') do
+      post :create, sop: sop.merge(project_ids: [former_project.id]), content_blobs: [blob], policy_attributes: valid_sharing
+    end
+
+    refute assigns(:sop).errors.empty?
+  end
+
+  test 'should not create new version if person has left the project' do
+    project = Factory(:project)
+    sop = Factory(:sop, projects: [project], policy: Factory(:publicly_viewable_policy, permissions: [Factory(:manage_permission, contributor: project)]))
+    person = Factory(:person, project: project)
+    gm = person.group_memberships.detect { |gm| gm.project == project }
+    gm.has_left = true
+    gm.save!
+
+    login_as(person)
+    assert_no_difference('Sop::Version.count', 1) do
+      post :new_version, id: sop.id, sop: { title: "haha!" }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision'
+    end
+  end
+
+  test 'should not include former projects in project selector' do
+    person = Factory(:person_in_multiple_projects)
+    active_project = person.projects.first
+    former_project = person.projects.last
+    gm = person.group_memberships.detect { |gm| gm.project == former_project }
+    gm.has_left = true
+    gm.save!
+
+    login_as(person)
+
+    get :new
+    assert_response :success
+
+    project_ids = JSON.parse(select_node_contents('#project-selector-possibilities-json')).map { |p| p['id'] }
+
+    assert_includes project_ids, active_project.id
+    refute_includes project_ids, former_project.id
+  end
+
   private
 
   def doi_citation_mock

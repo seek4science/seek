@@ -11,6 +11,10 @@ class PersonSerializer < AvatarObjSerializer
     serialize_annotations(object, context = 'tool')
   end
 
+  attribute :orcid do
+    object.orcid_uri
+  end
+
   attribute :project_positions do
     positions = []
     object.group_memberships.each do |gm|

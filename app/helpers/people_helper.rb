@@ -38,7 +38,7 @@ module PeopleHelper
       text_or_not_specified(nil)
     else
       logo = image(:orcid_id)
-      link_to(logo + ' ' + person.orcid_display_format, person.orcid_https_uri, target: '_blank').html_safe
+      link_to(logo + ' ' + person.orcid_display_format, person.orcid_uri, target: '_blank').html_safe
     end
   end
 

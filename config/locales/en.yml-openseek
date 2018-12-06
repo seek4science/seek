@@ -16,6 +16,12 @@ en:
   document: "Document"
   model: "Model"
   sop: "SOP"
+  workflow: "Workflow"
+  workflows:
+    workflow: "Workflow"
+  node: "Workflow Node"
+  nodes:
+    node: "Workflow Node"
   publication: "Publication"
   presentation: "Presentation"
   event: "Event"
@@ -24,11 +30,13 @@ en:
   sample_type: "Sample type"
   strain: "Strain"
   scale: "Scale"
+  organism: "Organism"
 
   person: "Person"
   project: "Project"
   institution: "Institution"
   programme: "Programme"
+  profile: "Profile"
 
   gadget:
     new_heading: "New or upload"

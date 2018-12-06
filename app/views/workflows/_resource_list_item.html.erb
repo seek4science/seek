@@ -1,0 +1,17 @@
+<%= list_item_description resource.description %>
+
+<div class="row">
+  <div class="col-sm-6">
+    <%= render partial:"assets/resource_list_item_contributor_and_creators",object:resource %>
+    <%= list_item_doi(resource) %>
+  </div>
+  <div class="col-sm-6 hidden-xs">
+    <%= list_item_authorized_list resource.investigations, t('investigation').pluralize, true, 50, true %>
+    <%= list_item_authorized_list resource.studies, t('study').pluralize, true, 50, true %>
+    <%= list_item_authorized_list resource.assays, t('assay').pluralize, true, 50, true %>
+  </div>
+</div>
+
+<div class="hidden-xs">
+    <%= scales_list_for_list_item resource %>
+</div>

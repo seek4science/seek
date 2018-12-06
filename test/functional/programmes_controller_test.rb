@@ -86,17 +86,13 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   test 'destroy' do
     login_as(Factory(:admin))
-    prog = Factory(:programme)
-    proj = prog.projects.first
-    refute_nil proj
-    assert_equal prog, proj.programme
+    prog = Factory(:programme, projects:[])
+    assert prog.can_delete?
     assert_difference('Programme.count', -1) do
       delete :destroy, params: { id: prog.id }
     end
     assert_redirected_to programmes_path
-    proj.reload
-    assert_nil proj.programme
-    assert_nil proj.programme_id
+
   end
 
   test 'admin can update' do

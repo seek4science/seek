@@ -149,17 +149,21 @@ class Sample < ApplicationRecord
 
   def related_organisms
     return [] unless sample_type
-    result = organisms
-    seek_sample_attributes = sample_type.sample_attributes
-    seek_sample_attributes.each { |a|
-      t = a.sample_attribute_type.title
-      if t.eql? 'NCBI ID'
-        v = get_attribute(a.title)
-        result = result + Organism.all.select { |o| o.bioportal_concept.concept_uri.end_with? v}
-      end
-    }
 
-    return result
+    # Note this depends on sample_type being immutable if there are samples
+
+    Rails.cache.fetch("sample-organisms-#{cache_key}") do
+      result = organisms
+      seek_sample_attributes = sample_type.sample_attributes
+      seek_sample_attributes.each {|a|
+        t = a.sample_attribute_type.title
+        if t.eql? 'NCBI ID'
+          v = get_attribute(a.title)
+          result = result + Organism.all.select {|o| o.bioportal_concept.concept_uri.end_with? v}
+        end
+      }
+      result
+    end
   end
 
   private

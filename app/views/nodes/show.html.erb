@@ -1,0 +1,35 @@
+<%= javascript_include_tag "zoom/lightbox"-%>
+<%= stylesheet_link_tag "lightbox" %>
+
+<%= render :partial => "general/item_title",:locals => {:item => @node, :version => @display_node.version,
+                                                        :buttons_partial => 'assets/asset_buttons'} -%>
+
+<%= render :partial=>"assets/reference_new_version_form", :locals=>{:resource=>@node} -%>
+
+<div class="row">
+  <div class="col-md-9 col-sm-8 box_about_actor">
+    <%= item_description @display_node.description -%>
+
+    <div class="row">
+      <div class="col-md-6">
+        <%= persistent_resource_id(@display_node) %>
+
+        <%= render :partial => 'assets/fileinfo',:object=>@display_node.content_blob -%>
+
+        <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @node} %>
+
+        <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_node} %>
+      </div>
+    </div>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @node, :deep => true, :include_parents => true} %>
+  </div>
+
+  <div class="col-md-3 col-sm-4">
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @node, :versioned_resource=>@display_node } %>
+  </div>
+</div>
+
+<%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_node, :resource=>@node} -%>
+
+<%# get, classify and authorize all assets for this project -%>
+<%= render :partial=>"general/items_related_to",:object => @node %>

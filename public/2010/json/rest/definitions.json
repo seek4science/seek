@@ -194,6 +194,40 @@
         }
       ]
     },
+    "snapshotSkeleton": {
+      "type": "object",
+      "properties": {
+        "snapshot": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "url": {
+          "$ref": "#/definitions/uriString"
+        }
+      },
+      "required": [
+        "snapshot",
+        "url"
+        ]
+    },
+    "nonEmptySnapshotsList": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/snapshotSkeleton"
+      }
+    },
+    "nullableSnapshotsList": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/nonEmptySnapshotsList"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+
     "nullableNonEmptyStringList": {
       "oneOf": [
         {
@@ -331,6 +365,22 @@
       },
       "required": [
         "self"
+      ],
+      "additionalProperties": false
+    },
+    "downloadableLinksType": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "$ref": "#/definitions/uriString"
+        },
+        "download": {
+          "$ref": "#/definitions/uriString"
+        }
+      },
+      "required": [
+        "self",
+        "download"
       ],
       "additionalProperties": false
     },
@@ -1623,6 +1673,9 @@
             "attributes": {
               "type": "object",
               "properties": {
+                "snapshots" : {
+                  "$ref": "#/definitions/nullableSnapshotsList"
+                },
                 "tags": {
                   "$ref": "#/definitions/nullableNonEmptyStringList"
                 },
@@ -2007,71 +2060,6 @@
       },
       "required": [
         "data"
-      ],
-      "additionalProperties": false
-    },
-    "getContentBlobsResponse": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "$ref": "#/definitions/nonEmptyString"
-            },
-            "type": {
-              "$ref": "#/definitions/nonEmptyString"
-            },
-            "attributes": {
-              "type": "object",
-              "properties": {
-                "original_filename": {
-                  "$ref": "#/definitions/nonEmptyString"
-                },
-                "url": {
-                  "$ref": "#/definitions/nullableUriString"
-                },
-                "md5sum": {
-                  "$ref": "#/definitions/md5sumString"
-                },
-                "sha1sum": {
-                  "$ref": "#/definitions/sha1sumString"
-                },
-                "content_type": {
-                  "$ref": "#/definitions/contentBlobType"
-                }
-              },
-              "required": [
-                "original_filename",
-                "md5sum",
-                "sha1sum",
-                "content_type"
-              ],
-              "additionalProperties": false
-            },
-            "links": {
-              "$ref": "#/definitions/linksType"
-            },
-            "meta": {
-              "$ref": "#/definitions/metaType"
-            }
-          },
-          "required": [
-            "id",
-            "type",
-            "attributes",
-            "links",
-            "meta"
-          ],
-          "additionalProperties": false
-        },
-        "jsonapi": {
-          "$ref": "#/definitions/JsonApiVersion"
-        }
-      },
-      "required": [
-        "data",
-        "jsonapi"
       ],
       "additionalProperties": false
     },
@@ -2989,6 +2977,9 @@
             "attributes": {
               "type": "object",
               "properties": {
+                "snapshots" : {
+                  "$ref": "#/definitions/nullableSnapshotsList"
+                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -4876,6 +4867,9 @@
             "attributes": {
               "type": "object",
               "properties": {
+                "snapshots" : {
+                  "$ref": "#/definitions/nullableSnapshotsList"
+                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -6151,7 +6145,7 @@
               "additionalProperties": false
             },
             "links": {
-              "$ref": "#/definitions/linksType"
+              "$ref": "#/definitions/downloadableLinksType"
             },
             "meta": {
               "$ref": "#/definitions/metaType"

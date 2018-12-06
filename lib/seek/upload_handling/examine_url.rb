@@ -8,10 +8,13 @@ module Seek
         @size = info[:file_size]
         if content_is_webpage?(@content_type)
           @is_webpage = true
-          page = summarize_webpage(url)
-          @title = page.title
-          @description = page.description
-          @image = page.images.best
+          if (is_myexperiment_url? url)
+          else
+            page = summarize_webpage(url)
+            @title = page.title
+            @description = page.description
+            @image = page.images.best
+          end
         else
           @is_webpage = false
           @filename = info[:file_name]
@@ -52,6 +55,41 @@ module Seek
         else
           fail exception
         end
+      end
+
+      def is_myexperiment_url? (url)
+        URI uri = URI(url)
+        @is_workflow = false
+        if !uri.hostname.include? "myexperiment"
+          return false
+        end
+        if !uri.path.end_with? ".html"
+          return false
+        end
+        if uri.path.include? "/workflow"
+          @is_workflow = true
+        end
+        begin
+          xml_url = url[0..-6] + '.xml'
+
+          xml_doc = Nokogiri::XML(open(xml_url))
+          xml_doc.xpath('/*/description').each do |node|
+            @description = node.text
+          end
+          xml_doc.xpath('/*/title').each do |node|
+            @title = node.text
+          end
+          xml_doc.xpath('/*/preview').each do |node|
+            @image = node.text
+          end
+
+
+          return true
+        rescue
+          return false
+        end
+
+        return false
       end
     end
   end

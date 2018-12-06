@@ -1,4 +1,4 @@
-class AssaySerializer < PCSSerializer
+class AssaySerializer < SnapshottableSerializer
   attributes :title, :description, :other_creators
   attribute :assay_class do
     { title: object.assay_class.title,

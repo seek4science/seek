@@ -65,7 +65,7 @@ class Programme < ApplicationRecord
   end
 
   def assets
-    (data_files+models+sops+presentations+events+publications+documents).uniq.compact
+    (data_files + models + sops + presentations + events + publications + documents).uniq.compact
   end
 
   def can_be_edited_by?(user)
@@ -85,8 +85,7 @@ class Programme < ApplicationRecord
   end
 
   def can_delete?(user = User.current_user)
-    user && (user.is_admin? ||
-              user.person.is_programme_administrator?(self) && projects.empty?)
+    user && projects.empty? && (user.is_admin? || user.person.is_programme_administrator?(self))
   end
 
   def rejected?
