@@ -56,7 +56,7 @@ module ImagesHelper
 
     code = country_code(country)
 
-    if code && !code.empty?
+    if code.present? && CountryCodes.has_flag?(code)
       image_tag("famfamfam_flags/#{code.downcase}.png",
                 'data-tooltip' => tooltip(text),
                 :style => "vertical-align:middle; margin-right: #{margin_right};")
