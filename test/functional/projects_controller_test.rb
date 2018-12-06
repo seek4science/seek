@@ -119,7 +119,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
 
     assert_difference('Project.count') do
-      post :create, project: { title: 'proj with dates', start_date:'2018-11-01', end_date:'2018-11-18' }
+      post :create, params: { project: { title: 'proj with dates', start_date:'2018-11-01', end_date:'2018-11-18' } }
     end
 
     project = assigns(:project)
@@ -1632,14 +1632,14 @@ class ProjectsControllerTest < ActionController::TestCase
   test 'start date overrides creation date in show page' do
     p = Factory(:project,start_date:nil, end_date:nil)
 
-    get :show, id:p.id
+    get :show, params: { id:p.id }
     assert_select "p strong",text:'Project created:',count:1
     assert_select "p strong",text:'Project start date:',count:0
     assert_select "p strong",text:'Project end date:',count:0
 
     p = Factory(:project,start_date:DateTime.now, end_date:DateTime.now + 1.day)
 
-    get :show, id:p.id
+    get :show, params: { id:p.id }
     assert_select "p strong",text:'Project created:',count:0
     assert_select "p strong",text:'Project start date:',count:1
     assert_select "p strong",text:'Project end date:',count:1
@@ -1647,7 +1647,7 @@ class ProjectsControllerTest < ActionController::TestCase
     # end date hidden if not set
     p = Factory(:project,start_date:DateTime.now, end_date:nil)
 
-    get :show, id:p.id
+    get :show, params: { id:p.id }
     assert_select "p strong",text:'Project created:',count:0
     assert_select "p strong",text:'Project start date:',count:1
     assert_select "p strong",text:'Project end date:',count:0

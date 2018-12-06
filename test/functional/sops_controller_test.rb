@@ -1200,7 +1200,7 @@ class SopsControllerTest < ActionController::TestCase
 
     sop, blob = valid_sop
     assert_difference('Sop.count') do
-      post :create, sop: sop.merge(project_ids: [active_project.id, former_project.id]), content_blobs: [blob], policy_attributes: valid_sharing
+      post :create, params: { sop: sop.merge(project_ids: [active_project.id, former_project.id]), content_blobs: [blob], policy_attributes: valid_sharing }
     end
 
     gm = person.group_memberships.detect { |gm| gm.project == former_project }
@@ -1211,7 +1211,7 @@ class SopsControllerTest < ActionController::TestCase
 
     sop, blob = valid_sop
     assert_no_difference('Sop.count') do
-      post :create, sop: sop.merge(project_ids: [former_project.id]), content_blobs: [blob], policy_attributes: valid_sharing
+      post :create, params: { sop: sop.merge(project_ids: [former_project.id]), content_blobs: [blob], policy_attributes: valid_sharing }
     end
 
     refute assigns(:sop).errors.empty?
@@ -1227,7 +1227,7 @@ class SopsControllerTest < ActionController::TestCase
 
     login_as(person)
     assert_no_difference('Sop::Version.count', 1) do
-      post :new_version, id: sop.id, sop: { title: "haha!" }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision'
+      post :new_version, params: { id: sop.id, sop: { title: "haha!" }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' }
     end
   end
 

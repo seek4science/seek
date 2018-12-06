@@ -602,7 +602,7 @@ class SamplesControllerTest < ActionController::TestCase
                                     patient: sample.id})
 
     with_config_value :related_items_limit, 1 do
-      get :show, id: sample
+      get :show, params: { id: sample }
     end
 
     assert_response :success
