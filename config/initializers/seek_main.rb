@@ -30,7 +30,7 @@ require 'my_annotations'
 
 if ActiveRecord::Base.connected?
   # This is here to eager-load all the annotation related models, since autoloading has changed in Rails 5
-  [Annotation, AnnotationAttribute, AnnotationValueSeed, TextValue, NumberValue]
+  [AnnotationAttribute, AnnotationValueSeed, NumberValue]
 end
 
 SEEK::Application.configure do
