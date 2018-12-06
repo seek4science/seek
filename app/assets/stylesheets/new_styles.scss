@@ -750,6 +750,10 @@ span.required, label.required::after {
     padding: 5px 10px;
   }
 
+  .panel-body {
+    position: relative;
+  }
+
   .panel-body.loading::after {
     position: absolute;
     top: 0;
