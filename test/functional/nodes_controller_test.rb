@@ -19,9 +19,7 @@ class NodesControllerTest < ActionController::TestCase
 
   test 'can create with valid url' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
-    node_attrs = Factory.attributes_for(:node,
-                                                project_ids: [@project.id]
-                                               )
+    node_attrs = Factory.attributes_for(:node, project_ids: [@project.id])
 
     assert_difference 'Node.count' do
       post :create, params: { node: node_attrs, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png', data: nil }], sharing: valid_sharing }
@@ -30,8 +28,8 @@ class NodesControllerTest < ActionController::TestCase
 
   test 'can create with local file' do
     node_attrs = Factory.attributes_for(:node,
-                                                contributor: User.current_user,
-                                                project_ids: [@project])
+                                        contributor: User.current_user,
+                                        project_ids: [@project.id])
 
     assert_difference 'Node.count' do
       assert_difference 'ActivityLog.count' do
@@ -142,7 +140,7 @@ class NodesControllerTest < ActionController::TestCase
     assert_equal [], node.annotations.select { |a| a.source == p.user }.collect { |a| a.value.text }.sort
     assert_equal %w(golf sparrow), node.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
-    xml_http_request :post, :update_annotations_ajax, id: node, tag_list: "soup,#{golf.value.text}"
+    post :update_annotations_ajax, xhr: true, params: { id: node, tag_list: "soup,#{golf.value.text}" }
 
     node.reload
 

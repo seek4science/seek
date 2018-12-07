@@ -19,9 +19,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'can create with valid url' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
-    workflow_attrs = Factory.attributes_for(:workflow,
-                                                project_ids: [@project.id]
-                                               )
+    workflow_attrs = Factory.attributes_for(:workflow, project_ids: [@project.id])
 
     assert_difference 'Workflow.count' do
       post :create, params: { workflow: workflow_attrs, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png', data: nil }], sharing: valid_sharing }
@@ -30,8 +28,8 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'can create with local file' do
     workflow_attrs = Factory.attributes_for(:workflow,
-                                                contributor: User.current_user,
-                                                project_ids: [@project])
+                                            contributor: User.current_user,
+                                            project_ids: [@project.id])
 
     assert_difference 'Workflow.count' do
       assert_difference 'ActivityLog.count' do
@@ -142,7 +140,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal [], workflow.annotations.select { |a| a.source == p.user }.collect { |a| a.value.text }.sort
     assert_equal %w(golf sparrow), workflow.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
-    xml_http_request :post, :update_annotations_ajax, id: workflow, tag_list: "soup,#{golf.value.text}"
+    post :update_annotations_ajax, xhr: true, params: { id: workflow, tag_list: "soup,#{golf.value.text}" }
 
     workflow.reload
 
