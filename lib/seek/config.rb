@@ -308,7 +308,7 @@ module Seek
 
     use_db = begin
       Settings.table_exists?
-    rescue ActiveRecord::NoDatabaseError
+    rescue StandardError
       false
     end
 
