@@ -15,6 +15,6 @@ class CreateExternalAssets < ActiveRecord::Migration
 
       t.timestamps null: false
     end
-    add_index :external_assets, %i[external_id external_service], unique: true, name: 'external_assets_by_external_id'
+    
   end
 end
