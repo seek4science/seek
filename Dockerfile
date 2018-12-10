@@ -40,6 +40,8 @@ RUN chown -R www-data solr config docker public /var/www db/schema.rb
 USER www-data
 RUN touch config/using-docker #allows us to see within SEEK we are running in a container
 
+RUN cp docker/database.docker.mysql.yml config/database.yml
+
 RUN bundle exec rake assets:precompile && \
     rm -rf tmp/cache/*
 
@@ -58,6 +60,6 @@ USER www-data
 EXPOSE 3000
 
 # Shared
-VOLUME ["/seek/filestore", "/seek/sqlite3-db", "/seek/tmp/cache"]
+VOLUME ["/seek/filestore", "/seek/tmp/cache"]
 
 CMD ["docker/entrypoint.sh"]
