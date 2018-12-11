@@ -84,6 +84,11 @@
 <% if admin_logged_in? %>
   <%= folding_panel('Project Settings', false, id: 'admin_section') do %>
     <span class="subtle">(Only visible to administrators)</span>
+    <div class="alert alert-info">
+      <p>This option allows members of the Project to use the <%=link_to "Norwegian e-Infrastructure for Life Sciences (NeLS)", "https://nels.bioinfo.no/" %>.</p>
+      <p>It is only available to members that have an account that gives you access to its services.</p>
+    </div>
+
     <div class="checkbox">
       <label>
         <%= f.check_box(:nels_enabled, autocomplete: 'off') %> <strong>Enable NeLS Integration</strong>
