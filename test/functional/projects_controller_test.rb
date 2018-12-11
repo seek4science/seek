@@ -1613,11 +1613,11 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'site administrator can enable NeLS integration' do
-    project_administrator = Factory(:admin)
-    project = project_administrator.projects.first
+    admin = Factory(:admin)
+    project = Factory(:project)
     assert_nil project.nels_enabled
 
-    login_as(project_administrator.user)
+    login_as(admin.user)
 
     get :edit, id: project.id
 
@@ -1631,13 +1631,31 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal true, project.nels_enabled
   end
 
+  test 'nels option hidden if not enabled seek wide' do
+    admin = Factory(:admin)
+    project = Factory(:project)
+
+    login_as(admin.user)
+
+    with_config_value(:nels_enabled,false) do
+      get :edit, id: project.id
+      assert_select 'div#nels_admin_section', count: 0
+    end
+
+    with_config_value(:nels_enabled,true) do
+      get :edit, id: project.id
+      assert_select 'div#nels_admin_section', count: 1
+    end
+
+  end
+
   test 'site administrator can disable NeLS integration' do
-    project_administrator = Factory(:admin)
-    project = project_administrator.projects.first
+    admin = Factory(:admin)
+    project = Factory(:project)
     project.nels_enabled = true
     assert_equal true, project.nels_enabled
 
-    login_as(project_administrator.user)
+    login_as(admin.user)
 
     get :edit, id: project.id
 
