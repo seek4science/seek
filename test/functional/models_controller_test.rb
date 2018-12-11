@@ -217,6 +217,8 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil flash.now[:error]
   end
 
+
+
   test 'should not create invalid model' do
     model = { title: 'Test' }
     assert_no_difference('Model.count') do
@@ -1163,6 +1165,46 @@ class ModelsControllerTest < ActionController::TestCase
     get :show, id: model
     assert_response :success
     assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+  end
+
+  test 'associated with assay_ids params' do
+    person = User.current_user.person
+    good_assay=Factory(:modelling_assay,contributor:person)
+    good_assay2=Factory(:modelling_assay,contributor:person)
+    bad_assay=Factory(:modelling_assay, contributor:Factory(:person))
+    bad_assay2=Factory(:experimental_assay, contributor:person)
+
+    assert good_assay.can_edit?
+    assert good_assay2.can_edit?
+    assert bad_assay2.can_edit?
+    refute bad_assay.can_edit?
+
+    assert good_assay.is_modelling?
+    assert good_assay2.is_modelling?
+    assert bad_assay.is_modelling?
+    refute bad_assay2.is_modelling?
+
+
+    ids = [good_assay,good_assay2,bad_assay,bad_assay2].collect(&:id).collect(&:to_s)
+
+    get :new, assay_ids:ids
+
+    assert_response :success
+
+    model = assigns(:model)
+    refute_empty model.assays
+    assert_equal [good_assay,good_assay2].sort,model.assays.sort
+
+    # dirty way to check that they end up in the embedded JSON script block.
+    # Cannot test the elements itself as the javascript needs to execute first
+    assert_select "#assay_asset_list" do
+      assert_select "script[type='application/json']", count:1 do |elements|
+        json = JSON.parse(elements.first.children.text)
+        ids = json.collect{|x| x["assay"]["id"]}
+        assert_equal [good_assay.id,good_assay2.id].sort,ids.sort
+
+      end
+    end
   end
 
   private
