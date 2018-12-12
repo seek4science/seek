@@ -6,8 +6,7 @@
   view = params[:graph_view] || default_view
   is_full_screen = params.key?(:fullscreen).present?
 %>
-
-
+<div style="float:right"><%= help_link :isa_overview, include_icon: true, link_text:'Help' %></div>
 <div class="row">
   <div class="col-sm-12 hidden-xs">
     <div id="isa-graph" class="panel panel-default">
@@ -38,19 +37,22 @@
           <%= image('graph_nodes') %>
           All nodes
         </button>
+        <button class="btn btn-default btn-xs" id="reset-nodes-btn"  data-tooltip="Resets the graph to its original state, reverting any changes to zoom or moved nodes.">
+          <%= image('undo') %>
+          Reset
+        </button>
       </div>
       <div class="isa-wrapper">
         <div id="cy"></div>
         <%= render partial: 'general/jstree', locals: { hash: hash, root_item: root_item } %>
       </div>
     </div>
-
     <span id="ruler" style="visibility: hidden"></span>
   </div>
+
 </div>
 
 <%= modal_isa_png %>
-<img id="exported-png2"/>
 
 <script type="text/javascript">
     var isaGraph = $j('#isa-graph')[0];
@@ -63,9 +65,13 @@
         isaGraph.innerHTML = "<div class='none_text'>Unable to display the graph for this browser version. Please upgrade your browser.</div>";
         isaGraph.style['text-align'] = 'center';
     } else {
+        drawInitialState();
+    }
+
+    function drawInitialState() {
         ISA.decodeHTMLForElements(elements);
         ISA.drawGraph(elements, '<%= node_id(root_item) -%>');
-    }
+    };
 
     ISA.view = {
         tree: function () {
@@ -75,6 +81,7 @@
             $j('#jstree').css('width', '100%');
             $j('#show-all-nodes-btn').hide();
             $j('#export-png-btn').hide();
+            $j('#reset-nodes-btn').hide();
             ISA.view.current = 'tree';
             return false;
         },
@@ -85,6 +92,7 @@
             $j('#jstree').hide();
             $j('#show-all-nodes-btn').show();
             $j('#export-png-btn').show();
+            $j('#reset-nodes-btn').show();
             cy.fit(ISA.defaults.padding);
             cy.resize();
             ISA.view.current = 'graph'
@@ -97,6 +105,7 @@
             $j('#jstree').show();
             $j('#show-all-nodes-btn').show();
             $j('#export-png-btn').show();
+            $j('#reset-nodes-btn').show();
             $j('#jstree').css('width', '300px');
             cy.fit(ISA.defaults.padding);
             cy.resize();
@@ -137,6 +146,15 @@
             }
 
             return false;
+        });
+
+        $j('#reset-nodes-btn').click(function() {
+            drawInitialState();
+
+            //stop the all nodes button being out of sync if selected
+            if (ISA.isShowGraphNodesActive()) {
+                $j('#show-all-nodes-btn').button('toggle');
+            }
         });
 
         // display the PNG when the modal box appears

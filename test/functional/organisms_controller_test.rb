@@ -413,6 +413,33 @@ class OrganismsControllerTest < ActionController::TestCase
 
   end
 
+  test 'publication organisms through nested route' do
+    assert_routing 'publications/3/organisms', controller: 'organisms', action: 'index', publication_id: '3'
+
+    o1 = Factory(:organism)
+    o2 = Factory(:organism)
+    a1 = Factory(:assay,organisms:[o1])
+    a2 = Factory(:assay,organisms:[o2])
+    pub1 = Factory(:publication, assays:[a1])
+    pub2 = Factory(:publication, assays:[a2])
+
+    assert_equal [o1],pub1.related_organisms
+    assert_equal [o2],pub2.related_organisms
+
+    o1.reload
+    assert_equal [pub1],o1.related_publications
+
+    get :index,publication_id:pub1.id
+
+    assert_response :success
+
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', organism_path(o1), text: o1.title
+      assert_select 'a[href=?]', organism_path(o2), text: o2.title, count: 0
+    end
+
+  end
+
   test 'assay organisms through nested route' do
     assert_routing 'assays/3/organisms', controller: 'organisms', action: 'index', assay_id: '3'
 

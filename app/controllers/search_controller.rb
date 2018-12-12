@@ -5,12 +5,21 @@ class SearchController < ApplicationController
   include Seek::ExternalSearch
   include Seek::FacetedBrowsing
 
-  def index
+  class InvalidSearchException < Exception; end;
 
+  def index
+    @results = []
     if Seek::Config.solr_enabled
-      perform_search (request.format.json?)
-    else
-      @results = []
+
+      begin
+        perform_search (request.format.json?)
+      rescue InvalidSearchException=>e
+        flash.now[:error] = e.message
+      rescue RSolr::Error::ConnectionRefused=>e
+        flash.now[:error] = "The search service is currently not running, and we've been notified of the problem. Please try again later"
+        forward_exception_notification(e, {message: 'An error with search occurred, SOLR connection refused.'})
+        Rails.logger.error(e)
+      end
     end
 
     #strip out nils, which can occur if the index is out of sync
@@ -68,7 +77,9 @@ class SearchController < ApplicationController
 
     searchable_types = Seek::Util.searchable_types
 
-    if (Seek::Config.solr_enabled and !downcase_query.blank?)
+    raise InvalidSearchException.new("Query string is empty or blank") if downcase_query.blank?
+
+    if (Seek::Config.solr_enabled)
       if type == "all"
           sources = searchable_types
           if is_json
@@ -84,8 +95,9 @@ class SearchController < ApplicationController
             @results |= search_result
           end
       else
-           search_type = type.singularize.camelize.constantize
-           raise "#{type} is not a valid search type" unless searchable_types.include?(search_type)
+           type_name = type.singularize.camelize
+           raise InvalidSearchException.new("#{type} is not a valid search type") unless searchable_types.map(&:to_s).include?(type_name)
+           search_type = type_name.constantize
            search = search_type.search do |query|
              query.keywords(downcase_query)
              query.paginate(:page => 1, :per_page => search_type.count ) if search_type.count > 30 # By default, Sunspot requests the first 30 results from Solr

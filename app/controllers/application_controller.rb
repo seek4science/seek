@@ -502,14 +502,14 @@ class ApplicationController < ActionController::Base
 
   def detect_for_filter(filter, resource, value)
     case
-    when resource.respond_to?(filter.pluralize)
-      resource.send(filter.pluralize).include? value
-    when resource.respond_to?("related_#{filter.pluralize}")
-      resource.send("related_#{filter.pluralize}").include?(value)
-    when resource.respond_to?(filter)
-      resource.send(filter) == value
-    else
-      false
+      when resource.respond_to?(filter.pluralize)
+        resource.send(filter.pluralize).include? value
+      when resource.respond_to?("related_#{filter.pluralize}")
+        resource.send("related_#{filter.pluralize}").include?(value)
+      when resource.respond_to?(filter)
+        resource.send(filter) == value
+      else
+        false
     end
   end
 
@@ -527,11 +527,7 @@ class ApplicationController < ActionController::Base
     payload[:user_agent] = request.user_agent
   end
 
-  def log_extra_exception_data
-    request.env['exception_notifier.exception_data'] = {
-      current_logged_in_user: current_user
-    }
-  end
+
 
   def redirect_to_sign_up_when_no_user
     redirect_to signup_path if User.count == 0

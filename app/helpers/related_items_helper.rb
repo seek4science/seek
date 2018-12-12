@@ -88,7 +88,7 @@ module RelatedItemsHelper
 
     # Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
-      if limit && related[key][:items].size > limit && %w[Project Investigation Study Assay Person Specimen Sample].include?(resource.class.name)
+      if limit && related[key][:items].size > limit && %w[Project Investigation Study Assay Person Specimen Sample Snapshot].include?(resource.class.name)
         related[key][:extra_count] = related[key][:items].size - limit
         related[key][:items] = related[key][:items][0...limit]
       end
@@ -101,7 +101,7 @@ module RelatedItemsHelper
     { 'Person' => {}, 'Project' => {}, 'Institution' => {}, 'Investigation' => {},
       'Study' => {}, 'Assay' => {}, 'DataFile' => {}, 'Document' => {},
       'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {}, 'Organism' => {},
-      'Strain' => {}, 'Sample' => {} }
+      'Strain' => {}, 'Sample' => {}, 'Workflow' => {}, 'Node' => {} }
   end
 
   def related_items_method(resource, item_type)
@@ -155,6 +155,9 @@ module RelatedItemsHelper
       total_count = res[:items].size
       if key == 'Project' || key == 'Institution' || key == 'SampleType'
         res[:hidden_count] = 0
+      elsif (key == 'Workflow' || key == 'Node') && !Seek::Config.workflows_enabled
+        res[:items] = []
+        res[:hidden_count] = 0
       elsif key == 'Person'
         if Seek::Config.is_virtualliver && User.current_user.nil?
           res[:items] = []
@@ -175,7 +178,10 @@ module RelatedItemsHelper
 
   def collect_related_items(resource)
     related = relatable_types
-    related.delete('Person') if resource.class == 'Person' # to avoid the same person showing up
+    related.delete('Person') if resource.is_a?(Person) # to avoid the same person showing up
+    if !resource.is_a?(Sample)
+      related.delete('Organism')
+    end
 
     answerable = {}
     related.each_key do |type|

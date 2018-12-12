@@ -290,7 +290,7 @@ module ApiHelper
   def associated_resources_xml(builder, object)
     object = object.parent if object.class.name.include?('::Version')
     associated = get_related_resources(object)
-    to_ignore = ignore_associated_types.collect(&:name)
+    to_ignore = ignore_associated_types.collect(&:name).concat ignore_associated_types_xml.collect(&:name)
     associated.delete_if { |k, _v| to_ignore.include?(k) }
     builder.tag! 'associated' do
       associated.keys.sort.each do |key|
@@ -308,6 +308,10 @@ module ApiHelper
   # types that should be ignored from the related resources. It may be desirable to add items in this list to the schema
   def ignore_associated_types
     [Strain, Organism]
+  end
+
+  def ignore_associated_types_xml
+    [Workflow, Node]
   end
 
   def generic_list_xml(builder, list, tag, attr = {})

@@ -10,6 +10,8 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :data_files
   has_and_belongs_to_many :models
   has_and_belongs_to_many :sops
+  has_and_belongs_to_many :workflows
+  has_and_belongs_to_many :nodes
   has_and_belongs_to_many :publications
   has_and_belongs_to_many :events
   has_and_belongs_to_many :presentations
@@ -67,6 +69,8 @@ class Project < ActiveRecord::Base
   validates :title, uniqueness: true
   validates :title, length: { maximum: 255 }
   validates :description, length: { maximum: 65_535 }
+
+  validate :validate_end_date
 
   # a default policy belonging to the project; this is set by a project PAL
   # if the project gets deleted, the default policy needs to be destroyed too
@@ -307,6 +311,10 @@ class Project < ActiveRecord::Base
         project_administrators.any? &&
         !has_member?(user) &&
         MessageLog.recent_project_membership_requests(user.try(:person),self).empty?
+  end
+
+  def validate_end_date
+    errors.add(:end_date, 'is before start date.') unless end_date.nil? || start_date.nil? || end_date >= start_date
   end
 
   # should put below at the bottom in order to override methods for hierarchies,

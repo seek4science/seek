@@ -100,4 +100,8 @@ class Strain < ActiveRecord::Base
     return new_object
   end
 
+  def related_people
+    [contributor]
+  end
+
 end

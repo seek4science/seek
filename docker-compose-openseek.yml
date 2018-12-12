@@ -1,9 +1,11 @@
-version: '2'
+version: '3'
 services:
   db: # Database implementation, in this case MySQL
     image: mysql:5.7
     container_name: seek-mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: always
+    stop_grace_period: 1m30s
     env_file:
       - docker/db.env
     volumes:
@@ -57,9 +59,11 @@ services:
         - solr
 
   openbis:
-      image: openbis/debian-openbis:16.05.2
+      image: openbis/debian-openbis:18.06.0
       container_name: openbis
       restart: always
+      environment:
+        SERVER_HOST_PORT: "localhost:4000"
       volumes:
         - openbis-state:/home/openbis/openbis_state
       ports:

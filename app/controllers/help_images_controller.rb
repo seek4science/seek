@@ -5,7 +5,7 @@ class HelpImagesController < ApplicationController
 
   def create
     @help_document = HelpDocument.find(params[:help_image][:help_document_id])
-    @help_image = HelpImage.new(params[:help_image])
+    @help_image = HelpImage.new(help_image_params)
     if @help_image.save
       @error_text = []
     else
@@ -31,5 +31,10 @@ class HelpImagesController < ApplicationController
       page.visual_effect :highlight, 'image_list'
     end
   end
-  
+
+  private
+
+  def help_image_params
+    params.require(:help_image).permit(:help_document_id, :uploaded_data )
+  end
 end

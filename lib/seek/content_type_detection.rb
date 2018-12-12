@@ -17,6 +17,10 @@ module Seek
       TEXT_MIME_TYPES.include?(blob.content_type)
     end
 
+    def is_cwl?(blob = self)
+      blob.original_filename.end_with?('.cwl')
+    end
+
     def is_indexable_text?(blob = self)
       within_text_size_limit(blob) && is_text?(blob) && blob.file_exists?
     end

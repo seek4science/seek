@@ -1,0 +1,16 @@
+<%
+  reasons = @reasons #errors_panel[:reasons]
+  error_msg = @error_msg #errors_panel[:error_msg]
+
+  if reasons || error_msg then
+%>
+    <div class="alert alert-danger">
+      <%= error_msg %>
+      <% if reasons then
+           reasons.each do |m| %>
+              <br><%= m %>
+          <% end
+             end
+          %>
+    </div>
+<% end %>
