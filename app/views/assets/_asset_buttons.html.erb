@@ -23,7 +23,6 @@
 
 <% end %>
 
-
 <% if asset.is_downloadable? -%>
     <%# param code is used for temporary link -%>
     <%
@@ -37,8 +36,10 @@
             <%= button_link_to('Explore', 'spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code => params[:code])) %>
         <% end -%>
 
-        <% if display_asset.single_content_blob && !display_asset.single_content_blob.show_as_external_link? %>
-            <%= view_content_button display_asset %>
+        <% if asset.is_a?(Workflow) %>
+          <%= view_content_button asset %>
+        <% elsif display_asset.single_content_blob &&  !display_asset.single_content_blob.show_as_external_link? %>
+             <%= view_content_button display_asset %>
         <%   end -%>
     <% end -%>
     <% if logged_in? && !can_download_asset?(asset, params[:code]) %>

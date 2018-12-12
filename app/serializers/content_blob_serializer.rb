@@ -10,4 +10,14 @@ class ContentBlobSerializer < BaseSerializer
   def self_link
     polymorphic_path([object.asset, object])
   end
+
+  def download_link
+    "#{self_link}/download"
+  end
+
+  def _links
+    { self: self_link, download: download_link }
+  end
+
+
 end

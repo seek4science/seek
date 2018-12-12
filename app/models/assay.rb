@@ -4,7 +4,10 @@ class Assay < ActiveRecord::Base
   include Seek::Taggable
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-
+  # needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
+  def projects
+    study.try(:projects) || []
+  end
 
   # needs to before acts_as_isa - otherwise auto_index=>false is overridden by Seek::Search::CommonFields
   if Seek::Config.solr_enabled
@@ -33,7 +36,6 @@ class Assay < ActiveRecord::Base
   has_many :strains, through: :assay_organisms
   has_many :tissue_and_cell_types, through: :assay_organisms
 
-
   before_save { assay_assets.each(&:set_version) }
   has_many :assay_assets, dependent: :destroy, inverse_of: :assay, autosave: true
 
@@ -44,6 +46,7 @@ class Assay < ActiveRecord::Base
   has_many :documents, through: :assay_assets, source: :asset, source_type: 'Document', inverse_of: :assays
 
   has_one :investigation, through: :study
+  has_one :external_asset, as: :seek_entity, dependent: :destroy
 
   validates_presence_of :assay_type_uri
   validates_presence_of :technology_type_uri, unless: :is_modelling?
@@ -198,6 +201,10 @@ class Assay < ActiveRecord::Base
   # overides that from Seek::RDF::RdfGeneration, as Assay entity depends upon the AssayClass (modelling, or experimental) of the Assay
   def rdf_type_entity_fragment
     { 'EXP' => 'Experimental_assay', 'MODEL' => 'Modelling_analysis' }[assay_class.key]
+  end
+
+  def external_asset_search_terms
+    external_asset ? external_asset.search_terms : []
   end
 
   def samples_attributes= attributes

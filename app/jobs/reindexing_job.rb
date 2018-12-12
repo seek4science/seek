@@ -3,7 +3,13 @@ class ReindexingJob < SeekJob
 
   def perform_job(item)
     if Seek::Config.solr_enabled
-      item.solr_index!
+      begin
+        item.solr_index!
+      rescue => e
+        Rails.logger.error "Could not index #{item} #{e.class} #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+        raise e
+      end
     end
   end
 

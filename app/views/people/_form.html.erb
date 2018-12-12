@@ -12,8 +12,6 @@
 
 <% if person -%>
     <%= panel("Knowledge and expertise") do %>
-        <%= render :partial=>"people/discipline_select",:locals=>{:f=>f} %>
-        <br/>
         <%= render :partial => "select_expertise", :locals => {:person => (person ? person : Person.new) } -%>
         <%= render :partial => "select_tools", :locals => {:person => (person ? person : Person.new) } -%>
     <% end %>

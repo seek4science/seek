@@ -1,6 +1,7 @@
 module Seek
   module EnabledFeaturesFilter
-    FEATURES = [:models, :biosamples, :organisms, :events, :documentation, :programmes, :assays, :publications, :samples, :openbis]
+    FEATURES = %i[assays biosamples documentation events models
+                  nels openbis organisms programmes publications samples].freeze
 
     def feature_enabled?(feature)
       feature = feature.to_s
@@ -8,14 +9,14 @@ module Seek
         true
       else
         respond_to do |format|
-          format.html {
+          format.html do
             flash[:error] = "#{feature.capitalize} are disabled"
             redirect_to main_app.root_path
-          }
-          format.xml { render text: '<error>'+"#{feature.capitalize} are disabled"+'</error>', status: :unprocessable_entity }
-          format.json {
-            render json: {"title": "#{feature.capitalize} are disabled"}, status: :unprocessable_entity
-          }
+          end
+          format.xml { render text: '<error>' + "#{feature.capitalize} are disabled" + '</error>', status: :unprocessable_entity }
+          format.json do
+            render json: { "title": "#{feature.capitalize} are disabled" }, status: :unprocessable_entity
+          end
         end
 
         false

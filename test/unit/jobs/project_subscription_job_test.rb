@@ -61,6 +61,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
     Factory(:assay, study: study, contributor: person)
 
     assets = ProjectSubscriptionJob.new(1).all_in_project project
+    # cause without openbis
     assert_equal ps.subscribable_types.count, assets.count
   end
 

@@ -11,6 +11,8 @@ class NelsController < ApplicationController
 
   include Seek::BreadCrumbs
 
+  before_filter :nels_enabled?
+
   skip_before_filter :add_breadcrumbs, only: :callback
 
   def callback
@@ -86,12 +88,6 @@ class NelsController < ApplicationController
       return false
     end
 
-    unless Seek::Config.nels_enabled
-      flash[:error] = 'NeLS integration is not enabled on this SEEK instance.'
-      redirect_to @assay
-      return false
-    end
-
     unless @assay.projects.any?(&:nels_enabled)
       flash[:error] = 'This assay is not associated with a NeLS-enabled project.'
       redirect_to @assay
@@ -112,8 +108,7 @@ class NelsController < ApplicationController
   end
 
   def rest_client
-    client_class = Nels::Rest::Client
-    @rest_client = client_class.new(@oauth_session.access_token)
+    @rest_client = Nels::Rest.client_class.new(@oauth_session.access_token)
   end
 
   def unauthorized_response

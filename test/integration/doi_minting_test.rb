@@ -13,7 +13,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'doiable assets' do
-    assert_equal %w(data_file document model sop), DOIABLE_ASSETS
+    assert_equal %w(data_file document model node sop workflow), DOIABLE_ASSETS
   end
 
   test 'mint a DOI button' do

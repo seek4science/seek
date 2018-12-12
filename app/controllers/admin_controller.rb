@@ -43,6 +43,7 @@ class AdminController < ApplicationController
     # Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
+    Seek::Config.project_admin_sample_type_restriction = string_to_boolean params[:project_admin_sample_type_restriction]
     Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
 
     Seek::Config.set_smtp_settings 'address', params[:address]
@@ -65,6 +66,8 @@ class AdminController < ApplicationController
 
     Seek::Config.internal_help_enabled = string_to_boolean params[:internal_help_enabled]
     Seek::Config.external_help_url = params[:external_help_url]
+
+    Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
 
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]
@@ -244,10 +247,7 @@ class AdminController < ApplicationController
       rescue SystemExit => e
         Rails.logger.info("Exit code #{e.status}")
       rescue => e
-        error = e.message
-        if Seek::Config.exception_notification_enabled
-          ExceptionNotifier.notify_exception(e, data: { message: 'Problem restarting delayed job' })
-        end
+        forward_exception_notification(e, {message:'Problem restarting delayed job'})
       end
     end
 
@@ -378,8 +378,6 @@ class AdminController < ApplicationController
       partial = 'user_stats_list'
       collection = Person.pals
       title = 'List of PALs'
-    when 'administrators'
-      partial = 'admin_selection'
     when 'none'
       partial = 'none'
     end
