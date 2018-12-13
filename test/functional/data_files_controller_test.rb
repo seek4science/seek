@@ -888,15 +888,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
-  test 'should expose spreadsheet contents' do
-    login_as(:model_owner)
-    get :data, id: data_files(:downloadable_data_file), format: 'xml'
-    assert_response :success
-    xml = @response.body
-    schema_path = File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'spreadsheet.xsd')
-    validate_xml_against_schema(xml, schema_path)
-  end
-
   test 'should not expose non downloadable spreadsheet' do
     login_as(:model_owner)
     get :data, id: data_files(:viewable_data_file), format: 'xml'
