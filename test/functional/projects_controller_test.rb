@@ -114,17 +114,44 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal [prog], project.programmes
   end
 
-  test 'create project with start and end dates' do
+  test 'create project with start and end dates and funding codes' do
     person = Factory(:admin)
     login_as(person)
 
     assert_difference('Project.count') do
-      post :create, project: { title: 'proj with dates', start_date:'2018-11-01', end_date:'2018-11-18' }
+      post :create, project: { title: 'proj with dates', start_date:'2018-11-01', end_date:'2018-11-18',funding_codes: 'aaa,bbb' }
     end
 
     project = assigns(:project)
     assert_equal Date.parse('2018-11-01'), project.start_date
     assert_equal Date.parse('2018-11-18'), project.end_date
+
+    assert_equal 2, project.funding_codes.length
+    assert_includes project.funding_codes, 'aaa'
+    assert_includes project.funding_codes, 'bbb'
+  end
+
+  test 'can add and remove funding codes' do
+    login_as(Factory(:admin))
+    project = Factory(:project)
+
+    assert_difference('Annotation.count', 2) do
+      put :update, id: project, project: { funding_codes: '1234,abcd' }
+    end
+
+    assert_redirected_to project
+
+    assert_equal 2, assigns(:project).funding_codes.length
+    assert_includes assigns(:project).funding_codes, '1234'
+    assert_includes assigns(:project).funding_codes, 'abcd'
+
+    assert_difference('Annotation.count', -2) do
+      put :update, id: project, project: { funding_codes: '' }
+    end
+
+    assert_redirected_to project
+
+    assert_equal 0, assigns(:project).funding_codes.length
   end
 
   test 'create project with blank programme' do

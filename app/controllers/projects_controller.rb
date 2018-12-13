@@ -330,7 +330,7 @@ class ProjectsController < ApplicationController
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, :programme_id, { organism_ids: [] },
                         { institution_ids: [] }, :default_license, :site_root_uri, :site_username, :site_password,
-                        :parent_id, :use_default_policy, :nels_enabled, :start_date, :end_date]
+                        :parent_id, :use_default_policy, :nels_enabled, :start_date, :end_date, :funding_codes]
 
     if action_name == 'update'
       restricted_params =
