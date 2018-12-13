@@ -896,4 +896,27 @@ class ProjectTest < ActiveSupport::TestCase
     project.nels_enabled = 'yes please'
     assert_equal true, project.reload.nels_enabled
   end
+
+  test 'funding code' do
+    person = Factory(:project_administrator)
+    proj = person.projects.first
+    User.with_current_user person.user do
+      proj.funding_codes='fish'
+      assert_equal ['fish'],proj.funding_codes.sort
+      proj.save!
+      proj=Project.find(proj.id)
+      assert_equal ['fish'],proj.funding_codes.sort
+
+      proj.funding_codes='1,2,3'
+      assert_equal ['1','2','3'],proj.funding_codes.sort
+      proj.save!
+      proj=Project.find(proj.id)
+      assert_equal ['1','2','3'],proj.funding_codes.sort
+
+      proj.update_attribute(:funding_codes,'a,b')
+      assert_equal ['a','b'],proj.funding_codes.sort
+    end
+
+
+  end
 end
