@@ -15,6 +15,8 @@
 
         <%= persistent_resource_id(@project) %>
 
+        <%= show_funding_codes(@project) %>
+
         <p>
           <strong>Public web page:</strong>
           <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
