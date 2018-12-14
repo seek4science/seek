@@ -8,6 +8,16 @@
     <% unless hide_contact_details?(resource) %>
         <%= list_item_optional_attribute "Internal web page", h(resource.wiki_page), h(resource.wiki_page) %>
     <% end %>
+
+    <% if resource.start_date %>
+      <%= list_item_attribute('Start date',date_as_string(resource.start_date,false)) %>
+    <% end %>
+
+    <% if resource.end_date %>
+      <%= list_item_attribute('End date',date_as_string(resource.end_date,false)) %>
+    <% end %>
+
+
   </div>
 
   <div class="col-sm-6 hidden-xs">

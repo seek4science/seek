@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.9'
+gem 'rails', '~> 4.2.11'
 gem 'rdoc'
 
 #database adaptors
@@ -164,7 +164,7 @@ group :test do
   gem 'ruby-prof', '>= 0.16.0'
   gem 'test-prof'
   gem 'rails-perftest'
-  gem 'minitest'
+  gem 'minitest','5.10.3'
   gem 'minitest-reporters'
   gem 'sunspot_matchers'
   gem 'database_cleaner'

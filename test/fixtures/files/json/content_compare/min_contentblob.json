@@ -24,7 +24,7 @@
     "meta": {
       "created": "2018-04-18T14:24:16.000Z",
       "modified": "2018-04-18T14:24:16.000Z",
-      "api_version": "0.1",
+      "api_version": "0.2",
       "uuid": "18dd0e40-2542-0136-c088-0800279c491a",
       "base_url": "http://localhost:3000"
     }

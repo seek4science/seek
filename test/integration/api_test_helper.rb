@@ -120,10 +120,17 @@ module ApiTestHelper
 
   def test_should_delete_object
     begin
-      obj = Factory(("#{@clz}").to_sym, contributor: @current_person)
+      obj = Factory(@clz.to_sym, contributor: @current_person)
     rescue NoMethodError
-      obj = Factory(("#{@clz}").to_sym)
+      obj = Factory(@clz.to_sym)
     end
+
+    # FIXME: programme factory cannot automatically be deleted, as it has projects associated
+    if (obj.is_a?(Programme))
+      obj.projects = []
+      obj.save!
+    end
+
     assert_difference ("#{@clz.classify.constantize}.count"), -1 do
       delete "/#{@plural_clz}/#{obj.id}.json"
       assert_response :success

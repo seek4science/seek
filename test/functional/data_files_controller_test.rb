@@ -108,40 +108,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div#associate_assay_fold_content p', text: /The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('data_file')}:/
   end
 
-  test 'get XML when not logged in' do
-    logout
-    df = Factory(:data_file, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    get :show, id: df, format: 'xml'
-    perform_api_checks
-  end
-
-  test 'XML for data file with tags' do
-    p = Factory :person
-    df = Factory(:data_file, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    Factory :tag, annotatable: df, source: p, value: 'golf'
-
-    test_get_rest_api_xml df
-  end
-
-  test 'should include tags in XML' do
-    p = Factory :person
-    df = Factory(:data_file, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    Factory :tag, annotatable: df, source: p, value: 'golf'
-    Factory :tag, annotatable: df, source: p, value: '<fish>'
-    Factory :tag, annotatable: df, source: p, value: 'frog', attribute_name: 'tool'
-    Factory :tag, annotatable: df, source: p, value: 'stuff', attribute_name: 'expertise'
-
-    test_get_rest_api_xml df
-
-    assert_response :success
-    xml = @response.body
-    assert xml.include?('<tags>')
-    assert xml.include?('<tag context="tag">golf')
-    assert xml.include?('<tag context="tag">&lt;fish&gt;')
-    assert xml.include?('<tag context="tool">frog')
-    assert xml.include?('<tag context="expertise">stuff')
-  end
-
   test 'should show index' do
     get :index
     assert_response :success
@@ -886,15 +852,6 @@ class DataFilesControllerTest < ActionController::TestCase
     get :download, id: data_files(:viewable_data_file)
     assert_redirected_to data_file_path(data_files(:viewable_data_file))
     assert flash[:error]
-  end
-
-  test 'should expose spreadsheet contents' do
-    login_as(:model_owner)
-    get :data, id: data_files(:downloadable_data_file), format: 'xml'
-    assert_response :success
-    xml = @response.body
-    schema_path = File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'spreadsheet.xsd')
-    validate_xml_against_schema(xml, schema_path)
   end
 
   test 'should not expose non downloadable spreadsheet' do

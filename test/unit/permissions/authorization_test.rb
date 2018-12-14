@@ -546,10 +546,14 @@ class AuthorizationTest < ActiveSupport::TestCase
     asset_manager = Factory(:asset_housekeeper)
     work_group = asset_manager.work_groups.first
     former_project_member = Factory(:person, group_memberships: [Factory(:group_membership, has_left: true, work_group: work_group)])
-    datafile1 = Factory(:data_file, contributor: former_project_member,
-                                    projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
-    datafile2 = Factory(:data_file, contributor: former_project_member,
-                                    projects: asset_manager.projects, policy: Factory(:private_policy))
+    datafile1 = nil
+    datafile2 = nil
+    disable_authorization_checks do
+      datafile1 = Factory(:data_file, contributor: former_project_member,
+                                      projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
+      datafile2 = Factory(:data_file, contributor: former_project_member,
+                                      projects: asset_manager.projects, policy: Factory(:private_policy))
+    end
 
     assert Seek::Permissions::Authorization.authorized_by_role?('manage', datafile1, asset_manager)
     assert Seek::Permissions::Authorization.authorized_by_role?('manage', datafile2, asset_manager)
@@ -624,8 +628,12 @@ class AuthorizationTest < ActiveSupport::TestCase
     policy2.permissions = [permission2]
 
     # resources are not entirely private
-    datafile = Factory(:data_file, contributor: former_project_member, projects: asset_manager.projects, policy: policy)
-    investigation = Factory(:investigation, contributor: former_project_member, projects: asset_manager.projects, policy: policy)
+    datafile = nil
+    investigation = nil
+    disable_authorization_checks do
+      datafile = Factory(:data_file, contributor: former_project_member, projects: asset_manager.projects, policy: policy)
+      investigation = Factory(:investigation, contributor: former_project_member, projects: asset_manager.projects, policy: policy)
+    end
 
     User.with_current_user asset_manager.user do
       assert datafile.can_manage?
@@ -822,6 +830,17 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert sop.can_download?(person1.user)
     assert sop.can_download?(person2.user)
     refute sop.can_download?(person3.user)
+  end
+
+
+  test 'cannot add content to former project' do
+    work_group = Factory(:work_group)
+    former_project_member = Factory(:person, group_memberships: [Factory(:group_membership, has_left: true, work_group: work_group)])
+    datafile = Factory.build(:data_file, contributor: former_project_member,
+                             projects: [work_group.project], policy: Factory(:publicly_viewable_policy))
+
+    refute datafile.save
+    assert datafile.errors[:base].any? { |e| e.include?('active member') }
   end
 
   private 

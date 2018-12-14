@@ -1,6 +1,7 @@
 class Organism < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
   include Seek::ProgrammeCompat
+  include Seek::Search::BackgroundReindexing
 
   acts_as_favouritable
   grouped_pagination
@@ -27,6 +28,14 @@ class Organism < ActiveRecord::Base
       organism.bioportal_concept.errors.each do |attr, msg|
         errors.add(attr, msg)
       end
+    end
+  end
+
+  if Seek::Config.solr_enabled
+    searchable(auto_index: false) do
+      text :title
+      text :searchable_terms
+      text :ncbi_id
     end
   end
 
@@ -67,7 +76,7 @@ class Organism < ActiveRecord::Base
   #   - a identifiers.org URI
   # if it doesn't match these rules it is left as it is
   def convert_concept_uri
-    concept_uri.strip! if concept_uri
+    concept_uri&.strip!
     case concept_uri
     when /\A\d+\Z/
       self.concept_uri = "http://purl.bioontology.org/ontology/NCBITAXON/#{concept_uri}"

@@ -18,33 +18,6 @@ class AssaysControllerTest < ActionController::TestCase
     @object = Factory(:experimental_assay, policy: Factory(:public_policy))
   end
 
-  test 'modelling assay validates with schema' do
-    df = Factory(:data_file, contributor: User.current_user.person)
-    a = Factory(:modelling_assay, contributor: User.current_user.person)
-    disable_authorization_checks do
-      a.associate(df)
-      a.reload
-    end
-
-    User.with_current_user(a.study.investigation.contributor) { a.study.investigation.projects << Factory(:project) }
-    assert_difference('ActivityLog.count') do
-      get :show, id: a, format: 'xml'
-    end
-
-    assert_response :success
-
-    validate_xml_against_schema(@response.body)
-  end
-
-  test 'index includes modelling validates with schema' do
-    get :index, page: 'all', format: 'xml'
-    assert_response :success
-    assays = assigns(:assays)
-    assert assays.include?(assays(:modelling_assay_with_data_and_relationship)), 'This test is invalid as the list should include the modelling assay'
-
-    validate_xml_against_schema(@response.body)
-  end
-
   test "shouldn't show unauthorized assays" do
     login_as Factory(:user)
     hidden = Factory(:experimental_assay, policy: Factory(:private_policy)) # ensure at least one hidden assay exists

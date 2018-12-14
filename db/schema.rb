@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181102134542) do
+ActiveRecord::Schema.define(version: 20181210162148) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -693,7 +693,6 @@ ActiveRecord::Schema.define(version: 20181102134542) do
     t.integer  "failures",           limit: 4,     default: 0
   end
 
-  add_index "external_assets", ["external_id", "external_service"], name: "external_assets_by_external_id", unique: true, using: :btree
   add_index "external_assets", ["seek_entity_type", "seek_entity_id"], name: "index_external_assets_on_seek_entity_type_and_seek_entity_id", using: :btree
   add_index "external_assets", ["seek_service_type", "seek_service_id"], name: "index_external_assets_on_seek_service_type_and_seek_service_id", using: :btree
 
@@ -995,6 +994,70 @@ ActiveRecord::Schema.define(version: 20181102134542) do
     t.boolean "active",             default: true
   end
 
+  create_table "node_auth_lookup", id: false, force: :cascade do |t|
+    t.integer "user_id",      limit: 4
+    t.integer "asset_id",     limit: 4
+    t.boolean "can_view",               default: false
+    t.boolean "can_manage",             default: false
+    t.boolean "can_edit",               default: false
+    t.boolean "can_download",           default: false
+    t.boolean "can_delete",             default: false
+  end
+
+  add_index "node_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_n_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
+  add_index "node_auth_lookup", ["user_id", "can_view"], name: "index_n_auth_lookup_on_user_id_and_can_view", using: :btree
+
+  create_table "node_versions", force: :cascade do |t|
+    t.integer  "node_id",             limit: 4
+    t.integer  "version",             limit: 4
+    t.text     "revision_comments",   limit: 65535
+    t.integer  "contributor_id",      limit: 4
+    t.string   "title",               limit: 255
+    t.text     "description",         limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "last_used_at"
+    t.string   "first_letter",        limit: 1
+    t.text     "other_creators",      limit: 65535
+    t.string   "uuid",                limit: 255
+    t.integer  "policy_id",           limit: 4
+    t.string   "doi",                 limit: 255
+    t.string   "license",             limit: 255
+    t.string   "deleted_contributor", limit: 255
+  end
+
+  add_index "node_versions", ["contributor_id"], name: "index_node_versions_on_contributor", using: :btree
+  add_index "node_versions", ["node_id"], name: "index_node_versions_on_node_id", using: :btree
+
+  create_table "node_versions_projects", id: false, force: :cascade do |t|
+    t.integer "project_id", limit: 4
+    t.integer "version_id", limit: 4
+  end
+
+  create_table "nodes", force: :cascade do |t|
+    t.integer  "contributor_id",      limit: 4
+    t.string   "title",               limit: 255
+    t.text     "description",         limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "last_used_at"
+    t.integer  "version",             limit: 4,     default: 1
+    t.string   "first_letter",        limit: 1
+    t.text     "other_creators",      limit: 65535
+    t.string   "uuid",                limit: 255
+    t.integer  "policy_id",           limit: 4
+    t.string   "doi",                 limit: 255
+    t.string   "license",             limit: 255
+    t.string   "deleted_contributor", limit: 255
+  end
+
+  add_index "nodes", ["contributor_id"], name: "index_nodes_on_contributor", using: :btree
+
+  create_table "nodes_projects", id: false, force: :cascade do |t|
+    t.integer "project_id", limit: 4
+    t.integer "node_id",    limit: 4
+  end
+
   create_table "notifiee_infos", force: :cascade do |t|
     t.integer  "notifiee_id",           limit: 4
     t.string   "notifiee_type",         limit: 255
@@ -1040,8 +1103,8 @@ ActiveRecord::Schema.define(version: 20181102134542) do
     t.string   "space_perm_id",         limit: 255
     t.string   "username",              limit: 255
     t.integer  "project_id",            limit: 4
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "dss_endpoint",          limit: 255
     t.string   "web_endpoint",          limit: 255
     t.integer  "refresh_period_mins",   limit: 4,     default: 120
@@ -1248,6 +1311,8 @@ ActiveRecord::Schema.define(version: 20181102134542) do
     t.integer  "parent_id",          limit: 4
     t.string   "default_license",    limit: 255,   default: "CC-BY-4.0"
     t.boolean  "use_default_policy",               default: false
+    t.date     "start_date"
+    t.date     "end_date"
   end
 
   create_table "projects_publications", id: false, force: :cascade do |t|
@@ -1284,6 +1349,16 @@ ActiveRecord::Schema.define(version: 20181102134542) do
   create_table "projects_strains", id: false, force: :cascade do |t|
     t.integer "project_id", limit: 4
     t.integer "strain_id",  limit: 4
+  end
+
+  create_table "projects_workflow_versions", id: false, force: :cascade do |t|
+    t.integer "project_id", limit: 4
+    t.integer "version_id", limit: 4
+  end
+
+  create_table "projects_workflows", id: false, force: :cascade do |t|
+    t.integer "project_id",  limit: 4
+    t.integer "workflow_id", limit: 4
   end
 
   create_table "publication_auth_lookup", id: false, force: :cascade do |t|
@@ -1611,6 +1686,14 @@ ActiveRecord::Schema.define(version: 20181102134542) do
 
   add_index "sops", ["contributor_id"], name: "index_sops_on_contributor", using: :btree
 
+  create_table "sops_workflows", id: false, force: :cascade do |t|
+    t.integer "workflow_id", limit: 4, null: false
+    t.integer "sop_id",      limit: 4, null: false
+  end
+
+  add_index "sops_workflows", ["sop_id"], name: "index_sops_workflows_on_sop_id", using: :btree
+  add_index "sops_workflows", ["workflow_id"], name: "index_sops_workflows_on_workflow_id", using: :btree
+
   create_table "special_auth_codes", force: :cascade do |t|
     t.string   "code",            limit: 255
     t.date     "expiration_date"
@@ -1826,6 +1909,60 @@ ActiveRecord::Schema.define(version: 20181102134542) do
   end
 
   add_index "work_groups", ["project_id"], name: "index_work_groups_on_project_id", using: :btree
+
+  create_table "workflow_auth_lookup", id: false, force: :cascade do |t|
+    t.integer "user_id",      limit: 4
+    t.integer "asset_id",     limit: 4
+    t.boolean "can_view",               default: false
+    t.boolean "can_manage",             default: false
+    t.boolean "can_edit",               default: false
+    t.boolean "can_download",           default: false
+    t.boolean "can_delete",             default: false
+  end
+
+  add_index "workflow_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
+  add_index "workflow_auth_lookup", ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view", using: :btree
+
+  create_table "workflow_versions", force: :cascade do |t|
+    t.integer  "workflow_id",         limit: 4
+    t.integer  "version",             limit: 4
+    t.text     "revision_comments",   limit: 65535
+    t.integer  "contributor_id",      limit: 4
+    t.string   "title",               limit: 255
+    t.text     "description",         limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "last_used_at"
+    t.string   "first_letter",        limit: 1
+    t.text     "other_creators",      limit: 65535
+    t.string   "uuid",                limit: 255
+    t.integer  "policy_id",           limit: 4
+    t.string   "doi",                 limit: 255
+    t.string   "license",             limit: 255
+    t.string   "deleted_contributor", limit: 255
+  end
+
+  add_index "workflow_versions", ["contributor_id"], name: "index_workflow_versions_on_contributor", using: :btree
+  add_index "workflow_versions", ["workflow_id"], name: "index_workflow_versions_on_workflow_id", using: :btree
+
+  create_table "workflows", force: :cascade do |t|
+    t.integer  "contributor_id",      limit: 4
+    t.string   "title",               limit: 255
+    t.text     "description",         limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "last_used_at"
+    t.integer  "version",             limit: 4,     default: 1
+    t.string   "first_letter",        limit: 1
+    t.text     "other_creators",      limit: 65535
+    t.string   "uuid",                limit: 255
+    t.integer  "policy_id",           limit: 4
+    t.string   "doi",                 limit: 255
+    t.string   "license",             limit: 255
+    t.string   "deleted_contributor", limit: 255
+  end
+
+  add_index "workflows", ["contributor_id"], name: "index_workflows_on_contributor", using: :btree
 
   create_table "worksheets", force: :cascade do |t|
     t.integer "content_blob_id", limit: 4

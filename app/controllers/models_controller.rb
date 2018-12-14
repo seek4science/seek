@@ -13,6 +13,7 @@ class ModelsController < ApplicationController
   before_filter :find_display_asset, :only => [:show, :download, :execute, :matching_data, :visualise, :export_as_xgmml, :compare_versions]
   before_filter :find_other_version, :only => [:compare_versions]
 
+
   include Seek::Jws::Simulator
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
@@ -20,6 +21,13 @@ class ModelsController < ApplicationController
   include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
+
+  # override new to associate assays
+  def new
+    setup_new_asset
+    associate_presented_assays
+    respond_for_new
+  end
 
   def find_other_version
     version = params[:other_version]
@@ -261,6 +269,14 @@ class ModelsController < ApplicationController
     latest_version = model_object.latest_version
     latest_version.model_image_id = model_object.model_image_id
     latest_version.save
+  end
+
+  # before_filter that links modelling analyses passed by assay_id, filtering out incorrect types and those none editable
+  def associate_presented_assays
+    return unless @model && params[:assay_ids] && params[:assay_ids].any?
+    assays = Assay.find(params[:assay_ids])
+    assays = assays.select{|assay| assay.assay_class.is_modelling?}.select{|assay| assay.can_edit?}
+    @model.assign_attributes({assay_ids:assays.collect(&:id)})
   end
 
   private

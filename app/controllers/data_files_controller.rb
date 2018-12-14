@@ -364,6 +364,7 @@ class DataFilesController < ApplicationController
   # @assay
   def rightfield_extraction_ajax
     @data_file = DataFile.new
+    @assay = Assay.new
     @warnings = nil
     critical_error_msg = nil
     session.delete :extraction_exception_message
@@ -378,10 +379,8 @@ class DataFilesController < ApplicationController
         critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
       end
     rescue Exception => e
-      ExceptionNotifier.notify_exception(e, data: {
-          message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}",
-          current_logged_in_user: current_user
-      })
+      forward_exception_notification(e, {message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}",
+                                         current_logged_in_user: current_user})
       session[:extraction_exception_message] = e.message
     end
 
