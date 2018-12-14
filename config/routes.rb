@@ -400,7 +400,6 @@ SEEK::Application.routes.draw do
       post :create_metadata
     end
     member do
-      get :matching_models
       get :data
       post :check_gatekeeper_required
       get :plot

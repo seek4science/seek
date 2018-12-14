@@ -13,7 +13,7 @@ class DataFilesController < ApplicationController
   before_filter :find_assets, only: [:index]
   before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob,
                                                              :request_resource, :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
-  before_filter :find_display_asset, only: [:show, :explore, :download, :matching_models]
+  before_filter :find_display_asset, only: [:show, :explore, :download]
   skip_before_filter :verify_authenticity_token, only: [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, only: [:upload_for_tool, :upload_from_email]
   before_filter :get_sample_type, only: :extract_samples
@@ -208,21 +208,6 @@ class DataFilesController < ApplicationController
         flash[:error] = 'Unable to view contents of this data file'
         format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
       end
-    end
-  end
-
-  def matching_models
-    # FIXME: should use the correct version
-    @matching_model_items = @data_file.matching_models
-    # filter authorization
-    ids = @matching_model_items.collect(&:primary_key)
-    models = Model.where(id: ids)
-    authorised_ids = Model.authorize_asset_collection(models, 'view').collect(&:id)
-    @matching_model_items = @matching_model_items.select { |mdf| authorised_ids.include?(mdf.primary_key.to_i) }
-
-    flash.now[:notice] = "#{@matching_model_items.count} #{t('model').pluralize}  were found that may be relevant to this #{t('data_file')} "
-    respond_to do |format|
-      format.html
     end
   end
 
