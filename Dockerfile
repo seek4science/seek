@@ -40,7 +40,8 @@ RUN chown -R www-data solr config docker public /var/www db/schema.rb
 USER www-data
 RUN touch config/using-docker #allows us to see within SEEK we are running in a container
 
-RUN cp docker/database.docker.mysql.yml config/database.yml
+RUN cp docker/database.docker.mysql.yml config/database.yml && \
+    chmod +x docker/upgrade.sh docker/start_workers.sh
 
 RUN bundle exec rake assets:precompile && \
     rm -rf tmp/cache/*
