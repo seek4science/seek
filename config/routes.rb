@@ -475,7 +475,6 @@ SEEK::Application.routes.draw do
       get :visualise
       post :check_gatekeeper_required
       get :download
-      get :matching_data
       get :published
       post :publish_related_items
       post :new_version

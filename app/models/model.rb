@@ -76,50 +76,6 @@ class Model < ActiveRecord::Base
     Seek::Config.models_enabled
   end
 
-  #a simple container for handling the matching results returned from #matching_data_files
-  class DataFileMatchResult < Struct.new(:search_terms,:score,:primary_key);end
-
-  #return a an array of DataFileMatchResult where the data file id is the key, and the matching terms/values are the values
-  def matching_data_files params_only=false
-    
-    results = {}
-
-    if Seek::Config.solr_enabled && is_jws_supported?
-      search_terms = parameters_and_values.keys
-      unless params_only
-        search_terms = search_terms | species | searchable_tags | organism_terms
-      end
-      #make the array uniq! case-insensistive whilst mainting the original case
-      dc = []
-      search_terms = search_terms.inject([]) do |r,v|
-        unless dc.include?(v.downcase)
-          r << v
-          dc << v.downcase
-        end
-        r
-      end
-
-      fields = [:fs_search_fields, :content_blob,:spreadsheet_annotation_search_fields, :searchable_tags]
-
-      search_terms.each do |key|
-        key = Seek::Search::SearchTermFilter.filter(key)
-        unless key.blank?
-          DataFile.search do |query|
-            query.keywords key, :fields=>fields
-          end.hits.each do |hit|
-            unless hit.score.nil?
-              results[hit.primary_key]||=DataFileMatchResult.new([],0,hit.primary_key)
-              results[hit.primary_key].search_terms << key
-              results[hit.primary_key].score += (0.75 + hit.score)
-            end
-          end
-        end
-      end
-    end
-
-    results.values.sort_by{|a| -a.score}
-  end
-
   def model_format
     if read_attribute(:model_format_id).nil? && contains_sbml?
       ModelFormat.sbml.first
