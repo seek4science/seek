@@ -199,6 +199,12 @@ class DataFilesController < ApplicationController
   end
 
   def explore
+    #drop invalid explore params
+    [:page_rows, :page, :sheet].each do |param|
+      if params[param].present? && (params[param] =~ /\A\d+\Z/).nil?
+        params.delete(param)
+      end
+    end
     if @display_data_file.contains_extractable_spreadsheet?
       respond_to do |format|
         format.html
