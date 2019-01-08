@@ -56,7 +56,7 @@ class ContentBlobsController < ApplicationController
         sheet = params[:sheet] || 1
         trim = params[:trim] || false
         file = open(@content_blob.filepath)
-        render text: spreadsheet_to_csv(file, sheet, trim), content_type: 'text/csv'
+        render text: spreadsheet_to_csv(file, sheet, trim, Seek::Config.jvm_memory_allocation), content_type: 'text/csv'
       else
         render text: 'Unable to view contents of this data file,', content_type: 'text/csv', status: :not_acceptable
       end

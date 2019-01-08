@@ -400,8 +400,6 @@ SEEK::Application.routes.draw do
       post :create_metadata
     end
     member do
-      get :matching_models
-      get :data
       post :check_gatekeeper_required
       get :plot
       get :explore
@@ -475,7 +473,6 @@ SEEK::Application.routes.draw do
       get :visualise
       post :check_gatekeeper_required
       get :download
-      get :matching_data
       get :published
       post :publish_related_items
       post :new_version

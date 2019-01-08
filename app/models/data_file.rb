@@ -115,40 +115,6 @@ class DataFile < ActiveRecord::Base
     content_blob.present? ? SampleType.sample_types_matching_content_blob(content_blob,user) : []
   end
 
-  # a simple container for handling the matching results returned from #matching_data_files
-  class ModelMatchResult < Struct.new(:search_terms, :score, :primary_key); end
-
-  # return a an array of ModelMatchResult where the model id is the key, and the matching terms/values are the values
-  def matching_models
-    results = {}
-
-    if Seek::Config.solr_enabled && contains_extractable_spreadsheet?
-      search_terms = spreadsheet_annotation_search_fields | content_blob_search_terms | fs_search_fields | searchable_tags
-      # make the array uniq! case-insensistive whilst mainting the original case
-      dc = []
-      search_terms = search_terms.each_with_object([]) do |v, r|
-        unless dc.include?(v.downcase)
-          r << v
-          dc << v.downcase
-        end
-      end
-      search_terms.each do |key|
-        key = Seek::Search::SearchTermFilter.filter(key)
-        next if key.blank?
-        Model.search do |query|
-          query.keywords key, fields: %i[model_contents_for_search description searchable_tags]
-        end.hits.each do |hit|
-          next if hit.score.nil?
-          results[hit.primary_key] ||= ModelMatchResult.new([], 0, hit.primary_key)
-          results[hit.primary_key].search_terms << key
-          results[hit.primary_key].score += hit.score
-        end
-      end
-    end
-
-    results.values.sort_by { |a| -a.score }
-  end
-
   def related_samples
     extracted_samples
   end

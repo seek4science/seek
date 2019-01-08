@@ -854,25 +854,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
-  test 'should not expose non downloadable spreadsheet' do
-    login_as(:model_owner)
-    get :data, id: data_files(:viewable_data_file), format: 'xml'
-    assert_response 403
-  end
-
-  def test_should_not_expose_contents_for_picture
-    get :data, id: data_files(:picture)
-    assert_redirected_to data_file_path(data_files(:picture))
-    assert flash[:error]
-  end
-
-  test 'should not expose spreadsheet contents if not authorized' do
-    login_as(:aaron)
-    get :data, id: data_files(:viewable_data_file)
-    assert_redirected_to data_file_path(data_files(:viewable_data_file))
-    assert flash[:error]
-  end
-
   test 'should update data file' do
     assert_difference('ActivityLog.count') do
       put :update, id: data_files(:picture).id, data_file: { title: 'diff title' }
@@ -894,27 +875,28 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should be possible to delete one version of data file' do
-    Seek::Config.delete_asset_version_enabled = true
-    # upload a data file
-    df = Factory :data_file, contributor: User.current_user.person
-    # upload new version 1 of the data file
-    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 1'
-    # upload new version 2 of the data file
-    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 2'
+    with_config_value :delete_asset_version_enabled,true do
+      # upload a data file
+      df = Factory :data_file, contributor: User.current_user.person
+      # upload new version 1 of the data file
+      post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 1'
+      # upload new version 2 of the data file
+      post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 2'
 
-    df.reload
-    assert_equal 3, df.versions.length
-
-    # the latest version is 3
-    assert_equal 3, df.version
-
-    assert_difference('df.versions.length', -1) do
-      put :destroy_version, id: df, version: 3
       df.reload
+      assert_equal 3, df.versions.length
+
+      # the latest version is 3
+      assert_equal 3, df.version
+
+      assert_difference('df.versions.length', -1) do
+        put :destroy_version, id: df, version: 3
+        df.reload
+      end
+      # the latest version becomes 2
+      assert_equal 2, df.version
+      assert_redirected_to data_file_path(df)
     end
-    # the latest version becomes 2
-    assert_equal 2, df.version
-    assert_redirected_to data_file_path(df)
   end
 
   test 'adding_new_conditions_to_different_versions' do
@@ -922,6 +904,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert d.can_edit?
     sf = StudiedFactor.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
                               start_value: 1, end_value: 2, data_file_id: d.id, data_file_version: d.version)
+
     assert_difference('DataFile::Version.count', 1) do
       assert_difference('StudiedFactor.count', 1) do
         post :new_version, id: d, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' # v2
@@ -2052,7 +2035,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, id: df
 
-    assert_select '.panel .panel-body span.none_text', text: 'No license specified'
+    assert_select '.panel .panel-body span#null_license', text: I18n.t('null_license')
   end
 
   test 'should display license' do
@@ -2104,7 +2087,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :edit, id: df2
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', text: 'License Not Specified'
+    assert_select '#license-select option[selected=?]', 'selected', text: I18n.t('null_license')
 
     register_content_blob
     assert_response :success
