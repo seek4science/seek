@@ -178,26 +178,6 @@ class DataFilesController < ApplicationController
     end
   end
 
-  def data
-    @data_file =  DataFile.find(params[:id])
-    sheet = params[:sheet] || 1
-    trim = params[:trim] || false
-    content_blob = @data_file.content_blob
-    file = open(content_blob.filepath)
-    mime_extensions = mime_extensions(content_blob.content_type)
-    if !(%w(xls xlsx) & mime_extensions).empty?
-      respond_to do |format|
-        format.html # currently complains about a missing template, but we don't want people using this for now - its purely XML
-        format.xml { render xml: spreadsheet_to_xml(file, memory_allocation = Seek::Config.jvm_memory_allocation) }
-      end
-    else
-      respond_to do |format|
-        flash[:error] = 'Unable to view contents of this data file'
-        format.html { redirect_to @data_file, format: 'html' }
-      end
-    end
-  end
-
   def explore
     #drop invalid explore params
     [:page_rows, :page, :sheet].each do |param|
