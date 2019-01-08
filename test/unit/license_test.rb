@@ -44,4 +44,17 @@ class LicenseTest < ActiveSupport::TestCase
     assert_nil Seek::License.find('cc-by', @od)
     assert_nil Seek::License.find('CC-BY-4.0', @zenodo)
   end
+
+  test 'override notspecified text and url' do
+    refute_nil (license = Seek::License.find('notspecified'))
+    assert license.is_a?(Seek::License)
+    assert license.is_null_license?
+    assert_equal 'No license - no permission to use unless the owner grants a licence',license['title']
+    assert_equal 'https://choosealicense.com/no-permission/',license['url']
+
+    #double check the main hash
+    license_json = Seek::License::OPENDEFINITION[:all].find{|x| x['id']=='notspecified'}
+    assert_equal license,Seek::License.new(license_json)
+  end
+
 end
