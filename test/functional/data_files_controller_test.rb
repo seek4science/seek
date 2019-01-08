@@ -875,27 +875,28 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should be possible to delete one version of data file' do
-    Seek::Config.delete_asset_version_enabled = true
-    # upload a data file
-    df = Factory :data_file, contributor: User.current_user.person
-    # upload new version 1 of the data file
-    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 1'
-    # upload new version 2 of the data file
-    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 2'
+    with_config_value :delete_asset_version_enabled,true do
+      # upload a data file
+      df = Factory :data_file, contributor: User.current_user.person
+      # upload new version 1 of the data file
+      post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 1'
+      # upload new version 2 of the data file
+      post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 2'
 
-    df.reload
-    assert_equal 3, df.versions.length
-
-    # the latest version is 3
-    assert_equal 3, df.version
-
-    assert_difference('df.versions.length', -1) do
-      put :destroy_version, id: df, version: 3
       df.reload
+      assert_equal 3, df.versions.length
+
+      # the latest version is 3
+      assert_equal 3, df.version
+
+      assert_difference('df.versions.length', -1) do
+        put :destroy_version, id: df, version: 3
+        df.reload
+      end
+      # the latest version becomes 2
+      assert_equal 2, df.version
+      assert_redirected_to data_file_path(df)
     end
-    # the latest version becomes 2
-    assert_equal 2, df.version
-    assert_redirected_to data_file_path(df)
   end
 
   test 'adding_new_conditions_to_different_versions' do
