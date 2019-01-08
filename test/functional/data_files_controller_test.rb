@@ -904,6 +904,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert d.can_edit?
     sf = StudiedFactor.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
                               start_value: 1, end_value: 2, data_file_id: d.id, data_file_version: d.version)
+
     assert_difference('DataFile::Version.count', 1) do
       assert_difference('StudiedFactor.count', 1) do
         post :new_version, id: d, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' # v2

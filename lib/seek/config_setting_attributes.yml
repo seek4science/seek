@@ -80,7 +80,6 @@ pdf_conversion_enabled:
 admin_impersonation_enabled:
 auth_lookup_enabled:
 guide_box_enabled:
-treatments_enabled:
 factors_studied_enabled:
 experimental_conditions_enabled:
 documentation_enabled:
