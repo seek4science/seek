@@ -12,14 +12,15 @@ module LicenseHelper
 
   def describe_license(id, source = nil)
     license = Seek::License.find(id, source)
-    if license && !license.is_null_license?
-      if license.url.blank?
-        license.title
-      else
-        link_to(license.title, license.url, target: :_blank)
+    content = license_description_content(license)
+
+    if !license || license.is_null_license?
+      content_tag(:span, id: 'null_license') do
+        image(:warning) +
+            content
       end
     else
-      content_tag(:span, 'No license specified', class: 'none_text')
+      content
     end
   end
 
@@ -41,6 +42,20 @@ module LicenseHelper
   end
 
   private
+
+  def license_description_content(license)
+    if license
+      url = license.url
+      title = license.title
+      if url.blank?
+        title
+      else
+        link_to(title, url, target: :_blank)
+      end
+    else
+      Seek::License::NULL_LICENSE_TEXT
+    end
+  end
 
   def license_values(opts = {})
     opts.delete(:source) || Seek::License::OPENDEFINITION[:all]

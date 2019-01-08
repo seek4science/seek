@@ -1,11 +1,12 @@
 module Seek
   class License < OpenStruct
     NULL_LICENSE = 'notspecified'.freeze
+    NULL_LICENSE_TEXT = 'No license - no permission to use unless the owner grants a licence'.freeze
 
     # overrides values taken from the JSON.
     # Preferable to modifying the JSON file directly which is a definitive source and may be replaced with an updated copy
     private_class_method def self.override_json(json)
-      json['notspecified']['title'] = 'No license - no permission to use unless the owner grants a licence'
+      json['notspecified']['title'] = NULL_LICENSE_TEXT
       json['notspecified']['url'] = 'https://choosealicense.com/no-permission/'
       json
     end
