@@ -1,7 +1,7 @@
 module Seek
   class License < OpenStruct
     NULL_LICENSE = 'notspecified'.freeze
-    NULL_LICENSE_TEXT = 'No license - no permission to use unless the owner grants a licence'.freeze
+    NULL_LICENSE_TEXT = I18n.t('null_license').freeze
 
     # overrides values taken from the JSON.
     # Preferable to modifying the JSON file directly which is a definitive source and may be replaced with an updated copy

@@ -84,6 +84,8 @@ en:
   jerm_harvester_name: 'The JERM Harvester'
   deleted_contributor_name: 'Deleted contributor'
 
+  null_license: 'No license - no permission to use unless the owner grants a licence'
+
   activerecord:
       attributes:
         person:

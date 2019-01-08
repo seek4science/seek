@@ -316,7 +316,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
     get :show, id: presentation
 
-    assert_select '.panel .panel-body span.none_text', text: 'No license specified'
+    assert_select '.panel .panel-body span#null_license', text: I18n.t('null_license')
   end
 
   test 'should display license' do

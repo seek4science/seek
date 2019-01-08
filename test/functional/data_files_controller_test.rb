@@ -2035,7 +2035,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, id: df
 
-    assert_select '.panel .panel-body span.none_text', text: 'No license specified'
+    assert_select '.panel .panel-body span#null_license', text: I18n.t('null_license')
   end
 
   test 'should display license' do
@@ -2087,7 +2087,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :edit, id: df2
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', text: 'License Not Specified'
+    assert_select '#license-select option[selected=?]', 'selected', text: I18n.t('null_license')
 
     register_content_blob
     assert_response :success
