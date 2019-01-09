@@ -28,7 +28,7 @@
 
           <%= render :partial => "assays/associate_assays", :locals=>{:resource => @document} -%>
 
-          <%= fancy_multiselect @document, :events, { other_projects_checkbox: true } if Seek::Config.events_enabled %>
+          <%= fancy_multiselect @document, :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
       <% end -%>
 
       <div>

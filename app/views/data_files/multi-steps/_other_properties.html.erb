@@ -7,7 +7,7 @@
                                                                   :existing_attributions => [], collapsed: false} -%>
     <%= f.fancy_multiselect :publications, { hidden: false, other_projects_checkbox: true } %>
 
-    <%= fancy_multiselect @data_file, :events, { hidden: false, other_projects_checkbox: true } if Seek::Config.events_enabled %>
+    <%= fancy_multiselect @data_file, :events, { hidden: false, other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
 
     <div class='multi-step-buttons'>
       <%= multi_step_start_button %>
