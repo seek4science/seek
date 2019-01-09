@@ -19,6 +19,7 @@ require 'nels_test_helper'
 require 'minitest/reporters'
 require 'minitest'
 require 'ostruct'
+require 'pry'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new]
 
