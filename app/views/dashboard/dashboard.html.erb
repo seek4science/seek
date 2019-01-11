@@ -14,6 +14,8 @@
     };
 </script>
 
+
+
 <div class="row">
   <div class="col-sm-8">
     <%= render partial: 'general/page_title', locals: { title: "#{@project ? t('project').capitalize : 'SEEK'} Dashboard" } %>
@@ -21,6 +23,7 @@
   <div class="col-sm-4">
     <div id="dashboard-controls" class="form-inline text-right">
       <%= render partial: 'dashboard/time_controls' -%>
+
     </div>
   </div>
 </div>
@@ -46,6 +49,11 @@
       </div>
     </div>
   </div>
+</div>
+<div class="row">
+  <span style="float:right">
+    <%= button_link_to "Refresh", 'refresh', polymorphic_path([:clear_cache, scope, :stats]), :method => :post %>
+  </span>
 </div>
 
 <script>

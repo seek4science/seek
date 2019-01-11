@@ -48,6 +48,12 @@ class StatsController < ApplicationController
     end
   end
 
+  def clear_cache
+    stats.clear_caches
+
+    redirect_to :back
+  end
+
   private
 
   def stats
