@@ -142,8 +142,12 @@ module RelatedItemsHelper
   end
 
   def order_related_items(related)
-    related.each do |_key, res|
-      res[:items].sort! { |item, item2| item2.updated_at <=> item.updated_at }
+    related.each do |key, res|
+      if key == 'Person' && !@project.nil?
+        res[:items] = sort_project_member_by_status(res[:items], @project.id)
+      else
+        res[:items].sort! { |item, item2| item2.updated_at <=> item.updated_at }
+      end
     end
   end
 
@@ -191,7 +195,20 @@ module RelatedItemsHelper
       related[type][:extra_count] = 0
       answerable[type] = !related[type][:items].nil?
     end
-
     related
   end
+
+  def sort_project_member_by_status(resource, project_id)
+    project = Project.find(project_id)
+    resource.sort_by {|person| person.current_projects.include?(project) ? 0 : 1}
   end
+
+  def get_person_id
+    if !params[:id].nil?
+      person_id = params[:id]
+    elsif !params[:person_id].nil?
+      person_id = params[:person_id]
+    end
+    person_id
+  end
+end
