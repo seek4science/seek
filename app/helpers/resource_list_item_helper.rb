@@ -1,4 +1,7 @@
 module ResourceListItemHelper
+
+  include RelatedItemsHelper
+
   def get_list_item_content_partial(resource)
     get_original_model_name(resource).pluralize.underscore + '/resource_list_item'
   end
@@ -20,6 +23,44 @@ module ResourceListItemHelper
     else
       'avatars/list_item_avatars'
     end
+  end
+
+  def list_item_title_no_cache (resource, options = {})
+    result =''
+    url = nil
+    project_id = ''
+    title = get_object_title(resource)
+    include_avatar = true
+    html = '<div class="list_item_title">'
+
+    if !@project.nil?
+      project_id = @project.id.to_s
+    elsif !params[:project_id].nil?
+      project_id = params[:project_id]
+    end
+
+    if resource.class.name.split('::')[0] == 'Person'
+      html = list_item_title_for_person(html, resource, title, url)
+      if project_id != ''
+        html << get_person_status(resource, project_id)
+      end
+    else
+      if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
+        html = list_item_title_with_avatar(html, resource, title, url)
+      else
+        html << (link_to title, (url.nil? ? show_resource_path(resource) : url)).to_s
+      end
+
+      if (controller_name == "people" && resource.class.name.split('::')[0] == 'Project') ||
+          controller_name == "projects"
+        html << get_project_status(resource)
+      end
+    end
+    html << '</div>'
+    visibility = resource.authorization_supported? && resource.can_manage? ? list_item_visibility(resource) : ''
+    html = html.gsub('#item_visibility', visibility)
+    result = html
+    result.html_safe
   end
 
   def list_item_title(resource, options = {})
@@ -242,5 +283,47 @@ module ResourceListItemHelper
 
   def list_item_orcid(person)
     orcid_identifier(person) if person.orcid.present?
+  end
+
+  private
+
+  def get_person_status(resource, project_id)
+    html =''
+    project = Project.find(project_id)
+    unless project_id.nil?
+      unless resource.current_projects.include?(project)
+        html << ": inactive since " #Todo hu add icon
+        html << "#{get_left_time(resource,project_id)}"
+      end
+    end
+    html
+  end
+
+  def get_project_status(resource)
+    html =''
+    person_id = get_person_id
+    project = Project.find(resource.id)
+    unless person_id.nil?
+      person = Person.find(person_id)
+      unless person.current_projects.include?(project)
+        html << ": inactive since " #Todo hu add icon
+        html << "#{get_left_time(person,resource.id.to_s)}"
+      end
+    end
+    html
+  end
+
+  def get_left_time(person,project_id)
+    left_time = nil
+    group_memberships = person.group_memberships
+    group_memberships.each do |group_membership|
+      if project_id == group_membership.work_group.project_id.to_s
+        unless group_membership.time_left_at.nil?
+        left_time = group_membership.time_left_at.to_date.to_s
+        break
+        end
+      end
+    end
+    left_time
   end
 end
