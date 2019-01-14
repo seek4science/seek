@@ -233,6 +233,39 @@ class PolicyTest < ActiveSupport::TestCase
     assert policy.public?
   end
 
+  test 'private?' do
+
+    [Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING, Policy::PUBLISHING].each do |type|
+      policy = Factory(:private_policy, access_type: type)
+      assert policy.permissions.empty?
+      refute policy.private?
+    end
+
+
+    # policy and all permissions are set to No Access
+    policy = Factory(:private_policy)
+    assert_equal Policy::NO_ACCESS, policy.access_type
+    assert policy.private?
+
+    policy.permissions.create(contributor: Factory(:project), access_type: Policy::NO_ACCESS)
+
+    assert policy.private?
+
+    perm = policy.permissions.create(contributor: Factory(:project), access_type: Policy::VISIBLE)
+
+    refute policy.private?
+
+    perm.update_columns(access_type: Policy::NO_ACCESS)
+    policy.reload
+
+    assert policy.private?
+
+    policy.permissions.create(contributor: Factory(:person), access_type: Policy::ACCESSIBLE)
+
+    refute policy.private?
+
+  end
+
   test 'associated items' do
     df = Factory(:data_file)
     policy = df.policy

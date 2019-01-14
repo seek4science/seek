@@ -238,7 +238,7 @@ class Policy < ActiveRecord::Base
   end
 
   def private?
-    access_type == Policy::NO_ACCESS && permissions.empty?
+    access_type == Policy::NO_ACCESS && permissions.where('access_type > ?', Policy::NO_ACCESS).empty?
   end
 
   def public?

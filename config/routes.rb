@@ -23,6 +23,7 @@ SEEK::Application.routes.draw do
         get :asset_activity
         get :contributors
         get :asset_accessibility
+        post :clear_cache
       end
     end
   end
