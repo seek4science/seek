@@ -20,7 +20,6 @@
   </div>
 </div>
 
-
 <script>
     var publishedAssetsChart = new Chart(document.getElementById('asset-accessibility-canvas').getContext('2d'), {
             type: 'pie',
@@ -45,6 +44,7 @@
                 legend: {
                     position: 'right',
                     labels: {
+                        <%# A little override to show the value in parentheses next to each label %>
                         generateLabels: function(chart) {
                             var labels = Chart.defaults.pie.legend.labels.generateLabels(chart);
                             labels.forEach(function (label) {
