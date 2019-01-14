@@ -188,7 +188,7 @@ module ResourceListItemHelper
 
     case policy.access_type
     when Policy::NO_ACCESS
-      if policy.permissions.empty?
+      if policy.private?
         title = 'Private'
         html << image('lock', title: title, class: css_class)
       else
