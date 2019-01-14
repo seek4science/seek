@@ -1,10 +1,13 @@
 <% scope = @project || :admin %>
 
 <script>
+    <%# A simple object to hold a list of functions for updating (refresh) each of the dashboard panels,
+          and a function to execute them all when e.g. the time period is changed. %>
     var Dashboard = {
-        updateCallbacks: [],
-        refreshAll: function () {
-            this.updateCallbacks.forEach(function (f) {
+        updateFunctions: [],
+
+        updateAll: function () {
+            this.updateFunctions.forEach(function (f) {
                 f();
             })
         }
@@ -47,10 +50,12 @@
 
 <script>
     $j(document).ready(function () {
+        <%# Behaviour for the "Most viewed/downloaded" and "Most active contributor" lists %>
         $j('.most-activity').each(function () {
             var container = $j(this);
             var body = $j('.panel-body', container);
 
+            <%# Function to fetch/update the stats via AJAX and render using handlebars %>
             var getStats = function () {
                 var data = {};
                 data.start_date  = $j('#dashboard-controls [data-dashboard-field="period-start"]').val();
@@ -79,7 +84,9 @@
                     }
                 });
             };
-            Dashboard.updateCallbacks.push(getStats);
+
+            <%# Register the update function %>
+            Dashboard.updateFunctions.push(getStats);
 
             $j('[data-dashboard-field="type"]', container).change(getStats);
         });
@@ -98,15 +105,17 @@
                 $j('.custom-range-field', wrapper).fadeOut();
                 $j('[data-dashboard-field="period-start"]', wrapper).val($j(this).val());
                 $j('[data-dashboard-field="period-end"]', wrapper).val(new Date().toISOString().substr(0,10));
-                Dashboard.refreshAll();
+                Dashboard.updateAll();
             }
         });
 
-        $j('[data-dashboard-period-btn]').click(function () { Dashboard.refreshAll(); return false; });
+        $j('[data-dashboard-period-btn]').click(function () { Dashboard.updateAll(); return false; });
 
-        Dashboard.updateCallbacks.push(getContributionStats);
-        Dashboard.updateCallbacks.push(getAccessibilityStats);
+        <%# Register update functions that were defined in some partials %>
+        Dashboard.updateFunctions.push(getContributionStats);
+        Dashboard.updateFunctions.push(getAccessibilityStats);
 
+        <%# Trigger a "change" event on the period selector  as a hacky way to load all the panels when the page is first loaded %>
         $j('[data-dashboard-field="period-select"]').change();
     });
 </script>
