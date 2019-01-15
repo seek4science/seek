@@ -1,7 +1,13 @@
 module Seek
   module Stats
     class DashboardStats
+
+      class InvalidScopeException < Exception; end
+
+      attr_reader :scope
+
       def initialize(scope = nil)
+        raise InvalidScopeException,"Invalid scope, must be nil or Project" if scope && !scope.is_a?(Project)
         @scope = scope
       end
 
@@ -43,7 +49,7 @@ module Seek
                     '%Y-%m-%d'
                   end
 
-          assets = (@scope.nil? ? (Programme.all + Project.all) : []) + scoped_resources
+          assets = (scope.nil? ? (Programme.all + Project.all) : []) + scoped_resources
           assets.select! { |a| a.created_at >= start_date && a.created_at <= end_date }
           date_grouped = assets.group_by { |a| a.created_at.strftime(strft) }
           types = assets.map(&:class).uniq
@@ -67,9 +73,9 @@ module Seek
           assets.select! { |a| a.class.name == type } if type
           assets.select! { |a| a.created_at >= start_date && a.created_at <= end_date }
           published_count = assets.count(&:is_published?)
-          private_count = assets.count(&:private?)
-          misc_permissions = assets.count - (published_count + private_count)
-          { published: published_count, restricted: misc_permissions, private: private_count }
+          restricted = assets.count(&:private?)
+          misc_permissions = assets.count - (published_count + restricted)
+          { published: published_count, restricted: misc_permissions, private: restricted }
         end
       end
 
@@ -80,16 +86,16 @@ module Seek
       private
 
       def cache_key_base
-        if @scope
-          "#{@scope.class.name}_#{@scope.id}_dashboard_stats"
+        if scope
+          "#{scope.class.name}_#{scope.id}_dashboard_stats"
         else
           'admin_dashboard_stats'
         end
       end
 
       def scoped_activities
-        @activities ||= if @scope
-                          ActivityLog.where(referenced_id: @scope.id, referenced_type: @scope.class.name)
+        @activities ||= if scope
+                          ActivityLog.where(referenced_id: scope.id, referenced_type: scope.class.name)
                         else
                           ActivityLog
                         end
@@ -100,16 +106,16 @@ module Seek
       end
 
       def scoped_assets
-        @assets ||= if @scope
-                      (@scope.assets + @scope.samples)
+        @assets ||= if scope
+                      (scope.assets + scope.samples)
                     else
                       Seek::Util.asset_types.map(&:all).flatten
                     end
       end
 
       def scoped_isa
-        @isa ||= if @scope
-                   @scope.investigations + @scope.studies + @scope.assays
+        @isa ||= if scope
+                   scope.investigations + scope.studies + scope.assays
                  else
                    Investigation.all + Study.all + Assay.all
                  end
