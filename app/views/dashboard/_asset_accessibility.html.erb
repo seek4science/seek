@@ -35,8 +35,8 @@
                 }],
                 labels: [
                     'Published',
-                    'Restricted',
-                    'Private'
+                    'Project accessible',
+                    'Other'
                 ]
             },
             options: {
@@ -75,7 +75,7 @@
         $j.ajax({ url: '<%= url -%>',
             data: data,
             success: function (resp) {
-                publishedAssetsChart.data.datasets[0].data = [resp.published_count, resp.restricted_count, resp.private_count];
+                publishedAssetsChart.data.datasets[0].data = [resp.published_count, resp.project_accessible_count, resp.other_count];
                 publishedAssetsChart.update();
             },
             error: function () {

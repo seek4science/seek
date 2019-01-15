@@ -47,4 +47,23 @@ class DashboardStatsTest < ActiveSupport::TestCase
 
     assert Rails.cache.exist?(another_project_key)
   end
+
+  test 'scope type guard' do
+
+    #happy if nil
+    Seek::Stats::DashboardStats.new
+    Seek::Stats::DashboardStats.new(nil)
+
+    #happy if project
+    Seek::Stats::DashboardStats.new(Factory(:project))
+
+    #not happy if something else
+    assert_raise Seek::Stats::DashboardStats::InvalidScopeException do
+      Seek::Stats::DashboardStats.new("I am a string")
+    end
+    assert_raise Seek::Stats::DashboardStats::InvalidScopeException do
+      Seek::Stats::DashboardStats.new(Factory(:person))
+    end
+
+  end
 end

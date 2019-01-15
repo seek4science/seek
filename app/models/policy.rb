@@ -81,7 +81,7 @@ class Policy < ActiveRecord::Base
 
   # checks that there are permissions for the provided contributor, for the access_type (or higher)
   def permission_granted?(contributor, access_type)
-    permissions.detect { |p| p.contributor == contributor && p.access_type >= access_type }
+    permissions.where(contributor:contributor).where('access_type >= ?',access_type).any?
   end
 
   def self.new_for_upload_tool(resource, recipient)
@@ -245,6 +245,16 @@ class Policy < ActiveRecord::Base
     access_type && access_type > Policy::NO_ACCESS && sharing_scope != Policy::ALL_USERS
   end
 
+  # item is acccessible to members of the projects passed. Ignores additional restrictions, such as additional permissions to block particular members.
+  # if items is a downloadable_asset it needs to be ACCESSIBLE, otherwise just VISIBLE
+  def projects_accessible?(projects, downloadable_asset)
+    lowest_access_type = downloadable_asset ? Policy::ACCESSIBLE : Policy::VISIBLE
+    return true if access_type >= lowest_access_type
+    Array(projects).select do |project|
+      !permission_granted?(project,lowest_access_type)
+    end.empty?
+  end
+
   # return the hash: key is access_type, value is the array of people
   def summarize_permissions(creators = [User.current_user.try(:person)], asset_housekeepers = [], contributor = User.current_user.try(:person))
     # build the hash containing contributor_type as key and the people in these groups as value,exception:'Public' holds the access_type as the value
@@ -402,20 +412,6 @@ class Policy < ActiveRecord::Base
     result |= people_list
     result |= whitelist
     remove_duplicate(result)
-  end
-
-  def is_entirely_private?(grouped_people_by_access_type, contributor)
-    entirely_private = true
-    if access_type > Policy::NO_ACCESS
-      entirely_private = false
-    else
-      grouped_people_by_access_type.reject { |key, _value| key == Policy::NO_ACCESS || key == Policy::DETERMINED_BY_GROUP }.each_value do |value|
-        value.each do |person|
-          entirely_private = false if person[0] != contributor.try(:id)
-        end
-      end
-    end
-    entirely_private
   end
 
   def concat_roles_to_name(grouped_people_by_access_type, creators, asset_housekeepers)
