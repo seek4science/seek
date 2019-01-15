@@ -43,7 +43,7 @@
         <%= render partial: 'dashboard/contributions', locals: { url: polymorphic_path([:contributions, scope, :stats]) } %>
       </div>
       <div class="col-sm-6">
-        <%= render partial: 'dashboard/published_assets', locals: { url: polymorphic_path([:asset_accessibility, scope, :stats]) } %>
+        <%= render partial: 'dashboard/asset_accessibility', locals: {url: polymorphic_path([:asset_accessibility, scope, :stats]) } %>
       </div>
       <div class="col-sm-6">
       </div>

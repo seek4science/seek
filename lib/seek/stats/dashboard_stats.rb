@@ -68,14 +68,18 @@ module Seek
       end
 
       def asset_accessibility(start_date, end_date, type: nil)
+        project_scope = scope
         Rails.cache.fetch("#{cache_key_base}_#{type || 'all'}_asset_accessibility_#{start_date}_#{end_date}", expires_in: 3.hours) do
           assets = scoped_resources
-          assets.select! { |a| a.class.name == type } if type
-          assets.select! { |a| a.created_at >= start_date && a.created_at <= end_date }
+          assets.select! {|a| a.class.name == type} if type
+          assets.select! {|a| a.created_at >= start_date && a.created_at <= end_date}
           published_count = assets.count(&:is_published?)
-          restricted = assets.count(&:private?)
-          misc_permissions = assets.count - (published_count + restricted)
-          { published: published_count, restricted: misc_permissions, private: restricted }
+
+          project_accessible_count = assets.count do |asset|
+            !asset.is_published? && asset.projects_accessible?(project_scope || asset.projects)
+          end
+          others_count = assets.count - published_count - project_accessible_count
+          {published: published_count, project_accessible: project_accessible_count, other: others_count}
         end
       end
 
