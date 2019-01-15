@@ -414,20 +414,6 @@ class Policy < ActiveRecord::Base
     remove_duplicate(result)
   end
 
-  def is_entirely_private?(grouped_people_by_access_type, contributor)
-    entirely_private = true
-    if access_type > Policy::NO_ACCESS
-      entirely_private = false
-    else
-      grouped_people_by_access_type.reject { |key, _value| key == Policy::NO_ACCESS || key == Policy::DETERMINED_BY_GROUP }.each_value do |value|
-        value.each do |person|
-          entirely_private = false if person[0] != contributor.try(:id)
-        end
-      end
-    end
-    entirely_private
-  end
-
   def concat_roles_to_name(grouped_people_by_access_type, creators, asset_housekeepers)
     creator_id_array = creators.collect { |c| c.id unless c.blank? }
     asset_housekeeper_id_array = asset_housekeepers.collect { |am| am.id unless am.blank? }
