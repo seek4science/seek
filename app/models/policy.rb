@@ -81,7 +81,7 @@ class Policy < ActiveRecord::Base
 
   # checks that there are permissions for the provided contributor, for the access_type (or higher)
   def permission_granted?(contributor, access_type)
-    permissions.detect { |p| p.contributor == contributor && p.access_type >= access_type }
+    permissions.where(contributor:contributor).where('access_type >= ?',access_type).any?
   end
 
   def self.new_for_upload_tool(resource, recipient)
@@ -243,6 +243,16 @@ class Policy < ActiveRecord::Base
 
   def public?
     access_type && access_type > Policy::NO_ACCESS && sharing_scope != Policy::ALL_USERS
+  end
+
+  # item is acccessible to members of the projects passed. Ignores additional restrictions, such as additional permissions to block particular members.
+  # if items is a downloadable_asset it needs to be ACCESSIBLE, otherwise just VISIBLE
+  def projects_accessible?(projects, downloadable_asset)
+    lowest_access_type = downloadable_asset ? Policy::ACCESSIBLE : Policy::VISIBLE
+    return true if access_type >= lowest_access_type
+    Array(projects).select do |project|
+      !permission_granted?(project,lowest_access_type)
+    end.empty?
   end
 
   # return the hash: key is access_type, value is the array of people

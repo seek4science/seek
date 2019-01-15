@@ -432,4 +432,40 @@ class AssetTest < ActiveSupport::TestCase
     end
   end
 
+  test 'projects_accessible?' do
+    project1 = Factory(:project)
+    project2 = Factory(:project)
+
+    df = Factory(:data_file, policy:Factory(:public_policy))
+    assert df.projects_accessible?(project1)
+
+    assay = Factory(:assay, policy:Factory(:public_policy))
+    assert assay.projects_accessible?(project1)
+
+    df = Factory(:data_file, policy:Factory(:private_policy, permissions:[Factory(:permission, access_type:Policy::VISIBLE,contributor:project1)]))
+    refute df.projects_accessible?(project1)
+
+    assay = Factory(:assay, policy:Factory(:private_policy, permissions:[Factory(:permission, access_type:Policy::VISIBLE,contributor:project1)]))
+    assert assay.projects_accessible?(project1)
+    refute assay.projects_accessible?(project2)
+
+    df = Factory(:data_file, policy:Factory(:private_policy, permissions:[Factory(:permission, access_type:Policy::ACCESSIBLE,contributor:project1)]))
+    assert df.projects_accessible?(project1)
+    refute df.projects_accessible?(project2)
+
+    df = Factory(:data_file, policy:Factory(:private_policy, permissions:[Factory(:permission, access_type:Policy::EDITING,contributor:project1)]))
+    assert df.projects_accessible?(project1)
+    refute df.projects_accessible?(project2)
+
+    df = Factory(:data_file, policy:Factory(:private_policy, permissions:[Factory(:permission, access_type:Policy::MANAGING,contributor:project1)]))
+    assert df.projects_accessible?(project1)
+    refute df.projects_accessible?(project2)
+    refute df.projects_accessible?([project1,project2])
+
+    df.policy.permissions.create(contributor:project2, access_type:Policy::ACCESSIBLE)
+    assert df.projects_accessible?(project2)
+    assert df.projects_accessible?([project1,project2])
+    refute refute df.projects_accessible?([project1,project2, Factory(:project)])
+  end
+
 end
