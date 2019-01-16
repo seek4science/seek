@@ -66,6 +66,7 @@ The license can currently be:
 
 ## ContentBlob
 <a name="ContentBlob"></a>
+<a name="contentBlobs"></a>
 The content of a <a href="#dataFiles">**DataFile**</a>, <a href="#documents">**Document**</a>, <a href="#models">**Model**</a>, <a href="#sops">**SOP**</a> or <a href="#presentations">**Presentation**</a> is specified as a set of **ContentBlobs**.
 
 When a resource with content is created, it is possible to specify a ContentBlob either as:
