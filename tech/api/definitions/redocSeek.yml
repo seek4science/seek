@@ -85,6 +85,10 @@ tags:
   description:
     $ref: ../descriptions/assays.md
 
+- name: contentBlobs
+  description:
+    $ref: ../descriptions/contentBlobs.md
+
 - name: dataFiles
   description:
     $ref: ../descriptions/dataFiles.md
@@ -150,6 +154,7 @@ x-tagGroups:
   - models
   - publications
   - sops
+  - contentBlobs
 
 - name: Activities
   tags:
@@ -461,46 +466,75 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
-  /data_files/{id}/content_blobs/{blob_id}:
+  /{asset_types}/{id}/content_blobs/{blob_id}:
+    parameters:
+    - name: asset_types
+      in: path
+      required: true
+      description: The typs of asset being fetched, uploaded or downloaded
+      type: string
+      default: data_files
+    - name: id
+      in: path
+      required: true
+      description: The asset content to fetch, upload or download
+      type: integer
+      default: 1152
+    - name: blob_id
+      in: path
+      required: true
+      description: The asset identifier to fetch, upload or download
+      type: integer
+      default: 1831
     put:
-      operationId: uploadDataFileContent
+      operationId: uploadAssetContent
       description:
-        $ref: ../descriptions/uploadDataFileContent.md
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: The data file content to upload
-        type: integer
-        default: 1152
-      - name: blob_id
-        in: path
-        required: true
-        description: The content identifier to upload
-        type: integer
-        default: 1831
-      - in: body
-        name: blobContent
-        description: The blob content to upload
-        schema:
-          type: string
-          format: binary
+        $ref: ../descriptions/uploadAssetContent.md
       consumes:
       - application/octet-stream
       produces:
       - '*/*'
       tags:
       - upload
-      - dataFiles
+      - contentBlobs
+      parameters:
+      - in: body
+        name: blobContent
+        description: The blob content to fetch, upload or download
+        schema:
+          type: string
+          format: binary
       responses:
         '200':
           description: Success
-  /data_files/{id}/content_blobs/{blob_id}/download:
+    get:
+      operationId: readContentBlob
+      description:
+        $ref: ../descriptions/readContentBlob.md
+      produces:
+      - application/json
+      - text/csv
+      tags:
+      - read
+      - contentBlobs
+      responses:
+        <<: *ReadType
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/contentBlobResponse'
+  /{asset_types}/{id}/content_blobs/{blob_id}/download:
     parameters:
+    - name: asset_types
+      in: path
+      required: true
+      description: The typs of asset being downloaded
+      type: string
+      default: data_files
     - name: id
       in: path
       required: true
-      description: The data file to fetch
+      description: The asset to fetch
       type: integer
       default: 1152
     - name: blob_id
@@ -510,14 +544,14 @@ paths:
       type: integer
       default: 1831
     get:
-      operationId: downloadDataFileContent
+      operationId: downloadAssetContent
       description:
-        $ref: ../descriptions/downloadDataFileContent.md
+        $ref: ../descriptions/downloadAssetContent.md
       produces:
       - '*/*'
       tags:
       - download
-      - dataFiles
+      - contentBlobs
       responses:
         <<: *ReadType
         '200':
@@ -620,67 +654,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
-  /documents/{id}/content_blobs/{blob_id}:
-    put:
-      operationId: uploadDocumentContent
-      description:
-        $ref: ../descriptions/uploadDocumentContent.md
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: The document content to upload
-        type: integer
-        default: 1152
-      - name: blob_id
-        in: path
-        required: true
-        description: The content identifier to upload
-        type: integer
-        default: 1831
-      - in: body
-        name: blobContent
-        description: The blob content to upload
-        schema:
-          type: string
-          format: binary
-      consumes:
-      - application/octet-stream
-      produces:
-      - '*/*'
-      tags:
-      - upload
-      - documents
-      responses:
-        '200':
-          description: Success
-  /documents/{id}/content_blobs/{blob_id}/download:
-    parameters:
-    - name: id
-      in: path
-      required: true
-      description: The document to fetch
-      type: integer
-      default: 1152
-    - name: blob_id
-      in: path
-      required: true
-      description: The blob to download
-      type: integer
-      default: 1831
-    get:
-      operationId: downloadDocumentContent
-      description:
-        $ref: ../descriptions/downloadDocumentContent.md
-      produces:
-      - '*/*'
-      tags:
-      - download
-      - documents
-      responses:
-        <<: *ReadType
-        '200':
-          description: Success
   /events:
     get:
       operationId: listEvents
@@ -1081,66 +1054,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
-  /models/{id}/content_blobs/{blob_id}:
-    put:
-      operationId: uploadModelContent
-      description:
-        $ref: ../descriptions/uploadModelContent.md
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: The model content to upload
-        type: integer
-        default: 1152
-      - name: blob_id
-        in: path
-        required: true
-        description: The content identifier to upload
-        type: integer
-        default: 1831
-      - in: body
-        name: blobContent
-        description: The blob content to upload
-        schema:
-          type: string
-          format: binary
-      consumes:
-      - application/octet-stream
-      produces:
-      - '*/*'
-      tags:
-      - upload
-      - models
-      responses:
-        '200':
-          description: Success
-  /models/{id}/content_blobs/{blob_id}/download:
-    parameters:
-    - name: id
-      in: path
-      required: true
-      description: The model to fetch
-      type: integer
-      default: 139
-    - name: blob_id
-      in: path
-      required: true
-      description: The blob to download
-      type: integer
-      default: 1850
-    get:
-      operationId: downloadModelContent
-      description:
-        $ref: ../descriptions/downloadModelContent.md
-      tags:
-      - read
-      - models
-      responses:
-        '200':
-          description: Success
-          schema:
-            type: file
   /organisms:
     get:
       operationId: listOrganisms
@@ -1385,67 +1298,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
-  /presentations/{id}/content_blobs/{blob_id}:
-    put:
-      operationId: uploadPresentationContent
-      description:
-        $ref: ../descriptions/uploadPresentationContent.md
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: The presentation content to upload
-        type: integer
-        default: 1152
-      - name: blob_id
-        in: path
-        required: true
-        description: The content identifier to upload
-        type: integer
-        default: 1831
-      - in: body
-        name: blobContent
-        description: The blob content to upload
-        schema:
-          type: string
-          format: binary
-      consumes:
-      - application/octet-stream
-      produces:
-      - '*/*'
-      tags:
-      - upload
-      - presentations
-      responses:
-        '200':
-          description: Success
-  /presentations/{id}/content_blobs/{blob_id}/download:
-    parameters:
-    - name: id
-      in: path
-      required: true
-      description: The presentation to fetch
-      type: integer
-      default: 377
-    - name: blob_id
-      in: path
-      required: true
-      description: The blob to download
-      type: integer
-      default: 3215
-    get:
-      operationId: downloadPresentationContent
-      description:
-        $ref: ../descriptions/downloadPresentationContent.md
-      tags:
-      - download
-      - presentations
-      responses:
-        <<: *ReadType
-        '200':
-          description: Success
-          schema:
-            type: file
   /programmes:
     get:
       operationId: listProgrammes
@@ -1805,67 +1657,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
-  /sops/{id}/content_blobs/{blob_id}:
-    put:
-      operationId: uploadSopContent
-      description:
-        $ref: ../descriptions/uploadSopContent.md
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: The sop content to upload
-        type: integer
-        default: 1152
-      - name: blob_id
-        in: path
-        required: true
-        description: The content identifier to upload
-        type: integer
-        default: 1831
-      - in: body
-        name: blobContent
-        description: The blob content to upload
-        schema:
-          type: string
-          format: binary
-      consumes:
-      - application/octet-stream
-      produces:
-      - '*/*'
-      tags:
-      - upload
-      - sops
-      responses:
-        '200':
-          description: Success
-  /sops/{id}/content_blobs/{blob_id}/download:
-    parameters:
-    - name: id
-      in: path
-      required: true
-      description: The SOP to fetch
-      type: integer
-      default: 203
-    - name: blob_id
-      in: path
-      required: true
-      description: The blob to download
-      type: integer
-      default: 1806
-    get:
-      operationId: downloadSopContent
-      description:
-        $ref: ../descriptions/downloadSopContent.md
-      tags:
-      - download
-      - sops
-      responses:
-        <<: *ReadType
-        '200':
-          description: Success
-          schema:
-            type: file
   /studies:
     get:
       operationId: listStudies
@@ -2081,6 +1872,26 @@ definitions:
     allOf:
     - $ref: '#/definitions/nonEmptyProjectPositionsList'
     x-nullable: true
+  snapshotSkeleton:
+    type: object
+    properties:
+      snapshot:
+        type: integer
+        minimum: 1
+      url:
+        $ref: '#/definitions/uriString'
+    required:
+    - snapshot
+    - url
+  nonEmptySnapshotsList:
+    type: array
+    minItems: 1
+    items:
+      $ref: '#/definitions/snapshotSkeleton'
+  nullableSnapshotsList:
+    allOf:
+    - $ref: '#/definitions/nonEmptySnapshotsList'
+    x-nullable: true
   nullableNonEmptyStringList:
     allOf:
     - $ref: '#/definitions/nonEmptyStringList'
@@ -2156,6 +1967,17 @@ definitions:
         $ref: '#/definitions/uriString'
     required:
     - self
+    additionalProperties: false
+  downloadableLinksType:
+    type: object
+    properties:
+      self:
+        $ref: '#/definitions/uriString'
+      download:
+        $ref: '#/definitions/uriString'
+    required:
+    - self
+    - download
     additionalProperties: false
   metaType:
     type: object
@@ -3063,6 +2885,8 @@ definitions:
           attributes:
             type: object
             properties:
+              snapshots:
+                $ref: '#/definitions/nullableSnapshotsList'
               tags:
                 $ref: '#/definitions/nullableNonEmptyStringList'
               title:
@@ -3182,6 +3006,8 @@ definitions:
           attributes:
             type: object
             properties:
+              tags:
+                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -3265,6 +3091,8 @@ definitions:
           attributes:
             type: object
             properties:
+              tags:
+                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -3327,52 +3155,6 @@ definitions:
     additionalProperties: false
     example:
       $ref: ../examples/assayPatch.yml
-  getContentBlobsResponse:
-    type: object
-    properties:
-      data:
-        type: object
-        properties:
-          id:
-            $ref: '#/definitions/nonEmptyString'
-          type:
-            $ref: '#/definitions/nonEmptyString'
-          attributes:
-            type: object
-            properties:
-              original_filename:
-                $ref: '#/definitions/nonEmptyString'
-              url:
-                $ref: '#/definitions/nullableUriString'
-              md5sum:
-                $ref: '#/definitions/md5sumString'
-              sha1sum:
-                $ref: '#/definitions/sha1sumString'
-              content_type:
-                $ref: '#/definitions/contentBlobType'
-            required:
-            - original_filename
-            - md5sum
-            - sha1sum
-            - content_type
-            additionalProperties: false
-          links:
-            $ref: '#/definitions/linksType'
-          meta:
-            $ref: '#/definitions/metaType'
-        required:
-        - id
-        - type
-        - attributes
-        - links
-        - meta
-        additionalProperties: false
-      jsonapi:
-        $ref: '#/definitions/JsonApiVersion'
-    required:
-    - data
-    - jsonapi
-    additionalProperties: false
   dataFileResponse:
     type: object
     properties:
@@ -4022,6 +3804,8 @@ definitions:
           attributes:
             type: object
             properties:
+              snapshots:
+                $ref: '#/definitions/nullableSnapshotsList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -5124,7 +4908,7 @@ definitions:
               doi:
                 $ref: '#/definitions/nullableUriString'
               pubmed_id:
-                type: '#/definitions/nullableInteger'
+                $ref: '#/definitions/nullableInteger'
               abstract:
                 $ref: '#/definitions/nullableNonEmptyString'
               citation:
@@ -5364,6 +5148,8 @@ definitions:
           attributes:
             type: object
             properties:
+              snapshots:
+                $ref: '#/definitions/nullableSnapshotsList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -6163,9 +5949,9 @@ definitions:
     items:
       $ref: '#/definitions/contentBlobSlot'
   contentBlobSlot:
-    allOf:
+    x-oneOf:
     - $ref: '#/definitions/remoteContentBlob'
-    x-nullable: true
+    - $ref: '#/definitions/contentBlobPlaceholder'
   remoteContentBlob:
     properties:
       url:
@@ -6254,7 +6040,7 @@ definitions:
             - asset
             additionalProperties: false
           links:
-            $ref: '#/definitions/linksType'
+            $ref: '#/definitions/downloadableLinksType'
           meta:
             $ref: '#/definitions/metaType'
         required:

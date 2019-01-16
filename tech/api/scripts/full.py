@@ -60,10 +60,13 @@ def walk_tree(base):
         for k in base.keys():
           v = base[k]
           if (k == 'oneOf') :
-            base['allOf'] = [v[0]]
-            del base['oneOf']
+            if ('type' in v[1]) : 
+              base['allOf'] = [v[0]]
 
-            base['x-nullable'] = True
+              base['x-nullable'] = True
+            else:
+              base['x-oneOf'] = v
+            del base['oneOf']
           else:
             walk_tree(v)
           if (k.endswith('Post') or k.endswith('Patch')):
