@@ -56,7 +56,7 @@ class OpenbisHelperTest < ActionView::TestCase
     cleaned = openbis_rich_content_sanitizer(txt).to_s
 
     exp =
-'
+      '
 <div>
 <div>text in div</div>
 <p> para gragh</p>
