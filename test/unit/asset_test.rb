@@ -468,4 +468,20 @@ class AssetTest < ActiveSupport::TestCase
     refute refute df.projects_accessible?([project1,project2, Factory(:project)])
   end
 
+  test 'update_timestamps with new version' do
+    contributor = Factory(:person)
+    User.with_current_user(contributor.user) do
+      df = Factory(:data_file, contributor:contributor)
+      t = DateTime.now + 5.days
+      travel_to(t) do
+        df.save_as_new_version
+        assert_equal 2,df.version
+        version = df.latest_version
+        assert_in_delta t,DateTime.parse(version.updated_at.to_s),0.1.second
+        assert_in_delta t,DateTime.parse(df.updated_at.to_s),0.1.second
+      end
+    end
+
+  end
+
 end
