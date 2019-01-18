@@ -88,17 +88,24 @@ module Seek
         assay = study.assays.where(title: FAKE_FILE_ASSAY_NAME).first
         return assay if assay
 
-        assay_params = { assay_class_id: AssayClass.for_type('experimental').id,
-                         title: FAKE_FILE_ASSAY_NAME,
-                         description: 'Automatically generated assay to host openbis files that are linked to
+        assay_params = {assay_class_id: AssayClass.for_type('experimental').id,
+                        title: FAKE_FILE_ASSAY_NAME,
+                        description: 'Automatically generated assay to host openbis files that are linked to
 the original OpenBIS experiment. Its content and linked data files will be updated by the system
-if automatic synchronization was selected.' }
+if automatic synchronization was selected.'}
         assay = Assay.new(assay_params)
-        assay.contributor = study.contributor
+        assay.contributor = valid_current_person # study.contributor
         assay.policy = study.policy.deep_copy
         assay.study = study
-        assay.save!
-        assay
+
+        try_to_save(assay)
+      end
+
+      def try_to_save(entity)
+        unless entity.save
+          raise "Could not save #{entity.class}, reported issues #{entity.errors.full_messages}"
+        end
+        entity
       end
 
       def sync_asset_content(obis_asset)
@@ -111,7 +118,7 @@ if automatic synchronization was selected.' }
         end
 
         # saving automatically triggers reindexing if needed
-        obis_asset.save! unless obis_asset.new_record?
+        try_to_save(obis_asset) unless obis_asset.new_record?
       end
 
       def handle_sync_err(exception, obis_asset)
@@ -128,18 +135,34 @@ if automatic synchronization was selected.' }
           return 'Cannot access OpenBIS: Invalid username or password' if exception.message && exception.message.include?('Invalid username or password')
         end
 
-        Rails.logger.error(exception)
-        exception.class.to_s
+        msg = exception.to_s
+        msg ||= exception.class.to_s
+        msg = msg.slice(0, 250) if msg.length > 250
+        msg
       end
 
       def sync_external_asset(obis_asset)
-        sync_asset_content(obis_asset)
-
-        return ["Sync failed: #{obis_asset.err_msg}"] if obis_asset.failed?
-        # raise "Sync failed: #{obis_asset.err_msg}" if obis_asset.failed?
 
         errs = []
-        errs = follow_dependent_from_asset(obis_asset).issues if should_follow_dependent(obis_asset)
+        begin
+          sync_asset_content(obis_asset)
+
+          return ["Sync failed: #{obis_asset.err_msg}"] if obis_asset.failed?
+
+          errs = follow_dependent_from_asset(obis_asset).issues if should_follow_dependent(obis_asset)
+
+        rescue => exception
+          msg = log_error(exception, 'Sync FATAL ERROR')
+          errs << msg
+        end
+
+        unless errs.empty?
+          msg = errs.join(',\n');
+          msg = msg.slice(0, 250) if msg.length > 250
+          obis_asset.err_msg = msg
+          try_to_save(obis_asset)
+        end
+
         errs
       end
 
@@ -201,46 +224,67 @@ if automatic synchronization was selected.' }
         associate_zamples_as_assays(study, zamples, sync_options)
       end
 
+      def valid_current_person
+
+        user = User.current_user
+        raise 'Cannot add new entities with nil current_user' if user.nil?
+
+        person = case user
+                 when User
+                   user.person
+                 when Person
+                   p = user
+                   user = p.user
+                   p
+                 else
+                   raise "Cannot add new entities unsuported current_user type #{user.class}"
+                 end
+
+        raise 'Cannot add new entities with guest current_user' if user.guest?
+        person
+      end
+
       def associate_zamples_as_assays(study, zamples, sync_options)
         reg_info = Seek::Openbis::RegistrationInfo.new
         return reg_info if zamples.empty?
 
-        external_assets = zamples.map { |ds| OpenbisExternalAsset.find_or_create_by_entity(ds) }
+        external_assets = zamples.map {|ds| OpenbisExternalAsset.find_or_create_by_entity(ds)}
 
         # warn about non assay
         reg_info.add_issues validate_expected_seek_type(external_assets, Assay)
 
-        existing_assays = external_assets.select { |es| es.seek_entity.is_a? Assay }
-                                         .map(&:seek_entity)
+        existing_assays = external_assets.select {|es| es.seek_entity.is_a? Assay}
+                              .map(&:seek_entity)
 
         # warn about already linked somewhere else
         reg_info.add_issues validate_study_relationship(existing_assays, study)
 
         # only own assays
-        existing_assays = existing_assays.select { |es| es.study.id == study.id }
+        existing_assays = existing_assays.select {|es| es.study.id == study.id}
 
         # params must be cloned so they will be independent in each creation
-        assay_params = { study_id: study.id }
-        contributor = study.contributor
+        assay_params = {study_id: study.id}
+        contributor = valid_current_person # study.contributor
+
 
         # new_assays
         external_assets
-          .select { |es| es.seek_entity.nil? }
-          .map do |es|
-            es.sync_options = sync_options.clone
-            createObisAssay(assay_params.clone, contributor, es)
+            .select {|es| es.seek_entity.nil?}
+            .map do |es|
+          es.sync_options = sync_options.clone
+          createObisAssay(assay_params.clone, contributor, es)
+        end
+            .each do |df|
+          if df.save
+            reg_info.add_created df
+          else
+            reg_info.add_issues df.errors.full_messages
           end
-          .each do |df|
-            if df.save
-              reg_info.add_created df
-            else
-              reg_info.add_issues df.errors.full_messages
-            end
-          end
+        end
 
         assays = existing_assays + reg_info.created
 
-        assays.each { |a| reg_info.merge follow_assay_dependent(a) }
+        assays.each {|a| reg_info.merge follow_assay_dependent(a)}
 
         reg_info
       end
@@ -264,11 +308,25 @@ if automatic synchronization was selected.' }
         data_sets_ids = extract_requested_sets(entity, sync_options)
         return reg_info if data_sets_ids.empty?
 
-        assay = fake_file_assay(study)
+        begin
+          assay = fake_file_assay(study)
+        rescue => exception # probably permission issue
+          msg = extract_err_message(exception)
+          log_error(exception)
+          reg_info.add_issues msg
+          return reg_info
+        end
+
         reg_info.add_created assay
 
         reg_info.merge associate_data_sets_ids(assay, data_sets_ids, entity.openbis_endpoint)
         reg_info
+      end
+
+      def log_error(exception, at = '')
+        msg = "#{at} #{exception.class} #{exception.message}\n #{exception.backtrace.join('\n\t')}"
+        Rails.logger.error msg
+        msg
       end
 
       def associate_data_sets_ids(assay, data_sets_ids, endpoint)
@@ -282,34 +340,33 @@ if automatic synchronization was selected.' }
         reg_info = Seek::Openbis::RegistrationInfo.new
         return reg_info if data_sets.empty?
 
-        external_assets = data_sets.map { |ds| OpenbisExternalAsset.find_or_create_by_entity(ds) }
+        external_assets = data_sets.map {|ds| OpenbisExternalAsset.find_or_create_by_entity(ds)}
 
         # warn about non datafiles
         reg_info.add_issues validate_expected_seek_type(external_assets, DataFile)
 
-        existing_files = external_assets.select { |es| es.seek_entity.is_a? DataFile }
-                                        .map(&:seek_entity)
+        existing_files = external_assets.select {|es| es.seek_entity.is_a? DataFile}
+                             .map(&:seek_entity)
 
         # params have to be cloned before each creation!
         datafile_params = {}
-        contributor = assay.contributor
+        contributor = valid_current_person # assay.contributor
         new_files = external_assets
-                    .select { |es| es.seek_entity.nil? }
-                    .map { |es| createObisDataFile(datafile_params.clone, contributor, es) }
+                        .select {|es| es.seek_entity.nil?}
+                        .map {|es| createObisDataFile(datafile_params.clone, contributor, es)}
 
-        User.with_current_user(assay.contributor.user) do
-          new_files.each do |df|
-            if df.save
-              reg_info.add_created df
-            else
-              reg_info.add_issues df.errors.full_messages
-            end
-          end
 
-          # associate with the assay
-          (existing_files | reg_info.created).each do |df|
-            assay.associate(df)
+        new_files.each do |df|
+          if df.save
+            reg_info.add_created df
+          else
+            reg_info.add_issues df.errors.full_messages
           end
+        end
+
+        # associate with the assay
+        (existing_files | reg_info.created).each do |df|
+          assay.associate(df)
         end
 
         reg_info
@@ -317,15 +374,15 @@ if automatic synchronization was selected.' }
 
       def validate_expected_seek_type(collection, type)
         # warn about wrong type
-        collection.reject { |es| es.seek_entity.nil? || es.seek_entity.is_a?(type) }
-                  .map { |es| "#{es.external_id} already registered as #{es.seek_entity.class} #{es.seek_entity.id}" }
+        collection.reject {|es| es.seek_entity.nil? || es.seek_entity.is_a?(type)}
+            .map {|es| "#{es.external_id} already registered as #{es.seek_entity.class} #{es.seek_entity.id}"}
       end
 
       def validate_study_relationship(collection, study)
         # warn about already linked somewhere else
         collection
-          .reject { |es| es.study.id == study.id }
-          .map { |es| "#{es.external_asset.external_id} already registered under different Study #{es.study.id}" }
+            .reject {|es| es.study.id == study.id}
+            .map {|es| "#{es.external_asset.external_id} already registered under different Study #{es.study.id}"}
       end
 
       def extract_requested_sets(entity, sync_options)
@@ -334,6 +391,7 @@ if automatic synchronization was selected.' }
       end
 
       def extract_requested_assays(entity, sync_options)
+
         sample_ids = if sync_options[:link_assays] == '1'
                        entity.sample_ids
                      else
@@ -341,11 +399,12 @@ if automatic synchronization was selected.' }
                      end
 
         candidates = Seek::Openbis::Zample.new(entity.openbis_endpoint)
-                                          .find_by_perm_ids(sample_ids)
+                         .find_by_perm_ids(sample_ids)
 
         zamples = []
         zamples.concat(filter_assay_like_zamples(candidates, entity.openbis_endpoint)) if sync_options[:link_assays] == '1'
-        zamples.concat(candidates.select { |s| sync_options[:linked_assays].include? s.perm_id }) if sync_options[:linked_assays]
+        zamples.concat(candidates.select {|s| sync_options[:linked_assays].include? s.perm_id}) if sync_options[:linked_assays]
+
         zamples.uniq
       end
 
@@ -355,7 +414,7 @@ if automatic synchronization was selected.' }
         # hance the types will be returned not just string
         types = assay_types(openbis_endpoint).map(&:code)
 
-        zamples.select { |s| types.include? s.type_code }
+        zamples.select {|s| types.include? s.type_code}
       end
 
       def assay_types(openbis_endpoint, use_semantic = false)
