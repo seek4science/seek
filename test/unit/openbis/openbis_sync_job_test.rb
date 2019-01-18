@@ -8,10 +8,12 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
 
     @batch_size = 3
     @endpoint = Factory(:openbis_endpoint, refresh_period_mins: 60)
+    @endpoint.assay_types = ['TZ_FAIR_ASSAY', 'EXPERIMENTAL_STEP'] #needed for automatic picking up of assays
+    assert @endpoint.save
     @job = OpenbisSyncJob.new(@endpoint, @batch_size)
     Delayed::Job.destroy_all # avoids jobs created from the after_create callback, this is tested for OpenbisEndpoint
-    @person = Factory(:person, project:@endpoint.project)
-    User.current_user = @person.user
+    @person = Factory(:person, project: @endpoint.project)
+    User.current_user = nil # @person.user
   end
 
   test 'setup' do
@@ -279,8 +281,9 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     end
   end
 
+
   test 'perfom_job does nothing on synchronized assets' do
-    assay = Factory :assay, contributor:@person
+    assay = Factory :assay, contributor: @person
     assert assay.data_files.empty?
 
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
@@ -290,6 +293,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     asset.seek_entity = assay
     asset.synchronized_at = DateTime.now - 1.days
 
+    assert asset.synchronized?
     assert asset.save
     old = asset.synchronized_at
 
@@ -302,8 +306,8 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     assert assay.data_files.empty?
   end
 
-  test 'perfom_job refresh content and dependencies on non-synchronized assets' do
-    assay = Factory :assay, contributor:@person
+  test 'perfom_job refresh content and dependencies on non-synchronized assay like asset' do
+    assay = Factory :assay, contributor: @person
     assert_empty assay.data_files
 
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
@@ -329,6 +333,43 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     refute_empty assay.data_files
     assert_equal zample.dataset_ids.length, assay.data_files.length
   end
+
+  test 'perfom_job refresh content and dependencies on non-synchronized study like asset' do
+    study = Factory :study, contributor: @person
+    assert_empty study.assays
+    assert_empty study.related_data_files
+
+    experiment = Seek::Openbis::Experiment.new(@endpoint, '20171121152132641-51')
+    refute experiment.sample_ids.empty?
+    refute experiment.dataset_ids.empty?
+    assert(experiment.sample_ids.length > 1)
+
+    asset = OpenbisExternalAsset.build(experiment, link_assays: '1', link_datasets: '1', new_arrivals: '1')
+    asset.seek_entity = study
+    asset.synchronized_at = DateTime.now - 1.days
+    asset.sync_state = :refresh
+
+    assert asset.save
+
+
+    User.with_current_user(nil) do
+      @job.perform_job(asset)
+    end
+
+    asset.reload
+    study.reload
+
+    assert asset.synchronized?
+    assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
+
+    refute_empty study.assays
+    refute_empty study.related_data_files
+
+    # one more cause there is fake assay for all the files
+    assert_equal experiment.sample_ids.length + 1, study.assays.length
+    assert_equal experiment.dataset_ids.length, study.related_data_files.length
+  end
+
 
   test 'perfom_job always update mod stamp even if no content change' do
     assay = Factory :assay
@@ -367,7 +408,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
   end
 
   test 'perfom_job always update mod stamp even if errors' do
-    assay = Factory :assay, contributor:@person
+    assay = Factory :assay, contributor: @person
 
     # normal sample
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
@@ -415,7 +456,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
   end
 
   test 'perfom_job sets fatal if failures larger than threshold' do
-    assay = Factory :assay, contributor:@person
+    assay = Factory :assay, contributor: @person
 
     # normal sample
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
