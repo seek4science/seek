@@ -22,7 +22,7 @@
     <%= render partial: 'assets/select_tags' -%>
 
     <% if Seek::Config.events_enabled -%>
-      <%= f.fancy_multiselect :events, other_projects_checkbox: true %>
+      <%= f.fancy_multiselect :events, other_projects_checkbox: true, sort_by: :start_date %>
     <% end -%>
 
     <%= f.fancy_multiselect :investigations, other_projects_checkbox: true %>

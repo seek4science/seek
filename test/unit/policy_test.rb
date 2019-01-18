@@ -233,6 +233,82 @@ class PolicyTest < ActiveSupport::TestCase
     assert policy.public?
   end
 
+  test 'private?' do
+
+    [Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING, Policy::PUBLISHING].each do |type|
+      policy = Factory(:private_policy, access_type: type)
+      assert policy.permissions.empty?
+      refute policy.private?
+    end
+
+
+    # policy and all permissions are set to No Access
+    policy = Factory(:private_policy)
+    assert_equal Policy::NO_ACCESS, policy.access_type
+    assert policy.private?
+
+    policy.permissions.create(contributor: Factory(:project), access_type: Policy::NO_ACCESS)
+
+    assert policy.private?
+
+    perm = policy.permissions.create(contributor: Factory(:project), access_type: Policy::VISIBLE)
+
+    refute policy.private?
+
+    perm.update_columns(access_type: Policy::NO_ACCESS)
+    policy.reload
+
+    assert policy.private?
+
+    policy.permissions.create(contributor: Factory(:person), access_type: Policy::ACCESSIBLE)
+
+    refute policy.private?
+
+  end
+
+  test 'projects_accessible?' do
+    project1 = Factory(:project)
+    project2 = Factory(:project)
+
+    #fully published
+    policy = Factory(:public_policy)
+    assert policy.projects_accessible?([project1],false)
+
+    #fully private
+    policy = Factory(:private_policy)
+    refute policy.projects_accessible?([project1],false)
+
+    # visible permission added, true if not downloadable item and all projects
+    policy.permissions.create(contributor:project1, access_type:Policy::VISIBLE)
+    assert policy.projects_accessible?([project1],false)
+    refute policy.projects_accessible?([project1],true)
+
+    # accessible policy, true in both cases
+    policy = Factory(:private_policy)
+    policy.permissions.create(contributor:project1, access_type:Policy::ACCESSIBLE)
+    assert policy.projects_accessible?([project1],true)
+    assert policy.projects_accessible?([project1],true)
+
+    # all projects need to pass
+    refute policy.projects_accessible?([project1,project2],true)
+
+    policy.permissions.create(contributor:project2, access_type:Policy::VISIBLE)
+    assert policy.projects_accessible?([project1, project2],false)
+    refute policy.projects_accessible?([project1, project2],true)
+
+    # other project permissions don't matter
+    policy.permissions.create(contributor:Factory(:project), access_type:Policy::NO_ACCESS)
+    assert policy.projects_accessible?([project1, project2],false)
+    refute policy.projects_accessible?([project1, project2],true)
+
+    # check higher permissions
+    policy = Factory(:private_policy)
+    policy.permissions.create(contributor:project1, access_type:Policy::MANAGING)
+    policy.permissions.create(contributor:project2, access_type:Policy::EDITING)
+    assert policy.projects_accessible?([project1, project2],false)
+    assert policy.projects_accessible?([project1, project2],true)
+  end
+
   test 'associated items' do
     df = Factory(:data_file)
     policy = df.policy

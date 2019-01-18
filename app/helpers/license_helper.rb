@@ -24,6 +24,16 @@ module LicenseHelper
     end
   end
 
+  # link to select a licence if the license is nil or a null license
+  def prompt_for_license(resource, versioned_resource)
+    license = Seek::License.find(versioned_resource.license)
+    return unless (license.nil? || license.is_null_license?) && resource.can_manage?
+    content_tag(:hr) +
+        content_tag(:p) do
+          link_to('Click here to choose a license', polymorphic_path(resource, action: :edit, anchor: 'license-section'))
+        end
+  end
+
   # whether to enable to auto selection of the license based on the selected project
   # only enabled if it is a new item, and the logged in person belongs to projects with a default license
   def enable_auto_project_license?
@@ -53,7 +63,7 @@ module LicenseHelper
         link_to(title, url, target: :_blank)
       end
     else
-      Seek::License::NULL_LICENSE_TEXT
+      link_to(Seek::License::NULL_LICENSE_TEXT,Seek::Help::HelpDictionary.instance.help_link(:null_license),target: :_blank)
     end
   end
 

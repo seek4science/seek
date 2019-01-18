@@ -3,7 +3,7 @@ Factory.define(:event) do |f|
   f.with_project_contributor
   f.title 'An Event'
   f.start_date Time.now
-  f.end_date 1.days.from_now
+  f.after_build {|e| e.end_date = e.start_date + 1.day if e.end_date.blank?}
 end
 
 Factory.define(:min_event, class: Event) do |f|

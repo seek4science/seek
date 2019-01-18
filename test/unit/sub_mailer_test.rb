@@ -1,7 +1,7 @@
 require 'test_helper'
-require 'time_test_helper'
 
 class SubMailerTest < ActionMailer::TestCase
+
   test 'send digest' do
     p = Factory :person
     p2 = Factory :person
@@ -13,12 +13,10 @@ class SubMailerTest < ActionMailer::TestCase
     log2 = Factory :activity_log, activity_loggable: model, action: 'update', controller_name: 'data_files', created_at: DateTime.new(2012, 12, 25, 13, 15, 0), culprit: p2.user
     email = nil
 
-    now = Time.zone.now
+    now = Time.now.in_time_zone('UTC')
 
-    pretend_now_is(now) do
-      with_time_zone('UTC') do
-        email = SubMailer.send_digest_subscription p, [log, log2], 'daily'
-      end
+    travel_to(now) do
+      email = SubMailer.send_digest_subscription p, [log, log2], 'daily'
     end
 
     assert_equal 'text/html; charset=UTF-8', email.content_type
@@ -46,7 +44,7 @@ class SubMailerTest < ActionMailer::TestCase
     email = nil
 
     now = Time.now
-    pretend_now_is(now) do
+    travel_to(now) do
       email = SubMailer.send_immediate_subscription p, log
     end
     assert_not_nil email
