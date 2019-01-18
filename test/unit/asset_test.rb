@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'time_test_helper'
 
 class AssetTest < ActiveSupport::TestCase
 
@@ -53,7 +52,7 @@ class AssetTest < ActiveSupport::TestCase
     model = Factory :model
     t = 1.day.ago
     assert_not_equal t.to_i, model.last_used_at.to_i
-    pretend_now_is(t) do
+    travel_to(t) do
       model.just_used
     end
     assert_equal t.to_i, model.last_used_at.to_i

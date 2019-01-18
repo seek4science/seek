@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'time_test_helper'
 
 class ContentBlobCleanerJobTest < ActiveSupport::TestCase
   def setup
@@ -30,14 +29,14 @@ class ContentBlobCleanerJobTest < ActiveSupport::TestCase
 
   test 'perform' do
     to_go, keep1, keep2, keep3, keep4 = nil
-    pretend_now_is(9.hours.ago) do
+    travel_to(9.hours.ago) do
       to_go = Factory(:content_blob)
       keep1 = Factory(:data_file).content_blob
       keep2 = Factory(:investigation).create_snapshot.content_blob
       keep3 = Factory(:strain_sample_type).content_blob
     end
 
-    pretend_now_is(7.hours.ago) do
+    travel_to(7.hours.ago) do
       keep4 = Factory(:content_blob)
     end
 

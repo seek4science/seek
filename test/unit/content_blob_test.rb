@@ -2,7 +2,6 @@ require 'test_helper'
 require 'docsplit'
 require 'seek/download_handling/http_streamer' # Needed to load exceptions that are tested later
 require 'minitest/mock'
-require 'time_test_helper'
 require 'private_address_check'
 
 class ContentBlobTest < ActiveSupport::TestCase
@@ -863,14 +862,14 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'added timestamps' do
     t1 = 1.day.ago
     blob = nil
-    pretend_now_is(t1) do
+    travel_to(t1) do
       blob = Factory(:content_blob)
       assert_equal t1.to_s, blob.created_at.to_s
       assert_equal t1.to_s, blob.updated_at.to_s
     end
 
     t2 = 1.hour.ago
-    pretend_now_is(t2) do
+    travel_to(t2) do
       blob.content_type = 'text/xml'
       blob.save!
       assert_equal t2.to_s, blob.updated_at.to_s
