@@ -26,7 +26,7 @@ module OpenbisHelper
     dataset = data_file.openbis_dataset
     asset = data_file.external_asset
     render partial: 'openbis_datasets/openbis_dataset_panel',
-           locals: { entity: dataset, modal_files: true, edit_button: true,
+           locals: { entity: dataset, modal_files: false,
                      can_edit: data_file.can_edit?,
                      sync_at: asset.synchronized_at, err_msg: asset.err_msg }
   end

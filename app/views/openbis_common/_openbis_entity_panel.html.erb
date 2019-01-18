@@ -19,7 +19,7 @@
           <label>Last sync.: </label>  <%= date_as_string(sync_at, true) if sync_at %>
         </div>
       </div>
-      <% if err_msg %>
+      <% if err_msg && can_edit %>
         <div class="col-md-5">
           <div style="color: red;">
             <label>Last failure: </label>  <%= err_msg if err_msg %>

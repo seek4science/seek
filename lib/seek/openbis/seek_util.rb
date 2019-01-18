@@ -128,10 +128,8 @@ if automatic synchronization was selected.' }
           return 'Cannot access OpenBIS: Invalid username or password' if exception.message && exception.message.include?('Invalid username or password')
         end
 
-        msg = exception.to_s
-        msg ||= exception.class.to_s
-        msg = msg.slice(0, 250) if msg.length > 250
-        msg
+        Rails.logger.error(exception)
+        exception.class.to_s
       end
 
       def sync_external_asset(obis_asset)
