@@ -123,8 +123,7 @@ if automatic synchronization was selected.'}
 
       def handle_sync_err(exception, obis_asset)
         Rails.logger.error("Cannot sync #{obis_asset.external_type} #{obis_asset.external_id}")
-        Rails.logger.error(exception.class)
-        Rails.logger.error(exception)
+        log_error(exception)
 
         extract_err_message(exception)
       end
@@ -135,10 +134,7 @@ if automatic synchronization was selected.'}
           return 'Cannot access OpenBIS: Invalid username or password' if exception.message && exception.message.include?('Invalid username or password')
         end
 
-        msg = exception.to_s
-        msg ||= exception.class.to_s
-        msg = msg.slice(0, 250) if msg.length > 250
-        msg
+        exception.class.to_s
       end
 
       def sync_external_asset(obis_asset)
