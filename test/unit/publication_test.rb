@@ -179,22 +179,22 @@ class PublicationTest < ActiveSupport::TestCase
 
   test 'publication date from pubmed' do
     mock_pubmed(content_file: 'pubmed_21533085.txt')
-    result = Bio::MEDLINE.new(Bio::PubMed.efetch(21_533_085).first).reference
-    assert_equal '2011/04/20', result.published_date
+    result = Bio::MEDLINE.new(Bio::PubMed.efetch(21533085).first).reference
+    assert_equal '2011-04-20', result.published_date.to_s
 
     mock_pubmed(content_file: 'pubmed_1.txt')
     result = Bio::MEDLINE.new(Bio::PubMed.efetch(1).first).reference
-    assert_equal '1975/06/01', result.published_date
+    assert_equal '1975-06-01', result.published_date.to_s
 
     mock_pubmed(content_file: 'pubmed_20533085.txt')
-    result = Bio::MEDLINE.new(Bio::PubMed.efetch(20_533_085).first).reference
-    assert_equal '2010/06/09', result.published_date
+    result = Bio::MEDLINE.new(Bio::PubMed.efetch(20533085).first).reference
+    assert_equal '2010-06-10', result.published_date.to_s
     assert_nil result.error
   end
 
   test 'unknown pubmed_id' do
     mock_pubmed(content_file: 'pubmed_not_found.txt')
-    result = Bio::MEDLINE.new(Bio::PubMed.efetch(1_111_111_111_111).first).reference
+    result = Bio::MEDLINE.new(Bio::PubMed.efetch(1111111111111).first).reference
     assert_equal 'No publication could be found on PubMed with that ID', result.error
   end
 

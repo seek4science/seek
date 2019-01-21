@@ -1,9 +1,8 @@
 PMID- 1
 OWN - NLM
 STAT- MEDLINE
-DA  - 19760116
 DCOM- 19760116
-LR  - 20091111
+LR  - 20170322
 IS  - 0006-2944 (Print)
 IS  - 0006-2944 (Linking)
 VI  - 13
@@ -20,16 +19,17 @@ AU  - Palese M
 FAU - Tephly, T R
 AU  - Tephly TR
 LA  - eng
+GR  - MC_UU_12013/5/MRC/United Kingdom
 PT  - Journal Article
 PT  - Research Support, U.S. Gov't, P.H.S.
-PL  - UNITED STATES
+PL  - United States
 TA  - Biochem Med
 JT  - Biochemical medicine
 JID - 0151424
 RN  - 0 (Formates)
-RN  - 124-38-9 (Carbon Dioxide)
-RN  - 67-56-1 (Methanol)
+RN  - 142M471B3J (Carbon Dioxide)
 RN  - EC 1.2.- (Aldehyde Oxidoreductases)
+RN  - Y4S76JWI15 (Methanol)
 SB  - IM
 MH  - Aldehyde Oxidoreductases/metabolism
 MH  - Animals
@@ -43,8 +43,11 @@ MH  - Kinetics
 MH  - Methanol/blood
 MH  - Methods
 MH  - Pseudomonas/enzymology
-EDAT- 1975/06/01
+EDAT- 1975/06/01 00:00
 MHDA- 1975/06/01 00:01
 CRDT- 1975/06/01 00:00
+PHST- 1975/06/01 00:00 [pubmed]
+PHST- 1975/06/01 00:01 [medline]
+PHST- 1975/06/01 00:00 [entrez]
 PST - ppublish
 SO  - Biochem Med. 1975 Jun;13(2):117-26.

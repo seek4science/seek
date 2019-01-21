@@ -1,14 +1,13 @@
 PMID- 21533085
 OWN - NLM
 STAT- MEDLINE
-DA  - 20110502
 DCOM- 20110830
-LR  - 20130630
+LR  - 20181113
 IS  - 1932-6203 (Electronic)
 IS  - 1932-6203 (Linking)
 VI  - 6
 IP  - 4
-DP  - 2011
+DP  - 2011 Apr 20
 TI  - Modeling the TNFalpha-induced apoptosis pathway in hepatocytes.
 PG  - e18646
 LID - 10.1371/journal.pone.0018646 [doi]
@@ -27,15 +26,15 @@ AB  - The proinflammatory cytokine TNFalpha fails to provoke cell death in isola
       Itch-mediated cFLIP degradation and predominantly caspase-8 activation is not
       involved. Time-resolved data of the respective pro- and antiapoptotic factors are
       obtained and subjected to mathematical modeling. On the basis of these data we
-      developed a mathematical model which reproduces the complex interplay regulating 
+      developed a mathematical model which reproduces the complex interplay regulating
       the phosphorylation status of JNK and generation of ROS. This model was fully
       integrated with our model of TNFalpha/Fas ligand sensitizing as well as with a
-      published NF-kappaB-model. The resulting comprehensive model delivers insight in 
+      published NF-kappaB-model. The resulting comprehensive model delivers insight in
       the dynamical interplay between the TNFalpha and FasL pathways, NF-kappaB and ROS
       and gives an example for successful model integration.
-AD  - Institute for System Dynamics, University of Stuttgart, Stuttgart, Germany.
 FAU - Schlatter, Rebekka
 AU  - Schlatter R
+AD  - Institute for System Dynamics, University of Stuttgart, Stuttgart, Germany.
 FAU - Schmich, Kathrin
 AU  - Schmich K
 FAU - Lutz, Anna
@@ -59,7 +58,7 @@ JID - 101285081
 RN  - 0 (DNA Primers)
 RN  - 0 (Reactive Oxygen Species)
 RN  - 0 (Tumor Necrosis Factor-alpha)
-RN  - 50-76-0 (Dactinomycin)
+RN  - 1CC1JFE158 (Dactinomycin)
 RN  - 9007-43-6 (Cytochromes c)
 SB  - IM
 MH  - Animals
@@ -79,13 +78,14 @@ MH  - *Models, Biological
 MH  - Reactive Oxygen Species/metabolism
 MH  - Tumor Necrosis Factor-alpha/*physiology
 PMC - PMC3080376
-OID - NLM: PMC3080376
 EDAT- 2011/05/03 06:00
 MHDA- 2011/08/31 06:00
 CRDT- 2011/05/03 06:00
-PHST- 2010/10/07 [received]
-PHST- 2011/03/14 [accepted]
-PHST- 2011/04/20 [epublish]
+PHST- 2010/10/07 00:00 [received]
+PHST- 2011/03/14 00:00 [accepted]
+PHST- 2011/05/03 06:00 [entrez]
+PHST- 2011/05/03 06:00 [pubmed]
+PHST- 2011/08/31 06:00 [medline]
 AID - 10.1371/journal.pone.0018646 [doi]
 PST - epublish
 SO  - PLoS One. 2011 Apr 20;6(4):e18646. doi: 10.1371/journal.pone.0018646.
