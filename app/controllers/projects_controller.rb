@@ -384,6 +384,8 @@ class ProjectsController < ApplicationController
           left_at = params[:memberships_to_flag][membership.id.to_s][:time_left_at]
           membership.update_attributes(time_left_at: left_at)
         end
+        member = Person.find(membership.person_id)
+        Rails.cache.delete_matched("rli_title_#{member.cache_key}_.*")
       end
     end
   end
