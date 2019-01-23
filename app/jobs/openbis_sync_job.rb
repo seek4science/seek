@@ -15,13 +15,25 @@ class OpenbisSyncJob < SeekJob
   def perform_job(obis_asset)
     if DEBUG
       puts "starting obis sync of #{obis_asset.class}:#{obis_asset.id} perm_id: #{obis_asset.external_id}"
-      Rails.logger.info "starting obis sync of #{obis_asset.class}:#{obis_asset.id} perm_id: #{obis_asset.external_id}"
+      Rails.logger.info "starting obis sync of #{obis_asset.class}:#{obis_asset.id} perm_id: #{obis_asset.external_id} #{obis_asset.external_type}"
     end
 
     errs = []
     obis_asset.reload
 
-    errs = seek_util.sync_external_asset(obis_asset) unless obis_asset.synchronized?
+    begin
+
+      # current user is being set to asset creator (it will be registered on his behalf)
+      # maybe it should be done by a system user instead???
+
+      User.with_current_user(obis_asset.seek_entity.contributor.user) do
+        errs = seek_util.sync_external_asset(obis_asset) unless obis_asset.synchronized?
+      end
+
+    rescue Exception => e
+      Rails.logger.error "Unrecovered ERROR in syn job #{e.message} #{e.backtrace.join("\n\t")}"
+      raise e
+    end
 
     if obis_asset.failed?
       handle_sync_failure obis_asset
@@ -105,10 +117,10 @@ class OpenbisSyncJob < SeekJob
     too_fresh = DateTime.now - (service.refresh_period_mins / 2).minutes
 
     service.external_assets
-           .where('synchronized_at < ? AND (sync_state = ? OR (updated_at < ? AND sync_state =?))',
-                  old, ExternalAsset.sync_states[:refresh], too_fresh, ExternalAsset.sync_states[:failed])
-           .order(:sync_state, :updated_at)
-           .limit(@batch_size)
+        .where('synchronized_at < ? AND (sync_state = ? OR (updated_at < ? AND sync_state =?))',
+               old, ExternalAsset.sync_states[:refresh], too_fresh, ExternalAsset.sync_states[:failed])
+        .order(:sync_state, :updated_at)
+        .limit(@batch_size)
   end
 
   def failure_threshold
