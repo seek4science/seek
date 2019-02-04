@@ -1204,32 +1204,35 @@ class SopsControllerTest < ActionController::TestCase
 
     AuthLookupUpdateQueue.destroy_all
 
-    assert_difference('AuthLookupUpdateQueue.count',1) do
-      put :update, id:sop.id,sop:{title: 'fish', creator_ids:[creator.id.to_s]}
-      assert_redirected_to sop
-      assert_equal 'fish',assigns(:sop).title
-      assert_equal [creator],assigns(:sop).creators
+    with_config_value(:auth_lookup_enabled, true) do
+      assert_difference('AuthLookupUpdateQueue.count',1) do
+        put :update, id:sop.id,sop:{title: 'fish', creator_ids:[creator.id.to_s]}
+        assert_redirected_to sop
+        assert_equal 'fish',assigns(:sop).title
+        assert_equal [creator],assigns(:sop).creators
+      end
+
+      AuthLookupUpdateQueue.destroy_all
+
+      # no job if no change to creators
+      assert_no_difference('AuthLookupUpdateQueue.count') do
+        put :update, id:sop.id,sop:{title: 'horse', creator_ids:[creator.id.to_s]}
+        assert_redirected_to sop
+        assert_equal 'horse',assigns(:sop).title
+        assert_equal [creator],assigns(:sop).creators
+      end
+
+      AuthLookupUpdateQueue.destroy_all
+
+      # job if creator removed
+      assert_difference('AuthLookupUpdateQueue.count',1) do
+        put :update, id:sop.id,sop:{title: 'fish', creator_ids:[]}
+        assert_redirected_to sop
+        assert_equal 'fish',assigns(:sop).title
+        assert_equal [],assigns(:sop).creators
+      end
     end
 
-    AuthLookupUpdateQueue.destroy_all
-
-    # no job if no change to creators
-    assert_no_difference('AuthLookupUpdateQueue.count') do
-      put :update, id:sop.id,sop:{title: 'horse', creator_ids:[creator.id.to_s]}
-      assert_redirected_to sop
-      assert_equal 'horse',assigns(:sop).title
-      assert_equal [creator],assigns(:sop).creators
-    end
-
-    AuthLookupUpdateQueue.destroy_all
-
-    # job if removed
-    assert_difference('AuthLookupUpdateQueue.count',1) do
-      put :update, id:sop.id,sop:{title: 'fish', creator_ids:[]}
-      assert_redirected_to sop
-      assert_equal 'fish',assigns(:sop).title
-      assert_equal [],assigns(:sop).creators
-    end
   end
 
   private
