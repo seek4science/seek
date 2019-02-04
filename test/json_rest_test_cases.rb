@@ -166,7 +166,7 @@ module JsonRestTestCases
 
     logout
 
-    get :show, url_opts
+    get :show, params: url_opts
     assert_response :not_found
   end
 
@@ -178,7 +178,7 @@ module JsonRestTestCases
       url_opts = rest_show_url_options.merge(id: item.id, format: format)
       logout
 
-      get :show, url_opts
+      get :show, params: url_opts
       assert_response :forbidden
     end
   end

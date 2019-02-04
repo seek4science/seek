@@ -1178,7 +1178,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     ids = [good_assay,good_assay2,bad_assay,bad_assay2].collect(&:id).collect(&:to_s)
 
-    get :new, assay_ids:ids
+    get :new, params: { assay_ids: ids }
 
     assert_response :success
 

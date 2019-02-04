@@ -1,5 +1,6 @@
 class NelsController < ApplicationController
 
+  before_action :nels_enabled?
   before_action :project_membership_required, except: :callback
   before_action :find_and_authorize_assay, except: :callback
   before_action :oauth_client
@@ -11,9 +12,7 @@ class NelsController < ApplicationController
 
   include Seek::BreadCrumbs
 
-  before_action :nels_enabled?
-
-  skip_before_filter :add_breadcrumbs, only: :callback
+  skip_before_action :add_breadcrumbs, only: :callback
 
   def callback
     hash = @oauth_client.get_token(params[:code])

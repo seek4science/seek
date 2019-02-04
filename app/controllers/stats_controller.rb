@@ -44,7 +44,7 @@ class StatsController < ApplicationController
   def clear_cache
     stats.clear_caches
 
-    redirect_back
+    redirect_back(fallback_location: root_path)
   end
 
   private
