@@ -20,7 +20,7 @@ class NelsControllerTest < ActionController::TestCase
   test 'cannot get browser if nels disabled' do
     with_config_value(:nels_enabled, false) do
       VCR.use_cassette('nels/get_user_info') do
-        get :index, assay_id: @assay.id
+        get :index, params: { assay_id: @assay.id }
       end
     end
 

@@ -137,7 +137,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Factory(:project)
 
     assert_difference('Annotation.count', 2) do
-      put :update, id: project, project: { funding_codes: '1234,abcd' }
+      put :update, params: { id: project, project: { funding_codes: '1234,abcd' } }
     end
 
     assert_redirected_to project
@@ -147,7 +147,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes assigns(:project).funding_codes, 'abcd'
 
     assert_difference('Annotation.count', -2) do
-      put :update, id: project, project: { funding_codes: '' }
+      put :update, params: { id: project, project: { funding_codes: '' } }
     end
 
     assert_redirected_to project
@@ -1644,12 +1644,12 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(admin.user)
 
     with_config_value(:nels_enabled,false) do
-      get :edit, id: project.id
+      get :edit, params: { id: project.id }
       assert_select 'div#nels_admin_section', count: 0
     end
 
     with_config_value(:nels_enabled,true) do
-      get :edit, id: project.id
+      get :edit, params: { id: project.id }
       assert_select 'div#nels_admin_section', count: 1
     end
 
