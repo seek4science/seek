@@ -153,11 +153,16 @@ module Seek
       detected_mime_type = mime_types_for_extension(file_extension).first
 
       if detected_mime_type.nil? && file_exists?
-        io = File.open(filepath)
-        detected_mime_type ||= MimeMagic.by_magic(io).try(:type) if file_exists?
-        io.close
+        detected_mime_type ||= mime_magic_content_type
       end
       detected_mime_type || content_type
+    end
+
+    def mime_magic_content_type
+      io = File.open(filepath)
+      type = MimeMagic.by_magic(io).try(:type) if file_exists?
+      io.close
+      type
     end
 
     def set_content_type_according_to_file

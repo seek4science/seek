@@ -2,6 +2,7 @@ module Seek
   module ContentExtraction
     MAXIMUM_PDF_CONVERT_TIME = 3.minutes
 
+    include ContentTypeDetection
     include SysMODB::SpreadsheetExtractor
 
     def pdf_contents_for_search
@@ -53,6 +54,7 @@ module Seek
     end
 
     def extract_text_from_pdf
+      return [] unless (is_pdf? || is_pdf_convertable?)
       output_directory = converted_storage_directory
       pdf_filepath = filepath('pdf')
       txt_filepath = filepath('txt')
@@ -68,17 +70,44 @@ module Seek
             split_content content
           end
         rescue Exception => e
+          double_check_mime_type
+          extract_text_from_pdf
           Rails.logger.error("Problem with extracting text from pdf #{id} #{e}")
           []
         end
       end
     end
 
-    def to_csv(sheet,trim=false)
-      spreadsheet_to_csv(open(filepath), sheet, trim, Seek::Config.jvm_memory_allocation)
+    def to_csv(sheet=1,trim=false)
+      return '' unless is_excel?
+      begin
+        spreadsheet_to_csv(open(filepath), sheet, trim, Seek::Config.jvm_memory_allocation)
+      rescue SysMODB::SpreadsheetExtractionException
+        double_check_mime_type
+        to_csv(sheet,trim)
+      end
+    end
+
+    def to_spreadsheet_xml
+      return nil unless is_extractable_spreadsheet?
+      begin
+        spreadsheet_to_xml(open(filepath), memory_allocation = Seek::Config.jvm_memory_allocation)
+      rescue SysMODB::SpreadsheetExtractionException
+        double_check_mime_type
+        to_spreadsheet_xml
+      end
     end
 
     private
+
+    # checks the type using mime magic, and updates if found to be different. This is to help cases where extraction
+    # fails due to the mime type being incorrectly set
+    def double_check_mime_type
+      suggested_type = mime_magic_content_type
+      if suggested_type && suggested_type != content_type
+        update_column(:content_type,suggested_type)
+      end
+    end
 
     def split_content(content, delimiter = "\n")
       content.split(delimiter).reject { |str| (str.blank? || str.length > 200) }.collect(&:strip).uniq
