@@ -230,4 +230,32 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
       assert_equal [person2, person], AuthLookupUpdateQueue.order(:id).to_a.collect(&:item)
     end
   end
+
+  test 'updates queue when creators added or removed' do
+    creator = Factory(:person)
+    person = Factory(:person)
+    df = Factory(:data_file, contributor:person)
+    User.with_current_user(person.user) do
+      AuthLookupUpdateQueue.destroy_all
+
+      df.creators << person
+      assert_equal [person],df.creators
+
+      assert_difference('AuthLookupUpdateQueue.count', 1) do
+        df.save!
+      end
+
+      AuthLookupUpdateQueue.destroy_all
+
+      df.creators = []
+      assert_equal [],df.creators
+
+      assert_difference('AuthLookupUpdateQueue.count', 1) do
+        df.save!
+      end
+
+    end
+
+
+  end
 end
