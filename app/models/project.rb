@@ -1,4 +1,5 @@
 class Project < ApplicationRecord
+  include Seek::Taggable
   include Seek::Rdf::RdfGeneration
   include Seek::Rdf::ReactToAssociatedChange
   include HasSettings
@@ -39,10 +40,9 @@ class Project < ApplicationRecord
 
   has_many :openbis_endpoints
 
-  belongs_to :programme
+  has_annotation_type :funding_code
 
-  # attr_accessible :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids, :title, :programme_id, :description,
-  #                 :web_page, :institution_ids, :parent_id, :wiki_page, :organism_ids, :default_license, :use_default_policy
+  belongs_to :programme
 
   # for handling the assignment for roles
   attr_accessor :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids

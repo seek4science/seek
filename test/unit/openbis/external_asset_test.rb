@@ -22,6 +22,7 @@ class ExternalAssetTest < ActiveSupport::TestCase
   end
 
   test 'save fails in db if service and external id are not unique' do
+    skip('add_index constraint removed but can be readded in 1.9.0 and enforce newer version of mysql')
     asset1 = ExternalAsset.new(external_service: 'OpenBIS', external_id: '23')
     assert asset1.save
 

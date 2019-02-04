@@ -28,6 +28,7 @@ module ProgrammesHelper
     link_list_for_role("#{t('programme')} Administrator", programme.programme_administrators, 'programme')
   end
 
+
   def can_create_programmes?
     Programme.can_create?
   end

@@ -17,6 +17,17 @@ class NelsControllerTest < ActionController::TestCase
     assert_select '#nels-tree'
   end
 
+  test 'cannot get browser if nels disabled' do
+    with_config_value(:nels_enabled, false) do
+      VCR.use_cassette('nels/get_user_info') do
+        get :index, assay_id: @assay.id
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
   test 'cannot get browser for non-NeLS project assay' do
     assay = Factory(:assay)
     person = assay.contributor
@@ -41,8 +52,8 @@ class NelsControllerTest < ActionController::TestCase
       get :index, params: { assay_id: @assay.id }
     end
 
-    assert_redirected_to @assay
-    assert flash[:error].include?('integration')
+    assert_redirected_to :root
+    refute_nil flash[:error]
   end
 
   test 'cannot get browser for assay without edit permissions' do

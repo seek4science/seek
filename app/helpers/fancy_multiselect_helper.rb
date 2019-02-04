@@ -24,6 +24,11 @@ module FancyMultiselectHelper
       association_class = options.delete(:association_class) || reflection.klass
       options[:unscoped_possibilities] = authorised_assets(association_class, nil, access) if options[:other_projects_checkbox]
       options[:possibilities] = authorised_assets(association_class, current_user.person.projects, access) unless options[:possibilities]
+      if options[:sort_by]
+        attr = options[:sort_by]
+        options[:possibilities] = options[:possibilities].sort_by(&attr)
+        options[:unscoped_possibilities] = options[:unscoped_possibilities].sort_by(&attr)
+      end
     end
   end
 
@@ -55,7 +60,8 @@ module FancyMultiselectHelper
       hidden: hidden,
       required: false,
       title: nil,
-      preview_disabled: association_controller.nil? || !association_controller.method_defined?(:preview)
+      preview_disabled: association_controller.nil? || !association_controller.method_defined?(:preview),
+      sort_by: :title
     }
   end
 

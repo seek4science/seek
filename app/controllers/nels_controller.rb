@@ -11,7 +11,9 @@ class NelsController < ApplicationController
 
   include Seek::BreadCrumbs
 
-  skip_before_action :add_breadcrumbs, only: :callback
+  before_action :nels_enabled?
+
+  skip_before_filter :add_breadcrumbs, only: :callback
 
   def callback
     hash = @oauth_client.get_token(params[:code])
@@ -83,12 +85,6 @@ class NelsController < ApplicationController
 
     unless @assay.can_edit?
       flash[:error] = 'You are not authorized to add NeLS data to this assay.'
-      redirect_to @assay
-      return false
-    end
-
-    unless Seek::Config.nels_enabled
-      flash[:error] = 'NeLS integration is not enabled on this SEEK instance.'
       redirect_to @assay
       return false
     end

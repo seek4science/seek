@@ -20,7 +20,6 @@
   </div>
 </div>
 
-
 <script>
     var publishedAssetsChart = new Chart(document.getElementById('asset-accessibility-canvas').getContext('2d'), {
             type: 'pie',
@@ -36,8 +35,8 @@
                 }],
                 labels: [
                     'Published',
-                    'Restricted',
-                    'Private'
+                    'Project accessible',
+                    'Other'
                 ]
             },
             options: {
@@ -45,6 +44,7 @@
                 legend: {
                     position: 'right',
                     labels: {
+                        <%# A little override to show the value in parentheses next to each label %>
                         generateLabels: function(chart) {
                             var labels = Chart.defaults.pie.legend.labels.generateLabels(chart);
                             labels.forEach(function (label) {
@@ -75,7 +75,7 @@
         $j.ajax({ url: '<%= url -%>',
             data: data,
             success: function (resp) {
-                publishedAssetsChart.data.datasets[0].data = [resp.published_count, resp.restricted_count, resp.private_count];
+                publishedAssetsChart.data.datasets[0].data = [resp.published_count, resp.project_accessible_count, resp.other_count];
                 publishedAssetsChart.update();
             },
             error: function () {

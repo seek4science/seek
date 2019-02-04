@@ -335,13 +335,14 @@ module Seek
         !respond_to?(:creators) || creators.empty?
       end
 
-      def private?
-        policy.private?
+      # item is acccessible to members of the projects passed. Ignores additional restrictions, such as additional permissions to block particular members.
+      # if items is a downloadable it needs to be ACCESSIBLE, otherwise just VISIBLE
+      def projects_accessible?(projects)
+        policy.projects_accessible?(projects, self.is_downloadable?)
       end
 
-      def public?
-        policy.public?
-      end
+      delegate :private?, to: :policy
+      delegate :public?, to: :policy
 
       def default_policy
         Policy.default

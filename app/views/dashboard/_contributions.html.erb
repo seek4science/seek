@@ -29,6 +29,9 @@
         options: {
             legend: {
                 position: 'right',
+                // Some custom behaviour for clicking on the legend:
+                // * single click hides the clicked dataset
+                // * double click hides all other datasets except the one clicked
                 onClick: function(e, legendItem) {
                     setTimeout(function () { contributionChart.nextClickIsDouble = false; }, 300);
                     var index = legendItem.datasetIndex;
@@ -67,7 +70,7 @@
                     stacked: true
                 }],
                 yAxes: [{
-                    ticks: { // This whole block is just to avoid and protoype.js bug that breaks the whole chart
+                    ticks: { // This whole block is just to avoid a prototype.js bug that breaks the whole chart
                         beginAtZero:true,
                         userCallback: function(label, index) {
                             if (Math.floor(label) === label) {
@@ -87,7 +90,7 @@
         var endDate = $j('#dashboard-controls [data-dashboard-field="period-end"]').val();
         var interval = container.find('[data-dashboard-field="interval-select"]').val();
 
-        // Store type visibility
+        // Remember which types the user has hidden
         var hidden = {};
         if (contributionChart.data.datasets) {
             contributionChart.data.datasets.forEach(function (dataset, index) {
@@ -106,7 +109,7 @@
                 interval: interval
             },
             success: function (resp) {
-                // Re-apply visibility settings
+                // Re-apply the visibility of each type, from above
                 resp.datasets.forEach(function (dataset, index) {
                     if (hidden[dataset.label] !== null) {
                         resp.datasets[index].hidden = hidden[dataset.label];

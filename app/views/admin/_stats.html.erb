@@ -33,19 +33,24 @@
 <script>
   $j(document).ready(function () {
     var getPage = function (page) {
-      $j('#stats-controls').spinner('add');
-      $j.ajax({ url: '<%= get_stats_admin_path -%>',
-        data: { page: page },
-        success: function (resp) {
-          $j('#stats-pane').html(resp);
-        },
-        error: function () {
-          $j('#stats-pane').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
-        },
-        complete: function () {
-          $j('#stats-controls').spinner('remove');
-        }
-      })
+      if (page) {
+          $j('#stats-controls').spinner('add');
+          $j.ajax({ url: '<%= get_stats_admin_path -%>',
+              data: { page: page },
+              success: function (resp) {
+                  $j('#stats-pane').html(resp);
+              },
+              error: function () {
+                  $j('#stats-pane').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
+              },
+              complete: function () {
+                  $j('#stats-controls').spinner('remove');
+              }
+          })
+      }
+      else {
+          $j('#stats-pane').html('');
+      }
     };
 
     $j('#query-selector').change(function () { getPage($j(this).val()) });

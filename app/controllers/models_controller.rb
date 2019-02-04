@@ -8,7 +8,7 @@ class ModelsController < ApplicationController
   before_action :models_enabled?
   before_action :find_assets, :only => [:index]
   before_action :find_and_authorize_requested_item, :except => [:build, :index, :new, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
-  before_action :find_display_asset, :only => [:show, :download, :execute, :matching_data, :visualise, :export_as_xgmml, :compare_versions]
+  before_action :find_display_asset, :only => [:show, :download, :execute, :visualise, :export_as_xgmml, :compare_versions]
   before_action :find_other_version, :only => [:compare_versions]
 
   include Seek::Jws::Simulator
@@ -18,6 +18,13 @@ class ModelsController < ApplicationController
   include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
+
+  # override new to associate assays
+  def new
+    setup_new_asset
+    associate_presented_assays
+    respond_for_new
+  end
 
   def find_other_version
     version = params[:other_version]
@@ -134,22 +141,6 @@ class ModelsController < ApplicationController
     end
   end
 
-  def matching_data
-    #FIXME: should use the correct version
-    @matching_data_items = @model.matching_data_files
-
-    #filter authorization
-    ids = @matching_data_items.collect(&:primary_key)
-    data_files = DataFile.where(id: ids)
-    authorised_ids = DataFile.authorize_asset_collection(data_files, "view").collect(&:id)
-    @matching_data_items = @matching_data_items.select { |mdf| authorised_ids.include?(mdf.primary_key.to_i) }
-
-    flash.now[:notice]="#{@matching_data_items.count} #{t('data_file').pluralize} found that may be relevant to this #{t('model')}"
-    respond_to do |format|
-      format.html
-    end
-  end
-
   protected
 
   def create_new_version comments
@@ -191,6 +182,14 @@ class ModelsController < ApplicationController
     latest_version = model_object.latest_version
     latest_version.model_image_id = model_object.model_image_id
     latest_version.save
+  end
+
+  # before_filter that links modelling analyses passed by assay_id, filtering out incorrect types and those none editable
+  def associate_presented_assays
+    return unless @model && params[:assay_ids] && params[:assay_ids].any?
+    assays = Assay.find(params[:assay_ids])
+    assays = assays.select{|assay| assay.assay_class.is_modelling?}.select{|assay| assay.can_edit?}
+    @model.assign_attributes({assay_ids:assays.collect(&:id)})
   end
 
   private

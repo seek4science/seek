@@ -5,6 +5,7 @@ class PeopleController < ApplicationController
   include Seek::FacetedBrowsing
   include Seek::DestroyHandling
   include Seek::AdminBulkAction
+  include RelatedItemsHelper
 
   before_action :find_and_authorize_requested_item, only: %i[show edit update destroy items]
   before_action :current_user_exists, only: %i[register create new]
@@ -61,6 +62,9 @@ class PeopleController < ApplicationController
                 end
 
       @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
+      if request.format.to_s == "text/html" && !params[:project_id].nil?
+        @people = sort_project_member_by_status(@people, params[:project_id])
+      end
       unless view_context.index_with_facets?('people') && params[:user_enable_facet] == 'true'
         @people = Person.paginate_after_fetch(@people,
                                               page: (params[:page] || Seek::Config.default_page('people')),

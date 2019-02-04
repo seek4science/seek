@@ -773,6 +773,7 @@ span.required, label.required::after {
   }
 }
 
+<<<<<<< HEAD
 .js-highlight, .js-highlight-yellow, .js-highlight-warning {
   animation: js-highlight-fadeout 1s;
 }
@@ -803,4 +804,8 @@ span.required, label.required::after {
 {
   0%   { background-color: #a7c7ff; }
   100% { background-color: inherit; }
+}
+
+#null_license img {
+  padding-right:1em;
 }

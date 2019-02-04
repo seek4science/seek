@@ -32,7 +32,7 @@ module Seek
     def self.persistent_classes
       cache('persistent_classes') do
         ensure_models_loaded
-        ApplicationRecord.descendants
+        filter_disabled(ApplicationRecord.descendants)
       end
     end
 
@@ -162,5 +162,19 @@ module Seek
         @@cache[name] ||= block.call
       end
     end
+
+    def self.filter_disabled(types)
+      disabled = %w[workflow event programme publication sample].collect do |setting|
+        unless Seek::Config.send("#{setting.pluralize}_enabled")
+          setting.classify.constantize
+        end
+      end.compact
+
+      # special case
+      disabled += [Node] unless Seek::Config.workflows_enabled
+
+      types - disabled
+    end
+    
   end
 end

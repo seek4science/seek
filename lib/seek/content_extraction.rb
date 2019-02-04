@@ -75,7 +75,7 @@ module Seek
     private
 
     def split_content(content, delimiter = "\n")
-      content.split(delimiter).reject { |str| (str.blank? || str.length > 50) }.collect(&:strip).uniq
+      content.split(delimiter).reject { |str| (str.blank? || str.length > 200) }.collect(&:strip).uniq
     end
 
     # filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines

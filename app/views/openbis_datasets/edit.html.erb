@@ -1,8 +1,9 @@
 
 <%= render :partial => 'openbis_common/errors_panel' %>
 
-<%= render :partial => 'openbis_dataset_panel', :object => @entity, locals: {sync_at: @asset.synchronized_at,
-                                                                             err_msg: @asset.err_msg} %>
+<%= render :partial => 'openbis_dataset_panel', :object => @entity, locals: { sync_at: @asset.synchronized_at,
+                                                                              err_msg: @asset.err_msg,
+                                                                              modal_files: false } %>
 
 <%
   not_registered = @datafile.new_record?

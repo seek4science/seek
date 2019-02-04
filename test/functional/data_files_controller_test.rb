@@ -108,40 +108,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div#associate_assay_fold_content p', text: /The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('data_file')}:/
   end
 
-  test 'get XML when not logged in' do
-    logout
-    df = Factory(:data_file, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    get :show, params: { id: df, format: 'xml' }
-    perform_api_checks
-  end
-
-  test 'XML for data file with tags' do
-    p = Factory :person
-    df = Factory(:data_file, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    Factory :tag, annotatable: df, source: p, value: 'golf'
-
-    test_get_rest_api_xml df
-  end
-
-  test 'should include tags in XML' do
-    p = Factory :person
-    df = Factory(:data_file, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    Factory :tag, annotatable: df, source: p, value: 'golf'
-    Factory :tag, annotatable: df, source: p, value: '<fish>'
-    Factory :tag, annotatable: df, source: p, value: 'frog', attribute_name: 'tool'
-    Factory :tag, annotatable: df, source: p, value: 'stuff', attribute_name: 'expertise'
-
-    test_get_rest_api_xml df
-
-    assert_response :success
-    xml = @response.body
-    assert xml.include?('<tags>')
-    assert xml.include?('<tag context="tag">golf')
-    assert xml.include?('<tag context="tag">&lt;fish&gt;')
-    assert xml.include?('<tag context="tool">frog')
-    assert xml.include?('<tag context="expertise">stuff')
-  end
-
   test 'should show index' do
     get :index
     assert_response :success
@@ -882,34 +848,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
-  test 'should expose spreadsheet contents' do
-    login_as(:model_owner)
-    get :data, params: { id: data_files(:downloadable_data_file), format: 'xml' }
-    assert_response :success
-    xml = @response.body
-    schema_path = File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'spreadsheet.xsd')
-    validate_xml_against_schema(xml, schema_path)
-  end
-
-  test 'should not expose non downloadable spreadsheet' do
-    login_as(:model_owner)
-    get :data, params: { id: data_files(:viewable_data_file), format: 'xml' }
-    assert_response 403
-  end
-
-  def test_should_not_expose_contents_for_picture
-    get :data, params: { id: data_files(:picture) }
-    assert_redirected_to data_file_path(data_files(:picture))
-    assert flash[:error]
-  end
-
-  test 'should not expose spreadsheet contents if not authorized' do
-    login_as(:aaron)
-    get :data, params: { id: data_files(:viewable_data_file) }
-    assert_redirected_to data_file_path(data_files(:viewable_data_file))
-    assert flash[:error]
-  end
-
   test 'should update data file' do
     assert_difference('ActivityLog.count') do
       put :update, params: { id: data_files(:picture).id, data_file: { title: 'diff title' } }
@@ -931,27 +869,28 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should be possible to delete one version of data file' do
-    Seek::Config.delete_asset_version_enabled = true
-    # upload a data file
-    df = Factory :data_file, contributor: User.current_user.person
-    # upload new version 1 of the data file
-    post :new_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision 1' }
-    # upload new version 2 of the data file
-    post :new_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision 2' }
+    with_config_value :delete_asset_version_enabled, true do
+      # upload a data file
+      df = Factory :data_file, contributor: User.current_user.person
+      # upload new version 1 of the data file
+      post :new_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision 1' }
+      # upload new version 2 of the data file
+      post :new_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision 2' }
 
-    df.reload
-    assert_equal 3, df.versions.length
-
-    # the latest version is 3
-    assert_equal 3, df.version
-
-    assert_difference('df.versions.length', -1) do
-      put :destroy_version, params: { id: df, version: 3 }
       df.reload
+      assert_equal 3, df.versions.length
+
+      # the latest version is 3
+      assert_equal 3, df.version
+
+      assert_difference('df.versions.length', -1) do
+        put :destroy_version, params: { id: df, version: 3 }
+        df.reload
+      end
+      # the latest version becomes 2
+      assert_equal 2, df.version
+      assert_redirected_to data_file_path(df)
     end
-    # the latest version becomes 2
-    assert_equal 2, df.version
-    assert_redirected_to data_file_path(df)
   end
 
   test 'adding_new_conditions_to_different_versions' do
@@ -959,6 +898,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert d.can_edit?
     sf = StudiedFactor.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
                               start_value: 1, end_value: 2, data_file_id: d.id, data_file_version: d.version)
+
     assert_difference('DataFile::Version.count', 1) do
       assert_difference('StudiedFactor.count', 1) do
         post :new_version, params: { id: d, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
@@ -2086,7 +2026,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, params: { id: df }
 
-    assert_select '.panel .panel-body span.none_text', text: 'No license specified'
+    assert_select '.panel .panel-body span#null_license', text: I18n.t('null_license')
   end
 
   test 'should display license' do
@@ -2138,7 +2078,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :edit, params: { id: df2 }
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', text: 'License Not Specified'
+    assert_select '#license-select option[selected=?]', 'selected', text: I18n.t('null_license')
 
     register_content_blob
     assert_response :success

@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'time_test_helper'
 
 class SessionStoreTest < ActionDispatch::IntegrationTest
   def setup
@@ -17,12 +16,12 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
     get "/data_files/#{df.id}"
     assert_response :success
 
-    pretend_now_is(29.minutes.from_now) do
+    travel_to(29.minutes.from_now) do
       get "/data_files/#{df.id}"
       assert_response :success
     end
 
-    pretend_now_is(60.minutes.from_now) do
+    travel_to(60.minutes.from_now) do
       get "/data_files/#{df.id}"
       assert_response :forbidden
     end

@@ -337,4 +337,5 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 2,Delayed::Job.count
     assert_equal 1,Delayed::Job.where('failed_at IS NOT NULL').count
   end
+
 end

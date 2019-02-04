@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'time_test_helper'
 
 class MessageLogTest < ActiveSupport::TestCase
   test 'create' do
@@ -53,11 +52,11 @@ class MessageLogTest < ActiveSupport::TestCase
     assert_equal 12.hours, MessageLog::RECENT_PERIOD
     recent = nil
     older = nil
-    pretend_now_is(Time.now - 6.hours) do
+    travel_to(Time.now - 6.hours) do
       recent = valid_log
       recent.save!
     end
-    pretend_now_is(Time.now - 18.hours) do
+    travel_to(Time.now - 18.hours) do
       older = valid_log
       older.save!
     end
@@ -77,7 +76,7 @@ class MessageLogTest < ActiveSupport::TestCase
     log3.resource = Factory(:project)
     log3.save!
     log4 = nil
-    pretend_now_is(Time.now - 18.hours) do
+    travel_to(Time.now - 18.hours) do
       log4 = valid_log
       log4.resource = log.resource
       log4.sender = log.sender

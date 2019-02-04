@@ -201,14 +201,14 @@ module Seek
         saved
       end
 
-      def update_timestamps(_from, to)
+      def update_timestamps(from, to)
         ['updated_at'].each do |key|
-          next unless to.has_attribute?(key)
+          next unless to.has_attribute?(key) && from.has_attribute?(key)
           logger.debug("explicit_versioning - update_timestamps method - setting timestamp_column '#{key}'")
-          if eval("from.#{key}.nil?")
+          if from.send("#{key}").nil?
             to.send("#{key}=", nil)
           else
-            to.send("#{key}=", eval("from.#{key}"))
+            to.send("#{key}=", from.send("#{key}"))
           end
         end
       rescue => err

@@ -12,15 +12,26 @@ module LicenseHelper
 
   def describe_license(id, source = nil)
     license = Seek::License.find(id, source)
-    if license && !license.is_null_license?
-      if license.url.blank?
-        license.title
-      else
-        link_to(license.title, license.url, target: :_blank)
+    content = license_description_content(license)
+
+    if !license || license.is_null_license?
+      content_tag(:span, id: 'null_license') do
+        image(:warning) +
+            content
       end
     else
-      content_tag(:span, 'No license specified', class: 'none_text')
+      content
     end
+  end
+
+  # link to select a licence if the license is nil or a null license
+  def prompt_for_license(resource, versioned_resource)
+    license = Seek::License.find(versioned_resource.license)
+    return unless (license.nil? || license.is_null_license?) && resource.can_manage?
+    content_tag(:hr) +
+        content_tag(:p) do
+          link_to('Click here to choose a license', polymorphic_path(resource, action: :edit, anchor: 'license-section'))
+        end
   end
 
   # whether to enable to auto selection of the license based on the selected project
@@ -41,6 +52,20 @@ module LicenseHelper
   end
 
   private
+
+  def license_description_content(license)
+    if license
+      url = license.url
+      title = license.title
+      if url.blank?
+        title
+      else
+        link_to(title, url, target: :_blank)
+      end
+    else
+      link_to(Seek::License::NULL_LICENSE_TEXT,Seek::Help::HelpDictionary.instance.help_link(:null_license),target: :_blank)
+    end
+  end
 
   def license_values(opts = {})
     opts.delete(:source) || Seek::License::OPENDEFINITION[:all]

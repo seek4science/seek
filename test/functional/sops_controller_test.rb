@@ -20,33 +20,6 @@ class SopsControllerTest < ActionController::TestCase
     @object = sops(:downloadable_sop)
   end
 
-  def test_get_xml_specific_version
-    login_as(:owner_of_my_first_sop)
-    get :show, params: { id: sops(:downloadable_sop), version: 2, format: 'xml' }
-    perform_api_checks
-    xml = @response.body
-    document     = LibXML::XML::Document.string(xml)
-    version_node = document.find_first('//ns:version', 'ns:http://www.sysmo-db.org/2010/xml/rest')
-    assert_not_nil version_node
-    assert_equal '2', version_node.content
-    content_blob_node = document.find_first('//ns:blob', 'ns:http://www.sysmo-db.org/2010/xml/rest')
-    assert_not_nil content_blob_node
-    md5sum = content_blob_node.find_first('//ns:md5sum', 'ns:http://www.sysmo-db.org/2010/xml/rest').content
-
-    # now check version 1
-    get :show, params: { id: sops(:downloadable_sop), version: 1, format: 'xml' }
-    perform_api_checks
-    xml = @response.body
-    document     = LibXML::XML::Document.string(xml)
-    version_node = document.find_first('//ns:version', 'ns:http://www.sysmo-db.org/2010/xml/rest')
-    assert_not_nil version_node
-    assert_equal '1', version_node.content
-    content_blob_node = document.find_first('//ns:blob', 'ns:http://www.sysmo-db.org/2010/xml/rest')
-    assert_not_nil content_blob_node
-    md5sum2 = content_blob_node.find_first('//ns:md5sum', 'ns:http://www.sysmo-db.org/2010/xml/rest').content
-    assert_not_equal md5sum, md5sum2
-  end
-
   test 'creators do not show in list item' do
     p1 = Factory :person
     p2 = Factory :person
@@ -879,7 +852,7 @@ class SopsControllerTest < ActionController::TestCase
 
     get :show, params: { id: sop }
 
-    assert_select '.panel .panel-body span.none_text', text: 'No license specified'
+    assert_select '.panel .panel-body span#null_license', text: I18n.t('null_license')
   end
 
   test 'should display license' do

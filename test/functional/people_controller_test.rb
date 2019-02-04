@@ -21,21 +21,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert_select 'title', text: 'People', count: 1
   end
 
-  def test_xml_for_person_with_tools_and_expertise
-    p = Factory :person
-    Factory :expertise, value: 'golf', annotatable: p
-    Factory :expertise, value: 'fishing', annotatable: p
-    Factory :tool, value: 'fishing rod', annotatable: p
-
-    test_get_rest_api_xml p
-
-    doc = LibXML::XML::Document.string(@response.body)
-    doc.root.namespaces.default_prefix = 's'
-    assert_equal 2, doc.find("//s:tags/s:tag[@context='expertise']").count
-    assert_equal 1, doc.find("//s:tags/s:tag[@context='tool']").count
-    assert_equal 'fishing rod', doc.find("//s:tags/s:tag[@context='tool']").first.content
-  end
-
   def test_should_get_index
     get :index
     assert_response :success

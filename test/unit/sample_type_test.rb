@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'time_test_helper'
 
 class SampleTypeTest < ActiveSupport::TestCase
 
@@ -859,7 +858,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     type.sample_attributes.detect { |t| t.title == 'full name' }.is_title = false
     type.sample_attributes.detect { |t| t.title == 'postcode' }.is_title = true
     disable_authorization_checks { type.save! }
-    pretend_now_is(Time.now + 1.minute) do
+    travel_to(Time.now + 1.minute) do
       type.refresh_samples
     end
 
