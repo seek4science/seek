@@ -2,6 +2,8 @@ module Seek
   module ContentExtraction
     MAXIMUM_PDF_CONVERT_TIME = 3.minutes
 
+    include SysMODB::SpreadsheetExtractor
+
     def pdf_contents_for_search
       content = []
       if file_exists?
@@ -70,6 +72,10 @@ module Seek
           []
         end
       end
+    end
+
+    def to_csv(sheet,trim=false)
+      spreadsheet_to_csv(open(filepath), sheet, trim, Seek::Config.jvm_memory_allocation)
     end
 
     private

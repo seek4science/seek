@@ -49,6 +49,10 @@ module Seek
       mime_extensions(blob.content_type).include?('xlsm')
     end
 
+    def is_csv?(blob = self)
+      mime_extensions(blob.content_type).include?('csv')
+    end
+
     def is_binary?(blob = self)
       blob.content_type == 'application/octet-stream'
     end
