@@ -3502,6 +3502,30 @@ class DataFilesControllerTest < ActionController::TestCase
     logout
   end
 
+  test 'sharing permissions should not show for edit' do
+    p = Factory(:person)
+    login_as(p.user)
+    df = Factory(:data_file, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:p, access_type:Policy::EDITING)]))
+
+    assert df.can_edit?(p.user)
+    refute df.can_manage?(p.user)
+
+    get :edit, id:df.id
+    assert_response :success
+
+    assert_select "div#sharing_form", count:0
+
+    # make sure it appears if can_manage
+
+    login_as(df.contributor.user)
+
+    get :edit, id:df.id
+    assert_response :success
+
+    assert_select "div#sharing_form", count:1
+
+  end
+
   # registers a new content blob, and triggers the javascript 'rightfield_extraction_ajax' call, and results in the metadata form HTML in the response
   # this replicates the old behaviour and result of calling #new
   def register_content_blob(skip_provide_metadata:false)

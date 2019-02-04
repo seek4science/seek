@@ -19,7 +19,7 @@
    creators_enable=true if creators_enable.nil?
    sharing_link=true if sharing_link.nil?
 %>
-<% if sharing_enable -%>
+<% if sharing_enable && f.object.can_manage? -%>
     <%= render :seek_partial => "sharing/form" -%>
 <% end -%>
 

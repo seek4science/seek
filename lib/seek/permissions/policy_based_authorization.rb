@@ -224,7 +224,7 @@ module Seek
 
       # triggers a background task to update or create the authorization lookup table records for this item
       def check_to_queue_update_auth_table
-        unless (previous_changes.keys & %w[contributor_id owner_id]).empty?
+        if try(:creators_changed?) || (previous_changes.keys & %w[contributor_id owner_id]).any?
           AuthLookupUpdateJob.new.add_items_to_queue self
         end
       end

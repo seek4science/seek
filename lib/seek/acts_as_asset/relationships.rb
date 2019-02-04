@@ -14,6 +14,14 @@ module Seek
         def attributions_objects
           attributions.map(&:other_object)
         end
+
+        def record_creators_changed(_assets_creator)
+          @creators_changed = true
+        end
+
+        def creators_changed?
+          @creators_changed
+        end
       end
 
       module Associations
@@ -40,7 +48,7 @@ module Seek
                    inverse_of: :other_object
 
           has_many :assets_creators, dependent: :destroy, as: :asset, foreign_key: :asset_id
-          has_many :creators, -> { order('assets_creators.id') }, class_name: 'Person', through: :assets_creators, after_remove: :update_timestamp, after_add: :update_timestamp
+          has_many :creators, -> { order('assets_creators.id') }, class_name: 'Person', through: :assets_creators, after_remove: %i[update_timestamp record_creators_changed], after_add: %i[update_timestamp record_creators_changed]
 
           has_many :publication_relationships, -> { where(predicate: Relationship::RELATED_TO_PUBLICATION) },
                    class_name: 'Relationship', as: :subject, dependent: :destroy, inverse_of: :subject
