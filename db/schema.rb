@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_28_142428) do
+ActiveRecord::Schema.define(version: 2018_12_10_162148) do
 
   create_table "activity_logs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "action"
@@ -663,7 +663,6 @@ ActiveRecord::Schema.define(version: 2018_11_28_142428) do
     t.datetime "updated_at", null: false
     t.string "err_msg"
     t.integer "failures", default: 0
-    t.index ["external_id", "external_service"], name: "external_assets_by_external_id", unique: true
     t.index ["seek_entity_type", "seek_entity_id"], name: "index_external_assets_on_seek_entity_type_and_seek_entity_id"
     t.index ["seek_service_type", "seek_service_id"], name: "index_external_assets_on_seek_service_type_and_seek_service_id"
   end
