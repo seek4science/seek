@@ -1228,6 +1228,44 @@ class SopsControllerTest < ActionController::TestCase
     refute_includes project_ids, former_project.id
   end
 
+  test 'authlookup item queued if creators changed' do
+    sop = Factory(:sop)
+    login_as(sop.contributor)
+    creator = Factory(:person)
+
+    AuthLookupUpdateQueue.destroy_all
+
+    with_config_value(:auth_lookup_enabled, true) do
+      assert_difference('AuthLookupUpdateQueue.count',1) do
+        put :update, id:sop.id,sop:{title: 'fish', creator_ids:[creator.id.to_s]}
+        assert_redirected_to sop
+        assert_equal 'fish',assigns(:sop).title
+        assert_equal [creator],assigns(:sop).creators
+      end
+
+      AuthLookupUpdateQueue.destroy_all
+
+      # no job if no change to creators
+      assert_no_difference('AuthLookupUpdateQueue.count') do
+        put :update, id:sop.id,sop:{title: 'horse', creator_ids:[creator.id.to_s]}
+        assert_redirected_to sop
+        assert_equal 'horse',assigns(:sop).title
+        assert_equal [creator],assigns(:sop).creators
+      end
+
+      AuthLookupUpdateQueue.destroy_all
+
+      # job if creator removed
+      assert_difference('AuthLookupUpdateQueue.count',1) do
+        put :update, id:sop.id,sop:{title: 'fish', creator_ids:[]}
+        assert_redirected_to sop
+        assert_equal 'fish',assigns(:sop).title
+        assert_equal [],assigns(:sop).creators
+      end
+    end
+
+  end
+
   private
 
   def doi_citation_mock
