@@ -27,4 +27,12 @@ module MultiStepWizardHelper
     content_tag(:button,'Next',class:'multi-step-next-button btn btn-primary')
   end
 
+  def wizard_footer_tips
+    star = content_tag(:span,class:'required'){'*'}
+    help = content_tag(:span, id:'help_link'){help_link(:data_file_wizard,link_text:'Wizard guide',include_icon:true)}
+    content_tag :div, id: 'wizard-footer-tips' do
+      ('Fields marked with a ' + star + ' are required, other fields are optional ' + help).html_safe
+    end
+  end
+
 end
