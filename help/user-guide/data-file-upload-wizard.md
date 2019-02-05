@@ -29,9 +29,9 @@ You can also jump straight to the end or back to the start by clicking the "End"
 
 You should provide the basic general metadata about the data file:
 
-* [Title](general-attributes.html#title)
+* [Title](general-attributes.html#title) (**Mandatory**)
 * [Description](general-attributes.html#description)
-* [Projects](general-attributes.html#projects)
+* [Projects](general-attributes.html#projects) (**Mandatory**)
 * [Tags](general-attributes.html#tags)
 
 ### Licensing and sharing
