@@ -48,16 +48,14 @@ class ContentBlobsController < ApplicationController
   def csv_data
     if @content_blob.no_content?
       render text: 'No content, Content blob does not have content', content_type: 'text/csv', status: :not_found
-    else
-      if @content_blob.is_csv?
+    elsif @content_blob.is_csv?
         render text: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
-      elsif @content_blob.is_excel?
+    elsif @content_blob.is_excel?
         sheet = params[:sheet] || 1
         trim = params[:trim] || false
         render text: @content_blob.to_csv(sheet, trim), content_type: 'text/csv'
-      else
+    else
         render text: 'Unable to view contents of this data file,', content_type: 'text/csv', status: :not_acceptable
-      end
     end
   end
   
