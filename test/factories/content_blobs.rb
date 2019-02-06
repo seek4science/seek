@@ -32,6 +32,13 @@ Factory.define(:pdf_content_blob, parent: :content_blob) do |f|
   f.data { File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read }
 end
 
+# a pdf file that fails to load or be converted to text
+Factory.define(:broken_pdf_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'broken_pdf_file.pdf'
+  f.content_type 'application/pdf'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/broken_pdf_file.pdf", 'rb').read }
+end
+
 Factory.define(:image_content_blob, parent: :content_blob) do |f|
   f.original_filename 'image_file.png'
   f.content_type 'image/png'

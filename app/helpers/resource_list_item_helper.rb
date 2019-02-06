@@ -25,45 +25,10 @@ module ResourceListItemHelper
     end
   end
 
-  def list_item_title_no_cache (resource, options = {})
-    result =''
-    url = nil
-    project_id = ''
-    title = get_object_title(resource)
-    include_avatar = true
-    html = '<div class="list_item_title">'
-
-    if !@project.nil?
-      project_id = @project.id.to_s
-    elsif !params[:project_id].nil?
-      project_id = params[:project_id]
-    end
-
-    if resource.class.name.split('::')[0] == 'Person'
-      html = list_item_title_for_person(html, resource, title, url)
-      if project_id != ''
-        html << get_person_status(resource, project_id)
-      end
-    else
-      if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
-        html = list_item_title_with_avatar(html, resource, title, url)
-      else
-        html << (link_to title, (url.nil? ? show_resource_path(resource) : url)).to_s
-      end
-
-      if (controller_name == "people" && resource.class.name.split('::')[0] == 'Project') ||
-          controller_name == "projects"
-        html << get_project_status(resource)
-      end
-    end
-    html << '</div>'
-    visibility = resource.authorization_supported? && resource.can_manage? ? list_item_visibility(resource) : ''
-    html = html.gsub('#item_visibility', visibility)
-    result = html
-    result.html_safe
-  end
-
   def list_item_title(resource, options = {})
+
+    html = nil
+
     cache_key = "rli_title_#{resource.cache_key}_#{resource.authorization_supported? && resource.can_manage?}"
     result = Rails.cache.fetch(cache_key) do
       title = options[:title]
@@ -86,6 +51,27 @@ module ResourceListItemHelper
       end
       html << '</div>'
     end
+
+    if [Person, Project].include?(resource.class)
+      if !@project.nil?
+        project_id = @project.id.to_s
+      elsif !params[:project_id].nil?
+        project_id = params[:project_id]
+      end
+    end
+
+    # remove '</div>'
+    result = result[0..-7]
+    if resource.class.name.split('::')[0] == 'Person'
+      unless project_id.blank?
+        result << get_person_status(resource, project_id)
+        Rails.logger.debug("member status = #{result}")
+      end
+    elsif resource.class.name.split('::')[0] == 'Project' && controller_name == "people"
+      result << get_project_status(resource)
+    end
+
+    result << '</div>'
     visibility = resource.authorization_supported? && resource.can_manage? ? list_item_visibility(resource) : ''
     result = result.gsub('#item_visibility', visibility)
     result.html_safe
