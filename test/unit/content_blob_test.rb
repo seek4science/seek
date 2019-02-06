@@ -942,6 +942,13 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     refute blob.is_pdf_convertable?
     assert_equal 'image/png',blob.content_type
+
+    # handles when the file is actually broken, rather than failing due to the mime type
+    blob = Factory(:broken_pdf_content_blob)
+    assert_empty blob.pdf_contents_for_search
+    assert_equal 'application/pdf',blob.content_type
+
+
   end
 
   test 'fix mime type after spreadsheet xml fail' do

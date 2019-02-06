@@ -69,9 +69,8 @@ module Seek
             content = filter_text_content content
             split_content content
           end
-        rescue Exception => e
-          double_check_mime_type
-          extract_text_from_pdf
+        rescue Docsplit::ExtractionFailed => e
+          extract_text_from_pdf if double_check_mime_type
           Rails.logger.error("Problem with extracting text from pdf #{id} #{e}")
           []
         end
@@ -83,8 +82,7 @@ module Seek
       begin
         spreadsheet_to_csv(open(filepath), sheet, trim, Seek::Config.jvm_memory_allocation)
       rescue SysMODB::SpreadsheetExtractionException
-        double_check_mime_type
-        to_csv(sheet,trim)
+        to_csv(sheet,trim) if double_check_mime_type
       end
     end
 
@@ -93,8 +91,7 @@ module Seek
       begin
         spreadsheet_to_xml(open(filepath), memory_allocation = Seek::Config.jvm_memory_allocation)
       rescue SysMODB::SpreadsheetExtractionException
-        double_check_mime_type
-        to_spreadsheet_xml
+        to_spreadsheet_xml if double_check_mime_type
       end
     end
 
@@ -102,10 +99,15 @@ module Seek
 
     # checks the type using mime magic, and updates if found to be different. This is to help cases where extraction
     # fails due to the mime type being incorrectly set
+    #
+    # @return boolean - the mime type was changed
     def double_check_mime_type
       suggested_type = mime_magic_content_type
       if suggested_type && suggested_type != content_type
         update_column(:content_type,suggested_type)
+        true
+      else
+        false
       end
     end
 
