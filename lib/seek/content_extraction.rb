@@ -24,7 +24,7 @@ module Seek
     def text_contents_for_search
       content = []
       if file_exists?
-        text = File.read(filepath,:encoding => 'iso-8859-1')
+        text = File.read(filepath, encoding: 'iso-8859-1')
         unless text.blank?
           content = filter_text_content text
           content = split_content(content)
@@ -54,14 +54,13 @@ module Seek
     end
 
     def extract_text_from_pdf
-      return [] unless (is_pdf? || is_pdf_convertable?)
-      output_directory = converted_storage_directory
+      return [] unless is_pdf? || is_pdf_convertable?
       pdf_filepath = filepath('pdf')
       txt_filepath = filepath('txt')
 
       if File.exist?(pdf_filepath)
         begin
-          Docsplit.extract_text(pdf_filepath, output: output_directory) unless File.exist?(txt_filepath)
+          Docsplit.extract_text(pdf_filepath, output: converted_storage_directory) unless File.exist?(txt_filepath)
           content = File.read(txt_filepath)
           if content.blank?
             []
@@ -77,19 +76,19 @@ module Seek
       end
     end
 
-    def to_csv(sheet=1,trim=false)
+    def to_csv(sheet = 1, trim = false)
       return '' unless is_excel?
       begin
-        spreadsheet_to_csv(open(filepath), sheet, trim, Seek::Config.jvm_memory_allocation)
+        spreadsheet_to_csv(File.open(filepath), sheet, trim, Seek::Config.jvm_memory_allocation)
       rescue SysMODB::SpreadsheetExtractionException
-        to_csv(sheet,trim) if double_check_mime_type
+        to_csv(sheet, trim) if double_check_mime_type
       end
     end
 
     def to_spreadsheet_xml
       return nil unless is_extractable_spreadsheet?
       begin
-        spreadsheet_to_xml(open(filepath), memory_allocation = Seek::Config.jvm_memory_allocation)
+        spreadsheet_to_xml(File.open(filepath), Seek::Config.jvm_memory_allocation)
       rescue SysMODB::SpreadsheetExtractionException
         to_spreadsheet_xml if double_check_mime_type
       end
@@ -104,7 +103,7 @@ module Seek
     def double_check_mime_type
       suggested_type = mime_magic_content_type
       if suggested_type && suggested_type != content_type
-        update_column(:content_type,suggested_type)
+        update_column(:content_type, suggested_type)
         true
       else
         false
