@@ -933,7 +933,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   test 'fix mime type after failed pdf contents for search' do
     check_for_soffice
-    blob = Factory(:image_content_blob, content_type:'application/msword', original_filename:'image.doc')
+    blob = Factory(:image_content_blob, content_type: 'application/msword', original_filename: 'image.doc')
     assert blob.is_pdf_convertable?
 
     assert_empty blob.pdf_contents_for_search
@@ -941,14 +941,22 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob.reload
 
     refute blob.is_pdf_convertable?
-    assert_equal 'image/png',blob.content_type
+    assert_equal 'image/png', blob.content_type
+
+    # incorrectly described as pdf
+    blob = Factory(:image_content_blob, content_type: 'application/pdf', original_filename: 'image.pdf')
+
+    assert_empty blob.pdf_contents_for_search
+
+    blob.reload
+
+    refute blob.is_pdf_convertable?
+    assert_equal 'image/png', blob.content_type
 
     # handles when the file is actually broken, rather than failing due to the mime type
     blob = Factory(:broken_pdf_content_blob)
     assert_empty blob.pdf_contents_for_search
-    assert_equal 'application/pdf',blob.content_type
-
-
+    assert_equal 'application/pdf', blob.content_type
   end
 
   test 'fix mime type after spreadsheet xml fail' do
@@ -962,6 +970,5 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute blob.is_extractable_spreadsheet?
     assert_equal 'image/png',blob.content_type
   end
-
 
 end
