@@ -8,8 +8,6 @@ class ContentBlobsController < ApplicationController
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
 
-  include SysMODB::SpreadsheetExtractor
-
   def update
     if @content_blob.no_content?
       @content_blob.tmp_io_object = get_request_payload
@@ -48,24 +46,19 @@ class ContentBlobsController < ApplicationController
   end
 
   def csv_data
-    if !@content_blob.no_content?
-      mime_extensions = mime_extensions(@content_blob.content_type)
-      if !(%w(csv) & mime_extensions).empty?
-        render body: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
-      elsif !(%w(xls xlsx) & mime_extensions).empty?
+    if @content_blob.no_content?
+      render text: 'No content, Content blob does not have content', content_type: 'text/csv', status: :not_found
+    elsif @content_blob.is_csv?
+        render text: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
+    elsif @content_blob.is_excel?
         sheet = params[:sheet] || 1
         trim = params[:trim] || false
-        file = open(@content_blob.filepath)
-        render body: spreadsheet_to_csv(file, sheet, trim, Seek::Config.jvm_memory_allocation), content_type: 'text/csv'
-      else
-        render plain: 'Unable to view contents of this data file,', status: :not_acceptable
-      end
+        render text: @content_blob.to_csv(sheet, trim), content_type: 'text/csv'
     else
-      render plain: 'No content, Content blob does not have content', status: :not_found
+        render text: 'Unable to view contents of this data file,', content_type: 'text/csv', status: :not_acceptable
     end
   end
-
-
+  
   def show
     respond_to do |format|
       format.json { render json: @content_blob }
@@ -103,35 +96,15 @@ class ContentBlobsController < ApplicationController
     end
   end
 
-  # def is_myexperiment?(uri)
-  #   return uri.host.include? "myexperiment"
-  # end
-  #
-  # def is_myexperiment_workflow?(uri)
-  #   return is_myexperiment?(uri) && (uri.path.include? "workflows")
-  # end
-  #
-  # def myexperiment_data_form(uri)
-  #   return uri.sub '.html' '.xml'
-  # end
-
   def get_pdf
     if @content_blob.file_exists?
-      begin
-        pdf_or_convert
-      rescue Exception => e
-        raise(e)
-      end
+      pdf_or_convert
     elsif @content_blob.cachable?
       if (caching_job = @content_blob.caching_job).exists?
         caching_job.first.destroy
       end
       @content_blob.retrieve
-      begin
-        pdf_or_convert
-      rescue Exception => e
-        raise(e)
-      end
+      pdf_or_convert
     else
       raise('This remote file is too big to be displayed as PDF.')
     end
