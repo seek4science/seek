@@ -22,9 +22,11 @@ class SessionsController < ApplicationController
   end
 
   def create
-    # authentication through omniauth?
-    if Seek::Config.omniauth_enabled && request.env.has_key?('omniauth.auth')
-      create_omniauth(request.env['omniauth.auth'])
+    omniauth = session[:omniauth]
+    session[:omniauth] = nil
+# authentication through omniauth?
+    if Seek::Config.omniauth_enabled && omniauth
+      create_omniauth(omniauth)
     else
       password_authentication
     end
@@ -121,19 +123,24 @@ class SessionsController < ApplicationController
     info = auth['info']
     
     # check if there is a user with that username as login
-    user_by_omniauth = User.find_by_login( info['nickname'])
+    user_by_omniauth = User.from_omniauth(auth)
     if user_by_omniauth
       @user = user_by_omniauth
       check_login
     # there is no such user, should we not create the user?
     elsif !Seek::Config.omniauth_user_create
-      failed_login "the authenticated user: #{info['nickname']} cannot be found"
+      failed_login "the authenticated user: #{info['nickname']} cannot be found; administrators have been informed"
+      Mailer.omniauth_failed_login(auth.to_yaml).deliver_later
     else
+      # TODO: Check this code out
       # create the user from the omniauth info
       @user = User.create({:login => info['nickname']})
       # some random password, since authentication should happen through omniauth in the future
       @user.password              = SecureRandom.hex
       @user.password_confirmation = @user.password
+
+      @user.uid = auth.uid
+      @user.provider = auth.provider
       # try to save
       if !@user.save
         failed_login "Cannot create a new user: #{info['nickname']}"

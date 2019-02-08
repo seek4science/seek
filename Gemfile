@@ -1,6 +1,8 @@
 source 'https://rubygems.org'
 
 gem 'rails', '~> 4.2.11'
+ruby '2.4.5'
+
 gem 'rdoc'
 
 #database adaptors
@@ -108,8 +110,8 @@ gem 'citeproc', '~> 1.0.4'
 gem 'csl-styles', '~> 1.0.1.7'
 gem 'bibtex-ruby', '~> 4.4.2'
 
-gem 'omniauth', '~> 1.3.1'
-gem 'omniauth-ldap', '~> 1.0.5'
+gem 'devise'
+gem 'omniauth_openid_connect'
 
 gem 'ransack', '~> 1.8.2'
 

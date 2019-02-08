@@ -1,6 +1,12 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
+  # Include default devise modules. Others available are:
+  # :confirmable, :lockable, :timeoutable and :omniauthable
+  # devise :database_authenticatable, :registerable,
+  #        :recoverable, :rememberable, :trackable, :validatable
+  devise :omniauthable, :omniauth_providers => [:elixir_aai]
+
   MIN_PASSWORD_LENGTH=10
 
   acts_as_annotation_source
@@ -12,7 +18,7 @@ class User < ActiveRecord::Base
   has_many :oauth_sessions, dependent: :destroy
 
   # restful_authentication plugin generated code ...
-  # Virtual attribute for the unencrypted password
+  # Virtual attribute for the unencrypted passwordb
   attr_accessor :password, :password_confirmation
 
   validates     :login, presence: true
@@ -121,6 +127,53 @@ class User < ActiveRecord::Base
   def active?
     # the existence of an activation code means they have not activated yet
     activation_code.nil?
+  end
+
+  def self.from_omniauth(auth)
+
+    require 'securerandom' #to set the seek user password to something random when the user is created
+
+    # TODO: Decide what to do about users who have an account but authenticate later on via Elixir AAI.
+    # TODO: The code below will update their account to note the Elixir auth. but leave their password intact;
+    # TODO: is this what we should be doing?
+    user = User.where(:provider => auth.provider, :uid => auth.uid).first
+
+    if !user
+    # TODO: Extra logic to cope with other possibilities
+      person = Person.where(:email => auth['info']['email']).first
+      if person
+        user = person.user
+        if !user
+          user = User.new(login: auth.info.nickname,
+                          provider: auth.provider,
+                          uid: auth.uid
+             )
+          user.password = SecureRandom.hex
+          user.password_confirmation = user.password
+
+          user.activate
+          person.user = user
+          person.save!
+        end
+      end
+    end
+    # `auth.info` fields: email, first_name, gender, image, last_name, name, nickname, phone, urls
+    if user
+      if user.provider.nil? and user.uid.nil?
+        user.uid = auth.uid
+        user.provider = auth.provider
+        user.save
+      end
+    # else
+    #   user = User.new(provider: auth.provider,
+    #                   uid: auth.uid,
+    #                   email: auth.info.email,
+    #                   name: "#{auth.info.first_name} #{auth.info.last_name}"
+    #   )
+    #   user.skip_confirmation!
+    end
+
+    user
   end
 
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
