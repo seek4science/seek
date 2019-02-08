@@ -253,10 +253,35 @@ Devise.setup do |config|
   # The default HTTP method used to sign out a resource. Default is :delete.
   config.sign_out_via = :delete
 
+  # This is hackery because of a race condition
+  secrets = YAML::load(File.read("#{Rails.root}/config/secrets.yml"))[Rails.env]
+
   # ==> OmniAuth
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
+  config.omniauth :openid_connect, {
+      name: :elixir_aai,
+      scope: [:openid, :email],
+      response_type: 'code',
+      issuer: 'https://login.elixir-czech.org/oidc/',
+      discovery: false,
+      send_nonce: true,
+      client_signing_alg: :RS256,
+      client_jwk_signing_key: '{"keys":[{"kty":"RSA","e":"AQAB","kid":"rsa1","alg":"RS256","n":"uVHPfUHVEzpgOnDNi3e2pVsbK1hsINsTy_1mMT7sxDyP-1eQSjzYsGSUJ3GHq9LhiVndpwV8y7Enjdj0purywtwk_D8z9IIN36RJAh1yhFfbyhLPEZlCDdzxas5Dku9k0GrxQuV6i30Mid8OgRQ2q3pmsks414Afy6xugC6u3inyjLzLPrhR0oRPTGdNMXJbGw4sVTjnh5AzTgX-GrQWBHSjI7rMTcvqbbl7M8OOhE3MQ_gfVLXwmwSIoKHODC0RO-XnVhqd7Qf0teS1JiILKYLl5FS_7Uy2ClVrAYd2T6X9DIr_JlpRkwSD899pq6PR9nhKguipJE0qUXxamdY9nw"}]}',
+      client_options: {
+          identifier: secrets['elixir_aai']['client_id'],
+          secret: secrets['elixir_aai']['secret'],
+          redirect_uri: 'http://localhost:3000/users/auth/elixir_aai/callback',
+          scheme: 'https',
+          host: 'login.elixir-czech.org',
+          port: 443,
+          authorization_endpoint: '/oidc/authorize',
+          token_endpoint: '/oidc/token',
+          userinfo_endpoint: '/oidc/userinfo',
+          jwks_uri: '/oidc/jwk',
+      }
+  }
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
@@ -277,48 +302,6 @@ Devise.setup do |config|
   # The router that invoked `devise_for`, in the example above, would be:
   # config.router_name = :my_engine
   #
-  # When using OmniAuth, Devise cannot automatically set OmniAuth path,
-  # so you need to do it manually. For the users scope, it would be:
-  config.omniauth_path_prefix = '/users/auth'
-  # config.omniauth :openid_connect, {
-  #     name: :tester,
-  #     scope: [:openid, :email, :profile],
-  #     response_type: 'code',
-  #     issuer: 'https://seek.eu.auth0.com',
-  #     discovery: false,
-  #     client_signing_alg: :RS256,
-  #     client_jwk_signing_key: '{"keys":[{"alg":"RS256","kty":"RSA","use":"sig","x5c":["MIIC/TCCAeWgAwIBAgIJRbYGzGTs95ZAMA0GCSqGSIb3DQEBCwUAMBwxGjAYBgNVBAMTEXNlZWsuZXUuYXV0aDAuY29tMB4XDTE4MDcxNDE4NDMzN1oXDTMyMDMyMjE4NDMzN1owHDEaMBgGA1UEAxMRc2Vlay5ldS5hdXRoMC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDgng1Zmaa9ZKeXkQ8FQfQjF4hJpD1l0FnT3J4ssqa+/1B7FMlqlmTXOYo5cp/4m5tqd/FBYIgvVULnUnGjM4+8szG0JpGFmWzjOiKXUjghu9C8+c1vpnIBxRh1LGlAMtqP6Vhxwa7hW0KKcxAG+wBA2SpW5onZ9kvZg8niFtsYtNb1nNimxVEB3kYa62uaaAjErFsZPGvxD+2rr+pTwBBB7/y4euwnZSthDyYGKvmkp5JaNQMX7scKiWeRc5Nj52sdMXKGmNmjCTkRzlU5DFrY2ceDRT/upDhD9sZ1r5YwoJi6kxWnunCH4X7Kj4PtZk5LXCsupKRxutPcKLI/1GmrAgMBAAGjQjBAMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFGaOxqtkf76E0cDepcJ74UgJR7vMMA4GA1UdDwEB/wQEAwIChDANBgkqhkiG9w0BAQsFAAOCAQEAVNNojzS+XbHFH/Z/FzyVQhj906x6jELgrz1tZ42UoyHqgyZnVmdXhu9dxo0gDsvsOhy5zcrFDDF8yfFyjjRycDPkrBLPwQ55zyQ5Tbtj8zQFTNVHNHEo70dEjE6z1/A6D6adEnNN9qpiYY2pgTmSbw1KM/6g23zdUi5OECFop8aEDFhdzq3Ki+rBaHo65xtTKxX/U/ygzhq4EoT1sWdI2+D1bQ6GC4SqTLYPD4+FGzVJzxHTnvXG6mgPjfIbd8jlhUlsvoyiiLt/xMSjZVihwhrMg9rR04B5Dfa2778zjOPxrpzVlVJ+mOk22brXrFDV/kftTAXFNB5YYWIWXMi7kg=="],"n":"4J4NWZmmvWSnl5EPBUH0IxeISaQ9ZdBZ09yeLLKmvv9QexTJapZk1zmKOXKf-JubanfxQWCIL1VC51JxozOPvLMxtCaRhZls4zoil1I4IbvQvPnNb6ZyAcUYdSxpQDLaj-lYccGu4VtCinMQBvsAQNkqVuaJ2fZL2YPJ4hbbGLTW9ZzYpsVRAd5GGutrmmgIxKxbGTxr8Q_tq6_qU8AQQe_8uHrsJ2UrYQ8mBir5pKeSWjUDF-7HColnkXOTY-drHTFyhpjZowk5Ec5VOQxa2NnHg0U_7qQ4Q_bGda-WMKCYupMVp7pwh-F-yo-D7WZOS1wrLqSkcbrT3CiyP9Rpqw","e":"AQAB","kid":"NjVBNjRCQTJGM0Q0ODc5QTMzMjZCMUU4ODM3NTAzMEM0RTI4MjQ3OQ","x5t":"NjVBNjRCQTJGM0Q0ODc5QTMzMjZCMUU4ODM3NTAzMEM0RTI4MjQ3OQ"}]}',
-  #     client_options: {
-  #     identifier: "kHbV2jtjENwEbOfrufYhKUE61zSv2pmt",
-  #     secret: "wCxHOuxUr0WYRpBwm5KPxwrM79grJhsFtw3h4ODRsbJXkc8QzY8SOvV2b5RWNMrc",
-  #     # Wish I could use the url helper for this! (user_elixir_aai_omniauth_callback_url)
-  #     redirect_uri: "http://localhost:3000/users/auth/tester/callback",
-  #     scheme: 'https',
-  #     host: 'seek.eu.auth0.com',
-  #     port: 443,
-  #     authorization_endpoint: '/authorize',
-  #     token_endpoint: '/oauth/token',
-  #     userinfo_endpoint: '/userinfo',
-  #     jwks_uri: 'https://seek.eu.auth0.com/.well-known/jwks',
-  #   }
-  # }
 
-  # This is hackery because of a race condition
-  secrets = YAML::load(File.read("#{Rails.root}/config/secrets.yml"))[Rails.env]
-
-  config.omniauth :facebook, secrets['facebook']['key'],
-                  secrets['facebook']['secret'],
-                  callback_url: "http://localhost:3000/users/auth/facebook/callback",
-                  scope: 'email', info_fields: 'email, first_name, last_name'
-  config.omniauth :ldap,
-                  {               callback_url: "http://localhost:3000/users/auth/facebook/callback",
-
-  :title => "Test Server",
-  :host => secrets['ldap']['host'],
-  :port => 389,
-  :method => :plain,
-  :base => 'DC=example,DC=com',
-  :uid => 'uid',
-  :password => 'password' }
 
 end

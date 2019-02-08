@@ -5,7 +5,7 @@ class User < ActiveRecord::Base
   # :confirmable, :lockable, :timeoutable and :omniauthable
   # devise :database_authenticatable, :registerable,
   #        :recoverable, :rememberable, :trackable, :validatable
-  devise :omniauthable, :omniauth_providers => [:facebook, :ldap]
+  devise :omniauthable, :omniauth_providers => [:elixir_aai]
 
   MIN_PASSWORD_LENGTH=10
 
@@ -29,7 +29,7 @@ class User < ActiveRecord::Base
   has_many :oauth_sessions, dependent: :destroy
 
   # restful_authentication plugin generated code ...
-  # Virtual attribute for the unencrypted password
+  # Virtual attribute for the unencrypted passwordb
   attr_accessor :password, :password_confirmation
 
   validates     :login, presence: true

@@ -21,8 +21,6 @@
           </ul>
         <% end #omniauth enabled and providers available %>
 
-
-
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="password_login">
             <%= form_tag main_app.session_path do %>
@@ -56,13 +54,11 @@
           <% if Seek::Config.omniauth_enabled && !Devise.omniauth_providers.empty? %>
             <% Devise.omniauth_providers.each do |provider, options| %>
               <div role="tabpanel" class="tab-pane" id="<%= provider.to_s %>_login">
-                <% if provider.to_s == "ldap" %>
-                  <%= link_to "Sign in with LDAP", user_ldap_omniauth_authorize_path%>
-              <% elsif provider.to_s == "facebook" %>
-                  <%= link_to "Sign in with Facebook", user_facebook_omniauth_authorize_path %>
-              <% else # provider == :ldap %>
+                <% if provider.to_s == "elixir_aai" %>
+                  <%= link_to "Sign in with ELIXIR AAI", user_elixir_aai_omniauth_authorize_path%>
+                <% else %>
                   <div class="alert alert-danger">No link for that omniauth provider yet</div>
-                <% end #provider != :ldap %>
+                <% end %>
               </div>
             <% end #each provider %>
           <% end #omniauth enabled and providers available %>
