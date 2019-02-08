@@ -20,6 +20,8 @@ class Sop < ActiveRecord::Base
 
   has_many :experimental_conditions, -> (r) { where('experimental_conditions.sop_version =?', r.version) }
 
+  has_and_belongs_to_many :workflows
+
   explicit_versioning(:version_column => "version") do
     acts_as_doi_mintable(proxy: :parent)
     acts_as_versioned_resource

@@ -30,7 +30,7 @@ module Seek
     def self.persistent_classes
       cache('persistent_classes') do
         ensure_models_loaded
-        ActiveRecord::Base.descendants
+        filter_disabled(ActiveRecord::Base.descendants)
       end
     end
 
@@ -57,7 +57,7 @@ module Seek
       # FIXME: hard-coded extra types - are are these items now user_creatable?
       # FIXME: remove the reliance on user-creatable, partly by respond_to?(:reindex) but also take into account if it has been enabled or not
       #- could add a searchable? method
-      extras = [Person, Programme, Project, Institution]
+      extras = [Person, Programme, Project, Institution, Organism]
       extras.delete(Programme) unless Seek::Config.programmes_enabled
       cache('searchable_types') { (user_creatable_types | extras).sort_by(&:name) }
     end
@@ -95,7 +95,7 @@ module Seek
 
     def self.inline_viewable_content_types
       # FIXME: needs to be discovered rather than hard-code classes here
-      [DataFile, Document, Model, Presentation, Sop]
+      [DataFile, Document, Model, Presentation, Sop, Workflow]
     end
 
     def self.multi_files_asset_types
@@ -154,5 +154,19 @@ module Seek
         @@cache[name] ||= block.call
       end
     end
+
+    def self.filter_disabled(types)
+      disabled = %w[workflow event programme publication sample].collect do |setting|
+        unless Seek::Config.send("#{setting.pluralize}_enabled")
+          setting.classify.constantize
+        end
+      end.compact
+
+      # special case
+      disabled += [Node] unless Seek::Config.workflows_enabled
+
+      types - disabled
+    end
+    
   end
 end

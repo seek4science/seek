@@ -15,6 +15,19 @@ SEEK::Application.routes.draw do
     end
   end
 
+  concern :has_dashboard do |stats_options|
+    resources :stats, stats_options.reverse_merge(only: []) do
+      collection do
+        get :dashboard
+        get :contributions
+        get :asset_activity
+        get :contributors
+        get :asset_accessibility
+        post :clear_cache
+      end
+    end
+  end
+
   resources :scales do
     collection do
       post :search
@@ -52,6 +65,7 @@ SEEK::Application.routes.draw do
       post :update_imprint_setting
       post :clear_failed_jobs
     end
+    concerns :has_dashboard, controller: :stats
   end
 
   resource :home do
@@ -169,6 +183,7 @@ SEEK::Application.routes.draw do
       get :select
       get :items
     end
+    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :only=>[:index]
     resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :only=>[:index]
     resources :avatars do
       member do
@@ -195,20 +210,14 @@ SEEK::Application.routes.draw do
       get :isa_children
       get :overview
     end
-    resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
-              :publications,:events,:samples,:specimens,:strains,:search,:organisms, :documents, :only=>[:index]
+    resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,
+              :publications,:events,:samples,:specimens,:strains,:search,:organisms,:documents, :only=>[:index]
+
     resources :openbis_endpoints do
-      member do
-        post :add_dataset
-      end
       collection do
         get :test_endpoint
         get :fetch_spaces
-        get :show_item_count
-        get :show_items
-        get :show_dataset_files
         get :browse
-        post :refresh_metadata_store
       end
     end
     resources :avatars do
@@ -229,6 +238,30 @@ SEEK::Application.routes.draw do
         post :set_project_folder_title
         post :set_project_folder_description
       end
+    end
+    concerns :has_dashboard, controller: :project_stats
+  end
+
+  resources :openbis_endpoints do
+    get :test_endpoint, on: :member
+    get :fetch_spaces, on: :member
+    get :refresh, on: :member
+    get :reset_fatals, on: :member
+    resources :openbis_experiments do
+      get :refresh, on: :member
+      post :register, on: :member
+      post :batch_register, on: :collection
+    end
+    resources :openbis_zamples do
+      get :refresh, on: :member
+      post :register, on: :member
+      post :batch_register, on: :collection
+    end
+    resources :openbis_datasets do
+      get :refresh, on: :member
+      post :register, on: :member
+      get :show_dataset_files, on: :member
+      post :batch_register, on: :collection
     end
   end
 
@@ -254,7 +287,7 @@ SEEK::Application.routes.draw do
       post :items_for_result
       post :resource_in_tab
     end
-    resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications, :documents, :only=>[:index]
+    resources :people,:projects,:assays,:studies,:models,:sops,:workflows, :nodes,:data_files,:publications, :documents, :only=>[:index]
     resources :snapshots, :only => [:show, :new, :create, :destroy] do
       member do
         get :mint_doi_confirm
@@ -300,7 +333,7 @@ SEEK::Application.routes.draw do
       get :published
       get :isa_children
     end
-    resources :people,:projects,:assays,:investigations,:models,:sops,:data_files,:publications, :documents,:only=>[:index]
+    resources :people,:projects,:assays,:investigations,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:only=>[:index]
   end
 
   resources :assays do
@@ -338,9 +371,11 @@ SEEK::Application.routes.draw do
       get :new_object_based_on_existing_one
       get :isa_children
     end
-    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications, :documents,:strains, :organisms, :only=>[:index]
+    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:strains,:organisms, :only=>[:index]
   end
 
+  # to be removed as STI does not work in too many places
+  # resources :openbis_assays, controller: 'assays', type: 'OpenbisAssay'
 
    ### ASSAY AND TECHNOLOGY TYPES ###
 
@@ -366,8 +401,6 @@ SEEK::Application.routes.draw do
       post :create_metadata
     end
     member do
-      get :matching_models
-      get :data
       post :check_gatekeeper_required
       get :plot
       get :explore
@@ -441,7 +474,6 @@ SEEK::Application.routes.draw do
       get :visualise
       post :check_gatekeeper_required
       get :download
-      get :matching_data
       get :published
       post :publish_related_items
       post :new_version
@@ -500,6 +532,58 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end
 
+  resources :workflows, concerns: [:has_content_blobs] do
+    collection do
+      get :typeahead
+      get :preview
+      post :test_asset_url
+      post :items_for_result
+      post :resource_in_tab
+    end
+    member do
+      post :check_related_items
+      post :check_gatekeeper_required
+      get :download
+      get :published
+      post :publish_related_items
+      post :publish
+      post :request_resource
+      post :update_annotations_ajax
+      post :new_version
+      delete :destroy_version
+      post :mint_doi
+      get :mint_doi_confirm
+      get :isa_children
+    end
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+  end
+
+  resources :nodes, concerns: [:has_content_blobs] do
+    collection do
+      get :typeahead
+      get :preview
+      post :test_asset_url
+      post :items_for_result
+      post :resource_in_tab
+    end
+    member do
+      post :check_related_items
+      post :check_gatekeeper_required
+      get :download
+      get :published
+      post :publish_related_items
+      post :publish
+      post :request_resource
+      post :update_annotations_ajax
+      post :new_version
+      delete :destroy_version
+      post :mint_doi
+      get :mint_doi_confirm
+      get :isa_children
+    end
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+  end
+
   resources :content_blobs, :except => [:show, :index, :update, :create, :destroy] do
     collection do
       post :examine_url
@@ -526,7 +610,7 @@ SEEK::Application.routes.draw do
       get :isa_children
     end
     resources :people,:projects, :institutions, :investigations, :studies, :assays,
-              :data_files, :models, :sops, :presentations, :documents, :events, :publications, :organisms
+              :data_files, :models, :sops, :workflows, :nodes, :presentations, :documents, :events, :publications, :organisms
   end
 
   resources :publications do
@@ -734,4 +818,6 @@ SEEK::Application.routes.draw do
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.
   # match ':controller(/:action(/:id))(.:format)'
+  #
+   get '/home/isa_colours' => 'homes#isa_colours'
 end

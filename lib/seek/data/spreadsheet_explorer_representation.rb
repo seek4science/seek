@@ -38,7 +38,7 @@ module Seek
       def spreadsheet_xml
         if contains_extractable_spreadsheet?
           Rails.cache.fetch("blob_ss_xml-#{content_blob.cache_key}") do
-            spreadsheet_to_xml(open(content_blob.filepath), memory_allocation = Seek::Config.jvm_memory_allocation)
+            content_blob.to_spreadsheet_xml
           end
         end
       end

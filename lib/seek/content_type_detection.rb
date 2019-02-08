@@ -17,6 +17,10 @@ module Seek
       TEXT_MIME_TYPES.include?(blob.content_type)
     end
 
+    def is_cwl?(blob = self)
+      blob.original_filename.end_with?('.cwl')
+    end
+
     def is_indexable_text?(blob = self)
       within_text_size_limit(blob) && is_text?(blob) && blob.file_exists?
     end
@@ -43,6 +47,10 @@ module Seek
 
     def is_xlsm?(blob = self)
       mime_extensions(blob.content_type).include?('xlsm')
+    end
+
+    def is_csv?(blob = self)
+      mime_extensions(blob.content_type).include?('csv')
     end
 
     def is_binary?(blob = self)
@@ -145,11 +153,16 @@ module Seek
       detected_mime_type = mime_types_for_extension(file_extension).first
 
       if detected_mime_type.nil? && file_exists?
-        io = File.open(filepath)
-        detected_mime_type ||= MimeMagic.by_magic(io).try(:type) if file_exists?
-        io.close
+        detected_mime_type ||= mime_magic_content_type
       end
       detected_mime_type || content_type
+    end
+
+    def mime_magic_content_type
+      io = File.open(filepath)
+      type = MimeMagic.by_magic(io).try(:type) if file_exists?
+      io.close
+      type
     end
 
     def set_content_type_according_to_file

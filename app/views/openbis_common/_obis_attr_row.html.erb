@@ -1,0 +1,31 @@
+
+<div class="row">
+  <div class="col-md-5">
+    <div>
+      <label>Perm ID: </label>  <%= entity.perm_id %>
+    </div>
+    <div>
+      <label>Type Code: </label> <%= text_or_not_specified(entity.type_code) %>
+    </div>
+    <div>
+      <label>Type: </label> <%= text_or_not_specified(entity.type_description) %>
+    </div>
+  </div>
+  <div class="col-md-5">
+    <div>
+      <label>Registration date: </label> <%= text_or_not_specified(date_as_string(entity.registration_date, true)) %>
+    </div>
+    <div>
+      <label>Registered by: </label> <%= text_or_not_specified(entity.registrator) %>
+    </div>
+    <% if entity.registration_date != entity.modification_date %>
+        <div>
+          <label>Modification date: </label> <%= text_or_not_specified(date_as_string(entity.modification_date, true)) %>
+        </div>
+        <div>
+          <label>Modified by: </label> <%= text_or_not_specified(entity.modifier) %>
+        </div>
+    <% end %>
+  </div>
+
+</div>

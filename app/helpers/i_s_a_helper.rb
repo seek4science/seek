@@ -33,9 +33,6 @@ module ISAHelper
   FILL_COLOURS = NEW_FILL_COLOURS
   FILL_COLOURS.default = '#8EE5EE' # cadetblue2
 
-  BORDER_COLOURS = { }
-  BORDER_COLOURS.default = '#71b7be'
-
   def cytoscape_elements(elements_hash)
     cytoscape_edge_elements(elements_hash) + cytoscape_node_elements(elements_hash)
     # aggregate_hidden_nodes(elements)
@@ -133,7 +130,7 @@ module ISAHelper
                             name: name,
                             source: source,
                             target: target,
-                            faveColor: BORDER_COLOURS.default },
+                            faveColor: FILL_COLOURS.default },
                     classes: 'resource-edge' }
     end
     elements

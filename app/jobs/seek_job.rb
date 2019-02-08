@@ -73,6 +73,7 @@ class SeekJob
     if Seek::Config.exception_notification_enabled
       ExceptionNotifier.notify_exception(exception, data: data)
     end
+    Rails.logger.error(message)
     Rails.logger.error(exception)
   end
 

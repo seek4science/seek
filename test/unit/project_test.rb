@@ -37,6 +37,34 @@ class ProjectTest < ActiveSupport::TestCase
     disable_authorization_checks {p.save!}
   end
 
+  test 'validate start and end date' do
+    # if start and end date are defined, then the end date must be later
+    p = Factory(:project,start_date:nil, end_date:nil)
+    assert p.valid?
+
+    #just an end date
+    p.end_date = DateTime.now
+    assert p.valid?
+
+    #start date in the future
+    p.start_date = DateTime.now + 1.day
+    refute p.valid?
+
+    #start date in the past
+    p.start_date = 1.day.ago
+    assert p.valid?
+
+    # no end date
+    p.start_date = DateTime.now + 1.day
+    p.end_date = nil
+    assert p.valid?
+
+    # future start and end dates are fine as long as end is later
+    p.start_date = DateTime.now + 1.day
+    p.end_date = DateTime.now + 2.day
+    assert p.valid?
+  end
+
   test 'to_rdf' do
     object = Factory :project, web_page: 'http://www.sysmo-db.org',
                                organisms: [Factory(:organism), Factory(:organism)]
@@ -867,5 +895,28 @@ class ProjectTest < ActiveSupport::TestCase
 
     project.nels_enabled = 'yes please'
     assert_equal true, project.reload.nels_enabled
+  end
+
+  test 'funding code' do
+    person = Factory(:project_administrator)
+    proj = person.projects.first
+    User.with_current_user person.user do
+      proj.funding_codes='fish'
+      assert_equal ['fish'],proj.funding_codes.sort
+      proj.save!
+      proj=Project.find(proj.id)
+      assert_equal ['fish'],proj.funding_codes.sort
+
+      proj.funding_codes='1,2,3'
+      assert_equal ['1','2','3'],proj.funding_codes.sort
+      proj.save!
+      proj=Project.find(proj.id)
+      assert_equal ['1','2','3'],proj.funding_codes.sort
+
+      proj.update_attribute(:funding_codes,'a,b')
+      assert_equal ['a','b'],proj.funding_codes.sort
+    end
+
+
   end
 end

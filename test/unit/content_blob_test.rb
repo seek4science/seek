@@ -2,7 +2,6 @@ require 'test_helper'
 require 'docsplit'
 require 'seek/download_handling/http_streamer' # Needed to load exceptions that are tested later
 require 'minitest/mock'
-require 'time_test_helper'
 require 'private_address_check'
 
 class ContentBlobTest < ActiveSupport::TestCase
@@ -634,6 +633,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'pdf_contents_for_search for a pdf file' do
     check_for_soffice
     pdf_content_blob = Factory(:pdf_content_blob)
+    assert pdf_content_blob.is_pdf?
     content = pdf_content_blob.pdf_contents_for_search
     assert_equal ['This is a pdf format'], content
   end
@@ -863,14 +863,14 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'added timestamps' do
     t1 = 1.day.ago
     blob = nil
-    pretend_now_is(t1) do
+    travel_to(t1) do
       blob = Factory(:content_blob)
       assert_equal t1.to_s, blob.created_at.to_s
       assert_equal t1.to_s, blob.updated_at.to_s
     end
 
     t2 = 1.hour.ago
-    pretend_now_is(t2) do
+    travel_to(t2) do
       blob.content_type = 'text/xml'
       blob.save!
       assert_equal t2.to_s, blob.updated_at.to_s
@@ -916,4 +916,59 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute File.exist?(pdf_path)
     refute File.exist?(txt_path)
   end
+
+  test 'fix mime type after failed csv extraction' do
+    blob = Factory(:image_content_blob, content_type:'application/excel', original_filename:'image.xls')
+    assert blob.is_excel?
+
+    text = blob.to_csv
+
+    assert text.blank?
+
+    blob.reload
+
+    refute blob.is_excel?
+    assert_equal 'image/png',blob.content_type
+  end
+
+  test 'fix mime type after failed pdf contents for search' do
+    check_for_soffice
+    blob = Factory(:image_content_blob, content_type: 'application/msword', original_filename: 'image.doc')
+    assert blob.is_pdf_convertable?
+
+    assert_empty blob.pdf_contents_for_search
+
+    blob.reload
+
+    refute blob.is_pdf_convertable?
+    assert_equal 'image/png', blob.content_type
+
+    # incorrectly described as pdf
+    blob = Factory(:image_content_blob, content_type: 'application/pdf', original_filename: 'image.pdf')
+
+    assert_empty blob.pdf_contents_for_search
+
+    blob.reload
+
+    refute blob.is_pdf_convertable?
+    assert_equal 'image/png', blob.content_type
+
+    # handles when the file is actually broken, rather than failing due to the mime type
+    blob = Factory(:broken_pdf_content_blob)
+    assert_empty blob.pdf_contents_for_search
+    assert_equal 'application/pdf', blob.content_type
+  end
+
+  test 'fix mime type after spreadsheet xml fail' do
+    blob = Factory(:image_content_blob, content_type:'application/msexcel', original_filename:'image.xls')
+    assert blob.is_extractable_spreadsheet?
+
+    assert_nil blob.to_spreadsheet_xml
+
+    blob.reload
+
+    refute blob.is_extractable_spreadsheet?
+    assert_equal 'image/png',blob.content_type
+  end
+
 end

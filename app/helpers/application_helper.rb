@@ -508,6 +508,21 @@ module ApplicationHelper
     link_to text, path, html_options
   end
 
+  # to display funding codes on the 'show' page if present
+  def show_funding_codes(item)
+    return if item.funding_codes.empty?
+    html = content_tag(:strong,'Funding codes:')
+    html << content_tag(:ul,class:'funding-codes') do
+      inner = ''
+      item.funding_codes.each do |code|
+        inner += content_tag(:li,code)
+      end
+      inner.html_safe
+    end
+
+    html.html_safe
+  end
+
   def using_docker?
     Seek::Docker.using_docker?
   end

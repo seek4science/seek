@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'time_test_helper'
 
 class MailerTest < ActionMailer::TestCase
   fixtures :all

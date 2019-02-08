@@ -1,0 +1,10 @@
+{"experiments":
+[
+  {"identifier":"/SEEK/FAIR/FAIR_EXP_1","registerator":"seek","code":"FAIR_EXP_1","modifier":"seek",
+    "permId":"20171121152132641-51","project":"20171121152000200-50",
+    "datasets":["20171002172401546-38", "20171002190934144-40", "20171004182824553-41"],
+    "experiment_type":{"code":"DEFAULT_EXPERIMENT","description":"Default Experiment"},
+    "samples":["20171002172111346-37", "20171002172639055-39"],"tags":[],"modificationDate":"2017-11-21 16:51:44.904522","registrationDate":"2017-11-21 15:21:32.71693",
+    "properties":{"GRANT":"BBSRC","EXPERIMENTAL_GOALS":"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<html><head></head><body><ul>\n <li>&nbsp;&nbsp;&nbsp; In Arabidopsis thaliana, many circadian clock-associated genes have been identified.</li>\n <li>&nbsp;&nbsp;&nbsp; the eveningexpressed TOC1 (TIMING OF CAB EXPRESSION 1) gene plays a role by forming a transcriptional feedback core loop</li>\n <li>&nbsp;&nbsp;&nbsp; the morning-expressed CCA1 (CIRCADIAN CLOCK-ASSOCIATED 1) gene</li>\n <li>&nbsp;&nbsp;&nbsp; homologous LHY (LATE ELONGATED HYPOCOTYL) gene.</li>\n</ul>\n</body></html>","EXPERIMENTAL_RESULTS":"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<html><head></head><body><p>Growth conditions</p>\n\n<p>Seedlings were grown on plates containing <u>1× MS salts with 0.8% to 1% agar </u>and, where indicated, supplemented with 3% (w/v) Suc. In all cases, media pH was corrected to pH 5.8. Unless otherwise stated, seeds were surface-sterilized before being stratified in the dark at 4°C for 48 h prior to transfer to the growth chamber. Plants were grown in Sanyo MLR-350 growth chambers at a constant temperature (20°C). The light level during photoperiods or constant light was 50 µmol m-2 s-1.</p>\n\n<p><em>Small fungi contamination noted on some seedlings.</em></p>\n</body></html>","XMLCOMMENTS":"<root><commentEntry date=\"1511277676686\" person=\"seek\">My first comment</commentEntry></root>","NAME":"SEEK experiment"}
+  }
+]}

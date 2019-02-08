@@ -120,7 +120,7 @@ class ProgrammeTest < ActiveSupport::TestCase
 
     refute_empty programme.projects
 
-    assert programme.can_delete?(admin)
+    refute programme.can_delete?(admin)
     refute programme.can_delete?(programme_administrator)
     refute programme.can_delete?(person)
     refute programme.can_delete?(nil)
@@ -133,6 +133,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     refute programme.can_delete?(nil)
   end
 
+
   test 'can be edited by' do
     admin = Factory(:admin)
     person = Factory(:person)
@@ -144,16 +145,6 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert programme.can_be_edited_by?(programme_administrator)
     refute programme.can_be_edited_by?(person)
     refute programme.can_be_edited_by?(nil)
-  end
-
-  test 'disassociate projects on destroy' do
-    programme = Factory(:programme)
-    project = programme.projects.first
-    assert_equal programme.id, project.programme_id
-    User.current_user = Factory(:admin).user
-    programme.destroy
-    project.reload
-    assert_nil project.programme_id
   end
 
   test 'programme_administrators' do
@@ -275,6 +266,10 @@ class ProgrammeTest < ActiveSupport::TestCase
     User.current_user = Factory(:admin)
     pa = Factory(:programme_administrator)
     prog = pa.programmes.first
+    prog.projects = []
+    prog.save!
+
+    assert prog.can_delete?
 
     assert pa.is_programme_administrator?(prog)
     assert pa.is_programme_administrator_of_any_programme?
@@ -293,6 +288,8 @@ class ProgrammeTest < ActiveSupport::TestCase
     # administrator of multiple programmes
     pa = Factory(:programme_administrator)
     prog = pa.programmes.first
+    prog.projects=[]
+    prog.save!
     prog2 = Factory(:programme)
     disable_authorization_checks do
       pa.is_programme_administrator = true, prog2

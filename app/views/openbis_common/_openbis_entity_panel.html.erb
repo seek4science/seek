@@ -1,0 +1,43 @@
+<%
+  entity ||= openbis_entity_panel
+  edit_button ||= false
+  sync_at ||= nil
+  err_msg ||= nil
+  can_edit ||= false
+%>
+
+
+<div class="panel panel-default" id="openbis-details">
+  <div class="panel-body">
+    <p>
+      <%= image(:openbis, :width=>'75px') %>
+    </p>
+
+    <div class="row">
+      <div class="col-md-5">
+        <div>
+          <label>Last sync.: </label>  <%= date_as_string(sync_at, true) if sync_at %>
+        </div>
+      </div>
+      <% if err_msg && can_edit %>
+        <div class="col-md-5">
+          <div style="color: red;">
+            <label>Last failure: </label>  <%= err_msg if err_msg %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%= render partial:'openbis_common/obis_attr_row', locals: {entity: entity} %>
+    <%= render partial:'openbis_common/obis_prop_row', locals: {entity: entity} %>
+
+    <% if can_edit %>
+    <div class="row">
+      <div class="col-md-5">
+        <%= link_to('Registration options', openbis_entity_edit_path(entity), class: "btn btn-default") if edit_button%>
+        <%= button_link_to 'Sync content', 'refresh', openbis_entity_sync_path(entity), class: "btn btn-default" %>
+      </div>
+    </div>
+    <% end %>
+  </div>
+</div>

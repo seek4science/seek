@@ -1,0 +1,93 @@
+<% type_options ||= Seek::Util.authorized_types.sort_by { |t| t.name } %>
+
+<div class="panel panel-default dashboard-panel" id="asset-accessibility">
+  <div class="panel-heading">
+    <div class="form-inline pull-right">
+      <div class="form-group">
+        <label>Type</label>
+        <select class="form-control input-sm" autocomplete="off" data-dashboard-field="type">
+          <option value="all" selected="selected">All</option>
+          <% type_options.each do |type| %>
+            <option value="<%= type.name -%>"><%= t(type.name.underscore).pluralize -%></option>
+          <% end %>
+        </select>
+      </div>
+    </div>
+    Asset accessibility
+  </div>
+  <div class="panel-body">
+    <canvas id="asset-accessibility-canvas"></canvas>
+  </div>
+</div>
+
+<script>
+    var publishedAssetsChart = new Chart(document.getElementById('asset-accessibility-canvas').getContext('2d'), {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: [],
+                    backgroundColor: [
+                        '#a6ff6a',
+                        '#ffe46e',
+                        '#ff8a60'
+                    ],
+                    label: 'Dataset 1'
+                }],
+                labels: [
+                    'Published',
+                    'Project accessible',
+                    'Other'
+                ]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: 'right',
+                    labels: {
+                        <%# A little override to show the value in parentheses next to each label %>
+                        generateLabels: function(chart) {
+                            var labels = Chart.defaults.pie.legend.labels.generateLabels(chart);
+                            labels.forEach(function (label) {
+                                label.text = label.text + ' (' + chart.data.datasets[0].data[label.index] + ')';
+                                return label;
+                            });
+
+                            return labels;
+                        }
+                    },
+                }
+            }
+        });
+
+    function getAccessibilityStats() {
+        var data = {
+            start_date: $j('#dashboard-controls [data-dashboard-field="period-start"]').val(),
+            end_date: $j('#dashboard-controls [data-dashboard-field="period-end"]').val(),
+        };
+        var typeField = $j('#asset-accessibility [data-dashboard-field="type"]');
+        if (typeField.length && typeField.val() !== 'all') {
+            data.type = typeField.val();
+        }
+
+        var body = $j('#asset-accessibility .panel-body');
+        body.addClass('loading');
+
+        $j.ajax({ url: '<%= url -%>',
+            data: data,
+            success: function (resp) {
+                publishedAssetsChart.data.datasets[0].data = [resp.published_count, resp.project_accessible_count, resp.other_count];
+                publishedAssetsChart.update();
+            },
+            error: function () {
+                $j('#asset-accessibility-canvas').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
+            },
+            complete: function () {
+                body.removeClass('loading');
+            }
+        });
+
+        return false;
+    }
+
+    $j('#asset-accessibility [data-dashboard-field="type"]').change(getAccessibilityStats);
+</script>

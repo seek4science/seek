@@ -59,12 +59,6 @@ class EventsControllerTest < ActionController::TestCase
     assert assigns(:events).count < Event.count # fails if all events are assigned to @events
   end
 
-  test 'xml for projectless event' do
-    id = Factory(:event, policy: Factory(:public_policy)).id
-    get :show, id: id, format: 'xml'
-    perform_api_checks
-  end
-
   test 'should show event' do
     get :show, id: events(:event_with_no_files).id
     assert_response :success

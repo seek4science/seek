@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'time_test_helper'
 
 class FeedReaderTest < ActiveSupport::TestCase
   def setup
@@ -50,7 +49,7 @@ class FeedReaderTest < ActiveSupport::TestCase
     assert blacklisted[url].is_a?(Time)
     assert_empty Seek::FeedReader.determine_feed_urls(:project_news)
 
-    pretend_now_is(Time.now + Seek::FeedReader::BLACKLIST_TIME + 1.minute) do
+    travel_to(Time.now + Seek::FeedReader::BLACKLIST_TIME + 1.minute) do
       assert_equal [url], Seek::FeedReader.determine_feed_urls(:project_news)
       blacklisted = Seek::Config.blacklisted_feeds
       assert_nil blacklisted[url]

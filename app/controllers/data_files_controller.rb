@@ -13,7 +13,7 @@ class DataFilesController < ApplicationController
   before_filter :find_assets, only: [:index]
   before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob,
                                                              :request_resource, :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
-  before_filter :find_display_asset, only: [:show, :explore, :download, :matching_models]
+  before_filter :find_display_asset, only: [:show, :explore, :download]
   skip_before_filter :verify_authenticity_token, only: [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, only: [:upload_for_tool, :upload_from_email]
   before_filter :get_sample_type, only: :extract_samples
@@ -178,26 +178,6 @@ class DataFilesController < ApplicationController
     end
   end
 
-  def data
-    @data_file =  DataFile.find(params[:id])
-    sheet = params[:sheet] || 1
-    trim = params[:trim] || false
-    content_blob = @data_file.content_blob
-    file = open(content_blob.filepath)
-    mime_extensions = mime_extensions(content_blob.content_type)
-    if !(%w(xls xlsx) & mime_extensions).empty?
-      respond_to do |format|
-        format.html # currently complains about a missing template, but we don't want people using this for now - its purely XML
-        format.xml { render xml: spreadsheet_to_xml(file, memory_allocation = Seek::Config.jvm_memory_allocation) }
-      end
-    else
-      respond_to do |format|
-        flash[:error] = 'Unable to view contents of this data file'
-        format.html { redirect_to @data_file, format: 'html' }
-      end
-    end
-  end
-
   def explore
     #drop invalid explore params
     [:page_rows, :page, :sheet].each do |param|
@@ -214,21 +194,6 @@ class DataFilesController < ApplicationController
         flash[:error] = 'Unable to view contents of this data file'
         format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
       end
-    end
-  end
-
-  def matching_models
-    # FIXME: should use the correct version
-    @matching_model_items = @data_file.matching_models
-    # filter authorization
-    ids = @matching_model_items.collect(&:primary_key)
-    models = Model.where(id: ids)
-    authorised_ids = Model.authorize_asset_collection(models, 'view').collect(&:id)
-    @matching_model_items = @matching_model_items.select { |mdf| authorised_ids.include?(mdf.primary_key.to_i) }
-
-    flash.now[:notice] = "#{@matching_model_items.count} #{t('model').pluralize}  were found that may be relevant to this #{t('data_file')} "
-    respond_to do |format|
-      format.html
     end
   end
 
@@ -385,10 +350,8 @@ class DataFilesController < ApplicationController
         critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
       end
     rescue Exception => e
-      ExceptionNotifier.notify_exception(e, data: {
-          message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}",
-          current_logged_in_user: current_user
-      })
+      forward_exception_notification(e, {message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}",
+                                         current_logged_in_user: current_user})
       session[:extraction_exception_message] = e.message
     end
 
@@ -574,7 +537,6 @@ class DataFilesController < ApplicationController
   end
 
   def rest_client
-    client_class = Nels::Rest::Client
-    @rest_client = client_class.new(@oauth_session.access_token)
+    @rest_client = Nels::Rest.client_class.new(@oauth_session.access_token)
   end
 end

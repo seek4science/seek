@@ -1,4 +1,7 @@
 module ResourceListItemHelper
+
+  include RelatedItemsHelper
+
   def get_list_item_content_partial(resource)
     get_original_model_name(resource).pluralize.underscore + '/resource_list_item'
   end
@@ -23,6 +26,9 @@ module ResourceListItemHelper
   end
 
   def list_item_title(resource, options = {})
+
+    html = nil
+
     cache_key = "rli_title_#{resource.cache_key}_#{resource.authorization_supported? && resource.can_manage?}"
     result = Rails.cache.fetch(cache_key) do
       title = options[:title]
@@ -45,6 +51,27 @@ module ResourceListItemHelper
       end
       html << '</div>'
     end
+
+    if [Person, Project].include?(resource.class)
+      if !@project.nil?
+        project_id = @project.id.to_s
+      elsif !params[:project_id].nil?
+        project_id = params[:project_id]
+      end
+    end
+
+    # remove '</div>'
+    result = result[0..-7]
+    if resource.class.name.split('::')[0] == 'Person'
+      unless project_id.blank?
+        result << get_person_status(resource, project_id)
+        Rails.logger.debug("member status = #{result}")
+      end
+    elsif resource.class.name.split('::')[0] == 'Project' && controller_name == "people"
+      result << get_project_status(resource)
+    end
+
+    result << '</div>'
     visibility = resource.authorization_supported? && resource.can_manage? ? list_item_visibility(resource) : ''
     result = result.gsub('#item_visibility', visibility)
     result.html_safe
@@ -188,7 +215,7 @@ module ResourceListItemHelper
 
     case policy.access_type
     when Policy::NO_ACCESS
-      if policy.permissions.empty?
+      if policy.private?
         title = 'Private'
         html << image('lock', title: title, class: css_class)
       else
@@ -242,5 +269,47 @@ module ResourceListItemHelper
 
   def list_item_orcid(person)
     orcid_identifier(person) if person.orcid.present?
+  end
+
+  private
+
+  def get_person_status(resource, project_id)
+    html =''
+    project = Project.find(project_id)
+    unless project_id.nil?
+      unless resource.current_projects.include?(project)
+        html << ": inactive since " #Todo hu add icon
+        html << "#{get_left_time(resource,project_id)}"
+      end
+    end
+    html
+  end
+
+  def get_project_status(resource)
+    html =''
+    person_id = get_person_id
+    project = Project.find(resource.id)
+    unless person_id.nil?
+      person = Person.find(person_id)
+      unless person.current_projects.include?(project)
+        html << ": inactive since " #Todo hu add icon
+        html << "#{get_left_time(person,resource.id.to_s)}"
+      end
+    end
+    html
+  end
+
+  def get_left_time(person,project_id)
+    left_time = nil
+    group_memberships = person.group_memberships
+    group_memberships.each do |group_membership|
+      if project_id == group_membership.work_group.project_id.to_s
+        unless group_membership.time_left_at.nil?
+        left_time = group_membership.time_left_at.to_date.to_s
+        break
+        end
+      end
+    end
+    left_time
   end
 end

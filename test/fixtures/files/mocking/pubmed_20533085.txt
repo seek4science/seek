@@ -1,8 +1,8 @@
 PMID- 20533085
 OWN - NLM
 STAT- MEDLINE
-DA  - 20100816
 DCOM- 20101202
+LR  - 20100816
 IS  - 1573-7225 (Electronic)
 IS  - 0957-5243 (Linking)
 VI  - 21
@@ -15,14 +15,14 @@ LID - 10.1007/s10552-010-9578-6 [doi]
 AB  - OBJECTIVES: To estimate the associations between occupational exposure to
       pesticides and extrahepatic biliary tract carcinoma in men, a population-based
       case-control study was carried out. METHODS: Cases (n = 104), aged 35-70,
-      diagnosed in 1995-1997, were sampled by active reporting systems from hospitals. 
+      diagnosed in 1995-1997, were sampled by active reporting systems from hospitals.
       Controls (n = 1,401) were a random sample of the general male population.
       Information on occupation and confounding factors was obtained by questionnaires.
       Exposures were quantified with respect to time, application methods, and use of
       personal protective equipment. Intensity was evaluated by using a published
       algorithm which weighted the exposure assigned according to the use of personal
       protective equipment and mode of application. Logistic regression analyses were
-      conducted adjusted for gallstones, age, and country. RESULTS: Being ever exposed 
+      conducted adjusted for gallstones, age, and country. RESULTS: Being ever exposed
       to pesticides resulted in an odds ratio (OR) of 1.0 [95%-confidence interval (CI)
       0.6-1.6]. A modestly elevated risk was found for backpack mounted sprayers OR =
       1.4 [95% CI 0.7-2.6] and vine farmers OR = 2.5 [95% CI 0.9-7.2]. Using time
@@ -33,15 +33,15 @@ AB  - OBJECTIVES: To estimate the associations between occupational exposure to
       occupational risk factor for extrahepatic biliary tract carcinoma, but no
       indication of a strong association was observed. Some modes of exposure were
       weakly, albeit not significantly associated with carcinoma risk. The observed
-      estimates of effects may be influenced by a lack of precise exposure assessment. 
+      estimates of effects may be influenced by a lack of precise exposure assessment.
       Different chemical compositions of pesticides were utilized during a long time
       span of pesticide exposure, and it should be considered that the exposure is
       assessed with substantial uncertainty that could non-differential and bias
       results toward the null.
-AD  - Bremen Institute for Prevention Research and Social Medicine, University of
-      Bremen, Bremen, Germany.
 FAU - Schmeisser, N
 AU  - Schmeisser N
+AD  - Bremen Institute for Prevention Research and Social Medicine, University of
+      Bremen, Bremen, Germany.
 FAU - Kaerlev, L
 AU  - Kaerlev L
 FAU - Bourdon-Raverdy, N
@@ -94,9 +94,11 @@ MH  - Risk Factors
 EDAT- 2010/06/10 06:00
 MHDA- 2010/12/14 06:00
 CRDT- 2010/06/10 06:00
-PHST- 2009/11/22 [received]
-PHST- 2010/05/03 [accepted]
-PHST- 2010/06/09 [aheadofprint]
+PHST- 2009/11/22 00:00 [received]
+PHST- 2010/05/03 00:00 [accepted]
+PHST- 2010/06/10 06:00 [entrez]
+PHST- 2010/06/10 06:00 [pubmed]
+PHST- 2010/12/14 06:00 [medline]
 AID - 10.1007/s10552-010-9578-6 [doi]
 PST - ppublish
 SO  - Cancer Causes Control. 2010 Sep;21(9):1493-502. doi: 10.1007/s10552-010-9578-6.

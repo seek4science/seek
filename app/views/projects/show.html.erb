@@ -15,6 +15,8 @@
 
         <%= persistent_resource_id(@project) %>
 
+        <%= show_funding_codes(@project) %>
+
         <p>
           <strong>Public web page:</strong>
           <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
@@ -68,9 +70,20 @@
             </p>
         <% end %>
         <p>
-          <strong><%= t('project') -%> created:</strong>
-          <%= date_as_string(@project.created_at, false) -%>
+          <% if @project.start_date %>
+            <strong><%= t('project') -%> start date:</strong>
+            <%= date_as_string(@project.start_date, false) -%>
+          <% else %>
+            <strong><%= t('project') -%> created:</strong>
+            <%= date_as_string(@project.created_at, false) %>
+          <% end %>
         </p>
+        <% if @project.end_date %>
+          <p>
+            <strong><%= t('project') -%> end date:</strong>
+            <%= date_as_string(@project.end_date, false) -%>
+          </p>
+        <% end %>
       </div>
     </div>
     
@@ -108,5 +121,5 @@
 <%= render :partial=>"general/items_related_to",:object => @project %>
 
 <% if request_project_membership_button_enabled?(@project) %>
-    <%= render partial: 'request_membership_form',locals:{project:@project} %>
+    <%= render partial: 'request_membership_form', locals: { project: @project } %>
 <% end %>

@@ -6,7 +6,7 @@ module Seek
           view: Set.new([
             :view, :show, :index, :search, :favourite, :favourite_delete, :comment, :comment_delete, :comments,
             :comments_timeline, :rate, :tag, :items, :statistics, :tag_suggestions, :preview, :runs,
-            :new_object_based_on_existing_one, :samples_table, :matching_models, :matching_data
+            :new_object_based_on_existing_one, :samples_table
           ]).freeze,
 
           download: Set.new([

@@ -21,6 +21,8 @@ class Study < ActiveRecord::Base
 
 
   has_many :assays
+  has_one :external_asset, as: :seek_entity, dependent: :destroy
+
   belongs_to :person_responsible, :class_name => "Person"
 
   validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true
@@ -54,4 +56,9 @@ class Study < ActiveRecord::Base
     new_object.publications = publications
     new_object
   end
+
+  def external_asset_search_terms
+    external_asset ? external_asset.search_terms : []
+  end
+
 end

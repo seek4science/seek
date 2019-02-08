@@ -61,6 +61,13 @@
         <% end %>
       </div>
     </div>
+    <% if @assay.external_asset %>
+      <div class="row">
+        <div class="col-md-12">
+          <%= external_asset_details(@assay) %>
+        </div>
+      </div>
+    <% end %>
     <% if ((@assay.is_modelling?) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY %>
         <div class="data_model_relationship">
           <% unless @assay.models.empty? %>

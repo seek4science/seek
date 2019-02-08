@@ -1,6 +1,8 @@
 <%
    return if resource.is_a?(Model) && !Seek::Config.modelling_analysis_enabled
    return unless Seek::Config.assays_enabled
+   return if resource.is_a?(Workflow)
+   return if resource.is_a?(Node)
 
    show_relationships = resource.is_a?(DataFile)
    resource_text ||= text_for_resource(resource)

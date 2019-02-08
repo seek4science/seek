@@ -1,10 +1,10 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.9'
+gem 'rails', '~> 4.2.11'
 gem 'rdoc'
 
 #database adaptors
-gem 'mysql2'
+gem 'mysql2', '0.4.10'
 gem 'pg'
 gem 'sqlite3'
 
@@ -29,7 +29,11 @@ gem 'prototype-rails', git: 'https://github.com/rails/prototype-rails', branch: 
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'linkeddata'
+
 gem 'openseek-api'
+# for fancy content escaping in openbis integration
+gem 'loofah'
+
 gem 'jbuilder', '~> 2.0'
 gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'
@@ -132,6 +136,7 @@ source 'https://rails-assets.org' do
   gem 'rails-assets-vue', '~> 2.1.8'
   gem 'rails-assets-eonasdan-bootstrap-datetimepicker', '~> 4.17.42'
   gem 'rails-assets-x-editable', '~> 1.5.1'
+  gem 'rails-assets-chartjs', '~> 2.7.2'
 end
 
 group :production do
@@ -159,7 +164,7 @@ group :test do
   gem 'ruby-prof', '>= 0.16.0'
   gem 'test-prof'
   gem 'rails-perftest'
-  gem 'minitest'
+  gem 'minitest','5.10.3'
   gem 'minitest-reporters'
   gem 'sunspot_matchers'
   gem 'database_cleaner'

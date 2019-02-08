@@ -1,0 +1,44 @@
+<div class="panel panel-default">
+  <div class="panel-body">
+
+    <p>
+      <%= image(:openbis, :width => '75px') %>
+    </p>
+
+    <%= form_tag({ controller: 'openbis_experiments', action: 'index' }, { method: 'get' }) do %>
+        <div class="form-group"><label>Project:</label> <%= @project.title %></div>
+        <div class="form-group"><label>Endpoint:</label> <%= @openbis_endpoint.title %></div>
+        <div class="form-group"><label>Entities like:</label> STUDY</div>
+        <div class="form-group"><label>OpenBIS Type:</label>
+          <%= select_tag :entity_type, options_for_select(@entity_type_options, @entity_type),
+                         id: 'entity_type', class: 'form-control', :onchange => 'this.form.submit();' %></div>
+        <div class="form-group"><label>Experiments:</label> <%= @entities.length %></div>
+    <% end %>
+  </div>
+</div>
+
+<%= render 'batch_parent_form_modal' %>
+
+<%= form_tag({ controller: 'openbis_experiments', action: 'batch_register' }, { id: 'batch_form' }) do |f| %>
+    <%= hidden_field_tag(:seek_parent) %>
+    <%= hidden_field_tag(:entity_type, @entity_type) %>
+    <%= hidden_field_tag('sync_options[link_dependent]') %>
+    <%= hidden_field_tag('sync_options[new_arrivals]') %>
+
+    <div class='row'>
+      <div class='col-md-6'>
+        <%= button_tag 'Batch registration', class: 'btn btn-default', type: 'button', 'data-toggle' => 'modal', 'data-target' => '#openbis_batch_parent-view' %>
+      </div>
+    </div>
+    <div class='row' id="openbis-experiments-cards">
+
+      <%= render partial: 'openbis_experiment_card', collection: @entities,
+                 locals: { extra: 'openbis_common/entity_batch_form_part' }
+
+      %>
+
+    </div>
+
+<% end %>
+
+

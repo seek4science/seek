@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'time_test_helper'
 
 class SampleTypeUpdateJobTest < ActiveSupport::TestCase
   def setup
@@ -39,7 +38,7 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
     refute SampleTypeUpdateJob.new(type, false).exists?
 
     job = SampleTypeUpdateJob.new(type)
-    pretend_now_is(Time.now + 1.minute) do
+    travel_to(Time.now + 1.minute) do
       job.perform
     end
     sample.reload
@@ -61,7 +60,7 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
     type.sample_attributes.detect { |t| t.title == 'postcode' }.is_title = true
     disable_authorization_checks { type.save! }
     job = SampleTypeUpdateJob.new(type, false)
-    pretend_now_is(Time.now + 1.minute) do
+    travel_to(Time.now + 1.minute) do
       job.perform
     end
     sample.reload
