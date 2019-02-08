@@ -1232,7 +1232,7 @@ class SopsControllerTest < ActionController::TestCase
 
     with_config_value(:auth_lookup_enabled, true) do
       assert_difference('AuthLookupUpdateQueue.count',1) do
-        put :update, id:sop.id,sop:{title: 'fish', creator_ids:[creator.id.to_s]}
+        put :update, params: { id:sop.id,sop:{title: 'fish', creator_ids:[creator.id.to_s]} }
         assert_redirected_to sop
         assert_equal 'fish',assigns(:sop).title
         assert_equal [creator],assigns(:sop).creators
@@ -1242,7 +1242,7 @@ class SopsControllerTest < ActionController::TestCase
 
       # no job if no change to creators
       assert_no_difference('AuthLookupUpdateQueue.count') do
-        put :update, id:sop.id,sop:{title: 'horse', creator_ids:[creator.id.to_s]}
+        put :update, params: { id:sop.id,sop:{title: 'horse', creator_ids:[creator.id.to_s]} }
         assert_redirected_to sop
         assert_equal 'horse',assigns(:sop).title
         assert_equal [creator],assigns(:sop).creators
@@ -1252,7 +1252,7 @@ class SopsControllerTest < ActionController::TestCase
 
       # job if creator removed
       assert_difference('AuthLookupUpdateQueue.count',1) do
-        put :update, id:sop.id,sop:{title: 'fish', creator_ids:[]}
+        put :update, params: { id:sop.id,sop:{title: 'fish', creator_ids:[]} }
         assert_redirected_to sop
         assert_equal 'fish',assigns(:sop).title
         assert_equal [],assigns(:sop).creators

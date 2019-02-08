@@ -3496,7 +3496,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert df.can_edit?(p.user)
     refute df.can_manage?(p.user)
 
-    get :edit, id:df.id
+    get :edit, params: { id:df.id }
     assert_response :success
 
     assert_select "div#sharing_form", count:0
@@ -3505,7 +3505,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     login_as(df.contributor.user)
 
-    get :edit, id:df.id
+    get :edit, params: { id:df.id }
     assert_response :success
 
     assert_select "div#sharing_form", count:1
