@@ -55,7 +55,7 @@
             <% Devise.omniauth_providers.each do |provider, options| %>
               <div role="tabpanel" class="tab-pane" id="<%= provider.to_s %>_login">
                 <% if provider.to_s == "elixir_aai" %>
-                  <%= link_to "Sign in with ELIXIR AAI", user_elixir_aai_omniauth_authorize_path%>
+                  <%= link_to "Sign in with ELIXIR AAI", identity_elixir_aai_omniauth_authorize_path%>
                 <% else %>
                   <div class="alert alert-danger">No link for that omniauth provider yet</div>
                 <% end %>

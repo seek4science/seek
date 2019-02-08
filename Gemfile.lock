@@ -690,7 +690,6 @@ GEM
       reek (~> 4.4)
       ruby_parser (~> 3.8)
       virtus (~> 1.0)
-    rubyntlm (0.3.4)
     rubyzip (1.2.2)
     safe_yaml (1.0.4)
     sample-template-generator (0.5.1)

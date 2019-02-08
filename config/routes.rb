@@ -1,6 +1,6 @@
 SEEK::Application.routes.draw do
 
-  devise_for :users, :controllers => {
+  devise_for :identities, :controllers => {
       :omniauth_callbacks => 'callbacks'
   }
 

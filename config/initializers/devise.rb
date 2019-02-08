@@ -262,7 +262,7 @@ Devise.setup do |config|
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
   config.omniauth :openid_connect, {
       name: :elixir_aai,
-      scope: [:openid, :email],
+      # scope: [:openid, :email, :profile],
       response_type: 'code',
       issuer: 'https://login.elixir-czech.org/oidc/',
       discovery: false,
@@ -272,7 +272,7 @@ Devise.setup do |config|
       client_options: {
           identifier: secrets['elixir_aai']['client_id'],
           secret: secrets['elixir_aai']['secret'],
-          redirect_uri: 'http://localhost:3000/users/auth/elixir_aai/callback',
+          redirect_uri: 'http://localhost:3000/identities/auth/elixir_aai/callback',
           scheme: 'https',
           host: 'login.elixir-czech.org',
           port: 443,
