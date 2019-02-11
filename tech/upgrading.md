@@ -40,14 +40,14 @@ It should only be necessary to run *bundle install* and the *db:migrate* rake
 task. Using *seek:upgrade* should still work, but could take a lot of
 unnecessary time. 
 
-## Steps to upgrade from 1.6.x to 1.7.x
+## Steps to upgrade from 1.7.x to 1.8.x
 
 ### Upgrading Ruby
 
-You will need to upgrade Ruby to Ruby 2.4.4. If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
+You will need to upgrade Ruby to Ruby 2.4.5. If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
 If you are not prompted you can install with the command:
 
-    rvm install ruby-2.4.4
+    rvm install ruby-2.4.5
 
 
 ### Set RAILS_ENV
@@ -68,18 +68,18 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.7.1
+    git checkout v1.8.0
 
 ### Updating using the tarball
 
 
 You can download the file from
-<https://bitbucket.org/fairdom/seek/downloads/seek-1.7.1.tar.gz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.8.0.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.7.1.tar.gz
+    tar zxvf seek-1.8.0.tar.gz
     mv seek seek-previous
-    mv seek-1.7.1 seek
+    mv seek-1.8.0 seek
     cd seek/
 
 and then copy across your existing filestore and database configuration file
