@@ -15,8 +15,15 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 Release data: _February 12th 2019_
 
-  * 
-  
+  * **openBIS integration** has been extended and improved upon, mainly through contributions from [Tomasz Zielinski](https://fairdomhub.org/people/711) 
+  of [SynthSys](https://fairdomhub.org/programmes/21). The extensions include linking between Studies and openBIS Experiments, and Assays and openBIS Objects.
+  Automation has also been added to automatically detect and synchronise new items. For more information please read our [Guide for using openBIS with SEEK](/help/user-guide/openbis.html).
+  **Note** that to use the new features, [openBIS 18.06.1 or later](https://wiki-bsse.ethz.ch/display/bis/openBIS+Download+Page) is required. 
+  * A new **Project Dashboard** has been added, to allow project members to view various statistics and trends, including graphs, within their project. 
+  For more information please read the [Project Dashboard Guide](/help/user-guide/project-dashboard.html) 
+  * **Former project members**, that have been marked as inactive within a project, are now more clearly indicated along with the date they left.
+  * **Project start and end dates** can now be defined for a project, which, if defined, are displayed on the Project page.
+        
 A full list of changes included in this release can be found in the [SEEK v1.8.0 release notes](release-notes-1.8.0.html)   
 
 ## Version 1.7.1
