@@ -24,6 +24,7 @@ layout: page
      - [Creating a Modelling analysis](generating-the-isa-structure.html#creating-a-modelling-analysis)
 - [ISA Overview Graph](isa-overview.html)     
 - [Creating and managing your own Programmes](programme-creation-and-management.html)
+- [Project Dashboard](project-dashboard.html)
 - [General attributes and links](general-attributes.html)
      - [Title](general-attributes.html#title)
      - [Description](general-attributes.html#description)
