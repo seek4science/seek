@@ -7,7 +7,7 @@ layout: page
 
 ## Enabling openBIS in SEEK
 
-Unless you are using the [openSEEK package](/tech/openseek.html), then by default openBIS is disabled. To enable the functionality described below, first go to the Admin pages (available from the user menu in the top right). 
+By default openBIS is disabled. To enable the functionality described below, first go to the Admin pages (available from the user menu in the top right). 
 Then select *Site Configuration* and the *Enable/disable features*. 
 There is a checkbox to enable openBIS towards the bottom of that page.
 
