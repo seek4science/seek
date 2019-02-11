@@ -11,6 +11,14 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.8.0
+
+Release data: _February 12th 2019_
+
+  * 
+  
+A full list of changes included in this release can be found in the [SEEK v1.8.0 release notes](release-notes-1.8.0.html)   
+
 ## Version 1.7.1
 
 Release date: _November 19th 2018_
