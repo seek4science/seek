@@ -6,7 +6,7 @@ redirect_from: "/other-distributions.html"
 
 # Installing SEEK for other Linux distributions
 
-Our main [Install Guide](install.html) is based upon the Ubuntu 16.04
+Our main [Install Guide](install.html) is based upon the Ubuntu 18.04
 (LTS) distribution and version. However, other than the distribution packages
 the install process should be very similar for other distributions.
 
