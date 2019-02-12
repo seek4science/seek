@@ -12,9 +12,7 @@ include Seek::MimeTypes
 namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
-    environment
-    db:seed:model_formats
-    update_stored_orcids
+    environment    
     convert_help_attachments
     convert_help_images
     update_help_image_links
@@ -25,6 +23,7 @@ namespace :seek do
     environment
     clear_filestore_tmp
     repopulate_auth_lookup_tables
+
   ]
 
   desc('upgrades SEEK from the last released version to the latest released version')
@@ -43,14 +42,7 @@ namespace :seek do
     ensure
       Seek::Config.solr_enabled = solr
     end
-  end
-
-  desc('updates stored orcid ids to be stored as https')
-  task(update_stored_orcids: :environment) do
-    Person.where('orcid is NOT NULL').each do |person|
-      person.update_column(:orcid, person.orcid_uri)
-    end
-  end
+  end  
 
   task(convert_help_attachments: :environment) do
     count = 0
