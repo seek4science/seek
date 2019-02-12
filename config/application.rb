@@ -74,7 +74,7 @@ module SEEK
 
     # load and set the application version from /config/version.yml
     if defined?(Rails.root.to_s) && File.exists?("#{(Rails.root.to_s)}/config/version.yml")
-      APP_VERSION = "1.8dev" # TODO: Un-hardcode this #App::Version.load "#{(Rails.root.to_s)}/config/version.yml"
+      APP_VERSION = "1.9.rails-5.2" # TODO: Un-hardcode this #App::Version.load "#{(Rails.root.to_s)}/config/version.yml"
     end
   end
 end
