@@ -58,11 +58,14 @@ you will need this later.
 
 The remaining packages are:
 
-    sudo apt install build-essential git imagemagick libcurl4-gnutls-dev libgmp-dev libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev libxml++2.6-dev libxslt1-dev nodejs openjdk-8-jdk openssh-server poppler-utils
+    sudo apt install build-essential git imagemagick libcurl4-gnutls-dev libgmp-dev \
+        libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
+        libxml++2.6-dev libxslt1-dev nodejs openjdk-8-jdk openssh-server poppler-utils
 
 Installing these packages now will make installing Ruby easier later on:
 
-    sudo apt install autoconf automake bison curl gawk libffi-dev libgdbm-dev libncurses5-dev libsqlite3-dev libyaml-dev sqlite3
+    sudo apt install autoconf automake bison curl gawk libffi-dev libgdbm-dev \
+        libncurses5-dev libsqlite3-dev libyaml-dev sqlite3
 
 ## Development or Production?
 
