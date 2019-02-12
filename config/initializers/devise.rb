@@ -262,7 +262,7 @@ Devise.setup do |config|
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
   config.omniauth :openid_connect, {
       name: :elixir_aai,
-      # scope: [:openid, :email, :profile],
+      scope: [:openid, :email],
       response_type: 'code',
       issuer: 'https://login.elixir-czech.org/oidc/',
       discovery: false,

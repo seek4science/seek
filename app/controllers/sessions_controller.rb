@@ -22,11 +22,15 @@ class SessionsController < ApplicationController
   end
 
   def create
-    omniauth = session[:omniauth]
-    session[:omniauth] = nil
-# authentication through omniauth?
-    if Seek::Config.omniauth_enabled && omniauth
-      create_omniauth(omniauth)
+    auth = session[:auth]
+    session.delete (:auth)
+
+    if !auth
+      auth = request.env['omniauth.auth']
+    end
+  # authentication through omniauth?
+    if Seek::Config.omniauth_enabled && auth
+      create_omniauth(auth)
     else
       password_authentication
     end
@@ -123,32 +127,41 @@ class SessionsController < ApplicationController
     info = auth['info']
     
     # check if there is a user with that username as login
-    user_by_omniauth = User.from_omniauth(auth)
+    identity = Identity.from_omniauth(auth)
+    user_by_omniauth = identity.user
     if user_by_omniauth
       @user = user_by_omniauth
       check_login
     # there is no such user, should we not create the user?
     elsif !Seek::Config.omniauth_user_create
-      failed_login "the authenticated user: #{info['nickname']} cannot be found; administrators have been informed"
+      failed_login 'the authenticated user: cannot be found; administrators have been informed'
       Mailer.omniauth_failed_login(auth.to_yaml).deliver_later
     else
       # TODO: Check this code out
       # create the user from the omniauth info
-      @user = User.create({:login => info['nickname']})
+      @user = User.create
+      if info['nickname']
+        @user.login = info['nickname']
+      else
+        @user.login = SecureRandom.hex
+      end
       # some random password, since authentication should happen through omniauth in the future
       @user.password              = SecureRandom.hex
       @user.password_confirmation = @user.password
 
-      @user.uid = auth.uid
-      @user.provider = auth.provider
       # try to save
       if !@user.save
-        failed_login "Cannot create a new user: #{info['nickname']}"
+        failed_login "Cannot create a new user: #{@user.login}"
       else
+        identity.user = @user
+        identity.save!
         # should we activate the user?
         @user.activate if Seek::Config.omniauth_user_activate
         # when user was saved successfully, also create the Profile and save with the user
-        person = Person.create(auth['info'].slice(:first_name, :last_name, :email))
+        person = Person.create
+        person.first_name = 'fred'
+        person.last_name = 'bloggs'
+        person.email = 'someone@somewhere.com'
         person.user = @user
         person.save
         check_login
