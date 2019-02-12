@@ -18,7 +18,9 @@ class Identity < ActiveRecord::Base
 
     if !identity
       identity = Identity.new(provider: auth.provider,
-                              uid: auth.uid)
+                              uid: auth.uid,
+                              email: auth.info.email
+            )
       identity.save!
     end
 

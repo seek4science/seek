@@ -2,8 +2,8 @@ class CallbacksController < Devise::OmniauthCallbacksController
 
   def elixir_aai
     @identity = Identity.from_omniauth(request.env["omniauth.auth"])
+    redirect_to new_user_path @identity
 
-    print ('fred')
     # @user = User.from_omniauth(request.env["omniauth.auth"])
     #
     # if @user.new_record?
