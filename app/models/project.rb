@@ -26,7 +26,7 @@ class Project < ApplicationRecord
   has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?, inverse_of: :projects
   has_many :group_memberships, through: :work_groups, inverse_of: :project
   # OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
-  has_many :people, -> { order('last_name ASC').uniq }, through: :group_memberships
+  has_many :people, -> { order('last_name ASC').distinct }, through: :group_memberships
 
   has_many :former_group_memberships, -> { where('time_left_at IS NOT NULL AND time_left_at <= ?', Time.now) },
            through: :work_groups, source: :group_memberships
