@@ -13,8 +13,6 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
-    db:seed:model_formats
-    update_stored_orcids
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -40,13 +38,6 @@ namespace :seek do
       puts 'Upgrade completed successfully'
     ensure
       Seek::Config.solr_enabled = solr
-    end
-  end
-
-  desc('updates stored orcid ids to be stored as https')
-  task(update_stored_orcids: :environment) do
-    Person.where('orcid is NOT NULL').each do |person|
-      person.update_column(:orcid, person.orcid_uri)
     end
   end
 
