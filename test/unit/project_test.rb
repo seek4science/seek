@@ -69,7 +69,7 @@ class ProjectTest < ActiveSupport::TestCase
     object = Factory :project, web_page: 'http://www.sysmo-db.org',
                                organisms: [Factory(:organism), Factory(:organism)]
     person = Factory(:person,project:object)
-    Factory :data_file, projects: [object], contributor:person
+    df = Factory :data_file, projects: [object], contributor:person
     Factory :data_file, projects: [object], contributor:person
     Factory :model, projects: [object], contributor:person
     Factory :sop, projects: [object], contributor:person
@@ -85,6 +85,9 @@ class ProjectTest < ActiveSupport::TestCase
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/projects/#{object.id}"), reader.statements.first.subject
+
+      #check includes the data file due to bug OPSK-1919
+      refute_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/data_files/#{df.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasItem")}
     end
   end
 

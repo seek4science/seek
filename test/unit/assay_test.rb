@@ -16,13 +16,19 @@ class AssayTest < ActiveSupport::TestCase
     Factory :assay_organism, assay: assay, organism: Factory(:organism)
     pub = Factory :publication
     Factory :relationship, subject: assay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub
-    Factory :assay_asset, assay: assay
+    df = (Factory :assay_asset, assay: assay).asset
+
+    refute_nil df
+    assert_includes assay.assets,df
     assay.reload
     assert_equal 2, assay.assets.size
     rdf = assay.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject
+
+      #check includes the data file due to bug OPSK-1919
+      refute_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/data_files/#{df.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasPart")}
     end
 
     # try modelling, with tech type nil
