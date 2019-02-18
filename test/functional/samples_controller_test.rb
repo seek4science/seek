@@ -11,6 +11,17 @@ class SamplesControllerTest < ActionController::TestCase
     @object = Factory(:sample, policy: Factory(:public_policy))
   end
 
+  test 'should return 406 when requesting RDF' do
+    login_as(Factory(:user))
+    sample = Factory :sample, contributor: User.current_user.person
+    assert sample.can_view?
+
+    get :show, id: sample, format: :rdf
+
+    assert_response :not_acceptable
+  end
+
+
   test 'index' do
     Factory(:sample, policy: Factory(:public_policy))
     get :index

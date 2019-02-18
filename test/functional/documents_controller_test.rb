@@ -25,6 +25,16 @@ class DocumentsControllerTest < ActionController::TestCase
     add_creator_to_test_object(document)
   end
 
+  test 'should return 406 when requesting RDF' do
+    login_as(Factory(:user))
+    doc = Factory :document, contributor: User.current_user.person
+    assert doc.can_view?
+
+    get :show, id: doc, format: :rdf
+
+    assert_response :not_acceptable
+  end
+
   test 'should get index' do
     FactoryGirl.create_list(:public_document, 3)
 
