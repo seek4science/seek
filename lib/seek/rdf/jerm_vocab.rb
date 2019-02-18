@@ -23,7 +23,9 @@ module Seek
 
       # predefined list of types and their JERM ontology class
       def self.defined_types
-        { DataFile => :Data,
+        {
+          Assay => :Assay,
+          DataFile => :Data,
           Model => :Model,
           Sop => :SOP,
           Person => :Person,
@@ -34,9 +36,8 @@ module Seek
           Investigation => :Investigation,
           Publication => :Publication,
           Strain => :Strain,
-          Compound => :Compound,
-          StudiedFactor => :Factors_studied,
-          Sample => :Data_sample}
+          Compound => :Compound
+        }
       end
 
       # this is the class fragment according to the measured item title

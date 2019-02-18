@@ -7,7 +7,6 @@ class DocumentsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
-  include RdfTestCases
   include MockHelper
   include HtmlHelper
 
@@ -23,6 +22,16 @@ class DocumentsControllerTest < ActionController::TestCase
   def edit_max_object(document)
     add_tags_to_test_object(document)
     add_creator_to_test_object(document)
+  end
+
+  test 'should return 406 when requesting RDF' do
+    login_as(Factory(:user))
+    doc = Factory :document, contributor: User.current_user.person
+    assert doc.can_view?
+
+    get :show, id: doc, format: :rdf
+
+    assert_response :not_acceptable
   end
 
   test 'should get index' do

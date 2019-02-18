@@ -3,7 +3,7 @@ require 'test_helper'
 class StudiedFactorsControllerTest < ActionController::TestCase
   fixtures :all
 
-  #include RdfTestCases
+
   include AuthenticatedTestHelper
   include ActionDispatch::Routing::PolymorphicRoutes
 
@@ -20,19 +20,13 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     data_file_studied_factor_url(object.data_file, object, host: 'localhost', port: '3000')
   end
 
-  # overides RdfTestCases, due to the nested route
-  def invoke_rdf_get(object)
-    get :show, id: object, data_file_id: object.data_file.id, format: 'rdf'
-  end
+  test 'should return 406 when requesting RDF' do
+    object = rest_api_test_object
+    assert object.can_view?
 
-  # overides RdfTestCases, due to the nested route
-  def test_response_code_for_not_available_rdf
-    id = 9999
-    id += 1 until StudiedFactor.find_by_id(id).nil?
+    get :show, id: object.id, data_file_id:object.data_file.id, format: :rdf
 
-    logout
-    get :show, id: id, data_file_id: 1, format: 'rdf'
-    assert_response :not_found
+    assert_response :not_acceptable
   end
 
   test 'routes' do

@@ -25,7 +25,7 @@ class UtilTest < ActiveSupport::TestCase
 
   test 'rdf capable types' do
     types = Seek::Util.rdf_capable_types
-    expected = %w[Assay Compound CultureGrowthType DataFile Document Investigation Model Node Organism Person Programme Project Publication Sop Strain Study Workflow]
+    expected = %w[Assay Compound DataFile Investigation Model Organism Person Programme Project Publication Sop Strain Study]
     assert_equal expected, types.collect(&:name).sort
   end
 

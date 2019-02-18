@@ -73,7 +73,8 @@ class ProjectTest < ActiveSupport::TestCase
     Factory :data_file, projects: [object], contributor:person
     Factory :model, projects: [object], contributor:person
     Factory :sop, projects: [object], contributor:person
-    Factory :presentation, projects: [object], contributor:person
+    presentation = Factory :presentation, projects: [object], contributor:person
+    doc = Factory :document, projects: [object], contributor:person
     i = Factory :investigation, projects: [object], contributor:person
     s = Factory :study, investigation: i, contributor:person
     Factory :assay, study: s, contributor:person
@@ -88,6 +89,10 @@ class ProjectTest < ActiveSupport::TestCase
 
       #check includes the data file due to bug OPSK-1919
       refute_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/data_files/#{df.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasItem")}
+
+      #document and presentation shouldn't be present (see OPSK-1920)
+      assert_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/presentations/#{presentation.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasItem")}
+      assert_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/documents/#{doc.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasItem")}
     end
   end
 
