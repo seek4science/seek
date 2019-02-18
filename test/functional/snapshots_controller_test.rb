@@ -8,6 +8,13 @@ class SnapshotsControllerTest < ActionController::TestCase
     doi_citation_mock
   end
 
+  test 'should return 406 when requesting RDF' do
+    create_assay_snapshot
+    get :show, assay_id: @assay.id, id: @snapshot.snapshot_number, format: :rdf
+
+    assert_response :not_acceptable
+  end
+
   test 'can get snapshot preview page' do
     user = Factory(:user)
     investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: user.person)

@@ -11,6 +11,15 @@ class WorkflowsControllerTest < ActionController::TestCase
     @project = User.current_user.person.projects.first
   end
 
+  test 'should return 406 when requesting RDF' do
+    wf = Factory :workflow, contributor: User.current_user.person
+    assert wf.can_view?
+
+    get :show, id: wf, format: :rdf
+
+    assert_response :not_acceptable
+  end
+
   test 'index' do
     get :index
     assert_response :success
