@@ -154,10 +154,6 @@ module ApplicationHelper
     contributor_links
   end
 
-  def tabbar
-    Seek::Config.is_virtualliver ? render(partial: 'general/tabnav_dropdown') : render(partial: 'general/menutabs')
-  end
-
   # joins the list with seperator and the last item with an 'and'
   def join_with_and(list, seperator = ', ')
     return list.first if list.count == 1
@@ -172,18 +168,6 @@ module ApplicationHelper
                         end
     end
     result
-  end
-
-  def tab_definition(options = {})
-    options[:gap_before] ||= false
-    options[:title] ||= options[:controllers].first.capitalize
-    options[:path] ||= eval "#{options[:controllers].first}_path"
-
-    attributes = (options[:controllers].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '')
-    attributes += " class='tab_gap_before'" if options[:gap_before]
-
-    link = link_to options[:title], options[:path]
-    "<li #{attributes}>#{link}</li>".html_safe
   end
 
   # Classifies each result item into a hash with the class name as the key.
@@ -415,6 +399,15 @@ module ApplicationHelper
 
     if referer == search_path && referer != request_uri && request_uri != root_path
       javascript_tag "
+              if (window.history.length > 1){
+                var a = document.createElement('a');
+                a.onclick = function(){ window.history.back(); };
+                a.onmouseover = function(){ this.style.cursor='pointer'; };
+                a.appendChild(document.createTextNode('Return to search'));
+                a.style.textDecoration='underline';
+                document.getElementById('return_to_search').appendChild(a);
+              }
+            "
         if (window.history.length > 1){
           var a = document.createElement('a');
           a.onclick = function(){ window.history.back(); };
@@ -483,22 +476,6 @@ module ApplicationHelper
                       klass.count
                     end
     [visible_total, full_total]
-  end
-
-  def describe_visibility(model)
-    text = '<strong>Visibility:</strong> '
-
-    if model.policy.access_type == Policy::NO_ACCESS
-      css_class = 'private'
-      text << 'Private '
-      text << 'with some exceptions ' unless model.policy.permissions.empty?
-      text << image('lock', style: 'vertical-align: middle')
-    else
-      css_class = 'public'
-      text << "Public #{image('world', style: 'vertical-align: middle')}"
-    end
-
-    "<span class='visibility #{css_class}'>#{text}</span>".html_safe
   end
 
   def cancel_button(path, html_options = {})
