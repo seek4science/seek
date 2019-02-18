@@ -398,26 +398,7 @@ module ApplicationHelper
     end
 
     if referer == search_path && referer != request_uri && request_uri != root_path
-      javascript_tag "
-              if (window.history.length > 1){
-                var a = document.createElement('a');
-                a.onclick = function(){ window.history.back(); };
-                a.onmouseover = function(){ this.style.cursor='pointer'; };
-                a.appendChild(document.createTextNode('Return to search'));
-                a.style.textDecoration='underline';
-                document.getElementById('return_to_search').appendChild(a);
-              }
-            "
-        if (window.history.length > 1){
-          var a = document.createElement('a');
-          a.onclick = function(){ window.history.back(); };
-          a.onmouseover = function(){ this.style.cursor='pointer'; }
-          a.appendChild(document.createTextNode('Return to search'));
-          a.style.textDecoration='underline';
-          document.getElementById('return_to_search').appendChild(a);
-        }
-      "
-      # link_to_function 'Return to search', "window.history.back();"
+      link_to('Return to search', '#', onclick: 'window.history.back();', id: 'return_to_search', style: 'display: none;')
     end
   end
 

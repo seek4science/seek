@@ -2,7 +2,7 @@
 // This file is automatically included by javascript_include_tag :defaults
 
 
-var tabber_ids = new Array();
+var tabber_ids = [];
 var tabberOptions = {'onLoad':function() {
     displayTabs();
 }};
@@ -98,8 +98,8 @@ function deleteCookie(name, path, domain) {
     }
 }
 
-var fullResourceListItemExpandableText = new Array();
-var truncResourceListItemExpandableText = new Array();
+var fullResourceListItemExpandableText = [];
+var truncResourceListItemExpandableText = [];
 
 function expandResourceListItemExpandableText(objectId){
     link = $('expandableLink'+objectId)
@@ -272,4 +272,9 @@ $j(document).ready(function () {
   }).on('hide.bs.collapse', function () {
     $j(this).parent().find('.panel-heading .caret-up').removeClass('caret-up').addClass('caret');
   });
+
+  var returnToSearch = $j('#return_to_search');
+  if (returnToSearch.length && window.history.length > 1) {
+      returnToSearch.show();
+  }
 });
