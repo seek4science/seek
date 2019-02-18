@@ -65,7 +65,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-
   has_annotation_type :expertise, method_name: :expertise
   has_annotation_type :tool
 
@@ -172,9 +171,6 @@ class Person < ActiveRecord::Base
     shares_project?(other_item) || shares_programme?(other_item)
   end
 
-
-
-
   def self.userless_people
     Person.includes(:user).select { |p| p.user.nil? }
   end
@@ -201,23 +197,6 @@ class Person < ActiveRecord::Base
     Person.order('ID asc').collect do |p|
       { 'id' => p.id, 'name' => p.name, 'email' => p.email, 'projects' => p.projects.collect(&:title).join(', ') }
     end.to_json
-  end
-
-  def validates_associated(*associations)
-    associations.each do |_association|
-      class_eval do
-        validates_each(associations) do |record, associate_name, _value|
-          associates = record.send(associate_name)
-          associates = [associates] unless associates.respond_to?('each')
-          associates.each do |associate|
-            next unless associate && !associate.valid?
-            associate.errors.each do |key, value|
-              record.errors.add(key, value)
-            end
-          end
-        end
-      end
-    end
   end
 
   def projects # ALL projects, former and current
