@@ -7,7 +7,6 @@ class DocumentsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
-  include RdfTestCases
   include MockHelper
   include HtmlHelper
 
