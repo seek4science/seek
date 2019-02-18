@@ -41,6 +41,12 @@ module Seek
 
         transformation.strip! if transformation
         collection_transformation.strip! if collection_transformation
+
+        # strip out non rdf capable active record models
+        items = items.reject do |item|
+          item.kind_of?(ActiveRecord::Base) && !Seek::Util.rdf_capable_types.include?(item.class)
+        end
+
         unless collection_transformation.blank?
           Rails.logger.debug("Performing collection transformation: #{collection_transformation}")
           items = eval("items.#{collection_transformation}")
