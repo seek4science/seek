@@ -47,8 +47,8 @@ class DataFilesController < ApplicationController
 	  #}
 
 
-		data_file_id = params["id"]
-		df = DataFile.find_by(data_file_id)
+    data_file_id = params[:id]
+    df = DataFile.find_by(id: data_file_id)
 
 		content_type = df.content_blob.content_type;
 		original_filename = df.content_blob.original_filename;
