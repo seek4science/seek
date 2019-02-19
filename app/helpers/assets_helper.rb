@@ -194,4 +194,22 @@ module AssetsHelper
     image_tag_for_key('download', polymorphic_path([fileinfo.asset, fileinfo], action: :download, code: params[:code]), 'Download', { title: 'Download this file' }, '')
   end
 
+  def galaxize_resource_path(resource, _code = nil, _galaxy_url = nil)
+    fetch = download_resource_path(resource,_code)
+    if resource.class.name.include?('::Version')
+      polymorphic_path(resource.parent, version: resource.version, action: :galaxize, code: params[:code],GALAXY_URL:  _galaxy_url,fetch_url: fetch + "?")
+    else
+      polymorphic_path(resource, action: :galaxize, code: params[:code],GALAXY_URL: _galaxy_url,fetch_url: fetch)
+    end
+  end
+
+  def download_or_galaxy_button(asset, galaxy_url, download_path, link_url, _human_name = nil, opts = {})
+    # galaxy_button = icon_link_to('Galaxy', 'galaxy', download_path, opts)
+    galaxy_button = icon_link_to(galaxy_url, 'galaxy', download_path, opts)
+    link_button_or_nil = nil
+    return asset.content_blobs.detect { |blob| !blob.show_as_external_link? } ?  galaxy_button : link_button_or_nil if asset.respond_to?(:content_blobs)
+    return asset.content_blob.show_as_external_link? ? link_button_or_nil : galaxy_button if asset.respond_to?(:content_blob)
+  end
+
+
 end

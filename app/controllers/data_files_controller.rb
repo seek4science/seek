@@ -13,7 +13,7 @@ class DataFilesController < ApplicationController
   before_filter :find_assets, only: [:index]
   before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob,
                                                              :request_resource, :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
-  before_filter :find_display_asset, only: [:show, :explore, :download]
+  before_filter :find_display_asset, only: [:show, :explore, :download, :matching_models ]
   skip_before_filter :verify_authenticity_token, only: [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, only: [:upload_for_tool, :upload_from_email]
   before_filter :get_sample_type, only: :extract_samples
@@ -34,6 +34,36 @@ class DataFilesController < ApplicationController
   include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
+
+
+  # download for galaxy
+  def galaxize
+		## params = {
+		#'URL': fetch_url,
+		## You can set the dataset type, should be a Galaxy datatype name
+		#'type': 'tabular',
+		## And the output filename
+		#'name': 'SyncDataset Name',
+	  #}
+
+
+		data_file_id = params["id"]
+		df = DataFile.find_by(data_file_id)
+
+		content_type = df.content_blob.content_type;
+		original_filename = df.content_blob.original_filename;
+
+		uri =  URI.parse(params[:GALAXY_URL])
+		uri.query = [uri.query,
+					'URL=' + root_url + params[:fetch_url],
+					"type=#{content_type}",
+					"name=#{original_filename}",
+				].compact.join('&')
+
+		Rails.logger.debug "The uri it will be redirected to"
+		Rails.logger.debug uri.to_s
+		redirect_to uri.to_s
+  end
 
   def plot
     sheet = params[:sheet] || 2
@@ -178,6 +208,26 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def data
+    @data_file =  DataFile.find(params[:id])
+    sheet = params[:sheet] || 1
+    trim = params[:trim] || false
+    content_blob = @data_file.content_blob
+    file = open(content_blob.filepath)
+    mime_extensions = mime_extensions(content_blob.content_type)
+    if !(%w(xls xlsx) & mime_extensions).empty?
+      respond_to do |format|
+        format.html # currently complains about a missing template, but we don't want people using this for now - its purely XML
+        format.xml { render xml: spreadsheet_to_xml(file, memory_allocation = Seek::Config.jvm_memory_allocation) }
+      end
+    else
+      respond_to do |format|
+        flash[:error] = 'Unable to view contents of this data file'
+        format.html { redirect_to @data_file, format: 'html' }
+      end
+    end
+  end
+  
   def explore
     #drop invalid explore params
     [:page_rows, :page, :sheet].each do |param|
@@ -185,6 +235,7 @@ class DataFilesController < ApplicationController
         params.delete(param)
       end
     end
+    
     if @display_data_file.contains_extractable_spreadsheet?
       respond_to do |format|
         format.html
