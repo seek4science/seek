@@ -3,6 +3,7 @@ module RdfHelper
     eval('@' + controller_name.singularize).to_rdf
   end
 
+  # FIXME: currently experimental and may not be used.
   def json_ld_script_block
     resource = eval('@' + controller_name.singularize)
     if resource && resource.rdf_supported?
