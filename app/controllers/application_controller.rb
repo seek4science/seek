@@ -33,7 +33,7 @@ class ApplicationController < ActionController::Base
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
   before_action :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
 
-  before_filter :rdf_enabled? #only allows through rdf calls to supported types
+  before_action :rdf_enabled? #only allows through rdf calls to supported types
 
   helper :all
 
