@@ -555,7 +555,7 @@ class ApplicationController < ActionController::Base
     return unless request.format.symbol == :rdf
     unless Seek::Util.rdf_capable_types.include?(controller_name.classify.constantize)
       respond_to do |format|
-        format.rdf { render text: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
+        format.rdf { render plain: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
       end
       false
     end
