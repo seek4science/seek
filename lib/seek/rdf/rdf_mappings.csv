@@ -20,7 +20,7 @@ Assay,projects,JERMVocab.itemProducedBy,u,,
 Assay,strains,JERMVocab.investigates,u,,
 Assay,study,JERMVocab.isPartOf,u,,
 Assay,technology_type_uri,JERMVocab.hasType,u,,
-Assay,assets,JERMVocab.hasPart,u,,select{|item| !item.class.name=='Presentation'}
+Assay,assets,JERMVocab.hasPart,u,,
 Assay,validation_assets,JERMVocab.isValidatedBy,u,,
 Assay,construction_assets,JERMVocab.isConstructedFrom,u,,
 Assay,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
@@ -37,8 +37,8 @@ Model,projects,JERMVocab.itemProducedBy,u,,
 Model,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
 Organism,assays,JERMVocab.isInvestigatedBy,u,,
 Organism,ncbi_uri,JERMVocab.NCBI_ID,l,URI.parse(item),compact
-Person,created_items,JERMVocab.isCreatorOf,u,,select{|item| !(item.class.name=='Presentation' || item.class.name=='Event' || item.class.name=='Sample')}
-Person,contributed_items,JERMVocab.isContributorOf,u,,select{|item| !(item.class.name=='Presentation' || item.class.name=='Event' || item.class.name=='Sample')}
+Person,created_items,JERMVocab.isCreatorOf,u,,
+Person,contributed_items,JERMVocab.isContributorOf,u,,
 Person,mbox_sha1sum,RDF::FOAF.mbox_sha1sum,l,,
 Person,first_name,RDF::FOAF.firstName,l,,
 Person,last_name,RDF::FOAF.familyName,l,,
@@ -53,7 +53,7 @@ Programme,people,JERMVocab.isAssociatedWith,u,,
 Programme,projects,JERMVocab.hasPart,u,,
 Programme,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
 Project,assays,JERMVocab.hasItem,u,,
-Project,assets,JERMVocab.hasItem,u,,select{|item| !item.class.name=='Presentation'}
+Project,assets,JERMVocab.hasItem,u,,
 Project,investigations,JERMVocab.hasItem,u,,
 Project,organisms,JERMVocab.investigates,u,,
 Project,studies,JERMVocab.hasItem,u,,

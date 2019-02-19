@@ -64,7 +64,6 @@ class ContentBlobsController < ApplicationController
       format.json { render json: @content_blob }
       format.html { render plain: 'Format not supported', status: :not_acceptable }
       format.xml { render plain: 'Format not supported', status: :not_acceptable }
-      format.rdf { render plain: 'Format not supported', status: :not_acceptable }
       format.csv { csv_data }
     end
   end

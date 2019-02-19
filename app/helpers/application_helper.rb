@@ -444,22 +444,6 @@ module ApplicationHelper
     [visible_total, full_total]
   end
 
-  def describe_visibility(model)
-    text = '<strong>Visibility:</strong> '
-
-    if model.policy.access_type == Policy::NO_ACCESS
-      css_class = 'private'
-      text << 'Private '
-      text << 'with some exceptions ' unless model.policy.permissions.empty?
-      text << image('lock', style: 'vertical-align: middle')
-    else
-      css_class = 'public'
-      text << "Public #{image('world', style: 'vertical-align: middle')}"
-    end
-
-    "<span class='visibility #{css_class}'>#{text}</span>".html_safe
-  end
-
   def cancel_button(path, html_options = {})
     html_options[:class] ||= ''
     html_options[:class] << ' btn btn-default'

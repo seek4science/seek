@@ -674,8 +674,6 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :group_memberships
-
   resources :site_announcements do
     collection do
       get :feed

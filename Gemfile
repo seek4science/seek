@@ -166,6 +166,7 @@ group :test do
   gem 'database_cleaner'
   gem 'vcr', '~> 2.9'
   gem 'rails-controller-testing'
+  gem 'simplecov'
 end
 
 group :test, :development do

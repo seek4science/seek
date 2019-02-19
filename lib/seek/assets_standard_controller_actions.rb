@@ -22,11 +22,7 @@ module Seek
       respond_to do |format|
         format.html
         format.xml
-        if asset.respond_to?(:to_rdf)
-          format.rdf { render template: 'rdf/show' }
-        else
-          format.rdf { render plain: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
-        end
+        format.rdf { render template: 'rdf/show' }
         format.json { render json: asset, scope: { requested_version: params[:version] } }
       end
     end

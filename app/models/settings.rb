@@ -26,7 +26,7 @@ class Settings < ApplicationRecord
 
   belongs_to :target, polymorphic: true, required: false
 
-  attr_encrypted :value, key: proc { Seek::Config.attr_encrypted_key }, marshal: true, marsheler: YAML
+  attr_encrypted :value, key: proc { Seek::Config.attr_encrypted_key }, marshal: true, marshaler: Marshal
   before_save :ensure_no_plaintext, if: :encrypt?
 
   # Support old plugin
