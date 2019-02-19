@@ -2,7 +2,6 @@ class Person < ActiveRecord::Base
 
   acts_as_annotation_source
 
-  include Seek::Rdf::RdfGeneration
   include Seek::Taggable
   include Seek::Roles::AdminDefinedRoles
 

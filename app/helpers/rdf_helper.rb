@@ -39,7 +39,4 @@ module RdfHelper
     end
   end
 
-  def json_ld(resource)
-
-  end
 end

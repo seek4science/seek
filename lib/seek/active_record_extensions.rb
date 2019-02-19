@@ -63,7 +63,7 @@ module Seek
     end
 
     def rdf_supported?
-      self.class.include? Seek::Rdf::RdfGeneration
+      Seek::Util.rdf_capable_types.include?(self.class)
     end
   end
 end

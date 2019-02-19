@@ -1,7 +1,5 @@
 class Project < ActiveRecord::Base
   include Seek::Taggable
-  include Seek::Rdf::RdfGeneration
-  include Seek::Rdf::ReactToAssociatedChange
 
   acts_as_yellow_pages
   title_trimmer
