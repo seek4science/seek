@@ -32,7 +32,7 @@ class EventsControllerTest < ActionController::TestCase
     event = Factory :event, contributor: User.current_user.person
     assert event.can_view?
 
-    get :show, id: event, format: :rdf
+    get :show, params: { id: event, format: :rdf }
 
     assert_response :not_acceptable
   end

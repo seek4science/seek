@@ -10,7 +10,7 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test 'should return 406 when requesting RDF' do
     create_assay_snapshot
-    get :show, assay_id: @assay.id, id: @snapshot.snapshot_number, format: :rdf
+    get :show, params: { assay_id: @assay.id, id: @snapshot.snapshot_number, format: :rdf }
 
     assert_response :not_acceptable
   end

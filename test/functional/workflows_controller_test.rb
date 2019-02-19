@@ -15,7 +15,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     wf = Factory :workflow, contributor: User.current_user.person
     assert wf.can_view?
 
-    get :show, id: wf, format: :rdf
+    get :show, params: { id: wf, format: :rdf }
 
     assert_response :not_acceptable
   end

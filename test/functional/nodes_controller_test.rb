@@ -15,7 +15,7 @@ class NodesControllerTest < ActionController::TestCase
     node = Factory :node, contributor: User.current_user.person
     assert node.can_view?
 
-    get :show, id: node, format: :rdf
+    get :show, params: { id: node, format: :rdf }
 
     assert_response :not_acceptable
   end

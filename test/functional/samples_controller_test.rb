@@ -16,7 +16,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample = Factory :sample, contributor: User.current_user.person
     assert sample.can_view?
 
-    get :show, id: sample, format: :rdf
+    get :show, params: { id: sample, format: :rdf }
 
     assert_response :not_acceptable
   end

@@ -24,7 +24,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     object = rest_api_test_object
     assert object.can_view?
 
-    get :show, id: object.id, data_file_id:object.data_file.id, format: :rdf
+    get :show, params: { id: object.id, data_file_id:object.data_file.id, format: :rdf }
 
     assert_response :not_acceptable
   end

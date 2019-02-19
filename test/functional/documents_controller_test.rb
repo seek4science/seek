@@ -29,7 +29,7 @@ class DocumentsControllerTest < ActionController::TestCase
     doc = Factory :document, contributor: User.current_user.person
     assert doc.can_view?
 
-    get :show, id: doc, format: :rdf
+    get :show, params: { id: doc, format: :rdf }
 
     assert_response :not_acceptable
   end
