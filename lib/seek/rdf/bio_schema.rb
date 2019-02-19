@@ -23,20 +23,13 @@ module Seek
         unless supported?
           raise UnsupportedTypeException.new("Bioschema not supported for #{resource.class.name}")
         end
+        json = {}
+        json['@context']={'':'http://schema.org','bio':'http://bioschemas.org'}
+        json['@type'] = SCHEMA_TYPES[resource.class]
+        json['@id'] = resource.rdf_resource
+        json['name'] = resource.title
 
-        ld = JSON.parse %(
-        {
-          "@context": {
-                "": "http://schema.org/",
-                "bio": "http://bioschemas.org/"
-          },
-          "@type": "#{SCHEMA_TYPES[resource.class]}",
-          "@id": "#{resource.rdf_resource}",
-          "name": "#{resource.title}"
-        }
-        )
-
-        JSON.pretty_generate(ld)
+        JSON.pretty_generate(json)
       end
 
       def supported?
