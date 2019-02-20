@@ -1,6 +1,6 @@
 module Seek
   module Rdf
-    class CSVRow
+    class MappingInfo
       attr_reader :type, :method, :property
       def initialize(row)
         @type = row[0]
@@ -36,8 +36,8 @@ module Seek
 
       def each_row
         mappings_csv.each do |row|
-          csv_row = CSVRow.new(row)
-          yield(csv_row) if csv_row.valid?
+          info = MappingInfo.new(row)
+          yield(info) if info.valid?
         end
       end
 
