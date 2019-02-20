@@ -62,13 +62,6 @@ module Seek
       self.class.include? Seek::Ontologies::SuggestedType
     end
 
-    def schema_org_supported?
-      Seek::Rdf::BioSchema.supported?(self)
-    end
-
-    def rdf_supported?
-      Seek::Util.rdf_capable_types.include?(self.class)
-    end
   end
 end
 

@@ -150,3 +150,9 @@ module Seek
     end
   end
 end
+
+ActiveRecord::Base.class_eval do
+  def rdf_supported?
+    Seek::Util.rdf_capable_types.include?(self.class)
+  end
+end

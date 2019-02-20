@@ -7,3 +7,10 @@ module Seek
     end
   end
 end
+
+ActiveRecord::Base.class_eval do
+  def schema_org_supported?
+    Seek::Rdf::BioSchema.supported?(self)
+  end
+end
+
