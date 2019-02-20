@@ -12,7 +12,6 @@
 //= require builder
 //= require application_shared
 //= require tagging
-//= require top_menu
 //= require dropMenu
 //= require dynamic_menu
 //= require assays
@@ -59,6 +58,7 @@
 //= require inplace
 //= require strain
 //= require publishing
+//= require cytoscape.js-2.5.0/cytoscape
 //= require cytoscape_isa_graph
 //= require bives
 //= require asset_report
