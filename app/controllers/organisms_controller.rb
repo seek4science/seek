@@ -28,8 +28,7 @@ class OrganismsController < ApplicationController
   end
 
   def index
-
-    if request.format.symbol == :html
+    if request.format.html?
       super
     else
       respond_to do |format|

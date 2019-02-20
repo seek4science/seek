@@ -550,14 +550,13 @@ class ApplicationController < ActionController::Base
     request.format.json?
   end
 
-  # fitler that responds with :not_acceptible if request rdf for non rdf capable resource
+  # filter that responds with :not_acceptable if request rdf for non rdf capable resource
   def rdf_enabled?
-    return unless request.format.symbol == :rdf
+    return unless request.format.rdf?
     unless Seek::Util.rdf_capable_types.include?(controller_name.classify.constantize)
       respond_to do |format|
         format.rdf { render plain: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
       end
-      false
     end
   end
 
