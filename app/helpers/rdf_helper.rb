@@ -24,7 +24,7 @@ module RdfHelper
 
   def schema_ld_script_block
     resource = eval('@' + controller_name.singularize)
-    if resource && resource.is_a?(ActiveRecord::Base) && resource.schema_org_supported?
+    if resource && resource.schema_org_supported?
       #begin
         content_tag :script, type: 'application/ld+json' do
           resource.to_schema_ld.html_safe

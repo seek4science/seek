@@ -5,6 +5,13 @@ class CountriesController < ApplicationController
   def show
     @country = white_list(params[:country_name])
     @institutions = Institution.where(["country LIKE ?", @country])
+
+    # needed as @country is a unique case of being a string rather than instance of ActiveRecord
+    @country.class_eval do
+      def schema_org_supported?
+        false
+      end
+    end
     
     respond_to do |format|
       if Seek::Config.is_virtualliver
