@@ -4,7 +4,6 @@ module Seek
       class Person
         attr_reader :resource
 
-        delegate :title, :description, :first_name, :last_name, :id, :rdf_resource, to: :resource
         def initialize(resource)
           @resource = resource
         end
@@ -14,11 +13,23 @@ module Seek
         end
 
         def image
-          if resource.avatar
-            "#{Seek::Config.site_base_host}/#{resource.class.table_name}/#{resource.id}/avatars/#{resource.avatar.id}&size=250"
-          end
+          return unless resource.avatar
+          "#{Seek::Config.site_base_host}/#{resource.class.table_name}/#{resource.id}/avatars/#{resource.avatar.id}&size=250"
         end
 
+        private
+
+        def respond_to_missing?(name, include_private = false)
+          resource.respond_to?(name, include_private)
+        end
+
+        def method_missing(method, *args, &block)
+          if resource.respond_to?(method)
+            resource.send(method, *args, &block)
+          else
+            super
+          end
+        end
       end
     end
   end

@@ -26,7 +26,6 @@ class BioSchemaTest < ActiveSupport::TestCase
     assert_equal p.last_name, wrapper.last_name
     assert_equal p.description, wrapper.description
     assert_equal "http://localhost:3000/people/#{p.id}/avatars/#{p.avatar.id}&size=250",wrapper.image
-
   end
 
   test 'person json_ld' do
