@@ -1,3 +1,7 @@
 class,method,property
 *,rdf_resource,@id
 *,title,name
+*,description,description
+Person,first_name,givenName
+Person,last_name,familyName
+Person,image,image
