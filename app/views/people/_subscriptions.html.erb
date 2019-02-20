@@ -67,19 +67,14 @@
 <% end %>
 
 <script type="text/javascript">
-    <%# MERGENOTE - whats this? and why use .invoke? (similar later on) %>
-    <% project_subscriptions_with_unsubscribed.map(&:project_id).each do |proj_id| %>
-      $$('#subscription<%= proj_id %> input').invoke('disable');
-    <% end %>
-
     var project_subscription = "subscription";
 
     function swap_subscription(old_div_id, new_div_id) {
-        var old_div = $(old_div_id);
+        var old_div = $j('#' + old_div_id)[0];
         if (old_div && old_div.style.display == "block") {
             old_div.style.display = "none";
         }
-        var new_div = $(new_div_id);
+        var new_div = $j('#' + new_div_id)[0];
         if (new_div && new_div.style.display == "none") {
             new_div.style.display = "block";
             new_div.select('input').invoke('enable');
@@ -87,38 +82,40 @@
     }
 
     function show_project_subscription() {
-        var new_project_subscription = "subscription" + $F('select_project_subscription');
+        var new_project_subscription = "subscription" + $j('#select_project_subscription').val();
         swap_subscription(project_subscription, new_project_subscription);
         project_subscription = new_project_subscription;
     }
 
     function updateSubscribedProjectsList(element, project_id, project_title) {
         var child_id = project_id + '_li';
-        var child = $(child_id);
+        var child = $j(child_id)[0];
         if (element.checked) {
             if (!child) {
                 child = document.createElement('LI');
                 child.id = child_id;
                 child.onclick = function() {
-                    $('select_project_subscription').value = project_id;
+                    $j('#select_project_subscription').val(project_id);
                     show_project_subscription();
-                    $('select_project_subscription').value = 0;
+                    $j('#select_project_subscription').val(0);
                     return false;
                 } ;
                 var child_link = document.createElement('a');
                 child_link.href = "#";
                 child_link.textContent = project_title;
                 child.appendChild(child_link);
-                $('project_subscription_list').appendChild(child);
+                $j('#project_subscription_list')[0].appendChild(child);
             }
-        }else
-         child.remove();
+        } else {
+            child.remove();
+        }
 
         //hide/display -None-
-        if ($('project_subscription_list').getElementsByTagName('li').length > 0)
-           $('no_project_text').style['display'] = 'none';
-        else
-           $('no_project_text').style['display'] = 'block'
+        if ($j('#project_subscription_list li').length > 0) {
+            $j('#no_project_text').hide();
+        } else {
+            $j('#no_project_text').show();
+        }
     }
 
 </script>

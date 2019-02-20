@@ -7,28 +7,8 @@
 
     var current_scale = scales_arr.indexOf('<%= current_scale %>');
 
-    function scales_onclick() {
-        $$('#scale_list li').each(function(item){
-            item.onclick = function() {
-                if (!loaded_scales[item.id]) {
-                    show_ajax_loader(item.id + '_results');
-                    $j.post('<%= search_scales_path %>', { scale_type: item.id }).done(function () {
-                      loaded_scales[item.id] = true;
-                      $j('#scaled_items > div').hide();
-                      $j('#' + item.id + '_results').show();
-                    });
-                }
-                if ($('scale')){
-                    $('scale').value = this.id
-                }
-                return false;
-            };
-        });
-    }
-
-    if ($('scale')) {
-        $('scale').value = scales_arr[current_scale];
-
+    if ($j('#scale').length) {
+        $j('#scale').val(scales_arr[current_scale]);
     }
 </script>
 <%= javascript_include_tag "scales/scales" %>
@@ -69,5 +49,23 @@
 </div>
 
 <script type="text/javascript">
-    scales_onclick();
+    $j('#scale_list li').click(function() {
+        var item = this;
+        if (!loaded_scales[item.id]) {
+            show_ajax_loader(item.id + '_results');
+            $j.post('<%= search_scales_path %>', { scale_type: item.id }).done(function () {
+                loaded_scales[item.id] = true;
+                $j('#scaled_items > div').hide();
+                $j('#' + item.id + '_results').show();
+            });
+        } else {
+            $j('#scaled_items > div').hide();
+            $j('#' + item.id + '_results').show();
+        }
+        if ($j('#scale').length) {
+            $j('#scale').val(item.id);
+        }
+
+        return false;
+    });
 </script>
