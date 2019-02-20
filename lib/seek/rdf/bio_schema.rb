@@ -3,29 +3,6 @@ module Seek
     class BioSchema
       class UnsupportedTypeException < RuntimeError; end
 
-      class CSVRow
-        attr_reader :type, :method, :property
-        def initialize(row)
-          @type = row[0]
-          @method = row[1]
-          @property = row[2]
-        end
-
-        def complete?
-          type && method && property
-        end
-
-        def matches?(resource)
-          type == '*' || resource.class.name == type.strip
-        end
-
-        def header?
-          type.casecmp('class').zero?
-        end
-      end
-
-      MAPPINGS_FILE = File.join(File.dirname(__FILE__), 'bioschema_mappings.csv').freeze
-
       attr_accessor :resource
 
       SCHEMA_TYPES = {
@@ -59,23 +36,18 @@ module Seek
       private
 
       def attributes_from_csv_mappings
-        mappings_csv.each_with_object({}) do |row, hash|
-          row = CSVRow.new(row)
-          next if row.header?
-
-          if row.complete? && row.matches?(resource)
-            value = process_mapping(row.method.strip)
-            hash[row.property.strip] = value if value
+        result = {}
+        BioSchemaCSVReader.instance.each_row do |row|
+          next unless row.matches?(resource)
+          if value = row.invoke(resource)
+            result[row.property.strip] = value
           end
         end
+        result
       end
 
       def process_mapping(method)
         resource.send(method) if resource.respond_to?(method)
-      end
-
-      def mappings_csv
-        @@csv ||= CSV.read(MAPPINGS_FILE)
       end
     end
   end
