@@ -642,8 +642,16 @@ class AssaysControllerTest < ActionController::TestCase
       end
     end
 
-    assert_select "#assay_sop_ids option[selected][value='#{sop.id}']", text: sop.title
-    assert_select "#assay_model_ids option[selected][value='#{model.id}']", text: model.title
+    sop_json = JSON.parse(select_node_contents('#add_sops_form [data-role="seek-existing-associations"]'))
+    assert_equal 1, sop_json.length
+    assert_equal sop.title, sop_json[0]['title']
+    assert_equal sop.id, sop_json[0]['id']
+
+    model_json = JSON.parse(select_node_contents('#add_models_form [data-role="seek-existing-associations"]'))
+    assert_equal 1, model_json.length
+    assert_equal model.title, model_json[0]['title']
+    assert_equal model.id, model_json[0]['id']
+
     df_json = JSON.parse(select_node_contents('#data_file_to_list script'))
     assert_equal 1, df_json.length
     assert_equal datafile.title, df_json[0]['title']
@@ -722,9 +730,16 @@ class AssaysControllerTest < ActionController::TestCase
         end
       end
     end
+    sop_json = JSON.parse(select_node_contents('#add_sops_form [data-role="seek-existing-associations"]'))
+    assert_equal 1, sop_json.length
+    assert_equal sop.title, sop_json[0]['title']
+    assert_equal sop.id, sop_json[0]['id']
 
-    assert_select "#assay_sop_ids option[selected][value='#{sop.id}']", text: sop.title
-    assert_select "#assay_model_ids option[selected][value='#{model.id}']", text: model.title
+    model_json = JSON.parse(select_node_contents('#add_models_form [data-role="seek-existing-associations"]'))
+    assert_equal 1, model_json.length
+    assert_equal model.title, model_json[0]['title']
+    assert_equal model.id, model_json[0]['id']
+
     df_json = JSON.parse(select_node_contents('#data_file_to_list script'))
     assert_equal 1, df_json.length
     assert_equal datafile.title, df_json[0]['title']
