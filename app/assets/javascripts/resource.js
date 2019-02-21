@@ -1,16 +1,3 @@
-function showResourceVersion(form) {
-    var url=$('resource_versions').value;    
-    location.href=url;
-    form.submit;
-}
-
-
-function showCompareVersions(form) {
-    var url=$('compare_versions').value;
-    location.href=url;
-    form.submit;
-}
-
 // ***************  Resource Upload Validation  *****************
 
 function validateResourceFields(is_new_file, resource_name, is_managed) {
@@ -46,16 +33,6 @@ function validateResourceFields(is_new_file, resource_name, is_managed) {
         $(resource_name + '_submit_btn').form.submit();
     }
 }
-
-function checkProjectExists(prefix) {
-    el=prefix+"_project_ids";
-    if ($F(el).length < 1) {
-        alert("Please specify at least one project");
-        return (false);       
-    }
-    return(true);
-}
-
 
 function createOrUpdateResource(is_new_file, resource_name){
     // filename and title set - can submit
