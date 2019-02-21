@@ -28,6 +28,7 @@ module ResourceListItemHelper
   def list_item_title(resource, options = {})
 
     html = nil
+    result = nil
 
     cache_key = "rli_title_#{resource.cache_key}_#{resource.authorization_supported? && resource.can_manage?}"
     result = Rails.cache.fetch(cache_key) do
@@ -50,6 +51,11 @@ module ResourceListItemHelper
         end
       end
       html << '</div>'
+    end
+
+    # add galaxy_url to GET URL
+    if resource.class == DataFile && params[:GALAXY_URL]
+      result = result.gsub(/href="([^"]*)"/, 'href=\1?GALAXY_URL=' + params[:GALAXY_URL])
     end
 
     if [Person, Project].include?(resource.class)

@@ -54,11 +54,11 @@ class DataFilesController < ApplicationController
 		original_filename = df.content_blob.original_filename;
 
 		uri =  URI.parse(params[:GALAXY_URL])
-		uri.query = [uri.query,
-					'URL=' + root_url + params[:fetch_url],
-					"type=#{content_type}",
-					"name=#{original_filename}",
-				].compact.join('&')
+
+    uri.query = [uri.query,
+                 'URL=' + root_url[0..-2] + "/data_files/#{df.id}" + "/content_blobs/#{df.content_blob.id}" + ".csv",
+                 "name=#{original_filename}"
+    ].compact.join('&')
 
 		Rails.logger.debug "The uri it will be redirected to"
 		Rails.logger.debug uri.to_s
@@ -235,7 +235,6 @@ class DataFilesController < ApplicationController
         params.delete(param)
       end
     end
-    
     if @display_data_file.contains_extractable_spreadsheet?
       respond_to do |format|
         format.html

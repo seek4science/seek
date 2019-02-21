@@ -204,8 +204,7 @@ module AssetsHelper
   end
 
   def download_or_galaxy_button(asset, galaxy_url, download_path, link_url, _human_name = nil, opts = {})
-    # galaxy_button = icon_link_to('Galaxy', 'galaxy', download_path, opts)
-    galaxy_button = icon_link_to(galaxy_url, 'galaxy', download_path, opts)
+    galaxy_button = icon_link_to('Send to Galaxy', 'galaxy', download_path, opts)
     link_button_or_nil = nil
     return asset.content_blobs.detect { |blob| !blob.show_as_external_link? } ?  galaxy_button : link_button_or_nil if asset.respond_to?(:content_blobs)
     return asset.content_blob.show_as_external_link? ? link_button_or_nil : galaxy_button if asset.respond_to?(:content_blob)

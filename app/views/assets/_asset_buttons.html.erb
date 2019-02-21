@@ -23,6 +23,10 @@
 
 <% end %>
 
+<% if params[:GALAXY_URL] %>
+  <%= download_or_galaxy_button asset, params[:GALAXY_URL], galaxize_resource_path(asset, params[:code], params[:GALAXY_URL]), asset.single_content_blob.try(:url), nil, :class => 'btn btn-default' %>
+<% end %>
+
 <% if asset.is_downloadable? -%>
     <%# param code is used for temporary link -%>
     <%
