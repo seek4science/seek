@@ -15,7 +15,7 @@ module Seek
     module InstanceMethods
       def scales=(scales, source = User.current_user)
         # handles scales passed as Id's, invalid or blank ids, or a single item
-        scales = Array(scales).map { |scale| scale.is_a?(Scale) ? scale : Scale.find_by_id(scale) }.compact
+        scales = Array(scales).map { |scale| scale.is_a?(Scale) ? scale : Scale.find_by_id(scale) }.compact.uniq
 
         remove = self.scales - scales
         add = scales - self.scales
@@ -41,7 +41,10 @@ module Seek
       end
 
       def scale_extra_params=(params_array)
+        annotations_with_attribute('additional_scale_info').each(&:destroy)
+
         params_array.each do |json|
+          next if json.blank?
           data = JSON.parse(json)
           attach_additional_scale_info data['scale_id'], param: data['param'], unit: data['unit']
         end

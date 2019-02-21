@@ -85,6 +85,20 @@ module AssociationsHelper
     end.to_json
   end
 
+  def associations_json_from_scales(object, scales, extra_data = {})
+    scales.map do |scale|
+      scale_params = object.fetch_additional_scale_info(scale.id)
+      if scale_params.any?
+        scale_params.map do |info|
+          { id: scale.id, title: scale.title,
+            extraParams: info.merge(stringified: info.to_json.to_s) }.reverse_merge(extra_data)
+        end
+      else
+        { id: scale.id, title: scale.title }.reverse_merge(extra_data)
+      end
+    end.flatten.to_json
+  end
+
   def associations_json_from_params(model, association_params)
     association_params.map do |association|
       item = model.find(association[:id])
