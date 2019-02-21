@@ -64,4 +64,5 @@
 //= require asset_report
 //= require uri
 //= require chartjs
+//= require swappable-selects
 //= require_tree ./templates

@@ -3,13 +3,15 @@ module FancyMultiselectHelper
     # override default values with options passed in to the method
     options.reverse_merge! default_fancy_multi_select_options(association, object, options)
 
-    options[:selected] ||= object.send(association).map(&options[:value_method])
+    options[:selected] ||= object.send(association)
 
     # - SetDefaultsWithReflection
     set_defaults_with_reflection(association, object, options)
 
-    # Set onchange options for select
-    options[:possibilities_options][:onchange] = select_onchange_options(association, options)
+    unless options[:preview_disabled]
+      options[:possibilities_options]['data-preview-url'] =
+          url_for({ action: 'preview', controller: association, element: "#{association}_preview" })
+    end
 
     render(partial: 'assets/fancy_multiselect', locals: options) # - Base
   end
@@ -42,45 +44,25 @@ module FancyMultiselectHelper
     association_controller = "#{association.to_s.classify.pluralize}Controller".constantize rescue nil
 
     {
-      intro: "The following #{association_text.pluralize} are associated with this #{object_type_text.downcase}:",
-      default_choice_text: "Select #{association_text} ...",
-      name: "#{object.class.name.underscore}[#{association.to_s.singularize}_ids]",
-      possibilities: nil,
-      unscoped_possibilities: [],
-      group_options_by: nil,
-      value_method: :id,
-      text_method: :title,
-      with_new_link: false,
-      object_type_text: object_type_text,
-      association_text: association_text,
-      association: association,
-      other_projects_checkbox: false,
-      object_type: object.class.name,
-      possibilities_options: {},
-      hidden: hidden,
-      required: false,
-      title: nil,
-      preview_disabled: association_controller.nil? || !association_controller.method_defined?(:preview),
-      sort_by: :title
+        intro: "The following #{association_text.pluralize} are associated with this #{object_type_text.downcase}:",
+        name: "#{object.class.name.underscore}[#{association.to_s.singularize}_ids]",
+        possibilities: nil,
+        unscoped_possibilities: [],
+        group_options_by: nil,
+        value_method: :id,
+        text_method: :title,
+        with_new_link: false,
+        object_type_text: object_type_text,
+        association_text: association_text,
+        association: association,
+        other_projects_checkbox: false,
+        object_type: object.class.name,
+        possibilities_options: {},
+        hidden: hidden,
+        required: false,
+        title: nil,
+        preview_disabled: association_controller.nil? || !association_controller.method_defined?(:preview),
+        sort_by: :title
     }
-  end
-
-  def select_onchange_options(association, options)
-    # - HideButtonWhenDefaultIsSelected
-    onchange = options[:possibilities_options][:onchange] || ''
-
-    collection_id = options[:name].to_s.delete(']').gsub(/[^-a-zA-Z0-9:.]/, '_')
-    onchange += "addSelectedToFancy('#{collection_id}', $F('possible_#{collection_id}'), this"
-    onchange += (',' + options[:add_callback]) if options[:add_callback]
-    onchange += ');'
-
-    # - AjaxPreview
-    unless options[:preview_disabled]
-      # adds options to the dropdown used to select items to add to the multiselect.
-      onchange += "show_ajax_loader('#{association}_preview');"\
-                  "$j.get('#{url_for({ action: 'preview', controller: "#{association}", element: "#{association}_preview" })}', { id: this.value });"
-    end
-
-    onchange.html_safe
   end
 end
