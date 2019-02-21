@@ -258,7 +258,7 @@ function activate_sheet_from_resizable(div_obj) {
 function max_container_width() {
     var max_width = $j(".corner_heading").width();
     $j(".col_heading").each(function() {
-        max_width += parseInt($j(this)[0].style.width); //$(this).offsetWidth does not worked when the element is in a hidden tab
+        max_width += parseInt($j(this)[0].style.width);
     });
     return max_width;
 }
