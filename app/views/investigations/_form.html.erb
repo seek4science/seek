@@ -39,7 +39,6 @@
                  :class => 'btn btn-primary' -%>
 <% else %>
     <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "investigation_submit_btn",
-                 :onclick => "javascript: $('investigation_submit_btn').form.submit();return(false);",
                  :class => 'btn btn-primary' -%>
 <% end %>
  or <%= cancel_button(@investigation.id ? investigation_path(@investigation.id) : investigations_path) -%>

@@ -48,10 +48,6 @@
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
-<script type="text/javascript">
-    var CREATE_INVESTIGATION_LINK = "<%= create_investigation_url %>";
-</script>
-
 <%
    button_text=action==:edit ? "Update" : "Create"
    disabled_text=action==:edit ? "Updating..." : "Creating..."
@@ -63,7 +59,6 @@
                  :class => 'btn btn-primary'-%>
 <% else %>
     <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "study_submit_btn",
-                 :onclick => "javascript: $('study_submit_btn').form.submit();return(false);",
                  :class => 'btn btn-primary'-%>
 <% end %>
  or <%= cancel_button(@study.id ? study_path(@study.id) : studies_path) -%>

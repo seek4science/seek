@@ -111,7 +111,7 @@
                  :onclick => "javascript: previewPermissions();return(false);", :class => 'btn btn-primary' -%>
 <% else %>
     <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "assay_submit_btn",
-                 :onclick => "javascript: $('assay_submit_btn').form.submit();return(false);", :class => 'btn btn-primary' -%>
+                 :class => 'btn btn-primary' -%>
 <% end %>
  or <%= cancel_button(@assay.id ? assay_path(@assay.id) : assays_path) -%>
 
