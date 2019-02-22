@@ -19,26 +19,6 @@ function displayTabs() {
     }
 }
 
-
-function trimSpaces(str) {
-    while ((str.length > 0) && (str.charAt(0) == ' '))
-        str = str.substring(1);
-    while ((str.length > 0) && (str.charAt(str.length - 1) == ' '))
-        str = str.substring(0, str.length - 1);
-    return str;
-}
-
-function addOrganismListTag(tag_id) {
-
-    organism_autocompleter = autocompleters['organism_autocompleter']
-    var index = organism_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
-    var item = new Element('a', {
-        'value': index
-    });
-    organism_autocompleter.addContactToList(item);
-}
-
-
 function checkNotInList(id, list) {
     rtn = true;
 
@@ -52,50 +32,7 @@ function checkNotInList(id, list) {
 }
 
 function clearList(name) {
-    select = $(name)
-    while (select.length > 0) {
-        select.remove(select.options[0])
-    }
-}
-
-
-
-  
-  
-/*==================================================
-  Cookie functions - courtesy of BioCatalogue
-  ==================================================*/
-function setCookie(name, value, expires, path, domain, secure) {
-    document.cookie= name + "=" + escape(value) +
-        ((expires) ? "; expires=" + expires.toGMTString() : "") +
-        ((path) ? "; path=" + path : "") +
-        ((domain) ? "; domain=" + domain : "") +
-        ((secure) ? "; secure" : "");
-}
-
-function getCookie(name) {
-    var dc = document.cookie;
-    var prefix = name + "=";
-    var begin = dc.indexOf("; " + prefix);
-    if (begin == -1) {
-        begin = dc.indexOf(prefix);
-        if (begin != 0) return null;
-    } else {
-        begin += 2;
-    }
-    var end = document.cookie.indexOf(";", begin);
-    if (end == -1) {
-        end = dc.length;
-    }
-    return unescape(dc.substring(begin + prefix.length, end));
-}
-function deleteCookie(name, path, domain) {
-    if (getCookie(name)) {
-        document.cookie = name + "=" +
-            ((path) ? "; path=" + path : "") +
-            ((domain) ? "; domain=" + domain : "") +
-            "; expires=Thu, 01-Jan-70 00:00:01 GMT";
-    }
+    $j('#' + name + ' option').remove()
 }
 
 var fullResourceListItemExpandableText = [];
@@ -214,10 +151,10 @@ function guid() {
 }
 
 function show_ajax_loader(element) {
-  $(element).innerHTML = '<%= image_tag("ajax-loader.gif").html_safe %>';
+  $j('#' + element)[0].innerHTML = '<%= image_tag("ajax-loader.gif").html_safe %>';
 }
 function show_large_ajax_loader(element) {
-  $(element).innerHTML = '<%= image_tag("ajax-loader-large.gif").html_safe %>';
+  $j('#' + element)[0].innerHTML = '<%= image_tag("ajax-loader-large.gif").html_safe %>';
 }
 
 
@@ -275,9 +212,44 @@ function digValue(object, path) {
 }( jQuery ));
 
 $j(document).ready(function () {
-  $j('.collapse').on('show.bs.collapse', function () {
-    $j(this).parent().find('.panel-heading .caret').removeClass('caret').addClass('caret-up');
-  }).on('hide.bs.collapse', function () {
-    $j(this).parent().find('.panel-heading .caret-up').removeClass('caret-up').addClass('caret');
-  });
+    $j('.collapse').on('show.bs.collapse', function () {
+        $j(this).parent().find('.panel-heading .caret').removeClass('caret').addClass('caret-up');
+    }).on('hide.bs.collapse', function () {
+        $j(this).parent().find('.panel-heading .caret-up').removeClass('caret-up').addClass('caret');
+    });
+
+    // Similar to bootstrap's 'collapse' but doesn't require IDs, will collapse the sibling div.panel-collapse.
+    $j('body').on('click.collapse-next.data-api', '[data-toggle=collapse-next]', function (e) {
+        $j(this).siblings('.panel-collapse').collapse('toggle');
+    });
+
+    // Swap select contents when a checkbox is checked
+    $j('[data-role="seek-swappable-select-toggle"]').change(function () {
+        var group = $j(this).parents('[data-role="seek-swappable-select-group"]');
+        var select = $j('[data-role="seek-swappable-select"]', group);
+        var alt = $j('[data-role="seek-swappable-select-alt"]', group);
+
+        var temp = select.html();
+        select.html(alt.html());
+        alt.html(temp);
+    });
+
+    // Show a summary with link to expand large sections of text
+    $j('[data-role="seek-expandable-link"]').click(function () {
+        var container = $j(this).parents('[data-role="seek-expandable"]');
+        var ellipsis = $j('[data-role="seek-expandable-ellipsis"]', container);
+        var remainder = $j('[data-role="seek-expandable-hidden"]', container);
+
+        if ($j(this)[0].innerHTML === '(Expand)') {
+            ellipsis.hide();
+            remainder.show();
+            $j(this).html('(Collapse)');
+        } else {
+            ellipsis.show();
+            remainder.hide();
+            $j(this).html('(Expand)');
+        }
+
+        return false;
+    });
 });

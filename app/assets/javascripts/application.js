@@ -8,7 +8,6 @@
 //= require jquery-ui
 //= require bootstrap
 //= require vue/vue
-//= require collapsible_panels
 //= require builder
 //= require application_shared
 //= require tagging
@@ -64,5 +63,4 @@
 //= require asset_report
 //= require uri
 //= require chartjs
-//= require swappable-selects
 //= require_tree ./templates

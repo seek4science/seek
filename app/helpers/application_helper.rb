@@ -306,7 +306,7 @@ module ApplicationHelper
   end
 
   # Finn's truncate method. Doesn't split up words, tries to get as close to length as possible
-  def truncate_without_splitting_words(text, length = 50)
+  def truncate_without_splitting_words(text, length = 50, ellipsis = true)
     truncated_result = ''
     remaining_length = length
     stop = false
@@ -331,7 +331,7 @@ module ApplicationHelper
       truncated_result += "\n"
     end
     # Need some kind of whitespace before elipses or auto-link breaks
-    html = truncated_result.strip + (truncated ? "\n..." : '')
+    html = truncated_result.strip + ((truncated && ellipsis) ? "\n..." : '')
     html.html_safe
   end
 
