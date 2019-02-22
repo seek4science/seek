@@ -33,7 +33,7 @@
     </div>
   <script>
     $j('.bioportal-pager-link').bind('ajax:beforeSend', function () {
-        show_ajax_loader('search_results');
+        $j('#search_results').spinner('add');
     }).bind('ajax:complete', function (e, xhr) {
         $j('#search_results').html(xhr.responseText);
     })

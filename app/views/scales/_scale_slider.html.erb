@@ -52,7 +52,7 @@
     $j('#scale_list li').click(function() {
         var item = this;
         if (!loaded_scales[item.id]) {
-            show_ajax_loader(item.id + '_results');
+            $j('#' + item.id + '_results').spinner('add');
             $j.post('<%= search_scales_path %>', { scale_type: item.id }).done(function () {
                 loaded_scales[item.id] = true;
                 $j('#scaled_items > div').hide();

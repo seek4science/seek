@@ -88,7 +88,7 @@
 
     $j('#possible_organisms').change(function () {
         if (this.value != '0') {
-            show_ajax_loader('existing_strains_for_assay_organism');
+            $j('#existing_strains_for_assay_organism').spinner('add');
             $j.get('<%= existing_strains_for_assay_organism_strains_path -%>', {organism_id: this.value}).done(function (html) {
                 $j('#existing_strains_for_assay_organism').html(html);
             });

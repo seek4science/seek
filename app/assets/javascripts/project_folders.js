@@ -1,5 +1,5 @@
 var tree;
-var elementFolderIds = new Array();
+var elementFolderIds = [];
 var displayed_folder_id = 0;
 
 function setupFoldersTree(dataJson, container_id,drop_accept_class) {
@@ -35,8 +35,7 @@ function remove_item_from_assay(item_element) {
     var origin_folder_id=item_element.data('origin-folder-id');
 
     var path = "/projects/" + project_id + "/folders/" + origin_folder_id + "/remove_asset";
-    path += "?asset_id=" + asset_id + "&asset_type=" + asset_class+"&asset_element_id="+asset_element_id;;
-
+    path += "?asset_id=" + asset_id + "&asset_type=" + asset_class + "&asset_element_id=" + asset_element_id;
     new Ajax.Request(path, {
         asynchronous:true,
         evalScripts:true
@@ -124,7 +123,7 @@ function element_id_for_folder_id(folder_id) {
 }
 
 function folder_clicked(folder_id, project_id) {
-    show_large_ajax_loader('folder_contents');
+    $j('#folder_contents').spinner('add');
     var path = "/projects/" + project_id + "/folders/" + folder_id + "/display_contents";
     displayed_folder_id = folder_id;
     new Ajax.Request(path, {asynchronous:true, evalScripts:true});

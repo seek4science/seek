@@ -6,7 +6,7 @@
     </p>
     <%= form_tag_with_callbacks(search_ajax_organisms_path,
                                 { id: "search_organism",
-                                  before: "show_ajax_loader('search_results');",
+                                  before: "$j('#search_results').spinner('add');",
                                   update: { success: 'search_results', error: 'search_results' },
                                   remote: true }) do -%>
 

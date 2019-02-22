@@ -112,17 +112,8 @@ function guid() {
     });
 }
 
-function show_ajax_loader(element) {
-  $j('#' + element)[0].innerHTML = '<%= image_tag("ajax-loader.gif").html_safe %>';
-}
-
-function show_large_ajax_loader(element) {
-  $j('#' + element)[0].innerHTML = '<%= image_tag("ajax-loader-large.gif").html_safe %>';
-}
-
 // Takes an object of arbitrary depth, and a period separated "path" and returns the value.
 // e.g. digValue({a: {b: {c: 1}}}, 'a.b.c') => 1
-
 function digValue(object, path) {
   var keys = path.split('.');
 
@@ -138,36 +129,46 @@ function digValue(object, path) {
   return value;
 }
 
-(function ($) {
-  $.fn.spinner = function (action, opts) {
+/* JQuery functions */
+(function ($j) {
+    // Adds an AJAX loader icon to the element.
+    // Example usage:
+    // $j('#some_container').spinner('add');
+    // $j('#some_container').spinner('remove');
+    // $j('#some_container').spinner('add', { size: 'large' });
+    // $j('#some_container').show().html('').spinner('add');
+  $j.fn.spinner = function (action, opts) {
     var options = opts || {};
-    if(action === 'add') {
+    if (action === 'add') {
       return this.each(function () {
-        if(!$(this).data('spinnerElement')) {
+        if (!$j(this).data('spinnerElement') || !$j('.seek-spinner', $j(this)).length) {
           var spinner;
           if (options.size == 'large') {
-            spinner = $('<%= image_tag("ajax-loader-large.gif").html_safe %>');
+            spinner = $j('<%= image_tag("ajax-loader-large.gif", class: 'seek-spinner').html_safe %>');
           } else {
-            spinner = $('<%= image_tag("ajax-loader.gif").html_safe %>');
+            spinner = $j('<%= image_tag("ajax-loader.gif", class: 'seek-spinner').html_safe %>');
           }
-          $(this).append(spinner);
-          $(this).data('spinnerElement', spinner);
+          $j(this).append(spinner);
+          $j(this).data('spinnerElement', spinner);
         }
       });
-    } else if(action === 'remove') {
+    } else if (action === 'remove') {
       return this.each(function () {
-        if($(this).data('spinnerElement')) {
-          $(this).data('spinnerElement').remove();
-          $(this).data('spinnerElement', null);
+        if ($j(this).data('spinnerElement')) {
+          $j(this).data('spinnerElement').remove();
+          $j(this).data('spinnerElement', null);
         }
       });
     }
   };
 
   // Highlights the selected elements for 1 second. Similar to `Effect.highlight`.
-  $.fn.highlight = function (colour) {
+    // Example usage:
+    // $j('#an_element').highlight();
+    // $j('#new_item').appendTo($j('#container')).highlight('green');
+  $j.fn.highlight = function (colour) {
     var cssClass = colour ? ('js-highlight-' + colour) : 'js-highlight'
-    var elements = $(this);
+    var elements = $j(this);
     elements.addClass(cssClass);
     setTimeout(function () { elements.removeClass(cssClass) }, 1100);
   };

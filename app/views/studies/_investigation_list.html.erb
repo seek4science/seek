@@ -17,9 +17,10 @@
 
 <script>
   $j('#study_investigation_id').change(function () {
-      show_ajax_loader('person_responsible_collection');
+      var people = $j('#person_responsible_collection');
+      people.html('').spinner('add');
       $j.post(
           '<%= investigation_selected_ajax_studies_path -%>',
-          { investigation_id: this.value }).done(function (html) { $j('#person_responsible_collection').html(html) });
+          { investigation_id: this.value }).done(function (html) { people.html(html); });
   });
 </script>
