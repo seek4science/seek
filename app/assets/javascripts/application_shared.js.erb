@@ -1,14 +1,12 @@
 // Place your application-specific JavaScript functions and classes here
 // This file is automatically included by javascript_include_tag :defaults
 
-
 var tabber_ids = [];
 var tabberOptions = {'onLoad':function() {
     displayTabs();
 }};
 
 function displayTabs() {
-
     for (var i = 0; i < tabber_ids.length; i++) {
         var tabber_id = tabber_ids[i];
         var spinner = $j('#' + tabber_id + '_spinner');
@@ -32,28 +30,12 @@ function checkNotInList(id, list) {
 }
 
 function clearList(name) {
-    $j('#' + name + ' option').remove()
-}
-
-var fullResourceListItemExpandableText = [];
-var truncResourceListItemExpandableText = [];
-
-function expandResourceListItemExpandableText(objectId){
-    link = $('expandableLink'+objectId)
-    text = $('expandableText'+objectId)
-    if (link.innerHTML == '(Expand)') { //EXPAND
-      link.innerHTML = '(Collapse)';
-      text.innerHTML = fullResourceListItemExpandableText[objectId];
-    }
-    else { //COLLAPSE
-      link.innerHTML = '(Expand)';
-      text.innerHTML = truncResourceListItemExpandableText[objectId];
-    }
+    $j('#' + name + ' option').remove();
 }
 
 //http://snipplr.com/view.php?codeview&id=1384
 function insertAtCursor(myField, myValue) {
-  myField = $(myField);
+  myField = $j('#' + myField)[0];
 
   textAreaScrollPosition = myField.scrollTop;
 
@@ -90,8 +72,7 @@ function onlyNumbers(evt)
  }
 
 //only allows float numbers to by typed
-function onlyFloatNumbers(evt)
-{
+function onlyFloatNumbers(evt) {
     var charCode = (evt.which) ? evt.which : event.keyCode
     if (charCode > 31 && (charCode < 48 || charCode > 57))
         //this is dot charCode
@@ -101,25 +82,6 @@ function onlyFloatNumbers(evt)
             return false;
 
     return true;
-}
-//perform the click link action
-function clickLink(link) {
-    var cancelled = false;
-    if (document.createEvent) {
-        var event = document.createEvent("MouseEvents");
-        event.initMouseEvent("click", true, true, window,
-            0, 0, 0, 0, 0,
-            false, false, false, false,
-            0, null);
-        cancelled = !link.dispatchEvent(event);
-    }
-    else if (link.fireEvent) {
-        cancelled = !link.fireEvent("onclick");
-    }
-
-    if (!cancelled) {
-        window.location = link.href;
-    }
 }
 
 function decodeHTML(str) {
@@ -153,10 +115,10 @@ function guid() {
 function show_ajax_loader(element) {
   $j('#' + element)[0].innerHTML = '<%= image_tag("ajax-loader.gif").html_safe %>';
 }
+
 function show_large_ajax_loader(element) {
   $j('#' + element)[0].innerHTML = '<%= image_tag("ajax-loader-large.gif").html_safe %>';
 }
-
 
 // Takes an object of arbitrary depth, and a period separated "path" and returns the value.
 // e.g. digValue({a: {b: {c: 1}}}, 'a.b.c') => 1

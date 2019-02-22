@@ -392,8 +392,7 @@ function createAnnotationStub(ann)
 
 function goToSheetPage(annotation){
     var paginateForSheet = $j('#paginate_sheet_' + (annotation.sheetNumber+1))[0];
-    if (paginateForSheet != null)
-    {
+    if (paginateForSheet != null) {
         //calculate the page
         var page = Math.floor(annotation.startRow/perPage) + 1;
         var links = paginateForSheet.getElementsByTagName('a');
@@ -405,7 +404,7 @@ function goToSheetPage(annotation){
         }
         if (link != null){
             link.href = link.href.concat('&annotation_id=' + annotation.id);
-            clickLink(link);
+            window.location = link.href;
         }else{
             jumpToAnnotation(annotation.id, annotation.sheetNumber+1, annotation.cellRange);
             $j('#annotation_overview').hide();
