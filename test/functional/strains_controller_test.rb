@@ -7,6 +7,7 @@ class StrainsControllerTest < ActionController::TestCase
   include RestTestCases
   include RdfTestCases
 #  include GeneralAuthorizationTestCases
+  include HtmlHelper
 
   def setup
     login_as :owner_of_fully_public_policy
@@ -283,9 +284,14 @@ class StrainsControllerTest < ActionController::TestCase
     genotype = strain.genotypes.first
     phenotype = strain.phenotypes.first
 
-    assert_select 'td input[value=?]', genotype.gene.title
-    assert_select 'td input[value=?]', genotype.modification.title
-    assert_select 'td input[value=?]', phenotype.description
+    genotypes = JSON.parse(select_node_contents('#existing-genotypes'))
+    phenotypes = JSON.parse(select_node_contents('#existing-phenotypes'))
+
+    assert_equal 1, genotypes.length
+    assert_equal 1, phenotypes.length
+    assert genotypes.any? { |g| g['item']['gene'] == genotype.gene.title }
+    assert genotypes.any? { |g| g['item']['modification'] == genotype.modification.title }
+    assert phenotypes.any? { |p| p['item']['description'] == phenotype.description }
   end
 
   test 'authorization for based-on strain' do
