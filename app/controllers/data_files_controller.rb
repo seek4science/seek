@@ -55,10 +55,18 @@ class DataFilesController < ApplicationController
 
 		uri =  URI.parse(params[:GALAXY_URL])
 
+    if ['application/vnd.ms-excel'].include? content_type
     uri.query = [uri.query,
                  'URL=' + root_url[0..-2] + "/data_files/#{df.id}" + "/content_blobs/#{df.content_blob.id}" + ".csv",
                  "name=#{original_filename}"
     ].compact.join('&')
+    else
+      uri.query = [uri.query,
+                   'URL=' + root_url + params[:fetch_url],
+                   "type=#{content_type}",
+                   "name=#{original_filename}",
+      ].compact.join('&')
+    end
 
 		Rails.logger.debug "The uri it will be redirected to"
 		Rails.logger.debug uri.to_s
