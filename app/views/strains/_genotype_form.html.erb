@@ -1,36 +1,29 @@
 <% parent_name ||= item.class.name.underscore
-   action ||=nil
+   existing = item.genotypes.each_with_index.map { |g, i| { objectName: parent_name, id: g.id, index: i,
+                                                            item: { gene: g.gene.try(:title),
+                                                                    modification: g.modification.try(:title) } } }
 %>
 <div class="col-sm-6">
   <div class="form-group">
     <label>Genotypes</label>
-    <%= button_link_to 'Add gene and mutation', 'add', "javascript: addGenotypeRow('genotype_table','#{parent_name}','#{action}')", :class => 'btn-xs' %>
+    <%= button_link_to 'Add gene and mutation', 'add', '#', id: 'add-genotype-btn', class: 'btn-xs' %>
 
-    <table id="genotype_table" class="table">
-      <tr>
-        <th>Gene affected</th>
-        <th>Kind of mutation</th>
-      </tr>
-      <% item.genotypes.each_with_index do |genotype, index| %>
-          <%= f.fields_for :genotypes, genotype do |genotype_form| %>
-              <tr id='genotype_row_<%= index %>'>
-                <td>
-                  <%= genotype_form.fields_for :gene, genotype.gene do |gene_form| %>
-                      <%= gene_form.text_field :title, :size => 10 %>
-
-                  <% end %>
-                </td>
-                <td>
-                  <%= genotype_form.fields_for :modification, genotype.modification do |modification_form| %>
-                      <%= modification_form.text_field :title, :size => 10 %>
-                  <% end %>
-                </td>
-                <td> <%= link_to image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_genotype_#{index}"), '#', onclick: "fadeGenotypeRow('#{index}','#{action}'); return false" -%>
-                </td>
-              </tr>
-              <%= genotype_form.hidden_field :_destroy,{:id => "genotype_#{index}",:value=>0} %>
-          <% end %>
-      <% end %>
+    <table id="genotype-table" class="table" data-object-name="<%= parent_name -%>">
+      <thead>
+        <tr>
+          <th>Gene affected</th>
+          <th>Kind of mutation</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
     </table>
   </div>
 </div>
+
+<%= content_tag(:script, existing.to_json.html_safe, type: 'application/json', id: 'existing-genotypes') %>
+<script>
+    $j(document).ready(function () {
+        var genotypes = JSON.parse(document.getElementById('existing-genotypes').innerText);
+        GenotypeOrPhenotypeTable($j('#genotype-table'), $j('#add-genotype-btn'), genotypes, 'strains/genotype_row');
+    });
+</script>

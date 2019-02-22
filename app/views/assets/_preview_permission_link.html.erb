@@ -29,6 +29,7 @@
 
             $j('#permissions_spinner').show();
 
+            var creators = creators || [];
             var creator_ids = creators.map(function (x) {
                 return x.id
             }).join(',');

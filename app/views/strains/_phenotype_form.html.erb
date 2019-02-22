@@ -1,23 +1,22 @@
 <% parent_name ||= item.class.name.underscore
-   action ||=nil
+   existing = item.phenotypes.each_with_index.map { |p, i| { objectName: parent_name, id: p.id, index: i,
+                                                             item: { description: p.description } } }
 %>
 <div class="col-sm-6">
   <div class="form-group">
     <label>Phenotypes</label>
-    <%= button_link_to 'Add phenotype', 'add', "javascript: addPhenotypeRow('phenotype_table','#{parent_name}','#{action}')", :class => 'btn-xs' %>
-    <table id="phenotype_table" class="table">
-      <% item.phenotypes.each_with_index do |phenotype,index| %>
-          <%= f.fields_for :phenotypes, phenotype do |phenotype_form| %>
-              <tr id='phenotype_row_<%= index %>'>
-                <td>
-                  <%= phenotype_form.text_field :description, :size=>25 %>
-                </td>
-                <td> <%= link_to image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_phenotype_#{index}"), '#', onclick: "fadePhenotypeRow('#{index}','#{action}'); return false" -%>
-                </td>
-              </tr>
-              <%= phenotype_form.hidden_field :_destroy,{:id => "phenotype_#{index}",:value=>0} %>
-          <% end %>
-      <% end %>
+    <%= button_link_to 'Add phenotype', 'add', '#', id: 'add-phenotype-btn', class: 'btn-xs' %>
+
+    <table id="phenotype-table" class="table" data-object-name="<%= parent_name -%>">
+      <tbody></tbody>
     </table>
   </div>
 </div>
+
+<%= content_tag(:script, existing.to_json.html_safe, type: 'application/json', id: 'existing-phenotypes') %>
+<script>
+    $j(document).ready(function () {
+        var phenotypes = JSON.parse(document.getElementById('existing-phenotypes').innerText);
+        GenotypeOrPhenotypeTable($j('#phenotype-table'), $j('#add-phenotype-btn'), phenotypes, 'strains/phenotype_row');
+    });
+</script>
