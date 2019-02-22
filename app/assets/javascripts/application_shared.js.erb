@@ -175,6 +175,20 @@ function digValue(object, path) {
             elements.removeClass(cssClass)
         }, 1100);
     };
+
+    $j.fn.easyTabs = function () {
+        return this.each(function(i, container) {
+            $j(this).find('> ul.easytabs-nav > li').click(function () {
+                $j(container).find('> .easytabs-pane').removeClass('active');
+                $j(container).find('> .easytabs-pane:eq(' +  $j(this).index() + ')').addClass('active');
+                $j(this).siblings().removeClass('active');
+                $j(this).addClass('active');
+            });
+            // Show first tab by default
+            $j(this).find('> ul.easytabs-nav > li:eq(0)').addClass('active');
+            $j(this).find('> .easytabs-pane:eq(0)').addClass('active');
+        });
+    };
 }(jQuery));
 
 $j(document).ready(function () {
@@ -217,5 +231,29 @@ $j(document).ready(function () {
         }
 
         return false;
+    });
+
+    // Handle adding an item from a fancy_multiselect dropdown.
+    $j('[data-role="seek-fancy-multiselect"] select[data-associations-list-id]').change(function () {
+        var listElement = $j('#' + $j(this).data('associationsListId'));
+        var listObject = listElement.data('associationList');
+        var selectedOption = $j('option:selected', $j(this));
+        if (!selectedOption.val()) {
+            return;
+        }
+        var item = { id: parseInt(selectedOption.val()),
+            title: selectedOption.text() };
+
+        // Load preview
+        if ($j(this).data('previewUrl')) {
+            $j.get($j(this).data('previewUrl'), { id: item.id });
+        }
+
+        if (!listObject.exists(function (i) { return i.id === item.id })) {
+            listObject.add(item);
+        } else {
+            // Highlight existing item if its already there
+            $j('[value=' + item.id + ']', listElement).parent().highlight('blue');
+        }
     });
 });

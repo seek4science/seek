@@ -10,9 +10,7 @@
 //= require vue/vue
 //= require builder
 //= require application_shared
-//= require tagging
 //= require dropMenu
-//= require dynamic_menu
 //= require assays
 //= require models
 //= require sharing
@@ -20,11 +18,9 @@
 //= require creators
 //= require resource
 //= require studied_factor
-//= require fancy_multiselect
 //= require parseuri
 //= require tabber-minimized
 //= require detect_browser
-//= require easytabs
 //= require favourites
 // This is not a mistake:
 //= require typeahead.js.js
