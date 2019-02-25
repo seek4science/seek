@@ -11,7 +11,6 @@
 //= require builder
 //= require application_shared
 //= require dropMenu
-//= require assays
 //= require models
 //= require sharing
 //= require attribution

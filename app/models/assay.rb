@@ -175,22 +175,21 @@ class Assay < ApplicationRecord
   # organism may be either an ID or Organism instance
   # strain_id should be the id of the strain
   # culture_growth should be the culture growth instance
-  def associate_organism(organism, strain_id = nil, culture_growth_type = nil, tissue_and_cell_type_id = '0', tissue_and_cell_type_title = nil)
+  def associate_organism(organism, strain_id = nil, culture_growth_type = nil, tissue_and_cell_type_id = nil, tissue_and_cell_type_title = nil)
     organism = Organism.find(organism) if organism.is_a?(Numeric) || organism.is_a?(String)
     strain = organism.strains.find_by_id(strain_id)
-    assay_organism = AssayOrganism.new(assay: self, organism: organism, culture_growth_type: culture_growth_type, strain: strain)
-
     tissue_and_cell_type = nil
     unless tissue_and_cell_type_title.blank?
-      if tissue_and_cell_type_id == '0' && tissue_and_cell_type_title.present?
+      if tissue_and_cell_type_id.blank? && tissue_and_cell_type_title.present?
         tissue_and_cell_type = TissueAndCellType.where(title: tissue_and_cell_type_title).first_or_create!
       else
         tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
       end
     end
-    assay_organism.tissue_and_cell_type = tissue_and_cell_type
 
-    unless AssayOrganism.exists_for?(strain, organism, self, culture_growth_type)
+    unless AssayOrganism.exists_for?(strain, organism, self, culture_growth_type, tissue_and_cell_type)
+      assay_organism = AssayOrganism.new(assay: self, organism: organism, culture_growth_type: culture_growth_type,
+                                         strain: strain, tissue_and_cell_type: tissue_and_cell_type)
       assay_organisms << assay_organism
     end
   end

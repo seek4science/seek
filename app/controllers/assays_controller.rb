@@ -155,6 +155,7 @@ class AssaysController < ApplicationController
     organisms             = params[:assay_organism_ids] || params[:assay][:organism_ids] || []
     assay.assay_organisms = []
     Array(organisms).each do |text|
+      # TODO: Refactor this to use proper nested params:
       o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")
       culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
       assay.associate_organism(o_id, strain_id, culture_growth,t_id,t_title)
