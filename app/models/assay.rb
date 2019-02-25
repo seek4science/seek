@@ -180,22 +180,19 @@ class Assay < ApplicationRecord
     strain = organism.strains.find_by_id(strain_id)
     assay_organism = AssayOrganism.new(assay: self, organism: organism, culture_growth_type: culture_growth_type, strain: strain)
 
-    unless AssayOrganism.exists_for?(strain, organism, self, culture_growth_type)
-      assay_organisms << assay_organism
-    end
-
     tissue_and_cell_type = nil
     unless tissue_and_cell_type_title.blank?
-      if tissue_and_cell_type_id == '0'
-        found = TissueAndCellType.where(title: tissue_and_cell_type_title).first
-        unless found
-          tissue_and_cell_type = TissueAndCellType.create!(title: tissue_and_cell_type_title) if !tissue_and_cell_type_title.nil? && tissue_and_cell_type_title != ''
-        end
+      if tissue_and_cell_type_id == '0' && tissue_and_cell_type_title.present?
+        tissue_and_cell_type = TissueAndCellType.where(title: tissue_and_cell_type_title).first_or_create!
       else
         tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
       end
     end
     assay_organism.tissue_and_cell_type = tissue_and_cell_type
+
+    unless AssayOrganism.exists_for?(strain, organism, self, culture_growth_type)
+      assay_organisms << assay_organism
+    end
   end
 
   # overides that from Seek::RDF::RdfGeneration, as Assay entity depends upon the AssayClass (modelling, or experimental) of the Assay
