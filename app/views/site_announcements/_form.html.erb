@@ -25,7 +25,7 @@
   <div id="announcement_expires" style="display: none;">
     <%= f.label :expires,"Expires at" -%>
     <br/>
-    <%= datetime_select "site_announcement","expires_at" -%>
+    <%= f.text_field :expires_at, data: { calendar: 'mixed' }, class: "calendar form-control", placeholder: Time.now.utc -%>
     <br/>
     <span class="headline_announcement_date">( Current server time is <%= Time.now.utc -%> )</span>
   </div>
@@ -40,11 +40,11 @@
 
 <script type="text/javascript">
     function toggle_expires_at(){
-        if ($("site_announcement_is_headline").checked) {
-            Effect.Appear("announcement_expires");
+        if ($j("#site_announcement_is_headline")[0].checked) {
+            $j("#announcement_expires").fadeIn();
         }
         else {
-            Effect.Fade("announcement_expires")
+            $j("#announcement_expires").fadeOut();
         }
     }
 

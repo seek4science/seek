@@ -119,8 +119,6 @@ class SiteAnnouncementsController < ApplicationController
   private
 
   def site_announcement_params
-    params.require(:site_announcement).permit(:title, :body, :show_in_feed, :is_headline,
-                                              'expires_at(1i)', 'expires_at(2i)', 'expires_at(3i)',
-                                              'expires_at(4i)', 'expires_at(5i)', :email_notification)
+    params.require(:site_announcement).permit(:title, :body, :show_in_feed, :is_headline, :expires_at, :email_notification)
   end
 end
