@@ -92,6 +92,12 @@ Associations.List.prototype.exists = function (itemOrFunction) {
     }
 };
 
+Associations.List.prototype.find = function (func) {
+    return this.items.find(function (item) {
+        return func(item.data);
+    })
+};
+
 Associations.List.prototype.removeAll = function () {
     this.items = [];
     this.listElement.html('');

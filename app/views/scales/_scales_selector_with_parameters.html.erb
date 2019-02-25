@@ -60,14 +60,14 @@
             item.extraParams.stringified = JSON.stringify(item.extraParams);
         }
 
-        var exists = list.exists(function (s) { return s.id === item.id && (!param || (s.extraParams.param === param)) });
-        if (!exists) {
+        var existsing = list.find(function (s) { return s.id === item.id && (!param || (s.extraParams.param === param)) });
+        if (!existsing) {
             list.add(item);
             $j('#possible_scale_ids').val('');
             $j('#choose_parameter_for_scale_id').val('');
             $j('#choose_unit_for_scale_id').val('');
         } else {
-            alert('Scale already added!');
+            existsing.element.highlight('blue');
         }
 
         return false;
