@@ -11,7 +11,7 @@ class BioSchemaTest < ActiveSupport::TestCase
 
   test 'exception for unsupported type' do
     o = unsupported_type
-    assert_raise Seek::BioSchema::BioSchema::UnsupportedTypeException do
+    assert_raise Seek::BioSchema::UnsupportedTypeException do
       Seek::BioSchema::BioSchema.new(o).json_ld
     end
   end

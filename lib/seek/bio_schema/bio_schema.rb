@@ -1,8 +1,6 @@
 module Seek
   module BioSchema
     class BioSchema
-      class UnsupportedTypeException < RuntimeError; end
-
       attr_reader :resource
 
       def initialize(resource)
