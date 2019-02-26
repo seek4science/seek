@@ -153,7 +153,7 @@ class AssaysController < ApplicationController
 
   def update_assay_organisms assay,params
     organisms             = params[:assay_organism_ids] || params[:assay][:organism_ids] || []
-    assay.assay_organisms = []
+    assay.assay_organisms = [] # This means new AssayOrganisms are created every time the assay is updated!
     Array(organisms).each do |text|
       # TODO: Refactor this to use proper nested params:
       o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")

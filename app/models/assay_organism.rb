@@ -11,14 +11,11 @@ class AssayOrganism < ApplicationRecord
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :assay
 
-  scope :matches_for, -> (strain, organism, assay, culture_growth_type) do
-     strain_clause = strain.nil? ? "strain_id IS NULL" : "strain_id = #{strain.id}"
-     cg_clause = culture_growth_type.nil? ? "culture_growth_type_id IS NULL" : "culture_growth_type_id = #{culture_growth_type.id}"
-     where("#{strain_clause} AND assay_id = ? AND organism_id = ? AND #{cg_clause}",assay.id,organism.id)
-  end
-
-  def self.exists_for? strain,organism,assay,culture_growth_type
-    !AssayOrganism.matches_for(strain,organism,assay,culture_growth_type).empty?
+  def self.exists_for?(assay, organism, strain, culture_growth_type, tissue_and_cell_type = nil)
+    ao = AssayOrganism.where(assay_id: assay, organism_id: organism, strain_id: strain,
+                             culture_growth_type_id: culture_growth_type)
+    ao = ao.where(tissue_and_cell_type_id: tissue_and_cell_type) if tissue_and_cell_type
+    ao.exists?
   end
 
 end
