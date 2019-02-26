@@ -1,6 +1,6 @@
 module Seek
-  module Rdf
-    module BioSchemaGeneration
+  module BioSchema
+    module Generation
       def to_schema_ld
         BioSchema.new(self).json_ld
       end
@@ -10,7 +10,6 @@ end
 
 ActiveRecord::Base.class_eval do
   def schema_org_supported?
-    Seek::Rdf::BioSchema.supported?(self)
+    Seek::BioSchema::BioSchema.supported?(self)
   end
 end
-

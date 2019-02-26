@@ -1,6 +1,6 @@
 module Seek
-  module Rdf
-    class MappingInfo
+  module BioSchema
+    class CSVMappingInfo
       attr_reader :type, :method, :property
       def initialize(row)
         @type = row[0]
@@ -26,25 +26,6 @@ module Seek
 
       def valid?
         complete? && !header?
-      end
-    end
-
-    class BioSchemaCSVReader
-      include Singleton
-
-      MAPPINGS_FILE = File.join(File.dirname(__FILE__), 'bioschema_mappings.csv').freeze
-
-      def each_row
-        mappings_csv.each do |row|
-          info = MappingInfo.new(row)
-          yield(info) if info.valid?
-        end
-      end
-
-      private
-
-      def mappings_csv
-        @csv ||= CSV.read(MAPPINGS_FILE)
       end
     end
   end

@@ -1,7 +1,7 @@
 module Seek
-  module Rdf
-    module BioSchemaResourceWrappers
-      class Person
+  module BioSchema
+    module ResourceWrappers
+      class ResourceWrapper
         attr_reader :resource
 
         def initialize(resource)
@@ -12,9 +12,8 @@ module Seek
           'http://schema.org'
         end
 
-        def image
-          return unless resource.avatar
-          "#{Seek::Config.site_base_host}/#{resource.class.table_name}/#{resource.id}/avatars/#{resource.avatar.id}&size=250"
+        def schema_type
+          @resource.class.name
         end
 
         private

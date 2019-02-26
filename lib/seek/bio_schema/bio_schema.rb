@@ -1,13 +1,9 @@
 module Seek
-  module Rdf
+  module BioSchema
     class BioSchema
       class UnsupportedTypeException < RuntimeError; end
 
       attr_reader :resource
-
-      SCHEMA_TYPES = {
-        Person => 'Person'
-      }.freeze
 
       def initialize(resource)
         @resource = resource
@@ -19,7 +15,7 @@ module Seek
         end
         json = {}
         json['@context'] = resource_wrapper.context
-        json['@type'] = SCHEMA_TYPES[resource.class]
+        json['@type'] = resource_wrapper.schema_type
         json.merge!(attributes_from_csv_mappings)
 
         JSON.pretty_generate(json)
@@ -30,20 +26,22 @@ module Seek
       end
 
       def self.supported?(resource)
-        SCHEMA_TYPES.keys.include?(resource.class)
+        SUPPORTED_TYPES.include?(resource.class)
       end
 
       private
 
+      SUPPORTED_TYPES = [Person].freeze
+
       def resource_wrapper
-        @wrapper = "Seek::Rdf::BioSchemaResourceWrappers::#{resource.class.name}".constantize.new(resource)
+        @wrapper = "Seek::BioSchema::ResourceWrappers::#{resource.class.name}".constantize.new(resource)
       end
 
       def attributes_from_csv_mappings
         result = {}
-        BioSchemaCSVReader.instance.each_row do |row|
+        CSVReader.instance.each_row do |row|
           next unless row.matches?(resource)
-          if value = row.invoke(resource_wrapper)
+          if (value = row.invoke(resource_wrapper))
             result[row.property.strip] = value
           end
         end
