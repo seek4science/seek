@@ -187,7 +187,7 @@ class Assay < ApplicationRecord
       end
     end
 
-    unless AssayOrganism.exists_for?(strain, organism, self, culture_growth_type, tissue_and_cell_type)
+    unless AssayOrganism.exists_for?(self, organism, strain, culture_growth_type, tissue_and_cell_type)
       assay_organism = AssayOrganism.new(assay: self, organism: organism, culture_growth_type: culture_growth_type,
                                          strain: strain, tissue_and_cell_type: tissue_and_cell_type)
       assay_organisms << assay_organism
