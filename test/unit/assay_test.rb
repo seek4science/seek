@@ -363,7 +363,7 @@ class AssayTest < ActiveSupport::TestCase
     with_config_value :is_virtualliver, true do
       assert_difference('AssayOrganism.count') do
         assert_difference('TissueAndCellType.count') do
-          disable_authorization_checks { assay.associate_organism(organism, nil, nil, '0', 'Fish Brains') }
+          disable_authorization_checks { assay.associate_organism(organism, nil, nil, '', 'Fish Brains') }
         end
       end
 
@@ -373,7 +373,7 @@ class AssayTest < ActiveSupport::TestCase
 
       assert_difference('AssayOrganism.count') do
         assert_no_difference('TissueAndCellType.count') do
-          disable_authorization_checks { assay.associate_organism(other_organism, nil, nil, '0', 'Fish Brains') }
+          disable_authorization_checks { assay.associate_organism(other_organism, nil, nil, '', 'Fish Brains') }
         end
       end
 

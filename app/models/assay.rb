@@ -179,12 +179,10 @@ class Assay < ApplicationRecord
     organism = Organism.find(organism) if organism.is_a?(Numeric) || organism.is_a?(String)
     strain = organism.strains.find_by_id(strain_id)
     tissue_and_cell_type = nil
-    unless tissue_and_cell_type_title.blank?
-      if tissue_and_cell_type_id.blank? && tissue_and_cell_type_title.present?
-        tissue_and_cell_type = TissueAndCellType.where(title: tissue_and_cell_type_title).first_or_create!
-      else
-        tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
-      end
+    if tissue_and_cell_type_id.present?
+      tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
+    elsif tissue_and_cell_type_title.present?
+      tissue_and_cell_type = TissueAndCellType.where(title: tissue_and_cell_type_title).first_or_create!
     end
 
     unless AssayOrganism.exists_for?(self, organism, strain, culture_growth_type, tissue_and_cell_type)
