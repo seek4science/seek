@@ -10,7 +10,6 @@
 //= require vue/vue
 //= require builder
 //= require application_shared
-//= require dropMenu
 //= require models
 //= require sharing
 //= require attribution

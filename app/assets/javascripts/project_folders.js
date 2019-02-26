@@ -131,14 +131,6 @@ function folder_clicked(folder_id, project_id) {
 
 }
 
-
-function focus_folder(folder_id) {
-    var element_id = element_id_for_folder_id(folder_id);
-    if ($(element_id)) {
-        $(element_id.gsub("label", "content")).toggleClassName("ygtvfocus");
-    }
-}
-
 Draggables.addObserver({
   onStart:function( eventName, draggable, event )
   {

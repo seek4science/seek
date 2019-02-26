@@ -6,17 +6,6 @@ jQuery(document).ready(function(){
     });
 });
 
-//params items: e.g. Model_1,Model_2,...
-function generateParamItems(resource_type, resource_ids){
-    var items = resource_type + '_';
-    items = items + resource_ids.replace(/,/g, ',' + resource_type + '_');
-    return items;
-}
-
-function displayMoreLink(){
-    $j(".more_link").show();
-}
-
 function hide_specified_facets(){
     $j(".specified_facets").hide();
 }
