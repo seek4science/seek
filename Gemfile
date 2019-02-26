@@ -90,7 +90,7 @@ gem 'mechanize'
 gem 'mimemagic'
 gem 'auto_strip_attributes'
 
-gem 'bootstrap-sass'
+gem 'bootstrap-sass', '>=3.4.1'
 gem 'sass-rails'
 gem 'sprockets-rails', '~> 3.2'
 
