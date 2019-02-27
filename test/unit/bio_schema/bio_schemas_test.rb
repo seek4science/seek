@@ -57,7 +57,7 @@ class BioSchemaTest < ActiveSupport::TestCase
 
     assert_equal "http://localhost:3000/projects/#{project.id}", json['@id']
     assert_equal 'my project', json['name']
-    assert_equal 'Organization', json['@type']
+    assert_equal 'Project', json['@type']
     assert_equal 'i am a project', json['description']
     assert_equal "http://localhost:3000/projects/#{project.id}/avatars/#{project.avatar.id}?size=250",json['logo']
     assert_equal 'http://project.com',json['url']
