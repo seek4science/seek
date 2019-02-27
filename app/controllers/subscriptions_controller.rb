@@ -9,7 +9,7 @@ class SubscriptionsController < ApplicationController
         flash[:notice] = "You have subscribed to this #{@subscription.subscribable.class.name.humanize}"
         format.html { redirect_to(@subscription.subscribable) }
       else
-        flash[:notice] = "You failed to subscribe to this #{@subscription.subscribable.class.name.humanize}"
+        flash[:error] = "You failed to subscribe to this #{@subscription.subscribable.class.name.humanize}"
         format.html { redirect_to(@subscription.subscribable) }
       end
     end
