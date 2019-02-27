@@ -11,6 +11,10 @@ module Seek
             Factory.instance.get(person).mini
           end
         end
+
+        def schema_type
+          'Organization'
+        end
       end
     end
   end
