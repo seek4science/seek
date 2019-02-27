@@ -176,11 +176,9 @@ SEEK::Application.routes.draw do
     member do
       post :check_related_items
       post :check_gatekeeper_required
-      get :admin
       get :published
       get :batch_publishing_preview
       post :publish_related_items
-      put :administer_update
       post :publish
       get :requested_approval_assets
       post :gatekeeper_decide
