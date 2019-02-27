@@ -6,5 +6,7 @@ Person,first_name,givenName
 Person,last_name,familyName
 Person,image,image
 Person,url,url
+Person,member_of,memberOf
 Project,image,logo
 Project,url,url
+Project,member,member

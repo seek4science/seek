@@ -25,6 +25,14 @@ module Seek
           rdf_resource
         end
 
+        def mini
+          {
+            '@type': schema_type,
+            '@id': identifier,
+            'name': title
+          }
+        end
+
         private
 
         def respond_to_missing?(name, include_private = false)

@@ -33,6 +33,8 @@ class BioSchemaTest < ActiveSupport::TestCase
     p = Factory(:person, first_name: 'Bob', last_name: 'Monkhouse',
                 description: 'I am a person', avatar: Factory(:avatar),
                 web_page:'http://me.com')
+    project = p.projects.first
+    refute_nil project
     refute_nil p.avatar
     json = Seek::BioSchema::BioSchema.new(p).json_ld
     json = JSON.parse(json)
@@ -44,12 +46,26 @@ class BioSchemaTest < ActiveSupport::TestCase
     assert_equal 'Bob', json['givenName']
     assert_equal 'Monkhouse', json['familyName']
     assert_equal 'http://me.com',json['url']
+
     refute_nil json['image']
     refute_nil json['@context']
+
+    member_of = json['memberOf']
+
+    assert_equal 1,member_of.count
+    expected={'@type'=>'Project','@id'=>project.rdf_resource,'name'=>project.title}
+    assert_equal expected,member_of.first
   end
 
   test 'project json ld' do
     project = Factory(:project, title:'my project',description:'i am a project', avatar:Factory(:avatar), web_page:'http://project.com')
+    member = Factory(:person)
+    member.add_to_project_and_institution(project,Factory(:institution))
+
+    member2 = Factory(:person)
+    member2.add_to_project_and_institution(project,Factory(:institution))
+
+
     refute_nil project.avatar
     json = Seek::BioSchema::BioSchema.new(project).json_ld
     json = JSON.parse(json)
@@ -61,6 +77,15 @@ class BioSchemaTest < ActiveSupport::TestCase
     assert_equal 'i am a project', json['description']
     assert_equal "http://localhost:3000/projects/#{project.id}/avatars/#{project.avatar.id}?size=250",json['logo']
     assert_equal 'http://project.com',json['url']
+    member_json = json['member']
+    refute_nil member_json
+    assert_equal 2,member_json.count
+
+    expected={'@type'=>'Person','@id'=>member.rdf_resource,'name'=>member.title}
+    assert_equal expected, member_json[0]
+
+    expected={'@type'=>'Person','@id'=>member2.rdf_resource,'name'=>member2.title}
+    assert_equal expected,member_json[1]
 
     #project with no webpage, just to check the default url
     project = Factory(:project)
