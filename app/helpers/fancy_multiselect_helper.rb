@@ -44,7 +44,6 @@ module FancyMultiselectHelper
     association_controller = "#{association.to_s.classify.pluralize}Controller".constantize rescue nil
 
     {
-        intro: "The following #{association_text.pluralize} are associated with this #{object_type_text.downcase}:",
         name: "#{object.class.name.underscore}[#{association.to_s.singularize}_ids]",
         possibilities: nil,
         unscoped_possibilities: [],

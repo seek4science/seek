@@ -29,11 +29,14 @@
   end
 
   existing_json = associations_json_from_relationship(selected, fieldName: name)
+
+  intro ||= "The following #{association_text.pluralize} are associated with this #{object_type_text.downcase}:"
+  help_text = "Here you can associate the #{object_type_text} with specific #{association_text.pluralize}." unless defined? help_text
 %>
 
 <%= folding_panel(title, hidden, id: "add_#{association}_form",
                   data: { role: 'seek-fancy-multiselect' },
-                  help_text: "Here you can associate the #{object_type_text} with specific #{association_text.pluralize}.") do %>
+                  help_text: help_text) do %>
   <div class="row">
     <div class="col-md-<%= preview_disabled ? '12' : '8'-%>">
       <p class="help-block"><%= intro %></p>
