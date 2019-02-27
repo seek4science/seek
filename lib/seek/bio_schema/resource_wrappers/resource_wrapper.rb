@@ -16,6 +16,15 @@ module Seek
           @resource.class.name
         end
 
+        def image
+          return unless resource.avatar
+          "#{Seek::Config.site_base_host}/#{resource.class.table_name}/#{resource.id}/avatars/#{resource.avatar.id}?size=250"
+        end
+
+        def identifier
+          rdf_resource
+        end
+
         private
 
         def respond_to_missing?(name, include_private = false)

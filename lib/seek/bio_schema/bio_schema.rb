@@ -29,7 +29,7 @@ module Seek
 
       private
 
-      SUPPORTED_TYPES = [Person].freeze
+      SUPPORTED_TYPES = [Person, Project].freeze
 
       def resource_wrapper
         ResourceWrappers::Factory.instance.get(resource)

@@ -1,7 +1,11 @@
 module Seek
   module BioSchema
     module ResourceWrappers
-      class Person < ResourceWrapper
+      class Project < ResourceWrapper
+        def schema_type
+          'Organization'
+        end
+
         def url
           web_page.blank? ? identifier : web_page
         end

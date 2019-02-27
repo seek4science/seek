@@ -26,11 +26,13 @@ class BioSchemaTest < ActiveSupport::TestCase
     assert_equal p.first_name, wrapper.first_name
     assert_equal p.last_name, wrapper.last_name
     assert_equal p.description, wrapper.description
-    assert_equal "http://localhost:3000/people/#{p.id}/avatars/#{p.avatar.id}&size=250", wrapper.image
+    assert_equal "http://localhost:3000/people/#{p.id}/avatars/#{p.avatar.id}?size=250", wrapper.image
   end
 
   test 'person json_ld' do
-    p = Factory(:person, first_name: 'Bob', last_name: 'Monkhouse', description: 'I am a person', avatar: Factory(:avatar))
+    p = Factory(:person, first_name: 'Bob', last_name: 'Monkhouse',
+                description: 'I am a person', avatar: Factory(:avatar),
+                web_page:'http://me.com')
     refute_nil p.avatar
     json = Seek::BioSchema::BioSchema.new(p).json_ld
     json = JSON.parse(json)
@@ -41,8 +43,31 @@ class BioSchemaTest < ActiveSupport::TestCase
     assert_equal 'I am a person', json['description']
     assert_equal 'Bob', json['givenName']
     assert_equal 'Monkhouse', json['familyName']
+    assert_equal 'http://me.com',json['url']
     refute_nil json['image']
     refute_nil json['@context']
+  end
+
+  test 'project json ld' do
+    project = Factory(:project, title:'my project',description:'i am a project', avatar:Factory(:avatar), web_page:'http://project.com')
+    refute_nil project.avatar
+    json = Seek::BioSchema::BioSchema.new(project).json_ld
+    json = JSON.parse(json)
+    pp json
+
+    assert_equal "http://localhost:3000/projects/#{project.id}", json['@id']
+    assert_equal 'my project', json['name']
+    assert_equal 'Organization', json['@type']
+    assert_equal 'i am a project', json['description']
+    assert_equal "http://localhost:3000/projects/#{project.id}/avatars/#{project.avatar.id}?size=250",json['logo']
+    assert_equal 'http://project.com',json['url']
+
+    #project with no webpage, just to check the default url
+    project = Factory(:project)
+    json = Seek::BioSchema::BioSchema.new(project).json_ld
+    json = JSON.parse(json)
+    assert_equal "http://localhost:3000/projects/#{project.id}",json['url']
+
   end
 
   test 'resource wrapper factory' do
