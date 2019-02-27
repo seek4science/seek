@@ -53,7 +53,7 @@ class PoliciesControllerTest < ActionController::TestCase
   test 'should show the correct manager(contributor) when updating a study' do
     study = Factory(:study)
     contributor = study.contributor
-    post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, is_new_file: 'false', contributor_id: contributor.user.id, resource_name: 'study' }
+    post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_id: study.id, resource_name: 'study' }
 
     assert_select 'div.access-type-manage li', text: "#{contributor.name}", count: 1
   end
@@ -62,7 +62,7 @@ class PoliciesControllerTest < ActionController::TestCase
     gatekeeper = Factory(:asset_gatekeeper)
     sop = Factory(:sop, project_ids: gatekeeper.projects.map(&:id))
     login_as(sop.contributor)
-    post :preview_permissions, params: { policy_attributes: projects_policy(Policy::VISIBLE, [gatekeeper.projects.first], Policy::ACCESSIBLE), is_new_file: 'false', resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
+    post :preview_permissions, params: { policy_attributes: projects_policy(Policy::VISIBLE, [gatekeeper.projects.first], Policy::ACCESSIBLE), resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
 
     assert_select '#preview_permissions div.alert', text: "An email will be sent to the Gatekeepers of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval.", count: 1
   end
@@ -72,13 +72,13 @@ class PoliciesControllerTest < ActionController::TestCase
     sop = Factory(:sop, project_ids: gatekeeper.projects.map(&:id))
     login_as(sop.contributor)
     ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
-    post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, is_new_file: 'false', resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
+    post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
 
     assert_select '#preview_permissions div.alert', text: "You requested the publishing approval from the Gatekeepers of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')}, and it is waiting for the decision. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval.", count: 1
   end
 
   test 'should not show notice message when an item can be published right away' do
-    post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, is_new_file: 'true', resource_name: 'sop', project_ids: Factory(:project).id.to_s }
+    post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_name: 'sop', project_ids: Factory(:project).id.to_s }
 
     assert_select '#preview_permissions div.alert', text: "An email will be sent to the Gatekeepers of the  #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval.", count: 0
   end
@@ -91,7 +91,7 @@ class PoliciesControllerTest < ActionController::TestCase
     login_as(a_person.user)
     assert sop.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sop, gatekeeper.projects.first.id.to_s)
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sop, gatekeeper.projects.first)
     assert !updated_can_publish_immediately
   end
 
@@ -102,7 +102,7 @@ class PoliciesControllerTest < ActionController::TestCase
     login_as(a_person.user)
     assert sop.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sop, Factory(:project).id.to_s)
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sop, Factory(:project))
     assert updated_can_publish_immediately
   end
 
@@ -117,7 +117,7 @@ class PoliciesControllerTest < ActionController::TestCase
       login_as(a_person.user)
       assert item.can_manage?
 
-      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, gatekeeper.projects.first.id.to_s)
+      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, gatekeeper.projects.first)
       assert !updated_can_publish_immediately
     end
   end
@@ -133,7 +133,7 @@ class PoliciesControllerTest < ActionController::TestCase
       login_as(a_person.user)
       assert item.can_manage?
 
-      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, Factory(:project).id.to_s)
+      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, Factory(:project))
       assert updated_can_publish_immediately
     end
   end
@@ -145,7 +145,7 @@ class PoliciesControllerTest < ActionController::TestCase
     login_as(a_person.user)
     assert assay.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(assay, '')
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(assay, [])
     assert updated_can_publish_immediately
   end
 
@@ -164,7 +164,7 @@ class PoliciesControllerTest < ActionController::TestCase
       assert assay.can_manage?
 
       # FIXME: can't test controller this way properly as it doesn't setup the @request and session properly
-      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(assay, assay.study.id.to_s)
+      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(assay, assay.study.projects)
       refute updated_can_publish_immediately
     end
   end
@@ -180,7 +180,7 @@ class PoliciesControllerTest < ActionController::TestCase
     login_as(a_person.user)
     assert item.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, gatekeeper.projects.first.id.to_s)
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, gatekeeper.projects.first)
     assert updated_can_publish_immediately
   end
 
@@ -197,7 +197,7 @@ class PoliciesControllerTest < ActionController::TestCase
 
   test 'additional permissions and privilege text for preview permission' do
     # no additional text
-    post :preview_permissions, params: { policy_attributes: { access_type: Policy::NO_ACCESS }, is_new_file: 'true', resource_name: 'assay' }
+    post :preview_permissions, params: { policy_attributes: { access_type: Policy::NO_ACCESS }, resource_name: 'assay' }
 
     # with additional text for permissions
     project = Factory(:project)

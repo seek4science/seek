@@ -1,6 +1,5 @@
 <%
-  is_new_file = params[:is_new_file]
-  resource_name = params[:resource_name]
+  resource_name = resource.class.name.underscore
   permissions, privileged_people = uniq_people_permissions_and_privileged_people(policy.permissions.to_a, privileged_people)
   downloadable = resource_name.camelize.constantize.new.try(:is_downloadable?)
   effective_permissions = permissions.reject { |p| p.access_type <= policy.access_type }
@@ -49,7 +48,7 @@
         <% end %>
       </div>
       <div class="modal-footer">
-        <input class="btn btn-primary" type=button value='OK' style="width: 5em" onclick="createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')">
+        <input class="btn btn-primary" type=button value='OK' style="width: 5em" onclick="createOrUpdateResource('<%= resource.new_record? -%>', '<%= resource_name -%>')">
         <input class="btn btn-default" type=button value='Cancel' data-dismiss="modal">
       </div>
     </div>

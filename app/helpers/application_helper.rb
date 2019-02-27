@@ -296,13 +296,7 @@ module ApplicationHelper
   end
 
   def preview_permission_popup_link(resource)
-    locals = {}
-    locals[:resource_name] = resource.class.name.underscore
-    locals[:resource_id] = resource.id
-    locals[:url] = preview_permissions_policies_path
-    locals[:is_new_file] = resource.new_record?
-    locals[:contributor_id] = resource.contributing_user.try(:id)
-    render partial: 'assets/preview_permission_link', locals: locals
+    render partial: 'assets/preview_permission_link', locals: { resource: resource }
   end
 
   # Finn's truncate method. Doesn't split up words, tries to get as close to length as possible
