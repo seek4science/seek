@@ -84,7 +84,7 @@ gem 'mechanize'
 gem 'mimemagic'
 gem 'auto_strip_attributes'
 gem 'coffee-rails', '~> 4.2'
-gem 'bootstrap-sass'
+gem 'bootstrap-sass', '>=3.4.1'
 gem 'sass-rails', '~> 5.0'
 gem 'sprockets-rails'
 
