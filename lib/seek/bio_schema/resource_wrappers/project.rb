@@ -2,14 +2,10 @@ module Seek
   module BioSchema
     module ResourceWrappers
       class Project < ResourceWrapper
+        relationships member: :people
+
         def url
           web_page.blank? ? identifier : web_page
-        end
-
-        def member
-          people.collect do |person|
-            Factory.instance.get(person).mini
-          end
         end
 
         def schema_type

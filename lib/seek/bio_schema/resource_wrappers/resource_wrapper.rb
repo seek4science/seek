@@ -35,6 +35,20 @@ module Seek
 
         private
 
+        def self.relationships(pairs)
+          pairs.each do |method, collection|
+            define_method(method) do
+              minis(send(collection))
+            end
+          end
+        end
+
+        def minis(collection)
+          collection.collect do |item|
+            Factory.instance.get(item).mini
+          end
+        end
+
         def respond_to_missing?(name, include_private = false)
           resource.respond_to?(name, include_private)
         end
