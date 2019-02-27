@@ -56,6 +56,7 @@ ul.asset_cards li.asset_card_item {
     min-height: 5em;
     max-height: 5em;
     float: left;
+    list-style: none;
 }
 
 li.asset_card_item img.asset_card_avatar {
