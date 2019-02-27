@@ -1,6 +1,6 @@
 <% unless matched_items.empty? -%>
-    <%= stylesheet_link_tag('spreadsheet_explorer', 'lightbox') %>
-    <%= javascript_include_tag 'spreadsheet_explorer', 'zoom/lightbox' %>
+    <%= stylesheet_link_tag('spreadsheet_explorer') %>
+    <%= javascript_include_tag 'spreadsheet_explorer' %>
     <!--- multiple  sheets --->
     <% matched_items.each do |item| -%>
         <% if authorization_for_showing_already_done || item.can_download? -%>
@@ -65,7 +65,7 @@
         }
     }
     function showMatchedItems() {
-        var item_ids = new Array();
+        var item_ids = [];
         <% matched_items.each do |item|%>
         item_ids.push("<%= item.id %>");
         <% end %>

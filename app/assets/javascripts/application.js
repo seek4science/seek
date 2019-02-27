@@ -57,4 +57,5 @@
 //= require asset_report
 //= require uri
 //= require chartjs
+//= require lightbox2
 //= require_tree ./templates

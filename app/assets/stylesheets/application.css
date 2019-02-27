@@ -39,4 +39,5 @@
 *= require eonasdan-bootstrap-datetimepicker
 *= require cytoscape_isa_graph
 *= require multi-step-wizard.css.erb
+*= require lightbox2
 */
