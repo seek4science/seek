@@ -2,7 +2,7 @@
   resource_type = text_for_resource(resource)
 %>
 
-<% if true || Seek::Config.email_enabled && !resource.managers.empty? -%>
+<% if Seek::Config.email_enabled && !resource.managers.empty? -%>
   <%= button_link_to("Request #{text_for_resource(resource)}", "message", '#', id: 'request_resource_button',
                      'data-toggle' => 'modal', 'data-target' => "#request-resource-modal") -%>
 
