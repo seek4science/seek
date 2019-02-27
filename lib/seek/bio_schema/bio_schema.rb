@@ -32,7 +32,7 @@ module Seek
       SUPPORTED_TYPES = [Person].freeze
 
       def resource_wrapper
-        @wrapper = "Seek::BioSchema::ResourceWrappers::#{resource.class.name}".constantize.new(resource)
+        ResourceWrappers::Factory.instance.get(resource)
       end
 
       def attributes_from_csv_mappings

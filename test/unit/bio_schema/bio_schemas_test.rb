@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class BioSchemaTest < ActiveSupport::TestCase
+
   test 'supported?' do
     p = Factory(:person)
     not_supported = unsupported_type
@@ -42,6 +43,17 @@ class BioSchemaTest < ActiveSupport::TestCase
     assert_equal 'Monkhouse', json['familyName']
     refute_nil json['image']
     refute_nil json['@context']
+  end
+
+  test 'resource wrapper factory' do
+
+    wrapper = Seek::BioSchema::ResourceWrappers::Factory.instance.get(Factory(:person))
+    assert wrapper.is_a?(Seek::BioSchema::ResourceWrappers::Person)
+
+    assert_raise Seek::BioSchema::UnsupportedTypeException do
+      Seek::BioSchema::ResourceWrappers::Factory.instance.get(unsupported_type)
+    end
+
   end
 
   private
