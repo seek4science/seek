@@ -128,7 +128,7 @@ class FoldersControllerTest < ActionController::TestCase
     folder.add_assets(sop)
     folder.save!
 
-    post :display_contents, xhr: true, params: { id: folder.id, project_id: folder.project.id }
+    get :display_contents, xhr: true, params: { id: folder.id, project_id: folder.project.id }
 
     assert_response :success
 
@@ -140,7 +140,7 @@ class FoldersControllerTest < ActionController::TestCase
     assay.study.investigation.projects = [@project]
     assay.study.investigation.save!
     assert assay.can_view?
-    post :display_contents, xhr: true, params: { id: "Assay_#{assay.id}", project_id: @project.id }
+    get :display_contents, xhr: true, params: { id: "Assay_#{assay.id}", project_id: @project.id }
     assert_response :success
     assert @response.body.match(/Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv/)
     assert @response.body.match(/5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3/)
@@ -155,7 +155,7 @@ class FoldersControllerTest < ActionController::TestCase
                                          study: study, contributor: person)
 
     refute assay.can_view?
-    post :display_contents, xhr: true, params: { id: "Assay_#{assay.id}", project_id: @project.id }
+    get :display_contents, xhr: true, params: { id: "Assay_#{assay.id}", project_id: @project.id }
     assert_redirected_to root_path
     refute @response.body.match(/Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv/)
     refute @response.body.match(/5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3/)
@@ -168,7 +168,7 @@ class FoldersControllerTest < ActionController::TestCase
     folder.add_assets(sop)
     folder.save!
 
-    post :display_contents, xhr: true, params: { id: folder.id, project_id: folder.project.id }
+    get :display_contents, xhr: true, params: { id: folder.id, project_id: folder.project.id }
     assert_redirected_to root_path
     assert @response.body.match(/Description.*Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF/).nil?
   end
@@ -263,7 +263,7 @@ class FoldersControllerTest < ActionController::TestCase
       folder.save!
     end
 
-    post :display_contents, xhr: true, params: { id: folder.id, project_id: folder.project.id }
+    get :display_contents, xhr: true, params: { id: folder.id, project_id: folder.project.id }
 
     assert_response :success
     assert @response.body.match(/Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF/)

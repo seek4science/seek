@@ -112,7 +112,7 @@ class FoldersController < ApplicationController
   end
 
   def browser_enabled
-    if !Seek::Config.project_browser_enabled
+    unless Seek::Config.project_browser_enabled
       flash[:error]="Not available"
       redirect_to @project
     end
