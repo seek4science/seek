@@ -45,12 +45,8 @@ module SuggestedTypesHelper
   end
 
   def cancel_link
-    if is_ajax_request?
-      link_to('Cancel', '#', 'data-dismiss' => 'modal', class: 'btn btn-default')
-    else
-      manage_path = eval "#{controller_name}_path"
-      cancel_button(manage_path)
-    end
+    manage_path = eval "#{controller_name}_path"
+    cancel_button(manage_path)
   end
 
   def ontology_editor_display(types, selected_uri = nil)
@@ -104,7 +100,7 @@ module SuggestedTypesHelper
 
   def edit_ontology_class_link(clz)
     link = if clz.can_edit?
-             new_popup_request? ? popup_link_to_edit(clz) : normal_link_to_edit(clz)
+             normal_link_to_edit(clz)
            else
              ''
            end
@@ -123,23 +119,6 @@ module SuggestedTypesHelper
 
   def normal_link_to_edit(clz)
     link_to(image('edit'), send("edit_suggested_#{clz.term_type}_type_path", id: clz))
-  end
-
-  def popup_link_to_edit(clz)
-    type = clz.term_type
-    link_to_with_callbacks(image('edit'), html: { remote: true, method: :get },
-                                          url: send("edit_suggested_#{type}_type_path", id: clz, term_type: type),
-                                          method: :get,
-                                          loading: "$('RB_redbox').scrollTo();Element.show('edit_suggested_type_spinner'); Element.hide('new_suggested_#{type}_type_form')",
-                                          loaded: "Element.hide('edit_suggested_type_spinner'); Element.show('new_suggested_#{type}_type_form')")
-  end
-
-  def new_popup_request?
-    action_name == 'new' && is_ajax_request?
-  end
-
-  def is_ajax_request?
-    request.xhr?
   end
 
   def descriptive_label(type)
