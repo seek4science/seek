@@ -29,7 +29,7 @@ Rails.application.config.assets.precompile += [
     "cytoscape_web/index",
     "profile_project_selection",
     'projects',
-    'scales',
+    'scales.js',
     'exhibit/exhibit-api.js',
     'flot/index.js',
     'project_folders',
