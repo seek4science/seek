@@ -14,7 +14,7 @@
 //= require sharing
 //= require attribution
 //= require creators
-//= require resource
+//= require validation
 //= require studied_factor
 //= require parseuri
 //= require tabber-minimized
