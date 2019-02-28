@@ -12,22 +12,27 @@ module Seek
         @property = row[2]
       end
 
+      # is the row complete?
       def complete?
         type && method && property
       end
 
+      # does the row match the given resource?
       def matches?(resource)
         type == '*' || resource.class.name == type.strip
       end
 
+      # is this row the CSV header?
       def header?
         type.casecmp('class').zero?
       end
 
+      # invokes the method on the resource and returns the result
       def invoke(resource)
         resource.try(method)
       end
 
+      # is this row valid?, in that it is complete and isn't the header
       def valid?
         complete? && !header?
       end

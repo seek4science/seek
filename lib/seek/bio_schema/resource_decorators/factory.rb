@@ -9,6 +9,7 @@ module Seek
           @decorator_classes = {}
         end
 
+        # get the Decorator for the given resource, throws an UnsupportedTypeException if that resource isn't supported
         def get(resource)
           type = resource.class
           unless resource.schema_org_supported?

@@ -6,10 +6,12 @@ module Seek
     class BioSchema
       attr_reader :resource
 
+      # initialise with a resource
       def initialize(resource)
         @resource = resource
       end
 
+      # returns the JSON-LD as a String, for the resource
       def json_ld
         unless supported?
           raise UnsupportedTypeException, "Bioschema not supported for #{resource.class.name}"
@@ -22,10 +24,12 @@ module Seek
         JSON.pretty_generate(json)
       end
 
+      # whether the resource BioSchema was initialized with is supported
       def supported?
         BioSchema.supported?(resource)
       end
 
+      # test directly (without intializing) whether a resource is supported
       def self.supported?(resource)
         SUPPORTED_TYPES.include?(resource.class)
       end

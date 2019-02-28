@@ -8,6 +8,7 @@ module Seek
 
       MAPPINGS_FILE = File.join(File.dirname(__FILE__), 'bioschema_mappings.csv').freeze
 
+      # An iterator that yields each valid row, as a CSVMappingInfo instance
       def each_row
         mappings_csv.each do |row|
           info = CSVMappingInfo.new(row)
