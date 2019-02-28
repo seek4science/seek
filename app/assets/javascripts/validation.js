@@ -1,14 +1,17 @@
-// ***************  Resource Upload Validation  *****************
+// Client-side form validation.
+//
+// These methods are bound to the form submit buttons and return false if the form is invalid,
+//   halting event propagation and preventing the form from being submitted.
 
-function validateResourceFields(isNewFile, resourceName) {
-    // only make this test if that's a new SOP
-    if (isNewFile) {
-        var respond_to_content_blobs = resourceName === 'model';
-        if (!validateUploadFormFields(respond_to_content_blobs, resourceName))
-           return false;
+function validateResourceFields(resourceName) {
+    var isNewResource = !!document.getElementById('upload-panel');
+
+    // Check new resource has at least a file/URL
+    if (isNewResource && !validateUploadFormFields()) {
+        return false;
     }
 
-    // other tests are applicable to both editing and creating new SOP
+    // Always check the title is prsent
     var title = $j('#' + resourceName + '_title');
     if (!title.val()) {
         alert("Please specify the title!");
@@ -16,39 +19,41 @@ function validateResourceFields(isNewFile, resourceName) {
         return false;
     }
 
-    // filename and title set - can submit
-    var submitBtn = $j('#' + resourceName + '_submit_btn')[0];
-    submitBtn.disabled = true;
-    submitBtn.value = isNewFile ? "Creating..." : "Updating...";
-    submitBtn.form.submit();
-}
-
-function createOrUpdateResource(is_new_file, resource_name){
-    // filename and title set - can submit
-    $(resource_name + '_submit_btn').disabled = true;
-    $(resource_name + '_submit_btn').value = (is_new_file=='true' ? "Creating..." : "Updating...");
-    $(resource_name + '_submit_btn').form.submit();
-}
-
-function validateUploadFormFields(respond_to_content_blobs, resource_name) {
-    if (respond_to_content_blobs) {
-        if ($('pending-files').children.length == 0 && $(resource_name + "_image_image_file") == null) {
-            alert("Please specify at least a file to upload or provide a URL.");
-            return false;
-        } else if ($('pending-files').children.length == 0 && $(resource_name + "_image_image_file") != null && $(resource_name + "_image_image_file").value == '' && $('previous_version_image') == null) {
-            alert("Please specify at least a file/image to upload or provide a URL.");
-            return false;
-        }
-    } else {
-        if ($('content_blobs__data').value.length == 0 && $('data_url_field').value.length == 0) {
-            alert("Please specify at least a file to upload or provide a URL.");
-            $('content_blobs__data').focus();
-            return false;
-        }
-    }
     return true;
 }
 
-function validateUploadNewVersion(respond_to_content_blobs, resource_name){
-    return validateUploadFormFields(respond_to_content_blobs, resource_name);
+function validateUploadFormFields() {
+    var files = $j('input[type="file"][name="content_blobs[][data]"]');
+    var hasFiles = files.toArray().some(function (f) { return f.value }); // Count non-blank file fields
+    var valid = true;
+
+    if ($j('#model_image_image_file').length) { // If it's a model...
+        var hasImage = !!$j('#model_image_image_file').val();
+        if (!hasFiles && !hasImage) {
+            valid = false;
+            alert("Please specify at least a file/image to upload or provide a URL.");
+        }
+    } else {
+        if (!hasFiles && !$j('input[name="content_blobs[][data_url]"]').val()) {
+            alert("Please specify a file to upload or provide a URL.");
+            valid = false;
+        }
+    }
+
+    if (!valid) {
+        var uploadForm = $j('#upload_type_selection').parents('.panel');
+        uploadForm[0].scrollIntoView();
+        uploadForm.highlight();
+    }
+
+    return valid;
+}
+
+function validateUploadNewVersion() {
+    return validateUploadFormFields();
+}
+
+function createOrUpdateResource(resourceName) {
+    // Disabling the button is handled automatically
+    $j('#' + resourceName + '_submit_btn').form().submit();
 }
