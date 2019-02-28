@@ -12,8 +12,8 @@ module Seek
           raise UnsupportedTypeException, "Bioschema not supported for #{resource.class.name}"
         end
         json = {}
-        json['@context'] = resource_wrapper.context
-        json['@type'] = resource_wrapper.schema_type
+        json['@context'] = resource_decorator.context
+        json['@type'] = resource_decorator.schema_type
         json.merge!(attributes_from_csv_mappings)
 
         JSON.pretty_generate(json)
@@ -31,15 +31,15 @@ module Seek
 
       SUPPORTED_TYPES = [Person, Project].freeze
 
-      def resource_wrapper
-        ResourceWrappers::Factory.instance.get(resource)
+      def resource_decorator
+        @decorator ||= ResourceDecorators::Factory.instance.get(resource)
       end
 
       def attributes_from_csv_mappings
         result = {}
         CSVReader.instance.each_row do |row|
           next unless row.matches?(resource)
-          if (value = row.invoke(resource_wrapper))
+          if (value = row.invoke(resource_decorator))
             result[row.property.strip] = value
           end
         end

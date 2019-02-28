@@ -20,7 +20,7 @@ class BioSchemaTest < ActiveSupport::TestCase
   test 'person wrapper test' do
     p = Factory(:person, first_name: 'Bob', last_name: 'Monkhouse', description: 'I am a person', avatar: Factory(:avatar))
     refute_nil p.avatar
-    wrapper = Seek::BioSchema::ResourceWrappers::Person.new(p)
+    wrapper = Seek::BioSchema::ResourceDecorators::Person.new(p)
     assert_equal p.id, wrapper.id
     assert_equal p.title, wrapper.title
     assert_equal p.first_name, wrapper.first_name
@@ -97,11 +97,11 @@ class BioSchemaTest < ActiveSupport::TestCase
 
   test 'resource wrapper factory' do
 
-    wrapper = Seek::BioSchema::ResourceWrappers::Factory.instance.get(Factory(:person))
-    assert wrapper.is_a?(Seek::BioSchema::ResourceWrappers::Person)
+    wrapper = Seek::BioSchema::ResourceDecorators::Factory.instance.get(Factory(:person))
+    assert wrapper.is_a?(Seek::BioSchema::ResourceDecorators::Person)
 
     assert_raise Seek::BioSchema::UnsupportedTypeException do
-      Seek::BioSchema::ResourceWrappers::Factory.instance.get(unsupported_type)
+      Seek::BioSchema::ResourceDecorators::Factory.instance.get(unsupported_type)
     end
 
   end
