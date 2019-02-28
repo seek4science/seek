@@ -2,9 +2,6 @@
 //= require jquery
 //= require jquery_ujs
 //= require jquery_no_conflict
-//= require prototype
-//= require prototype_patch
-//= require scriptaculous
 //= require jquery-ui
 //= require bootstrap
 //= require vue/vue
