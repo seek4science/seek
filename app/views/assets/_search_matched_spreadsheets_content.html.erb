@@ -51,10 +51,10 @@
     function displayTabsImmediately() {
         for (var i = 0; i < tabber_ids.length; i++) {
             var tabber_id = tabber_ids[i];
-            var spinner = $(tabber_id + "_spinner");
-            if (spinner != null) {
+            var spinner = $j('#' + tabber_id + "_spinner");
+            if (spinner.length) {
                 spinner.hide();
-                $(tabber_id).show();
+                $j('#' + tabber_id).show();
             }
         }
     }
