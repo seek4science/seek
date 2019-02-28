@@ -1,5 +1,6 @@
 module Seek
   module BioSchema
+    # The mixin for an ActiveRecord model to provide the ability to get the Schema.org (Bioschema.org) JSON-LD
     module Generation
       def to_schema_ld
         BioSchema.new(self).json_ld

@@ -1,5 +1,8 @@
 module Seek
   module BioSchema
+    # Reads the CSV mapping file, that contains details about the propery and method
+    # to be invoked for a given resource type
+    # a wildcard (*) for the type means if applies to any resource type that is supported
     class CSVReader
       include Singleton
 

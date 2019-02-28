@@ -1,5 +1,8 @@
 module Seek
   module BioSchema
+    # Main entry point for generating Schema.org JSON-LD for a given resource.
+    #
+    # Example: Seek::BioSchema::BioSchema.new(Person.find(id)).json_ld
     class BioSchema
       attr_reader :resource
 
@@ -47,7 +50,7 @@ module Seek
       end
 
       def process_mapping(method)
-        resource.send(method) if resource.respond_to?(method)
+        resource.try(method)
       end
     end
   end

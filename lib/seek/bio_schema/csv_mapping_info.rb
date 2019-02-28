@@ -1,5 +1,9 @@
 module Seek
   module BioSchema
+    # Handles a CSV row from the bioschema mapping definitions
+    # A row contains - type, method, property
+    # Provides the ability to validate the row, check if it matches a given resource,
+    # and invoke the method to get the property value
     class CSVMappingInfo
       attr_reader :type, :method, :property
       def initialize(row)
@@ -21,7 +25,7 @@ module Seek
       end
 
       def invoke(resource)
-        resource.send(method) if resource.respond_to?(method)
+        resource.try(method)
       end
 
       def valid?
