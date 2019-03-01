@@ -9,7 +9,7 @@ class SessionsController < ApplicationController
   prepend_before_filter :strip_root_for_xml_requests
 
   # render new.html.erb
-  def new
+  def newsave!
     
   end
 
@@ -37,6 +37,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
+    Identity.current_identity = nil
     logout_user
     flash[:notice] = "You have been logged out."
 
@@ -77,6 +78,10 @@ class SessionsController < ApplicationController
   
   def successful_login
     self.current_user = @user
+    if Identity.current_identity
+      Identity.current_identity.user = self.current_user
+      Identity.current_identity.save!
+    end
     flash[:notice] = "You have successfully logged in, #{@user.display_name}."
     if params[:remember_me] == "on"
       @user.remember_me unless @user.remember_token?
@@ -137,16 +142,8 @@ class SessionsController < ApplicationController
       failed_login 'the authenticated user: cannot be found; administrators have been informed'
       Mailer.omniauth_failed_login(auth.to_yaml).deliver_later
     else
-      determined_params = {}
-      if info['email']
-        determined_params['email'] = info['email']
-      end
-      if info
-        if info['nickname']
-          determined_params['login'] = info['nickname']
-        end
-      end
-      redirect_to new_user_path (determined_params)
+      flash[:notice] = 'You need to login directly to link accounts. If you do not have an account then you must register.'
+      redirect_to login_path
       # # TODO: Check this code out
       # # create the user from the omniauth info
       # @user = User.create

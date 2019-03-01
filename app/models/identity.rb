@@ -2,11 +2,14 @@ class Identity < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :omniauthable, :omniauth_providers => [:elixir_aai]
+  devise :timeoutable, :timeout_in => 10.seconds
   #  :database_authenticatable, :registerable,
   #  :recoverable, :rememberable, :validatable
 
   belongs_to :user
-  
+
+  cattr_accessor :current_identity
+
   def self.from_omniauth(auth)
 
     require 'securerandom' #to set the seek user password to something random when the user is created
@@ -23,6 +26,8 @@ class Identity < ActiveRecord::Base
             )
       identity.save!
     end
+
+    Identity.current_identity = identity
 
     # # TODO: Extra logic to cope with other possibilities
     #   person = Person.where(:email => auth['info']['email']).first
