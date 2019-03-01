@@ -72,10 +72,7 @@ module Seek
 
     def self.rdf_capable_types
       cache('rdf_capable_types') do
-        types = persistent_classes.select do |c|
-          c.included_modules.include?(Seek::Rdf::RdfGeneration)
-        end
-        types - [Sample] # SAMPLE is not yet fully supported
+        Seek::Rdf::JERMVocab.defined_types.keys
       end
     end
 

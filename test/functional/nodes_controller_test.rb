@@ -11,6 +11,15 @@ class NodesControllerTest < ActionController::TestCase
     @project = User.current_user.person.projects.first
   end
 
+  test 'should return 406 when requesting RDF' do
+    node = Factory :node, contributor: User.current_user.person
+    assert node.can_view?
+
+    get :show, id: node, format: :rdf
+
+    assert_response :not_acceptable
+  end
+
   test 'index' do
     get :index
     assert_response :success

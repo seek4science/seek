@@ -33,6 +33,8 @@ class ApplicationController < ActionController::Base
   before_filter :check_json_id_type, only: [:create, :update], if: :json_api_request?
   before_filter :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
 
+  before_filter :rdf_enabled? #only allows through rdf calls to supported types
+
   helper :all
 
   layout Seek::Config.main_layout
@@ -584,6 +586,17 @@ class ApplicationController < ActionController::Base
 
   def json_api_request?
     request.format.json?
+  end
+
+  # fitler that responds with :not_acceptible if request rdf for non rdf capable resource
+  def rdf_enabled?
+    return unless request.format.symbol == :rdf
+    unless Seek::Util.rdf_capable_types.include?(controller_name.classify.constantize)
+      respond_to do |format|
+        format.rdf { render text: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
+      end
+      false
+    end
   end
 
   def json_api_errors(object)
