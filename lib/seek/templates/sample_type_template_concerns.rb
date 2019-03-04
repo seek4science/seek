@@ -44,7 +44,6 @@ module Seek
 
       def matches_content_blob?(blob)
         return false unless content_blob
-
         Rails.cache.fetch("st-match-#{blob.id}-#{content_blob.id}") do
           template_reader.matches?(blob)
         end
