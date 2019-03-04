@@ -60,8 +60,8 @@ module AvatarsHelper
   end
 
   def avatar_url(avatar_for_instance, avatar_id, size = nil)
-    serve_from_public = Rails.configuration.assets.enabled
-    if serve_from_public
+    #serve_from_public = Rails.configuration.assets.enabled
+    if Rails.env.production?
       avatar = Avatar.find(avatar_id)
       if avatar_for_instance.avatars.include?(avatar)
         avatar.public_asset_url(size)
