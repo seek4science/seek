@@ -80,4 +80,14 @@ class HomesHelperTest < ActionView::TestCase
     assert_equal snapshot2.resource.title.to_s, downloaded[:title]
     assert_equal assay_snapshot_path(snapshot2.resource, snapshot2), downloaded[:url]
   end
+
+  test 'feed_item_content_for_html with nil values' do
+    entry = Feedjira::Parser::RSSEntry.new
+    class << entry
+      attr_accessor :feed_title
+    end
+    result = feed_item_content_for_html(entry)
+    assert_equal [nil,'Unknown title', 'Unknown publisher', 'No summary ()'], result
+  end
+
 end

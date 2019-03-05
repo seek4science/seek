@@ -109,6 +109,8 @@ class DataFile < ActiveRecord::Base
   def sample_template?
     return false if external_asset.is_a? OpenbisExternalAsset
     possible_sample_types.any?
+  rescue SysMODB::SpreadsheetExtractionException
+    false
   end
 
   def possible_sample_types(user = User.current_user)
