@@ -40,6 +40,14 @@ module HomesHelper
     logged_in_and_registered? && Seek::Config.show_announcements
   end
 
+  #displays the news feed panel and content
+  def home_news_feeds
+    render :partial=>"home_news_feeds"
+  rescue RuntimeError=>e
+    Rails.logger.error("Error fetching and parsing news feeds: #{e.message} - #{e.backtrace.join($/)}")
+    ''
+  end
+
   # get multiple feeds from multiple sites
   def get_feed(feed_url = nil)
     unless feed_url.blank?

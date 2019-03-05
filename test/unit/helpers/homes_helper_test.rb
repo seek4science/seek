@@ -89,4 +89,5 @@ class HomesHelperTest < ActionView::TestCase
     result = feed_item_content_for_html(entry)
     assert_equal [nil,'Unknown title', 'Unknown publisher', 'No summary ()'], result
   end
+
 end
