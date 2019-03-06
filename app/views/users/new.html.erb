@@ -30,9 +30,9 @@
 
 
           <div class="form-group">
-            <label>Login name</label>
-            <%= f.text_field :login, :class => 'form-control' %>
-            <p class="help-block">Login should contain a minimum of 3 characters.</p>
+            <label>Username</label>
+            <%= f.text_field :login, :placeholder => 'Username', :class => 'form-control' %>
+            <p class="help-block">The username should contain a minimum of 3 characters.</p>
           </div>
 
           <div class="form-group">
@@ -42,7 +42,7 @@
 
           <div class="form-group">
             <label>Password</label>
-            <%= f.password_field :password, :class => 'form-control' %>
+            <%= f.password_field :password, :placeholder => 'Password', :class => 'form-control' %>
             <p class="help-block">Password should contain a minimum of <%= User::MIN_PASSWORD_LENGTH %> characters.</p>
           </div>
 
