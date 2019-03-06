@@ -11,9 +11,9 @@ function validateResourceFields(resourceName) {
         return false;
     }
 
-    // Always check the title is prsent
+    // Check the title is present, if the form has a title field
     var title = $j('#' + resourceName + '_title');
-    if (!title.val()) {
+    if (title.length && !title.val()) {
         alert("Please specify the title!");
         title.focus();
         return false;
