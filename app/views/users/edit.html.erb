@@ -2,9 +2,9 @@
 
 <h1>Manage Account</h1>
 
-<%= panel('Login Details') do %>
+<%= panel('User Details') do %>
     <div class="form-group">
-      <label>Login</label>
+      <label>Username</label>
 
       <p class="form-control-static"><%= @user.login %></p>
     </div>
@@ -15,7 +15,7 @@
 
         <div class="form-group">
           <label>New password</label>
-          <%= f.password_field :password, :class => 'form-control' %>
+          <%= f.password_field :password, :placeholder => 'Password', :class => 'form-control' %>
           <p class="help-block">Password should contain a minimum of <%= User::MIN_PASSWORD_LENGTH %> characters.</p>
         </div>
 
