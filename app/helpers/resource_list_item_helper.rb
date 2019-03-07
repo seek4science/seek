@@ -259,9 +259,19 @@ module ResourceListItemHelper
   end
 
   def list_item_author_list(all_authors)
-    authors = all_authors.select { |a| a.person && a.person.can_view? }
-    other_authors = all_authors.select { |a| a.person.nil? }.map { |a| a.last_name + ' ' + a.first_name }.join(',')
-    list_item_person_list(authors.map(&:person), other_authors, 'Author')
+    html = '<b>Author: </b>'
+    if all_authors.empty?
+      html << "<span class='none_text'>Not specified</span>"
+    else
+      html << all_authors.map do |author|
+        if author.person && author.person.can_view?
+          link_to get_object_title(author.person), show_resource_path(author.person)
+        else
+          author.full_name
+        end
+      end.join(', ')
+    end
+    html.html_safe
   end
 
   def list_item_doi(resource)
