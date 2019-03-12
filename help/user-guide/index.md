@@ -39,7 +39,7 @@ layout: page
      - [Sharing](general-attributes.html#sharing)
      - [Tags](general-attributes.html#tags)
      - [Attributions](general-attributes.html#attributions)
-     - [Contributors](general-attributes.html#contributors)
+     - [Creators](general-attributes.html#creators)
      - [SOPs](general-attributes.html#sops)
      - [Data Files](general-attributes.html#data-files)
      - [Publications](general-attributes.html#publications)

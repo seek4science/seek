@@ -63,12 +63,13 @@ An attribution in SEEK allows you, where appropriate, to select the asset from w
 
 ![add tags 1](/images/user-guide/add_attribution_1.png){:.screenshot}
 
-## Contributors
-Contributors are others who have been involved in generating the asset, through for example planning, experimentation, or analysis.
+## Creators
+Creators are others who have been involved in generating the asset, through for example planning, experimentation, or analysis. 
+They may not necessarily be the same person that registered the item - the Contributor.
 
 ![add contributor 1](/images/user-guide/add_contributor_1.png){:.screenshot}
 
-You can add multiple contributors, either one by one.
+You can add multiple creators, either one by one.
 
 ![add contributor 1](/images/user-guide/add_contributor_1.png){:.screenshot}
 
@@ -82,11 +83,11 @@ You can choose to add all member of a project, or members of a project from a sp
 
 You can also include non-SEEK creators.
 
-You can also add non-SEEK contributors using free text.
+You can also add non-SEEK creators using free text.
 
 ![add non-SEEK contributors 1](/images/user-guide/add_nonseek_contributors_1.png){:.screenshot}
 
-Contributors can be removed easily where necessary.
+Creators can be removed easily where necessary.
 
 ![add project members 3](/images/user-guide/add_project_members_3.png){:.screenshot}
 

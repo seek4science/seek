@@ -32,7 +32,7 @@ Assets in SEEK can be described using a number of fields, for example:
 * [Sharing](general-attributes.html#sharing)
 * [Tags](general-attributes.html#tags)
 * [Attributions](general-attributes.html#attributions)
-* [Contributors](general-attributes.html#contributors)
+* [Creators](general-attributes.html#creators)
 * [Publications](general-attributes.html#publications)
 * [Experimental assays and Modelling analysis](general-attributes.html#experimental-assays-and-modelling-analysis)
 * [Events](general-attributes.html#events)
