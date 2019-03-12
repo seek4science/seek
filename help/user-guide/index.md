@@ -43,7 +43,7 @@ layout: page
      - [SOPs](general-attributes.html#sops)
      - [Data Files](general-attributes.html#data-files)
      - [Publications](general-attributes.html#publications)
-     - [Experimental assays and Modelling analysis](general-attributes.html#experimental-assays-and-Modelling-analysis)
+     - [Experimental assays and Modelling analysis](general-attributes.html#experimental-assays-and-modelling-analysis)
      - [Events](general-attributes.html#events)
 - [Making an Investigation, Study or Assay citable](investigation-snapshots.html)
      - [Making public](investigation-snapshots.html#making-public)
