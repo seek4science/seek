@@ -10,7 +10,7 @@ function updateCreatorSettings() {
 
     // update the page
     if(html.length == 0) {
-        $j('#creators_list').html('<li><span class="none_text">No creators</span></li>');
+        $j('#creators_list').html('<li class="association-list-item"><span class="none_text">No creators</span></li>');
     }
     else {
         $j('#creators_list').html(html);

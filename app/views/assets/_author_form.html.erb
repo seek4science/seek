@@ -12,7 +12,7 @@
 <%= folding_panel(t('creator').capitalize.pluralize, collapsed, :body_options => {:id => 'creator_fold_content'},
                   :help_text => "Here you attribute this #{resource_type_text} to other people.") do %>
   <p>
-    If this <%= resource_type_text %> was contributed by, or together with, other members, please list their names below.
+    If this <%= resource_type_text %> was created, by or together with, other members, please list their names below.
     <br/>
     <strong>
       The <%= t('creator').pluralize -%> you specify will have permissions to 'view and edit summary and contents'.
@@ -33,8 +33,7 @@
   </p>
 
   <p>
-    If anyone not registered with <%= Seek::Config.application_name %> assisted with the contribution of
-    this <%= resource_type_text %>, you can specify them below.
+    If anyone not registered with <%= Seek::Config.application_name %> assisted creating this <%= resource_type_text %>, you can specify them below.
   </p>
   <p>
     <%= text_field_tag "#{resource_type}[other_creators]", other_creators, :class => 'form-control' %>
