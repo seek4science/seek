@@ -6,37 +6,37 @@ module Seek
       #
       # the option :data will get merged with some default info that reports the configured site host, and current user
       # information
-      def self.send_notification(exception, options = {})
+      def self.send_notification(exception, options = {}, user = User.current_user)
         return unless Seek::Config.exception_notification_enabled
         env = options[:env]
-        data = default_data.merge(options[:data] || {})
+        data = default_data(user).merge(options[:data] || {})
         begin
           Rails.logger.error "Sending execption ERROR - #{exception.class.name} (#{exception.message})"
           ExceptionNotifier.notify_exception(exception, env: env, data: data)
-        rescue StandardError => deliver_exception
-          Rails.logger.error 'Error delivering exception email - ' \
-                       "#{deliver_exception.class.name} (#{deliver_exception.message})"
+         rescue StandardError => deliver_exception
+           Rails.logger.error 'Error delivering exception email - ' \
+                        "#{deliver_exception.class.name} (#{deliver_exception.message})"
         end
       end
 
-      def self.default_data
+      def self.default_data(user)
         {
-          user: user_hash,
-          person: person_hash,
+          user: user_hash(user),
+          person: person_hash(user),
           site_host: Seek::Config.site_base_host
         }
       end
 
-      def self.user_hash
-        return {} unless User.current_user
-        { id: User.current_user.id,
-          login: User.current_user.login,
-          created_at: User.current_user.created_at }
+      def self.user_hash(user)
+        return {} unless user
+        { id: user.id,
+          login: user.login,
+          created_at: user.created_at }
       end
 
-      def self.person_hash
-        return {} unless User.current_user&.person
-        person = User.current_user.person
+      def self.person_hash(user)
+        return {} unless user&.person
+        person = user.person
         { id: person.id,
           name: person.title,
           email: person.email,

@@ -35,7 +35,7 @@ module Seek
 
       def exception_notification(status, exception)
         unless [404, 406].include?(status)
-          Seek::Errors::ExceptionForwarder.send_notification(exception, env:request.env)
+          Seek::Errors::ExceptionForwarder.send_notification(exception, {env:request.env}, current_user)
         end
       end
 
