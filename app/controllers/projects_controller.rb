@@ -165,6 +165,7 @@ class ProjectsController < ApplicationController
     @project = Project.new(project_params)
     @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
 
+
     respond_to do |format|
       if @project.save
         if params[:default_member] && params[:default_member][:add_to_project] && params[:default_member][:add_to_project] == '1'
@@ -174,6 +175,19 @@ class ProjectsController < ApplicationController
           person.is_project_administrator = true, @project
           disable_authorization_checks { person.save }
         end
+        members = params[:project][:members]
+        if members.nil?
+          members = []
+        end
+        members.each { | member|
+          person = Person.find(member[:person_id])
+          institution = Institution.find(member[:institution_id])
+          unless person.nil? || institution.nil?
+            person.add_to_project_and_institution(@project, institution)
+            person.save!
+          end
+        }
+        update_administrative_roles
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
         # format.json {render json: @project, adapter: :json, status: 200 }
@@ -318,7 +332,11 @@ class ProjectsController < ApplicationController
 
   def project_role_params
     params[:project].keys.each do |k|
-      params[:project][k] = params[:project][k].split(',')
+      if k.end_with?('_ids')
+        if params[:project][k].kind_of?(String)
+          params[:project][k] = params[:project][k].split(',')
+        end
+      end
     end
 
     params.require(:project).permit({ project_administrator_ids: [] },

@@ -6,6 +6,35 @@ class ProjectSerializer < AvatarObjSerializer
 
   attribute :default_policy, if: :show_default_policy?
 
+  attribute :members
+
+  def attributes(*args)
+    hash = super
+    hash.merge roles
+  end
+
+
+  def members
+    current_members = []
+    object.current_group_memberships.each { |membership|
+      current_members << {:person_id => "#{membership.person_id}",
+      :institution_id => "#{membership.institution.id}" }
+    }
+    current_members
+  end
+
+  def roles
+    current_roles = {}
+    Seek::Roles::ProjectRelatedRoles.role_names.each { |role|
+      current_people = []
+      Seek::Roles::ProjectRelatedRoles.instance.people_with_project_and_role(object, role).each {|person|
+        current_people << "#{person.id}"
+      }
+      current_roles["#{role}_ids"] = current_people
+    }
+    current_roles
+  end
+
   def default_policy
     BaseSerializer.convert_policy object.default_policy
   end

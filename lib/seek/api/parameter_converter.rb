@@ -69,6 +69,14 @@ module Seek
             end
           },
 
+          pal_ids: ->(value) {
+            if value
+              value.join(', ')
+            else
+              ''
+            end
+          },
+
           programme_ids: ->(value) {
             value.try(:first)
           },
