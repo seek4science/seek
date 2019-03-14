@@ -247,7 +247,7 @@ class AdminController < ApplicationController
       rescue SystemExit => e
         Rails.logger.info("Exit code #{e.status}")
       rescue => e
-        forward_exception_notification(e, {message:'Problem restarting delayed job'})
+        Seek::Errors::ExceptionForwarder.send_notification(e, data:{message:'Problem restarting delayed job'})
       end
     end
 

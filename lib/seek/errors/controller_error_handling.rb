@@ -19,12 +19,6 @@ module Seek
         end
       end
 
-      def log_extra_exception_data
-        request.env['exception_notifier.exception_data'] = {
-            current_logged_in_user: current_user
-        }
-      end
-
       def render_application_error(exception)
         logger.error "ERROR - #{exception.class.name} (#{exception.message})"
         status = error_response_code(exception)
@@ -40,26 +34,11 @@ module Seek
       end
 
       def exception_notification(status, exception)
-        unless !Seek::Config.exception_notification_enabled || [404, 406].include?(status)
-          begin
-            ExceptionNotifier.notify_exception(exception, env: request.env)
-          rescue Exception => deliver_exception
-            logger.error "ERROR - #{exception.class.name} (#{exception.message})"
-            logger.error "Error delivering exception email - #{deliver_exception.class.name} (#{deliver_exception.message})"
-          end
+        unless [404, 406].include?(status)
+          Seek::Errors::ExceptionForwarder.send_notification(exception, env:request.env)
         end
       end
 
-      # call to trigger an exception notification email, if the exception has been rescued and handled, but an email notification still needs to be sent
-      def forward_exception_notification(exception, data={})
-        return unless Seek::Config.exception_notification_enabled
-        begin
-          ExceptionNotifier.notify_exception(exception, env: request.env, data:data)
-        rescue Exception => deliver_exception
-          logger.error "ERROR - #{exception.class.name} (#{exception.message})"
-          logger.error "Error delivering exception email - #{deliver_exception.class.name} (#{deliver_exception.message})"
-        end
-      end
     end
   end
 end
