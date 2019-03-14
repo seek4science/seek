@@ -8,13 +8,13 @@ module Seek
       # information
       def self.send_notification(exception, options = {})
         return unless Seek::Config.exception_notification_enabled
-        env = option[:env]
+        env = options[:env]
         data = default_data.merge(options[:data] || {})
         begin
-          logger.error "Sending execption ERROR - #{exception.class.name} (#{exception.message})"
+          Rails.logger.error "Sending execption ERROR - #{exception.class.name} (#{exception.message})"
           ExceptionNotifier.notify_exception(exception, env: env, data: data)
         rescue StandardError => deliver_exception
-          logger.error 'Error delivering exception email - ' \
+          Rails.logger.error 'Error delivering exception email - ' \
                        "#{deliver_exception.class.name} (#{deliver_exception.message})"
         end
       end
