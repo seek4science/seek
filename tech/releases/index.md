@@ -11,6 +11,19 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.8.1
+
+Release date: _March_ 2019
+
+Bug fixes and minor improvements, main fixes are:
+
+  * Fix to some cases where the RDF wasn't including associated assets
+  * Better handling of news feed errors, and avoid cases where they could prevent the front page loading
+  * Fixed the order publication authors are displayed in list items  
+  * Project Dashboard help link
+
+A full list of changes included in this release can be found in the [SEEK v1.8.1 release notes](release-notes-1.8.1.html)
+
 ## Version 1.8.0
 
 Release data: _February 12th 2019_

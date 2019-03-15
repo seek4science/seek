@@ -68,16 +68,16 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.8.0
+    git checkout v1.8.1
 
 ### Updating using the tarball
 
 
 You can download the file from
-<https://bitbucket.org/fairdom/seek/downloads/seek-1.8.0.tar.gz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.8.1.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.8.0.tar.gz
+    tar zxvf seek-1.8.1.tar.gz
     mv seek seek-previous
     mv seek-1.8.0 seek
     cd seek/

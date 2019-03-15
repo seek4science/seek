@@ -8,6 +8,10 @@ redirect_from: "/install.html"
 
 ## Introduction
 
+These steps describe how to install SEEK directly on the machine (_bare-metal_). 
+
+For how to install and run using Docker, which in many cases is simpler and quicker, please read the [Docker Compose guide](docker/docker-compose.html).
+
 If you have installed SEEK, please take a moment to fill out our very
 short,optional [SEEK Registration
 Form](http://seek4science.org/seek-registration)
@@ -76,8 +80,20 @@ for Production](install-production.html)
 
 ## Getting SEEK
 
-Now you are ready for installing SEEK. You can either download SEEK or install
-from GitHub. You can download SEEK from
+Now you are ready for installing SEEK. You can either install directly from Github, or by downloading the files. You can also run SEEK from Docker
+
+### Install directly from Github
+
+If you wish to install directly from GitHub, the latest version of SEEK is
+tagged as *(v{{ site.current_seek_version }})*. To fetch this run:
+
+    git clone https://github.com/seek4science/seek.git
+    cd seek/
+    git checkout v{{ site.current_seek_version }}
+
+### Download to install
+
+Alternatively, you can download SEEK from
 <https://bitbucket.org/fairdom/seek/downloads/seek-{{ site.current_seek_version }}.tar.gz>
 
     wget https://bitbucket.org/fairdom/seek/downloads/seek-{{ site.current_seek_version }}.tar.gz
@@ -87,13 +103,6 @@ then unpack the file with:
     tar zxfv seek-{{ site.current_seek_version }}.tar.gz
     mv seek-{{ site.current_seek_version }} seek
     cd seek/
-
-Alternatively, if you wish to install directly from GitHub, the latest version of SEEK is
-tagged as *(v{{ site.current_seek_version }})*. To fetch this run:
-
-    git clone https://github.com/seek4science/seek.git
-    cd seek/
-    git checkout v{{ site.current_seek_version }}
 
 ## Setting up Ruby and RubyGems with RVM
 

@@ -16,7 +16,3 @@ the [Docker Engine Install Guides](https://docs.docker.com/engine/installation/)
 
 Optionally, for larger deployments you will also need [Docker Compose](https://docs.docker.com/compose/), 
 which also provides an [Installation Guide](https://docs.docker.com/compose/install/)
-
-
-
-Now move onto to [Running a basic container](basic-container.html)
