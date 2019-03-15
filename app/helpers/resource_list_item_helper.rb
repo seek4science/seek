@@ -242,7 +242,17 @@ module ResourceListItemHelper
     other_html = ''
     content_tag(:p, class: 'list_item_attribute') do
       html << content_tag(:b, "#{contributor_count == 1 ? key : key.pluralize}: ")
-      html << contributors.map { |c| link_to truncate(c.title, length: 75), show_resource_path(c), title: get_object_title(c) }.join(', ')
+      if (key == 'Author')
+        html << contributors.map do |author|
+          if author.person && author.person.can_view?
+            link_to get_object_title(author.person), show_resource_path(author.person)
+          else
+            author.full_name
+          end
+        end.join(', ')
+      else
+        html << contributors.map {|c| link_to truncate(c.title, length: 75), show_resource_path(c), title: get_object_title(c)}.join(', ')
+      end
       unless other_contributors.blank?
         other_html << ', ' unless contributors.empty?
         other_html << other_contributors
@@ -253,19 +263,7 @@ module ResourceListItemHelper
   end
 
   def list_item_author_list(all_authors)
-    html = '<b>Author: </b>'
-    if all_authors.empty?
-      html << "<span class='none_text'>Not specified</span>"
-    else
-      html << all_authors.map do |author|
-        if author.person && author.person.can_view?
-          link_to get_object_title(author.person), show_resource_path(author.person)
-        else
-          author.full_name
-        end
-      end.join(', ')
-    end
-    html.html_safe
+    list_item_person_list(all_authors, nil, 'Author')
   end
 
   def list_item_doi(resource)
