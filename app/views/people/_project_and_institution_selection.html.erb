@@ -1,15 +1,24 @@
 <%= panel("#{t('project').pluralize} and Institutions") do %>
     <p>
-      If you already belong to a <%= t('project') %>, please see it is listed below and if so select it. If you are in a
-      project that is not listed, then please select "Other" and provide the name of the project.
-      Likewise, also indicate if you belong to an already defined Institution, or provide the name if you cannot find it listed.
+      If you need to be assigned to one or more existing <%= t('project').pluralize %>, please select it below and also indicate the Institution you belong to.
+      By doing so a <%= t('project') %> Administrator will be notified and will be able to add you. You will be notified by email once added.
     </p>
+
+    <p class="alert alert-warning" id="no-project-warning">
+      If you register but are not a member of a <%= t('project') %> you will not be able to add new content. You will need to contact a <%= t('project') %> administrator to ask to be assigned to that Project,
+      or you can <%= help_link(:join_project,link_text:'Request to join') %> from the <%= t('project') %> page.
+      <% if Seek::Config.programme_user_creation_enabled && Seek::Config.programmes_enabled %>
+        You can also to create and administer your own <%= t('project').pluralize %>, by <%= help_link(:programme_self_management,link_text:'Creating and managing your own Programme space') %>.
+      <% end %>
+    </p>
+
+
     <div class="row">
       <div class="col-sm-4">
         <label><%= t('project').pluralize %></label>
         <%= select_tag "projects",
                        options_for_select(Project.all.sort_by(&:title).collect { |p| [p.title, p.id] }|[['Others', 0]], :selected => params['projects']),
-                       {:onchange => "Javascript:others('projects')", :multiple => true, :class => "form-control"}
+                       {:onchange => "javascript:others('projects')", :multiple => true, :class => "form-control"}
         -%>
         <div id='other_projects' style='display: none' class="form-group">
           <label>Other <%= t('project').pluralize %></label>
@@ -21,7 +30,7 @@
         <label>Institutions</label>
         <%= select_tag "institutions",
                        options_for_select(Institution.all.sort_by(&:title).collect { |i| [i.title, i.id] }|[['Others', 0]], :selected => params['institutions']),
-                       {:onchange => "Javascript:others('institutions')", :multiple => true, :class => "form-control"}
+                       {:onchange => "javascript:others('institutions')", :multiple => true, :class => "form-control"}
         -%>
         <div id='other_institutions' style='display: none' class="form-group">
           <label>Other institutions</label>
@@ -29,14 +38,25 @@
         </div>
       </div>
     </div>
+    <br/>
+
+
 <% end %>
 
 <script type="text/javascript">
     $j(document).ready(function () {
         $j('#projects').multiselect({maxHeight: 250});
         $j('#institutions').multiselect({maxHeight: 250});
+
+        // hides the warning if a registered project is selected
+        $j('#projects').change(function() {
+           if ($j('#projects option:selected[value!="0"]').length == 0) {
+               $j('#no-project-warning').show();
+           }
+           else {
+               $j('#no-project-warning').hide();
+           }
+        });
     });
 </script>
 
-<%= javascript_tag "others('projects')" -%>
-<%= javascript_tag "others('institutions')" -%>
