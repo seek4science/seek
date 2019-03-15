@@ -4239,6 +4239,44 @@
       ],
       "additionalProperties": false
     },
+    "member": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "institution_id": {
+          "$ref": "#/definitions/nonEmptyString"
+        }
+      }
+    },
+"membersList": {
+  "type": "array",
+  "minItems": 0,
+  "uniqueItems": true,
+  "items": {
+    "$ref": "#/definitions/member"
+  }
+},
+    "nullableMembersList": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/membersList"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+
+    "personList": {
+  "type": "array",
+  "minItems": 0,
+  "uniqueItems": true,
+  "items": {
+    "$ref": "#/definitions/nonEmptyString"
+  }
+},
     "projectResponse": {
       "type": "object",
       "properties": {
@@ -4274,6 +4312,21 @@
                 },
                 "default_license": {
                   "$ref": "#/definitions/nullableLicense"
+                },
+                "members": {
+                  "$ref": "#/definitions/nullableMembersList"
+                },
+                "pal_ids": {
+                  "$ref": "#/definitions/personList"
+                },
+                "project_administrator_ids": {
+                  "$ref": "#/definitions/personList"
+                },
+                "asset_housekeeper_ids": {
+                  "$ref": "#/definitions/personList"
+                },
+                "asset_gatekeeper_ids": {
+                  "$ref": "#/definitions/personList"
                 }
               },
               "required": [
