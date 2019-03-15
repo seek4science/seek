@@ -43,10 +43,12 @@
 
 <% end %>
 
+
+
 <script type="text/javascript">
     $j(document).ready(function () {
-        $j('#projects').multiselect({maxHeight: 250});
-        $j('#institutions').multiselect({maxHeight: 250});
+        $j('#projects').multiselect({maxHeight: 250, buttonWidth: '20em', numberDisplayed: 1});
+        $j('#institutions').multiselect({maxHeight: 250, buttonWidth: '20em', numberDisplayed: 1});
 
         // hides the warning if a registered project is selected
         $j('#projects').change(function() {
