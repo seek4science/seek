@@ -11,8 +11,6 @@ class ApplicationController < ActionController::Base
 
   include CommonSweepers
 
-  before_filter :log_extra_exception_data
-
   # if the logged in user is currently partially registered, force the continuation of the registration process
   before_filter :partially_registered?
 
