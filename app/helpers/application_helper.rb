@@ -262,13 +262,13 @@ module ApplicationHelper
   def contributor(contributor, avatar = false, size = 100, you_text = false)
     return unless contributor
 
+    contributor_name = h(contributor.name)
+    contributor_url = person_path(contributor)
+    contributor_name_link = link_to(contributor_name, contributor_url)
+
     if contributor.class.name == 'User'
       # this string will output " (you) " for current user next to the display name, when invoked with 'you_text == true'
       you_string = you_text && logged_in? && user.id == current_user.id ? "<small style='vertical-align: middle; color: #666666; margin-left: 0.5em;'>(you)</small>" : ''
-      contributor_name = h(contributor.name)
-      contributor_url = person_path(contributor)
-      contributor_name_link = link_to(contributor_name, contributor_url)
-
       if avatar
         result = avatar(contributor_person, size, false, contributor_url, contributor_name, false)
         result += "<p style='margin: 0; text-align: center;'>#{contributor_name_link}#{you_string}</p>"
@@ -277,7 +277,7 @@ module ApplicationHelper
         return (contributor_name_link + you_string).html_safe
       end
     else
-      return nil
+      return (contributor_name_link).html_safe
     end
   end
 
@@ -415,6 +415,15 @@ module ApplicationHelper
 
     if referer == search_path && referer != request_uri && request_uri != root_path
       javascript_tag "
+              if (window.history.length > 1){
+                var a = document.createElement('a');
+                a.onclick = function(){ window.history.back(); };
+                a.onmouseover = function(){ this.style.cursor='pointer'; };
+                a.appendChild(document.createTextNode('Return to search'));
+                a.style.textDecoration='underline';
+                document.getElementById('return_to_search').appendChild(a);
+              }
+            "
         if (window.history.length > 1){
           var a = document.createElement('a');
           a.onclick = function(){ window.history.back(); };
