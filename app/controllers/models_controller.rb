@@ -106,6 +106,17 @@ class ModelsController < ApplicationController
     end
   end
 
+  def edit_version_comment
+    @model = Model.find(params[:id])
+    @comment = @model.versions.find_by(:version => params[:version])
+    if @comment.update(revision_comments: params[:revision_comments])
+      flash[:notice] = "The comment of version #{params[:version]} was successfully updated."
+    else
+      flash[:error] = "Unable to update the comment of version #{params[:version]}. Please try again."
+    end
+    redirect_to model_path(@model)
+  end
+
   def delete_model_metadata
     attribute=params[:attribute]
     if attribute=="model_type"

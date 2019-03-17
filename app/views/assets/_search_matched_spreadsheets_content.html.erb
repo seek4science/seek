@@ -65,7 +65,7 @@
         }
     }
     function showMatchedItems() {
-        var item_ids = new Array();
+        var item_ids = [];
         <% matched_items.each do |item|%>
         item_ids.push("<%= item.id %>");
         <% end %>

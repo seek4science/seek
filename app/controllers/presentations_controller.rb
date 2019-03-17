@@ -34,6 +34,17 @@ class PresentationsController < ApplicationController
 
   end
 
+  def edit_version_comment
+    @presentation = Presentation.find(params[:id])
+    @comment = @presentation.versions.find_by(:version => params[:version])
+    if @comment.update(revision_comments: params[:revision_comments])
+      flash[:notice] = "The comment of version #{params[:version]} was successfully updated."
+    else
+      flash[:error] = "Unable to update the comment of version #{params[:version]}. Please try again."
+    end
+    redirect_to presentation_path(@presentation)
+  end
+
  # PUT /presentations/1
   # PUT /presentations/1.xml
   def update

@@ -34,6 +34,17 @@ class DocumentsController < ApplicationController
     end
   end
 
+  def edit_version_comment
+    @document = Document.find(params[:id])
+    @comment = @document.versions.find_by(:version => params[:version])
+    if @comment.update(revision_comments: params[:revision_comments])
+      flash[:notice] = "The comment of version #{params[:version]} was successfully updated."
+    else
+      flash[:error] = "Unable to update the comment of version #{params[:version]}. Please try again."
+    end
+    redirect_to document_path(@document)
+  end
+
   # PUT /documents/1
   def update
     update_annotations(params[:tag_list], @document) if params.key?(:tag_list)

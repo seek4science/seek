@@ -88,6 +88,18 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def edit_version_comment
+    @data_file = DataFile.find(params[:id])
+    @comment = @data_file.versions.find_by(:version => params[:version])
+    if @comment.update(revision_comments: params[:revision_comments])
+      flash[:notice] = "The comment of version #{params[:version]} was successfully updated."
+    else
+      flash[:error] = "Unable to update the comment of version #{params[:version]}. Please try again."
+    end
+    redirect_to data_file_path(@data_file)
+  end
+
+
   def upload_for_tool
     params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
     @data_file = DataFile.new(data_file_params)
