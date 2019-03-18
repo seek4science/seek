@@ -13,7 +13,7 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 ## Version 1.8.1
 
-Release date: _March_ 2019
+Release date: 18th _March_ 2019
 
 Bug fixes and minor improvements, main fixes are:
 
