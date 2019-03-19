@@ -554,6 +554,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :edit_version_comment
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
@@ -580,6 +581,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :edit_version_comment
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
