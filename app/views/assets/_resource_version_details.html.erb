@@ -13,9 +13,9 @@
                   </small>
                 </h4>
                 <p>
-                <% if version.contributor.id == current_user.person_id %>
-                  <small><%= link_to_function "Edit comment",visual_effect(:toggle_appear, "edit_version_comment_form") %></small>
-                <% end %>
+                  <% if resource.can_manage? %>
+                    <small><%= link_to_function "Edit comment",visual_effect(:toggle_appear, "edit_version_comment_form") %></small>
+                  <% end %>
                 </p>
                 <p class="list-group-item-text">
                   <% if version.revision_comments.blank? %>
@@ -24,7 +24,7 @@
                       <%= white_list(version.revision_comments) -%>
                   <% end %>
                 </p>
-                <% if version.contributor.id == current_user.person_id %>
+                <% if resource.can_manage? %>
                   <%= render :partial=>"assets/edit_version_comment_form",:locals => {:version=>version} -%>
                 <% end %>
               </div>
