@@ -26,9 +26,7 @@ module Seek
 
     def external_service_error(exception, service_name, message, strategy)
       message = "There was a problem communicating with #{service_name} - #{message}"
-      if Seek::Config.exception_notification_enabled
-        ExceptionNotifier.notify_exception(exception, data: { message: "Error interacting with #{service_name}" })
-      end
+      Seek::Errors::ExceptionForwarder.send_notification(exception, data: { message: "Error interacting with #{service_name}" } )
 
       if strategy.respond_to?(:call)
         strategy.call(message)

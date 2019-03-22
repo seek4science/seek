@@ -349,8 +349,7 @@ class DataFilesController < ApplicationController
         critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
       end
     rescue Exception => e
-      forward_exception_notification(e, {message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}",
-                                         current_logged_in_user: current_user})
+      Seek::Errors::ExceptionForwarder.send_notification(e, data:{message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}"})
       session[:extraction_exception_message] = e.message
     end
 
