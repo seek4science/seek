@@ -43,9 +43,7 @@ module Seek
 
     # converts to a string, as <major>.<minor>.<patch>
     def to_s
-      v = "#{major}.#{minor}"
-      v << ".#{patch}" if patch
-      v
+      "#{major}.#{minor}".tap { |v| v << ".#{patch}" if patch }
     end
   end
 end
