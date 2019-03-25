@@ -91,7 +91,7 @@ module ApplicationHelper
   end
 
   def version_text
-    "(v.#{SEEK::Application::APP_VERSION})"
+    "(v.#{Seek::Version.read_cached})"
   end
 
   def authorized_list(all_items, attribute, sort = true, max_length = 75, count_hidden_items = false)
