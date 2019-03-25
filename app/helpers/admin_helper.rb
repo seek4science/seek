@@ -84,7 +84,7 @@ module AdminHelper
   end
 
   def git_link_tag
-    if File.exist?(File.join(Rails.root, '.git'))
+    if Seek::Version.git_present?
       begin
         version = Seek::Version.git_version
         branch = Seek::Version.git_branch
