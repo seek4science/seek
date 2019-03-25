@@ -10,17 +10,17 @@ class VersionTest < ActiveSupport::TestCase
   end
 
   test 'all numbers' do
-    str = Seek::Version.read(File.join(Rails.root, 'test/fixtures/files/version1.yml')).to_s
+    str = Seek::Version.read(File.join(Rails.root, 'test/fixtures/files/version1.test-yml')).to_s
     assert_equal '1.2.3', str
   end
 
   test 'wordy patch' do
-    str = Seek::Version.read(File.join(Rails.root, 'test/fixtures/files/version2.yml')).to_s
+    str = Seek::Version.read(File.join(Rails.root, 'test/fixtures/files/version2.test-yml')).to_s
     assert_equal '2.3.sprint-33', str
   end
 
   test 'no patch' do
-    str = Seek::Version.read(File.join(Rails.root, 'test/fixtures/files/version3.yml')).to_s
+    str = Seek::Version.read(File.join(Rails.root, 'test/fixtures/files/version3.test-yml')).to_s
     assert_equal '4.0', str
   end
 end
