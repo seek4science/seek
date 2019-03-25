@@ -23,4 +23,8 @@ class VersionTest < ActiveSupport::TestCase
     str = Seek::Version.read(File.join(Rails.root, 'test/fixtures/files/version3.test-yml')).to_s
     assert_equal '4.0', str
   end
+
+  test 'APP_VERSION' do
+    assert_equal Seek::Version::APP_VERSION, Seek::Version.read
+  end
 end

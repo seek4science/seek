@@ -16,10 +16,7 @@ module Seek
       Seek::Version.new(path)
     end
 
-    # reads the YAML and stores a copy of the Seek::Version, which is returned for subsequent calls
-    def self.read_cached(path = Rails.root.join('config/version.yml'))
-      @@version ||= read(path)
-    end
+    APP_VERSION = read.freeze
 
     def self.git_version
       `git rev-parse HEAD`.chomp
