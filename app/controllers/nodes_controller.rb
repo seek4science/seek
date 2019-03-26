@@ -36,17 +36,6 @@ class NodesController < ApplicationController
     
   end
 
-  def edit_version_comment
-    @node = Node.find(params[:id])
-    @comment = @node.versions.find_by(:version => params[:version])
-    if @comment.update(revision_comments: params[:revision_comments])
-      flash[:notice] = "The comment of version #{params[:version]} was successfully updated."
-    else
-      flash[:error] = "Unable to update the comment of version #{params[:version]}. Please try again."
-    end
-    redirect_to node_path(@node)
-  end
-
   # PUT /Nodes/1
   def update
     update_annotations(params[:tag_list], @node) if params.key?(:tag_list)

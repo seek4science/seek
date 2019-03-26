@@ -14,7 +14,7 @@
                 </h4>
                 <p>
                   <% if resource.can_manage? %>
-                    <small><%= link_to_function "Edit comment",visual_effect(:toggle_appear, "edit_version_comment_form") %></small>
+                    <small><%= link_to_function "Edit comment",visual_effect(:toggle_appear, "edit_version_comment_form_#{version.version}") %></small>
                   <% end %>
                 </p>
                 <p class="list-group-item-text">

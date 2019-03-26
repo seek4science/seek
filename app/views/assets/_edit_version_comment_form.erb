@@ -1,5 +1,5 @@
 <% if logged_in_and_member? -%>
-  <%= panel('Please enter new comment here:', :id => 'edit_version_comment_form', :style => 'display: none') do %>
+  <%= panel('Please enter new comment here:', :id => 'edit_version_comment_form_'+"#{version.version}", :style => 'display: none') do %>
     <%= form_tag({:action=>"edit_version_comment", :version=>version.version}, :multipart => true) do -%>
       <div class="form-group">
         <%= text_area_tag :revision_comments, version.revision_comments, :size=>"55x4", :class => 'form-control' -%>

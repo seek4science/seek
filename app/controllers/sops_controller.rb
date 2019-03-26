@@ -43,18 +43,6 @@ class SopsController < ApplicationController
 
   end
 
-
-  def edit_version_comment
-    @sop = Sop.find(params[:id])
-    @comment = @sop.versions.find_by(:version => params[:version])
-    if @comment.update(revision_comments: params[:revision_comments])
-      flash[:notice] = "The comment of version #{params[:version]} was successfully updated."
-    else
-      flash[:error] = "Unable to update the comment of version #{params[:version]}. Please try again."
-    end
-    redirect_to sop_path(@sop)
-  end
-
   # PUT /sops/1
   def update
     update_annotations(params[:tag_list], @sop) if params.key?(:tag_list)

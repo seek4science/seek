@@ -37,17 +37,6 @@ class WorkflowsController < ApplicationController
     
   end
 
-  def edit_version_comment
-    @workflow = Workflow.find(params[:id])
-    @comment = @workflow.versions.find_by(:version => params[:version])
-    if @comment.update(revision_comments: params[:revision_comments])
-      flash[:notice] = "The comment of version #{params[:version]} was successfully updated."
-    else
-      flash[:error] = "Unable to update the comment of version #{params[:version]}. Please try again."
-    end
-    redirect_to workflow_path(@workflow)
-  end
-
   # PUT /Workflows/1
   def update
     update_annotations(params[:tag_list], @workflow) if params.key?(:tag_list)
