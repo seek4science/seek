@@ -1,6 +1,5 @@
 class Programme < ApplicationRecord
   include Seek::Taggable
-  include Seek::Rdf::RdfGeneration
 
   attr_accessor :administrator_ids
 

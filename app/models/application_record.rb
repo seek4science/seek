@@ -69,10 +69,6 @@ class ApplicationRecord < ActiveRecord::Base
     self.class.include? Seek::Ontologies::SuggestedType
   end
 
-  def rdf_supported?
-    self.class.include? Seek::Rdf::RdfGeneration
-  end
-
   def self.subscribable?
     include? Seek::Subscribable
   end

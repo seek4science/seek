@@ -129,3 +129,9 @@ Factory.define :assets_creator do |f|
   f.association :asset, factory: :data_file
   f.association :creator, factory: :person_in_project
 end
+
+Factory.define(:avatar) do |f|
+  f.original_filename "#{Rails.root}/test/fixtures/files/file_picture.png"
+  f.image_file File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb')
+  f.association :owner, factory: :person
+end

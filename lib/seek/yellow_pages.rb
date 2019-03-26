@@ -47,6 +47,9 @@ module Seek #:nodoc:
         end
         include Seek::YellowPages::InstanceMethods
         include Seek::Search::BackgroundReindexing
+        include Seek::BioSchema::Generation
+        include Seek::Rdf::RdfGeneration
+        include Seek::Rdf::ReactToAssociatedChange
       end
 
       def is_yellow_pages?

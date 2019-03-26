@@ -6,12 +6,6 @@ Factory.define(:brand_new_user, class: User) do |f|
   f.password_confirmation test_password
 end
 
-Factory.define(:avatar) do |f|
-  f.original_filename "#{Rails.root}/test/fixtures/files/file_picture.png"
-  f.image_file File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb')
-  f.association :owner, factory: :person
-end
-
 # activated_user mainly exists for :person to use in its association
 Factory.define(:activated_user, parent: :brand_new_user) do |f|
   f.after_create do |u|

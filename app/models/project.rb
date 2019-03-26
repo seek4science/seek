@@ -1,7 +1,5 @@
 class Project < ApplicationRecord
-  include Seek::Taggable
-  include Seek::Rdf::RdfGeneration
-  include Seek::Rdf::ReactToAssociatedChange
+  include Seek::Taggable  
   include HasSettings
 
   acts_as_yellow_pages
