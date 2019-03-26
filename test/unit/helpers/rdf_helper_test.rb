@@ -1,5 +1,5 @@
 require 'test_helper'
-require 'nokigiri'
+
 
 class RdfHelperTest < ActionView::TestCase
   test 'schema_ld_script_block' do
@@ -15,12 +15,12 @@ class RdfHelperTest < ActionView::TestCase
     block = schema_ld_script_block
     refute block.blank?
 
-    doc = HTML::Document.new(block)
-    script = doc.root.children.first
+    frag = Nokogiri::HTML::DocumentFragment.parse(block)
+    script = frag.children.first
     assert_equal 'script', script.name
-    assert_equal 'application/ld+json', script.attributes['type']
-
-    json = JSON.parse(doc.root.children.first.children.first.content)
+    assert_equal 'application/ld+json', script.attributes['type'].content
+    
+    json = JSON.parse(frag.children.first.children.first.content)
 
     # TODO: check JSON LD
   end
