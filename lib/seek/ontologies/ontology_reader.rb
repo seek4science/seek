@@ -51,7 +51,7 @@ module Seek
       end
 
       def fetch_description_for(uri)
-        result = ontology.query(subject: uri, predicate: RDF::DC11.description).first
+        result = ontology.query(subject: uri, predicate: RDF::Vocab::DC11.description).first
         result.nil? ? result : result.object.to_s
       end
 
