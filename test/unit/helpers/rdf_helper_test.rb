@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'nokigiri'
 
 class RdfHelperTest < ActionView::TestCase
   test 'schema_ld_script_block' do
