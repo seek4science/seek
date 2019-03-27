@@ -143,7 +143,7 @@ end
 group :production do
   gem 'passenger'
   gem 'puma'
-  gem 'system'
+  #gem 'system'
 end
 
 group :development do
