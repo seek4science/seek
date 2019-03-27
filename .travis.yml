@@ -23,8 +23,8 @@ before_script:
   - cp test/database.travis.$DB_TYPE.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:create
   - RAILS_ENV=test bundle exec rake db:schema:load
-  - sh -c "if [ '$DB_TYPE' = 'mysql' ]; then RAILS_ENV=production bundle exec rake db:create; fi"
-  - sh -c "if [ '$DB_TYPE' = 'mysql' ]; then RAILS_ENV=production bundle exec rake db:schema:load; fi"
+  - sh -c "if [ '$SUITE' = 'rake assets:precompile RAILS_ENV=production' ]; then RAILS_ENV=production bundle exec rake db:create; fi"
+  - sh -c "if [ '$SUITE' = 'rake assets:precompile RAILS_ENV=production' ]; then RAILS_ENV=production bundle exec rake db:schema:load; fi"
 
 script: bundle exec $SUITE
 
