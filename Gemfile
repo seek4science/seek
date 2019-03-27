@@ -29,7 +29,7 @@ gem 'dynamic_form'
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'linkeddata'
-gem 'rdf','1.99.1'
+gem 'rdf'#,'1.99.1'
 
 
 gem 'openseek-api'
