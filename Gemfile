@@ -29,6 +29,8 @@ gem 'dynamic_form'
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'linkeddata'
+gem 'rdf','1.99.1'
+
 
 gem 'openseek-api'
 # for fancy content escaping in openbis integration
@@ -55,7 +57,7 @@ gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
 gem 'nokogiri', '~> 1.8.1'
-gem 'rdf-virtuoso', git: 'https://github.com/stuzart/rdf-virtuoso', branch: 'ruby-rdf-3'
+gem 'rdf-virtuoso', git: 'https://github.com/digibib/rdf-virtuoso', branch: 'develop'#, git: 'https://github.com/stuzart/rdf-virtuoso', branch: 'ruby-rdf-3'
 gem 'terrapin'
 gem 'colorize', '0.7.4'
 gem 'lograge'
