@@ -15,7 +15,7 @@ module Seek
       # provides a singleton instance of the configured repository
       def self.instance
         # TODO: in the future, when/if we support more repository flavours, the instance we return will need to be configurable
-        #Seek::Rdf::VirtuosoRepository.instance
+        Seek::Rdf::VirtuosoRepository.instance
       end
 
       # an RDF::Query that can be used to create queries to query the repository
