@@ -204,7 +204,7 @@ function addAuthorsFromSelect() {
   }).get();
   
   addAuthorsToPublication( authorlist, '#publication_publication_authors');
-  return;
+
   
   // jQuery('#publication_publication_authors option').each(function(index,element){
     // console.log('value:' + jQuery(element).val());
@@ -424,7 +424,7 @@ function transferProjectIds() {
   var registerForm = $j('form#new_publication');
 
   for (var i = 0; i < selectedProjects.length; i++) {
-    var element = "<input multiple='multiple' value='" + selectedProjects[i] + "' type='hidden' name='publication[project_ids][]' id='publication_project_ids'>"
+    var element = "<input multiple='multiple' value='" + selectedProjects[i] + "' type='hidden' name='publication[project_ids][]' id='publication_project_ids'>";
     registerForm.append(element);
   }
 }

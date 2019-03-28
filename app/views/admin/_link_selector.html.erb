@@ -14,7 +14,7 @@
           <% if authorization_for_showing_already_done || item.can_view? -%>
             <tr id="<%= resource_id + "_" + item.id.to_s + "_source_row" -%>">
               <td id="<%= resource_id + "_" + item.id.to_s + "_source_cell"
-                  -%>" onclick="javascript:checkItem('<%= item.id.to_s -%>', 'source', '<%= resource_id -%>')">
+                  -%>" onclick="checkItem('<%= item.id.to_s -%>', 'source', '<%= resource_id -%>')">
                     <%= item.title -%>
               </td>
             </tr>
@@ -37,7 +37,7 @@
           <% if authorization_for_showing_already_done || item.can_view? -%>
             <tr id="<%= resource_id + "_" + item.id.to_s + "_target_row" -%>" style="display:none;">
               <td id="<%= resource_id + "_" + item.id.to_s + "_target_cell"
-                  -%>" onclick="javascript:checkItem('<%= item.id.to_s -%>', 'target', '<%= resource_id -%>')">
+                  -%>" onclick="checkItem('<%= item.id.to_s -%>', 'target', '<%= resource_id -%>')">
                     <%= item.title -%>
               </td>
             </tr>

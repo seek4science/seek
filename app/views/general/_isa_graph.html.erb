@@ -71,8 +71,7 @@
     function drawInitialState() {
         ISA.decodeHTMLForElements(elements);
         ISA.drawGraph(elements, '<%= node_id(root_item) -%>');
-    };
-
+    }
     ISA.view = {
         tree: function () {
             $j('#isa-tree-view-btn').button('toggle');
@@ -95,7 +94,7 @@
             $j('#reset-nodes-btn').show();
             cy.fit(ISA.defaults.padding);
             cy.resize();
-            ISA.view.current = 'graph'
+            ISA.view.current = 'graph';
             return false;
         },
 
@@ -109,7 +108,7 @@
             $j('#jstree').css('width', '300px');
             cy.fit(ISA.defaults.padding);
             cy.resize();
-            ISA.view.current = 'split'
+            ISA.view.current = 'split';
             return false;
         },
 

@@ -16,13 +16,13 @@
       <div class="contents curved_bottom">
         <div class="text-center">
 
-            <input type=button id="my_project_button" class="<%= button_class %>" value="My <%= t('project') %>" onclick="javascript:myProjectClicked();"/>
+            <input type=button id="my_project_button" class="<%= button_class %>" value="My <%= t('project') %>" onclick="myProjectClicked();"/>
 
             <ul id="my_project_menu" class='dynamic_menu with_smaller_shadow' style="display:none;">
 
                 <% current_user.person.projects.each do |p| %>
 
-                    <li class='dynamic_menu_li' onclick="javascript:location.href='<%= project_path(p) -%>';"><%= h(p.title) %></li>
+                    <li class='dynamic_menu_li' onclick="location.href='<%= project_path(p) -%>';"><%= h(p.title) %></li>
                 <% end %>
             </ul>
 

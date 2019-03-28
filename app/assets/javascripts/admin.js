@@ -1,1 +1,1 @@
-var autocompleters = new Array();
+var autocompleters = [];
