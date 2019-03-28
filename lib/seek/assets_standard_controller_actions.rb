@@ -112,6 +112,17 @@ module Seek
       item
     end
 
+    def edit_version_comment
+      item = class_for_controller_name.find(params[:id])
+      @comment = item.versions.find_by(:version => params[:version])
+      if @comment.update(revision_comments: params[:revision_comments])
+        flash[:notice] = "The comment of version #{params[:version]} was successfully updated."
+      else
+        flash[:error] = "Unable to update the comment of version #{params[:version]}. Please try again."
+      end
+      redirect_to item
+    end
+
     def return_to_fancy_parent(item)
       return false unless item.respond_to?(:parent_name) && !item.parent_name.blank?
       render partial: 'assets/back_to_fancy_parent', locals: { child: item, parent_name: item.parent_name }

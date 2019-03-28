@@ -80,7 +80,7 @@ function insertFancyListItem2(multiselect, displaylist, option) {
 
 function fetchJsonForScale(scale_id) {
 
-    var result=new Array();
+    var result=[];
     var options = $('scale_ids_and_params').childElements().select(function(c){return c.selected;});
     options.each(function(opt) {
 
