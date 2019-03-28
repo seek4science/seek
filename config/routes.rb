@@ -410,6 +410,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :edit_version_comment
       #MERGENOTE - this is a destroy, and should be the destroy method, not post since we are not updating or creating something.
       post :destroy_version
       get :mint_doi_confirm
@@ -450,6 +451,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :edit_version_comment
       delete :destroy_version
       get :isa_children
     end
@@ -473,6 +475,7 @@ SEEK::Application.routes.draw do
       get :published
       post :publish_related_items
       post :new_version
+      post :edit_version_comment
       post :submit_to_sycamore
       post :export_as_xgmml
       post :update_annotations_ajax
@@ -514,6 +517,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :edit_version_comment
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
@@ -545,6 +549,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :edit_version_comment
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
@@ -571,6 +576,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :edit_version_comment
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
@@ -738,6 +744,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :edit_version_comment
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm

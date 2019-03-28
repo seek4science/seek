@@ -50,6 +50,7 @@
 </div>
 
 <%= render :partial=>"layouts/footer" %>
+<%= debug(params) if Rails.env.development? %>
 
 <%= render partial: 'layouts/piwik' if Seek::Config.piwik_analytics_enabled %>
 <%= analytics_init if Seek::Config.google_analytics_enabled %>
