@@ -58,7 +58,6 @@ class SampleTypesController < ApplicationController
   # POST /sample_types.json
   def create
     # because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
-    tags = params[:sample_type].delete(:tags)
     @sample_type = SampleType.new(sample_type_params)
     @sample_type.contributor = User.current_user.person
 
@@ -68,7 +67,6 @@ class SampleTypesController < ApplicationController
 
     respond_to do |format|
       if @sample_type.save
-        @sample_type.update_attribute(:tags, tags)
         format.html { redirect_to @sample_type, notice: 'Sample type was successfully created.' }
         format.json { render json: @sample_type, status: :created, location: @sample_type}
       else
