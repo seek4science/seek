@@ -7,7 +7,7 @@ module Seek
     end
 
     def add_annotations(annotations, attr = 'tag', owner = User.current_user, owned_tags_only = false)
-      annotate_with(resolve_tags(annotations), attr, owner, owned_tags_only)
+      annotate_with(annotations, attr, owner, owned_tags_only)
     end
 
     # returns true or false to indicate the tags have changed

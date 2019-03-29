@@ -34,9 +34,8 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'should create sample_type' do
-
-
-    Factory :tag, source: @person.user, annotatable: Factory(:simple_sample_type), value: 'golf'
+    Factory :annotation, attribute_name: 'sample_type_tag', source: @person.user,
+            annotatable: Factory(:simple_sample_type), value: 'golf'
 
     assert_difference('ActivityLog.count') do
       assert_difference('SampleType.count') do
