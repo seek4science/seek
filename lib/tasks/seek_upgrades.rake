@@ -13,6 +13,7 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
+    fix_sample_type_tag_annotations
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -41,4 +42,17 @@ namespace :seek do
     end
   end
 
+  desc('Fix sample type tag annotations')
+  task(fix_sample_type_tag_annotations: :environment) do
+    plural = AnnotationAttribute.where(name: 'sample_type_tags').first
+    if plural
+      annotations = plural.annotations
+      count = annotations.count
+      if count > 0
+        singular = AnnotationAttribute.where(name: 'sample_type_tag').first_or_create!
+        annotations.update_all(attribute_id: singular.id)
+        puts "Fixed #{count} sample type tag"
+      end
+    end
+  end
 end

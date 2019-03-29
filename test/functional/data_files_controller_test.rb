@@ -23,7 +23,7 @@ class DataFilesControllerTest < ActionController::TestCase
     # by TZ for some reason depending on tets order user was no longer logged
     login_as(:datafile_owner) unless User.current_user
     @object = data_files(:picture)
-    @object.tag_with 'tag1'
+    @object.annotate_with 'tag1'
     @object
   end
 

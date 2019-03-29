@@ -14,7 +14,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   def rest_api_test_object
     @object = Factory :presentation, contributor: User.current_user.person
-    @object.tag_with 'tag1'
+    @object.annotate_with 'tag1'
     @object
   end
 
