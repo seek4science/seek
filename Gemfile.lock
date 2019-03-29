@@ -35,13 +35,6 @@ GIT
       rdf (>= 1.99)
 
 GIT
-  remote: https://github.com/myGrid/annotations.git
-  revision: 401f831c3e0ace82b109dd649d8d7b0820f58032
-  branch: rails4.2
-  specs:
-    my_annotations (0.8.1)
-
-GIT
   remote: https://github.com/myGrid/search_biomodel.git
   revision: e109ac6d8b102f7ecb65140c17d263b85e066870
   specs:
@@ -874,7 +867,6 @@ DEPENDENCIES
   mimemagic (= 0.3.2)
   minitest (= 5.10.3)
   minitest-reporters
-  my_annotations!
   my_responds_to_parent!
   mysql2
   nokogiri (~> 1.8.1)

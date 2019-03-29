@@ -21,6 +21,10 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::Permissions::AuthorizationEnforcement
   include Seek::Permissions::ActsAsAuthorized
 
+  include Annotations::Acts::Annotatable
+  include Annotations::Acts::AnnotationSource
+  include Annotations::Acts::AnnotationValue
+
   def self.is_taggable?
     false # defaults to false, unless it includes Taggable which will override this and check the configuration
   end
