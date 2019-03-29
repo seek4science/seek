@@ -6,7 +6,7 @@ class HomesController < ApplicationController
 
   def index
     respond_with do |format|
-      format.html { render seek_template: :index }
+      format.html { render template: :index }
     end
   end
 
