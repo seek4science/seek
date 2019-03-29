@@ -13,7 +13,6 @@ class TaggableTest < ActiveSupport::TestCase
     with_config_value :tagging_enabled, false do
       refute Model.is_taggable?
       refute Assay.is_taggable?
-      refute person.is_taggable?
       refute model.is_taggable?
       refute assay.is_taggable?
     end
