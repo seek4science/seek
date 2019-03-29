@@ -3,17 +3,17 @@
 class AnnotationAttribute < ApplicationRecord
   validates_presence_of :name,
                         :identifier
-  
+
   validates_uniqueness_of :name,
-                          :case_sensitive => false
+                          case_sensitive: false
 
   validates_uniqueness_of :identifier,
-                          :case_sensitive => false
-                          
+                          case_sensitive: false
+
   has_many :annotations,
-           :foreign_key => "attribute_id"
-           
-  before_validation :set_identifier         
+           foreign_key: 'attribute_id'
+
+  before_validation :set_identifier
 
   # If the identifier is not set, generate it before validation takes place.
   # See Annotations::Config::default_attribute_identifier_template
@@ -28,13 +28,13 @@ class AnnotationAttribute < ApplicationRecord
   #     Annotations::Config::default_attribute_identifier_template, where '%s' in the template will be replaced with
   #     the transformation of 'name' through the Proc specified by Annotations::Config::attribute_name_transform_for_identifier.
   def set_identifier
-    unless self.name.blank? or !self.identifier.blank?
-      if self.name.match(/^<.+>$/)
-        self.identifier = self.name[1, self.name.length-1].chop
-      elsif self.name.match(/^http:\/\//) or self.name.match(/^urn:/)
-        self.identifier = self.name
+    unless name.blank? || !identifier.blank?
+      if name.match?(/^<.+>$/)
+        self.identifier = name[1, name.length - 1].chop
+      elsif name.match(/^http:\/\//) || name.match(/^urn:/)
+        self.identifier = name
       else
-        self.identifier = (Annotations::Config::default_attribute_identifier_template % Annotations::Config::attribute_name_transform_for_identifier.call(self.name))
+        self.identifier = (Annotations::Config.default_attribute_identifier_template % Annotations::Config.attribute_name_transform_for_identifier.call(name))
       end
     end
   end
