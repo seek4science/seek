@@ -146,7 +146,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'should update sample_type' do
     sample_type = Factory(:patient_sample_type, project_ids: @project_ids)
-    assert_empty sample_type.tags_as_text_array
+    assert_empty sample_type.tags
 
     golf = Factory :tag, source: @person.user, annotatable: Factory(:simple_sample_type), value: 'golf'
 

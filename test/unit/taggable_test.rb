@@ -2,19 +2,15 @@ require 'test_helper'
 
 class TaggableTest < ActiveSupport::TestCase
   test 'tagging enabled' do
-    assert Person.is_taggable?
     assert Model.is_taggable?
     assert Assay.is_taggable?
 
-    person = Person.new
     model = Model.new
     assay = Assay.new
-    assert person.is_taggable?
     assert model.is_taggable?
     assert assay.is_taggable?
 
     with_config_value :tagging_enabled, false do
-      refute Person.is_taggable?
       refute Model.is_taggable?
       refute Assay.is_taggable?
       refute person.is_taggable?
@@ -116,7 +112,7 @@ class TaggableTest < ActiveSupport::TestCase
   test 'no duplication tags' do
     p = Factory :person
     User.current_user = p.user
-    attr = 'tag'
+    attr = 'expertise'
 
     p.annotate_with %w(coffee coffee), attr
     p.save!
