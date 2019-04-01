@@ -1,7 +1,6 @@
 # Imported from the my_annotations plugin developed as part of BioCatalogue and no longer maintained. Originally found at https://github.com/myGrid/annotations
 
 class Annotation < ApplicationRecord
-  #include AnnotationsVersionFu
 
   belongs_to :annotatable,
              polymorphic: true,

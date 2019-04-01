@@ -9,13 +9,12 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'to_json_ld' do
-    puts Factory(:person).to_json_ld
+    refute_nil JSON.parse(Factory(:person).to_json_ld)
   end
 
   test 'to schema ld' do
     p = Factory(:person)
     assert p.schema_org_supported?
-    puts p.to_schema_ld
   end
 
   test "registered user's profile can be edited by" do
