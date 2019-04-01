@@ -3362,7 +3362,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('Sample.count', 4) do
       data_file.extract_samples(sample_type, true)
-      data_file.save!
+      disable_authorization_checks { data_file.save! }
     end
 
     data_file.reload
