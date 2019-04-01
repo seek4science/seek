@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TaggableTest < ActiveSupport::TestCase
+class AnnotatableTest < ActiveSupport::TestCase
 
   test 'tagging enabled' do
     assert Model.is_taggable?
