@@ -1,7 +1,7 @@
 # Imported from the my_annotations plugin developed as part of BioCatalogue and no longer maintained. Originally found at https://github.com/myGrid/annotations
 
 class Annotation < ApplicationRecord
-  include AnnotationsVersionFu
+  #include AnnotationsVersionFu
 
   belongs_to :annotatable,
              polymorphic: true,
@@ -35,44 +35,6 @@ class Annotation < ApplicationRecord
            :check_duplicate,
            :check_limit_per_source,
            :check_content_restrictions
-
-  # ========================
-  # Versioning configuration
-  # ------------------------
-
-  annotations_version_fu do
-    belongs_to :annotatable,
-               polymorphic: true
-
-    belongs_to :source,
-               polymorphic: true
-
-    belongs_to :value,
-               polymorphic: true
-
-    belongs_to :annotation_attribute,
-               class_name: 'AnnotationAttribute',
-               foreign_key: 'attribute_id'
-
-    belongs_to :version_creator,
-               class_name: "::#{Annotations::Config.user_model_name}"
-
-    validates_presence_of :source_type,
-                          :source_id,
-                          :annotatable_type,
-                          :annotatable_id,
-                          :attribute_id,
-                          :value_type
-
-    # NOTE: make sure to update the logic in here
-    # if Annotation#value_content changes!
-    def value_content
-      if defined?(@raw_value)
-        return @raw_value.respond_to?(:ann_content) ? @raw_value.ann_content : @raw_value
-      end
-      value.nil? ? '' : value.ann_content
-    end
-  end
 
   # ========================
 
