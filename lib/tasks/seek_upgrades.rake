@@ -16,6 +16,7 @@ namespace :seek do
     convert_help_attachments
     convert_help_images
     update_help_image_links
+    fix_sample_type_tag_annotations
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -91,6 +92,21 @@ namespace :seek do
 
     puts "#{count} HelpDocuments updated"
   end
+
+  desc('Fix sample type tag annotations')
+  task(fix_sample_type_tag_annotations: :environment) do
+    plural = AnnotationAttribute.where(name: 'sample_type_tags').first
+    if plural
+      annotations = plural.annotations
+      count = annotations.count
+      if count > 0
+        singular = AnnotationAttribute.where(name: 'sample_type_tag').first_or_create!
+        annotations.update_all(attribute_id: singular.id)
+        puts "Fixed #{count} sample type tag"
+      end
+    end
+  end
+
 end
 
 def convert_db_files_to_content_blobs(resource)

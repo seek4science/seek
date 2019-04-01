@@ -1,5 +1,5 @@
 class Project < ApplicationRecord
-  include Seek::Taggable  
+  include Seek::Annotatable  
   include HasSettings
 
   acts_as_yellow_pages

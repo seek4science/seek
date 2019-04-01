@@ -2,7 +2,7 @@ class Person < ApplicationRecord
 
   acts_as_annotation_source
 
-  include Seek::Taggable
+  include Seek::Annotatable
   include Seek::Roles::AdminDefinedRoles
 
   auto_strip_attributes :email, :first_name, :last_name, :web_page

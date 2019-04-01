@@ -14,7 +14,7 @@ class SampleType < ApplicationRecord
   # everything concerned with sample type templates
   include Seek::Templates::SampleTypeTemplateConcerns
 
-  include Seek::Taggable
+  include Seek::Annotatable
 
   include Seek::Permissions::SpecialContributors
 

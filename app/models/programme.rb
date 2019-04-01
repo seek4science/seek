@@ -1,5 +1,5 @@
 class Programme < ApplicationRecord
-  include Seek::Taggable
+  include Seek::Annotatable
 
   attr_accessor :administrator_ids
 

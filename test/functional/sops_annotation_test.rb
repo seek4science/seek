@@ -216,7 +216,7 @@ class SopsAnnotationTest < ActionController::TestCase
       assert_select 'p', text: /not yet been tagged/, count: 1
     end
 
-    sop.tag_with %w(fish sparrow sprocket)
+    sop.annotate_with %w(fish sparrow sprocket)
     sop.save!
 
     get :show, params: { id: sop }

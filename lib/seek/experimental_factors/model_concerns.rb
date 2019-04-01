@@ -5,7 +5,7 @@ module Seek
       extend ActiveSupport::Concern
 
       included do
-        include Seek::Taggable
+        include Seek::Annotatable
 
         belongs_to :measured_item
         belongs_to :unit

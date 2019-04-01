@@ -56,8 +56,7 @@ class SampleTypesController < ApplicationController
 
   # POST /sample_types
   # POST /sample_types.json
-  def create
-    # because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
+  def create    
     @sample_type = SampleType.new(sample_type_params)
     @sample_type.contributor = User.current_user.person
 

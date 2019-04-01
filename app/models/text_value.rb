@@ -2,7 +2,7 @@
 
 class TextValue < ApplicationRecord
 
-  TAG_TYPES = %w[tag expertise tool sample_type_tags].freeze
+  TAG_TYPES = %w[tag expertise tool sample_type_tag].freeze
 
   validates_presence_of :text
 
