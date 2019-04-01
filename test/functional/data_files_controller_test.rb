@@ -1232,7 +1232,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'explore earlier version' do
     df = data_files(:downloadable_spreadsheet_data_file)
+    assert df.can_edit?
     df.versions.first.content_blob.save # Need to do this as file_size isn't set when loading from fixture
+    assert df.can_download?
     get :explore, params: { id: df, version: 1 }
 
     assert_response :success
