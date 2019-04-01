@@ -2,6 +2,7 @@ require 'test_helper'
 
 
 class RdfHelperTest < ActionView::TestCase
+
   test 'schema_ld_script_block' do
     @person = Factory(:person)
     @investigation = Factory(:investigation)
@@ -14,6 +15,12 @@ class RdfHelperTest < ActionView::TestCase
     @controller = PeopleController.new
     block = schema_ld_script_block
     refute block.blank?
+
+    # none ActiveRecord resource, e.g. for search (this imitates the behaviour)
+    @search = ActiveSupport::SafeBuffer.new('fish')
+    @controller = SearchController.new
+    assert schema_ld_script_block.blank?
+
 
     frag = Nokogiri::HTML::DocumentFragment.parse(block)
     script = frag.children.first
