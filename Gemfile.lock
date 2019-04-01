@@ -25,7 +25,13 @@ GIT
     my_responds_to_parent (1.0.0)
 
 GIT
-  remote: https://github.com/digibib/rdf-virtuoso
+  remote: https://github.com/myGrid/search_biomodel.git
+  revision: e109ac6d8b102f7ecb65140c17d263b85e066870
+  specs:
+    search_biomodel (2.2.1)
+
+GIT
+  remote: https://github.com/ruby-rdf/rdf-virtuoso
   revision: 0cf165e1f244e16454362ae09b4a8ff4a8cd4e99
   branch: develop
   specs:
@@ -33,12 +39,6 @@ GIT
       api_smith (~> 1.3.0)
       httparty (~> 0.12.0)
       rdf (>= 1.99)
-
-GIT
-  remote: https://github.com/myGrid/search_biomodel.git
-  revision: e109ac6d8b102f7ecb65140c17d263b85e066870
-  specs:
-    search_biomodel (2.2.1)
 
 GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
