@@ -3,7 +3,7 @@ require 'test_helper'
 class ScalableTest < ActiveSupport::TestCase
   def setup
     User.current_user = Factory(:user)
-    @model = Factory :model, contributor: User.current_user.person
+    @model = Factory :model#, contributor: User.current_user.person
     @small_scale = Factory :scale, title: 'small', pos: 1, image_name: 'airprom/sub-cellular.jpg'
     @medium_scale = Factory :scale, title: 'medium', pos: 2, image_name: 'airprom/lung.jpg'
     @large_scale = Factory :scale, title: 'large', pos: 3, image_name: 'airprom/organism.jpg'
@@ -16,28 +16,32 @@ class ScalableTest < ActiveSupport::TestCase
 
   test 'assign scales' do
     @model.scales = [@small_scale]
-    @model.save
+    log_model_auth_state
+    @model.save!
     scales = Model.find(@model.id).scales
     assert_equal [@small_scale], scales
   end
 
   test 'assign scales using ids' do
     @model.scales = [@small_scale.id]
-    @model.save
+    log_model_auth_state
+    @model.save!
     scales = Model.find(@model.id).scales
     assert_equal [@small_scale], scales
 
     # skip invalid id's and handle string id's
     model2 = Factory :model
     model2.scales = ['', '9999', @small_scale.id.to_s]
-    model2.save
+    model2.save!
+    log_model_auth_state(model2)
     scales = Model.find(model2.id).scales
     assert_equal [@small_scale], scales
   end
 
   test 'updating scales correctly resolves differences' do
     @model.scales = [@small_scale.id]
-    @model.save
+    log_model_auth_state
+    @model.save!
     assert_no_difference('Annotation.count') do
       @model.scales = [@medium_scale.id]
       @model.save!
@@ -57,7 +61,8 @@ class ScalableTest < ActiveSupport::TestCase
 
   test 'retrieved scales are ordered' do
     @model.scales = [@large_scale, @small_scale, @medium_scale]
-    @model.save
+    log_model_auth_state
+    @model.save!
     scales = Model.find(@model.id).scales
     assert_equal [@small_scale, @medium_scale, @large_scale], scales
   end
@@ -65,6 +70,7 @@ class ScalableTest < ActiveSupport::TestCase
   test 'attaching and fetching additional info' do
     @model.scales = [@small_scale]
     @model.attach_additional_scale_info @small_scale.id, param: 'fish', unit: 'meter'
+    log_model_auth_state
     @model.save!
     info = @model.fetch_additional_scale_info(@small_scale.id)
     assert_equal 1, info.length
@@ -82,6 +88,7 @@ class ScalableTest < ActiveSupport::TestCase
     @model.scales = [@small_scale]
     @model.attach_additional_scale_info @small_scale.id, param: 'fish', unit: 'meter'
     @model.attach_additional_scale_info @small_scale.id, param: 'soup', unit: 'cm'
+    log_model_auth_state
     @model.save!
     info = @model.fetch_additional_scale_info(@small_scale.id)
     assert_equal 2, info.count
@@ -93,5 +100,16 @@ class ScalableTest < ActiveSupport::TestCase
 
     @model.scales = []
     assert_empty @model.fetch_additional_scale_info(@small_scale.id)
+  end
+
+  def log_model_auth_state(model = @model)
+    puts "###########"
+    puts "Caller - #{caller[0]}"
+    puts "Changed - #{model.changes.inspect}"
+    puts "authorized_changes_to_attributes? - #{model.send(:authorized_changes_to_attributes?)}"
+    puts "authorized_to_edit? - #{model.send(:authorized_to_edit?)}"
+    puts "authorized_associations_for_action? - #{model.send(:authorized_associations_for_action?)}"
+    puts "authorized_required_access_for_owner? - #{model.send(:authorized_required_access_for_owner?)}"
+    puts "###########"
   end
 end
