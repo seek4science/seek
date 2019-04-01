@@ -2,14 +2,27 @@
 
 class TextValue < ApplicationRecord
   include AnnotationsVersionFu
-  include TextValueExtensions
+
+  TAG_TYPES = %w[tag expertise tool sample_type_tags].freeze
 
   validates_presence_of :text
 
-  acts_as_annotation_value :content_field => :text
+  acts_as_annotation_value content_field: :text
 
   belongs_to :version_creator,
-             :class_name => "::#{Annotations::Config.user_model_name}"
+             class_name: "::#{Annotations::Config.user_model_name}"
+
+  def self.all_tags(attributes = TAG_TYPES)
+    with_attribute_names(attributes).compact
+  end
+
+  def tag_count
+    annotation_count TAG_TYPES
+  end
+
+  def create_new_version?
+    false
+  end
 
   # ========================
   # Versioning configuration
@@ -19,7 +32,7 @@ class TextValue < ApplicationRecord
     validates_presence_of :text
 
     belongs_to :version_creator,
-               :class_name => "::#{Annotations::Config.user_model_name}"
+               class_name: "::#{Annotations::Config.user_model_name}"
   end
 
   # ========================
