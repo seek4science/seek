@@ -4,12 +4,12 @@
 require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
-require 'colorize'
 require 'seek/mime_types'
 
 include Seek::MimeTypes
 
 namespace :seek do
+
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment    

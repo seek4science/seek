@@ -1,4 +1,4 @@
-require 'colorize'
+
 module Seek
   module Ontologies
     class Synchronize
@@ -45,7 +45,7 @@ module Seek
 
         # check all assay uri-s, for those that don't exist in ontology. This is unusual and uris shouldn't be removed
         # revert to top level uri - print warning
-        Rails.logger.debug "#{assays_for_update.count} assays found where the #{type} no longer exists in the ontology".green
+        Rails.logger.debug "#{assays_for_update.count} assays found where the #{type} no longer exists in the ontology"
         disable_authorization_checks do
           assays_for_update.each do |assay|
             assay.send("use_default_#{type}_uri!")
@@ -80,11 +80,11 @@ module Seek
 
       def update_assays_and_remove_suggested_type(assays, suggested_type, type, new_ontology_uri)
         assays.each do |assay|
-          Rails.logger.info "updating assay: #{assay.id} with the new #{type} uri #{new_ontology_uri}".green
+          Rails.logger.info "updating assay: #{assay.id} with the new #{type} uri #{new_ontology_uri}"
           assay.send("#{type}_uri=", new_ontology_uri)
           assay.save
         end
-        Rails.logger.info "destroying suggested type #{suggested_type.id} with label #{suggested_type.label}".green
+        Rails.logger.info "destroying suggested type #{suggested_type.id} with label #{suggested_type.label}"
         suggested_type.destroy
       end
 
