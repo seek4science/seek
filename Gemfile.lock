@@ -443,7 +443,7 @@ GEM
       pyu-ruby-sasl (~> 0.0.3.2)
       rubyntlm (~> 0.3.4)
     open4 (1.3.0)
-    openseek-api (0.17.2)
+    openseek-api (0.17.3)
       terrapin
     options (2.3.2)
     parallel (1.14.0)
