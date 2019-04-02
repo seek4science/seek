@@ -70,6 +70,8 @@ module SEEK
     # openbis_endpoints/26-20170404142724224014370...
     config.active_record.cache_timestamp_format = :usec
 
+    config.action_mailer.deliver_later_queue_name = 'mailers'
+
     config.active_job.queue_adapter = Rails.env.test? ? :test : :delayed_job
 
   end

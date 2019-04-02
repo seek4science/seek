@@ -1,7 +1,7 @@
 class QueueNames
-  SAMPLES='samples'
-  REMOTE_CONTENT='remotecontent'
-  AUTH_LOOKUP='authlookup'
-  DEFAULT=Delayed::Worker.default_queue_name
-  MAILERS=ActionMailer::DeliveryJob.queue_name
+  SAMPLES = 'samples'.freeze
+  REMOTE_CONTENT = 'remotecontent'.freeze
+  AUTH_LOOKUP = 'authlookup'.freeze
+  DEFAULT = Delayed::Worker.default_queue_name
+  MAILERS = SEEK::Application.config.action_mailer.deliver_later_queue_name
 end
