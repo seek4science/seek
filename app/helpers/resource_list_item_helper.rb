@@ -164,7 +164,7 @@ module ResourceListItemHelper
 
   def list_item_description(text, auto_link = true, length = 500, hide_if_blank=false)
     return '' if hide_if_blank && text.blank?
-    text = strip_tags(text) if text.length > length
+    text = strip_tags(text) if text && text.length > length
     content_tag :div, class: 'list_item_desc' do
       text_or_not_specified(text, description: true, auto_link: auto_link, length: length)
     end.html_safe
