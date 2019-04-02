@@ -250,6 +250,7 @@ GEM
       sexp_processor (~> 4.8)
     formatador (0.2.5)
     fssm (0.2.10)
+    gem-licenses (0.2.2)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
     google-analytics-rails (1.1.0)
@@ -845,6 +846,7 @@ DEPENDENCIES
   feedjira (~> 1)
   fleximage!
   fssm
+  gem-licenses
   google-analytics-rails
   guard-rubycritic
   handlebars_assets
@@ -941,4 +943,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.17.1
+   1.17.2
