@@ -838,7 +838,6 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'tagging' do
-    assert SampleType.is_taggable?
     type = Factory(:simple_sample_type)
     assert_empty type.tags
     User.with_current_user(@person.user) do

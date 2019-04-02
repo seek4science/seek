@@ -34,9 +34,8 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'should create sample_type' do
-
-
-    Factory :tag, source: @person.user, annotatable: Factory(:simple_sample_type), value: 'golf'
+    Factory :annotation, attribute_name: 'sample_type_tag', source: @person.user,
+            annotatable: Factory(:simple_sample_type), value: 'golf'
 
     assert_difference('ActivityLog.count') do
       assert_difference('SampleType.count') do
@@ -147,7 +146,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'should update sample_type' do
     sample_type = Factory(:patient_sample_type, project_ids: @project_ids)
-    assert_empty sample_type.tags_as_text_array
+    assert_empty sample_type.tags
 
     golf = Factory :tag, source: @person.user, annotatable: Factory(:simple_sample_type), value: 'golf'
 

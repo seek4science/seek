@@ -1,5 +1,5 @@
 class Project < ActiveRecord::Base
-  include Seek::Taggable
+  include Seek::Annotatable
   include Seek::Rdf::RdfGeneration
   include Seek::Rdf::ReactToAssociatedChange
 
