@@ -319,7 +319,7 @@ class PublicationsController < ApplicationController
 
   def publication_params
     params.require(:publication).permit(:pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,
-                                        :published_date, :bibtex_file, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
+                                        :published_date, :bibtex_file, :registered_mode, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
                                         { data_file_ids: [] }, { scales: [] },
                                         { publication_authors_attributes: [:person_id, :id] }).tap do |pub_params|
@@ -374,6 +374,8 @@ class PublicationsController < ApplicationController
 
   # create a publication from a form that contains all the data
   def create_publication
+
+    @publication.registered_mode = @publication.registered_mode || 3
     assay_ids = params[:assay_ids] || []
     # create publication authors
     plain_authors = params[:publication][:publication_authors]
@@ -411,6 +413,7 @@ class PublicationsController < ApplicationController
   # create a publication from a reference file, at the moment supports only bibtex
   # only sets the @publication and redirects to the create_publication with content from the bibtex file
   def import_publication
+
     @publication = Publication.new(publication_projects_params)
 
     require 'bibtex'

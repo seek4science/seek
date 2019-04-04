@@ -156,6 +156,7 @@ class Publication < ActiveRecord::Base
   # @param reference Bio::Reference
   # @see https://github.com/bioruby/bioruby/blob/master/lib/bio/reference.rb
   def extract_pubmed_metadata(reference)
+    self.registered_mode = 1
     self.title = reference.title.chomp # remove full stop
     self.abstract = reference.abstract
     self.journal = reference.journal
@@ -167,6 +168,7 @@ class Publication < ActiveRecord::Base
   # @param doi_record DOI::Record
   # @see https://github.com/SysMO-DB/doi_query_tool/blob/master/lib/doi_record.rb
   def extract_doi_metadata(doi_record)
+    self.registered_mode = 2
     self.title = doi_record.title
     self.published_date = doi_record.date_published
     self.journal = doi_record.journal
@@ -177,6 +179,7 @@ class Publication < ActiveRecord::Base
 
   # @param bibtex_record BibTeX entity from bibtex-ruby gem
   def extract_bibtex_metadata(bibtex_record)
+    self.registered_mode = 4
     self.title           = bibtex_record.title.try(:to_s).try(:encode!)
     self.abstract        = bibtex_record[:abstract].try(:to_s).try(:encode!) || ''
     self.journal         = bibtex_record.journal.try(:to_s).try(:encode!)

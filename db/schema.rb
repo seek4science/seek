@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181210162148) do
+ActiveRecord::Schema.define(version: 20190403124116) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -1401,6 +1401,7 @@ ActiveRecord::Schema.define(version: 20181210162148) do
     t.integer  "publication_type",    limit: 4,     default: 1
     t.string   "citation",            limit: 255
     t.string   "deleted_contributor", limit: 255
+    t.integer  "registered_mode",     limit: 4
   end
 
   add_index "publications", ["contributor_id"], name: "index_publications_on_contributor", using: :btree
