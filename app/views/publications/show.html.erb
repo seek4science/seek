@@ -37,6 +37,10 @@
           <strong for="date_published">Date Published:</strong>
           <span><%= date_as_string(@publication.published_date,false,true) -%></span>
         </p>
+        <p>
+          <strong for="registered_mode">Registered: </strong>
+          <span><%= publication_registered_mode(@publication.registered_mode) -%></span>
+        </p>
       </div>
     </div>
     <div class="row">

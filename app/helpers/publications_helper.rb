@@ -23,6 +23,20 @@ module PublicationsHelper
     end
   end
 
+  def publication_registered_mode(mode)
+    if mode == 1
+      'by PubMed ID'
+    elsif mode == 2
+      'by DOI'
+    elsif mode == 3
+      'manually'
+    elsif mode == 4
+      'from bibtex file'
+    else
+      `unknown`
+    end
+  end
+
   def authorised_publications(projects = nil)
     authorised_assets(Publication, projects)
   end
