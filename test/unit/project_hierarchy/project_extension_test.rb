@@ -26,14 +26,17 @@ class ProjectExtensionTest < ActiveSupport::TestCase
       assert parent_proj.institutions.include?(ins)
     end
   end
-
-
+  
   test 'related resource to parent project' do
     parent_proj = Factory :project
     proj = Factory :project, parent: parent_proj
+    contributor = Factory(:person)
+    contributor.add_to_project_and_institution(proj,Factory(:institution))
 
-    Project::RELATED_RESOURCE_TYPES.each do |type|
-      proj.send "#{type.underscore.pluralize}=".to_sym, [Factory(type.underscore.to_sym)] unless %w(Study Assay).include?(type)
+    Project::RELATED_RESOURCE_TYPES.reject{|type| %w(Study Assay).include?(type)}.each do |type|
+      item = Factory(type.underscore.to_sym)
+      item.contributor = contributor if item.respond_to?(:contributor)
+      proj.send "#{type.underscore.pluralize}=".to_sym, [item]
 
       proj.send("#{type.underscore.pluralize}".to_sym).each do |resource|
         assert parent_proj.send("related_#{type.underscore.pluralize}".to_sym).include?(resource)
