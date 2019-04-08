@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_10_162148) do
+ActiveRecord::Schema.define(version: 2019_04_08_163210) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 2018_12_10_162148) do
     t.datetime "updated_at"
     t.string "http_referer"
     t.text "user_agent"
-    t.text "data", limit: 4294967295
+    t.text "data", limit: 16777215
     t.string "controller_name"
     t.index ["action"], name: "act_logs_action_index", length: 191
     t.index ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index", length: { activity_loggable_type: 191 }
