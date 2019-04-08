@@ -5,8 +5,13 @@
 # for example lib/tasks/capistrano.rake, and they will automatically be available to Rake.
 
 require File.expand_path('../config/application', __FILE__)
-require 'gem-licenses'
+
 
 SEEK::Application.load_tasks
-Gem::GemLicenses.install_tasks
+
+
+if !Rails.env.production?
+  require 'gem-licenses'
+  Gem::GemLicenses.install_tasks
+end
 
