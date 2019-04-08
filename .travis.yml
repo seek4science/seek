@@ -17,7 +17,7 @@ env:
   - SUITE="rails test test/functional" DB_TYPE=mysql
   - SUITE="rails test test/integration" DB_TYPE=mysql
   - SUITE="rspec spec" DB_TYPE=mysql
-  - SUITE="RAILS_ENV=production rake assets:precompile" DB_TYPE=mysql
+  - SUITE="rake assets:precompile RAILS_ENV=production" DB_TYPE=mysql
 #  - SUITE="rake teaspoon" RAILS_ENV=test DB_TYPE=mysql
 
 before_install:
