@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class TagsControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
 
   fixtures :all
@@ -36,6 +37,19 @@ class TagsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', person_path(p), text: p.name, count: 1
       assert_select 'a[href=?]', data_file_path(df), text: df.title, count: 1
     end
+  end
+
+  test 'show for sample_type_tag' do
+    st = Factory(:simple_sample_type, contributor: User.current_user.person, tags: 'fish, peas')
+    assert_equal 2, st.tags.count
+    assert st.can_view?
+
+    ann = st.annotations.first.value
+
+    get :show, params: { id: ann }
+    assert_response :success
+    assert objects = assigns(:tagged_objects)
+    assert_includes objects, st
   end
 
   test 'show for expertise tag' do
