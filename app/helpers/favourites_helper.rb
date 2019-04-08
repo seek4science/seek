@@ -10,7 +10,7 @@ module FavouritesHelper
   def savable_search_icon(path, size, search_options, options = {}, &block)
     html = block_given? ? capture(&block) : image('saved_search_avatar', class: 'avatar curved with_smaller_shadow search_fav_avatar', size: size)
     search_options[:resource_type] ||= 'SavedSearch'
-    options['data-favourite-url'] ||= add_favourites_url(search_options)
+    options['data-favourite-url'] ||= add_favourites_path(search_options)
     options['data-tooltip'] ||= tooltip('Drag to Favourites to save this search')
     html = link_to_draggable(html, path, options)
     html.html_safe
