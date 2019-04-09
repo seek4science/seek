@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_08_163210) do
+ActiveRecord::Schema.define(version: 2019_04_09_102407) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1780,20 +1780,10 @@ ActiveRecord::Schema.define(version: 2019_04_08_163210) do
     t.string "name"
   end
 
-  create_table "text_value_versions", id: :integer,  force: :cascade do |t|
-    t.integer "text_value_id", null: false
-    t.integer "version", null: false
-    t.integer "version_creator_id"
-    t.text "text", limit: 4294967295, null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.index ["text_value_id"], name: "index_text_value_versions_on_text_value_id"
-  end
-
   create_table "text_values", id: :integer,  force: :cascade do |t|
     t.integer "version"
     t.integer "version_creator_id"
-    t.text "text", limit: 4294967295, null: false
+    t.text "text", limit: 16777215, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
