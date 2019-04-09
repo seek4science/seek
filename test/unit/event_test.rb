@@ -112,9 +112,9 @@ class EventTest < ActiveSupport::TestCase
 
       assert_raise(ActiveRecord::RecordNotSaved) do
         event.documents << doc
+        event.save!
       end
-
-      assert_empty event.documents
+      
     end
   end
 end
