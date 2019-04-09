@@ -74,5 +74,7 @@ module SEEK
 
     config.active_job.queue_adapter = Rails.env.test? ? :test : :delayed_job
 
+    config.active_record.sqlite3.represent_boolean_as_integer = true
+
   end
 end
