@@ -28,7 +28,7 @@ class ScalableTest < ActiveSupport::TestCase
     assert_equal [@small_scale], scales
 
     # skip invalid id's and handle string id's
-    model2 = Factory :model
+    model2 = Factory :model, contributor:User.current_user.person
     model2.scales = ['', '9999', @small_scale.id.to_s]
     model2.save
     scales = Model.find(model2.id).scales

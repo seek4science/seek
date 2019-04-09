@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class WorkflowTest < ActiveSupport::TestCase
+
   test 'validations' do
     workflow = Factory :workflow
     workflow.title = ''
@@ -44,10 +45,12 @@ class WorkflowTest < ActiveSupport::TestCase
     workflow = Factory :workflow
     assert workflow.sops.empty?
 
-    User.current_user = workflow.contributor
-    assert_difference 'workflow.sops.count' do
-      workflow.sops << Factory(:sop)
+    User.with_current_user(workflow.contributor.user) do
+      assert_difference 'workflow.sops.count' do
+        workflow.sops << Factory(:sop, contributor:workflow.contributor)
+      end
     end
+
   end
 
   test 'has uuid' do
