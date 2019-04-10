@@ -92,6 +92,16 @@
                     var date_published = year+"-"+month+"-"+day;
                     jQuery('#publication_published_date').val(date_published);
 
+                    var authorlist = [];
+                    data.author.forEach(function(item,index){
+                        author_name = item.given+' '+item.family;
+                        console.log ('author_name:'+ author_name);
+                        console.log ('index:'+ index);
+                        jQuery('#author-'+index).text (author_name);
+                        jQuery('#author-'+index+'-value').val (author_name);
+                        //document.getElementById('author-2').innerHTML =author_name;
+                    });
+
                 },
 
                 statusCode: {
