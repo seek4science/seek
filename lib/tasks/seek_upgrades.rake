@@ -230,6 +230,6 @@ def convert_db_files_to_content_blobs(resource)
   data = ActiveRecord::Base.connection.select_one("SELECT data FROM db_files WHERE id=#{resource.db_file_id}")['data']
   ContentBlob.create!(data: data,
                       content_type: resource.content_type,
-                      original_filename: resource.filename,
+                      original_filename: resource[:filename],
                       asset: resource)
 end
