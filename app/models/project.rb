@@ -100,7 +100,7 @@ class Project < ApplicationRecord
   has_many :project_subscriptions, dependent: :destroy
 
   def assets
-    data_files | sops | models | publications | presentations | documents
+    data_files | sops | models | publications | presentations | documents | workflows | nodes
   end
 
   def institutions=(new_institutions)
@@ -218,7 +218,10 @@ class Project < ApplicationRecord
   end
 
   def can_delete?(user = User.current_user)
-    user && user.is_admin? && work_groups.collect(&:people).flatten.empty?
+    user && user.is_admin? && work_groups.collect(&:people).flatten.empty? &&
+        investigations.empty? && studies.empty? && assays.empty? && assets.empty? &&
+        samples.empty? && sample_types.empty?
+
   end
 
   def lineage_ancestor_cannot_be_self
