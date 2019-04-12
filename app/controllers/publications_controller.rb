@@ -322,7 +322,7 @@ class PublicationsController < ApplicationController
                                         :published_date, :bibtex_file, :registered_mode, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
                                         { data_file_ids: [] }, { scales: [] },
-                                        { publication_authors_attributes: [:person_id, :id] }).tap do |pub_params|
+                                        { publication_authors_attributes: [:person_id, :id, :first_name, :last_name ] }).tap do |pub_params|
       filter_association_params(pub_params, :assay_ids, Assay, :can_edit?)
       filter_association_params(pub_params, :study_ids, Study, :can_view?)
       filter_association_params(pub_params, :investigation_ids, Investigation, :can_view?)

@@ -78,12 +78,12 @@
                 accepts: { 'citeproc': "application/vnd.citationstyles.csl+json" },
                 dataType: 'json',
                 success: function(data, textStatus, jqXHR) {
-                    //console.log("DOI:"+data);
+                    console.log("DOI:", data);
                     jQuery('#publication_doi').parents('.form-group').removeClass('has-error');
                     jQuery('#publication_doi').parents('.form-group').addClass('has-success');
                     jQuery('#crossref_id').val(data.DOI);
                     jQuery('#publication_title').val(data.title);
-                    jQuery('#publication_journal').val(data.publisher);
+                    jQuery('#publication_journal').val(data["container-title"]);
                     published_data = data["published-online"] || data["published-print"];
                     //console.log("published_data:"+published_data);
                     year=published_data["date-parts"][0][0];
@@ -98,7 +98,13 @@
                         console.log ('author_name:'+ author_name);
                         console.log ('index:'+ index);
                         jQuery('#author-'+index).text (author_name);
-                        jQuery('#author-'+index+'-value').val (author_name);
+                        //jQuery('#author-'+index+'-value').val (author_name);
+
+                        jQuery('#publication_publication_authors_attributes_'+index+'_person_first_name').val (item.given);
+                        jQuery('#publication_publication_authors_attributes_'+index+'_person_last_name').val (item.family);
+
+
+                        //jQuery('#publication_publication_authors_attributes_0_person_id').val(author_name);
                         //document.getElementById('author-2').innerHTML =author_name;
                     });
 
