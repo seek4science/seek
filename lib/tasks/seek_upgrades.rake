@@ -48,7 +48,11 @@ namespace :seek do
     count = 0
     HelpAttachment.all.each do |ha|
       next if ha.content_blob
-      convert_db_files_to_content_blobs(ha)
+      data = ActiveRecord::Base.connection.select_one("SELECT data FROM db_files WHERE id=#{ha.db_file_id}")['data']
+      ContentBlob.create!(data: data,
+                          content_type: ha.content_type,
+                          original_filename: ha[:filename],
+                          asset: ha)
       count += 1
     end
 
@@ -57,10 +61,16 @@ namespace :seek do
 
   task(convert_help_images: :environment) do
     count = 0
-    HelpImage.all.each do |ha|
-      next if ha.content_blob
-      convert_db_files_to_content_blobs(ha)
-      count += 1
+    HelpImage.all.each do |hi|
+      next if hi.content_blob
+      file_path = Rails.root.join('public', 'help_images', *("%08d" % hi.id).scan(/..../), hi[:filename])
+      if File.exist?(file_path)
+        ContentBlob.create!(tmp_io_object: File.open(file_path),
+                            content_type: hi.content_type,
+                            original_filename: hi[:filename],
+                            asset: hi)
+        count += 1
+      end
     end
 
     puts "#{count} HelpImages converted"
@@ -68,7 +78,7 @@ namespace :seek do
 
   task(update_help_image_links: :environment) do
     count = 0
-    re = /!\/help_images((\/\d\d\d\d)+)\/[^!]+!/
+    re = /!\/help_images((\/\d\d\d\d)(\/\d\d\d\d)+)\/[^!]+!/
     HelpDocument.all.each do |hd|
       body = hd.body
       replacements = {}
@@ -224,12 +234,4 @@ namespace :seek do
       puts 'done'
     end
   end
-end
-
-def convert_db_files_to_content_blobs(resource)
-  data = ActiveRecord::Base.connection.select_one("SELECT data FROM db_files WHERE id=#{resource.db_file_id}")['data']
-  ContentBlob.create!(data: data,
-                      content_type: resource.content_type,
-                      original_filename: resource[:filename],
-                      asset: resource)
 end
