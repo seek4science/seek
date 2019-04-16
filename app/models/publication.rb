@@ -180,22 +180,43 @@ class Publication < ActiveRecord::Base
   # @param bibtex_record BibTeX entity from bibtex-ruby gem
   def extract_bibtex_metadata(bibtex_record)
     self.registered_mode = 4
-    self.title           = bibtex_record.title.try(:to_s).try(:encode!)
+
+    self.title           = bibtex_record.title.try(:to_s).try(:encode!).gsub /^{|}$/, ''
     self.abstract        = bibtex_record[:abstract].try(:to_s).try(:encode!) || ''
     self.journal         = bibtex_record.journal.try(:to_s).try(:encode!)
-    self.published_date  = Date.new(bibtex_record.year.try(:to_i), bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1)
+    self.published_date  = Date.new(bibtex_record.year.try(:to_i) || 1 , bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1)
     self.doi             = bibtex_record[:doi].try(:to_s).try(:encode!)
     self.pubmed_id       = bibtex_record[:pubmed_id].try(:to_s).try(:encode!)
     plain_authors = bibtex_record[:author].split(' and ') # by bibtex definition
     plain_authors.each_with_index do |author, index| # multiselect
       next if author.empty?
-      last_name, first_name = author.split(', ') # by bibtex definition
+      last_name,first_name = author.split(', ') # by bibtex definition
+      first_name = clean_up_name((first_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''))
+      last_name =  clean_up_name((last_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''))
       pa = PublicationAuthor.new(publication: self,
-                                 first_name: first_name.try(:encode),
-                                 last_name: last_name.try(:encode),
+                                 first_name: first_name,
+                                 last_name: last_name,
                                  author_index: index)
       publication_authors << pa
     end
+  end
+
+  def clean_up_name(name)
+    name.gsub  /^~$/, ''
+    if name .include? '{\"u}'
+      name.sub! '{\"u}', 'ü'
+    elsif name.include? '{\"o}'
+      name.sub! '{\"o}', 'ö'
+    elsif name.include? '{\"a}'
+      name.sub! '{\"a}', 'ä'
+    elsif name.include? '{\"A}'
+      name.sub! '{\"A}', 'Ä'
+    elsif name.include? '{\"O}'
+      name.sub! '{\"O}', 'Ö'
+    elsif name.include? '{\"U}'
+      name.sub! '{\"U}', 'Ü'
+    end
+    name
   end
 
   def associate(item)

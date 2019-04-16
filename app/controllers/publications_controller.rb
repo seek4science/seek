@@ -460,11 +460,11 @@ class PublicationsController < ApplicationController
       @publication.errors[:bibtex_file] = 'Upload a file!'
     else
       bibtex_file = params[:publication].delete(:bibtex_file)
-      bibtex = BibTeX.parse(bibtex_file.read)
-      if bibtex['@article'].empty?
-        @publication.errors[:bibtex_file] = 'The bibtex file should contain at least one @article'
+      bibtex = BibTeX.open(bibtex_file.path)
+      if bibtex['@article'].empty? && bibtex['@inproceedings'].empty?
+        @publication.errors[:bibtex_file] = 'The bibtex file should contain at least one item'
       else
-        articles = bibtex['@article']
+        articles = bibtex
         publications = []
         publications_with_errors = []
 
