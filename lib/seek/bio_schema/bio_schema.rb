@@ -4,6 +4,7 @@ module Seek
     #
     # Example: Seek::BioSchema::BioSchema.new(Person.find(id)).json_ld
     class BioSchema
+      include ActionView::Helpers::SanitizeHelper
       attr_reader :resource
 
       # initialise with a resource

@@ -5,6 +5,7 @@ module Seek
     # Provides the ability to validate the row, check if it matches a given resource,
     # and invoke the method to get the property value
     class CSVMappingInfo
+      include ActionView::Helpers::SanitizeHelper
       attr_reader :type, :method, :property
       def initialize(row)
         @type = row[0]
@@ -29,7 +30,12 @@ module Seek
 
       # invokes the method on the resource and returns the result
       def invoke(resource)
-        resource.try(method)
+        value = resource.try(method)
+        if value.is_a?(String)
+          sanitize(value)
+        else
+          value
+        end
       end
 
       # is this row valid?, in that it is complete and isn't the header

@@ -38,7 +38,6 @@ class BioSchemaTest < ActiveSupport::TestCase
     refute_nil p.avatar
     json = Seek::BioSchema::BioSchema.new(p).json_ld
     json = JSON.parse(json)
-    pp json
     assert_equal "http://localhost:3000/people/#{p.id}", json['@id']
     assert_equal 'Bob Monkhouse', json['name']
     assert_equal 'Person', json['@type']
@@ -57,6 +56,27 @@ class BioSchemaTest < ActiveSupport::TestCase
     assert_equal expected,member_of.first
   end
 
+  test 'sanitize values' do
+    p = Factory(:person, first_name: 'Mr <script>bob</script>', last_name: "Monk'house",
+                description: 'I am a <script>person</script>', avatar: Factory(:avatar),
+                web_page:'http://me.com?q=fish')
+    p.projects.first.update_attribute(:title,'The <script>sane</script> project')
+    json = Seek::BioSchema::BioSchema.new(p).json_ld
+    json = JSON.parse(json)
+    assert_equal "http://localhost:3000/people/#{p.id}", json['@id']
+    assert_equal "Mr Bob Monk'House", json['name']
+    assert_equal 'Person', json['@type']
+    assert_equal 'I am a person', json['description']
+    assert_equal 'Mr bob', json['givenName']
+    assert_equal "Monk'house", json['familyName']
+    assert_equal 'http://me.com?q=fish',json['url']
+
+    member_of = json['memberOf']
+
+    assert_equal 1,member_of.count
+    expected={'@type'=>'Organization','@id'=>p.projects.first.rdf_resource,'name'=>"The sane project"}
+  end
+
   test 'project json ld' do
     project = Factory(:project, title:'my project',description:'i am a project', avatar:Factory(:avatar), web_page:'http://project.com')
     member = Factory(:person)
@@ -69,7 +89,6 @@ class BioSchemaTest < ActiveSupport::TestCase
     refute_nil project.avatar
     json = Seek::BioSchema::BioSchema.new(project).json_ld
     json = JSON.parse(json)
-    pp json
 
     assert_equal "http://localhost:3000/projects/#{project.id}", json['@id']
     assert_equal 'my project', json['name']

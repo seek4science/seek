@@ -5,6 +5,7 @@ module Seek
       # The Decorator is an extension to the resource that provided or alters the properties of that resource
       # for Schema.org (Bioschemas.org)
       class BaseDecorator
+        include ActionView::Helpers::SanitizeHelper
         attr_reader :resource
 
         def initialize(resource)
@@ -40,7 +41,7 @@ module Seek
           {
             '@type': schema_type,
             '@id': identifier,
-            'name': title
+            'name': sanitize(title)
           }
         end
 
