@@ -460,7 +460,10 @@ class PublicationsController < ApplicationController
       @publication.errors[:bibtex_file] = 'Upload a file!'
     else
       bibtex_file = params[:publication].delete(:bibtex_file)
-      bibtex = BibTeX.open(bibtex_file.path)
+      data = bibtex_file.read
+      bibtex = BibTeX.parse(data,:filter => :latex)
+
+
       if bibtex['@article'].empty? && bibtex['@inproceedings'].empty?
         @publication.errors[:bibtex_file] = 'The bibtex file should contain at least one item'
       else
@@ -489,6 +492,7 @@ class PublicationsController < ApplicationController
           flash[:error] = "There are #{publications_with_errors.length} publications that could not be saved"
           publications_with_errors.each do |publication|
             flash[:error] += '<br>' + publication.errors.full_messages.join('<br>')
+            flash[:error] += '<br>' + publication.title
           end
           flash[:error] = flash[:error].html_safe
         end

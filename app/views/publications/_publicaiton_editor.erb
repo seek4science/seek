@@ -78,14 +78,14 @@
                 accepts: { 'citeproc': "application/vnd.citationstyles.csl+json" },
                 dataType: 'json',
                 success: function(data, textStatus, jqXHR) {
-                    console.log("DOI:", data);
+                    //console.log("DOI:", data);
                     jQuery('#publication_doi').parents('.form-group').removeClass('has-error');
                     jQuery('#publication_doi').parents('.form-group').addClass('has-success');
                     jQuery('#crossref_id').val(data.DOI);
                     jQuery('#publication_title').val(data.title);
                     jQuery('#publication_journal').val(data["container-title"]);
-                    published_data = data["published-online"] || data["published-print"];
-                    //console.log("published_data:"+published_data);
+                    published_data = data["published-online"] || data["published-print"] || data["accepted"];
+                    //console.log("published_data:", published_data);
                     year=published_data["date-parts"][0][0];
                     month= published_data["date-parts"][0][1];
                     day= published_data["date-parts"][0][2];
