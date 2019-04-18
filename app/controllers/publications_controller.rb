@@ -460,7 +460,7 @@ class PublicationsController < ApplicationController
       @publication.errors[:bibtex_file] = 'Upload a file!'
     else
       bibtex_file = params[:publication].delete(:bibtex_file)
-      data = bibtex_file.read
+      data = bibtex_file.read.force_encoding('UTF-8')
       bibtex = BibTeX.parse(data,:filter => :latex)
 
 

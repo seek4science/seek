@@ -191,8 +191,12 @@ class Publication < ActiveRecord::Base
     plain_authors.each_with_index do |author, index| # multiselect
       next if author.empty?
       last_name,first_name = author.split(', ') # by bibtex definition
-      first_name = first_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''
-      last_name =  last_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''
+      unless first_name.nil?
+        first_name =  first_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''
+      end
+      unless last_name.nil?
+        last_name =  last_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''
+      end
       pa = PublicationAuthor.new(publication: self,
                                  first_name: first_name,
                                  last_name: last_name,
