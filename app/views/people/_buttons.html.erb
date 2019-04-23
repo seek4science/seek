@@ -20,9 +20,6 @@
           <li>
             <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", nil, "Manage Account" -%>
           </li>
-          <li>
-            <%= image_tag_for_key "oauth", user_oauth_sessions_path(@person.user), "OAuth Sessions", nil, "OAuth Sessions" -%>
-          </li>
       <% end -%>
       <% if admin_logged_in? -%>
           <li>

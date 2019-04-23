@@ -8,7 +8,7 @@ class SessionsController < ApplicationController
   prepend_before_action :strip_root_for_xml_requests
 
   # render new.html.erb
-  def new
+  def newsave!
     
   end
 
@@ -21,15 +21,22 @@ class SessionsController < ApplicationController
   end
 
   def create
-    # authentication through omniauth?
-    if Seek::Config.omniauth_enabled && request.env.has_key?('omniauth.auth')
-      create_omniauth(request.env['omniauth.auth'])
+    auth = session[:auth]
+    session.delete (:auth)
+
+    if !auth
+      auth = request.env['omniauth.auth']
+    end
+  # authentication through omniauth?
+    if Seek::Config.omniauth_enabled && auth
+      create_omniauth(auth)
     else
       password_authentication
     end
   end
 
   def destroy
+    Identity.current_identity = nil
     logout_user
     flash[:notice] = "You have been logged out."
 
@@ -70,6 +77,10 @@ class SessionsController < ApplicationController
   
   def successful_login
     self.current_user = @user
+    if Identity.current_identity
+      Identity.current_identity.user = self.current_user
+      Identity.current_identity.save!
+    end
     flash[:notice] = "You have successfully logged in, #{@user.display_name}."
     if params[:remember_me] == "on"
       @user.remember_me unless @user.remember_token?
@@ -120,31 +131,47 @@ class SessionsController < ApplicationController
     info = auth['info']
     
     # check if there is a user with that username as login
-    user_by_omniauth = User.find_by_login( info['nickname'])
+    identity = Identity.from_omniauth(auth)
+    user_by_omniauth = identity.user
     if user_by_omniauth
       @user = user_by_omniauth
       check_login
     # there is no such user, should we not create the user?
     elsif !Seek::Config.omniauth_user_create
-      failed_login "the authenticated user: #{info['nickname']} cannot be found"
+      failed_login 'the authenticated user: cannot be found; administrators have been informed'
+      Mailer.omniauth_failed_login(auth.to_yaml).deliver_later
     else
-      # create the user from the omniauth info
-      @user = User.create({:login => info['nickname']})
-      # some random password, since authentication should happen through omniauth in the future
-      @user.password              = SecureRandom.hex
-      @user.password_confirmation = @user.password
-      # try to save
-      if !@user.save
-        failed_login "Cannot create a new user: #{info['nickname']}"
-      else
-        # should we activate the user?
-        @user.activate if Seek::Config.omniauth_user_activate
-        # when user was saved successfully, also create the Profile and save with the user
-        person = Person.create(auth['info'].slice(:first_name, :last_name, :email))
-        person.user = @user
-        person.save
-        check_login
-      end
+      flash[:notice] = 'You need to login directly to link accounts. If you do not have an account then you must register.'
+      redirect_to login_path
+      # # TODO: Check this code out
+      # # create the user from the omniauth info
+      # @user = User.create
+      # if info['nickname']
+      #   @user.login = info['nickname']
+      # else
+      #   @user.login = SecureRandom.hex
+      # end
+      # # some random password, since authentication should happen through omniauth in the future
+      # @user.password              = SecureRandom.hex
+      # @user.password_confirmation = @user.password
+      #
+      # # try to save
+      # if !@user.save
+      #   failed_login "Cannot create a new user: #{@user.login}"
+      # else
+      #   identity.user = @user
+      #   identity.save!
+      #   # should we activate the user?
+      #   @user.activate if Seek::Config.omniauth_user_activate
+      #   # when user was saved successfully, also create the Profile and save with the user
+      #   person = Person.create
+      #   person.first_name = 'fred'
+      #   person.last_name = 'bloggs'
+      #   person.email = 'someone@somewhere.com'
+      #   person.user = @user
+      #   person.save
+      #   check_login
+      # end
     end
   end
 
