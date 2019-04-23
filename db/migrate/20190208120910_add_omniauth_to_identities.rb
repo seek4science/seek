@@ -1,4 +1,4 @@
-class AddOmniauthToIdentities < ActiveRecord::Migration
+class AddOmniauthToIdentities < ActiveRecord::Migration[4.2]
   def change
     add_column :identities, :provider, :string
     add_column :identities, :uid, :string

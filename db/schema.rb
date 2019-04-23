@@ -624,6 +624,25 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.datetime "updated_at"
   end
 
+  create_table "identities", id: :integer,  force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "provider"
+    t.string "uid"
+    t.string "token"
+    t.integer "expires_at"
+    t.boolean "expires"
+    t.integer "user_id"
+    t.index ["email"], name: "index_identities_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_identities_on_reset_password_token", unique: true
+    t.index ["user_id"], name: "index_user_id"
+  end
+
   create_table "institutions", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.text "address", limit: 16777215
@@ -915,24 +934,6 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_oauth_sessions_on_user_id"
-  end
-
-  add_index "oauth_sessions", ["user_id"], name: "index_oauth_sessions_on_user_id", using: :btree
-
-  create_table "openbis_endpoints", force: :cascade do |t|
-    t.string   "as_endpoint",           limit: 255
-    t.string   "space_perm_id",         limit: 255
-    t.string   "username",              limit: 255
-    t.integer  "project_id",            limit: 4
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
-    t.string   "dss_endpoint",          limit: 255
-    t.string   "web_endpoint",          limit: 255
-    t.integer  "refresh_period_mins",   limit: 4,     default: 120
-    t.integer  "policy_id",             limit: 4
-    t.string   "encrypted_password",    limit: 255
-    t.string   "encrypted_password_iv", limit: 255
-    t.text     "meta_config_json",      limit: 65535
   end
 
   create_table "openbis_endpoints", id: :integer,  force: :cascade do |t|
