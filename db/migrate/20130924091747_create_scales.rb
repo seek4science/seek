@@ -7,6 +7,6 @@ class CreateScales < ActiveRecord::Migration
       t.string :image_name
 
       t.timestamps
-    end if !table_exists?('scales')
+    end unless data_source_exists?('scales')
   end
 end

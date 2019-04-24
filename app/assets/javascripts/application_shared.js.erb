@@ -1,43 +1,23 @@
 // Place your application-specific JavaScript functions and classes here
 // This file is automatically included by javascript_include_tag :defaults
 
-
-var tabber_ids = new Array();
-var tabberOptions = {'onLoad':function() {
-    displayTabs();
-}};
+var tabber_ids = [];
+var tabberOptions = {
+    onLoad: function () {
+        displayTabs();
+    }
+};
 
 function displayTabs() {
-
     for (var i = 0; i < tabber_ids.length; i++) {
         var tabber_id = tabber_ids[i];
-        var spinner = $(tabber_id + "_spinner");
-        if (spinner != null) {
-          spinner.hide();
-          Effect.Appear(tabber_id, {duration : 0.5}); 
+        var spinner = $j('#' + tabber_id + '_spinner');
+        if (spinner.length) {
+            spinner.hide();
+            $j('#' + tabber_id).fadeIn();
         }
     }
 }
-
-
-function trimSpaces(str) {
-    while ((str.length > 0) && (str.charAt(0) == ' '))
-        str = str.substring(1);
-    while ((str.length > 0) && (str.charAt(str.length - 1) == ' '))
-        str = str.substring(0, str.length - 1);
-    return str;
-}
-
-function addOrganismListTag(tag_id) {
-
-    organism_autocompleter = autocompleters['organism_autocompleter']
-    var index = organism_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
-    var item = new Element('a', {
-        'value': index
-    });
-    organism_autocompleter.addContactToList(item);
-}
-
 
 function checkNotInList(id, list) {
     rtn = true;
@@ -48,141 +28,61 @@ function checkNotInList(id, list) {
             break;
         }
 
-    return(rtn);
+    return (rtn);
 }
 
 function clearList(name) {
-    select = $(name)
-    while (select.length > 0) {
-        select.remove(select.options[0])
-    }
-}
-
-
-
-  
-  
-/*==================================================
-  Cookie functions - courtesy of BioCatalogue
-  ==================================================*/
-function setCookie(name, value, expires, path, domain, secure) {
-    document.cookie= name + "=" + escape(value) +
-        ((expires) ? "; expires=" + expires.toGMTString() : "") +
-        ((path) ? "; path=" + path : "") +
-        ((domain) ? "; domain=" + domain : "") +
-        ((secure) ? "; secure" : "");
-}
-
-function getCookie(name) {
-    var dc = document.cookie;
-    var prefix = name + "=";
-    var begin = dc.indexOf("; " + prefix);
-    if (begin == -1) {
-        begin = dc.indexOf(prefix);
-        if (begin != 0) return null;
-    } else {
-        begin += 2;
-    }
-    var end = document.cookie.indexOf(";", begin);
-    if (end == -1) {
-        end = dc.length;
-    }
-    return unescape(dc.substring(begin + prefix.length, end));
-}
-function deleteCookie(name, path, domain) {
-    if (getCookie(name)) {
-        document.cookie = name + "=" +
-            ((path) ? "; path=" + path : "") +
-            ((domain) ? "; domain=" + domain : "") +
-            "; expires=Thu, 01-Jan-70 00:00:01 GMT";
-    }
-}
-
-var fullResourceListItemExpandableText = new Array();
-var truncResourceListItemExpandableText = new Array();
-
-function expandResourceListItemExpandableText(objectId){
-    link = $('expandableLink'+objectId)
-    text = $('expandableText'+objectId)
-    if (link.innerHTML == '(Expand)') { //EXPAND
-      link.innerHTML = '(Collapse)';
-      text.innerHTML = fullResourceListItemExpandableText[objectId];
-    }
-    else { //COLLAPSE
-      link.innerHTML = '(Expand)';
-      text.innerHTML = truncResourceListItemExpandableText[objectId];
-    }
+    $j('#' + name + ' option').remove();
 }
 
 //http://snipplr.com/view.php?codeview&id=1384
 function insertAtCursor(myField, myValue) {
-  myField = $(myField);
+    myField = $j('#' + myField)[0];
 
-  textAreaScrollPosition = myField.scrollTop;
+    textAreaScrollPosition = myField.scrollTop;
 
-  //IE support
-  if (document.selection) {
-    myField.focus();
-    sel = document.selection.createRange();
-    sel.text = myValue;
-  }
-  //MOZILLA/NETSCAPE support
-  else if (myField.selectionStart || myField.selectionStart == '0') {
-    var startPos = myField.selectionStart;
-    var endPos = myField.selectionEnd;
-    myField.value = myField.value.substring(0, startPos)
-                  + myValue 
-                  + myField.value.substring(endPos, myField.value.length);
-    myField.focus(); 
-    myField.setSelectionRange(startPos + myValue.length, startPos + myValue.length);
-  } else {
-    myField.value += myValue;
-  }
-  
-  myField.scrollTop = textAreaScrollPosition;
+    //IE support
+    if (document.selection) {
+        myField.focus();
+        sel = document.selection.createRange();
+        sel.text = myValue;
+    }
+    //MOZILLA/NETSCAPE support
+    else if (myField.selectionStart || myField.selectionStart == '0') {
+        var startPos = myField.selectionStart;
+        var endPos = myField.selectionEnd;
+        myField.value = myField.value.substring(0, startPos)
+            + myValue
+            + myField.value.substring(endPos, myField.value.length);
+        myField.focus();
+        myField.setSelectionRange(startPos + myValue.length, startPos + myValue.length);
+    } else {
+        myField.value += myValue;
+    }
+
+    myField.scrollTop = textAreaScrollPosition;
 }
 
 //only allows numbers to by typed
-function onlyNumbers(evt)
- {
+function onlyNumbers(evt) {
     var charCode = (evt.which) ? evt.which : event.keyCode
     if (charCode > 31 && (charCode < 48 || charCode > 57))
-       return false;
+        return false;
 
     return true;
- }
+}
 
 //only allows float numbers to by typed
-function onlyFloatNumbers(evt)
-{
+function onlyFloatNumbers(evt) {
     var charCode = (evt.which) ? evt.which : event.keyCode
     if (charCode > 31 && (charCode < 48 || charCode > 57))
-        //this is dot charCode
+    //this is dot charCode
         if (charCode == 46)
             return true;
         else
             return false;
 
     return true;
-}
-//perform the click link action
-function clickLink(link) {
-    var cancelled = false;
-    if (document.createEvent) {
-        var event = document.createEvent("MouseEvents");
-        event.initMouseEvent("click", true, true, window,
-            0, 0, 0, 0, 0,
-            false, false, false, false,
-            0, null);
-        cancelled = !link.dispatchEvent(event);
-    }
-    else if (link.fireEvent) {
-        cancelled = !link.fireEvent("onclick");
-    }
-
-    if (!cancelled) {
-        window.location = link.href;
-    }
 }
 
 function decodeHTML(str) {
@@ -207,69 +107,153 @@ function encodeHTML(str) {
 
 // taken from stack overflow - http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
 function guid() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
 }
 
-function show_ajax_loader(element) {
-  $(element).innerHTML = '<%= image_tag("ajax-loader.gif").html_safe %>';
-}
-function show_large_ajax_loader(element) {
-  $(element).innerHTML = '<%= image_tag("ajax-loader-large.gif").html_safe %>';
-}
-
-
 // Takes an object of arbitrary depth, and a period separated "path" and returns the value.
 // e.g. digValue({a: {b: {c: 1}}}, 'a.b.c') => 1
-
 function digValue(object, path) {
-  var keys = path.split('.');
+    var keys = path.split('.');
 
-  var value = object[keys.shift()];
+    var value = object[keys.shift()];
 
-  keys.forEach(function (key) {
-    if (typeof value === 'undefined') {
-      return value;
-    }
-    value = value[key];
-  });
+    keys.forEach(function (key) {
+        if (typeof value === 'undefined') {
+            return value;
+        }
+        value = value[key];
+    });
 
-  return value;
+    return value;
 }
 
-(function ($) {
-  $.fn.spinner = function (action, opts) {
-    var options = opts || {};
-    if(action === 'add') {
-      return this.each(function () {
-        if(!$(this).data('spinnerElement')) {
-          var spinner;
-          if (options.size == 'large') {
-            spinner = $('<%= image_tag("ajax-loader-large.gif").html_safe %>');
-          } else {
-            spinner = $('<%= image_tag("ajax-loader.gif").html_safe %>');
-          }
-          $(this).append(spinner);
-          $(this).data('spinnerElement', spinner);
+/* JQuery functions */
+(function ($j) {
+    // Adds an AJAX loader icon to the element.
+    // Example usage:
+    // $j('#some_container').spinner('add');
+    // $j('#some_container').spinner('remove');
+    // $j('#some_container').spinner('add', { size: 'large' });
+    // $j('#some_container').show().html('').spinner('add');
+    $j.fn.spinner = function (action, opts) {
+        var options = opts || {};
+        if (action === 'add') {
+            return this.each(function () {
+                if (!$j(this).data('spinnerElement') || !$j('.seek-spinner', $j(this)).length) {
+                    var spinner;
+                    if (options.size == 'large') {
+                        spinner = $j('<%= image_tag("ajax-loader-large.gif", class: 'seek-spinner').html_safe %>');
+                    } else {
+                        spinner = $j('<%= image_tag("ajax-loader.gif", class: 'seek-spinner').html_safe %>');
+                    }
+                    $j(this).append(spinner);
+                    $j(this).data('spinnerElement', spinner);
+                }
+            });
+        } else if (action === 'remove') {
+            return this.each(function () {
+                if ($j(this).data('spinnerElement')) {
+                    $j(this).data('spinnerElement').remove();
+                    $j(this).data('spinnerElement', null);
+                }
+            });
         }
-      });
-    } else if(action === 'remove') {
-      return this.each(function () {
-        if($(this).data('spinnerElement')) {
-          $(this).data('spinnerElement').remove();
-          $(this).data('spinnerElement', null);
-        }
-      });
-    }
-  };
-}( jQuery ));
+    };
+
+    // Highlights the selected elements for 1 second. Similar to `Effect.highlight`.
+    // Example usage:
+    // $j('#an_element').highlight();
+    // $j('#new_item').appendTo($j('#container')).highlight('green');
+    $j.fn.highlight = function (colour) {
+        var cssClass = colour ? ('js-highlight-' + colour) : 'js-highlight'
+        var elements = $j(this);
+        elements.addClass(cssClass);
+        setTimeout(function () {
+            elements.removeClass(cssClass)
+        }, 1100);
+    };
+
+    $j.fn.easyTabs = function () {
+        return this.each(function(i, container) {
+            $j(this).find('> ul.easytabs-nav > li').click(function () {
+                $j(container).find('> .easytabs-pane').removeClass('active');
+                $j(container).find('> .easytabs-pane:eq(' +  $j(this).index() + ')').addClass('active');
+                $j(this).siblings().removeClass('active');
+                $j(this).addClass('active');
+            });
+            // Show first tab by default
+            $j(this).find('> ul.easytabs-nav > li:eq(0)').addClass('active');
+            $j(this).find('> .easytabs-pane:eq(0)').addClass('active');
+        });
+    };
+}(jQuery));
 
 $j(document).ready(function () {
-  $j('.collapse').on('show.bs.collapse', function () {
-    $j(this).parent().find('.panel-heading .caret').removeClass('caret').addClass('caret-up');
-  }).on('hide.bs.collapse', function () {
-    $j(this).parent().find('.panel-heading .caret-up').removeClass('caret-up').addClass('caret');
-  });
+    $j('.collapse').on('show.bs.collapse', function () {
+        $j(this).parent().find('.panel-heading .caret').removeClass('caret').addClass('caret-up');
+    }).on('hide.bs.collapse', function () {
+        $j(this).parent().find('.panel-heading .caret-up').removeClass('caret-up').addClass('caret');
+    });
+
+    // Similar to bootstrap's 'collapse' but doesn't require IDs, will collapse the sibling div.panel-collapse.
+    $j('body').on('click.collapse-next.data-api', '[data-toggle=collapse-next]', function (e) {
+        $j(this).siblings('.panel-collapse').collapse('toggle');
+    });
+
+    // Swap select contents when a checkbox is checked
+    $j('[data-role="seek-swappable-select-toggle"]').change(function () {
+        var group = $j(this).parents('[data-role="seek-swappable-select-group"]');
+        var select = $j('[data-role="seek-swappable-select"]', group);
+        var alt = $j('[data-role="seek-swappable-select-alt"]', group);
+
+        var temp = select.html();
+        select.html(alt.html());
+        alt.html(temp);
+    });
+
+    // Show a summary with link to expand large sections of text
+    $j('[data-role="seek-expandable-link"]').click(function () {
+        var container = $j(this).parents('[data-role="seek-expandable"]');
+        var ellipsis = $j('[data-role="seek-expandable-ellipsis"]', container);
+        var remainder = $j('[data-role="seek-expandable-hidden"]', container);
+
+        if ($j(this)[0].innerHTML === '(Expand)') {
+            ellipsis.hide();
+            remainder.show();
+            $j(this).html('(Collapse)');
+        } else {
+            ellipsis.show();
+            remainder.hide();
+            $j(this).html('(Expand)');
+        }
+
+        return false;
+    });
+
+    // Handle adding an item from a fancy_multiselect dropdown.
+    $j('[data-role="seek-fancy-multiselect"] select[data-associations-list-id]').change(function () {
+        var listElement = $j('#' + $j(this).data('associationsListId'));
+        var listObject = listElement.data('associationList');
+        var selectedOption = $j('option:selected', $j(this));
+        if (!selectedOption.val()) {
+            return;
+        }
+        var item = { id: parseInt(selectedOption.val()),
+            title: selectedOption.text() };
+
+        // Load preview
+        if ($j(this).data('previewUrl')) {
+            $j.get($j(this).data('previewUrl'), { id: item.id });
+        }
+
+        if (!listObject.exists(function (i) { return i.id === item.id })) {
+            listObject.add(item);
+        } else {
+            // Highlight existing item if its already there
+            $j('[value=' + item.id + ']', listElement).parent().highlight('blue');
+        }
+    });
 });

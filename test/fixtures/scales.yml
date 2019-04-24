@@ -1,24 +1,29 @@
 Cell:
- title: "Cell"
- pos: 1
- key: "cell"
+  title: "Cell"
+  pos: 1
+  key: "cell"
+  image_name: "vl-scales/cell.png"
 
 Intercellular:
- title: "Intercellular"
- pos: 2
- key: "intercellular"
+  title: "Intercellular"
+  pos: 2
+  key: "intercellular"
+  image_name: "vl-scales/intercellular.png"
 
 LiverLobule:
   title: "LiverLobule"
   pos: 3
   key:  "liverLobule"
+  image_name: "vl-scales/liverLobule.jpg"
 
 Liver:
- title: "Liver"
- pos: 4
- key: "liver"
+  title: "Liver"
+  pos: 4
+  key: "liver"
+  image_name: "vl-scales/liver.png"
 
 Organism:
- title: "Organism"
- pos: 5
- key: "organism"
+  title: "Organism"
+  pos: 5
+  key: "organism"
+  image_name: "vl-scales/organism.png"

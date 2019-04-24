@@ -1,3 +1,3 @@
-class ReindexingQueue < ActiveRecord::Base
+class ReindexingQueue < ApplicationRecord
   belongs_to :item, :polymorphic => true
 end

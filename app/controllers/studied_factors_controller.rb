@@ -3,11 +3,11 @@ class StudiedFactorsController < ApplicationController
   include Seek::AnnotationCommon
   include Seek::AssetsCommon
 
-  before_filter :login_required, except: [:show]
-  before_filter :find_data_file_edit_auth, except: [:show]
-  before_filter :find_data_file_view_auth, only: [:show]
-  before_filter :create_new_studied_factor, only: [:index]
-  before_filter :no_comma_for_decimal, only: %i[create update]
+  before_action :login_required, except: [:show]
+  before_action :find_data_file_edit_auth, except: [:show]
+  before_action :find_data_file_view_auth, only: [:show]
+  before_action :create_new_studied_factor, only: [:index]
+  before_action -> { no_comma_for_decimal(studied_factor_params) }, only: %i[create update]
 
   include Seek::BreadCrumbs
 
@@ -30,31 +30,19 @@ class StudiedFactorsController < ApplicationController
 
     update_annotations(params[:annotation][:value], @studied_factor, 'description') if try_block { !params[:annotation][:value].blank? }
 
-    render :update do |page|
-      if @studied_factor.save
-        page.insert_html :bottom, 'condition_or_factor_rows', partial: 'condition_or_factor_row', object: @studied_factor, locals: { asset: 'data_file', show_delete: true }
-        page.visual_effect :highlight, 'condition_or_factor_rows'
-        # clear the _add_factor form
-        page.call "autocompleters['substance_autocompleter'].deleteAllTokens"
-        page[:add_condition_or_factor_form].reset
-        page[:substance_condition_factor].hide
-        page[:growth_medium_or_buffer_description].hide
-      else
-        page.alert(@studied_factor.errors.full_messages)
+    if @studied_factor.save
+      respond_to do |format|
+        format.js
       end
+    else
+      render plain: @studied_factor.errors.full_messages, status: :unprocessable_entity
     end
   end
 
   def create_from_existing
-    studied_factor_ids = []
     new_studied_factors = []
-    # retrieve the selected FSes
-
-    params.each do |key, value|
-      studied_factor_ids.push value.to_i if key =~ /checkbox/
-    end
     # create the new FSes based on the selected FSes
-    studied_factor_ids.each do |id|
+    existing_studied_factor_params[:existing_studied_factor].each do |id|
       studied_factor = StudiedFactor.find(id)
       new_studied_factor = StudiedFactor.new(measured_item_id: studied_factor.measured_item_id, unit_id: studied_factor.unit_id, start_value: studied_factor.start_value,
                                              end_value: studied_factor.end_value, standard_deviation: studied_factor.standard_deviation)
@@ -70,27 +58,19 @@ class StudiedFactorsController < ApplicationController
       new_studied_factors.push new_studied_factor
     end
 
-    render :update do |page|
-      new_studied_factors.each do |sf|
-        if sf.save
-          page.insert_html :bottom, 'condition_or_factor_rows', partial: 'studied_factors/condition_or_factor_row', object: sf, locals: { asset: 'data_file', show_delete: true }
-        else
-          page.alert("can not create factor studied: item: #{try_block { sf.substances.collect { |s| s.title + '/' } }} #{sf.measured_item.title}, values: #{sf.start_value}-#{sf.end_value}#{sf.unit.title}, SD: #{sf.standard_deviation}")
-        end
-      end
-      page.visual_effect :highlight, 'condition_or_factor_rows'
+    @saved_factors, @errored_factors = new_studied_factors.partition(&:save)
+    respond_to do |format|
+      format.js
     end
   end
 
   def destroy
     @studied_factor = StudiedFactor.find(params[:id])
-    render :update do |page|
-      if @studied_factor.destroy
-        page.visual_effect :fade, "condition_or_factor_row_#{@studied_factor.id}"
-        page.visual_effect :fade, "edit_condition_or_factor_#{@studied_factor.id}_form"
-      else
-        page.alert(@studied_factor.errors.full_messages)
-      end
+
+    if @studied_factor.destroy
+      render js: "$j('#condition_or_factor_row_#{@studied_factor.id}').fadeOut();"
+    else
+      render plain: @studied_factor.errors.full_messages, status: :unprocessable_entity
     end
   end
 
@@ -113,30 +93,28 @@ class StudiedFactorsController < ApplicationController
 
     update_annotations(params[:annotation][:value], @studied_factor, 'description') if try_block { !params[:annotation][:value].blank? }
 
+
     if @studied_factor.update_attributes(studied_factor_params)
-      render :update do |page|
-        page.visual_effect :fade, "edit_condition_or_factor_#{@studied_factor.id}_form"
-        page.call "autocompleters['#{@studied_factor.id}_substance_autocompleter'].deleteAllTokens"
-        page.replace "condition_or_factor_row_#{@studied_factor.id}", partial: 'condition_or_factor_row', object: @studied_factor, locals: { asset: 'data_file', show_delete: true }
+      respond_to do |format|
+        format.js
       end
     else
-      render :update do |page|
-        page.alert(@studied_factor.errors.full_messages)
-      end
+      render plain: @studied_factor.errors.full_messages, status: :unprocessable_entity
     end
   end
 
   def show
     @studied_factor = StudiedFactor.find(params[:id])
-    respond_to do |format|
-      format.rdf { render text: 'not yet available',status: :forbidden }
-    end
   end
 
   private
 
   def studied_factor_params
     params.require(:studied_factor).permit(:measured_item_id, :unit_id, :start_value, :end_value, :standard_deviation)
+  end
+
+  def existing_studied_factor_params
+    params.permit(existing_studied_factor: [])
   end
 
   def find_data_file_view_auth
@@ -148,7 +126,7 @@ class StudiedFactorsController < ApplicationController
       respond_to do |format|
         flash[:error] = 'You are not authorized to perform this action'
         format.html { redirect_to data_files_path }
-        format.rdf { render text: 'You are not authorized to perform this action', status: :forbidden }
+        format.rdf { render plain: 'You are not authorized to perform this action', status: :forbidden }
       end
       return false
     end
@@ -156,7 +134,7 @@ class StudiedFactorsController < ApplicationController
     respond_to do |format|
       flash[:error] = "Couldn't find the Data file"
       format.html { redirect_to data_files_path }
-      format.rdf { render text: 'Not found', status: :not_found }
+      format.rdf { render plain: 'Not found', status: :not_found }
     end
     return false
   end

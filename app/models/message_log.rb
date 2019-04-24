@@ -1,5 +1,5 @@
 # records and tracks messages that have been sent, and when
-class MessageLog < ActiveRecord::Base
+class MessageLog < ApplicationRecord
   # the different types of messages
   PROJECT_MEMBERSHIP_REQUEST = 1
 

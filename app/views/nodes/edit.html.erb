@@ -32,7 +32,7 @@
       <div>
         <%= preview_permission_popup_link(@node)-%>
         <%= f.submit "Update", :id => "node_submit_btn",
-                     :onclick => "javascript: validateResourceFields(false, 'node', #{current_user_authorized_to_manage}); return(false);",
+                     :onclick => "return validateResourceFields('node')",
                      :class => 'btn btn-primary' -%>
         or <%= cancel_button(node_path(@node)) -%>
       </div>

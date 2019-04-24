@@ -5,14 +5,14 @@ class OpenbisEndpointsController < ApplicationController
 
   include Seek::DestroyHandling
 
-  before_filter :openbis_enabled?
+  before_action :openbis_enabled?
 
-  before_filter :get_endpoint, only: %i[show edit update refresh destroy reset_fatals]
-  before_filter :get_project
-  before_filter :project_required
-  before_filter :project_member?
-  before_filter :project_can_admin?, except: [:browse]
-  before_filter :get_endpoints, only: %i[index show browse]
+  before_action :get_endpoint, only: %i[show edit update refresh destroy reset_fatals]
+  before_action :get_project
+  before_action :project_required
+  before_action :project_member?
+  before_action :project_can_admin?, except: [:browse]
+  before_action :get_endpoints, only: %i[index show browse]
 
   def index
     respond_with(@project, @openbis_endpoints)
@@ -122,7 +122,7 @@ class OpenbisEndpointsController < ApplicationController
     end
   end
 
-  # overides the after_filter callback from application_controller, as the behaviour needs to be
+  # overides the after_action callback from application_controller, as the behaviour needs to be
   # slightly different
   def log_event
     action = action_name.downcase

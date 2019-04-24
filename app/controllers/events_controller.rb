@@ -2,11 +2,11 @@ class EventsController < ApplicationController
   include Seek::PreviewHandling
   include Seek::AssetsStandardControllerActions
 
-  before_filter :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
+  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
 
-  before_filter :find_assets
+  before_action :find_assets
 
-  before_filter :events_enabled?
+  before_action :events_enabled?
 
   include Seek::IndexPager
 
@@ -17,7 +17,6 @@ class EventsController < ApplicationController
   def show
     respond_to do |format|
       format.html # show.html.erb
-      format.rdf { render template: 'rdf/show' }
       format.xml
       format.json {render json: @event}
     end

@@ -2,7 +2,7 @@
   <h1><%= errors.size > 1 ? "Errors" : "An error"-%> occurred whilst <%= verb -%> your annotation</h1>
   <ul>
     <% errors.each do |attribute, errors_array| %>
-      <li><%= errors_array%></li>
+      <li><%= errors_array.html_safe %></li>
     <% end %>
   </ul>
 </div>

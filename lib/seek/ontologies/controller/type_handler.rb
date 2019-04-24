@@ -4,8 +4,8 @@ module Seek
       module TypeHandler
         extend ActiveSupport::Concern
         included do
-          before_filter :find_ontology_type_class, only: [:show]
-          before_filter :find_and_authorize_assays, only: [:show]
+          before_action :find_ontology_type_class, only: [:show]
+          before_action :find_and_authorize_assays, only: [:show]
         end
 
         def show

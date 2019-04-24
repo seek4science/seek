@@ -1,6 +1,6 @@
 # Represents content from External Service like for example OpenBIS
 # it provides basic features for tracking state, errors, and serialization
-class ExternalAsset < ActiveRecord::Base
+class ExternalAsset < ApplicationRecord
   self.inheritance_column = 'class_type'
   attr_accessor :sync_options, :content_changed
 
@@ -105,7 +105,7 @@ class ExternalAsset < ActiveRecord::Base
   end
 
   def needs_reindexing
-    content_changed || external_mod_stamp_changed? || new_record?
+    content_changed || will_save_change_to_external_mod_stamp? || saved_change_to_external_mod_stamp? || new_record?
   end
 
   def trigger_reindexing

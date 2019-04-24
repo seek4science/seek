@@ -20,7 +20,7 @@
       </label>
     </div>
     <%= render :partial => 'projects/project_selector', locals: {resource: @data_file, allow_nil: Seek::Config.is_virtualliver} -%>
-    <%= render :seek_partial => 'assets/select_tags', locals: {collapsed: true} if DataFile.is_taggable? %>
+    <%= render :partial => 'assets/select_tags', locals: {collapsed: true} if DataFile.is_taggable? %>
     <%= cancel_button(data_files_path) -%>
     <div class='multi-step-buttons'>
       <%= multi_step_forward_button %>

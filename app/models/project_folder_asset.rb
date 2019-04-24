@@ -1,4 +1,4 @@
-class ProjectFolderAsset < ActiveRecord::Base
+class ProjectFolderAsset < ApplicationRecord
   belongs_to :asset, polymorphic: :true
   belongs_to :project_folder
 

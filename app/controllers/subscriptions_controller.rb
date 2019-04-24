@@ -1,6 +1,6 @@
 class SubscriptionsController < ApplicationController
-  before_filter :login_required
-  before_filter :find_and_authorize_requested_item, :only => [:destroy]
+  before_action :login_required
+  before_action :find_and_authorize_requested_item, :only => [:destroy]
 
   def create
     @subscription = current_user.person.subscriptions.build(subscription_params)
@@ -9,7 +9,7 @@ class SubscriptionsController < ApplicationController
         flash[:notice] = "You have subscribed to this #{@subscription.subscribable.class.name.humanize}"
         format.html { redirect_to(@subscription.subscribable) }
       else
-        flash[:notice] = "You failed to subscribe to this #{@subscription.subscribable.class.name.humanize}"
+        flash[:error] = "You failed to subscribe to this #{@subscription.subscribable.class.name.humanize}"
         format.html { redirect_to(@subscription.subscribable) }
       end
     end

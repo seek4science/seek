@@ -3,14 +3,14 @@ class AssaysController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
 
-  before_filter :assays_enabled?
+  before_action :assays_enabled?
 
-  before_filter :find_assets, :only=>[:index]
-  before_filter :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show,:new_object_based_on_existing_one]
+  before_action :find_assets, :only=>[:index]
+  before_action :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show,:new_object_based_on_existing_one]
 
   #project_membership_required_appended is an alias to project_membership_required, but is necessary to include the actions
   #defined in the application controller
-  before_filter :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
+  before_action :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
   include Seek::Publishing::PublishingCommon
 
@@ -153,8 +153,9 @@ class AssaysController < ApplicationController
 
   def update_assay_organisms assay,params
     organisms             = params[:assay_organism_ids] || params[:assay][:organism_ids] || []
-    assay.assay_organisms = []
+    assay.assay_organisms = [] # This means new AssayOrganisms are created every time the assay is updated!
     Array(organisms).each do |text|
+      # TODO: Refactor this to use proper nested params:
       o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")
       culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
       assay.associate_organism(o_id, strain_id, culture_growth,t_id,t_title)
@@ -168,12 +169,6 @@ class AssaysController < ApplicationController
       format.rdf { render :template=>'rdf/show'}
       format.json {render json: @assay}
 
-    end
-  end
-
-  def update_types
-    render :update do |page|
-      page.replace_html "favourite_list", :partial=>"favourites/gadget_list"
     end
   end
 

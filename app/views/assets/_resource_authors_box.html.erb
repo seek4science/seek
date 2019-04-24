@@ -30,17 +30,17 @@ creators ||= resource.creators.reject { |c| contributor && (c == contributor) }
             [<%= h(creator.name) %>]
         <% end %>
     <% end %>
-    <span id='unexpanded'><br/><%= link_to_function "Expand", "$('unexpanded').hide();$('expanded').show();" unless creators.empty? %></span>
+    <span id='unexpanded'><br/><%= link_to "Expand", '#', onclick: "$j('#unexpanded').hide();$j('#expanded').show(); return false;" unless creators.empty? %></span>
 
     <span id='expanded' style="display: none;">
       <% creators.each do |creator| %>
-          <% if creator.nil? || creator.can_view? %>
-
+          <% if creator.can_view? %>
+              <span class="author_avatar"><%= favouritable_icon(creator, 50) -%></span>
           <% elsif creator.title_is_public? %>
               [<%= h(creator.name) %>]
           <% end %>
       <% end %>
-      <br/><%= link_to_function "Unexpand", "$('expanded').hide();$('unexpanded').show();"%>
+      <br/><%= link_to "Unexpand", '#', onclick: "$j('#expanded').hide();$j('#unexpanded').show(); return false;"%>
     </span>
   </div>
 

@@ -23,7 +23,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
   end
 
   test 'should show edit on technology types' do
-    get :edit, id: @suggested_technology_type
+    get :edit, params: { id: @suggested_technology_type }
     assert_response :success
     assert_not_nil assigns(:suggested_technology_type)
   end
@@ -33,7 +33,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     suggested = Factory(:suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography')
     assert suggested.children.empty?
     assert_difference('SuggestedTechnologyType.count') do
-      post :create, suggested_technology_type: { label: 'test tech type', parent_uri: "suggested_technology_type:#{suggested.id}" }
+      post :create, params: { suggested_technology_type: { label: 'test tech type', parent_uri: "suggested_technology_type:#{suggested.id}" } }
     end
     assert_redirected_to action: :index
     assert suggested.children.count == 1
@@ -45,7 +45,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     login_as Factory(:admin)
 
     assert_difference('SuggestedTechnologyType.count') do
-      post :create, suggested_technology_type: { label: 'test tech type', parent_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography' }
+      post :create, params: { suggested_technology_type: { label: 'test tech type', parent_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography' } }
     end
     assert_redirected_to action: :index
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', SuggestedTechnologyType.last.parent.uri
@@ -55,7 +55,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
 
   test 'should update label' do
     login_as Factory(:admin)
-    put :update, id: @suggested_technology_type, suggested_technology_type: { label: 'new label' }
+    put :update, params: { id: @suggested_technology_type, suggested_technology_type: { label: 'new label' } }
     assert_redirected_to action: :index
     get :index
     suggested_technology_type = SuggestedTechnologyType.find @suggested_technology_type
@@ -74,38 +74,38 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     assert_equal suggested_parent1.uri, suggested_technology_type.parent.uri.to_s
 
     # update to other parent suggested
-    put :update, id: suggested_technology_type.id, suggested_technology_type: { parent_uri: "suggested_technology_type:#{suggested_parent2.id}" }
+    put :update, params: { id: suggested_technology_type.id, suggested_technology_type: { parent_uri: "suggested_technology_type:#{suggested_parent2.id}" } }
     assert_redirected_to action: :index
     suggested_parent2.reload
     assert_includes suggested_parent2.children, suggested_technology_type
 
     # update to other parent from ontology
-    put :update, id: suggested_technology_type.id, suggested_technology_type: { parent_uri: ontology_parent_uri }
+    put :update, params: { id: suggested_technology_type.id, suggested_technology_type: { parent_uri: ontology_parent_uri } }
     assert_redirected_to action: :index
   end
 
   test 'should delete suggested technology type' do
     # even owner cannot delete own type
     assert_no_difference('SuggestedTechnologyType.count') do
-      delete :destroy, id: @suggested_technology_type
+      delete :destroy, params: { id: @suggested_technology_type }
     end
     assert_equal 'Admin rights required to manage types', flash[:error]
-    flash[:error] = nil
+    clear_flash(:error)
     logout
     # log in as another user, who is not the owner of the suggested technology type
     login_as Factory(:user)
     assert_no_difference('SuggestedTechnologyType.count') do
-      delete :destroy, id: @suggested_technology_type
+      delete :destroy, params: { id: @suggested_technology_type }
     end
 
     assert_equal 'Admin rights required to manage types', flash[:error]
-    flash[:error] = nil
+    clear_flash(:error)
     logout
 
     # log in as admin
     login_as Factory(:user, person_id: Factory(:admin).id)
     assert_difference('SuggestedTechnologyType.count', -1) do
-      delete :destroy, id: @suggested_technology_type
+      delete :destroy, params: { id: @suggested_technology_type }
     end
     assert_nil flash[:error]
     assert_redirected_to action: :index
@@ -118,7 +118,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     child = Factory :suggested_technology_type, parent_id: parent.id
 
     assert_no_difference('SuggestedTechnologyType.count') do
-      delete :destroy, id: parent.id
+      delete :destroy, params: { id: parent.id }
     end
     assert flash[:error]
     assert_redirected_to action: :index
@@ -130,7 +130,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     suggested = Factory :suggested_technology_type
     Factory(:experimental_assay, suggested_technology_type: suggested)
     assert_no_difference('SuggestedTechnologyType.count') do
-      delete :destroy, id: suggested.id
+      delete :destroy, params: { id: suggested.id }
     end
     assert flash[:error]
     assert_redirected_to action: :index

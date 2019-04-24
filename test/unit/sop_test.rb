@@ -47,8 +47,6 @@ class SopTest < ActiveSupport::TestCase
 
     asset = Sop.new projects: [projects(:sysmo_project)], policy: Factory(:private_policy)
     assert !asset.valid?
-
-
   end
 
   test 'virtual liver allows blank projects' do
@@ -98,8 +96,6 @@ class SopTest < ActiveSupport::TestCase
 
   def test_version_created_for_new_sop
     sop = Factory(:sop)
-
-    assert sop.save
 
     sop = Sop.find(sop.id)
 
@@ -163,14 +159,17 @@ class SopTest < ActiveSupport::TestCase
 
   test 'assign projects' do
 
-    sop = Factory(:sop, projects: [@project],contributor:@person)
-    another_project = Factory(:project)
-    @person.add_to_project_and_institution(another_project,@person.institutions.first)
-    projects = [@project, another_project]
-    sop.update_attributes(project_ids: projects.map(&:id))
-    sop.save!
-    sop.reload
-    assert_equal projects.sort, sop.projects.sort
+    User.with_current_user(@person.user) do
+      sop = Factory(:sop, projects: [@project],contributor:@person)
+      another_project = Factory(:project)
+      @person.add_to_project_and_institution(another_project,@person.institutions.first)
+      projects = [@project, another_project]
+      sop.update_attributes(project_ids: projects.map(&:id))
+      sop.save!
+      sop.reload
+      assert_equal projects.sort, sop.projects.sort
+    end
+
   end
 
   test 'sop with no contributor' do

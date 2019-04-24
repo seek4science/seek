@@ -1,13 +1,8 @@
-class Workflow < ActiveRecord::Base
+class Workflow < ApplicationRecord
 
   include Seek::Rdf::RdfGeneration
   include Seek::UploadHandling::ExamineUrl
 
-
-  #searchable must come before acts_as_asset is called
-  searchable(:auto_index => false) do
-    text :exp_conditions_search_fields
-  end if Seek::Config.solr_enabled
 
   acts_as_asset
 

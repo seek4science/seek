@@ -1,0 +1,5 @@
+<% if @suggested_type.save %>
+  $j("#assay_<%= @suggested_type.term_type -%>_types_list").html('<%= escape_javascript(render(partial: 'assays/ontology_with_suggested_types_selection_list', locals: { suggested_type: @suggested_type })) -%>');
+<% else %>
+  alert("Something is wrong with the <%= controller_name.singularize.humanize.downcase -%>: <%= @suggested_type.errors.full_messages.to_sentence -%>");
+<% end %>

@@ -11,6 +11,15 @@ class WorkflowsControllerTest < ActionController::TestCase
     @project = User.current_user.person.projects.first
   end
 
+  test 'should return 406 when requesting RDF' do
+    wf = Factory :workflow, contributor: User.current_user.person
+    assert wf.can_view?
+
+    get :show, params: { id: wf, format: :rdf }
+
+    assert_response :not_acceptable
+  end
+
   test 'index' do
     get :index
     assert_response :success
@@ -19,23 +28,21 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'can create with valid url' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
-    workflow_attrs = Factory.attributes_for(:workflow,
-                                                project_ids: [@project.id]
-                                               )
+    workflow_attrs = Factory.attributes_for(:workflow, project_ids: [@project.id])
 
     assert_difference 'Workflow.count' do
-      post :create, workflow: workflow_attrs, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png', data: nil }], sharing: valid_sharing
+      post :create, params: { workflow: workflow_attrs, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png', data: nil }], sharing: valid_sharing }
     end
   end
 
   test 'can create with local file' do
     workflow_attrs = Factory.attributes_for(:workflow,
-                                                contributor: User.current_user,
-                                                project_ids: [@project])
+                                            contributor: User.current_user,
+                                            project_ids: [@project.id])
 
     assert_difference 'Workflow.count' do
       assert_difference 'ActivityLog.count' do
-        post :create, workflow: workflow_attrs, content_blobs: [{ data: file_for_upload }], sharing: valid_sharing
+        post :create, params: { workflow: workflow_attrs, content_blobs: [{ data: file_for_upload }], sharing: valid_sharing }
       end
     end
   end
@@ -43,13 +50,13 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'can edit' do
     workflow = Factory :workflow, contributor: User.current_user.person
 
-    get :edit, id: workflow
+    get :edit, params: { id: workflow }
     assert_response :success
   end
 
   test 'can update' do
     workflow = Factory :workflow, contributor: User.current_user.person
-    post :update, id: workflow, workflow: { title: 'updated' }
+    post :update, params: { id: workflow, workflow: { title: 'updated' } }
     assert_redirected_to workflow_path(workflow)
   end
 
@@ -58,8 +65,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory :workflow, contributor: User.current_user.person
 
     assert_difference 'workflow.version' do
-      post :new_version, id: workflow, workflow: {},
-                         content_blobs: [{ data_url: 'http://somewhere.com/piccy.png' }]
+      post :new_version, params: { id: workflow, workflow: {}, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png' }] }
 
       workflow.reload
     end
@@ -75,7 +81,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     new_file_path = file_for_upload
     assert_difference 'workflow.version' do
-      post :new_version, id: workflow, workflow: {}, content_blobs: [{ data: new_file_path }]
+      post :new_version, params: { id: workflow, workflow: {}, content_blobs: [{ data: new_file_path }] }
 
       workflow.reload
     end
@@ -87,7 +93,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow_attrs = Factory.build(:workflow, contributor: User.current_user.person).attributes # .symbolize_keys(turn string key to symbol)
 
     assert_no_difference 'Workflow.count' do
-      post :create, workflow: workflow_attrs, content_blobs: [{ data_url: 'http://www.blah.de/images/logo.png' }]
+      post :create, params: { workflow: workflow_attrs, content_blobs: [{ data_url: 'http://www.blah.de/images/logo.png' }] }
     end
     assert_not_nil flash[:error]
   end
@@ -97,7 +103,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory :workflow, contributor: User.current_user.person
     new_data_url = 'http://www.blah.de/images/liver-illustration.png'
     assert_no_difference 'workflow.version' do
-      post :new_version, id: workflow, workflow: {}, content_blobs: [{ data_url: new_data_url }]
+      post :new_version, params: { id: workflow, workflow: {}, content_blobs: [{ data_url: new_data_url }] }
 
       workflow.reload
     end
@@ -108,7 +114,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory :workflow, contributor: User.current_user.person
     content_blob_id = workflow.content_blob.id
     assert_difference('Workflow.count', -1) do
-      delete :destroy, id: workflow
+      delete :destroy, params: { id: workflow }
     end
     assert_redirected_to workflows_path
 
@@ -143,7 +149,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal [], workflow.annotations.select { |a| a.source == p.user }.collect { |a| a.value.text }.sort
     assert_equal %w(golf sparrow), workflow.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
-    xml_http_request :post, :update_annotations_ajax, id: workflow, tag_list: "soup,#{golf.value.text}"
+    post :update_annotations_ajax, xhr: true, params: { id: workflow, tag_list: "soup,#{golf.value.text}" }
 
     workflow.reload
 
@@ -157,7 +163,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory(:workflow, contributor: user.person)
     login_as(user)
     assert workflow.can_manage?, 'The workflow must be manageable for this test to succeed'
-    put :update, id: workflow, workflow: { other_creators: 'marry queen' }
+    put :update, params: { id: workflow, workflow: { other_creators: 'marry queen' } }
     workflow.reload
     assert_equal 'marry queen', workflow.other_creators
   end
@@ -170,7 +176,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'should show the other creators in -uploader and creators- box' do
     workflow = Factory(:workflow, policy: Factory(:public_policy), other_creators: 'another creator')
-    get :show, id: workflow
+    get :show, params: { id: workflow }
     assert_select 'div', text: 'another creator', count: 1
   end
 
@@ -186,7 +192,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     pres3 = Factory(:workflow, contributor: Factory(:person), creators: [person1], policy: Factory(:public_policy))
     pres4 = Factory(:workflow, contributor: Factory(:person), creators: [person2], policy: Factory(:public_policy))
 
-    get :index, person_id: person1.id
+    get :index, params: { person_id: person1.id }
     assert_response :success
 
     assert_select 'div.list_item_title' do
@@ -201,7 +207,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'should display null license text' do
     workflow = Factory :workflow, policy: Factory(:public_policy)
 
-    get :show, id: workflow
+    get :show, params: { id: workflow }
 
     assert_select '.panel .panel-body span#null_license', text: I18n.t('null_license')
   end
@@ -209,7 +215,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'should display license' do
     workflow = Factory :workflow, license: 'CC-BY-4.0', policy: Factory(:public_policy)
 
-    get :show, id: workflow
+    get :show, params: { id: workflow }
 
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
   end
@@ -220,11 +226,11 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     workflow.update_attributes license: 'CC0-1.0'
 
-    get :show, id: workflow, version: 1
+    get :show, params: { id: workflow, version: 1 }
     assert_response :success
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
 
-    get :show, id: workflow, version: workflowv.version
+    get :show, params: { id: workflow, version: workflowv.version }
     assert_response :success
     assert_select '.panel .panel-body a', text: 'CC0 1.0'
   end
@@ -236,11 +242,11 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert_nil workflow.license
 
-    put :update, id: workflow, workflow: { license: 'CC-BY-SA-4.0' }
+    put :update, params: { id: workflow, workflow: { license: 'CC-BY-SA-4.0' } }
 
     assert_response :redirect
 
-    get :show, id: workflow
+    get :show, params: { id: workflow }
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share-Alike 4.0'
     assert_equal 'CC-BY-SA-4.0', assigns(:workflow).license
   end
@@ -252,7 +258,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory(:workflow, policy: Factory(:public_policy), contributor:User.current_user.person)
     workflow2 = Factory(:workflow, policy: Factory(:public_policy))
 
-    get :index, programme_id: programme.id
+    get :index, params: { programme_id: programme.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do

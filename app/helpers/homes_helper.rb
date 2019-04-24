@@ -1,6 +1,3 @@
-
-
-
 module HomesHelper
   include UsersHelper
   include AssetsHelper
@@ -38,6 +35,14 @@ module HomesHelper
 
   def show_announcements?
     logged_in_and_registered? && Seek::Config.show_announcements
+  end
+
+  #displays the news feed panel and content
+  def home_news_feeds
+    render :partial=>"home_news_feeds"
+  rescue RuntimeError=>e
+    Rails.logger.error("Error fetching and parsing news feeds: #{e.message} - #{e.backtrace.join($/)}")
+    ''
   end
 
   # get multiple feeds from multiple sites
@@ -104,9 +109,8 @@ module HomesHelper
     entry_title = entry.title || 'Unknown title'
     feed_title = entry.feed_title || 'Unknown publisher'
     entry_date = determine_entry_date(entry)
-    entry_summary = truncate(strip_tags(entry.summary || entry.content), length: 500)
-    # TODO: Try removing .to_str when running Rails 4.2
-    tt = tooltip("#{CGI.unescapeHTML(entry_summary.to_str)} (#{entry_date&.strftime('%c')})")
+    entry_summary = truncate(strip_tags(entry.summary || entry.content), length: 500) || 'No summary'
+    tt = tooltip("#{CGI.unescapeHTML(entry_summary)} (#{entry_date&.strftime('%c')})")
     [entry_date, entry_title, feed_title, tt]
   end
 
@@ -152,7 +156,7 @@ module HomesHelper
         description: item.respond_to?(:description) ? item.description : nil,
         abstract: item.respond_to?(:abstract) ? item.abstract : nil,
         created_at: log.created_at,
-        avatar_image: avatar(item, nil, true, nil, nil, true, 'home_asset_icon'),
+        avatar_image: avatar(item, 60, true, nil, nil, true, 'home_asset_icon'),
         url: show_resource_path(item),
         log_id: log.id
       }

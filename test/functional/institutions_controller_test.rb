@@ -32,37 +32,37 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   def test_should_create_institution
     assert_difference('Institution.count') do
-      post :create, institution: { title: 'test', country: 'Finland' }
+      post :create, params: { institution: { title: 'test', country: 'Finland' } }
     end
 
     assert_redirected_to institution_path(assigns(:institution))
   end
 
   def test_should_show_institution
-    get :show, id: institutions(:one).id
+    get :show, params: { id: institutions(:one).id }
     assert_response :success
   end
 
   def test_should_get_edit
     i = Factory(:institution)
     Factory(:avatar, owner: i)
-    get :edit, id: i
+    get :edit, params: { id: i }
 
     assert_response :success
   end
 
   def test_should_update_institution
-    put :update, id: institutions(:one).id, institution: { title: 'something' }
+    put :update, params: { id: institutions(:one).id, institution: { title: 'something' } }
     assert_redirected_to institution_path(assigns(:institution))
   end
 
   def test_should_destroy_institution
     institution = institutions(:four)
-    get :show, id: institution
+    get :show, params: { id: institution }
     assert_select '#buttons li', text: /delete institution/i, count: 1
 
     assert_difference('Institution.count', -1) do
-      delete :destroy, id: institution
+      delete :destroy, params: { id: institution }
     end
 
     assert_redirected_to institutions_path
@@ -71,11 +71,11 @@ class InstitutionsControllerTest < ActionController::TestCase
   def test_non_admin_should_not_destroy_institution
     login_as(:aaron)
     institution = institutions(:four)
-    get :show, id: institution.id
+    get :show, params: { id: institution.id }
     assert_select 'span.icon', text: /Delete Institution/, count: 0
     assert_select 'span.disabled_icon', text: /Delete Institution/, count: 0
     assert_no_difference('Institution.count') do
-      delete :destroy, id: institution
+      delete :destroy, params: { id: institution }
     end
     assert_not_nil flash[:error]
   end
@@ -86,10 +86,10 @@ class InstitutionsControllerTest < ActionController::TestCase
     a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
     institution.reload
     assert_includes institution.people, a_person
-    get :show, id: institution
+    get :show, params: { id: institution }
     assert_select 'span.disabled_icon', text: /Delete Institution/, count: 1
     assert_no_difference('Institution.count') do
-      delete :destroy, id: institution
+      delete :destroy, params: { id: institution }
     end
     assert_not_nil flash[:error]
   end
@@ -98,36 +98,36 @@ class InstitutionsControllerTest < ActionController::TestCase
     project_admin = Factory(:project_administrator)
     institution = project_admin.institutions.first
     login_as(project_admin.user)
-    get :show, id: institution
+    get :show, params: { id: institution }
     assert_response :success
     assert_select 'a', text: /Edit Institution/, count: 1
 
-    get :edit, id: institution
+    get :edit, params: { id: institution }
     assert_response :success
 
-    put :update, id: institution.id, institution: { title: 'something' }
+    put :update, params: { id: institution.id, institution: { title: 'something' } }
     assert_redirected_to institution_path(assigns(:institution))
   end
 
   def test_user_cant_edit_project
     login_as(Factory(:user))
-    get :show, id: institutions(:two)
+    get :show, params: { id: institutions(:two) }
     assert_select 'a', text: /Edit Institution/, count: 0
 
-    get :edit, id: institutions(:two)
+    get :edit, params: { id: institutions(:two) }
     assert_response :redirect
 
     # TODO: Test for update
   end
 
   def test_admin_can_edit
-    get :show, id: institutions(:two)
+    get :show, params: { id: institutions(:two) }
     assert_select 'a', text: /Edit Institution/, count: 1
 
-    get :edit, id: institutions(:two)
+    get :edit, params: { id: institutions(:two) }
     assert_response :success
 
-    put :update, id: institutions(:two).id, institution: { title: 'something' }
+    put :update, params: { id: institutions(:two).id, institution: { title: 'something' } }
     assert_redirected_to institution_path(assigns(:institution))
   end
 
@@ -137,7 +137,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_difference('Institution.count') do
-      post :create, institution: { title: 'a test institution', country: 'Thailand' }
+      post :create, params: { institution: { title: 'a test institution', country: 'Thailand' } }
     end
   end
 
@@ -148,7 +148,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     prog1 = Factory(:programme, projects: [person1.projects.first])
     prog2 = Factory(:programme, projects: [person2.projects.first])
 
-    get :index, programme_id: prog1.id
+    get :index, params: { programme_id: prog1.id }
     assert_response :success
 
     assert_select 'div.list_item_title' do
@@ -168,10 +168,10 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert !(project_admin.institutions.include? institution)
 
     login_as(project_admin.user)
-    get :edit, id: institution
+    get :edit, params: { id: institution }
     assert_response :success
 
-    put :update, id: institution, institution: { title: 'test' }
+    put :update, params: { id: institution, institution: { title: 'test' } }
     assert_redirected_to institution
     institution.reload
     assert_equal 'test', institution.title
@@ -194,7 +194,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     login_as(person)
 
     assert_difference('ActivityLog.count') do
-      get :show, id: institution.id
+      get :show, params: { id: institution.id }
     end
 
     log = ActivityLog.last
@@ -203,7 +203,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal person.user, log.culprit
 
     assert_difference('ActivityLog.count') do
-      put :update, id: institution.id, institution: { title: 'fishy project' }
+      put :update, params: { id: institution.id, institution: { title: 'fishy project' } }
     end
 
     log = ActivityLog.last

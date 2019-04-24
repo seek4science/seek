@@ -1,0 +1,19 @@
+<tr class="subtype-row">
+    <td>
+        <input type="text" class="form-control" size="25"
+               value="{{ item.description }}"
+               name="{{ objectName }}[phenotypes_attributes][{{ index }}][description]"
+               id="{{ objectName }}_phenotypes_attributes_{{ index }}_description">
+    </td>
+    <td>
+        <a class="remove-association clickable" title="Delete this entry">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        </a>
+        {{#if id}}
+            <input value="0" type="hidden" data-role="destroy"
+                   name="{{ objectName }}[phenotypes_attributes][{{ index }}][_destroy]">
+            <input type="hidden" value="{{ id }}" name="{{ objectName }}[phenotypes_attributes][{{ index }}][id]"
+                   id="{{ objectName }}_phenotypes_attributes_{{ index }}_id">
+        {{/if}}
+    </td>
+</tr>

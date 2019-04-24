@@ -1,4 +1,4 @@
-class SampleAttributeType < ActiveRecord::Base
+class SampleAttributeType < ApplicationRecord
   # attr_accessible :base_type, :regexp, :title, :placeholder, :description, :resolution
 
   validates :title, :base_type, :regexp, presence: true

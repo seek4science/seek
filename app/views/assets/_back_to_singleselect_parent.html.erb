@@ -3,7 +3,7 @@
 
     var text,value,child_list;
     text = "<%= child.title %>";
-    value = "<%= child.id %>";;
+    value = "<%= child.id %>";
     if (!window.opener) {
         alert("New "+ "<%= text_for_resource(child)%>" +" was created but its parent window was closed.");
         window.close();

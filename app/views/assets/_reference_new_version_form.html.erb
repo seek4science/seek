@@ -8,7 +8,7 @@
               <%= text_area_tag :revision_comments, nil, :size=>"55x4", :class => 'form-control' -%>
             </div>
             <%= submit_tag "Upload", :id => "new_version_submit_btn",
-                           :onclick => "javascript: validateUploadNewVersion(#{resource.respond_to?(:content_blobs)}, '#{controller_name.singularize}'); return(false);",
+                           :onclick => "return validateUploadNewVersion();",
                            :class => 'btn btn-primary'-%>
         <% end %>
     <% end %>

@@ -22,11 +22,7 @@ module Seek
       respond_to do |format|
         format.html
         format.xml
-        if asset.respond_to?(:to_rdf)
-          format.rdf { render template: 'rdf/show' }
-        else
-          format.rdf { render text: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
-        end
+        format.rdf { render template: 'rdf/show' }
         format.json { render json: asset, scope: { requested_version: params[:version] } }
       end
     end
@@ -114,6 +110,17 @@ module Seek
       update_relationships(item, params)
       build_model_image item, model_image_params if item.is_a?(Model) && model_image_present?
       item
+    end
+
+    def edit_version_comment
+      item = class_for_controller_name.find(params[:id])
+      @comment = item.versions.find_by(:version => params[:version])
+      if @comment.update(revision_comments: params[:revision_comments])
+        flash[:notice] = "The comment of version #{params[:version]} was successfully updated."
+      else
+        flash[:error] = "Unable to update the comment of version #{params[:version]}. Please try again."
+      end
+      redirect_to item
     end
 
     def return_to_fancy_parent(item)

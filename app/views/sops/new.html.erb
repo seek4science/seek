@@ -32,7 +32,7 @@
       <div>
         <%= preview_permission_popup_link(@sop)-%>
         <%= create_button :id => "sop_submit_btn",
-                       :onclick => "validateResourceFields(true,'sop',true); return(false);",
+                       :onclick => "return validateResourceFields('sop')",
                        :class => 'btn btn-primary' -%>
         or <%= cancel_button(sops_path) -%>
       </div>

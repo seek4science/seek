@@ -10,11 +10,6 @@ module AjaxHelper
     html.html_safe
   end
 
-  def button_to_with_callbacks(name, options = {}, html_options = {})
-    html_options[:type] = 'button'
-    link_to_with_callbacks name, options, html_options
-  end
-
   def form_tag_with_callbacks(url_for_options = {}, options = {}, &block)
     js = form_callback_javascript options
     html = form_tag(url_for_options, options, &block)
@@ -41,8 +36,9 @@ module AjaxHelper
     after = options.delete(:after)
     id = options[:id]
     id ||= options[:html][:id] if options[:html]
-    success_update_element = options[:update][:success] if options[:update]
-    failure_update_element = options[:update][:failure] if options[:update]
+    update_opts = options.delete(:update) || {}
+    success_update_element = update_opts[:success]
+    failure_update_element = update_opts[:failure]
 
     render(template: 'general/form_tag_callbacks', locals: { id: id,
                                                              before: before,

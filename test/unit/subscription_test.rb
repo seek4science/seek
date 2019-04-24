@@ -57,11 +57,16 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'can subscribe to someone elses subscribable' do
-    s = Factory(:subscribable, contributor: Factory(:person))
-    refute s.subscribed?
-    disable_authorization_checks { s.subscribe }
-    assert s.save
-    assert s.subscribed?
+
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      s = Factory(:subscribable, contributor: person)
+      refute s.subscribed?
+      disable_authorization_checks { s.subscribe }
+      assert s.save
+      assert s.subscribed?
+    end
+
   end
 
   test 'subscribers with a frequency of immediate are sent emails when activity is logged' do

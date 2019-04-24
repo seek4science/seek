@@ -99,7 +99,7 @@
         var associationList = $j('#assay_asset_list').data('associationList');
         var collection;
 
-        if ($('include_other_project_assays').checked) {
+        if (document.getElementById('include_other_project_assays').checked) {
             collection = assayOptions.all;
         } else {
             collection = assayOptions.project;

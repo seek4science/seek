@@ -8,6 +8,15 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 3, p.work_groups.size
   end
 
+  test 'to_json_ld' do
+    refute_nil JSON.parse(Factory(:person).to_json_ld)
+  end
+
+  test 'to schema ld' do
+    p = Factory(:person)
+    assert p.schema_org_supported?
+  end
+
   test "registered user's profile can be edited by" do
     admin = Factory(:admin)
     project_administrator = Factory(:project_administrator)
@@ -112,14 +121,19 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'to_rdf' do
-    object = Factory :person, skype_name: 'skypee', email: 'sdkfhsd22fkhfsd@sdkfsdkhfkhsdf.com'
+    object = Factory :person, skype_name: 'skypee', email: 'sdkfhsd22fkhfsd@sdkfsdkhfkhsdf.com', web_page:'http://google.com'
     Factory(:study, contributor: object)
     Factory(:investigation, contributor: object)
     Factory(:assay, contributor: object)
-    Factory(:assay, contributor: object)
-    Factory(:assets_creator, creator: object)
-    Factory(:assets_creator, asset: Factory(:sop), creator: object)
-    object.web_page = 'http://google.com'
+    assay = Factory(:assay, contributor: object, creators:[object])
+    presentation = Factory(:assay, contributor:object, creators:[object])
+    doc = Factory(:document, contributor:object, creators:[object])
+    sop = Factory(:sop, creators:[object])
+
+    assert_equal [object],assay.creators
+    assert_equal [object],presentation.creators
+    assert_equal [object],sop.creators
+    assert_equal [object],doc.creators
 
     disable_authorization_checks do
       object.save!
@@ -130,7 +144,13 @@ class PersonTest < ActiveSupport::TestCase
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/people/#{object.id}"), reader.statements.first.subject
-      assert reader.has_triple? ["http://localhost:3000/people/#{object.id}", RDF::FOAF.mbox_sha1sum, 'b507549e01d249ee5ed98bd40e4d86d1470a13b8']
+      assert reader.has_triple? ["http://localhost:3000/people/#{object.id}", RDF::Vocab::FOAF.mbox_sha1sum, 'b507549e01d249ee5ed98bd40e4d86d1470a13b8']
+
+      #none rdf supported created items are filtered out
+      assert reader.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/assays/#{assay.id}"]
+      assert reader.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/sops/#{sop.id}"]
+      refute reader.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/documents/#{doc.id}"]
+      refute reader.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/presentations/#{presentation.id}"]
     end
   end
 

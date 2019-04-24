@@ -100,17 +100,21 @@
 
 <% if Seek::Config.project_hierarchy_enabled && logged_in_and_member? -%>
     <div style="clear:both;">
-      <b>Project Hierarchies
-        (<%= link_to_function "hide", visual_effect(:toggle_appear, "project_hierarchy")+"$('project_hierarchy').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>
-        ):</b><br/><br/>
+      <b>
+        Project Hierarchies
+        (<%= link_to "hide", '#', id: 'project-hierarchy-toggle' -%>):
+      </b><br/><br/>
 
-      <div id="project_hierarchy" style="display: block;">
+      <div id="project_hierarchy">
         <ul><%= Rails.cache.fetch([:project_tree_editor, @project.cache_key]) { tree_editor_display Project, false, false, @project.id, "Person", true, true } %></ul>
       </div>
     </div>
     <br/>
     <div style="clear:both;">
-      <b><%= t('project') %> Members(<%= link_to_function "show", visual_effect(:toggle_appear, "project_mailing_list")+"$('project_mailing_list').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>):</b><br/><br/>
+      <b>
+        <%= t('project') %> Members
+        (<%= link_to "show", '#', id: 'project-hierarchy-members-toggle' %>):
+      </b><br/><br/>
       <div id="project_mailing_list" style="display: none;">
         <%= project_mailing_list @project %>
       </div>
@@ -123,3 +127,33 @@
 <% if request_project_membership_button_enabled?(@project) %>
     <%= render partial: 'request_membership_form', locals: { project: @project } %>
 <% end %>
+
+<script>
+  $j('#project-hierarchy-toggle').click(function () {
+      var el = $j('#project_hierarchy');
+
+      if (el[0].style.display === 'none') {
+          el.fadeIn();
+          $j(this).text('hide');
+      } else {
+          el.fadeOut();
+          $j(this).text('show');
+      }
+
+      return false;
+  });
+
+  $j('#project-hierarchy-members-toggle').click(function () {
+      var el = $j('#project_mailing_list');
+
+      if (el[0].style.display === 'none') {
+          el.fadeIn();
+          $j(this).text('hide');
+      } else {
+          el.fadeOut();
+          $j(this).text('show');
+      }
+
+      return false;
+  });
+</script>

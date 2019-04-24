@@ -1,6 +1,6 @@
 class TagsController < ApplicationController
-  before_filter :find_tag, only: [:show]
-  before_filter :find_tagged_objects, only: [:show]
+  before_action :find_tag, only: [:show]
+  before_action :find_tagged_objects, only: [:show]
 
   def show
     if @tagged_objects.empty?
@@ -53,19 +53,19 @@ class TagsController < ApplicationController
   end
 
   def tag_types_for_selection
-    if params[:type]
-      types = [params[:type]]
-    else
-      types = %w(expertise tool tag sample_type_tags)
-    end
+    types = if params[:type]
+              [params[:type]]
+            else
+              TextValue::TAG_TYPES
+            end
     types
   end
 
   def get_tags
     attribute = AnnotationAttribute.where(name: params[:type] || 'tag').first
     TextValue.select(:text)
-      .joins("LEFT OUTER JOIN annotations ON annotations.value_id = text_values.id AND annotations.value_type = 'TextValue'" \
+             .joins("LEFT OUTER JOIN annotations ON annotations.value_id = text_values.id AND annotations.value_type = 'TextValue'" \
                   'LEFT OUTER JOIN annotation_value_seeds ON annotation_value_seeds.value_id = text_values.id')
-      .where('annotations.attribute_id = :attribute_id OR annotation_value_seeds.attribute_id = :attribute_id', attribute_id: attribute.try(:id)).uniq
+             .where('annotations.attribute_id = :attribute_id OR annotation_value_seeds.attribute_id = :attribute_id', attribute_id: attribute.try(:id)).distinct
   end
 end

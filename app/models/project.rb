@@ -1,7 +1,6 @@
-class Project < ActiveRecord::Base
-  include Seek::Taggable
-  include Seek::Rdf::RdfGeneration
-  include Seek::Rdf::ReactToAssociatedChange
+class Project < ApplicationRecord
+  include Seek::Annotatable  
+  include HasSettings
 
   acts_as_yellow_pages
   title_trimmer
@@ -25,7 +24,7 @@ class Project < ActiveRecord::Base
   has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?, inverse_of: :projects
   has_many :group_memberships, through: :work_groups, inverse_of: :project
   # OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
-  has_many :people, -> { order('last_name ASC').uniq }, through: :group_memberships
+  has_many :people, -> { order('last_name ASC').distinct }, through: :group_memberships
 
   has_many :former_group_memberships, -> { where('time_left_at IS NOT NULL AND time_left_at <= ?', Time.now) },
            through: :work_groups, source: :group_memberships
@@ -45,10 +44,10 @@ class Project < ActiveRecord::Base
 
   # for handling the assignment for roles
   attr_accessor :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids
-  after_save :handle_project_administrator_ids, if: '@project_administrator_ids'
-  after_save :handle_asset_gatekeeper_ids, if: '@asset_gatekeeper_ids'
-  after_save :handle_pal_ids, if: '@pal_ids'
-  after_save :handle_asset_housekeeper_ids, if: '@asset_housekeeper_ids'
+  after_save :handle_project_administrator_ids, if: -> { @project_administrator_ids }
+  after_save :handle_asset_gatekeeper_ids, if: -> { @asset_gatekeeper_ids }
+  after_save :handle_pal_ids, if: -> { @pal_ids }
+  after_save :handle_asset_housekeeper_ids, if: -> { @asset_housekeeper_ids }
 
 
   # SEEK projects suffer from having 2 types of ancestor and descendant,that were added separately - those from the historical lineage of the project, and also from
@@ -80,8 +79,6 @@ class Project < ActiveRecord::Base
   #  is to be used)
   belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
-  has_many :settings, class_name: 'Settings', as: :target, dependent: :destroy
-
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
     [programme].compact
@@ -103,7 +100,7 @@ class Project < ActiveRecord::Base
   has_many :project_subscriptions, dependent: :destroy
 
   def assets
-    data_files | sops | models | publications | presentations | documents
+    data_files | sops | models | publications | presentations | documents | workflows | nodes
   end
 
   def institutions=(new_institutions)
@@ -163,27 +160,27 @@ class Project < ActiveRecord::Base
   end
 
   def site_password
-    settings['site_password']
+    settings.get('site_password')
   end
 
   def site_password= password
-    settings['site_password'] = password
+    settings.set('site_password', password)
   end
 
   def site_username
-    settings['site_username']
+    settings.get('site_username')
   end
 
   def site_username= username
-    settings['site_username'] = username
+    settings.set('site_username', username)
   end
 
   def nels_enabled
-    settings['nels_enabled']
+    settings.get('nels_enabled')
   end
 
   def nels_enabled= checkbox_value
-    settings['nels_enabled'] = !(checkbox_value == '0' || !checkbox_value)
+    settings.set('nels_enabled', !(checkbox_value == '0' || !checkbox_value))
   end
 
   # indicates whether this project has a person, or associated user, as a member
@@ -221,7 +218,10 @@ class Project < ActiveRecord::Base
   end
 
   def can_delete?(user = User.current_user)
-    user && user.is_admin? && work_groups.collect(&:people).flatten.empty?
+    user && user.is_admin? && work_groups.collect(&:people).flatten.empty? &&
+        investigations.empty? && studies.empty? && assays.empty? && assets.empty? &&
+        samples.empty? && sample_types.empty?
+
   end
 
   def lineage_ancestor_cannot_be_self
@@ -319,5 +319,7 @@ class Project < ActiveRecord::Base
 
   # should put below at the bottom in order to override methods for hierarchies,
   # Try to find a better way for overriding methods regardless where to include the module
-  include Seek::ProjectHierarchies::ProjectExtension if Seek::Config.project_hierarchy_enabled
+  if Seek::Config.project_hierarchy_enabled
+    include Seek::ProjectHierarchies::ProjectExtension
+  end
 end

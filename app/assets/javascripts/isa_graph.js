@@ -254,7 +254,14 @@ var ISA = {
     },
 
     fullscreen: function (state) {
+        // width of the #cy element as a percentage, before switching
+        var width = $j("#cy").width() / $j('#cy').parent().width() * 100;
+
         $j('#isa-graph').toggleClass('fullscreen', state);
+
+        //required to reset the width percentage after switching within the split view
+        $j('#cy').css('width',width+'%');
+
         cy.fit(ISA.defaults.padding);
         cy.userZoomingEnabled(!cy.userZoomingEnabled());
         cy.resize();
@@ -403,5 +410,24 @@ var ISA = {
                 cy.resize();
             }
         });
+    },
+
+    resizableGraphElement: function(switchOn) {
+        if (!$j('#cy').is('.ui-resizable')) {
+            $j("#cy").resizable({
+                handleSelector: ".splitter",
+                resizeHeight: false,
+                stop: function(event, ui) {
+                    cy.fit(ISA.defaults.padding);
+                    cy.resize();
+                }
+            });
+        }
+        if (switchOn) {
+            $j("#cy").resizable("enable");
+        }
+        else {
+            $j("#cy").resizable("disable");
+        }
     }
 };

@@ -5,7 +5,7 @@ class ApplicationHelperTest < ActionView::TestCase
     with_config_value(:application_name, 'TEST-TEST-TEST') do # the application name is no longer used, and is just SEEK ID
       assay = Factory(:assay)
       html = persistent_resource_id(assay)
-      blocks = HTML::Document.new(html).root.children.first.children
+      blocks = Nokogiri::HTML::DocumentFragment.parse(html).children.first.children
       # should be something like
       # <p class="id">
       #   <label>SEEK ID: </label>
@@ -19,7 +19,7 @@ class ApplicationHelperTest < ActionView::TestCase
 
       versioned_sop = Factory(:sop_version)
       html = persistent_resource_id(versioned_sop)
-      blocks = HTML::Document.new(html).root.children.first.children
+      blocks = Nokogiri::HTML::DocumentFragment.parse(html).children.first.children
       # should be something like
       # <p class="id">
       #   <label>SEEK ID: </label>
@@ -34,7 +34,7 @@ class ApplicationHelperTest < ActionView::TestCase
       # handles sub uri
       with_config_value(:site_base_host,'http://seek.org/fish') do
         html = persistent_resource_id(assay)
-        blocks = HTML::Document.new(html).root.children.first.children
+        blocks = Nokogiri::HTML::DocumentFragment.parse(html).children.first.children
         assert_equal 'strong', blocks.first.name
         assert_match(/SEEK ID/, blocks.first.children.first.content)
         assert_equal 'a', blocks.last.name
@@ -42,7 +42,7 @@ class ApplicationHelperTest < ActionView::TestCase
         assert_match(/http:\/\/seek.org\/fish\/assays\/#{assay.id}/, blocks.last.children.first.content)
 
         html = persistent_resource_id(versioned_sop)
-        blocks = HTML::Document.new(html).root.children.first.children
+        blocks = Nokogiri::HTML::DocumentFragment.parse(html).children.first.children
         assert_equal 'strong', blocks.first.name
         assert_match(/SEEK ID/, blocks.first.children.first.content)
         assert_equal 'a', blocks.last.name

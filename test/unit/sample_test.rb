@@ -512,20 +512,20 @@ class SampleTest < ActiveSupport::TestCase
   test 'sample with clashing attribute names with dynamic rails methods' do
     person = Factory(:person)
     sample_type = SampleType.new title: 'with awkward attributes', projects: person.projects, contributor: person
-    sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title_was', is_title: true, sample_type: sample_type)
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title_before_last_save', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     disable_authorization_checks { sample_type.save! }
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = sample_type
 
-    sample.set_attribute(:title_was, 'the title')
+    sample.set_attribute(:title_before_last_save, 'the title')
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert_equal 'the title', sample.title
 
     sample = Sample.find(sample.id)
     assert_equal 'the title', sample.title
-    assert_equal 'the title', sample.get_attribute(:title_was)
+    assert_equal 'the title', sample.get_attribute(:title_before_last_save)
   end
 
   test 'strain type stores valid strain info' do

@@ -1,17 +1,15 @@
-<%= javascript_include_tag 'jquery.ui.effect' %>
-
 <%= index_title -%>
 
 <div class="row">
   <div class="col-sm-2">
     <button class="btn btn-primary" type="button" data-toggle="collapse" href="#collapseFilter" aria-expanded="<%= params.has_key?(:query) ? 'true' : 'false' %>" aria-controls="collapseFilter">
-      <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filter <span class="servicedrop glyphicon glyphicon-chevron-down">
+      <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filter <span class="servicedrop glyphicon glyphicon-chevron-down"></span>
     </button>
   </div>
   <div class="col-sm-2">
     <%= dropdown_button('Export', 'export', menu_options: { class: 'pull-right' }) do %>
       <% Publication::EXPORT_TYPES.each do |key,value| %>
-        <li><%= image_tag_for_key(key.to_s, export_publications_path( :format => key, :params => params), nil, nil, value[:name]) -%></li>
+        <li><%= image_tag_for_key(key.to_s, export_publications_path(format: key, query: params.permit(:query)[:query]), nil, nil, value[:name]) -%></li>
       <% end %>
     <% end %>
   </div>

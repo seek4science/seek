@@ -11,27 +11,27 @@ class ApplicationController < ActionController::Base
 
   include CommonSweepers
 
-  before_filter :log_extra_exception_data
-
   # if the logged in user is currently partially registered, force the continuation of the registration process
-  before_filter :partially_registered?
+  before_action :partially_registered?
 
-  after_filter :log_event
+  after_action :log_event
 
   include AuthenticatedSystem
 
-  around_filter :with_current_user
+  around_action :with_current_user
 
   rescue_from 'ActiveRecord::RecordNotFound', with: :render_not_found_error
   rescue_from 'ActiveRecord::UnknownAttributeError', with: :render_unknown_attribute_error
   rescue_from NotImplementedError, with: :render_not_implemented_error
 
-  before_filter :project_membership_required, only: [:create, :new]
+  before_action :project_membership_required, only: [:create, :new]
 
-  before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
+  before_action :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
 
-  before_filter :check_json_id_type, only: [:create, :update], if: :json_api_request?
-  before_filter :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
+  before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
+  before_action :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
+
+  before_action :rdf_enabled? #only allows through rdf calls to supported types
 
   helper :all
 
@@ -58,7 +58,7 @@ class ApplicationController < ActionController::Base
     # will be named xml. Turns a params hash like.. {:xml => {:param_one => "val", :param_two => "val2"}}
     # into {:param_one => "val", :param_two => "val2"}
 
-    # This should probably be used with prepend_before_filter, since some filters might need this to happen so they can check params.
+    # This should probably be used with prepend_before_action, since some filters might need this to happen so they can check params.
     # see sessions controller for an example usage
     params[:xml].each { |k, v| params[k] = v } if request.format.xml? && params[:xml]
   end
@@ -121,50 +121,12 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
-  # MERGENOTE - put back for now, but needs modularizing, refactoring, and possibly replacing
-  def resource_in_tab
-    resource_type = params[:resource_type]
-    view_type = params[:view_type]
-    scale_title = params[:scale_title] || ''
-
-    if params[:actions_partial_disable] == 'true'
-      actions_partial_disable = true
-    else
-      actions_partial_disable = false
-    end
-
-    # params[:resource_ids] is passed as string, e.g. "id1, id2, ..."
-    resource_ids = (params[:resource_ids] || '').split(',')
-    clazz = resource_type.constantize
-    resources = clazz.where(id: resource_ids)
-    if clazz.respond_to?(:authorized_partial_asset_collection)
-      authorized_resources = clazz.authorized_partial_asset_collection(resources, 'view')
-    elsif resource_type == 'Project' || resource_type == 'Institution'
-      authorized_resources = resources
-    elsif resource_type == 'Person' && Seek::Config.is_virtualliver && current_user.nil?
-      authorized_resources = []
-    else
-      authorized_resources = resources.select(&:can_view?)
-    end
-
-    render partial: 'assets/resource_in_tab',
-           locals: { resources: resources,
-                     scale_title: scale_title,
-                     authorized_resources: authorized_resources,
-                     view_type: view_type,
-                     actions_partial_disable: actions_partial_disable }
-  end
-
   private
 
   def restrict_guest_user
     if current_user && current_user.guest?
       flash[:error] = 'You cannot perform this action as a Guest User. Please sign in or register for an account first.'
-      if !request.env['HTTP_REFERER'].nil?
-        redirect_to :back
-      else
-        redirect_to main_app.root_path
-      end
+      redirect_back fallback_location: main_app.root_path
     end
   end
 
@@ -239,8 +201,8 @@ class ApplicationController < ActionController::Base
     if object.nil?
       respond_to do |format|
         flash[:error] = "The #{name.humanize} does not exist!"
-        format.rdf { render text: 'Not found', status: :not_found }
-        format.xml { render text: '<error>404 Not found</error>', status: :not_found }
+        format.rdf { render plain: 'Not found', status: :not_found }
+        format.xml { render xml: '<error>404 Not found</error>', status: :not_found }
         format.json { render json: { errors: [{ title: 'Not found',
                                                 detail: "Couldn't find #{name.camelize} with 'id'=[#{params[:id]}]" }] },
                              status: :not_found }
@@ -278,8 +240,8 @@ class ApplicationController < ActionController::Base
             render template: 'general/landing_page_for_hidden_item', locals: { item: object }, status: :forbidden
           end
         end
-        format.rdf { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
-        format.xml { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
+        format.rdf { render plain: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
+        format.xml { render plain: "<error>You may not #{privilege} #{name}:#{params[:id]}</error>", status: :forbidden }
         format.json { render json: { errors: [{ title: 'Forbidden',
                                                 details: "You may not #{privilege} #{name}:#{params[:id]}" }] },
                              status: :forbidden }
@@ -303,8 +265,8 @@ class ApplicationController < ActionController::Base
         end
       end
 
-      format.rdf { render text: 'Not found', status: :not_found }
-      format.xml { render text: '<error>404 Not found</error>', status: :not_found }
+      format.rdf { render plain: 'Not found', status: :not_found }
+      format.xml { render xml: '<error>404 Not found</error>', status: :not_found }
       format.json { render json: { errors: [{ title: 'Not found', detail: e.message }] }, status: :not_found }
     end
     false
@@ -313,14 +275,14 @@ class ApplicationController < ActionController::Base
   def render_unknown_attribute_error(e)
     respond_to do |format|
       format.json { render json: { errors: [{ title: 'Unknown attribute', details: e.message }] }, status: :unprocessable_entity }
-      format.all { render text: e.message, status: :unprocessable_entity }
+      format.all { render plain: e.message, status: :unprocessable_entity }
     end
   end
 
   def render_not_implemented_error(e)
     respond_to do |format|
       format.json { render json: { errors: [{ title: 'Not implemented', details: e.message }] }, status: :not_implemented }
-      format.all { render text: e.message, status: :not_implemented }
+      format.all { render plain: e.message, status: :not_implemented }
     end
   end
 
@@ -467,21 +429,21 @@ class ApplicationController < ActionController::Base
   end
 
   # Strips any unexpected filter, which protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
-  def strip_unpermitted_filters(filters)
+  def permitted_filters(filters)
     # placed this in a separate method so that other controllers could override it if necessary
     permitted = Seek::Util.persistent_classes.select { |c| c.respond_to? :find_by_id }.map { |c| c.name.underscore }
-    filters.select { |filter| permitted.include?(filter.to_s) }
+    filters.permit(*permitted)
   end
 
   def apply_filters(resources)
-    filters = params[:filter] || {}
+    filters = params[:filter] || ActionController::Parameters.new
 
     # translate params that are send as an _id, like project_id=12 - which will usually be a consequence of nested routing
     params.keys.each do |key|
       filters[key.gsub('_id', '')] = params[key] if key.end_with?('_id')
     end
 
-    filters = strip_unpermitted_filters(filters)
+    filters = permitted_filters(filters).to_unsafe_h
 
     if filters.size > 0
       params[:page] ||= 'all'
@@ -584,6 +546,16 @@ class ApplicationController < ActionController::Base
 
   def json_api_request?
     request.format.json?
+  end
+
+  # filter that responds with :not_acceptable if request rdf for non rdf capable resource
+  def rdf_enabled?
+    return unless request.format.rdf?
+    unless Seek::Util.rdf_capable_types.include?(controller_name.classify.constantize)
+      respond_to do |format|
+        format.rdf { render plain: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
+      end
+    end
   end
 
   def json_api_errors(object)

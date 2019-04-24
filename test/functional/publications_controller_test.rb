@@ -37,7 +37,7 @@ class PublicationsControllerTest < ActionController::TestCase
     mock_pubmed(content_file: 'pubmed_1.txt')
     assay = assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s] }
+      post :create, params: { publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s] } }
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -50,7 +50,7 @@ class PublicationsControllerTest < ActionController::TestCase
     login_as(:model_owner) # can edit assay
     assay = assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s] }
+      post :create, params: { publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s] } }
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -62,7 +62,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should create doi publication' do
     mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1371/journal.pone.0004803', content_file: 'cross_ref3.xml')
     assert_difference('Publication.count') do
-      post :create, publication: { doi: '10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, params: { publication: { doi: '10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -71,7 +71,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should create doi publication with doi prefix' do
     mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1371/journal.pone.0004803', content_file: 'cross_ref3.xml')
     assert_difference('Publication.count') do
-      post :create, publication: { doi: 'DOI: 10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, params: { publication: { doi: 'DOI: 10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_not_nil assigns(:publication)
@@ -80,7 +80,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     # formatted slightly different
     assert_difference('Publication.count') do
-      post :create, publication: { doi: ' doi:10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, params: { publication: { doi: ' doi:10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_not_nil assigns(:publication)
@@ -89,7 +89,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     # also test with spaces around
     assert_difference('Publication.count') do
-      post :create, publication: { doi: '  10.1371/journal.pone.0004803  ', project_ids: [projects(:sysmo_project).id] } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, params: { publication: { doi: '  10.1371/journal.pone.0004803  ', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -107,7 +107,7 @@ class PublicationsControllerTest < ActionController::TestCase
     }
 
     assert_difference('Publication.count') do
-      post :create, subaction: 'Create', publication: publication
+      post :create, params: { subaction: 'Create', publication: publication }
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -138,7 +138,7 @@ class PublicationsControllerTest < ActionController::TestCase
       ],
       published_date: Date.new(2006)
     }
-    post :create, subaction: 'Import', publication: { bibtex_file: fixture_file_upload('files/publication.bibtex') }
+    post :create, params: { subaction: 'Import', publication: { bibtex_file: fixture_file_upload('files/publication.bibtex') } }
     p = assigns(:publication)
     assert_equal publication[:title], p.title
     assert_equal publication[:journal], p.journal
@@ -172,7 +172,7 @@ class PublicationsControllerTest < ActionController::TestCase
                     }]
 
     assert_difference('Publication.count', 2) do
-      post :create, subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/publications.bibtex'), project_ids: [projects(:one).id] }
+      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/publications.bibtex'), project_ids: [projects(:one).id] } }
     end
 
     publication0 = Publication.where(title: publications[0][:title]).first
@@ -190,7 +190,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should only show the year for 1st Jan' do
     publication = Factory(:publication, published_date: Date.new(2013, 1, 1))
-    get :show, id: publication
+    get :show, params: { id: publication }
     assert_response :success
     assert_select('p') do
       assert_select 'strong', text: 'Date Published:'
@@ -214,14 +214,14 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should show publication' do
-    get :show, id: publications(:one)
+    get :show, params: { id: publications(:one) }
     assert_response :success
   end
 
   test 'should export publication as endnote' do
     publication_formatter_mock
     with_config_value :pubmed_api_email, 'fred@email.com' do
-      get :show, id: publication_for_export_tests, format: 'enw'
+      get :show, params: { id: publication_for_export_tests, format: 'enw' }
     end
     assert_response :success
     assert_match(/%0 Journal Article.*/, response.body)
@@ -249,7 +249,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should export publication as bibtex' do
     publication_formatter_mock
     with_config_value :pubmed_api_email, 'fred@email.com' do
-      get :show, id: publication_for_export_tests, format: 'bibtex'
+      get :show, params: { id: publication_for_export_tests, format: 'bibtex' }
     end
     assert_response :success
     assert_match(/@article{PMID:5,.*/, response.body)
@@ -265,7 +265,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should export pre-print publication as bibtex' do
     publication_formatter_mock
     with_config_value :pubmed_api_email, 'fred@email.com' do
-      get :show, id: pre_print_publication_for_export_tests, format: 'bibtex'
+      get :show, params: { id: pre_print_publication_for_export_tests, format: 'bibtex' }
     end
     assert_response :success
     assert_match(/.*author.*/, response.body)
@@ -275,7 +275,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should export publication as embl' do
     publication_formatter_mock
     with_config_value :pubmed_api_email, 'fred@email.com' do
-      get :show, id: publication_for_export_tests, format: 'embl'
+      get :show, params: { id: publication_for_export_tests, format: 'embl' }
     end
     assert_response :success
     assert_match(/RX   PUBMED; 5\..*/, response.body)
@@ -301,7 +301,7 @@ class PublicationsControllerTest < ActionController::TestCase
                       pubmed_id: 404)
 
     with_config_value :pubmed_api_email, 'fred@email.com' do
-      get :show, id: pub, format: 'enw'
+      get :show, params: { id: pub, format: 'enw' }
     end
 
     assert_redirected_to pub
@@ -324,7 +324,7 @@ class PublicationsControllerTest < ActionController::TestCase
                   pubmed_id: 999)
 
     with_config_value :pubmed_api_email, 'fred@email.com' do
-      get :show, id: pub, format: 'enw'
+      get :show, params: { id: pub, format: 'enw' }
     end
 
     assert_redirected_to pub
@@ -333,12 +333,12 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should filter publications by projects_id for export' do
     # project without publications
-    get :export, query: { projects_id_in: [projects(:sysmo_project).id + 1] }
+    get :export, params: { query: { projects_id_in: [projects(:sysmo_project).id + 1] } }
     assert_response :success
     p = assigns(:publications)
     assert_equal 0, p.length
     # project with publications
-    get :export, query: { projects_id_in: [projects(:sysmo_project).id] }
+    get :export, params: { query: { projects_id_in: [projects(:sysmo_project).id] } }
     assert_response :success
     p = assigns(:publications)
     assert_equal 3, p.length
@@ -346,14 +346,14 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should filter publications sort by published date for export' do
     # sort by published_date asc
-    get :export, query: { s: [{ name: :published_date, dir: :asc }] }
+    get :export, params: { query: { s: [{ name: :published_date, dir: :asc }] } }
     assert_response :success
     p = assigns(:publications)
     assert_operator p[0].published_date, :<=, p[1].published_date
     assert_operator p[1].published_date, :<=, p[2].published_date
 
     # sort by published_date desc
-    get :export, query: { s: [{ name: :published_date, dir: :desc }] }
+    get :export, params: { query: { s: [{ name: :published_date, dir: :desc }] } }
     assert_response :success
     p = assigns(:publications)
     assert_operator p[0].published_date, :>=, p[1].published_date
@@ -362,7 +362,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should filter publications by title contains for export' do
     # sort by published_date asc
-    get :export, query: { title_cont: 'workflows' }
+    get :export, params: { query: { title_cont: 'workflows' } }
     assert_response :success
     p = assigns(:publications)
     assert_equal 1, p.count
@@ -370,14 +370,14 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should filter publications by authour name contains for export' do
     # sort by published_date asc
-    get :export, query: { publication_authors_last_name_cont: 'Bau' }
+    get :export, params: { query: { publication_authors_last_name_cont: 'Bau' } }
     assert_response :success
     p = assigns(:publications)
     assert_equal 1, p.count
   end
 
   test 'should get edit' do
-    get :edit, id: publications(:one)
+    get :edit, params: { id: publications(:one) }
     assert_response :success
   end
 
@@ -392,7 +392,7 @@ class PublicationsControllerTest < ActionController::TestCase
     new_assay = assays(:metabolomics_assay)
     assert new_assay.publications.empty?
 
-    put :update, id: p, publication: { abstract: p.abstract, assay_ids: [new_assay.id.to_s] }
+    put :update, params: { id: p, publication: { abstract: p.abstract, assay_ids: [new_assay.id.to_s] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -418,7 +418,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert df.can_view?
     # add association
-    put :update, id: p, publication: { abstract: p.abstract, data_file_ids: [df.id.to_s] }
+    put :update, params: { id: p, publication: { abstract: p.abstract, data_file_ids: [df.id.to_s] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -430,7 +430,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert df.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract, data_file_ids: [] }
+    put :update, params: { id: p, publication: { abstract: p.abstract, data_file_ids: [''] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -448,7 +448,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract, model_ids: [model.id.to_s] }
+    put :update, params: { id: p, publication: { abstract: p.abstract, model_ids: [model.id.to_s] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -461,7 +461,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert model.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract, model_ids: [] }
+    put :update, params: { id: p, publication: { abstract: p.abstract, model_ids: [''] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -479,7 +479,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract, investigation_ids: [investigation.id.to_s] }
+    put :update, params: { id: p, publication: { abstract: p.abstract, investigation_ids: [investigation.id.to_s] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -491,7 +491,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert investigation.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract, investigation_ids: [] }
+    put :update, params: { id: p, publication: { abstract: p.abstract, investigation_ids: [''] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -509,7 +509,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract, study_ids: [study.id.to_s] }
+    put :update, params: { id: p, publication: { abstract: p.abstract, study_ids: [study.id.to_s] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -521,7 +521,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert study.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract, study_ids: [] }
+    put :update, params: { id: p, publication: { abstract: p.abstract, study_ids: [''] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -539,7 +539,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract, presentation_ids:[presentation.id.to_s] }
+    put :update, params: { id: p, publication: { abstract: p.abstract, presentation_ids:[presentation.id.to_s] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -551,7 +551,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert presentation.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract, presentation_ids: [] }
+    put :update, params: { id: p, publication: { abstract: p.abstract, presentation_ids: [''] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -571,7 +571,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert new_assay.publications.empty?
 
     # Should not add the new assay and should not remove the old one
-    put :update, id: p, publication: { abstract: p.abstract, assay_ids: [new_assay.id] }
+    put :update, params: { id: p, publication: { abstract: p.abstract, assay_ids: [new_assay.id] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -589,8 +589,8 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should keep model and data associations after update' do
     p = publications(:pubmed_2)
-    put :update, id: p, publication: { abstract: p.abstract, model_ids: p.models.collect { |m| m.id.to_s },
-                                       data_file_ids: p.data_files.map(&:id), assay_ids: [] }
+    put :update, params: { id: p, publication: { abstract: p.abstract, model_ids: p.models.collect { |m| m.id.to_s },
+                                       data_file_ids: p.data_files.map(&:id), assay_ids: [''] } }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -613,10 +613,10 @@ class PublicationsControllerTest < ActionController::TestCase
     as_virtualliver do
       assert_difference('PublicationAuthor.count', 0) do
         assert_difference('AssetsCreator.count', 2) do
-          put :update, id: p.id, publication: {
+          put :update, params: { id: p.id, publication: {
               abstract: p.abstract,
               publication_authors_attributes: { '0' => { id: p.publication_authors[0].id, person_id: seek_author1.id },
-                                                '1' => { id: p.publication_authors[1].id, person_id: seek_author2.id } } }
+                                                '1' => { id: p.publication_authors[1].id, person_id: seek_author2.id } } } }
         end
       end
     end
@@ -638,7 +638,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_difference('PublicationAuthor.count', 0) do
       # seek_authors (AssetsCreators) decrease by 2.
       assert_difference('AssetsCreator.count', -2) do
-        post :disassociate_authors, id: p.id
+        post :disassociate_authors, params: { id: p.id }
       end
     end
   end
@@ -646,7 +646,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should update project' do
     p = publications(:one)
     assert_equal projects(:sysmo_project), p.projects.first
-    put :update, id: p.id, publication: { project_ids: [projects(:one).id] }
+    put :update, params: { id: p.id, publication: { project_ids: [projects(:one).id] } }
     assert_redirected_to publication_path(p)
     p.reload
     assert_equal [projects(:one)], p.projects
@@ -658,7 +658,7 @@ class PublicationsControllerTest < ActionController::TestCase
     login_as(publication.contributor)
 
     assert_difference('Publication.count', -1) do
-      delete :destroy, id: publication.id
+      delete :destroy, params: { id: publication.id }
     end
 
     assert_redirected_to publications_path
@@ -670,14 +670,14 @@ class PublicationsControllerTest < ActionController::TestCase
 
     # PubMed version of publication already exists, so it shouldn't re-add
     assert_no_difference('Publication.count') do
-      post :create, publication: { doi: '10.1093/nar/gkl320', projects: pub.projects.first } if pub
+      post :create, params: { publication: { doi: '10.1093/nar/gkl320', projects: pub.projects.first } } if pub
     end
   end
 
   test 'should retrieve the right author order after a publication is created and after some authors are associate/disassociated with seek profiles' do
     mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1016/j.future.2011.08.004', content_file: 'cross_ref5.xml')
     assert_difference('Publication.count') do
-      post :create, publication: { doi: '10.1016/j.future.2011.08.004', project_ids: [projects(:sysmo_project).id] }
+      post :create, params: { publication: { doi: '10.1016/j.future.2011.08.004', project_ids: [projects(:sysmo_project).id] } }
     end
     publication = assigns(:publication)
     original_authors = ['Sean Bechhofer', 'Iain Buchan', 'David De Roure', 'Paolo Missier', 'John Ainsworth', 'Jiten Bhagat', 'Philip Couch', 'Don Cruickshank',
@@ -693,10 +693,10 @@ class PublicationsControllerTest < ActionController::TestCase
     as_virtualliver do
       assert_difference('publication.non_seek_authors.count', -2) do
         assert_difference('AssetsCreator.count', 2) do
-          put :update, id: publication.id, publication: {
+          put :update, params: { id: publication.id, publication: {
               abstract: publication.abstract,
               publication_authors_attributes: { '0' => { id: publication.non_seek_authors[12].id, person_id: seek_author1.id },
-                                                '1' => { id: publication.non_seek_authors[15].id, person_id: seek_author2.id } } }
+                                                '1' => { id: publication.non_seek_authors[15].id, person_id: seek_author2.id } } } }
         end
       end
     end
@@ -708,7 +708,7 @@ class PublicationsControllerTest < ActionController::TestCase
     # Disassociate seek-authors
     assert_difference('publication.non_seek_authors.count', 2) do
       assert_difference('AssetsCreator.count', -2) do
-        post :disassociate_authors, id: publication.id
+        post :disassociate_authors, params: { id: publication.id }
       end
     end
 
@@ -721,7 +721,7 @@ class PublicationsControllerTest < ActionController::TestCase
     doi_citation_mock
     mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1016/j.future.2011.08.004', content_file: 'cross_ref5.xml')
     assert_difference('Publication.count') do
-      post :create, publication: { doi: '10.1016/j.future.2011.08.004', project_ids: [projects(:sysmo_project).id] } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, params: { publication: { doi: '10.1016/j.future.2011.08.004', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
     assert assigns(:publication)
     publication = assigns(:publication)
@@ -738,15 +738,15 @@ class PublicationsControllerTest < ActionController::TestCase
     # Associate a non-seek author to a seek person
     assert_difference('publication.non_seek_authors.count', -2) do
       assert_difference('AssetsCreator.count', 2) do
-        put :update, id: publication.id, publication: {
+        put :update, params: { id: publication.id, publication: {
             abstract: publication.abstract,
             publication_authors_attributes: { '0' => { id: publication.non_seek_authors[12].id, person_id: seek_author1.id },
-                                              '1' => { id: publication.non_seek_authors[15].id, person_id: seek_author2.id } } }
+                                              '1' => { id: publication.non_seek_authors[15].id, person_id: seek_author2.id } } } }
       end
     end
     publication.reload
     joined_original_authors = original_authors.join(', ')
-    get :show, id: publication.id
+    get :show, params: { id: publication.id }
     assert @response.body.include?(joined_original_authors)
   end
 
@@ -782,15 +782,15 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
 
-    get :edit, id: p.id
+    get :edit, params: { id: p.id }
 
     assert_response :success
     assert_not_includes response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
     # This will be slow!
 
-    # 21 = 3 * 7 (investigations, studies, assays, events, presentations, data files and models)
-    # plus an extra 4 * 2 for the study optgroups in the assay and study associations
-    assert_equal 25, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
+    # 14 = 2 * 7 (investigations, studies, assays, events, presentations, data files and models)
+    # plus an extra 4 = 2 * 2 for the study optgroups in the assay and study associations
+    assert_equal 18, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
   end
 
   test 'programme publications through nested routing' do
@@ -799,7 +799,7 @@ class PublicationsControllerTest < ActionController::TestCase
     publication = Factory(:publication, projects: programme.projects, policy: Factory(:public_policy))
     publication2 = Factory(:publication, policy: Factory(:public_policy))
 
-    get :index, programme_id: programme.id
+    get :index, params: { programme_id: programme.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -822,7 +822,7 @@ class PublicationsControllerTest < ActionController::TestCase
     o1.reload
     assert_equal [publication1],o1.related_publications
 
-    get :index, organism_id: o1.id
+    get :index, params: { organism_id: o1.id }
 
 
     assert_response :success
@@ -835,7 +835,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'query single authors for typeahead' do
     query = 'Bloggs'
-    get :query_authors_typeahead, format: :json, full_name: query
+    get :query_authors_typeahead, params: { format: :json, full_name: query }
     assert_response :success
     authors = JSON.parse(@response.body)
     assert_equal 1, authors.length, authors
@@ -851,18 +851,18 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'query single author for typeahead that is unknown' do
     query = 'Nobody knows this person'
-    get :query_authors_typeahead, format: :json, full_name: query
+    get :query_authors_typeahead, params: { format: :json, full_name: query }
     assert_response :success
     authors = JSON.parse(@response.body)
     assert_equal 0, authors['data'].length
   end
 
-  test 'query authors for initilization' do
+  test 'query authors for initialization' do
     query_authors = {
       '0' => { full_name: 'J Bloggs' },
       '1' => { full_name: 'J Bauers' }
     }
-    get :query_authors, format: :json, as: :json, authors: query_authors
+    get :query_authors, format: :json, as: :json, params: { authors: query_authors }
     assert_response :success
     authors = JSON.parse(@response.body)
     assert_equal 2, authors.length, authors
@@ -889,13 +889,13 @@ class PublicationsControllerTest < ActionController::TestCase
     project = Factory(:project)
 
     assert_difference('Publication.count') do
-      post :create, publication: { project_ids: ['', project.id.to_s],
+      post :create, params: { publication: { project_ids: ['', project.id.to_s],
                                    doi: 'https://doi.org/10.5072/abcd',
                                    title: 'Cool stuff',
                                    publication_authors: ['', User.current_user.person.name],
                                    abstract: 'We did stuff',
                                    journal: 'Journal of Interesting Stuff',
-                                   published_date: '2017-05-23' }, subaction: 'Create'
+                                   published_date: '2017-05-23' }, subaction: 'Create' }
 
     end
 
@@ -932,10 +932,10 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_difference('PublicationAuthor.count', 0) do
       assert_difference('AssetsCreator.count', 2) do
         assert_difference('Permission.count', 2) do
-          put :update, id: p.id, publication: {
+          put :update, params: { id: p.id, publication: {
               abstract: p.abstract,
               publication_authors_attributes: { '0' => { id: p.publication_authors[0].id, person_id: seek_author1.id },
-                                                '1' => { id: p.publication_authors[1].id, person_id: seek_author2.id } } }
+                                                '1' => { id: p.publication_authors[1].id, person_id: seek_author2.id } } } }
         end
       end
     end
@@ -946,6 +946,39 @@ class PublicationsControllerTest < ActionController::TestCase
     assert p.can_manage?(p.contributor.user)
     assert p.can_manage?(seek_author1.user)
     assert p.can_manage?(seek_author2.user)
+  end
+
+  test 'should fetch pubmed preview' do
+    VCR.use_cassette('publications/fairdom_by_pubmed') do
+      with_config_value :pubmed_api_email, 'fred@email.com' do
+        post :fetch_preview, xhr: true, params: { key: '27899646', protocol: 'pubmed', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+      end
+    end
+
+    assert_response :success
+    assert response.body.include?('FAIRDOMHub: a repository')
+  end
+
+  test 'should handle missing pubmed preview' do
+    VCR.use_cassette('publications/missing_by_pubmed') do
+      with_config_value :pubmed_api_email, 'fred@email.com' do
+        post :fetch_preview, xhr: true, params: { key: '40404040404', protocol: 'pubmed', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+      end
+    end
+
+    assert_response :internal_server_error
+    assert response.body.include?('An error has occurred')
+  end
+
+  test 'should fetch doi preview' do
+    VCR.use_cassette('publications/fairdom_by_doi') do
+      with_config_value :pubmed_api_email, 'fred@email.com' do
+        post :fetch_preview, xhr: true, params: { key: '10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+      end
+    end
+
+    assert_response :success
+    assert response.body.include?('FAIRDOMHub: a repository')
   end
 
   private

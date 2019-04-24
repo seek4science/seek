@@ -17,16 +17,8 @@ module VlnProjectsTreeHelper
       display_style = 'display:block' if (foldable == true) && (!selected_display_items.nil?) && selected_display_items.include?(root)
 
       # two images for toggle
-      expand_link = link_to_function expand_plus_image, style: 'float:left;' + 'display:' + (display_style == 'display:none' ? 'block;' : 'none;'), id: "projects_hierarchies_expand_#{root.id}" do |page|
-        page.visual_effect :toggle_blind, "#{root.id}", duration: 0.5
-        page["projects_hierarchies_expand_#{root.id}"].toggle
-        page["projects_hierarchies_collapse_#{root.id}"].toggle
-      end
-      collapse_link = link_to_function collapse_minus_image, style: 'float:left;' + 'display:' + (display_style == 'display:none' ? 'none;' : 'block;'), id: "projects_hierarchies_collapse_#{root.id}" do |page|
-        page.visual_effect :toggle_blind, "#{root.id}", duration: 0.5
-        page["projects_hierarchies_expand_#{root.id}"].toggle
-        page["projects_hierarchies_collapse_#{root.id}"].toggle
-      end
+      expand_link = expand_hierarchy_link(root.id, display_style)
+      collapse_link = collapse_hierarchy_link(root.id, display_style)
 
       folder_tag = expand_link + collapse_link
       if foldable
@@ -58,16 +50,8 @@ module VlnProjectsTreeHelper
       parent.children.sort { |a, b| a.title.downcase <=> b.title.downcase }.each do |child|
         display_style = (foldable == true) ? 'display:none' : 'display:block'
         display_style = 'display:block' if (foldable == true) && (!selected_display_items.nil?) && selected_display_items.include?(child)
-        expand_link = link_to_function expand_plus_image, style: 'float:left;' + 'display:' + (display_style == 'display:none' ? 'block;' : 'none;'), id: "projects_hierarchies_expand_#{parent.id}_#{child.id}" do |page|
-          page.visual_effect :toggle_blind, "#{parent.id}_#{child.id}", duration: 0.5
-          page["projects_hierarchies_expand_#{parent.id}_#{child.id}"].toggle
-          page["projects_hierarchies_collapse_#{parent.id}_#{child.id}"].toggle
-        end
-        collapse_link = link_to_function collapse_minus_image, style: 'float:left;' + 'display:' + (display_style == 'display:none' ? 'none;' : 'block;'), id: "projects_hierarchies_collapse_#{parent.id}_#{child.id}" do |page|
-          page.visual_effect :toggle_blind, "#{parent.id}_#{child.id}", duration: 0.5
-          page["projects_hierarchies_expand_#{parent.id}_#{child.id}"].toggle
-          page["projects_hierarchies_collapse_#{parent.id}_#{child.id}"].toggle
-        end
+        expand_link = expand_hierarchy_link("#{parent.id}_#{child.id}", display_style)
+        collapse_link = collapse_hierarchy_link("#{parent.id}_#{child.id}", display_style)
 
         folder_tag = expand_link + collapse_link
         if foldable
@@ -119,5 +103,19 @@ module VlnProjectsTreeHelper
       end
     end
     result
+  end
+
+  def expand_hierarchy_link(id, display_style)
+    link_to expand_plus_image, '#',
+            style: 'float:left;' + 'display:' + (display_style == 'display:none' ? 'block;' : 'none;'),
+            id: "projects_hierarchies_expand_#{id}",
+            onclick: "$j('##{id}').slideToggle(); $j('#projects_hierarchies_expand_#{id}').toggle(); $j('#projects_hierarchies_collapse_#{id}').toggle(); return false;"
+  end
+
+  def collapse_hierarchy_link(id, display_style)
+    link_to collapse_minus_image, '#',
+            style: 'float:left;' + 'display:' + (display_style == 'display:none' ? 'none;' : 'block;'),
+            id: "projects_hierarchies_collapse_#{id}",
+            onclick: "$j('##{id}').slideToggle(); $j('#projects_hierarchies_expand_#{id}').toggle(); $j('#projects_hierarchies_collapse_#{id}').toggle(); return false;"
   end
 end

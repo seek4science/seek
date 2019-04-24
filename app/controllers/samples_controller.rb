@@ -4,11 +4,11 @@ class SamplesController < ApplicationController
   include Seek::AssetsCommon
   include Seek::IndexPager
 
-  before_filter :samples_enabled?
-  before_filter :find_index_assets, only: :index
-  before_filter :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
+  before_action :samples_enabled?
+  before_action :find_index_assets, only: :index
+  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
 
-  before_filter :auth_to_create, only: [:new, :create]
+  before_action :auth_to_create, only: [:new, :create]
 
   include Seek::IsaGraphExtensions
   include Seek::BreadCrumbs

@@ -35,6 +35,17 @@ namespace :seek_stats do
     bar.increment!(bar.remaining)
   end
 
+  task(users_with_people_creation_dates: :environment) do
+    file = File.join(Rails.root, 'tmp', 'users-with-people.csv')
+    CSV.open(file, 'wb') do |csv|
+      csv << ['type', 'creation date']
+      User.all.each do |user|
+        next if user.person.nil?
+        csv << ["User", user.created_at.strftime('%d-%m-%Y')]
+      end
+    end
+  end
+
   # filesizes and versions across projects
   task(filesizes_and_versions: :environment) do
     types = [Model, Sop, Presentation, DataFile]

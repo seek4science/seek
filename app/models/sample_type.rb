@@ -1,4 +1,4 @@
-class SampleType < ActiveRecord::Base
+class SampleType < ApplicationRecord
   # attr_accessible :title, :uuid, :sample_attributes_attributes,
  #                 :description, :uploaded_template, :project_ids, :tags
 
@@ -14,7 +14,7 @@ class SampleType < ActiveRecord::Base
   # everything concerned with sample type templates
   include Seek::Templates::SampleTypeTemplateConcerns
 
-  include Seek::Taggable
+  include Seek::Annotatable
 
   include Seek::Permissions::SpecialContributors
 

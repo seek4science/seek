@@ -5,9 +5,9 @@ module Seek
         extend ActiveSupport::Concern
 
         included do
-          before_filter :check_allowed_to_manage_types, only: %i[destroy index]
-          before_filter :project_membership_required_appended, only: [:index]
-          before_filter :find_and_authorize_requested_item, only: %i[edit update destroy]
+          before_action :check_allowed_to_manage_types, only: %i[destroy index]
+          before_action :project_membership_required_appended, only: [:index]
+          before_action :find_and_authorize_requested_item, only: %i[edit update destroy]
 
           include Seek::BreadCrumbs
         end

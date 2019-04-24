@@ -1,9 +1,9 @@
 class ContentBlobsController < ApplicationController
-  before_filter :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download show update]
-  before_filter :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download show update]
-  before_filter :set_asset_version, only: %i[get_pdf download]
+  before_action :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download show update]
+  before_action :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download show update]
+  before_action :set_asset_version, only: %i[get_pdf download]
 
-  skip_before_filter :check_json_id_type, only: [:update]
+  skip_before_action :check_json_id_type, only: [:update]
 
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
@@ -14,7 +14,7 @@ class ContentBlobsController < ApplicationController
       @content_blob.save
       @asset.touch
       respond_to do |format|
-        format.all { render text: @content_blob.file_size, status: :ok }
+        format.all { render plain: @content_blob.file_size, status: :ok }
       end
     else
       respond_to do |format|
@@ -30,41 +30,40 @@ class ContentBlobsController < ApplicationController
       view_text_content
     else
       @pdf_url = pdf_url
-      render action: :view_pdf_content, layout: false
+      view_pdf_content
     end
   end
 
   def view_text_content
-    render text: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/plain'
+    render plain: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/plain'
   end
 
   def view_pdf_content
     @pdf_url = pdf_url
     respond_to do |format|
-      format.html { render layout: false }
+      format.html { render 'view_pdf_content', layout: false }
     end
   end
 
   def csv_data
     if @content_blob.no_content?
-      render text: 'No content, Content blob does not have content', content_type: 'text/csv', status: :not_found
+      render plain: 'No content, Content blob does not have content', content_type: 'text/csv', status: :not_found
     elsif @content_blob.is_csv?
-        render text: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
+        render plain: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
     elsif @content_blob.is_excel?
         sheet = params[:sheet] || 1
         trim = params[:trim] || false
-        render text: @content_blob.to_csv(sheet, trim), content_type: 'text/csv'
+        render plain: @content_blob.to_csv(sheet, trim), content_type: 'text/csv'
     else
-        render text: 'Unable to view contents of this data file,', content_type: 'text/csv', status: :not_acceptable
+        render plain: 'Unable to view contents of this data file,', content_type: 'text/csv', status: :not_acceptable
     end
   end
   
   def show
     respond_to do |format|
       format.json { render json: @content_blob }
-      format.html { render text: 'Format not supported', status: :not_acceptable }
-      format.xml { render text: 'Format not supported', status: :not_acceptable }
-      format.rdf { render text: 'Format not supported', status: :not_acceptable }
+      format.html { render plain: 'Format not supported', status: :not_acceptable }
+      format.xml { render plain: 'Format not supported', status: :not_acceptable }
       format.csv { csv_data }
     end
   end

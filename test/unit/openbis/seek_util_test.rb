@@ -744,9 +744,12 @@ class SeekUtilTest < ActiveSupport::TestCase
     zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(['20171002172111346-37', '20171002172639055-39'])
     assert_equal 2, zamples.length
 
-    df = Factory :data_file
+    df = Factory :data_file, contributor: @creator
     ea = OpenbisExternalAsset.find_or_create_by_entity(zamples[0])
     df.external_asset = ea
+
+    assert df.can_edit?
+    assert ea.can_edit?
     assert df.save
     assert ea.save
 

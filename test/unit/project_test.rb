@@ -69,11 +69,12 @@ class ProjectTest < ActiveSupport::TestCase
     object = Factory :project, web_page: 'http://www.sysmo-db.org',
                                organisms: [Factory(:organism), Factory(:organism)]
     person = Factory(:person,project:object)
-    Factory :data_file, projects: [object], contributor:person
+    df = Factory :data_file, projects: [object], contributor:person
     Factory :data_file, projects: [object], contributor:person
     Factory :model, projects: [object], contributor:person
     Factory :sop, projects: [object], contributor:person
-    Factory :presentation, projects: [object], contributor:person
+    presentation = Factory :presentation, projects: [object], contributor:person
+    doc = Factory :document, projects: [object], contributor:person
     i = Factory :investigation, projects: [object], contributor:person
     s = Factory :study, investigation: i, contributor:person
     Factory :assay, study: s, contributor:person
@@ -85,8 +86,17 @@ class ProjectTest < ActiveSupport::TestCase
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/projects/#{object.id}"), reader.statements.first.subject
+
+      #check includes the data file due to bug OPSK-1919
+      refute_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/data_files/#{df.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasItem")}
+
+      #document and presentation shouldn't be present (see OPSK-1920)
+      assert_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/presentations/#{presentation.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasItem")}
+      assert_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/documents/#{doc.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasItem")}
     end
   end
+
+
 
   test 'rdf for web_page - existing or blank or nil' do
     object = Factory :project, web_page: 'http://google.com'
@@ -486,14 +496,89 @@ class ProjectTest < ActiveSupport::TestCase
     project = Factory(:project)
     work_group = Factory(:work_group, project: project)
     a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
-    assert !project.work_groups.collect(&:people).flatten.empty?
-    assert !project.can_delete?(user)
+    refute project.work_groups.collect(&:people).flatten.empty?
+    refute project.can_delete?(user)
 
     # can delete if admin and workgroups are empty
     work_group.group_memberships.delete_all
     assert project.work_groups.reload.collect(&:people).flatten.empty?
     assert user.is_admin?
     assert project.can_delete?(user)
+
+    # cannot delete if there are assets, even if no people
+    user = Factory(:admin).user
+    project = Factory(:project)
+    assert_empty project.people
+    assert project.can_delete?(user)
+    Factory(:investigation, projects:[project])
+    project.work_groups.clear # FactoryGirl - with_project_contributor automatically adds the contributor to the project
+    project.reload
+    assert_empty project.people
+    refute_empty project.investigations
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:study, investigation: Factory(:investigation, projects:[project]))
+    project.work_groups.clear
+    project.reload
+    refute_empty project.studies
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:assay, study: Factory(:study, investigation: Factory(:investigation, projects:[project])))
+    project.work_groups.clear
+    project.reload
+    refute_empty project.assays
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:sop, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.sops
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:workflow, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.workflows
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:workflow, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.workflows
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:node, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.nodes
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:sample, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.samples
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:simple_sample_type, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.sample_types
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:publication, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.publications
+    refute project.can_delete?(user)
   end
 
   test 'gatekeepers' do

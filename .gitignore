@@ -18,6 +18,7 @@ config/using-docker
 
 *.DS_Store
 log/*.log*
+log/puma*
 
 filestore*/
 filestore

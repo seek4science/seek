@@ -54,11 +54,10 @@
         <% if asset.versioned? -%>
             <li>
               <% if asset.new_version_supported? %>
-                  <%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") %>
+                  <%= link_to (image("new") + " Upload new version"), '#', onclick: "$j('#upload_new_version_form').fadeToggle(); return false" %>
               <% else %>
-                  <%= link_to_function image("new")+" Upload new version", nil,disabled:true, class:'disabled' %>
+                  <%= link_to (image("new") + " Upload new version"), '#', disabled: true, class: 'disabled' %>
               <% end %>
-
             </li>
         <% end -%>
 

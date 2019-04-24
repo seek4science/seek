@@ -36,12 +36,12 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
 
   test 'should forbid the unauthorized page' do
     data_file = Factory :data_file, contributor: User.current_user.person
-    get "/data_files/#{data_file.id}", {}, 'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}"
+    get "/data_files/#{data_file.id}", headers: { 'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}" }
     assert_response :success
 
     logout "http://www.example.com/data_files/#{data_file.id}"
     assert_redirected_to data_file_path(data_file)
-    get "/data_files/#{data_file.id}", {}, 'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}"
+    get "/data_files/#{data_file.id}", headers: { 'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}" }
     assert_response :forbidden
 
     login_as_test_user "http://www.example.com/data_files/#{data_file.id}"
@@ -68,7 +68,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
       data_file = Factory :data_file, contributor: User.current_user.person
 
       logout 'http://www.example.com/'
-      get "/data_files/#{data_file.id}", {}, 'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}"
+      get "/data_files/#{data_file.id}", headers: { 'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}" }
       assert_response :forbidden
 
       get '/help'
@@ -95,11 +95,11 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
 
   def login_as_test_user(referer)
     User.current_user = test_user
-    post '/session', { login: test_user.login, password: generate_user_password }, 'HTTP_REFERER' => referer
+    post '/session', params: { login: test_user.login, password: generate_user_password }, headers: { 'HTTP_REFERER' => referer }
   end
 
   def logout(referer)
-    delete '/session', {}, 'HTTP_REFERER' => referer
+    delete '/session', headers: { 'HTTP_REFERER' => referer }
     User.current_user = nil
   end
 end

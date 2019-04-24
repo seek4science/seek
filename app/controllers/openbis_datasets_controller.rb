@@ -6,7 +6,7 @@ class OpenbisDatasetsController < ApplicationController
   # it was like this in Stuart code, but if one can see the dataset why it should not see list
   # of its files even if it was registered as another private DataFile?
 
-  # before_filter :authorise_show_dataset_files, only: [:show_dataset_files]
+  # before_action :authorise_show_dataset_files, only: [:show_dataset_files]
 
   def seek_entity
     @datafile = @asset.seek_entity || DataFile.new

@@ -84,10 +84,10 @@ module AdminHelper
   end
 
   def git_link_tag
-    if File.exist?(File.join(Rails.root, '.git'))
+    if Seek::Version.git_present?
       begin
-        version = `git rev-parse HEAD`.chomp
-        branch = `git rev-parse --abbrev-ref HEAD`.chomp
+        version = Seek::Version.git_version
+        branch = Seek::Version.git_branch
         link = link_to(version[0...7], "https://github.com/seek4science/seek/commit/#{version}", target: '_blank', title: version).html_safe
         "Git revision: #{link} (branch: #{branch})".html_safe
       rescue

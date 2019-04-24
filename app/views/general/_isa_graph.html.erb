@@ -6,6 +6,25 @@
   view = params[:graph_view] || default_view
   is_full_screen = params.key?(:fullscreen).present?
 %>
+
+<style>
+  #cy {
+    flex: 0 0 auto;
+    /* only manually resize */
+
+  }
+
+  .splitter {
+    flex: 0 0 auto;
+    cursor: col-resize;
+  }
+
+  #jstree {
+    flex: 1 1 auto;
+
+  }
+</style>
+
 <div style="float:right"><%= help_link :isa_overview, include_icon: true, link_text:'Help' %></div>
 <div class="row">
   <div class="col-sm-12 hidden-xs">
@@ -47,7 +66,7 @@
         <%= render partial: 'general/jstree', locals: { hash: hash, root_item: root_item } %>
       </div>
     </div>
-    <span id="ruler" style="visibility: hidden"></span>
+
   </div>
 
 </div>
@@ -71,8 +90,7 @@
     function drawInitialState() {
         ISA.decodeHTMLForElements(elements);
         ISA.drawGraph(elements, '<%= node_id(root_item) -%>');
-    };
-
+    }
     ISA.view = {
         tree: function () {
             $j('#isa-tree-view-btn').button('toggle');
@@ -82,6 +100,7 @@
             $j('#show-all-nodes-btn').hide();
             $j('#export-png-btn').hide();
             $j('#reset-nodes-btn').hide();
+            ISA.resizableGraphElement(false);
             ISA.view.current = 'tree';
             return false;
         },
@@ -93,9 +112,11 @@
             $j('#show-all-nodes-btn').show();
             $j('#export-png-btn').show();
             $j('#reset-nodes-btn').show();
+            $j('#cy').css('width', '100%');
+            ISA.resizableGraphElement(false);
             cy.fit(ISA.defaults.padding);
             cy.resize();
-            ISA.view.current = 'graph'
+            ISA.view.current = 'graph';
             return false;
         },
 
@@ -106,10 +127,11 @@
             $j('#show-all-nodes-btn').show();
             $j('#export-png-btn').show();
             $j('#reset-nodes-btn').show();
-            $j('#jstree').css('width', '300px');
+            $j('#cy').css('width', '70%');
+            ISA.resizableGraphElement(true);
             cy.fit(ISA.defaults.padding);
             cy.resize();
-            ISA.view.current = 'split'
+            ISA.view.current = 'split';
             return false;
         },
 
@@ -149,7 +171,11 @@
         });
 
         $j('#reset-nodes-btn').click(function() {
+            $j('#cy').resizable('destroy');
             drawInitialState();
+            if (ISA.view.current == 'split') {
+                ISA.resizableGraphElement(true);
+            }
 
             //stop the all nodes button being out of sync if selected
             if (ISA.isShowGraphNodesActive()) {
@@ -187,6 +213,11 @@
                 ISA.fullscreen(false);
             }
         });
+
+
+
+
+
 
     });
 </script>

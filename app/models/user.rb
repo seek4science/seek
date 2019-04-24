@@ -1,6 +1,6 @@
 require 'digest/sha1'
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   MIN_PASSWORD_LENGTH=10
 
   acts_as_annotation_source
@@ -23,7 +23,7 @@ class User < ActiveRecord::Base
   validates_length_of       :login, within: 3..40
   validates_uniqueness_of   :login, case_sensitive: false
 
-  validates :email, format: { with: RFC822::EMAIL }, if: 'email'
+  validates :email, format: { with: RFC822::EMAIL }, if: -> { email }
   validates :email, presence: true, if: :check_email_present?
   validate :email_available?, if: :check_email_present?
 

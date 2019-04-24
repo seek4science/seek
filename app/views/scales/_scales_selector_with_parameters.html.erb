@@ -1,80 +1,75 @@
-
 <%
-   name = "#{object.class.name.underscore}[scales]"
-   possibilities ||= Scale.all
-   selected ||= object.scales.map(&:id)
-   intro ||= "The following #{t('scale').pluralize} are associated with this #{t('model')}:"
-   default_choice_text ||= "Select Item ..."
-   button_text ||= "Associate with this #{t('model')}"
-   value_method ||= :id
-   text_method ||= :title
-   html_options ||= ''
-   association_step_content ||= nil
-
-
-   default_choice = [default_choice_text, 0]
-   collection_id = 'scale_ids'
-   possibilities_collection_id = "possible_#{collection_id}"
-   possibilities_options ||= {}
-   possibilities_options[:onchange] = "javascript:possibilities_selection_changed();"
+  obj = "#{object.class.name.underscore}"
+  selected ||= object.scales
+  intro ||= "The following #{t('scale').pluralize} are associated with this #{t('model')}:"
+  button_text ||= "Associate with this #{t('model')}"
+  existing_json = associations_json_from_scales(object, selected, fieldName: obj)
 %>
 
-<%= selected %>
+<%= folding_panel("#{t('scale').pluralize}", false, id: 'add_scales_form',
+                  body_options: { id: 'add_scales_form_fold_content' },
+                  help_text: "Here you can associate the #{t('model')} with specific #{t('scale').pluralize}") do %>
+  <p style="color: #666666;">
+    <%= intro %>
+  </p>
 
-<%= javascript_include_tag "scales/scales_selection" %>
-
-<%= folding_panel("#{t('scale').pluralize}", false, :id => 'add_scales_form', :body_options => {:id => 'add_scales_form_fold_content'},
-                  :help_text => "Here you can associate the #{t('model')} with specific #{t('scale').pluralize}") do %>
-    <div class="yui-u first" <%= html_options %>>
-      <p style="color: #666666;">
-        <%= intro %>
-      </p>
-
-      <div id="<%= collection_id %>_display_area" class="box_editing_inner" style="line-height: 1.5;">
-        <span class="none_text">Loading...</span>
-      </div>
-      <div class="association_step">
-
-        <%= select_tag possibilities_collection_id,
-                       options_for_select([default_choice]|possibilities.collect { |o| [truncate(h(o.send(text_method)), :length => 120), o.send(value_method)] }),
-                       possibilities_options -%>
-        <%# This ensures that the parameter is always sent, even when nothing is selected.
+  <%= hidden_field_tag "#{obj}[scales][]", "" %>
+  <%= hidden_field_tag "#{obj}[scale_extra_params][]", "" %>
+  <%= associations_list('scale_list', 'associations/scale', existing_json, 'data-field-name' => obj, empty_text: 'None') %>
+  <div class="association_step row">
+    <div class="col-sm-4">
+      <%= select_tag 'possible_scale_ids',
+                     options_for_select(Scale.all.collect { |o| [truncate(o.title, length: 120), o.id] }),
+                     class: 'form-control', prompt: 'Select scale...', autocomplete: 'off' -%>
+    </div>
+    <%# This ensures that the parameter is always sent, even when nothing is selected.
         It adds a "" as the first item in the array. So if items 1,2, and 3 are selected the
         value of the parameter will be ["","1","2","3"]. This is compatible with the rails
         association association_ids= methods, which reject 'blank' values automatically.%>
-        <span id='additional_scale_details' style="display:none;" >
-            Param name: <%= text_field_tag 'choose_parameter_for_scale_id' -%>
-            Unit: <%= text_field_tag 'choose_unit_for_scale_id' -%>
-        </span>
-        <%= hidden_field_tag "#{name}[]", "" %>
-        <%= select_tag "#{object.class.name.underscore}[scale_extra_params]", [],
-                       { multiple: true, style: "display:none;", id: 'scale_ids_and_params' } -%>
-
-        <%= select_tag name,
-                       options_from_collection_for_select(possibilities, value_method, text_method, selected),
-                       { multiple: true, style: "display:none;", id: collection_id } -%>
-        <%= association_step_content -%>
-      </div>
-
-      <br/>
-      <%= link_to_function(image('new') + "#{button_text}", "addSelectedToFancy2('#{collection_id}', $F('#{possibilities_collection_id}'))", :id => "add_to_#{collection_id}_link", :class => "block_link") %>
-
-
+    <div id='additional_scale_details' class="col-sm-8 form-inline" style="display:none;" >
+      Param name: <%= text_field_tag nil, '', id: 'choose_parameter_for_scale_id', class: 'form-control', autocomplete: 'off' -%>
+      Unit: <%= text_field_tag nil, '', id: 'choose_unit_for_scale_id' , class: 'form-control', autocomplete: 'off' -%>
     </div>
+  </div>
+
+  <br/>
+  <%= button_link_to(button_text, 'new', '#', id: 'add-scale-btn') %>
 <% end %>
+
 <script type="text/javascript">
-    Event.observe(window, 'load', function () {
-        updateFancyMultiselect2('<%= collection_id %>');
+    $j('#possible_scale_ids').change(function () {
+        if ($j(this).val()) {
+            $j('#additional_scale_details').show();
+            $j('#add-scale-btn').show();
+        } else {
+            $j('#additional_scale_details').hide();
+            $j('#add-scale-btn').hide();
+        }
     });
 
+    $j('#add-scale-btn').click(function () {
+        var list = $j('#scale_list').data('associationList');
+        var param = $j('#choose_parameter_for_scale_id').val();
+        var unit = $j('#choose_unit_for_scale_id').val();
+        var selectedOption = $j('#possible_scale_ids option:selected');
 
-    <% object.scales.each do |scale| -%>
-    <%
-       info_list = object.fetch_additional_scale_info(scale.id)
-       info_list.each do |info|
-    -%>
+        var item = { id: parseInt(selectedOption.val()),
+                     title: selectedOption.text() };
+        if (param) {
+            item.extraParams = { param: param, unit: unit, scale_id: item.id };
+            item.extraParams.stringified = JSON.stringify(item.extraParams);
+        }
 
-            updateScaleAndParamsList(<%= info.to_json.html_safe -%>);
-        <% end %>
-    <% end -%>
+        var existsing = list.find(function (s) { return s.id === item.id && (!param || (s.extraParams.param === param)) });
+        if (!existsing) {
+            list.add(item);
+            $j('#possible_scale_ids').val('');
+            $j('#choose_parameter_for_scale_id').val('');
+            $j('#choose_unit_for_scale_id').val('');
+        } else {
+            existsing.element.highlight('blue');
+        }
+
+        return false;
+    });
 </script>

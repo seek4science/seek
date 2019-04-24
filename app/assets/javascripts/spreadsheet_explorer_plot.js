@@ -6,13 +6,13 @@ function plot_selected_cells(target_element,width,height) {
 
 function generate_json_data() {
     var cells = $j('td.selected_cell');
-    var columns = $j('.col_heading.selected_heading').size();
+    var columns = $j('.col_heading.selected_heading').length;
     var headings;
-    var rows = new Array();
+    var rows = [];
     var colors = ["red","blue","green","cyan","magenta","darkgreen"];
 
-    for (var i=0; i<cells.size(); i += columns) {
-        var row = new Array();
+    for (var i=0; i<cells.length; i += columns) {
+        var row = [];
         for (var j=0;j<columns;j+=1) {
             row.push(cells.eq(i + j).html());
         }
@@ -24,13 +24,13 @@ function generate_json_data() {
         }
     }
 
-    var result = new Array();
+    var result = [];
     var json;
 
-    for (var col=1;col<headings.size();col++) {
+    for (var col=1;col<headings.length;col++) {
 
-        var data=new Array();
-        for (row=0;row<rows.size();row++) {
+        var data=[];
+        for (row=0;row<rows.length;row++) {
             var r = rows[row];
 
             data.push([parseFloat(r[0]),parseFloat(r[col])]);
@@ -40,7 +40,7 @@ function generate_json_data() {
             data: data
         };
 
-        if (col<colors.size()) {
+        if (col<colors.length) {
             json["color"]=colors[col-1];
             json["curvedLines"]={show:true};
         }
@@ -51,9 +51,9 @@ function generate_json_data() {
 
 function set_text_annotation_content() {
     var cells = $j('td.selected_cell');
-    var columns = $j('.col_heading.selected_heading').size();
+    var columns = $j('.col_heading.selected_heading').length;
     var text;
-    for(var i = 0; i < cells.size(); i += columns)
+    for(var i = 0; i < cells.length; i += columns)
     {
     for(var j = 0; j < columns; j += 1)
     {

@@ -1,4 +1,4 @@
-class Worksheet < ActiveRecord::Base
+class Worksheet < ApplicationRecord
 
   belongs_to :spreadsheet
   belongs_to :content_blob, inverse_of: :worksheets

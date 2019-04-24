@@ -46,9 +46,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     xml_blob = model.content_blobs.last
 
     original_md5 = pdf_blob.md5sum
-    put model_content_blob_path(model, pdf_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
+    put model_content_blob_path(model, pdf_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :success
     blob = pdf_blob.reload
@@ -57,9 +55,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     assert pdf_blob.file_size > 0
 
     original_md5 = xml_blob.md5sum
-    put model_content_blob_path(model, xml_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'BIOMD0000000064.xml'))
+    put model_content_blob_path(model, xml_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'BIOMD0000000064.xml')) }
 
     assert_response :success
     blob = xml_blob.reload
@@ -78,9 +74,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     pdf_blob = model.content_blobs.first
 
     original_md5 = pdf_blob.md5sum
-    put model_content_blob_path(model, pdf_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
+    put model_content_blob_path(model, pdf_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :forbidden
     validate_json_against_fragment response.body, '#/definitions/errors'
@@ -99,9 +93,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     assert model.can_edit?(@current_user)
 
     original_md5 = pdf_blob.md5sum
-    put model_content_blob_path(model, pdf_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
+    put model_content_blob_path(model, pdf_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :bad_request
     validate_json_against_fragment response.body, '#/definitions/errors'
@@ -124,7 +116,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz.camelize(:lower)}Post"
 
     assert_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", @to_post
+      post "/#{@plural_clz}.json", params: @to_post
       assert_response :success
     end
 
@@ -146,7 +138,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     @to_post = JSON.parse(template.result(binding))
 
     assert_no_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", @to_post
+      post "/#{@plural_clz}.json", params: @to_post
       assert_response :unprocessable_entity
       validate_json_against_fragment response.body, '#/definitions/errors'
     end

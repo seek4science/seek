@@ -21,9 +21,12 @@ var MultiStepWizard = {
     jumpToEnd: function() {
       this.jumpToStep(this.lastStep());
     },
-    lastStep: function() {
-        var lastId = $j('.multi-step-block').map(function(){return this.id}).toArray().sort().last();
-        return lastId.gsub('step-','');
+    lastStep: function () {
+        var steps = $j('.multi-step-block').map(function () {
+            return this.id
+        }).toArray();
+        var lastId = steps.sort()[steps.length - 1];
+        return lastId.replace('step-', '');
     },
     numberOfSteps:function() {
       return $j('.multi-step-block').length;

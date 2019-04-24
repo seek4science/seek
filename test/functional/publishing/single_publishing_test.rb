@@ -17,23 +17,23 @@ class SinglePublishingTest < ActionController::TestCase
     df.projects << gatekeeper.projects.first
     assert df.can_publish?, 'The data file must be manageable for this test to succeed'
 
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :success
     assert_select 'a', text: /Publish #{I18n.t('data_file')}/
 
-    get :check_related_items, id: df
+    get :check_related_items, params: { id: df }
     assert_response :success
     assert_nil flash[:error]
 
-    get :publish_related_items, id: df
+    get :publish_related_items, params: { id: df }
     assert_response :success
     assert_nil flash[:error]
 
-    get :check_gatekeeper_required, id: df
+    get :check_gatekeeper_required, params: { id: df }
     assert_response :success
     assert_nil flash[:error]
 
-    post :publish, id: df
+    post :publish, params: { id: df }
     assert_response :redirect
     assert_nil flash[:error]
   end
@@ -43,23 +43,23 @@ class SinglePublishingTest < ActionController::TestCase
     assert df.can_view?, 'The datafile must be viewable for this test to be meaningful'
     assert !df.can_publish?, 'The datafile must not be manageable for this test to succeed'
 
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :success
     assert_select 'a', text: /Publish #{I18n.t('data_file')}/, count: 0
 
-    get :check_related_items, id: df
+    get :check_related_items, params: { id: df }
     assert_redirected_to :root
     assert flash[:error]
 
-    get :publish_related_items, id: df
+    get :publish_related_items, params: { id: df }
     assert_redirected_to :root
     assert flash[:error]
 
-    get :check_gatekeeper_required, id: df
+    get :check_gatekeeper_required, params: { id: df }
     assert_redirected_to :root
     assert flash[:error]
 
-    post :publish, id: df
+    post :publish, params: { id: df }
     assert_redirected_to :root
     assert flash[:error]
   end
@@ -68,7 +68,7 @@ class SinglePublishingTest < ActionController::TestCase
     df = data_with_isa
     assert df.can_publish?, 'The datafile must be publishable for this test to succeed'
 
-    get :check_related_items, id: df.id
+    get :check_related_items, params: { id: df.id }
     assert_response :success
 
     assert_select 'a[href=?]', data_file_path(df), text: /#{df.title}/
@@ -103,7 +103,7 @@ class SinglePublishingTest < ActionController::TestCase
     assert request_publishing_df.can_publish?, 'The datafile must not be publishable for this test to succeed'
     assert !notifying_df.can_publish?, 'The datafile must not be publishable for this test to succeed'
 
-    get :publish_related_items, id: df.id
+    get :publish_related_items, params: { id: df.id }
     assert_response :success
 
     assert_select '.type_and_title', text: /Investigation/, count: 1 do
@@ -160,7 +160,7 @@ class SinglePublishingTest < ActionController::TestCase
       params[:publish][asset.class.name][asset.id.to_s] = '1'
     end
 
-    get :check_gatekeeper_required, params.merge(id: df.id)
+    get :check_gatekeeper_required, params: params.merge(id: df.id)
     assert_response :success
 
     assert_select 'ul#waiting_approval' do
@@ -183,7 +183,7 @@ class SinglePublishingTest < ActionController::TestCase
     df.projects << gatekeeper.projects.first
     assert df.can_publish?, 'The data file must be manageable for this test to succeed'
 
-    get :check_related_items, id: df
+    get :check_related_items, params: { id: df }
     assert_response :success
     assert_select 'ul#waiting_approval', count: 1
     assert_nil flash[:error]
@@ -198,7 +198,7 @@ class SinglePublishingTest < ActionController::TestCase
     assert !df.is_published?, 'The data file must not be published for this test to be meaningful'
     assert !df.gatekeeper_required?, 'The data file must need require a gatekeeper for this test to proceed'
 
-    get :check_gatekeeper_required, id: df
+    get :check_gatekeeper_required, params: { id: df }
     assert_response :success
     assert_select 'h1', text: /Confirm publishing/
     assert_nil flash[:error]
@@ -214,7 +214,7 @@ class SinglePublishingTest < ActionController::TestCase
     params[:publish][df.class.name][df.id.to_s] = '1'
 
     assert_difference('ResourcePublishLog.count', 1) do
-      post :publish, params.merge(id: df.id)
+      post :publish, params: params.merge(id: df.id)
     end
 
     assert_response :redirect
@@ -242,7 +242,7 @@ class SinglePublishingTest < ActionController::TestCase
 
     assert_difference('ResourcePublishLog.count', 1) do
       assert_enqueued_emails 1 do
-        post :publish, params.merge(id: df.id)
+        post :publish, params: params.merge(id: df.id)
       end
     end
 
@@ -283,7 +283,7 @@ class SinglePublishingTest < ActionController::TestCase
     assert !non_owned_assets.empty?, 'There should be non manageable assets included in this test'
 
     assert_no_enqueued_emails do
-      post :publish, params.merge(id: df)
+      post :publish, params: params.merge(id: df)
     end
 
     assert_response :redirect
@@ -334,7 +334,7 @@ class SinglePublishingTest < ActionController::TestCase
     assert !non_publishable_assets.empty?, 'There should be non publishable assets included in this test'
 
     assert_no_enqueued_emails do
-      post :publish, params.merge(id: df)
+      post :publish, params: params.merge(id: df)
     end
 
     assert_response :redirect
@@ -363,7 +363,7 @@ class SinglePublishingTest < ActionController::TestCase
     assert !df1.can_view?, 'This datafile must not be viewable for the test to succeed'
     assert df2.can_view?, 'This datafile must be viewable for the test to succeed'
 
-    get :published, id: df.id, published_items: published_items, waiting_for_publish_items: waiting_for_publish_items
+    get :published, params: { id: df.id, published_items: published_items, waiting_for_publish_items: waiting_for_publish_items }
     assert_response :success
 
     assert_select 'ul#published' do

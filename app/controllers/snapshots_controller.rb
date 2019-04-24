@@ -2,13 +2,13 @@ require 'zenodo/oauth2/client'
 require 'zenodo-client'
 
 class SnapshotsController < ApplicationController
-  before_filter :find_resource
-  before_filter :auth_resource, only: [:mint_doi_confirm, :mint_doi, :new, :create, :export_preview, :export_submit, :destroy]
-  before_filter :check_resource_permitted_for_ro, only: [:new, :create]
-  before_filter :find_snapshot, only: [:show, :mint_doi_confirm, :mint_doi, :download, :export_preview, :export_submit, :destroy]
-  before_filter :doi_minting_enabled?, only: [:mint_doi_confirm, :mint_doi]
-  before_filter :zenodo_oauth_client
-  before_filter :zenodo_oauth_session, only: [:export_submit]
+  before_action :find_resource
+  before_action :auth_resource, only: [:mint_doi_confirm, :mint_doi, :new, :create, :export_preview, :export_submit, :destroy]
+  before_action :check_resource_permitted_for_ro, only: [:new, :create]
+  before_action :find_snapshot, only: [:show, :mint_doi_confirm, :mint_doi, :download, :export_preview, :export_submit, :destroy]
+  before_action :doi_minting_enabled?, only: [:mint_doi_confirm, :mint_doi]
+  before_action :zenodo_oauth_client
+  before_action :zenodo_oauth_session, only: [:export_submit]
 
   include Seek::BreadCrumbs
   include Zenodo::Oauth2::SessionHelper
@@ -23,7 +23,6 @@ class SnapshotsController < ApplicationController
   def show
     respond_to do |format|
       format.html # show.html.erb
-      format.rdf { render template: 'rdf/show' }
       format.json { render json: @snapshot }
     end
   end
@@ -59,10 +58,8 @@ class SnapshotsController < ApplicationController
   def export_submit # Export AND publish
     access_token = @oauth_session.access_token
 
-    metadata = params[:metadata].delete_if { |k,v| v.blank? }
-
-    wrap_service('Zenodo', polymorphic_path([@resource, @snapshot]), rescue_all: true) do
-      if @snapshot.export_to_zenodo(access_token, metadata) && @snapshot.publish_in_zenodo(access_token)
+    wrap_service('Zenodo', polymorphic_path([@resource, @snapshot]), rescue_all: !Rails.env.test?) do
+      if @snapshot.export_to_zenodo(access_token, metadata_params) && @snapshot.publish_in_zenodo(access_token)
         flash[:notice] = "Snapshot successfully exported to Zenodo"
         redirect_to polymorphic_path([@resource, @snapshot])
       else
@@ -119,4 +116,7 @@ class SnapshotsController < ApplicationController
     end
   end
 
+  def metadata_params
+    params.require(:metadata).permit(:access_right, :license, :embargo_date, :access_conditions, creators: [:name]).delete_if { |k,v| v.blank? }
+  end
 end
