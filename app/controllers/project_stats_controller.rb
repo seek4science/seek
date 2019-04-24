@@ -6,7 +6,7 @@ class ProjectStatsController < StatsController
   private
 
   def stats
-    Seek::Stats::DashboardStats.new(@project)
+    Seek::Stats::ProjectDashboardStats.new(@project)
   end
 
   def find_project
