@@ -1,7 +1,4 @@
 class ProjectStatsController < StatsController
-  before_action :member_of_this_project
-  skip_before_action :is_user_admin_auth
-
   private
 
   def stats
@@ -19,7 +16,7 @@ class ProjectStatsController < StatsController
     end
   end
 
-  def member_of_this_project
+  def check_access_rights
     unless @project.has_member?(current_user)
       flash[:error] = "You are not a member of this #{t('project')}, so cannot access this page."
       redirect_to project_path(@project)

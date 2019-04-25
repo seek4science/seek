@@ -39,7 +39,7 @@ module Seek
                     '%Y-%m-%d'
                   end
 
-          assets = (scope.nil? ? (Programme.all + Project.all) : []) + scoped_resources
+          assets = scoped_resources
           assets.select! { |a| a.created_at >= start_date && a.created_at <= end_date }
           date_grouped = assets.group_by { |a| a.created_at.strftime(strft) }
           types = assets.map(&:class).uniq
@@ -58,9 +58,8 @@ module Seek
       end
 
       def asset_accessibility(start_date, end_date, type: nil)
-        project_scope = scope
         Rails.cache.fetch("#{cache_key_base}_#{type || 'all'}_asset_accessibility_#{start_date}_#{end_date}", expires_in: 3.hours) do
-          assets = scoped_resources
+          assets = scoped_isa + scoped_assets
           assets.select! {|a| a.class.name == type} if type
           assets.select! {|a| a.created_at >= start_date && a.created_at <= end_date}
           published_count = assets.count(&:is_published?)
@@ -88,7 +87,7 @@ module Seek
       end
 
       def scoped_resources
-        @resources ||= (scoped_isa + scoped_assets)
+        @resources ||= (Programme.all + Project.all + scoped_isa + scoped_assets)
       end
 
       def scoped_assets
@@ -97,6 +96,10 @@ module Seek
 
       def scoped_isa
         @isa ||= Investigation.all + Study.all + Assay.all
+      end
+
+      def project_scope
+        nil
       end
 
       def dates_between(start_date, end_date, interval = 'month')

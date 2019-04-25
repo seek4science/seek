@@ -53,7 +53,7 @@ class Programme < ApplicationRecord
     studies(include_clause).collect(&:assays).flatten.uniq
   end
 
-  %i[data_files documents models sops presentations events publications].each do |type|
+  %i[data_files documents models sops presentations events publications samples].each do |type|
     define_method(type) do
       projects.includes(type).collect(&type).flatten.uniq
     end

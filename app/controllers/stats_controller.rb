@@ -1,7 +1,7 @@
 class StatsController < ApplicationController
-  before_action :is_user_admin_auth
-  before_action :get_dates, only: %i[asset_activity contributors contributions asset_accessibility]
   before_action :get_scope
+  before_action :check_access_rights
+  before_action :get_dates, only: %i[asset_activity contributors contributions asset_accessibility]
   before_action :add_breadcrumbs
 
   def dashboard
@@ -65,6 +65,10 @@ class StatsController < ApplicationController
 
   def get_scope
     @scope = :admin
+  end
+
+  def check_access_rights
+    is_user_admin_auth
   end
 
   def add_breadcrumbs
