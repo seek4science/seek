@@ -11,9 +11,21 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.8.2
+
+Release date: _25th April 2019_
+
+Bug fixes and minor improvements, changes are:
+
+   * Fix to a potential database lock, particularly when registering multiple items in quick succession through the API
+   * Ability to edit version revision comments
+   * Fix to correctly show the creator of a particular DataFile version
+   
+Changes are also described in the [SEEK v1.8.2 release notes](release-notes-1.8.2.html)   
+
 ## Version 1.8.1
 
-Release date: 18th _March_ 2019
+Release date: _18th March 2019_
 
 Bug fixes and minor improvements, main fixes are:
 

@@ -36,9 +36,10 @@ You can also tell which version you have installed by looking at the
 
 ## Upgrading between patch versions (e.g. between 1.4.0 and 1.4.1) 
 
-It should only be necessary to run *bundle install* and the *db:migrate* rake
-task. Using *seek:upgrade* should still work, but could take a lot of
-unnecessary time. 
+When upgrading between patch versions, it should only be necessary to run 
+    
+    bundle install
+    bundle exec rake seek:upgrade 
 
 ## Steps to upgrade from 1.7.x to 1.8.x
 
@@ -68,16 +69,16 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.8.1
+    git checkout v1.8.2
 
 ### Updating using the tarball
 
 
 You can download the file from
-<https://bitbucket.org/fairdom/seek/downloads/seek-1.8.1.tar.gz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.8.2.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.8.1.tar.gz
+    tar zxvf seek-1.8.2.tar.gz
     mv seek seek-previous
     mv seek-1.8.0 seek
     cd seek/
