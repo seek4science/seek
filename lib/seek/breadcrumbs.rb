@@ -43,11 +43,6 @@ module Seek
         add_show_breadcrumb @assay
       elsif %w[compounds suggested_assay_types suggested_technology_types site_announcements].include?(controller_name)
         add_index_breadcrumb('admin', 'Administration')
-      elsif controller_name == 'dashboards'
-        add_index_breadcrumb 'projects'
-        add_show_breadcrumb @project
-        add_breadcrumb 'Dashboard'
-        return
       end
 
       # Index
