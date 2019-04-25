@@ -17,7 +17,7 @@ class ProgrammeStatsController < StatsController
   end
 
   def check_access_rights
-    unless User.admin_logged_in? || (current_person && current_person.is_programme_administrator?(@programme))
+    unless @programme.can_manage?
       flash[:error] = "You do not have permission to access this page."
       redirect_to programme_path(@programme)
       false

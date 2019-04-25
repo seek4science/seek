@@ -1,6 +1,7 @@
-<% if User.admin_logged_in? || (current_person && current_person.is_programme_administrator?(item)) %>
+<% if item.can_manage? -%>
   <%= button_link_to("Dashboard", 'project_dashboard', dashboard_programme_stats_path(item)) %>
 <% end -%>
+
 <%= admin_dropdown do %>
     <% if item.can_manage? -%>
         <li><%= image_tag_for_key('manage', edit_programme_path(item), "Manage #{t('programme')}", nil, "Manage #{t('programme')}") %></li>
