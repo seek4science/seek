@@ -4,9 +4,9 @@ class PublicationSerializer < BaseSerializer
              :doi, :pubmed_id,
              :abstract, :citation 
   attribute :link_to_pub do
-    if :pubmed_id
+    if !object.pubmed_id.nil?
       'https://www.ncbi.nlm.nih.gov/pubmed/' + object.pubmed_id.to_s
-    elsif :doi
+    elsif !object.doi.nil?
       'https://doi.org/' + object.doi.to_s
     else
       ''

@@ -274,37 +274,6 @@ class PublicationsController < ApplicationController
     end
   end
 
-  def fetch_pubmed_or_doi_result(pubmed_id, doi)
-    result = nil
-    @error = nil
-    if pubmed_id
-      begin
-        result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
-        @error = result.error
-      rescue => exception
-        raise exception unless Rails.env.production?
-        result ||= Bio::Reference.new({})
-        @error = 'There was a problem contacting the PubMed query service. Please try again later'
-        Seek::Errors::ExceptionForwarder.send_notification(exception, data: { message: "Problem accessing ncbi using pubmed id #{pubmed_id}" })
-      end
-    elsif doi
-      begin
-        query = DOI::Query.new(Seek::Config.crossref_api_email)
-        result = query.fetch(doi)
-        @error = 'Unable to get result' if result.blank?
-        @error = 'Unable to get DOI' if result.title.blank?
-      rescue DOI::MalformedDOIException
-        @error = 'The DOI you entered appears to be malformed.'
-      rescue DOI::NotFoundException
-        @error = 'The DOI you entered could not be resolved.'
-      rescue RuntimeError => exception
-        @error = 'There was an problem contacting the DOI query service. Please try again later'
-        Seek::Errors::ExceptionForwarder.send_notification(exception, data:{ message: "Problem accessing crossref using DOI #{doi}" })
-      end
-    end
-    result
-  end
-
   def get_data(publication, pubmed_id, doi = nil)
     result = fetch_pubmed_or_doi_result(pubmed_id, doi)
     publication.extract_metadata(result) unless @error
@@ -421,7 +390,9 @@ class PublicationsController < ApplicationController
       @publication.errors[:bibtex_file] = 'Upload a file!'
     else
       bibtex_file = params[:publication].delete(:bibtex_file)
-      bibtex = BibTeX.parse(bibtex_file.read)
+      data = bibtex_file.read.force_encoding('UTF-8')
+      bibtex = BibTeX.parse(data,:filter => :latex)
+
       if bibtex['@article'].empty?
         @publication.errors[:bibtex_file] = 'The bibtex file should contain at least one @article'
       else
@@ -496,7 +467,6 @@ class PublicationsController < ApplicationController
           end
           flash[:error] = flash[:error].html_safe
         end
-
       end
     end
 
