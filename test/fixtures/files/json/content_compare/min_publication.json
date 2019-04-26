@@ -11,11 +11,11 @@
       "title": "A Minimal Publication",
       "journal": null,
       "published_date": null,
-      "doi": null,
+      "doi": "10.5072/abcd",
       "pubmed_id": null,
       "abstract": null,
       "citation": null,
-      "link_to_pub": null,
+      "link_to_pub": "https://doi.org/10.5072/abcd",
       "authors": null
     },
     "relationships": {

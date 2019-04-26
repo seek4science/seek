@@ -8,6 +8,7 @@ end
 
 Factory.define(:min_publication, class: Publication) do |f|
   f.title 'A Minimal Publication'
+  f.doi 'https://doi.org/10.5072/abcd'
   f.projects { [Factory.build(:min_project)] }
 end
 
