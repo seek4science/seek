@@ -180,18 +180,32 @@ class Publication < ActiveRecord::Base
   # @param bibtex_record BibTeX entity from bibtex-ruby gem
   def extract_bibtex_metadata(bibtex_record)
     self.registered_mode = 4
-    self.title           = bibtex_record.title.try(:to_s).try(:encode!).gsub /{|}/, ''
+
+    unless bibtex_record[:title].nil?
+      self.title           = bibtex_record[:title].try(:to_s).try(:encode!).gsub /{|}/, ''
+    end
+
     self.abstract        = bibtex_record[:abstract].try(:to_s).try(:encode!) || ''
     self.journal         = bibtex_record.journal.try(:to_s).try(:encode!)
     self.published_date  = Date.new(bibtex_record.year.try(:to_i) || 1 , bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1)
     self.doi             = bibtex_record[:doi].try(:to_s).try(:encode!)
     self.pubmed_id       = bibtex_record[:pubmed_id].try(:to_s).try(:encode!)
 
-    result = fetch_pubmed_or_doi_result(self.pubmed_id, self.doi)
-
-    unless self.doi.nil?
-      render_citation(self.doi, style)
+    unless bibtex_record[:editors].nil?
+      self.editor          = bibtex_record[:editors].try(:to_s).try(:encode!)
     end
+
+
+    unless bibtex_record[:booktitle].nil?
+      self.booktitle          = bibtex_record[:booktitle].try(:to_s).try(:encode!)
+    end
+
+
+    unless bibtex_record[:publisher].nil?
+      self.publisher          = bibtex_record[:publisher].try(:to_s).try(:encode!)
+    end
+
+    result = fetch_pubmed_or_doi_result(self.pubmed_id, self.doi)
 
     unless result.nil?
       unless result.citation.nil?
