@@ -2,6 +2,7 @@ require 'libxml'
 
 class Publication < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
+  include PublicationsHelper
 
   alias_attribute :description, :abstract
 
@@ -173,13 +174,14 @@ class Publication < ActiveRecord::Base
     self.published_date = doi_record.date_published
     self.journal = doi_record.journal
     self.doi = doi_record.doi
-    self.publication_type = doi_record.publication_type
+    #self.publication_type = doi_record.publication_type
     self.citation = doi_record.citation
   end
 
   # @param bibtex_record BibTeX entity from bibtex-ruby gem
   def extract_bibtex_metadata(bibtex_record)
     self.registered_mode = 4
+    self.publication_type = get_publication_type(bibtex_record)
 
     unless bibtex_record[:title].nil?
       self.title           = bibtex_record[:title].try(:to_s).try(:encode!).gsub /{|}/, ''

@@ -14,6 +14,7 @@ class PublicationsController < ApplicationController
   include Seek::BreadCrumbs
 
   include Seek::IsaGraphExtensions
+  include PublicationsHelper
 
   def export
     @query = Publication.ransack(params[:query])
@@ -392,16 +393,14 @@ class PublicationsController < ApplicationController
       bibtex_file = params[:publication].delete(:bibtex_file)
       data = bibtex_file.read.force_encoding('UTF-8')
       bibtex = BibTeX.parse(data,:filter => :latex)
-
-      if bibtex['@article'].empty?
-        @publication.errors[:bibtex_file] = 'The bibtex file should contain at least one @article'
+      if bibtex[0].nil?
+        @publication.errors[:bibtex_file] = 'The bibtex file should contain at least one item'
       else
         # warning if there are more than one article
-        if bibtex['@article'].length > 1
-          flash[:error] = "The bibtex file did contain more than one @article: #{bibtex['@article'].length}; only the first one is parsed"
+        if bibtex.length > 1
+          flash[:error] = "The bibtex file did contain #{bibtex.length} items; only the first one is parsed."
         end
-        article = bibtex['@article'][0]
-        @publication.extract_bibtex_metadata(article)
+        @publication.extract_bibtex_metadata(bibtex[0])
         # the new form will be rendered with the information from the imported bibtex article
         @subaction = 'Create'
       end
@@ -435,8 +434,8 @@ class PublicationsController < ApplicationController
       bibtex = BibTeX.parse(data,:filter => :latex)
 
 
-      if bibtex['@article'].empty? && bibtex['@inproceedings'].empty?
-        @publication.errors[:bibtex_file] = 'The bibtex file should contain at least one item'
+      if bibtex[0].nil?
+        @publication.errors[:bibtex_file] = 'The bibtex file should contain at least one item.'
       else
         articles = bibtex
         publications = []
