@@ -21,6 +21,9 @@ Factory.define(:max_publication, class: Publication) do |f|
   f.citation 'JMB Oct 2017, 12:234-245'
   f.publication_authors {[Factory(:publication_author), Factory(:publication_author)]}
   f.abstract 'Amazing insights into the mechanism of TF2'
+  f.editor 'Richling, S. and Baumann, M. and Heuveline, V.'
+  f.booktitle 'Proceedings of the 3rd bwHPC-Symposium: Heidelberg 2016'
+  f.publisher 'Heidelberg University Library, heiBOOKS'
   f.projects { [Factory.build(:max_project)] }
   f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
