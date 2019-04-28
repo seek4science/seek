@@ -30,8 +30,10 @@
             </p>
             <% when 4,5,6 %>
             <p>
+              <% unless @publication.booktitle.nil? %>
                 <strong><%= "Book Title" -%>:</strong>
                 <%=h @publication.booktitle -%>
+              <% end %>
             </p>
             <% else %>
           <p>
@@ -68,6 +70,7 @@
     </div>
     <div class="row">
       <div class="col-md-12 col-sm-10">
+        <% unless @publication.publication_authors.size == 0 %>
         <p>
           <strong>Author<%= @publication.publication_authors.size > 1 ? "s" : "" -%>:</strong>
           <% if @publication.publication_authors.empty? %>
@@ -82,6 +85,7 @@
               end.join(', ').html_safe %>
           <% end %>
         </p>
+        <% end %>
       </div>
     </div>
     <%= render :partial => "general/isa_graph", :locals => { :root_item => @publication, :deep => true, :include_parents => true } %>

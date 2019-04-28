@@ -180,6 +180,7 @@ class Publication < ActiveRecord::Base
 
   # @param bibtex_record BibTeX entity from bibtex-ruby gem
   def extract_bibtex_metadata(bibtex_record)
+
     self.registered_mode = 4
     self.publication_type = get_publication_type(bibtex_record)
 
@@ -193,8 +194,9 @@ class Publication < ActiveRecord::Base
     self.doi             = bibtex_record[:doi].try(:to_s).try(:encode!)
     self.pubmed_id       = bibtex_record[:pubmed_id].try(:to_s).try(:encode!)
 
-    unless bibtex_record[:editors].nil?
-      self.editor          = bibtex_record[:editors].try(:to_s).try(:encode!)
+
+    unless bibtex_record[:editor].nil?
+      self.editor          = bibtex_record[:editor].try(:to_s).try(:encode!)
     end
 
 
@@ -214,7 +216,7 @@ class Publication < ActiveRecord::Base
     self.citation = result.citation
       end
 
-    unless result.journal.nil?
+    if self.journal.nil? && !result.journal.nil?
       self.journal = result.journal
     end
 
@@ -223,21 +225,23 @@ class Publication < ActiveRecord::Base
     end
   end
 
-    plain_authors = bibtex_record[:author].split(' and ') # by bibtex definition
-    plain_authors.each_with_index do |author, index| # multiselect
-      next if author.empty?
-      last_name,first_name = author.split(', ') # by bibtex definition
-      unless first_name.nil?
-        first_name =  first_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''
+    unless bibtex_record[:author].nil?
+      plain_authors = bibtex_record[:author].split(' and ') # by bibtex definition
+      plain_authors.each_with_index do |author, index| # multiselect
+        next if author.empty?
+        last_name,first_name = author.split(', ') # by bibtex definition
+        unless first_name.nil?
+          first_name =  first_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''
+        end
+        unless last_name.nil?
+          last_name =  last_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''
+        end
+        pa = PublicationAuthor.new(publication: self,
+                                   first_name: first_name,
+                                   last_name: last_name,
+                                   author_index: index)
+        publication_authors << pa
       end
-      unless last_name.nil?
-        last_name =  last_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''
-      end
-      pa = PublicationAuthor.new(publication: self,
-                                 first_name: first_name,
-                                 last_name: last_name,
-                                 author_index: index)
-      publication_authors << pa
     end
   end
 

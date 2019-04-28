@@ -1,7 +1,11 @@
 <div class="list_item_desc"><%= list_item_expandable_text "Abstract", h(resource.abstract) %></div>
 
 <p class="list_item_attribute">
-  <%= list_item_author_list(resource.publication_authors) %>
+  <% if resource.publication_authors.size == 0 %>
+  <%= list_item_attribute "Editor", h(resource.editor)%>
+ <% else %>
+    <%= list_item_author_list(resource.publication_authors) %>
+  <% end %>
 </p>
 
 <div class="row">
