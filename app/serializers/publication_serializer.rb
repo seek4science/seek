@@ -1,4 +1,5 @@
 class PublicationSerializer < BaseSerializer
+  include PublicationsHelper
   attributes :title, #:publication_authors,
              :journal, :published_date,
              :doi, :pubmed_id,
@@ -11,6 +12,10 @@ class PublicationSerializer < BaseSerializer
     else
       ''
     end
+  end
+
+  attribute :publication_type do
+    publication_type_text(object.publication_type)
   end
 
   attribute :authors do

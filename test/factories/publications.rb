@@ -10,6 +10,7 @@ Factory.define(:min_publication, class: Publication) do |f|
   f.title 'A Minimal Publication'
   f.doi 'https://doi.org/10.5072/abcd'
   f.projects { [Factory.build(:min_project)] }
+  f.publication_type nil
 end
 
 Factory.define(:max_publication, class: Publication) do |f|
@@ -24,6 +25,7 @@ Factory.define(:max_publication, class: Publication) do |f|
   f.editor 'Richling, S. and Baumann, M. and Heuveline, V.'
   f.booktitle 'Proceedings of the 3rd bwHPC-Symposium: Heidelberg 2016'
   f.publisher 'Heidelberg University Library, heiBOOKS'
+  f.publication_type 1
   f.projects { [Factory.build(:max_project)] }
   f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}

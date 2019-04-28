@@ -66,7 +66,7 @@ module PublicationsHelper
 
     case type
     when 1
-      return 'Article'
+      return 'Journal'
     when 2
       return 'Book'
     when 3
@@ -91,6 +91,8 @@ module PublicationsHelper
       return 'Tech report'
     when 13
       return 'Unpublished'
+    else
+      return nil
     end
   end
 

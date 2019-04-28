@@ -19,6 +19,7 @@
       "booktitle":	null,
       "publisher":	null,
       "link_to_pub": "https://doi.org/10.5072/abcd",
+      "publication_type":null,
       "authors": null
     },
     "relationships": {

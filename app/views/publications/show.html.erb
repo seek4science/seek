@@ -22,10 +22,37 @@
 
         <%= render :partial => 'projects/show_project_relationship', :locals => { :resource => @publication } %>
 
-        <p>
-          <strong><%= publication_type_text @publication.publication_type -%>:</strong>
-          <%=h @publication.journal -%>
-        </p>
+        <% case @publication.publication_type %>
+          <% when 1 %>
+            <p>
+                <strong><%= "Journal" -%>:</strong>
+                <%=h @publication.journal -%>
+            </p>
+            <% when 4,5,6 %>
+            <p>
+                <strong><%= "Book Title" -%>:</strong>
+                <%=h @publication.booktitle -%>
+            </p>
+            <% else %>
+          <p>
+            <strong><%=h publication_type_text(@publication.publication_type) -%></strong>
+          </p>
+
+        <% end %>
+
+        <% unless @publication.editor.nil? %>
+          <p>
+            <strong>Editor<%= @publication.editor.size > 1 ? "s" : "" -%>:</strong>
+            <%=h @publication.editor -%>
+          </p>
+        <% end %>
+
+        <% unless @publication.publisher.nil? %>
+          <p>
+            <strong>Publisher:</strong>
+            <%=h @publication.publisher -%>
+          </p>
+        <% end %>
 
       </div>
       <div class="col-md-6">

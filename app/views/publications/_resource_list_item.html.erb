@@ -7,7 +7,12 @@
 <div class="row">
   <div class="col-sm-6">
     <%= list_item_attribute "Date Published", date_as_string(resource.published_date,false,true) %>
-    <%= list_item_optional_attribute publication_type_text(resource.publication_type), h(resource.journal) %>
+    <% case resource.publication_type %>
+    <% when 4,5,6 %>
+      <%= list_item_optional_attribute publication_type_text(resource.publication_type), h(resource.booktitle) %>
+    <% else %>
+      <%= list_item_optional_attribute publication_type_text(resource.publication_type), h(resource.journal) %>
+    <% end %>
   </div>
 
   <div class="col-sm-6 hidden-xs">

@@ -4551,6 +4551,9 @@
                 "link_to_pub": {
                   "$ref": "#/definitions/nullableUriString"
                 },
+                "publication_type": {
+                  "$ref": "#/definitions/nullableNonEmptyString"
+                },
                 "authors": {
                   "$ref": "#/definitions/nullableNonEmptyStringList"
                 },
