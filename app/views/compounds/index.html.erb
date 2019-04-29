@@ -22,3 +22,24 @@
 <div id="edit-compound-modals">
   <%= render partial: 'edit_compound', collection: @compounds, as: 'compound' %>
 </div>
+
+<script>
+    $j(document).ready(function () {
+        $j(document).on('click', '.sabio-rk-search-btn', function () {
+            var button = this;
+            button.disabled = true;
+            var data = { compound_name: $j(this).parent().find('.compound-title').val() };
+            if ($j(this).data('compoundId'))
+                data.id = $j(this).data('compoundId');
+            $j.post('<%= search_in_sabiork_compounds_path -%>', data).always(function () {
+                button.disabled = false;
+            });
+
+            return false;
+        });
+
+        $j(document).on('ajax:error', function (xhr) {
+            alert(xhr.responseText);
+        });
+    });
+</script>

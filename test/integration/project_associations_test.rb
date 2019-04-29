@@ -4,7 +4,7 @@ class ProjectAssociationsTest < ActionDispatch::IntegrationTest
   ASSETS_WITH_MULTIPLE_PROJECTS = %w(data_files events investigations models publications sops presentations samples publications)
   def setup
     User.current_user = Factory(:user, login: 'test')
-    post '/session', login: 'test', password: 'blah'
+    post '/session', params: { login: 'test', password: 'blah' }
   end
 
   test 'form allows setting project_ids' do
@@ -31,8 +31,7 @@ class ProjectAssociationsTest < ActionDispatch::IntegrationTest
 
       item.projects = [Factory(:project), Factory(:project)]
       disable_authorization_checks do
-        put "/#{type_name}/#{item.id}", "#{item.class.name.downcase}".to_sym => { id: item.id },
-                                        :sharing => { "access_type_#{Policy::ALL_USERS}" => Policy::VISIBLE, :your_proj_access_type => Policy::ACCESSIBLE }
+        put "/#{type_name}/#{item.id}", params: { "#{item.class.name.downcase}".to_sym => { id: item.id }, :sharing => { "access_type_#{Policy::ALL_USERS}" => Policy::VISIBLE, :your_proj_access_type => Policy::ACCESSIBLE } }
       end
 
       item.reload

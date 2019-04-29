@@ -1,7 +1,7 @@
 # A handy controller for testing failures: such as the error messages and exception notification
 class FailController < ApplicationController
   
-  before_filter :is_user_admin_auth
+  before_action :is_user_admin_auth
   
   # GET /fail/?http_code=:code
   def index

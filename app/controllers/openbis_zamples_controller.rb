@@ -3,7 +3,7 @@
 class OpenbisZamplesController < ApplicationController
   include Seek::Openbis::EntityControllerBase
 
-  before_filter :seek_type
+  before_action :seek_type
 
   def seek_entity
     @assay = @asset.seek_entity || Assay.new

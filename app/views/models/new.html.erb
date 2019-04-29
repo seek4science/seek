@@ -37,7 +37,7 @@
       <div>
         <%= preview_permission_popup_link(@model)-%>
         <%= create_button :id => "model_submit_btn",
-                       :onclick => "javascript: validateResourceFields(true, 'model',true); return(false);",
+                       :onclick => "return validateResourceFields('model')",
                        :class => 'btn btn-primary' -%>
         or <%= cancel_button(models_path) -%>
       </div>

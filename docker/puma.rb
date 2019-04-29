@@ -1,6 +1,6 @@
-require 'system'
+require 'concurrent-ruby'
 # Change to match your CPU core count
-workers System::CPU.count
+workers Concurrent.processor_count
 
 worker_timeout 120
 

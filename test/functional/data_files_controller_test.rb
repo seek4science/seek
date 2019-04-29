@@ -23,7 +23,7 @@ class DataFilesControllerTest < ActionController::TestCase
     # by TZ for some reason depending on tets order user was no longer logged
     login_as(:datafile_owner) unless User.current_user
     @object = data_files(:picture)
-    @object.tag_with 'tag1'
+    @object.annotate_with 'tag1'
     @object
   end
 
@@ -33,7 +33,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'title', text: 'Data files', count: 1
 
     df = Factory(:data_file, contributor: User.current_user.person)
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :success
     assert_select 'title', text: df.title, count: 1
 
@@ -49,13 +49,13 @@ class DataFilesControllerTest < ActionController::TestCase
     assert json['data']['links']['self'].ends_with?("?version=#{df.version}")
   end
 
-  # because the activity logging is currently an after_filter, the AuthorizationEnforcement can silently prevent
+  # because the activity logging is currently an after_action, the AuthorizationEnforcement can silently prevent
   # the log being saved, unless it is public, since it has passed out of the around filter and User.current_user is nil
   test 'download and view activity logging for private items' do
     df = Factory :data_file, policy: Factory(:private_policy)
     @request.session[:user_id] = df.contributor.user.id
     assert_difference('ActivityLog.count') do
-      get :show, id: df
+      get :show, params: { id: df }
     end
     assert_response :success
 
@@ -64,7 +64,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df, al.activity_loggable
 
     assert_difference('ActivityLog.count') do
-      get :download, id: df
+      get :download, params: { id: df }
     end
     assert_response :success
 
@@ -94,12 +94,12 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory :data_file
     login_as(df.contributor.user)
     as_virtualliver do
-      get :edit, id: df.id
+      get :edit, params: { id: df.id }
       assert_response :success
       assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
     end
     as_not_virtualliver do
-      get :edit, id: df.id
+      get :edit, params: { id: df.id }
       assert_response :success
       assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
     end
@@ -130,7 +130,7 @@ class DataFilesControllerTest < ActionController::TestCase
     p2 = Factory :person
     df = Factory(:data_file, title: 'ZZZZZ', creators: [p2], contributor: p1, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
 
-    get :index, page: 'Z'
+    get :index, params: { page: 'Z' }
 
     # check the test is behaving as expected:
     assert_equal p1, df.contributor
@@ -149,7 +149,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(:registered_user_with_no_projects)
     data_file = Factory(:data_file, policy: Factory(:public_policy, access_type: Policy::EDITING))
 
-    put :update, id: data_file, data_file: { title: 'new title' }
+    put :update, params: { id: data_file, data_file: { title: 'new title' } }
 
     assert_response :redirect
   end
@@ -165,7 +165,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     refute_includes new_assay.data_files, d
     assert_difference('ActivityLog.count') do
-      put :update, id: d, data_file: { title: d.title, assay_assets_attributes: [{ assay_id: new_assay.id.to_s }] }
+      put :update, params: { id: d, data_file: { title: d.title, assay_assets_attributes: [{ assay_id: new_assay.id.to_s }] } }
     end
 
     assert_redirected_to data_file_path(d)
@@ -179,7 +179,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
-    get :index, page: 'all'
+    get :index, params: { page: 'all' }
     assert_response :success
     assert_equal assigns(:data_files).sort_by(&:id), DataFile.authorize_asset_collection(assigns(:data_files), 'view', users(:aaron)).sort_by(&:id), "data files haven't been authorized properly"
   end
@@ -198,7 +198,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [blob], policy_attributes: valid_sharing
+          post :create, params: { data_file: df, content_blobs: [blob], policy_attributes: valid_sharing }
         end
       end
     end
@@ -211,7 +211,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [{}], policy_attributes: valid_sharing
+          post :create, params: { data_file: df, content_blobs: [{}], policy_attributes: valid_sharing }
         end
       end
     end
@@ -225,7 +225,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
 
@@ -244,7 +244,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
 
@@ -265,7 +265,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, data_file: { title: 'Test' }, content_blobs: [{ data_url: uri.to_s }], policy_attributes: valid_sharing
+          post :create, params: { data_file: { title: 'Test' }, content_blobs: [{ data_url: uri.to_s }], policy_attributes: valid_sharing }
         end
       end
     end
@@ -281,8 +281,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, data_file: data, content_blobs: [blob],
-                        policy_attributes: valid_sharing
+          post :create, params: { data_file: data, content_blobs: [blob], policy_attributes: valid_sharing }
         end
       end
     end
@@ -303,8 +302,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, data_file: data, content_blobs: [blob],
-                        policy_attributes: valid_sharing
+          post :create, params: { data_file: data, content_blobs: [blob], policy_attributes: valid_sharing }
         end
       end
     end
@@ -323,7 +321,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [blob], policy_attributes: valid_sharing
+          post :create, params: { data_file: df, content_blobs: [blob], policy_attributes: valid_sharing }
         end
       end
     end
@@ -339,8 +337,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_difference('DataFile::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: assay.id }]),
-                 content_blobs: [blob], policy_attributes: valid_sharing
+            post :create, params: { data_file: data_file.merge(assay_assets_attributes: [{ assay_id: assay.id }]), content_blobs: [blob], policy_attributes: valid_sharing }
           end
         end
       end
@@ -365,7 +362,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_difference('DataFile::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing
+            post :create, params: { data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing }
           end
         end
       end
@@ -375,12 +372,12 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'upload_for_tool inacessible with normal login' do
-    post :upload_for_tool, data_file: { title: 'Test', data: fixture_file_upload('files/file_picture.png'), project_id: projects(:sysmo_project).id }, recipient_id: people(:quentin_person).id
+    post :upload_for_tool, params: { data_file: { title: 'Test', data: fixture_file_upload('files/file_picture.png'), project_id: projects(:sysmo_project).id }, recipient_id: people(:quentin_person).id }
     assert_redirected_to root_url
   end
 
   test 'upload_from_email inacessible with normal login' do
-    post :upload_from_email, data_file: { title: 'Test', data: fixture_file_upload('files/file_picture.png'), project_id: projects(:sysmo_project).id }, recipient_ids: [people(:quentin_person).id], cc_ids: []
+    post :upload_from_email, params: { data_file: { title: 'Test', data: fixture_file_upload('files/file_picture.png'), project_id: projects(:sysmo_project).id }, recipient_ids: [people(:quentin_person).id], cc_ids: [] }
     assert_redirected_to root_url
   end
 
@@ -388,9 +385,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         session[:xml_login] = true
-        post :upload_for_tool, data_file: { title: 'Test', project_id: projects(:sysmo_project).id },
-                               content_blobs: [{ data: file_for_upload }],
-                               recipient_id: people(:quentin_person).id
+        post :upload_for_tool, params: { data_file: { title: 'Test', project_id: projects(:sysmo_project).id }, content_blobs: [{ data: picture_file }], recipient_id: people(:quentin_person).id }
       end
     end
 
@@ -415,8 +410,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         session[:xml_login] = true
-        post :upload_from_email, data_file: { title: 'Test', project_ids: [projects(:sysmo_project).id] },
-                                 content_blobs: [{ data: file_for_upload }], recipient_ids: [people(:quentin_person).id], sender_id: users(:datafile_owner).person_id
+        post :upload_from_email, params: { data_file: { title: 'Test', project_ids: [projects(:sysmo_project).id] }, content_blobs: [{ data: picture_file }], recipient_ids: [people(:quentin_person).id], sender_id: users(:datafile_owner).person_id }
       end
     end
 
@@ -441,7 +435,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('ActivityLog.count') do
         assert_difference('DataFile.count') do
           assert_difference('ContentBlob.count') do
-            post :create, data_file: data_file, content_blobs: [blob]
+            post :create, params: { data_file: data_file, content_blobs: [blob] }
           end
         end
       end
@@ -461,7 +455,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should show data file' do
     d = Factory :rightfield_datafile, policy: Factory(:public_policy)
     assert_difference('ActivityLog.count') do
-      get :show, id: d
+      get :show, params: { id: d }
     end
     assert_response :success
 
@@ -483,7 +477,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
 
@@ -506,7 +500,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
 
@@ -529,7 +523,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         @request.env['HTTP_USER_AGENT'] = 'Windows'
-        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
 
@@ -551,7 +545,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert df.content_blob.is_webpage?
     login_as(df.contributor.user)
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :success
 
     assert_select '#buttons a.btn[href=?]', 'http://webpage.com', text: 'External Link'
@@ -569,7 +563,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert df.content_blob.show_as_external_link?
     login_as(df.contributor.user)
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :success
 
     assert_select '#buttons a.btn[href=?]', 'spotify:track:3vX71b5ey9twzyCqJwBEvY', text: 'External Link'
@@ -589,7 +583,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert df.can_view?(user)
     assert !df.can_download?(user)
     login_as(user)
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :success
 
     assert_select 'div.box_about_actor' do
@@ -606,21 +600,21 @@ class DataFilesControllerTest < ActionController::TestCase
     d = Factory :rightfield_datafile, title: '"Title with quote', policy: Factory(:public_policy)
 
     assert_difference('ActivityLog.count') do
-      get :show, id: d
+      get :show, params: { id: d }
     end
 
     assert_response :success
   end
 
   test 'should get edit' do
-    get :edit, id: data_files(:picture)
+    get :edit, params: { id: data_files(:picture) }
     assert_response :success
     assert_select 'h1', text: /Editing #{I18n.t('data_file')}/
     assert_select 'div.alert-info', text: /the #{I18n.t('data_file')}/i
   end
 
   test 'publications included in form for datafile' do
-    get :edit, id: data_files(:picture)
+    get :edit, params: { id: data_files(:picture) }
     assert_response :success
     assert_select 'div#add_publications_form', true
 
@@ -635,7 +629,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert df.content_blob.is_webpage?
     login_as(df.contributor.user)
     assert df.can_download?(df.contributor.user)
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :success
     assert_select '#buttons' do
       assert_select 'a[href=?]', download_data_file_path(df, version: df.version), count: 0
@@ -651,7 +645,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'show download button for non website data file' do
     df = Factory :data_file
     login_as(df.contributor.user)
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :success
     assert_select '#buttons' do
       assert_select 'a[href=?]', download_data_file_path(df, version: df.version), count: 1
@@ -667,7 +661,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory :rightfield_datafile, policy: Factory(:public_policy)
     login_as(df.contributor.user)
     assert_difference('ActivityLog.count') do
-      get :download, id: df.id
+      get :download, params: { id: df.id }
     end
     assert_response :success
     al = ActivityLog.last
@@ -680,7 +674,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'should download' do
     assert_difference('ActivityLog.count') do
-      get :download, id: Factory(:small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person).id
+      get :download, params: { id: Factory(:small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person).id }
     end
     assert_response :success
     assert_equal 'attachment; filename="small-test-spreadsheet.xls"', @response.header['Content-Disposition']
@@ -692,7 +686,7 @@ class DataFilesControllerTest < ActionController::TestCase
     mock_http
     data_file = data_files(:url_based_data_file)
     assert_difference('ActivityLog.count') do
-      get :download, id: data_files(:url_based_data_file)
+      get :download, params: { id: data_files(:url_based_data_file) }
     end
     assert_not_empty @response.body
     assert_response :success
@@ -701,7 +695,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should gracefully handle when downloading a unknown host url' do
     stub_request(:any, 'http://sdkfhsdfkhskfj.com/pic.png').to_raise(SocketError)
     df = data_files(:url_no_host_data_file)
-    get :download, id: df
+    get :download, params: { id: df }
     assert_redirected_to data_file_path(df, version: df.version)
     assert_not_nil flash[:error]
   end
@@ -709,7 +703,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should gracefully handle when downloading a url resulting in 404' do
     mock_http
     df = data_files(:url_not_found_data_file)
-    get :download, id: df
+    get :download, params: { id: df }
     assert_redirected_to data_file_path(df, version: df.version)
     assert_not_nil flash[:error]
   end
@@ -721,7 +715,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [blob], policy_attributes: valid_sharing
+          post :create, params: { data_file: df, content_blobs: [blob], policy_attributes: valid_sharing }
         end
       end
     end
@@ -734,7 +728,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'file.txt', assigns(:data_file).content_blob.original_filename
     assert_equal 'text/plain', assigns(:data_file).content_blob.content_type
 
-    get :download, id: assigns(:data_file)
+    get :download, params: { id: assigns(:data_file) }
 
     assert_redirected_to assigns(:data_file).content_blob.url
   end
@@ -746,7 +740,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [blob], policy_attributes: valid_sharing
+          post :create, params: { data_file: df, content_blobs: [blob], policy_attributes: valid_sharing }
         end
       end
     end
@@ -759,7 +753,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'file.txt', assigns(:data_file).content_blob.original_filename
     assert_equal 'text/plain', assigns(:data_file).content_blob.content_type
 
-    get :download, id: assigns(:data_file)
+    get :download, params: { id: assigns(:data_file) }
 
     assert_redirected_to assigns(:data_file).content_blob.url
   end
@@ -771,7 +765,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [blob], policy_attributes: valid_sharing
+          post :create, params: { data_file: df, content_blobs: [blob], policy_attributes: valid_sharing }
         end
       end
     end
@@ -784,7 +778,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal '', assigns(:data_file).content_blob.original_filename
     assert_equal 'text/html', assigns(:data_file).content_blob.content_type
 
-    get :download, id: assigns(:data_file)
+    get :download, params: { id: assigns(:data_file) }
     assert_response :success
   end
 
@@ -795,7 +789,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [blob], policy_attributes: valid_sharing
+          post :create, params: { data_file: df, content_blobs: [blob], policy_attributes: valid_sharing }
         end
       end
     end
@@ -808,7 +802,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal '', assigns(:data_file).content_blob.original_filename
     assert_equal 'text/html', assigns(:data_file).content_blob.content_type
 
-    get :download, id: assigns(:data_file)
+    get :download, params: { id: assigns(:data_file) }
     assert_response :success
   end
 
@@ -819,7 +813,7 @@ class DataFilesControllerTest < ActionController::TestCase
     FileUtils.rm df.content_blob.filepath
     assert !df.content_blob.file_exists?
 
-    get :download, id: df
+    get :download, params: { id: df }
 
     assert_redirected_to df
     assert flash[:error].match(/Unable to find a copy of the file for download/)
@@ -831,7 +825,7 @@ class DataFilesControllerTest < ActionController::TestCase
                  content_blob: Factory(:content_blob, data: data, content_type: 'images/png'),
                  policy: Factory(:downloadable_public_policy)
 
-    get :download, id: df, disposition: 'inline'
+    get :download, params: { id: df, disposition: 'inline' }
     assert_response :success
     assert @response.header['Content-Disposition'].include?('inline')
   end
@@ -842,21 +836,21 @@ class DataFilesControllerTest < ActionController::TestCase
                  content_blob: Factory(:content_blob, data: data, content_type: 'images/png'),
                  policy: Factory(:downloadable_public_policy)
 
-    get :download, id: df
+    get :download, params: { id: df }
     assert_response :success
     assert @response.header['Content-Disposition'].include?('attachment')
   end
 
   test "shouldn't download" do
     login_as(:aaron)
-    get :download, id: data_files(:viewable_data_file)
+    get :download, params: { id: data_files(:viewable_data_file) }
     assert_redirected_to data_file_path(data_files(:viewable_data_file))
     assert flash[:error]
   end
 
   test 'should update data file' do
     assert_difference('ActivityLog.count') do
-      put :update, id: data_files(:picture).id, data_file: { title: 'diff title' }
+      put :update, params: { id: data_files(:picture).id, data_file: { title: 'diff title' } }
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
@@ -866,7 +860,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count', -1) do
         assert_no_difference('ContentBlob.count') do
-          delete :destroy, id: data_files(:editable_data_file).id
+          delete :destroy, params: { id: data_files(:editable_data_file).id }
         end
       end
     end
@@ -875,13 +869,13 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should be possible to delete one version of data file' do
-    with_config_value :delete_asset_version_enabled,true do
+    with_config_value :delete_asset_version_enabled, true do
       # upload a data file
       df = Factory :data_file, contributor: User.current_user.person
       # upload new version 1 of the data file
-      post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 1'
+      post :new_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision 1' }
       # upload new version 2 of the data file
-      post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 2'
+      post :new_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision 2' }
 
       df.reload
       assert_equal 3, df.versions.length
@@ -890,7 +884,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_equal 3, df.version
 
       assert_difference('df.versions.length', -1) do
-        put :destroy_version, id: df, version: 3
+        put :destroy_version, params: { id: df, version: 3 }
         df.reload
       end
       # the latest version becomes 2
@@ -907,7 +901,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile::Version.count', 1) do
       assert_difference('StudiedFactor.count', 1) do
-        post :new_version, id: d, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' # v2
+        post :new_version, params: { id: d, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
       end
     end
 
@@ -926,7 +920,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   def test_should_add_nofollow_to_links_in_show_page
     assert_difference('ActivityLog.count') do
-      get :show, id: data_files(:data_file_with_links_in_description)
+      get :show, params: { id: data_files(:data_file_with_links_in_description) }
     end
 
     assert_select 'div#description' do
@@ -938,7 +932,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(:datafile_owner) # this user is a member of sysmo, and can edit this data file
     df = data_files(:data_file_with_no_contributor)
     assert_difference('ActivityLog.count') do
-      put :update, id: df, data_file: { title: 'blah blah blah blah' }
+      put :update, params: { id: df, data_file: { title: 'blah blah blah blah' } }
     end
 
     updated_df = assigns(:data_file)
@@ -956,7 +950,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = DataFile.find(df.id)
     assert df.attributions.collect(&:other_object).include?(jerm_file), 'The datafile should have had the jerm file added as an attribution'
     assert_difference('ActivityLog.count') do
-      get :show, id: df
+      get :show, params: { id: df }
     end
 
     assert_response :success
@@ -965,31 +959,31 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'filtering by assay' do
     assay = assays(:metabolomics_assay)
-    get :index, filter: { assay: assay.id }
+    get :index, params: { filter: { assay: assay.id } }
     assert_response :success
   end
 
   test 'filtering by study' do
     study = studies(:metabolomics_study)
-    get :index, filter: { study: study.id }
+    get :index, params: { filter: { study: study.id } }
     assert_response :success
   end
 
   test 'filtering by investigation' do
     inv = investigations(:metabolomics_investigation)
-    get :index, filter: { investigation: inv.id }
+    get :index, params: { filter: { investigation: inv.id } }
     assert_response :success
   end
 
   test 'filtering by project' do
     project = projects(:sysmo_project)
-    get :index, filter: { project: project.id }
+    get :index, params: { filter: { project: project.id } }
     assert_response :success
   end
 
   test 'filtering by person' do
     person = people(:person_for_datafile_owner)
-    get :index, filter: { person: person.id }, page: 'all'
+    get :index, params: { filter: { person: person.id }, page: 'all' }
     assert_response :success
     df = data_files(:downloadable_data_file)
     df2 = data_files(:sysmo_data_file)
@@ -1007,7 +1001,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !df.can_manage?(user), 'data file should be editable but not manageable for this test'
     assert_equal Policy::EDITING, df.policy.access_type, 'data file should have an initial policy with access type for editing'
     assert_difference('ActivityLog.count') do
-      put :update, id: df, data_file: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS }
+      put :update, params: { id: df, data_file: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS } }
     end
 
     assert_redirected_to data_file_path(df)
@@ -1025,11 +1019,10 @@ class DataFilesControllerTest < ActionController::TestCase
     refute df.can_manage?(user), 'data file should be editable but not manageable for this test'
     assert_equal Policy::EDITING, df.policy.access_type, 'data file should have an initial policy with access type for editing'
     assert_difference('ActivityLog.count') do
-      put :update, id: df, data_file: { title: 'new title' },
-                   policy_attributes: { access_type: Policy::NO_ACCESS,
+      put :update, params: { id: df, data_file: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS,
                                         permissions_attributes: { contributor_type: 'Person',
                                                                   contributor_id: user.person.id,
-                                                                  access_type: Policy::MANAGING } }
+                                                                  access_type: Policy::MANAGING } } }
     end
 
     assert_redirected_to data_file_path(df)
@@ -1039,7 +1032,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'fail gracefullly when trying to access a missing data file' do
-    get :show, id: 99_999
+    get :show, params: { id: 99_999 }
     assert_response :not_found
   end
 
@@ -1053,7 +1046,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert df.can_manage?(user), 'data file should be editable and manageable for this test'
     assert_equal Policy::EDITING, df.policy.access_type, 'data file should have an initial policy with access type for editing'
     assert_difference('ActivityLog.count') do
-      put :update, id: df, data_file: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS }
+      put :update, params: { id: df, data_file: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS } }
     end
 
     assert_redirected_to data_file_path(df)
@@ -1076,7 +1069,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     golf = Factory :tag, annotatable: dummy_df, source: p2, value: 'golf'
 
-    xml_http_request :post, :update_annotations_ajax, id: viewable_df, tag_list: golf.value.text
+    post :update_annotations_ajax, xhr: true, params: { id: viewable_df, tag_list: golf.value.text }
 
     viewable_df.reload
 
@@ -1087,7 +1080,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !private_df.can_view?(p.user)
     assert !private_df.can_edit?(p.user)
 
-    xml_http_request :post, :update_annotations_ajax, id: private_df, tag_list: golf.value.text
+    post :update_annotations_ajax, xhr: true, params: { id: private_df, tag_list: golf.value.text }
 
     private_df.reload
     assert private_df.annotations.empty?
@@ -1112,7 +1105,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal [], df.annotations.select { |a| a.source == p.user }.collect { |a| a.value.text }.sort
     assert_equal %w[golf sparrow], df.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
-    xml_http_request :post, :update_annotations_ajax, id: df, tag_list: "soup, #{golf.value.text}"
+    post :update_annotations_ajax, xhr: true, params: { id: df, tag_list: "soup, #{golf.value.text}" }
 
     df.reload
 
@@ -1124,7 +1117,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'correct response to unknown action' do
     df = data_files(:picture)
     assert_raises ActionController::UrlGenerationError do
-      get :sdkfjshdfkhsdf, id: df
+      get :sdkfjshdfkhsdf, params: { id: df }
     end
   end
 
@@ -1133,16 +1126,16 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert !df.can_download?, 'The datafile must not be downloadable for this test to succeed'
     assert_difference('ActivityLog.count') do
-      get :show, id: df
+      get :show, params: { id: df }
     end
 
     assert_response :success
-    assert_select '#request_resource_button > a', text: /Request #{I18n.t('data_file')}/, count: 1
+    assert_select '#request_resource_button', text: /Request #{I18n.t('data_file')}/, count: 1
 
     logout
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :success
-    assert_select '#request_resource_button > a', text: /Request #{I18n.t('data_file')}/, count: 0
+    assert_select '#request_resource_button', text: /Request #{I18n.t('data_file')}/, count: 0
   end
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
@@ -1151,8 +1144,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, data_file: data_file, content_blobs: [blob],
-                        policy_attributes: projects_policy(Policy::VISIBLE, data_file[:project_ids], Policy::ACCESSIBLE)
+          post :create, params: { data_file: data_file, content_blobs: [blob], policy_attributes: projects_policy(Policy::VISIBLE, data_file[:project_ids], Policy::ACCESSIBLE) }
         end
       end
     end
@@ -1185,8 +1177,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal permission.policy_id, df.policy_id
     assert_equal permission.access_type, Policy::NO_ACCESS
     assert_difference('ActivityLog.count') do
-      put :update, id: df, data_file: { title: df.title },
-                   policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING)
+      put :update, params: { id: df, data_file: { title: df.title }, policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING) }
     end
     df.reload
 
@@ -1207,7 +1198,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     login_as(df.contributor)
 
-    put :update, id: df, data_file: { title: df.title }, policy_attributes: projects_policy(Policy::NO_ACCESS, df.projects, Policy::ACCESSIBLE)
+    put :update, params: { id: df, data_file: { title: df.title }, policy_attributes: projects_policy(Policy::NO_ACCESS, df.projects, Policy::ACCESSIBLE) }
 
     assert_redirected_to df
 
@@ -1223,7 +1214,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'explore logged as inline_view' do
     data = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy)
     assert_difference('ActivityLog.count') do
-      get :explore, id: data
+      get :explore, params: { id: data }
     end
     assert_response :success
     al = ActivityLog.last
@@ -1235,21 +1226,23 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'explore latest version' do
     data = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy)
-    get :explore, id: data
+    get :explore, params: { id: data }
     assert_response :success
   end
 
   test 'explore earlier version' do
     df = data_files(:downloadable_spreadsheet_data_file)
+    assert df.can_edit?
     df.versions.first.content_blob.save # Need to do this as file_size isn't set when loading from fixture
-    get :explore, id: df, version: 1
+    assert df.can_download?
+    get :explore, params: { id: df, version: 1 }
 
     assert_response :success
   end
 
   test 'gracefully handles explore with no spreadsheet' do
     df = data_files(:picture)
-    get :explore, id: df, version: 1
+    get :explore, params: { id: df, version: 1 }
     assert_redirected_to data_file_path(df, version: 1)
     assert flash[:error]
   end
@@ -1259,7 +1252,7 @@ class DataFilesControllerTest < ActionController::TestCase
                  policy: Factory(:public_policy),
                  content_blob: Factory(:small_test_spreadsheet_content_blob, data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read))
     assert df.can_download?
-    get :explore, id: df
+    get :explore, params: { id: df }
     assert_response :success
     assert_select 'td', text: 'A link to BBC', count: 1
     assert_select 'td a[href=?][target=_blank]', 'http://bbc.co.uk/news', count: 1
@@ -1270,7 +1263,7 @@ class DataFilesControllerTest < ActionController::TestCase
                  policy: Factory(:public_policy),
                  content_blob: Factory(:small_test_spreadsheet_content_blob, data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read))
 
-    get :explore, id: df
+    get :explore, params: { id: df }
     assert_response :success
 
     min_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS
@@ -1300,7 +1293,7 @@ class DataFilesControllerTest < ActionController::TestCase
                  content_blob: Factory(:small_test_spreadsheet_content_blob,
                                        data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read))
 
-    get :explore, id: df, page_rows: 5
+    get :explore, params: { id: df, page_rows: 5 }
     assert_response :success
     assert_select 'div#spreadsheet_1' do
       assert_select 'div.row_heading', count: 5
@@ -1315,7 +1308,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                        data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read))
 
     page_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS / 2 + 1
-    get :explore, id: df, page_rows: page_rows
+    get :explore, params: { id: df, page_rows: page_rows }
     assert_response :success
 
     assert_select 'div#paginate_sheet_1' do
@@ -1346,7 +1339,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal Policy::NO_ACCESS, data_file.policy.access_type
     login_as(uploader)
 
-    put :update, id: data_file, data_file: { title: data_file.title }, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, params: { id: data_file, data_file: { title: data_file.title }, policy_attributes: { access_type: Policy::VISIBLE } }
 
     assert_equal Policy::VISIBLE, assigns(:data_file).policy.access_type
     assert_nil flash[:error]
@@ -1362,7 +1355,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person.user)
     assert data_file.can_manage?
 
-    put :update, id: data_file, data_file: { title: data_file.title }, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, params: { id: data_file, data_file: { title: data_file.title }, policy_attributes: { access_type: Policy::VISIBLE } }
 
     assert_equal Policy::VISIBLE, assigns(:data_file).policy.access_type
     assert_nil flash[:error]
@@ -1377,7 +1370,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person.user)
     assert data_file.can_manage?
 
-    put :update, id: data_file, data_file: { title: data_file.title }, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, params: { id: data_file, data_file: { title: data_file.title }, policy_attributes: { access_type: Policy::VISIBLE } }
 
     assert_equal Policy::VISIBLE, assigns(:data_file).policy.access_type
     assert_nil flash[:error]
@@ -1431,31 +1424,31 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'should show the latest version if the params[:version] is not specified' do
     data_file = data_files(:editable_data_file)
-    get :show, id: data_file
+    get :show, params: { id: data_file }
     assert_response :success
     assert_nil flash[:error]
 
     logout
     published_data_file = Factory(:data_file, policy: Factory(:public_policy))
-    get :show, id: published_data_file
+    get :show, params: { id: published_data_file }
     assert_response :success
     assert_nil flash[:error]
   end
 
   test 'should show the correct version' do
     data_file = data_files(:downloadable_spreadsheet_data_file)
-    get :show, id: data_file, version: 1
+    get :show, params: { id: data_file, version: 1 }
     assert_response :success
     assert_nil flash[:error]
 
-    get :show, id: data_file, version: 2
+    get :show, params: { id: data_file, version: 2 }
     assert_response :success
     assert_nil flash[:error]
   end
 
   test 'should show error for the incorrect version' do
     data_file = data_files(:editable_data_file)
-    get :show, id: data_file, version: 2
+    get :show, params: { id: data_file, version: 2 }
     assert_redirected_to root_path
     assert_not_nil flash[:error]
   end
@@ -1463,13 +1456,13 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should not show private data file to logged out user' do
     df = Factory :data_file
     logout
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :forbidden
   end
 
   test 'should not show private data file to another user' do
     df = Factory :data_file, contributor: Factory(:person)
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :forbidden
   end
 
@@ -1481,22 +1474,22 @@ class DataFilesControllerTest < ActionController::TestCase
     published_data_file.reload
 
     logout
-    get :show, id: published_data_file, version: 1
+    get :show, params: { id: published_data_file, version: 1 }
     assert_redirected_to root_path
     assert_not_nil flash[:error]
 
-    flash[:error] = nil
-    get :show, id: published_data_file, version: 2
+    clear_flash(:error)
+    get :show, params: { id: published_data_file, version: 2 }
     assert_response :success
     assert_nil flash[:error]
 
     login_as(Factory(:user_not_in_project))
-    get :show, id: published_data_file, version: 1
+    get :show, params: { id: published_data_file, version: 1 }
     assert_redirected_to root_path
     assert_not_nil flash[:error]
 
-    flash[:error] = nil
-    get :show, id: published_data_file, version: 2
+    clear_flash(:error)
+    get :show, params: { id: published_data_file, version: 2 }
     assert_response :success
     assert_nil flash[:error]
   end
@@ -1504,7 +1497,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should set the other creators ' do
     data_file = data_files(:picture)
     assert data_file.can_manage?, 'The data file must be manageable for this test to succeed'
-    put :update, id: data_file, data_file: { other_creators: 'marry queen' }
+    put :update, params: { id: data_file, data_file: { other_creators: 'marry queen' } }
     data_file.reload
     assert_equal 'marry queen', data_file.other_creators
   end
@@ -1522,7 +1515,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file = data_files(:picture)
     data_file.other_creators = 'another creator'
     data_file.save
-    get :show, id: data_file
+    get :show, params: { id: data_file }
 
     assert_select 'div', text: 'another creator', count: 1
   end
@@ -1552,8 +1545,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_empty Subscription.all
 
     df_param = { title: 'Test', project_ids: [proj.id] }
-    blob = { data: file_for_upload }
-    post :create, data_file: df_param, content_blobs: [blob], policy_attributes: valid_sharing
+    blob = { data: picture_file }
+    post :create, params: { data_file: df_param, content_blobs: [blob], policy_attributes: valid_sharing }
 
     df = assigns(:data_file)
 
@@ -1571,7 +1564,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory(:data_file, policy: Factory(:public_policy))
     project = df.projects.first
     df2 = Factory(:data_file, policy: Factory(:public_policy))
-    get :index, project_id: project.id
+    get :index, params: { project_id: project.id }
     assert_response :success
     assert_select 'div.list_item_title' do
       assert_select 'a[href=?]', data_file_path(df), text: df.title
@@ -1583,7 +1576,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory(:data_file, policy: Factory(:public_policy))
     project = df.projects.first
     df2 = Factory(:data_file, policy: Factory(:public_policy))
-    get :index, project_id: project.id
+    get :index, params: { project_id: project.id }
     assert_response :success
     assert_select '#resource-count-stats', count: 0
   end
@@ -1592,7 +1585,7 @@ class DataFilesControllerTest < ActionController::TestCase
     Factory :data_file # needs a data file to be sure that the problem being fixed is triggered
     study_id = 999
     assert_nil Study.find_by_id(study_id)
-    get :index, study_id: study_id
+    get :index, params: { study_id: study_id }
     assert_response :not_found
   end
 
@@ -1600,14 +1593,14 @@ class DataFilesControllerTest < ActionController::TestCase
     Factory :data_file # needs a data file to be sure that the problem being fixed is triggered
     project_id = 999
     assert_nil Project.find_by_id(project_id)
-    get :index, project_id: project_id
+    get :index, params: { project_id: project_id }
     assert_response :not_found
   end
 
   test 'handles nil description' do
     df = Factory(:data_file, description: nil, policy: Factory(:public_policy))
 
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :success
   end
 
@@ -1618,7 +1611,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     df = Factory(:data_file, description: desc, policy: Factory(:public_policy))
 
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :success
     assert_select 'div#description' do
       assert_select 'p'
@@ -1642,7 +1635,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df3 = Factory(:data_file, contributor: Factory(:person), creators: [person1], policy: Factory(:public_policy))
     df4 = Factory(:data_file, contributor: Factory(:person), creators: [person2], policy: Factory(:public_policy))
 
-    get :index, person_id: person1.id
+    get :index, params: { person_id: person1.id }
     assert_response :success
 
     assert_select 'div.list_item_title' do
@@ -1656,7 +1649,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'edit should include tags element' do
     df = Factory(:data_file, policy: Factory(:public_policy))
-    get :edit, id: df.id
+    get :edit, params: { id: df.id }
     assert_response :success
 
     assert_select 'div.panel-heading', text: /Tags/, count: 1
@@ -1673,7 +1666,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'edit should include not include tags element when tags disabled' do
     with_config_value :tagging_enabled, false do
       df = Factory(:data_file, policy: Factory(:public_policy))
-      get :edit, id: df.id
+      get :edit, params: { id: df.id }
       assert_response :success
 
       assert_select 'div.panel-heading', text: /Tags/, count: 0
@@ -1692,7 +1685,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'get data_file as json' do
     df = Factory(:data_file, policy: Factory(:public_policy), title: 'fish flop', description: 'testing json description')
-    get :show, id: df, format: 'json'
+    get :show, params: { id: df, format: 'json' }
     assert_response :success
     json = JSON.parse(response.body)
     assert_equal df.id, json['data']['id'].to_i
@@ -1705,7 +1698,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory(:data_file, policy: Factory(:private_policy), title: 'fish flop', description: 'testing json description')
     assert !df.can_view?
 
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :forbidden
     assert_select 'h2', text: /The #{I18n.t('data_file')} is not visible to you./
 
@@ -1726,7 +1719,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !df.can_view?
     assert df.can_see_hidden_item?(user.person)
 
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :forbidden
     assert_select 'h2', text: /The #{I18n.t('data_file')} is not visible to you./
 
@@ -1742,13 +1735,13 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !df.can_view?
     assert AssetDoiLog.was_doi_minted_for?(df.class.name, df.id, df.version)
 
-    get :show, id: df
+    get :show, params: { id: df }
     assert_response :forbidden
     assert_select 'p.comment', text: /#{comment}/
   end
 
   test 'landing page for non-existing private_item' do
-    get :show, id: 123
+    get :show, params: { id: 123 }
     assert_response :not_found
     assert_select 'h1', text: '404'
     assert_select 'h2', text: 'The requested page or resource does not exist.'
@@ -1762,7 +1755,7 @@ class DataFilesControllerTest < ActionController::TestCase
     AssetDoiLog.create(asset_type: klass, asset_id: id, asset_version: version, action: AssetDoiLog::MINT)
     AssetDoiLog.create(asset_type: klass, asset_id: id, asset_version: version, action: AssetDoiLog::DELETE, comment: comment)
     assert AssetDoiLog.was_doi_minted_for?(klass, id, version)
-    get :show, id: id, version: version
+    get :show, params: { id: id, version: version }
     assert_response :not_found
     assert_select 'p[class=comment]', text: /#{comment}/
   end
@@ -1782,7 +1775,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, params
+          post :create, params: params
         end
       end
     end
@@ -1813,7 +1806,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
         assert_difference('DataFile.count') do
           assert_difference('ContentBlob.count') do
-            post :create, params
+            post :create, params: params
           end
         end
       end
@@ -1845,7 +1838,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
         assert_difference('DataFile.count') do
           assert_difference('ContentBlob.count') do
-            post :create, params
+            post :create, params: params
           end
         end
       end
@@ -1877,7 +1870,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, params
+          post :create, params: params
         end
       end
     end
@@ -1907,7 +1900,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, params
+          post :create, params: params
         end
       end
     end
@@ -1937,7 +1930,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, params
+          post :create, params: params
         end
       end
     end
@@ -1969,7 +1962,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, params
+          post :create, params: params
         end
       end
     end
@@ -2000,7 +1993,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, params
+        post :create, params: params
       end
     end
 
@@ -2022,7 +2015,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, params
+        post :create, params: params
       end
     end
 
@@ -2033,7 +2026,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should display null license text' do
     df = Factory :data_file, policy: Factory(:public_policy)
 
-    get :show, id: df
+    get :show, params: { id: df }
 
     assert_select '.panel .panel-body span#null_license', text: I18n.t('null_license')
   end
@@ -2041,7 +2034,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should display license' do
     df = Factory :data_file, license: 'CC-BY-4.0', policy: Factory(:public_policy)
 
-    get :show, id: df
+    get :show, params: { id: df }
 
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
   end
@@ -2052,11 +2045,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
     df.update_attributes license: 'CC0-1.0'
 
-    get :show, id: df, version: 1
+    get :show, params: { id: df, version: 1 }
     assert_response :success
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
 
-    get :show, id: df, version: dfv.version
+    get :show, params: { id: df, version: dfv.version }
     assert_response :success
     assert_select '.panel .panel-body a', text: 'CC0 1.0'
   end
@@ -2067,11 +2060,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_nil df.license
 
-    put :update, id: df, data_file: { license: 'CC-BY-SA-4.0' }
+    put :update, params: { id: df, data_file: { license: 'CC-BY-SA-4.0' } }
 
     assert_response :redirect
 
-    get :show, id: df
+    get :show, params: { id: df }
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share-Alike 4.0'
     assert_equal 'CC-BY-SA-4.0', assigns(:data_file).license
   end
@@ -2079,13 +2072,13 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'check correct license pre-selected' do
     df = Factory :data_file, license: 'CC-BY-SA-4.0', policy: Factory(:public_policy)
 
-    get :edit, id: df
+    get :edit, params: { id: df }
     assert_response :success
     assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution Share-Alike 4.0'
 
     df2 = Factory :data_file, license: nil, policy: Factory(:public_policy)
 
-    get :edit, id: df2
+    get :edit, params: { id: df2 }
     assert_response :success
     assert_select '#license-select option[selected=?]', 'selected', text: I18n.t('null_license')
 
@@ -2133,7 +2126,7 @@ class DataFilesControllerTest < ActionController::TestCase
     disable_authorization_checks{sample_type.save!}
     refute sample_type.can_view?
 
-    get :select_sample_type, id: data_file
+    get :select_sample_type, params: { id: data_file }
 
     assert_select 'select[name=sample_type_id] option', count: 2
     assert_select 'select[name=sample_type_id] option', text:'visible1'
@@ -2152,21 +2145,21 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     login_as(person.user)
 
-    get :filter, filter: 'no'
+    get :filter, params: { filter: 'no' }
     assert_select 'a', text: /no samples/, count: 1
     assert_response :success
 
-    get :filter, filter: '', with_samples: 'true'
+    get :filter, params: { filter: '', with_samples: 'true' }
     assert_select 'a', count: 3
     assert_select 'a', text: /no samples/, count: 0
     assert_response :success
 
-    get :filter, filter: 'f', with_samples: 'true'
+    get :filter, params: { filter: 'f', with_samples: 'true' }
     assert_select 'a', count: 2
     assert_select 'a', text: /fish/
     assert_select 'a', text: /frog/
 
-    get :filter, filter: 'fi', with_samples: 'true'
+    get :filter, params: { filter: 'fi', with_samples: 'true' }
     assert_select 'a', count: 1
     assert_select 'a', text: /fish/
   end
@@ -2186,23 +2179,23 @@ class DataFilesControllerTest < ActionController::TestCase
 
     login_as(person.user)
 
-    get :filter, filter: 'datax'
+    get :filter, params: { filter: 'datax' }
     assert_select 'a', count: 2
     assert_select 'a', text: /datax1./, count: 2
     assert_select 'a', text: /datax2./, count: 0
     assert_response :success
 
-    get :filter, filter: 'datax', all_projects: 'true'
+    get :filter, params: { filter: 'datax', all_projects: 'true' }
     assert_select 'a', count: 4
     assert_select 'a', text: /datax./, count: 4
     assert_response :success
 
-    get :filter, filter: 'datax', all_projects: 'true', simulation_data: 'true'
+    get :filter, params: { filter: 'datax', all_projects: 'true', simulation_data: 'true' }
     assert_select 'a', count: 1
     assert_select 'a', text: /datax2b/, count: 1
     assert_response :success
 
-    get :filter, filter: 'datax', simulation_data: 'true'
+    get :filter, params: { filter: 'datax', simulation_data: 'true' }
     assert response.body.blank?
     assert_response :success
   end
@@ -2213,7 +2206,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file = Factory(:data_file, projects: programme.projects, policy: Factory(:public_policy))
     data_file2 = Factory(:data_file, policy: Factory(:public_policy))
 
-    get :index, programme_id: programme.id
+    get :index, params: { programme_id: programme.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -2231,7 +2224,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     login_as(data_file.contributor)
 
-    get :samples_table, format: :json, id: data_file.id
+    get :samples_table, params: { format: :json, id: data_file.id }
 
     assert_response :success
 
@@ -2247,7 +2240,7 @@ class DataFilesControllerTest < ActionController::TestCase
                        originating_data_file: data_file)
     end
 
-    get :samples_table, format: :json, id: data_file.id
+    get :samples_table, params: { format: :json, id: data_file.id }
 
     assert_response :forbidden
   end
@@ -2273,7 +2266,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(another_person)
 
     assert_no_difference('Sample.count') do
-      post :extract_samples, id: data_file, confirm: 'true'
+      post :extract_samples, params: { id: data_file, confirm: 'true' }
     end
 
     assert_redirected_to data_file_path(data_file)
@@ -2302,7 +2295,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.save!
 
     assert_difference('Sample.count', 3) do
-      post :extract_samples, id: data_file.id, confirm: 'true'
+      post :extract_samples, params: { id: data_file.id, confirm: 'true' }
     end
 
     assert(samples = assigns(:samples))
@@ -2329,7 +2322,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.save!
 
     assert_difference('Sample.count', 3) do
-      post :extract_samples, id: data_file.id, confirm: 'true'
+      post :extract_samples, params: { id: data_file.id, confirm: 'true' }
     end
 
     assert_redirected_to data_file_path(data_file)
@@ -2374,7 +2367,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.save!
 
     assert_difference('Sample.count', 0) do
-      post :extract_samples, id: data_file.id
+      post :extract_samples, params: { id: data_file.id }
     end
 
     assert_redirected_to select_sample_type_data_file_path(data_file) # Test for this is in data_files_controller_test
@@ -2400,7 +2393,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('Sample.count') do
       assert_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count", 1) do
-        post :extract_samples, id: data_file.id
+        post :extract_samples, params: { id: data_file.id }
       end
     end
 
@@ -2427,7 +2420,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                         originating_data_file: data_file, contributor: person),
 
     assert_no_difference('Sample.count') do
-      post :extract_samples, id: data_file, confirm: 'true'
+      post :extract_samples, params: { id: data_file, confirm: 'true' }
     end
 
     assert_redirected_to data_file_path(data_file)
@@ -2441,13 +2434,13 @@ class DataFilesControllerTest < ActionController::TestCase
 
     login_as(data_file.contributor)
 
-    get :show, id: data_file
+    get :show, params: { id: data_file }
     assert_response :success
     assert_select '#snapshot-citation', text: /Bacall, F/, count:0
 
     data_file.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
-    get :show, id: data_file
+    get :show, params: { id: data_file }
     assert_response :success
     assert_select '#snapshot-citation', text: /Bacall, F/, count:1
   end
@@ -2472,13 +2465,13 @@ class DataFilesControllerTest < ActionController::TestCase
     df = data_file_with_extracted_samples
 
     assert_no_difference('DataFile.count') do
-      delete :destroy, id: df.id
+      delete :destroy, params: { id: df.id }
     end
     assert_redirected_to destroy_samples_confirm_data_file_path(df)
 
     assert_difference('DataFile.count', -1) do
       assert_difference('Sample.count', -4) do
-        delete :destroy, id: df.id, destroy_extracted_samples: '1'
+        delete :destroy, params: { id: df.id, destroy_extracted_samples: '1' }
       end
     end
 
@@ -2488,7 +2481,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count', -1) do
       assert_no_difference('Sample.count') do
-        delete :destroy, id: df.id, destroy_extracted_samples: '0'
+        delete :destroy, params: { id: df.id, destroy_extracted_samples: '0' }
       end
     end
 
@@ -2499,7 +2492,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(Factory(:person))
     df = data_file_with_extracted_samples
     assert df.can_delete?
-    get :destroy_samples_confirm, id: df.id
+    get :destroy_samples_confirm, params: { id: df.id }
     assert_response :success
   end
 
@@ -2507,7 +2500,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(Factory(:person))
     df = data_file_with_extracted_samples(Factory(:person))
     refute df.can_delete?
-    get :destroy_samples_confirm, id: df.id
+    get :destroy_samples_confirm, params: { id: df.id }
     assert_redirected_to data_file_path(df)
     refute_nil flash[:error]
   end
@@ -2517,8 +2510,7 @@ class DataFilesControllerTest < ActionController::TestCase
     Factory(:sample, originating_data_file: data_file, contributor: User.current_user.person)
 
     assert_no_difference('DataFile::Version.count') do
-      post :new_version, id: data_file.id, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }],
-                         revision_comments: 'This is a new revision'
+      post :new_version, params: { id: data_file.id, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to data_file
@@ -2530,7 +2522,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(Factory(:person))
     df = openbis_linked_data_file
 
-    get :show, id: df.id
+    get :show, params: { id: df.id }
     assert_response :success
     assert assigns(:data_file)
     assert_equal df, assigns(:data_file)
@@ -2542,7 +2534,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(Factory(:person))
     df = openbis_linked_data_file
 
-    get :show, id: df.id
+    get :show, params: { id: df.id }
     assert_response :success
     assert assigns(:data_file)
     assert_equal df, assigns(:data_file)
@@ -2558,8 +2550,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('DataFile.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: assay.id }]),
-             content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { data_file: data_file.merge(assay_assets_attributes: [{ assay_id: assay.id }]), content_blobs: [blob], policy_attributes: valid_sharing }
 
       end
     end
@@ -2573,7 +2564,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file = Factory(:jerm_data_file,
                         content_blob: Factory(:txt_content_blob, url: 'http://project.jerm/file.txt', data: 'jkl'),
                         policy: Factory(:public_policy))
-    get :download, id: data_file
+    get :download, params: { id: data_file }
     assert_equal 'abc', @response.body
     assert_response :success
   end
@@ -2583,7 +2574,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file = Factory(:jerm_data_file,
                         content_blob: Factory(:txt_content_blob, url: 'http://mocked404.com', data: 'xyz'),
                         policy: Factory(:public_policy))
-    get :download, id: data_file
+    get :download, params: { id: data_file }
     assert_equal 'xyz', @response.body
     assert_response :success
   end
@@ -2593,7 +2584,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file = Factory(:jerm_data_file,
                         content_blob: Factory(:txt_content_blob, url: 'http://gone-project.jerm/file.txt', data: 'qwe'),
                         policy: Factory(:public_policy))
-    get :download, id: data_file
+    get :download, params: { id: data_file }
     assert_equal 'qwe', @response.body
     assert_response :success
   end
@@ -2610,7 +2601,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('Sample.count') do
       assert_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count", 1) do
         VCR.use_cassette('nels/get_sample_metadata') do
-          post :retrieve_nels_sample_metadata, id: data_file
+          post :retrieve_nels_sample_metadata, params: { id: data_file }
 
           assert_redirected_to data_file
         end
@@ -2633,7 +2624,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('Sample.count') do
       assert_no_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count") do
         VCR.use_cassette('nels/missing_sample_metadata') do
-          post :retrieve_nels_sample_metadata, id: data_file
+          post :retrieve_nels_sample_metadata, params: { id: data_file }
 
           assert_redirected_to data_file
           assert flash[:error].include?('No sample metadata')
@@ -2660,7 +2651,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('Sample.count') do
       assert_no_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count") do
         VCR.use_cassette('nels/get_sample_metadata') do
-          post :retrieve_nels_sample_metadata, id: data_file
+          post :retrieve_nels_sample_metadata, params: { id: data_file }
 
           assert_redirected_to oauth_client.authorize_url
         end
@@ -2675,7 +2666,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @user.person, assay_ids: [@assay.id],
                                     content_blob: Factory(:url_content_blob, url: nels_url))
 
-    get :show, id: data_file
+    get :show, params: { id: data_file }
 
     assert_response :success
 
@@ -2691,7 +2682,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_equal df.reload.policy.sharing_scope, Policy::ALL_USERS
 
-    put :update, id: df, data_file: { title: df.title }, policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING)
+    put :update, params: { id: df, data_file: { title: df.title }, policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING) }
 
     assert_redirected_to data_file_path(df)
     assert_nil df.reload.policy.sharing_scope
@@ -2716,7 +2707,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('AssayAsset.count', 4) do
       assert_difference('Sample.count', 4) do
-        post :extract_samples, id: data_file.id, confirm: 'true', assay_ids: [assay_asset1.assay_id]
+        post :extract_samples, params: { id: data_file.id, confirm: 'true', assay_ids: [assay_asset1.assay_id] }
       end
     end
 
@@ -2729,9 +2720,9 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'create content blob' do
     person = Factory(:person)
     login_as(person)
-    blob = { data: file_for_upload }
+    blob = { data: picture_file }
     assert_difference('ContentBlob.count') do
-      post :create_content_blob, content_blobs: [blob]
+      post :create_content_blob, params: { content_blobs: [blob] }
     end
     assert_response :success
     assert df = assigns(:data_file)
@@ -2741,9 +2732,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'create content blob requires login' do
     logout
-    blob = { data: file_for_upload }
+    blob = { data: picture_file }
     assert_no_difference('ContentBlob.count') do
-      post :create_content_blob, content_blobs: [blob]
+      post :create_content_blob, params: { content_blobs: [blob] }
     end
     assert_response :redirect
   end
@@ -2755,7 +2746,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     session[:uploaded_content_blob_id] = content_blob.id.to_s
 
-    post :rightfield_extraction_ajax, content_blob_id: content_blob.id.to_s, format: 'js'
+    post :rightfield_extraction_ajax, params: { content_blob_id: content_blob.id.to_s, format: 'js' }
 
     assert_response :success
     assert data_file = assigns(:data_file)
@@ -2788,7 +2779,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_no_difference('Assay.count') do
           assert_no_difference('AssayAsset.count') do
-            post :create_metadata, params
+            post :create_metadata, params: params
           end
         end
       end
@@ -2833,7 +2824,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_no_difference('Assay.count') do
           assert_difference('AssayAsset.count') do
-            post :create_metadata, params
+            post :create_metadata, params: params
           end
         end
       end
@@ -2866,7 +2857,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_no_difference('Assay.count') do
           assert_no_difference('AssayAsset.count') do
-            post :create_metadata, params
+            post :create_metadata, params: params
           end
         end
       end
@@ -2891,7 +2882,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
-        post :create_metadata, params
+        post :create_metadata, params: params
       end
     end
 
@@ -2916,7 +2907,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
-        post :create_metadata, params
+        post :create_metadata, params: params
       end
     end
 
@@ -2939,7 +2930,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
-        post :create_metadata, params
+        post :create_metadata, params: params
       end
     end
 
@@ -2964,7 +2955,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
-        post :create_metadata, params
+        post :create_metadata, params: params
       end
     end
 
@@ -2988,7 +2979,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
-        post :create_metadata, params
+        post :create_metadata, params: params
       end
     end
 
@@ -3032,7 +3023,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_difference('Assay.count') do
           assert_difference('AssayAsset.count', 2) do
-            post :create_metadata, params
+            post :create_metadata, params: params
           end
         end
       end
@@ -3103,7 +3094,7 @@ class DataFilesControllerTest < ActionController::TestCase
         assert_difference('Assay.count') do
           assert_difference('Policy.count', 2) do
             assert_difference('Permission.count', 4) do
-              post :create_metadata, params
+              post :create_metadata, params: params
             end
           end
         end
@@ -3162,7 +3153,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_no_difference('DataFile.count') do
         assert_no_difference('Assay.count') do
           assert_no_difference('AssayAsset.count') do
-            post :create_metadata, params
+            post :create_metadata, params: params
           end
         end
       end
@@ -3191,7 +3182,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute bad_assay.can_edit?
 
     assert_no_difference('AssayAsset.count') do
-      put :update, id: data_file.id, data_file: { title: data_file.title, assay_assets_attributes: [{ assay_id: bad_assay.id }] }
+      put :update, params: { id: data_file.id, data_file: { title: data_file.title, assay_assets_attributes: [{ assay_id: bad_assay.id }] } }
     end
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
     #assert_response :unprocessable_entity
@@ -3200,7 +3191,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_empty data_file.assays
 
     assert_difference('AssayAsset.count') do
-      put :update, id: data_file.id, data_file: { title: data_file.title, assay_assets_attributes: [{ assay_id: good_assay.id }] }
+      put :update, params: { id: data_file.id, data_file: { title: data_file.title, assay_assets_attributes: [{ assay_id: good_assay.id }] } }
     end
     data_file.reload
     assert_equal [good_assay], data_file.assays
@@ -3228,8 +3219,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file, blob = valid_data_file
 
     assert_no_difference('AssayAsset.count') do
-      post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: bad_assay.id }]), content_blobs: [blob], 
-                    policy_attributes: valid_sharing
+      post :create, params: { data_file: data_file.merge(assay_assets_attributes: [{ assay_id: bad_assay.id }]), content_blobs: [blob], policy_attributes: valid_sharing }
     end
 
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
@@ -3239,8 +3229,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file, blob = valid_data_file
 
     assert_difference('AssayAsset.count') do
-      post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: good_assay.id }]), content_blobs: [blob], 
-                    policy_attributes: valid_sharing
+      post :create, params: { data_file: data_file.merge(assay_assets_attributes: [{ assay_id: good_assay.id }]), content_blobs: [blob], policy_attributes: valid_sharing }
     end
     data_file = assigns(:data_file)
     assert_equal [good_assay],data_file.assays
@@ -3308,7 +3297,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     register_content_blob(skip_provide_metadata:true)
 
-    get :provide_metadata,assay_ids:[assay1.id]
+    get :provide_metadata, params: { assay_ids:[assay1.id] }
     assert_response :success
 
     assert df=assigns(:data_file)
@@ -3327,7 +3316,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     register_content_blob(skip_provide_metadata:true)
 
-    get :provide_metadata,assay_ids:[assay1.id,assay2.id]
+    get :provide_metadata, params: { assay_ids:[assay1.id,assay2.id] }
     assert_response :success
 
     assert df=assigns(:data_file)
@@ -3347,7 +3336,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     register_content_blob(skip_provide_metadata:true)
 
-    get :provide_metadata,assay_ids:[assay3.id]
+    get :provide_metadata, params: { assay_ids:[assay3.id] }
     assert_response :success
 
     #assay 3 is not allowed
@@ -3375,7 +3364,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('Sample.count', 4) do
       data_file.extract_samples(sample_type, true)
-      data_file.save!
+      disable_authorization_checks { data_file.save! }
     end
 
     data_file.reload
@@ -3435,14 +3424,12 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:any, 'https://mocked404.com').to_return(status: 404)
   end
 
-  def file_for_upload
-    ActionDispatch::Http::UploadedFile.new(filename: 'file_picture.png',
-                                           content_type: 'image/png',
-                                           tempfile: fixture_file_upload('files/file_picture.png'))
+  def picture_file
+    fixture_file_upload('files/file_picture.png', 'image/png')
   end
 
   def valid_data_file
-    [{ title: 'Test',simulation_data:'0', project_ids: [User.current_user.person.projects.first.id]}, { data: file_for_upload }]
+    [{ title: 'Test',simulation_data:'0', project_ids: [User.current_user.person.projects.first.id]}, { data: picture_file }]
   end
 
   def valid_data_file_with_http_url
@@ -3472,12 +3459,13 @@ class DataFilesControllerTest < ActionController::TestCase
 
     login_as owner.user
 
-    get :show, id: private_item, format: :json
+    get :show, params: { id: private_item, format: :json }
     assert_response :success
     parsed_response = JSON.parse(@response.body)
     assert parsed_response['data']['attributes'].key?('policy')
     assert parsed_response['data']['attributes']['policy'].key?('access')
-    get :show, id: visible_item, format: :json
+
+    get :show, params: { id: visible_item, format: :json }
     assert_response :success
     parsed_response = JSON.parse(@response.body)
     assert parsed_response['data']['attributes'].key?('policy')
@@ -3485,17 +3473,17 @@ class DataFilesControllerTest < ActionController::TestCase
 
     logout
 
-    get :show, id: private_item, format: :json
+    get :show, params: { id: private_item, format: :json }
     assert_response :forbidden
-    get :show, id: visible_item, format: :json
+    get :show, params: { id: visible_item, format: :json }
     assert_response :success
     parsed_response = JSON.parse(@response.body)
     assert_not parsed_response['data']['attributes'].key?('policy')
 
     login_as random_person.user
-    get :show, id: private_item, format: :json
+    get :show, params: { id: private_item, format: :json }
     assert_response :forbidden
-    get :show, id: visible_item, format: :json
+    get :show, params: { id: visible_item, format: :json }
     assert_response :success
     parsed_response = JSON.parse(@response.body)
     assert_not parsed_response['data']['attributes'].key?('policy')
@@ -3510,7 +3498,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert df.can_edit?(p.user)
     refute df.can_manage?(p.user)
 
-    get :edit, id:df.id
+    get :edit, params: { id:df.id }
     assert_response :success
 
     assert_select "div#sharing_form", count:0
@@ -3519,7 +3507,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     login_as(df.contributor.user)
 
-    get :edit, id:df.id
+    get :edit, params: { id:df.id }
     assert_response :success
 
     assert_select "div#sharing_form", count:1
@@ -3530,13 +3518,13 @@ class DataFilesControllerTest < ActionController::TestCase
   # this replicates the old behaviour and result of calling #new
   def register_content_blob(skip_provide_metadata:false)
 
-    blob = {data: file_for_upload}
+    blob = {data: picture_file}
     assert_difference('ContentBlob.count') do
-      post :create_content_blob, content_blobs: [blob]
+      post :create_content_blob, params: { content_blobs: [blob] }
     end
     content_blob_id = assigns(:data_file).content_blob.id
     session[:uploaded_content_blob_id] = content_blob_id.to_s
-    post :rightfield_extraction_ajax,content_blob_id:content_blob_id.to_s,format:'js'
+    post :rightfield_extraction_ajax, params: { content_blob_id:content_blob_id.to_s, format:'js' }
     get :provide_metadata unless skip_provide_metadata
   end
 end

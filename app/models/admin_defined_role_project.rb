@@ -1,4 +1,4 @@
-class AdminDefinedRoleProject < ActiveRecord::Base
+class AdminDefinedRoleProject < ApplicationRecord
   belongs_to :project
   belongs_to :person
 

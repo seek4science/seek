@@ -1,0 +1,13 @@
+<% name = params[:id].blank? ? 'compound' : params[:id] %>
+
+$j('#<%= name -%>_title').val('<%= @results[:title] -%>');
+$j('#<%= name -%>_sabiork_id').val('<%= @results[:sabiork_id] -%>');
+$j('#<%= name -%>_synonyms').val('<%= @results[:synonyms] -%>');
+$j('#<%= name -%>_chebi_ids').val('<%= @results[:chebi_ids] -%>');
+$j('#<%= name -%>_kegg_ids').val('<%= @results[:kegg_ids] -%>');
+
+<% if params[:id].blank? %>
+  $j("#edit_compound_body_<% params[:id] -%>").highlight();
+<% else %>
+  $j("#add_compound_form").highlight();
+<% end %>

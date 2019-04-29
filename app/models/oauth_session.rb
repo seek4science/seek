@@ -1,4 +1,4 @@
-class OauthSession < ActiveRecord::Base
+class OauthSession < ApplicationRecord
 
   belongs_to :user
   # attr_accessible :access_token, :expires_in, :refresh_token, :provider, :user_id

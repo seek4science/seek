@@ -19,7 +19,7 @@ class LogPublishingTest < ActionController::TestCase
     sop_params, blob = valid_sop
     sop_params[:project_ids] = [@another_project.id] # this project has no gatekeeper
     assert_difference ('ResourcePublishLog.count') do
-      post :create, sop: sop_params, content_blobs: [blob], policy_attributes: public_sharing
+      post :create, params: { sop: sop_params, content_blobs: [blob], policy_attributes: public_sharing }
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
@@ -31,7 +31,7 @@ class LogPublishingTest < ActionController::TestCase
   test 'log when creating item and request publish it' do
     sop, blob = valid_sop
     assert_difference ('ResourcePublishLog.count') do
-      post :create, sop: sop, content_blobs: [blob], policy_attributes: { access_type: Policy::ACCESSIBLE }
+      post :create, params: { sop: sop, content_blobs: [blob], policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
@@ -43,7 +43,7 @@ class LogPublishingTest < ActionController::TestCase
   test 'dont log when creating the non-public item' do
     sop, blob = valid_sop
     assert_no_difference ('ResourcePublishLog.count') do
-      post :create, sop: sop, content_blobs: [blob]
+      post :create, params: { sop: sop, content_blobs: [blob] }
     end
 
     assert_equal Policy::NO_ACCESS, assigns(:sop).policy.access_type
@@ -58,7 +58,7 @@ class LogPublishingTest < ActionController::TestCase
     assert sop.can_publish?
 
     assert_difference ('ResourcePublishLog.count') do
-      put :update, id: sop.id, sop: { title: sop.title }, policy_attributes: public_sharing
+      put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: public_sharing }
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
@@ -76,7 +76,7 @@ class LogPublishingTest < ActionController::TestCase
     assert sop.can_publish?
 
     assert_difference ('ResourcePublishLog.count') do
-      put :update, id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::ACCESSIBLE }
+      put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
@@ -92,7 +92,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal Policy::NO_ACCESS, sop.policy.access_type
 
     assert_no_difference ('ResourcePublishLog.count') do
-      put :update, id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::NO_ACCESS }
+      put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::NO_ACCESS } }
     end
   end
 
@@ -107,7 +107,7 @@ class LogPublishingTest < ActionController::TestCase
     ResourcePublishLog.create(resource: sop, user: User.current_user, publish_state: ResourcePublishLog::PUBLISHED)
 
     assert_difference ('ResourcePublishLog.count') do
-      put :update, id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::NO_ACCESS }
+      put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::NO_ACCESS } }
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::UNPUBLISHED, publish_log.publish_state.to_i
@@ -121,7 +121,7 @@ class LogPublishingTest < ActionController::TestCase
     df = Factory(:data_file, project_ids: @gatekeeper.projects.collect(&:id))
 
     login_as(df.contributor)
-    put :update, id: df.id, data_file: { title: df.title }, policy_attributes: { access_type: Policy::ACCESSIBLE }
+    put :update, params: { id: df.id, data_file: { title: df.title }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
 
     logout
 
@@ -133,7 +133,7 @@ class LogPublishingTest < ActionController::TestCase
     params[:gatekeeper_decide][df.class.name][df.id.to_s]['decision'] = 1
 
     assert_difference ('ResourcePublishLog.count') do
-      post :gatekeeper_decide, params.merge(id: @gatekeeper.id)
+      post :gatekeeper_decide, params: params.merge(id: @gatekeeper.id)
     end
 
     publish_log = ResourcePublishLog.last
@@ -148,7 +148,7 @@ class LogPublishingTest < ActionController::TestCase
     df = Factory(:data_file, project_ids: gatekeeper2.projects.collect(&:id))
 
     login_as(df.contributor)
-    put :update, id: df.id, data_file: { title: df.title }, policy_attributes: { access_type: Policy::ACCESSIBLE }
+    put :update, params: { id: df.id, data_file: { title: df.title }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
 
     logout
 
@@ -163,7 +163,7 @@ class LogPublishingTest < ActionController::TestCase
     params[:gatekeeper_decide][df.class.name][df.id.to_s]['decision'] = 1
 
     assert_no_difference ('ResourcePublishLog.count') do
-      post :gatekeeper_decide, params.merge(id: @gatekeeper.id)
+      post :gatekeeper_decide, params: params.merge(id: @gatekeeper.id)
     end
 
     publish_log2 = ResourcePublishLog.last
@@ -201,7 +201,7 @@ class LogPublishingTest < ActionController::TestCase
     params[:publish][request_publishing_df.class.name][request_publishing_df.id.to_s] = '1'
 
     assert_difference('ResourcePublishLog.count', 2) do
-      post :publish, params.merge(id: df)
+      post :publish, params: params.merge(id: df)
       a = 1
     end
     assert_response :redirect
@@ -215,7 +215,7 @@ class LogPublishingTest < ActionController::TestCase
   private
 
   def valid_sop
-    [{ title: 'Test', project_ids: [@gatekeeper_project] }, { data: file_for_upload }]
+    [{ title: 'Test', project_ids: [@gatekeeper_project.id] }, { data: file_for_upload }]
   end
 
   def public_sharing

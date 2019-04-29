@@ -7,7 +7,7 @@ class OauthSessionsControllerTest < ActionController::TestCase
     user = Factory(:user)
     login_as(user)
 
-    get :index, user_id: user.id
+    get :index, params: { user_id: user.id }
 
     assert_response :success
   end
@@ -17,7 +17,7 @@ class OauthSessionsControllerTest < ActionController::TestCase
     other_user = Factory(:user)
     login_as(other_user)
 
-    get :index, user_id: user.id
+    get :index, params: { user_id: user.id }
 
     assert_redirected_to root_path
     assert_not_empty flash[:error]
@@ -27,7 +27,7 @@ class OauthSessionsControllerTest < ActionController::TestCase
     oauth_session = Factory(:oauth_session)
     login_as(oauth_session.user)
 
-    get :index, user_id: oauth_session.user.id
+    get :index, params: { user_id: oauth_session.user.id }
 
     assert_response :success
     assert_equal 1, assigns(:oauth_sessions).size
@@ -40,7 +40,7 @@ class OauthSessionsControllerTest < ActionController::TestCase
     login_as(user)
 
     assert_difference('OauthSession.count', -1) do
-      delete :destroy, user_id: user.id, id: oauth_session.id
+      delete :destroy, params: { user_id: user.id, id: oauth_session.id }
     end
 
     assert_redirected_to user_oauth_sessions_path(user)
@@ -52,7 +52,7 @@ class OauthSessionsControllerTest < ActionController::TestCase
     login_as(other_user)
 
     assert_no_difference('OauthSession.count') do
-      delete :destroy, user_id: oauth_session.user.id, id: oauth_session.id
+      delete :destroy, params: { user_id: oauth_session.user.id, id: oauth_session.id }
     end
 
     assert_redirected_to root_path

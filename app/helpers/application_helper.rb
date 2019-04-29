@@ -1,6 +1,5 @@
 # Methods added to this helper will be available to all templates in the application.
 # require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','helpers','application_helper')
-require 'app_version'
 
 module ApplicationHelper
   include FancyMultiselectHelper
@@ -92,7 +91,7 @@ module ApplicationHelper
   end
 
   def version_text
-    "(v.#{SEEK::Application::APP_VERSION})"
+    "(v.#{Seek::Version::APP_VERSION})"
   end
 
   def authorized_list(all_items, attribute, sort = true, max_length = 75, count_hidden_items = false)
@@ -246,23 +245,10 @@ module ApplicationHelper
   def contributor(contributor, avatar = false, size = 100, you_text = false)
     return unless contributor
 
-    if contributor.class.name == 'User'
-      # this string will output " (you) " for current user next to the display name, when invoked with 'you_text == true'
-      you_string = you_text && logged_in? && user.id == current_user.id ? "<small style='vertical-align: middle; color: #666666; margin-left: 0.5em;'>(you)</small>" : ''
-      contributor_name = h(contributor.name)
-      contributor_url = person_path(contributor)
-      contributor_name_link = link_to(contributor_name, contributor_url)
+    contributor_name = h(contributor.name)
+    contributor_name_link = link_to(contributor_name, contributor)
 
-      if avatar
-        result = avatar(contributor_person, size, false, contributor_url, contributor_name, false)
-        result += "<p style='margin: 0; text-align: center;'>#{contributor_name_link}#{you_string}</p>"
-        return result.html_safe
-      else
-        return (contributor_name_link + you_string).html_safe
-      end
-    else
-      return nil
-    end
+    contributor_name_link.html_safe
   end
 
   # this helper is to be extended to include many more types of objects that can belong to the
@@ -297,17 +283,11 @@ module ApplicationHelper
   end
 
   def preview_permission_popup_link(resource)
-    locals = {}
-    locals[:resource_name] = resource.class.name.underscore
-    locals[:resource_id] = resource.id
-    locals[:url] = preview_permissions_policies_path
-    locals[:is_new_file] = resource.new_record?
-    locals[:contributor_id] = resource.contributing_user.try(:id)
-    render partial: 'assets/preview_permission_link', locals: locals
+    render partial: 'assets/preview_permission_link', locals: { resource: resource }
   end
 
   # Finn's truncate method. Doesn't split up words, tries to get as close to length as possible
-  def truncate_without_splitting_words(text, length = 50)
+  def truncate_without_splitting_words(text, length = 50, ellipsis = true)
     truncated_result = ''
     remaining_length = length
     stop = false
@@ -332,7 +312,7 @@ module ApplicationHelper
       truncated_result += "\n"
     end
     # Need some kind of whitespace before elipses or auto-link breaks
-    html = truncated_result.strip + (truncated ? "\n..." : '')
+    html = truncated_result.strip + ((truncated && ellipsis) ? "\n..." : '')
     html.html_safe
   end
 
@@ -388,20 +368,6 @@ module ApplicationHelper
     I18n.t(resource_type.underscore.to_s)
   end
 
-  def add_return_to_search
-    referer = request.headers['Referer'].try(:normalize_trailing_slash)
-    search_path = main_app.search_url.normalize_trailing_slash
-    root_path = main_app.root_url.normalize_trailing_slash
-    request_uri = request.fullpath.try(:normalize_trailing_slash)
-    unless request_uri.include?(root_path)
-      request_uri = root_path.chop + request_uri
-    end
-
-    if referer == search_path && referer != request_uri && request_uri != root_path
-      link_to('Return to search', '#', onclick: 'window.history.back();', id: 'return_to_search', style: 'display: none;')
-    end
-  end
-
   def no_deletion_explanation_message(clz)
     no_deletion_explanation_messages[clz] || "You are unable to delete this #{clz.name}. It might be published"
   end
@@ -411,7 +377,7 @@ module ApplicationHelper
       Study => "You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
       Investigation => "You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it.",
       Strain => 'You cannot delete this Strain. Samples associated with it or you are not authorized.',
-      Project => "You cannot delete this #{I18n.t 'project'}. It may have people associated with it.",
+      Project => "You cannot delete this #{I18n.t 'project'}. It may have people or items associated with it.",
       Institution => 'You cannot delete this Institution. It may have people associated with it.',
       SampleType => 'You cannot delete this Sample Type, it may have Samples associated with it or have another Sample Type linked to it',
       SampleControlledVocab => 'You can delete this Controlled Vocabulary, it may be associated with a Sample Type' }
@@ -485,7 +451,9 @@ module ApplicationHelper
     Seek::Docker.using_docker?
   end
 
-  private
+  def white_list(text)
+    Rails::Html::WhiteListSanitizer.new.sanitize(text)
+  end
 
   PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => 'Institutions', 'people' => 'People', 'sessions' => 'Login', 'users' => 'Signup', 'search' => 'Search',
                   'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize,
@@ -497,10 +465,6 @@ end
 class ApplicationFormBuilder < ActionView::Helpers::FormBuilder
   def fancy_multiselect(association, options = {})
     @template.fancy_multiselect object, association, options
-  end
-
-  def subform_delete_link(link_text = 'remove', link_options = {}, hidden_field_options = {})
-    hidden_field(:_destroy, hidden_field_options) + @template.link_to_function(link_text, "$(this).previous().value = '1';$(this).up().hide();", link_options)
   end
 end
 

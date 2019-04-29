@@ -1,0 +1,4 @@
+$j('.edit-compound-modal').modal('hide');
+$j('#compound_row_<%= @compound.id -%>').replaceWith("<%= escape_javascript(render partial: 'compound_row', object: @compound) -%>");
+$j('#edit_compound_<%= @compound.id -%>').replaceWith("<%= escape_javascript(render partial: 'edit_compound', object: @compound, as: 'compound') -%>");
+$j('#compound_row_<%= @compound.id -%>').highlight();

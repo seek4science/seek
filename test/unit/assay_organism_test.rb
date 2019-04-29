@@ -6,19 +6,22 @@ class AssayOrganismTest < ActiveSupport::TestCase
     organism = strain.organism
     assay = Factory :assay
     cult = Factory :culture_growth_type
+    cell_type = Factory(:tissue_and_cell_type)
+    cell_type2 = Factory(:tissue_and_cell_type)
 
-    ao = Factory :assay_organism
+    Factory(:assay_organism)
+    refute AssayOrganism.exists_for?(assay, organism, strain, cult)
 
-    refute AssayOrganism.exists_for?(strain, organism, assay, cult)
+    AssayOrganism.create!(strain: strain, organism: organism, assay: assay, culture_growth_type: cult)
+    assert AssayOrganism.exists_for?(assay, organism, strain, cult)
+    refute AssayOrganism.exists_for?(assay, organism, nil, nil)
 
-    ao = AssayOrganism.create strain: strain, organism: organism, assay: assay, culture_growth_type: cult
+    AssayOrganism.create!(strain: nil, organism: organism, assay: assay, culture_growth_type: nil)
+    assert AssayOrganism.exists_for?(assay, organism, nil, nil)
 
-    assert AssayOrganism.exists_for? strain, organism, assay, cult
-
-    refute AssayOrganism.exists_for? nil, organism, assay, nil
-
-    ao = AssayOrganism.create strain: nil, organism: organism, assay: assay, culture_growth_type: nil
-
-    assert AssayOrganism.exists_for? nil, organism, assay, nil
+    AssayOrganism.create!(strain: nil, organism: organism, assay: assay, culture_growth_type: cult, tissue_and_cell_type: cell_type)
+    assert AssayOrganism.exists_for?(assay, organism, nil, cult)
+    refute AssayOrganism.exists_for?(assay, organism, nil, cult, cell_type2)
+    assert AssayOrganism.exists_for?(assay, organism, nil, cult, cell_type)
   end
 end

@@ -3,12 +3,12 @@ module Seek
     def self.included(klass)
       klass.class_eval do
         include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
-        include Seek::ProgrammeCompat
 
         join_table_name = [table_name, 'projects'].sort.join('_')
         has_and_belongs_to_many :projects, join_table: "#{join_table_name}",
                                            before_add: :react_to_project_addition,
                                            before_remove: :react_to_project_removal
+        has_many :programmes, through: :projects
 
         after_save -> { @project_additions = [] }
 

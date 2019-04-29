@@ -1,3 +1,3 @@
-class CultureGrowthType < ActiveRecord::Base
+class CultureGrowthType < ApplicationRecord
   include Seek::Rdf::RdfGeneration
 end

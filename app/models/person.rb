@@ -1,9 +1,8 @@
-class Person < ActiveRecord::Base
+class Person < ApplicationRecord
 
   acts_as_annotation_source
 
-  include Seek::Rdf::RdfGeneration
-  include Seek::Taggable
+  include Seek::Annotatable
   include Seek::Roles::AdminDefinedRoles
 
   auto_strip_attributes :email, :first_name, :last_name, :web_page
@@ -44,7 +43,7 @@ class Person < ActiveRecord::Base
   has_many :current_work_groups, class_name: 'WorkGroup', through: :current_group_memberships,
                                  source: :work_group
 
-  has_many :institutions, -> { uniq }, through: :work_groups
+  has_many :institutions, -> { distinct }, through: :work_groups
 
   has_many :favourite_group_memberships, dependent: :destroy
   has_many :favourite_groups, through: :favourite_group_memberships
@@ -104,7 +103,7 @@ class Person < ActiveRecord::Base
   end
 
   def queue_update_auth_table
-    if previous_changes.keys.include?('roles_mask')
+    if saved_changes.keys.include?('roles_mask')
       AuthLookupUpdateJob.new.add_items_to_queue self
     end
   end
@@ -115,7 +114,7 @@ class Person < ActiveRecord::Base
 
   # those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
   def self.active
-    Person.unscoped.order('avatar_id is null, updated_at DESC')
+    Person.unscoped.order(Arel.sql('avatar_id IS NULL'), 'updated_at DESC')
   end
 
   def receive_notifications
@@ -329,14 +328,14 @@ class Person < ActiveRecord::Base
                          .where('controller_name != \'people\'')
                          .order('created_at DESC')
                          .limit(limit)
-                         .uniq +
+                         .distinct +
               ActivityLog.group(:id, :activity_loggable_type, :activity_loggable_id)
               .where(culprit_type: 'User', culprit_id: user, action: 'create')
               .where('controller_name != \'sessions\'')
               .where('controller_name != \'people\'')
               .order('created_at DESC')
               .limit(limit)
-              .uniq
+              .distinct
     results.sort_by(&:created_at).reverse.uniq { |r| "#{r.activity_loggable_type}#{r.activity_loggable_id}" }[0...limit]
   end
 

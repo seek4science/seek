@@ -68,7 +68,7 @@ module ISAHelper
 
       if node.can_view?
         data['description'] = if item.respond_to?(:description)
-                                truncate(h(item.description), length: 500)
+                                truncate(item.description, length: 500)
                               else
                                 ''
                               end
@@ -77,8 +77,8 @@ module ISAHelper
           data['description'] = item.is_a?(Publication) ? 'No abstract' : 'No description'
         end
 
-        data['name'] = truncate(h(item.title), length: 110)
-        data['fullName'] = h(item.title)
+        data['name'] = truncate(item.title, length: 110)
+        data['fullName'] = item.title
         avatar = resource_avatar_path(item) || icon_filename_for_key("#{item.class.name.downcase}_avatar")
         data['imageUrl'] = asset_path(avatar)
         data['url'] = item.is_a?(Seek::ObjectAggregation) ? polymorphic_path([item.object, item.type]) : polymorphic_path(item)

@@ -1,12 +1,12 @@
 
 
 class FoldersController < ApplicationController
-  before_filter :login_required
-  before_filter :check_project
-  before_filter :browser_enabled
-  before_filter :get_folder, :only=>[:create_folder, :destroy, :display_contents,:remove_asset]
-  before_filter :get_folders,:only=>[:index,:move_asset_to,:create_folder]
-  before_filter :get_asset, :only=>[:move_asset_to,:remove_asset]
+  before_action :login_required
+  before_action :check_project
+  before_action :browser_enabled
+  before_action :get_folder, :only=>[:create_folder, :destroy, :display_contents,:remove_asset]
+  before_action :get_folders,:only=>[:index,:move_asset_to,:create_folder]
+  before_action :get_asset, :only=>[:move_asset_to,:remove_asset]
 
   include Seek::BreadCrumbs
 
@@ -40,12 +40,12 @@ class FoldersController < ApplicationController
       @folder.add_child(title)
       @folder.save!
       respond_to do |format|
-        format.js {render :text=>""}
+        format.js { render plain: '' }
       end
     else
       error_text="The name is too short, it must be 2 or more characters"
       respond_to do |format|
-        format.js {render :text=>error_text,:status=>500}
+        format.js { render plain: error_text, status: 500 }
       end
     end
 
@@ -81,25 +81,25 @@ class FoldersController < ApplicationController
 
   def display_contents
     begin
-      store_folder_cookie()
+      store_folder_cookie
     rescue Exception=>e
       Rails.logger.error("Error reading cookie for last folder browser - #{e.message}")
     end
-    render :update do |page|
-      page.replace_html "folder_contents",:partial=>"contents",:locals=>{:folder=>@folder}
+    respond_to do |format|
+      format.js
     end
   end
 
   def set_project_folder_title
     @item = ProjectFolder.find(params[:id])
     @item.update_attribute(:title, params[:value])
-    render text: @item.title
+    render plain: @item.title
   end
 
   def set_project_folder_description
     @item = ProjectFolder.find(params[:id])
     @item.update_attribute(:description, params[:value])
-    render text: @item.description
+    render plain: @item.description
   end
 
   private
@@ -112,7 +112,7 @@ class FoldersController < ApplicationController
   end
 
   def browser_enabled
-    if !Seek::Config.project_browser_enabled
+    unless Seek::Config.project_browser_enabled
       flash[:error]="Not available"
       redirect_to @project
     end

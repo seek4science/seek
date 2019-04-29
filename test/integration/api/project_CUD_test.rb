@@ -28,7 +28,7 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
     @to_post['data']['attributes']['title'] = 'test project hierarchy'
     @to_post['data']['attributes']['parent_id'] = parent.id
     assert_difference('Project.count') do
-      post "/projects.json",  @to_post
+      post "/projects.json", params: @to_post
     end
     assert_includes assigns(:project).ancestors, parent
   end
@@ -36,7 +36,7 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
   def test_normal_user_cannot_create_project
     user_login(Factory(:person))
     assert_no_difference('Project.count') do
-      post "/projects.json", @to_post
+      post "/projects.json", params: @to_post
     end
   end
 

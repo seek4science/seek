@@ -223,21 +223,21 @@ class UserTest < ActiveSupport::TestCase
   def test_should_require_login
     assert_no_difference 'User.count' do
       u = create_user(login: nil)
-      assert u.errors.get(:login)
+      assert u.errors[:login]
     end
   end
 
   def test_should_require_password
     assert_no_difference 'User.count' do
       u = create_user(password: nil)
-      assert u.errors.get(:password)
+      assert u.errors[:password]
     end
   end
 
   def test_should_require_password_confirmation
     assert_no_difference 'User.count' do
       u = create_user(password_confirmation: nil)
-      assert u.errors.get(:password_confirmation)
+      assert u.errors[:password_confirmation]
     end
   end
 
@@ -269,9 +269,9 @@ class UserTest < ActiveSupport::TestCase
   end
 
   def test_should_remember_me_for_one_week
-    before = 1.week.from_now.utc
+    before = 1.week.from_now.utc - 1.second
     users(:quentin).remember_me_for 1.week
-    after = 1.week.from_now.utc
+    after = 1.week.from_now.utc + 1.second
     assert_not_nil users(:quentin).remember_token
     assert_not_nil users(:quentin).remember_token_expires_at
     assert users(:quentin).remember_token_expires_at.between?(before, after)
@@ -282,13 +282,13 @@ class UserTest < ActiveSupport::TestCase
     users(:quentin).remember_me_until time
     assert_not_nil users(:quentin).remember_token
     assert_not_nil users(:quentin).remember_token_expires_at
-    assert_equal users(:quentin).remember_token_expires_at, time
+    assert_equal users(:quentin).remember_token_expires_at.to_date, time.to_date
   end
 
   def test_should_remember_me_default_six_months
-    before = 6.months.from_now.utc
+    before = 6.months.from_now.utc - 1.second
     users(:quentin).remember_me
-    after = 6.months.from_now.utc
+    after = 6.months.from_now.utc + 1.second
     assert_not_nil users(:quentin).remember_token
     assert_not_nil users(:quentin).remember_token_expires_at
     assert users(:quentin).remember_token_expires_at.between?(before, after)

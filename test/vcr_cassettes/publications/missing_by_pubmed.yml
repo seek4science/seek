@@ -1,0 +1,65 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi
+    body:
+      encoding: US-ASCII
+      string: tool=bioruby&email=%28fred%40email.com%29&retmode=text&db=pubmed&rettype=medline&id=40404040404
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Content-Length:
+      - '95'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 20 Nov 2018 12:34:52 GMT
+      Server:
+      - Finatra
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Content-Security-Policy:
+      - upgrade-insecure-requests
+      X-Ratelimit-Remaining:
+      - '99'
+      Ncbi-Phid:
+      - D0BD4A451B2445650000142A294452EA.1.1.m_5
+      Cache-Control:
+      - private
+      L5d-Success-Class:
+      - '1.0'
+      Ncbi-Sid:
+      - 9EF0B260C38E3476_D205SID
+      X-Ratelimit-Limit:
+      - '100'
+      Access-Control-Allow-Origin:
+      - "*"
+      Content-Type:
+      - text/plain; charset=UTF-8
+      Set-Cookie:
+      - ncbi_sid=9EF0B260C38E3476_D205SID; domain=.nih.gov; path=/; expires=Wed, 20
+        Nov 2019 12:34:52 GMT
+      X-Ua-Compatible:
+      - IE=Edge
+      X-Xss-Protection:
+      - 1; mode=block
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |2
+
+        id: 40404040404 Error occurred: The following PMID is not available: 40404040404
+    http_version: 
+  recorded_at: Tue, 20 Nov 2018 12:33:58 GMT
+recorded_with: VCR 2.9.3

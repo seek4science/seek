@@ -14,7 +14,7 @@ assay_type_text = is_modelling_type?(@type_class) ? "Biological problem addresse
       <br/>
 
       <%= image("current",{:title=>"Current #{assay_type_text}",:alt=>"Current #{assay_type_text}",:style=>"vertical-align:middle"}) -%>
-      <%= @type_class.descriptive_label -%>
+      <%= descriptive_label(@type_class) -%>
 
       <br/>
 

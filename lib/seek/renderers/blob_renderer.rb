@@ -21,10 +21,10 @@ module Seek
       private
 
       def handle_render_exception(content_blob, exception)
-        if Seek::Config.exception_notification_enabled
-          data = { message: 'rendering error', renderer: self, item: content_blob.inspect }
-          ExceptionNotifier.notify_exception(exception, data: data)
-        end
+        Seek::Errors::ExceptionForwarder.send_notification(exception,
+                                                           data:{ message: 'rendering error',
+                                                                  renderer: self,
+                                                                  item: content_blob.inspect })
       end
     end
   end

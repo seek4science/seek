@@ -16,7 +16,7 @@ class ProjectStatsControllerTest < ActionController::TestCase
 
     request.env["HTTP_REFERER"] = dashboard_project_stats_path(project)
 
-    post :clear_cache, project_id:project.id
+    post :clear_cache, params: { project_id:project.id }
     assert_redirected_to dashboard_project_stats_path(project)
 
     refute Rails.cache.exist?(key)
@@ -34,7 +34,7 @@ class ProjectStatsControllerTest < ActionController::TestCase
 
     request.env["HTTP_REFERER"] = dashboard_project_stats_path(project)
 
-    post :clear_cache, project_id:project.id
+    post :clear_cache, params: { project_id:project.id }
     assert_redirected_to project_path(project)
 
     assert Rails.cache.exist?(key)

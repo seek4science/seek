@@ -1,4 +1,4 @@
-class Scale < ActiveRecord::Base
+class Scale < ApplicationRecord
   has_many :scalings, :dependent => :destroy
 
   # attr_accessible :image_name, :key, :pos, :title

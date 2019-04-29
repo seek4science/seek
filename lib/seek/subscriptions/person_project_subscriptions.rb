@@ -35,9 +35,9 @@ module Seek
           subscriptions.delete_all
         else
           if workgroup_or_membership.is_a?(WorkGroup)
-            pid = workgroup_or_membership.project_id_was
+            pid = workgroup_or_membership.project_id_before_last_save
           else
-            pid = workgroup_or_membership.work_group.try(:project_id_was)
+            pid = workgroup_or_membership.work_group.try(:project_id_before_last_save)
           end
 
           if pid && (ps = project_subscriptions.find { |ps| ps.project_id == pid })

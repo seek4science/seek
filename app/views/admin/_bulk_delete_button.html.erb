@@ -3,5 +3,5 @@
     <% collection.each do |item| %>
         <%= hidden_field_tag "ids[]", item.id %>
     <% end %>
-    <%= button_link_to('Destroy All', 'destroy', '#', :onclick => "if(confirm('Are you sure?')){$(this).up('form').submit()}", :id => "bulk") %>
+    <%= button_link_to('Destroy All', 'destroy', '#', confirm: 'Are you sure?', id: 'bulk') %>
 <% end %>

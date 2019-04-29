@@ -38,9 +38,7 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     assert doc.can_edit?(@current_user)
 
     original_md5 = doc.content_blob.md5sum
-    put document_content_blob_path(doc, doc.content_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
+    put document_content_blob_path(doc, doc.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :success
     blob = doc.content_blob.reload
@@ -56,9 +54,7 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     assert doc.can_download?(@current_user)
     refute doc.can_edit?(@current_user)
 
-    put document_content_blob_path(doc, doc.content_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
+    put document_content_blob_path(doc, doc.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :forbidden
     blob = doc.content_blob.reload
@@ -74,9 +70,7 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     assert doc.can_edit?(@current_user)
 
     original_md5 = doc.content_blob.md5sum
-    put document_content_blob_path(doc, doc.content_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf'))
+    put document_content_blob_path(doc, doc.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')) }
 
     assert_response :bad_request
     blob = doc.content_blob.reload
@@ -95,7 +89,7 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz.camelize(:lower)}Post"
 
     assert_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", @to_post
+      post "/#{@plural_clz}.json", params: @to_post
       assert_response :success
     end
 
@@ -118,7 +112,7 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     @to_post = JSON.parse(template.result(binding))
 
     assert_no_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", @to_post
+      post "/#{@plural_clz}.json", params: @to_post
       #assert_response :unprocessable_entity
     end
 

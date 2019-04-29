@@ -23,14 +23,14 @@ class OrganismsControllerTest < ActionController::TestCase
 
   test 'admin can get edit' do
     login_as(:quentin)
-    get :edit, id: organisms(:yeast)
+    get :edit, params: { id: organisms(:yeast) }
     assert_response :success
     assert_nil flash[:error]
   end
 
   test 'non admin cannot get edit' do
     login_as(:aaron)
-    get :edit, id: organisms(:yeast)
+    get :edit, params: { id: organisms(:yeast) }
     assert_response :redirect
     assert_not_nil flash[:error]
   end
@@ -38,7 +38,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'admin can update' do
     login_as(:quentin)
     y = organisms(:yeast)
-    put :update, id: y.id, organism: { title: 'fffff' }
+    put :update, params: { id: y.id, organism: { title: 'fffff' } }
     assert_redirected_to organism_path(y)
     assert_nil flash[:error]
     y = Organism.find(y.id)
@@ -48,7 +48,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'non admin cannot update' do
     login_as(:aaron)
     y = organisms(:yeast)
-    put :update, id: y.id, organism: { title: 'fffff' }
+    put :update, params: { id: y.id, organism: { title: 'fffff' } }
     assert_redirected_to root_path
     assert_not_nil flash[:error]
     y = Organism.find(y.id)
@@ -92,7 +92,7 @@ class OrganismsControllerTest < ActionController::TestCase
 
   test 'admin has create organism menu option' do
     login_as(Factory(:admin))
-    get :show, id: Factory(:organism)
+    get :show, params: { id: Factory(:organism) }
     assert_response :success
     assert_select 'li#create-menu' do
       assert_select 'ul.dropdown-menu' do
@@ -103,7 +103,7 @@ class OrganismsControllerTest < ActionController::TestCase
 
   test 'project administrator has create organism menu option' do
     login_as(Factory(:project_administrator))
-    get :show, id: Factory(:organism)
+    get :show, params: { id: Factory(:organism) }
     assert_response :success
     assert_select 'li#create-menu' do
       assert_select 'ul.dropdown-menu' do
@@ -114,7 +114,7 @@ class OrganismsControllerTest < ActionController::TestCase
 
   test 'non admin doesn not have create organism menu option' do
     login_as(Factory(:user))
-    get :show, id: Factory(:organism)
+    get :show, params: { id: Factory(:organism) }
     assert_response :success
     assert_select 'li#create-menu' do
       assert_select 'ul.dropdown-menu' do
@@ -126,7 +126,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'admin can create new organism' do
     login_as(:quentin)
     assert_difference('Organism.count') do
-      post :create, organism: { title: 'An organism' }
+      post :create, params: { organism: { title: 'An organism' } }
     end
     assert_not_nil assigns(:organism)
     assert_redirected_to organism_path(assigns(:organism))
@@ -135,7 +135,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'create organism with concept uri' do
     login_as(:quentin)
     assert_difference('Organism.count') do
-      post :create, organism: { title: 'An organism', concept_uri:'https://identifiers.org/taxonomy/9606' }
+      post :create, params: { organism: { title: 'An organism', concept_uri:'https://identifiers.org/taxonomy/9606' } }
     end
     assert_not_nil assigns(:organism)
 
@@ -147,7 +147,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'create organism with ncbi id number' do
     login_as(:quentin)
     assert_difference('Organism.count') do
-      post :create, organism: { title: 'An organism', concept_uri:'2222' }
+      post :create, params: { organism: { title: 'An organism', concept_uri:'2222' } }
     end
     assert_not_nil assigns(:organism)
     assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2222',assigns(:organism).concept_uri
@@ -157,7 +157,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'update organism with ncbi id number' do
     login_as(:quentin)
     org = Factory(:organism)
-    patch :update, id: org.id, organism: {concept_uri:'2222'}
+    patch :update, params: { id: org.id, organism: {concept_uri:'2222'} }
     assert_not_nil assigns(:organism)
     assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2222',assigns(:organism).concept_uri
   end
@@ -165,7 +165,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'project administrator can create new organism' do
     login_as(Factory(:project_administrator))
     assert_difference('Organism.count') do
-      post :create, organism: { title: 'An organism' }
+      post :create, params: { organism: { title: 'An organism' } }
     end
     assert_not_nil assigns(:organism)
     assert_redirected_to organism_path(assigns(:organism))
@@ -174,7 +174,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'programme administrator can create new organism' do
     login_as(Factory(:programme_administrator_not_in_project))
     assert_difference('Organism.count') do
-      post :create, organism: { title: 'An organism' }
+      post :create, params: { organism: { title: 'An organism' } }
     end
     assert_not_nil assigns(:organism)
     assert_redirected_to organism_path(assigns(:organism))
@@ -183,7 +183,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'non admin cannot create new organism' do
     login_as(:aaron)
     assert_no_difference('Organism.count') do
-      post :create, organism: { title: 'An organism' }
+      post :create, params: { organism: { title: 'An organism' } }
     end
     assert_redirected_to root_path
     assert_not_nil flash[:error]
@@ -192,7 +192,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'delete button disabled for associated organisms' do
     login_as(:quentin)
     y = organisms(:yeast)
-    get :show, id: y
+    get :show, params: { id: y }
     assert_response :success
     assert_select 'span.disabled_icon img', count: 1
     assert_select 'span.disabled_icon a', count: 0
@@ -201,7 +201,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'admin sees edit and create buttons' do
     login_as(:quentin)
     y = organisms(:human)
-    get :show, id: y
+    get :show, params: { id: y }
     assert_response :success
     assert_select '#content a[href=?]', edit_organism_path(y), count: 1
     assert_select '#content a', text: /Edit Organism/, count: 1
@@ -215,7 +215,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'project administrator sees create buttons' do
     login_as(Factory(:project_administrator))
     y = organisms(:human)
-    get :show, id: y
+    get :show, params: { id: y }
     assert_response :success
 
     assert_select '#content a[href=?]', new_organism_path, count: 1
@@ -225,7 +225,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'non admin does not see edit, create and delete buttons' do
     login_as(:aaron)
     y = organisms(:human)
-    get :show, id: y
+    get :show, params: { id: y }
     assert_response :success
     assert_select '#content a[href=?]', edit_organism_path(y), count: 0
     assert_select '#content a', text: /Edit Organism/, count: 0
@@ -240,7 +240,7 @@ class OrganismsControllerTest < ActionController::TestCase
     login_as(:quentin)
     o = organisms(:human)
     assert_difference('Organism.count', -1) do
-      delete :destroy, id: o
+      delete :destroy, params: { id: o }
     end
     assert_redirected_to organisms_path
   end
@@ -249,7 +249,7 @@ class OrganismsControllerTest < ActionController::TestCase
     login_as(Factory(:project_administrator))
     o = organisms(:human)
     assert_difference('Organism.count', -1) do
-      delete :destroy, id: o
+      delete :destroy, params: { id: o }
     end
     assert_redirected_to organisms_path
   end
@@ -258,7 +258,7 @@ class OrganismsControllerTest < ActionController::TestCase
     login_as(:aaron)
     o = organisms(:human)
     assert_no_difference('Organism.count') do
-      delete :destroy, id: o
+      delete :destroy, params: { id: o }
     end
     refute_nil flash[:error]
   end
@@ -266,7 +266,7 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'visualise available when logged out' do
     logout
     o = Factory(:organism, bioportal_concept: Factory(:bioportal_concept))
-    get :visualise, id: o
+    get :visualise, params: { id: o }
     assert_response :success
   end
 
@@ -274,7 +274,7 @@ class OrganismsControllerTest < ActionController::TestCase
     login_as(:quentin)
     o = organisms(:yeast)
     assert_no_difference('Organism.count') do
-      delete :destroy, id: o
+      delete :destroy, params: { id: o }
     end
   end
 
@@ -286,7 +286,7 @@ class OrganismsControllerTest < ActionController::TestCase
     parent_strain = Factory :strain
     strain_b = Factory :strain, title: 'strainB', parent: parent_strain, organism: organism
 
-    get :show, id: organism
+    get :show, params: { id: organism }
     assert_response :success
     assert_select 'table.strain_list' do
       assert_select 'tr', count: 2 do
@@ -304,7 +304,7 @@ class OrganismsControllerTest < ActionController::TestCase
 
     assert_difference('Organism.count', -1) do
       assert_difference('Strain.count', -3) do
-        delete :destroy, id: organism
+        delete :destroy, params: { id: organism }
       end
     end
   end
@@ -327,7 +327,7 @@ class OrganismsControllerTest < ActionController::TestCase
     sample.set_attribute(:seekstrain, strain.id)
     sample.save!
 
-    get :show, id: organism
+    get :show, params: { id: organism }
 
     assert_response :success
     assert_select 'div.related-items > ul > li > a', text: "Samples (1)"
@@ -337,13 +337,13 @@ class OrganismsControllerTest < ActionController::TestCase
   test 'create multiple organisms with blank concept uri' do
     login_as(Factory(:admin))
     assert_difference('Organism.count') do
-      post :create, organism: { title: 'An organism', concept_uri:'' }
+      post :create, params: { organism: { title: 'An organism', concept_uri:'' } }
     end
     assert_not_nil assigns(:organism)
     assert_nil assigns(:organism).concept_uri
 
     assert_difference('Organism.count') do
-      post :create, organism: { title: 'An organism 2', concept_uri:'' }
+      post :create, params: { organism: { title: 'An organism 2', concept_uri:'' } }
     end
 
     refute_nil assigns(:organism)
@@ -369,7 +369,7 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_includes o2.projects,p2
     refute_includes o2.projects,p1
 
-    get :index,project_id:p1.id
+    get :index, params: { project_id:p1.id }
 
     assert_response :success
 
@@ -402,7 +402,7 @@ class OrganismsControllerTest < ActionController::TestCase
     refute_nil p1.programme
     refute_nil p2.programme
 
-    get :index,programme_id:p1.programme.id
+    get :index, params: { programme_id:p1.programme.id }
 
     assert_response :success
 
@@ -429,7 +429,7 @@ class OrganismsControllerTest < ActionController::TestCase
     o1.reload
     assert_equal [pub1],o1.related_publications
 
-    get :index,publication_id:pub1.id
+    get :index, params: { publication_id:pub1.id }
 
     assert_response :success
 
@@ -451,7 +451,7 @@ class OrganismsControllerTest < ActionController::TestCase
     a2 = Factory(:assay,organisms:[o2])
 
 
-    get :index,assay_id:a1
+    get :index, params: { assay_id:a1 }
 
     assert_response :success
 

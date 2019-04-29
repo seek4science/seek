@@ -28,7 +28,7 @@ $j(window)
         adjust_container_dimensions();
     });
 
-$j(document).ready(function ($) {
+$j(document).ready(function ($j) {
 
     //Auto scrolling
     var xInc = "+=0";
@@ -46,8 +46,8 @@ $j(document).ready(function ($) {
 
     //To disable text-selection
     //http://stackoverflow.com/questions/2700000/how-to-disable-text-selection-using-jquery
-    $.fn.disableSelect = function() {
-        $(this).attr('unselectable', 'on')
+    $j.fn.disableSelect = function() {
+        $j(this).attr('unselectable', 'on')
             .css('-moz-user-select', 'none')
             .each(function() {
                 this.onselectstart = function() { return false; };
@@ -55,33 +55,33 @@ $j(document).ready(function ($) {
     };
 
     //Clickable worksheet tabs
-    $("a.sheet_tab")
+    $j("a.sheet_tab")
         .click(function () {
-            activateSheet(null, $(this));
+            activateSheet(null, $j(this));
         })
         .mouseover(function (){
             this.style.cursor = 'pointer';
         });
 
     //Cell selection
-    $("table.sheet td.cell")
+    $j("table.sheet td.cell")
         .mousedown(function () {
             //enable selection of cells only in spreadsheet explore, not search preview.
-            if ($('div#spreadsheet_outer_frame').length > 0) {
+            if ($j('div#spreadsheet_outer_frame').length > 0) {
                 if (!isMouseDown) {
                     //Update the cell info box to contain either the value of the cell or the formula
                     // also make hovering over the info box display all the text.
-                    if ($(this).attr("title")) {
-                        $('#cell_info').val($(this).attr("title"));
-                        $('#cell_info').attr("title", $(this).attr("title"));
+                    if ($j(this).attr("title")) {
+                        $j('#cell_info').val($j(this).attr("title"));
+                        $j('#cell_info').attr("title", $j(this).attr("title"));
                     }
                     else {
-                        $('#cell_info').val($(this).html());
-                        $('#cell_info').attr("title", $(this).html());
+                        $j('#cell_info').val($j(this).html());
+                        $j('#cell_info').attr("title", $j(this).html());
                     }
                     isMouseDown = true;
-                    startRow = parseInt($(this).attr("row"));
-                    startCol = parseInt($(this).attr("col"));
+                    startRow = parseInt($j(this).attr("row"));
+                    startCol = parseInt($j(this).attr("col"));
                 }
 
                 select_cells(startCol, startRow, startCol, startRow, null);
@@ -92,8 +92,8 @@ $j(document).ready(function ($) {
         .mouseover(function (e) {
             if (isMouseDown) {
 
-                endRow = parseInt($(this).attr("row"));
-                endCol = parseInt($(this).attr("col"));
+                endRow = parseInt($j(this).attr("row"));
+                endCol = parseInt($j(this).attr("col"));
 
                 select_cells(startCol, startRow, endCol, endRow, null);
             }
@@ -101,11 +101,11 @@ $j(document).ready(function ($) {
     ;
 
     //Auto scrolling when selection box is dragged to the edge of the view
-    $("div.sheet")
+    $j("div.sheet")
         .mousemove(function (e) {
             if(isMouseDown)
             {
-                var sheet = $("div.active_sheet");
+                var sheet = $j("div.active_sheet");
                 if(e.pageY >= (sheet.position().top + sheet.outerHeight()) - slowScrollBoundary)
                     if(e.pageY >= (sheet.position().top + sheet.outerHeight()) - fastScrollBoundary)
                         yInc =  "+=50px";
@@ -147,10 +147,10 @@ $j(document).ready(function ($) {
     ;
 
     //Scroll headings when sheet is scrolled
-    $("div.sheet")
+    $j("div.sheet")
         .scroll(function (e) {
-            $(this).parent().find("div.row_headings").scrollTop(($(this)).scrollTop());
-            $(this).parent().parent().find("div.col_headings").scrollLeft(($(this)).scrollLeft());
+            $j(this).parent().find("div.row_headings").scrollTop(($j(this)).scrollTop());
+            $j(this).parent().parent().find("div.col_headings").scrollLeft(($j(this)).scrollLeft());
         })
     ;
 
@@ -165,9 +165,8 @@ $j(document).ready(function ($) {
                     scroll(object);
             });
         }
-    };
-
-    $(document)
+    }
+    $j(document)
         .mouseup(function () {
             if (isMouseDown)
             {
@@ -175,39 +174,39 @@ $j(document).ready(function ($) {
                 if(scrolling)
                 {
                     scrolling = false;
-                    $('div.active_sheet').stop();
+                    $j('div.active_sheet').stop();
                 }
                 //Hide annotations
-                $('#annotation_container').hide();
-                $('div.annotation').hide();
+                $j('#annotation_container').hide();
+                $j('div.annotation').hide();
             }
         })
     ;
 
     //Select cells that are typed in
-    $('input#selection_data')
+    $j('input#selection_data')
         .keyup(function(e) {
             if(e.keyCode == 13) {
                 var active_sheet = $j("div.active_sheet");
                 var active_sheet_number = active_sheet.id.split('_')[1];
-                select_range($(this).val(), active_sheet_number);
+                select_range($j(this).val(), active_sheet_number);
             }
         })
     ;
 
     //Resizable column/row headings
     //also makes them clickable to select all cells in that row/column
-    $( "div.col_heading" )
+    $j( "div.col_heading" )
         .resizable({
             minWidth: 20,
             handles: 'e',
             stop: function (){
                 //when in spreadsheet "explore"
                 if ( (window.location.href).indexOf("explore") > -1 ) {
-                    $("table.active_sheet col:eq(" + ($(this).index() - 1) + ")").width($(this).width());
+                    $j("table.active_sheet col:eq(" + ($j(this).index() - 1) + ")").width($j(this).width());
                 } else {
                     var obj_id = activate_sheet_from_resizable(this);
-                    $("table." + obj_id + ".active_sheet col:eq(" + ($(this).index() - 1) + ")").width($(this).width());
+                    $j("table." + obj_id + ".active_sheet col:eq(" + ($j(this).index() - 1) + ")").width($j(this).width());
                 }
                 if ($j("div.spreadsheet_container").width()>max_container_width()) {
                     adjust_container_dimensions();
@@ -216,33 +215,33 @@ $j(document).ready(function ($) {
         })
         .mousedown(function(){
             //enable selection of cells only in spreadsheet explore, not search preview.
-            if ($('div#spreadsheet_outer_frame').length > 0) {
-                var col = $(this).index();
-                var last_row = $(this).parent().parent().parent().find("div.row_heading").size();
+            if ($j('div#spreadsheet_outer_frame').length > 0) {
+                var col = $j(this).index();
+                var last_row = $j(this).parent().parent().parent().find("div.row_heading").length;
                 select_cells(col, 1, col, last_row, null);
             }
         })
     ;
-    $( "div.row_heading" )
+    $j( "div.row_heading" )
         .resizable({
             minHeight: 15,
             handles: 's',
             stop: function (){
-                var height = $(this).height();
+                var height = $j(this).height();
                 //when in spreadsheet "explore"
                 if ( (window.location.href).indexOf("explore") > -1 ) {
-                     $("table.active_sheet tr:eq(" + $(this).index() + ")").height(height).css('line-height', height - 2 + "px");
+                     $j("table.active_sheet tr:eq(" + $j(this).index() + ")").height(height).css('line-height', height - 2 + "px");
                 } else {
                     var obj_id = activate_sheet_from_resizable(this);
-                    $("table." + obj_id + ".active_sheet tr:eq(" + $(this).index() + ")").height(height).css('line-height', height - 2 + "px");
+                    $j("table." + obj_id + ".active_sheet tr:eq(" + $j(this).index() + ")").height(height).css('line-height', height - 2 + "px");
                 }
             }
         })
         .mousedown(function(){
             //enable selection of cells only in spreadsheet explore, not search preview.
-            if ($('div#spreadsheet_outer_frame').length > 0) {
-                var row = $(this).index() + 1;
-                var last_col = $(this).parent().parent().parent().find("div.col_heading").size();
+            if ($j('div#spreadsheet_outer_frame').length > 0) {
+                var row = $j(this).index() + 1;
+                var last_col = $j(this).parent().parent().parent().find("div.col_heading").length;
                 select_cells(1, row, last_col, row, null);
             }
         })
@@ -259,7 +258,7 @@ function activate_sheet_from_resizable(div_obj) {
 function max_container_width() {
     var max_width = $j(".corner_heading").width();
     $j(".col_heading").each(function() {
-        max_width += parseInt($(this).style.width); //$(this).offsetWidth does not worked when the element is in a hidden tab
+        max_width += parseInt($j(this)[0].style.width);
     });
     return max_width;
 }
@@ -334,7 +333,7 @@ function explodeCellRange(range) {
 // changed, and to re-enhance DOM elements that have been reloaded
 function bindAnnotations(annotation_sources) {
     var annotationIndexTable = $j("div#annotation_overview table");
-    for(var s = 0; s < annotation_sources.size(); s++)
+    for(var s = 0; s < annotation_sources.length; s++)
     {
         var source = annotation_sources[s];
 
@@ -343,7 +342,7 @@ function bindAnnotations(annotation_sources) {
             .append($j("<a>Annotations from " + source.name + "</a>").attr({href : source.url})))
             .appendTo(annotationIndexTable);
 
-        for(var a = 0; a < source.annotations.size(); a++)
+        for(var a = 0; a < source.annotations.length; a++)
         {
             var ann = source.annotations[a];
 
@@ -392,9 +391,8 @@ function createAnnotationStub(ann)
 }
 
 function goToSheetPage(annotation){
-    var paginateForSheet = $('paginate_sheet_' + (annotation.sheetNumber+1));
-    if (paginateForSheet != null)
-    {
+    var paginateForSheet = $j('#paginate_sheet_' + (annotation.sheetNumber+1))[0];
+    if (paginateForSheet != null) {
         //calculate the page
         var page = Math.floor(annotation.startRow/perPage) + 1;
         var links = paginateForSheet.getElementsByTagName('a');
@@ -406,7 +404,7 @@ function goToSheetPage(annotation){
         }
         if (link != null){
             link.href = link.href.concat('&annotation_id=' + annotation.id);
-            clickLink(link);
+            window.location = link.href;
         }else{
             jumpToAnnotation(annotation.id, annotation.sheetNumber+1, annotation.cellRange);
             $j('#annotation_overview').hide();
@@ -447,7 +445,7 @@ function bindAnnotation(ann) {
 
 //to identify the current page for a specific sheet
 function currentPage(sheetNumber){
-    var paginateForSheet = $('paginate_sheet_' + (sheetNumber));
+    var paginateForSheet = $j('#paginate_sheet_' + (sheetNumber))[0];
     if (paginateForSheet != null)
     {
         var current_page = paginateForSheet.getElementsByClassName('current')[0].innerText;
@@ -464,10 +462,7 @@ function toggle_annotation_form(annotation_id) {
     $j(elem + ' div.annotation_text').toggle();
     $j(elem + ' div.annotation_edit_text').toggle();
     $j(elem + ' #annotation_controls').toggle();
-};
-
-
-
+}
 //To display the annotations
 function show_annotation(id,x,y) {
     var annotation_container = $j("#annotation_container");
@@ -672,10 +667,10 @@ function copy_cells()
 {
 
     var cells = $j('td.selected_cell');
-    var columns = $j('.col_heading.selected_heading').size();
+    var columns = $j('.col_heading.selected_heading').length;
     var text = "";
 
-    for(var i = 0; i < cells.size(); i += columns)
+    for(var i = 0; i < cells.length; i += columns)
     {
         for(var j = 0; j < columns; j += 1)
         {
@@ -694,7 +689,7 @@ function changeRowsPerPage(){
     if (current_href.endsWith('#'))
         current_href = current_href.substring(0,current_href.length-1);
 
-    var update_per_page = $('per_page').value;
+    var update_per_page = $j('per_page')[0].value;
     var update_href = '';
     if (current_href.match('page_rows') == null){
         update_href = current_href.concat('&page_rows='+update_per_page);
@@ -761,6 +756,33 @@ function relativeRows(minRow, maxRow, sheetNumber){
 function displayRowsPerPage(){
     paginations = document.getElementsByClassName('pagination');
     if (paginations.length > 0){
-        $('rows_per_page').show();
+        $j('#rows_per_page').show();
     }
 }
+
+$j(document).ready(function () {
+    $j('#new_annotation_form').on('ajax:beforeSend', function () {
+        $j('#create_annotation_button')[0].disabled = true;
+    }).on('ajax:complete', function () {
+        $j('#annotation_form').hide();
+        $j('#create_annotation_button')[0].disabled = false;
+    });
+
+    $j('#plot_panel_form').on('ajax:beforeSend', function () {
+        $j('#store_plot_button')[0].disabled = true;
+    }).on('ajax:complete', function () {
+        $j('#plot_panel').hide();
+        $j('#store_plot_button')[0].disabled = false;
+    });
+
+    // Handle updating annotations/displaying of errors when annotations are created/updated/destroyed
+    $j('#spreadsheet-explorer').on('ajax:success', '.spreadsheet-annotation-ctrl', function (_, data) {
+        $j('#annotations').html(data);
+    }).on('ajax:error', '.spreadsheet-annotation-ctrl', function (_, xhr) {
+        $j('#spreadsheet_errors').html(xhr.responseText);
+    }).on('ajax:beforeSend', '.spreadsheet-annotation-ctrl', function () {
+        $j(this).parent().find('.loading-spinner').show();
+    }).on('ajax:complete', '.spreadsheet-annotation-ctrl', function () {
+        $j(this).parent().find('.loading-spinner').hide();
+    });
+});

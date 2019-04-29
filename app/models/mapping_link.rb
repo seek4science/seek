@@ -1,4 +1,4 @@
-class MappingLink < ActiveRecord::Base
+class MappingLink < ApplicationRecord
   belongs_to :substance, :polymorphic => true
   belongs_to :mapping
 

@@ -29,7 +29,7 @@ class DocumentsControllerTest < ActionController::TestCase
     doc = Factory :document, contributor: User.current_user.person
     assert doc.can_view?
 
-    get :show, id: doc, format: :rdf
+    get :show, params: { id: doc, format: :rdf }
 
     assert_response :not_acceptable
   end
@@ -47,7 +47,7 @@ class DocumentsControllerTest < ActionController::TestCase
     visible_doc = Factory(:public_document)
     hidden_doc = Factory(:private_document)
 
-    get :index, page: 'all'
+    get :index, params: { page: 'all' }
 
     assert_response :success
     assert_includes assigns(:documents), visible_doc
@@ -57,7 +57,7 @@ class DocumentsControllerTest < ActionController::TestCase
   test 'should show' do
     visible_doc = Factory(:public_document)
 
-    get :show, id: visible_doc
+    get :show, params: { id: visible_doc }
 
     assert_response :success
   end
@@ -65,7 +65,7 @@ class DocumentsControllerTest < ActionController::TestCase
   test 'should not show hidden document' do
     hidden_doc = Factory(:private_document)
 
-    get :show, id: hidden_doc
+    get :show, params: { id: hidden_doc }
 
     assert_response :forbidden
   end
@@ -94,8 +94,7 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_difference('Document.count') do
         assert_difference('Document::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, document: { title: 'Document', project_ids: [person.projects.first.id]},
-                 content_blobs: [valid_content_blob], policy_attributes: valid_sharing
+            post :create, params: { document: { title: 'Document', project_ids: [person.projects.first.id]}, content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
           end
         end
       end
@@ -110,8 +109,7 @@ class DocumentsControllerTest < ActionController::TestCase
     event = Factory(:event,contributor:person)
     event2 = Factory(:event,contributor:person)
     assert_difference('Document.count') do
-      post :create, document: { title: 'Document', project_ids: [person.projects.first.id],event_ids:[event.id.to_s,event2.id.to_s]},
-           content_blobs: [valid_content_blob], policy_attributes: valid_sharing
+      post :create, params: { document: { title: 'Document', project_ids: [person.projects.first.id],event_ids:[event.id.to_s,event2.id.to_s]}, content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
     end
 
     assert (doc = assigns(:document))
@@ -129,8 +127,7 @@ class DocumentsControllerTest < ActionController::TestCase
     refute event.can_view?
 
     assert_no_difference('Document.count') do
-      post :create, document: { title: 'Document', project_ids: [person.projects.first.id],event_ids:[event.id.to_s]},
-           content_blobs: [valid_content_blob], policy_attributes: valid_sharing
+      post :create, params: { document: { title: 'Document', project_ids: [person.projects.first.id],event_ids:[event.id.to_s]}, content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
     end
 
   end
@@ -144,8 +141,8 @@ class DocumentsControllerTest < ActionController::TestCase
     assert document.assays.empty?
 
     assert_difference('ActivityLog.count') do
-      put :update, id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id],
-                                                assay_assets_attributes: [{ assay_id: assay.id }] }
+      put :update, params: { id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id],
+                                                assay_assets_attributes: [{ assay_id: assay.id }] } }
     end
 
     assert_redirected_to document_path(assigns(:document))
@@ -163,8 +160,8 @@ class DocumentsControllerTest < ActionController::TestCase
     event = Factory(:event,contributor:person)
 
     assert_difference('ActivityLog.count') do
-      put :update, id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id],
-                                                event_ids:['',event.id.to_s] }
+      put :update, params: { id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id],
+                                                event_ids:['',event.id.to_s] } }
     end
 
     assert (doc = assigns(:document))
@@ -179,7 +176,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_difference('Document.count', -1) do
       assert_no_difference('ContentBlob.count') do
-        delete :destroy, id: document
+        delete :destroy, params: { id: document }
       end
     end
 
@@ -189,7 +186,7 @@ class DocumentsControllerTest < ActionController::TestCase
   test 'should be able to view pdf content' do
     doc = Factory(:public_document)
     assert doc.content_blob.is_content_viewable?
-    get :show, id: doc.id
+    get :show, params: { id: doc.id }
     assert_response :success
     assert_select 'a', text: /View content/, count: 1
   end
@@ -203,7 +200,7 @@ class DocumentsControllerTest < ActionController::TestCase
     document2 = Factory(:document,contributor:person)
 
 
-    get :index, assay_id: assay.id
+    get :index, params: { assay_id: assay.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -221,7 +218,7 @@ class DocumentsControllerTest < ActionController::TestCase
     document2 = Factory(:document,contributor:person)
 
 
-    get :index, study_id: assay.study.id
+    get :index, params: { study_id: assay.study.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -239,7 +236,7 @@ class DocumentsControllerTest < ActionController::TestCase
     document2 = Factory(:document,contributor:person)
 
 
-    get :index, investigation_id: assay.study.investigation.id
+    get :index, params: { investigation_id: assay.study.investigation.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -257,7 +254,7 @@ class DocumentsControllerTest < ActionController::TestCase
     document2 = Factory(:document,policy: Factory(:public_policy),contributor:Factory(:person))
 
 
-    get :index, person_id: person.id
+    get :index, params: { person_id: person.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -275,7 +272,7 @@ class DocumentsControllerTest < ActionController::TestCase
     document2 = Factory(:document,policy: Factory(:public_policy),contributor:Factory(:person))
 
 
-    get :index, project_id: person.projects.first.id
+    get :index, params: { project_id: person.projects.first.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -291,13 +288,6 @@ class DocumentsControllerTest < ActionController::TestCase
   end
 
   def valid_content_blob
-    { data: file_for_upload, data_url: '' }
+    { data: fixture_file_upload('files/a_pdf_file.pdf'), data_url: '' }
   end
-
-  def file_for_upload
-    ActionDispatch::Http::UploadedFile.new(filename: 'doc.pdf',
-                                           content_type: 'application/pdf',
-                                           tempfile: fixture_file_upload('files/a_pdf_file.pdf'))
-  end
-
 end

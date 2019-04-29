@@ -13,9 +13,9 @@ module Seek
             flash[:error] = "#{feature.capitalize} are disabled"
             redirect_to main_app.root_path
           end
-          format.xml { render text: '<error>' + "#{feature.capitalize} are disabled" + '</error>', status: :unprocessable_entity }
+          format.xml { render xml: '<error>' + "#{feature.capitalize} are disabled" + '</error>', status: :unprocessable_entity }
           format.json do
-            render json: { "title": "#{feature.capitalize} are disabled" }, status: :unprocessable_entity
+            render json: { title: "#{feature.capitalize} are disabled" }, status: :unprocessable_entity
           end
         end
 

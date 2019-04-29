@@ -4,7 +4,7 @@
 # DECLARING WHAT "LARGE" AVATAR IS
 LARGE_SIZE = '500'.freeze
 
-class Avatar < ActiveRecord::Base
+class Avatar < ApplicationRecord
   acts_as_fleximage do
     image_directory Seek::Config.avatar_filestore_path
     use_creation_date_based_directories false

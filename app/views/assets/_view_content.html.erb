@@ -29,7 +29,8 @@
             %>
             <%#param code is used for temporary link %>
             <% url = polymorphic_path([asset, content_blob], :action => 'download', :disposition => 'inline', :code => params[:code], :image_size => zoom_width) %>
-            <% options = {:rel => "lightbox", :title => 'Preview'} %>
+            <%# lightbox ID needs to be unique %>
+            <% options = { 'data-lightbox' => "view_content_blob_#{content_blob.id}_#{Time.now.to_i}_#{rand(10000000)}", :title => 'Preview'} %>
         <% else %>
             <%#param code is used for temporary link %>
             <% url = polymorphic_path([asset, content_blob], :action => 'view_content', :code => params[:code]) %>

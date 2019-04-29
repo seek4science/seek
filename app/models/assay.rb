@@ -1,4 +1,4 @@
-class Assay < ActiveRecord::Base
+class Assay < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::Ontologies::AssayOntologyTypes
   include Seek::Taggable
@@ -175,27 +175,21 @@ class Assay < ActiveRecord::Base
   # organism may be either an ID or Organism instance
   # strain_id should be the id of the strain
   # culture_growth should be the culture growth instance
-  def associate_organism(organism, strain_id = nil, culture_growth_type = nil, tissue_and_cell_type_id = '0', tissue_and_cell_type_title = nil)
+  def associate_organism(organism, strain_id = nil, culture_growth_type = nil, tissue_and_cell_type_id = nil, tissue_and_cell_type_title = nil)
     organism = Organism.find(organism) if organism.is_a?(Numeric) || organism.is_a?(String)
     strain = organism.strains.find_by_id(strain_id)
-    assay_organism = AssayOrganism.new(assay: self, organism: organism, culture_growth_type: culture_growth_type, strain: strain)
+    tissue_and_cell_type = nil
+    if tissue_and_cell_type_id.present?
+      tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
+    elsif tissue_and_cell_type_title.present?
+      tissue_and_cell_type = TissueAndCellType.where(title: tissue_and_cell_type_title).first_or_create!
+    end
 
-    unless AssayOrganism.exists_for?(strain, organism, self, culture_growth_type)
+    unless AssayOrganism.exists_for?(self, organism, strain, culture_growth_type, tissue_and_cell_type)
+      assay_organism = AssayOrganism.new(assay: self, organism: organism, culture_growth_type: culture_growth_type,
+                                         strain: strain, tissue_and_cell_type: tissue_and_cell_type)
       assay_organisms << assay_organism
     end
-
-    tissue_and_cell_type = nil
-    unless tissue_and_cell_type_title.blank?
-      if tissue_and_cell_type_id == '0'
-        found = TissueAndCellType.where(title: tissue_and_cell_type_title).first
-        unless found
-          tissue_and_cell_type = TissueAndCellType.create!(title: tissue_and_cell_type_title) if !tissue_and_cell_type_title.nil? && tissue_and_cell_type_title != ''
-        end
-      else
-        tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
-      end
-    end
-    assay_organism.tissue_and_cell_type = tissue_and_cell_type
   end
 
   # overides that from Seek::RDF::RdfGeneration, as Assay entity depends upon the AssayClass (modelling, or experimental) of the Assay

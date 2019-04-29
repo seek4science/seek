@@ -30,6 +30,8 @@ module MockHelper
                            record_url: "https://sandbox.zenodo.org/record/#{ZENODO_DEPOSITION_ID}" }.to_json,
                    status: 202
                  )
+
+    stub_request(:post, "http://idontexist.soup/deposit/depositions?access_token=#{ZENODO_ACCESS_TOKEN}").to_return(status: 404)
   end
 
   def zenodo_oauth_mock

@@ -14,7 +14,7 @@
     <div class="faceted_browsing">
         <div data-ex-role="exhibit-collection" data-ex-item-types="<%= object_type%>"></div>
         <div class="yui-g" id="exhibit">
-            <div class="yui-u first" style="width: 85%">
+            <div class="yui-u first" style="width: 84%">
               <div id="loading" class="ajax_loading">
                  <%= image_tag "ajax-loader-large.gif" -%>
               </div>
@@ -35,14 +35,14 @@
                   <br/>
               <% end %>
               <ul class="sectionIcons reset_button">
-                    <li><%= link_to_function 'Reset All Filters', 'resetAllFilters()', {:class => 'reset_all_filters' }%> </li>
+                    <li><%= link_to 'Reset All Filters', '#', { onclick: 'resetAllFilters(); return false;', class: 'reset_all_filters' }%> </li>
               </ul>
             </div>
         </div>
     </div>
 
     <script type="text/javascript">
-       var items_for_result_url = '<%= url_for(:action => 'items_for_result') %>'
+       var items_for_result_url = '<%= url_for(:action => 'items_for_result') %>';
        Exhibit.SelectionState.currentAssetType = "<%= object_type %>";
        var internationalized_resource_name = '<%= internationalized_resource_name(object_type, true)%>'
     </script>

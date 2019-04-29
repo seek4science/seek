@@ -74,21 +74,14 @@ module Seek
       end
     end
 
-    def no_comma_for_decimal
-      check_string = ''
-      if controller_name.downcase == 'studied_factors' && params[:studied_factor].is_a?(Hash)
-        check_string.concat(params[:studied_factor][:start_value].to_s + params[:studied_factor][:end_value].to_s + params[:studied_factor][:standard_deviation].to_s)
-      elsif controller_name.downcase == 'experimental_conditions' && params[:experimental_condition].is_a?(Hash)
-        check_string.concat(params[:experimental_condition][:start_value].to_s)
-      end
-
-      if check_string =~ /,/
-        render :update do |page|
-          page.alert('Please use point instead of comma for decimal number')
+    def no_comma_for_decimal(parameters)
+      [:start_value, :end_value, :standard_deviation].any? do |key|
+        if parameters[key] && parameters[key].include?(',')
+          respond_to do |format|
+            format.any { render js: "alert('Please use point instead of comma for decimal number');" }
+          end
+          return true
         end
-        return false
-      else
-        return true
       end
     end
 

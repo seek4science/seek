@@ -1,8 +1,6 @@
 require 'test_helper'
 
 class WarningsTest < ActiveSupport::TestCase
-  include Seek::Templates::Extract
-
   def setup
     @warnings = Seek::Templates::Extract::Warnings.new
   end
@@ -19,26 +17,26 @@ class WarningsTest < ActiveSupport::TestCase
   end
 
   test 'warning equality' do
-    a = Warnings::Warning.new(:no_permission, 'aa', 'extra')
-    a2 = Warnings::Warning.new(:no_permission, 'aa', 'extra')
+    a = Seek::Templates::Extract::Warnings::Warning.new(:no_permission, 'aa', 'extra')
+    a2 = Seek::Templates::Extract::Warnings::Warning.new(:no_permission, 'aa', 'extra')
 
     assert a == a2
     assert a.eql? a2
     refute a.equal? a2
 
-    b = Warnings::Warning.new(:not_in_db, 'aa', 'extra')
+    b = Seek::Templates::Extract::Warnings::Warning.new(:not_in_db, 'aa', 'extra')
 
     refute a == b
     refute a.eql?(b)
     refute a.equal?(b)
 
-    b = Warnings::Warning.new(:no_permission, 'bb', 'extra')
+    b = Seek::Templates::Extract::Warnings::Warning.new(:no_permission, 'bb', 'extra')
 
     refute a == b
     refute a.eql?(b)
     refute a.equal?(b)
 
-    b = Warnings::Warning.new(:no_permission, 'aa', 'extra different')
+    b = Seek::Templates::Extract::Warnings::Warning.new(:no_permission, 'aa', 'extra different')
 
     refute a == b
     refute a.eql?(b)

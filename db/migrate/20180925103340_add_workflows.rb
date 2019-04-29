@@ -1,4 +1,4 @@
-class AddWorkflows < ActiveRecord::Migration
+class AddWorkflows < ActiveRecord::Migration[4.2]
   def change
     create_table "projects_workflow_versions", id: false, force: :cascade do |t|
       t.integer "project_id", limit: 4

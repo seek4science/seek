@@ -73,7 +73,7 @@ module Seek
         select_handler(role_name).instance.check_role_for_item(self, role_name, item)
       end
 
-      include Seek::ProjectHierarchies::AdminDefinedRolesExtension if Seek::Config.project_hierarchy_enabled
+      prepend Seek::ProjectHierarchies::AdminDefinedRolesExtension if Seek::Config.project_hierarchy_enabled
     end
   end
 end

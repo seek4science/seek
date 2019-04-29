@@ -35,7 +35,7 @@
       <div class="checkbox">
         <label>
           <% if current_user.try(:person) %>
-              <%= check_box_tag :anon, true, @anon, :onchange => visual_effect(:toggle_appear, 'anon_notes', :duration => 0.5) -%>
+              <%= check_box_tag :anon, true, @anon, :onchange => "$j('#anon_notes').fadeToggle();" -%>
           <% else %>
               <%= check_box_tag :anon, true, true, :disabled => true -%>
           <% end %>

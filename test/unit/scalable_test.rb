@@ -3,10 +3,10 @@ require 'test_helper'
 class ScalableTest < ActiveSupport::TestCase
   def setup
     User.current_user = Factory(:user)
-    @model = Factory :model
-    @small_scale = Factory :scale, title: 'small', pos: 1
-    @medium_scale = Factory :scale, title: 'medium', pos: 2
-    @large_scale = Factory :scale, title: 'large', pos: 3
+    @model = Factory :model, contributor: User.current_user.person
+    @small_scale = Factory :scale, title: 'small', pos: 1, image_name: 'airprom/sub-cellular.jpg'
+    @medium_scale = Factory :scale, title: 'medium', pos: 2, image_name: 'airprom/lung.jpg'
+    @large_scale = Factory :scale, title: 'large', pos: 3, image_name: 'airprom/organism.jpg'
   end
 
   test 'models have scales' do
@@ -28,7 +28,7 @@ class ScalableTest < ActiveSupport::TestCase
     assert_equal [@small_scale], scales
 
     # skip invalid id's and handle string id's
-    model2 = Factory :model
+    model2 = Factory :model, contributor:User.current_user.person
     model2.scales = ['', '9999', @small_scale.id.to_s]
     model2.save
     scales = Model.find(model2.id).scales

@@ -1,0 +1,99 @@
+<%
+  entity=controller_name.singularize
+  object ||= eval("@"+entity)
+  display_asset = nil
+  if asset == "data_file"
+    asset_object = @data_file
+    display_asset = @display_data_file
+  elsif asset == "sop"
+    asset_object = @sop
+    display_asset = @display_sop
+  end
+  if entity == "studied_factor"
+    measured_items = MeasuredItem.factors_studied_items
+    units = Unit.factors_studied_units
+  elsif entity == 'experimental_condition'
+    measured_items = MeasuredItem.all
+    units = Unit.all
+  end
+
+  form_id = object.new_record? ? 'add_condition_or_factor_form' : "edit_condition_or_factor_#{object.id}_form"
+  form_class = object.new_record? ? 'add-condition-or-factor-form' : 'edit-condition-or-factor-form'
+  html_options = { id: form_id, class: "condition-or-factor-form #{form_class}" }
+%>
+<%= form_for [asset_object, object], remote: true, html: html_options do |f| %>
+  <div class="conditions_or_factors">
+    <h4><%= object.new_record? ? 'Add new entry manually' : 'Edit this entry' %></h4>
+    <div class="row">
+      <div class="col-sm-3">
+        <div class="form-group">
+          <label>Item</label>
+          <%= f.collection_select :measured_item_id,
+                                  measured_items.sort { |a, b| a.title <=> b.title },
+                                  :id, :title, {},
+                                  { class: 'form-control measured-item-select' } %>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <div class="form-group">
+          <label>Unit</label>
+          <%= f.collection_select :unit_id, units.sort { |a, b| a.order <=> b.order },
+                                  :id, :symbol, {},
+                                  { class: "form-control" }%>
+        </div>
+      </div>
+      <% if entity == "studied_factor" %>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <label>Start value</label>
+            <%= f.text_field :start_value, size: 4, class: 'form-control' %>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <label>End value</label>
+            <%= f.text_field :end_value, size: 4, class: 'form-control' %>
+          </div>
+        </div>
+
+        <div class="col-sm-2">
+          <div class="form-group">
+            <label>SD</label>
+            <%= f.text_field :standard_deviation, size: 4, class: 'form-control' %>
+          </div>
+        </div>
+      <% elsif entity == 'experimental_condition' %>
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Value</label>
+            <%= f.text_field :start_value, size: 4, class: 'form-control' %>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="col-sm-12">
+        <%= hidden_field_tag :version, display_asset.version -%>
+
+        <div class="substance_condition_factor" style="display: none">
+          <%= render :partial => "layouts/substances_autocomplete", :locals => (object.new_record? ?
+                                                                                    {:name => "substance"} : {:name => "#{object.id}_substance", :resource => object})  -%>
+        </div>
+        <div class="growth_medium_or_buffer_description" style="display: none">
+          <%= hidden_field_tag "annotation[attribute_name]", "description" -%>
+          Please enter the description:<br/>
+          <%= text_area_tag "annotation[value]", (object.new_record? ? nil : try_block { Annotation.for_annotatable(object.class.name, object.id).with_attribute_name('description').first.value.text }), :cols => 45,:class=>"form-control" -%>
+        </div>
+
+        <div class="form-group">
+          <% if object.new_record? %>
+            <%= f.submit 'Add', :id => "#{entity}_submit", :class => 'btn btn-primary' -%>
+          <% else %>
+            <%= f.submit "Update", :id => "update_#{object.id}", :class => 'btn btn-primary' %>
+            or
+            <%= link_to 'Cancel', '#', data: { dismiss: 'modal' } %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

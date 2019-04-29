@@ -1,4 +1,4 @@
-class AssetsCreator < ActiveRecord::Base
+class AssetsCreator < ApplicationRecord
   belongs_to :asset, :polymorphic => true
   belongs_to :creator, :class_name => 'Person'
 
