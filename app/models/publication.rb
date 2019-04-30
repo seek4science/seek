@@ -191,6 +191,7 @@ class Publication < ActiveRecord::Base
     self.abstract        = bibtex_record[:abstract].try(:to_s).try(:encode!) || ''
     self.journal         = bibtex_record.journal.try(:to_s).try(:encode!)
     self.published_date  = Date.new(bibtex_record.year.try(:to_i) || 1 , bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1)
+    self.published_date = nil if self.published_date.to_s == "0001-01-01"
     self.doi             = bibtex_record[:doi].try(:to_s).try(:encode!)
     self.pubmed_id       = bibtex_record[:pubmed_id].try(:to_s).try(:encode!)
 

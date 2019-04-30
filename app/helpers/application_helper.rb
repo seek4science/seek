@@ -54,7 +54,7 @@ module ApplicationHelper
   def date_as_string(date, show_time_of_day = false, year_only_1st_jan = false)
     # for publications, if it is the first of jan, then it can be assumed it is just the year (unlikely have a publication on New Years Day)
 
-    if date.to_s == "0001-01-01"
+    if date.to_s == nil
       str = "<span class='none_text'>No date defined</span>"
     elsif year_only_1st_jan && !date.blank? && date.month == 1 && date.day == 1
       str = date.year.to_s
