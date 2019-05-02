@@ -289,7 +289,7 @@ class PublicationsController < ApplicationController
 
   def publication_params
     params.require(:publication).permit(:pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,
-                                        :published_date, :bibtex_file, :registered_mode, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
+                                        :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
                                         { data_file_ids: [] }, { scales: [] },
                                         { publication_authors_attributes: [:person_id, :id, :first_name, :last_name ] }).tap do |pub_params|

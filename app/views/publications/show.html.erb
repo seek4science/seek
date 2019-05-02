@@ -22,34 +22,33 @@
 
         <%= render :partial => 'projects/show_project_relationship', :locals => { :resource => @publication } %>
 
-        <% case @publication.publication_type %>
-          <% when 1 %>
-            <p>
-                <strong><%= "Journal" -%>:</strong>
-                <%=h @publication.journal -%>
-            </p>
-            <% when 4,5,6 %>
-            <p>
-              <% unless @publication.booktitle.nil? %>
-                <strong><%= "Book Title" -%>:</strong>
-                <%=h @publication.booktitle -%>
-              <% end %>
-            </p>
-            <% else %>
-          <p>
-            <strong><%=h publication_type_text(@publication.publication_type) -%></strong>
-          </p>
+        <p>
+          <strong><%= "Publication type" -%>:</strong>
+          <%=h publication_type_text(@publication.publication_type) -%>
+        </p>
 
+        <% unless @publication.journal.nil? || @publication.journal.empty? %>
+          <p>
+            <strong><%= "Journal" -%>:</strong>
+            <%=h @publication.journal -%>
+          </p>
         <% end %>
 
-        <% unless @publication.editor.nil? %>
+        <% unless @publication.booktitle.nil? || @publication.booktitle.empty? %>
+          <p>
+          <strong><%= "Book Title" -%>:</strong>
+          <%=h @publication.booktitle -%>
+          </p>
+        <% end %>
+
+        <% unless @publication.editor.nil? || @publication.editor.empty? %>
           <p>
             <strong>Editor<%= @publication.editor.size > 1 ? "s" : "" -%>:</strong>
             <%=h @publication.editor -%>
           </p>
         <% end %>
 
-        <% unless @publication.publisher.nil? %>
+        <% unless @publication.publisher.nil? || @publication.publisher.empty? %>
           <p>
             <strong>Publisher:</strong>
             <%=h @publication.publisher -%>
