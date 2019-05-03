@@ -84,12 +84,40 @@
                 accepts: { 'citeproc': "application/vnd.citationstyles.csl+json" },
                 dataType: 'json',
                 success: function(data, textStatus, jqXHR) {
-                    console.log("DOI:", data);
+                    //console.log("DOI:", data);
                     jQuery('#publication_doi').parents('.form-group').removeClass('has-error');
                     jQuery('#publication_doi').parents('.form-group').addClass('has-success');
                     jQuery('#crossref_id').val(data.DOI);
                     jQuery('#publication_title').val(data.title);
                     jQuery('#publication_journal').val(data["container-title"]);
+                    jQuery('#publication_publisher').val(data["publisher"]);
+                    jQuery('#publication_publisher').val(data["publisher"]);
+
+                    if (typeof data["abstract"] !== 'undefined') {
+                        var regex = /(<([^>]+)>)/ig
+                        var  result = data["abstract"].replace(regex, "").slice(9);
+                        //console.log("abstract:",result);
+                        jQuery('#publication_abstract').val(result);
+                    }
+
+                    if (!jQuery('#publication_citation').val()) {
+                        var publication_citation = data["container-title"];
+
+                        if (typeof data["volume"] !== 'undefined') {
+                            publication_citation += ','+data["volume"];
+                        }
+
+                        if (typeof data["issue"] !== 'undefined') {
+                            publication_citation += '('+ data["issue"]+')';
+                        }
+
+                        if (typeof data["page"] !== 'undefined') {
+                            publication_citation += ':' + data["page"];
+                        }
+                        console.log("citation:",publication_citation);
+                        jQuery('#publication_citation').val(publication_citation);
+                    }
+
                     published_data = data["published-online"] || data["published-print"] || data["accepted"];
                     //console.log("published_data:", published_data);
                     year=published_data["date-parts"][0][0];
@@ -138,39 +166,60 @@
                     jQuery('#publication_pubmed_id').parents('.form-group').removeClass('has-error');
                     jQuery('#publication_pubmed_id').parents('.form-group').addClass('has-success');
                     var doc = jQuery(data);
-                    console.log("Pudmed:");
-                    console.log(data);
+                    //console.log("Pudmed ID:", data);
                     var doi_elem = jQuery(data).find('PubmedArticleSet > PubmedArticle > PubmedData > ArticleIdList > ArticleId[IdType="doi"]');
                     if( doi_elem.length != 0) {
                         jQuery('#publication_doi').val(doi_elem.html());
                     }
-
-                    var medline_citation = jQuery(data).find('PubmedArticleSet > PubmedArticle > MedlineCitation');
-
-                    var title_elem = medline_citation.find('Article > ArticleTitle');
+                    var article = jQuery(data).find('PubmedArticleSet > PubmedArticle > MedlineCitation > Article');
+                    var title_elem = article.find('ArticleTitle');
                     if( title_elem.length != 0) {
                         jQuery('#publication_title').val(title_elem.html());
                     }
-                    var abstract_elem = medline_citation.find('Article > Abstract > AbstractText');
+                    var abstract_elem = article.find('Abstract > AbstractText');
                     if( abstract_elem.length != 0) {
                         jQuery('#publication_abstract').val(abstract_elem.html());
                     }
-                    var journal_elem = medline_citation.find('Article > Journal > Title');
+                    var journal_elem = article.find('Journal > Title');
                     if( journal_elem.length != 0) {
-                        jQuery('#publication_journal').val(journal_elem.html());
+                        jQuery('#publication_journal').val(journal_elem.html())
                     }
-                    var published_date = medline_citation.find('Article > ArticleDate');
-                    if( published_date.length != 0) {
-                        year=published_date.find('Year').html();
-                        console.log("year:"+year);
-                        month= published_date.find('Month').html();
-                        console.log("month:"+month);
 
-                        day= published_date.find('Day').html();
-                        console.log("day:"+day);
-                        var date_published_string = year+"-"+month+"-"+day;
-                        console.log("date_published"+date_published_string);
-                        jQuery('#publication_published_date').val(date_published_string);
+                    if (!jQuery('#publication_citation').val()) { g
+                        var journalIssue_Title = article.find('Journal > Title');
+                        var publication_citation = journalIssue_Title.html();
+                        //console.log("JournalIssue_Title:", journalIssue_Title.html());
+
+                        if (article.find('Journal > JournalIssue > Volume').length > 0) {
+                            publication_citation += ','+article.find('Journal > JournalIssue > Volume').html();
+                            //console.log("JournalIssue_Volume:", article.find('Journal > JournalIssue > Volume').html());
+                        }
+
+                        if (article.find('Journal > JournalIssue > Issue').length > 0) {
+                            publication_citation += '('+article.find('Journal > JournalIssue > Issue').html()+')';
+                            //console.log("JournalIssue_Issue:", article.find('Journal > JournalIssue > Issue').html());
+                        }
+
+                        if (article.find('Pagination > MedlinePgn').length > 0) {
+                            publication_citation += ':' + article.find('Pagination > MedlinePgn').html();
+                            //console.log("Page:", article.find('Pagination > MedlinePgn').html());
+                        }
+                         gjQuery('#publication_citation').val(publication_citation);
+                    }
+
+                    var published_date1 = article.find('Journal > JournalIssue > PubDate');
+                    var published_date2 = article.find('ArticleDate');
+
+                    if(  published_date1.find('Year').length == 0 ||
+                         published_date1.find('Month').length == 0 ||
+                         published_date1.find('Day').length == 0){
+
+                        var date_published = published_date2.find('Year').html()+"-"+published_date2.find('Month').html()+"-"+published_date2.find('Day').html();
+                        jQuery('#publication_published_date').val(date_published);
+
+                    }else {
+                        var date_published = published_date1.find('Year').html()+"-"+published_date1.find('Month').html()+"-"+published_date1.find('Day').html();
+                        jQuery('#publication_published_date').val(date_published);
                     }
                 },
                 error: function() {
