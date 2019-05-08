@@ -234,13 +234,11 @@ class PolicyTest < ActiveSupport::TestCase
   end
 
   test 'private?' do
-
-    [Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING, Policy::PUBLISHING].each do |type|
+    [Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING].each do |type|
       policy = Factory(:private_policy, access_type: type)
       assert policy.permissions.empty?
       refute policy.private?
     end
-
 
     # policy and all permissions are set to No Access
     policy = Factory(:private_policy)
@@ -336,20 +334,30 @@ class PolicyTest < ActiveSupport::TestCase
 
   test 'limits public access' do
     policy = Policy.new(access_type: Policy::MANAGING)
-    refute policy.save
-    assert policy.errors[:access_type].any?
-    assert policy.errors[:access_type].any? { |m| m.include?('too permissive') }
 
-    policy.access_type = Policy::VISIBLE
-    assert policy.save
-    refute policy.errors[:access_type].any?
+    with_config_value(:max_all_visitors_access_type, Policy::ACCESSIBLE) do
+      refute policy.save
+      assert policy.errors[:access_type].any?
+      assert policy.errors[:access_type].any? { |m| m.include?('too permissive') }
 
-    policy.access_type = Policy::EDITING
-    refute policy.save
-    assert policy.errors[:access_type].any?
+      policy.access_type = Policy::VISIBLE
+      assert policy.save
+      refute policy.errors[:access_type].any?
 
-    policy.access_type = Policy::ACCESSIBLE
-    assert policy.save
-    refute policy.errors[:access_type].any?
+      policy.access_type = Policy::EDITING
+      refute policy.save
+      assert policy.errors[:access_type].any?
+
+      policy.access_type = Policy::ACCESSIBLE
+      assert policy.save
+      refute policy.errors[:access_type].any?
+    end
+
+    with_config_value(:max_all_visitors_access_type, Policy::VISIBLE) do
+      policy.access_type = Policy::ACCESSIBLE
+      refute policy.save
+      assert policy.errors[:access_type].any?
+      assert policy.errors[:access_type].any? { |m| m.include?('too permissive') }
+    end
   end
 end

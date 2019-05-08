@@ -48,6 +48,11 @@
         admin_dropdown_setting(:default_associated_projects_access_type, option_tags, nil,
                                "Default permissions option for members of associated #{t('project').pluralize}") %>
 
+    <%= access_type_options = [Policy::PRIVATE, Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING]
+        option_tags = policy_selection_options(access_type_options, DataFile.new, Seek::Config.max_all_visitors_access_type)
+        admin_dropdown_setting(:max_all_visitors_access_type, option_tags, 'Permission Limits',
+                               'Maximum permission option for all visitors, including those without a login') %>
+
     <%= admin_setting_block('Default License', "The default license to use when one is not specified by a #{t('project').pluralize}.") do
       grouped_license_select(:default_license, Seek::Config.default_license, id: 'license-select',
                              class: 'form-control', source: Seek::License::OPENDEFINITION[:data])
