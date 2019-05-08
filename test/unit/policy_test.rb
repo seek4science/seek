@@ -333,4 +333,23 @@ class PolicyTest < ActiveSupport::TestCase
     endpoint = Factory(:openbis_endpoint,policy:policy)
     assert_equal [endpoint,project],policy.associated_items.sort_by{|i| i.class.name}
   end
+
+  test 'limits public access' do
+    policy = Policy.new(access_type: Policy::MANAGING)
+    refute policy.save
+    assert policy.errors[:access_type].any?
+    assert policy.errors[:access_type].any? { |m| m.include?('too permissive') }
+
+    policy.access_type = Policy::VISIBLE
+    assert policy.save
+    refute policy.errors[:access_type].any?
+
+    policy.access_type = Policy::EDITING
+    refute policy.save
+    assert policy.errors[:access_type].any?
+
+    policy.access_type = Policy::ACCESSIBLE
+    assert policy.save
+    refute policy.errors[:access_type].any?
+  end
 end

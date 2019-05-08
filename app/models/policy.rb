@@ -438,6 +438,9 @@ class Policy < ApplicationRecord
     Policy::ACCESSIBLE
   end
 
+  validates :access_type, numericality: { less_than_or_equal_to: Policy.max_public_access_type,
+                                          message: 'is too permissive' }
+
   # utility to get all items associated with this policy.
   def associated_items
     types = (Seek::Util.authorized_types + [OpenbisEndpoint])
