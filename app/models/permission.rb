@@ -1,7 +1,4 @@
 class Permission < ApplicationRecord
-
-  cattr_reader :precedence
-
   belongs_to :contributor, :polymorphic => true
   belongs_to :policy, :inverse_of => :permissions
 

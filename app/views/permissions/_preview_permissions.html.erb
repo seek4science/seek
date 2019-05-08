@@ -3,7 +3,7 @@
   permissions, privileged_people = uniq_people_permissions_and_privileged_people(policy.permissions.to_a, privileged_people)
   downloadable = resource_name.camelize.constantize.new.try(:is_downloadable?)
   effective_permissions = permissions.reject { |p| p.access_type <= policy.access_type }
-  sorted_permissions = effective_permissions.sort_by { |p| Permission.precedence.index(p.contributor_type) }
+  sorted_permissions = effective_permissions.sort_by { |p| Permission::PRECEDENCE.index(p.contributor_type) }
   grouped_contributors = group_by_access_type(sorted_permissions, privileged_people, downloadable)
 %>
 

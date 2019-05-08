@@ -277,7 +277,7 @@ module Seek
         # Sort permissions according to precedence, then access type, so the most direct (People), permissive (Manage)
         # permissions are applied last.
         sorted_permissions = policy.permissions
-                                   .sort_by { |p| Permission.precedence.index(p.contributor_type) * 100 - p.access_type }
+                                   .sort_by { |p| Permission::PRECEDENCE.index(p.contributor_type) * 100 - p.access_type }
                                    .reverse
 
         # Extract the individual member permissions from each FavouriteGroup and ensure they are also sorted by access_type:
