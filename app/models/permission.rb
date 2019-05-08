@@ -34,7 +34,7 @@ class Permission < ApplicationRecord
   end
 
   #precedence of permission types. Highest precedence is listed first
-  @@precedence = ['Person', 'FavouriteGroup', 'WorkGroup', 'Project', 'Programme', 'Institution']
+  PRECEDENCE = ['Person', 'FavouriteGroup', 'WorkGroup', 'Project', 'Programme', 'Institution'].freeze
 
   #takes a list of permissions, and gives you a list from the highest precedence to the lowest
   def self.sort_for person, list
@@ -42,8 +42,8 @@ class Permission < ApplicationRecord
     #sort would list things from low to high, so the sort block will return -1 when p has a higher permission than p2
     list.sort do |p, p2|
       unless p.contributor_type == p2.contributor_type
-        #@@precedence has a smaller index for higher precedence types
-        p.compare_by(p2) {|p| @@precedence.index(p.contributor_type)}
+        #PRECEDENCE has a smaller index for higher precedence types
+        p.compare_by(p2) {|p| PRECEDENCE.index(p.contributor_type)}
       else
         #highest access type should come first so we need to reverse it
         p.compare_by(p2) {|p| p.access_type_for(person)} * -1
