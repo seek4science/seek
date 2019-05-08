@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 class Permission < ActiveRecord::Base
 
   cattr_reader :precedence
 
+=======
+class Permission < ApplicationRecord
+>>>>>>> b7fb9d8... Replaced references to class var
   belongs_to :contributor, :polymorphic => true
   belongs_to :policy, :inverse_of => :permissions
 
