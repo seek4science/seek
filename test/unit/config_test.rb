@@ -146,9 +146,9 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 0, Seek::Config.default_all_visitors_access_type
   end
 
-  test 'changing nax_all_visitors_access_type integer conversion' do
-    Seek::Config.nax_all_visitors_access_type = '0'
-    assert_equal 0, Seek::Config.nax_all_visitors_access_type
+  test 'changing max_all_visitors_access_type integer conversion' do
+    Seek::Config.max_all_visitors_access_type = '0'
+    assert_equal 0, Seek::Config.max_all_visitors_access_type
   end
 
   test 'smtp_settings authentication' do
