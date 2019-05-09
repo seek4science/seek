@@ -86,7 +86,6 @@ module Seek
     end
 
     def to_spreadsheet_xml
-      return nil unless is_extractable_spreadsheet?
       begin
         spreadsheet_to_xml(File.open(filepath), Seek::Config.jvm_memory_allocation)
       rescue SysMODB::SpreadsheetExtractionException
