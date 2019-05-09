@@ -33,13 +33,13 @@
               <%= hidden_field_tag "called_from[id]", params[:id] -%>
 
               <div class="form-group">
-                <label>Username</label>
-                <%= text_field_tag 'login', nil, :placeholder => 'Username', :class => 'form-control', :autofocus => true -%>
+                <label>Username or Email Address</label>
+                <%= text_field_tag 'login', nil, placeholder: 'Username or Email Address', class: 'form-control', autofocus: true -%>
               </div>
 
               <div class="form-group">
                 <label>Password</label>
-                <%= password_field_tag 'password', nil, :placeholder => 'Password', :class => 'form-control' -%>
+                <%= password_field_tag 'password', nil, placeholder: 'Password', class: 'form-control' -%>
               </div>
 
               <div class="form-group">

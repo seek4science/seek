@@ -62,8 +62,14 @@ class SessionsControllerTest < ActionController::TestCase
     assert_select 'title', text: 'Login', count: 1
   end
 
-  test 'should_login_and_redirect' do
-    post :create, params: { login: 'quentin', password: 'test' }
+  test 'should log in with username' do
+    post :create, params: { login: users(:quentin).login, password: 'test' }
+    assert session[:user_id]
+    assert_response :redirect
+  end
+
+  test 'should log in with email' do
+    post :create, params: { login: users(:quentin).person.email, password: 'test' }
     assert session[:user_id]
     assert_response :redirect
   end
