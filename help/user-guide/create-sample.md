@@ -41,8 +41,7 @@ Once you have completed all of the information select Create.
 
 ## Creating Samples from a template
 
-You can bulk create samples by populating a template and uploading as a Datafile. Once uploaded it may be recognised as having
-originated from a sample type template, and an option to exctract samples will be displayed as a button.
+You can bulk-create samples by populating a template and uploading as a Datafile. Once uploaded it should be recognised as having originated from a sample type template, and an option to _extract samples_ will be displayed as a button.
 
 You will be shown whilst the samples are being extracted, and then when ready a Preview button will show. This can take a while if 
 there are a lot of samples, and it is fine if you leave the page and revist the data file later.
