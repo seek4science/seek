@@ -123,15 +123,15 @@ class User < ApplicationRecord
     activation_code.nil?
   end
 
-  # Authenticates a user by their login name (or email address) and unencrypted password.  Returns the user or nil.
-  def self.authenticate(login_or_email, password)
-    user = get_user(login_or_email)  # need to get the salt
+  # Authenticates a user by their email address or login name and unencrypted password.  Returns the user or nil.
+  def self.authenticate(email_or_login, password)
+    user = get_user(email_or_login)  # need to get the salt
     user && user.authenticated?(password) ? user : nil
   end
 
-  def self.get_user(login_or_email)
-    User.where(login: login_or_email).first ||
-        User.joins(:person).where(people: { email: login_or_email }).first
+  def self.get_user(email_or_login)
+    User.joins(:person).where(people: { email: email_or_login }).first ||
+      User.where(login: email_or_login).first
   end
 
   # Encrypts some data with the salt.
