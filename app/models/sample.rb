@@ -1,7 +1,5 @@
-class Sample < ApplicationRecord
-  # attr_accessible :contributor_id, :contributor_type, :json_metadata,
-  #                :policy_id, :sample_type_id, :sample_type, :title, :uuid, :project_ids, :policy, :contributor,
-  #                :other_creators, :data
+class Sample < ActiveRecord::Base
+
 
   include Seek::Rdf::RdfGeneration
 
@@ -159,7 +157,7 @@ class Sample < ApplicationRecord
     Rails.cache.fetch("sample-organisms-#{cache_key}-#{Organism.order('updated_at DESC').first.try(:cache_key)}") do
       sample_type.sample_attributes.collect do |attribute|
         next unless attribute.sample_attribute_type.title == 'NCBI ID'
-        value = get_attribute(attribute.title.to_sym)
+        value = get_attribute(attribute.hash_key)
         if value
           Organism.all.select { |o| o.ncbi_id && o.ncbi_id.to_s == value }
         end

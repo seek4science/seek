@@ -1100,6 +1100,22 @@ class SampleTest < ActiveSupport::TestCase
       assert_equal [org1,org2].sort,sample.related_organisms.sort
     end
 
+    #handles capitalized attribute name
+    sample_type = Factory(:simple_sample_type)
+    sample_type.sample_attributes << Factory.build(:sample_attribute, title: 'NcBi',
+                                                   sample_attribute_type: Factory(:ncbi_id_sample_attribute_type),
+                                                   required: true,
+                                                   sample_type: sample_type)
+    sample_type.save!
+    User.with_current_user(contributor.user) do
+      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
+      sample.set_attribute(:the_title,'testing related orgs')
+      sample.set_attribute(:ncbi,'12345')
+      sample.save!
+
+      assert_equal [org1,org2].sort,sample.related_organisms.sort
+    end
+
   end
 
 
