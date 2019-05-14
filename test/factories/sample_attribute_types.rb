@@ -49,6 +49,12 @@ Factory.define(:full_name_sample_attribute_type, parent: :string_sample_attribut
   f.title 'Full name'
 end
 
+#NCBI ID
+Factory.define(:ncbi_id_sample_attribute_type, parent: :string_sample_attribute_type) do |f|
+  f.title 'NCBI ID'
+  f.regexp '[0-9]+'
+end
+
 # positive integer
 Factory.define(:age_sample_attribute_type, parent: :integer_sample_attribute_type) do |f|
   f.regexp '^[1-9]\d*$'
