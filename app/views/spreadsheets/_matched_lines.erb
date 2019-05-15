@@ -4,7 +4,7 @@
       <div id="item_<%= object.id %>">
         <%= render :partial => "spreadsheets/row", :locals => {:sheet_array => sheet_array, :object_id => object.id} %>
         <%= link_to_function ("View more details " + expand_image).html_safe, :style => "background_display: block;", :id => 'show_details_image_' + object.id.to_s do |page|
-          page << "if ($('item_#{object.id}_details') === null) {"
+          page << "if (!document.getElementById('item_#{object.id}_details')) {"
           page.insert_html :after, "item_" + object.id.to_s, "<div id='item_#{object.id}_details' style='display: block;'></div>"
           page.replace_html 'item_'+ object.id.to_s + "_details", :partial => "assets/resource_list_item", :locals => {:resource_list_item => object}
           page << "}"

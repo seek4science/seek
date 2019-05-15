@@ -11,7 +11,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
     assert_empty person.subscriptions.where(subscribable_id: data_file.id, subscribable_type: 'DataFile')
 
     assert_difference('Subscription.count', 1) do
-      post :create, subscription: { subscribable_id: data_file.id, subscribable_type: 'DataFile' }
+      post :create, params: { subscription: { subscribable_id: data_file.id, subscribable_type: 'DataFile' } }
     end
 
     assert_redirected_to data_file
@@ -29,7 +29,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
     assert_empty someone_else.subscriptions.where(subscribable_id: data_file.id, subscribable_type: 'DataFile', person_id: someone_else.id)
 
     assert_difference('Subscription.count', 1) do
-      post :create, subscription: { subscribable_id: data_file.id, subscribable_type: 'DataFile' }
+      post :create, params: { subscription: { subscribable_id: data_file.id, subscribable_type: 'DataFile' } }
     end
 
     assert_redirected_to data_file
@@ -44,7 +44,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
     login_as(person)
 
     assert_difference('Subscription.count', -1) do
-      delete :destroy, id: subscription.id
+      delete :destroy, params: { id: subscription.id }
     end
 
     assert_redirected_to subscription.subscribable
@@ -59,7 +59,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
     assert_not_equal someone_else, person
 
     assert_no_difference('Subscription.count') do
-      delete :destroy, id: subscription.id
+      delete :destroy, params: { id: subscription.id }
     end
 
     assert flash[:error].include?('not authorized')

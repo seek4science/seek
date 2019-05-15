@@ -109,9 +109,12 @@ class EventTest < ActiveSupport::TestCase
 
       event = Factory(:event,contributor:person)
       assert event.valid?
-      event.documents << doc
 
-      refute event.save
+      assert_raise(ActiveRecord::RecordNotSaved) do
+        event.documents << doc
+        event.save!
+      end
+      
     end
   end
 end

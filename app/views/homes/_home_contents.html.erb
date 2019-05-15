@@ -22,7 +22,7 @@
   <div class="col-md-3">
     <%= render :partial=>"gadgets/announcements_gadget" if show_announcements? %>
 
-    <%= render :partial=>"home_news_feeds" -%>
+    <%= home_news_feeds %>
 
     <% if Seek::Config.tagging_enabled %>
         <div id="sidebar_tag_cloud">

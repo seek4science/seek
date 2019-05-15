@@ -46,7 +46,7 @@
           </div>
       <% end %>
       <div class="col-md-<%=content_grid_size-%> col-sm-<%=content_grid_size - 1-%> <%='col-xs-9' if resource.is_a?(Person)-%> list_item_content">
-        <%= render :seek_partial=> content_partial,:locals=>{:resource => resource} %>
+        <%= render :partial=> content_partial,:locals=>{:resource => resource} %>
       </div>
       <% unless actions_partial.blank? %>
           <div class="col-sm-2 text-right list_item_actions">

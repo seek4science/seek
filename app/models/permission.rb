@@ -1,7 +1,4 @@
-class Permission < ActiveRecord::Base
-
-  cattr_reader :precedence
-
+class Permission < ApplicationRecord
   belongs_to :contributor, :polymorphic => true
   belongs_to :policy, :inverse_of => :permissions
 
@@ -13,17 +10,17 @@ class Permission < ActiveRecord::Base
   after_commit :queue_rdf_generation_job
 
   def queue_update_auth_table
-    unless (previous_changes.keys - ["updated_at"]).empty?
+    unless (saved_changes.keys - ["updated_at"]).empty?
       assets = policy.assets
-      assets = assets | (Policy.find_by_id(policy_id_was).try(:assets) || []) unless policy_id_was.blank?
+      assets = assets | (Policy.find_by_id(policy_id_before_last_save).try(:assets) || []) unless policy_id_before_last_save.blank?
       AuthLookupUpdateJob.new.add_items_to_queue assets.compact
     end
   end
 
   def queue_rdf_generation_job
-    unless (previous_changes.keys - ["updated_at"]).empty?
+    unless (saved_changes.keys - ["updated_at"]).empty?
       policy.queue_rdf_generation_job
-      Policy.find_by_id(policy_id_was).try(:queue_rdf_generation_job) unless policy_id_was.blank?
+      Policy.find_by_id(policy_id_before_last_save).try(:queue_rdf_generation_job) unless policy_id_before_last_save.blank?
     end
   end
   
@@ -34,7 +31,7 @@ class Permission < ActiveRecord::Base
   end
 
   #precedence of permission types. Highest precedence is listed first
-  @@precedence = ['Person', 'FavouriteGroup', 'WorkGroup', 'Project', 'Programme', 'Institution']
+  PRECEDENCE = ['Person', 'FavouriteGroup', 'WorkGroup', 'Project', 'Programme', 'Institution'].freeze
 
   #takes a list of permissions, and gives you a list from the highest precedence to the lowest
   def self.sort_for person, list
@@ -42,8 +39,8 @@ class Permission < ActiveRecord::Base
     #sort would list things from low to high, so the sort block will return -1 when p has a higher permission than p2
     list.sort do |p, p2|
       unless p.contributor_type == p2.contributor_type
-        #@@precedence has a smaller index for higher precedence types
-        p.compare_by(p2) {|p| @@precedence.index(p.contributor_type)}
+        #PRECEDENCE has a smaller index for higher precedence types
+        p.compare_by(p2) {|p| PRECEDENCE.index(p.contributor_type)}
       else
         #highest access type should come first so we need to reverse it
         p.compare_by(p2) {|p| p.access_type_for(person)} * -1

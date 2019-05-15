@@ -45,7 +45,7 @@ module JsonRestTestCases
     className = object.class.name.dup
     className[0] = className[0].downcase
     fragment = '#/definitions/' + className + 'Response'
-    get :show, rest_show_url_options(object).merge(id: object, format: 'json')
+    get :show, params: rest_show_url_options(object).merge(id: object, format: 'json')
 
     if check_for_501_read_return
       assert_response :not_implemented
@@ -92,7 +92,7 @@ module JsonRestTestCases
 
       edit_max_object(object) if m == 'max'
 
-      get :show, rest_show_url_options(object).merge(id: object, format: 'json')
+      get :show, params: rest_show_url_options(object).merge(id: object, format: 'json')
 
       assert_response :success
       parsed_response = JSON.parse(@response.body)
@@ -166,7 +166,7 @@ module JsonRestTestCases
 
     logout
 
-    get :show, url_opts
+    get :show, params: url_opts
     assert_response :not_found
   end
 
@@ -178,7 +178,7 @@ module JsonRestTestCases
       url_opts = rest_show_url_options.merge(id: item.id, format: format)
       logout
 
-      get :show, url_opts
+      get :show, params: url_opts
       assert_response :forbidden
     end
   end

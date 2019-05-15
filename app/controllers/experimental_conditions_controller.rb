@@ -3,10 +3,10 @@ class ExperimentalConditionsController < ApplicationController
   include Seek::AnnotationCommon
   include Seek::AssetsCommon
 
-  before_filter :login_required
-  before_filter :find_and_auth_sop  
-  before_filter :create_new_condition, :only=>[:index]
-  before_filter :no_comma_for_decimal, :only=>[:create, :update]
+  before_action :login_required
+  before_action :find_and_auth_sop
+  before_action :create_new_condition, :only=>[:index]
+  before_action -> { no_comma_for_decimal(experimental_condition_params) }, :only=>[:create, :update]
 
   include Seek::BreadCrumbs
 
@@ -28,32 +28,19 @@ class ExperimentalConditionsController < ApplicationController
 
     update_annotations(params[:annotation][:value], @experimental_condition, 'description') if try_block{!params[:annotation][:value].blank?}
 
-    render :update do |page|
-      if @experimental_condition.save
-        page.insert_html :bottom,"condition_or_factor_rows",:partial=>"studied_factors/condition_or_factor_row",:object=>@experimental_condition,:locals=>{:asset => 'sop', :show_delete=>true}
-        page.visual_effect :highlight,"condition_or_factor_rows"
-        # clear the _add_factor form
-        page.call "autocompleters['substance_autocompleter'].deleteAllTokens"
-        page[:add_condition_or_factor_form].reset
-        page[:substance_condition_factor].hide
-        page[:growth_medium_or_buffer_description].hide
-      else
-        page.alert(@experimental_condition.errors.full_messages)
+    if @experimental_condition.save
+      respond_to do |format|
+        format.js
       end
+    else
+      render plain: @experimental_condition.errors.full_messages, status: :unprocessable_entity
     end
   end
 
   def create_from_existing
-    experimental_condition_ids = []
     new_experimental_conditions = []
-    #retrieve the selected FSes
-    params.each do |key, value|
-       if key =~ /checkbox_/
-         experimental_condition_ids.push value.to_i
-       end
-    end
     #create the new FSes based on the selected FSes
-    experimental_condition_ids.each do |id|
+    existing_experimental_condition_params[:existing_studied_factor].each do |id|
       experimental_condition = ExperimentalCondition.find(id)
       new_experimental_condition = ExperimentalCondition.new(:measured_item_id => experimental_condition.measured_item_id, :unit_id => experimental_condition.unit_id, :start_value => experimental_condition.start_value)
       new_experimental_condition.sop=@sop
@@ -67,28 +54,20 @@ class ExperimentalConditionsController < ApplicationController
 
       new_experimental_conditions.push new_experimental_condition
     end
-    #
-    render :update do |page|
-        new_experimental_conditions.each do  |ec|
-          if ec.save
-            page.insert_html :bottom,"condition_or_factor_rows",:partial=>"studied_factors/condition_or_factor_row",:object=>ec,:locals=>{:asset => 'sop', :show_delete=>true}
-          else
-            page.alert("can not create factor studied: item: #{try_block{ec.substance.name}} #{ec.measured_item.title}, value: #{ec.start_value}}#{ec.unit.title}")
-          end
-        end
-        page.visual_effect :highlight,"condition_or_factor_rows"
+
+    @saved_conditions, @errored_conditions = new_experimental_conditions.partition(&:save)
+    respond_to do |format|
+      format.js
     end
   end
 
   def destroy
     @experimental_condition=ExperimentalCondition.find(params[:id])
-    render :update do |page|
-      if @experimental_condition.destroy
-        page.visual_effect :fade, "condition_or_factor_row_#{@experimental_condition.id}"
-        page.visual_effect :fade, "edit_condition_or_factor_#{@experimental_condition.id}_form"
-      else
-        page.alert(@experimental_condition.errors.full_messages)
-      end
+
+    if @experimental_condition.destroy
+      render js: "$j('#condition_or_factor_row_#{@experimental_condition.id}').fadeOut();"
+    else
+      render plain: @experimental_condition.errors.full_messages, status: :unprocessable_entity
     end
   end
 
@@ -113,16 +92,13 @@ class ExperimentalConditionsController < ApplicationController
 
       update_annotations(params[:annotation][:value], @experimental_condition, 'description') if try_block{!params[:annotation][:value].blank?}
 
+
       if @experimental_condition.update_attributes(experimental_condition_params)
-        render :update do |page|
-          page.visual_effect :fade,"edit_condition_or_factor_#{@experimental_condition.id}_form"
-          page.call "autocompleters['#{@experimental_condition.id}_substance_autocompleter'].deleteAllTokens"
-          page.replace "condition_or_factor_row_#{@experimental_condition.id}", :partial => 'studied_factors/condition_or_factor_row', :object => @experimental_condition, :locals=>{:asset => 'sop', :show_delete=>true}
+        respond_to do |format|
+          format.js
         end
       else
-        render :update do |page|
-          page.alert(@experimental_condition.errors.full_messages)
-        end
+        render plain: @experimental_condition.errors.full_messages, status: :unprocessable_entity
       end
   end
 
@@ -130,6 +106,10 @@ class ExperimentalConditionsController < ApplicationController
 
   def experimental_condition_params
     params.require(:experimental_condition).permit(:measured_item_id, :unit_id, :start_value)
+  end
+
+  def existing_experimental_condition_params
+    params.permit(existing_studied_factor: [])
   end
 
   def find_and_auth_sop

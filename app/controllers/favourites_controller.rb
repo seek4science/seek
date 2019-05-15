@@ -1,5 +1,5 @@
 class FavouritesController < ApplicationController
-  before_filter :login_required
+  before_action :login_required
 
   cache_sweeper :favourites_sweeper, only: %i[add delete]
 
@@ -18,30 +18,19 @@ class FavouritesController < ApplicationController
     favourite = Favourite.new(user: current_user, resource: resource)
 
     if resource && resource.is_favouritable? && favourite.save
-      render :update, status: :created do |page|
-        page.replace_html 'favourite_list', partial: 'favourites/gadget_list'
-        page.visual_effect :highlight, 'add-favourites-zone', startcolor: '#DDDDFF'
-      end
+      render partial: 'favourites/gadget_list', status: :created
     else
-      render :update, status: :unprocessable_entity do |page|
-        page.visual_effect :highlight, 'add-favourites-zone', startcolor: '#FF0000'
-      end
+      head :unprocessable_entity
     end
   end
 
   def delete
     f = Favourite.find(params[:id])
 
-    if f.user == current_user
-      f.destroy
-      render :update do |page|
-        page.replace_html 'favourite_list', partial: 'favourites/gadget_list'
-        page.visual_effect :highlight, 'add-favourites-zone', startcolor: '#DDDDFF'
-      end
+    if f.user == current_user && f.destroy
+      render partial: 'favourites/gadget_list'
     else
-      render :update, status: :unprocessable_entity do |page|
-        page.visual_effect :highlight, 'add-favourites-zone', startcolor: '#FF0000'
-      end
+      head :unprocessable_entity
     end
   end
 end

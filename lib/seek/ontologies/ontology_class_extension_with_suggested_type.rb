@@ -3,12 +3,8 @@ module Seek
     module OntologyClassExtensionWithSuggestedType
       extend ActiveSupport::Concern
 
-      included do
-        alias_method_chain :children, :suggested_types
-      end
-
-      def children_with_suggested_types
-        children_without_suggested_types + suggested_children
+      def children
+        super + suggested_children
       end
 
       def suggested_children

@@ -96,6 +96,8 @@ class ProjectTest < ActiveSupport::TestCase
     end
   end
 
+
+
   test 'rdf for web_page - existing or blank or nil' do
     object = Factory :project, web_page: 'http://google.com'
 
@@ -494,14 +496,89 @@ class ProjectTest < ActiveSupport::TestCase
     project = Factory(:project)
     work_group = Factory(:work_group, project: project)
     a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
-    assert !project.work_groups.collect(&:people).flatten.empty?
-    assert !project.can_delete?(user)
+    refute project.work_groups.collect(&:people).flatten.empty?
+    refute project.can_delete?(user)
 
     # can delete if admin and workgroups are empty
     work_group.group_memberships.delete_all
     assert project.work_groups.reload.collect(&:people).flatten.empty?
     assert user.is_admin?
     assert project.can_delete?(user)
+
+    # cannot delete if there are assets, even if no people
+    user = Factory(:admin).user
+    project = Factory(:project)
+    assert_empty project.people
+    assert project.can_delete?(user)
+    Factory(:investigation, projects:[project])
+    project.work_groups.clear # FactoryGirl - with_project_contributor automatically adds the contributor to the project
+    project.reload
+    assert_empty project.people
+    refute_empty project.investigations
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:study, investigation: Factory(:investigation, projects:[project]))
+    project.work_groups.clear
+    project.reload
+    refute_empty project.studies
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:assay, study: Factory(:study, investigation: Factory(:investigation, projects:[project])))
+    project.work_groups.clear
+    project.reload
+    refute_empty project.assays
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:sop, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.sops
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:workflow, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.workflows
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:workflow, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.workflows
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:node, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.nodes
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:sample, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.samples
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:simple_sample_type, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.sample_types
+    refute project.can_delete?(user)
+
+    project = Factory(:project)
+    Factory(:publication, projects:[project])
+    project.work_groups.clear
+    project.reload
+    refute_empty project.publications
+    refute project.can_delete?(user)
   end
 
   test 'gatekeepers' do

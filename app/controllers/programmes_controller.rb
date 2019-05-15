@@ -3,17 +3,17 @@ class ProgrammesController < ApplicationController
   include Seek::DestroyHandling
   include ApiHelper
 
-  before_filter :programmes_enabled?
-  before_filter :login_required, except: [:show, :index, :isa_children]
-  before_filter :find_and_authorize_requested_item, only: [:edit, :update, :destroy, :storage_report]
-  before_filter :find_requested_item, only: [:show, :admin, :initiate_spawn_project, :spawn_project,:activation_review,:accept_activation,:reject_activation,:reject_activation_confirmation]
-  before_filter :find_activated_programmes, only: [:index]
-  before_filter :is_user_admin_auth, only: [:initiate_spawn_project, :spawn_project,:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation,:awaiting_activation]
-  before_filter :can_activate?, only: [:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation]
-  before_filter :inactive_view_allowed?, only: [:show]
+  before_action :programmes_enabled?
+  before_action :login_required, except: [:show, :index, :isa_children]
+  before_action :find_and_authorize_requested_item, only: [:edit, :update, :destroy, :storage_report]
+  before_action :find_requested_item, only: [:show, :admin, :initiate_spawn_project, :spawn_project,:activation_review,:accept_activation,:reject_activation,:reject_activation_confirmation]
+  before_action :find_activated_programmes, only: [:index]
+  before_action :is_user_admin_auth, only: [:initiate_spawn_project, :spawn_project,:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation,:awaiting_activation]
+  before_action :can_activate?, only: [:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation]
+  before_action :inactive_view_allowed?, only: [:show]
 
 
-  skip_before_filter :project_membership_required
+  skip_before_action :project_membership_required
 
   include Seek::BreadCrumbs
 

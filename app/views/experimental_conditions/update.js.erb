@@ -1,0 +1,4 @@
+$j('#substance_list').tagsinput('removeAll');
+$j('.edit-condition-modal').modal('hide');
+$j('#condition_or_factor_row_<%= @experimental_condition.id -%>').replaceWith("<%= escape_javascript(render partial: 'studied_factors/condition_or_factor_row', object: @experimental_condition, locals: { asset: 'sop', show_delete: true }) -%>");
+$j('#condition-or-factor-table tbody:last-child').highlight();

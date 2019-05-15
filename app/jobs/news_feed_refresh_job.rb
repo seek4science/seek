@@ -4,6 +4,7 @@ class NewsFeedRefreshJob < SeekJob
   FEEDS = [:news].freeze
 
   def perform_job(_) # ArgumentError thrown if this isn't present
+    return unless Seek::Config.news_enabled
     Seek::FeedReader.clear_cache
 
     FEEDS.each do |feed|

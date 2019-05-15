@@ -10,7 +10,7 @@ class NelsControllerTest < ActionController::TestCase
 
   test 'can get browser' do
     VCR.use_cassette('nels/get_user_info') do
-      get :index, assay_id: @assay.id
+      get :index, params: { assay_id: @assay.id }
     end
 
     assert_response :success
@@ -20,7 +20,7 @@ class NelsControllerTest < ActionController::TestCase
   test 'cannot get browser if nels disabled' do
     with_config_value(:nels_enabled, false) do
       VCR.use_cassette('nels/get_user_info') do
-        get :index, assay_id: @assay.id
+        get :index, params: { assay_id: @assay.id }
       end
     end
 
@@ -34,10 +34,10 @@ class NelsControllerTest < ActionController::TestCase
     login_as(person)
 
     assert assay.can_edit?(person)
-    refute assay.projects.any? { |p| p.settings['nels_enabled'] }
+    refute assay.projects.any? { |p| p.settings.get('nels_enabled') }
 
     VCR.use_cassette('nels/get_user_info') do
-      get :index, assay_id: assay.id
+      get :index, params: { assay_id: assay.id }
     end
 
     assert_redirected_to assay
@@ -46,10 +46,10 @@ class NelsControllerTest < ActionController::TestCase
 
   test 'cannot get browser if NeLS integration disabled' do
     assert @assay.can_edit?(@user)
-    assert @assay.projects.any? { |p| p.settings['nels_enabled'] }
+    assert @assay.projects.any? { |p| p.settings.get('nels_enabled') }
 
     with_config_value(:nels_enabled, false) do
-      get :index, assay_id: @assay.id
+      get :index, params: { assay_id: @assay.id }
     end
 
     assert_redirected_to :root
@@ -61,10 +61,10 @@ class NelsControllerTest < ActionController::TestCase
     login_as(person)
 
     refute @assay.can_edit?(person)
-    assert @assay.projects.any? { |p| p.settings['nels_enabled'] }
+    assert @assay.projects.any? { |p| p.settings.get('nels_enabled') }
 
     VCR.use_cassette('nels/get_user_info') do
-      get :index, assay_id: @assay.id
+      get :index, params: { assay_id: @assay.id }
     end
 
     assert_redirected_to @assay
@@ -80,7 +80,7 @@ class NelsControllerTest < ActionController::TestCase
                                             "assay_id:#{@assay.id}")
 
     VCR.use_cassette('nels/get_user_info') do
-      get :index, assay_id: @assay.id
+      get :index, params: { assay_id: @assay.id }
     end
 
     assert_redirected_to oauth_client.authorize_url
@@ -88,7 +88,7 @@ class NelsControllerTest < ActionController::TestCase
 
   test 'can load projects' do
     VCR.use_cassette('nels/get_projects') do
-      get :projects, assay_id: @assay.id, format: :json
+      get :projects, params: { assay_id: @assay.id, format: :json }
     end
 
     assert_response :success
@@ -97,7 +97,7 @@ class NelsControllerTest < ActionController::TestCase
 
   test 'reports 500 error when loading projects' do
     VCR.use_cassette('nels/get_projects_500') do
-      get :projects, assay_id: @assay.id, format: :json
+      get :projects, params: { assay_id: @assay.id, format: :json }
     end
 
     assert_response :internal_server_error
@@ -106,7 +106,7 @@ class NelsControllerTest < ActionController::TestCase
 
   test 'can load datasets' do
     VCR.use_cassette('nels/get_datasets') do
-      get :datasets, assay_id: @assay.id, format: :json, id: @project_id
+      get :datasets, params: { assay_id: @assay.id, format: :json, id: @project_id }
     end
 
     assert_response :success
@@ -115,7 +115,7 @@ class NelsControllerTest < ActionController::TestCase
 
   test 'can load dataset' do
     VCR.use_cassette('nels/get_dataset') do
-      get :dataset, assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id
+      get :dataset, params: { assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id }
     end
 
     assert_response :success
@@ -130,7 +130,7 @@ class NelsControllerTest < ActionController::TestCase
       assert_difference('ContentBlob.count', 1) do
         VCR.use_cassette('nels/get_dataset') do
           VCR.use_cassette('nels/get_persistent_url') do
-            post :register, assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype
+            post :register, params: { assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype }
 
             assert_redirected_to provide_metadata_data_files_path(project_ids: project_ids)
 

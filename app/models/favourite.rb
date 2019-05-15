@@ -1,4 +1,4 @@
-class Favourite < ActiveRecord::Base
+class Favourite < ApplicationRecord
   belongs_to :user
   belongs_to :resource, :polymorphic => true
   
@@ -18,8 +18,8 @@ class Favourite < ActiveRecord::Base
   private
 
   def destroy_saved_search
-    if resource_type_was == 'SavedSearch'
-      SavedSearch.find(resource_id_was).destroy
+    if resource_type == 'SavedSearch'
+      SavedSearch.find(resource_id).try(:destroy)
     end
   end
 end

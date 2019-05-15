@@ -1,4 +1,4 @@
-class Document < ActiveRecord::Base
+class Document < ApplicationRecord
 
   include Seek::Rdf::RdfGeneration
 

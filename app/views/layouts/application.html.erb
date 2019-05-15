@@ -8,10 +8,14 @@
 
   <%= favicon_link_tag('favicon.png', :type => 'image/png') %>
   <%= csrf_meta_tag %>
+
+  <%= schema_ld_script_block %>
+
   <%= seek_stylesheet_tags %>
   <%= seek_javascript_tags %>
 
   <link href="#data" type="application/json" rel="exhibit-data" />
+
 </head>
 
 <body id="body">
@@ -27,8 +31,6 @@
           </ol>
         </div>
     <% end %>
-
-    <%= add_return_to_search %>
 
     <%# applying styling to error / notice messages -%>
     <% if flash[:error] %>
@@ -48,6 +50,7 @@
 </div>
 
 <%= render :partial=>"layouts/footer" %>
+<%#= debug(params) if Rails.env.development? %>
 
 <%= render partial: 'layouts/piwik' if Seek::Config.piwik_analytics_enabled %>
 <%= analytics_init if Seek::Config.google_analytics_enabled %>

@@ -512,20 +512,20 @@ class SampleTest < ActiveSupport::TestCase
   test 'sample with clashing attribute names with dynamic rails methods' do
     person = Factory(:person)
     sample_type = SampleType.new title: 'with awkward attributes', projects: person.projects, contributor: person
-    sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title_was', is_title: true, sample_type: sample_type)
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title_before_last_save', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     disable_authorization_checks { sample_type.save! }
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = sample_type
 
-    sample.set_attribute(:title_was, 'the title')
+    sample.set_attribute(:title_before_last_save, 'the title')
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert_equal 'the title', sample.title
 
     sample = Sample.find(sample.id)
     assert_equal 'the title', sample.title
-    assert_equal 'the title', sample.get_attribute(:title_was)
+    assert_equal 'the title', sample.get_attribute(:title_before_last_save)
   end
 
   test 'strain type stores valid strain info' do
@@ -685,6 +685,8 @@ class SampleTest < ActiveSupport::TestCase
     sample.set_attribute(:patient, 'a b c d e f 123')
     refute sample.valid?
   end
+
+
 
   test 'can create' do
     refute Sample.can_create?
@@ -1020,6 +1022,100 @@ class SampleTest < ActiveSupport::TestCase
     assert_difference('SampleResourceLink.count', -1) do
       disable_authorization_checks { linked_sample.destroy! }
     end
+  end
+
+  test 'related organisms through ncbi id' do
+    org1 = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://purl.obolibrary.org/obo/NCBITaxon_12345'))
+    org2 = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://identifiers.org/taxonomy/12345'))
+    org3 = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://identifiers.org/taxonomy/12346'))
+    org4 = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: nil))
+    org5 = Factory(:organism, bioportal_concept: nil)
+
+    sample_type = Factory(:simple_sample_type)
+    sample_type.sample_attributes << Factory.build(:sample_attribute, title: 'ncbi',
+                                                   sample_attribute_type: Factory(:ncbi_id_sample_attribute_type),
+                                                   required: false,
+                                                   sample_type: sample_type)
+    sample_type.save!
+
+    contributor = Factory(:person)
+    User.with_current_user(contributor.user) do
+
+      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
+      sample.set_attribute(:the_title,'testing related orgs')
+      sample.set_attribute(:ncbi,"12345")
+      sample.save!
+
+      assert_equal [org1,org2].sort,sample.related_organisms.sort
+    end
+
+    #with nil ncbi id
+    User.with_current_user(contributor.user) do
+      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
+      sample.set_attribute(:the_title,'testing related orgs')
+      sample.set_attribute(:ncbi,nil)
+      sample.save!
+
+      assert_empty sample.related_organisms
+    end
+
+    #with blank ncbi id
+    User.with_current_user(contributor.user) do
+      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
+      sample.set_attribute(:the_title,'testing related orgs')
+      sample.set_attribute(:ncbi,'')
+      sample.save!
+
+      assert_empty sample.related_organisms
+    end
+
+    #with partially matching ncbi id
+    User.with_current_user(contributor.user) do
+      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
+      sample.set_attribute(:the_title,'testing related orgs')
+      sample.set_attribute(:ncbi,'345')
+      sample.save!
+
+      assert_empty sample.related_organisms
+    end
+
+    #shouldn't be duplicates
+    sample_type = Factory(:simple_sample_type)
+    sample_type.sample_attributes << Factory.build(:sample_attribute, title: 'ncbi',
+                                                   sample_attribute_type: Factory(:ncbi_id_sample_attribute_type),
+                                                   required: true,
+                                                   sample_type: sample_type)
+    sample_type.sample_attributes << Factory.build(:sample_attribute, title: 'ncbi2',
+                                                   sample_attribute_type: Factory(:ncbi_id_sample_attribute_type),
+                                                   required: true,
+                                                   sample_type: sample_type)
+    sample_type.save!
+    User.with_current_user(contributor.user) do
+      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
+      sample.set_attribute(:the_title,'testing related orgs')
+      sample.set_attribute(:ncbi,'12345')
+      sample.set_attribute(:ncbi2,'12345')
+      sample.save!
+
+      assert_equal [org1,org2].sort,sample.related_organisms.sort
+    end
+
+    #handles capitalized attribute name
+    sample_type = Factory(:simple_sample_type)
+    sample_type.sample_attributes << Factory.build(:sample_attribute, title: 'NcBi',
+                                                   sample_attribute_type: Factory(:ncbi_id_sample_attribute_type),
+                                                   required: true,
+                                                   sample_type: sample_type)
+    sample_type.save!
+    User.with_current_user(contributor.user) do
+      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
+      sample.set_attribute(:the_title,'testing related orgs')
+      sample.set_attribute(:ncbi,'12345')
+      sample.save!
+
+      assert_equal [org1,org2].sort,sample.related_organisms.sort
+    end
+
   end
 
 

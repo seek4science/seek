@@ -50,40 +50,41 @@
     <% end -%>
 
     <% if @folder.editable? %>
-        <div>
-        <%= image_tag_for_key "add", "javascript:Effect.Appear('new_child');new Effect.Highlight('new_child');",
-                              "Add subfolder",
-                              {},
-                              "Add a sub-folder",
-                              :function
-        -%>
-        </div>
+      <%= button_link_to('Add subfolder', 'add', '#', id: 'add-subfolder-btn') %>
     <% end -%>
-
   </li>
-
 </ul>
 
 <div style='clear:both;'>&nbsp;</div>
 
 <% if @folder.editable? -%>
-    <div id='new_child' style='display:none;'>
-      <div id="error_text" class='error_div alert alert-danger' style="display:none;"></div>
-      <%= form_tag_with_callbacks(create_folder_project_folder_path(@project,@folder),
-                                  {
-                                          :id=>:create_child_form,
-                                          :update=>{:failure=>:error_text},
-                                          :loading=>"$('add_folder_button').disabled=true;",
-                                          :complete=>"$('add_folder_button').disabled=false;",
-                                          :success=>"location.reload();",
-                                          :failure=>"$('error_text').show();",
-                                          :remote=>true}) do -%>
-              <%= label_tag "Create a new sub-folder:" -%>
-              <%= hidden_field_tag :project_id, @folder.project.id -%>
-              <%= text_field_tag :title -%>
-              <%= submit_tag(:create, :id=>"add_folder_button") -%>
-          <% end -%>
-
+  <div id='new_child' style='display:none;'>
+    <div id="error_text" class='error_div alert alert-danger' style="display:none;"></div>
+    <%= form_tag(create_folder_project_folder_path(@project, @folder), { id: :create_child_form, remote: true }) do -%>
+      <div class="input-group">
+        <%= text_field_tag :title, nil, id: 'subfolder-title', placeholder: 'Enter sub-folder name...', class: 'form-control' -%>
+        <div class="input-group-btn">
+          <%= submit_tag "Create", data: { disable_with: 'Creating...' }, class: 'btn btn-primary' %>
         </div>
+      </div>
+    <% end -%>
+  </div>
+  <script>
+      $j(document).ready(function () {
+          $j('#add-subfolder-btn').click(function () {
+              $j('#new_child').fadeIn();
+              $j('#subfolder-title').focus();
+              return false;
+          });
+          $j('#create_child_form').on("ajax:before", function () {
+              $j('#new_child').spinner('add');
+          }).on("ajax:success", function (_, data) {
+              location.reload();
+          }).on("ajax:error", function (_, data) {
+              $j('#new_child').spinner('remove');
+              $j('#error_text').html(data).show();
+          });
+      });
+  </script>
 <% end -%>
 

@@ -6,7 +6,7 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "form allows creating temporary access links for #{type_name}" do
       User.with_current_user(Factory(:user, login: 'test')) do
-        post '/session', login: 'test', password: generate_user_password
+        post '/session', params: { login: 'test', password: generate_user_password }
 
         get "/#{type_name}/new"
         assert_select 'form div#temporary_links', count: 0
@@ -140,7 +140,7 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
           item.special_auth_codes << Factory(:special_auth_code, asset: item)
         end
 
-        post '/session', login: user.login, password: user.password
+        post '/session', params: { login: user.login, password: user.password }
 
         get "/#{type_name}/#{item.id}"
 
@@ -158,7 +158,7 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
         item.special_auth_codes << Factory(:special_auth_code, asset: item)
         user = Factory(:user)
 
-        post '/session', login: user.login, password: user.password
+        post '/session', params: { login: user.login, password: user.password }
         get "/#{type_name}/#{item.id}"
 
         assert_response :success, "failed for asset #{type_name}"

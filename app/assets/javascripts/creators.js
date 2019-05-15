@@ -10,7 +10,7 @@ function updateCreatorSettings() {
 
     // update the page
     if(html.length == 0) {
-        $j('#creators_list').html('<li><span class="none_text">No creators</span></li>');
+        $j('#creators_list').html('<li class="association-list-item"><span class="none_text">No creators</span></li>');
     }
     else {
         $j('#creators_list').html(html);
@@ -45,30 +45,6 @@ function addCreator(creator) {
     else {
         alert('The following creator was not added (already in the list of creators):\n\n' + creator.name);
     }
-}
-
-function updateInstitutionList(data, project_name){
-    data = data.evalJSON(true);
-    var element = $j('#adv_creator_select_institutions')[0];
-    var spinner = $j('#adv_creator_select_project_spinner')[0];
-    element.options.length = "";
-    element.options[0] = new Option('All members of ' + project_name, 0);
-    var next_index_to_use = 1;
-    for (var i = 0; i < data.institution_list.length; i++) {
-        element.options[next_index_to_use] = new Option('Members of ' + project_name + ' @ ' + data.institution_list[i][0], data.institution_list[i][1]);
-        next_index_to_use++;
-    }
-    spinner.hide();
-    element.show();
-    $j('#adv_creator_select_add').show();
-}
-
-function addPeopleToList(data){
-    data = data.evalJSON(true);
-    for (var i = 0; i < data.people_list.length; i++) {
-        addCreator({name: data.people_list[i][0], email: data.people_list[i][1], id: data.people_list[i][2]});
-    }
-    $j('#adv_creator_select_spinner').hide();
 }
 
 $j(function() {

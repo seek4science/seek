@@ -42,7 +42,7 @@ class OpenbisFakeJobTest < ActiveSupport::TestCase
   end
 
   test 'performs job on assay' do
-    assay = Factory :assay
+    assay = Factory(:assay, created_at: 1.day.ago, updated_at: 1.day.ago)
     mod = assay.updated_at
 
     @job.perform_job(assay)

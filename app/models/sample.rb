@@ -1,7 +1,5 @@
-class Sample < ActiveRecord::Base
-  # attr_accessible :contributor_id, :contributor_type, :json_metadata,
-  #                :policy_id, :sample_type_id, :sample_type, :title, :uuid, :project_ids, :policy, :contributor,
-  #                :other_creators, :data
+class Sample < ApplicationRecord
+
 
   include Seek::Rdf::RdfGeneration
 
@@ -148,25 +146,24 @@ class Sample < ActiveRecord::Base
   end
 
   def related_organisms
-    return [] unless sample_type
-
-    # Note this depends on sample_type being immutable if there are samples
-
-    Rails.cache.fetch("sample-organisms-#{cache_key}") do
-      result = organisms
-      seek_sample_attributes = sample_type.sample_attributes
-      seek_sample_attributes.each {|a|
-        t = a.sample_attribute_type.title
-        if t.eql? 'NCBI ID'
-          v = get_attribute(a.title)
-          result = result + Organism.all.select {|o| o.bioportal_concept.concept_uri.end_with? v}
-        end
-      }
-      result
-    end
+    organisms | ncbi_linked_organisms
   end
 
   private
+
+  # organisms linked through an NCBI attribute type
+  def ncbi_linked_organisms
+    return [] unless sample_type
+    Rails.cache.fetch("sample-organisms-#{cache_key}-#{Organism.order('updated_at DESC').first.try(:cache_key)}") do
+      sample_type.sample_attributes.collect do |attribute|
+        next unless attribute.sample_attribute_type.title == 'NCBI ID'
+        value = get_attribute(attribute.hash_key)
+        if value
+          Organism.all.select { |o| o.ncbi_id && o.ncbi_id.to_s == value }
+        end
+      end.flatten.compact.uniq
+    end
+  end
 
   def samples_this_links_to
     return [] unless sample_type

@@ -17,7 +17,7 @@
 
 <%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales?%>
 
-<%= render :seek_partial=>"sharing/form" if @investigation.can_manage? -%>
+<%= render :partial=>"sharing/form" if @investigation.can_manage? -%>
 
 <%  existing_creators = @investigation.creators
     existing_creators =  [current_user.person] if existing_creators.blank?
@@ -39,7 +39,6 @@
                  :class => 'btn btn-primary' -%>
 <% else %>
     <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "investigation_submit_btn",
-                 :onclick => "javascript: $('investigation_submit_btn').form.submit();return(false);",
                  :class => 'btn btn-primary' -%>
 <% end %>
  or <%= cancel_button(@investigation.id ? investigation_path(@investigation.id) : investigations_path) -%>

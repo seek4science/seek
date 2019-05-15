@@ -1,0 +1,81 @@
+require 'test_helper'
+
+class PermissionTest < ActiveSupport::TestCase
+  fixtures :all
+
+  setup do
+    @programme = Factory(:programme)
+    @project = Factory(:project, programme: @programme)
+    @project2 = Factory(:project, programme: @programme)
+    @institution = Factory(:institution)
+    @person = Factory(:person, project: @project)
+    @person.add_to_project_and_institution(@project2, @institution)
+    @person2 = Factory(:person, project: @project)
+    @project2_work_group = @project2.work_groups.first
+    @favourite_group = Factory(:favourite_group, user: @person.user)
+    @favourite_group.favourite_group_memberships.create!(person: @person2, access_type: Policy::MANAGING)
+
+    @data_file = Factory(:data_file, projects: [@project], contributor: @person)
+
+    # 1 of each type of permission
+    @data_file.policy.permissions.create!(contributor: @institution, access_type: Policy::MANAGING)
+    @data_file.policy.permissions.create!(contributor: @programme, access_type: Policy::MANAGING)
+    @data_file.policy.permissions.create!(contributor: @project2, access_type: Policy::MANAGING)
+    @data_file.policy.permissions.create!(contributor: @project2_work_group, access_type: Policy::MANAGING)
+    @data_file.policy.permissions.create!(contributor: @favourite_group, access_type: Policy::MANAGING)
+    @data_file.policy.permissions.create!(contributor: @person2, access_type: Policy::MANAGING)
+  end
+
+  test 'cleans up project-dependent permissions after delete' do
+    assert_difference('Permission.count', -2) do
+      @person.group_memberships.last.destroy!
+      disable_authorization_checks { @project2.destroy! }
+    end
+
+    refute @data_file.policy.reload.permissions.where(contributor_id: @project2, contributor_type: 'Project').any?
+    refute @data_file.policy.reload.permissions.where(contributor_id: @project2_work_group, contributor_type: 'WorkGroup').any?
+  end
+
+  test 'cleans up institution-dependent permissions after delete' do
+    assert_difference('Permission.count', -2) do
+      @person.group_memberships.last.destroy!
+      disable_authorization_checks { @institution.destroy! }
+    end
+
+    refute @data_file.policy.reload.permissions.where(contributor_id: @institution, contributor_type: 'Institution').any?
+    refute @data_file.policy.reload.permissions.where(contributor_id: @project2_work_group, contributor_type: 'WorkGroup').any?
+  end
+
+  test 'cleans up person-dependent permissions after delete' do
+    assert_difference('Permission.count', -1) do
+      disable_authorization_checks { @person2.destroy! }
+    end
+
+    refute @data_file.policy.reload.permissions.where(contributor_id: @person2, contributor_type: 'Person').any?
+  end
+
+  test 'cleans up programme-dependent permissions after delete' do
+    assert_difference('Permission.count', -1) do
+      disable_authorization_checks { @programme.destroy! }
+    end
+
+    refute @data_file.policy.reload.permissions.where(contributor_id: @programme, contributor_type: 'Programme').any?
+  end
+
+  test 'cleans up work group-dependent permissions after delete' do
+    assert_difference('Permission.count', -1) do
+      @person.group_memberships.last.destroy!
+      disable_authorization_checks { @project2_work_group.destroy! }
+    end
+
+    refute @data_file.policy.reload.permissions.where(contributor_id: @project2_work_group, contributor_type: 'WorkGroup').any?
+  end
+
+  test 'cleans up favourite group-dependent permissions after delete' do
+    assert_difference('Permission.count', -1) do
+      disable_authorization_checks { @favourite_group.destroy! }
+    end
+
+    refute @data_file.policy.reload.permissions.where(contributor_id: @favourite_group, contributor_type: 'FavouriteGroup').any?
+  end
+end

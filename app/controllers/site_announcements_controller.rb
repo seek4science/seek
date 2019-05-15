@@ -1,9 +1,9 @@
 class SiteAnnouncementsController < ApplicationController
   include Seek::BreadCrumbs
 
-  before_filter :login_required, except: %i[feed notification_settings update_notification_settings]
+  before_action :login_required, except: %i[feed notification_settings update_notification_settings]
 
-  before_filter :check_manage_announcements, only: %i[new create edit update destroy]
+  before_action :check_manage_announcements, only: %i[new create edit update destroy]
 
   def feed
     limit = params[:limit]
@@ -119,8 +119,6 @@ class SiteAnnouncementsController < ApplicationController
   private
 
   def site_announcement_params
-    params.require(:site_announcement).permit(:title, :body, :show_in_feed, :is_headline,
-                                              'expires_at(1i)', 'expires_at(2i)', 'expires_at(3i)',
-                                              'expires_at(4i)', 'expires_at(5i)', :email_notification)
+    params.require(:site_announcement).permit(:title, :body, :show_in_feed, :is_headline, :expires_at, :email_notification)
   end
 end

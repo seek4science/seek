@@ -1,7 +1,7 @@
 class ProjectStatsController < StatsController
-  before_filter :find_project
-  before_filter :member_of_this_project
-  skip_before_filter :is_user_admin_auth
+  before_action :find_project
+  before_action :member_of_this_project
+  skip_before_action :is_user_admin_auth
 
   private
 

@@ -1,4 +1,4 @@
-class Sop < ActiveRecord::Base
+class Sop < ApplicationRecord
 
   include Seek::Rdf::RdfGeneration
 

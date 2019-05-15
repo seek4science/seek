@@ -21,6 +21,21 @@ module Seek
         end
       end
 
+      def to_json_ld
+        rdf_graph = to_rdf_graph
+        context = JSON.parse %(
+        {
+          "@context": #{ns_prefixes.to_json}
+        }
+        )
+
+        compacted = nil
+        JSON::LD::API.fromRdf(rdf_graph) do |expanded|
+          compacted = JSON::LD::API.compact(expanded, context['@context'])
+        end
+        JSON.pretty_generate(compacted)
+      end
+
       def to_rdf_graph
         rdf_graph = RDF::Graph.new
         rdf_graph = describe_type(rdf_graph)
@@ -42,7 +57,7 @@ module Seek
       end
 
       def rdf_resource
-        uri = URI.join(Seek::Config.site_base_host + "/", "#{self.class.name.tableize}/","#{id}").to_s
+        uri = URI.join(Seek::Config.site_base_host + '/', "#{self.class.name.tableize}/", id.to_s).to_s
         RDF::Resource.new(uri)
       end
 
@@ -81,15 +96,15 @@ module Seek
       def ns_prefixes
         {
           'jerm' => JERMVocab.to_uri.to_s,
-          'dcterms' => RDF::DC.to_uri.to_s,
-          'owl' => RDF::OWL.to_uri.to_s,
-          'foaf' => RDF::FOAF.to_uri.to_s,
-          'sioc' => RDF::SIOC.to_uri.to_s
+          'dcterms' => RDF::Vocab::DC.to_uri.to_s,
+          'owl' => RDF::Vocab::OWL.to_uri.to_s,
+          'foaf' => RDF::Vocab::FOAF.to_uri.to_s,
+          'sioc' => RDF::Vocab::SIOC.to_uri.to_s
         }
       end
 
       def create_rdf_generation_job(force = false, refresh_dependents = true)
-        unless !force && (changed - %w[updated_at last_used_at]).empty?
+        unless !force && (saved_changes.keys - %w[updated_at last_used_at]).empty?
           RdfGenerationJob.new(self, refresh_dependents).queue_job
         end
       end
@@ -133,5 +148,11 @@ module Seek
         create_rdf_generation_job(true, false)
       end
     end
+  end
+end
+
+ActiveRecord::Base.class_eval do
+  def rdf_supported?
+    Seek::Util.rdf_capable_types.include?(self.class)
   end
 end

@@ -2,14 +2,14 @@ class OrganismsController < ApplicationController
 
   include Seek::DestroyHandling
 
-  before_filter :organisms_enabled?
-  before_filter :find_requested_item, :only=>[:show,:edit,:more_ajax,:visualise,:destroy, :update]
-  before_filter :login_required,:except=>[:show,:index,:visualise]
-  before_filter :can_manage?,:only=>[:edit,:update]
-  before_filter :auth_to_create, :only=>[:new,:create, :destroy]
-  before_filter :find_assets, only: [:index]
+  before_action :organisms_enabled?
+  before_action :find_requested_item, :only=>[:show,:edit,:visualise,:destroy, :update]
+  before_action :login_required,:except=>[:show,:index,:visualise]
+  before_action :can_manage?,:only=>[:edit,:update]
+  before_action :auth_to_create, :only=>[:new,:create, :destroy]
+  before_action :find_assets, only: [:index]
 
-  skip_before_filter :project_membership_required
+  skip_before_action :project_membership_required
   
   cache_sweeper :organisms_sweeper,:only=>[:update,:create,:destroy]
 
@@ -28,8 +28,7 @@ class OrganismsController < ApplicationController
   end
 
   def index
-
-    if request.format.symbol == :html
+    if request.format.html?
       super
     else
       respond_to do |format|
@@ -65,24 +64,11 @@ class OrganismsController < ApplicationController
     wrap_service('BioPortal', proc { |m| error = m }) do
       results,pages = search search_term,{:isexactmatch=>0,:pagesize=>100,:page=>pagenum,:ontologies=>"NCBITAXON",:apikey=>Seek::Config.bioportal_api_key}
     end
-    render :update do |page|
-      if results
-        page.replace_html 'search_results', :partial => "search_results",
-                          :object => results, :locals => { :pages => pages, :pagenum => pagenum, :search_term => search_term }
-      else
-        page.replace_html 'search_results', :partial => "search_error", :locals => { :text => error || "Nothing found" }
-      end
-    end
-  end
-
-  def more_ajax    
-    concept = @organism.concept
-    render :update do |page|
-      if concept
-        page.replace_html 'bioportal_more',:partial=>"concept",:object=>concept
-      else
-        page.replace_html 'bioportal_more',:text=>"Nothing found"
-      end
+    if results
+      render :partial => "search_results",
+                        :object => results, :locals => { :pages => pages, :pagenum => pagenum, :search_term => search_term }
+    else
+      render :partial => "search_error", :locals => { :text => error || "Nothing found" }
     end
   end
 

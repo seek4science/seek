@@ -1,14 +1,9 @@
-
 <% if SiteAnnouncement.headline_announcement and !current_user.nil? -%>
   <div class="box_standout headline_announcement">
     <%= site_annoucements_headline %>
   </div>
 <% end -%>
+
 <% if show_scales? %>
-    <%= Seek::Config.tabs_lazy_load_enabled ? render(:partial => "scales/scale_display_lazy_load") : render(:partial => "scales/scale_display") -%>
+  <%= render(partial: 'scales/scale_display') -%>
 <% end %>
-
-
-
-
-

@@ -29,8 +29,12 @@ module Seek
       is_xls?(blob) || is_xlsx?(blob) || is_xlsm?(blob)
     end
 
+    def is_supported_spreadsheet_format?(blob = self)
+      is_excel?(blob)
+    end
+
     def is_extractable_spreadsheet?(blob = self)
-      within_spreadsheet_size_limit(blob) && is_excel?(blob) && blob.file_exists?
+      blob.file_exists? && within_spreadsheet_size_limit(blob) && is_supported_spreadsheet_format?(blob)
     end
 
     def is_in_simulatable_size_limit?(blob = self)

@@ -43,7 +43,7 @@
 
         <%= preview_permission_popup_link(@data_file)-%>
         <%= f.submit "Update", :id => "data_file_submit_btn",
-                     :onclick => "javascript: validateResourceFields(false, 'data_file', #{current_user_authorized_to_manage}); return(false);",
+                     :onclick => "return validateResourceFields('data_file');",
                      :class => 'btn btn-primary' -%>
         or <%= cancel_button(data_file_path(@data_file)) -%>
 

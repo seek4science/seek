@@ -1,5 +1,5 @@
 class StatisticsController < ApplicationController
-  before_filter :is_user_admin_auth, only: [:index]
+  before_action :is_user_admin_auth, only: [:index]
 
   def index; end
 

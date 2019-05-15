@@ -1,5 +1,5 @@
 
-class SuggestedAssayType < ActiveRecord::Base
+class SuggestedAssayType < ApplicationRecord
   include Seek::Ontologies::SuggestedType
 
   before_destroy :update_assay_uri

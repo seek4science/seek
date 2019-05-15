@@ -21,9 +21,7 @@ class AttributionsTest < ActionController::TestCase
     assert !users(:owner_of_my_first_sop).person.projects.empty?
     assert users(:owner_of_my_first_sop).person.projects.include?(projects(:myexperiment_project))
     assert_difference ['Sop.count', 'Relationship.count'] do
-      post :create, sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] },
-                    content_blobs: [{ data: file_for_upload }],
-                    sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id]])
+      post :create, params: { sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] }, content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id]]) }
       assert_redirected_to sop_path(assigns(:sop))
     end
   end
@@ -32,8 +30,7 @@ class AttributionsTest < ActionController::TestCase
     # create a SOP and verify that both SOP and attribution get created
     # (two identical attributions will be posted, but only one needs to be created)
     assert_difference ['Sop.count', 'Relationship.count'] do
-      post :create, sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] },
-                    content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id], ['Sop', @sop1.id]])
+      post :create, params: { sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] }, content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id], ['Sop', @sop1.id]]) }
       assert_redirected_to sop_path(assigns(:sop))
     end
   end
@@ -41,15 +38,14 @@ class AttributionsTest < ActionController::TestCase
   def test_should_remove_attribution_on_update
     # create a SOP / attribution first
     assert_difference ['Sop.count', 'Relationship.count'] do
-      post :create, sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] },
-                    content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id]])
+      post :create, params: { sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] }, content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id]]) }
       assert_redirected_to sop_path(assigns(:sop))
     end
 
     # update the SOP, but supply no data about attributions - these should be removed
     assert_no_difference('Sop.count') do
       assert_difference('Relationship.count', -1) do
-        put :update, id: assigns(:sop).id, sop: { title: 'edited_title', project_ids: [projects(:myexperiment_project).id] }, sharing: valid_sharing, attributions: [] # NB! no attributions supplied - should remove if any existed for the sop
+        put :update, params: { id: assigns(:sop).id, sop: { title: 'edited_title', project_ids: [projects(:myexperiment_project).id] }, sharing: valid_sharing, attributions: [] } # NB! no attributions supplied - should remove if any existed for the sop
 
         assert_redirected_to sop_path(assigns(:sop))
       end
@@ -60,8 +56,7 @@ class AttributionsTest < ActionController::TestCase
     # create a SOP and verify that both SOP and attributions get created
     assert_difference('Sop.count') do
       assert_difference('Relationship.count', +2) do
-        post :create, sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] },
-                      content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id], ['Sop', @sop2.id]])
+        post :create, params: { sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] }, content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id], ['Sop', @sop2.id]]) }
 
         assert_redirected_to sop_path(assigns(:sop))
       end
@@ -87,8 +82,7 @@ class AttributionsTest < ActionController::TestCase
     # create a SOP / attributions first
     assert_difference('Sop.count') do
       assert_difference('Relationship.count', +2) do
-        post :create, sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] },
-                      content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id], ['Sop', @sop2.id]])
+        post :create, params: { sop: { title: 'test_attributions', project_ids: [projects(:myexperiment_project).id] }, content_blobs: [{ data: file_for_upload }], sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop1.id], ['Sop', @sop2.id]]) }
         assert_redirected_to sop_path(assigns(:sop))
       end
     end
@@ -104,8 +98,7 @@ class AttributionsTest < ActionController::TestCase
     # update the SOP: attributions data will add a new attribution, remove one old and keep one old unchanged -
     # this leaves the total number of attributions unchaged
     assert_no_difference ['Sop.count', 'Relationship.count'] do
-      put :update, id: assigns(:sop).id, sop: { title: 'edited_title' }, sharing: valid_sharing,
-          attributions: ActiveSupport::JSON.encode([['Sop', @sop3.id], ['Sop', @sop2.id]])
+      put :update, params: { id: assigns(:sop).id, sop: { title: 'edited_title' }, sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([['Sop', @sop3.id], ['Sop', @sop2.id]]) }
     end
     assert_redirected_to sop_path(assigns(:sop))
 
@@ -150,7 +143,7 @@ class AttributionsTest < ActionController::TestCase
     assert_equal [sop2], sop1.attributions.collect(&:other_object)
     assert_equal [sop2], sop1.attributions_objects
 
-    get :show, id: sop1
+    get :show, params: { id: sop1 }
     assert_response :success
     assert_select 'div.panel' do
       assert_select 'div.panel-heading', text: /Attributions/
@@ -161,7 +154,7 @@ class AttributionsTest < ActionController::TestCase
       end
     end
 
-    get :show, id: sop3
+    get :show, params: { id: sop3 }
     assert_response :success
     assert_select 'div.panel' do
       assert_select 'div.panel-heading', text: /Attributions/

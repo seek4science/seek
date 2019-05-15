@@ -1,4 +1,4 @@
-class SavedSearch < ActiveRecord::Base
+class SavedSearch < ApplicationRecord
   belongs_to :user
 
   acts_as_favouritable

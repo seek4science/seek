@@ -23,20 +23,20 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   test 'should show' do
     announcement = Factory(:feed_announcement)
     assert_not_nil announcement.announcer
-    get :show, id: announcement
+    get :show, params: { id: announcement }
     assert_response :success
   end
 
   test 'should get edit' do
     announcement = Factory(:feed_announcement)
     assert_not_nil announcement.announcer
-    get :edit, id: announcement
+    get :edit, params: { id: announcement }
     assert_response :success
   end
 
   test 'should create' do
     assert_difference('SiteAnnouncement.count') do
-      post :create, site_announcement: { title: 'fred' }
+      post :create, params: { site_announcement: { title: 'fred' } }
     end
     assert_equal users(:quentin).person, assigns(:site_announcement).announcer
   end
@@ -44,7 +44,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   test 'should destroy' do
     ann = Factory(:site_announcement)
     assert_difference('SiteAnnouncement.count', -1) do
-      delete :destroy, id: ann.id
+      delete :destroy, params: { id: ann.id }
     end
   end
 
@@ -61,7 +61,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     assert registered_receivers.count >= 5
 
     assert_enqueued_emails(registered_receivers.count) do
-      post :create, site_announcement: { title: 'fred', email_notification: true }
+      post :create, params: { site_announcement: { title: 'fred', email_notification: true } }
       site_announcement = assigns(:site_announcement)
       assert SendAnnouncementEmailsJob.new(site_announcement.id, 1).exists?
       first_id = people.collect(&:notifiee_info).collect(&:id).min
@@ -74,7 +74,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     if person
       person.delete
       assert_enqueued_emails(NotifieeInfo.where(receive_notifications: true).count - 1) do
-        post :create, site_announcement: { title: 'fred', email_notification: true }
+        post :create, params: { site_announcement: { title: 'fred', email_notification: true } }
       end
     end
   end
@@ -83,7 +83,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     ann = Factory(:feed_announcement)
     login_as(Factory(:person))
     assert_no_difference('SiteAnnouncement.count') do
-      delete :destroy, id: ann.id
+      delete :destroy, params: { id: ann.id }
     end
 
     assert_not_nil flash[:error]
@@ -91,7 +91,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
 
   test 'should update' do
     ann = Factory(:feed_announcement)
-    put :update, id: ann, site_announcement: { title: 'bob' }
+    put :update, params: { id: ann, site_announcement: { title: 'bob' } }
     ann = SiteAnnouncement.find(ann.id)
     assert_equal 'bob', ann.title
   end
@@ -108,7 +108,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     login_as(Factory(:person))
     announcement = Factory(:feed_announcement)
     assert_not_nil announcement.announcer
-    get :edit, id: announcement
+    get :edit, params: { id: announcement }
     assert_response :redirect
     assert_redirected_to(root_url)
     assert_not_nil flash[:error]
@@ -117,7 +117,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   test 'should not create' do
     login_as(Factory(:person))
     assert_no_difference('SiteAnnouncement.count') do
-      post :create, site_announcement: { title: 'fred' }
+      post :create, params: { site_announcement: { title: 'fred' } }
     end
     assert_response :redirect
     assert_redirected_to(root_url)
@@ -127,7 +127,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   test 'should not update' do
     login_as(:aaron)
     ann = Factory(:feed_announcement)
-    put :update, id: ann, site_announcement: { title: 'bob' }
+    put :update, params: { id: ann, site_announcement: { title: 'bob' } }
 
     assert_response :redirect
     assert_redirected_to(root_url)
@@ -155,7 +155,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   test 'should only show feeds when feed_only passed' do
     Factory :headline_announcement, show_in_feed: false, title: 'a headline announcement'
     Factory :headline_announcement, show_in_feed: true, title: 'a headline announcement also in feed'
-    get :index, feed_only: true
+    get :index, params: { feed_only: true }
     assert_response :success
     assert_select 'div.announcement_list div.announcement span.announcement_title', text: 'a headline announcement', count: 0
     assert_select 'div.announcement_list div.announcement span.announcement_title', text: 'a headline announcement also in feed', count: 1
@@ -164,14 +164,14 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   test 'handle notification_settings' do
     # valid key
     key = Factory(:notifiee_info).unique_key
-    get :notification_settings, key: key
+    get :notification_settings, params: { key: key }
     assert_response :success
     assert_nil flash[:error]
     assert_select 'input[checked=checked][id=receive_notifications]'
 
     # invalid key
     key = 'random'
-    get :notification_settings, key: key
+    get :notification_settings, params: { key: key }
     assert_redirected_to :root
     assert_not_nil flash[:error]
   end

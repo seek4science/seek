@@ -16,7 +16,7 @@ class HelpDocumentsControllerTest < ActionController::TestCase
       assert_response :success
       assert_not_nil assigns(:help_documents)
 
-      get :show, id: help_documents(:one).to_param
+      get :show, params: { id: help_documents(:one).to_param }
       assert_response :success
       assert_not_nil assigns(:help_document)
     end
@@ -64,7 +64,7 @@ class HelpDocumentsControllerTest < ActionController::TestCase
   test 'should create help_document for internal help' do
     with_config_value :internal_help_enabled, true do
       assert_difference('HelpDocument.count') do
-        post :create, help_document: { identifier: 'test', title: 'new' }
+        post :create, params: { help_document: { identifier: 'test', title: 'new' } }
       end
 
       assert_redirected_to help_document_path(assigns(:help_document))
@@ -75,7 +75,7 @@ class HelpDocumentsControllerTest < ActionController::TestCase
   test 'should create help_document for external help' do
     with_config_value :internal_help_enabled, false do
       assert_no_difference('HelpDocument.count') do
-        post :create, help_document: { identifier: 'test', title: 'new' }
+        post :create, params: { help_document: { identifier: 'test', title: 'new' } }
       end
 
       assert_redirected_to Seek::Config.external_help_url
@@ -84,14 +84,14 @@ class HelpDocumentsControllerTest < ActionController::TestCase
 
   test 'should show help_document for internal help' do
     with_config_value :internal_help_enabled, true do
-      get :show, id: help_documents(:one).to_param
+      get :show, params: { id: help_documents(:one).to_param }
       assert_response :success
     end
   end
 
   test 'should show help_document for external help' do
     with_config_value :internal_help_enabled, false do
-      get :show, id: help_documents(:one).to_param
+      get :show, params: { id: help_documents(:one).to_param }
       assert_response :redirect
       assert_redirected_to Seek::Config.external_help_url
     end
@@ -99,14 +99,14 @@ class HelpDocumentsControllerTest < ActionController::TestCase
 
   test 'should get edit for internal help' do
     with_config_value :internal_help_enabled, true do
-      get :edit, id: help_documents(:one).to_param
+      get :edit, params: { id: help_documents(:one).to_param }
       assert_response :success
     end
   end
 
   test 'should get edit for external help' do
     with_config_value :internal_help_enabled, false do
-      get :edit, id: help_documents(:one).to_param
+      get :edit, params: { id: help_documents(:one).to_param }
       assert_response :redirect
       assert_redirected_to Seek::Config.external_help_url
     end
@@ -114,14 +114,14 @@ class HelpDocumentsControllerTest < ActionController::TestCase
 
   test 'should update help_document for internal help' do
     with_config_value :internal_help_enabled, true do
-      put :update, id: help_documents(:one).to_param, help_document: { title: 'fish' }
+      put :update, params: { id: help_documents(:one).to_param, help_document: { title: 'fish' } }
       assert_redirected_to help_document_path(assigns(:help_document))
     end
   end
 
   test 'should update help_document for external help' do
     with_config_value :internal_help_enabled, false do
-      put :update, id: help_documents(:one).to_param, help_document: { title: 'fish' }
+      put :update, params: { id: help_documents(:one).to_param, help_document: { title: 'fish' } }
       assert_response :redirect
       assert_redirected_to Seek::Config.external_help_url
     end
@@ -130,7 +130,7 @@ class HelpDocumentsControllerTest < ActionController::TestCase
   test 'should destroy help_document for internal help' do
     with_config_value :internal_help_enabled, true do
       assert_difference('HelpDocument.count', -1) do
-        delete :destroy, id: help_documents(:one).to_param
+        delete :destroy, params: { id: help_documents(:one).to_param }
       end
 
       assert_redirected_to help_documents_path
@@ -140,7 +140,7 @@ class HelpDocumentsControllerTest < ActionController::TestCase
   test 'should destroy help_document for external help' do
     with_config_value :internal_help_enabled, false do
       assert_no_difference('HelpDocument.count') do
-        delete :destroy, id: help_documents(:one).to_param
+        delete :destroy, params: { id: help_documents(:one).to_param }
       end
 
       assert_redirected_to Seek::Config.external_help_url
@@ -187,7 +187,7 @@ class HelpDocumentsControllerTest < ActionController::TestCase
   test 'should redirect to index page if available for internal help' do
     with_config_value :internal_help_enabled, true do
       assert_difference('HelpDocument.count') do
-        post :create, help_document: { identifier: 'index', title: 'Index page' }
+        post :create, params: { help_document: { identifier: 'index', title: 'Index page' } }
         get :index
         assert_response :redirect
         assert_nil assigns(:help_documents) # no collection set (not on index page)
@@ -199,7 +199,7 @@ class HelpDocumentsControllerTest < ActionController::TestCase
   test 'should redirect to index page if available for external help' do
     with_config_value :internal_help_enabled, false do
       assert_no_difference('HelpDocument.count') do
-        post :create, help_document: { identifier: 'index', title: 'Index page' }
+        post :create, params: { help_document: { identifier: 'index', title: 'Index page' } }
         get :index
         assert_response :redirect
         assert_redirected_to Seek::Config.external_help_url
@@ -211,7 +211,7 @@ class HelpDocumentsControllerTest < ActionController::TestCase
     with_config_value :internal_help_enabled, true do
       doc = help_documents(:one)
 
-      put :update, id: doc.to_param, help_document: { title: 'hi', identifier: 'fish' }
+      put :update, params: { id: doc.to_param, help_document: { title: 'hi', identifier: 'fish' } }
 
       assert_equal 'hi', assigns(:help_document).title
       assert_not_equal 'fish', assigns(:help_document).identifier
@@ -221,9 +221,9 @@ class HelpDocumentsControllerTest < ActionController::TestCase
   test "shouldn't create docs with invalid identifiers for internal help" do
     with_config_value :internal_help_enabled, true do
       assert_no_difference('HelpDocument.count') do
-        post :create, help_document: { identifier: '//#[][]a', title: 'invalid1' }
-        post :create, help_document: { identifier: 'hello/hello', title: 'invalid2' }
-        post :create, help_document: { identifier: '-hello', title: 'invalid3' }
+        post :create, params: { help_document: { identifier: '//#[][]a', title: 'invalid1' } }
+        post :create, params: { help_document: { identifier: 'hello/hello', title: 'invalid2' } }
+        post :create, params: { help_document: { identifier: '-hello', title: 'invalid3' } }
       end
     end
   end

@@ -6,8 +6,8 @@ module Seek
       included do
         include Seek::Jws::Interaction
         include Seek::ExternalServiceWrapper
-        before_filter :find_display_asset_for_jws, only: [:simulate]
-        before_filter :jws_enabled, only: [:simulate]
+        before_action :find_display_asset_for_jws, only: [:simulate]
+        before_action :jws_enabled, only: [:simulate]
       end
 
       def simulate

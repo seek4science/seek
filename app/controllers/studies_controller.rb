@@ -2,14 +2,14 @@ class StudiesController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
 
-  before_filter :find_assets, only: [:index]
-  before_filter :find_and_authorize_requested_item, only: %i[edit update destroy show new_object_based_on_existing_one]
+  before_action :find_assets, only: [:index]
+  before_action :find_and_authorize_requested_item, only: %i[edit update destroy show new_object_based_on_existing_one]
 
   # project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
   # defined in the application controller
-  before_filter :project_membership_required_appended, only: [:new_object_based_on_existing_one]
+  before_action :project_membership_required_appended, only: [:new_object_based_on_existing_one]
 
-  before_filter :check_assays_are_not_already_associated_with_another_study, only: %i[create update]
+  before_action :check_assays_are_not_already_associated_with_another_study, only: %i[create update]
 
   include Seek::Publishing::PublishingCommon
 
@@ -133,9 +133,7 @@ class StudiesController < ApplicationController
 
     people ||= []
 
-    render :update do |page|
-      page.replace_html 'person_responsible_collection', partial: 'studies/person_responsible_list', locals: { people: people }
-    end
+    render partial: 'studies/person_responsible_list', locals: { people: people }
   end
 
   def check_assays_are_not_already_associated_with_another_study

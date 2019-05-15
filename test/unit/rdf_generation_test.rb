@@ -186,6 +186,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
 
     refute Factory(:event).rdf_supported?
     refute Factory(:institution).rdf_supported?
+    refute Factory(:document).rdf_supported?
   end
 
 end

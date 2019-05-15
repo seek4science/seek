@@ -1,6 +1,6 @@
 class StatsController < ApplicationController
-  before_filter :is_user_admin_auth
-  before_filter :get_dates, only: %i[asset_activity contributors contributions asset_accessibility]
+  before_action :is_user_admin_auth
+  before_action :get_dates, only: %i[asset_activity contributors contributions asset_accessibility]
 
   def dashboard
     respond_to do |format|
@@ -44,7 +44,7 @@ class StatsController < ApplicationController
   def clear_cache
     stats.clear_caches
 
-    redirect_to :back
+    redirect_back(fallback_location: root_path)
   end
 
   private

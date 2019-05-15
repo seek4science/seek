@@ -41,7 +41,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     study = Factory(:study, assays: [assay1, assay2], policy: Factory(:public_policy), contributor:person)
 
-    get :show, id: study.id
+    get :show, params: { id: study.id }
     assert_response :success
 
     assert_select 'ul.nav-pills' do
@@ -66,7 +66,7 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'should get show' do
     study = Factory(:study, policy: Factory(:public_policy))
-    get :show, id: study.id
+    get :show, params: { id: study.id }
     assert_response :success
     assert_not_nil assigns(:study)
   end
@@ -84,7 +84,7 @@ class StudiesControllerTest < ActionController::TestCase
     inv = investigations(:metabolomics_investigation)
 
     assert inv.can_edit?, 'model owner should be able to edit this investigation'
-    get :new, investigation_id: inv
+    get :new, params: { investigation_id: inv }
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
@@ -97,7 +97,7 @@ class StudiesControllerTest < ActionController::TestCase
     inv = investigations(:metabolomics_investigation)
 
     assert inv.can_edit?, 'model owner should be able to edit this investigation'
-    get :new, investigation_id: inv
+    get :new, params: { investigation_id: inv }
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
@@ -112,7 +112,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert !inv.projects.map(&:people).flatten.include?(user.person), 'this person should not be a member of the investigations project'
     assert !inv.can_edit?(user)
-    get :new, investigation_id: inv
+    get :new, params: { investigation_id: inv }
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
@@ -123,7 +123,7 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should get edit' do
-    get :edit, id: studies(:metabolomics_study)
+    get :edit, params: { id: studies(:metabolomics_study) }
     assert_response :success
     assert_not_nil assigns(:study)
   end
@@ -131,7 +131,7 @@ class StudiesControllerTest < ActionController::TestCase
   test "shouldn't show edit for unauthorized users" do
     s = Factory :study, policy: Factory(:private_policy)
     login_as(Factory(:user))
-    get :edit, id: s
+    get :edit, params: { id: s }
     assert_redirected_to study_path(s)
     assert flash[:error]
   end
@@ -139,7 +139,7 @@ class StudiesControllerTest < ActionController::TestCase
   test 'should update' do
     s = studies(:metabolomics_study)
     assert_not_equal 'test', s.title
-    put :update, id: s.id, study: { title: 'test' }
+    put :update, params: { id: s.id, study: { title: 'test' } }
     s = assigns(:study)
     assert_redirected_to study_path(s)
     assert_equal 'test', s.title
@@ -148,7 +148,7 @@ class StudiesControllerTest < ActionController::TestCase
   test 'should create' do
     investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
     assert_difference('Study.count') do
-      post :create, study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing
+      post :create, params: { study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing }
     end
     s = assigns(:study)
     assert_redirected_to study_path(s)
@@ -161,7 +161,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert_equal Policy::EVERYONE, s.policy.access_type
 
-    put :update, id: s, study: { title: s.title }, policy_attributes: { access_type: Policy::NO_ACCESS }
+    put :update, params: { id: s, study: { title: s.title }, policy_attributes: { access_type: Policy::NO_ACCESS } }
     s = assigns(:study)
     assert_response :redirect
     s.reload
@@ -175,7 +175,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert_equal Policy::EVERYONE, s.policy.access_type
 
-    put :update, id: s, study: { title: s.title }, policy_attributes: { access_type: Policy::NO_ACCESS }
+    put :update, params: { id: s, study: { title: s.title }, policy_attributes: { access_type: Policy::NO_ACCESS } }
     s = assigns(:study)
     assert_response :unprocessable_entity
     s.reload
@@ -184,7 +184,7 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'should not create with assay already related to study' do
     assert_no_difference('Study.count') do
-      post :create, study: { title: 'test', investigation: investigations(:metabolomics_investigation), assay_ids: [assays(:metabolomics_assay3).id] }
+      post :create, params: { study: { title: 'test', investigation: investigations(:metabolomics_investigation), assay_ids: [assays(:metabolomics_assay3).id] } }
     end
     s = assigns(:study)
     assert flash[:error]
@@ -193,7 +193,7 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'should not update with assay already related to study' do
     s = studies(:metabolomics_study)
-    put :update, id: s.id, study: { title: 'test', assay_ids: [assays(:metabolomics_assay3).id] }
+    put :update, params: { id: s.id, study: { title: 'test', assay_ids: [assays(:metabolomics_assay3).id] } }
     s = assigns(:study)
     assert flash[:error]
     assert_response :redirect
@@ -201,7 +201,7 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'should can update with assay already related to this study' do
     s = studies(:metabolomics_study)
-    put :update, id: s.id, study: { title: 'new title', assay_ids: [assays(:metabolomics_assay).id] }
+    put :update, params: { id: s.id, study: { title: 'new title', assay_ids: [assays(:metabolomics_assay).id] } }
     s = assigns(:study)
     assert !flash[:error]
     assert_redirected_to study_path(s)
@@ -212,12 +212,12 @@ class StudiesControllerTest < ActionController::TestCase
   test "no edit button shown for people who can't edit the study" do
     login_as Factory(:user)
     study = Factory :study, policy: Factory(:private_policy)
-    get :show, id: study
+    get :show, params: { id: study }
     assert_select 'a', text: /Edit #{I18n.t('study')}/i, count: 0
   end
 
   test 'edit button in show for person in project' do
-    get :show, id: studies(:metabolomics_study)
+    get :show, params: { id: studies(:metabolomics_study) }
     assert_select 'a', text: /Edit #{I18n.t('study')}/i, count: 1
   end
 
@@ -226,7 +226,7 @@ class StudiesControllerTest < ActionController::TestCase
     login_as(Factory(:user))
     Factory :permission, contributor: User.current_user, policy: s.policy, access_type: Policy::VISIBLE
 
-    put :update, id: s.id, study: { title: 'test' }
+    put :update, params: { id: s.id, study: { title: 'test' } }
 
     assert_redirected_to study_path(s)
     assert flash[:error]
@@ -236,7 +236,7 @@ class StudiesControllerTest < ActionController::TestCase
     study = Factory(:study, contributor: Factory(:person))
     login_as study.contributor.user
     assert_difference('Study.count', -1) do
-      delete :destroy, id: study.id
+      delete :destroy, params: { id: study.id }
     end
     assert !flash[:error]
     assert_redirected_to studies_path
@@ -246,7 +246,7 @@ class StudiesControllerTest < ActionController::TestCase
     login_as(:aaron)
     study = studies(:study_with_no_assays)
     assert_no_difference('Study.count') do
-      delete :destroy, id: study.id
+      delete :destroy, params: { id: study.id }
     end
     assert flash[:error]
     assert_redirected_to study
@@ -255,14 +255,14 @@ class StudiesControllerTest < ActionController::TestCase
   test 'study project member cannot delete if assays associated' do
     study = studies(:metabolomics_study)
     assert_no_difference('Study.count') do
-      delete :destroy, id: study.id
+      delete :destroy, params: { id: study.id }
     end
     assert flash[:error]
     assert_redirected_to study
   end
 
   def test_should_add_nofollow_to_links_in_show_page
-    get :show, id: studies(:study_with_links_in_description)
+    get :show, params: { id: studies(:study_with_links_in_description) }
     assert_select 'div#description' do
       assert_select 'a[rel="nofollow"]'
     end
@@ -271,7 +271,7 @@ class StudiesControllerTest < ActionController::TestCase
   def test_assay_tab_doesnt_show_private_sops_or_datafiles
     login_as(:model_owner)
     study = studies(:study_with_assay_with_public_private_sops_and_datafile)
-    get :show, id: study
+    get :show, params: { id: study }
     assert_response :success
 
     assert_select 'ul.nav-pills' do
@@ -305,55 +305,9 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
-  def test_assay_tab_doesnt_show_private_sops_or_datafiles_with_lazy_load
-    login_as(:model_owner)
-    study = studies(:study_with_assay_with_public_private_sops_and_datafile)
-    with_config_value :tabs_lazy_load_enabled, true do
-      get :show, id: study
-      assert_response :success
-      assert_select 'div.tabbertab' do
-        assert_select 'h3', text: "#{I18n.t('assays.assay').pluralize} (1)", count: 1
-        assert_select 'h3', text: "#{I18n.t('sop').pluralize} (2)", count: 1
-        assert_select 'h3', text: "#{I18n.t('data_file').pluralize} (2)", count: 1
-      end
-      get :resource_in_tab, resource_ids: study.assays.map(&:id).join(','), resource_type: 'Assay', view_type: 'view_some', scale_title: 'all', actions_partial_disable: 'false'
-      assert_select 'div.list_item' do
-        # the Assay resource_list_item
-        assert_select 'p.list_item_attribute a[title=?]', sops(:sop_with_fully_public_policy).title, count: 1
-        assert_select 'p.list_item_attribute a[href=?]', sop_path(sops(:sop_with_fully_public_policy)), count: 1
-        assert_select 'p.list_item_attribute a[title=?]', sops(:sop_with_private_policy_and_custom_sharing).title, count: 0
-        assert_select 'p.list_item_attribute a[href=?]', sop_path(sops(:sop_with_private_policy_and_custom_sharing)), count: 0
-
-        assert_select 'p.list_item_attribute a[title=?]', data_files(:downloadable_data_file).title, count: 1
-        assert_select 'p.list_item_attribute a[href=?]', data_file_path(data_files(:downloadable_data_file)), count: 1
-        assert_select 'p.list_item_attribute a[title=?]', data_files(:private_data_file).title, count: 0
-        assert_select 'p.list_item_attribute a[href=?]', data_file_path(data_files(:private_data_file)), count: 0
-      end
-
-      get :resource_in_tab, resource_ids: study.related_sops.map(&:id).join(','), resource_type: 'Sop', view_type: 'view_some', scale_title: 'all', actions_partial_disable: 'false'
-
-      assert_select 'div.list_item' do
-        # Sops resource_list_item
-        assert_select 'div.list_item_title a[href=?]', sop_path(sops(:sop_with_fully_public_policy)), text: 'SOP with fully public policy', count: 1
-        assert_select 'div.list_item_actions a[href=?]', download_sop_path(sops(:sop_with_fully_public_policy)), count: 1
-        assert_select 'div.list_item_title a[href=?]', sop_path(sops(:sop_with_private_policy_and_custom_sharing)), count: 0
-        assert_select 'div.list_item_actions a[href=?]', download_sop_path(sops(:sop_with_private_policy_and_custom_sharing)), count: 0
-      end
-      get :resource_in_tab, resource_ids: study.related_data_files.map(&:id).join(','), resource_type: 'DataFile', view_type: 'view_some', scale_title: 'all', actions_partial_disable: 'false'
-
-      assert_select 'div.list_item' do
-        # DataFiles resource_list_item
-        assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:downloadable_data_file)), text: 'Download Only', count: 1
-        assert_select 'div.list_item_actions a[href=?]', download_data_file_path(data_files(:downloadable_data_file)), count: 1
-        assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:private_data_file)), count: 0
-        assert_select 'div.list_item_actions a[href=?]', download_data_file_path(data_files(:private_data_file)), count: 0
-      end
-    end
-  end
-
   def test_should_show_investigation_tab
     s = studies(:metabolomics_study)
-    get :show, id: s
+    get :show, params: { id: s }
     assert_response :success
     assert_select 'ul.nav-pills' do
       assert_select 'a', text: "#{I18n.t('investigation').pluralize} (1)", count: 1
@@ -362,13 +316,13 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'filtering by investigation' do
     inv = investigations(:metabolomics_investigation)
-    get :index, filter: { investigation: inv.id }
+    get :index, params: { filter: { investigation: inv.id } }
     assert_response :success
   end
 
   test 'filtering by project' do
     project = projects(:sysmo_project)
-    get :index, filter: { project: project.id }
+    get :index, params: { filter: { project: project.id } }
     assert_response :success
   end
 
@@ -379,7 +333,7 @@ class StudiesControllerTest < ActionController::TestCase
     person = study.contributor
     refute_equal study.contributor, study2.contributor
     assert person.is_a?(Person)
-    get :index, person_id: person.id
+    get :index, params: { person_id: person.id }
     assert_response :success
     assert_select 'div.list_item_title' do
       assert_select 'a[href=?]', study_path(study), text: study.title
@@ -394,12 +348,12 @@ class StudiesControllerTest < ActionController::TestCase
                             policy: Factory(:policy,
                                             access_type: Policy::NO_ACCESS,
                                             permissions: [Factory(:permission, contributor: proj, access_type: Policy::EDITING)]))
-    get :edit, id: study.id
+    get :edit, params: { id: study.id }
   end
 
   test 'should show the contributor avatar' do
     study = Factory(:study, policy: Factory(:public_policy))
-    get :show, id: study
+    get :show, params: { id: study }
     assert_response :success
     assert_select '.author_avatar' do
       assert_select 'a[href=?]', person_path(study.contributing_user.person) do
@@ -413,7 +367,7 @@ class StudiesControllerTest < ActionController::TestCase
     inv = Factory :investigation, policy: Factory(:public_policy), contributor:person
     study = Factory :study, title: 'the study', policy: Factory(:public_policy),
                             investigation: inv, contributor:person
-    get :new_object_based_on_existing_one, id: study.id
+    get :new_object_based_on_existing_one, params: { id: study.id }
     assert_response :success
     assert_select '#study_title[value=?]', 'the study'
     assert_select "select#study_investigation_id option[selected][value='#{study.investigation.id}']", count: 1
@@ -422,7 +376,7 @@ class StudiesControllerTest < ActionController::TestCase
   test 'object based on existing one when unauthorized to view' do
     study = Factory :study, title: 'the private study', policy: Factory(:private_policy)
     refute study.can_view?
-    get :new_object_based_on_existing_one, id: study.id
+    get :new_object_based_on_existing_one, params: { id: study.id }
     assert_response :forbidden
   end
 
@@ -436,7 +390,7 @@ class StudiesControllerTest < ActionController::TestCase
     study = Factory(:study, policy: Factory(:public_policy))
     logout
     assert study.can_view?
-    get :new_object_based_on_existing_one, id: study.id
+    get :new_object_based_on_existing_one, params: { id: study.id }
     assert_redirected_to study
     refute_nil flash[:error]
   end
@@ -448,7 +402,7 @@ class StudiesControllerTest < ActionController::TestCase
     study = Factory :study, title: 'the private study', policy: Factory(:public_policy), investigation: inv, contributor:person
     assert study.can_view?
     refute study.investigation.can_edit?
-    get :new_object_based_on_existing_one, id: study.id
+    get :new_object_based_on_existing_one, params: { id: study.id }
     assert_response :success
     assert_select '#study_title[value=?]', 'the private study'
     assert_select "select#study_investigation_id option[selected][value='#{study.investigation.id}']", count: 0
@@ -463,7 +417,7 @@ class StudiesControllerTest < ActionController::TestCase
     login_as contributor
     assert assay1.study.can_view?
     assert assay2.study.can_view?
-    get :index, assay_id: assay1.id
+    get :index, params: { assay_id: assay1.id }
     assert_response :success
     assert_select 'div.list_item_title' do
       assert_select 'a[href=?]', study_path(assay1.study), text: assay1.study.title
@@ -476,7 +430,7 @@ class StudiesControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert study.creators.empty?
 
-    put :update, id: study.id, study: { title: study.title, creator_ids: [creator.id] }
+    put :update, params: { id: study.id, study: { title: study.title, creator_ids: [creator.id] } }
     assert_redirected_to study_path(study)
 
     assert study.creators.include?(creator)
@@ -485,7 +439,7 @@ class StudiesControllerTest < ActionController::TestCase
   test 'should have creators association box' do
     study = Factory(:study, policy: Factory(:public_policy))
 
-    get :edit, id: study.id
+    get :edit, params: { id: study.id }
     assert_response :success
     assert_select '#creators_list'
     assert_select "input[type='text'][name='creator-typeahead']"
@@ -501,7 +455,7 @@ class StudiesControllerTest < ActionController::TestCase
     study.reload
     assert study.creators.include?(creator)
 
-    get :show, id: study.id
+    get :show, params: { id: study.id }
     assert_response :success
     assert_select 'span.author_avatar a[href=?]', "/people/#{creator.id}"
   end
@@ -513,7 +467,7 @@ class StudiesControllerTest < ActionController::TestCase
     study.save
     study.reload
 
-    get :show, id: study.id
+    get :show, params: { id: study.id }
     assert_response :success
     assert_select 'div.panel-body div', text: other_creators
   end
@@ -527,7 +481,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert study.creators.include?(creator)
     assert_equal 1, study.creators.count
 
-    get :show, id: study.id
+    get :show, params: { id: study.id }
     assert_response :success
 
     study.reload
@@ -543,7 +497,7 @@ class StudiesControllerTest < ActionController::TestCase
     study = Factory(:study, investigation: investigation, policy: Factory(:public_policy), contributor:investigation.contributor)
     study2 = Factory(:study, investigation: investigation2, policy: Factory(:public_policy), contributor:investigation2.contributor)
 
-    get :index, programme_id: programme.id
+    get :index, params: { programme_id: programme.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -567,7 +521,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert_difference('Subscription.count', -2) do
       assert_difference('Study.count', -1) do
-        delete :destroy, id: study.id
+        delete :destroy, params: { id: study.id }
       end
     end
 
@@ -582,7 +536,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert investigation.can_view?
     assert_empty person.projects & investigation.projects
     assert_no_difference('Study.count') do
-      post :create, study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing
+      post :create, params: { study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing }
     end
     assert_response :unprocessable_entity
   end
@@ -598,7 +552,7 @@ class StudiesControllerTest < ActionController::TestCase
     refute_empty person.projects & investigation.projects
 
     assert_no_difference('Study.count') do
-      post :create, study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing
+      post :create, params: { study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing }
     end
     assert_response :unprocessable_entity
   end
@@ -616,7 +570,7 @@ class StudiesControllerTest < ActionController::TestCase
     refute_equal investigation,study.investigation
 
 
-    put :update,id:study.id,study:{investigation_id:investigation.id}
+    put :update, params: { id:study.id, study:{investigation_id:investigation.id} }
 
     assert_response :unprocessable_entity
     study.reload
@@ -636,7 +590,7 @@ class StudiesControllerTest < ActionController::TestCase
     refute_empty person.projects & investigation.projects
     refute_equal investigation,study.investigation
 
-    put :update,id:study.id,study:{investigation_id:investigation.id}
+    put :update, params: { id:study.id, study:{investigation_id:investigation.id} }
 
     assert_response :unprocessable_entity
     study.reload
@@ -652,7 +606,7 @@ class StudiesControllerTest < ActionController::TestCase
     refute_includes projects[1].people, person
     investigation = Factory(:investigation, contributor: another_person, projects:projects, policy: Factory(:publicly_viewable_policy))
     assert_difference('Study.count', 1) do
-      post :create, study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing
+      post :create, params: { study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing }
     end
   end
 end

@@ -1,4 +1,4 @@
-require File.expand_path('../boot', __FILE__)
+require_relative 'boot'
 
 require 'rails/all'
 
@@ -11,8 +11,7 @@ end
 
 module SEEK
   class Application < Rails::Application
-    config.autoload_paths += %W(#{Rails.root}/lib #{Rails.root}/app/sweepers
-                                #{Rails.root}/app/reindexers #{Rails.root}/app/jobs)
+    config.eager_load_paths << Rails.root.join('lib')
 
     # Force all environments to use the same logger level
     # (by default production uses :info, the others :debug)
@@ -37,23 +36,21 @@ module SEEK
     config.filter_parameters += [:password,"rack.request.form_vars"]
 
     # Activate observers that should always be running
-    config.active_record.observers = :annotation_reindexer,
-        :assay_reindexer,
-        :assay_asset_reindexer,
-        :measured_item_reindexer,
-        :studied_factor_reindexer,
-        :experimental_condition_reindexer,
-        :mapping_reindexer,
-        :mapping_link_reindexer,
-        :compound_reindexer,
-        :synonym_reindexer,
-        :person_reindexer,
-        :programme_reindexer,
-        :assets_creator_reindexer
-
-    config.action_view.sanitized_allowed_attributes = ['rel']
-    config.action_view.sanitized_allowed_tags = ["u"]
-    WhiteListHelper.tags.merge %w(u)
+    if ActiveRecord::Base.connected?
+      config.active_record.observers = :annotation_reindexer,
+          :assay_reindexer,
+          :assay_asset_reindexer,
+          :measured_item_reindexer,
+          :studied_factor_reindexer,
+          :experimental_condition_reindexer,
+          :mapping_reindexer,
+          :mapping_link_reindexer,
+          :compound_reindexer,
+          :synonym_reindexer,
+          :person_reindexer,
+          :programme_reindexer,
+          :assets_creator_reindexer
+    end
 
     config.middleware.use Rack::Deflater,
                           include: %w(text/html application/xml application/json text/css application/javascript)
@@ -73,14 +70,11 @@ module SEEK
     # openbis_endpoints/26-20170404142724224014370...
     config.active_record.cache_timestamp_format = :usec
 
-    # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.active_record.raise_in_transactional_callbacks = true
+    config.action_mailer.deliver_later_queue_name = 'mailers'
 
     config.active_job.queue_adapter = Rails.env.test? ? :test : :delayed_job
 
-    # load and set the application version from /config/version.yml
-    if defined?(Rails.root.to_s) && File.exists?("#{(Rails.root.to_s)}/config/version.yml")
-      APP_VERSION = App::Version.load "#{(Rails.root.to_s)}/config/version.yml"
-    end
+    config.active_record.sqlite3.represent_boolean_as_integer = true
+
   end
 end

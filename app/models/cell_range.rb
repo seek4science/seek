@@ -1,4 +1,4 @@
-class CellRange < ActiveRecord::Base
+class CellRange < ApplicationRecord
 
   include Seek::Data::SpreadsheetExplorerRepresentation
 

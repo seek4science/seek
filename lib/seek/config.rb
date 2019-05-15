@@ -306,7 +306,13 @@ module Seek
       val
     end
 
-    if Settings.table_exists?
+    use_db = begin
+      Settings.table_exists?
+    rescue StandardError
+      false
+    end
+
+    if use_db
       def get_value(setting, conversion = nil)
         result = Settings.global.fetch(setting)
         if result
