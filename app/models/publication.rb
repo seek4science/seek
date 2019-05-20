@@ -174,7 +174,6 @@ class Publication < ActiveRecord::Base
     self.published_date = doi_record.date_published
     self.journal = doi_record.journal
     self.doi = doi_record.doi
-    #self.publication_type = doi_record.publication_type
     self.citation = doi_record.citation
   end
 

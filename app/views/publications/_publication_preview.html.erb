@@ -1,4 +1,9 @@
-<%= panel(publication.title, :id => 'publication_preview', :class => 'list_item') do %>
+<%= panel("Publication overview", :id => 'publication_preview', :class => 'list_item') do %>
+
+    <%= list_item_attribute "Title", publication.title %>
+
+    <%= list_item_attribute "Publication Type", publication_type_text(publication.publication_type) %>
+
     <%= list_item_attribute "PubMed ID", publication.pubmed_id, publication.pubmed_uri,{:target => "_blank"} unless publication.pubmed_id.nil? %>
 
     <%= list_item_attribute "DOI", publication.doi, publication.doi_uri, {:target => "_blank"} unless publication.doi.nil? %>
@@ -18,6 +23,6 @@
     <%= f.hidden_field :parent_name %>
     <%= f.hidden_field :pubmed_id %>
     <%= f.hidden_field :doi %>
-
+    <%= f.hidden_field :publication_type %>
     <%= f.submit 'Register', :name => "subaction", :value => 'Register', :onclick => "transferProjectIds();", :class => 'btn btn-primary' %>
 <% end %>
