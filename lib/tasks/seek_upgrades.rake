@@ -16,6 +16,7 @@ namespace :seek do
     update_help_image_links
     fix_sample_type_tag_annotations
     sqlite_boolean_update
+    delete_orphaned_permissions
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -233,5 +234,19 @@ namespace :seek do
 
       puts 'done'
     end
+  end
+
+  desc('Delete permissions with non-existent contributor')
+  task(delete_orphaned_permissions: :environment) do
+    count = 0
+
+    Permission.includes(:contributor).find_each do |p|
+      if p.contributor.nil?
+        p.destroy!
+        count += 1
+      end
+    end
+
+    puts "#{count} orphaned permissions deleted"
   end
 end

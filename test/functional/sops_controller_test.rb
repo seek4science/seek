@@ -281,6 +281,8 @@ class SopsControllerTest < ActionController::TestCase
       assert_difference('Sop.count', -1) do
         assert_no_difference('ContentBlob.count') do
           delete :destroy, params: { id: sops(:my_first_sop) }
+
+          assert flash[:notice].include?('deleted')
         end
       end
     end
@@ -1259,6 +1261,22 @@ class SopsControllerTest < ActionController::TestCase
       end
     end
 
+  end
+
+  test 'should destroy sop and redirect to my items page' do
+    person = people(:person_for_owner_of_my_first_sop)
+    login_as(person)
+    assert_difference('ActivityLog.count') do
+      assert_difference('Sop.count', -1) do
+        assert_no_difference('ContentBlob.count') do
+          delete :destroy, params: { id: sops(:my_first_sop), return_to: 'my_items' }
+
+          assert flash[:notice].include?('deleted')
+        end
+      end
+    end
+
+    assert_redirected_to items_person_path(person)
   end
 
   private

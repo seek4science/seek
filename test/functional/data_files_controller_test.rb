@@ -657,6 +657,30 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'show explore button' do
+    df = Factory(:small_test_spreadsheet_datafile)
+    login_as(df.contributor.user)
+    get :show, params: { id: df }
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 1
+      assert_select 'span.disabled-button', text: 'Explore', count: 0
+    end
+  end
+
+  test 'show disabled explore button if spreadsheet too big' do
+    df = Factory(:small_test_spreadsheet_datafile)
+    login_as(df.contributor.user)
+    with_config_value(:max_extractable_spreadsheet_size, 0) do
+      get :show, params: { id: df }
+    end
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
+      assert_select 'span.disabled-button', text: 'Explore', count: 1
+    end
+  end
+
   test 'should download datafile from standard route' do
     df = Factory :rightfield_datafile, policy: Factory(:public_policy)
     login_as(df.contributor.user)

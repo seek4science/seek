@@ -21,6 +21,7 @@ class Programme < ApplicationRecord
   has_many :people, -> { order('last_name ASC').distinct }, through: :group_memberships
   has_many :institutions, -> { distinct }, through: :work_groups
   has_many :admin_defined_role_programmes, dependent: :destroy
+  has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
   accepts_nested_attributes_for :projects
 
   # validations

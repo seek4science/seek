@@ -147,4 +147,25 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     refute fetch_errors(errors, '/data/attributes/description').any?
     refute fetch_errors(errors, '/data/attributes/potato').any?
   end
+
+  test 'cannot add overly permissive policy to data file' do
+    template_file = File.join(ApiTestHelper.template_dir, 'post_max_data_file.json.erb')
+    template = ERB.new(File.read(template_file))
+    to_post = JSON.parse(template.result(binding))
+    to_post['data']['attributes']['policy']['access'] = 'edit'
+
+    with_config_value(:max_all_visitors_access_type, Policy::EDITING) do
+      assert_no_difference("#{@clz.classify}.count") do
+        post "/#{@plural_clz}.json", params: to_post
+        assert_response :unprocessable_entity
+
+        validate_json_against_fragment response.body, '#/definitions/errors'
+      end
+    end
+
+    h = JSON.parse(response.body)
+    errors = h["errors"]
+
+    assert errors.any?
+  end
 end
