@@ -391,8 +391,8 @@ tags:
     * A description of the **Assay**
     * A string listing other creators of the **Assay**
     * A string containing the abbreviated form of the kind of **Assay** - normally *EXP* for experimental or *MOD* for modelling
-    * A URI to the type of **Assay** resolving to an entry in the [JERM ontology](http://www.mygrid.org.uk/ontology/JERMOntology)
-    * A URI to the technology used in the **Assay** resolving to an entry in the [JERM ontology](http://www.mygrid.org.uk/ontology/JERMOntology)
+    * A URI to the type of **Assay** resolving to an entry in the [JERM ontology](http://jermontology.org/ontology/JERMOntology)
+    * A URI to the technology used in the **Assay** resolving to an entry in the [JERM ontology](http://jermontology.org/ontology/JERMOntology)
     * The sharing <a href="#Policy">**Policy**</a> of the **Assay**
     * References to the <a href="#people">**People**</a> who created the **Assay**
     * A singleton reference to the <a href="#studies">**Study**</a> which the **Assay** is part of
@@ -806,55 +806,30 @@ paths:
             $ref: '#/definitions/assaysResponse'
           examples:
             application/json:
-
               data:
-
               - id: '1'
-
                 type: assays
-
                 attributes:
-
                   title: Standard-based Excel template for metabolomics data
-
                 links:
-
                   self: /assays/1
-
               - id: '2'
-
                 type: assays
-
                 attributes:
-
                   title: Gene expression(Transcriptome)
-
                 links:
-
                   self: /assays/2
-
               - id: '3'
-
                 type: assays
-
                 attributes:
-
                   title: metabolome-LCMS
-
                 links:
-
                   self: /assays/3
-
               jsonapi:
-
                 version: '1.0'
-
               meta:
-
                 base_url: https://fairdomhub.org
-
                 api_version: '0.1'
-
     post:
       operationId: createAssay
       description: |
@@ -898,10 +873,10 @@ paths:
                     description: An experimental assay class description
                   assay_type:
                     label:
-                    uri: http://www.mygrid.org.uk/ontology/JERMOntology#Transcriptomics
+                    uri: http://jermontology.org/ontology/JERMOntology#Transcriptomics
                   technology_type:
                     label:
-                    uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
+                    uri: http://jermontology.org/ontology/JERMOntology#RNA-Seq
                 relationships:
                   creators:
                     data:
@@ -1012,10 +987,10 @@ paths:
                     description: An experimental assay class description
                   assay_type:
                     label:
-                    uri: http://www.mygrid.org.uk/ontology/JERMOntology#Transcriptomics
+                    uri: http://jermontology.org/ontology/JERMOntology#Transcriptomics
                   technology_type:
                     label:
-                    uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
+                    uri: http://jermontology.org/ontology/JERMOntology#RNA-Seq
                 relationships:
                   creators:
                     data:
@@ -1092,129 +1067,67 @@ paths:
             $ref: '#/definitions/assayResponse'
           examples:
             application/json:
-
               data:
-
                 id: '267'
-
                 type: assays
-
                 attributes:
-
                   title: Culturing and synchronisation of P. falciparum
-
                   description:
-
                   assay_class:
-
                     title: Experimental Assay
-
                     key: EXP
-
                     description:
-
                   assay_type:
-
                     label: Experimental Assay Type
-
                     uri: http://jermontology.org/ontology/JERMOntology#Experimental_assay_type
-
                   technology_type:
-
                     label: Technology Type
-
                     uri: http://jermontology.org/ontology/JERMOntology#Technology_type
-
                 relationships:
-
                   creators:
-
                     data: []
-
                   submitter:
-
                     data:
-
                     - id: '411'
-
                       type: people
-
                   organisms:
-
                     data: []
-
                   people:
-
                     data:
-
                     - id: '411'
-
                       type: people
-
                   projects:
-
                     data:
-
                     - id: '17'
-
                       type: projects
-
                   investigation:
-
                     data:
-
                       id: '56'
-
                       type: investigations
-
                   study:
-
                     data:
-
                       id: '118'
-
                       type: studies
-
                   data_files:
-
                     data: []
-
                   models:
-
                     data: []
-
                   sops:
-
                     data: []
-
                   publications:
-
                     data: []
-
                   documents:
-
                     data: []
-
                 links:
-
                   self: /assays/267
-
                 meta:
-
                   created: '2014-08-15T13:01:52.000Z'
-
                   modified: '2017-11-08T14:21:08.000Z'
-
                   api_version: '0.1'
-
                   uuid: 510b329d-1628-4e19-9ecb-4efd8966baa6
-
                   base_url: https://fairdomhub.org
-
               jsonapi:
-
                 version: '1.0'
-
     delete:
       operationId: deleteAssay
       description: |
@@ -1244,67 +1157,36 @@ paths:
             $ref: '#/definitions/dataFilesResponse'
           examples:
             application/json:
-
               data:
-
               - id: '1'
-
                 type: data_files
-
                 attributes:
-
                   title: Growth-rate dependent catabolic flux disitribution
-
                 links:
-
                   self: /data_files/1
-
               - id: '2'
-
                 type: data_files
-
                 attributes:
-
                   title: 'Excel sheet template : concentrations of intracellular metabolites'
-
                 links:
-
                   self: /data_files/2
-
               - id: '6'
-
                 type: data_files
-
                 attributes:
-
                   title: 0804_shake-flask-sigB-starvation
-
                 links:
-
                   self: /data_files/6
-
               - id: '8'
-
                 type: data_files
-
                 attributes:
-
                   title: Transcriptomics Template (ArrayExpress Format)
-
                 links:
-
                   self: /data_files/8
-
               jsonapi:
-
                 version: '1.0'
-
               meta:
-
                 base_url: https://fairdomhub.org
-
                 api_version: '0.1'
-
     post:
       operationId: createDataFile
       description: |
@@ -1444,158 +1326,82 @@ paths:
             $ref: '#/definitions/dataFileResponse'
           examples:
             application/json:
-
               data:
-
                 id: '1152'
-
                 type: data_files
-
                 attributes:
-
                   tags:
-
                   title: G3PDH Kinetic data
-
                   description: Experimental data set for the kinetic characterisation
                     of G3PDH
-
                   license:
-
                   latest_version: 2
-
                   versions:
-
                   - version: 1
-
                     revision_comments:
-
                     url: https://fairdomhub.org/data_files/1152?version=1
-
                   - version: 2
-
                     revision_comments:
-
                     url: https://fairdomhub.org/data_files/1152?version=2
-
                   version: 2
-
                   revision_comments:
-
                   created_at: '2014-12-08T17:25:32.000Z'
-
                   updated_at: '2015-05-07T12:16:24.000Z'
-
                   content_blobs:
-
                   - original_filename: G3PDH_kinetics-SEEK.xls
-
                     url:
-
                     md5sum: 54470f803b4e5348096c63bdda458ae6
-
                     sha1sum: 9a88d3c402fe060453001ac3d82974ee91f4095f
-
                     content_type: application/vnd.ms-excel
-
                     link: https://fairdomhub.org/data_files/1152/content_blobs/1831
-
                     size: 100864
-
                 relationships:
-
                   creators:
-
                     data:
-
                     - id: '411'
-
                       type: people
-
                     - id: '49'
-
                       type: people
-
                   submitter:
-
                     data:
-
                     - id: '411'
-
                       type: people
-
                   people:
-
                     data:
-
                     - id: '49'
-
                       type: people
-
                     - id: '411'
-
                       type: people
-
                   projects:
-
                     data:
-
                     - id: '17'
-
                       type: projects
-
                   investigations:
-
                     data:
-
                     - id: '56'
-
                       type: investigations
-
                   studies:
-
                     data:
-
                     - id: '118'
-
                       type: studies
-
                   assays:
-
                     data:
-
                     - id: '253'
-
                       type: assays
-
                   publications:
-
                     data: []
-
                   events:
-
                     data: []
-
                 links:
-
                   self: /data_files/1152?version=2
-
                 meta:
-
                   created: '2014-08-11T06:32:28.000Z'
-
                   modified: '2015-03-03T09:54:27.000Z'
-
                   api_version: '0.1'
-
                   uuid: d6a8a3a9-44da-46c9-a36e-f6fad19de5f7
-
                   base_url: https://fairdomhub.org
-
               jsonapi:
-
                 version: '1.0'
-
     patch:
       operationId: updateDataFile
       description: |
@@ -2143,67 +1949,36 @@ paths:
             $ref: '#/definitions/eventsResponse'
           examples:
             application/json:
-
               data:
-
               - id: '1'
-
                 type: events
-
                 attributes:
-
                   title: SysMO Conference 2011
-
                 links:
-
                   self: /events/1
-
               - id: '2'
-
                 type: events
-
                 attributes:
-
                   title: 'All Hands SySMO PALs  meeting '
-
                 links:
-
                   self: /events/2
-
               - id: '4'
-
                 type: events
-
                 attributes:
-
                   title: SilicoTryp student & post-doc meeting
-
                 links:
-
                   self: /events/4
-
               - id: '5'
-
                 type: events
-
                 attributes:
-
                   title: Bacell-meeting 1109-Groningen
-
                 links:
-
                   self: /events/5
-
               jsonapi:
-
                 version: '1.0'
-
               meta:
-
                 base_url: https://fairdomhub.org
-
                 api_version: '0.1'
-
     post:
       operationId: createEvent
       description: |
@@ -2302,80 +2077,46 @@ paths:
             $ref: '#/definitions/eventResponse'
           examples:
             application/json:
-
               data:
-
                 id: '75'
-
                 type: events
-
                 attributes:
-
                   title: CropClock Kick-off Meeting, November 2014
-
                   description: "The kickoff meeting of CropClock team took place in\
-                    \ November 12,\n2014 at the Max Plank Institute (MPIPZ, http://www.mpipz.mpg.de/en),\
-                    \ Kologne,\nGermany. The goal for this meeting was for the members\
-                    \ of the various teams\nto get acquainted with each other\xE2\u20AC\
-                    \u2122s expertise and to discuss the following items:\n1) Logistics\
-                    \ about the project start,  2) Data that need to be shared,  3)\
-                    \ Matlab\ncode that needs to shared among the teams. \r\nThe initial\
-                    \ plan of action for\ndata sharing was also laid out."
-
+                    \ November 12, 2014 at the Max Plank Institute (MPIPZ, http://www.mpipz.mpg.de/en),\
+                    \ Kologne, Germany. The goal for this meeting was for the members\
+                    \ of the various teams to get acquainted with each other\u2019\
+                    s expertise and to discuss the following items: 1) Logistics about\
+                    \ the project start,  2) Data that need to be shared,  3) Matlab\
+                    \ code that needs to shared among the teams. \r\nThe initial plan\
+                    \ of action for data sharing was also laid out."
                   url: http://www.mpipz.mpg.de/en
-
                   address:
-
                   city: Kologne
-
                   country: Germany
-
                   start_date: '2014-11-12T00:00:00.000Z'
-
                   end_date: '2014-11-12T00:00:00.000Z'
-
                 relationships:
-
                   projects:
-
                     data:
-
                     - id: '26'
-
                       type: projects
-
                   data_files:
-
                     data: []
-
                   publications:
-
                     data: []
-
                   presentations:
-
                     data: []
-
                 links:
-
                   self: /events/75
-
                 meta:
-
                   created: '2017-04-24T09:49:00.000Z'
-
                   modified: '2017-04-26T07:43:42.000Z'
-
                   api_version: '0.1'
-
                   uuid: 2adac480-0b01-0135-8501-549f350973c0
-
                   base_url: https://fairdomhub.org
-
               jsonapi:
-
                 version: '1.0'
-
     patch:
       operationId: updateEvent
       description: |
@@ -2672,57 +2413,32 @@ paths:
             $ref: '#/definitions/investigationsResponse'
           examples:
             application/json:
-
               data:
-
               - id: '1'
-
                 type: investigations
-
                 attributes:
-
                   title: Creating data sheet template for 'omics data
-
                 links:
-
                   self: /investigations/1
-
               - id: '2'
-
                 type: investigations
-
                 attributes:
-
                   title: The transition from growing to non-growing Bacillus subtilis
                     cells
-
                 links:
-
                   self: /investigations/2
-
               - id: '3'
-
                 type: investigations
-
                 attributes:
-
-                  title: "Systems Biology of Clostridium acetobutylicum - a possible\
-                    \ answer to dwindling\ncrude oil reserves"
-
+                  title: Systems Biology of Clostridium acetobutylicum - a possible
+                    answer to dwindling crude oil reserves
                 links:
-
                   self: /investigations/3
-
               jsonapi:
-
                 version: '1.0'
-
               meta:
-
                 base_url: https://fairdomhub.org
-
                 api_version: '0.1'
-
     post:
       operationId: createInvestigation
       description: |
@@ -2834,424 +2550,216 @@ paths:
             $ref: '#/definitions/investigationResponse'
           examples:
             application/json:
-
               data:
-
                 id: '56'
-
                 type: investigations
-
                 attributes:
-
                   title: Glucose metabolism in Plasmodium falciparum trophozoites
-
-                  description: "The investigation entails the construction and validation\
-                    \ of a detailed\nmathematical model for glycolysis of the malaria\
-                    \ parasite Plasmodium falciparum\nin the blood stage trophozoite\
-                    \ form."
-
+                  description: The investigation entails the construction and validation
+                    of a detailed mathematical model for glycolysis of the malaria
+                    parasite Plasmodium falciparum in the blood stage trophozoite
+                    form.
                 relationships:
-
                   creators:
-
                     data:
-
                     - id: '411'
-
                       type: people
-
                     - id: '49'
-
                       type: people
-
                   submitter:
-
                     data:
-
                     - id: '411'
-
                       type: people
-
                   people:
-
                     data:
-
                     - id: '49'
-
                       type: people
-
                     - id: '411'
-
                       type: people
-
                   projects:
-
                     data:
-
                     - id: '17'
-
                       type: projects
-
                   studies:
-
                     data:
-
                     - id: '118'
-
                       type: studies
-
                     - id: '119'
-
                       type: studies
-
                     - id: '138'
-
                       type: studies
-
                   assays:
-
                     data:
-
                     - id: '247'
-
                       type: assays
-
                     - id: '249'
-
                       type: assays
-
                     - id: '250'
-
                       type: assays
-
                     - id: '251'
-
                       type: assays
-
                     - id: '252'
-
                       type: assays
-
                     - id: '253'
-
                       type: assays
-
                     - id: '254'
-
                       type: assays
-
                     - id: '255'
-
                       type: assays
-
                     - id: '256'
-
                       type: assays
-
                     - id: '257'
-
                       type: assays
-
                     - id: '258'
-
                       type: assays
-
                     - id: '259'
-
                       type: assays
-
                     - id: '260'
-
                       type: assays
-
                     - id: '261'
-
                       type: assays
-
                     - id: '262'
-
                       type: assays
-
                     - id: '263'
-
                       type: assays
-
                     - id: '264'
-
                       type: assays
-
                     - id: '265'
-
                       type: assays
-
                     - id: '266'
-
                       type: assays
-
                     - id: '267'
-
                       type: assays
-
                     - id: '268'
-
                       type: assays
-
                     - id: '294'
-
                       type: assays
-
                     - id: '295'
-
                       type: assays
-
                     - id: '296'
-
                       type: assays
-
                   data_files:
-
                     data:
-
                     - id: '1147'
-
                       type: data_files
-
                     - id: '1148'
-
                       type: data_files
-
                     - id: '1149'
-
                       type: data_files
-
                     - id: '1150'
-
                       type: data_files
-
                     - id: '1151'
-
                       type: data_files
-
                     - id: '1152'
-
                       type: data_files
-
                     - id: '1153'
-
                       type: data_files
-
                     - id: '1154'
-
                       type: data_files
-
                     - id: '1155'
-
                       type: data_files
-
                     - id: '1156'
-
                       type: data_files
-
                     - id: '1157'
-
                       type: data_files
-
                     - id: '1158'
-
                       type: data_files
-
                     - id: '1159'
-
                       type: data_files
-
                     - id: '1160'
-
                       type: data_files
-
                     - id: '1213'
-
                       type: data_files
-
                     - id: '1214'
-
                       type: data_files
-
                   models:
-
                     data:
-
                     - id: '124'
-
                       type: models
-
                     - id: '126'
-
                       type: models
-
                     - id: '127'
-
                       type: models
-
                     - id: '128'
-
                       type: models
-
                     - id: '129'
-
                       type: models
-
                     - id: '130'
-
                       type: models
-
                     - id: '131'
-
                       type: models
-
                     - id: '132'
-
                       type: models
-
                     - id: '133'
-
                       type: models
-
                     - id: '134'
-
                       type: models
-
                     - id: '135'
-
                       type: models
-
                     - id: '136'
-
                       type: models
-
                     - id: '138'
-
                       type: models
-
                     - id: '139'
-
                       type: models
-
                     - id: '144'
-
                       type: models
-
                     - id: '175'
-
                       type: models
-
                     - id: '176'
-
                       type: models
-
                     - id: '177'
-
                       type: models
-
                     - id: '179'
-
                       type: models
-
                   sops:
-
                     data:
-
                     - id: '192'
-
                       type: sops
-
                     - id: '193'
-
                       type: sops
-
                     - id: '194'
-
                       type: sops
-
                     - id: '195'
-
                       type: sops
-
                     - id: '196'
-
                       type: sops
-
                     - id: '197'
-
                       type: sops
-
                     - id: '198'
-
                       type: sops
-
                     - id: '199'
-
                       type: sops
-
                     - id: '200'
-
                       type: sops
-
                     - id: '201'
-
                       type: sops
-
                     - id: '202'
-
                       type: sops
-
                     - id: '203'
-
                       type: sops
-
                     - id: '207'
-
                       type: sops
-
                   publications:
-
                     data:
-
                     - id: '240'
-
                       type: publications
-
                     - id: '268'
-
                       type: publications
-
                     - id: '269'
-
                       type: publications
-
                   documents:
-
                     data: []
-
                 links:
-
                   self: /investigations/56
-
                 meta:
-
                   created: '2014-08-08T13:16:45.000Z'
-
                   modified: '2016-08-30T13:14:32.000Z'
-
                   api_version: '0.1'
-
                   uuid: 6bc37a3b-94d9-4fe2-8996-64180c396324
-
                   base_url: https://fairdomhub.org
-
               jsonapi:
-
                 version: '1.0'
-
     patch:
       operationId: updateInvestigation
       description: |
@@ -3367,69 +2875,38 @@ paths:
             $ref: '#/definitions/modelsResponse'
           examples:
             application/json:
-
               data:
-
               - id: '16'
-
                 type: models
-
                 attributes:
-
                   title: Basic kinetic model of Escherichia coli's electron transport
                     chain (ETC)
-
                 links:
-
                   self: /models/16
-
               - id: '18'
-
                 type: models
-
                 attributes:
-
-                  title: "Development of agent-based models describing the response\
-                    \ of Escherichia\ncoli to changes in oxygen availability"
-
+                  title: Development of agent-based models describing the response
+                    of Escherichia coli to changes in oxygen availability
                 links:
-
                   self: /models/18
-
               - id: '20'
-
                 type: models
-
                 attributes:
-
                   title: sigB-response_starvation_shakeflask
-
                 links:
-
                   self: /models/20
-
               - id: '21'
-
                 type: models
-
                 attributes:
-
                   title: Model for ED pathway in Sulfolobus solfataricus
-
                 links:
-
                   self: /models/21
-
               jsonapi:
-
                 version: '1.0'
-
               meta:
-
                 base_url: https://fairdomhub.org
-
                 api_version: '0.1'
-
     post:
       operationId: createModel
       description: |
@@ -3575,161 +3052,84 @@ paths:
             $ref: '#/definitions/modelResponse'
           examples:
             application/json:
-
               data:
-
                 id: '139'
-
                 type: models
-
                 attributes:
-
                   tags:
-
                   title: GLCtr Kinetic model
-
-                  description: "Mathematica notebook for the parameterisation of the\
-                    \ glucose transport\nrate equation based on SEEK linked experimental\
-                    \ data."
-
+                  description: Mathematica notebook for the parameterisation of the
+                    glucose transport rate equation based on SEEK linked experimental
+                    data.
                   license:
-
                   latest_version: 2
-
                   versions:
-
                   - version: 1
-
                     revision_comments:
-
                     url: https://fairdomhub.org/models/139?version=1
-
                   - version: 2
-
                     revision_comments:
-
                     url: https://fairdomhub.org/models/139?version=2
-
                   version: 2
-
                   revision_comments:
-
                   created_at: '2015-02-04T11:19:45.000Z'
-
                   updated_at: '2015-09-08T11:29:40.000Z'
-
                   content_blobs:
-
                   - original_filename: GlcTr-SEEK.nb
-
                     url:
-
                     md5sum: 5ebff56838fec4da9a81300ddb1dac28
-
                     sha1sum: b2681c49f33d9b4586f52ab6eba17363782c4c52
-
                     content_type: application/mathematica
-
                     link: https://fairdomhub.org/models/139/content_blobs/1850
-
                     size: 35105
-
                   model_type: Ordinary differential equations (ODE)
-
                   model_format: Mathematica
-
                   environment:
-
                 relationships:
-
                   creators:
-
                     data:
-
                     - id: '411'
-
                       type: people
-
                     - id: '49'
-
                       type: people
-
                   submitter:
-
                     data:
-
                     - id: '411'
-
                       type: people
-
                   people:
-
                     data:
-
                     - id: '49'
-
                       type: people
-
                     - id: '411'
-
                       type: people
-
                   projects:
-
                     data:
-
                     - id: '17'
-
                       type: projects
-
                   investigations:
-
                     data:
-
                     - id: '56'
-
                       type: investigations
-
                   studies:
-
                     data:
-
                     - id: '118'
-
                       type: studies
-
                   assays:
-
                     data:
-
                     - id: '261'
-
                       type: assays
-
                   publications:
-
                     data: []
-
                 links:
-
                   self: /models/139?version=2
-
                 meta:
-
                   created: '2014-08-11T09:12:46.000Z'
-
                   modified: '2015-09-08T11:29:40.000Z'
-
                   api_version: '0.1'
-
                   uuid: da095021-2e64-47d4-932f-87ff56febaa1
-
                   base_url: https://fairdomhub.org
-
               jsonapi:
-
                 version: '1.0'
-
     patch:
       operationId: updateModel
       description: |
@@ -3851,67 +3251,36 @@ paths:
             $ref: '#/definitions/organismsResponse'
           examples:
             application/json:
-
               data:
-
               - id: '1933753700'
-
                 type: organisms
-
                 attributes:
-
                   title: Acidithiobacillus caldus
-
                 links:
-
                   self: /organisms/1933753700
-
               - id: '1933753714'
-
                 type: organisms
-
                 attributes:
-
                   title: Arabidopsis thaliana
-
                 links:
-
                   self: /organisms/1933753714
-
               - id: '1933753716'
-
                 type: organisms
-
                 attributes:
-
                   title: Arabidopsis thaliana
-
                 links:
-
                   self: /organisms/1933753716
-
               - id: '1933753708'
-
                 type: organisms
-
                 attributes:
-
                   title: Bacillus methanolicus
-
                 links:
-
                   self: /organisms/1933753708
-
               jsonapi:
-
                 version: '1.0'
-
               meta:
-
                 base_url: https://fairdomhub.org
-
                 api_version: '0.1'
-
   /organisms/{id}:
     parameters:
     - name: id
@@ -3937,83 +3306,44 @@ paths:
             $ref: '#/definitions/organismResponse'
           examples:
             application/json:
-
               data:
-
                 id: '1933753696'
-
                 type: organisms
-
                 attributes:
-
                   title: Plasmodium falciparum
-
                   concept_uri: http://purl.bioontology.org/ontology/NCBITAXON/5833
-
                   ontology_id: NCBITAXON
-
                 relationships:
-
                   projects:
-
                     data:
-
                     - id: '17'
-
                       type: projects
-
                   assays:
-
                     data:
-
                     - id: '294'
-
                       type: assays
-
                     - id: '295'
-
                       type: assays
-
                     - id: '296'
-
                       type: assays
-
                   models:
-
                     data:
-
                     - id: '175'
-
                       type: models
-
                     - id: '176'
-
                       type: models
-
                     - id: '177'
-
                       type: models
-
                 links:
-
                   self: /organisms/1933753696
-
                 meta:
-
                   created: '2015-03-03T09:52:07.000Z'
-
                   modified: '2015-03-03T09:52:07.000Z'
-
                   api_version: '0.1'
-
                   uuid: 335d74e0-a6be-0135-6773-549f350973c0
-
                   base_url: https://fairdomhub.org
-
               jsonapi:
-
                 version: '1.0'
-
   /people:
     get:
       operationId: listPeople
@@ -4408,60 +3738,35 @@ paths:
             $ref: '#/definitions/presentationsResponse'
           examples:
             application/json:
-
               data:
-
               - id: '2'
-
                 type: presentations
-
                 attributes:
-
-                  title: "Feed-back regulation of the anabolic (ProB) and osmoadaptive\
-                    \ (ProJ) glutamate\nkinases: predicted role of a flexible protein\
-                    \ loop."
-
+                  title: 'Feed-back regulation of the anabolic (ProB) and osmoadaptive
+                    (ProJ) glutamate kinases: predicted role of a flexible protein
+                    loop.'
                 links:
-
                   self: /presentations/2
-
               - id: '3'
-
                 type: presentations
-
                 attributes:
-
-                  title: "Balancing the osmotic gradient: adaptation of the cytoplasmic\
-                    \ solute pool\nvia de novo synthesis and compatible solute uptake\
-                    \ in response to hyper-osmolarity."
-
+                  title: 'Balancing the osmotic gradient: adaptation of the cytoplasmic
+                    solute pool via de novo synthesis and compatible solute uptake
+                    in response to hyper-osmolarity.'
                 links:
-
                   self: /presentations/3
-
               - id: '4'
-
                 type: presentations
-
                 attributes:
-
-                  title: "Towards system understanding of B. subtilis - integrating\
-                    \ fluxes and cellular\ncomponents under salt stress"
-
+                  title: Towards system understanding of B. subtilis - integrating
+                    fluxes and cellular components under salt stress
                 links:
-
                   self: /presentations/4
-
               jsonapi:
-
                 version: '1.0'
-
               meta:
-
                 base_url: https://fairdomhub.org
-
                 api_version: '0.1'
-
     post:
       operationId: createPresentation
       description: |
@@ -4595,136 +3900,71 @@ paths:
             $ref: '#/definitions/presentationResponse'
           examples:
             application/json:
-
               data:
-
                 id: '253'
-
                 type: presentations
-
                 attributes:
-
                   tags:
-
                   title: Data and model Management in Systems Biology
-
                   description: Presentation at the 10th anniversary of SABIO-RK, Heidelberg
                     2016
-
                   license:
-
                   latest_version: 1
-
                   versions:
-
                   - version: 1
-
                     revision_comments:
-
                     url: https://fairdomhub.org/presentations/253?version=1
-
                   version: 1
-
                   revision_comments:
-
                   created_at: '2016-05-31T09:08:57.000Z'
-
                   updated_at: '2016-06-01T20:19:00.000Z'
-
                   content_blobs:
-
                   - original_filename: data-and-model-management-in-systems-biology
-
                     url: https://www.slideshare.net/dagwa/data-and-model-management-in-systems-biology
-
                     md5sum: 1173007d7340ce19abbe015ffb9881f0
-
                     sha1sum: 9a72a5bfa4b73d2aa5ee7a02024ad45cadcc9cd5
-
                     content_type: text/html
-
                     link: https://fairdomhub.org/presentations/253/content_blobs/2505
-
                     size: 157861
-
                 relationships:
-
                   creators:
-
                     data:
-
                     - id: '600'
-
                       type: people
-
                   submitter:
-
                     data:
-
                     - id: '600'
-
                       type: people
-
                   people:
-
                     data:
-
                     - id: '600'
-
                       type: people
-
                   projects:
-
                     data:
-
                     - id: '35'
-
                       type: projects
-
                     - id: '49'
-
                       type: projects
-
                   investigations:
-
                     data: []
-
                   studies:
-
                     data: []
-
                   assays:
-
                     data: []
-
                   publications:
-
                     data: []
-
                   events:
-
                     data: []
-
                 links:
-
                   self: /presentations/253?version=1
-
                 meta:
-
                   created: '2016-05-31T09:08:57.000Z'
-
                   modified: '2016-06-01T20:19:00.000Z'
-
                   api_version: '0.1'
-
                   uuid: 3acc9170-093d-0134-4373-549f350973c0
-
                   base_url: https://fairdomhub.org
-
               jsonapi:
-
                 version: '1.0'
-
     patch:
       operationId: updatePresentation
       description: |
@@ -4845,55 +4085,30 @@ paths:
             $ref: '#/definitions/programmesResponse'
           examples:
             application/json:
-
               data:
-
               - id: '1'
-
                 type: programmes
-
                 attributes:
-
                   title: SysMO
-
                 links:
-
                   self: /programmes/1
-
               - id: '2'
-
                 type: programmes
-
                 attributes:
-
                   title: e:Bio
-
                 links:
-
                   self: /programmes/2
-
               - id: '3'
-
                 type: programmes
-
                 attributes:
-
                   title: 'SARCHI: Mechanistic modelling of health and epidemiology'
-
                 links:
-
                   self: /programmes/3
-
               jsonapi:
-
                 version: '1.0'
-
               meta:
-
                 base_url: https://fairdomhub.org
-
                 api_version: '0.1'
-
     post:
       operationId: createProgramme
       description: |
@@ -4999,499 +4214,259 @@ paths:
             $ref: '#/definitions/programmeResponse'
           examples:
             application/json:
-
               data:
-
                 id: '3'
-
                 type: programmes
-
                 attributes:
-
                   avatar:
-
                   title: 'SARCHI: Mechanistic modelling of health and epidemiology'
-
                   description: "The currently used mathematical models for medical\
-                    \ treatment at\nthe individual or population level are largely\
-                    \ phenomenological and have limited\nquantitative predictive power.\
-                    \ It is usually not possible to predict the effect\nof an intervention\
-                    \ in a specific process or to predict the effect of a pharmaceutical\n\
-                    drug since the step or enzyme on which the intervention/drug works\
-                    \ is not explicit\nin the model.\r\n\r\nTaking HIV pathogenesis\
-                    \ as an example, the immune system\nresponse, vaccine exposure,\
-                    \ and drug regimen all affect viral replication and\nonward transmission,\
-                    \ which may be a single parameter in a model. Or in higher-level\n\
-                    scenarios of epidemiological intervention, condom distribution,\
-                    \ behavioural\nmessaging, and vaccines may all be affecting a\
-                    \ single transmissibility parameter."
-
+                    \ treatment at the individual or population level are largely\
+                    \ phenomenological and have limited quantitative predictive power.\
+                    \ It is usually not possible to predict the effect of an intervention\
+                    \ in a specific process or to predict the effect of a pharmaceutical\
+                    \ drug since the step or enzyme on which the intervention/drug\
+                    \ works is not explicit in the model.\r\n\r\nTaking HIV pathogenesis\
+                    \ as an example, the immune system response, vaccine exposure,\
+                    \ and drug regimen all affect viral replication and onward transmission,\
+                    \ which may be a single parameter in a model. Or in higher-level\
+                    \ scenarios of epidemiological intervention, condom distribution,\
+                    \ behavioural messaging, and vaccines may all be affecting a single\
+                    \ transmissibility parameter."
                   web_page: http://sacemaquarterly.com/mathematical-modelling/sarchi-project-mechanistic-modelling-health-epidemiology.html
-
-                  funding_details: "South African Research Chair in: \"Mechanistic\
-                    \ modelling of health\nand epidemiology\" hosted by Stellenbosch\
-                    \ University, funded by the DST and administered\nby NRF. "
-
+                  funding_details: 'South African Research Chair in: "Mechanistic
+                    modelling of health and epidemiology" hosted by Stellenbosch University,
+                    funded by the DST and administered by NRF. '
                   funding_codes:
-
                 relationships:
-
                   people:
-
                     data:
-
                     - id: '49'
-
                       type: people
-
                     - id: '411'
-
                       type: people
-
                     - id: '433'
-
                       type: people
-
                     - id: '705'
-
                       type: people
-
                     - id: '706'
-
                       type: people
-
                   projects:
-
                     data:
-
                     - id: '17'
-
                       type: projects
-
                   institutions:
-
                     data:
-
                     - id: '50'
-
                       type: institutions
-
                     - id: '62'
-
                       type: institutions
-
                     - id: '142'
-
                       type: institutions
-
                   investigations:
-
                     data:
-
                     - id: '56'
-
                       type: investigations
-
                   studies:
-
                     data:
-
                     - id: '118'
-
                       type: studies
-
                     - id: '119'
-
                       type: studies
-
                     - id: '138'
-
                       type: studies
-
                   assays:
-
                     data:
-
                     - id: '247'
-
                       type: assays
-
                     - id: '249'
-
                       type: assays
-
                     - id: '250'
-
                       type: assays
-
                     - id: '251'
-
                       type: assays
-
                     - id: '252'
-
                       type: assays
-
                     - id: '253'
-
                       type: assays
-
                     - id: '254'
-
                       type: assays
-
                     - id: '255'
-
                       type: assays
-
                     - id: '256'
-
                       type: assays
-
                     - id: '257'
-
                       type: assays
-
                     - id: '258'
-
                       type: assays
-
                     - id: '259'
-
                       type: assays
-
                     - id: '260'
-
                       type: assays
-
                     - id: '261'
-
                       type: assays
-
                     - id: '262'
-
                       type: assays
-
                     - id: '263'
-
                       type: assays
-
                     - id: '264'
-
                       type: assays
-
                     - id: '265'
-
                       type: assays
-
                     - id: '266'
-
                       type: assays
-
                     - id: '267'
-
                       type: assays
-
                     - id: '268'
-
                       type: assays
-
                     - id: '294'
-
                       type: assays
-
                     - id: '295'
-
                       type: assays
-
                     - id: '296'
-
                       type: assays
-
                   data_files:
-
                     data:
-
                     - id: '1147'
-
                       type: data_files
-
                     - id: '1148'
-
                       type: data_files
-
                     - id: '1149'
-
                       type: data_files
-
                     - id: '1150'
-
                       type: data_files
-
                     - id: '1151'
-
                       type: data_files
-
                     - id: '1152'
-
                       type: data_files
-
                     - id: '1153'
-
                       type: data_files
-
                     - id: '1154'
-
                       type: data_files
-
                     - id: '1155'
-
                       type: data_files
-
                     - id: '1156'
-
                       type: data_files
-
                     - id: '1157'
-
                       type: data_files
-
                     - id: '1158'
-
                       type: data_files
-
                     - id: '1159'
-
                       type: data_files
-
                     - id: '1160'
-
                       type: data_files
-
                     - id: '1213'
-
                       type: data_files
-
                     - id: '1214'
-
                       type: data_files
-
                   models:
-
                     data:
-
                     - id: '124'
-
                       type: models
-
                     - id: '126'
-
                       type: models
-
                     - id: '127'
-
                       type: models
-
                     - id: '128'
-
                       type: models
-
                     - id: '129'
-
                       type: models
-
                     - id: '130'
-
                       type: models
-
                     - id: '131'
-
                       type: models
-
                     - id: '132'
-
                       type: models
-
                     - id: '133'
-
                       type: models
-
                     - id: '134'
-
                       type: models
-
                     - id: '135'
-
                       type: models
-
                     - id: '136'
-
                       type: models
-
                     - id: '138'
-
                       type: models
-
                     - id: '139'
-
                       type: models
-
                     - id: '140'
-
                       type: models
-
                     - id: '141'
-
                       type: models
-
                     - id: '142'
-
                       type: models
-
                     - id: '143'
-
                       type: models
-
                     - id: '144'
-
                       type: models
-
                     - id: '175'
-
                       type: models
-
                     - id: '176'
-
                       type: models
-
                     - id: '177'
-
                       type: models
-
                     - id: '179'
-
                       type: models
-
                   sops:
-
                     data:
-
                     - id: '191'
-
                       type: sops
-
                     - id: '192'
-
                       type: sops
-
                     - id: '193'
-
                       type: sops
-
                     - id: '194'
-
                       type: sops
-
                     - id: '195'
-
                       type: sops
-
                     - id: '196'
-
                       type: sops
-
                     - id: '197'
-
                       type: sops
-
                     - id: '198'
-
                       type: sops
-
                     - id: '199'
-
                       type: sops
-
                     - id: '200'
-
                       type: sops
-
                     - id: '201'
-
                       type: sops
-
                     - id: '202'
-
                       type: sops
-
                     - id: '203'
-
                       type: sops
-
                     - id: '204'
-
                       type: sops
-
                     - id: '205'
-
                       type: sops
-
                     - id: '206'
-
                       type: sops
-
                     - id: '207'
-
                       type: sops
-
                   publications:
-
                     data:
-
                     - id: '240'
-
                       type: publications
-
                     - id: '268'
-
                       type: publications
-
                     - id: '269'
-
                       type: publications
-
                   presentations:
-
                     data: []
-
                   events:
-
                     data: []
-
                   documents:
-
                     data: []
-
                 links:
-
                   self: /programmes/3
-
                 meta:
-
                   created: '2014-07-31T09:24:43.000Z'
-
                   modified: '2016-09-19T13:15:39.000Z'
-
                   api_version: '0.1'
-
                   uuid: 4538959b-7efc-4e1c-8ae0-9cf9c9487ebc
-
                   base_url: https://fairdomhub.org
-
               jsonapi:
-
                 version: '1.0'
-
     patch:
       operationId: updateProgramme
       description: |
@@ -5923,85 +4898,47 @@ paths:
             $ref: '#/definitions/publicationsResponse'
           examples:
             application/json:
-
               data:
-
               - id: '1'
-
                 type: publications
-
                 attributes:
-
                   title: Quantitative proteomic analysis of Sulfolobus solfataricus
                     membrane proteins
-
                 links:
-
                   self: /publications/1
-
               - id: '2'
-
                 type: publications
-
                 attributes:
-
-                  title: "Genome-scale reconstruction and analysis of the Pseudomonas\
-                    \ putida KT2440\nmetabolic network facilitates applications in\
-                    \ biotechnology"
-
+                  title: Genome-scale reconstruction and analysis of the Pseudomonas
+                    putida KT2440 metabolic network facilitates applications in biotechnology
                 links:
-
                   self: /publications/2
-
               - id: '4'
-
                 type: publications
-
                 attributes:
-
-                  title: "Functional analysis of new transporters involved in stress\
-                    \ tolerance inPseudomonas\nputidaDOT-T1E"
-
+                  title: Functional analysis of new transporters involved in stress
+                    tolerance inPseudomonas putidaDOT-T1E
                 links:
-
                   self: /publications/4
-
               - id: '5'
-
                 type: publications
-
                 attributes:
-
                   title: Identification and characterization of the PhhR regulon inPseudomonas
                     putida
-
                 links:
-
                   self: /publications/5
-
               - id: '7'
-
                 type: publications
-
                 attributes:
-
-                  title: "Metabolic modeling and analysis of the metabolic switch\
-                    \ in Streptomyces\ncoelicolor"
-
+                  title: Metabolic modeling and analysis of the metabolic switch in
+                    Streptomyces coelicolor
                 links:
-
                   self: /publications/7
-
               jsonapi:
-
                 version: '1.0'
-
               meta:
-
                 base_url: https://fairdomhub.org
-
                 api_version: '0.1'
-
   /publications/{id}:
     parameters:
     - name: id
@@ -6027,157 +4964,88 @@ paths:
             $ref: '#/definitions/publicationResponse'
           examples:
             application/json:
-
               data:
-
                 id: '240'
-
                 type: publications
-
                 attributes:
-
-                  title: |2-
-
+                  title: |-
                     Construction and validation of a detailed kinetic model of glycolysis in
-
                                   Plasmodium falciparum
-
                   journal: FEBS J
-
                   published_date: '2015-04-01'
-
                   doi: 10.1111/febs.13237
-
                   pubmed_id:
-
-                  abstract: "The enzymes in the Embden\xE2\u20AC\u201CMeyerhof\xE2\
-                    \u20AC\u201CParnas pathway of Plasmodium falciparum\ntrophozoites\
-                    \ were kinetically characterized and their integrated activities\n\
-                    analyzed in a mathematical model. For validation of the model,\
-                    \ we compared model\npredictions for steady-state fluxes and metabolite\
-                    \ concentrations of the hexose\nphosphates with experimental values\
-                    \ for intact parasites. The model, which is\ncompletely based\
-                    \ on kinetic parameters that were measured for the individual\n\
-                    enzymes, gives an accurate prediction of the steady-state fluxes\
-                    \ and intermediate\nconcentrations. This is the first detailed\
-                    \ kinetic model for glucose metabolism\nin P. falciparum, one\
-                    \ of the most prolific malaria-causing protozoa, and the\nhigh\
-                    \ predictive power of the model makes it a strong tool for future\
-                    \ drug target\nidentification studies. The modelling workflow\
-                    \ is transparent and reproducible,\nand completely documented\
-                    \ in the SEEK platform, where all experimental data\nand model\
+                  abstract: "The enzymes in the Embden\u2013Meyerhof\u2013Parnas pathway\
+                    \ of Plasmodium falciparum trophozoites were kinetically characterized\
+                    \ and their integrated activities analyzed in a mathematical model.\
+                    \ For validation of the model, we compared model predictions for\
+                    \ steady-state fluxes and metabolite concentrations of the hexose\
+                    \ phosphates with experimental values for intact parasites. The\
+                    \ model, which is completely based on kinetic parameters that\
+                    \ were measured for the individual enzymes, gives an accurate\
+                    \ prediction of the steady-state fluxes and intermediate concentrations.\
+                    \ This is the first detailed kinetic model for glucose metabolism\
+                    \ in P. falciparum, one of the most prolific malaria-causing protozoa,\
+                    \ and the high predictive power of the model makes it a strong\
+                    \ tool for future drug target identification studies. The modelling\
+                    \ workflow is transparent and reproducible, and completely documented\
+                    \ in the SEEK platform, where all experimental data and model\
                     \ files are available for download."
-
                   citation: 'FEBS J 282(8) : 1481'
-
                   link_to_pub: https://www.ncbi.nlm.nih.gov/pubmed/
-
                   authors:
-
                   - Gerald Penkler
-
                   - Francois du Toit
-
                   - Waldo Adams
-
                   - Marina Rautenbach
-
                   - Daniel C. Palm
-
                   - Dawie Van Niekerk
-
                   - Jacky Snoep
-
                 relationships:
-
                   people:
-
                     data:
-
                     - id: '49'
-
                       type: people
-
                     - id: '411'
-
                       type: people
-
                   projects:
-
                     data:
-
                     - id: '17'
-
                       type: projects
-
                   investigations:
-
                     data:
-
                     - id: '56'
-
                       type: investigations
-
                   studies:
-
                     data:
-
                     - id: '118'
-
                       type: studies
-
                     - id: '119'
-
                       type: studies
-
                     - id: '138'
-
                       type: studies
-
                   assays:
-
                     data: []
-
                   data_files:
-
                     data: []
-
                   models:
-
                     data: []
-
                   publications:
-
                     data: []
-
                   presentations:
-
                     data: []
-
                   events:
-
                     data: []
-
                 links:
-
                   self: /publications/240
-
                 meta:
-
                   created: '2015-07-09T15:30:55.000Z'
-
                   modified: '2016-09-19T13:34:11.000Z'
-
                   api_version: '0.1'
-
                   uuid: 69bebf90-087d-0133-36e3-549f350973c0
-
                   base_url: https://fairdomhub.org
-
               jsonapi:
-
                 version: '1.0'
-
   /sample_types:
     get:
       operationId: listSampleTypes
@@ -6194,79 +5062,42 @@ paths:
             $ref: '#/definitions/sampleTypesResponse'
           examples:
             application/json:
-
               data:
-
               - id: '1'
-
                 type: sample_types
-
                 attributes:
-
                   title: SysMO Biosample
-
                 links:
-
                   self: /sample_types/1
-
               - id: '2'
-
                 type: sample_types
-
                 attributes:
-
                   title: YEAST_chemostat_steady_state_culture
-
                 links:
-
                   self: /sample_types/2
-
               - id: '3'
-
                 type: sample_types
-
                 attributes:
-
                   title: chemostat_yeast_anaerobic
-
                 links:
-
                   self: /sample_types/3
-
               - id: '4'
-
                 type: sample_types
-
                 attributes:
-
                   title: test for SysMetEx1
-
                 links:
-
                   self: /sample_types/4
-
               - id: '8'
-
                 type: sample_types
-
                 attributes:
-
                   title: SysMetEx_Cell_Culture
-
                 links:
-
                   self: /sample_types/8
-
               jsonapi:
-
                 version: '1.0'
-
               meta:
-
                 base_url: https://fairdomhub.org
-
                 api_version: '0.1'
-
   /sops:
     get:
       operationId: listSops
@@ -6283,69 +5114,38 @@ paths:
             $ref: '#/definitions/sopsResponse'
           examples:
             application/json:
-
               data:
-
               - id: '4'
-
                 type: sops
-
                 attributes:
-
                   title: Fluorescent probe labeling for microarrays
-
                 links:
-
                   self: /sops/4
-
               - id: '5'
-
                 type: sops
-
                 attributes:
-
                   title: Guidelines for Writing Standard Operating Procedures (SOP)
-
                 links:
-
                   self: /sops/5
-
               - id: '16'
-
                 type: sops
-
                 attributes:
-
                   title: Flash-labeling of tetra-cyc-modified proteins in E.coli
-
                 links:
-
                   self: /sops/16
-
               - id: '17'
-
                 type: sops
-
                 attributes:
-
-                  title: "Measuring the mobility of soluble and aggergating protein\
-                    \ using fluorescence\nrecovery after photobleaching (FRAP) in\
-                    \ normal and osmotically stressed cells."
-
+                  title: Measuring the mobility of soluble and aggergating protein
+                    using fluorescence recovery after photobleaching (FRAP) in normal
+                    and osmotically stressed cells.
                 links:
-
                   self: /sops/17
-
               jsonapi:
-
                 version: '1.0'
-
               meta:
-
                 base_url: https://fairdomhub.org
-
                 api_version: '0.1'
-
     post:
       operationId: createSop
       description: |
@@ -6479,153 +5279,80 @@ paths:
             $ref: '#/definitions/sopResponse'
           examples:
             application/json:
-
               data:
-
                 id: '203'
-
                 type: sops
-
                 attributes:
-
                   tags:
-
                   title: Validation experiments
-
-                  description: "SOP for the determination of external metabolites\
-                    \ (Glc, Pyr, Gly,\nLac) in intact trophozoite incubations, and\
-                    \ for the determination of intracellular\nmetabolite concentrations."
-
+                  description: SOP for the determination of external metabolites (Glc,
+                    Pyr, Gly, Lac) in intact trophozoite incubations, and for the
+                    determination of intracellular metabolite concentrations.
                   license:
-
                   latest_version: 1
-
                   versions:
-
                   - version: 1
-
                     revision_comments:
-
                     url: https://fairdomhub.org/sops/203?version=1
-
                   version: 1
-
                   revision_comments:
-
                   created_at: '2014-08-15T13:00:40.000Z'
-
                   updated_at: '2015-04-17T10:27:22.000Z'
-
                   content_blobs:
-
                   - original_filename: Validation SOP.docx
-
                     url:
-
                     md5sum: 80afdbcc9064a4f96eb2e8cbec138d70
-
                     sha1sum: b46118506c779972df036e0f7233b9cd3995bf50
-
                     content_type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
-
                     link: https://fairdomhub.org/sops/203/content_blobs/1806
-
                     size: 154968
-
                 relationships:
-
                   creators:
-
                     data:
-
                     - id: '411'
-
                       type: people
-
                     - id: '49'
-
                       type: people
-
                   submitter:
-
                     data:
-
                     - id: '411'
-
                       type: people
-
                   people:
-
                     data:
-
                     - id: '49'
-
                       type: people
-
                     - id: '411'
-
                       type: people
-
                   projects:
-
                     data:
-
                     - id: '17'
-
                       type: projects
-
                   investigations:
-
                     data:
-
                     - id: '56'
-
                       type: investigations
-
                   studies:
-
                     data:
-
                     - id: '119'
-
                       type: studies
-
                   assays:
-
                     data:
-
                     - id: '260'
-
                       type: assays
-
                     - id: '266'
-
                       type: assays
-
                   publications:
-
                     data: []
-
                 links:
-
                   self: /sops/203?version=1
-
                 meta:
-
                   created: '2014-08-15T13:00:40.000Z'
-
                   modified: '2015-04-17T10:27:22.000Z'
-
                   api_version: '0.1'
-
                   uuid: 90825ba2-b548-49e0-9215-a8c3ba19ee4b
-
                   base_url: https://fairdomhub.org
-
               jsonapi:
-
                 version: '1.0'
-
     patch:
       operationId: updateSop
       description: |
@@ -6744,55 +5471,30 @@ paths:
             $ref: '#/definitions/studiesResponse'
           examples:
             application/json:
-
               data:
-
               - id: '1'
-
                 type: studies
-
                 attributes:
-
                   title: Creating template for metabolomics data
-
                 links:
-
                   self: /studies/1
-
               - id: '2'
-
                 type: studies
-
                 attributes:
-
                   title: Biphase Batch Fermentation(2009/02/04)
-
                 links:
-
                   self: /studies/2
-
               - id: '3'
-
                 type: studies
-
                 attributes:
-
                   title: Investigation of different pH values for metabolic shift
-
                 links:
-
                   self: /studies/3
-
               jsonapi:
-
                 version: '1.0'
-
               meta:
-
                 base_url: https://fairdomhub.org
-
                 api_version: '0.1'
-
     post:
       operationId: createStudy
       description: |
@@ -6902,153 +5604,79 @@ paths:
             $ref: '#/definitions/studyResponse'
           examples:
             application/json:
-
               data:
-
                 id: '138'
-
                 type: studies
-
                 attributes:
-
                   title: Model analysis
-
                   description:
-
                   experimentalists:
-
                   person_responsible_id: '411'
-
                 relationships:
-
                   creators:
-
                     data: []
-
                   submitter:
-
                     data:
-
                     - id: '411'
-
                       type: people
-
                   people:
-
                     data:
-
                     - id: '411'
-
                       type: people
-
                   projects:
-
                     data:
-
                     - id: '17'
-
                       type: projects
-
                   investigation:
-
                     data:
-
                       id: '56'
-
                       type: investigations
-
                   assays:
-
                     data:
-
                     - id: '294'
-
                       type: assays
-
                     - id: '295'
-
                       type: assays
-
                     - id: '296'
-
                       type: assays
-
                   data_files:
-
                     data:
-
                     - id: '1213'
-
                       type: data_files
-
                     - id: '1214'
-
                       type: data_files
-
                   models:
-
                     data:
-
                     - id: '144'
-
                       type: models
-
                     - id: '175'
-
                       type: models
-
                     - id: '176'
-
                       type: models
-
                     - id: '177'
-
                       type: models
-
                     - id: '179'
-
                       type: models
-
                   sops:
-
                     data: []
-
                   publications:
-
                     data:
-
                     - id: '240'
-
                       type: publications
-
                     - id: '268'
-
                       type: publications
-
                   documents:
-
                     data: []
-
                 links:
-
                   self: /studies/138
-
                 meta:
-
                   created: '2015-07-01T08:14:11.000Z'
-
                   modified: '2015-07-01T08:14:11.000Z'
-
                   api_version: '0.1'
-
                   uuid: 29af988a-9b3b-4ce3-a42d-1bebf0c4cbe1
-
                   base_url: https://fairdomhub.org
-
               jsonapi:
-
                 version: '1.0'
-
     patch:
       operationId: updateStudy
       description: |
@@ -8475,9 +7103,9 @@ definitions:
           assay_class:
             key: EXP
           assay_type:
-            uri: http://www.mygrid.org.uk/ontology/JERMOntology#Transcriptomics
+            uri: http://jermontology.org/ontology/JERMOntology#Transcriptomics
           technology_type:
-            uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
+            uri: http://jermontology.org/ontology/JERMOntology#RNA-Seq
           other_creators: Anonymous creator
           description: A Western Blot Assay
           policy:
@@ -8604,9 +7232,9 @@ definitions:
           assay_class:
             key: EXP
           assay_type:
-            uri: http://www.mygrid.org.uk/ontology/JERMOntology#Transcriptomics
+            uri: http://jermontology.org/ontology/JERMOntology#Transcriptomics
           technology_type:
-            uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
+            uri: http://jermontology.org/ontology/JERMOntology#RNA-Seq
           other_creators: Anonymous creator
           description: A Western Blot Assay
           policy:
