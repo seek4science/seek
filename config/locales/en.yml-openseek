@@ -13,6 +13,7 @@ en:
     modelling_analysis:  "Modelling analysis"
 
   data_file: "Data file"
+  discipline: "Discipline"
   document: "Document"
   model: "Model"
   sop: "SOP"

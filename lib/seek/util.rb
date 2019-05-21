@@ -5,6 +5,8 @@ module Seek
     # NOTE: the provided params collection will not be affected.
     # Instead, a new hash will be returned.
     def self.remove_rails_special_params_from(params, additional_to_remove = [])
+      # TODO: Refactor me to use strong param filtering
+      params = params.to_unsafe_h if params.is_a?(ActionController::Parameters)
       return {} if params.blank?
 
       special_params = %w[id format controller action commit].concat(additional_to_remove)
@@ -30,7 +32,7 @@ module Seek
     def self.persistent_classes
       cache('persistent_classes') do
         ensure_models_loaded
-        filter_disabled(ActiveRecord::Base.descendants)
+        filter_disabled(ApplicationRecord.descendants)
       end
     end
 
@@ -108,6 +110,12 @@ module Seek
     def self.doiable_asset_types
       cache('doiable_types') do
         persistent_classes.select(&:supports_doi?).sort_by(&:name)
+      end
+    end
+
+    def self.uuid_types
+      cache('uuid_types') do
+        persistent_classes.select { |c| c.method_defined?(:uuid) }.sort_by(&:name)
       end
     end
 

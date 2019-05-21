@@ -1,4 +1,4 @@
-class AddNodes < ActiveRecord::Migration
+class AddNodes < ActiveRecord::Migration[4.2]
   def change
     create_table "node_versions_projects", id: false, force: :cascade do |t|
       t.integer "project_id", limit: 4

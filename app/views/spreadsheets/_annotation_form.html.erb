@@ -4,15 +4,8 @@
     <div style="float: right"><a href="#" onclick="$j('#annotation_form').hide(); return false;">Close</a></div>
     <br style="clear:both"/>
   </div>
-  <%= form_tag_with_callbacks(spreadsheet_annotations_path,
-                {:update => {:success => "annotations", :failure => "spreadsheet_errors"},
-                :success => "$j('#spreadsheet_errors').hide();",
-                :failure => "$j('#spreadsheet_errors').show();",
-                :loading => "Element.show('spinner');$('create_annotation_button').disabled=true;",
-                :complete => "Element.hide('spinner');Element.hide('annotation_form');$('create_annotation_button').disabled=false;",
-                :id => "new_annotation_form",:remote => true}
-                ) do %>
-    
+  <%= form_tag(spreadsheet_annotations_path, method: :post, class: 'spreadsheet-annotation-ctrl',
+               id: "new_annotation_form", remote: true) do  %>
     <%= hidden_field_tag :annotation_content_blob_id, @display_data_file.content_blob.id %>
     <%= hidden_field_tag :annotation_sheet_id, "0" %>
     
@@ -29,5 +22,5 @@
                        
     <%= submit_tag 'Add Annotation',:id=>"create_annotation_button" %>
   <% end %>
-  <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%>
+  <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;', :class => 'loading-spinner' -%>
 </div>

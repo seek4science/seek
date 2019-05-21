@@ -22,7 +22,8 @@
     %>
     <% if suggested_limit > 0 && suggested_tags.count > 0 -%>
         <p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
-          <%= link_to_function ("View suggestions" + expand_image("0.3em")).html_safe, visual_effect(:toggle_blind, "#{name}_tag_suggestions", :duration => 0.4) %>
+          <%= link_to(("View suggestions" + expand_image("0.3em")).html_safe, '#',
+                      onclick: "$j('##{name}_tag_suggestions').slideToggle(); return false;") %>
         </p>
         <div id="<%= name -%>_tag_suggestions" style="font-size: 93%; color: #333333; display: none; text-align: center; margin-top: 0.5em; padding: 0.3em;">
           <div class="tags_smaller">

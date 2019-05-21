@@ -22,10 +22,32 @@
                 <%= sub_form.text_field :expiration_date, data: { calendar: true }, class: 'calendar form-control' %>
                 <p class='help-block'>After this date the link will not be accessible.</p>
               </div>
-              <%= sub_form.subform_delete_link 'Revoke', {:onclick => "$('add_a_temporary_link').show(); "}, :class => 'hidden_destroy_field' %>
+              <div>
+                <%= sub_form.hidden_field(:_destroy, class: 'hidden_destroy_field') %>
+                <%= button_link_to 'Revoke', 'destroy', '#', class: 'revoke_temporary_link' %>
+              </div>
             </fieldset>
         <% end %>
-        <%= link_to_function "Add a Sharing Link", "addTempLink();", :id => "add_a_temporary_link", :style => "display: #{f.object.special_auth_codes.empty? ? 'block' : 'none'}" %>
+        <%= button_link_to "Add a Sharing Link", 'add', '#',
+                    id: "add_a_temporary_link", style: "#{f.object.special_auth_codes.any? ? 'display: none;' : ''}" %>
    <% end %>
   <%= render :partial => 'assets/folding_box', :locals => {:hidden =>  false, :fold_id => 'temporary_links', :fold_title => title_and_help, :contents => content} %>
 <% end %>
+
+<script>
+    $j('#add_a_temporary_link').click(function () {
+      $j('#new_temporary_link_form').show();
+      $j('#new_temporary_link_form .hidden_destroy_field')[0].value = '0';
+      $j("#add_a_temporary_link").hide();
+      $j('#temp_link').select();
+
+      return false;
+  });
+  $j('.revoke_temporary_link').click(function () {
+      $j(this).siblings('.hidden_destroy_field')[0].value = '1';
+      $j(this).parents('fieldset').hide();
+      $j('#add_a_temporary_link').show();
+
+      return false;
+  });
+</script>

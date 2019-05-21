@@ -42,11 +42,11 @@ module SampleTypesHelper
   end
 
   def sample_type_tags_list(sample_type)
-    list_item_tags_list(sample_type.tag_annotations.collect(&:value), type: 'sample_type_tags')
+    list_item_tags_list(sample_type.sample_type_tag_annotations.collect(&:value), type: 'sample_type_tag')
   end
 
   def all_sample_type_tags
-    tags = Annotation.with_attribute_name('sample_type_tags').collect(&:value)
+    tags = Annotation.with_attribute_name('sample_type_tag').collect(&:value)
     tags.uniq.sort_by(&:tag_count).reverse
   end
 end

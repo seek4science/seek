@@ -38,9 +38,7 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     assert sop.can_edit?(@current_user)
 
     original_md5 = sop.content_blob.md5sum
-    put sop_content_blob_path(sop, sop.content_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
+    put sop_content_blob_path(sop, sop.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :success
     blob = sop.content_blob.reload
@@ -60,7 +58,7 @@ class SopCUDTest < ActionDispatch::IntegrationTest
         Factory(:permission, policy: policy, contributor: Factory(:favourite_group), access_type: Policy::MANAGING)
     ]
     policy.reload
-    assert_equal Permission.precedence.sort, permissions.map(&:contributor_type).sort, 'Should be one of each permission type'
+    assert_equal Permission::PRECEDENCE.sort, permissions.map(&:contributor_type).sort, 'Should be one of each permission type'
     sop = Factory(:sop, contributor: @current_person, policy: policy)
     original_policy = sop.reload.policy
     original_permissions = original_policy.permissions.to_a
@@ -82,7 +80,7 @@ class SopCUDTest < ActionDispatch::IntegrationTest
         }
     }
 
-    patch sop_path(sop, format: :json), to_patch.to_json, { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    patch sop_path(sop, format: :json), params: to_patch.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
     assert_response :success
 
     updated_policy = JSON.parse(@response.body)['data']['attributes']['policy']

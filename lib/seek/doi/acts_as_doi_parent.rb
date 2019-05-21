@@ -61,17 +61,3 @@ module Seek
     end
   end
 end
-
-ActiveRecord::Base.class_eval do
-  def self.supports_doi?
-    false
-  end
-
-  def supports_doi?
-    self.class.supports_doi?
-  end
-
-  ActiveRecord::Base.class_eval do
-    include Seek::Doi::ActsAsDoiParent
-  end
-end

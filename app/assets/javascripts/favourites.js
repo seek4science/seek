@@ -8,9 +8,10 @@ $j(document).ready(function () {
         accept: ".favouritable",
         drop: function(event, ui) {
             $j('#fav_ajax-loader').show();
-            $j.post(ui.draggable.data('favouriteUrl')).always(function() {
-                $j('#fav_ajax-loader').hide();
-            });
+            $j.post(ui.draggable.data('favouriteUrl'))
+                .done(function (data) { $j('#favourite_list').html(data); $j("#add-favourites-zone").highlight('success'); })
+                .fail(function () { $j("#add-favourites-zone").highlight('danger'); })
+                .always(function() { $j('#fav_ajax-loader').hide(); });
         }
     });
 
@@ -21,11 +22,11 @@ $j(document).ready(function () {
             $j('#fav_ajax-loader').show();
             $j.ajax({
                 url: ui.draggable.data('deleteUrl'),
-                type: 'DELETE',
-                success: function() {
-                    $j('#fav_ajax-loader').hide();
-                }
-            });
+                type: 'DELETE'
+            })
+                .done(function (data) { $j('#favourite_list').html(data); $j("#add-favourites-zone").highlight('success'); })
+                .fail(function () { $j("#add-favourites-zone").highlight('danger'); })
+                .always(function() { $j('#fav_ajax-loader').hide(); });
         }
     });
 

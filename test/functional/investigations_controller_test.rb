@@ -30,7 +30,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test 'should respond to ro for research object' do
     inv = Factory :investigation, contributor: User.current_user.person
-    get :show, id: inv, format: 'ro'
+    get :show, params: { id: inv, format: 'ro' }
     assert_response :success
     assert_equal "attachment; filename=\"investigation-#{inv.id}.ro.zip\"", @response.header['Content-Disposition']
     assert_equal 'application/vnd.wf4ever.robundle+zip', @response.header['Content-Type']
@@ -60,7 +60,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     end
 
 
-    get :show, id: study.investigation.id
+    get :show, params: { id: study.investigation.id }
     assert_response :success
 
     assert_select 'ul.nav-pills' do
@@ -79,7 +79,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should show item' do
-    get :show, id: investigations(:metabolomics_investigation)
+    get :show, params: { id: investigations(:metabolomics_investigation) }
     assert_response :success
     assert_not_nil assigns(:investigation)
   end
@@ -97,7 +97,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should show edit' do
-    get :edit, id: investigations(:metabolomics_investigation)
+    get :edit, params: { id: investigations(:metabolomics_investigation) }
     assert_response :success
     assert assigns(:investigation)
   end
@@ -105,14 +105,14 @@ class InvestigationsControllerTest < ActionController::TestCase
   test "shouldn't show edit for unauthorized user" do
     i = Factory(:investigation, policy: Factory(:private_policy))
     login_as(Factory(:user))
-    get :edit, id: i
+    get :edit, params: { id: i }
     assert_redirected_to investigation_path(i)
     assert flash[:error]
   end
 
   test 'should update' do
     i = investigations(:metabolomics_investigation)
-    put :update, id: i.id, investigation: { title: 'test' }
+    put :update, params: { id: i.id, investigation: { title: 'test' } }
 
     assert_redirected_to investigation_path(i)
     assert assigns(:investigation)
@@ -122,7 +122,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'should create' do
     login_as(Factory :user)
     assert_difference('Investigation.count') do
-      put :create, investigation: Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id]), sharing: valid_sharing
+      put :create, params: { investigation: Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id]), sharing: valid_sharing }
     end
     assert assigns(:investigation)
     assert !assigns(:investigation).new_record?
@@ -134,9 +134,8 @@ class InvestigationsControllerTest < ActionController::TestCase
     another_project = Factory(:project)
     login_as(user)
     assert_difference('Investigation.count') do
-      post :create, investigation: Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id]),
-           policy_attributes: { access_type: Policy::ACCESSIBLE,
-                                permissions_attributes: project_permissions([project, another_project], Policy::EDITING) }
+      post :create, params: { investigation: Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id]), policy_attributes: { access_type: Policy::ACCESSIBLE,
+                                permissions_attributes: project_permissions([project, another_project], Policy::EDITING) } }
     end
 
     investigation = assigns(:investigation)
@@ -153,7 +152,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(Factory :user)
 
     assert_no_difference('Investigation.count') do
-      post :create, investigation: { project_ids: [User.current_user.person.projects.first.id] }
+      post :create, params: { investigation: { project_ids: [User.current_user.person.projects.first.id] } }
     end
     assert_template :new
 
@@ -166,7 +165,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(Factory :user)
 
     assert_no_difference('Investigation.count') do
-      post :create, investigation: { title: 'investigation with no projects' }
+      post :create, params: { investigation: { title: 'investigation with no projects' } }
     end
     assert_template :new
 
@@ -177,12 +176,12 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test 'no edit button in show for unauthorized user' do
     login_as(Factory(:user))
-    get :show, id: Factory(:investigation, policy: Factory(:private_policy))
+    get :show, params: { id: Factory(:investigation, policy: Factory(:private_policy)) }
     assert_select 'a', text: /Edit #{I18n.t('investigation')}/i, count: 0
   end
 
   test 'edit button in show for authorized user' do
-    get :show, id: investigations(:metabolomics_investigation)
+    get :show, params: { id: investigations(:metabolomics_investigation) }
     assert_select 'a[href=?]', edit_investigation_path(investigations(:metabolomics_investigation)), text: /Edit #{I18n.t('investigation')}/i, count: 1
   end
 
@@ -192,20 +191,20 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     assert !inv.can_edit?
 
-    get :show, id: inv
+    get :show, params: { id: inv }
     assert_select 'a', text: /Add a #{I18n.t('study')}/i, count: 0
   end
 
   test 'add study button for person that can edit' do
     inv = investigations(:metabolomics_investigation)
-    get :show, id: inv
+    get :show, params: { id: inv }
     assert_select 'a[href=?]', new_study_path(investigation_id: inv), text: /Add a #{I18n.t('study')}/i, count: 1
   end
 
   test "unauthorized user can't edit investigation" do
     i = Factory(:investigation, policy: Factory(:private_policy))
     login_as(Factory(:user))
-    get :edit, id: i
+    get :edit, params: { id: i }
     assert_redirected_to investigation_path(i)
     assert flash[:error]
   end
@@ -213,7 +212,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test "unauthorized users can't update investigation" do
     i = Factory(:investigation, policy: Factory(:private_policy))
     login_as(Factory(:user))
-    put :update, id: i.id, investigation: { title: 'test' }
+    put :update, params: { id: i.id, investigation: { title: 'test' } }
 
     assert_redirected_to investigation_path(i)
   end
@@ -221,7 +220,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'should destroy investigation' do
     i = Factory(:investigation, contributor: User.current_user.person)
     assert_difference('Investigation.count', -1) do
-      delete :destroy, id: i.id
+      delete :destroy, params: { id: i.id }
     end
     assert !flash[:error]
     assert_redirected_to investigations_path
@@ -231,7 +230,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     i = Factory(:investigation, policy: Factory(:private_policy))
     login_as(Factory(:user))
     assert_no_difference('Investigation.count') do
-      delete :destroy, id: i.id
+      delete :destroy, params: { id: i.id }
     end
     assert flash[:error]
     assert_redirected_to i
@@ -240,31 +239,31 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'should not destroy investigation with a study' do
     investigation = investigations(:metabolomics_investigation)
     assert_no_difference('Investigation.count') do
-      delete :destroy, id: investigation.id
+      delete :destroy, params: { id: investigation.id }
     end
     assert flash[:error]
     assert_redirected_to investigation
   end
 
   test 'option to delete investigation without study' do
-    get :show, id: Factory(:investigation, contributor: User.current_user.person).id
+    get :show, params: { id: Factory(:investigation, contributor: User.current_user.person).id }
     assert_select 'a', text: /Delete #{I18n.t('investigation')}/i, count: 1
   end
 
   test 'no option to delete investigation with study' do
-    get :show, id: investigations(:metabolomics_investigation).id
+    get :show, params: { id: investigations(:metabolomics_investigation).id }
     assert_select 'a', text: /Delete #{I18n.t('investigation')}/i, count: 0
   end
 
   test 'no option to delete investigation when unauthorized' do
     i = Factory :investigation, policy: Factory(:private_policy)
     login_as Factory(:user)
-    get :show, id: i.id
+    get :show, params: { id: i.id }
     assert_select 'a', text: /Delete #{I18n.t('investigation')}/i, count: 0
   end
 
   test 'should_add_nofollow_to_links_in_show_page' do
-    get :show, id: investigations(:investigation_with_links_in_description)
+    get :show, params: { id: investigations(:investigation_with_links_in_description) }
     assert_select 'div#description' do
       assert_select 'a[rel="nofollow"]'
     end
@@ -272,7 +271,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test 'object based on existing one' do
     inv = Factory :investigation, title: 'the inv', policy: Factory(:public_policy)
-    get :new_object_based_on_existing_one, id: inv.id
+    get :new_object_based_on_existing_one, params: { id: inv.id }
     assert_response :success
     assert_select '#investigation_title[value=?]', 'the inv'
   end
@@ -280,7 +279,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'object based on existing one when unauthorised' do
     inv = Factory :investigation, title: 'the inv', policy: Factory(:private_policy), contributor: Factory(:person)
     refute inv.can_view?
-    get :new_object_based_on_existing_one, id: inv.id
+    get :new_object_based_on_existing_one, params: { id: inv.id }
     assert_response :forbidden
   end
 
@@ -288,20 +287,20 @@ class InvestigationsControllerTest < ActionController::TestCase
     inv = Factory(:investigation, policy: Factory(:public_policy))
     logout
     assert inv.can_view?
-    get :new_object_based_on_existing_one, id: inv.id
+    get :new_object_based_on_existing_one, params: { id: inv.id }
     assert_redirected_to inv
     refute_nil flash[:error]
   end
 
   test 'filtering by project' do
     project = projects(:sysmo_project)
-    get :index, filter: { project: project.id }
+    get :index, params: { filter: { project: project.id } }
     assert_response :success
   end
 
   test 'should show the contributor avatar' do
     investigation = Factory(:investigation, policy: Factory(:public_policy))
-    get :show, id: investigation
+    get :show, params: { id: investigation }
     assert_response :success
     assert_select '.author_avatar' do
       assert_select 'a[href=?]', person_path(investigation.contributing_user.person) do
@@ -315,7 +314,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert investigation.creators.empty?
 
-    put :update, id: investigation.id, investigation: { title: investigation.title, creator_ids: [creator.id] }
+    put :update, params: { id: investigation.id, investigation: { title: investigation.title, creator_ids: [creator.id] } }
     assert_redirected_to investigation_path(investigation)
 
     assert investigation.creators.include?(creator)
@@ -324,7 +323,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'should have creators association box' do
     investigation = Factory(:investigation, policy: Factory(:public_policy))
 
-    get :edit, id: investigation.id
+    get :edit, params: { id: investigation.id }
     assert_response :success
     assert_select '#creators_list'
     assert_select "input[type='text'][name='creator-typeahead']"
@@ -340,7 +339,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     investigation.reload
     assert investigation.creators.include?(creator)
 
-    get :show, id: investigation.id
+    get :show, params: { id: investigation.id }
     assert_response :success
     assert_select 'span.author_avatar a[href=?]', "/people/#{creator.id}"
   end
@@ -352,7 +351,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     investigation.save
     investigation.reload
 
-    get :show, id: investigation.id
+    get :show, params: { id: investigation.id }
     assert_response :success
     assert_select 'div.panel-body div', text: other_creators
   end
@@ -364,7 +363,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy),contributor:person)
     investigation2 = Factory(:investigation, policy: Factory(:public_policy))
 
-    get :index, programme_id: programme.id
+    get :index, params: { programme_id: programme.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -381,7 +380,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     refute investigation.can_view?(nil)
 
     assert_enqueued_emails 1 do
-      put :update, investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, params: { investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::VISIBLE } }
     end
 
     refute investigation.can_view?(nil)
@@ -399,7 +398,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert investigation.is_published?
 
     assert_no_enqueued_emails do
-      put :update, investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+      put :update, params: { investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
 
     assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
@@ -415,7 +414,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     assert_difference('Subscription.count', -2) do
       assert_difference('Investigation.count', -1) do
-        delete :destroy, id: i.id
+        delete :destroy, params: { id: i.id }
       end
     end
 
@@ -429,7 +428,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     refute investigation.snapshots.any?
 
-    get :show, id: investigation
+    get :show, params: { id: investigation }
 
     assert_response :success
     assert_select '#citation-instructions a[href=?]', new_investigation_snapshot_path(investigation)
@@ -443,7 +442,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     refute investigation.permitted_for_research_object?
 
-    get :show, id: investigation
+    get :show, params: { id: investigation }
 
     assert_response :success
     assert_select '#citation-instructions a[href=?]', check_related_items_investigation_path(investigation)
@@ -460,7 +459,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert investigation.permitted_for_research_object?
     assert investigation.snapshots.any?
 
-    get :show, id: investigation
+    get :show, params: { id: investigation }
 
     assert_response :success
     assert_select '#citation-instructions .alert p', text: /You have created 1 snapshot of this Investigation/
@@ -482,7 +481,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     refute investigation.can_manage?(person.user)
     assert investigation.can_view?(person.user)
 
-    get :show, id: investigation
+    get :show, params: { id: investigation }
 
     assert_response :success
     assert_select '#citation-instructions', count: 0

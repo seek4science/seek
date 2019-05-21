@@ -7,10 +7,7 @@
   <br/>
 
   <% unless @display_sop.experimental_conditions.empty? -%>
-    <ul>
-       <%= render :partial=>"studied_factors/condition_or_factor_row_headings", :locals=>{:asset => 'sop', :show_delete=>false} %>
-       <%= render :partial=>"studied_factors/condition_or_factor_row",:collection=>@sop.experimental_conditions, :locals=>{:asset => 'sop', :show_delete=>false} %>
-    </ul>
+    <%= render partial: "studied_factors/condition_or_factor_table", locals: { collection: @sop.experimental_conditions, asset: 'sop', show_delete: false } %>
   <% else -%>
     <span class="none_text">There are no experimental conditions for this <%= t('sop') %>.</span>
   <% end -%>

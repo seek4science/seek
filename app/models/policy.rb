@@ -1,4 +1,4 @@
-class Policy < ActiveRecord::Base
+class Policy < ApplicationRecord
   has_many :permissions, -> { order('created_at ASC') },
            dependent: :destroy,
            autosave: true,
@@ -16,6 +16,9 @@ class Policy < ActiveRecord::Base
     end
   end
 
+  validates :access_type, numericality: { less_than_or_equal_to: -> (_) { Seek::Config.max_all_visitors_access_type }, # This needs to be a proc so the setting can be changed without restarting the app
+                                          message: 'is too permissive' }
+
   alias_attribute :title, :name
 
   after_commit :queue_update_auth_table
@@ -27,14 +30,14 @@ class Policy < ActiveRecord::Base
   end
 
   def queue_update_auth_table
-    unless (previous_changes.keys - ['updated_at']).empty? || assets.empty?
+    unless (saved_changes.keys - ['updated_at']).empty? || assets.empty?
       AuthLookupUpdateJob.new.add_items_to_queue(assets)
     end
   end
 
   def queue_rdf_generation_job
     supported_assets = assets.select(&:rdf_supported?)
-    unless (previous_changes.keys - ['updated_at']).empty? || supported_assets.empty?
+    unless (saved_changes.keys - ['updated_at']).empty? || supported_assets.empty?
       supported_assets.each { |asset| RdfGenerationJob.new(asset).queue_job }
     end
   end
@@ -432,10 +435,6 @@ class Policy < ActiveRecord::Base
 
   def destroy_if_redundant
     destroy if assets.none?
-  end
-
-  def self.max_public_access_type
-    Policy::ACCESSIBLE
   end
 
   # utility to get all items associated with this policy.

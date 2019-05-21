@@ -1,36 +1,20 @@
-<% error_text ||= [] %>
-<% unless error_text.empty? %>
-  <div id="errorExplanation">
-    <h2>The following errors prevented your image being uploaded</h2>
-    <ul>
-      <% error_text.each do |e| %>
-        <% e = "The uploaded image is too large" if e[0..8] == "Size is n" %>
-        <li><%= e %></li>
-      <% end %>
-    </ul>  
-  </div> 
-<% end %>
-
 <% if images.empty? %>
   <span class="none_text">No images</span>
 <% end %>
+
 <% images.each do |i| %>
   <div class="image_thumbnail">
-    <%= link_to(i.public_filename, :target => "blank") do %>
+    <%= link_to(view_help_image_path(i), target: '_blank') do %>
       <div class="thumb">
-        <%= image_tag(i.public_filename(:thumb), :class => "thumb") -%>
+        <%= image_tag(view_help_image_path(i, image_size: '64x64'), class: 'thumb') -%>
       </div>
     <% end %>
     <br/>
-    <%= link_to(image('new', :title => "Insert image", :alt => "Insert image"), "#", :onclick => "insertAtCursor('help_document_body',\"!#{i.public_filename}!\"); return false;") %>
-    <%= link_to_with_callbacks(image('destroy', :title => "Delete image", :alt => "Delete image"),
-                      {:update => "images_list",
-                       :url => help_document_help_image_path(@help_document,i),
-                       :with=>"'help_document_id=' + '#{@help_document.identifier}'",
-                       :confirm => 'Are you sure you wish to delete this image?', 
-                       :method => :delete,
-                       :loading => "Element.show('image_spinner_#{i.id}')"},
-                      {:remote => true}) %>
-    <%= image_tag "ajax-loader.gif", :id => "image_spinner_#{i.id}", :style => 'display:none;' -%>
+    <%= link_to(image('new', title: 'Insert image', alt: 'Insert image'), "#", onclick: "insertAtCursor('help_document_body',\"!#{view_help_image_path(i)}!\"); return false;") %>
+    <%= link_to(image('destroy', alt: 'Delete', title: 'Delete image'),
+                help_document_help_image_path(@help_document, i),
+                data: { confirm: 'Are you sure you wish to delete this image?' }, remote: true, method: :delete,
+                class: 'delete-help-image') %>
+    <%= image_tag 'ajax-loader.gif', id: "image_spinner_#{i.id}", style: 'display:none;' -%>
   </div>
 <% end %>

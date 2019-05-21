@@ -15,7 +15,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     p = Factory :person
     sop = Factory :sop, policy: Factory(:all_sysmo_viewable_policy)
     fish = Factory :tag, annotatable: sop, source: p, value: 'fish'
-    get :edit_tag, id: fish.value.id
+    get :edit_tag, params: { id: fish.value.id }
     assert_response :success
   end
 
@@ -27,7 +27,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     assert_equal ['fish'], sop.annotations.select { |a| a.source == p }.collect { |a| a.value.text }
 
     golf = Factory :tag, annotatable: sop, source: p, value: 'golf'
-    post :edit_tag, id: fish.value.id, tag_list: "#{golf.value.text}, microbiology, spanish"
+    post :edit_tag, params: { id: fish.value.id, tag_list: "#{golf.value.text}, microbiology, spanish" }
     assert_redirected_to action: :tags
 
     sop.reload
@@ -41,7 +41,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     fish = Factory :tag, annotatable: sop, source: p, value: Factory(:text_value, text: 'fish')
     assert_equal ['fish'], sop.annotations.select { |a| a.source == p }.collect { |a| a.value.text }
 
-    post :edit_tag, id: fish.value.id, tag_list: fish.value.text
+    post :edit_tag, params: { id: fish.value.id, tag_list: fish.value.text }
     assert_redirected_to action: :tags
 
     sop.reload
@@ -58,15 +58,15 @@ class AdminAnnotationsTest < ActionController::TestCase
     sop = Factory :sop, policy: Factory(:all_sysmo_viewable_policy)
     fish = Factory :tag, annotatable: sop, source: p, value: 'fish'
 
-    get :edit_tag, id: fish.value.id
+    get :edit_tag, params: { id: fish.value.id }
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    post :edit_tag, id: fish.value.id, tag_list: 'microbiology, spanish'
+    post :edit_tag, params: { id: fish.value.id, tag_list: 'microbiology, spanish' }
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    post :delete_tag, id: fish.value.id
+    post :delete_tag, params: { id: fish.value.id }
     assert_redirected_to :root
     assert_not_nil flash[:error]
   end
@@ -88,7 +88,7 @@ class AdminAnnotationsTest < ActionController::TestCase
 
     golf = Factory(:text_value, text: 'golf')
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
-    post :edit_tag, id: fishing.value.id, tag_list: "#{golf.text}, microbiology, spanish"
+    post :edit_tag, params: { id: fishing.value.id, tag_list: "#{golf.text}, microbiology, spanish" }
     assert_redirected_to action: :tags
     assert_nil flash[:error]
 
@@ -120,7 +120,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
     assert_not_nil fishing
 
-    post :edit_tag, id: fishing.value.id, tag_list: "#{golf.value.text}, fishing, spanish"
+    post :edit_tag, params: { id: fishing.value.id, tag_list: "#{golf.value.text}, fishing, spanish" }
     assert_redirected_to action: :tags
     assert_nil flash[:error]
 
@@ -151,7 +151,7 @@ class AdminAnnotationsTest < ActionController::TestCase
 
     assert person.annotations_with_attribute('expertise').select { |a| a.value.text == 'sparrow' }.blank?
 
-    post :edit_tag, id: fishing.value.id, tag_list: 'sparrow'
+    post :edit_tag, params: { id: fishing.value.id, tag_list: 'sparrow' }
     assert_redirected_to action: :tags
     assert_nil flash[:error]
 
@@ -178,7 +178,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
     assert_not_nil fishing
 
-    post :edit_tag, id: fishing.value.id, tag_list: ''
+    post :edit_tag, params: { id: fishing.value.id, tag_list: '' }
     assert_redirected_to action: :tags
     assert_nil flash[:error]
 
@@ -206,7 +206,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     assert_not_nil fishing
 
     golf = Factory(:tag, annotatable: person, source: users(:quentin), value: 'golf')
-    post :edit_tag, id: fishing.value.id, tag_list: golf.value.text
+    post :edit_tag, params: { id: fishing.value.id, tag_list: golf.value.text }
     assert_redirected_to action: :tags
     assert_nil flash[:error]
 
@@ -235,14 +235,14 @@ class AdminAnnotationsTest < ActionController::TestCase
     assert_not_nil fishing
 
     # must be a post
-    get :delete_tag, id: fishing.value.id
+    get :delete_tag, params: { id: fishing.value.id }
     assert_redirected_to action: :tags
     assert_not_nil flash[:error]
 
     fishing = person.annotations_with_attribute('expertise').find { |a| a.value.text == 'fishing' }
     assert_not_nil fishing
 
-    post :delete_tag, id: fishing.value.id
+    post :delete_tag, params: { id: fishing.value.id }
     assert_redirected_to action: :tags
     assert_nil flash[:error]
 

@@ -4,7 +4,7 @@ module NelsTestHelper
     create_sample_attribute_type
 
     @project = Factory(:project)
-    @project.settings['nels_enabled'] = true
+    @project.settings.set('nels_enabled', true)
     person = Factory(:person, project: @project)
     @user = person.user
     @nels_access_token = 'fake-access-token'

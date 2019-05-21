@@ -1,4 +1,4 @@
-class AuthLookupUpdateQueue < ActiveRecord::Base
+class AuthLookupUpdateQueue < ApplicationRecord
   belongs_to :item, :polymorphic=>:true
 
   def self.exists?(item)

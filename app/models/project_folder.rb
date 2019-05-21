@@ -1,5 +1,5 @@
-class ProjectFolder < ActiveRecord::Base
-  before_destroy :deletable?
+class ProjectFolder < ApplicationRecord
+  before_destroy -> (folder) { throw :abort unless folder.deletable? }
   before_destroy :unsort_assets_and_remove_children
 
   belongs_to :project
@@ -7,7 +7,7 @@ class ProjectFolder < ActiveRecord::Base
   has_many :children,-> { order(:title) }, :class_name=>"ProjectFolder",:foreign_key=>:parent_id, :after_add=>:update_child
   has_many :project_folder_assets, :dependent=>:destroy
 
-  scope :root_folders, -> (project) { where(project_id: project.id, parent_id: nil).order('LOWER(title)') }
+  scope :root_folders, -> (project) { where(project_id: project.id, parent_id: nil).order(Arel.sql('LOWER(title)')) }
 
   validates_presence_of :project,:title
 

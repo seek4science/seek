@@ -43,6 +43,6 @@ class NelsIntegrationTest < ActionDispatch::IntegrationTest
 
   def login_as(user)
     User.current_user = user
-    post '/session', login: user.login, password: generate_user_password
+    post '/session', params: { login: user.login, password: generate_user_password }
   end
 end

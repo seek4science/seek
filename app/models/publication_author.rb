@@ -1,4 +1,4 @@
-class PublicationAuthor < ActiveRecord::Base
+class PublicationAuthor < ApplicationRecord
   belongs_to :publication
   belongs_to :person
 

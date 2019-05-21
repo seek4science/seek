@@ -36,7 +36,7 @@
       <div>
         <%= preview_permission_popup_link(@presentation)-%>
         <%= f.submit "Update", :id => "presentation_submit_btn",
-            :onclick => "javascript: validateResourceFields(false, 'presentation', #{current_user_authorized_to_manage});  return(false);",
+            :onclick => "return validateResourceFields('presentation')",
             :class => 'btn btn-primary' -%>
         or <%= cancel_button(presentation_path(@presentation)) -%>
       </div>

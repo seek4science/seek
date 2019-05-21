@@ -1,12 +1,3 @@
-function optionsFromArray(array) {
-    var options = [];
-
-    for(var i = 0; i < array.length; i++)
-        options.push($j('<option/>').val(array[i][1]).text(array[i][0])[0]);
-
-    return options;
-}
-
 function nestedOptionsFromJSONArray(array,prompt_option_text) {
     var options = [];
     options.push($j('<option/>').val(0).text(prompt_option_text));
@@ -90,6 +81,12 @@ Associations.List.prototype.exists = function (itemOrFunction) {
     } else {
         return this.items.includes(itemOrFunction);
     }
+};
+
+Associations.List.prototype.find = function (func) {
+    return this.items.find(function (item) {
+        return func(item.data);
+    })
 };
 
 Associations.List.prototype.removeAll = function () {

@@ -37,9 +37,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     assert pres.can_edit?(@current_user)
 
     original_md5 = pres.content_blob.md5sum
-    put presentation_content_blob_path(pres, pres.content_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
+    put presentation_content_blob_path(pres, pres.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :success
     blob = pres.content_blob.reload
@@ -55,9 +53,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     assert pres.can_download?(@current_user)
     refute pres.can_edit?(@current_user)
 
-    put presentation_content_blob_path(pres, pres.content_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
+    put presentation_content_blob_path(pres, pres.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :forbidden
     validate_json_against_fragment response.body, '#/definitions/errors'
@@ -74,9 +70,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     assert pres.can_edit?(@current_user)
 
     original_md5 = pres.content_blob.md5sum
-    put presentation_content_blob_path(pres, pres.content_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf'))
+    put presentation_content_blob_path(pres, pres.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')) }
 
     assert_response :bad_request
     validate_json_against_fragment response.body, '#/definitions/errors'
@@ -96,7 +90,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz.camelize(:lower)}Post"
 
     assert_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", @to_post
+      post "/#{@plural_clz}.json", params: @to_post
       assert_response :success
     end
 
@@ -118,7 +112,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     @to_post = JSON.parse(template.result(binding))
 
     assert_no_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", @to_post
+      post "/#{@plural_clz}.json", params: @to_post
       # assert_response :unprocessable_entity
       # validate_json_against_fragment response.body, '#/definitions/errors'
     end

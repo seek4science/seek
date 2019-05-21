@@ -1,4 +1,4 @@
-class ExperimentalConditionLink < ActiveRecord::Base
+class ExperimentalConditionLink < ApplicationRecord
   belongs_to :substance, :polymorphic => true
   belongs_to :experimental_condition
 

@@ -28,7 +28,7 @@ module RdfTestCases
   end
 
   def invoke_rdf_get(object)
-    get :show, id: object, format: 'rdf'
+    get :show, params: { id: object, format: 'rdf' }
   end
 
   def expected_rdf_resource_uri(object)
@@ -42,7 +42,7 @@ module RdfTestCases
       item = Factory itemname.to_sym, policy: Factory(:private_policy)
 
       logout
-      get :show, id: item.id, format: 'rdf'
+      get :show, params: { id: item.id, format: 'rdf' }
       assert_response :forbidden
     end
   end
@@ -53,7 +53,7 @@ module RdfTestCases
     id += 1 until clz.find_by_id(id).nil?
 
     logout
-    get :show, id: id, format: 'rdf'
+    get :show, params: { id: id, format: 'rdf' }
     assert_response :not_found
   end
 end

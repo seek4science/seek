@@ -5,6 +5,7 @@
 <%= content_tag :script, project_lookup_json(parents), type: 'application/json', id: 'project-lookup-json' %>
 <script>
   var projectsLookup = JSON.parse($j('#project-lookup-json').text());
+  Sharing.implicitProjects = [];
   Sharing.defaultPolicies = JSON.parse($j('#project-default-policies-json').text());
 
   function setImplicitProjects(lookupId, skipPrompt) {
@@ -12,6 +13,7 @@
     if (lookupId) {
       var projects = projectsLookup[parseInt(lookupId)];
       if (projects && projects.length) {
+          Sharing.implicitProjects = projects;
         if (projects.length == 1) {
           // Ask if they want to use the default policy (if there is one)
           if (Sharing.defaultPolicies[projects[0].id] && (skipPrompt || confirm('' + projects[0].title + ' has a default policy specified, do you want to apply it?'))) {

@@ -3,7 +3,6 @@
 require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
-require 'colorize'
 require 'benchmark'
 
 include SysMODB::SpreadsheetExtractor
@@ -108,25 +107,25 @@ namespace :seek_dev do
         puts "Preparing to add person #{firstname} #{lastname} with email #{email}"
         person = Person.new first_name: firstname, last_name: lastname, email: email
       else
-        puts "A person already exists with firstname and lastname #{firstname},#{lastname} respectively, skipping".red
+        puts "A person already exists with firstname and lastname #{firstname},#{lastname} respectively, skipping"
         next
       end
       project = Project.find_by_id(project_id)
       if project.nil?
-        pp "No project found for id #{project_id}, skipping #{person.name}".red
+        pp "No project found for id #{project_id}, skipping #{person.name}"
         next
       end
       institution = Institution.find_by_id(institution_id)
       if institution.nil?
-        pp "No institution found for id #{institution_id}, skipping #{person.name}".red
+        pp "No institution found for id #{institution_id}, skipping #{person.name}"
         next
       end
       person.add_to_project_and_institution(project, institution)
       begin
         person.save!
-        puts "#{person.name} successfully added".green
+        puts "#{person.name} successfully added"
       rescue Exception => e
-        puts "Error adding #{person.name}".red
+        puts "Error adding #{person.name}"
         puts e
       end
     end

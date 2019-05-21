@@ -1,4 +1,4 @@
-class ProjectPosition < ActiveRecord::Base
+class ProjectPosition < ApplicationRecord
   has_many :group_memberships_project_positions
   has_many :group_memberships, :through => :group_memberships_project_positions
 

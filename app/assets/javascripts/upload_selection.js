@@ -16,31 +16,12 @@ function setup_url_field(examine_url_path,examine_button_id) {
     upload_url_field.on('keypress',function(event) {
         update_url_checked_status(false);
     });
-};
-
+}
 function submit_url_for_examination() {
     disallow_copy_option();
     $j('#test_url_result')[0].innerHTML="<p class='large_spinner'/>";
     var data_url = upload_url_field.val();
     $j.post(examine_url_href, { data_url: data_url }, function(data){} );
-}
-
-function from_url_selected(){
-    Effect.Fade("upload_from_file", {
-        duration: 0.0
-    });
-    Effect.Appear("upload_from_url");
-    $j('#upload_from_file_button').removeClass("block_link_active");
-    $j('#upload_from_url_button').addClass("block_link_active");
-}
-
-function from_file_selected(){
-    Effect.Fade("upload_from_url", {
-        duration: 0.0
-    });
-    Effect.Appear("upload_from_file");
-    $j('#upload_from_file_button').addClass("block_link_active");
-    $j('#upload_from_url_button').removeClass("block_link_active");
 }
 
 function allow_copy_option() {
@@ -65,7 +46,7 @@ function changeUploadButtonText(isFile) {
     if ($j('[data-upload-button]').length) {
         if (isFile) {
             //data-upload-file-text provides alternative text for when a file is selected
-            var text = $j('[data-upload-button]').data('upload-file-text') || 'Upload and Save'
+            var text = $j('[data-upload-button]').data('upload-file-text') || 'Upload and Save';
             $j('[data-upload-button]').val(text);
         } else {
             $j('[data-upload-button]').val('Register');

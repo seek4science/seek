@@ -29,7 +29,7 @@
       <div>
         <%= preview_permission_popup_link(@workflow)-%>
         <%= create_button :id => "workflow_submit_btn",
-                       :onclick => "validateResourceFields(true,'workflow',true); return(false);",
+                       :onclick => "return validateResourceFields('workflow')",
                        :class => 'btn btn-primary' -%>
         or <%= cancel_button(workflows_path) -%>
       </div>

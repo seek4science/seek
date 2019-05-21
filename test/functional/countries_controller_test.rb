@@ -10,7 +10,7 @@ class CountriesControllerTest < ActionController::TestCase
   end
 
   test 'get Netherlands' do
-    get :show, country_name: 'Netherlands'
+    get :show, params: { country_name: 'Netherlands' }
     assert_response :success
   end
 end

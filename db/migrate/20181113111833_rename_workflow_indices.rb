@@ -1,4 +1,4 @@
-class RenameWorkflowIndices < ActiveRecord::Migration
+class RenameWorkflowIndices < ActiveRecord::Migration[4.2]
   def change
     # rename_index "workflow_auth_lookup",
     #              "index_workflow_auth_lookup_on_user_id_and_asset_id_and_can_view",

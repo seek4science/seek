@@ -1,4 +1,4 @@
-class ExperimentalCondition < ActiveRecord::Base
+class ExperimentalCondition < ApplicationRecord
   include Seek::ExperimentalFactors::ModelConcerns
 
   belongs_to :sop

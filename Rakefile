@@ -6,6 +6,12 @@
 
 require File.expand_path('../config/application', __FILE__)
 
+
 SEEK::Application.load_tasks
 
+
+if !Rails.env.production?
+  require 'gem-licenses'
+  Gem::GemLicenses.install_tasks
+end
 

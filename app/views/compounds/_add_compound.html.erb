@@ -1,40 +1,30 @@
 <div>
-  <%= form_for_with_callbacks 'compound',
-                              before: "$('compound_submit').disabled=true;",
-                              loaded: "$('compound_submit').disabled=false;",
-                              method: :post,
-                              html: { id: "add_compound_form", remote: true } do |f| -%>
+  <%= form_for Compound.new, { id: "add_compound_form", remote: true } do |f| -%>
       <h4> Add new compound </h4>
       <span>(Please separate multiple synonyms and IDs by semi-colon)</span>
 
       <div class="row">
         <div class="form-group col-sm-3">
           <label>Compound Name</label>
-          <%= f.text_area :title, rows: 2, class: 'form-control' %>
-          <%= button_to_with_callbacks "Search in SabioRK",
-                                       {url: {controller: 'compounds', action: "search_in_sabiork"},
-                                        with: "'compound_name=' + escape($F('compound_title'))",
-                                        before: "$('search_in_sabiork').disabled=true;",
-                                        loaded: "$('search_in_sabiork').disabled=false;",},
-                                       { class: 'btn btn-default btn-xs',
-                                         id: 'search_in_sabiork',
-                                         remote: true } %>
+          <%= f.text_area :title, rows: 2, class: 'form-control compound-title' %>
+
+          <%= link_to "Search in SabioRK", '#', class: 'btn btn-default btn-xs sabio-rk-search-btn' %>
         </div>
         <div class="form-group col-sm-3">
           <label>Synonyms</label>
-          <%= f.text_area :synonyms, rows: 2, class: 'form-control'-%>
+          <%= text_area_tag 'compound[synonyms]', '', rows: 2, class: 'form-control' %>
         </div>
         <div class="form-group col-sm-2">
           <label>SabioRK ID</label>
-          <%= text_area :compound, :sabiork_id, rows: 2, class: 'form-control' %>
+          <%= text_area_tag 'compound[sabiork_id]', '', rows: 2, class: 'form-control' %>
         </div>
         <div class="form-group col-sm-2">
           <label>ChEBI IDs</label>
-          <%= text_area :compound, :chebi_ids, rows: 2, class: 'form-control' %>
+          <%= text_area_tag 'compound[chebi_ids]', '', rows: 2, class: 'form-control' %>
         </div>
         <div class="form-group col-sm-2">
           <label>KEGG IDs</label>
-          <%= text_area :compound, :kegg_ids, rows: 2, class: 'form-control' %>
+          <%= text_area_tag 'compound[kegg_ids]', '', rows: 2, class: 'form-control' %>
         </div>
       </div>
 

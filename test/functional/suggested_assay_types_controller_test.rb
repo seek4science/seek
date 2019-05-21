@@ -25,7 +25,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'should show edit own assay types' do
-    get :edit, id: Factory(:suggested_assay_type, contributor_id: User.current_user.person.try(:id)).id
+    get :edit, params: { id: Factory(:suggested_assay_type, contributor_id: User.current_user.person.try(:id)).id }
     assert_response :success
     assert_not_nil assigns(:suggested_assay_type)
   end
@@ -35,7 +35,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     suggested = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics')
     assert suggested.children.empty?
     assert_difference('SuggestedAssayType.count') do
-      post :create, suggested_assay_type: { label: 'test assay type', parent_uri: "suggested_assay_type:#{suggested.id}" }
+      post :create, params: { suggested_assay_type: { label: 'test assay type', parent_uri: "suggested_assay_type:#{suggested.id}" } }
     end
     assert_redirected_to action: :index
     assert suggested.children.count == 1
@@ -47,7 +47,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     login_as Factory(:admin)
 
     assert_difference('SuggestedAssayType.count') do
-      post :create, suggested_assay_type: { label: 'test assay type', parent_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics' }
+      post :create, params: { suggested_assay_type: { label: 'test assay type', parent_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics' } }
     end
     assert_redirected_to action: :index
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', SuggestedAssayType.last.parent.uri
@@ -58,7 +58,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
   test 'should update label' do
     login_as Factory(:admin)
     suggested_assay_type = Factory(:suggested_assay_type, label: 'old label', contributor_id: User.current_user.person.try(:id))
-    put :update, id: suggested_assay_type.id, suggested_assay_type: { label: 'new label' }
+    put :update, params: { id: suggested_assay_type.id, suggested_assay_type: { label: 'new label' } }
     assert_redirected_to action: :index
     get :index
     assert_select 'li a[href=?]', assay_types_path(uri: suggested_assay_type.uri, label: 'new label'), text: 'new label'
@@ -77,13 +77,13 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     assert_equal suggested_parent1.uri, suggested_assay_type.parent.uri.to_s
 
     # update to other parent suggested
-    put :update, id: suggested_assay_type.id, suggested_assay_type: { parent_uri: "suggested_assay_type:#{suggested_parent2.id}" }
+    put :update, params: { id: suggested_assay_type.id, suggested_assay_type: { parent_uri: "suggested_assay_type:#{suggested_parent2.id}" } }
     assert_redirected_to action: :index
     suggested_parent2.reload
     assert_includes suggested_parent2.children, suggested_assay_type
 
     # update to other parent from ontology
-    put :update, id: suggested_assay_type.id, suggested_assay_type: { parent_uri: ontology_parent_uri }
+    put :update, params: { id: suggested_assay_type.id, suggested_assay_type: { parent_uri: ontology_parent_uri } }
     assert_redirected_to action: :index
 
     ontology_parent = Seek::Ontologies::AssayTypeReader.instance.class_for_uri('http://jermontology.org/ontology/JERMOntology#Fluxomics')
@@ -94,25 +94,25 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     # even owner cannot delete own type
     suggested_assay_type = Factory(:suggested_assay_type, label: 'delete_me', contributor_id: User.current_user.person.try(:id))
     assert_no_difference('SuggestedAssayType.count') do
-      delete :destroy, id: suggested_assay_type.id
+      delete :destroy, params: { id: suggested_assay_type.id }
     end
     assert_equal 'Admin rights required to manage types', flash[:error]
-    flash[:error] = nil
+    clear_flash(:error)
     logout
     # log in as another user, who is not the owner of the suggested assay type
     login_as Factory(:user)
     assert_no_difference('SuggestedAssayType.count') do
-      delete :destroy, id: suggested_assay_type.id
+      delete :destroy, params: { id: suggested_assay_type.id }
     end
 
     assert_equal 'Admin rights required to manage types', flash[:error]
-    flash[:error] = nil
+    clear_flash(:error)
     logout
 
     # log in as admin
     login_as Factory(:user, person_id: Factory(:admin).id)
     assert_difference('SuggestedAssayType.count', -1) do
-      delete :destroy, id: suggested_assay_type.id
+      delete :destroy, params: { id: suggested_assay_type.id }
     end
     assert_nil flash[:error]
     assert_redirected_to action: :index
@@ -125,7 +125,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     child = Factory :suggested_assay_type, parent_id: parent.id
 
     assert_no_difference('SuggestedAssayType.count') do
-      delete :destroy, id: parent.id
+      delete :destroy, params: { id: parent.id }
     end
     assert flash[:error]
     assert_redirected_to action: :index
@@ -137,7 +137,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     suggested_at = Factory :suggested_assay_type
     Factory(:experimental_assay, suggested_assay_type: suggested_at)
     assert_no_difference('SuggestedAssayType.count') do
-      delete :destroy, id: suggested_at.id
+      delete :destroy, params: { id: suggested_at.id }
     end
     assert flash[:error]
     assert_redirected_to action: :index

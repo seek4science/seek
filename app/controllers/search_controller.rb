@@ -1,6 +1,6 @@
 class SearchController < ApplicationController
 
-  before_filter :set_default_search_params
+  before_action :set_default_search_params
 
   include Seek::ExternalSearch
   include Seek::FacetedBrowsing
@@ -17,8 +17,8 @@ class SearchController < ApplicationController
         flash.now[:error] = e.message
       rescue RSolr::Error::ConnectionRefused=>e
         flash.now[:error] = "The search service is currently not running, and we've been notified of the problem. Please try again later"
-        forward_exception_notification(e, {message: 'An error with search occurred, SOLR connection refused.'})
-        Rails.logger.error(e)
+
+        Seek::Errors::ExceptionForwarder.send_notification(e, env:request.env, data:{message: 'An error with search occurred, SOLR connection refused.'})
       end
     end
 

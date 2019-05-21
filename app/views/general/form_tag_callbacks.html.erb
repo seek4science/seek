@@ -3,21 +3,22 @@
         var loading_<%= id -%> = function () {<%= loading.html_safe -%>
         };
 
-        $('<%= id -%>').observe("ajax:before", loading_<%= id -%>);
+        $j('#<%= id -%>').on("ajax:before", loading_<%= id -%>);
     <% end -%>
 
     <% if before -%>
-        var before_<%= id -%> = function () {<%= before.html_safe -%>
+        var before_<%= id -%> = function () {
+            <%= before.html_safe -%>
         };
 
-        $('<%= id -%>').observe("ajax:before", before_<%= id -%>);
+        $j('#<%= id -%>').on("ajax:before", before_<%= id -%>);
     <% end -%>
 
     <% if complete -%>
         var complete_<%= id -%> = function () {<%= complete.html_safe -%>
         };
 
-        $('<%= id -%>').observe("ajax:complete", complete_<%= id -%>);
+        $j('#<%= id -%>').on("ajax:complete", complete_<%= id -%>);
 
     <% end -%>
 
@@ -25,32 +26,32 @@
         var after_<%= id -%> = function () {<%= after.html_safe -%>
         };
 
-        $('<%= id -%>').observe("ajax:after", after_<%= id -%>);
+        $j('#<%= id -%>').on("ajax:after", after_<%= id -%>);
     <% end -%>
 
     <% if success -%>
         var success_<%= id -%> = function () {<%= success.html_safe -%>
         };
 
-        $('<%= id -%>').observe("ajax:success", success_<%= id -%>);
+        $j('#<%= id -%>').on("ajax:success", success_<%= id -%>);
     <% end -%>
 
     <% if failure -%>
         var failure_<%= id -%> = function () {<%= failure.html_safe -%>
         };
 
-        $('<%= id -%>').observe("ajax:failure", failure_<%= id -%>);
+        $j('#<%= id -%>').on("ajax:error", failure_<%= id -%>);
     <% end -%>
 
     <% if success_update_element -%>
-    $('<%= id -%>').observe("ajax:success", function(event) {
-        $('<%= success_update_element -%>').update(event.memo.responseText);
+    $j('#<%= id -%>').on("ajax:success", function(event, data, status, xhr) {
+        $j('#<%= success_update_element -%>').html(data);
     });
     <% end -%>
 
     <% if failure_update_element -%>
-    $('<%= id -%>').observe("ajax:failure", function(event) {
-        $('<%= failure_update_element -%>').update(event.memo.responseText);
+    $j('#<%= id -%>').on("ajax:error", function(event, xhr, status, statusText) {
+        $j('#<%= failure_update_element -%>').html(xhr.responseText);
     });
     <% end -%>
 
