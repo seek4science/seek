@@ -78,4 +78,19 @@ class PermissionTest < ActiveSupport::TestCase
 
     refute @data_file.policy.reload.permissions.where(contributor_id: @favourite_group, contributor_type: 'FavouriteGroup').any?
   end
+
+  test 'contributor_type of permission is validated' do
+    disable_authorization_checks do
+      assert @data_file.policy.permissions.create(contributor: @programme, access_type: Policy::EDITING)
+      assert @data_file.policy.permissions.create(contributor: @project2, access_type: Policy::EDITING)
+      assert @data_file.policy.permissions.create(contributor: @institution, access_type: Policy::EDITING)
+      assert @data_file.policy.permissions.create(contributor: @person, access_type: Policy::EDITING)
+      assert @data_file.policy.permissions.create(contributor: @project2_work_group, access_type: Policy::EDITING)
+      assert @data_file.policy.permissions.create(contributor: @favourite_group, access_type: Policy::EDITING)
+
+      p = @data_file.policy.permissions.build(contributor: Factory(:sop), access_type: Policy::EDITING)
+      refute p.save
+      assert p.errors[:contributor_type].any?
+    end
+  end
 end
