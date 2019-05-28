@@ -1,6 +1,7 @@
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => item} %>
 <% if logged_in_and_member? %>
     <%= button_link_to("New #{t('investigation')} based on this one", 'new', new_object_based_on_existing_one_investigation_path(item,:controller_name=>"investigations")) %>
+    <%= button_link_to("Export ISATab JSON", 'publish', export_isatab_json_investigation_path(item)) %>
 <% end %>
 
 <% if item.can_edit? -%>
