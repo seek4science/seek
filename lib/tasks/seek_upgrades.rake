@@ -16,7 +16,6 @@ namespace :seek do
     db:seed:model_formats
     update_stored_orcids
     fix_sample_type_tag_annotations
-    sqlite_boolean_update
     delete_orphaned_permissions
   ]
 
