@@ -11,6 +11,18 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.8.3
+
+Release date: _29th May 2019_
+
+Bug fix release:
+
+   * Fix to correctly clean up permissions when a contributor is deleted
+   * Additional constraints to prevent invalid permissions, particularly when changing through the API
+   * Fix to finding related Organisms to a Sample through an NCBI ID attribute
+
+Changes are also described in the [SEEK v1.8.3 release notes](release-notes-1.8.3.html)         
+
 ## Version 1.8.2
 
 Release date: _25th April 2019_
