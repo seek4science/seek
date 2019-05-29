@@ -10,6 +10,10 @@ jdk:
 
 sudo: false
 
+branches:
+  except:
+    - gent-scenarios
+
 env:
   - SUITE="rails test test/unit" DB_TYPE=mysql
   - SUITE="rails test test/unit" DB_TYPE=sqlite3
