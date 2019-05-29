@@ -16,6 +16,9 @@ class Policy < ActiveRecord::Base
     end
   end
 
+  validates :access_type, numericality: { less_than_or_equal_to: -> (_) { Seek::Config.max_all_visitors_access_type }, # This needs to be a proc so the setting can be changed without restarting the app
+                                          message: 'is too permissive' }
+
   alias_attribute :title, :name
 
   after_commit :queue_update_auth_table
@@ -432,10 +435,6 @@ class Policy < ActiveRecord::Base
 
   def destroy_if_redundant
     destroy if assets.none?
-  end
-
-  def self.max_public_access_type
-    Policy::ACCESSIBLE
   end
 
   # utility to get all items associated with this policy.

@@ -102,6 +102,8 @@ SEEK::Application.configure do
       Settings.defaults[:session_store_timeout] = 30.minutes
 
       Settings.defaults[:default_all_visitors_access_type] = Policy::NO_ACCESS
+      Settings.defaults[:max_all_visitors_access_type] = Policy::MANAGING
+
       Settings.defaults[:openbis_enabled] = true
       Settings.defaults[:openbis_debug] = false
       Settings.defaults[:openbis_autosync] = true

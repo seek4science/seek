@@ -78,7 +78,7 @@ var Sharing = {
 
   associatedProjectAccessType: <%= Seek::Config.default_associated_projects_access_type %>,
   allVisitorsAccessType: <%= Seek::Config.default_all_visitors_access_type %>,
-  maxPublicAccessType: <%= Policy.max_public_access_type %>,
+  maxPublicAccessType: <%= Seek::Config.max_all_visitors_access_type %>,
 
   permissionsChanged: function () {
     if (originalPolicy.access_type !== Sharing.permissionsTable.publicPermission.access_type)

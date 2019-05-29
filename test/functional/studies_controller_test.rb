@@ -224,7 +224,7 @@ class StudiesControllerTest < ActionController::TestCase
   test "unauthorized user can't update" do
     s = Factory :study, policy: Factory(:private_policy)
     login_as(Factory(:user))
-    Factory :permission, contributor: User.current_user, policy: s.policy, access_type: Policy::VISIBLE
+    Factory(:permission, contributor: User.current_user.person, policy: s.policy, access_type: Policy::VISIBLE)
 
     put :update, id: s.id, study: { title: 'test' }
 
