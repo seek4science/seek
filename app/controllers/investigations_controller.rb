@@ -36,7 +36,6 @@ class InvestigationsController < ApplicationController
 
   def export_isatab_json
     the_hash = convert_investigation Investigation.find(params[:id])
-    JSON.pretty_generate(the_hash)
     send_data JSON.pretty_generate(the_hash) , filename: 'isatab.json'
   end
 
