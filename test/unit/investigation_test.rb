@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class InvestigationTest < ActiveSupport::TestCase
+
+  require "isatab_converter"
+  include IsaTabConverter
+
   fixtures :investigations, :projects, :studies, :assays, :assay_assets, :permissions, :policies
 
   test 'associations' do
@@ -49,6 +53,13 @@ class InvestigationTest < ActiveSupport::TestCase
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/investigations/#{object.id}"), reader.statements.first.subject
     end
+  end
+
+  test 'to_isatab' do
+    object = Factory(:max_investigation, description: 'Max investigation')
+    the_hash = convert_investigation (object)
+    json = JSON.pretty_generate(the_hash)
+    assert_not_equal the_hash, {}
   end
 
   # the lib/sysmo/title_trimmer mixin should automatically trim the title :before_save
