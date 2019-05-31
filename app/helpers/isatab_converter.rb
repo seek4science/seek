@@ -15,14 +15,17 @@ module IsaTabConverter
     isa_investigation[:identifier] = investigation.id
     isa_investigation[:title] = investigation.title
     isa_investigation[:description] = investigation.description
-    isa_investigation[:submission_date] = investigation.created_at.to_date.iso8601
-    isa_investigation[:public_release_date] = investigation.created_at.to_date.iso8601
+    isa_investigation[:submissionDate] = investigation.created_at.to_date.iso8601
+    isa_investigation[:publicReleaseDate] = investigation.created_at.to_date.iso8601
 
     # ontologySourceReferences pre-defined
     # Note can only map once as experiment type and technology type have the same URL
+    # Need to check version of JERM
     isa_investigation[:ontologySourceReferences] = [
         {:file => JERM_ONTOLOGY_URL,
-         :name => 'jerm_ontology'}]
+         :name => 'jerm_ontology',
+        :version => '1.0',
+        :description => ''}]
 
     # map publications from publications
     publications = []
@@ -60,8 +63,9 @@ module IsaTabConverter
     isa_study[:identifier] = study.id
     isa_study[:title] = study.title
     isa_study[:description] = study.description
-    isa_study[:submission_date] = study.created_at.to_date.iso8601
-    isa_study[:public_release_date] = study.created_at.to_date.iso8601
+    isa_study[:submissionDate] = study.created_at.to_date.iso8601
+    isa_study[:publicReleaseDate] = study.created_at.to_date.iso8601
+    isa_study[:filename] = nil
 
     # map publications from publications
     publications = []
@@ -78,10 +82,13 @@ module IsaTabConverter
     isa_study[:people] = people
 
     # studyDesignDescriptors not yet mapped
+    isa_study[:studyDesignDescriptors] = []
 
     # materials not yet mapped
+    isa_study[:materials] = {:sources => [], :samples => [], :otherMaterials => []}
 
     # processSequence not yet mapped
+    isa_study[:processSequence] = []
 
     # map assays from assays
     assays = []
@@ -101,10 +108,13 @@ module IsaTabConverter
     isa_study[:protocols] = protocols
 
     # factors not yet mapped
+    isa_study[:factors] = []
 
     # characteristicCategories not yet mapped
+    isa_study[:characteristicCategories] = []
 
     # unitCategories not yet mapped
+    isa_study[:unitCategories] = []
 
     # comments are not mapped
 
@@ -136,27 +146,40 @@ module IsaTabConverter
     # comments are not mapped
 
     # filename not yet mapped
+    isa_assay[:filename] = nil
 
     # mao measurementType from assay_type
     if assay.assay_type_uri
-        isa_assay[:measurement_type]= convert_annotation(assay.assay_type_uri)
+        isa_assay[:measurementType]= convert_annotation(assay.assay_type_uri)
     end
 
     # map technologyType from technology_type
     if assay.technology_type_uri
-        isa_assay[:technology_type] = convert_annotation(assay.technology_type_uri)
+        isa_assay[:technologyType] = convert_annotation(assay.technology_type_uri)
     end
-    # technologyPlatform not yet mapped
 
-    # dataFiles not yet mapped
+    # technologyPlatform not yet mapped
+    isa_assay[:technologyPlatform] = nil
+
+    # map dataFiles from data_files
+    dataFiles = []
+    assay.data_files.each do |d|
+      dataFiles << convert_data_file(d)
+    end
+    isa_assay[:dataFiles] = dataFiles
+
 
     # materials not yet mapped
+    isa_assay[:materials] = {:sources => [], :samples => [], :otherMaterials => []}
 
     # characteristicCategories not yet mapped
+    isa_assay[:characteristicCategories] = []
 
     # unitCategories not yet mapped
+    isa_assay[:unitCategories] = []
 
     # processSequence not yet mapped
+    isa_assay[:processSequence] = []
 
     OBJECT_MAP[assay] = isa_assay
 
@@ -172,18 +195,21 @@ module IsaTabConverter
 
     # @id not yet mapped
 
-    isa_person[:last_name] = person.last_name
-    isa_person[:first_name] = person.first_name
-    # midInitials is not mapped
+    isa_person[:lastName] = person.last_name
+    isa_person[:firstName] = person.first_name
+    isa_person[:midInitials] = ''
     # eMail is not mapped
+    isa_person[:email] = ''
     isa_person[:phone] = person.phone
     # fax is not mapped
-    # address is not mapped
+    isa_person[:fax] = nil
+    isa_person[:address] = nil
 
     # affiliation is not yet mapped
+    isa_person[:affiliation] = nil
 
     # roles are not yet mapped
-
+    isa_person[:roles] = []
     # comments are not mapped
 
 
@@ -222,24 +248,56 @@ module IsaTabConverter
 
     isa_protocol = {}
 
+    isa_protocol['@id'] = URI.join(Seek::Config.site_base_host + '/sops/', sop.id.to_s).to_s
+
     # comments are not mapped
 
     isa_protocol[:name] = sop.title
 
     # protocol_type not yet mapped
+    isa_protocol[:protocolType] = {:annotationValue => nil}
 
     isa_protocol[:description] = sop.description
 
     # uri cannot be mapped
+    isa_protocol[:uri] = nil
 
     isa_protocol[:version] = sop.version.to_s
 
     # parameters cannot be mapped
+    isa_protocol[:parameters] = []
 
     # components not yet mapped
+    isa_protocol[:components] = []
 
     OBJECT_MAP[sop] = isa_protocol
 
     return isa_protocol
   end
+
+  def convert_data_file(data_file)
+    if OBJECT_MAP.has_key? (data_file)
+      return OBJECT_MAP[data_file]
+    end
+
+    isa_data_file = {}
+
+    if data_file.content_blob.url
+      isa_data_file['@id'] = data_file.content_blob.url
+    else
+      isa_data_file['@id'] = URI.join(Seek::Config.site_base_host + '/data_files/', data_file.id.to_s).to_s
+    end
+
+    # comments are not mapped
+
+    isa_data_file[:name] = data_file.title
+
+    # data_file_type fixed at raw data file
+    isa_data_file[:type] = 'Raw Data File'
+
+    OBJECT_MAP[data_file] = isa_data_file
+
+    return isa_data_file
+  end
+
 end
