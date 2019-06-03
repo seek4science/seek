@@ -9,6 +9,8 @@
 
 <%= render :partial => 'contact_details_form', :locals => {:f => f} %>
 
+<%= render partial:'galaxy_details', locals:{f:f}  %>
+
 <% if person -%>
     <%# f.fancy_multiselect(:disciplines, possibilities: Discipline.all, help_text: nil,
                             intro: "You belong to the following disciplines:") %>

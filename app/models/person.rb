@@ -22,6 +22,8 @@ class Person < ApplicationRecord
   validates :email, format: { with: RFC822::EMAIL }
   validates :web_page, url: { allow_nil: true, allow_blank: true }
 
+  validates :galaxy_instance, url: { allow_nil: true, allow_blank: true }
+
   validates_uniqueness_of :email, case_sensitive: false
 
   has_and_belongs_to_many :disciplines
