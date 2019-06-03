@@ -30,14 +30,14 @@ module IsaTabConverter
     # map publications from publications
     publications = []
     investigation.publications.each do |p|
-      publications << convert_publication(p)
-    end
+        publications << convert_publication(p)
+     end
     isa_investigation[:publications] = publications
 
     # map people from people
     people = []
     investigation.related_people.each do |p|
-      people << convert_person(p)
+        people << convert_person(p)
     end
     isa_investigation[:people] = people
 
@@ -90,22 +90,21 @@ module IsaTabConverter
     # processSequence not yet mapped
     isa_study[:processSequence] = []
 
-    # map assays from assays
-    assays = []
-    study.assays.each do |a|
-      assays << convert_assay(a)
-    end
-    isa_study[:assays] = assays
-
     protocols = []
     # map protocols from the sops referenced by the assays
-    # must be done after mapping of assays
     study.assays.each do |a|
       a.sops.each do |s|
         protocols << convert_sop(s)
       end
     end
     isa_study[:protocols] = protocols
+
+    # map assays from assays
+    assays = []
+    study.assays.each do |a|
+      assays << convert_assay(a)
+    end
+    isa_study[:assays] = assays
 
     # factors not yet mapped
     isa_study[:factors] = []
@@ -179,8 +178,34 @@ module IsaTabConverter
     isa_assay[:unitCategories] = []
 
     # processSequence not yet mapped
-    isa_assay[:processSequence] = []
+    processSequence = []
+    if !assay.sops.empty?
+      sop = assay.sops.first
+      process = {}
+      # name is not mapped
+      #
+      process['@id'] = URI.join(Seek::Config.site_base_host + '/assays/', assay.id.to_s).to_s
+      process[:executesProtocol] = {}
+      process[:executesProtocol]['@id'] = OBJECT_MAP[sop]['@id']
+      process[:parameterValues] = []
+      process[:performer] = nil
+      process[:date] = assay.created_at.to_date.iso8601
+      # process[:previousProcess] = nil
+      # process[:nextProcess] = nil
+      process[:inputs] = []
+      process[:outputs] = []
+      assay.data_files.each do |d|
+        if !assay.outgoing.include? d
+          process[:inputs] << {'@id' => OBJECT_MAP[d]['@id']}
+        end
+        if !assay.incoming.include? d
+          process[:outputs] << {'@id' => OBJECT_MAP[d]['@id']}
+        end
+      end
+     processSequence << process
+    end
 
+    isa_assay[:processSequence] = processSequence
     OBJECT_MAP[assay] = isa_assay
 
     return isa_assay
