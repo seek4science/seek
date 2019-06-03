@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_10_122522) do
+ActiveRecord::Schema.define(version: 2019_06_03_094502) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -964,6 +964,8 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.string "uuid"
     t.integer "roles_mask", default: 0
     t.string "orcid"
+    t.string "galaxy_instance"
+    t.string "galaxy_api_key"
   end
 
   create_table "permissions", id: :integer,  force: :cascade do |t|

@@ -1,0 +1,21 @@
+<%= panel("Galaxy details", :id => "galaxy_details") do %>
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="form-group">
+        <%= f.label 'Galaxy URL' %>
+
+        <%= f.text_field :galaxy_instance, :class => 'form-control' %>
+      </div>
+
+    </div>
+
+    <div class="col-sm-6">
+      <div class="form-group">
+        <%= f.label 'Galaxy API key' %>
+
+        <%= f.text_field :galaxy_api_key, :class => 'form-control' %>
+      </div>
+    </div>
+  </div>
+
+<% end %>

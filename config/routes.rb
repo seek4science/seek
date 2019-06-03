@@ -426,6 +426,8 @@ SEEK::Application.routes.draw do
       get :destroy_samples_confirm
       post :retrieve_nels_sample_metadata
       get :retrieve_nels_sample_metadata
+      post :galaxy_analyse
+      get :galaxy_analysis_progress
     end
     resources :studied_factors do
       collection do
