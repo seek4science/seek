@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_03_094502) do
+ActiveRecord::Schema.define(version: 2019_06_03_154444) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -557,6 +557,19 @@ ActiveRecord::Schema.define(version: 2019_06_03_094502) do
     t.string "resource_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "galaxy_execution_queue_items",  force: :cascade do |t|
+    t.integer "person_id"
+    t.integer "data_file_id"
+    t.integer "sample_id"
+    t.string "workflow_id"
+    t.string "history_name"
+    t.string "history_id"
+    t.integer "status"
+    t.text "std_out"
+    t.string "current_status"
+    t.integer "delayed_job_id"
   end
 
   create_table "genes", id: :integer,  force: :cascade do |t|

@@ -37,7 +37,22 @@ class DataFilesController < ApplicationController
   def galaxy_analyse
     raise "No data file" unless @data_file
 
-    #create jobs
+    @data_file.extracted_samples.each do |sample|
+      GalaxyExecutionQueueItem.create(status:GalaxyExecutionQueueItem::QUEUED,
+                                      person: User.current_user.person,
+                                      data_file: @data_file,
+                                      sample: sample)
+    end
+
+    #during testing
+    if @data_file.extracted_samples.empty?
+      GalaxyExecutionQueueItem.create(status:GalaxyExecutionQueueItem::QUEUED,
+                                      person: User.current_user.person,
+                                      data_file: @data_file,
+                                      sample: Sample.first)
+    end
+
+    GalaxyExecutionJob.new(@data_file).queue_job
 
     redirect_to(galaxy_analysis_progress_data_file_path(@data_file))
 
