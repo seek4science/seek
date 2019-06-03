@@ -1,0 +1,11 @@
+<% if item.can_download? %>
+
+  <%= button_link_to("Analyse", 'cytoscape_web',
+                     galaxy_analyse_data_file_path(item, :code => params[:code]),
+                     :title => "Analyse with Galaxy",
+                     method: :post) %>
+
+<% end %>
+
+<%= render :partial => 'assets/asset_buttons', :locals => {:asset => item, :version => version} -%>
+

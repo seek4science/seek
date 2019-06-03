@@ -6,13 +6,13 @@ module Seek
           view: Set.new([
             :view, :show, :index, :search, :favourite, :favourite_delete, :comment, :comment_delete, :comments,
             :comments_timeline, :rate, :tag, :items, :statistics, :tag_suggestions, :preview, :runs,
-            :new_object_based_on_existing_one, :samples_table
+            :new_object_based_on_existing_one, :samples_table, :galaxy_analysis_progress
           ]).freeze,
 
           download: Set.new([
             :download, :named_download, :launch, :submit_job, :data, :execute, :plot, :explore, :visualise,
             :export_as_xgmml, :download_log, :download_results, :input, :output, :download_output, :download_input,
-            :view_result, :compare_versions, :simulate
+            :view_result, :compare_versions, :simulate, :galaxy_analyse
           ]).freeze,
 
           edit: Set.new([

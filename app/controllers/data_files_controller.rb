@@ -34,6 +34,19 @@ class DataFilesController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
+  def galaxy_analyse
+    raise "No data file" unless @data_file
+
+    #create jobs
+
+    redirect_to(galaxy_analysis_progress_data_file_path(@data_file))
+
+  end
+
+  def galaxy_analysis_progress
+
+  end
+
   def plot
     sheet = params[:sheet] || 2
     @csv_data = spreadsheet_to_csv(open(@data_file.content_blob.filepath), sheet, true)
