@@ -31,6 +31,13 @@ class Workflow < ApplicationRecord
     true
   end
 
+  def galaxy_id
+    url = content_blob.url
+    if url
+      Rack::Utils.parse_query(URI(url).query)['id']
+    end
+  end
+
   #defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
     true

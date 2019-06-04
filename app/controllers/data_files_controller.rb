@@ -52,7 +52,7 @@ class DataFilesController < ApplicationController
                                       sample: Sample.first)
     end
 
-    GalaxyExecutionJob.new(@data_file).queue_job
+    GalaxyExecutionJob.new(@data_file, Workflow.first).queue_job
 
     redirect_to(galaxy_analysis_progress_data_file_path(@data_file))
 
