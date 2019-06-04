@@ -428,6 +428,7 @@ SEEK::Application.routes.draw do
       get :retrieve_nels_sample_metadata
       post :galaxy_analyse
       get :galaxy_analysis_progress
+      get :galaxy_execution_status
     end
     resources :studied_factors do
       collection do

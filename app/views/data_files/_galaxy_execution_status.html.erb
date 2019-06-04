@@ -1,0 +1,39 @@
+<div id="execution-progress">
+
+  <table id="progress">
+    <thead>
+    <tr>
+      <th>Sample</th>
+      <th>Sample</th>
+      <th>Status</th>
+      <th>Galaxy History</th>
+    </tr>
+    </thead>
+
+    <% galaxy_items.each do |item| %>
+      <tbody>
+      <tr class='<%= status_css_class(item) %>'>
+        <td><%= link_to(item.sample.title, item.sample) %></td>
+        <td><%= link_to(item.workflow.title, item.workflow) %></td>
+        <td><%= item.status_name %></td>
+        <td><%= link_to(item.history_id, item.history_url) if item.history_id %></td>
+      </tr>
+      </tbody>
+
+    <% end %>
+
+  </table>
+
+  <script>
+      setTimeout(function () {
+          $j.ajax('<%= galaxy_execution_status_data_file_path(@data_file) %>', {
+                  data: { 'execution_id': '<%= execution_id -%>' },
+                  success: function (html) {
+                      $j('#execution-progress').replaceWith(html);
+                  }
+              }
+          );
+      }, 1000);
+  </script>
+
+</div>

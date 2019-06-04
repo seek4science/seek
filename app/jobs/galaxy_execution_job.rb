@@ -1,11 +1,12 @@
 require 'pty'
 
 class GalaxyExecutionJob < SeekJob
-  attr_reader :data_file_id, :workflow_id
+  attr_reader :data_file_id, :workflow_id, :execution_id
 
-  def initialize(data_file,workflow)
+  def initialize(data_file,workflow,execution_id)
     @data_file_id = data_file.id
     @workflow_id = workflow.id
+    @execution_id = execution_id
   end
 
   def perform_job(item)
@@ -15,7 +16,7 @@ class GalaxyExecutionJob < SeekJob
   end
 
   def gather_items
-    [GalaxyExecutionQueueItem.where(data_file_id: data_file_id).where(status: GalaxyExecutionQueueItem::QUEUED).first].compact
+    [queued_items.first].compact
   end
 
   def timelimit
@@ -23,10 +24,14 @@ class GalaxyExecutionJob < SeekJob
   end
 
   def follow_on_job?
-    GalaxyExecutionQueueItem.where(data_file_id: data_file_id).where(status: GalaxyExecutionQueueItem::QUEUED).any?
+    queued_items.any?
   end
 
   private
+
+  def queued_items
+    GalaxyExecutionQueueItem.where(data_file_id: data_file_id,status: GalaxyExecutionQueueItem::QUEUED,execution_id: execution_id)
+  end
 
   def execute_galaxy_script(item)
     cmd = command(item)

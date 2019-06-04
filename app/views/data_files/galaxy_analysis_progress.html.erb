@@ -1,3 +1,48 @@
+<style>
+
+  table#progress {
+    width: 90%;
+    border: 1px solid;
+  }
+
+  table#progress thead {
+    border: 1px solid;
+  }
+
+  table#progress th, td{
+    border-left:1px solid #ccc;
+    border-right: 1px solid #ccc;
+    padding: 0.5em;
+  }
+
+  table#progress tbody tr {
+    border-bottom: 1px solid #ccc;
+  }
+
+  table#progress tr.status-queued {
+    background-color: lightgrey;
+  }
+
+  table#progress tr.status-running {
+    background-color: lightyellow;
+  }
+
+  table#progress tr.status-finished {
+    background-color: lightgreen;
+  }
+
+  table#progress tr.status-failed {
+    background-color: red;
+  }
+
+</style>
+
 <%= image(:galaxy_logo) %>
 
 <h1>Progress for <%= @data_file.title %></h1>
+
+
+
+
+  <%= render partial: 'data_files/galaxy_execution_status', locals: { galaxy_items: @galaxy_items, execution_id:params[:execution_id] } %>
+

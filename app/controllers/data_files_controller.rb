@@ -37,28 +37,36 @@ class DataFilesController < ApplicationController
   def galaxy_analyse
     raise "No data file" unless @data_file
 
+    execution_id = UUID.generate[0..7]
+
+    workflow = Workflow.first
+
     @data_file.extracted_samples.each do |sample|
       GalaxyExecutionQueueItem.create(status:GalaxyExecutionQueueItem::QUEUED,
                                       person: User.current_user.person,
                                       data_file: @data_file,
-                                      sample: sample)
+                                      execution_id: execution_id,
+                                      sample: sample,
+                                      workflow: workflow)
     end
 
-    #during testing
-    if @data_file.extracted_samples.empty?
-      GalaxyExecutionQueueItem.create(status:GalaxyExecutionQueueItem::QUEUED,
-                                      person: User.current_user.person,
-                                      data_file: @data_file,
-                                      sample: Sample.first)
-    end
+    GalaxyExecutionJob.new(@data_file, workflow, execution_id).queue_job
 
-    GalaxyExecutionJob.new(@data_file, Workflow.first).queue_job
-
-    redirect_to(galaxy_analysis_progress_data_file_path(@data_file))
+    redirect_to(galaxy_analysis_progress_data_file_path(@data_file, execution_id:execution_id))
 
   end
 
   def galaxy_analysis_progress
+    execution_id = params[:execution_id]
+    @galaxy_items = GalaxyExecutionQueueItem.where(data_file_id:@data_file.id, execution_id:execution_id)
+  end
+
+  def galaxy_execution_status
+    execution_id = params[:execution_id]
+    @galaxy_items = GalaxyExecutionQueueItem.where(data_file_id:@data_file.id, execution_id:execution_id)
+    respond_to do |format|
+      format.html { render partial: 'data_files/galaxy_execution_status', locals: { galaxy_items: @galaxy_items, execution_id:execution_id } }
+    end
 
   end
 
