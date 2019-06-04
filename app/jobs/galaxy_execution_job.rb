@@ -9,14 +9,36 @@ class GalaxyExecutionJob < SeekJob
     @execution_id = execution_id
   end
 
-  def perform_job(item)
-    item.update_attribute(:status, GalaxyExecutionQueueItem::RUNNING)
-    execute_galaxy_script(item)
-    item.update_attribute(:status, GalaxyExecutionQueueItem::FINISHED)
+  def perform_job(items)
+    chunks = items.each_slice(4).to_a
+
+    chunks.each do |chunk|
+      puts "#{chunk.count} execution items to process"
+      threads = []
+      chunk.each do |item|
+        threads << Thread.new do
+          item.update_attribute(:status, GalaxyExecutionQueueItem::RUNNING)
+          begin
+            execute_galaxy_script(item)
+          rescue RuntimeError=>e
+            puts "Unexpected runtime error #{e.message}"
+          end
+
+          item.update_attribute(:status, GalaxyExecutionQueueItem::FINISHED)
+        end
+      end
+
+      puts "#{threads.count} threads created and running"
+
+      threads.each(&:join)
+
+      puts "All threads joined"
+    end
+
   end
 
   def gather_items
-    [queued_items.first].compact
+    [queued_items]
   end
 
   def timelimit
@@ -46,13 +68,12 @@ class GalaxyExecutionJob < SeekJob
           # Do stuff with the output here. Just printing to show it works
           stdout.each { |line| handle_response(line,item) }
         rescue Errno::EIO
-          puts "Errno:EIO error found"
+          #puts "Errno:EIO error found"
         end
       end
     rescue PTY::ChildExited
       puts "The child process exited!"
     end
-
   end
 
   def handle_response(line,item)
