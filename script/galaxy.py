@@ -18,12 +18,22 @@ import json
 import time
 import sys
 
-print("args is " + "'" + sys.argv[1]+"'")
+def report_status(message, data = {}):
+    r = {
+        "status" : message,
+        "data" : data
+    }
+    print(json.dumps(r))
+    sys.stdout.flush() # make sure the message gets delivered rather than buffered
 
-json = json.loads(sys.argv[1])
-data = json['data']
+report_status("Script started")
 
-print(json)
+#print("args is " + "'" + sys.argv[1]+"'")
+
+json_args = json.loads(sys.argv[1])
+data = json_args['data']
+
+#print(json)
 
 """## Configuration
 
@@ -33,8 +43,8 @@ print(json)
 """
 
 galaxy_config = {
-    'url': json['url'],
-    'api_key': json['api_key'] # make an account on the Galaxy instance and then User - Preferences - Manage API key
+    'url': json_args['url'],
+    'api_key': json_args['api_key'] # make an account on the Galaxy instance and then User - Preferences - Manage API key
 }
 
 fairdom_config = {
@@ -42,7 +52,7 @@ fairdom_config = {
     #'study' : 'RIL_8-way_growth_chamber',    
     #'assay' : 'RNA_seq_E-MTAB-3965',         
     'workflow' : 'Salmon_maize_paired_quick', # name of the workflow, assumes there is only one with that name
-    'workflow_id' : json['workflow_id']
+    'workflow_id' : json_args['workflow_id']
 }
 
 samples = {
@@ -80,24 +90,26 @@ for file in files:
         investigation_library = file['id']
 
 if not investigation_present:
-    print("create investigation")
+    #print("create investigation")
     investigation_library =  gi.libraries.create_folder(library[0]['id'], fairdom_config['investigation'], description=None)[0]
 else:
     investigation_library =  gi.libraries.get_folders(library[0]['id'], name = "/" + fairdom_config['investigation'])[0]
-    print("investigation present")
+    #print("investigation present")
+
+report_status("Deploying data")
 
 uploads = {}
 for sample in samples:
-    print(sample)
+    #print(sample)
     uploads[sample] = []
     for key, file in samples[sample].items():
-            print(file)
+            #print(file)
             # does not check if file is present
             file_present = False
             for avail_file in files:
                 if avail_file['name'] == ("/" + fairdom_config['investigation'] + "/" + file):
-                    print("file found: ")
-                    print(avail_file)
+                    #print("file found: ")
+                    #print(avail_file)
                     uploads[sample].append(avail_file) 
                     file_present = True
                     break
@@ -116,9 +128,9 @@ not_yet_ready = True
 errors = False
 while not_yet_ready:
     for sample in samples:
-        print(sample)
+        #print(sample)
         for upload in uploads[sample]:
-            print(gi.libraries.show_dataset(library[0]['id'], upload['id'])['state'])
+            #print(gi.libraries.show_dataset(library[0]['id'], upload['id'])['state'])
             if gi.libraries.show_dataset(library[0]['id'], upload['id'])['state'] == 'ok':
                 not_yet_ready = False
                 # update_library_dataset(library[0]['id'], name="name_to_which_it_needs_to_be_changed")
@@ -129,10 +141,11 @@ while not_yet_ready:
                 not_yet_ready = True
 
     if not_yet_ready:
-        print("Waiting for upload")
+        #print("Waiting for upload")
+        report_status("Waiting for upload")
         time.sleep(60)
             
-print("Ready !")
+#print("Ready !")
 
 """## Run workflow"""
 
@@ -140,10 +153,11 @@ print("Ready !")
 workflows = gi.workflows.get_workflows(workflow_id = fairdom_config['workflow_id'], published=True)
 workflow = workflows[0]
 
-print("Workflow: "+workflow['name'])
+#print("Workflow: "+workflow['name'])
 
 invoked_workflows = {}
 
+report_status("Starting workflow")
 
 for sample in samples:
     
@@ -156,9 +170,10 @@ for sample in samples:
                              inputs=inputs, 
                              import_inputs_to_history=True, 
                              history_name=sample)
-    print(invoked_workflow)
+    report_status("Workflow running",{"history_id" : invoked_workflow['history_id']})
+    #print(invoked_workflow)
 
-    print("History: " + galaxy_config['url'] + "/histories/view?id="+invoked_workflow['history_id'])
+    #print("History: " + galaxy_config['url'] + "/histories/view?id="+invoked_workflow['history_id'])
 
     invoked_workflows[sample] = invoked_workflow
 
@@ -200,6 +215,7 @@ while not all_ready:
                     all_ready = False
 
 
+report_status("Workflow complete")
 exit()
 
 

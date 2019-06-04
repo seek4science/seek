@@ -27,6 +27,10 @@ class GalaxyExecutionJob < SeekJob
     queued_items.any?
   end
 
+  def follow_on_delay
+    0.5.second
+  end
+
   private
 
   def queued_items
@@ -35,19 +39,34 @@ class GalaxyExecutionJob < SeekJob
 
   def execute_galaxy_script(item)
     cmd = command(item)
+    puts "command = #{cmd}"
     begin
       PTY.spawn( cmd ) do |stdout, stdin, pid|
         begin
           # Do stuff with the output here. Just printing to show it works
-          stdout.each { |line| print line }
+          stdout.each { |line| handle_response(line,item) }
         rescue Errno::EIO
-          puts "Errno:EIO error"
+          puts "Errno:EIO error found"
         end
       end
     rescue PTY::ChildExited
       puts "The child process exited!"
     end
 
+  end
+
+  def handle_response(line,item)
+    puts line
+    begin
+      j = JSON.parse(line)
+      msg = j['status']
+      item.update_attribute(:current_status,msg)
+      if j['data'] && j['data']['history_id']
+        item.update_attribute(:history_id,j['data']['history_id'])
+      end
+    rescue JSON::ParserError
+      puts "not JSON, ignoring: #{line}"
+    end
   end
 
   def command(item)

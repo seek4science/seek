@@ -22,7 +22,9 @@ class GalaxyExecutionQueueItem < ApplicationRecord
   end
 
   def history_url
-
+    if history_id
+      URI.join(person.galaxy_instance,"/histories/view","?id=#{history_id}").to_s
+    end
   end
 
 end

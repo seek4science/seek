@@ -5,7 +5,8 @@
     <tr>
       <th>Sample</th>
       <th>Sample</th>
-      <th>Status</th>
+      <th>SEEK Status</th>
+      <th>Galaxy Status</th>
       <th>Galaxy History</th>
     </tr>
     </thead>
@@ -16,7 +17,8 @@
         <td><%= link_to(item.sample.title, item.sample) %></td>
         <td><%= link_to(item.workflow.title, item.workflow) %></td>
         <td><%= item.status_name %></td>
-        <td><%= link_to(item.history_id, item.history_url) if item.history_id %></td>
+        <td><%= item.current_status %></td>
+        <td><%= link_to(item.history_id, item.history_url, target: :_blank) if item.history_id %></td>
       </tr>
       </tbody>
 
