@@ -39,7 +39,7 @@ class DataFilesController < ApplicationController
 
     execution_id = UUID.generate[0..7]
 
-    workflow = Workflow.first
+    workflow = Workflow.find(2)
 
     @data_file.extracted_samples.each do |sample|
       GalaxyExecutionQueueItem.create(status:GalaxyExecutionQueueItem::QUEUED,

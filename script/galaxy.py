@@ -157,7 +157,7 @@ workflow = workflows[0]
 
 invoked_workflows = {}
 
-report_status("Starting workflow")
+report_status("Setting up workflow")
 
 for sample in samples:
     
@@ -170,7 +170,7 @@ for sample in samples:
                              inputs=inputs, 
                              import_inputs_to_history=True, 
                              history_name=sample)
-    report_status("Workflow running",{"history_id" : invoked_workflow['history_id']})
+    report_status("Workflow started",{"history_id" : invoked_workflow['history_id']})
     #print(invoked_workflow)
 
     #print("History: " + galaxy_config['url'] + "/histories/view?id="+invoked_workflow['history_id'])
@@ -197,22 +197,25 @@ downloads = {
 }
 
 all_ready = False
+job_found = False
 
-while not all_ready:
-    time.sleep(30)
-    all_ready = True
+while not (all_ready and job_found):
+    time.sleep(10)
     for sample in samples:
-        #print (sample)
         filename_prefix = fairdom_config['investigation'] + '_' + sample + '_' # to do: link with sample name, for now hardcoded
 
-        for step in gi.workflows.show_invocation(invoked_workflows[sample]['workflow_id'], invoked_workflows[sample]['id'])['steps']:
-            #print(step)
-            if step['job_id']: # input does not have job_id
-                if gi.jobs.get_state(step['job_id']) == 'ok':
-                    # job finished
-                    all_ready = True
-                else:
+        step_status = {'step_status' : {}}
+        invocation = gi.workflows.show_invocation(invoked_workflows[sample]['workflow_id'], invoked_workflows[sample]['id'])
+        all_ready = True
+        job_found = False
+        for step in invocation['steps']:
+            if step['job_id']: # inputs have no job id
+                job_found = True
+                state = gi.jobs.get_state(step['job_id'])
+                step_status['step_status'][step['workflow_step_id']] = state
+                if state != 'ok':
                     all_ready = False
+        report_status("Workflow running",step_status)
 
 
 report_status("Workflow complete")

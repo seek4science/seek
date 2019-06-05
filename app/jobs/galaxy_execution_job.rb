@@ -10,7 +10,7 @@ class GalaxyExecutionJob < SeekJob
   end
 
   def perform_job(items)
-    chunks = items.each_slice(4).to_a
+    chunks = items.each_slice(2).to_a
 
     chunks.each do |chunk|
       puts "#{chunk.count} execution items to process"
@@ -26,13 +26,11 @@ class GalaxyExecutionJob < SeekJob
 
           item.update_attribute(:status, GalaxyExecutionQueueItem::FINISHED)
         end
+        sleep(2)
       end
-
-      puts "#{threads.count} threads created and running"
 
       threads.each(&:join)
 
-      puts "All threads joined"
     end
 
   end
@@ -82,8 +80,13 @@ class GalaxyExecutionJob < SeekJob
       j = JSON.parse(line)
       msg = j['status']
       item.update_attribute(:current_status,msg)
-      if j['data'] && j['data']['history_id']
-        item.update_attribute(:history_id,j['data']['history_id'])
+      if j['data']
+        if j['data']['history_id']
+          item.update_attribute(:history_id,j['data']['history_id'])
+        end
+        if steps = j['data']['step_status']
+          item.update_attribute(:step_json,JSON.dump(steps))
+        end
       end
     rescue JSON::ParserError
       puts "not JSON, ignoring: #{line}"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_04_133805) do
+ActiveRecord::Schema.define(version: 2019_06_05_102857) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -567,7 +567,7 @@ ActiveRecord::Schema.define(version: 2019_06_04_133805) do
     t.string "history_name"
     t.string "history_id"
     t.integer "status"
-    t.text "std_out"
+    t.text "step_json"
     t.string "current_status"
     t.integer "delayed_job_id"
     t.string "execution_id"
