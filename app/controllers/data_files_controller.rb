@@ -34,14 +34,20 @@ class DataFilesController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
+  def galaxy_analyse_setup
+
+  end
+
   def galaxy_analyse
     raise "No data file" unless @data_file
 
     execution_id = UUID.generate[0..7]
 
-    workflow = Workflow.find(2)
+    workflow = Workflow.find(params[:workflow_id])
 
-    @data_file.extracted_samples.each do |sample|
+    sample_ids = params[:sample_ids].reject(&:empty?)
+    samples = Sample.find(sample_ids)
+    samples.each do |sample|
       GalaxyExecutionQueueItem.create(status:GalaxyExecutionQueueItem::QUEUED,
                                       person: User.current_user.person,
                                       data_file: @data_file,

@@ -429,6 +429,7 @@ SEEK::Application.routes.draw do
       post :galaxy_analyse
       get :galaxy_analysis_progress
       get :galaxy_execution_status
+      get :galaxy_analyse_setup
     end
     resources :studied_factors do
       collection do

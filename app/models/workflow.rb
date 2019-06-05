@@ -56,5 +56,9 @@ class Workflow < ApplicationRecord
   def cwl_viewer_url
     return content_blob.url.sub('https://', 'https://view.commonwl.org/workflows/')
   end
+
+  def self.available_galaxy_workflows
+    Workflow.all.select(&:can_download?).select{|wf| wf.galaxy_id.present?}
+  end
     
 end

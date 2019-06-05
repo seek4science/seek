@@ -12,7 +12,7 @@ module Seek
           download: Set.new([
             :download, :named_download, :launch, :submit_job, :data, :execute, :plot, :explore, :visualise,
             :export_as_xgmml, :download_log, :download_results, :input, :output, :download_output, :download_input,
-            :view_result, :compare_versions, :simulate, :galaxy_analyse, :galaxy_execution_status
+            :view_result, :compare_versions, :simulate, :galaxy_analyse,:galaxy_analyse_setup, :galaxy_execution_status
           ]).freeze,
 
           edit: Set.new([
