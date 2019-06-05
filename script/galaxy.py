@@ -212,7 +212,7 @@ while not (all_ready and job_found):
             if step['job_id']: # inputs have no job id
                 job_found = True
                 state = gi.jobs.get_state(step['job_id'])
-                step_status['step_status'][step['workflow_step_id']] = state
+                step_status['step_status'][step['job_id']] = state
                 if state != 'ok':
                     all_ready = False
         report_status("Workflow running",step_status)
