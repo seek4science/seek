@@ -26,16 +26,20 @@ class GalaxyExecutionJob < SeekJob
             puts "Unexpected runtime error #{e.message}"
           end
 
-          if item.outputs
-            item.update_attribute(:output_json, JSON.dump(item.outputs))
+          if item.error?
+            item.update_attribute(:status, GalaxyExecutionQueueItem::FAILED)
+          else
+            if item.outputs
+              item.update_attribute(:output_json, JSON.dump(item.outputs))
+            end
+
+            item.update_attribute(:status, GalaxyExecutionQueueItem::CREATING_RESULTS)
+
+            data_files = register_data_files(item)
+            assay = register_assay(item, data_files)
+
+            item.update_attribute(:status, GalaxyExecutionQueueItem::FINISHED)
           end
-
-          item.update_attribute(:status, GalaxyExecutionQueueItem::CREATING_RESULTS)
-
-          data_files = register_data_files(item)
-          assay = register_assay(item, data_files)
-
-          item.update_attribute(:status, GalaxyExecutionQueueItem::FINISHED)
         end
         sleep(2)
       end
@@ -102,6 +106,9 @@ class GalaxyExecutionJob < SeekJob
           item.outputs ||= []
           item.outputs << j['data']
           puts "output added - #{item.outputs.count} #{j['data'].inspect}"
+        end
+        if j['data']['error']
+          item.update_attribute(:error,j['data']['error'])
         end
       end
     rescue JSON::ParserError

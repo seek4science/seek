@@ -19,7 +19,7 @@
         <td><%= link_to(item.sample.title, item.sample) %></td>
         <td><%= link_to(item.workflow.title, item.workflow) %></td>
         <td><%= item.status_name %></td>
-        <td><%= item.current_status %></td>
+        <td><%= item.current_status %><%= " - #{item.error}" if item.error? %></td>
         <td><%= galaxy_step_status(item.step_json) %></td>
         <td><%= link_to(item.history_id, item.history_url, target: :_blank) if item.history_id %></td>
         <td><%= link_to(item.assay.title, item.assay) if item.assay %></td>

@@ -32,6 +32,10 @@ class GalaxyExecutionQueueItem < ApplicationRecord
     end
   end
 
+  def error?
+    error.present?
+  end
+
   # def outputs
   #   return [] unless output_json
   #   JSON.parse(output_json)
