@@ -170,6 +170,10 @@ class GalaxyExecutionJob < SeekJob
     end
   end
 
+  def execution_url
+    "#{Seek::Config.site_base_host}/data_files/#{data_file_id}/galaxy_analysis_progress?execution_id=#{execution_id}"
+  end
+
   def register_assay(item, data_files)
     projects = study.projects
     assay_name = "#{history_name} - #{workflow.title} - #{item.sample.title}"
@@ -181,6 +185,10 @@ class GalaxyExecutionJob < SeekJob
     assay.assay_assets.build(asset:item.sample, direction:AssayAsset::Direction::INCOMING)
     assay.assay_assets.build(asset:workflow)
     assay.policy = study.policy.deep_copy
+    assay.description = "History: #{item.history_url},
+
+          Execution #{execution_url}"
+
     disable_authorization_checks do
       assay.save!
     end
