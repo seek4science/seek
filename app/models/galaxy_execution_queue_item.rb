@@ -1,5 +1,7 @@
 class GalaxyExecutionQueueItem < ApplicationRecord
 
+  attr_accessor :outputs
+
   belongs_to :data_file
   belongs_to :sample
   belongs_to :person
@@ -26,5 +28,10 @@ class GalaxyExecutionQueueItem < ApplicationRecord
       URI.join(person.galaxy_instance,"/histories/view","?id=#{history_id}").to_s
     end
   end
+
+  # def outputs
+  #   return [] unless output_json
+  #   JSON.parse(output_json)
+  # end
 
 end

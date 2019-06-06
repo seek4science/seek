@@ -1,12 +1,14 @@
 require 'pty'
 
 class GalaxyExecutionJob < SeekJob
-  attr_reader :data_file_id, :workflow_id, :execution_id
+  attr_reader :data_file_id, :workflow_id, :execution_id, :study_id, :history_name
 
-  def initialize(data_file,workflow,execution_id)
+  def initialize(data_file,workflow,execution_id, study_id)
     @data_file_id = data_file.id
     @workflow_id = workflow.id
     @execution_id = execution_id
+    @study_id = study_id
+    @history_name = 'Stuarts galaxy workflow'
   end
 
   def perform_job(items)
@@ -24,6 +26,12 @@ class GalaxyExecutionJob < SeekJob
             puts "Unexpected runtime error #{e.message}"
           end
 
+          if item.outputs
+            item.update_attribute(:output_json, JSON.dump(item.outputs))
+          end
+
+          register_data_files(item)
+
           item.update_attribute(:status, GalaxyExecutionQueueItem::FINISHED)
         end
         sleep(2)
@@ -32,7 +40,6 @@ class GalaxyExecutionJob < SeekJob
       threads.each(&:join)
 
     end
-
   end
 
   def gather_items
@@ -54,10 +61,11 @@ class GalaxyExecutionJob < SeekJob
   private
 
   def queued_items
-    GalaxyExecutionQueueItem.where(data_file_id: data_file_id,status: GalaxyExecutionQueueItem::QUEUED,execution_id: execution_id)
+    GalaxyExecutionQueueItem.where(data_file_id: data_file_id, status: GalaxyExecutionQueueItem::QUEUED, execution_id: execution_id)
   end
 
   def execute_galaxy_script(item)
+    @outputs = []
     cmd = command(item)
     puts "command = #{cmd}"
     begin
@@ -87,6 +95,11 @@ class GalaxyExecutionJob < SeekJob
         if steps = j['data']['step_status']
           item.update_attribute(:step_json,JSON.dump(steps))
         end
+        if j['data']['step'] && j['data']['output']
+          item.outputs ||= []
+          item.outputs << j['data']
+          puts "output added - #{item.outputs.count} #{j['data'].inspect}"
+        end
       end
     rescue JSON::ParserError
       puts "not JSON, ignoring: #{line}"
@@ -103,16 +116,54 @@ class GalaxyExecutionJob < SeekJob
     json['url']=item.person.galaxy_instance
     json['api_key']=item.person.galaxy_api_key
     json['workflow_id'] = workflow.galaxy_id
-    json['history_name'] = 'Stuarts galaxy workflow'
+    json['history_name'] = @history_name
     json['folder_name'] = 'Stuart script testing'
     json['input_data']={}
     json['input_data']['forward']=item.sample.get_attribute('fastq_forward')
     json['input_data']['reverse']=item.sample.get_attribute('fastq_reverse')
+    json['downloads'] = downloads
     JSON(json).to_s
+  end
+
+  def downloads
+    hash = {
+        'concat': {
+            'name':'out_file1',
+            'filename_postfix':'concat.txt'
+        }
+    }
+    JSON.dump(hash)
   end
 
   def workflow
     Workflow.find(workflow_id)
+  end
+
+  def study
+    Study.find(study_id)
+  end
+
+  def register_data_files(item)
+    projects = study.projects
+    puts "outputs = #{item.outputs}"
+    item.outputs.each do |output|
+      step = output['step']
+      output_name = output['output']['name']
+      filepath = output['output']['filepath']
+      data_file_name = "#{workflow.title} (#{item.history_id}) - #{step} - #{output_name}"
+
+      disable_authorization_checks do
+        data_file = DataFile.new(title: data_file_name, contributor:item.person, projects:projects)
+        data_file.policy = study.policy.deep_copy
+        data_file.license = projects.last.default_license
+        content_blob = data_file.build_content_blob(tmp_io_object: File.open(filepath))
+        content_blob.original_filename=filepath.split("/").last
+        content_blob.save!
+        data_file.save!
+        puts "Data file saved #{data_file.title}"
+      end
+
+    end
   end
 
 end

@@ -140,4 +140,4 @@ def download_data(gi, invoked_workflow, downloads):
                         f.write(gi.datasets.download_dataset(outputs[output]['id'], use_default_filename=False,
                                                              maxwait=12000))
 
-                    report_status("Downloaded output",{'step':step['workflow_step_label'],'output':{output:filename}})
+                    report_status("Downloaded output",{'step':step['workflow_step_label'],'output':{"name":output, "filepath":filename}})

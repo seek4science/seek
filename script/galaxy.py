@@ -12,6 +12,7 @@ report_status("Script started")
 # load json from first command argument
 json_args = json.loads(sys.argv[1])
 input_data = json_args['input_data']
+downloads = json_args['downloads']
 
 gi = connect_to_galaxy(json_args['url'],  json_args['api_key'])
 #connect to galaxy

@@ -12,6 +12,8 @@ class SeekJob
           perform_job(item)
         end
       rescue Exception => exception
+        puts(exception)
+        Rails.logger.error(exception)
         raise exception if Rails.env.test?
         unless item.respond_to?(:destroyed?) && item.destroyed?
           report_exception(exception, item)
