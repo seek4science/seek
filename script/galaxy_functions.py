@@ -26,12 +26,9 @@ def create_investigation_library(gi, libary_name,investigation_name ):
 
     investigation_present = False
 
-    investigation_folder = ""
-
     for file in files:
         if file['name'] == ("/" + investigation_name):
             investigation_present = True
-            investigation_folder = file['id']
 
     if not investigation_present:    
         investigation_folder =  gi.libraries.create_folder(library[0]['id'], investigation_name, description=None)[0]
@@ -117,3 +114,24 @@ def wait_for_workflow(gi,  invoked_workflow):
             report_status("Workflow running",step_status)
         except bioblend.ConnectionError as bioblend_error:
             print("Bioblend connection error") 
+
+def download_data(gi, invoked_workflow, downloads):
+    filename_prefix = 'output-'
+    for step in gi.workflows.show_invocation(invoked_workflow['workflow_id'], invoked_workflow['id'])[
+        'steps']:
+        if step['workflow_step_label'] in downloads:
+            outputs = gi.jobs.show_job(step['job_id'])['outputs']
+            for output in outputs:
+                if output == downloads[step['workflow_step_label']]['name']:
+                    print("BOO")
+                    # print(step['workflow_step_label'])
+                    # print(output)
+                    #print(filename_prefix + downloads[step['workflow_step_label']]['filename_postfix'])
+                    # print (outputs[output]['id'])
+                    # print (outputs[output]['src'])
+                    # gi.datasets.download_dataset(outputs[output]['id'], file_path=filename_prefix + downloads[step['workflow_step_label']]['filename_postfix'], use_default_filename=False, maxwait=12000)
+                    filename = filename_prefix + downloads[step['workflow_step_label']]['filename_postfix']
+                    report_status("Downloading output",{'step':step['workflow_step_label'],'output':{output:filename}})
+                    with open(filename, 'bw') as f:
+                        f.write(gi.datasets.download_dataset(outputs[output]['id'], use_default_filename=False,
+                                                             maxwait=12000))

@@ -33,6 +33,20 @@ report_status("Workflow started",{"history_id" : invoked_workflow['history_id']}
 wait_for_workflow(gi,  invoked_workflow)
 
 report_status("Workflow complete")
+
+
+report_status("Downloading data")
+
+downloads = {
+    'concat': {
+        'name' : 'out_file1',
+        'filename_postfix' : 'concat.txt' # zip file with a html (and other stuff) inside
+    }
+}
+
+download_data(gi,invoked_workflow, downloads)
+
+report_status("Finished")
 exit()
 
 
