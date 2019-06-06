@@ -103,9 +103,9 @@ class GalaxyExecutionJob < SeekJob
     json['url']=item.person.galaxy_instance
     json['api_key']=item.person.galaxy_api_key
     json['workflow_id']=workflow.galaxy_id
-    json['data']={}
-    json['data']['forward']=item.sample.get_attribute('fastq_forward')
-    json['data']['reverse']=item.sample.get_attribute('fastq_reverse')
+    json['input_data']={}
+    json['input_data']['forward']=item.sample.get_attribute('fastq_forward')
+    json['input_data']['reverse']=item.sample.get_attribute('fastq_reverse')
     JSON(json).to_s
   end
 
