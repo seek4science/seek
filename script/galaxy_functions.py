@@ -4,6 +4,8 @@ import bioblend
 import json
 import time
 import sys
+import tempfile
+import os
 
 def report_status(message, data = {}):
     r = {
@@ -18,7 +20,7 @@ def connect_to_galaxy(url,  api_key):
     gi.users.get_current_user() # just to check
     return gi
     
-def create_investigation_library(gi, libary_name,investigation_name ):    
+def create_investigation_library(gi, libary_name,folder_name ):
     library = gi.libraries.get_libraries(name = libary_name)
 
     # If a folder with the investigation name already exist,     
@@ -27,23 +29,23 @@ def create_investigation_library(gi, libary_name,investigation_name ):
     investigation_present = False
 
     for file in files:
-        if file['name'] == ("/" + investigation_name):
+        if file['name'] == ("/" + folder_name):
             investigation_present = True
 
     if not investigation_present:    
-        investigation_folder =  gi.libraries.create_folder(library[0]['id'], investigation_name, description=None)[0]
+        investigation_folder =  gi.libraries.create_folder(library[0]['id'], folder_name, description=None)[0]
     else:
-        investigation_folder =  gi.libraries.get_folders(library[0]['id'], name = "/" +investigation_name)[0] 
+        investigation_folder =  gi.libraries.get_folders(library[0]['id'], name = "/" +folder_name)[0]
     return library,  files, investigation_folder    
     
-def deploy_data(gi, library,  input_data,  files, investigation_folder_name,  investigation_folder):    
+def deploy_data(gi, library,  input_data,  files, folder_name,  investigation_folder):
     uploads = []
     for key, file in input_data.items():
             #print(file)
             # does not check if file is present
             file_present = False
             for avail_file in files:
-                if avail_file['name'] == ("/" +investigation_folder_name + "/" + file):                
+                if avail_file['name'] == ("/" +folder_name + "/" + file):
                     uploads.append(avail_file) 
                     file_present = True
                     break
@@ -116,14 +118,16 @@ def wait_for_workflow(gi,  invoked_workflow):
             print("Bioblend connection error") 
 
 def download_data(gi, invoked_workflow, downloads):
-    filename_prefix = 'output-'
+    dir = tempfile.gettempdir() + "/" + "seek-galaxy-outputs" + "/" + invoked_workflow['history_id'] + "/"
+    os.makedirs(dir,exist_ok=True)
+    filename_prefix = dir + 'output-'
     for step in gi.workflows.show_invocation(invoked_workflow['workflow_id'], invoked_workflow['id'])[
         'steps']:
         if step['workflow_step_label'] in downloads:
             outputs = gi.jobs.show_job(step['job_id'])['outputs']
             for output in outputs:
                 if output == downloads[step['workflow_step_label']]['name']:
-                    print("BOO")
+
                     # print(step['workflow_step_label'])
                     # print(output)
                     #print(filename_prefix + downloads[step['workflow_step_label']]['filename_postfix'])
@@ -131,7 +135,9 @@ def download_data(gi, invoked_workflow, downloads):
                     # print (outputs[output]['src'])
                     # gi.datasets.download_dataset(outputs[output]['id'], file_path=filename_prefix + downloads[step['workflow_step_label']]['filename_postfix'], use_default_filename=False, maxwait=12000)
                     filename = filename_prefix + downloads[step['workflow_step_label']]['filename_postfix']
-                    report_status("Downloading output",{'step':step['workflow_step_label'],'output':{output:filename}})
+
                     with open(filename, 'bw') as f:
                         f.write(gi.datasets.download_dataset(outputs[output]['id'], use_default_filename=False,
                                                              maxwait=12000))
+
+                    report_status("Downloaded output",{'step':step['workflow_step_label'],'output':{output:filename}})
