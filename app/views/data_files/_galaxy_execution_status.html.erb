@@ -9,6 +9,7 @@
       <th>Galaxy Status</th>
       <th>Jobs</th>
       <th>Galaxy History</th>
+      <th>Results</th>
     </tr>
     </thead>
 
@@ -21,6 +22,7 @@
         <td><%= item.current_status %></td>
         <td><%= galaxy_step_status(item.step_json) %></td>
         <td><%= link_to(item.history_id, item.history_url, target: :_blank) if item.history_id %></td>
+        <td><%= link_to(item.assay.title, item.assay) if item.assay %></td>
       </tr>
       </tbody>
 

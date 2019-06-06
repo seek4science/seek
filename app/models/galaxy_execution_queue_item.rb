@@ -6,15 +6,18 @@ class GalaxyExecutionQueueItem < ApplicationRecord
   belongs_to :sample
   belongs_to :person
   belongs_to :workflow
+  belongs_to :assay
 
   QUEUED=0
   RUNNING=1
+  CREATING_RESULTS=2
   FINISHED=20
   FAILED=99
 
   STATUS = {
       QUEUED => "queued",
       RUNNING => "running",
+      CREATING_RESULTS => "storing",
       FINISHED => "finished",
       FAILED => "failed"
   }.freeze

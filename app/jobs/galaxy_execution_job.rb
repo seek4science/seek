@@ -30,7 +30,10 @@ class GalaxyExecutionJob < SeekJob
             item.update_attribute(:output_json, JSON.dump(item.outputs))
           end
 
-          register_data_files(item)
+          item.update_attribute(:status, GalaxyExecutionQueueItem::CREATING_RESULTS)
+
+          data_files = register_data_files(item)
+          assay = register_assay(item, data_files)
 
           item.update_attribute(:status, GalaxyExecutionQueueItem::FINISHED)
         end
@@ -145,25 +148,44 @@ class GalaxyExecutionJob < SeekJob
 
   def register_data_files(item)
     projects = study.projects
-    puts "outputs = #{item.outputs}"
-    item.outputs.each do |output|
+    item.outputs.collect do |output|
       step = output['step']
       output_name = output['output']['name']
       filepath = output['output']['filepath']
       data_file_name = "#{workflow.title} (#{item.history_id}) - #{step} - #{output_name}"
 
+      data_file = DataFile.new(title: data_file_name, contributor:item.person, projects:projects)
+      data_file.policy = study.policy.deep_copy
+      data_file.license = projects.last.default_license
+      content_blob = data_file.build_content_blob(tmp_io_object: File.open(filepath))
+      content_blob.original_filename=filepath.split("/").last
+
       disable_authorization_checks do
-        data_file = DataFile.new(title: data_file_name, contributor:item.person, projects:projects)
-        data_file.policy = study.policy.deep_copy
-        data_file.license = projects.last.default_license
-        content_blob = data_file.build_content_blob(tmp_io_object: File.open(filepath))
-        content_blob.original_filename=filepath.split("/").last
         content_blob.save!
         data_file.save!
-        puts "Data file saved #{data_file.title}"
       end
 
+      data_file
+
     end
+  end
+
+  def register_assay(item, data_files)
+    projects = study.projects
+    assay_name = "#{history_name} - #{workflow.title} - #{item.sample.title}"
+
+    assay = Assay.new(title:assay_name, study:study, contributor:item.person, assay_class:AssayClass.experimental)
+    data_files.each do |df|
+      assay.assay_assets.build(asset:df, direction:AssayAsset::Direction::OUTGOING)
+    end
+    assay.assay_assets.build(asset:item.sample, direction:AssayAsset::Direction::INCOMING)
+    assay.assay_assets.build(asset:workflow)
+    assay.policy = study.policy.deep_copy
+    disable_authorization_checks do
+      assay.save!
+    end
+    item.update_attribute(:assay_id, assay.id)
+    assay
   end
 
 end

@@ -44,6 +44,7 @@ class Assay < ApplicationRecord
   has_many :models, through: :assay_assets, source: :asset, source_type: 'Model', inverse_of: :assays
   has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample', inverse_of: :assays
   has_many :documents, through: :assay_assets, source: :asset, source_type: 'Document', inverse_of: :assays
+  has_many :workflows, through: :assay_assets, source: :asset, source_type: 'Workflow', inverse_of: :assays
 
   has_one :investigation, through: :study
   has_one :external_asset, as: :seek_entity, dependent: :destroy
@@ -113,7 +114,7 @@ class Assay < ApplicationRecord
   end
 
   def self.simple_associated_asset_types
-    [:models, :sops, :publications, :documents]
+    [:models, :sops, :publications, :documents, :workflows]
   end
 
   # Associations where there is additional metadata on the association, i.e. `direction`
