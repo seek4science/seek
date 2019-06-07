@@ -1,4 +1,4 @@
-<% if item.can_download? %>
+<% if item.can_download? && item.extracted_samples.any? %>
 
   <%= button_link_to("Analyse", 'galaxy_button',
                      galaxy_analyse_setup_data_file_path(item, :code => params[:code]),

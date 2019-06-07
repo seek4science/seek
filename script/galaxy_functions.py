@@ -72,6 +72,9 @@ def deploy_data(gi, library,  input_data,  files, folder_name,  investigation_fo
             else: 
                 not_yet_ready = True
 
+        if errors:
+            report_status("Error uploading data")
+            raise Exception("error uploading " + upload['name'])
         if not_yet_ready:    
             report_status("Waiting for upload")
             time.sleep(60)

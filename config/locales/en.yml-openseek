@@ -11,6 +11,7 @@ en:
     assay: "Assay"
     experimental_assay: "Experimental assay"
     modelling_analysis:  "Modelling analysis"
+    informatics_analysis: "Informatics analysis"
 
   data_file: "Data file"
   discipline: "Discipline"

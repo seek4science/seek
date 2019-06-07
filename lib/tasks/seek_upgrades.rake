@@ -17,6 +17,7 @@ namespace :seek do
     fix_sample_type_tag_annotations
     sqlite_boolean_update
     delete_orphaned_permissions
+    create_informatics_analysis_type
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -248,5 +249,14 @@ namespace :seek do
     end
 
     puts "#{count} orphaned permissions deleted"
+  end
+
+  task(create_informatics_analysis_type: :environment) do
+    c = AssayClass.find_or_initialize_by(key:'INF')
+    if c.new_record?
+      c.title = I18n.t('assays.informatics_analysis')
+      c.save!
+      puts "New assay class #{I18n.t('assays.informatics_analysis')} created"
+    end
   end
 end

@@ -7,3 +7,8 @@ modelling_assay_class:
   id: 2
   title: <%= I18n.t('assays.modelling_analysis') %>
   key: MODEL
+
+modelling_assay_class:
+  id: 2
+  title: <%= I18n.t('assays.informatics_analysis') %>
+  key: INF

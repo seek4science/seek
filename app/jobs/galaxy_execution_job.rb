@@ -143,7 +143,6 @@ class GalaxyExecutionJob < SeekJob
       hash[step_label] ||= []
       hash[step_label] << {"name":row[1].strip, "filename_postfix":row[2].strip}
     end
-    puts "hash = #{hash.inspect}"
     hash
   end
 
@@ -187,7 +186,7 @@ class GalaxyExecutionJob < SeekJob
     projects = study.projects
     assay_name = "#{history_name} - #{workflow.title} - #{item.sample.title}"
 
-    assay = Assay.new(title:assay_name, study:study, contributor:item.person, assay_class:AssayClass.experimental)
+    assay = Assay.new(title:assay_name, study:study, contributor:item.person, assay_class:AssayClass.informatics)
     data_files.each do |df|
       assay.assay_assets.build(asset:df, direction:AssayAsset::Direction::OUTGOING)
     end
