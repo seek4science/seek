@@ -17,7 +17,7 @@ module Seek
   class ObjectAggregation
     include ActionView::Helpers::TextHelper
 
-    attr_reader :object, :type, :count
+    attr_reader :object, :type, :count, :children
 
     def ==(other)
       eql?(other)
@@ -47,6 +47,7 @@ module Seek
       @object = object
       @type = type
       @count = children.count
+      @children = children
     end
   end
 

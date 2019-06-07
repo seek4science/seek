@@ -163,6 +163,22 @@ module ISAHelper
       if assay_asset
         label_data << direction_name(assay_asset.direction) if assay_asset.direction && assay_asset.direction != 0
       end
+    elsif source_type == 'Seek::ObjectAggregation' && target_type == 'Assay'
+      first = source.children.first
+      if first.is_a?(Sample)
+        assay_asset = AssayAsset.where(['assay_id=? AND asset_id=?', target_id, first.id]).first
+        if assay_asset
+          label_data << direction_name(assay_asset.direction) if assay_asset.direction && assay_asset.direction != 0
+        end
+      end
+    elsif source_type == 'Assay' && target_type == 'Seek::ObjectAggregation'
+      first = target.children.first
+      if first.is_a?(Sample)
+        assay_asset = AssayAsset.where(['assay_id=? AND asset_id=?', source_id, first.id]).first
+        if assay_asset
+          label_data << direction_name(assay_asset.direction) if assay_asset.direction && assay_asset.direction != 0
+        end
+      end
     end
     label_data.join(', ')
   end
