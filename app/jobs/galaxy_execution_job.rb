@@ -143,6 +143,7 @@ class GalaxyExecutionJob < SeekJob
       hash[step_label] ||= []
       hash[step_label] << {"name":row[1].strip, "filename_postfix":row[2].strip}
     end
+    puts "hash = #{hash.inspect}"
     hash
   end
 
@@ -160,7 +161,7 @@ class GalaxyExecutionJob < SeekJob
       step = output['step']
       output_name = output['output']['name']
       filepath = output['output']['filepath']
-      data_file_name = "#{workflow.title} (#{item.history_id}) - #{step} - #{output_name}"
+      data_file_name = "#{workflow.title} - #{step} - #{output_name}"
 
       data_file = DataFile.new(title: data_file_name, contributor:item.person, projects:projects)
       data_file.policy = study.policy.deep_copy
