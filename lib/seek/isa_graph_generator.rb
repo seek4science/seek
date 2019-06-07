@@ -187,7 +187,7 @@ module Seek
         }
       when Assay
         {
-          children: %i[data_files models sops publications documents],
+          children: %i[data_files models sops publications documents workflows],
           parents: [:study],
           # related: [:publications],
           aggregated_children: { samples: :samples }
@@ -202,7 +202,7 @@ module Seek
           parents: %i[assays studies investigations data_files models presentations],
           related: [:events]
         }
-      when DataFile, Document, Model, Sop, Sample, Presentation
+      when DataFile, Document, Model, Sop, Sample, Presentation, Workflow
         {
           parents: [:assays],
           related: %i[publications events],
