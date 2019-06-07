@@ -13,7 +13,7 @@ try:
     # load json from first command argument
     json_args = json.loads(sys.argv[1])
     input_data = json_args['input_data']
-    #downloads = {json_args['downloads']}
+    downloads = json_args['downloads']
 
     gi = connect_to_galaxy(json_args['url'],  json_args['api_key'])
     #connect to galaxy
@@ -36,12 +36,12 @@ try:
 
     report_status("Downloading data")
 
-    downloads = {
-        'concat': {
-            'name' : 'out_file1',
-            'filename_postfix' : 'concat.txt' # zip file with a html (and other stuff) inside
-        }
-    }
+    # downloads = {
+    #     'concat': {
+    #         'name' : 'out_file1',
+    #         'filename_postfix' : 'concat.txt' # zip file with a html (and other stuff) inside
+    #     }
+    # }
 
     # downloads = {
     #     'FastQC forward': {

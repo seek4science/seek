@@ -18,6 +18,21 @@
   </div>
 
   <div class="form-group">
+    <label>Analysis title</label>
+    <%= text_field_tag :assay_title,'', class:'form-control'  %>
+  </div>
+
+  <div class="form-group">
+    <label>Analysis description</label>
+    <%= text_area_tag :assay_description,'', class:'form-control', rows: 3  %>
+  </div>
+
+  <div class="form-group">
+    <label>Output data</label>
+    <%= text_area_tag :output_data,'', class:'form-control', rows: 3  %>
+  </div>
+
+  <div class="form-group">
     <label>Samples</label>
     <ul id="samples">
       <%= hidden_field_tag "sample_ids[]" %>

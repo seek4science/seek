@@ -118,6 +118,7 @@ def wait_for_workflow(gi,  invoked_workflow):
             print("Bioblend connection error") 
 
 def download_data(gi, invoked_workflow, downloads):
+    print(downloads)
     dir = tempfile.gettempdir() + "/" + "seek-galaxy-outputs" + "/" + invoked_workflow['history_id'] + "/"
     os.makedirs(dir,exist_ok=True)
     filename_prefix = dir + 'output-'
@@ -125,19 +126,13 @@ def download_data(gi, invoked_workflow, downloads):
         'steps']:
         if step['workflow_step_label'] in downloads:
             outputs = gi.jobs.show_job(step['job_id'])['outputs']
+            wanted_outputs = downloads[step['workflow_step_label']]
             for output in outputs:
-                if output == downloads[step['workflow_step_label']]['name']:
+                if len(list(filter(lambda x: x['name']==output, wanted_outputs)))>0:
+                    for o in list(filter(lambda x: x['name']==output, wanted_outputs)):
+                        filename = filename_prefix + o['filename_postfix']
+                        with open(filename, 'bw') as f:
+                            f.write(gi.datasets.download_dataset(outputs[output]['id'], use_default_filename=False,
+                                                                 maxwait=12000))
 
-                    # print(step['workflow_step_label'])
-                    # print(output)
-                    #print(filename_prefix + downloads[step['workflow_step_label']]['filename_postfix'])
-                    # print (outputs[output]['id'])
-                    # print (outputs[output]['src'])
-                    # gi.datasets.download_dataset(outputs[output]['id'], file_path=filename_prefix + downloads[step['workflow_step_label']]['filename_postfix'], use_default_filename=False, maxwait=12000)
-                    filename = filename_prefix + downloads[step['workflow_step_label']]['filename_postfix']
-
-                    with open(filename, 'bw') as f:
-                        f.write(gi.datasets.download_dataset(outputs[output]['id'], use_default_filename=False,
-                                                             maxwait=12000))
-
-                    report_status("Downloaded output",{'step':step['workflow_step_label'],'output':{"name":output, "filepath":filename}})
+                        report_status("Downloaded output",{'step':step['workflow_step_label'],'output':{"name":output, "filepath":filename}})

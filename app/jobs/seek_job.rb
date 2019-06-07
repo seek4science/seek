@@ -12,6 +12,7 @@ class SeekJob
           perform_job(item)
         end
       rescue Exception => exception
+        raise(exception)
         puts(exception)
         Rails.logger.error(exception)
         raise exception if Rails.env.test?

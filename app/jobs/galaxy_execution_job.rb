@@ -1,14 +1,15 @@
 require 'pty'
 
 class GalaxyExecutionJob < SeekJob
-  attr_reader :data_file_id, :workflow_id, :execution_id, :study_id, :history_name
+  attr_reader :data_file_id, :workflow_id, :execution_id, :study_id, :history_name, :assay_description
 
-  def initialize(data_file,workflow,execution_id, study_id)
+  def initialize(data_file,workflow,execution_id, study_id, history_name, assay_description)
     @data_file_id = data_file.id
     @workflow_id = workflow.id
     @execution_id = execution_id
     @study_id = study_id
-    @history_name = 'Stuarts galaxy workflow'
+    @history_name = history_name
+    @assay_description = assay_description
   end
 
   def perform_job(items)
@@ -126,23 +127,23 @@ class GalaxyExecutionJob < SeekJob
     json['url']=item.person.galaxy_instance
     json['api_key']=item.person.galaxy_api_key
     json['workflow_id'] = workflow.galaxy_id
-    json['history_name'] = @history_name
+    json['history_name'] = @history_name + "-" + item.sample.title
     json['folder_name'] = 'Stuart script testing'
     json['input_data']={}
     json['input_data']['forward']=item.sample.get_attribute('fastq_forward')
     json['input_data']['reverse']=item.sample.get_attribute('fastq_reverse')
-    json['downloads'] = downloads
+    json['downloads'] = downloads(item)
     JSON(json).to_s
   end
 
-  def downloads
-    hash = {
-        'concat': {
-            'name':'out_file1',
-            'filename_postfix':'concat.txt'
-        }
-    }
-    JSON.dump(hash)
+  def downloads(item)
+    hash = {}
+    CSV.parse(item.output_data).each do |row|
+      step_label = row[0].strip
+      hash[step_label] ||= []
+      hash[step_label] << {"name":row[1].strip, "filename_postfix":row[2].strip}
+    end
+    hash
   end
 
   def workflow
@@ -192,9 +193,9 @@ class GalaxyExecutionJob < SeekJob
     assay.assay_assets.build(asset:item.sample, direction:AssayAsset::Direction::INCOMING)
     assay.assay_assets.build(asset:workflow)
     assay.policy = study.policy.deep_copy
-    assay.description = "History: #{item.history_url},
-
-          Execution #{execution_url}"
+    assay.description = "#{@assay_description}
+History: #{item.history_url}
+Execution #{execution_url}"
 
     disable_authorization_checks do
       assay.save!

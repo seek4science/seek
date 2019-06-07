@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_06_164456) do
+ActiveRecord::Schema.define(version: 2019_06_07_102630) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -574,6 +574,7 @@ ActiveRecord::Schema.define(version: 2019_06_06_164456) do
     t.text "output_json"
     t.integer "assay_id"
     t.string "error"
+    t.text "output_data"
   end
 
   create_table "genes", id: :integer,  force: :cascade do |t|

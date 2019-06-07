@@ -47,6 +47,10 @@ class DataFilesController < ApplicationController
 
     study_id = params[:study_id]
 
+    assay_title = params[:assay_title]
+    assay_description = params[:assay_description]
+    output_data = params[:output_data]
+
     sample_ids = params[:sample_ids].reject(&:empty?)
     samples = Sample.find(sample_ids)
     samples.each do |sample|
@@ -55,10 +59,11 @@ class DataFilesController < ApplicationController
                                       data_file: @data_file,
                                       execution_id: execution_id,
                                       sample: sample,
-                                      workflow: workflow)
+                                      workflow: workflow,
+                                      output_data: output_data)
     end
 
-    GalaxyExecutionJob.new(@data_file, workflow, execution_id, study_id).queue_job
+    GalaxyExecutionJob.new(@data_file, workflow, execution_id, study_id, assay_title, assay_description).queue_job
 
     redirect_to(galaxy_analysis_progress_data_file_path(@data_file, execution_id:execution_id))
 
