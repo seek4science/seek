@@ -13,7 +13,7 @@ class GalaxyExecutionJob < SeekJob
   end
 
   def perform_job(items)
-    chunks = items.each_slice(2).to_a
+    chunks = items.each_slice(4).to_a
 
     chunks.each do |chunk|
       puts "#{chunk.count} execution items to process"
@@ -22,6 +22,7 @@ class GalaxyExecutionJob < SeekJob
         threads << Thread.new do
           item.update_attribute(:status, GalaxyExecutionQueueItem::RUNNING)
           begin
+            sleep(rand * 4)
             execute_galaxy_script(item)
           rescue RuntimeError=>e
             puts "Unexpected runtime error #{e.message}"
