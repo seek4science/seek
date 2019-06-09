@@ -83,7 +83,12 @@ class Assay < ApplicationRecord
 
   # returns true if this is an experimental class of assay
   def is_experimental?
-    !assay_class.nil? && assay_class.key == 'EXP'
+    assay_class && assay_class.key == 'EXP'
+  end
+
+  # returns true if this is an experimental class of assay
+  def is_informatics?
+    assay_class && assay_class.key == 'INF'
   end
 
   # Create or update relationship of this assay to another, with a specific relationship type and version
@@ -149,7 +154,9 @@ class Assay < ApplicationRecord
   end
 
   def avatar_key
-    type = is_modelling? ? 'modelling' : 'experimental'
+    type = 'modelling' if is_modelling?
+    type = 'experimental' if is_experimental?
+    type = 'informatics' if is_informatics?
     "assay_#{type}_avatar"
   end
 
