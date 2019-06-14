@@ -17,6 +17,7 @@ namespace :seek do
     fix_sample_type_tag_annotations
     sqlite_boolean_update
     delete_orphaned_permissions
+    rebuild_sample_templates
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -248,5 +249,11 @@ namespace :seek do
     end
 
     puts "#{count} orphaned permissions deleted"
+  end
+
+  task(rebuild_sample_template: :environment) do
+    SampleType.all.reject{|st| st.uploaded_template?}.each do |sample_type|
+      sample_type.queue_template_generation
+    end
   end
 end
