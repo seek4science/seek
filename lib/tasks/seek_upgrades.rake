@@ -251,7 +251,7 @@ namespace :seek do
     puts "#{count} orphaned permissions deleted"
   end
 
-  task(rebuild_sample_template: :environment) do
+  task(rebuild_sample_templates: :environment) do
     SampleType.all.reject{|st| st.uploaded_template?}.each do |sample_type|
       sample_type.queue_template_generation
     end
