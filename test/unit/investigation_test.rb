@@ -57,6 +57,15 @@ class InvestigationTest < ActiveSupport::TestCase
 
   test 'to_isatab' do
     object = Factory(:max_investigation, description: 'Max investigation')
+    assay = object.assays.first
+
+    sample = Factory(:sample, policy: Factory(:publicly_viewable_policy))
+
+    User.with_current_user(assay.contributor.user) do
+      assay.associate(sample)
+      assay.save!
+    end
+
     the_hash = convert_investigation (object)
     json = JSON.pretty_generate(the_hash)
     assert_not_equal the_hash, {}

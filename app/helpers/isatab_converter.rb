@@ -84,8 +84,13 @@ module IsaTabConverter
     # studyDesignDescriptors not yet mapped
     isa_study[:studyDesignDescriptors] = []
 
-    # materials not yet mapped
+    # map materials from the samples referenced by the assays
     isa_study[:materials] = {:sources => [], :samples => [], :otherMaterials => []}
+    study.assays.each do |a|
+      a.samples.each do |s|
+        isa_study[:materials][:samples] << convert_sample(s)
+      end
+    end
 
     # processSequence not yet mapped
     isa_study[:processSequence] = []
@@ -195,11 +200,17 @@ module IsaTabConverter
       process[:inputs] = []
       process[:outputs] = []
       assay.data_files.each do |d|
-        if !assay.outgoing.include? d
+        if assay.incoming.include? d
           process[:inputs] << {'@id' => OBJECT_MAP[d]['@id']}
-        end
-        if !assay.incoming.include? d
+        else
           process[:outputs] << {'@id' => OBJECT_MAP[d]['@id']}
+        end
+      end
+      assay.samples.each do |s|
+        if assay.incoming.include? s
+          process[:inputs] << {'@id' => OBJECT_MAP[s]['@id']}
+        else
+          process[:outputs] << {'@id' => OBJECT_MAP[s]['@id']}
         end
       end
      processSequence << process
@@ -264,6 +275,23 @@ module IsaTabConverter
     OBJECT_MAP[publication] = isa_publication
 
     return publication
+  end
+
+  def convert_sample(sample)
+    if OBJECT_MAP.has_key? (sample)
+      return OBJECT_MAP[sample]
+    end
+
+    isa_sample = {}
+    isa_sample['@id'] = URI.join(Seek::Config.site_base_host + '/samples/', sample.id.to_s).to_s
+    isa_sample[:name] = sample.title
+    isa_sample[:characteristics] = []
+    isa_sample[:factorValues] = []
+    isa_sample[:derivesFrom] = []
+
+    OBJECT_MAP[sample] = isa_sample
+
+    return isa_sample
   end
 
   def convert_sop(sop)
