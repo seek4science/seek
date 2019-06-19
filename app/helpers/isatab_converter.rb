@@ -84,6 +84,13 @@ module IsaTabConverter
     # studyDesignDescriptors not yet mapped
     isa_study[:studyDesignDescriptors] = []
 
+    # map chacteristicCategories from SampleAttributeTypes
+    # must be done before the sample mapping
+    isa_study[:characteristicCategories] = []
+    SampleAttributeType.all.each do |s|
+      isa_study[:characteristicCategories] << convert_sample_attribute_type(s)
+    end
+
     # map materials from the samples referenced by the assays
     isa_study[:materials] = {:sources => [], :samples => [], :otherMaterials => []}
     study.assays.each do |a|
@@ -113,9 +120,6 @@ module IsaTabConverter
 
     # factors not yet mapped
     isa_study[:factors] = []
-
-    # characteristicCategories not yet mapped
-    isa_study[:characteristicCategories] = []
 
     # unitCategories not yet mapped
     isa_study[:unitCategories] = []
@@ -286,12 +290,46 @@ module IsaTabConverter
     isa_sample['@id'] = URI.join(Seek::Config.site_base_host + '/samples/', sample.id.to_s).to_s
     isa_sample[:name] = sample.title
     isa_sample[:characteristics] = []
+    sample.sample_type.sample_attributes.each do |attribute|
+      value = sample.get_attribute(attribute.hash_key)
+      next if value.blank?
+
+      material_attribute_value = {}
+      category = {}
+      category['@id'] = OBJECT_MAP[attribute.sample_attribute_type]['@id']
+      material_attribute_value[:category] = category
+      case attribute.sample_attribute_type.base_type
+        when Seek::Samples::BaseType::DATE
+          value = Date.parse(value).strftime('%e %B %Y')
+        when Seek::Samples::BaseType::DATE_TIME
+          value = DateTime.parse(value).strftime('%e %B %Y %H:%M:%S')
+        when Seek::Samples::BaseType::SEEK_STRAIN
+          value = 'Not implemented'
+        when Seek::Samples::BaseType::SEEK_SAMPLE
+          value = 'Not implemented'
+      end
+      material_attribute_value[:value] = value
+      isa_sample[:characteristics] << material_attribute_value
+    end
     isa_sample[:factorValues] = []
     isa_sample[:derivesFrom] = []
 
     OBJECT_MAP[sample] = isa_sample
 
     return isa_sample
+  end
+
+  def convert_sample_attribute_type (sat)
+    if OBJECT_MAP.has_key? (sat)
+      return OBJECT_MAP[sat]
+    end
+
+    isa_material_attribute = {}
+    isa_material_attribute['@id'] = URI.join(Seek::Config.site_base_host + '/sample_attribute_types/', sat.id.to_s).to_s
+    OBJECT_MAP[sat] = isa_material_attribute
+    # Need to do the type
+    return isa_material_attribute
+
   end
 
   def convert_sop(sop)
