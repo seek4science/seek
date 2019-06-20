@@ -5,9 +5,6 @@ cache: bundler
 service:
   - docker
 
-jdk:
-  - oraclejdk9
-
 sudo: false
 
 env:
