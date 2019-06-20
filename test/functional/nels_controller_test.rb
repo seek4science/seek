@@ -141,4 +141,20 @@ class NelsControllerTest < ActionController::TestCase
       end
     end
   end
+
+  test 'raises error on NeLS callback if no code provided' do
+    get :callback
+
+    assert_redirected_to root_path
+    assert flash[:error].present?
+  end
+
+  test 'raises error on NeLS callback if no user logged-in' do
+    logout
+
+    get :callback, params: { code: '123' }
+
+    assert_redirected_to root_path
+    assert flash[:error].present?
+  end
 end
