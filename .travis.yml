@@ -6,7 +6,7 @@ service:
   - docker
 
 jdk:
-  - oraclejdk8
+  - oraclejdk9
 
 sudo: false
 
