@@ -25,7 +25,12 @@ module IsaTabConverter
         {:file => JERM_ONTOLOGY_URL,
          :name => 'jerm_ontology',
         :version => '1.0',
-        :description => ''}]
+        :description => ''},
+        {:file => URI.encode("#{Seek::Config.site_base_host}/ontologies/ad_hoc_ontology"),
+         :name => 'ad_hoc_ontology',
+         :version => '1.0',
+         :description => ''}
+    ]
 
     # map publications from publications
     publications = []
@@ -84,11 +89,12 @@ module IsaTabConverter
     # studyDesignDescriptors not yet mapped
     isa_study[:studyDesignDescriptors] = []
 
-    # map chacteristicCategories from SampleAttributeTypes
+    # map chacteristicCategories from SampleAttributes
     # must be done before the sample mapping
     isa_study[:characteristicCategories] = []
-    SampleAttributeType.all.each do |s|
-      isa_study[:characteristicCategories] << convert_sample_attribute_type(s)
+    # Should we really map all or just the ones used in the investigation?
+    SampleAttribute.all.each do |s|
+      isa_study[:characteristicCategories] << convert_sample_attribute(s)
     end
 
     # map materials from the samples referenced by the assays
@@ -296,7 +302,7 @@ module IsaTabConverter
 
       material_attribute_value = {}
       category = {}
-      category['@id'] = OBJECT_MAP[attribute.sample_attribute_type]['@id']
+      category['@id'] = OBJECT_MAP[attribute]['@id']
       material_attribute_value[:category] = category
       case attribute.sample_attribute_type.base_type
         when Seek::Samples::BaseType::DATE
@@ -319,15 +325,24 @@ module IsaTabConverter
     return isa_sample
   end
 
-  def convert_sample_attribute_type (sat)
-    if OBJECT_MAP.has_key? (sat)
-      return OBJECT_MAP[sat]
+  def convert_sample_attribute (sa)
+    if OBJECT_MAP.has_key? (sa)
+      return OBJECT_MAP[sa]
     end
 
     isa_material_attribute = {}
-    isa_material_attribute['@id'] = URI.join(Seek::Config.site_base_host + '/sample_attribute_types/', sat.id.to_s).to_s
-    OBJECT_MAP[sat] = isa_material_attribute
-    # Need to do the type
+    isa_material_attribute['@id'] = URI.encode("#{Seek::Config.site_base_host}/sample_types/#{sa.sample_type.id.to_s}/#{sa.title}")
+    isa_material_attribute['characteristicType'] = {}
+    isa_material_attribute['characteristicType']["$ref"] = 'ontology_annotation_schema.json#'
+    if ["Float", "Integer"].include? sa.sample_attribute_type.base_type
+      isa_material_attribute['characteristicType']['annotationValue'] = {'type' => 'number'}
+    else
+      isa_material_attribute['characteristicType']['annotationValue'] = {'type' => 'string'}
+    end
+    isa_material_attribute['characteristicType']['termSource'] = 'ad_hoc_ontology'
+    isa_material_attribute['characteristicType']['termAccession'] = URI.encode("#{sa.title}")
+
+    OBJECT_MAP[sa] = isa_material_attribute
     return isa_material_attribute
 
   end
