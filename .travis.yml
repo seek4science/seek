@@ -2,8 +2,10 @@ language: ruby
 
 cache: bundler
 
-service:
+services:
   - docker
+  - mysql
+  - postgresql
 
 sudo: false
 
