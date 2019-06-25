@@ -971,4 +971,32 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal 'image/png',blob.content_type
   end
 
+  test 'tmp_io_objects in tmp dir are deleted' do
+    file = Tempfile.new('testing-content-blob')
+    file.write('test test test')
+    file.close
+
+    assert File.exists?(file.path)
+    tmp_object = File.open(file.path)
+    blob = ContentBlob.create(original_filename:'testing-content-blob.txt', tmp_io_object: tmp_object)
+    assert blob.file_exists?
+    assert_equal 14,blob.file_size
+    refute File.exists?(file.path)
+  end
+
+  test 'tmp_io_object not in tmp are not deleted' do
+    #files outside of tmp/ shouldn't be cleaned up as they may just be needed for copy
+    path = File.join(Seek::Config.temporary_filestore_path,'test-content-blob.txt')
+    puts path
+    file = File.open(path,'w')
+    file.write('test test test')
+    file.close
+    tmp_object = File.open(path)
+    blob = ContentBlob.create(original_filename:'testing-content-blob.txt', tmp_io_object: tmp_object)
+    assert blob.file_exists?
+    assert_equal 14,blob.file_size
+    assert File.exists?(path)
+    File.delete(path)
+  end
+
 end
