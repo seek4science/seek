@@ -2,8 +2,10 @@ language: ruby
 
 cache: bundler
 
-jdk:
-  - oraclejdk8
+services:
+  - docker
+  - mysql
+  - postgresql
 
 sudo: false
 
@@ -17,14 +19,18 @@ env:
   - SUITE="rake assets:precompile RAILS_ENV=production" DB_TYPE=mysql
 #  - SUITE="rake teaspoon" RAILS_ENV=test DB_TYPE=mysql
 
+before_install:
+  # starts up a virtuoso docker repository and sets up the config to use it, for the rdf repository related integration tests
+  - sh -c "if [ '$SUITE' = 'rails test test/integration' ]; then sh -e script/virtuoso-docker-for-travis.sh; fi"
+
 before_script:
   - sh -c "if [ '$SUITE' = 'rake teaspoon' ]; then sh -e /etc/init.d/xvfb start && sleep 60; fi"
   - sh -c "if [ '$DB_TYPE' = 'pgsql' ]; then psql -c 'create database travis_ci_test;' -U postgres; fi"
   - cp test/database.travis.$DB_TYPE.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:create
   - RAILS_ENV=test bundle exec rake db:schema:load
-  - sh -c "if [ '$DB_TYPE' = 'mysql' ]; then RAILS_ENV=production bundle exec rake db:create; fi"
-  - sh -c "if [ '$DB_TYPE' = 'mysql' ]; then RAILS_ENV=production bundle exec rake db:schema:load; fi"
+  - sh -c "if [ '$SUITE' = 'rake assets:precompile RAILS_ENV=production' ]; then RAILS_ENV=production bundle exec rake db:create; fi"
+  - sh -c "if [ '$SUITE' = 'rake assets:precompile RAILS_ENV=production' ]; then RAILS_ENV=production bundle exec rake db:schema:load; fi"
 
 script: bundle exec $SUITE
 

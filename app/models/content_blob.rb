@@ -251,7 +251,7 @@ class ContentBlob < ActiveRecord::Base
 
     if @tmp_io_object.respond_to?(:path)
       @tmp_io_object.flush if @tmp_io_object.respond_to? :flush
-      FileUtils.mv @tmp_io_object.path, filepath
+      FileUtils.cp @tmp_io_object.path, filepath
     else
       @tmp_io_object.rewind
       File.open(filepath, 'wb+') do |f|
