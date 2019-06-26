@@ -131,10 +131,27 @@ class SessionsController < ApplicationController
         ldap_fist_name = ldap_user[Seek::Config.ldap[:ldap_first_name]].first
         ldap_last_name = ldap_user[Seek::Config.ldap[:ldap_last_name]].first
 
+
+        user_by_ldap = User.find_by_login(login)
+        if user_by_ldap
+            user_by_ldap.email = ldap_email
+            @user = user_by_ldap
+            logger.info "update email"
+            if !@user.save!
+                failed_login "Failed to update ldap information"
+            end
+            check_login
+            return
+        end
+
+        # create user
+	      range = [*'0'..'9',*'A'..'Z',*'a'..'z']
+	      fake_password = (0...10).map{ range.sample }.join
+
         # create user
         @user = User.create({ :login => login, :password => password, :password_confirmation => password, :email => ldap_email })
 
-        if !@user.save
+        if !@user.save!
            failed_login "Cannot create a new user: #{login}"
         else
           self.current_user = @user
