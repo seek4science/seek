@@ -189,28 +189,35 @@ class SessionsControllerTest < ActionController::TestCase
     assert_select '#login-panel form', 1
   end
 
-  test 'should have ldap login' do
+  test 'should have provider login' do
     # change the setting
     Seek::Config.omniauth_enabled   = true
-    Seek::Config.omniauth_providers = {
-      ldap: {
-        title: 'organization-ldap',
-        host: 'localhost',
-        port: 389,
-        method: :plain,
-        base: 'DC=example,DC=com',
-        uid: 'samaccountname',
-        password: '',
-        bind_dn: ''
+    Devise.setup do |config|
+      config.omniauth :ldap,  {
+          name: :ldap,
+          title: 'organization-ldap',
+          host: 'localhost',
+          port: 389,
+          method: :plain,
+          base: 'DC=example,DC=com',
+          uid: 'samaccountname',
+          password: '',
+          bind_dn: ''
       }
-    }
+    end
+
+    assert Devise.omniauth_providers.include? :ldap
 
     get :new
     assert_response :success
-    assert_select '#login-panel form', 2
-    assert_select '#ldap_login input[name="username"]', 1
-    assert_select '#ldap_login input[name="password"]', 1
-  end
+    assert_select '#login-panel li', Devise.omniauth_providers.length + 1
+
+    # LDAP login is known about
+    assert_select '#login-panel div[id="ldap_login"]', 1
+
+    # No login specified for LDAP
+    assert_select '#login-panel div[class="alert alert-danger"]', 1
+ end
 
   test 'should not create omni authenticated user' do
     # change the setting
