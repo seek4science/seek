@@ -9,9 +9,10 @@ module Seek
     end
 
     def respond_to_destruction(asset, format)
-      redirect_location_on_success = url_for action: :index
       can_delete = !asset.respond_to?(:can_delete?) || asset.can_delete?
+      asset_type_text = t(asset.class.name.underscore)
       if can_delete && asset.destroy
+        flash[:notice] = "#{asset_type_text} was successfully deleted."
         format.html { redirect_to(redirect_location_on_success) }
         format.xml { head :ok }
         format.json {render json: {status: :ok}, status: :ok}
@@ -39,6 +40,14 @@ module Seek
       respond_to do |format|
         format.html { redirect_to(polymorphic_path(asset)) }
         format.xml { head :ok }
+      end
+    end
+
+    def redirect_location_on_success
+      if params[:return_to] && params[:return_to] == 'my_items'
+         items_person_path(current_person)
+      else
+        url_for action: :index
       end
     end
   end

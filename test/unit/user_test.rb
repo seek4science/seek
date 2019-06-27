@@ -329,8 +329,15 @@ class UserTest < ActiveSupport::TestCase
     user.password='123456789A'
     user.password_confirmation='123456789A'
     assert user.valid?
+  end
 
+  test 'fetch correct user' do
+    alice = Factory(:person, user: Factory(:activated_user, login: 'alice'), email: 'alice@example.com')
+    eve = Factory(:person, user: Factory(:activated_user, login: 'alice@example.com'), email: 'eve@example.com')
 
+    assert_equal alice.user, User.get_user('alice')
+    assert_equal alice.user, User.get_user('alice@example.com')
+    assert_equal eve.user, User.get_user('eve@example.com')
   end
 
   protected
