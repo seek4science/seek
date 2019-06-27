@@ -5,8 +5,4 @@
   <%= admin_checkbox_setting(:omniauth_user_create, 1, Seek::Config.omniauth_user_create,
                              "Omniauth user creation on login", "When a user logs in through an omniauth provider and does not exist as a seek user, they will be created with the information given by the provider."
                              ) %>
-
-  <%= admin_checkbox_setting(:omniauth_user_activate, 1, Seek::Config.omniauth_user_activate,
-                             "Omniauth user activation on login", "The user created through login by omniauth is also activated."
-                             ) %>
 </div>

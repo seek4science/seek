@@ -58,7 +58,6 @@ class AdminController < ApplicationController
 
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
-    Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
     Seek::Config.jws_enabled = string_to_boolean params[:jws_enabled]
