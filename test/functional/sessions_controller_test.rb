@@ -182,6 +182,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'should have only seek login' do
+    Seek::Config.omniauth_enabled   = false
     assert !Seek::Config.omniauth_enabled
     get :new
     assert_response :success
@@ -227,7 +228,7 @@ class SessionsControllerTest < ActionController::TestCase
 
     post :create
     assert_redirected_to login_path
-    assert_match(/the authenticated user: .+ cannot be found/, flash[:error])
+    assert_match(/the authenticated user: cannot be found/, flash[:error])
     assert_nil User.find_by_login('new_ldap_user')
   end
 
@@ -235,47 +236,11 @@ class SessionsControllerTest < ActionController::TestCase
     # change the setting
     Seek::Config.omniauth_enabled       = true
     Seek::Config.omniauth_user_create   = true
-    Seek::Config.omniauth_user_activate = false
     @request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:ldap]
 
     post :create
     assert_redirected_to login_path
-    assert_match(/You still need to activate your account. A validation email should have been sent to you./, flash[:error])
-    new_user = User.find_by_login('new_ldap_user')
-    assert_not_nil new_user
-    assert !new_user.active?
-    assert_equal OmniAuth.config.mock_auth[:ldap][:info]['email'], new_user.person.email
-    assert_equal 1, Person.where(first_name: 'new', last_name: 'ldap_user').count
-  end
-
-  test 'should create and activate omni authenticated user' do
-    # change the setting
-    Seek::Config.omniauth_enabled       = true
-    Seek::Config.omniauth_user_create   = true
-    Seek::Config.omniauth_user_activate = true
-    @request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:ldap]
-
-    post :create
-    assert_redirected_to root_path
-    assert_match(/You have successfully logged in, New Ldap_user./, flash[:notice])
-    new_user = User.find_by_login('new_ldap_user')
-    assert_not_nil new_user
-    assert new_user.active?
-    assert !Person.where(first_name: 'new', last_name: 'ldap_user').empty?
-  end
-
-  test 'should authenticate user with legacy encryption and update password' do
-    sha1_user = Factory(:sha1_pass_user)
-    test_password = generate_user_password
-
-    assert_equal User.sha1_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password
-
-    post :create, params: { login: sha1_user.login, password: test_password }
-    assert session[:user_id]
-    assert_response :redirect
-
-    sha1_user.reload
-    assert_equal User.sha256_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password
+    assert_match(/You need to login directly to link accounts/, flash[:notice])
   end
 
   protected

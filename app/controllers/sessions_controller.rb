@@ -143,35 +143,6 @@ class SessionsController < ApplicationController
     else
       flash[:notice] = 'You need to login directly to link accounts. If you do not have an account then you must register.'
       redirect_to login_path
-      # # TODO: Check this code out
-      # # create the user from the omniauth info
-      # @user = User.create
-      # if info['nickname']
-      #   @user.login = info['nickname']
-      # else
-      #   @user.login = SecureRandom.hex
-      # end
-      # # some random password, since authentication should happen through omniauth in the future
-      # @user.password              = SecureRandom.hex
-      # @user.password_confirmation = @user.password
-      #
-      # # try to save
-      # if !@user.save
-      #   failed_login "Cannot create a new user: #{@user.login}"
-      # else
-      #   identity.user = @user
-      #   identity.save!
-      #   # should we activate the user?
-      #   @user.activate if Seek::Config.omniauth_user_activate
-      #   # when user was saved successfully, also create the Profile and save with the user
-      #   person = Person.create
-      #   person.first_name = 'fred'
-      #   person.last_name = 'bloggs'
-      #   person.email = 'someone@somewhere.com'
-      #   person.user = @user
-      #   person.save
-      #   check_login
-      # end
     end
   end
 
