@@ -1,6 +1,6 @@
 class Permission < ApplicationRecord
-
-  cattr_reader :precedence
+  # Valid permission types, in order of precedence. Highest precedence is listed first
+  PRECEDENCE = ['Person', 'FavouriteGroup', 'WorkGroup', 'Project', 'Programme', 'Institution'].freeze
 
   belongs_to :contributor, :polymorphic => true
   belongs_to :policy, :inverse_of => :permissions
@@ -8,6 +8,7 @@ class Permission < ApplicationRecord
   validates_presence_of :contributor
   validates_presence_of :policy
   validates_presence_of :access_type
+  validates :contributor_type, inclusion: { in: PRECEDENCE }
 
   after_commit :queue_update_auth_table
   after_commit :queue_rdf_generation_job
@@ -33,17 +34,14 @@ class Permission < ApplicationRecord
     affected_people.any? { |p| p && (p.id == person.id) } # Checking by object doesn't work for some reason, have to use ID!
   end
 
-  #precedence of permission types. Highest precedence is listed first
-  @@precedence = ['Person', 'FavouriteGroup', 'WorkGroup', 'Project', 'Programme', 'Institution']
-
   #takes a list of permissions, and gives you a list from the highest precedence to the lowest
   def self.sort_for person, list
     return [] if list.empty?
     #sort would list things from low to high, so the sort block will return -1 when p has a higher permission than p2
     list.sort do |p, p2|
       unless p.contributor_type == p2.contributor_type
-        #@@precedence has a smaller index for higher precedence types
-        p.compare_by(p2) {|p| @@precedence.index(p.contributor_type)}
+        #PRECEDENCE has a smaller index for higher precedence types
+        p.compare_by(p2) {|p| PRECEDENCE.index(p.contributor_type)}
       else
         #highest access type should come first so we need to reverse it
         p.compare_by(p2) {|p| p.access_type_for(person)} * -1

@@ -158,8 +158,8 @@ assay_with_suggested_assay_type:
 
 openbis_assay1:
   title: Openbis Sample Assay
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
+  assay_type_uri: "http://jermontology.org/ontology/JERMOntology#Metabolomics"
+  technology_type_uri: "http://jermontology.org/ontology/JERMOntology#Gas_chromatography"
   study: junk_study
   contributor: person_for_model_owner
   assay_class: experimental_assay_class

@@ -16,6 +16,9 @@ namespace :seek do
     update_help_image_links
     fix_sample_type_tag_annotations
     sqlite_boolean_update
+    delete_orphaned_permissions
+    rebuild_sample_templates
+    fix_model_version_files
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -232,6 +235,56 @@ namespace :seek do
       Unit.where("factors_studied = 'f'").update_all(factors_studied: 0)
 
       puts 'done'
+    end
+  end
+
+  desc('Delete permissions with non-existent contributor')
+  task(delete_orphaned_permissions: :environment) do
+    count = 0
+
+    Permission.includes(:contributor).find_each do |p|
+      if p.contributor.nil?
+        p.destroy!
+        count += 1
+      end
+    end
+
+    puts "#{count} orphaned permissions deleted"
+  end
+
+  task(rebuild_sample_templates: :environment) do
+    SampleType.all.reject{|st| st.uploaded_template?}.each do |sample_type|
+      sample_type.queue_template_generation
+    end
+  end
+
+  task(fix_model_version_files: :environment) do
+    possible_affected_models = Model.where('version > 1').select{|m| m.versions.select{|mv| mv.created_at > '1 Oct 2018'}.any?}
+
+    # find those that aren't a webpage, and no file present
+    affected_models = possible_affected_models.select do |model|
+      model.versions.detect do |mv|
+        mv.content_blobs.detect do |blob|
+          !(blob.is_webpage? || blob.file_exists?)
+        end.present?
+      end.present?
+    end
+
+    affected_models.each do |model|
+      # all blobs that contain a file and aren't a webpage. reversed, as the later versions are more likely to contain the file
+      good_blobs = model.versions.reverse.collect{|mv| mv.content_blobs.reject(&:is_webpage?).select(&:file_exists?).select(&:sha1sum)}.flatten
+
+      # blobs that appear to have missing files
+      bad_blobs = model.versions.collect{|mv| mv.content_blobs.reject{|blob| blob.is_webpage? || blob.file_exists?}}.flatten
+      bad_blobs.each do |blob|
+        match = good_blobs.detect{|good_blob| blob.original_filename == good_blob.original_filename && blob.sha1sum == good_blob.sha1sum}
+        if match
+          FileUtils.cp match.file_path, blob.file_path
+        else
+          #try and retrieve from remote source. Method checks if the blob meets the criteria
+          blob.create_retrieval_job
+        end
+      end
     end
   end
 end

@@ -644,9 +644,20 @@ class ModelsControllerTest < ActionController::TestCase
 
   def test_should_create_new_version
     m = Factory(:model, contributor:User.current_user.person)
+    assert_equal 1,m.version
+    assert_equal 1,m.versions[0].content_blobs.count
+    assert m.versions[0].content_blobs.first.file_exists?
+    assert_equal 'cronwright.xml',m.versions[0].content_blobs.first.original_filename
+
     assert_difference('Model::Version.count', 1) do
       post :new_version, params: { id: m, model: { title: m.title}, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }], revision_comments: 'This is a new revision' }
     end
+
+    # check previous version isn't affected
+    assert_equal 1,m.version
+    assert_equal 1,m.versions[0].content_blobs.count
+    assert m.versions[0].content_blobs.first.file_exists?
+    assert_equal 'cronwright.xml', m.versions[0].content_blobs.first.original_filename
 
     assert_redirected_to model_path(m)
     assert assigns(:model)
@@ -961,11 +972,25 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'should create new model version based on content_blobs of previous version' do
     m = Factory(:model_2_files, policy: Factory(:private_policy))
+
+    assert_equal 1,m.version
+    assert_equal 2,m.versions[0].content_blobs.count
+    assert m.versions[0].content_blobs[0].file_exists?
+    assert m.versions[0].content_blobs[1].file_exists?
+    assert_equal 'cronwright.xml', m.versions[0].content_blobs.first.original_filename
+
     retained_content_blob = m.content_blobs.first
     login_as(m.contributor)
     assert_difference('Model::Version.count', 1) do
       post :new_version, params: { id: m, model: { title: m.title }, content_blobs: [{ data: file_for_upload }], retained_content_blob_ids: [retained_content_blob.id] }
     end
+
+    # check previous version isn't affected
+    assert_equal 1,m.version
+    assert_equal 2,m.versions[0].content_blobs.count
+    assert m.versions[0].content_blobs[0].file_exists?
+    assert m.versions[0].content_blobs[1].file_exists?
+    assert_equal 'cronwright.xml', m.versions[0].content_blobs.first.original_filename
 
     assert_redirected_to model_path(m)
     assert assigns(:model)

@@ -67,7 +67,7 @@ end
 Factory.define(:favourite_group_membership) do |f|
   f.association :person
   f.association :favourite_group
-  f.access_type 1
+  f.access_type Policy::VISIBLE
 end
 
 # SpecialAuthCode
