@@ -213,6 +213,7 @@ class AdminController < ApplicationController
     Seek::Config.recaptcha_public_key = params[:recaptcha_public_key]
     Seek::Config.default_associated_projects_access_type = params[:default_associated_projects_access_type]
     Seek::Config.default_all_visitors_access_type = params[:default_all_visitors_access_type]
+    Seek::Config.max_all_visitors_access_type = params[:max_all_visitors_access_type]
     Seek::Config.permissions_popup = params[:permissions_popup]
     Seek::Config.auth_lookup_update_batch_size = params[:auth_lookup_update_batch_size]
 

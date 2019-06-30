@@ -60,7 +60,7 @@ class SopCUDTest < ActionDispatch::IntegrationTest
         Factory(:permission, policy: policy, contributor: Factory(:favourite_group), access_type: Policy::MANAGING)
     ]
     policy.reload
-    assert_equal Permission.precedence.sort, permissions.map(&:contributor_type).sort, 'Should be one of each permission type'
+    assert_equal Permission::PRECEDENCE.sort, permissions.map(&:contributor_type).sort, 'Should be one of each permission type'
     sop = Factory(:sop, contributor: @current_person, policy: policy)
     original_policy = sop.reload.policy
     original_permissions = original_policy.permissions.to_a

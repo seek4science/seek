@@ -102,6 +102,8 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :organisms, before_add: :update_rdf_on_associated_change, before_remove: :update_rdf_on_associated_change
   has_many :project_subscriptions, dependent: :destroy
 
+  has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
+
   def assets
     data_files | sops | models | publications | presentations | documents
   end
