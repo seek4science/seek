@@ -10,7 +10,7 @@ Factory.define(:min_publication, class: Publication) do |f|
   f.title 'A Minimal Publication'
   f.doi 'https://doi.org/10.5072/abcd'
   f.projects { [Factory.build(:min_project)] }
-  f.publication_type nil
+  f.publication_type 1
 end
 
 Factory.define(:max_publication, class: Publication) do |f|
