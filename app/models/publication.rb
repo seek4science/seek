@@ -41,6 +41,7 @@ class Publication < ActiveRecord::Base
 
   validates :doi, format: { with: VALID_DOI_REGEX, message: 'is invalid' }, allow_blank: true
   validates :pubmed_id, numericality: { greater_than: 0, message: 'is invalid' }, allow_blank: true
+  validates :publication_type,:presence => true
 
   # validation differences between OpenSEEK and the VLN SEEK
   validates_uniqueness_of :pubmed_id, allow_nil: true, allow_blank: true, if: 'Seek::Config.is_virtualliver'
@@ -213,17 +214,17 @@ class Publication < ActiveRecord::Base
 
     unless result.nil?
       unless result.citation.nil?
-    self.citation = result.citation
+        self.citation = result.citation
       end
 
-    if self.journal.nil? && !result.journal.nil?
-      self.journal = result.journal
-    end
+      if self.journal.nil? && !result.journal.nil?
+        self.journal = result.journal
+      end
 
-    unless result.date_published.nil?
-      self.published_date = result.date_published
+      unless result.date_published.nil?
+       self.published_date = result.date_published
+      end
     end
-  end
 
     unless bibtex_record[:author].nil?
       plain_authors = bibtex_record[:author].split(' and ') # by bibtex definition
