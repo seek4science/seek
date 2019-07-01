@@ -49,7 +49,7 @@ class Person < ApplicationRecord
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
 
   RELATED_RESOURCE_TYPES = %w[DataFile Sop Model Document Publication Presentation
-                              Sample Event Investigation Study Assay Strain].freeze
+                              Sample Event Investigation Study Assay Strain Workflow].freeze
 
   RELATED_RESOURCE_TYPES.each do |type|
     has_many :"contributed_#{type.tableize}", foreign_key: :contributor_id, class_name: type
