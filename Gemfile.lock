@@ -804,7 +804,7 @@ GEM
     yaml_db (0.7.0)
       rails (>= 3.0)
       rake (>= 0.8.7)
-    yard (0.9.12)
+    yard (0.9.20)
     zip-container (3.0.2)
       rubyzip (~> 1.2.1)
 
