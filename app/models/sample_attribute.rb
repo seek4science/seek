@@ -55,11 +55,6 @@ class SampleAttribute < ApplicationRecord
   end
 
   # The key used to address this attribute in the sample's JSON blob
-  def accessor_name
-    generate_accessor_name if self[:accessor_name].blank?
-    super
-  end
-
   def hash_key
     title.parameterize.underscore
   end
