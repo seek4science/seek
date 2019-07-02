@@ -80,7 +80,7 @@ class Sample < ApplicationRecord
 
   def referenced_resources
     sample_type.sample_attributes.select(&:seek_resource?).map do |sa|
-      value = get_attribute(sa.hash_key)
+      value = get_attribute(sa)
       type = sa.sample_attribute_type.base_type_handler.type
       type.constantize.find_by_id(value['id']) if value && type
     end.compact
@@ -95,14 +95,20 @@ class Sample < ApplicationRecord
   end
 
   def get_attribute(attr)
+    attr = attr.accessor_name if attr.is_a?(SampleAttribute)
+
     data[attr]
   end
 
   def set_attribute(attr, value)
+    attr = attr.accessor_name if attr.is_a?(SampleAttribute)
+
     data[attr] = value
   end
 
   def blank_attribute?(attr)
+    attr = attr.accessor_name if attr.is_a?(SampleAttribute)
+
     data[attr].blank? || (data[attr].is_a?(Hash) && data[attr]['id'].blank? && data[attr]['title'].blank?)
   end
 
@@ -129,7 +135,7 @@ class Sample < ApplicationRecord
   def title_from_data
     attr = title_attribute
     if attr
-      value = get_attribute(title_attribute.hash_key)
+      value = get_attribute(title_attribute)
       if attr.seek_resource?
         value[:title] || value[:id]
       else
@@ -157,7 +163,7 @@ class Sample < ApplicationRecord
     Rails.cache.fetch("sample-organisms-#{cache_key}-#{Organism.order('updated_at DESC').first.try(:cache_key)}") do
       sample_type.sample_attributes.collect do |attribute|
         next unless attribute.sample_attribute_type.title == 'NCBI ID'
-        value = get_attribute(attribute.hash_key)
+        value = get_attribute(attribute)
         if value
           Organism.all.select { |o| o.ncbi_id && o.ncbi_id.to_s == value }
         end
@@ -169,7 +175,7 @@ class Sample < ApplicationRecord
     return [] unless sample_type
     seek_sample_attributes = sample_type.sample_attributes.select { |attr| attr.sample_attribute_type.seek_sample? }
     seek_sample_attributes.map do |attr|
-      value = get_attribute(attr.hash_key)
+      value = get_attribute(attr)
       Sample.find_by_id(value['id']) if value
     end.compact
   end
