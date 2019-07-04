@@ -1,4 +1,4 @@
-class SampleAttribute < ActiveRecord::Base
+class SampleAttribute < ApplicationRecord
   METHOD_PREFIX = '__sample_data_'
 
   # attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos, :sample_type_id,

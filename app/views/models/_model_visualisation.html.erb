@@ -17,7 +17,7 @@
       %>
     <span class="none_text">(Click on the image to zoom)</span>
     <div id="thumbnail" >
-          <a href='<%= model_model_image_path(@model,@display_model.model_image, :code=>params[:code],:size=>zoom_width) %>' rel="lightbox">
+          <a href='<%= model_model_image_path(@model,@display_model.model_image, :code=>params[:code],:size=>zoom_width) %>' data-lightbox="model-image-<%= image.id -%>">
             <img src="<%= model_model_image_path(@model,@display_model.model_image,:code=>params[:code],:size=>image_width)  %>" style="max-width: 100%;"/>
           </a>
     </div>

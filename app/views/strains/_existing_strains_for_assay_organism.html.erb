@@ -1,17 +1,17 @@
-<%
-   strain_links=[]
-   strains = existing_strains_for_assay_organism.select{|strain| strain.can_view?}
-
-%>
+<% strains = existing_strains_for_assay_organism.select{ |strain| strain.can_view? } %>
 <div id="existing_strains_for_assay_organism">
   <% if existing_strains_for_assay_organism.empty? -%>
-      <p class="none_text">No strains have been defined for <b><%= h(organism.title) -%></b> for your projects.</p>
+      <p class="none_text">
+        No strains have been defined for <b><%= h(organism.title) -%></b> for your projects.
+      </p>
   <% else -%>
-      <p class="none_text">Here are the strains for <b><%= h(organism.title) -%></b> defined for your projects.<br/>If required, please select the appropriate one.</p>
+      <p class="none_text">
+        Here are the strains for <b><%= h(organism.title) -%></b> defined for your projects.<br/>
+        If required, please select the appropriate one.
+      </p>
       <%= select_tag :strains,
-                     options_for_select([["No strain".html_safe, 0]]|strains.collect{|strain| [strain.info,strain.id]}) -%>
+                     options_for_select(strains.map { |strain| [strain.info,strain.id] }),
+                     include_blank: 'No strain',
+                     class: 'form-control' %>
   <% end -%>
 </div>
-
-
-

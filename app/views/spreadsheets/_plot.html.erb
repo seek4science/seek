@@ -11,17 +11,8 @@
 
   </div>
   <div>&nbsp;</div>
-
-  <%= form_tag_with_callbacks(spreadsheet_annotations_path,
-               {       :method=>:post,
-                       :update => {:success => "annotations", :failure => "spreadsheet_errors"},
-                :success => "$j('#spreadsheet_errors').hide();",
-                :failure => "$j('#spreadsheet_errors').show();",
-                :loading => "Element.show('spinner_plot');$('store_plot_button').disabled=true;",
-                :complete => "Element.hide('spinner_plot');Element.hide('plot_panel');$('store_plot_button').disabled=false;",
-                :id => "plot_panel_form",
-                :remote => true}) do %>
-
+  <%= form_tag(spreadsheet_annotations_path, method: :post, class: 'spreadsheet-annotation-ctrl',
+               id: "plot_panel_form", remote: true) do  %>
     <div style="display:none;">
       <%= hidden_field_tag :annotation_content_blob_id, @display_data_file.content_blob.id %>
       <%= hidden_field_tag :annotation_sheet_id, "0" %>
@@ -33,6 +24,6 @@
     </div>
     <%= submit_tag('Store as annotation',:id=>"store_plot_button") if logged_in? %>
   <% end %>
-  <%= image_tag "ajax-loader.gif", :id => 'spinner_plot', :style => 'display:none;' -%>
+  <%= image_tag "ajax-loader.gif", :id => 'spinner_plot', :style => 'display:none;', :class => 'loading-spinner' -%>
 
 </div>

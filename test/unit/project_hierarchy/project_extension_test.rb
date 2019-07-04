@@ -2,6 +2,7 @@ require 'test_helper'
 require 'project_hierarchy_test_helper'
 
 class ProjectExtensionTest < ActiveSupport::TestCase
+  
   include ProjectHierarchyTestHelper
 
   test 'change parent' do
@@ -20,23 +21,29 @@ class ProjectExtensionTest < ActiveSupport::TestCase
     institutions = [Factory(:institution), Factory(:institution)]
     parent_proj = Factory :project, title: 'parent proj'
     project = Factory :project, parent: parent_proj
-    project.institutions = institutions
+    disable_authorization_checks { project.institutions = institutions }
 
     institutions.each do |ins|
       assert parent_proj.institutions.include?(ins)
     end
   end
-
-
+  
   test 'related resource to parent project' do
     parent_proj = Factory :project
     proj = Factory :project, parent: parent_proj
+    contributor = Factory(:person)
+    contributor.add_to_project_and_institution(proj,Factory(:institution))
 
-    Project::RELATED_RESOURCE_TYPES.each do |type|
-      proj.send "#{type.underscore.pluralize}=".to_sym, [Factory(type.underscore.to_sym)] unless %w(Study Assay).include?(type)
+    User.with_current_user(contributor.user) do
+      Project::RELATED_RESOURCE_TYPES.reject{|type| %w(Study Assay).include?(type)}.each do |type|
+        item = Factory(type.underscore.to_sym)
+        item.contributor = contributor if item.respond_to?(:contributor)
+        assert proj.can_edit?
+        proj.send "#{type.underscore.pluralize}=".to_sym, [item]
 
-      proj.send("#{type.underscore.pluralize}".to_sym).each do |resource|
-        assert parent_proj.send("related_#{type.underscore.pluralize}".to_sym).include?(resource)
+        proj.send("#{type.underscore.pluralize}".to_sym).each do |resource|
+          assert parent_proj.send("related_#{type.underscore.pluralize}".to_sym).include?(resource)
+        end
       end
     end
   end
@@ -45,4 +52,5 @@ class ProjectExtensionTest < ActiveSupport::TestCase
     refute @proj.children.empty?
     refute @proj.can_delete?(Factory(:admin))
   end
+
 end

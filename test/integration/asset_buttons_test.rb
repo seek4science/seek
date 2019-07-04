@@ -8,7 +8,7 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
   def setup
     User.current_user = Factory(:user, login: 'test')
     @current_user = User.current_user
-    post '/session', login: 'test', password: generate_user_password
+    post '/session', params: { login: 'test', password: generate_user_password }
     stub_request(:head, 'http://somewhere.com/piccy.pdf').to_return(status: 404)
     stub_request(:head, 'http://www.abc.com/').to_return(status: 404)
     stub_request(:head, 'http://somewhere.com/piccy_no_copy.pdf').to_return(status: 404)

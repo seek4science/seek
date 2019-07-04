@@ -7,31 +7,19 @@ class PeopleController < ApplicationController
   include Seek::AdminBulkAction
   include RelatedItemsHelper
 
-  before_filter :find_and_authorize_requested_item, only: %i[show edit update destroy items]
-  before_filter :current_user_exists, only: %i[register create new]
-  before_filter :is_during_registration, only: [:register]
-  before_filter :is_user_admin_auth, only: [:destroy]
-  before_filter :auth_to_create, only: %i[new create]
-  before_filter :administerable_by_user, only: %i[admin administer_update]
-  before_filter :do_projects_belong_to_project_administrator_projects?, only: [:administer_update]
-  before_filter :editable_by_user, only: %i[edit update]
+  before_action :find_and_authorize_requested_item, only: %i[show edit update destroy items]
+  before_action :current_user_exists, only: %i[register create new]
+  before_action :is_during_registration, only: [:register]
+  before_action :is_user_admin_auth, only: [:destroy]
+  before_action :auth_to_create, only: %i[new create]
+  before_action :editable_by_user, only: %i[edit update]
 
-  skip_before_filter :partially_registered?, only: %i[register create]
-  skip_before_filter :project_membership_required, only: %i[create new]
-  skip_after_filter :request_publish_approval, :log_publishing, only: %i[create update]
-
-  after_filter :reset_notifications, only: [:administer_update]
+  skip_before_action :partially_registered?, only: %i[register create]
+  skip_before_action :project_membership_required, only: %i[create new]
+  skip_after_action :request_publish_approval, :log_publishing, only: %i[create update]
 
   cache_sweeper :people_sweeper, only: %i[update create destroy]
   include Seek::BreadCrumbs
-
-  def reset_notifications
-    # disable sending notifications for non_project members
-    if !@person.member? && @person.notifiee_info.receive_notifications
-      @person.notifiee_info.receive_notifications = false
-      @person.notifiee_info.save
-    end
-  end
 
   protect_from_forgery only: []
 
@@ -139,12 +127,6 @@ class PeopleController < ApplicationController
     end
   end
 
-  def admin
-    respond_to do |format|
-      format.html
-    end
-  end
-
   # GET /people/select
   #
   # Page for after registration that allows you to select yourself from a list of
@@ -201,12 +183,12 @@ class PeopleController < ApplicationController
   end
 
   def notify_admin_and_project_administrators_of_new_user
-    Mailer.contact_admin_new_user(params, current_user).deliver_later
+    Mailer.contact_admin_new_user(notification_params.to_h, current_user).deliver_later
 
     # send mail to project managers
     project_administrators = project_administrators_of_selected_projects params[:projects]
     project_administrators.each do |project_administrator|
-      Mailer.contact_project_administrator_new_user(project_administrator, params, current_user).deliver_later
+      Mailer.contact_project_administrator_new_user(project_administrator, notification_params.to_h, current_user).deliver_later
     end
   end
 
@@ -232,33 +214,6 @@ class PeopleController < ApplicationController
         format.html { render action: 'edit' }
         format.xml  { render xml: @person.errors, status: :unprocessable_entity }
         format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # PUT /people/1
-  # PUT /people/1.xml
-  def administer_update
-    had_no_projects = @person.work_groups.empty?
-
-    respond_to do |format|
-      previous_projects = @person.projects
-      if @person.update_attributes(administer_person_params)
-        new_projects = @person.projects - previous_projects
-        set_project_related_roles(@person)
-
-        @person.save # this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
-        @person.touch
-        if Seek::Config.email_enabled && @person.user && new_projects.any? && @person != current_person
-          Mailer.notify_user_projects_assigned(@person,new_projects).deliver_later
-        end
-
-        flash[:notice] = 'Person was successfully updated.'
-        format.html { redirect_to(@person) }
-        format.xml  { head :ok }
-      else
-        format.html { render action: 'admin' }
-        format.xml  { render xml: @person.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -369,6 +324,10 @@ class PeopleController < ApplicationController
     params.require(:roles).permit({ pal: [] }, { project_administrator: [] }, { asset_housekeeper: [] }, asset_gatekeeper: [])
   end
 
+  def notification_params
+    params.permit(:projects, :institutions, :other_projects, :other_institutions)
+  end
+
   def set_tools_and_expertise(person, params)
     exp_changed = person.add_annotations(params[:expertise_list], 'expertise') if params[:expertise_list]
     tools_changed = person.add_annotations(params[:tool_list], 'tool') if params[:tool_list]
@@ -416,41 +375,10 @@ class PeopleController < ApplicationController
     end
   end
 
-  def do_projects_belong_to_project_administrator_projects?
-    if params[:person] && params[:person][:work_group_ids]
-      if User.admin_or_project_administrator_logged_in?
-        projects = []
-        params[:person][:work_group_ids].each do |id|
-          work_group = WorkGroup.find_by_id(id)
-          project = work_group.try(:project)
-          projects << project unless project.nil?
-        end
-        flag = true
-        projects.each do |project|
-          unless @person.projects.include?(project) || project.can_be_administered_by?(current_user)
-            flag = false
-          end
-        end
-        if flag == false
-          error("#{t('project')} manager can not assign person to the #{t('project').pluralize} that they are not in", 'Is invalid')
-        end
-        flag
-      end
-  end
-  end
-
   def editable_by_user
     unless @person.can_be_edited_by?(current_user)
       error('Insufficient privileges', 'is invalid (insufficient_privileges)')
       false
-    end
-  end
-
-  def administerable_by_user
-    @person = Person.find(params[:id])
-    unless @person.can_be_administered_by?(current_user)
-      error('Insufficient privileges', 'is invalid (insufficient_privileges)')
-      return false
     end
   end
 

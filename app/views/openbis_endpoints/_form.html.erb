@@ -57,7 +57,7 @@
 
     <div class="form-group">
       <label>Default sharing permissions</label>
-      <%= render :seek_partial => "sharing/form" %>
+      <%= render :partial => "sharing/form" %>
     </div>
 
     <%= f.submit(@openbis_endpoint.new_record? ? "Add" : "Update",

@@ -29,7 +29,7 @@
       <div>
         <%= preview_permission_popup_link(@node)-%>
         <%= create_button :id => "node_submit_btn",
-                       :onclick => "validateResourceFields(true,'node',true); return(false);",
+                       :onclick => "return validateResourceFields('node')",
                        :class => 'btn btn-primary' -%>
         or <%= cancel_button(nodes_path) -%>
       </div>

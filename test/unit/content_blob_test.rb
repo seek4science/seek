@@ -987,7 +987,6 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'tmp_io_object not in tmp are not deleted' do
     #files outside of tmp/ shouldn't be cleaned up as they may just be needed for copy
     path = File.join(Seek::Config.temporary_filestore_path,'test-content-blob.txt')
-    puts path
     file = File.open(path,'w')
     file.write('test test test')
     file.close

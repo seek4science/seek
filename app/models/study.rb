@@ -1,4 +1,4 @@
-class Study < ActiveRecord::Base
+class Study < ApplicationRecord
 
   include Seek::Rdf::RdfGeneration
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled

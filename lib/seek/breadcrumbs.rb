@@ -1,7 +1,7 @@
 module Seek
   module BreadCrumbs
     def self.included(base)
-      base.before_filter :add_breadcrumbs
+      base.before_action :add_breadcrumbs
     end
 
     # FIXME: badly needs refactoring, this code is wrong in so many ways:

@@ -16,11 +16,11 @@
    sharing_link=true if sharing_link.nil?
 %>
 <% if sharing_enable && f.object.can_manage? -%>
-    <%= render :seek_partial => "sharing/form" -%>
+    <%= render :partial => "sharing/form" -%>
 <% end -%>
 
 <% if taggable -%>
-    <%= render :seek_partial=>"assets/select_tags" -%>
+    <%= render :partial=>"assets/select_tags" -%>
 <% end -%>
 
 <% if attribution_enable %>

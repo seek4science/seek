@@ -53,27 +53,20 @@
                    less_id = "less_#{object_type}"
                    facet_type_id = "#{object_type}_facet"
                 %>
-                <%= link_to_function ("<b>More filters </b>"+image("expand")).html_safe, :id => more_id, :style => "display: none;", :class => "more_link" do |page|
-                  page[more_id].toggle
-                  page[less_id].toggle
-                  page.visual_effect(:toggle_appear, facet_type_id, :duration => 0.3)
-                end
-                -%>
-                <%= link_to_function ("<b>Less filters </b>"+image("collapse")).html_safe, :id => less_id, :style => "display: none;" do |page|
-                  page[more_id].toggle
-                  page[less_id].toggle
-                  page.visual_effect(:toggle_appear, facet_type_id, :duration => 0.3)
-                end
-                -%>
+                <%= link_to('#', id: more_id, style: 'display: none;', class: 'more_link', onclick: "$j('##{less_id}').toggle(); $j('##{more_id}').toggle(); $j('##{facet_type_id}').fadeToggle()") do %>
+                  <b>More filters</b> <%= image("expand") -%>
+                <% end %>
+                <%= link_to('#', id: less_id, style: 'display: none;', class: 'less_link', onclick: "$j('##{less_id}').toggle(); $j('##{more_id}').toggle(); $j('##{facet_type_id}').fadeToggle()") do %>
+                  <b>Less filters</b> <%= image("collapse") -%>
+                <% end %>
               </div>
           <% end %>
       <% end %>
 
       <br/>
       <ul class="sectionIcons reset_button">
-        <li><%= link_to_function 'Reset All Filters', 'resetAllFilters()', {:class => 'reset_all_filters'} %> </li>
+        <li><%= link_to 'Reset All Filters', '#', { onclick: 'resetAllFilters(); return false;', class: 'reset_all_filters' }%> </li>
       </ul>
-
     </div>
   </div>
 </div>

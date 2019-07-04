@@ -40,9 +40,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     assert df.can_edit?(@current_user)
 
     original_md5 = df.content_blob.md5sum
-    put data_file_content_blob_path(df, df.content_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
+    put data_file_content_blob_path(df, df.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :success
     blob = df.content_blob.reload
@@ -58,9 +56,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     assert df.can_download?(@current_user)
     assert df.can_edit?(@current_user)
 
-    put data_file_content_blob_path(df, df.content_blob),
-        { file: fixture_file_upload('files/txt_test.txt', 'text/plain') },
-        { 'Accept' => 'application/json' }
+    put data_file_content_blob_path(df, df.content_blob), params: { file: fixture_file_upload('files/txt_test.txt', 'text/plain') }, headers: { 'Accept' => 'application/json' }
 
     assert_response :success
     blob = df.content_blob.reload
@@ -75,9 +71,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     assert df.can_download?(@current_user)
     refute df.can_edit?(@current_user)
 
-    put data_file_content_blob_path(df, df.content_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
+    put data_file_content_blob_path(df, df.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :forbidden
     validate_json_against_fragment response.body, '#/definitions/errors'
@@ -94,9 +88,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     assert df.can_edit?(@current_user)
 
     original_md5 = df.content_blob.md5sum
-    put data_file_content_blob_path(df, df.content_blob), nil,
-        'Accept' => 'application/json',
-        'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf'))
+    put data_file_content_blob_path(df, df.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')) }
 
     assert_response :bad_request
     validate_json_against_fragment response.body, '#/definitions/errors'
@@ -116,7 +108,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz.camelize(:lower)}Post"
 
     assert_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", @to_post
+      post "/#{@plural_clz}.json", params: @to_post
       assert_response :success
     end
 
@@ -138,7 +130,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     @to_post = JSON.parse(template.result(binding))
 
     assert_no_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", @to_post
+      post "/#{@plural_clz}.json", params: @to_post
       assert_response :unprocessable_entity
       validate_json_against_fragment response.body, '#/definitions/errors'
     end

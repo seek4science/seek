@@ -85,9 +85,9 @@ module Seek
     end
 
     def update_subscription_job_if_study_or_assay
-      if self.is_a?(Study) && self.investigation_id_changed?
+      if self.is_a?(Study) && self.saved_change_to_investigation_id?
         # update subscriptions for study
-        old_investigation_id = investigation_id_was
+        old_investigation_id = investigation_id_before_last_save
         old_investigation = Investigation.find_by_id old_investigation_id
         projects_to_remove = old_investigation.nil? ? [] : old_investigation.projects
         projects_to_add = investigation.projects
@@ -96,8 +96,8 @@ module Seek
         assays.each do |assay|
           update_subscriptions_for assay, projects_to_add, projects_to_remove
         end
-      elsif self.is_a?(Assay) && self.study_id_changed?
-        old_study_id = study_id_was
+      elsif self.is_a?(Assay) && self.saved_change_to_study_id?
+        old_study_id = study_id_before_last_save
         old_study = Study.find_by_id old_study_id
         projects_to_remove = old_study.nil? ? [] : old_study.projects
         projects_to_add = study.projects
@@ -117,15 +117,5 @@ module Seek
       SetSubscriptionsForItemJob.new(item, projects_to_add).queue_job
       RemoveSubscriptionsForItemJob.new(item, projects_to_remove).queue_job
     end
-  end
-end
-
-ActiveRecord::Base.class_eval do
-  def self.subscribable?
-    include? Seek::Subscribable
-  end
-
-  def subscribable?
-    self.class.subscribable?
   end
 end

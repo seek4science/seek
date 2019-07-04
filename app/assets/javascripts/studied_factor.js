@@ -1,37 +1,29 @@
-var autocompleters = new Array();
+var autocompleters = [];
 
-function additionalFieldForItem(form_id, fs_or_ec_id){
-    var elements =  $(form_id).getElements();
-    var item;
-    for (var i=0;i<elements.length;i++)
-    {
-      var id = elements[i].id;
-      if (id.match('measured_item_id'))
-        item = elements[i];
+function additionalFieldForItem() {
+    var form = $j(this).parents('.condition-or-factor-form');
+    var text = $j(':selected', $j(this)).text();
+
+    if (text === 'concentration'){
+        $j('.growth_medium_or_buffer_description', form).hide();
+        $j('.substance_condition_factor', form).show();
     }
-
-    //check if the selected item is concentration
-    var selectedIndex = item.selectedIndex;
-    var option_select = item.options[selectedIndex];
-
-    if (option_select.text == 'concentration'){
-        fade(fs_or_ec_id + 'growth_medium_or_buffer_description');
-        appear(fs_or_ec_id + 'substance_condition_factor');
-    }
-    else if (option_select.text == 'growth medium' || option_select.text == 'buffer'){
-        fade(fs_or_ec_id + 'substance_condition_factor');
-        appear(fs_or_ec_id + 'growth_medium_or_buffer_description');
+    else if (text === 'growth medium' || text === 'buffer'){
+        $j('.substance_condition_factor', form).hide();
+        $j('.growth_medium_or_buffer_description', form).show();
     }
     else{
-        fade(fs_or_ec_id + 'substance_condition_factor');
-        fade(fs_or_ec_id + 'growth_medium_or_buffer_description');
+        $j('.substance_condition_factor', form).hide();
+        $j('.growth_medium_or_buffer_description', form).hide();
     }
 }
 
-function appear(element_id){
-   Effect.Appear(element_id, { duration: 0.5 });
+function resetMeasuredItemSelects() {
+    $j('.measured-item-select').each(function () {
+        additionalFieldForItem.apply(this);
+    })
 }
-
-function fade(element_id){
-   Effect.Fade(element_id, { duration: 0.25 });
-}
+$j(document).ready(function () {
+    $j(document).on('change', '.measured-item-select', additionalFieldForItem);
+    resetMeasuredItemSelects();
+});

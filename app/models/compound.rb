@@ -1,4 +1,4 @@
-class Compound < ActiveRecord::Base
+class Compound < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   has_many :studied_factor_links, :as => :substance
   has_many :experimental_condition_links,:as => :substance

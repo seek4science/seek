@@ -8,12 +8,12 @@ class ScalesControllerTest < ActionController::TestCase
 
   test 'show' do
     scale = Factory :scale
-    get :show, id: scale
+    get :show, params: { id: scale }
     assert_response :success
   end
 
-  test 'search and lazy load_results' do
-    xml_http_request :get, :search_and_lazy_load_results, scale_type: 'organism'
+  test 'search' do
+    get :search, xhr: true, params: { scale_type: 'organism' }
     assert_response :success
   end
 end

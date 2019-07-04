@@ -3,14 +3,14 @@ class SampleTypesController < ApplicationController
   include Seek::UploadHandling::DataUpload
   include Seek::IndexPager
 
-  before_filter :samples_enabled?
-  before_filter :find_sample_type, only: [:show, :edit, :update, :destroy, :template_details]
-  before_filter :check_no_created_samples, only: [:destroy]
-  before_filter :find_assets, only: [:index]
-  before_filter :auth_to_create, only: [:new, :create]
-  before_filter :project_membership_required, only: [:create, :new, :select, :filter_for_select]
+  before_action :samples_enabled?
+  before_action :find_sample_type, only: [:show, :edit, :update, :destroy, :template_details]
+  before_action :check_no_created_samples, only: [:destroy]
+  before_action :find_assets, only: [:index]
+  before_action :auth_to_create, only: [:new, :create]
+  before_action :project_membership_required, only: [:create, :new, :select, :filter_for_select]
 
-  before_filter :authorize_requested_sample_type, except: [:index, :new, :create]
+  before_action :authorize_requested_sample_type, except: [:index, :new, :create]
 
   # GET /sample_types/1  ,'sample_attributes','linked_sample_attributes'
   # GET /sample_types/1.json
@@ -56,7 +56,7 @@ class SampleTypesController < ApplicationController
 
   # POST /sample_types
   # POST /sample_types.json
-  def create
+  def create    
     @sample_type = SampleType.new(sample_type_params)
     @sample_type.contributor = User.current_user.person
 
@@ -111,7 +111,7 @@ class SampleTypesController < ApplicationController
 
   # used for ajax call to get the filtered sample types for selection
   def filter_for_select
-    @sample_types = SampleType.joins(:projects).where('projects.id' => params[:projects]).uniq.to_a
+    @sample_types = SampleType.joins(:projects).where('projects.id' => params[:projects]).distinct.to_a
     unless params[:tags].blank?
       @sample_types.select! do |sample_type|
         if params[:exclusive_tags] == '1'

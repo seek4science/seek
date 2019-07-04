@@ -1,5 +1,5 @@
 
-class Subscription < ActiveRecord::Base
+class Subscription < ApplicationRecord
   belongs_to :person #, :required_access => false
   belongs_to :subscribable, :polymorphic => true #,:required_access => false
   belongs_to :project_subscription

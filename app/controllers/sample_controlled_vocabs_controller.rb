@@ -4,11 +4,11 @@ class SampleControlledVocabsController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
 
-  before_filter :samples_enabled?
-  before_filter :login_required, except: [:show, :index]
-  before_filter :find_and_authorize_requested_item, except: [:index, :new, :create]
-  before_filter :find_assets, only: :index
-  before_filter :auth_to_create, only: [:new, :create]
+  before_action :samples_enabled?
+  before_action :login_required, except: [:show, :index]
+  before_action :find_and_authorize_requested_item, except: [:index, :new, :create]
+  before_action :find_assets, only: :index
+  before_action :auth_to_create, only: [:new, :create]
 
   def show
     respond_with(@sample_controlled_vocab)

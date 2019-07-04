@@ -4,11 +4,11 @@ class SamplesController < ApplicationController
   include Seek::AssetsCommon
   include Seek::IndexPager
 
-  before_filter :samples_enabled?
-  before_filter :find_index_assets, only: :index
-  before_filter :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
+  before_action :samples_enabled?
+  before_action :find_index_assets, only: :index
+  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
 
-  before_filter :auth_to_create, only: [:new, :create]
+  before_action :auth_to_create, only: [:new, :create]
 
   include Seek::IsaGraphExtensions
   include Seek::BreadCrumbs
@@ -105,7 +105,7 @@ class SamplesController < ApplicationController
   private
 
   def sample_params(sample_type)
-    sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:hash_key).collect(&:to_sym) | sample_type.sample_attributes.map(&:method_name).collect(&:to_sym) : []
+    sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:accessor_name).collect(&:to_sym) | sample_type.sample_attributes.map(&:method_name).collect(&:to_sym) : []
     params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
                                    { data: sample_type_param_keys }, { creator_ids: [] },
                                    { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] }, sample_type_param_keys)

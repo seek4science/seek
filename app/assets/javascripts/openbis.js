@@ -37,7 +37,7 @@ var OpenBis = {
         if (confirm('Are you sure you wish to refresh the metadata?')) {
             var endpointId = $j(this).data('endpoint-id');
             var projectId = $j(this).data('project-id');
-            var path = '/projects/' + projectId + '/openbis_endpoints/refresh_metadata_store'
+            var path = '/projects/' + projectId + '/openbis_endpoints/refresh_metadata_store';
             $j.ajax(path, {
                     method: 'POST',
                     data: {id: endpointId},
@@ -56,7 +56,7 @@ var OpenBis = {
     },
 
     fetchItemsForBrowseSpace: function (spaceId, projectId) {
-        var path = '/projects/' + projectId + '/openbis_endpoints/show_items'
+        var path = '/projects/' + projectId + '/openbis_endpoints/show_items';
         $j.ajax(path, {
                 data: {id: spaceId},
                 success: function (html) {
@@ -74,7 +74,7 @@ var OpenBis = {
 
 
     browseEndpointChanged: function () {
-        var selected = $j('#select-endpoints option:selected')
+        var selected = $j('#select-endpoints option:selected');
         var endpointId = selected.val();
         var projectId = selected.data('project-id');
         if (endpointId.trim()) {

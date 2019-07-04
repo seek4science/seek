@@ -1,4 +1,4 @@
-class GroupMembership < ActiveRecord::Base
+class GroupMembership < ApplicationRecord
   belongs_to :person, inverse_of: :group_memberships
   belongs_to :work_group, inverse_of: :group_memberships
   has_one :project, through: :work_group, inverse_of: :group_memberships
@@ -27,7 +27,7 @@ class GroupMembership < ActiveRecord::Base
   end
 
   def remember_previous_person
-    @previous_person_id = person_id_was
+    @previous_person_id = person_id_before_last_save
   end
 
   def queue_update_auth_table
@@ -36,7 +36,7 @@ class GroupMembership < ActiveRecord::Base
 
     AuthLookupUpdateJob.new.add_items_to_queue(people.compact.uniq)
 
-    if previous_changes.include?('time_left_at') && project
+    if saved_changes.include?('time_left_at') && project
       ProjectLeavingJob.new(person, project).queue_job(1, self.time_left_at || Time.now)
     end
   end
@@ -50,8 +50,8 @@ class GroupMembership < ActiveRecord::Base
   private
 
   def remove_admin_defined_role_projects
-    project = Project.find_by_id(WorkGroup.find(work_group_id_was).project_id)
-    person = Person.find_by_id(person_id_was)
+    project = Project.find_by_id(WorkGroup.find(work_group_id).project_id)
+    person = Person.find_by_id(person_id)
     if project && person
       Seek::Roles::ProjectRelatedRoles.role_names.each do |role_name|
         person.send("is_#{role_name}=", [false, project])
@@ -61,7 +61,7 @@ class GroupMembership < ActiveRecord::Base
   end
 
   def destroy_empty_work_group
-    wg = WorkGroup.find_by_id(work_group_id_was)
+    wg = WorkGroup.find_by_id(work_group_id)
 
     wg.destroy if wg && wg.people.empty?
   end

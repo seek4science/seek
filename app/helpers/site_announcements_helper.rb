@@ -1,5 +1,3 @@
-
-
 module SiteAnnouncementsHelper
   def site_annoucements_headline
     headline = SiteAnnouncement.headline_announcement

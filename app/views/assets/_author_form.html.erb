@@ -32,8 +32,6 @@
     <%= objects_input('creator-typeahead', [], :typeahead => {:query_url => typeahead_people_path + '?query=%QUERY'}) -%>
   </p>
 
-  <%#= render :partial => 'assets/advanced_creator_select' %>
-
   <p>
     If anyone not registered with <%= Seek::Config.application_name %> assisted creating this <%= resource_type_text %>, you can specify them below.
   </p>

@@ -1,57 +1,49 @@
 <% icon_view ||= false %>
 
-<% asset = content_blob.asset
-   if Seek::Util.inline_viewable_content_types.include?(asset.class) %>
+<% asset = content_blob.asset %>
+<% if Seek::Util.inline_viewable_content_types.include?(asset.class) %>
+  <% if asset.is_a?(Workflow)%>
+    <% if asset.is_github_cwl? %>
+      <%= button_link_to('View content', "show", asset.cwl_viewer_url, html_options = {:target=>'_blank'} ) %>
+    <% elsif asset.is_myexperiment? %>
+      <%= button_link_to('View content', "show", content_blob.url, html_options = {:target=>'_blank'} ) %>
+    <% end %>
+  <% elsif content_blob.is_content_viewable? %>
+    <%#FIXME: this decision of whether to display image can be made in view_content controller method, as it does between text and pdf %>
+    <% if content_blob.is_image? %>
+      <%
+        image_width = content_blob.width.to_i
+        #zoom to larger image
+        zoom_width = image_width < Seek::ActsAsFleximageExtension::STANDARD_SIZE ? Seek::ActsAsFleximageExtension::STANDARD_SIZE : image_width
+        zoom_width = zoom_width > Seek::ActsAsFleximageExtension::MAX_SIZE ? Seek::ActsAsFleximageExtension::MAX_SIZE : zoom_width
+        zoom_width = (zoom_width == image_width) ? nil : zoom_width
+      %>
+      <%#param code is used for temporary link %>
+      <% url = polymorphic_path([asset, content_blob], action: 'download', disposition: 'inline', code: params[:code], image_size: zoom_width) %>
+      <%# lightbox ID needs to be unique %>
+      <% options = { 'data-lightbox' => "view_content_blob_#{content_blob.id}_#{Time.now.to_i}_#{rand(10000000)}", :title => 'Preview'} %>
+    <% else %>
+      <%#param code is used for temporary link %>
+      <% url = polymorphic_path([asset, content_blob], :action => 'view_content', :code => params[:code]) %>
+      <% options = {:onclick => "checkSupportedBrowser();", :title => 'View contents of this file'} %>
+    <% end %>
 
-
-    <% is_inline_viewable = content_blob.is_content_viewable? %>
-    <% if asset.is_a?(Workflow)%>
-      <% if asset.is_github_cwl? %>
-        <%= button_link_to('View content', "show", asset.cwl_viewer_url, html_options = {:target=>'_blank'} ) %>
-      <% elsif asset.is_myexperiment? %>
-        <%= button_link_to('View content', "show", content_blob.url, html_options = {:target=>'_blank'} ) %>
-      <% else %>
-<!--        <%= button_link_to('View content', "show", 'http://www.reddit.com') %> -->
-      <% end %>
-    <% elsif is_inline_viewable %>
-        <%#FIXME: this decision of whether to display image can be made in view_content controller method, as it does between text and pdf %>
-        <% if content_blob.is_image? %>
-            <%
-              class << content_blob
-                acts_as_fleximage_extension
-              end
-
-              image_width = content_blob.width.to_i
-              #zoom to larger image
-              zoom_width=image_width < Seek::ActsAsFleximageExtension::STANDARD_SIZE ? Seek::ActsAsFleximageExtension::STANDARD_SIZE : image_width
-              zoom_width=zoom_width > Seek::ActsAsFleximageExtension::MAX_SIZE ? Seek::ActsAsFleximageExtension::MAX_SIZE : zoom_width
-              zoom_width = (zoom_width == image_width) ? nil : zoom_width
-            %>
-            <%#param code is used for temporary link %>
-            <% url = polymorphic_path([asset, content_blob], :action => 'download', :disposition => 'inline', :code => params[:code], :image_size => zoom_width) %>
-            <% options = {:rel => "lightbox", :title => 'Preview'} %>
-        <% else %>
-            <%#param code is used for temporary link %>
-            <% url = polymorphic_path([asset, content_blob], :action => 'view_content', :code => params[:code]) %>
-            <% options = {:onclick => "checkSupportedBrowser();", :title => 'View contents of this file'} %>
-        <% end %>
-
-        <% if icon_view %>
-            <%= link_to(image('show'), url, options) %>
-        <% else %>
-            <%= button_link_to('View content', "show", url, options) %>
-        <% end %>
-    <% elsif !asset.is_a?(Model) && !(asset.is_a?(DataFile) && asset.contains_extractable_spreadsheet?) && asset.is_downloadable_asset? %>
-        <% if content_blob.file_exists? %>
-            <% supported_file_formats = ['pdf'] %>
-            <% supported_file_formats += Seek::ContentTypeDetection::PDF_VIEWABLE_FORMAT if (Seek::Config.pdf_conversion_enabled && Seek::Config.soffice_available?) %>
-            <% explanation = "Your #{text_for_resource(asset)} is unable to be viewed in browser. " +
-                "Supported file formats are: " + supported_file_formats.join(', ') +
-                "; Supported image formats are: " + Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.join(', ') %>
-        <% else %>
-            <% explanation = "This content is stored externally and cannot be previewed." %>
-        <% end %>
-        <span data-tooltip='<%= tooltip(explanation) %>'>
+    <% if icon_view %>
+      <%= link_to(image('show'), url, options) %>
+    <% else %>
+      <%= button_link_to('View content', "show", url, options) %>
+    <% end %>
+  <% elsif !asset.is_a?(Model) && asset.is_downloadable_asset? %>
+    <% if content_blob.file_exists? %>
+      <% supported_file_formats = ['pdf'] %>
+      <% supported_file_formats += Seek::ContentTypeDetection::PDF_VIEWABLE_FORMAT if (Seek::Config.pdf_conversion_enabled && Seek::Config.soffice_available?) %>
+      <% explanation = "Your #{text_for_resource(asset)} is unable to be viewed in browser. " +
+          "Supported file formats are: " + supported_file_formats.join(', ') +
+          "; Supported image formats are: " + Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.join(', ') %>
+    <% else %>
+      <% explanation = "This content is stored externally and cannot be previewed." %>
+    <% end %>
+    <span data-tooltip='<%= tooltip(explanation) %>'>
           <% if icon_view %>
               <%= image('show', :onclick => "alert('#{explanation}');") %>
           <% else %>
@@ -60,13 +52,13 @@
             </span>
           <% end %>
         </span>
-    <% end %>
+  <% end %>
 <% end %>
 
 <script type="text/javascript">
-  function checkSupportedBrowser(){
-    if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)){
-      alert('View inline content of this item is not supported in this browser version. Please upgrade your browser.');
+    function checkSupportedBrowser(){
+        if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)){
+            alert('View inline content of this item is not supported in this browser version. Please upgrade your browser.');
+        }
     }
-  }
 </script>

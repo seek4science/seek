@@ -52,7 +52,7 @@ module ProjectHierarchyTestHelper
   def login_as_test_user
     User.current_user = Factory(:user, login: 'test')
     # test actions in controller with User.current_user not nil
-    post '/session', login: 'test', password: generate_user_password
+    post '/session', params: { login: 'test', password: generate_user_password }
   end
 
   def initialize_hierarchical_projects

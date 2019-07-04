@@ -1,4 +1,4 @@
-class AssetDoiLog < ActiveRecord::Base
+class AssetDoiLog < ApplicationRecord
   # attr_accessible :action, :asset_id, :asset_type, :asset_version, :comment, :user_id, :doi
 
   belongs_to :asset, :polymorphic => true #, :required_access => false

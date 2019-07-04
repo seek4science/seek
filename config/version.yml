@@ -1,23 +1,13 @@
 # This is your version information.
+# It is is read by Seek::Version and reported by rake app:version
 #
-# This is a simple plugin that makes it easy to manage the version number of your
-# Rails application. The version numbers supported by this plugin look like 
-# '2.0.1 M4 (600) of branch by coder on 2008-10-27'. 
-# 
-# The components that produced the example about would be:
+# major, minor are required, patch is optional. All be numeric or text. the following would produce "2.0.sprint-555"
 # 
 # major:        2
 # minor:        0
-# patch:        1
-# milestone:    M4
-# build:        600
-# branch:       branch
-# committer:    coder
-# build_date:   2008-10-27
-# 
-# major and minor are required. All others are optional - See readme in the app_version plugin
+# patch:        sprint-555
 
 
 major:        1
-minor:        8
-patch: 	      3 
+minor:        9 
+patch: 	      0

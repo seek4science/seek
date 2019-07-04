@@ -14,13 +14,7 @@
 <!-- Tab panes -->
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane" id="Register">
-    <%= form_tag_with_callbacks(fetch_preview_publications_path,
-                            {:remote=>true,
-                             :id=>"fetch_publication",
-                             :success => "Element.show('publication_preview_container'); Element.hide('publication_error'); new Effect.Highlight('publication_preview_container', { duration: 1.0 });",
-                             :failure => "Element.show('publication_error'); Element.hide('publication_preview_container');new Effect.Highlight('publication_error', { duration: 1.0, startcolor: '#FF5555' });",
-                             :loading => "Element.hide('publication_preview_container');Element.show('spinner');$('fetch_button').disabled=true;",
-                             :complete => "Element.hide('spinner');$('fetch_button').disabled=false;"}) do %>
+    <%= form_tag(fetch_preview_publications_path, { remote: true, id: 'fetch_publication' }) do %>
     <p>
       Choose whether to search by PubMed ID or DOI using the dropdown menu below, then enter the document identifier into the text box and click "Fetch".<br>
       If SEEK successfully retrieves your publication, click "Register" to process to the next step.
@@ -213,6 +207,14 @@ function addAuthorsFromSelect() {
 }
 
 jQuery(document).ready(function() {
+  $j('#fetch_publication').on('ajax:before', function () {
+    $j('#spinner').show();
+  });
+
+  $j('#fetch_publication').on('ajax:complete', function () {
+    $j('#spinner').hide();
+  });
+
   // activate tab of current subaction, but only if no hash is set
   if( !window.location.hash) {
     var newpublications_tabs = jQuery('#new_publication_tabs');

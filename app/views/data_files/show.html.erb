@@ -1,6 +1,3 @@
-<%= javascript_include_tag "zoom/lightbox"-%>
-<%= stylesheet_link_tag "lightbox" %>
-
 <%= render :partial => "general/item_title",:locals => {:item=>@data_file, :version => @display_data_file.version,
                                                         :buttons_partial => 'assets/asset_buttons'} -%>
 
@@ -43,4 +40,3 @@
 <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} %>
 
 <%= render :partial=>"general/items_related_to",:object => @data_file -%>
-

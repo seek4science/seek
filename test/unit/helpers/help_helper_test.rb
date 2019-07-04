@@ -3,13 +3,13 @@ require 'test_helper'
 class HelpHelperTest < ActionView::TestCase
   test 'help link' do
     link = help_link :investigation_checksum
-    tag = HTML::Document.new(link).root.children.first
+    tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
     assert_equal 'https://docs.seek4science.org/tech/investigation-checksum.html', tag['href']
     assert_equal '_blank', tag['target']
     assert_equal 'Help', tag.children.first.content
 
     link = help_link :investigation_checksum, link_text: 'chicken soup'
-    tag = HTML::Document.new(link).root.children.first
+    tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
     assert_equal 'https://docs.seek4science.org/tech/investigation-checksum.html', tag['href']
     assert_equal '_blank', tag['target']
     assert_equal 'chicken soup', tag.children.first.content
@@ -22,18 +22,18 @@ class HelpHelperTest < ActionView::TestCase
 
   test 'include icon' do
     link = help_link :investigation_checksum, include_icon: true
-    tag = HTML::Document.new(link).root.children.first
+    tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
     assert_equal 2,tag.children.count
     assert_equal 'help_icon',tag.children.first['class']
     assert_equal 'Help', tag.children[1].content
 
     link = help_link :investigation_checksum, include_icon: false
-    tag = HTML::Document.new(link).root.children.first
+    tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
     assert_equal 1,tag.children.count
     assert_equal 'Help', tag.children.first.content
 
     link = help_link :investigation_checksum
-    tag = HTML::Document.new(link).root.children.first
+    tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
     assert_equal 1,tag.children.count
     assert_equal 'Help', tag.children.first.content
   end

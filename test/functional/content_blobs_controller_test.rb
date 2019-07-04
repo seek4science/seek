@@ -25,7 +25,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
     blob = sop.content_blob
 
-    get :show, id: blob.id, sop_id: sop.id, format: 'json'
+    get :show, params: { id: blob.id, sop_id: sop.id, format: 'json' }
     assert_response :success
     perform_jsonapi_checks
   end
@@ -34,13 +34,13 @@ class ContentBlobsControllerTest < ActionController::TestCase
     sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
     blob = sop.content_blob
 
-    get :show, id: blob.id, sop_id: sop.id
+    get :show, params: { id: blob.id, sop_id: sop.id }
     assert_response :not_acceptable
 
-    get :show, id: blob.id, sop_id: sop.id, format: 'xml'
+    get :show, params: { id: blob.id, sop_id: sop.id, format: 'xml' }
     assert_response :not_acceptable
 
-    get :show, id: blob.id, sop_id: sop.id, format: 'rdf'
+    get :show, params: { id: blob.id, sop_id: sop.id, format: 'rdf' }
     assert_response :not_acceptable
   end
 
@@ -48,18 +48,18 @@ class ContentBlobsControllerTest < ActionController::TestCase
     sop = Factory(:pdf_sop, policy: Factory(:private_policy))
     blob = sop.content_blob
 
-    get :show, id: blob.id, sop_id: sop.id, format: 'json'
+    get :show, params: { id: blob.id, sop_id: sop.id, format: 'json' }
     assert_response :forbidden
   end
 
   test 'should find_and_auth_asset for get_pdf' do
     sop1 = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
 
-    get :get_pdf, sop_id: sop1.id, id: sop1.content_blob.id
+    get :get_pdf, params: { sop_id: sop1.id, id: sop1.content_blob.id }
     assert_response :success
 
     sop2 = Factory(:pdf_sop, policy: Factory(:private_policy))
-    get :get_pdf, sop_id: sop2.id, id: sop2.content_blob.id
+    get :get_pdf, params: { sop_id: sop2.id, id: sop2.content_blob.id }
     assert_redirected_to sop2
     assert_not_nil flash[:error]
   end
@@ -71,7 +71,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url to file' do
     # test successful request to file
     stub_request(:head, 'http://mockedlocation.com/a-piccy.png').to_return(status: 200, headers: { 'Content-Type' => 'image/png' })
-    xml_http_request :get, :examine_url, data_url: 'http://mockedlocation.com/a-piccy.png'
+    get :examine_url, xhr: true, params: { data_url: 'http://mockedlocation.com/a-piccy.png' }
     assert_response :success
     assert !@response.body.include?('This is a webpage')
     refute @response.body.include?('disallow_copy_option();')
@@ -84,7 +84,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url to webpage' do
     # successful request to webpage
     stub_request(:any, 'http://somewhere.com').to_return(body: '', status: 200, headers: { 'Content-Type' => 'text/html' })
-    xml_http_request :get, :examine_url, data_url: 'http://somewhere.com'
+    get :examine_url, xhr: true, params: { data_url: 'http://somewhere.com' }
     assert_response :success
     assert @response.body.include?('This is a webpage')
     assert @response.body.include?('disallow_copy_option();')
@@ -97,7 +97,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url forbidden' do
     # forbidden
     stub_request(:head, 'http://unauth.com/file.pdf').to_return(status: 403, headers: { 'Content-Type' => 'application/pdf' })
-    xml_http_request :get, :examine_url, data_url: 'http://unauth.com/file.pdf'
+    get :examine_url, xhr: true, params: { data_url: 'http://unauth.com/file.pdf' }
     assert_response :success
     assert @response.body.include?('Access to this link is unauthorized')
     assert @response.body.include?('disallow_copy_option();')
@@ -109,7 +109,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url unauthorized' do
     # unauthorized
     stub_request(:head, 'http://unauth.com/file.pdf').to_return(status: 401, headers: { 'Content-Type' => 'application/pdf' })
-    xml_http_request :get, :examine_url, data_url: 'http://unauth.com/file.pdf'
+    get :examine_url, xhr: true, params: { data_url: 'http://unauth.com/file.pdf' }
     assert_response :success
     assert @response.body.include?('Access to this link is unauthorized')
     assert @response.body.include?('disallow_copy_option();')
@@ -121,7 +121,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url 404' do
     # 404
     stub_request(:head, 'http://missing.com').to_return(status: 404, headers: { 'Content-Type' => 'text/html' })
-    xml_http_request :get, :examine_url, data_url: 'http://missing.com'
+    get :examine_url, xhr: true, params: { data_url: 'http://missing.com' }
     assert_response :success
     assert @response.body.include?('Nothing can be found at that URL')
     assert @response.body.include?('disallow_copy_option();')
@@ -133,7 +133,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url host not found' do
     # doesn't exist
     stub_request(:head, 'http://nohost.com').to_raise(SocketError)
-    xml_http_request :get, :examine_url, data_url: 'http://nohost.com'
+    get :examine_url, xhr: true, params: { data_url: 'http://nohost.com' }
     assert_response :success
     assert @response.body.include?('Nothing can be found at that URL')
     assert @response.body.include?('disallow_copy_option();')
@@ -144,7 +144,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'examine url bad uri' do
     # bad uri
-    xml_http_request :get, :examine_url, data_url: 'this is not a uri'
+    get :examine_url, xhr: true, params: { data_url: 'this is not a uri' }
     assert_response :success
     assert @response.body.include?('The URL appears to be invalid')
     assert @response.body.include?('disallow_copy_option();')
@@ -154,7 +154,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'examine url unrecognized scheme' do
-    xml_http_request :get, :examine_url, data_url: 'fish://tuna:1525125151'
+    get :examine_url, xhr: true, params: { data_url: 'fish://tuna:1525125151' }
     assert_response :success
     assert @response.body.include?('Unhandled URL scheme')
     assert @response.body.include?('disallow_copy_option();')
@@ -169,7 +169,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
       # Need to allow the request through so that `private_address_check` can catch it.
       WebMock.allow_net_connect!
       VCR.turned_off do
-        xml_http_request :get, :examine_url, data_url: 'http://localhost/secrets'
+        get :examine_url, xhr: true, params: { data_url: 'http://localhost/secrets' }
         assert_response :success
         assert @response.body.include?('URL is inaccessible')
         assert @response.body.include?('disallow_copy_option();')
@@ -188,7 +188,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
       WebMock.allow_net_connect!
       assert PrivateAddressCheck.resolves_to_private_address?('192.168.0.1')
       VCR.turned_off do
-        xml_http_request :get, :examine_url, data_url: 'http://192.168.0.1/config'
+        get :examine_url, xhr: true, params: { data_url: 'http://192.168.0.1/config' }
         assert_response :success
         assert @response.body.include?('URL is inaccessible')
         assert @response.body.include?('disallow_copy_option();')
@@ -204,11 +204,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'should find_and_auth_asset for download' do
     sop1 = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
 
-    get :download, sop_id: sop1.id, id: sop1.content_blob.id
+    get :download, params: { sop_id: sop1.id, id: sop1.content_blob.id }
     assert_response :success
 
     sop2 = Factory(:pdf_sop, policy: Factory(:private_policy))
-    get :download, sop_id: sop2.id, id: sop2.content_blob.id
+    get :download, params: { sop_id: sop2.id, id: sop2.content_blob.id }
     assert_redirected_to sop2
     assert_not_nil flash[:error]
   end
@@ -217,11 +217,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
     sop1 = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
     sop2 = Factory(:pdf_sop, policy: Factory(:private_policy))
 
-    get :get_pdf, sop_id: sop1.id, id: sop1.content_blob.id
+    get :get_pdf, params: { sop_id: sop1.id, id: sop1.content_blob.id }
     assert_response :success
 
     # don't match
-    get :get_pdf, sop_id: sop1.id, id: sop2.content_blob.id
+    get :get_pdf, params: { sop_id: sop1.id, id: sop2.content_blob.id }
     assert_redirected_to :root
     assert_not_nil flash[:error]
   end
@@ -230,11 +230,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
     sop1 = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
     sop2 = Factory(:pdf_sop, policy: Factory(:private_policy))
 
-    get :download, sop_id: sop1.id, id: sop1.content_blob.id
+    get :download, params: { sop_id: sop1.id, id: sop1.content_blob.id }
     assert_response :success
 
     # don't match
-    get :download, sop_id: sop1.id, id: sop2.content_blob.id
+    get :download, params: { sop_id: sop1.id, id: sop2.content_blob.id }
     assert_redirected_to :root
     assert_not_nil flash[:error]
   end
@@ -243,7 +243,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     model = Factory :typeless_model, policy: Factory(:public_policy)
 
     assert_difference('ActivityLog.count') do
-      get :download, model_id: model.id, id: model.content_blobs.first.id
+      get :download, params: { model_id: model.id, id: model.content_blobs.first.id }
     end
     assert_response :success
     assert_equal 'attachment; filename="file_with_no_extension"', @response.header['Content-Disposition']
@@ -259,7 +259,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert !File.exist?(pdf_path)
     assert ms_word_sop.can_download?
 
-    get :get_pdf, sop_id: ms_word_sop.id, id: ms_word_sop.content_blob.id
+    get :get_pdf, params: { sop_id: ms_word_sop.id, id: ms_word_sop.content_blob.id }
     assert_response :success
 
     assert_equal 'attachment; filename="ms_word_test.pdf"', @response.header['Content-Disposition']
@@ -281,7 +281,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     Seek::Config.stub(:soffice_available?, false) do
       assert_raises(RuntimeError) do
-        get :get_pdf, sop_id: ms_word_sop.id, id: ms_word_sop.content_blob.id
+        get :get_pdf, params: { sop_id: ms_word_sop.id, id: ms_word_sop.content_blob.id }
       end
     end
   end
@@ -301,7 +301,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert pdf_sop.content_blob.cachable?
 
     with_config_value(:hard_max_cachable_size, 10_000) do # Temporarily increase this, as the PDF is ~8kB
-      get :get_pdf, sop_id: pdf_sop.id, id: pdf_sop.content_blob.id
+      get :get_pdf, params: { sop_id: pdf_sop.id, id: pdf_sop.content_blob.id }
     end
 
     assert_response :success
@@ -327,7 +327,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                                             url: 'http://somewhere.com/piccy.doc',
                                             uuid: UUID.generate))
     with_config_value(:hard_max_cachable_size, 10_000) do # Temporarily increase this, as the PDF is ~9kB
-      get :get_pdf, sop_id: doc_sop.id, id: doc_sop.content_blob.id
+      get :get_pdf, params: { sop_id: doc_sop.id, id: doc_sop.content_blob.id }
     end
     assert_response :success
     assert_equal 'attachment; filename="ms_word_test.pdf"', @response.header['Content-Disposition']
@@ -347,7 +347,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                                         url: 'http://somewhere.com/piccy.doc',
                                         uuid: UUID.generate))
     blob = sop.content_blob
-    get :get_pdf, sop_id: 999, id: blob.id
+    get :get_pdf, params: { sop_id: 999, id: blob.id }
     assert_redirected_to root_path
     assert_not_nil flash[:error]
   end
@@ -359,7 +359,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     FileUtils.rm df.content_blob.filepath
     refute df.content_blob.file_exists?
 
-    get :download, data_file_id: df, id: df.content_blob
+    get :download, params: { data_file_id: df, id: df.content_blob }
 
     assert_redirected_to df
     assert flash[:error].match(/Unable to find a copy of the file for download/)
@@ -369,7 +369,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
 
     assert_difference('ActivityLog.count') do
-      get :view_content, sop_id: sop.id, id: sop.content_blob.id
+      get :view_content, params: { sop_id: sop.id, id: sop.content_blob.id }
     end
 
     assert_response :success
@@ -388,7 +388,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'log inline_view for viewing pdf and image' do
     sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
     assert_difference('ActivityLog.count') do
-      get :view_content, sop_id: sop.id, id: sop.content_blob.id
+      get :view_content, params: { sop_id: sop.id, id: sop.content_blob.id }
     end
     assert_response :success
     al = ActivityLog.last
@@ -399,7 +399,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                                                    original_filename: 'test.png',
                                                    content_type: 'image/png'))
     assert_difference('ActivityLog.count') do
-      get :download, data_file_id: df.id, id: df.content_blob.id, disposition: 'inline'
+      get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline' }
     end
     assert_response :success
     al = ActivityLog.last
@@ -408,20 +408,20 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'should view content as correct format for type' do
     df = Factory(:data_file, content_blob: Factory(:csv_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
-    get :view_content, data_file_id: df.id, id: df.content_blob.id
+    get :view_content, params: { data_file_id: df.id, id: df.content_blob.id }
     assert_response :success
     assert @response.body.include?('1,2,3,4,5')
     assert_equal 'text/plain', @response.content_type
 
     df = Factory(:data_file, content_blob: Factory(:doc_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
-    get :view_content, data_file_id: df.id, id: df.content_blob.id
+    get :view_content, params: { data_file_id: df.id, id: df.content_blob.id }
     assert_response :success
     assert_equal 'text/html', @response.content_type
   end
 
   test 'can fetch csv content blob as csv' do
     df = Factory(:data_file, content_blob: Factory(:csv_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
-    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :success
 
     assert @response.content_type, 'text/csv'
@@ -433,7 +433,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'can fetch excel content blob as csv' do
     df = Factory(:data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
-    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :success
 
     assert @response.content_type, 'text/csv'
@@ -445,7 +445,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'cannot fetch binary content blob as csv' do
     df = Factory(:data_file, content_blob: Factory(:binary_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
-    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :not_acceptable
 
     assert @response.content_type, 'text/csv'
@@ -457,7 +457,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'cannot fetch empty content blob as csv' do
     df = Factory(:data_file, content_blob: Factory(:blank_pdf_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
-    get :show, data_file_id: df.id, id: df.content_blob.id, format: 'csv'
+    get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :not_found
 
     assert @response.content_type, 'text/csv'
@@ -472,7 +472,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
                              content_blob: Factory(:image_content_blob))
 
-    get :download, data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '900'
+    get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '900' }
 
     assert_response :success
   end
@@ -486,7 +486,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                                        uuid: UUID.generate)
     assert !df.content_blob.file_exists?
 
-    get :download, data_file_id: df, id: df.content_blob
+    get :download, params: { data_file_id: df, id: df.content_blob }
     assert_response :success
   end
 
@@ -499,7 +499,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                                        uuid: UUID.generate)
     assert !df.content_blob.file_exists?
 
-    get :download, data_file_id: df, id: df.content_blob
+    get :download, params: { data_file_id: df, id: df.content_blob }
 
     assert_redirected_to df.content_blob.url
   end
@@ -507,7 +507,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'should download' do
     df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person
     assert_difference('ActivityLog.count') do
-      get :download, data_file_id: df, id: df.content_blob
+      get :download, params: { data_file_id: df, id: df.content_blob }
     end
     assert_response :success
     assert_equal 'attachment; filename="small-test-spreadsheet.xls"', @response.header['Content-Disposition']
@@ -518,7 +518,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'should not log download for inline view intent' do
     df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person
     assert_no_difference('ActivityLog.count') do
-      get :download, data_file_id: df, id: df.content_blob, intent: :inline_view
+      get :download, params: { data_file_id: df, id: df.content_blob, intent: :inline_view }
     end
     assert_response :success
   end
@@ -531,7 +531,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                                        url: 'http://mockedlocation.com/a-piccy.png',
                                        uuid: UUID.generate)
     assert_difference('ActivityLog.count') do
-      get :download, data_file_id: df, id: df.content_blob
+      get :download, params: { data_file_id: df, id: df.content_blob }
     end
     assert_response :success
   end
@@ -544,7 +544,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                                        url: 'http://unknownhost.com/pic.png',
                                        uuid: UUID.generate)
 
-    get :download, data_file_id: df, id: df.content_blob
+    get :download, params: { data_file_id: df, id: df.content_blob }
 
     assert_redirected_to data_file_path(df, version: df.version)
     assert_not_nil flash[:error]
@@ -558,7 +558,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                                        url: 'http://mocked404.com',
                                        uuid: UUID.generate)
 
-    get :download, data_file_id: df, id: df.content_blob
+    get :download, params: { data_file_id: df, id: df.content_blob }
     assert_redirected_to data_file_path(df, version: df.version)
     assert_not_nil flash[:error]
   end
@@ -571,7 +571,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                                        url: 'http://mocked500.com',
                                        uuid: UUID.generate)
 
-    get :download, data_file_id: df, id: df.content_blob
+    get :download, params: { data_file_id: df, id: df.content_blob }
     assert_redirected_to data_file_path(df, version: df.version)
     assert_not_nil flash[:error]
     assert_includes flash[:error], '500'
@@ -583,7 +583,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  content_blob: Factory(:content_blob, data: data, content_type: 'images/png'),
                  policy: Factory(:downloadable_public_policy)
 
-    get :download, data_file_id: df, id: df.content_blob, disposition: 'inline'
+    get :download, params: { data_file_id: df, id: df.content_blob, disposition: 'inline' }
     assert_response :success
     assert @response.header['Content-Disposition'].include?('inline')
   end
@@ -596,7 +596,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  content_blob: Factory(:content_blob, data: data, content_type: 'images/png'),
                  policy: Factory(:downloadable_public_policy)
 
-    get :download, data_file_id: df, id: df.content_blob
+    get :download, params: { data_file_id: df, id: df.content_blob }
     assert_response :success
     assert @response.header['Content-Disposition'].include?('attachment')
   end
@@ -605,7 +605,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user.person
     first_content_blob = model.content_blobs.first
     assert_difference('ActivityLog.count') do
-      get :download, model_id: model.id, id: first_content_blob.id
+      get :download, params: { model_id: model.id, id: first_content_blob.id }
     end
     assert_response :success
     al = ActivityLog.last
@@ -620,7 +620,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     model = Factory :model_2_files, policy: Factory(:public_policy), contributor: User.current_user.person
     first_content_blob = model.content_blobs.first
     assert_difference('ActivityLog.count') do
-      get :download, model_id: model.id, id: first_content_blob.id
+      get :download, params: { model_id: model.id, id: first_content_blob.id }
     end
     assert_response :success
     assert_equal "attachment; filename=\"#{first_content_blob.original_filename}\"", @response.header['Content-Disposition']
@@ -639,11 +639,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert sop.can_download?
     refute data_file.can_download?
 
-    get :download, sop_id: sop.id, id: data_file.content_blob.id
+    get :download, params: { sop_id: sop.id, id: data_file.content_blob.id }
     assert_not_equal 'secret', response.body.force_encoding(Encoding::UTF_8)
     assert_response :redirect
 
-    get :download, sop_id: sop.id, id: data_file.content_blob.id, format: 'json'
+    get :download, params: { sop_id: sop.id, id: data_file.content_blob.id, format: 'json' }
     assert_response :not_found
   end
 
@@ -654,7 +654,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert sample_type.can_view?
     assert sample_type.can_download?
     assert_difference('ActivityLog.count') do
-      get :download, sample_type_id:sample_type.id, id:sample_type.template.id
+      get :download, params: { sample_type_id:sample_type.id, id:sample_type.template.id }
     end
 
     assert_response :success
@@ -671,7 +671,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     refute sample_type.can_view?
     refute sample_type.can_download?
     assert_no_difference('ActivityLog.count') do
-      get :download, sample_type_id:sample_type.id, id:sample_type.template.id
+      get :download, params: { sample_type_id:sample_type.id, id:sample_type.template.id }
     end
 
     assert_response :redirect

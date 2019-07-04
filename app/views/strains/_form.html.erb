@@ -1,7 +1,3 @@
-<script type="text/javascript">
-    updateFancyMultiselect('strain_project_ids');
-</script>
-
 <%= f.error_messages -%>
 
 <div id="strain_form">
@@ -37,17 +33,15 @@
   </div>
 
   <div class="row">
-    <%= render :partial => "genotype_form", :locals => {:item => @strain, :f => f, :action => action} %>
-    <%= render :partial => "phenotype_form", :locals => {:item => @strain, :f => f, :action => action} %>
+    <%= render partial: 'genotype_form', locals: { item: @strain } %>
+    <%= render partial: 'phenotype_form', locals: { item: @strain } %>
   </div>
 
   <div class="form-group">
     <%= f.label "Organism", class: 'required' -%>
     <%= f.select :organism_id,
                  options_for_select([["Not specified", ""]] + Organism.order(:title).map { |o| [o.title, o.id] }, @strain.organism.try(:id) || current_user.try(:person).try(:projects).try(:first).try(:organism_ids).try(:first)), {},
-                 :onchange => "show_ajax_loader('strains_of_selected_organism');strains_of_selected_organism(this.value,'strain_parent_id', 'strain[parent_id]');",
-                 :class => 'form-control'
-    -%>
+                 class: 'form-control' -%>
   </div>
 
   <div class="form-group">
@@ -64,32 +58,46 @@
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @strain} %>
 
   <% if (action == 'create') || (action == 'edit' && @strain.can_manage?) %>
-      <%= render :seek_partial => "sharing/form", :locals => {:object => @strain} -%>
+    <%= render :partial => "sharing/form", :locals => {:object => @strain} -%>
   <% end %>
 
-  <%= f.hidden_field :id %>
-
   <%
-     button_text=action=="edit" ? "Update" : "Create"
-     disabled_text=action=="edit" ? "Updating..." : "Creating..."
+    button_text=action=="edit" ? "Update" : "Create"
+    disabled_text=action=="edit" ? "Updating..." : "Creating..."
   %>
   <% if @strain.can_manage? %>
-      <%= preview_permission_popup_link(@strain) -%>
-      <%= f.submit button_text, :id => "strain_submit_btn",
-                   :onclick => "previewPermissions();return(false);",
-                   :class => 'btn btn-primary' -%>
+    <%= preview_permission_popup_link(@strain) -%>
+    <%= f.submit button_text, :id => "strain_submit_btn",
+                 :onclick => "previewPermissions();return(false);",
+                 :class => 'btn btn-primary' -%>
   <% else %>
-      <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "strain_submit_btn",
-                   :class => 'btn btn-primary' -%>
+    <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "strain_submit_btn",
+                 :class => 'btn btn-primary' -%>
   <% end %>
   or <%= cancel_button(@strain.id ? strain_path(@strain.id) : strains_path) %>
 </div>
 
 <script type="text/javascript">
-    if ('<%= action.to_s%>' == 'create' && <%= @strain.parent_id.nil?%> && <%= f.error_messages.blank?%>) {
-        show_ajax_loader('strains_of_selected_organism');
-        strains_of_selected_organism($F('strain_organism_id'), 'strain_parent_id', 'strain[parent_id]');
-    }
+    $j(document).ready(function () {
+        $j('#strain_organism_id').change(function () {
+            var select = $j('#strain_parent_id');
+            select.hide().html('<option value="0">Select Strain ...</option>');
+            $j('#strains_of_selected_organism').spinner('add');
+
+            $j.get('<%= strains_of_selected_organism_strains_path -%>', { organism_id: $j(this).val() }).done(function (data) {
+                data.strains.forEach(function (strain) {
+                    select.append($j('<option value="' + strain[0] + '">' + strain[1] + '</option>'));
+                });
+            }).fail(function () {
+                alert('Something went wrong, please try again...');
+            }).always(function () {
+                $j('#strains_of_selected_organism').spinner('remove');
+                select.show();
+            });
+        });
+    });
+
+    <% if action.to_s == 'create' && @strain.parent_id.nil? && f.error_messages.blank? %>
+    $j('#strain_organism_id').change(); // Trigger AJAX call
+    <% end %>
 </script>
-
-

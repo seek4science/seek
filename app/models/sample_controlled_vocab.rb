@@ -1,4 +1,4 @@
-class SampleControlledVocab < ActiveRecord::Base
+class SampleControlledVocab < ApplicationRecord
   # attr_accessible :title, :description, :sample_controlled_vocab_terms_attributes
 
   has_many :sample_controlled_vocab_terms, inverse_of: :sample_controlled_vocab,

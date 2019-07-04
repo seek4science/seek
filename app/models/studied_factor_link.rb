@@ -1,4 +1,4 @@
-class StudiedFactorLink < ActiveRecord::Base
+class StudiedFactorLink < ApplicationRecord
   belongs_to :substance, polymorphic: true
   belongs_to :studied_factor
 

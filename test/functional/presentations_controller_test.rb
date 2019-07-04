@@ -31,18 +31,18 @@ class PresentationsControllerTest < ActionController::TestCase
                                                )
 
     assert_difference 'Presentation.count' do
-      post :create, presentation: presentation_attrs, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png', data: nil }], sharing: valid_sharing
+      post :create, params: { presentation: presentation_attrs, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png', data: nil }], sharing: valid_sharing }
     end
   end
 
   test 'can create with local file' do
     presentation_attrs = Factory.attributes_for(:presentation,
                                                 contributor: User.current_user,
-                                                project_ids: [@project])
+                                                project_ids: [@project.id])
 
-    assert_difference 'Presentation.count' do
-      assert_difference 'ActivityLog.count' do
-        post :create, presentation: presentation_attrs, content_blobs: [{ data: file_for_upload }], sharing: valid_sharing
+    assert_difference 'ActivityLog.count' do
+      assert_difference 'Presentation.count' do
+        post :create, params: { presentation: presentation_attrs, content_blobs: [{ data: file_for_upload }], sharing: valid_sharing }
       end
     end
   end
@@ -50,20 +50,20 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'can edit' do
     presentation = Factory :presentation, contributor: User.current_user.person
 
-    get :edit, id: presentation
+    get :edit, params: { id: presentation }
     assert_response :success
   end
 
   test 'can update' do
     presentation = Factory :presentation, contributor: User.current_user.person
-    post :update, id: presentation, presentation: { title: 'updated' }
+    post :update, params: { id: presentation, presentation: { title: 'updated' } }
     assert_redirected_to presentation_path(presentation)
   end
 
   test 'should show presentation' do
     presentation = Factory :ppt_presentation, contributor: User.current_user.person
     assert_difference 'ActivityLog.count' do
-      get :show, id: presentation
+      get :show, params: { id: presentation }
     end
 
     assert_response :success
@@ -83,8 +83,7 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation = Factory :presentation, contributor: User.current_user.person
 
     assert_difference 'presentation.version' do
-      post :new_version, id: presentation, presentation: {},
-                         content_blobs: [{ data_url: 'http://somewhere.com/piccy.png' }]
+      post :new_version, params: { id: presentation, presentation: {}, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png' }] }
 
       presentation.reload
     end
@@ -100,7 +99,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
     new_file_path = file_for_upload
     assert_difference 'presentation.version' do
-      post :new_version, id: presentation, presentation: {}, content_blobs: [{ data: new_file_path }]
+      post :new_version, params: { id: presentation, presentation: {}, content_blobs: [{ data: new_file_path }] }
 
       presentation.reload
     end
@@ -112,7 +111,7 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation_attrs = Factory.build(:presentation, contributor: User.current_user.person).attributes # .symbolize_keys(turn string key to symbol)
 
     assert_no_difference 'Presentation.count' do
-      post :create, presentation: presentation_attrs, content_blobs: [{ data_url: 'http://www.blah.de/images/logo.png' }]
+      post :create, params: { presentation: presentation_attrs, content_blobs: [{ data_url: 'http://www.blah.de/images/logo.png' }] }
     end
     assert_not_nil flash[:error]
   end
@@ -122,7 +121,7 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation = Factory :presentation, contributor: User.current_user.person
     new_data_url = 'http://www.blah.de/images/liver-illustration.png'
     assert_no_difference 'presentation.version' do
-      post :new_version, id: presentation, presentation: {}, content_blobs: [{ data_url: new_data_url }]
+      post :new_version, params: { id: presentation, presentation: {}, content_blobs: [{ data_url: new_data_url }] }
 
       presentation.reload
     end
@@ -133,7 +132,7 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation = Factory :presentation, contributor: User.current_user.person
     content_blob_id = presentation.content_blob.id
     assert_difference('Presentation.count', -1) do
-      delete :destroy, id: presentation
+      delete :destroy, params: { id: presentation }
     end
     assert_redirected_to presentations_path
 
@@ -168,7 +167,7 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_equal [], presentation.annotations.select { |a| a.source == p.user }.collect { |a| a.value.text }.sort
     assert_equal %w(golf sparrow), presentation.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
-    xml_http_request :post, :update_annotations_ajax, id: presentation, tag_list: "soup,#{golf.value.text}"
+    post :update_annotations_ajax, xhr: true, params: { id: presentation, tag_list: "soup,#{golf.value.text}" }
 
     presentation.reload
 
@@ -181,7 +180,7 @@ class PresentationsControllerTest < ActionController::TestCase
     pres = Factory :ppt_presentation, policy: Factory(:public_policy)
     login_as(pres.contributor.user)
     assert_difference('ActivityLog.count') do
-      get :download, id: pres.id
+      get :download, params: { id: pres.id }
     end
     assert_response :success
     al = ActivityLog.last
@@ -197,7 +196,7 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation = Factory(:presentation, contributor: user.person)
     login_as(user)
     assert presentation.can_manage?, 'The presentation must be manageable for this test to succeed'
-    put :update, id: presentation, presentation: { other_creators: 'marry queen' }
+    put :update, params: { id: presentation, presentation: { other_creators: 'marry queen' } }
     presentation.reload
     assert_equal 'marry queen', presentation.other_creators
   end
@@ -210,7 +209,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'should show the other creators in -uploader and creators- box' do
     presentation = Factory(:presentation, policy: Factory(:public_policy), other_creators: 'another creator')
-    get :show, id: presentation
+    get :show, params: { id: presentation }
     assert_select 'div', text: 'another creator', count: 1
   end
 
@@ -218,13 +217,13 @@ class PresentationsControllerTest < ActionController::TestCase
     Seek::Config.stub(:soffice_available?, true) do
       ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
       assert ms_ppt_presentation.content_blob.is_content_viewable?
-      get :show, id: ms_ppt_presentation.id
+      get :show, params: { id: ms_ppt_presentation.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
 
       openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
       assert openoffice_ppt_presentation.content_blob.is_content_viewable?
-      get :show, id: openoffice_ppt_presentation.id
+      get :show, params: { id: openoffice_ppt_presentation.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
     end
@@ -234,13 +233,13 @@ class PresentationsControllerTest < ActionController::TestCase
     Seek::Config.stub(:soffice_available?, false) do
       ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
       refute ms_ppt_presentation.content_blob.is_content_viewable?
-      get :show, id: ms_ppt_presentation.id
+      get :show, params: { id: ms_ppt_presentation.id }
       assert_response :success
       assert_select 'span.disabled-button', text: /View content/, count: 1
 
       openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
       refute openoffice_ppt_presentation.content_blob.is_content_viewable?
-      get :show, id: openoffice_ppt_presentation.id
+      get :show, params: { id: openoffice_ppt_presentation.id }
       assert_response :success
       assert_select 'span.disabled-button', text: /View content/, count: 1
     end
@@ -248,7 +247,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'should display the file icon according to version' do
     ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-    get :show, id: ms_ppt_presentation.id
+    get :show, params: { id: ms_ppt_presentation.id }
     assert_response :success
     assert_select 'img[src=?]', '/assets/file_icons/small/ppt.png'
 
@@ -259,7 +258,7 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_equal 2, ms_ppt_presentation.versions.count
     assert_not_nil ms_ppt_presentation.find_version(2).content_blob
 
-    get :show, id: ms_ppt_presentation.id, version: 2
+    get :show, params: { id: ms_ppt_presentation.id, version: 2 }
     assert_response :success
     assert_select 'img[src=?]', '/assets/file_icons/small/pdf.png'
   end
@@ -276,7 +275,7 @@ class PresentationsControllerTest < ActionController::TestCase
     pres3 = Factory(:presentation, contributor: Factory(:person), creators: [person1], policy: Factory(:public_policy))
     pres4 = Factory(:presentation, contributor: Factory(:person), creators: [person2], policy: Factory(:public_policy))
 
-    get :index, person_id: person1.id
+    get :index, params: { person_id: person1.id }
     assert_response :success
 
     assert_select 'div.list_item_title' do
@@ -300,7 +299,7 @@ class PresentationsControllerTest < ActionController::TestCase
     pres1 = Factory(:presentation, policy: Factory(:public_policy), publications:[pub1])
     pres2 = Factory(:presentation, policy: Factory(:public_policy), publications:[pub2])
 
-    get :index, publication_id: pub1.id
+    get :index, params: { publication_id: pub1.id }
     assert_response :success
 
     assert_select 'div.list_item_title' do
@@ -313,7 +312,7 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'should display null license text' do
     presentation = Factory :presentation, policy: Factory(:public_policy)
 
-    get :show, id: presentation
+    get :show, params: { id: presentation }
 
     assert_select '.panel .panel-body span#null_license', text: I18n.t('null_license')
   end
@@ -321,7 +320,7 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'should display license' do
     presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
 
-    get :show, id: presentation
+    get :show, params: { id: presentation }
 
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
   end
@@ -332,11 +331,11 @@ class PresentationsControllerTest < ActionController::TestCase
 
     presentation.update_attributes license: 'CC0-1.0'
 
-    get :show, id: presentation, version: 1
+    get :show, params: { id: presentation, version: 1 }
     assert_response :success
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
 
-    get :show, id: presentation, version: presentationv.version
+    get :show, params: { id: presentation, version: presentationv.version }
     assert_response :success
     assert_select '.panel .panel-body a', text: 'CC0 1.0'
   end
@@ -348,11 +347,11 @@ class PresentationsControllerTest < ActionController::TestCase
 
     assert_nil presentation.license
 
-    put :update, id: presentation, presentation: { license: 'CC-BY-SA-4.0' }
+    put :update, params: { id: presentation, presentation: { license: 'CC-BY-SA-4.0' } }
 
     assert_response :redirect
 
-    get :show, id: presentation
+    get :show, params: { id: presentation }
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share-Alike 4.0'
     assert_equal 'CC-BY-SA-4.0', assigns(:presentation).license
   end
@@ -364,7 +363,7 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation = Factory(:presentation, policy: Factory(:public_policy), contributor:User.current_user.person)
     presentation2 = Factory(:presentation, policy: Factory(:public_policy))
 
-    get :index, programme_id: programme.id
+    get :index, params: { programme_id: programme.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -376,7 +375,7 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'should return 406 when showing presentation as RDF' do
     presentation = Factory :ppt_presentation, contributor: User.current_user.person
 
-    get :show, id: presentation, format: :rdf
+    get :show, params: { id: presentation, format: :rdf }
 
     assert_response :not_acceptable
   end

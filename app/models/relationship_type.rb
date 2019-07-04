@@ -1,4 +1,4 @@
-class RelationshipType < ActiveRecord::Base
+class RelationshipType < ApplicationRecord
   VALIDATION='VALIDATION'
   CONSTRUCTION='CONSTRUCTION'
   SIMULATION='SIMULATION'

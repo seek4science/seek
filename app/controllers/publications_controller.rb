@@ -5,11 +5,11 @@ class PublicationsController < ApplicationController
   include Seek::AssetsCommon
   include Seek::PreviewHandling
 
-  before_filter :publications_enabled?
+  before_action :publications_enabled?
 
-  before_filter :find_assets, only: [:index]
-  before_filter :find_and_authorize_requested_item, only: %i[show edit update destroy]
-  before_filter :suggest_authors, only: :edit
+  before_action :find_assets, only: [:index]
+  before_action :find_and_authorize_requested_item, only: %i[show edit update destroy]
+  before_action :suggest_authors, only: :edit
 
   include Seek::BreadCrumbs
 
@@ -133,6 +133,7 @@ class PublicationsController < ApplicationController
     end
     pubmed_id, doi = preprocess_pubmed_or_doi pubmed_id, doi
     result = get_data(@publication, pubmed_id, doi)
+    @authors = result.authors
     if !@error.nil?
       if protocol == 'pubmed'
         @error_text = @error
@@ -143,16 +144,12 @@ class PublicationsController < ApplicationController
           @error_text = "Couldn't retrieve DOI: #{doi} - #{@error}"
         end
       end
-      render :update do |page|
-        page[:publication_preview_container].hide
-        page[:publication_error].show
-        page[:publication_error].replace_html(render(partial: 'publications/publication_error', locals: { publication: @publication, error_text: @error_text }, status: 500))
+      respond_to do |format|
+        format.js { render status: 500 }
       end
     else
-      render :update do |page|
-        page[:publication_error].hide
-        page[:publication_preview_container].show
-        page[:publication_preview_container].replace_html(render(partial: 'publications/publication_preview', locals: { publication: @publication, authors: result.authors }))
+      respond_to do |format|
+        format.js
       end
     end
   end

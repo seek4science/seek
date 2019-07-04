@@ -265,7 +265,7 @@ class DataFileTest < ActiveSupport::TestCase
     User.with_current_user(user) do
       mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://mockedlocation.com/picture.png'
 
-      data_file = Factory :data_file, content_blob: ContentBlob.new(url: 'http://mockedlocation.com/picture.png', original_filename: 'picture.png')
+      data_file = Factory :data_file, contributor:user.person, content_blob: ContentBlob.new(url: 'http://mockedlocation.com/picture.png', original_filename: 'picture.png')
 
       data_file.save!
 

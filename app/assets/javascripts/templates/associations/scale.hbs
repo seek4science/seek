@@ -1,0 +1,11 @@
+<li class="assocation-list-item">
+    <input type="hidden" name="{{fieldName}}[scales][]" value="{{id}}"/>
+    {{title}}
+    {{#if extraParams}}
+       (param: {{extraParams.param}}, unit:{{extraParams.unit}})
+       <input type="hidden" name="{{fieldName}}[scale_extra_params][]" value='{{extraParams.stringified}}'/>
+    {{/if}}
+    <a class="remove-association clickable" title="Remove">
+        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+    </a>
+</li>

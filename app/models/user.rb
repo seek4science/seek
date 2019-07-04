@@ -1,6 +1,6 @@
 require 'digest/sha1'
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   MIN_PASSWORD_LENGTH=10
 
   acts_as_annotation_source
@@ -23,7 +23,7 @@ class User < ActiveRecord::Base
   validates_length_of       :login, within: 3..40
   validates_uniqueness_of   :login, case_sensitive: false
 
-  validates :email, format: { with: RFC822::EMAIL }, if: 'email'
+  validates :email, format: { with: RFC822::EMAIL }, if: -> { email }
   validates :email, presence: true, if: :check_email_present?
   validate :email_available?, if: :check_email_present?
 
@@ -123,10 +123,15 @@ class User < ActiveRecord::Base
     activation_code.nil?
   end
 
-  # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
-  def self.authenticate(login, password)
-    u = User.where(['login = ?', login]).first # need to get the salt
-    u && u.authenticated?(password) ? u : nil
+  # Authenticates a user by their email address or login name and unencrypted password.  Returns the user or nil.
+  def self.authenticate(email_or_login, password)
+    user = get_user(email_or_login)  # need to get the salt
+    user && user.authenticated?(password) ? user : nil
+  end
+
+  def self.get_user(email_or_login)
+    User.joins(:person).where(people: { email: email_or_login }).first ||
+      User.where(login: email_or_login).first
   end
 
   # Encrypts some data with the salt.

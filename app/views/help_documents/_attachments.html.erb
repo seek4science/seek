@@ -1,25 +1,39 @@
-<div class="help_upload_box">
-  <div id="attachment_list">
-    <%= render :partial => 'attachment_list', :locals => {:attachments => @help_document.attachments} %>
-  </div>
+<% collapsed ||= false %>
 
-  <%= form_for(:help_attachment, :url => {:controller => :help_attachments, :action => :create}, :html => { :multipart => true, :target => "attachment_upload"}) do |f| %>
+<%= folding_panel("Attachments (<span id='attachments_count'>#{@help_document.attachments.size}</span>)".html_safe, collapsed, id: 'help-attachment-box') do %>
+  <div class="help_upload_box">
+    <% if @error_text.present? %>
+      <div id="errorExplanation">
+        <h5>The following errors prevented your attachment being uploaded</h5>
+        <ul>
+          <% @error_text.each do |e| %>
+            <% e = "The uploaded file is too large" if e[0..8] == "Size is n" %>
+            <li><%= e %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div id="attachment_list">
+      <%= render partial: 'help_documents/attachment_list', locals: { attachments: @help_document.attachments } %>
+    </div>
+
+    <h3>Upload new attachment</h3>
+
+    <form enctype="multipart/form-data" method="post" name="attachment-form">
       <div class="form-group">
-        <%= f.label :title %>
-        <%= f.text_field :title, :class => 'form-control'  %>
+        <%= label_tag 'Title' %>
+        <%= text_field_tag 'help_attachment[title]', '', class: 'form-control'  %>
       </div>
 
       <div class="form-group">
         <%= label_tag "Attachment" %>
-        <%= f.file_field :uploaded_data %>
+        <%= file_field_tag "content_blobs[][data]" %>
       </div>
 
-      <%= hidden_field_tag "help_attachment[help_document_id]", @help_document.id %>
+      <%= submit_tag "Upload", onclick: "$j('#attachment_spinner').show();", id: 'submit-help-attachment', class: 'btn btn-primary' %>
 
-      <%= submit_tag "Upload", :onclick => "Element.show('attachment_spinner')", :class => 'btn btn-primary' %>
-
-      <%= image_tag "ajax-loader.gif", :id => 'attachment_spinner', :style => 'display:none;' -%>
-  <% end %>
-
-  <iframe id="attachment_upload" name="attachment_upload" style="display: none"></iframe>
-</div>
+      <%= image_tag 'ajax-loader.gif', id: 'attachment_spinner', style: 'display: none;' -%>
+    </form>
+  </div>
+<% end %>

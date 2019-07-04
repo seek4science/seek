@@ -21,12 +21,12 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-class Settings < ActiveRecord::Base
+class Settings < ApplicationRecord
   class SettingNotFound < RuntimeError; end
 
   belongs_to :target, polymorphic: true, required: false
 
-  attr_encrypted :value, key: proc { Seek::Config.attr_encrypted_key }, marshal: true, marsheler: YAML
+  attr_encrypted :value, key: proc { Seek::Config.attr_encrypted_key }, marshal: true, marshaler: Marshal
   before_save :ensure_no_plaintext, if: :encrypt?
 
   # Support old plugin
@@ -55,32 +55,36 @@ class Settings < ActiveRecord::Base
     end
   end
 
-  #get a setting value by [] notation
-  def self.[](var_name)
-    fetch(var_name).try(:value)
-  end
+  class << self
+    #get a setting value by [] notation
+    def get(var_name)
+      fetch(var_name).try(:value)
+    end
+    alias_method :[], :get
 
-  #set a setting value by [] notation
-  def self.[]=(var_name, value)
-    var_name = var_name.to_s
+    #set a setting value by [] notation
+    def set(var_name, value)
+      var_name = var_name.to_s
 
-    record = fetch(var_name) || new(var: var_name)
-    record.value = value
-    record.save!
+      record = fetch(var_name) || new(var: var_name)
+      record.value = value
+      record.save!
 
-    value
-  end
+      value
+    end
+    alias_method :[]=, :set
 
-  def self.merge!(var_name, hash_value)
-    raise ArgumentError unless hash_value.is_a?(Hash)
+    def merge!(var_name, hash_value)
+      raise ArgumentError unless hash_value.is_a?(Hash)
 
-    old_value = self[var_name] || {}
-    raise TypeError, "Existing value is not a hash, can't merge!" unless old_value.is_a?(Hash)
+      old_value = self[var_name] || {}
+      raise TypeError, "Existing value is not a hash, can't merge!" unless old_value.is_a?(Hash)
 
-    new_value = old_value.with_indifferent_access.merge(hash_value)
-    self[var_name] = new_value
+      new_value = old_value.with_indifferent_access.merge(hash_value)
+      self[var_name] = new_value
 
-    new_value
+      new_value
+    end
   end
 
   #get the value field, YAML decoded
@@ -140,6 +144,6 @@ class Settings < ActiveRecord::Base
   private
 
   def ensure_no_plaintext
-    self[:value] = nil if encrypted_value_changed?
+    self[:value] = nil if will_save_change_to_encrypted_value?
   end
 end

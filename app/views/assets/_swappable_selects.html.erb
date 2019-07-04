@@ -1,0 +1,24 @@
+<%
+  is_checked ||= false
+  if is_checked
+    temp = select_options
+    select_options = alternative_select_options
+    alternative_select_options = temp
+  end
+%>
+
+<div data-role="seek-swappable-select-group">
+  <%# This is the visible select, which by default holds the `select_options` %>
+  <%= select_tag nil, select_options,
+                 options.merge('data-role' => 'seek-swappable-select') -%>
+
+  <%# This is the hidden select, which serves as a container to hold the swappable options %>
+  <%= select_tag nil, alternative_select_options,
+                 options.except(:id, :class).merge('data-role' => 'seek-swappable-select-alt',
+                                                   style: 'display: none;') %>
+
+  <label>
+    <%= check_box_tag nil, nil, is_checked, 'data-role' => 'seek-swappable-select-toggle', autocomplete: 'off' -%>
+    <%= check_box_text %>
+  </label>
+</div>

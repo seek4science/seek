@@ -4,10 +4,10 @@ module Seek
       include Seek::ExternalServiceWrapper
 
       def self.included(base)
-        base.before_filter :set_asset_version, only: %i[mint_doi_confirm mint_doi minted_doi new_version update]
-        base.before_filter :mint_doi_auth, only: %i[mint_doi_confirm mint_doi]
-        base.before_filter :new_version_auth, only: [:new_version]
-        base.before_filter :unpublish_auth, only: [:update]
+        base.before_action :set_asset_version, only: %i[mint_doi_confirm mint_doi minted_doi new_version update]
+        base.before_action :mint_doi_auth, only: %i[mint_doi_confirm mint_doi]
+        base.before_action :new_version_auth, only: [:new_version]
+        base.before_action :unpublish_auth, only: [:update]
       end
 
       def mint_doi_confirm

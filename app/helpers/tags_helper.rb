@@ -38,28 +38,9 @@ module TagsHelper
     end.join('').html_safe
   end
 
-  def refresh_tag_cloud(entity, page)
-    page.replace 'tag_cloud', partial: 'tags/tag_cloud',
-                              locals: { tags: fetch_tags_for_item(entity)[1],
-                                        show_overall_count: false,
-                                        id: 'tag_cloud',
-                                        tags_smaller: true,
-                                        no_tags_text: 'This item has not yet been tagged.' }
-  end
-
   # determines whether the tag cloud should be immediately updated, dependent on the number of tags. A large number of tags can make rebuilding it
   # an expensive process on the next page reload. The limit is based upon the number of visible tags set in the configuration
   def immediately_clear_tag_cloud?
     Annotation.count < (Seek::Config.max_visible_tags * 2)
-  end
-
-  # The tag cloud is generation is quite an expensive process and doesn't need to automatically update when filled up already.
-  # When it is small its nice to see new tags appear in the cloud.
-  def handle_clearing_tag_cloud(page)
-    if immediately_clear_tag_cloud?
-      page.replace_html 'sidebar_tag_cloud', partial: 'gadgets/tag_cloud_gadget'
-    else
-      RebuildTagCloudsJob.new.queue_job
-    end
   end
 end

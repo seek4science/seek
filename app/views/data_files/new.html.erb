@@ -12,7 +12,7 @@
 
       <div>
         <%= create_button id:"data_file_submit_btn",
-                          onclick:"javascript: validateResourceFields(true,'data_file',true); return(false);",
+                          onclick:"return validateResourceFields('data_file');",
                           class:'btn btn-primary',
                           button_text:'Upload',
                           'data-upload-file-text' => 'Upload' %>

@@ -1,6 +1,3 @@
-
-
-
 module HomesHelper
   include UsersHelper
   include AssetsHelper

@@ -1,0 +1,2 @@
+$j('#sbml_model')[0].value = '<%= escape_javascript(IO.read(@display_model.sbml_content_blobs.first.filepath).gsub(/\n/, '')) -%>';
+$j('#sycamore-form')[0].submit();

@@ -1,4 +1,4 @@
-class StudiedFactor < ActiveRecord::Base
+class StudiedFactor < ApplicationRecord
   include Seek::ExperimentalFactors::ModelConcerns
 
   belongs_to :data_file

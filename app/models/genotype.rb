@@ -1,4 +1,4 @@
-class Genotype < ActiveRecord::Base
+class Genotype < ApplicationRecord
   belongs_to :strain
   belongs_to :gene
   belongs_to :modification

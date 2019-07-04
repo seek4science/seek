@@ -1,4 +1,4 @@
-class ProjectSubscription < ActiveRecord::Base
+class ProjectSubscription < ApplicationRecord
   belongs_to :person
   belongs_to :project
   has_many :subscriptions, :dependent => :destroy

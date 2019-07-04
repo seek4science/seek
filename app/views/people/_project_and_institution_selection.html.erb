@@ -1,5 +1,5 @@
 <%= panel("#{t('project').pluralize} and Institutions") do %>
-    <p>
+  <p>
       If you need to be assigned to one or more existing <%= t('project').pluralize %>, please select it below and also indicate the Institution you belong to.
       By doing so a <%= t('project') %> Administrator will be notified and will be able to add you. You will be notified by email once added.
     </p>
@@ -11,46 +11,44 @@
         You can also to create and administer your own <%= t('project').pluralize %>, by <%= help_link(:programme_self_management,link_text:'Creating and managing your own Programme space') %>.
       <% end %>
     </p>
-
-
-    <div class="row">
-      <div class="col-sm-4">
-        <label><%= t('project').pluralize %></label>
-        <%= select_tag "projects",
-                       options_for_select(Project.all.sort_by(&:title).collect { |p| [p.title, p.id] }|[['Others', 0]], :selected => params['projects']),
-                       {:onchange => "javascript:others('projects')", :multiple => true, :class => "form-control"}
-        -%>
-        <div id='other_projects' style='display: none' class="form-group">
-          <label>Other <%= t('project').pluralize %></label>
-          <%= text_field_tag :other_projects, nil, {:style => "width: 100%", :value => params['other_projects'], :class => 'form-control'} %>
-        </div>
-      </div>
-
-      <div class="col-sm-4">
-        <label>Institutions</label>
-        <%= select_tag "institutions",
-                       options_for_select(Institution.all.sort_by(&:title).collect { |i| [i.title, i.id] }|[['Others', 0]], :selected => params['institutions']),
-                       {:onchange => "javascript:others('institutions')", :multiple => true, :class => "form-control"}
-        -%>
-        <div id='other_institutions' style='display: none' class="form-group">
-          <label>Other institutions</label>
-          <%= text_field_tag :other_institutions, nil, {:style => "width: 100%", :value => params['other_institutions'], :class => 'form-control'} %>
-        </div>
+  <div class="row">
+    <div class="col-sm-4">
+      <label><%= t('project').pluralize %></label>
+      <%= select_tag "projects",
+                     options_for_select(Project.all.sort_by(&:title).collect { |p| [p.title, p.id] }|[['Others', 0]],
+                                        selected: params['projects']),
+                     { multiple: true, class: 'form-control'} -%>
+      <div style='display: none' class="form-group other">
+        <label>Other <%= t('project').pluralize %></label>
+        <%= text_field_tag :other_projects, params['other_projects'], class: 'form-control' %>
       </div>
     </div>
-    <br/>
 
-
+    <div class="col-sm-4">
+      <label>Institutions</label>
+      <%= select_tag "institutions",
+                     options_for_select(Institution.all.sort_by(&:title).collect { |i| [i.title, i.id] }|[['Others', 0]],
+                                        selected: params['institutions']),
+                     { multiple: true, class: 'form-control'} -%>
+      <div style='display: none' class="form-group other">
+        <label>Other institutions</label>
+        <%= text_field_tag :other_institutions, params['other_institutions'], class: 'form-control' %>
+      </div>
+    </div>
+  </div>
 <% end %>
-
-
 
 <script type="text/javascript">
     $j(document).ready(function () {
-        $j('#projects').multiselect({maxHeight: 250, buttonWidth: '20em', numberDisplayed: 1});
-        $j('#institutions').multiselect({maxHeight: 250, buttonWidth: '20em', numberDisplayed: 1});
+        function showOther() {
+            if ($j(this).val().indexOf('0') > -1) {
+                $j(this).siblings('.other').show();
+            } else {
+                $j(this).siblings('.other').hide();
+            }
+        }
 
-        // hides the warning if a registered project is selected
+	// hides the warning if a registered project is selected
         $j('#projects').change(function() {
            if ($j('#projects option:selected[value!="0"]').length == 0) {
                $j('#no-project-warning').show();
@@ -59,6 +57,11 @@
                $j('#no-project-warning').hide();
            }
         });
+
+        $j('#projects').multiselect({maxHeight: 250, buttonWidth: '20em', numberDisplayed: 1});
+        $j('#institutions').multiselect({maxHeight: 250, buttonWidth: '20em', numberDisplayed: 1});
     });
 </script>
 
+<%= javascript_tag "others('projects')" -%>
+<%= javascript_tag "others('institutions')" -%>

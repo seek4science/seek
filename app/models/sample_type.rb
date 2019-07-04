@@ -1,4 +1,4 @@
-class SampleType < ActiveRecord::Base
+class SampleType < ApplicationRecord
   # attr_accessible :title, :uuid, :sample_attributes_attributes,
  #                 :description, :uploaded_template, :project_ids, :tags
 
