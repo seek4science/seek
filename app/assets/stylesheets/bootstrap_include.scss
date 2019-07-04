@@ -14,6 +14,23 @@
 
 .navbar {
   border-radius: 0;
+  background-color: #33495C;
+  border-color: darken(#33495C, 6.5%);
+
+}
+
+.navbar-nav > li > a {
+  color: #cce6f3 !important;
+}
+
+.navbar-nav > li > a:hover {
+  color: lighten(#33495C, 40%) !important;
+}
+
+
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+  color: lighten(#33495C, 30%) !important;
+  background-color: darken(#33495C, 6.5%) !important;
 }
 
 @mixin responsive-text-align($size) {
