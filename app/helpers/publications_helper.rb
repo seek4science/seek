@@ -21,7 +21,7 @@ module PublicationsHelper
     elsif mode == 3
       'manually'
     elsif mode == 4
-      'from bibtex file'
+      'from a bibtex file'
     else
       `unknown`
     end

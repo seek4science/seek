@@ -401,8 +401,12 @@ class PublicationsController < ApplicationController
           flash[:error] = "The bibtex file did contain #{bibtex.length} items; only the first one is parsed."
         end
         @publication.extract_bibtex_metadata(bibtex[0])
-        # the new form will be rendered with the information from the imported bibtex article
-        @subaction = 'Create'
+        if @publication.title.nil?
+          flash[:error] = "Please check your bibtex file, it should contain the title or the chapter name of the publication."
+        else
+          # the new form will be rendered with the information from the imported bibtex article
+         @subaction = 'Create'
+        end
       end
     end
 
@@ -462,7 +466,11 @@ class PublicationsController < ApplicationController
           flash[:error] = "There are #{publications_with_errors.length} publications that could not be saved"
           publications_with_errors.each do |publication|
             flash[:error] += '<br>' + publication.errors.full_messages.join('<br>')
-            flash[:error] += '<br>' + publication.title
+            if publication.title.nil?
+              flash[:error] = "Please check your bibtex files, each publication should contain a title or a chapter name."
+            else
+              flash[:error] += '<br>' + publication.title
+            end
           end
           flash[:error] = flash[:error].html_safe
         end

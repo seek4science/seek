@@ -184,15 +184,18 @@ class Publication < ActiveRecord::Base
     self.registered_mode = 4
     self.publication_type = get_publication_type(bibtex_record)
 
-    self.title           = bibtex_record[:title].nil? ? nil : (bibtex_record[:title].try(:to_s).try(:encode!).gsub /{|}/, '')
-    self.abstract        = bibtex_record[:abstract].try(:to_s).try(:encode!)
-    self.journal         = bibtex_record.journal.try(:to_s).try(:encode!)
-    month = bibtex_record[:month]
-    year = bibtex_record[:year]
+    self.title           = bibtex_record[:title].try(:to_s).gsub /{|}/, '' unless bibtex_record[:title].nil?
+    self.title           = bibtex_record[:chapter].try(:to_s).gsub /{|}/, '' if (self.title.nil? && !bibtex_record[:chapter].nil?)
+    self.abstract        = bibtex_record[:abstract].try(:to_s)
+    self.journal         = bibtex_record.journal.try(:to_s)
+    month = bibtex_record[:month].try(:to_s)
+    year = bibtex_record[:year].try(:to_s)
     self.published_date  = Date.new(bibtex_record.year.try(:to_i) || 1 , bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1)
     self.published_date = nil if self.published_date.to_s == "0001-01-01"
-    self.doi             = bibtex_record[:doi].try(:to_s).try(:encode!)
-    self.pubmed_id       = bibtex_record[:pubmed_id].try(:to_s).try(:encode!)
+    self.doi             = bibtex_record[:doi].try(:to_s)
+    self.pubmed_id       = bibtex_record[:pubmed_id].try(:to_s)
+    self.booktitle = bibtex_record[:booktitle].try(:to_s)
+    self.publisher = bibtex_record[:publisher].try(:to_s)
 
     unless bibtex_record[:author].nil?
       plain_authors = bibtex_record[:author].split(' and ') # by bibtex definition
@@ -200,10 +203,34 @@ class Publication < ActiveRecord::Base
         next if author.empty?
         last_name,first_name = author.split(', ') # by bibtex definition
         unless first_name.nil?
-          first_name =  first_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''
+          first_name =  first_name.try(:to_s).gsub /^{|}$/, ''
         end
         unless last_name.nil?
-          last_name =  last_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''
+          last_name =  last_name.try(:to_s).gsub /^{|}$/, ''
+        end
+        pa = PublicationAuthor.new(publication: self,
+                                   first_name: first_name,
+                                   last_name: last_name,
+                                   author_index: index)
+        publication_authors << pa
+      end
+    end
+
+    unless bibtex_record[:editor].nil? && bibtex_record[:editors].nil?
+      self.editor = bibtex_record[:editor].try(:to_s) || bibtex_record[:editors].try(:to_s)
+    end
+
+    # in some cases, e.g. proceedings, book, there are no authors but only editors
+    if bibtex_record[:author].nil? && !self.editor.nil?
+      plain_editors = self.editor.split(' and ') # by bibtex definition
+      plain_editors.each_with_index do |editor, index| # multiselect
+        next if editor.empty?
+        last_name,first_name = editor.split(', ') # by bibtex definition
+        unless first_name.nil?
+          first_name =  first_name.try(:to_s).gsub /^{|}$/, ''
+        end
+        unless last_name.nil?
+          last_name =  last_name.try(:to_s).gsub /^{|}$/, ''
         end
         pa = PublicationAuthor.new(publication: self,
                                    first_name: first_name,
@@ -214,18 +241,21 @@ class Publication < ActiveRecord::Base
     end
 
 
-    unless bibtex_record[:editor].nil? && bibtex_record[:editors].nil?
-      self.editor = bibtex_record[:editor].try(:to_s).try(:encode!) || bibtex_record[:editors].try(:to_s).try(:encode!)
-    end
+    page_or_pages = (bibtex_record[:pages].try(:to_s).match?(/[^0-9]/) ? "page".pluralize : "page" ) unless bibtex_record[:pages].nil?
+    pages = bibtex_record[:pages].try(:to_s)
+    volume = bibtex_record[:volume].try(:to_s)
+    series = bibtex_record[:series].try(:to_s)
+    number = bibtex_record[:number].try(:to_s)
+    url =    bibtex_record[:url].try(:to_s) || bibtex_record[:biburl].try(:to_s)
+    address = bibtex_record[:address].try(:to_s)
+    school = bibtex_record[:school].try(:to_s)
+    tutor = bibtex_record[:tutor].try(:to_s)
+    tutorhits = bibtex_record[:tutorhits].try(:to_s)
+    note = bibtex_record[:note].try(:to_s)
 
-      self.booktitle = bibtex_record[:booktitle].try(:to_s).try(:encode!)
-      self.publisher = bibtex_record[:publisher].try(:to_s).try(:encode!)
-
-      page = ((bibtex_record[:pages].include? "-") ? "page".pluralize : "page") unless bibtex_record[:pages].nil?
-
-
-    # using doi/pubmed_id to fetch the metadata
+    #using doi/pubmed_id to fetch the metadata
     result = fetch_pubmed_or_doi_result(self.pubmed_id, self.doi)
+
     unless result.nil?
       self.citation = result.citation  unless result.citation.nil?
 
@@ -243,13 +273,13 @@ class Publication < ActiveRecord::Base
         #Journal
         self.citation = ''
         self.citation += self.journal.nil? ? '':self.journal
-        self.citation += (bibtex_record[:volume].nil? || bibtex_record[:volume].blank?) ? '': ', volume: '+ bibtex_record[:volume].try(:to_s).try(:encode!)
-        self.citation += bibtex_record[:number].nil? ? '' : '('+ bibtex_record[:number].try(:to_s).try(:encode!)+')'
-        self.citation += (bibtex_record[:pages].nil? || bibtex_record[:pages].blank?) ? '' : (', '+ page + ' '+bibtex_record[:pages].try(:to_s).try(:encode!))
-        self.citation += (self.editor.nil? || self.editor.blank?) ? '' : (', Eds: '+ self.editor)
+        self.citation += volume.blank? ? '': ', volume '+ volume
+        self.citation += number.nil? ? '' : '('+ number+')'
+        self.citation += pages.blank? ? '' : (', '+ page_or_pages + ' '+pages)
+        self.citation += self.editor.blank? ? '' : (', Eds: '+ self.editor)
         unless month.nil? && year.nil?
-          self.citation += month.nil? ? ',' : (', '+ month.try(:to_s).try(:encode!).capitalize)
-          self.citation += year.nil? ? '' : (' '+year.try(:to_s).try(:encode!))
+          self.citation += month.nil? ? ',' : (', '+ month.capitalize)
+          self.citation += year.nil? ? '' : (' '+year)
         end
 
         Rails.logger.info("Citation:Journal:"+ self.citation)
@@ -259,83 +289,52 @@ class Publication < ActiveRecord::Base
         Rails.logger.info("Citation: Booklet")
       when 4
         Rails.logger.info("Citation: InBook")
-      when 5
-        Rails.logger.info("Citation: InCollection")
-      when 6
-        # InProceedings
+      when 5,6
+        # InProceedings / InCollection /InBook
         self.citation = ''
         self.citation += self.booktitle.nil? ? '' : ('In '+ self.booktitle)
-        self.citation += (bibtex_record[:volume].nil? || bibtex_record[:volume].blank?) ? '' : (', volume '+ bibtex_record[:volume].try(:to_s).try(:encode!))
-        self.citation += (bibtex_record[:series].nil? || bibtex_record[:series].blank?) ? '' : (' of '+bibtex_record[:series].try(:to_s).try(:encode!))
-        self.citation += (bibtex_record[:pages].nil? || bibtex_record[:pages].blank?) ? '' : (', '+ page + ' '+bibtex_record[:pages].try(:to_s).try(:encode!))
-        self.citation += (self.editor.nil? || self.editor.blank?) ? '' : (', Eds: '+ self.editor)
-        self.citation += (self.publisher.nil? || self.publisher.blank?) ? '' : (', '+ self.publisher)
-        unless bibtex_record[:address].nil? || (self.booktitle.include? bibtex_record[:address].try(:to_s).try(:encode!))
-          self.citation += bibtex_record[:address].nil? ? '' : (', '+ bibtex_record[:address].try(:to_s).try(:encode!))
+        self.citation += volume.blank? ? '' : (', volume '+ volume)
+        self.citation += series.blank? ? '' : (' of '+series)
+        self.citation += pages.blank? ? '' : (', '+ page_or_pages + ' '+pages)
+        self.citation += self.editor.blank? ? '' : (', Eds: '+ self.editor)
+        self.citation += self.publisher.blank? ? '' : (', '+ self.publisher)
+        unless address.nil? || (self.booktitle.include? address)
+          self.citation += address.nil? ? '' : (', '+ address)
         end
-        unless self.booktitle.include? year.try(:to_s).try(:encode!)
+        unless self.booktitle.include? year
           unless month.nil? && year.nil?
-            self.citation += month.nil? ? ',' : (', '+ month.try(:to_s).try(:encode!).capitalize)
-            self.citation += year.nil? ? '' : (' '+year.try(:to_s).try(:encode!))
+            self.citation += month.nil? ? ',' : (', '+ month.capitalize)
+            self.citation += year.nil? ? '' : (' '+year)
           end
         end
-        Rails.logger.info("Citation: InProceedings:"+ self.citation)
-
+        Rails.logger.info("Citation: InProceedings/InCollection:"+ self.citation)
       when 7
         Rails.logger.info("Citation: Manual")
-      when 8
-        #Master Thesis
-        self.citation = ''
-        self.citation += bibtex_record[:school].nil? ? '' : (', '+ bibtex_record[:school].try(:to_s).try(:encode!))
-        self.citation += bibtex_record[:year].nil? ? '' : (', '+ bibtex_record[:year].try(:to_s).try(:encode!))
-        self.citation += bibtex_record[:tutor].nil? ? '' : (', '+ bibtex_record[:tutor].try(:to_s).try(:encode!)+'(Tutor)')
-        self.citation += bibtex_record[:tutorhits].nil? ? '' : (', '+ bibtex_record[:tutorhits].try(:to_s).try(:encode!)+'(HITS Tutor)')
-        self.citation += bibtex_record[:note].nil? ? '' : (', '+ bibtex_record[:note].try(:to_s).try(:encode!))
-        Rails.logger.info("Citation: Master Thesis:"+ self.citation)
       when 9
         Rails.logger.info("Citation: Misc")
-      when 10
+      when 8,10
         #PhD Thesis
         self.citation = ''
-        self.citation += bibtex_record[:school].nil? ? '' : (', '+ bibtex_record[:school].try(:to_s).try(:encode!))
-        self.citation += bibtex_record[:year].nil? ? '' : (', '+ bibtex_record[:year].try(:to_s).try(:encode!))
-        self.citation += bibtex_record[:tutor].nil? ? '' : (', '+ bibtex_record[:tutor].try(:to_s).try(:encode!)+'(Tutor)')
-        self.citation += bibtex_record[:tutorhits].nil? ? '' : (', '+ bibtex_record[:tutorhits].try(:to_s).try(:encode!)+'(HITS Tutor)')
-        self.citation += bibtex_record[:note].nil? ? '' : (', '+ bibtex_record[:note].try(:to_s).try(:encode!))
-        Rails.logger.info("Citation: Phd Thesis:"+ self.citation)
+        self.citation += school.nil? ? '' : (' '+ school)
+        self.citation += year.nil? ? '' : (', '+ year)
+        self.citation += tutor.nil? ? '' : (', '+ tutor+'(Tutor)')
+        self.citation += tutorhits.nil? ? '' : (', '+ tutorhits+'(HITS Tutor)')
+        self.citation += note.nil? ? '' : (', '+ note)
+        Rails.logger.info("Citation: Thesis:"+ self.citation)
       when 11
         # Proceedings are conference proceedings, it has no authors but editors
+        # Book
         self.journal = self.title
-        unless self.editor.nil?
-          plain_editors = self.editor.split(' and ') # by bibtex definition
-          plain_editors.each_with_index do |editor, index| # multiselect
-            next if editor.empty?
-            last_name,first_name = editor.split(', ') # by bibtex definition
-            unless first_name.nil?
-              first_name =  first_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''
-            end
-            unless last_name.nil?
-              last_name =  last_name.try(:to_s).try(:encode!).gsub /^{|}$/, ''
-            end
-            pa = PublicationAuthor.new(publication: self,
-                                       first_name: first_name,
-                                       last_name: last_name,
-                                       author_index: index)
-            publication_authors << pa
-          end
-        end
-
         self.citation = ''
-        self.citation += (bibtex_record[:volume].nil? || bibtex_record[:volume].blank?) ? '' : ('volume '+ bibtex_record[:volume].try(:to_s).try(:encode!))
-        self.citation += (bibtex_record[:series].nil? || bibtex_record[:series].blank?) ? '' : (' of '+bibtex_record[:series].try(:to_s).try(:encode!))
-        self.citation += (self.publisher.nil? || self.publisher.blank?) ? '' : (', '+ self.publisher)
+        self.citation += volume.blank? ? '' : ('volume '+ volume)
+        self.citation += series.blank? ? '' : (' of '+series)
+        self.citation += self.publisher.blank? ? '' : (', '+ self.publisher)
         unless month.nil? && year.nil?
           self.citation += self.citation.blank? ? '' : ','
-          self.citation += month.nil? ? '' : (' '+ month.try(:to_s).try(:encode!).capitalize)
-          self.citation += year.nil? ? '' : (' '+year.try(:to_s).try(:encode!))
+          self.citation += month.nil? ? '' : (' '+ month.capitalize)
+          self.citation += year.nil? ? '' : (' '+year)
         end
-        url =  bibtex_record[:url] || bibtex_record[:biburl]
-        self.citation += url.nil? ? '' : (', '+ url.try(:to_s).try(:encode!))
+        self.citation += url.nil? ? '' : (', '+ url)
         Rails.logger.info("Citation: Proceedings"+self.citation)
       when 12
         Rails.logger.info("Citation: Tech report")
