@@ -62,8 +62,8 @@
           <%=h @publication.citation -%>
         </p>
         <p>
-          <strong for="date_published">Registered:</strong>
-            <span><%= h publication_registered_mode(@publication.registered_mode) -%></span>
+          <strong for="date_published">Date Published:</strong>
+            <span><%= date_as_string(@publication.published_date,false,true) -%></span>
         </p>
       </div>
     </div>
