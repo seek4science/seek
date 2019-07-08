@@ -58,6 +58,8 @@ module PublicationsHelper
         @error = 'There was an problem contacting the DOI query service. Please try again later'
         Seek::Errors::ExceptionForwarder.send_notification(exception, data: {message: "Problem accessing crossref using DOI #{doi}"})
       end
+    else
+      @error = 'Please enter either a DOI or a PubMed ID for the publication.'
     end
     result
   end
