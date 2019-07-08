@@ -133,7 +133,6 @@ class PublicationsController < ApplicationController
     end
     pubmed_id, doi = preprocess_pubmed_or_doi pubmed_id, doi
     result = get_data(@publication, pubmed_id, doi)
-    @authors = result.authors
     if !@error.nil?
       if protocol == 'pubmed'
         @error_text = @error
@@ -148,6 +147,7 @@ class PublicationsController < ApplicationController
         format.js { render status: 500 }
       end
     else
+      @authors = result.authors
       respond_to do |format|
         format.js
       end
@@ -507,7 +507,7 @@ class PublicationsController < ApplicationController
   end
 
   def preprocess_pubmed_or_doi(pubmed_id, doi)
-    doi = doi.sub(/doi\.*:/i, '').strip unless doi.nil?
+    doi = doi.gsub(/(https?:\/\/)?(dx\.)?doi\.org\//i,'').strip unless doi.nil?
     pubmed_id.strip! unless pubmed_id.nil? || pubmed_id.is_a?(Integer)
     [pubmed_id, doi]
   end
