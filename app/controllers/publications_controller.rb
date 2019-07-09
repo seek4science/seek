@@ -125,8 +125,8 @@ class PublicationsController < ApplicationController
     @publication = Publication.new(publication_params)
     key = params[:key]
     protocol = params[:protocol]
-    pubmed_id = nil
     doi = nil
+    pubmed_id = nil
     if protocol == 'pubmed' && !key.blank?
       pubmed_id = key
     elsif protocol == 'doi'
@@ -388,25 +388,19 @@ class PublicationsController < ApplicationController
 
     require 'bibtex'
     if !params.key?(:publication) || !params[:publication].key?(:bibtex_file)
-      @publication.errors[:bibtex_file] = 'Upload a file!'
+      flash[:error] = 'Please upload a bibtex file!'
     else
       bibtex_file = params[:publication].delete(:bibtex_file)
       data = bibtex_file.read.force_encoding('UTF-8')
       bibtex = BibTeX.parse(data,:filter => :latex)
       if bibtex[0].nil?
-        @publication.errors[:bibtex_file] = 'The bibtex file should contain at least one item'
+        flash[:error] =  'The bibtex file should contain at least one item.'
       else
         # warning if there are more than one article
         if bibtex.length > 1
           flash[:error] = "The bibtex file did contain #{bibtex.length} items; only the first one is parsed."
         end
         @publication.extract_bibtex_metadata(bibtex[0])
-        if @publication.title.nil?
-          flash[:error] = "Please check your bibtex file, it should contain the title or the chapter name of the publication."
-        else
-          # the new form will be rendered with the information from the imported bibtex article
-         @subaction = 'Create'
-        end
       end
     end
 
@@ -415,13 +409,13 @@ class PublicationsController < ApplicationController
         format.html { render action: 'new' }
         format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json { render json: @publication.errors, status: :unprocessable_entity }
-
       end
     else
-      respond_to do |format|
-        format.html { render action: 'new' }
-        format.json { render json: @publication, status: :ok }
-      end
+        @subaction = 'Create'
+        respond_to do |format|
+          format.html { render action: 'new' }
+          format.json { render json: @publication, status: :ok }
+        end
     end
   end
 
@@ -431,7 +425,7 @@ class PublicationsController < ApplicationController
 
     require 'bibtex'
     if !params.key?(:publication) || !params[:publication].key?(:bibtex_file)
-      @publication.errors[:bibtex_file] = 'Upload a file!'
+      flash[:error] =  'Please upload a bibtex file!'
     else
       bibtex_file = params[:publication].delete(:bibtex_file)
       data = bibtex_file.read.force_encoding('UTF-8')
@@ -439,7 +433,7 @@ class PublicationsController < ApplicationController
 
 
       if bibtex[0].nil?
-        @publication.errors[:bibtex_file] = 'The bibtex file should contain at least one item.'
+        flash[:error] = 'The bibtex file should contain at least one item.'
       else
         articles = bibtex
         publications = []
@@ -457,19 +451,23 @@ class PublicationsController < ApplicationController
         end
 
         if publications.any?
-          flash[:notice] = "Successfully imported #{publications.length} publications"
+          flash[:notice] = "Successfully imported #{publications.length} publications. <br>"
+          publications.each_with_index do |publication, index|
+            flash[:notice]+= "<br>"+(index+1).to_s+": "+ publication.title + "<br>"
+          end
+          flash[:notice] = flash[:notice].html_safe
         else
-          @publication.errors[:bibtex_file] = 'No article could be imported successfully'
+          flash[:error] = 'No article could be imported successfully'
         end
 
         if publications_with_errors.any?
           flash[:error] = "There are #{publications_with_errors.length} publications that could not be saved"
-          publications_with_errors.each do |publication|
-            flash[:error] += '<br>' + publication.errors.full_messages.join('<br>')
+          publications_with_errors.each_with_index do |publication, index|
+            flash[:error]+= "<br>"
             if publication.title.nil?
-              flash[:error] = "Please check your bibtex files, each publication should contain a title or a chapter name."
+              flash[:error]+= "<br>"+(index+1).to_s+": No title.<br>"+ "Please check your bibtex files, each publication should contain a title or a chapter name."
             else
-              flash[:error] += '<br>' + publication.title
+              flash[:error]+= "<br>"+(index+1).to_s+": "+ publication.title + "<br>"+ publication.errors.full_messages.join('<br>')
             end
           end
           flash[:error] = flash[:error].html_safe

@@ -50,6 +50,8 @@ class Publication < ActiveRecord::Base
 
   validate :check_uniqueness_within_project, unless: 'Seek::Config.is_virtualliver'
 
+  validate :check_bibtex_file
+
   attr_writer :refresh_policy
   before_save :refresh_policy, on: :update
   after_update :update_creators_from_publication_authors
@@ -186,6 +188,12 @@ class Publication < ActiveRecord::Base
 
     self.title           = bibtex_record[:title].try(:to_s).gsub /{|}/, '' unless bibtex_record[:title].nil?
     self.title           = bibtex_record[:chapter].try(:to_s).gsub /{|}/, '' if (self.title.nil? && !bibtex_record[:chapter].nil?)
+
+    if self.title.blank?
+      self.errors.add(:base,'Please check your bibtex file, it should contain the title or the chapter name of the publication.')
+      return
+    end
+
     self.abstract        = bibtex_record[:abstract].try(:to_s)
     self.journal         = bibtex_record.journal.try(:to_s)
     month = bibtex_record[:month].try(:to_s)
@@ -218,6 +226,7 @@ class Publication < ActiveRecord::Base
 
     unless bibtex_record[:editor].nil? && bibtex_record[:editors].nil?
       self.editor = bibtex_record[:editor].try(:to_s) || bibtex_record[:editors].try(:to_s)
+      return
     end
 
     # in some cases, e.g. proceedings, book, there are no authors but only editors
@@ -238,6 +247,11 @@ class Publication < ActiveRecord::Base
                                    author_index: index)
         publication_authors << pa
       end
+    end
+
+    if bibtex_record[:author].nil? && bibtex_record[:editor].nil? && bibtex_record[:editors].nil?
+      self.errors.add(:base,'You need at least one author or editor for your publication.')
+      return
     end
 
 
@@ -298,10 +312,10 @@ class Publication < ActiveRecord::Base
         self.citation += pages.blank? ? '' : (', '+ page_or_pages + ' '+pages)
         self.citation += self.editor.blank? ? '' : (', Eds: '+ self.editor)
         self.citation += self.publisher.blank? ? '' : (', '+ self.publisher)
-        unless address.nil? || (self.booktitle.include? address)
+        unless address.nil? || (self.booktitle.try(:include?, address))
           self.citation += address.nil? ? '' : (', '+ address)
         end
-        unless self.booktitle.include? year
+        unless self.booktitle.try(:include?, year)
           unless month.nil? && year.nil?
             self.citation += month.nil? ? ',' : (', '+ month.capitalize)
             self.citation += year.nil? ? '' : (' '+year)
@@ -316,6 +330,7 @@ class Publication < ActiveRecord::Base
         #PhD Thesis
         self.citation = ''
         self.citation += school.nil? ? '' : (' '+ school)
+        self.errors.add(:base,'A thesis need to have a school') if school.nil?
         self.citation += year.nil? ? '' : (', '+ year)
         self.citation += tutor.nil? ? '' : (', '+ tutor+'(Tutor)')
         self.citation += tutorhits.nil? ? '' : (', '+ tutorhits+'(HITS Tutor)')
@@ -458,9 +473,16 @@ class Publication < ActiveRecord::Base
       next unless existing.any?
       matching_projects = existing.collect(&:projects).flatten.uniq & projects
       if matching_projects.any?
-        errors[attr] << "You cannot register the same #{name} within the same project."
+        errors.add(:base, "You cannot register the same #{name} within the same project.")
         return false
       end
+    end
+  end
+
+  def check_bibtex_file
+    if publication_type == 6
+      errors.add(:base, "An InProceedings needs to have a booktitle.") if booktitle.nil?
+      return false
     end
   end
 
