@@ -126,9 +126,9 @@ class PublicationsController < ApplicationController
     protocol = params[:protocol]
     pubmed_id = nil
     doi = nil
-    if protocol == 'pubmed' && !key.blank?
+    if protocol == 'pubmed' && key.present?
       pubmed_id = key
-    elsif protocol == 'doi' && !key.blank?
+    elsif protocol == 'doi' && key.present?
       doi = key
     end
     pubmed_id, doi = preprocess_pubmed_or_doi pubmed_id, doi
