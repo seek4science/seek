@@ -68,7 +68,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_redirected_to edit_publication_path(assigns(:publication))
   end
 
-  test 'should create doi publication with doi prefix' do
+  test 'should create doi publication with various doi prefixes' do
     mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1371/journal.pone.0004803', content_file: 'cross_ref3.xml')
     assert_difference('Publication.count') do
       post :create, params: { publication: { doi: 'DOI: 10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
@@ -76,7 +76,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_not_nil assigns(:publication)
     assert_redirected_to edit_publication_path(assigns(:publication))
-    publication = assigns(:publication).destroy
+    assigns(:publication).destroy
 
     # formatted slightly different
     assert_difference('Publication.count') do
@@ -85,7 +85,25 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_not_nil assigns(:publication)
     assert_redirected_to edit_publication_path(assigns(:publication))
-    publication = assigns(:publication).destroy
+    assigns(:publication).destroy
+
+    # with url
+    assert_difference('Publication.count') do
+      post :create, params: { publication: { doi: 'https://doi.org/10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+    end
+
+    assert_not_nil assigns(:publication)
+    assert_redirected_to edit_publication_path(assigns(:publication))
+    assigns(:publication).destroy
+
+    # with url but no protocol
+    assert_difference('Publication.count') do
+      post :create, params: { publication: { doi: 'doi.org/10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+    end
+
+    assert_not_nil assigns(:publication)
+    assert_redirected_to edit_publication_path(assigns(:publication))
+    assigns(:publication).destroy
 
     # also test with spaces around
     assert_difference('Publication.count') do
@@ -974,6 +992,57 @@ class PublicationsControllerTest < ActionController::TestCase
     VCR.use_cassette('publications/fairdom_by_doi') do
       with_config_value :pubmed_api_email, 'fred@email.com' do
         post :fetch_preview, xhr: true, params: { key: '10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+      end
+    end
+
+    assert_response :success
+    assert response.body.include?('FAIRDOMHub: a repository')
+  end
+
+  test 'should handle blank pubmed' do
+    VCR.use_cassette('publications/fairdom_by_doi') do
+      with_config_value :pubmed_api_email, 'fred@email.com' do
+        post :fetch_preview, xhr: true, params: { key: ' ', protocol: 'pubmed', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+      end
+    end
+
+    assert_response :internal_server_error
+    assert_match /An error has occurred.*Please enter either a DOI or a PubMed ID/,response.body
+  end
+
+  test 'should handle blank doi' do
+    VCR.use_cassette('publications/fairdom_by_doi') do
+      with_config_value :pubmed_api_email, 'fred@email.com' do
+        post :fetch_preview, xhr: true, params: { key: ' ', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+      end
+    end
+
+    assert_response :internal_server_error
+    assert_match /An error has occurred.*Please enter either a DOI or a PubMed ID/,response.body
+  end
+
+  test 'should fetch doi preview with prefixes' do
+    VCR.use_cassette('publications/fairdom_by_doi') do
+      with_config_value :pubmed_api_email, 'fred@email.com' do
+        post :fetch_preview, xhr: true, params: { key: 'doi: 10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+      end
+    end
+
+    assert_response :success
+    assert response.body.include?('FAIRDOMHub: a repository')
+
+    VCR.use_cassette('publications/fairdom_by_doi') do
+      with_config_value :pubmed_api_email, 'fred@email.com' do
+        post :fetch_preview, xhr: true, params: { key: 'doi.org/10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+      end
+    end
+
+    assert_response :success
+    assert response.body.include?('FAIRDOMHub: a repository')
+
+    VCR.use_cassette('publications/fairdom_by_doi') do
+      with_config_value :pubmed_api_email, 'fred@email.com' do
+        post :fetch_preview, xhr: true, params: { key: 'https://doi.org/10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id] } }
       end
     end
 
