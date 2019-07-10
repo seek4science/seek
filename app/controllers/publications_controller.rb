@@ -259,7 +259,7 @@ class PublicationsController < ApplicationController
     @publication.publication_authors.clear
 
     # Query pubmed article to fetch authors
-    result = fetch_pubmed_or_doi_result @publication.pubmed_id, @publication.doi
+    result = @publication.fetch_pubmed_or_doi_result @publication.pubmed_id, @publication.doi
 
     unless result.nil?
       result.authors.each_with_index do |author, index|
