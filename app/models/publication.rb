@@ -143,11 +143,18 @@ class Publication < ActiveRecord::Base
     false
   end
 
-  def extract_metadata(reference)
+  def extract_metadata(pubmed_id, doi)
+
+    reference = fetch_pubmed_or_doi_result(pubmed_id, doi)
+
+    if reference.nil? || self.errors.any?
+      return
+    end
+
     if reference.respond_to?(:pubmed)
-      extract_pubmed_metadata(reference)
+      result = extract_pubmed_metadata(reference)
     else
-      extract_doi_metadata(reference)
+      result = extract_doi_metadata(reference)
     end
 
     reference.authors.each_with_index do |author, index|
@@ -155,6 +162,7 @@ class Publication < ActiveRecord::Base
                                 last_name: author.last_name,
                                 author_index: index)
     end
+    return reference
   end
 
   # @param reference Bio::Reference
@@ -268,7 +276,7 @@ class Publication < ActiveRecord::Base
     note = bibtex_record[:note].try(:to_s)
 
     #using doi/pubmed_id to fetch the metadata
-    result = fetch_pubmed_or_doi_result(self.pubmed_id, self.doi)
+    result = fetch_pubmed_or_doi_result(self.pubmed_id, self.doi) if self.pubmed_id.present? || self.doi.present?
 
     unless result.nil?
       self.citation = result.citation  unless result.citation.nil?
@@ -358,8 +366,43 @@ class Publication < ActiveRecord::Base
       else
         return nil
       end
-
     end
+  end
+
+
+  def fetch_pubmed_or_doi_result(pubmed_id, doi)
+    result = nil
+    @error = nil
+    if pubmed_id
+      begin
+        result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+        @error = result.error
+      rescue => exception
+        raise exception unless Rails.env.production?
+        result ||= Bio::Reference.new({})
+        @error = 'There was a problem contacting the PubMed query service. Please try again later'
+        Seek::Errors::ExceptionForwarder.send_notification(exception, data: {message: "Problem accessing ncbi using pubmed id #{pubmed_id}"})
+      end
+    elsif doi
+      begin
+        query = DOI::Query.new(Seek::Config.crossref_api_email)
+        result = query.fetch(doi)
+        @error = 'Unable to get result' if result.blank?
+        @error = 'Unable to get DOI' if result.title.blank?
+      rescue DOI::MalformedDOIException
+        @error = 'The DOI you entered appears to be malformed.'
+      rescue DOI::NotFoundException
+        @error = 'The DOI you entered could not be resolved.'
+      rescue RuntimeError => exception
+        @error = 'There was an problem contacting the DOI query service. Please try again later'
+        Seek::Errors::ExceptionForwarder.send_notification(exception, data: {message: "Problem accessing crossref using DOI #{doi}"})
+      end
+    else
+      @error = 'Please enter either a DOI or a PubMed ID for the publication.'
+    end
+
+    self.errors.add(:base, @error) unless @error.nil?
+    result
   end
 
 

@@ -127,13 +127,14 @@ class PublicationsController < ApplicationController
     protocol = params[:protocol]
     doi = nil
     pubmed_id = nil
-    if protocol == 'pubmed' && !key.blank?
+    if protocol == 'pubmed' && key.present?
       pubmed_id = key
-    elsif protocol == 'doi'
+    elsif protocol == 'doi' && key.present?
       doi = key
     end
     pubmed_id, doi = preprocess_pubmed_or_doi pubmed_id, doi
     result = get_data(@publication, pubmed_id, doi)
+    @error =  @publication.errors.full_messages.join('<br>') if @publication.errors.any?
     if !@error.nil?
       if protocol == 'pubmed'
         @error_text = @error
@@ -276,8 +277,7 @@ class PublicationsController < ApplicationController
   end
 
   def get_data(publication, pubmed_id, doi = nil)
-    result = fetch_pubmed_or_doi_result(pubmed_id, doi)
-    publication.extract_metadata(result) unless @error
+    result = publication.extract_metadata(pubmed_id, doi)
     result
   end
 
