@@ -12,7 +12,7 @@
                 <th>ID</th>
                 <th>Title</th>
                 <% shown_attributes.each do |attribute| %>
-                    <th <%= 'data-title-column="true" ' if (attribute.is_title && link) -%>data-hash-key="<%= attribute.hash_key -%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>"><%= attribute.title %></th>
+                    <th <%= 'data-title-column="true" ' if (attribute.is_title && link) -%>data-accessor-name="<%= attribute.accessor_name -%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>"><%= attribute.title %></th>
                 <% end %>
               </tr>
           <% end %>
@@ -30,7 +30,7 @@
                             <%= content_tag(:div, data: {
                                 toggle: 'popover',
                                 content: errors.map { |e| "#{attribute.title} #{e}<br/>" }.join.html_safe }) do %>
-                                <%= text_or_not_specified(sample.get_attribute(attribute.hash_key), auto_link: link) %>
+                                <%= text_or_not_specified(sample.get_attribute(attribute), auto_link: link) %>
                             <% end %>
                           </td>
                       <% else %>

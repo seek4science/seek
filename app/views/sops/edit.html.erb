@@ -27,11 +27,13 @@
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @sop } %>
 
       <%# only the owner should be able to change sharing permissions -%>
-      <% if current_user_authorized_to_manage -%>
+      <% if current_user_authorized_to_manage %>
           <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
 
           <%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
-      <% end -%>
+
+          <%= fancy_multiselect @sop, :workflows, { other_projects_checkbox: false } if Seek::Config.workflows_enabled -%>
+      <% end %>
 
       <div>
         <%= preview_permission_popup_link(@sop)-%>

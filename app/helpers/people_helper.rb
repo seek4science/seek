@@ -4,7 +4,7 @@ module PeopleHelper
   end
 
   def contact_details_warning_message
-    msg = "This information is only visible to other people whom you share a #{t('project')}"
+    msg = "This information is only visible to other people with whom you share a #{t('project')}"
     msg << " or #{t('programme')}" if Seek::Config.programmes_enabled
     msg << '.'
     msg

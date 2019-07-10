@@ -3538,6 +3538,16 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test 'should show view content button for image' do
+    data_file = Factory(:data_file, content_blob: Factory(:image_content_blob))
+    login_as(data_file.contributor)
+
+    get :show, params: { id: data_file }
+
+    assert_response :success
+    assert_select 'a.btn[data-lightbox]', count: 1
+  end
+
   # registers a new content blob, and triggers the javascript 'rightfield_extraction_ajax' call, and results in the metadata form HTML in the response
   # this replicates the old behaviour and result of calling #new
   def register_content_blob(skip_provide_metadata:false)

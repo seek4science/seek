@@ -19,10 +19,10 @@ data:
       description: An experimental assay class description
     assay_type:
       label: 
-      uri: http://www.mygrid.org.uk/ontology/JERMOntology#Transcriptomics
+      uri: http://jermontology.org/ontology/JERMOntology#Transcriptomics
     technology_type:
       label: 
-      uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
+      uri: http://jermontology.org/ontology/JERMOntology#RNA-Seq
   relationships:
     creators:
       data:
