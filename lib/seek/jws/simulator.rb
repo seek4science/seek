@@ -14,8 +14,12 @@ module Seek
         if @constraint_based = params[:constraint_based]
           wrap_service('JWS online', model_path(@model, version: @display_model.version)) do
             slug = upload_model_blob(select_jws_content_blob, @constraint_based == '1')
-            @simulate_url = model_simulate_url_from_slug(slug)
-            @no_sidebar = true
+            if slug
+              @simulate_url = model_simulate_url_from_slug(slug)
+            else
+              @jws_error = "JWS Online was unable to parse the SBML during upload"
+            end
+
           end
         end
       end
