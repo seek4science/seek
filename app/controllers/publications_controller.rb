@@ -19,7 +19,7 @@ class PublicationsController < ApplicationController
   def export
     @query = Publication.ransack(params[:query])
     @publications = @query.result(distinct: true)
-                          .includes(:publication_authors, :projects)
+                        .includes(:publication_authors, :projects)
     # @query.build_condition
     @query.build_sort if @query.sorts.empty?
 
@@ -255,24 +255,33 @@ class PublicationsController < ApplicationController
 
   def disassociate_authors
     @publication = Publication.find(params[:id])
-    @publication.creators.clear # get rid of author links
-    @publication.publication_authors.clear
 
-    # Query pubmed article to fetch authors
-    result = @publication.fetch_pubmed_or_doi_result @publication.pubmed_id, @publication.doi
+    if @publication.pubmed_id.present? || @publication.doi.present?
+      @publication.creators.clear # get rid of author links
+      @publication.publication_authors.clear
 
-    unless result.nil?
-      result.authors.each_with_index do |author, index|
-        pa = PublicationAuthor.new(publication: @publication,
-                                   first_name: author.first_name,
-                                   last_name: author.last_name,
-                                   author_index: index)
-        pa.save
+      # Query pubmed article to fetch authors
+      result = @publication.fetch_pubmed_or_doi_result @publication.pubmed_id, @publication.doi
+
+      unless result.nil?
+        result.authors.each_with_index do |author, index|
+          pa = PublicationAuthor.new(publication: @publication,
+                                     first_name: author.first_name,
+                                     last_name: author.last_name,
+                                     author_index: index)
+          pa.save
+        end
+      end
+    else
+      @publication.publication_authors.each do |author|
+        author.update_attributes(person_id: nil) unless author.person_id.nil?
       end
     end
+
+
     respond_to do |format|
-      format.html { redirect_to(edit_publication_url(@publication)) }
-      format.xml  { head :ok }
+      format.html {redirect_to(edit_publication_url(@publication))}
+      format.xml {head :ok}
     end
   end
 
