@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190428221140) do
+ActiveRecord::Schema.define(version: 20190712094906) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -1384,6 +1384,13 @@ ActiveRecord::Schema.define(version: 20190428221140) do
     t.integer  "person_id",      limit: 4
   end
 
+  create_table "publication_types", force: :cascade do |t|
+    t.string   "title",      limit: 255
+    t.string   "key",        limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "publications", force: :cascade do |t|
     t.integer  "pubmed_id",           limit: 4
     t.text     "title",               limit: 65535
@@ -1405,6 +1412,7 @@ ActiveRecord::Schema.define(version: 20190428221140) do
     t.string   "booktitle",           limit: 255
     t.string   "publisher",           limit: 255
     t.string   "editor",              limit: 255
+    t.integer  "publication_type_id", limit: 4
   end
 
   add_index "publications", ["contributor_id"], name: "index_publications_on_contributor", using: :btree

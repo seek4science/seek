@@ -35,6 +35,8 @@ class Publication < ActiveRecord::Base
   has_many :publication_authors, dependent: :destroy, autosave: true
   has_many :persons, through: :publication_authors
 
+  belongs_to :publication_type
+
   VALID_DOI_REGEX = /\A(10[.][0-9]{4,}(?:[.][0-9]+)*\/(?:(?!["&\'<>])\S)+)\z/
   VALID_PUBMED_REGEX = /\A(([1-9])([0-9]{0,7}))\z/
   # Note that the PubMed regex deliberately does not allow versions
