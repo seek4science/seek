@@ -228,7 +228,7 @@ class ProjectsController < ApplicationController
     # listing institutions for a project is public data, but still
     # we require login to protect from unwanted requests
 
-    project_id = white_list(params[:id])
+    project_id = params[:id]
     institution_list = nil
 
     begin

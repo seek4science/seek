@@ -96,7 +96,10 @@
             institutionSelect.html('');
             institutionSelect.html('<option value="">any institution</option>');
             data.institution_list.forEach(function (i) {
-              institutionSelect.append('<option value="'+i[idIndex]+'">'+i[0]+'</option>');
+                var opt = $j('<option>');
+                opt.attr('value', i[idIndex]);
+                opt.text(i[0]);
+                institutionSelect.append(opt);
             });
           },
           complete: function () {
