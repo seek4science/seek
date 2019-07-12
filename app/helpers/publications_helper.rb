@@ -26,4 +26,6 @@ module PublicationsHelper
   def authorised_publications(projects = nil)
     authorised_assets(Publication, projects)
   end
+
+  
 end
