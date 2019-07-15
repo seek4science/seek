@@ -180,7 +180,7 @@ if this still doesn't report the correct version you may need to do:
 .. and select the _java-8_ version
 
 You can also use the Oracle version of Java 8. This can be easily installed with Apt, through the 
-[Oracle PPA](https://medium.com/coderscorner/installing-oracle-java-8-in-ubuntu-16-10-845507b13343)
+[Oracle PPA](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04)
 
 
 ### Set RAILS_ENV
