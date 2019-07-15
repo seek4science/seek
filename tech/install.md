@@ -26,7 +26,7 @@ would be beneficial if it is new to you. Documentation and resources
 describing Ruby on Rails can be found at http://rubyonrails.org/documentation
 .
 
-SEEK is based on the 4.2 version of Rails, and requires Ruby 2.4.
+SEEK is built upon the 5.2 version of Rails, and requires Ruby 2.4.
 
 We recommend that you run SEEK on a Linux system. This guide is based on an
 [Ubuntu (18.04 LTS)](http://releases.ubuntu.com/18.04/) system. However, running on other Linux distributions the

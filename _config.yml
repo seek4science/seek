@@ -1,7 +1,7 @@
 #baseurl: /seek
 
-current_seek_version: 1.8.3
-current_docker_tag: 1.8
+current_seek_version: 1.9.0
+current_docker_tag: 1.9
 
 plugins:
   - jekyll-sitemap
@@ -9,5 +9,5 @@ plugins:
   - jekyll-feed
 
 name: FAIRDOM
-url: http://docs.seek4science.org
+url: https://docs.seek4science.org
 author: FAIRDOM

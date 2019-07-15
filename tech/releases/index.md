@@ -11,6 +11,24 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.9.0
+
+Release date; _16th July 2019_
+
+  * Major upgrade of the underlying platform
+    * Rails 4.2 → Rails 5.2
+    * Updating and replacing affected libraries and dependencies
+    * Unifying javascript to use jQuery framework throughout, and removing Prototype references
+  * A lot of bugfixes and minor improvements discovered during the upgrade testing  
+  * Ability to login with email as well as username
+  * Ability to edit previous version revision comments
+  * Show the SEEK ID of the selected node when navigating the ISA overview
+
+
+Changes are also described in the [SEEK v1.9.0 release notes](release-notes-1.9.0.html). 
+Please note that many of the bugfixes are those created during the Rails upgrade,
+due to changes in the Rails version.
+
 ## Version 1.8.3
 
 Release date: _29th May 2019_
