@@ -59,7 +59,7 @@ GEM
   remote: https://rubygems.org/
   remote: https://rails-assets.org/
   specs:
-    RedCloth (4.2.9)
+    RedCloth (4.3.2)
     actioncable (5.2.3)
       actionpack (= 5.2.3)
       nio4r (~> 2.0)
@@ -804,7 +804,7 @@ GEM
     yaml_db (0.7.0)
       rails (>= 3.0)
       rake (>= 0.8.7)
-    yard (0.9.12)
+    yard (0.9.20)
     zip-container (3.0.2)
       rubyzip (~> 1.2.1)
 
@@ -812,7 +812,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  RedCloth (= 4.2.9)
+  RedCloth (>= 4.3.0)
   active_model_serializers (~> 0.10.2)
   activerecord-session_store
   acts-as-taggable-on
@@ -943,4 +943,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.17.2
+   1.17.3

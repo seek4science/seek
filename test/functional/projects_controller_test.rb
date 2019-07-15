@@ -1699,6 +1699,37 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select "p strong",text:'Project end date:',count:0
   end
 
+  test 'can request institutions' do
+    project = Factory(:project)
+    institution = Factory(:institution)
+    member = Factory(:person, project: project, institution: institution)
+    unrelated_institution = Factory(:institution)
+
+    get :request_institutions, xhr: true, params: { id: project.id }
+
+    assert_response :success
+
+    res = JSON.parse(response.body)
+    assert_equal 200, res['status']
+
+    list = res['institution_list']
+
+    # The institution list is an array of arrays,
+    # [0] institution title
+    # [1] institution ID
+    # [2] work group ID
+    assert list.any? { |item| item[1] == institution.id }
+    refute list.any? { |item| item[1] == unrelated_institution.id }
+  end
+
+  test 'cannot request institutions of non-existent project' do
+    get :request_institutions, xhr: true, params: { id: Project.maximum(:id) + 100 }
+
+    res = JSON.parse(response.body)
+
+    assert_equal 404, res['status']
+  end
+
   private
 
   def edit_max_object(project)
