@@ -191,6 +191,37 @@ class Project < ApplicationRecord
     people.include? user_or_person
   end
 
+  def members= replacement_members
+    current = self.current_group_memberships.collect {|g| {:person_id => g.person_id, :institution_id => g.institution.id}}
+    replacement = replacement_members.collect {|rm| {:person_id => rm['person_id'].to_i, :institution_id => rm['institution_id'].to_i}}
+
+    to_remove = current - replacement
+    to_add = replacement - current
+
+    unless to_add.nil?
+      to_add.each do |new_info|
+        person = Person.find(new_info[:person_id])
+        institution = Institution.find(new_info[:institution_id])
+        unless person.nil? || institution.nil?
+          person.add_to_project_and_institution(self, institution)
+          person.save!
+        end
+      end
+    end
+
+    unless to_remove.nil?
+      to_remove.each do |r|
+        person = Person.find(r[:person_id])
+        institution = Institution.find(r[:institution_id])
+        gms = self.current_group_memberships.all.select {|gm| gm.person.id == r[:person_id] && gm.institution.id == r[:institution_id]}
+        unless gms.empty?
+          person.group_memberships.destroy(gms.first)
+        end
+      end
+
+    end
+  end
+
   def person_roles(person)
     # Get intersection of all project memberships + person's memberships to find project membership
     project_memberships = work_groups.collect(&:group_memberships).flatten

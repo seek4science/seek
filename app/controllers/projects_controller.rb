@@ -210,6 +210,7 @@ class ProjectsController < ApplicationController
             ProjectChangedEmailJob.new(@project).queue_job
           end
           expire_resource_list_item_content
+          @project.reload
           flash[:notice] = "#{t('project')} was successfully updated."
           format.html { redirect_to(@project) }
           format.xml  { head :ok }
@@ -296,9 +297,9 @@ class ProjectsController < ApplicationController
   end
 
   def update_administrative_roles
-    unless params[:project].blank?
-      @project.update_attributes(project_role_params)
-    end
+    # unless params[:project].blank?
+    #   @project.update_attributes(project_role_params)
+    # end
   end
 
   def storage_report
@@ -329,25 +330,21 @@ class ProjectsController < ApplicationController
 
   private
 
-  def project_role_params
-    params[:project].keys.each do |k|
-      if k.end_with?('_ids')
-        if params[:project][k].kind_of?(String)
-          params[:project][k] = params[:project][k].split(',')
-        end
-      end
-    end
-
-    params.require(:project).permit({ project_administrator_ids: [] },
-                                    { asset_gatekeeper_ids: [] },
-                                    { asset_housekeeper_ids: [] },
-                                    pal_ids: [])
-  end
+  # def project_role_params
+  #   params[:project].keys.each do |k|
+  #     if k.end_with?('_ids')
+  #       if params[:project][k].kind_of?(String)
+  #         params[:project][k] = params[:project][k].split(',')
+  #       end
+  #     end
+  #   end
+  #
+  # end
 
   def project_params
-    permitted_params = [:title, :web_page, :wiki_page, :description, :programme_id, { organism_ids: [] },
+    permitted_params = [:title, :web_page, :wiki_page, :description, :programme_id, { organism_ids: [] }, {:members => [[:person_id, :institution_id]]},
                         { institution_ids: [] }, :default_license, :site_root_uri, :site_username, :site_password,
-                        :parent_id, :use_default_policy, :nels_enabled, :start_date, :end_date, :funding_codes]
+                        :parent_id, :use_default_policy, :nels_enabled, :start_date, :end_date, :funding_codes, :pals]
 
     if action_name == 'update'
       restricted_params =
