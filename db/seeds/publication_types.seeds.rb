@@ -14,10 +14,9 @@ PUBLICATION_TYPE = [{ title: 'Journal', key: 'journal' },
 
 ]
 
-
 PUBLICATION_TYPE.each do |type|
   publication_tpye= PublicationType.find_or_initialize_by(key: type[:key])
   publication_tpye.update_attributes(title: type[:title])
 end
 
-
+puts "Seeded #{PUBLICATION_TYPE.count} publication types"
