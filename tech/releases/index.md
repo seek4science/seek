@@ -23,6 +23,7 @@ Release date; _16th July 2019_
   * Ability to login with email as well as username
   * Ability to edit previous version revision comments
   * Show the SEEK ID of the selected node when navigating the ISA overview
+  * Fix for model files appearing missing for previous versions (don't worry, no files were actually lost)
 
 
 Changes are also described in the [SEEK v1.9.0 release notes](release-notes-1.9.0.html). 

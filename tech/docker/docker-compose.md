@@ -13,7 +13,7 @@ You will first need [Docker installed](docker-install.html)
 
 See the [Docker Compose Installation Guide](https://docs.docker.com/compose/install/) for how to install Docker Compose.
  
-Once installed, all that is needed is the [docker-compose.yml](https://github.com/seek4science/seek/blob/seek-{{ site.current_docker_tag }}/docker-compose.yml), and the [docker/db.env](https://github.com/seek4science/seek/blob/master/docker/db.env),
+Once installed, all that is needed is the [docker-compose.yml](https://raw.githubusercontent.com/seek4science/seek/seek-{{ site.current_docker_tag }}/docker-compose.yml),
 although you can simply check out the SEEK source from GitHub - see [Getting SEEK](../install.html#getting-seek).
 
 First you need to create 4 volumes
