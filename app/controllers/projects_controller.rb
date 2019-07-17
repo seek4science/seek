@@ -332,7 +332,11 @@ class ProjectsController < ApplicationController
 
   def project_role_params
     params[:project].keys.each do |k|
-      params[:project][k] = params[:project][k].split(',')
+      unless params[:project][k].nil? then
+        params[:project][k] = params[:project][k].split(',')
+      else
+        params[:project][k] = []
+      end
     end
 
     params.require(:project).permit({ project_administrator_ids: [] },
