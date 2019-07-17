@@ -297,9 +297,9 @@ class ProjectsController < ApplicationController
   end
 
   def update_administrative_roles
-    # unless params[:project].blank?
-    #   @project.update_attributes(project_role_params)
-    # end
+    unless params[:project].blank?
+      @project.update_attributes(project_role_params)
+    end
   end
 
   def storage_report
@@ -330,16 +330,16 @@ class ProjectsController < ApplicationController
 
   private
 
-  # def project_role_params
-  #   params[:project].keys.each do |k|
-  #     if k.end_with?('_ids')
-  #       if params[:project][k].kind_of?(String)
-  #         params[:project][k] = params[:project][k].split(',')
-  #       end
-  #     end
-  #   end
-  #
-  # end
+  def project_role_params
+    params[:project].keys.each do |k|
+      params[:project][k] = params[:project][k].split(',')
+    end
+
+    params.require(:project).permit({ project_administrator_ids: [] },
+                                    { asset_gatekeeper_ids: [] },
+                                    { asset_housekeeper_ids: [] },
+                                    pal_ids: [])
+  end
 
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, :programme_id, { organism_ids: [] }, {:members => [[:person_id, :institution_id]]},
@@ -352,7 +352,9 @@ class ProjectsController < ApplicationController
           site_username: User.admin_logged_in?,
           site_password: User.admin_logged_in?,
           nels_enabled: User.admin_logged_in?,
-          institution_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)) }
+          institution_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
+          members: (User.admin_logged_in? || @project.can_be_administered_by?(current_user))
+        }
       restricted_params.each do |param, allowed|
         permitted_params.delete(param) if params[:project] && !allowed
       end

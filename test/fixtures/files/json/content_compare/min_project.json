@@ -9,15 +9,23 @@
       "web_page": null,
       "wiki_page": null,
       "default_license": "CC-BY-4.0",
-      "members": null,
-      "pal_ids": [],
-      "project_administrator_ids": [],
-      "asset_housekeeper_ids": [],
-      "asset_gatekeeper_ids": []
+      "members": null
 
     },
     "relationships": {
       "organisms": {
+        "data": []
+      },
+      "pals": {
+        "data": []
+      },
+      "project_administrators": {
+        "data": []
+      },
+      "asset_housekeepers": {
+        "data": []
+      },
+      "asset_gatekeepers": {
         "data": []
       },
       "people": {

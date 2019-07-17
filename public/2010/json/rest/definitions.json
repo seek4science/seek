@@ -4315,18 +4315,6 @@
                 },
                 "members": {
                   "$ref": "#/definitions/nullableMembersList"
-                },
-                "pal_ids": {
-                  "$ref": "#/definitions/personList"
-                },
-                "project_administrator_ids": {
-                  "$ref": "#/definitions/personList"
-                },
-                "asset_housekeeper_ids": {
-                  "$ref": "#/definitions/personList"
-                },
-                "asset_gatekeeper_ids": {
-                  "$ref": "#/definitions/personList"
                 }
               },
               "required": [
@@ -4342,6 +4330,18 @@
               "properties": {
                 "organisms": {
                   "$ref": "#/definitions/organismReferencesList"
+                },
+                "pals": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "project_administrators": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "asset_housekeepers": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "asset_gatekeepers": {
+                  "$ref": "#/definitions/peopleReferenceList"
                 },
                 "people": {
                   "$ref": "#/definitions/peopleReferenceList"
@@ -4463,6 +4463,9 @@
                 },
                 "default_license": {
                   "$ref": "#/definitions/nullableLicense"
+                },
+                "members": {
+                  "$ref": "#/definitions/nullableMembersList"
                 }
               },
               "additionalProperties": false
@@ -4470,6 +4473,18 @@
             "relationships": {
               "type": "object",
               "properties": {
+                "pals": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "project_administrators": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "asset_housekeepers": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "asset_gatekeepers": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
                 "programmes": {
                   "$ref": "#/definitions/programmeReferencesList"
                 },
@@ -4524,6 +4539,9 @@
                 },
                 "default_license": {
                   "$ref": "#/definitions/nullableLicense"
+                },
+                "members": {
+                  "$ref": "#/definitions/nullableMembersList"
                 }
               },
               "required": [
@@ -4534,6 +4552,18 @@
             "relationships": {
               "type": "object",
               "properties": {
+                "pals": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "project_administrators": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "asset_housekeepers": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "asset_gatekeepers": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
                 "programmes": {
                   "$ref": "#/definitions/programmeReferencesList"
                 },

@@ -15,14 +15,22 @@
         {"person_id" : "1039987009", "institution_id" : "980191505"},
         {"person_id" : "1039987010", "institution_id" : "980191507"},
         {"person_id" : "1039987011", "institution_id" : "980191509"}
-      ],
-      "pal_ids": [],
-      "project_administrator_ids": [],
-      "asset_housekeeper_ids": [],
-      "asset_gatekeeper_ids": []
+      ]
     },
     "relationships": {
       "organisms": {
+        "data": []
+      },
+      "pals": {
+        "data": []
+      },
+      "project_administrators": {
+        "data": []
+      },
+      "asset_housekeepers": {
+        "data": []
+      },
+      "asset_gatekeepers": {
         "data": []
       },
       "people": {
