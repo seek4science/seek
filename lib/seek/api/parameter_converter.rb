@@ -69,38 +69,6 @@ module Seek
             end
           },
 
-          pal_ids: ->(value) {
-            if value
-              value.join(', ')
-            else
-              ''
-            end
-          },
-
-          project_administrator_ids: ->(value) {
-            if value
-              value.join(', ')
-            else
-              ''
-            end
-          },
-
-          asset_housekeeper_ids: ->(value) {
-            if value
-              value.join(', ')
-            else
-              ''
-            end
-          },
-
-          asset_gatekeeper_ids: ->(value) {
-            if value
-              value.join(', ')
-            else
-              ''
-            end
-          },
-
           programme_ids: ->(value) {
             value.try(:first)
           },

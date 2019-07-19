@@ -2,7 +2,7 @@ class ProjectSerializer < AvatarObjSerializer
 
   # class ProjectSerializer < ActiveModel::Serializer
   attributes :title, :description,
-             :web_page, :wiki_page, :default_license
+             :web_page, :wiki_page, :default_license, :start_date, :end_date
 
   attribute :default_policy, if: :show_default_policy?
 
@@ -16,6 +16,8 @@ class ProjectSerializer < AvatarObjSerializer
     }
     current_members
   end
+
+  attribute :use_default_policy, if: :show_default_policy?
 
   has_many :project_administrators
   has_many :pals
@@ -43,10 +45,11 @@ class ProjectSerializer < AvatarObjSerializer
   has_many :documents
 
   def show_default_policy?
-    has_default_policy = !object.default_policy.nil?
-    respond_to_manage = object.respond_to?('can_manage?')
-    current_user = User.current_user
-    can_manage = object.can_manage?(current_user)
-    return has_default_policy && respond_to_manage && can_manage
+    !object.default_policy.nil?
+    # has_default_policy = !object.default_policy.nil?
+    # respond_to_manage = object.respond_to?('can_manage?')
+    # current_user = User.current_user
+    # can_manage = object.can_manage?(current_user)
+    # return has_default_policy && respond_to_manage && can_manage
   end
 end

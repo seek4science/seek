@@ -1747,6 +1747,7 @@ class ProjectsControllerTest < ActionController::TestCase
     for i in 1..5 do
       Factory(:person).add_to_project_and_institution(project, Factory(:institution))
     end
+    project.default_policy = Factory(:private_policy)
     project.programme_id = (Factory(:programme)).id
     add_avatar_to_test_object(project)
   end

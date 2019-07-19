@@ -348,7 +348,11 @@ class ProjectsController < ApplicationController
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, :programme_id, { organism_ids: [] }, {:members => [[:person_id, :institution_id]]},
                         { institution_ids: [] }, :default_license, :site_root_uri, :site_username, :site_password,
-                        :parent_id, :use_default_policy, :nels_enabled, :start_date, :end_date, :funding_codes, :pals]
+                        :parent_id, :use_default_policy, :default_policy, :nels_enabled, :start_date, :end_date, :funding_codes,
+                        { project_administrator_ids: [] },
+                        { asset_gatekeeper_ids: [] },
+                        { asset_housekeeper_ids: [] },
+                        { pal_ids: [] } ]
 
     if action_name == 'update'
       restricted_params =
@@ -357,7 +361,11 @@ class ProjectsController < ApplicationController
           site_password: User.admin_logged_in?,
           nels_enabled: User.admin_logged_in?,
           institution_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
-          members: (User.admin_logged_in? || @project.can_be_administered_by?(current_user))
+          members: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
+          project_administrator_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
+          asset_gatekeeper_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
+          asset_housekeeper_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
+          pal_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user))
         }
       restricted_params.each do |param, allowed|
         permitted_params.delete(param) if params[:project] && !allowed

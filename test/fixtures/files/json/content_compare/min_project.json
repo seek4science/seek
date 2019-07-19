@@ -9,8 +9,9 @@
       "web_page": null,
       "wiki_page": null,
       "default_license": "CC-BY-4.0",
-      "members": null
-
+      "members": null,
+      "start_date": null,
+      "end_date": null
     },
     "relationships": {
       "organisms": {

@@ -128,6 +128,16 @@
       "minLength": 1,
       "format": "date-time"
     },
+    "nullableDateTimeString": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/dateTimeString"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "nonEmptyString": {
       "type": "string",
       "minLength": 1
@@ -4315,7 +4325,17 @@
                 },
                 "members": {
                   "$ref": "#/definitions/nullableMembersList"
+                },
+                "start_date": {
+                  "$ref": "#/definitions/nullableDateTimeString"
+                },
+                "end_date": {
+                  "$ref": "#/definitions/nullableDateTimeString"
+                },
+                "use_default_policy":  {
+                  "type": "boolean"
                 }
+
               },
               "required": [
                 "title",
@@ -4466,6 +4486,15 @@
                 },
                 "members": {
                   "$ref": "#/definitions/nullableMembersList"
+                },
+                "start_date": {
+                  "$ref": "#/definitions/nullableDateTimeString"
+                },
+                "end_date": {
+                  "$ref": "#/definitions/nullableDateTimeString"
+                },
+                "use_default_policy":  {
+                  "type": "boolean"
                 }
               },
               "additionalProperties": false
@@ -4542,6 +4571,16 @@
                 },
                 "members": {
                   "$ref": "#/definitions/nullableMembersList"
+                },
+                "start_date": {
+                  "$ref": "#/definitions/nullableDateTimeString"
+                },
+                "end_date": {
+                  "$ref": "#/definitions/nullableDateTimeString"
+                },
+                "use_default_policy":  {
+                  "type": "boolean",
+                  "default": false
                 }
               },
               "required": [
