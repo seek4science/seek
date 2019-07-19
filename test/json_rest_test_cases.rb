@@ -82,7 +82,7 @@ module JsonRestTestCases
 
   def edit_max_object(object); end
 
-  def test_AAAjson_content
+  def test_json_content
     [
         # 'min',
         'max'].each do |m|
