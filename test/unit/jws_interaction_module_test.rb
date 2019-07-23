@@ -53,7 +53,7 @@ class JwsInteractionModuleTest < ActiveSupport::TestCase
   end
 
   test 'model_simulate_url_from_slug' do
-    expected = "#{Seek::Config.jws_online_root}/models/bob-2/simulate?embedded=1"
+    expected = "#{Seek::Config.jws_online_root}/models/bob-2/simulate/?embedded=1"
     assert_equal expected, model_simulate_url_from_slug('bob-2')
   end
 end
