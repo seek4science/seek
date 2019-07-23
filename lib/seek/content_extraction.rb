@@ -110,9 +110,6 @@ module Seek
       end
     end
 
-    # def split_content(content, delimiter = "\n")
-    #   content.split(delimiter).reject { |str| (str.blank? || str.length > 200) }.collect(&:strip).uniq
-    # end
 
     def split_content(content, length=10, overlap=5)
       overlap = length-overlap
