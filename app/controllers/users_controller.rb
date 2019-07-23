@@ -99,7 +99,7 @@ class UsersController < ApplicationController
       if User.current_user
         format.json { redirect_to person_path(User.current_user.person) }
       else
-        format.json { render json: {}, status: :unprocessable_entity }
+        format.json { render json: {}, status: :not_found }
       end
     end
   end
