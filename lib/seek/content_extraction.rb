@@ -110,8 +110,26 @@ module Seek
       end
     end
 
-    def split_content(content, delimiter = "\n")
-      content.split(delimiter).reject { |str| (str.blank? || str.length > 200) }.collect(&:strip).uniq
+    # def split_content(content, delimiter = "\n")
+    #   content.split(delimiter).reject { |str| (str.blank? || str.length > 200) }.collect(&:strip).uniq
+    # end
+
+    def split_content(content, length=10, overlap=5)
+      overlap = length-overlap
+      if overlap<=0
+        raise 'overlap should be smaller than length'
+      end
+      length -=1
+      words = content.split(' ')
+      i = 0
+      phrases = Array.new
+      loop do
+        temp = words[i*overlap..i*overlap+length]
+        break if !temp || temp.empty?
+        phrases << temp.join(' ')
+        i+=1
+      end
+      phrases
     end
 
     # filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines
