@@ -4,6 +4,8 @@ module Seek
 
     include ContentTypeDetection
     include SysMODB::SpreadsheetExtractor
+    include ContentSplit
+
 
     def pdf_contents_for_search
       content = []
@@ -107,10 +109,6 @@ module Seek
       else
         false
       end
-    end
-
-    def split_content(content, delimiter = "\n")
-      content.split(delimiter).reject { |str| (str.blank? || str.length > 200) }.collect(&:strip).uniq
     end
 
     # filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines
