@@ -538,6 +538,10 @@ SEEK::Application.routes.draw do
       post :test_asset_url
       post :items_for_result
       post :resource_in_tab
+      post :create_content_blob
+      get :provide_metadata
+      post :metadata_extraction_ajax
+      post :create_metadata
     end
     member do
       post :check_related_items

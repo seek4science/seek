@@ -11,12 +11,13 @@ class Workflow < ApplicationRecord
   scope :default_order, -> { order("title") }
 
   validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
-  # validate :is_myexperiment?
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   has_and_belongs_to_many :sops
+
+  serialize :metadata
 
   explicit_versioning(:version_column => "version") do
     acts_as_doi_mintable(proxy: :parent)
