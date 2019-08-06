@@ -17,6 +17,8 @@ class Workflow < ApplicationRecord
 
   has_and_belongs_to_many :sops
 
+  belongs_to :workflow_class
+
   serialize :metadata
 
   explicit_versioning(:version_column => "version") do

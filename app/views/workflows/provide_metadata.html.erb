@@ -2,13 +2,16 @@
 
 <%= form_tag({:action => :create_metadata}, :multipart => true) do -%>
   <%= hidden_field_tag 'content_blob_id', @workflow.content_blob.id %>
+  <%= hidden_field_tag 'metadata', @workflow.metadata %>
+  <%= hidden_field_tag 'workflow_class_id', @workflow.workflow_class_id %>
+
   <div class="asset_form">
       <%= error_messages_for :workflow -%>
 
       <div class="form-group">
         <label class="required">Title</label>
-        <% workflow_title_value = (@workflow.blank? || !(@workflow.metadata.has_key? (:title))) ? nil : @workflow.metadata[:title] -%>
-        <%= text_field_tag 'workflow[title]', workflow_title_value, :class=>"form-control" -%>
+        <% workflow_title_value = @workflow.blank? ? nil : @workflow.title -%>
+        <%= workflow_title_value -%>
       </div>
 
       <div class="form-group">

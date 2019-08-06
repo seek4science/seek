@@ -24,7 +24,7 @@
             dataType: "html",
             timeout: 0,
             url: '<%= metadata_extraction_ajax_workflows_path -%>',
-            data: <%= {content_blob_id:@workflow.content_blob.id}.to_json.html_safe %>
+            data: <%= {content_blob_id: @workflow.content_blob.id, workflow_class_id: @workflow.workflow_class.id}.to_json.html_safe %>
         });
 
         request.done(function (data) {

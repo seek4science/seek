@@ -57,6 +57,7 @@ class WorkflowsController < ApplicationController
 
   def create_content_blob
     @workflow = Workflow.new
+    @workflow.workflow_class = WorkflowClass.find_by_id(params[:workflow_class_id])
     respond_to do |format|
       if handle_upload_data && @workflow.content_blob.save
         session[:uploaded_content_blob_id] = @workflow.content_blob.id
@@ -80,9 +81,11 @@ class WorkflowsController < ApplicationController
     begin
       if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
         @workflow.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
-        # @warnings = @data_file.populate_metadata_from_template
-        # @warnings.merge(warnings)
-        @workflow.metadata[:title] = 'Boopty boop'
+        @workflow.workflow_class = WorkflowClass.find_by_id(params[:workflow_class_id])
+        metadata_name = "extract_#{@workflow.workflow_class.key}_metadata"
+        if defined? metadata_name
+          self.send(metadata_name, @workflow)
+        end
       else
         critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
       end
@@ -130,6 +133,8 @@ class WorkflowsController < ApplicationController
     blob = ContentBlob.find(params[:content_blob_id])
     @workflow.content_blob = blob
 
+    @workflow.workflow_class = WorkflowClass.find(params[:workflow_class_id])
+    @workflow.metadata = eval (params[:metadata])
     all_valid = @workflow.save && blob.save
 
     if all_valid
@@ -166,12 +171,16 @@ class WorkflowsController < ApplicationController
   private
 
   def workflow_params
-    params.require(:workflow).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
+    params.require(:workflow).permit(:title, :description, :workflow_class_id, :metadata, { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                 { publication_ids: [] })
   end
 
   alias_method :asset_params, :workflow_params
+
+  def extract_CWL_metadata(w)
+    w.title = 'Bop Cop Dop'
+  end
 
 end
