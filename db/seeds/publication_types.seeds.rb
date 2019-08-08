@@ -1,15 +1,15 @@
-PUBLICATION_TYPE = [{ title: 'Journal', key: 'journal' },
+PUBLICATION_TYPE = [{ title: 'Journal', key: 'article' },
                     { title: 'Book', key: 'book' },
                     { title: 'Booklet', key: 'booklet' },
                     { title: 'InBook', key: 'inbook' },
                     { title: 'InCollection', key: 'incollection' },
                     { title: 'InProceedings', key: 'inproceedings' },
                     { title: 'Manual', key: 'manual' },
-                    { title: 'Masters Thesis', key: 'masters_thesis' },
+                    { title: 'Masters Thesis', key: 'mastersthesis' },
                     { title: 'Misc', key: 'misc' },
-                    { title: 'Phd Thesis', key: 'phd_thesis' },
+                    { title: 'Phd Thesis', key: 'phdthesis' },
                     { title: 'Proceedings', key: 'proceedings' },
-                    { title: 'Tech report', key: 'tech_report' },
+                    { title: 'Tech report', key: 'techreport' },
                     { title: 'Unpublished', key: 'unpublished' }
 
 ]

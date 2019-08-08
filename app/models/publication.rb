@@ -43,7 +43,7 @@ class Publication < ActiveRecord::Base
 
   validates :doi, format: { with: VALID_DOI_REGEX, message: 'is invalid' }, allow_blank: true
   validates :pubmed_id, numericality: { greater_than: 0, message: 'is invalid' }, allow_blank: true
-  validates :publication_type,:presence => true
+  validates :publication_type_id,:presence => true
 
   # validation differences between OpenSEEK and the VLN SEEK
   validates_uniqueness_of :pubmed_id, allow_nil: true, allow_blank: true, if: 'Seek::Config.is_virtualliver'
@@ -52,7 +52,7 @@ class Publication < ActiveRecord::Base
 
   validate :check_uniqueness_within_project, unless: 'Seek::Config.is_virtualliver'
 
-  validate :check_bibtex_file
+  #validate :check_bibtex_file
 
   attr_writer :refresh_policy
   before_save :refresh_policy, on: :update
@@ -194,7 +194,7 @@ class Publication < ActiveRecord::Base
   def extract_bibtex_metadata(bibtex_record)
 
     self.registered_mode = 4
-    self.publication_type = get_publication_type(bibtex_record)
+    self.publication_type_id = PublicationType.get_publication_type_id(bibtex_record)
 
     self.title           = bibtex_record[:title].try(:to_s).gsub /{|}/, '' unless bibtex_record[:title].nil?
     self.title           = bibtex_record[:chapter].try(:to_s).gsub /{|}/, '' if (self.title.nil? && !bibtex_record[:chapter].nil?)
@@ -292,8 +292,8 @@ class Publication < ActiveRecord::Base
 
     # generating the citations for different types of publications by using the data from Bibtex file when no doi/pubmed_id
     if self.citation.nil?
-      case self.publication_type
-      when 1
+      publication_type = PublicationType.find(self.publication_type_id)
+      if  publication_type.is_journal?
         #Journal
         self.citation = ''
         self.citation += self.journal.nil? ? '':self.journal
@@ -307,13 +307,13 @@ class Publication < ActiveRecord::Base
         end
 
         Rails.logger.info("Citation:Journal:"+ self.citation)
-      when 2
+      elsif publication_type.is_book?
         Rails.logger.info("Citation: Book")
-      when 3
+      elsif publication_type.is_booklet?
         Rails.logger.info("Citation: Booklet")
-      when 4
+      elsif publication_type.is_inbook?
         Rails.logger.info("Citation: InBook")
-      when 5,6
+      elsif publication_type.is_inproceedings? || publication_type.is_incollection?
         # InProceedings / InCollection /InBook
         self.citation = ''
         self.citation += self.booktitle.nil? ? '' : ('In '+ self.booktitle)
@@ -332,12 +332,12 @@ class Publication < ActiveRecord::Base
           end
         end
         Rails.logger.info("Citation: InProceedings/InCollection:"+ self.citation)
-      when 7
+      elsif publication_type.is_manual?
         Rails.logger.info("Citation: Manual")
-      when 9
+      elsif publication_type.is_misc?
         Rails.logger.info("Citation: Misc")
-      when 8,10
-        #PhD Thesis
+      elsif publication_type.is_phd_thesis? || publication_type.is_masters_thesis?
+        #PhD/Master Thesis
         self.citation = ''
         self.citation += school.nil? ? '' : (' '+ school)
         self.errors.add(:base,'A thesis need to have a school') if school.nil?
@@ -346,7 +346,7 @@ class Publication < ActiveRecord::Base
         self.citation += tutorhits.nil? ? '' : (', '+ tutorhits+'(HITS Tutor)')
         self.citation += note.nil? ? '' : (', '+ note)
         Rails.logger.info("Citation: Thesis:"+ self.citation)
-      when 11
+      elsif publication_type.is_proceedings?
         # Proceedings are conference proceedings, it has no authors but editors
         # Book
         self.journal = self.title
@@ -361,9 +361,9 @@ class Publication < ActiveRecord::Base
         end
         self.citation += url.nil? ? '' : (', '+ url)
         Rails.logger.info("Citation: Proceedings"+self.citation)
-      when 12
+      elsif publication_type.is_tech_report?
         Rails.logger.info("Citation: Tech report")
-      when 13
+      elsif publication_type.is_unpublished?
         Rails.logger.info("Citation: Unpublished")
       else
         return nil
@@ -525,7 +525,7 @@ class Publication < ActiveRecord::Base
   end
 
   def check_bibtex_file
-    if publication_type == 6
+    if PublicationType.find(publication_type_id).is_inproceedings?
       errors.add(:base, "An InProceedings needs to have a booktitle.") if booktitle.nil?
       return false
     end

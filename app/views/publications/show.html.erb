@@ -24,7 +24,7 @@
 
         <p>
           <strong><%= "Publication type" -%>:</strong>
-          <%=h publication_type_text(@publication.publication_type) -%>
+          <%=h PublicationType.find(@publication.publication_type_id).title -%>
         </p>
 
         <% unless @publication.journal.nil? || @publication.journal.empty? %>

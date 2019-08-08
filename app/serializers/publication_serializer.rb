@@ -15,7 +15,7 @@ class PublicationSerializer < BaseSerializer
   end
 
   attribute :publication_type do
-    publication_type_text(object.publication_type)
+    PublicationType.find(object.publication_type_id).title
   end
 
   attribute :authors do

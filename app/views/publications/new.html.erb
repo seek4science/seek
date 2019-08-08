@@ -29,10 +29,14 @@
 
       <div class="form-group">
         <div class="row">
-        <div class="col-sm-3">
-          <% @listofpublication = [["Publication Type", ""],["Journal", "1"],["Book", "2"],["Booklet", "3"],["InBook", "4"],["InCollection", "5"],["InProceedings", "6"],["Manual", "7"],["Masters Thesis", "8"],["Misc", "9"],["Phd Thesis", "10"],["Proceedings", "11"],["Tech report", "12"],["Unpublished", "13"]] %>
-          <%= select_tag("publication[publication_type]", options_for_select(@listofpublication), :class => 'form-control') %>
-        </div>
+          <div class="col-sm-3">
+            <span id="publication_type_info" style="display:none;"></span>
+             <span id="publication_type_selection">
+              <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
+                              {:include_blank => "Publication type"},
+                              {:class => 'form-control'} -%>
+      </span>
+          </div>
         </div>
       </div>
 
@@ -75,8 +79,12 @@
     <div class="form-group">
       <%= label_tag :publication_types, 'Publication Type', :class => 'control-label col-sm-2' %>
       <div class="col-sm-2">
-        <% @listofpublication = [["None selected", ""],["Journal", "1"],["Book", "2"],["Booklet", "3"],["InBook", "4"],["InCollection", "5"],["InProceedings", "6"],["Manual", "7"],["Masters Thesis", "8"],["Misc", "9"],["Phd Thesis", "10"],["Proceedings", "11"],["Tech report", "12"],["Unpublished", "13"]] %>
-        <%= select_tag :publication, options_for_select(@listofpublication,@publication.publication_type), name:'publication[publication_type]', id: 'publication_publication_type', class: 'form-control' %>
+        <span id="publication_type_info" style="display:none;"></span>
+        <span id="publication_type_selection">
+        <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
+                              {:include_blank => "Publication type"},
+                              {:class => 'form-control'} -%>
+      </span>
       </div>
     </div>
     <div class="form-group">

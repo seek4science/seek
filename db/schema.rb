@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190712094906) do
+ActiveRecord::Schema.define(version: 20190730080909) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -1405,7 +1405,6 @@ ActiveRecord::Schema.define(version: 20190712094906) do
     t.string   "doi",                 limit: 255
     t.string   "uuid",                limit: 255
     t.integer  "policy_id",           limit: 4
-    t.integer  "publication_type",    limit: 4,     default: 1
     t.string   "citation",            limit: 255
     t.string   "deleted_contributor", limit: 255
     t.integer  "registered_mode",     limit: 4

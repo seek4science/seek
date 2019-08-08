@@ -1,3 +1,5 @@
+<% publication_type = PublicationType.find(resource.publication_type_id) %>
+
 <div class="list_item_desc"><%= list_item_expandable_text "Abstract", h(resource.abstract) %></div>
 
 <p class="list_item_attribute">
@@ -11,12 +13,11 @@
 <div class="row">
   <div class="col-sm-6">
     <%= list_item_attribute "Date Published", date_as_string(resource.published_date,false,true) %>
-    <% case resource.publication_type %>
-    <% when 4,5,6 %>
-      <%= list_item_optional_attribute publication_type_text(resource.publication_type), h(resource.booktitle) %>
-    <% when 13 %>
+
+    <% if publication_type.is_incollection? || publication_type.is_inbook? || publication_type.is_inproceedings? %>
+      <%= list_item_optional_attribute PublicationType.find(resource.publication_type_id).title, h(resource.booktitle) %>
     <% else %>
-      <%= list_item_optional_attribute publication_type_text(resource.publication_type), h(resource.journal) %>
+      <%= list_item_optional_attribute PublicationType.find(resource.publication_type_id).title, h(resource.journal) %>
     <% end %>
   </div>
 
