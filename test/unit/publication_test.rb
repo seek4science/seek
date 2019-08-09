@@ -270,41 +270,41 @@ class PublicationTest < ActiveSupport::TestCase
 
   test 'validation' do
     project = Factory :project
-    asset = Publication.new title: 'fred', projects: [project], doi: '10.1371/journal.pcbi.1002352', publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id
+    asset = Publication.new title: 'fred', projects: [project], doi: '10.1371/journal.pcbi.1002352', publication_type: Factory(:journal)
     assert asset.valid?
 
-    asset = Publication.new title: 'fred', projects: [project], pubmed_id: '111', publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id
+    asset = Publication.new title: 'fred', projects: [project], pubmed_id: '111', publication_type: Factory(:journal)
     assert asset.valid?
 
-    asset = Publication.new title: 'fred', projects: [project],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id
+    asset = Publication.new title: 'fred', projects: [project], publication_type: Factory(:journal)
     assert asset.valid?
 
-    asset = Publication.new projects: [project], doi: '10.1371/journal.pcbi.1002352',publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id
+    asset = Publication.new projects: [project], doi: '10.1371/journal.pcbi.1002352',publication_type: Factory(:journal)
     assert !asset.valid?
 
     as_virtualliver do
-      asset = Publication.new title: 'fred', doi: '10.1371/journal.pcbi.1002352',publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id
+      asset = Publication.new title: 'fred', doi: '10.1371/journal.pcbi.1002352',publication_type: Factory(:journal)
       assert asset.valid?
     end
 
     # invalid DOI
-    asset = Publication.new title: 'fred', doi: '10.1371', projects: [project],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id
+    asset = Publication.new title: 'fred', doi: '10.1371', projects: [project],publication_type: Factory(:journal)
     assert !asset.valid?
-    asset = Publication.new title: 'fred', doi: 'bogus', projects: [project],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id
+    asset = Publication.new title: 'fred', doi: 'bogus', projects: [project],publication_type: Factory(:journal)
     assert !asset.valid?
 
     # invalid pubmed
-    asset = Publication.new title: 'fred', pubmed_id: 0, projects: [project],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id
+    asset = Publication.new title: 'fred', pubmed_id: 0, projects: [project],publication_type: Factory(:journal)
     assert !asset.valid?
 
-    asset = Publication.new title: 'fred2', pubmed_id: 1234, projects: [project], publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id
+    asset = Publication.new title: 'fred2', pubmed_id: 1234, projects: [project], publication_type: Factory(:journal)
     assert asset.valid?
 
-    asset = Publication.new title: 'fred', pubmed_id: 'bogus', projects: [project],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id
+    asset = Publication.new title: 'fred', pubmed_id: 'bogus', projects: [project],publication_type: Factory(:journal)
     assert !asset.valid?
 
     # can have both a pubmed and doi
-    asset = Publication.new title: 'bob', doi: '10.1371/journal.pcbi.1002352', projects: [project], publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id
+    asset = Publication.new title: 'bob', doi: '10.1371/journal.pcbi.1002352', projects: [project], publication_type: Factory(:journal)
     assert asset.valid?
     asset.pubmed_id = '999'
     assert asset.valid?
@@ -341,47 +341,48 @@ class PublicationTest < ActiveSupport::TestCase
 
   test 'project_not_required' do
     as_virtualliver do
-      p = Publication.new(title: 'blah blah blah', pubmed_id: '123',publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+      p = Publication.new(title: 'blah blah blah', pubmed_id: '123', publication_type: Factory(:journal))
       assert p.valid?
     end
   end
 
   test 'validate uniqueness of pubmed_id and doi' do
     project1 = Factory :project
-    pub = Publication.new(title: 'test1', pubmed_id: '1234', projects: [project1],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+    journal = Factory :journal
+    pub = Publication.new(title: 'test1', pubmed_id: '1234', projects: [project1],publication_type_id: journal.id)
     assert pub.valid?
     assert pub.save
-    pub = Publication.new(title: 'test2', pubmed_id: '1234', projects: [project1],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+    pub = Publication.new(title: 'test2', pubmed_id: '1234', projects: [project1],publication_type_id: journal.id)
     assert !pub.valid?
 
     # unique pubmed_id and doi not only in one project
     as_virtualliver do
-      pub = Publication.new(title: 'test2', pubmed_id: '1234', projects: [Factory(:project)],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+      pub = Publication.new(title: 'test2', pubmed_id: '1234', projects: [Factory(:project)],publication_type_id: journal.id)
       assert !pub.valid?
     end
 
-    pub = Publication.new(title: 'test3', doi: '10.1002/0470841559.ch1', projects: [project1],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+    pub = Publication.new(title: 'test3', doi: '10.1002/0470841559.ch1', projects: [project1],publication_type_id: journal.id)
     assert pub.valid?
     assert pub.save
-    pub = Publication.new(title: 'test4', doi: '10.1002/0470841559.ch1', projects: [project1],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+    pub = Publication.new(title: 'test4', doi: '10.1002/0470841559.ch1', projects: [project1],publication_type_id: journal.id)
     assert !pub.valid?
 
     as_virtualliver do
-      pub = Publication.new(title: 'test4', doi: '10.1002/0470841559.ch1', projects: [Factory(:project)],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+      pub = Publication.new(title: 'test4', doi: '10.1002/0470841559.ch1', projects: [Factory(:project)],publication_type_id: journal.id)
       assert !pub.valid?
     end
 
     # should be allowed for another project, but only that project on its own
     as_not_virtualliver do
       project2 = Factory :project
-      pub = Publication.new(title: 'test5', pubmed_id: '1234', projects: [project2],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+      pub = Publication.new(title: 'test5', pubmed_id: '1234', projects: [project2],publication_type_id: journal.id)
       assert pub.valid?
-      pub = Publication.new(title: 'test5', pubmed_id: '1234', projects: [project1, project2],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+      pub = Publication.new(title: 'test5', pubmed_id: '1234', projects: [project1, project2],publication_type_id: journal.id)
       assert !pub.valid?
 
-      pub = Publication.new(title: 'test5', doi: '10.1002/0470841559.ch1', projects: [project2],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+      pub = Publication.new(title: 'test5', doi: '10.1002/0470841559.ch1', projects: [project2],publication_type_id: journal.id)
       assert pub.valid?
-      pub = Publication.new(title: 'test5', doi: '10.1002/0470841559.ch1', projects: [project1, project2],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+      pub = Publication.new(title: 'test5', doi: '10.1002/0470841559.ch1', projects: [project1, project2],publication_type_id: journal.id)
       assert !pub.valid?
     end
 
@@ -397,14 +398,15 @@ class PublicationTest < ActiveSupport::TestCase
 
   test 'validate uniqueness of title' do
     project1 = Factory :project
-    pub = Publication.new(title: 'test1', pubmed_id: '1234', projects: [project1],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+    journal = Factory :journal
+    pub = Publication.new(title: 'test1', pubmed_id: '1234', projects: [project1],publication_type_id: journal.id)
     assert pub.valid?
     assert pub.save
-    pub = Publication.new(title: 'test1', pubmed_id: '33343', projects: [project1],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+    pub = Publication.new(title: 'test1', pubmed_id: '33343', projects: [project1],publication_type_id: journal.id)
     assert !pub.valid?
 
     project2 = Factory :project
-    pub = Publication.new(title: 'test1', pubmed_id: '234', projects: [project2],publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+    pub = Publication.new(title: 'test1', pubmed_id: '234', projects: [project2],publication_type_id: journal.id)
     as_virtualliver do
       assert !pub.valid?
     end
@@ -424,7 +426,8 @@ class PublicationTest < ActiveSupport::TestCase
 
   test 'strips domain from DOI if an URL is given' do
     project = Factory(:project)
-    pub = Publication.new(title: 'test1', projects: [project], doi: '10.5072/abc',publication_type_id: PublicationType.find_by(key: Factory(:journal).key).id)
+    journal = Factory :journal
+    pub = Publication.new(title: 'test1', projects: [project], doi: '10.5072/abc',publication_type_id: journal.id)
     assert pub.valid?
     assert_equal '10.5072/abc', pub.doi
 

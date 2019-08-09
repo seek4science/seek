@@ -8,7 +8,7 @@
 
 one:
   title: A paper on blabla
-  publication_type_id: 236642001
+  publication_type: Journal
   abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
   journal: JOURNAL OF SCIENCE
   contributor: quentin_person
@@ -19,7 +19,7 @@ one:
   
 pubmed_2:
   title: Another paper on blabla
-  publication_type_id: 236642001
+  publication_type: Journal
   abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
   journal: JOURNAL OF SCIENCE
   contributor: quentin_person
@@ -30,7 +30,7 @@ pubmed_2:
   
 taverna_paper_pubmed:
   title: "Taverna: a tool for building and running workflows of services"
-  publication_type_id: 236642001
+  publication_type: Journal
   abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
   journal: JOURNAL OF SCIENCE
   contributor: quentin_person
