@@ -525,8 +525,8 @@ class Publication < ActiveRecord::Base
   end
 
   def check_bibtex_file
-    if PublicationType.find(publication_type_id).is_inproceedings?
-      errors.add(:base, "An InProceedings needs to have a booktitle.") if booktitle.nil?
+    if self.publication_type.is_inproceedings?
+        errors.add(:base, "An InProceedings needs to have a booktitle.") if self.booktitle.nil?
       return false
     end
   end
