@@ -125,15 +125,19 @@ class PublicationsController < ApplicationController
     @publication = Publication.new(publication_params)
     key = params[:key]
     protocol = params[:protocol]
-    doi = nil
-    pubmed_id = nil
-    if protocol == 'pubmed' && key.present?
-      pubmed_id = key
-    elsif protocol == 'doi' && key.present?
-      doi = key
+    if params[:publication][:publication_type_id].blank?
+      @error = "Please choose a publication type."
+    else
+      doi = nil
+      pubmed_id = nil
+      if protocol == 'pubmed' && key.present?
+        pubmed_id = key
+      elsif protocol == 'doi' && key.present?
+        doi = key
+      end
+      pubmed_id, doi = preprocess_pubmed_or_doi pubmed_id, doi
+      result = get_data(@publication, pubmed_id, doi)
     end
-    pubmed_id, doi = preprocess_pubmed_or_doi pubmed_id, doi
-    result = get_data(@publication, pubmed_id, doi)
     @error =  @publication.errors.full_messages.join('<br>') if @publication.errors.any?
     if !@error.nil?
       if protocol == 'pubmed'
@@ -297,7 +301,7 @@ class PublicationsController < ApplicationController
   end
 
   def publication_params
-    params.require(:publication).permit(:publication_type_id, :pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,
+    params.require(:publication).permit(:publication_type_id, :pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,:editor,
                                         :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
                                         { data_file_ids: [] }, { scales: [] },
@@ -451,11 +455,14 @@ class PublicationsController < ApplicationController
         # create publications from articles
         articles.each do |article|
           current_publication = Publication.new(publication_params)
-          current_publication.extract_bibtex_metadata(article)
-          if current_publication.save
-            publications << current_publication
-          else
+          unless current_publication.extract_bibtex_metadata(article)
             publications_with_errors << current_publication
+          else
+            if current_publication.save
+              publications << current_publication
+            else
+              publications_with_errors << current_publication
+            end
           end
         end
 

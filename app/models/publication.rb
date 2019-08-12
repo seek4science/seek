@@ -52,8 +52,6 @@ class Publication < ActiveRecord::Base
 
   validate :check_uniqueness_within_project, unless: 'Seek::Config.is_virtualliver'
 
-  #validate :check_bibtex_file
-
   attr_writer :refresh_policy
   before_save :refresh_policy, on: :update
   after_update :update_creators_from_publication_authors
@@ -195,76 +193,91 @@ class Publication < ActiveRecord::Base
 
     self.registered_mode = 4
     self.publication_type_id = PublicationType.get_publication_type_id(bibtex_record)
-
     self.title           = bibtex_record[:title].try(:to_s).gsub /{|}/, '' unless bibtex_record[:title].nil?
     self.title           = bibtex_record[:chapter].try(:to_s).gsub /{|}/, '' if (self.title.nil? && !bibtex_record[:chapter].nil?)
+    self.title         += ( ":"+ (bibtex_record[:subtitle].try(:to_s).gsub /{|}/, '')) unless bibtex_record[:subtitle].nil?
 
-    if self.title.blank?
-      self.errors.add(:base,'Please check your bibtex file, it should contain the title or the chapter name of the publication.')
-      return
+    unless check_bibtex_file (bibtex_record)
+      return false
+    else
+      self.abstract        = bibtex_record[:abstract].try(:to_s)
+      self.journal         = bibtex_record.journal.try(:to_s)
+      month = bibtex_record[:month].try(:to_s)
+      year = bibtex_record[:year].try(:to_s)
+      self.published_date  = Date.new(bibtex_record.year.try(:to_i) || 1 , bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1)
+      self.published_date = nil if self.published_date.to_s == "0001-01-01"
+      self.doi             = bibtex_record[:doi].try(:to_s)
+      self.pubmed_id       = bibtex_record[:pubmed_id].try(:to_s)
+      self.booktitle = bibtex_record[:booktitle].try(:to_s)
+      self.publisher = bibtex_record[:publisher].try(:to_s)
+
+      unless bibtex_record[:author].nil?
+        plain_authors = bibtex_record[:author].split(' and ') # by bibtex definition
+        plain_authors.each_with_index do |author, index| # multiselect
+          next if author.empty?
+          last_name,first_name = author.split(', ') # by bibtex definition
+          unless first_name.nil?
+            first_name =  first_name.try(:to_s).gsub /^{|}$/, ''
+          end
+          unless last_name.nil?
+            last_name =  last_name.try(:to_s).gsub /^{|}$/, ''
+          end
+          pa = PublicationAuthor.new(publication: self,
+                                     first_name: first_name,
+                                     last_name: last_name,
+                                     author_index: index)
+          publication_authors << pa
+        end
+      end
+
+      unless bibtex_record[:editor].nil? && bibtex_record[:editors].nil?
+        self.editor = bibtex_record[:editor].try(:to_s) || bibtex_record[:editors].try(:to_s)
+      end
+
+      # in some cases, e.g. proceedings, book, there are no authors but only editors
+      if bibtex_record[:author].nil? && !self.editor.nil?
+        plain_editors = self.editor.split(' and ') # by bibtex definition
+        plain_editors.each_with_index do |editor, index| # multiselect
+          next if editor.empty?
+          last_name,first_name = editor.split(', ') # by bibtex definition
+          unless first_name.nil?
+            first_name =  first_name.try(:to_s).gsub /^{|}$/, ''
+          end
+          unless last_name.nil?
+            last_name =  last_name.try(:to_s).gsub /^{|}$/, ''
+          end
+          pa = PublicationAuthor.new(publication: self,
+                                     first_name: first_name,
+                                     last_name: last_name,
+                                     author_index: index)
+          publication_authors << pa
+        end
+      end
+
+      #using doi/pubmed_id to fetch the metadata
+      result = fetch_pubmed_or_doi_result(self.pubmed_id, self.doi) if self.pubmed_id.present? || self.doi.present?
+
+      unless result.nil?
+        self.citation = result.citation  unless result.citation.nil?
+
+        if self.journal.nil? && !result.journal.nil?
+          self.journal = result.journal
+        end
+
+        self.published_date = result.date_published unless result.date_published.nil?
+      end
+
+      if self.citation.nil?
+        self.generate_citation(bibtex_record)
+      end
+      return true
     end
+  end
 
-    self.abstract        = bibtex_record[:abstract].try(:to_s)
-    self.journal         = bibtex_record.journal.try(:to_s)
+  # generating the citations for different types of publications by using the data from Bibtex file when no doi/pubmed_id
+  def generate_citation(bibtex_record)
     month = bibtex_record[:month].try(:to_s)
     year = bibtex_record[:year].try(:to_s)
-    self.published_date  = Date.new(bibtex_record.year.try(:to_i) || 1 , bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1)
-    self.published_date = nil if self.published_date.to_s == "0001-01-01"
-    self.doi             = bibtex_record[:doi].try(:to_s)
-    self.pubmed_id       = bibtex_record[:pubmed_id].try(:to_s)
-    self.booktitle = bibtex_record[:booktitle].try(:to_s)
-    self.publisher = bibtex_record[:publisher].try(:to_s)
-
-    unless bibtex_record[:author].nil?
-      plain_authors = bibtex_record[:author].split(' and ') # by bibtex definition
-      plain_authors.each_with_index do |author, index| # multiselect
-        next if author.empty?
-        last_name,first_name = author.split(', ') # by bibtex definition
-        unless first_name.nil?
-          first_name =  first_name.try(:to_s).gsub /^{|}$/, ''
-        end
-        unless last_name.nil?
-          last_name =  last_name.try(:to_s).gsub /^{|}$/, ''
-        end
-        pa = PublicationAuthor.new(publication: self,
-                                   first_name: first_name,
-                                   last_name: last_name,
-                                   author_index: index)
-        publication_authors << pa
-      end
-    end
-
-    unless bibtex_record[:editor].nil? && bibtex_record[:editors].nil?
-      self.editor = bibtex_record[:editor].try(:to_s) || bibtex_record[:editors].try(:to_s)
-      return
-    end
-
-    # in some cases, e.g. proceedings, book, there are no authors but only editors
-    if bibtex_record[:author].nil? && !self.editor.nil?
-      plain_editors = self.editor.split(' and ') # by bibtex definition
-      plain_editors.each_with_index do |editor, index| # multiselect
-        next if editor.empty?
-        last_name,first_name = editor.split(', ') # by bibtex definition
-        unless first_name.nil?
-          first_name =  first_name.try(:to_s).gsub /^{|}$/, ''
-        end
-        unless last_name.nil?
-          last_name =  last_name.try(:to_s).gsub /^{|}$/, ''
-        end
-        pa = PublicationAuthor.new(publication: self,
-                                   first_name: first_name,
-                                   last_name: last_name,
-                                   author_index: index)
-        publication_authors << pa
-      end
-    end
-
-    if bibtex_record[:author].nil? && bibtex_record[:editor].nil? && bibtex_record[:editors].nil?
-      self.errors.add(:base,'You need at least one author or editor for your publication.')
-      return
-    end
-
-
     page_or_pages = (bibtex_record[:pages].try(:to_s).match?(/[^0-9]/) ? "page".pluralize : "page" ) unless bibtex_record[:pages].nil?
     pages = bibtex_record[:pages].try(:to_s)
     volume = bibtex_record[:volume].try(:to_s)
@@ -276,101 +289,117 @@ class Publication < ActiveRecord::Base
     tutor = bibtex_record[:tutor].try(:to_s)
     tutorhits = bibtex_record[:tutorhits].try(:to_s)
     note = bibtex_record[:note].try(:to_s)
+    institution = bibtex_record[:institution].try(:to_s)
+    type = bibtex_record[:type].try(:to_s)
+    howpublished = bibtex_record[:howpublished].try(:to_s)
 
-    #using doi/pubmed_id to fetch the metadata
-    result = fetch_pubmed_or_doi_result(self.pubmed_id, self.doi) if self.pubmed_id.present? || self.doi.present?
-
-    unless result.nil?
-      self.citation = result.citation  unless result.citation.nil?
-
-      if self.journal.nil? && !result.journal.nil?
-        self.journal = result.journal
+    publication_type = PublicationType.find(self.publication_type_id)
+    if publication_type.is_journal?
+      self.citation = ''
+      self.citation += self.journal.nil? ? '':self.journal
+      self.citation += volume.blank? ? '': ', volume '+ volume
+      self.citation += number.nil? ? '' : '('+ number+')'
+      self.citation += pages.blank? ? '' : (', '+ page_or_pages + ' '+pages)
+      self.citation += self.editor.blank? ? '' : (', Eds: '+ self.editor)
+      unless month.nil? && year.nil?
+        self.citation += month.nil? ? ',' : (', '+ month.capitalize)
+        self.citation += year.nil? ? '' : (' '+year)
       end
-
-      self.published_date = result.date_published unless result.date_published.nil?
-    end
-
-    # generating the citations for different types of publications by using the data from Bibtex file when no doi/pubmed_id
-    if self.citation.nil?
-      publication_type = PublicationType.find(self.publication_type_id)
-      if  publication_type.is_journal?
-        #Journal
-        self.citation = ''
-        self.citation += self.journal.nil? ? '':self.journal
-        self.citation += volume.blank? ? '': ', volume '+ volume
-        self.citation += number.nil? ? '' : '('+ number+')'
-        self.citation += pages.blank? ? '' : (', '+ page_or_pages + ' '+pages)
-        self.citation += self.editor.blank? ? '' : (', Eds: '+ self.editor)
+      Rails.logger.info("Citation:Journal:"+ self.citation)
+    elsif publication_type.is_booklet?
+      self.citation = ''
+      self.citation += howpublished.blank? ? '': ''+ howpublished
+      self.citation += address.nil? ? '' : (', '+ address)
+      unless month.nil? && year.nil?
+        self.citation += month.nil? ? ',' : (', '+ month.capitalize)
+        self.citation += year.nil? ? '' : (' '+year)
+      end
+      self.citation += note.nil? ? '' : (', '+ note)
+      Rails.logger.info("Citation: Booklet"+self.citation)
+    elsif publication_type.is_inbook?
+      self.citation = ''
+      self.citation += self.booktitle.nil? ? '' : ('In '+ self.booktitle)
+      self.citation += volume.blank? ? '' : (', volume '+ volume)
+      self.citation += series.blank? ? '' : (' of '+series)
+      self.citation += pages.blank? ? '' : (', '+ page_or_pages + ' '+pages)
+      self.citation += self.editor.blank? ? '' : (', Eds: '+ self.editor)
+      self.citation += self.publisher.blank? ? '' : (', '+ self.publisher)
+      unless address.nil? || (self.booktitle.try(:include?, address))
+        self.citation += address.nil? ? '' : (', '+ address)
+      end
+      unless self.booktitle.try(:include?, year)
         unless month.nil? && year.nil?
           self.citation += month.nil? ? ',' : (', '+ month.capitalize)
           self.citation += year.nil? ? '' : (' '+year)
         end
-
-        Rails.logger.info("Citation:Journal:"+ self.citation)
-      elsif publication_type.is_book?
-        Rails.logger.info("Citation: Book")
-      elsif publication_type.is_booklet?
-        Rails.logger.info("Citation: Booklet")
-      elsif publication_type.is_inbook?
-        Rails.logger.info("Citation: InBook")
-      elsif publication_type.is_inproceedings? || publication_type.is_incollection?
-        # InProceedings / InCollection /InBook
-        self.citation = ''
-        self.citation += self.booktitle.nil? ? '' : ('In '+ self.booktitle)
-        self.citation += volume.blank? ? '' : (', volume '+ volume)
-        self.citation += series.blank? ? '' : (' of '+series)
-        self.citation += pages.blank? ? '' : (', '+ page_or_pages + ' '+pages)
-        self.citation += self.editor.blank? ? '' : (', Eds: '+ self.editor)
-        self.citation += self.publisher.blank? ? '' : (', '+ self.publisher)
-        unless address.nil? || (self.booktitle.try(:include?, address))
-          self.citation += address.nil? ? '' : (', '+ address)
-        end
-        unless self.booktitle.try(:include?, year)
-          unless month.nil? && year.nil?
-            self.citation += month.nil? ? ',' : (', '+ month.capitalize)
-            self.citation += year.nil? ? '' : (' '+year)
-          end
-        end
-        Rails.logger.info("Citation: InProceedings/InCollection:"+ self.citation)
-      elsif publication_type.is_manual?
-        Rails.logger.info("Citation: Manual")
-      elsif publication_type.is_misc?
-        Rails.logger.info("Citation: Misc")
-      elsif publication_type.is_phd_thesis? || publication_type.is_masters_thesis?
-        #PhD/Master Thesis
-        self.citation = ''
-        self.citation += school.nil? ? '' : (' '+ school)
-        self.errors.add(:base,'A thesis need to have a school') if school.nil?
-        self.citation += year.nil? ? '' : (', '+ year)
-        self.citation += tutor.nil? ? '' : (', '+ tutor+'(Tutor)')
-        self.citation += tutorhits.nil? ? '' : (', '+ tutorhits+'(HITS Tutor)')
-        self.citation += note.nil? ? '' : (', '+ note)
-        Rails.logger.info("Citation: Thesis:"+ self.citation)
-      elsif publication_type.is_proceedings?
-        # Proceedings are conference proceedings, it has no authors but editors
-        # Book
-        self.journal = self.title
-        self.citation = ''
-        self.citation += volume.blank? ? '' : ('volume '+ volume)
-        self.citation += series.blank? ? '' : (' of '+series)
-        self.citation += self.publisher.blank? ? '' : (', '+ self.publisher)
+      end
+      Rails.logger.info("Citation:"+publication_type.title+":" + self.citation)
+      Rails.logger.info("Citation: InBook")
+    elsif publication_type.is_inproceedings? || publication_type.is_incollection? || publication_type.is_book?
+      # InProceedings / InCollection
+      self.citation = ''
+      self.citation += self.booktitle.nil? ? '' : ('In '+ self.booktitle)
+      self.citation += volume.blank? ? '' : (', volume '+ volume)
+      self.citation += series.blank? ? '' : (' of '+series)
+      self.citation += pages.blank? ? '' : (', '+ page_or_pages + ' '+pages)
+      self.citation += self.editor.blank? ? '' : (', Eds: '+ self.editor)
+      self.citation += self.publisher.blank? ? '' : (', '+ self.publisher)
+      unless address.nil? || (self.booktitle.try(:include?, address))
+        self.citation += address.nil? ? '' : (', '+ address)
+      end
+      unless self.booktitle.try(:include?, year)
         unless month.nil? && year.nil?
-          self.citation += self.citation.blank? ? '' : ','
-          self.citation += month.nil? ? '' : (' '+ month.capitalize)
+          self.citation += month.nil? ? ',' : (', '+ month.capitalize)
           self.citation += year.nil? ? '' : (' '+year)
         end
-        self.citation += url.nil? ? '' : (', '+ url)
-        Rails.logger.info("Citation: Proceedings"+self.citation)
-      elsif publication_type.is_tech_report?
-        Rails.logger.info("Citation: Tech report")
-      elsif publication_type.is_unpublished?
-        Rails.logger.info("Citation: Unpublished")
-      else
-        return nil
       end
-    end
-  end
+      Rails.logger.info("Citation:"+publication_type.title+":" + self.citation)
+    elsif publication_type.is_manual?
+      Rails.logger.info("Citation: Manual")
+    elsif publication_type.is_misc?
+      self.citation = ''
+      self.citation += howpublished.blank? ? '': ''+ howpublished
 
+      Rails.logger.info("Citation: Misc"+ self.citation)
+    elsif publication_type.is_phd_thesis? || publication_type.is_masters_thesis?
+      #PhD/Master Thesis
+      self.citation = ''
+      self.citation += school.nil? ? '' : (' '+ school)
+      self.errors.add(:base,'A thesis need to have a school') if school.nil?
+      self.citation += year.nil? ? '' : (', '+ year)
+      self.citation += tutor.nil? ? '' : (', '+ tutor+'(Tutor)')
+      self.citation += tutorhits.nil? ? '' : (', '+ tutorhits+'(HITS Tutor)')
+      self.citation += note.nil? ? '' : (', '+ note)
+      Rails.logger.info("Citation: Thesis:"+ self.citation)
+    elsif publication_type.is_proceedings?
+      # Proceedings are conference proceedings, it has no authors but editors
+      # Book
+      self.journal = self.title
+      self.citation = ''
+      self.citation += volume.blank? ? '' : ('volume '+ volume)
+      self.citation += series.blank? ? '' : (' of '+series)
+      self.citation += self.publisher.blank? ? '' : (', '+ self.publisher)
+      unless month.nil? && year.nil?
+        self.citation += self.citation.blank? ? '' : ','
+        self.citation += month.nil? ? '' : (' '+ month.capitalize)
+        self.citation += year.nil? ? '' : (' '+year)
+      end
+      self.citation += url.nil? ? '' : (', '+ url)
+      Rails.logger.info("Citation: Proceedings"+self.citation)
+    elsif publication_type.is_tech_report?
+      self.citation = ''
+      self.citation += institution.blank? ? ' ': institution
+      self.citation += type.blank? ? ' ' : (', '+type)
+      Rails.logger.info("Citation: Tech report")
+    elsif publication_type.is_unpublished?
+      self.citation = ''
+      self.citation += note.blank? ? ' ': note
+      Rails.logger.info("Citation: Unpublished" +self.citation)
+    else
+      return nil
+    end
+    self.citation =  self.citation.strip.gsub(/^,/,'').strip
+  end
 
   def fetch_pubmed_or_doi_result(pubmed_id, doi)
     result = nil
@@ -524,11 +553,31 @@ class Publication < ActiveRecord::Base
     end
   end
 
-  def check_bibtex_file
-    if self.publication_type.is_inproceedings?
-        errors.add(:base, "An InProceedings needs to have a booktitle.") if self.booktitle.nil?
+  def check_bibtex_file (bibtex_record)
+
+    if self.title.blank?
+      errors.add(:base, "Please check your bibtex files, each publication should contain a title or a chapter name.")
       return false
     end
+
+    if self.publication_type.is_inproceedings? && self.booktitle.nil?
+        errors.add(:base, "An InProceedings needs to have a booktitle.")
+        return false
+    end
+
+    if bibtex_record[:author].nil? && self.editor.nil?
+      self.errors.add(:base,'You need at least one author or editor for your publication.')
+      return false
+    end
+
+    if self.publication_type.is_phd_thesis? || self.publication_type.is_masters_thesis?
+      if bibtex_record[:school].try(:to_s).nil?
+        self.errors.add(:base,'A thesis needs to have a school.')
+        return false
+      end
+    end
+    
+    return true
   end
 
   # defines that this is a user_creatable object type, and appears in the "New Object" gadget
