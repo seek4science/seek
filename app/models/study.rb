@@ -17,9 +17,6 @@ class Study < ApplicationRecord
   acts_as_isa
   acts_as_snapshottable
 
-  attr_accessor :new_link_from_assay
-
-
   has_many :assays
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
