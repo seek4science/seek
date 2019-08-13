@@ -84,8 +84,6 @@ module RelatedItemsHelper
     # Authorize
     authorize_related_items(related)
 
-    order_related_items(related)
-
     # Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
       if limit && related[key][:items].size > limit && %w[Project Investigation Study Assay Person Specimen Sample Snapshot].include?(resource.class.name)
@@ -139,16 +137,6 @@ module RelatedItemsHelper
       end
     end
     method_hash
-  end
-
-  def order_related_items(related)
-    related.each do |key, res|
-      if key == 'Person' && !@project.nil?
-        res[:items] = sort_project_member_by_status(res[:items], @project.id)
-      else
-        res[:items].sort! { |item, item2| item2.updated_at <=> item.updated_at }
-      end
-    end
   end
 
   def authorize_related_items(related)
