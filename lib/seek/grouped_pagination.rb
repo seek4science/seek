@@ -1,4 +1,4 @@
-# encoding: utf-8
+
 # Inspired by http://www.hennessynet.com/blog/?p=70
 # but as a seperate mixin, rather than built into the will_paginate plugin
 module Seek
@@ -31,10 +31,6 @@ module Seek
       def paginate_after_fetch(collection, *args)
         options = args.pop unless args.nil?
         options ||= {}
-        reorder = options[:reorder].nil? ? true : options[:reorder]
-
-        # only reorder if there are items and they respond to updated_at
-        reorder = reorder && collection.first && collection.first.respond_to?(:updated_at)
 
         @latest_limit = options[:latest_limit] || @latest_limit
         @default_page = options[:default_page] || @default_page
@@ -44,17 +40,12 @@ module Seek
 
         page = options[:page] || default_page
 
-        records = []
-        if page == 'all'
-          records = collection
-        elsif page == 'latest'
-          if reorder
-            records = collection.sort { |x, y| y.updated_at <=> x.updated_at }[0...@latest_limit]
-          else
-            records = collection[0...@latest_limit]
-          end
+        records = collection
+        Seek::ListSorter.index_items(records, page)
+        if page == 'latest'
+          records.sort! { |x, y| y.updated_at <=> x.updated_at }[0...@latest_limit]
         elsif @pages.include?(page)
-          records = collection.select { |i| i.first_letter == page }
+          records.select! { |i| i.first_letter == page }
         end
 
         page_totals = {}
@@ -78,7 +69,6 @@ module Seek
     end
 
     module SingletonMethods
-
       def paginate(*args)
         options = args.pop unless args.nil?
         options ||= {}
@@ -96,14 +86,14 @@ module Seek
         elsif @pages.include?(page)
           query_options = { conditions: options[:conditions] }
           query_options.merge!(options.except(:conditions, :page, :default_page))
-          records = unscoped.where("#{@field}" => page).where(query_options[:conditions]).order(query_options[:order])
+          records = unscoped.where(@field.to_s => page).where(query_options[:conditions]).order(query_options[:order])
         end
 
         page_totals = {}
         @pages.each do |p|
           query_options = [conditions: options[:conditions]]
           query_options[0].merge!(options.except(:conditions, :page, :default_page))
-          page_totals[p] = where("#{@field}" => p).where(query_options[0][:conditions]).count
+          page_totals[p] = where(@field.to_s => p).where(query_options[0][:conditions]).count
         end
 
         result = Collection.new(records, page, @pages, page_totals)
@@ -119,7 +109,6 @@ module Seek
 
         result
       end
-
     end
 
     module InstanceMethods
@@ -127,7 +116,7 @@ module Seek
       # uses some code based upon: http://github.com/grosser/sort_alphabetical/blob/9a8665d17394506c29cce51d8e22af69e2931523/lib/sort_alphabetical.rb with special handling for Ø
       def strip_first_letter(text)
         # handle the characters that can't be handled through normalization
-        %w(ØO).each do |s|
+        %w[ØO].each do |s|
           text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
         end
 

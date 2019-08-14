@@ -50,14 +50,13 @@ class PeopleController < ApplicationController
       unless view_context.index_with_facets?('people') && params[:user_enable_facet] == 'true'
         @people = Person.paginate_after_fetch(@people,
                                               page: (params[:page] || Seek::Config.default_page('people')),
-                                              reorder: false,
                                               latest_limit: Seek::Config.limit_latest)
       end
     end
     if params[:page]=='latest' || params[:page].blank?
       @people.sort_by!(&:updated_at).reverse!
     else
-      sort_items('Person',@people)
+      Seek::ListSorter.index_items(@people,params[:page])
     end
 
 

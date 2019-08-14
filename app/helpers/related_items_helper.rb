@@ -84,7 +84,7 @@ module RelatedItemsHelper
     # Authorize
     authorize_related_items(related)
 
-    sort_resource_hash_items(related)
+    Seek::ListSorter.related_items(related)
 
     # Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
@@ -118,28 +118,6 @@ module RelatedItemsHelper
     else
       []
     end
-  end
-
-  def sort_resource_hash_items(items)
-    return if items.empty?
-
-    items.each do |key, res|
-      sort_items(key,res[:items])
-    end
-  end
-
-  def sort_items(type_name,items)
-    # potential to store definition in a config file, or database
-    rules = {
-        "Person" => "last_name",
-        "Institution" => "title",
-        "Event" => "start_date",
-        "Publication" => "published_date",
-        "Other" => "updated_at"
-    }
-    field = rules[type_name] || rules["Other"]
-    items.sort_by!(&field.to_sym)
-    items.reverse! if ['updated_at','start_date','published_date'].include?(field)
   end
 
   def self.relations_methods
@@ -195,9 +173,7 @@ module RelatedItemsHelper
   def collect_related_items(resource)
     related = relatable_types
     related.delete('Person') if resource.is_a?(Person) # to avoid the same person showing up
-    if !resource.is_a?(Sample)
-      related.delete('Organism')
-    end
+    related.delete('Organism') unless resource.is_a?(Sample)
 
     answerable = {}
     related.each_key do |type|
@@ -212,7 +188,7 @@ module RelatedItemsHelper
 
   def sort_project_member_by_status(resource, project_id)
     project = Project.find(project_id)
-    resource.sort_by {|person| person.current_projects.include?(project) ? 0 : 1}
+    resource.sort_by { |person| person.current_projects.include?(project) ? 0 : 1 }
   end
 
   def get_person_id
