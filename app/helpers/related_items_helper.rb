@@ -3,7 +3,7 @@ module RelatedItemsHelper
     perform_authorization(resource_hash) unless authorization_already_done
     limit_items(resource_hash, limit) unless limit.nil?
     remove_empty_tabs(resource_hash) unless show_empty_tabs
-    sort_items(resource_hash)
+    update_item_details(resource_hash)
   end
 
   private
@@ -33,7 +33,7 @@ module RelatedItemsHelper
     end
   end
 
-  def sort_items(resource_hash)
+  def update_item_details(resource_hash)
     ordered_keys(resource_hash).map { |key| resource_hash[key].merge(type: key) }.each do |resource_type|
       update_resource_type(resource_type)
     end
@@ -84,6 +84,8 @@ module RelatedItemsHelper
     # Authorize
     authorize_related_items(related)
 
+    sort_resource_hash_items(related)
+
     # Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
       if limit && related[key][:items].size > limit && %w[Project Investigation Study Assay Person Specimen Sample Snapshot].include?(resource.class.name)
@@ -116,6 +118,28 @@ module RelatedItemsHelper
     else
       []
     end
+  end
+
+  def sort_resource_hash_items(items)
+    return if items.empty?
+
+    items.each do |key, res|
+      sort_items(key,res[:items])
+    end
+  end
+
+  def sort_items(type_name,items)
+    # potential to store definition in a config file, or database
+    rules = {
+        "Person" => "last_name",
+        "Institution" => "title",
+        "Event" => "start_date",
+        "Publication" => "published_date",
+        "Other" => "updated_at"
+    }
+    field = rules[type_name] || rules["Other"]
+    items.sort_by!(&field.to_sym)
+    items.reverse! if ['updated_at','start_date','published_date'].include?(field)
   end
 
   def self.relations_methods

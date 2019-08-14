@@ -43,16 +43,10 @@ class PeopleController < ApplicationController
     if @people
       @people = @people.select(&:can_view?)
     else
-      @people = if params[:page].blank? || params[:page] == 'latest' || params[:page] == 'all'
-                  Person.active
-                else
-                  Person.all
-                end
+      @people = Person.all
 
       @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
-      if request.format.to_s == "text/html" && !params[:project_id].nil?
-        @people = sort_project_member_by_status(@people, params[:project_id])
-      end
+
       unless view_context.index_with_facets?('people') && params[:user_enable_facet] == 'true'
         @people = Person.paginate_after_fetch(@people,
                                               page: (params[:page] || Seek::Config.default_page('people')),
@@ -60,6 +54,13 @@ class PeopleController < ApplicationController
                                               latest_limit: Seek::Config.limit_latest)
       end
     end
+    if params[:page]=='latest' || params[:page].blank?
+      @people.sort_by!(&:updated_at).reverse!
+    else
+      sort_items('Person',@people)
+    end
+
+
 
     respond_to do |format|
       format.html # index.html.erb
