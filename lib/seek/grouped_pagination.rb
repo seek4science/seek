@@ -40,10 +40,10 @@ module Seek
 
         page = options[:page] || default_page
 
-        records = collection
+        records = collection.to_a
         Seek::ListSorter.index_items(records, page)
         if page == 'latest'
-          records.sort! { |x, y| y.updated_at <=> x.updated_at }[0...@latest_limit]
+          records = records.sort{ |x, y| y.updated_at <=> x.updated_at }[0...@latest_limit]
         elsif @pages.include?(page)
           records.select! { |i| i.first_letter == page }
         end

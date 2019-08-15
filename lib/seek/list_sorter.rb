@@ -38,9 +38,9 @@ module Seek
     end
 
     def self.sort_by_field(items, field)
-      items.sort_by!(&field.to_sym)
+      # needs to handle nil values, which sort_by!(&field) raises and error. items with a nil value go at the end
+      items.sort_by! { |item| [item.send(field) ? 0 : 1, item.send(field)] }
       items.reverse! if %w[updated_at start_date published_date].include?(field)
     end
-
   end
 end

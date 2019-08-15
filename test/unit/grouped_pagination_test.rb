@@ -2,6 +2,7 @@
 require 'test_helper'
 
 class GroupedPaginationTest < ActiveSupport::TestCase
+
   def test_first_letter
     p = Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     assert_not_nil p.first_letter
