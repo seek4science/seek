@@ -90,7 +90,7 @@ module ProjectsHelper
   end
 
   def project_membership_json(project)
-    project.work_groups.map do |wg|
+    project.work_groups.sort_by{|wg| wg.institution.title}.map do |wg|
       wg.group_memberships.map do |gm|
         {
           id: gm.id.to_s,
