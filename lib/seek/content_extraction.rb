@@ -29,7 +29,7 @@ module Seek
         text = File.read(filepath, encoding: 'iso-8859-1')
         unless text.blank?
           content = filter_text_content text
-          content = split_content(content)
+          content = split_content(content,10,5)
         end
       end
       content
@@ -68,7 +68,7 @@ module Seek
             []
           else
             content = filter_text_content content
-            split_content content
+            split_content(content,10,5)
           end
         rescue Docsplit::ExtractionFailed => e
           extract_text_from_pdf if double_check_mime_type
