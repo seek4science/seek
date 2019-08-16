@@ -1,7 +1,6 @@
 <%= error_messages_for :study %>
 
 <%= f.hidden_field :create_from_asset %>
-<%= f.hidden_field :new_link_from_assay -%>
 
 <div class="form-group">
   <label class="required">Title</label>
@@ -20,7 +19,6 @@
 
 <%= folding_panel("#{t('investigation')} details") do %>
     <label class="required"><%= t('investigation') %></label>
-    <%=link_to "New #{t('investigation')}?",new_investigation_path(:new_link_from_study=>true), :onclick => "window.open(this.href);return false;"%><br/>
     <div id="investigation_collection">
       <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
     </div>
