@@ -2,15 +2,12 @@ require 'test_helper'
 
 class ListSorterTest < ActiveSupport::TestCase
   test 'rules' do
-    expected = {
-      'Person' => { 'index' => 'last_name', 'related' => 'last_name' },
-      'Institution' => { 'index' => 'title', 'related' => 'title' },
-      'Event' => { 'index' => 'start_date', 'related' => 'start_date' },
-      'Publication' => { 'index' => 'published_date', 'related' => 'published_date' },
-      'Other' => { 'index' => 'title', 'related' => 'updated_at' }
-    }
-
-    assert_equal expected, Seek::ListSorter::RULES
+    assert_equal 'last_name, first_name', Seek::ListSorter.sort_field('Person', 'index')
+    assert_equal 'title', Seek::ListSorter.sort_field('Sop', 'index')
+    assert_equal 'title', Seek::ListSorter.sort_field('NewModelThatDoesntExist', 'index')
+    assert_equal 'updated_at DESC', Seek::ListSorter.sort_field('NewModelThatDoesntExist', 'related')
+    assert_equal 'published_date DESC', Seek::ListSorter.sort_field('Publication', 'index')
+    assert_equal 'updated_at DESC', Seek::ListSorter.sort_field('Assay', 'related')
 
     assert Seek::ListSorter::RULES.frozen?
   end
@@ -54,15 +51,19 @@ class ListSorterTest < ActiveSupport::TestCase
   end
 
   test 'index items' do
-    p1 = Factory(:person, last_name: 'jones')
-    p2 = Factory(:person, last_name: 'davis')
-    p3 = Factory(:person, last_name: 'smith')
-    p4 = Factory(:person, last_name: nil)
+    p1 = Factory(:person, last_name: 'jones', first_name: nil)
+    p2 = Factory(:person, last_name: 'davis', first_name: nil)
+    p3 = Factory(:person, last_name: 'smith', first_name: 'dave')
+    p4 = Factory(:person, last_name: nil, first_name: 'bob')
+    p5 = Factory(:person, last_name: 'smith', first_name: 'john')
+    p6 = Factory(:person, last_name: 'davis', first_name: 'tom')
     p1.update_attribute(:updated_at, 6.days.ago)
     p2.update_attribute(:updated_at, 3.days.ago)
     p3.update_attribute(:updated_at, 1.days.ago)
     p4.update_attribute(:updated_at, 2.days.ago)
-    people = [p1, p2, p3, p4]
+    p5.update_attribute(:updated_at, 8.days.ago)
+    p6.update_attribute(:updated_at, 7.days.ago)
+    people = [p1, p2, p3, p4, p5, p6]
 
     i1 = Factory(:institution, title: 'Nottingham Uni')
     i2 = Factory(:institution, title: 'Bradford Uni')
@@ -91,9 +92,9 @@ class ListSorterTest < ActiveSupport::TestCase
     sops = [s1, s2, s3]
 
     Seek::ListSorter.index_items(people, 'all')
-    assert_equal [p2, p1, p3, p4], people
+    assert_equal [p6, p2, p1, p3, p5, p4], people
     Seek::ListSorter.index_items(people, 'latest')
-    assert_equal [p3, p4, p2, p1], people
+    assert_equal [p3, p4, p2, p1, p6, p5], people
 
     Seek::ListSorter.index_items(institutions, 'all')
     assert_equal [i2, i4, i1, i3], institutions
@@ -109,5 +110,27 @@ class ListSorterTest < ActiveSupport::TestCase
     assert_equal [s1, s3, s2], sops
     Seek::ListSorter.index_items(sops, 'latest')
     assert_equal [s3, s2, s1], sops
+  end
+
+  test 'complex sorting' do
+    Address = Struct.new(:country, :city)
+    brisbane = Address.new('Australia', 'Brisbane')
+    beijing = Address.new('China', 'Beijing')
+    shanghai = Address.new('China', 'Shanghai')
+    shenzhen = Address.new('China', 'Shenzhen')
+    nil_city = Address.new('China', nil)
+    marseille = Address.new('France', 'Marseille')
+    paris = Address.new('France', 'Paris')
+    unknown = Address.new('Unknown', nil)
+    atlantis = Address.new(nil, 'Atlantis')
+    places = [beijing, nil_city, shanghai, paris, brisbane, marseille, shenzhen, unknown, atlantis]
+
+    Seek::ListSorter.sort_by_field(places, 'country DESC, city ASC')
+
+    assert_equal places, [unknown, marseille, paris, beijing, shanghai, shenzhen, nil_city, brisbane, atlantis]
+
+    Seek::ListSorter.sort_by_field(places, 'country ASC, city DESC')
+
+    assert_equal places, [brisbane, shenzhen, shanghai, beijing, nil_city, paris, marseille, unknown, atlantis]
   end
 end

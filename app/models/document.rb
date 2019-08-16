@@ -8,8 +8,6 @@ class Document < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
-  scope :default_order, -> { order("title") }
-
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, -> (r) { where('content_blobs.asset_version = ?', r.version) }, :as => :asset, :foreign_key => :asset_id
 

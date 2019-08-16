@@ -3,11 +3,14 @@ module Seek
   class ListSorter
     # potential to store definition in a config file, or database
     RULES = {
-      'Person' => { 'index' => 'last_name', 'related' => 'last_name' },
+      'Person' => { 'index' => 'last_name, first_name', 'related' => 'last_name, first_name' },
       'Institution' => { 'index' => 'title', 'related' => 'title' },
-      'Event' => { 'index' => 'start_date', 'related' => 'start_date' },
-      'Publication' => { 'index' => 'published_date', 'related' => 'published_date' },
-      'Other' => { 'index' => 'title', 'related' => 'updated_at' }
+      'Event' => { 'index' => 'start_date DESC', 'related' => 'start_date DESC' },
+      'Publication' => { 'index' => 'published_date DESC', 'related' => 'published_date DESC' },
+      'Investigation' => { 'index' => 'updated_at DESC' },
+      'Study' => { 'index' => 'updated_at DESC' },
+      'Assay' => { 'index' => 'updated_at DESC' },
+      'Other' => { 'index' => 'title', 'related' => 'updated_at DESC' }
     }.freeze
 
     # sort items in the related items hash according the rule for its type
@@ -25,22 +28,47 @@ module Seek
       return if items.empty?
       type_name = items.first.class.name
       if page == 'latest'
-        sort_by_field(items, 'updated_at')
+        sort_by_field(items, 'updated_at DESC')
       else
         sort_items(type_name, items, 'index')
       end
     end
 
     def self.sort_items(type_name, items, view)
-      type_name = 'Other' unless RULES[type_name]
-      field = RULES[type_name][view] || RULES['Other'][view]
-      sort_by_field(items, field)
+      sort_by_field(items, sort_field(type_name, view))
     end
 
-    def self.sort_by_field(items, field)
-      # needs to handle nil values, which sort_by!(&field) raises and error. items with a nil value go at the end
-      items.sort_by! { |item| [item.send(field) ? 0 : 1, item.send(field)] }
-      items.reverse! if %w[updated_at start_date published_date].include?(field)
+    # Sort an array with SQL-style order by clauses, e.g.:
+    # * `last_name`
+    # * `updated_at DESC`
+    # * `first_letter ASC, updated_at DESC`
+    def self.sort_by_field(items, fields)
+      fields = fields.split(",").map(&:strip)
+      fields_and_mods = fields.map do |f|
+        field, order = f.split(' ')
+        [field, order&.match?(/desc/i) ? -1 : 1]
+      end
+
+      items.sort! do |a, b|
+        val = 0
+        fields_and_mods.each do |field, mod|
+          x = a.send(field)
+          y = b.send(field)
+          val = if x.nil?
+                  1
+                elsif y.nil?
+                  -1
+                else
+                  (x <=> y) * mod
+                end
+          break if val != 0
+        end
+        val
+      end
+    end
+
+    def self.sort_field(type_name, view)
+      (RULES[type_name] || RULES['Other'])[view] || RULES['Other'][view]
     end
   end
 end

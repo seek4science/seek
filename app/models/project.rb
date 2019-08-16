@@ -57,7 +57,6 @@ class Project < ApplicationRecord
   belongs_to :lineage_ancestor, class_name: 'Project', foreign_key: :ancestor_id
   has_many :lineage_descendants, class_name: 'Project', foreign_key: :ancestor_id
 
-  scope :default_order, -> { order('title') }
   scope :without_programme, -> { where('programme_id IS NULL') }
 
   validates :web_page, url: {allow_nil: true, allow_blank: true}
