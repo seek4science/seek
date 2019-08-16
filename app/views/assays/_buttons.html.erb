@@ -13,7 +13,7 @@
     <%= button_link_to('Add data from NeLS', 'add', assay_nels_path(item.id)) %>
 <% end -%>
 
-<%= admin_dropdown do %>
+<%= item_actions_dropdown do %>
     <% if item.can_manage? -%>
         <li><%= icon_link_to("Manage #{assay_word}", 'manage', edit_assay_path) %></li>
         <%= render :partial => 'snapshots/new_snapshot_link', :locals => { :item => item } %>

@@ -38,7 +38,6 @@ class StudiesController < ApplicationController
   def new
     @study = Study.new
     @study.create_from_asset = params[:create_from_asset]
-    @study.new_link_from_assay = params[:new_link_from_assay]
     investigation = nil
     investigation = Investigation.find(params[:investigation_id]) if params[:investigation_id]
 
@@ -102,19 +101,15 @@ class StudiesController < ApplicationController
     update_relationships(@study, params)
     ### TO DO: what about validation of person responsible? is it already included (for json?)
     if @study.save
-      if @study.new_link_from_assay == 'true'
-        render partial: 'assets/back_to_singleselect_parent', locals: { child: @study, parent: 'assay' }
-      else
-        respond_to do |format|
-          flash[:notice] = "The #{t('study')} was successfully created.<br/>".html_safe
-          if @study.create_from_asset == 'true'
-            flash.now[:notice] << "Now you can create new #{t('assays.assay')} by clicking -Add an #{t('assays.assay')}- button".html_safe
-            format.html { redirect_to study_path(id: @study, create_from_asset: @study.create_from_asset) }
-            format.json {render json: @study}
-          else
-            format.html { redirect_to study_path(@study) }
-            format.json {render json: @study}
-          end
+      respond_to do |format|
+        flash[:notice] = "The #{t('study')} was successfully created.<br/>".html_safe
+        if @study.create_from_asset == 'true'
+          flash.now[:notice] << "Now you can create new #{t('assays.assay')} by clicking -Add an #{t('assays.assay')}- button".html_safe
+          format.html { redirect_to study_path(id: @study, create_from_asset: @study.create_from_asset) }
+          format.json { render json: @study }
+        else
+          format.html { redirect_to study_path(@study) }
+          format.json { render json: @study }
         end
       end
     else
@@ -164,7 +159,7 @@ class StudiesController < ApplicationController
 
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
-                                  :other_creators, :create_from_asset, :new_link_from_assay, { creator_ids: [] },
+                                  :other_creators, :create_from_asset, { creator_ids: [] },
                                   { scales: [] }, { publication_ids: [] })
   end
 end
