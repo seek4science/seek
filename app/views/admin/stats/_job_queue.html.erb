@@ -9,7 +9,7 @@
 </p>
 
 <% if Delayed::Job.where('failed_at IS NOT NULL').count > 0 %>
-  <%= button_link_to "Clear failed jobs", 'clear', '#', id: 'clear-failed-btn', class: 'btn-primary' %>
+  <%= button_link_to "Clear failed jobs", 'destroy', '#', id: 'clear-failed-btn', class: 'btn-primary' %>
 <% end %>
 
 <table class="table table-hover">
@@ -34,7 +34,7 @@
         <td><%= date_as_string(item.run_at,true) -%></td>
         <td><%= date_as_string(item.locked_at,true) -%></td>
         <td>
-          <%= item.failed_at.nil? ? date_as_string(item.failed_at,true) : link_to_function(date_as_string(item.failed_at,true),"Effect.toggle('last_error_#{item.id}','appear', { delay: 0.5 });") -%>
+          <%= item.failed_at.nil? ? date_as_string(item.failed_at,true) : link_to(date_as_string(item.failed_at,true), '#', onclick: "$j('#last_error_#{item.id}').fadeIn(); return false;") -%>
         </td>
         <td><%= item.handler -%></td>
       </tr>

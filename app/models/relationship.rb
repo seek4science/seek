@@ -9,7 +9,7 @@
 # *****************************************************************************
 
 
-class Relationship < ActiveRecord::Base
+class Relationship < ApplicationRecord
 
   validates_presence_of :subject, :other_object
   

@@ -8,8 +8,12 @@ module Seek
       MIN_ROWS = 35
       MIN_COLS = 10
 
+      def supported_spreadsheet_format?
+        content_blob && content_blob.is_supported_spreadsheet_format?
+      end
+
       def contains_extractable_spreadsheet?
-        content_blob && content_blob.is_extractable_spreadsheet?
+        supported_spreadsheet_format? && content_blob.is_extractable_spreadsheet?
       end
 
       def spreadsheet_annotations
@@ -36,10 +40,8 @@ module Seek
       # Return the data file's spreadsheet XML
       # If it doesn't exist yet, it gets created
       def spreadsheet_xml
-        if contains_extractable_spreadsheet?
-          Rails.cache.fetch("blob_ss_xml-#{content_blob.cache_key}") do
-            content_blob.to_spreadsheet_xml
-          end
+        Rails.cache.fetch("blob_ss_xml-#{content_blob.cache_key}") do
+          content_blob.to_spreadsheet_xml
         end
       end
 

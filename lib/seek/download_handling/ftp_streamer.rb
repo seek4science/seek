@@ -31,6 +31,6 @@ module Seek
       end
     end
 
-    class SizeLimitExceededException < Exception; end
+    class SizeLimitExceededException < RuntimeError; end
   end
 end

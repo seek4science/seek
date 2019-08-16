@@ -2,8 +2,8 @@ module Seek
   module Publishing
     module GatekeeperPublish
       def self.included(base)
-        base.before_filter :set_gatekeeper, only: [:requested_approval_assets, :gatekeeper_decide]
-        base.before_filter :gatekeeper_auth, only: [:requested_approval_assets, :gatekeeper_decide]
+        base.before_action :set_gatekeeper, only: [:requested_approval_assets, :gatekeeper_decide]
+        base.before_action :gatekeeper_auth, only: [:requested_approval_assets, :gatekeeper_decide]
       end
 
       def requested_approval_assets

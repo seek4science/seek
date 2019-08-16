@@ -84,7 +84,7 @@ class SubscriptionWithHierarchyTest < ActionDispatch::IntegrationTest
     assert_equal 0, ProjectSubscription.where(person_id: person.id).count
 
     assert_difference('ProjectSubscription.count', 2) do
-      put "/people/#{person.id}", id: person.id, person: { 'project_subscriptions_attributes' => add_project_subscriptions_attributes }
+      put "/people/#{person.id}", params: { id: person.id, person: { 'project_subscriptions_attributes' => add_project_subscriptions_attributes } }
     end
 
     person.reload
@@ -95,7 +95,7 @@ class SubscriptionWithHierarchyTest < ActionDispatch::IntegrationTest
     remove_project_subscriptions_attributes = [{ 'id' => first_id, 'project_id' => @proj_child1.id, '_destroy' => '1', 'frequency' => 'daily' },
                                                { 'id' => second_id, 'project_id' => @proj_child2.id, '_destroy' => '1', 'frequency' => 'weekly' }]
     assert_difference('ProjectSubscription.count', -2) do
-      put "/people/#{person.id}", id: person.id, person: { 'project_subscriptions_attributes' => remove_project_subscriptions_attributes }
+      put "/people/#{person.id}", params: { id: person.id, person: { 'project_subscriptions_attributes' => remove_project_subscriptions_attributes } }
     end
 
     person.reload

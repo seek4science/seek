@@ -3,7 +3,7 @@ require 'test_helper'
 class ContentTypeDetectionTest < ActiveSupport::TestCase
   include Seek::ContentTypeDetection
 
-  def test_is_xls
+  test 'is_xls' do
     blob = Factory :spreadsheet_content_blob
     assert blob.is_xls?
     assert is_xls?(blob)
@@ -13,7 +13,7 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     assert !is_xls?(blob)
   end
 
-  def test_is_xlsx
+  test 'is_xlsx' do
     blob = Factory :xlsx_content_blob
     assert blob.is_xlsx?
     assert is_xlsx?(blob)
@@ -23,7 +23,7 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     assert !is_xlsx?(blob)
   end
 
-  def test_is_excel
+  test 'is_excel' do
     blob = Factory :spreadsheet_content_blob
     assert blob.is_excel?
     assert is_excel?(blob)
@@ -39,11 +39,9 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     blob = Factory :doc_content_blob
     assert !blob.is_excel?(blob)
     assert !is_excel?(blob)
-
   end
 
-  def test_is_extractable_spreadsheet
-
+  test 'is_extractable_spreadsheet' do
     blob = Factory :spreadsheet_content_blob
     assert blob.is_extractable_spreadsheet?
     assert is_extractable_spreadsheet?(blob)
@@ -57,13 +55,41 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     assert is_extractable_spreadsheet?(blob)
 
     blob = Factory :doc_content_blob
-    assert !blob.is_extractable_spreadsheet?
-    assert !is_extractable_spreadsheet?(blob)
+    refute blob.is_extractable_spreadsheet?
+    refute is_extractable_spreadsheet?(blob)
 
-
+    with_config_value(:max_extractable_spreadsheet_size, 0) do
+      blob = Factory :xlsx_content_blob
+      refute blob.is_extractable_spreadsheet?
+      refute is_extractable_spreadsheet?(blob)
+    end
   end
 
-  def test_is_sbml
+  test 'is_supported_spreadsheet_format' do
+    blob = Factory :spreadsheet_content_blob
+    assert blob.is_supported_spreadsheet_format?
+    assert is_supported_spreadsheet_format?(blob)
+
+    blob = Factory :xlsx_content_blob
+    assert blob.is_supported_spreadsheet_format?
+    assert is_supported_spreadsheet_format?(blob)
+
+    blob = Factory :xlsm_content_blob
+    assert blob.is_supported_spreadsheet_format?
+    assert is_supported_spreadsheet_format?(blob)
+
+    blob = Factory :doc_content_blob
+    refute blob.is_supported_spreadsheet_format?
+    refute is_supported_spreadsheet_format?(blob)
+
+    with_config_value(:max_extractable_spreadsheet_size, 0) do
+      blob = Factory :xlsx_content_blob
+      assert blob.is_supported_spreadsheet_format?
+      assert is_supported_spreadsheet_format?(blob)
+    end
+  end
+
+  test 'is_sbml' do
     blob = Factory :teusink_model_content_blob
     assert is_sbml?(blob)
     assert !is_jws_dat?(blob)
@@ -72,7 +98,7 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     assert !blob.is_xgmml?
   end
 
-  def test_is_jws_dat
+  test 'is_jws_dat' do
     blob = Factory :teusink_jws_model_content_blob
     assert !is_sbml?(blob)
     assert is_jws_dat?(blob)
@@ -81,7 +107,7 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     assert !blob.is_xgmml?
   end
 
-  def test_is_xgmml
+  test 'is_xgmml' do
     blob = Factory :xgmml_content_blob
     assert blob.is_xgmml?
     assert !blob.is_sbml?

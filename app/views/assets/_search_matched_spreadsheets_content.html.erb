@@ -1,6 +1,6 @@
 <% unless matched_items.empty? -%>
-    <%= stylesheet_link_tag('spreadsheet_explorer', 'lightbox') %>
-    <%= javascript_include_tag 'spreadsheet_explorer', 'zoom/lightbox' %>
+    <%= stylesheet_link_tag('spreadsheet_explorer') %>
+    <%= javascript_include_tag 'spreadsheet_explorer' %>
     <!--- multiple  sheets --->
     <% matched_items.each do |item| -%>
         <% if authorization_for_showing_already_done || item.can_download? -%>
@@ -51,19 +51,14 @@
     function displayTabsImmediately() {
         for (var i = 0; i < tabber_ids.length; i++) {
             var tabber_id = tabber_ids[i];
-            var spinner = $(tabber_id + "_spinner");
-            if (spinner != null) {
+            var spinner = $j('#' + tabber_id + "_spinner");
+            if (spinner.length) {
                 spinner.hide();
-                $(tabber_id).show();
+                $j('#' + tabber_id).show();
             }
         }
     }
-    function addSpreadsheetContainerAdjustedToTabber(){
-        for (var i = 0; i < tabber_ids.length; i++) {
-            var tabber_id = tabber_ids[i];
-            $(tabber_id).show();
-        }
-    }
+
     function showMatchedItems() {
         var item_ids = [];
         <% matched_items.each do |item|%>

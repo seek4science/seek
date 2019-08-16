@@ -1,4 +1,4 @@
-class AdminDefinedRoleProgramme < ActiveRecord::Base
+class AdminDefinedRoleProgramme < ApplicationRecord
   belongs_to :programme
   belongs_to :person
 

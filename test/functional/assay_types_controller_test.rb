@@ -12,7 +12,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   test 'should show assay types to public' do
     assay = Factory :experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', policy: Factory(:public_policy)
     logout
-    get :show, uri: assay.assay_type_uri
+    get :show, params: { uri: assay.assay_type_uri }
     assert_response :success
     assert_select 'h1', text: /Assay type 'Fluxomics'/
     assert_select 'div.list_items_container' do
@@ -24,7 +24,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   test 'hierarchy' do
     assay = Factory :experimental_assay, title: 'flux balance assay', assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Flux_balance_analysis', policy: Factory(:public_policy)
     logout
-    get :show, uri: 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type'
+    get :show, params: { uri: 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type' }
     assert_response :success
 
     assert_select 'h1', text: /Assay type 'Experimental assay type'/
@@ -48,7 +48,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     pub_assay = Factory :experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', policy: Factory(:public_policy)
     priv_assay = Factory :experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', policy: Factory(:private_policy)
     logout
-    get :show, uri: 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type'
+    get :show, params: { uri: 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type' }
     assert_response :success
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(pub_assay), text: /#{pub_assay.title}/
@@ -60,7 +60,7 @@ class AssayTypesControllerTest < ActionController::TestCase
 
   test 'modelling analysis' do
     assay = Factory :modelling_assay
-    get :show, uri: assay.assay_type_uri
+    get :show, params: { uri: assay.assay_type_uri }
     assert_response :success
     assert_select 'h1', text: /Biological problem addressed 'Model analysis type'/
   end
@@ -68,7 +68,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   test 'unmatched label passed render term suggestion page with ontology label' do
     assay = Factory :experimental_assay, policy: Factory(:public_policy)
     # with unmatched label
-    get :show, uri: assay.assay_type_uri, label: 'frog'
+    get :show, params: { uri: assay.assay_type_uri, label: 'frog' }
     # undefined label with uri in ontology will go to suggestion page pointing to term with ontology label
     assert_not_nil flash[:notice]
     assert_select 'h1', text: /Assay type 'frog'/
@@ -80,7 +80,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     # assay with ontology types
     assay = Factory :experimental_assay, policy: Factory(:public_policy)
     # with correct label
-    get :show, uri: assay.assay_type_uri, label: assay.assay_type_label
+    get :show, params: { uri: assay.assay_type_uri, label: assay.assay_type_label }
     assert_select 'h1', text: /Assay type '#{assay.assay_type_label}'/
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
@@ -90,7 +90,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   test 'no label passed render the same page as long as the same ontolgoy uri is passed' do
     assay = Factory :experimental_assay, policy: Factory(:public_policy)
     # without label
-    get :show, uri: assay.assay_type_uri
+    get :show, params: { uri: assay.assay_type_uri }
     assert_select 'h1', text: /Assay type '#{assay.assay_type_label}'/i
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
@@ -103,7 +103,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay, suggested_assay_type: suggested_assay_type, policy: Factory(:public_policy)
 
     # with correct label
-    get :show, uri: suggested_assay_type.uri, label: 'this is an assay type'
+    get :show, params: { uri: suggested_assay_type.uri, label: 'this is an assay type' }
     assert_select 'h1', text: /Assay type 'this is an assay type'/
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
@@ -113,7 +113,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   test 'unmatched label passed render term suggestion page with suggested_assay_type_label' do
     suggested_assay_type = Factory(:suggested_assay_type)
     assay = Factory :experimental_assay, suggested_assay_type: suggested_assay_type, policy: Factory(:public_policy)
-    get :show, uri: assay.assay_type_uri, label: 'frog'
+    get :show, params: { uri: assay.assay_type_uri, label: 'frog' }
     assert_not_nil flash[:notice]
     assert_select 'h1', text: /Assay type 'frog'/
     assert_select 'div.list_items_container', count: 0

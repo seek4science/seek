@@ -1,8 +1,8 @@
 <% if admin_logged_in? -%>
-    <% content_for(:buttons) do %>
-        <%= button_link_to("Return to document", 'back', help_document_path(@help_document)) -%>
-        <%= button_link_to('Remove', 'destroy', help_document_path(@help_document), { data: { confirm: 'Are you sure you wish to remove this page?' }, :method => :delete })  -%>
-    <% end -%>
+  <% content_for(:buttons) do %>
+    <%= button_link_to("Return to document", 'back', help_document_path(@help_document)) -%>
+    <%= button_link_to('Remove', 'destroy', help_document_path(@help_document), { data: { confirm: 'Are you sure you wish to remove this page?' }, :method => :delete })  -%>
+  <% end -%>
 <% end -%>
 
 <%= render :partial=>"general/page_title", :locals=>{ :title => "Editing Page: #{h @help_document.title}"} %>
@@ -11,13 +11,66 @@
 
 <div class="row" style="margin-top: 1em">
   <div class="col-md-6">
-    <%= folding_panel("Attachments (<span id='attachments_count'>#{@help_document.attachments.size}</span>)".html_safe, true) do %>
-        <%= render :partial => 'attachments' %>
-    <% end %>
+    <%= render partial: 'attachments', locals: { collapsed: true } %>
   </div>
   <div class="col-md-6">
-    <%= folding_panel("Images (<span id='images_count'>#{@help_document.images.size}</span>)".html_safe, true) do %>
-        <%= render :partial => 'images' %>
-    <% end %>
+    <%= render partial: 'images', locals: { collapsed: true } %>
   </div>
 </div>
+
+<script>
+    var helpImagePath = '<%= help_document_help_images_path(@help_document) -%>';
+    var helpAttachmentPath = '<%= help_document_help_attachments_path(@help_document) -%>';
+
+    $j(document).ready(function () {
+        $j(document).on('click', '#submit-help-image', function (e) {
+          var imageForm = document.forms.namedItem('image-form');
+          var data = new FormData(imageForm);
+
+          $j.ajax({
+              url: helpImagePath,
+              type: 'POST',
+              data: data,
+              contentType: false,
+              scripts: true,
+              processData: false,
+          }).always(function (body) {
+              $j('#help-image-box').replaceWith(body).highlight();
+          });
+
+          return false;
+        });
+
+        $j(document).on('click', '#submit-help-attachment', function (e) {
+          var attachmentForm = document.forms.namedItem('attachment-form');
+          var data = new FormData(attachmentForm);
+
+          $j.ajax({
+              url: helpAttachmentPath,
+              type: 'POST',
+              data: data,
+              contentType: false,
+              scripts: true,
+              processData: false,
+          }).always(function (body) {
+              $j('#help-attachment-box').replaceWith(body).highlight();
+          });
+
+          return false;
+        });
+
+        $j(document).on('ajax:beforeSend', '.delete-help-image', function () {
+            $j(this).spinner('add');
+        });
+        $j(document).on('ajax:complete', '.delete-help-image', function (e, xhr) {
+            $j('#help-image-box').replaceWith(xhr.responseText).highlight();
+        });
+
+        $j(document).on('ajax:beforeSend', '.delete-help-attachment', function () {
+            $j(this).spinner('add');
+        });
+        $j(document).on('ajax:complete', '.delete-help-attachment', function (e, xhr) {
+            $j('#help-attachment-box').replaceWith(xhr.responseText).highlight();
+        });
+    });
+</script>

@@ -1,6 +1,6 @@
 require 'libxml'
 
-class Publication < ActiveRecord::Base
+class Publication < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include PublicationsHelper
 
@@ -46,11 +46,11 @@ class Publication < ActiveRecord::Base
   validates :publication_type_id,:presence => true
 
   # validation differences between OpenSEEK and the VLN SEEK
-  validates_uniqueness_of :pubmed_id, allow_nil: true, allow_blank: true, if: 'Seek::Config.is_virtualliver'
-  validates_uniqueness_of :doi, allow_nil: true, allow_blank: true, if: 'Seek::Config.is_virtualliver'
-  validates_uniqueness_of :title, if: 'Seek::Config.is_virtualliver'
+  validates_uniqueness_of :pubmed_id, allow_nil: true, allow_blank: true, if: -> { Seek::Config.is_virtualliver }
+  validates_uniqueness_of :doi, allow_nil: true, allow_blank: true, if: -> { Seek::Config.is_virtualliver }
+  validates_uniqueness_of :title, if: -> { Seek::Config.is_virtualliver }
 
-  validate :check_uniqueness_within_project, unless: 'Seek::Config.is_virtualliver'
+  validate :check_uniqueness_within_project, unless: -> { Seek::Config.is_virtualliver }
 
   attr_writer :refresh_policy
   before_save :refresh_policy, on: :update

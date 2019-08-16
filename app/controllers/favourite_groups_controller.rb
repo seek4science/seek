@@ -1,13 +1,11 @@
 class FavouriteGroupsController < ApplicationController
-  include WhiteListHelper
-
-  before_filter :login_required
-  before_filter :find_favourite_group, only: %i[edit update destroy]
-  before_filter :set_no_layout, only: %i[new edit]
+  before_action :login_required
+  before_action :find_favourite_group, only: %i[edit update destroy]
+  before_action :set_no_layout, only: %i[new edit]
 
   protect_from_forgery except: %i[create update destroy]
 
-  skip_before_filter :project_membership_required
+  skip_before_action :project_membership_required
 
   def new
     @f_group = FavouriteGroup.new

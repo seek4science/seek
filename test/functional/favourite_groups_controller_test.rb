@@ -16,7 +16,7 @@ class FavouriteGroupsControllerTest < ActionController::TestCase
     name = fav.name
 
     assert_no_difference('FavouriteGroup.count') do
-      post :create, favourite_group_name: name, favourite_group_members: {}.to_json, format: 'json'
+      post :create, params: { favourite_group_name: name, favourite_group_members: {}.to_json, format: 'json' }
     end
 
     assert_response :unprocessable_entity
@@ -33,7 +33,7 @@ class FavouriteGroupsControllerTest < ActionController::TestCase
 
     name = fav.name
 
-    put :update, id: other_fav.id, favourite_group_name: name, favourite_group_members: {}.to_json, format: 'json'
+    put :update, params: { id: other_fav.id, favourite_group_name: name, favourite_group_members: {}.to_json, format: 'json' }
 
     assert_response :unprocessable_entity
   end

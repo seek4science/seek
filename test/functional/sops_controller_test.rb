@@ -25,7 +25,7 @@ class SopsControllerTest < ActionController::TestCase
     p2 = Factory :person
     sop = Factory(:sop, title: 'ZZZZZ', creators: [p2], contributor: p1, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
 
-    get :index, page: 'Z'
+    get :index, params: { page: 'Z' }
 
     # check the test is behaving as expected:
     assert_equal p1, sop.contributor
@@ -46,18 +46,18 @@ class SopsControllerTest < ActionController::TestCase
 
     assert !sop.can_download?, 'The SOP must not be downloadable for this test to succeed'
 
-    get :show, id: sop
+    get :show, params: { id: sop }
     assert_response :success
-    assert_select '#request_resource_button > a', text: /Request #{I18n.t('sop')}/, count: 1
+    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 1
 
     logout
-    get :show, id: sop
+    get :show, params: { id: sop }
     assert_response :success
-    assert_select '#request_resource_button > a', text: /Request #{I18n.t('sop')}/, count: 0
+    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 0
   end
 
   test 'fail gracefullly when trying to access a missing sop' do
-    get :show, id: 99_999
+    get :show, params: { id: 99_999 }
     assert_response :not_found
   end
 
@@ -68,7 +68,7 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, sop: { title: 'Test' }, content_blobs: [{ data_url: uri.to_s }], policy_attributes: valid_sharing
+        post :create, params: { sop: { title: 'Test' }, content_blobs: [{ data_url: uri.to_s }], policy_attributes: valid_sharing }
       end
     end
     assert_not_nil flash[:error]
@@ -87,7 +87,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
-    get :index, page: 'all'
+    get :index, params: { page: 'all' }
     assert_response :success
     assert_equal assigns(:sops).sort_by(&:id), Sop.authorize_asset_collection(assigns(:sops), 'view', users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
   end
@@ -95,13 +95,13 @@ class SopsControllerTest < ActionController::TestCase
   test 'should not show private sop to logged out user' do
     sop = Factory :sop
     logout
-    get :show, id: sop
+    get :show, params: { id: sop }
     assert_response :forbidden
   end
 
   test 'should not show private sop to another user' do
     sop = Factory :sop, contributor: Factory(:person)
-    get :show, id: sop
+    get :show, params: { id: sop }
     assert_response :forbidden
   end
 
@@ -117,7 +117,7 @@ class SopsControllerTest < ActionController::TestCase
     blob = { data_url: 'http://sdfsdfds.com/sdf.png' }
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { sop: sop, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
     assert_not_nil flash.now[:error]
@@ -127,7 +127,7 @@ class SopsControllerTest < ActionController::TestCase
     blob = { data_url: 's  df::sd:dfds.com/sdf.png' }
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { sop: sop, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
     assert_not_nil flash.now[:error]
@@ -137,7 +137,7 @@ class SopsControllerTest < ActionController::TestCase
     sop = { title: 'Test', project_ids: [@project.id] }
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, sop: sop, content_blobs: [{}], policy_attributes: valid_sharing
+        post :create, params: { sop: sop, content_blobs: [{}], policy_attributes: valid_sharing }
       end
     end
     assert_not_nil flash.now[:error]
@@ -154,7 +154,7 @@ class SopsControllerTest < ActionController::TestCase
 
     refute_includes new_assay.sops, s
 
-    put :update, id: s.id, sop: { title: s.title, assay_assets_attributes: [{ assay_id: new_assay.id }] }
+    put :update, params: { id: s.id, sop: { title: s.title, assay_assets_attributes: [{ assay_id: new_assay.id }] } }
 
     assert_redirected_to sop_path(s)
 
@@ -171,8 +171,7 @@ class SopsControllerTest < ActionController::TestCase
     assay = Factory(:assay, contributor: User.current_user.person)
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, sop: sop.merge(assay_assets_attributes: [{ assay_id: assay.id }]),
-             content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { sop: sop.merge(assay_assets_attributes: [{ assay_id: assay.id }]), content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
 
@@ -190,7 +189,7 @@ class SopsControllerTest < ActionController::TestCase
     sop, blob = valid_sop_with_url
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { sop: sop, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -207,7 +206,7 @@ class SopsControllerTest < ActionController::TestCase
     blob[:make_local_copy] = '1'
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, sop: sop_details, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { sop: sop_details, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -222,7 +221,7 @@ class SopsControllerTest < ActionController::TestCase
     s = Factory :pdf_sop, policy: Factory(:public_policy)
 
     assert_difference('ActivityLog.count') do
-      get :show, id: s.id
+      get :show, params: { id: s.id }
     end
 
     assert_response :success
@@ -245,7 +244,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should get edit' do
     login_as(:owner_of_my_first_sop)
-    get :edit, id: sops(:my_first_sop)
+    get :edit, params: { id: sops(:my_first_sop) }
     assert_response :success
     assert_select 'h1', text: /Editing #{I18n.t('sop')}/
 
@@ -255,7 +254,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'publications excluded in form for sops' do
     login_as(:owner_of_my_first_sop)
-    get :edit, id: sops(:my_first_sop)
+    get :edit, params: { id: sops(:my_first_sop) }
     assert_response :success
     assert_select 'div#add_publications_form', false
 
@@ -268,7 +267,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(person = Factory(:person))
     sop = Factory(:sop, contributor: person)
     assert_empty sop.policy.permissions
-    put :update, id: sop.id, sop: { title: 'Test2' }, policy_attributes: { access_type: Policy::ACCESSIBLE, permissions_attributes: project_permissions(sop.projects, Policy::ACCESSIBLE) }
+    put :update, params: { id: sop.id, sop: { title: 'Test2' }, policy_attributes: { access_type: Policy::ACCESSIBLE, permissions_attributes: project_permissions(sop.projects, Policy::ACCESSIBLE) } }
     sop = assigns(:sop)
     assert_redirected_to sop_path(sop)
     assert_equal 'Test2', sop.title
@@ -281,7 +280,9 @@ class SopsControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('Sop.count', -1) do
         assert_no_difference('ContentBlob.count') do
-          delete :destroy, id: sops(:my_first_sop)
+          delete :destroy, params: { id: sops(:my_first_sop) }
+
+          assert flash[:notice].include?('deleted')
         end
       end
     end
@@ -292,7 +293,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should not be able to edit exp conditions for downloadable only sop' do
     s = sops(:downloadable_sop)
 
-    get :show, id: s
+    get :show, params: { id: s }
     assert_select 'a', text: /Edit experimental conditions/, count: 0
   end
 
@@ -302,7 +303,7 @@ class SopsControllerTest < ActionController::TestCase
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
     # create new version
-    post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload(tempfile_fixture: 'files/little_file_v2.txt', content_type: 'text/plain', filename: 'little_file_v2.txt') }]
+    post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: fixture_file_upload('files/little_file_v2.txt', 'text/plain') }] }
     assert_redirected_to sop_path(assigns(:sop))
 
     s = Sop.find(s.id)
@@ -311,15 +312,15 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 1, s.versions[0].version
     assert_equal 2, s.versions[1].version
 
-    get :show, id: s
+    get :show, params: { id: s }
     assert_select 'p', text: /little_file_v2.txt/, count: 1
     assert_select 'p', text: /sop.pdf/, count: 0
 
-    get :show, id: s, version: '2'
+    get :show, params: { id: s, version: '2' }
     assert_select 'p', text: /little_file_v2.txt/, count: 1
     assert_select 'p', text: /sop.pdf/, count: 0
 
-    get :show, id: s, version: '1'
+    get :show, params: { id: s, version: '1' }
     assert_select 'p', text: /little_file_v2.txt/, count: 0
     assert_select 'p', text: /sop.pdf/, count: 1
   end
@@ -328,7 +329,7 @@ class SopsControllerTest < ActionController::TestCase
     sop = Factory :doc_sop, policy: Factory(:public_policy)
     login_as(sop.contributor.user)
     assert_difference('ActivityLog.count') do
-      get :download, id: sop.id
+      get :download, params: { id: sop.id }
     end
     assert_response :success
     al = ActivityLog.last
@@ -343,7 +344,7 @@ class SopsControllerTest < ActionController::TestCase
     s = Factory(:sop, contributor: @user.person)
 
     assert_difference('Sop::Version.count', 1) do
-      post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision'
+      post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to sop_path(s)
@@ -369,7 +370,7 @@ class SopsControllerTest < ActionController::TestCase
     refute s.can_edit?
 
     assert_no_difference('Sop::Version.count') do
-      post :new_version, id: s, data: fixture_file_upload('files/file_picture.png'), revision_comments: 'This is a new revision'
+      post :new_version, params: { id: s, data: fixture_file_upload('files/file_picture.png'), revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to sop_path(s)
@@ -389,7 +390,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 1, s.experimental_conditions.count
     assert_difference('Sop::Version.count', 1) do
       assert_difference('ExperimentalCondition.count', 1) do
-        post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' # v2
+        post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
       end
     end
 
@@ -405,7 +406,7 @@ class SopsControllerTest < ActionController::TestCase
                                               start_value: 1, sop_id: s.id, sop_version: s.version)
     assert_difference('Sop::Version.count', 1) do
       assert_difference('ExperimentalCondition.count', 1) do
-        post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' # v2
+        post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
       end
     end
 
@@ -423,26 +424,26 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_add_nofollow_to_links_in_show_page
-    get :show, id: sops(:sop_with_links_in_description)
+    get :show, params: { id: sops(:sop_with_links_in_description) }
     assert_select 'div#description' do
       assert_select 'a[rel="nofollow"]'
     end
   end
 
   def test_can_display_sop_with_no_contributor
-    get :show, id: sops(:sop_with_no_contributor)
+    get :show, params: { id: sops(:sop_with_no_contributor) }
     assert_response :success
   end
 
   def test_can_show_edit_for_sop_with_no_contributor
-    get :edit, id: sops(:sop_with_no_contributor)
+    get :edit, params: { id: sops(:sop_with_no_contributor) }
     assert_response :success
   end
 
   def test_editing_doesnt_change_contributor
     login_as(:model_owner) # this user is a member of sysmo, and can edit this sop
     sop = sops(:sop_with_no_contributor)
-    put :update, id: sop, sop: { title: 'blah blah blah' }, policy_attributes: valid_sharing
+    put :update, params: { id: sop, sop: { title: 'blah blah blah' }, policy_attributes: valid_sharing }
     updated_sop = assigns(:sop)
     assert_redirected_to sop_path(updated_sop)
     assert_equal 'blah blah blah', updated_sop.title, 'Title should have been updated'
@@ -451,25 +452,25 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'filtering by assay' do
     assay = assays(:metabolomics_assay)
-    get :index, filter: { assay: assay.id }
+    get :index, params: { filter: { assay: assay.id } }
     assert_response :success
   end
 
   test 'filtering by study' do
     study = studies(:metabolomics_study)
-    get :index, filter: { study: study.id }
+    get :index, params: { filter: { study: study.id } }
     assert_response :success
   end
 
   test 'filtering by investigation' do
     inv = investigations(:metabolomics_investigation)
-    get :index, filter: { investigation: inv.id }
+    get :index, params: { filter: { investigation: inv.id } }
     assert_response :success
   end
 
   test 'filtering by project' do
     project = projects(:sysmo_project)
-    get :index, filter: { project: project.id }
+    get :index, params: { filter: { project: project.id } }
     assert_response :success
   end
 
@@ -477,7 +478,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:owner_of_my_first_sop)
     person = people(:person_for_owner_of_my_first_sop)
     p = projects(:sysmo_project)
-    get :index, filter: { person: person.id }, page: 'all'
+    get :index, params: { filter: { person: person.id }, page: 'all' }
     assert_response :success
     sop  = sops(:downloadable_sop)
     sop2 = sops(:sop_with_fully_public_policy)
@@ -494,7 +495,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_edit?(@user), 'sop should be editable but not manageable for this test'
     refute sop.can_manage?(@user), 'sop should be editable but not manageable for this test'
     assert_equal Policy::NO_ACCESS, sop.policy.access_type
-    put :update, id: sop, sop: { title: 'new title' }, policy_attributes: { access_type: Policy::EDITING }
+    put :update, params: { id: sop, sop: { title: 'new title' }, policy_attributes: { access_type: Policy::EDITING } }
 
     assert_redirected_to sop_path(sop)
     sop.reload
@@ -509,7 +510,7 @@ class SopsControllerTest < ActionController::TestCase
 
     sop = Factory :sop, contributor: User.current_user.person, policy: Factory(:policy, access_type: Policy::EDITING)
 
-    put :update, id: sop, sop: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS }
+    put :update, params: { id: sop, sop: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS } }
     assert_redirected_to sop_path(sop)
     sop.reload
 
@@ -521,7 +522,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:owner_of_my_first_sop)
     sop = sops(:sop_with_project_without_gatekeeper)
     assert sop.can_manage?, 'The sop must be manageable for this test to succeed'
-    post :publish, id: sop
+    post :publish, params: { id: sop }
     assert_response :redirect
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
@@ -530,7 +531,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'do not isa_publish if not can_manage?' do
     sop = sops(:sop_with_project_without_gatekeeper)
     assert !sop.can_manage?, 'The sop must not be manageable for this test to succeed'
-    post :publish, id: sop
+    post :publish, params: { id: sop }
     assert_redirected_to :root
     assert_not_nil flash[:error]
     assert_nil flash[:notice]
@@ -553,7 +554,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'breadcrumb for showing sop' do
     sop = sops(:sop_with_fully_public_policy)
-    get :show, id: sop
+    get :show, params: { id: sop }
     assert_response :success
     assert_select 'div.breadcrumbs', text: /Home #{I18n.t('sop').pluralize} Index #{sop.title}/, count: 1 do
       assert_select 'a[href=?]', root_path, count: 1
@@ -564,7 +565,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'breadcrumb for editing sop' do
     sop = sops(:sop_with_all_sysmo_users_policy)
     assert sop.can_edit?
-    get :edit, id: sop
+    get :edit, params: { id: sop }
     assert_response :success
     assert_select 'div.breadcrumbs', text: /Home SOPs Index #{sop.title} Edit/, count: 1 do
       assert_select 'a[href=?]', root_path, count: 1
@@ -586,8 +587,7 @@ class SopsControllerTest < ActionController::TestCase
     as_not_virtualliver do
       gatekeeper = Factory(:asset_gatekeeper)
       @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
-      post :create, sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: file_for_upload }],
-                    policy_attributes: { access_type: Policy::VISIBLE }
+      post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::VISIBLE } }
       sop = assigns(:sop)
       assert_redirected_to (sop)
       policy = sop.policy
@@ -604,7 +604,7 @@ class SopsControllerTest < ActionController::TestCase
     sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
     login_as(sop.contributor)
     assert sop.can_manage?
-    put :update, id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::VISIBLE } }
     sop = assigns(:sop)
     assert_redirected_to(sop)
     updated_policy = sop.policy
@@ -615,7 +615,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should be able to view pdf content' do
     sop = Factory(:sop, policy: Factory(:all_sysmo_downloadable_policy))
     assert sop.content_blob.is_content_viewable?
-    get :show, id: sop.id
+    get :show, params: { id: sop.id }
     assert_response :success
     assert_select 'a', text: /View content/, count: 1
   end
@@ -627,13 +627,13 @@ class SopsControllerTest < ActionController::TestCase
       pdf_filepath = content_blob.filepath('pdf')
       FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
       assert content_blob.is_content_viewable?
-      get :show, id: ms_word_sop.id
+      get :show, params: { id: ms_word_sop.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
 
       openoffice_word_sop = Factory(:odt_sop, policy: Factory(:all_sysmo_downloadable_policy))
       assert openoffice_word_sop.content_blob.is_content_viewable?
-      get :show, id: openoffice_word_sop.id
+      get :show, params: { id: openoffice_word_sop.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
     end
@@ -648,7 +648,7 @@ class SopsControllerTest < ActionController::TestCase
     pdf_filepath = content_blob.filepath('pdf')
     FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
     assert !content_blob.is_content_viewable?
-    get :show, id: ms_word_sop.id
+    get :show, params: { id: ms_word_sop.id }
     assert_response :success
     assert_select 'a', text: /View content/, count: 0
 
@@ -659,14 +659,14 @@ class SopsControllerTest < ActionController::TestCase
     sop, blob = valid_sop
     assert_difference('ActivityLog.count', 1) do
       assert_difference('Sop.count', 1) do
-        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { sop: sop, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
     al1 = ActivityLog.last
     s = assigns(:sop)
     assert_difference('ActivityLog.count', 1) do
       assert_difference('Sop::Version.count', 1) do
-        post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision'
+        post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
       end
     end
     al2 = ActivityLog.last
@@ -679,7 +679,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should not create duplication sop_versions_projects when uploading new version' do
     sop = Factory(:sop)
     login_as(sop.contributor)
-    post :new_version, id: sop, sop: { title: sop.title }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision'
+    post :new_version, params: { id: sop, sop: { title: sop.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
 
     sop.reload
     assert_equal 2, sop.versions.count
@@ -688,7 +688,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should not create duplication sop_versions_projects when uploading sop' do
     sop, blob = valid_sop
-    post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
+    post :create, params: { sop: sop, content_blobs: [blob], policy_attributes: valid_sharing }
 
     sop = assigns(:sop)
     assert_equal 1, sop.versions.count
@@ -703,7 +703,7 @@ class SopsControllerTest < ActionController::TestCase
     project_sop_version = sop_version.projects.first
 
     login_as(sop.contributor)
-    delete :destroy, id: sop
+    delete :destroy, params: { id: sop }
     assert_nil Sop::Version.find_by_id(sop_version.id)
     sql = "select * from projects_sop_versions where project_id = #{project_sop_version.id} and version_id = #{sop_version.id}"
     assert ActiveRecord::Base.connection.select_all(sql).empty?
@@ -717,7 +717,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(sop.contributor)
     assert sop.can_publish?
     assert_enqueued_emails 1 do
-      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+      put :update, params: { sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
   end
 
@@ -730,7 +730,7 @@ class SopsControllerTest < ActionController::TestCase
     assert !sop.is_published?
     assert sop.can_publish?
     assert_no_enqueued_emails do
-      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+      put :update, params: { sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
   end
 
@@ -743,11 +743,11 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_publish?
     # send the first time
     assert_enqueued_emails 1 do
-      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+      put :update, params: { sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
     # dont send again
     assert_no_enqueued_emails do
-      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+      put :update, params: { sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
   end
 
@@ -759,7 +759,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_view?(nil)
 
     assert_no_enqueued_emails do
-      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+      put :update, params: { sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
 
     assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
@@ -773,7 +773,7 @@ class SopsControllerTest < ActionController::TestCase
     refute sop.can_view?(nil)
 
     assert_no_enqueued_emails do
-      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, params: { sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE } }
     end
 
     assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
@@ -789,7 +789,7 @@ class SopsControllerTest < ActionController::TestCase
     refute sop.can_download?(nil)
 
     assert_enqueued_emails 1 do
-      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+      put :update, params: { sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
 
     refute sop.is_published?
@@ -808,12 +808,11 @@ class SopsControllerTest < ActionController::TestCase
     sop = Factory :sop, contributor: User.current_user.person, policy: policy
     assert sop.can_manage?
 
-    put :update, id: sop.id, sop: { title: sop.title },
-        policy_attributes: { access_type: Policy::NO_ACCESS,
+    put :update, params: { id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::NO_ACCESS,
                              permissions_attributes: { '1' => { contributor_type: 'Person',
                                                                 contributor_id: a_person.id,
                                                                 access_type: Policy::MANAGING } }
-        }
+        } }
 
     assert_redirected_to sop
     assert_equal 1, sop.reload.policy.permissions.count
@@ -825,7 +824,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_edit?
     assert_not_equal sop.projects.first, User.current_user.person.projects.first
 
-    get :edit, id: sop
+    get :edit, params: { id: sop }
     assert_response :success
 
     selected = JSON.parse(select_node_contents('#project-selector-selected-json'))
@@ -834,11 +833,11 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should show tags box according to config' do
     sop = Factory(:sop, policy: Factory(:public_policy))
-    get :show, id: sop.id
+    get :show, params: { id: sop.id }
     assert_response :success
     assert_select 'div#tags_box', count: 1
     with_config_value :tagging_enabled, false do
-      get :show, id: sop.id
+      get :show, params: { id: sop.id }
       assert_response :success
       assert_select 'div#tags_box', count: 0
     end
@@ -853,7 +852,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should display null license text' do
     sop = Factory :sop, policy: Factory(:public_policy)
 
-    get :show, id: sop
+    get :show, params: { id: sop }
 
     assert_select '.panel .panel-body span#null_license', text: I18n.t('null_license')
   end
@@ -861,7 +860,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should display license' do
     sop = Factory :sop, license: 'CC-BY-4.0', policy: Factory(:public_policy)
 
-    get :show, id: sop
+    get :show, params: { id: sop }
 
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
   end
@@ -872,11 +871,11 @@ class SopsControllerTest < ActionController::TestCase
 
     sop.update_attributes license: 'CC0-1.0'
 
-    get :show, id: sop, version: 1
+    get :show, params: { id: sop, version: 1 }
     assert_response :success
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0'
 
-    get :show, id: sop, version: sopv.version
+    get :show, params: { id: sop, version: sopv.version }
     assert_response :success
     assert_select '.panel .panel-body a', text: 'CC0 1.0'
   end
@@ -886,11 +885,11 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_nil sop.license
 
-    put :update, id: sop, sop: { license: 'CC-BY-SA-4.0' }
+    put :update, params: { id: sop, sop: { license: 'CC-BY-SA-4.0' } }
 
     assert_response :redirect
 
-    get :show, id: sop
+    get :show, params: { id: sop }
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share-Alike 4.0'
     assert_equal 'CC-BY-SA-4.0', assigns(:sop).license
   end
@@ -901,7 +900,7 @@ class SopsControllerTest < ActionController::TestCase
     sop = Factory(:sop, projects: programme.projects, policy: Factory(:public_policy))
     sop2 = Factory(:sop, policy: Factory(:public_policy))
 
-    get :index, programme_id: programme.id
+    get :index, params: { programme_id: programme.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -913,17 +912,17 @@ class SopsControllerTest < ActionController::TestCase
   test 'permission popup setting set in sharing form' do
     sop = Factory :sop, contributor: User.current_user.person
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_ON_CHANGE do
-      get :edit, id: sop
+      get :edit, params: { id: sop }
     end
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "on_change"/, count: 1
 
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_ALWAYS do
-      get :edit, id: sop
+      get :edit, params: { id: sop }
     end
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "always"/, count: 1
 
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_NEVER do
-      get :edit, id: sop
+      get :edit, params: { id: sop }
     end
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "never"/, count: 1
   end
@@ -934,13 +933,13 @@ class SopsControllerTest < ActionController::TestCase
 
     login_as(sop.contributor)
 
-    get :show, id: sop
+    get :show, params: { id: sop }
     assert_response :success
     assert_select '#snapshot-citation', text: /Bacall, F/, count:0
 
     sop.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
-    get :show, id: sop
+    get :show, params: { id: sop }
     assert_response :success
     assert_select '#snapshot-citation', text: /Bacall, F/, count:1
   end
@@ -955,7 +954,7 @@ class SopsControllerTest < ActionController::TestCase
 
     login_as(sop.contributor)
 
-    get :show, id: sop
+    get :show, params: { id: sop }
 
     assert_response :success
     assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 0
@@ -968,7 +967,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(sop.contributor)
 
     with_config_value(:time_lock_doi_for, 10) do
-      get :show, id: sop
+      get :show, params: { id: sop }
 
       assert_response :success
       assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 0
@@ -981,7 +980,7 @@ class SopsControllerTest < ActionController::TestCase
 
     login_as(sop.contributor)
 
-    get :show, id: sop
+    get :show, params: { id: sop }
 
     assert_response :success
     assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 1
@@ -994,7 +993,7 @@ class SopsControllerTest < ActionController::TestCase
 
     login_as(person)
 
-    get :show, id: sop
+    get :show, params: { id: sop }
 
     assert_response :success
     assert_select '#citation-instructions', count: 0
@@ -1008,7 +1007,7 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { sop: sop, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
 
@@ -1023,7 +1022,7 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { sop: sop, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
 
@@ -1037,7 +1036,7 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
+        post :create, params: { sop: sop, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
 
@@ -1047,7 +1046,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should show sop as RDF' do
     sop = Factory(:sop, policy: Factory(:publicly_viewable_policy))
 
-    get :show, id: sop, format: :rdf
+    get :show, params: { id: sop, format: :rdf }
 
     assert_response :success
   end
@@ -1072,7 +1071,7 @@ class SopsControllerTest < ActionController::TestCase
     refute bad_assay.can_edit?
 
     assert_no_difference('AssayAsset.count') do
-      put :update, id: sop.id, sop: { title: sop.title, assay_assets_attributes: [{ assay_id: bad_assay.id }] }
+      put :update, params: { id: sop.id, sop: { title: sop.title, assay_assets_attributes: [{ assay_id: bad_assay.id }] } }
     end
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
     # assert_response :unprocessable_entity
@@ -1081,7 +1080,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_empty sop.assays
 
     assert_difference('AssayAsset.count') do
-      put :update, id: sop.id, sop: { title: sop.title, assay_assets_attributes: [{ assay_id: good_assay.id }] }
+      put :update, params: { id: sop.id, sop: { title: sop.title, assay_assets_attributes: [{ assay_id: good_assay.id }] } }
     end
     sop.reload
     assert_equal [good_assay], sop.assays
@@ -1108,8 +1107,7 @@ class SopsControllerTest < ActionController::TestCase
     sop, blob = valid_sop
 
     assert_no_difference('AssayAsset.count') do
-      post :create, sop: sop.merge(assay_assets_attributes: [{ assay_id: bad_assay.id }]), content_blobs: [blob],
-           policy_attributes: valid_sharing
+      post :create, params: { sop: sop.merge(assay_assets_attributes: [{ assay_id: bad_assay.id }]), content_blobs: [blob], policy_attributes: valid_sharing }
     end
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
     #assert_response :unprocessable_entity
@@ -1118,8 +1116,7 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_difference('Sop.count') do
       assert_difference('AssayAsset.count') do
-        post :create, sop: sop.merge(assay_assets_attributes: [{ assay_id: good_assay.id }]), content_blobs: [blob],
-             policy_attributes: valid_sharing
+        post :create, params: { sop: sop.merge(assay_assets_attributes: [{ assay_id: good_assay.id }]), content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
     sop = assigns(:sop)
@@ -1132,7 +1129,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(sop.contributor)
     assert sop.can_manage?
 
-    put :update, id: sop.id, sop: { title: sop.title, project_ids: sop.project_ids + [another_project.id] }
+    put :update, params: { id: sop.id, sop: { title: sop.title, project_ids: sop.project_ids + [another_project.id] } }
 
     refute assigns(:sop).errors.empty?
   end
@@ -1146,7 +1143,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_manage?
     assert_equal 2, sop.projects.length
 
-    put :update, id: sop.id, sop: { title: sop.title, project_ids: sop.reload.project_ids }
+    put :update, params: { id: sop.id, sop: { title: sop.title, project_ids: sop.reload.project_ids } }
 
     assert_redirected_to(sop)
     assert assigns(:sop).errors.empty?
@@ -1164,7 +1161,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_not_includes another_project.people, sop.contributor
     assert_equal 1, sop.projects.length
 
-    put :update, id: sop.id, sop: { title: sop.title, project_ids: (sop.project_ids + [another_project.id]) }
+    put :update, params: { id: sop.id, sop: { title: sop.title, project_ids: (sop.project_ids + [another_project.id]) } }
 
     assert_redirected_to(sop)
     assert assigns(:sop).errors.empty?
@@ -1178,7 +1175,7 @@ class SopsControllerTest < ActionController::TestCase
 
     sop, blob = valid_sop
     assert_difference('Sop.count') do
-      post :create, sop: sop.merge(project_ids: [active_project.id, former_project.id]), content_blobs: [blob], policy_attributes: valid_sharing
+      post :create, params: { sop: sop.merge(project_ids: [active_project.id, former_project.id]), content_blobs: [blob], policy_attributes: valid_sharing }
     end
 
     gm = person.group_memberships.detect { |gm| gm.project == former_project }
@@ -1189,7 +1186,7 @@ class SopsControllerTest < ActionController::TestCase
 
     sop, blob = valid_sop
     assert_no_difference('Sop.count') do
-      post :create, sop: sop.merge(project_ids: [former_project.id]), content_blobs: [blob], policy_attributes: valid_sharing
+      post :create, params: { sop: sop.merge(project_ids: [former_project.id]), content_blobs: [blob], policy_attributes: valid_sharing }
     end
 
     refute assigns(:sop).errors.empty?
@@ -1205,7 +1202,7 @@ class SopsControllerTest < ActionController::TestCase
 
     login_as(person)
     assert_no_difference('Sop::Version.count', 1) do
-      post :new_version, id: sop.id, sop: { title: "haha!" }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision'
+      post :new_version, params: { id: sop.id, sop: { title: "haha!" }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' }
     end
   end
 
@@ -1236,34 +1233,50 @@ class SopsControllerTest < ActionController::TestCase
     AuthLookupUpdateQueue.destroy_all
 
     with_config_value(:auth_lookup_enabled, true) do
-      assert_difference('AuthLookupUpdateQueue.count',1) do
-        put :update, id:sop.id,sop:{title: 'fish', creator_ids:[creator.id.to_s]}
+      assert_difference('AuthLookupUpdateQueue.count', 1) do
+        put :update, params: {id: sop.id, sop: {title: 'fish', creator_ids: [creator.id.to_s]}}
         assert_redirected_to sop
-        assert_equal 'fish',assigns(:sop).title
-        assert_equal [creator],assigns(:sop).creators
+        assert_equal 'fish', assigns(:sop).title
+        assert_equal [creator], assigns(:sop).creators
       end
 
       AuthLookupUpdateQueue.destroy_all
 
       # no job if no change to creators
       assert_no_difference('AuthLookupUpdateQueue.count') do
-        put :update, id:sop.id,sop:{title: 'horse', creator_ids:[creator.id.to_s]}
+        put :update, params: {id: sop.id, sop: {title: 'horse', creator_ids: [creator.id.to_s]}}
         assert_redirected_to sop
-        assert_equal 'horse',assigns(:sop).title
-        assert_equal [creator],assigns(:sop).creators
+        assert_equal 'horse', assigns(:sop).title
+        assert_equal [creator], assigns(:sop).creators
       end
 
       AuthLookupUpdateQueue.destroy_all
 
       # job if creator removed
-      assert_difference('AuthLookupUpdateQueue.count',1) do
-        put :update, id:sop.id,sop:{title: 'fish', creator_ids:[]}
+      assert_difference('AuthLookupUpdateQueue.count', 1) do
+        put :update, params: {id: sop.id, sop: {title: 'fish', creator_ids: ['']}}
         assert_redirected_to sop
-        assert_equal 'fish',assigns(:sop).title
-        assert_equal [],assigns(:sop).creators
+        assert_equal 'fish', assigns(:sop).title
+        assert_equal [], assigns(:sop).creators
       end
     end
 
+  end
+
+  test 'should destroy sop and redirect to my items page' do
+    person = people(:person_for_owner_of_my_first_sop)
+    login_as(person)
+    assert_difference('ActivityLog.count') do
+      assert_difference('Sop.count', -1) do
+        assert_no_difference('ContentBlob.count') do
+          delete :destroy, params: { id: sops(:my_first_sop), return_to: 'my_items' }
+
+          assert flash[:notice].include?('deleted')
+        end
+      end
+    end
+
+    assert_redirected_to items_person_path(person)
   end
 
   private
@@ -1282,14 +1295,11 @@ class SopsControllerTest < ActionController::TestCase
         .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/broken_doi_metadata_response.html"), status: 200)
   end
 
-  def file_for_upload(options = {})
-    default = { filename: 'file_picture.png', content_type: 'image/png', tempfile_fixture: 'files/file_picture.png' }
-    options = default.merge(options)
-    ActionDispatch::Http::UploadedFile.new({
-                                             filename: options[:filename],
-                                             content_type: options[:content_type],
-                                             tempfile: fixture_file_upload(options[:tempfile_fixture])
-                                           })
+  def picture_file(options = {})
+    options.reverse_merge!({ filename: 'file_picture.png',
+                             content_type: 'image/png',
+                             tempfile_fixture: 'files/file_picture.png' })
+    fixture_file_upload(options[:tempfile_fixture], options[:content_type])
   end
 
   def valid_sop_with_url
@@ -1298,6 +1308,6 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def valid_sop
-    [{ title: 'Test', project_ids: [@project.id] }, { data: file_for_upload, data_url: '' }]
+    [{ title: 'Test', project_ids: [@project.id] }, { data: picture_file, data_url: '' }]
   end
 end

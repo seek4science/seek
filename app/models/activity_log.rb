@@ -1,7 +1,9 @@
 # frozen_string_literal: true
+class ActivityLog < ApplicationRecord
+  belongs_to :activity_loggable, polymorphic: true
+  belongs_to :referenced, polymorphic: true
+  belongs_to :culprit, polymorphic: true
 
-require_dependency File.join(Gem.loaded_specs['acts_as_activity_logged'].full_gem_path, 'lib', 'activity_log')
-class ActivityLog < ActiveRecord::Base
   serialize :data
 
   scope :no_spider, -> { where("(UPPER(user_agent) NOT LIKE '%SPIDER%' OR user_agent IS NULL)") }
@@ -9,8 +11,8 @@ class ActivityLog < ActiveRecord::Base
   # returns items that have duplicates for a given action - NOTE that the result does not contain all the actual duplicates.
   scope :duplicates, ->(action) {
     select('activity_loggable_type, activity_loggable_id')
-      .where("action = ? AND controller_name != 'sessions'", action)
-      .group('activity_loggable_type, activity_loggable_id HAVING COUNT(*)>1')
+        .where("action = ? AND controller_name != 'sessions'", action)
+        .group('activity_loggable_type, activity_loggable_id HAVING COUNT(*)>1')
   }
   after_create :send_notification
   after_save :clear_activity_caches

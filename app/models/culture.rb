@@ -1,4 +1,4 @@
-class Culture < ActiveRecord::Base
+class Culture < ApplicationRecord
 
   has_one :organism
   belongs_to :sop

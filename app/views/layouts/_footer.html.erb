@@ -1,6 +1,6 @@
 <% logged_in?? cache_name = 'footer' : cache_name = 'footer1' %>
 
-<% cache cache_name, skip_digest: true do -%>
+
     <div id="ft">
       <div class="container">
         <div id="seek-credit">
@@ -10,34 +10,36 @@
           </a>
           <span class="subtle"><%= version_text -%></span>
         </div>
-        <div class="ft-info">
-          <% if Seek::Config.dm_project_link != Seek::Config.project_link %>
-              <%= link_to "About #{Seek::Config.dm_project_name}", Seek::Config.dm_project_link, :target => '_blank' %> |
-          <% end %>
-          <%= link_to Seek::Config.project_name, Seek::Config.project_link, :target => '_blank' %> |
-          <% if logged_in_and_registered? %>
-              <%= link_to 'Provide feedback', feedback_home_path -%> |
-          <% end %>
-          <%= link_to 'Funding and Programmes', funding_home_path, :target => '_blank' -%> |
-          <%= link_to 'Credits', Seek::Help::HelpDictionary.instance.help_link(:credits), :target => '_blank' -%>
-          <% if Seek::Config.terms_enabled %>
-              | <%= link_to("Terms & Conditions", terms_home_path) %>
-          <% end %>
-          <% if Seek::Config.privacy_enabled %>
-              | <%= link_to("Privacy Policy", privacy_home_path) %>
-          <% end %>
-          <% if Seek::Config.imprint_enabled %>
-              | <%= link_to("Imprint", imprint_home_path) %>
-          <% end %>
-        </div>
-        <div class="ft-info">
-          Copyright &copy; 2008 - 2019
-          <%= link_to "The University of Manchester", "http://www.manchester.ac.uk/", :target => '_blank' %> and
-          <%= link_to "HITS gGmbH", "http://www.h-its.org/", :target => '_blank' %>
-          <% if Seek::Config.copyright_addendum_enabled  %>
-              <br/><%= Seek::Config.copyright_addendum_content.html_safe%>
-          <% end %>
-        </div>
+        <% cache cache_name, skip_digest: true do -%>
+          <div class="ft-info">
+            <% if Seek::Config.dm_project_link != Seek::Config.project_link %>
+                <%= link_to "About #{Seek::Config.dm_project_name}", Seek::Config.dm_project_link, :target => '_blank' %> |
+            <% end %>
+            <%= link_to Seek::Config.project_name, Seek::Config.project_link, :target => '_blank' %> |
+            <% if logged_in_and_registered? %>
+                <%= link_to 'Provide feedback', feedback_home_path -%> |
+            <% end %>
+            <%= link_to 'Funding and Programmes', funding_home_path, :target => '_blank' -%> |
+            <%= link_to 'Credits', Seek::Help::HelpDictionary.instance.help_link(:credits), :target => '_blank' -%>
+            <% if Seek::Config.terms_enabled %>
+                | <%= link_to("Terms & Conditions", terms_home_path) %>
+            <% end %>
+            <% if Seek::Config.privacy_enabled %>
+                | <%= link_to("Privacy Policy", privacy_home_path) %>
+            <% end %>
+            <% if Seek::Config.imprint_enabled %>
+                | <%= link_to("Imprint", imprint_home_path) %>
+            <% end %>
+          </div>
+          <div class="ft-info">
+            Copyright &copy; 2008 - 2019
+            <%= link_to "The University of Manchester", "http://www.manchester.ac.uk/", :target => '_blank' %> and
+            <%= link_to "HITS gGmbH", "http://www.h-its.org/", :target => '_blank' %>
+            <% if Seek::Config.copyright_addendum_enabled  %>
+                <br/><%= Seek::Config.copyright_addendum_content.html_safe%>
+            <% end %>
+          </div>
+        <% end -%>
       </div>
     </div>
-<% end -%>
+

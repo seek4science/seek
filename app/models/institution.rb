@@ -1,4 +1,4 @@
-class Institution < ActiveRecord::Base
+class Institution < ApplicationRecord
 
   acts_as_yellow_pages
   title_trimmer
@@ -11,7 +11,7 @@ class Institution < ActiveRecord::Base
 
   has_many :work_groups, dependent: :destroy, inverse_of: :institution
   has_many :projects, through: :work_groups,  inverse_of: :institutions
-  has_many :programmes, -> { uniq }, through: :projects, inverse_of: :institutions
+  has_many :programmes, -> { distinct }, through: :projects, inverse_of: :institutions
   has_many :group_memberships, through: :work_groups, inverse_of: :institutions
   has_many :people, -> { order('last_name ASC').distinct }, through: :group_memberships, inverse_of: :institutions
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy

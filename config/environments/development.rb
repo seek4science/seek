@@ -40,7 +40,7 @@ SEEK::Application.configure do
   config.assets.raise_runtime_errors = true
 
 
-  config.serve_static_files = true
+  config.public_file_server.enabled = true
 
   I18n.enforce_available_locales = true
 

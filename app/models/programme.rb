@@ -1,6 +1,5 @@
-class Programme < ActiveRecord::Base
+class Programme < ApplicationRecord
   include Seek::Annotatable
-  include Seek::Rdf::RdfGeneration
 
   attr_accessor :administrator_ids
 
@@ -19,8 +18,8 @@ class Programme < ActiveRecord::Base
   has_many :projects, dependent: :nullify
   has_many :work_groups, through: :projects
   has_many :group_memberships, through: :work_groups
-  has_many :people, -> { order('last_name ASC').uniq }, through: :group_memberships
-  has_many :institutions, -> { uniq }, through: :work_groups
+  has_many :people, -> { order('last_name ASC').distinct }, through: :group_memberships
+  has_many :institutions, -> { distinct }, through: :work_groups
   has_many :admin_defined_role_programmes, dependent: :destroy
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
   accepts_nested_attributes_for :projects
@@ -32,7 +31,7 @@ class Programme < ActiveRecord::Base
 
   validates :web_page, url: { allow_nil: true, allow_blank: true }
 
-  after_save :handle_administrator_ids, if: '@administrator_ids'
+  after_save :handle_administrator_ids, if: -> { @administrator_ids }
   before_create :activate_on_create
 
   # scopes

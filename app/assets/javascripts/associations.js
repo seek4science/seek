@@ -1,12 +1,3 @@
-function optionsFromArray(array) {
-    var options = [];
-
-    for(var i = 0; i < array.length; i++)
-        options.push($j('<option/>').val(array[i][1]).text(array[i][0])[0]);
-
-    return options;
-}
-
 function nestedOptionsFromJSONArray(array,prompt_option_text) {
     var options = [];
     options.push($j('<option/>').val(0).text(prompt_option_text));
@@ -67,9 +58,12 @@ Associations.List.prototype.add = function (association) {
     if (this.element.data('fieldName')) {
         association.fieldName = this.element.data('fieldName');
     }
-    this.items.push(new Associations.ListItem(this, association));
+    var newItem = new Associations.ListItem(this, association);
+
+    this.items.push(newItem);
     this.toggleEmptyListText();
     this.onAdd(association);
+
 };
 
 Associations.List.prototype.remove = function (listItem) {
@@ -91,6 +85,18 @@ Associations.List.prototype.exists = function (itemOrFunction) {
         return this.items.includes(itemOrFunction);
     }
 };
+
+Associations.List.prototype.find = function (func) {
+    return this.items.find(function (item) {
+        return func(item.data);
+    })
+};
+
+Associations.List.prototype.findDuplicate = function(association) {
+    return this.items.find(function(item) {
+        return item.id = association.id;
+    });
+}
 
 Associations.List.prototype.removeAll = function () {
     this.items = [];
@@ -145,6 +151,15 @@ Associations.MultiList.prototype.removeAll = function () {
     }
 };
 
+Associations.MultiList.prototype.findDuplicate = function(association) {
+    for(var key in this.lists) {
+        var match = this.lists[key].findDuplicate(association);
+        if (match) {
+            return match;
+        }
+    }
+}
+
 // Object to control the association selection form.
 Associations.Form = function (list, element) {
     this.list = list;
@@ -173,7 +188,12 @@ Associations.Form.prototype.submit = function () {
     this.selectedItems.forEach(function (selectedItem) {
         // Merge the common fields with the selected item's attributes
         var associationObject = $j.extend({}, commonFields, selectedItem);
-        list.add(associationObject);
+        if (list.findDuplicate(associationObject)) {
+            alert("The item '"+associationObject.title + "' has already been associated");
+        }
+        else {
+            list.add(associationObject);
+        }
     });
 
     if (this.afterSubmit)

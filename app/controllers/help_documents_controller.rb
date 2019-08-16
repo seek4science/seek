@@ -2,11 +2,11 @@ class HelpDocumentsController < ApplicationController
 
   include Seek::DestroyHandling
 
-  before_filter :documentation_enabled?
-  before_filter :internal_help_enabled
-  before_filter :find_document, :except => [:new, :index, :create]
-  before_filter :login_required, :except=>[:show,:index]
-  before_filter :is_user_admin_auth, :except => [:show, :index]
+  before_action :documentation_enabled?
+  before_action :internal_help_enabled
+  before_action :find_document, :except => [:new, :index, :create]
+  before_action :login_required, :except=>[:show,:index]
+  before_action :is_user_admin_auth, :except => [:show, :index]
   
   def internal_help_enabled
     if (!Seek::Config.internal_help_enabled)

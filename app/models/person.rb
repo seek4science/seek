@@ -1,8 +1,7 @@
-class Person < ActiveRecord::Base
+class Person < ApplicationRecord
 
   acts_as_annotation_source
 
-  include Seek::Rdf::RdfGeneration
   include Seek::Annotatable
   include Seek::Roles::AdminDefinedRoles
 
@@ -42,7 +41,7 @@ class Person < ActiveRecord::Base
   has_many :current_work_groups, class_name: 'WorkGroup', through: :current_group_memberships,
                                  source: :work_group
 
-  has_many :institutions, -> { uniq }, through: :work_groups
+  has_many :institutions, -> { distinct }, through: :work_groups
 
   has_many :favourite_group_memberships, dependent: :destroy
   has_many :favourite_groups, through: :favourite_group_memberships
@@ -50,7 +49,7 @@ class Person < ActiveRecord::Base
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
 
   RELATED_RESOURCE_TYPES = %w[DataFile Sop Model Document Publication Presentation
-                              Sample Event Investigation Study Assay Strain].freeze
+                              Sample Event Investigation Study Assay Strain Workflow].freeze
 
   RELATED_RESOURCE_TYPES.each do |type|
     has_many :"contributed_#{type.tableize}", foreign_key: :contributor_id, class_name: type
@@ -62,7 +61,6 @@ class Person < ActiveRecord::Base
       send("created_#{type}") | send("contributed_#{type}")
     end
   end
-
 
   has_annotation_type :expertise, method_name: :expertise
   has_annotation_type :tool
@@ -106,7 +104,7 @@ class Person < ActiveRecord::Base
   end
 
   def queue_update_auth_table
-    if previous_changes.keys.include?('roles_mask')
+    if saved_changes.keys.include?('roles_mask')
       AuthLookupUpdateJob.new.add_items_to_queue self
     end
   end
@@ -117,7 +115,7 @@ class Person < ActiveRecord::Base
 
   # those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
   def self.active
-    Person.unscoped.order('avatar_id is null, updated_at DESC')
+    Person.unscoped.order(Arel.sql('avatar_id IS NULL'), 'updated_at DESC')
   end
 
   def receive_notifications
@@ -173,9 +171,6 @@ class Person < ActiveRecord::Base
     shares_project?(other_item) || shares_programme?(other_item)
   end
 
-
-
-
   def self.userless_people
     Person.includes(:user).select { |p| p.user.nil? }
   end
@@ -202,23 +197,6 @@ class Person < ActiveRecord::Base
     Person.order('ID asc').collect do |p|
       { 'id' => p.id, 'name' => p.name, 'email' => p.email, 'projects' => p.projects.collect(&:title).join(', ') }
     end.to_json
-  end
-
-  def validates_associated(*associations)
-    associations.each do |_association|
-      class_eval do
-        validates_each(associations) do |record, associate_name, _value|
-          associates = record.send(associate_name)
-          associates = [associates] unless associates.respond_to?('each')
-          associates.each do |associate|
-            next unless associate && !associate.valid?
-            associate.errors.each do |key, value|
-              record.errors.add(key, value)
-            end
-          end
-        end
-      end
-    end
   end
 
   def projects # ALL projects, former and current
@@ -351,14 +329,14 @@ class Person < ActiveRecord::Base
                          .where('controller_name != \'people\'')
                          .order('created_at DESC')
                          .limit(limit)
-                         .uniq +
+                         .distinct +
               ActivityLog.group(:id, :activity_loggable_type, :activity_loggable_id)
               .where(culprit_type: 'User', culprit_id: user, action: 'create')
               .where('controller_name != \'sessions\'')
               .where('controller_name != \'people\'')
               .order('created_at DESC')
               .limit(limit)
-              .uniq
+              .distinct
     results.sort_by(&:created_at).reverse.uniq { |r| "#{r.activity_loggable_type}#{r.activity_loggable_id}" }[0...limit]
   end
 

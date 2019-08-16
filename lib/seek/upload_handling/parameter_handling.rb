@@ -55,7 +55,7 @@ module Seek
 
       def check_for_empty_data_if_present(blob_params)
         return true unless blob_params[:data_url].blank?
-        Array(blob_params[:data]).each do |data|
+        Array.wrap(blob_params[:data]).each do |data|
           if !data.blank? && data.size == 0
             flash.now[:error] = 'The file that you are uploading is empty. Please check your selection and try again!'
             return false

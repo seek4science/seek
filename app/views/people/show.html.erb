@@ -73,4 +73,4 @@
 <%= render :partial=>"people/project_subscriptions",:locals => {:person=>@person} if (mine?(@person) || current_user.try(:person).try(:is_admin?))  %>
 
 <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-<%= render :seek_partial=>"general/items_related_to", :object => @person %>
+<%= render :partial=>"general/items_related_to", :object => @person %>

@@ -1,0 +1,11 @@
+<% @saved_factors.each do |sf| %>
+  $j('#condition-or-factor-table tbody').append("<%= escape_javascript(render partial: 'condition_or_factor_row', object: sf, locals: { asset: 'data_file', show_delete: true }) -%>");
+  $j('#condition-or-factor-table tbody:last-child').highlight();
+<% end %>
+
+<% @errored_factors.each do |sf| %>
+  alert('can not create factor studied: item: <%= try_block { sf.substances.collect { |s| s.title + '/' } } -%> <%= sf.measured_item.title -%>, values: <%= sf.start_value -%>-<%= sf.end_value -%><%= sf.unit.title -%>, SD: <%= sf.standard_deviation -%>')
+<% end %>
+
+$j('#create-from-existing-form')[0].reset();
+$j('.existing_conditions_or_factors').hide();

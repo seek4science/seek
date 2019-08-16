@@ -39,7 +39,7 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
   def test_normal_user_cannot_create_institution
     user_login(Factory(:person))
     assert_no_difference('Institution.count') do
-      post "/institutions.json", @to_post
+      post "/institutions.json", params: @to_post
     end
   end
 

@@ -1,3 +1,3 @@
-class Modification < ActiveRecord::Base
+class Modification < ApplicationRecord
   validates_presence_of :title
 end

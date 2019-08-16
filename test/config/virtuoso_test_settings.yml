@@ -1,0 +1,12 @@
+#change settings where appropriate, and then save as virtuoso_settings.yml
+
+test:
+
+  uri: http://localhost:8890/sparql
+  update_uri: http://localhost:8890/sparql-auth
+
+  username: dba
+  password: tester
+
+  private_graph: seek-testing:private
+  public_graph: seek-testing:public

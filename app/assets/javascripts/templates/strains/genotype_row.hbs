@@ -1,0 +1,25 @@
+<tr class="subtype-row">
+    <td>
+        <input type="text" size="10" class="form-control"
+               value="{{ item.gene }}"
+               name="{{ objectName }}[genotypes_attributes][{{ index }}][gene_attributes][title]"
+               id="{{ objectName }}_genotypes_attributes_{{ index }}_gene_attributes_title">
+    </td>
+    <td>
+        <input type="text" size="10" class="form-control"
+               value="{{ item.modification }}"
+               name="{{ objectName }}[genotypes_attributes][{{ index }}][modification_attributes][title]"
+               id="{{ objectName }}_genotypes_attributes_{{ index }}_modification_attributes_title">
+    </td>
+    <td>
+        <a class="remove-association clickable" title="Delete this entry">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        </a>
+        {{#if id}}
+            <input value="0" type="hidden" data-role="destroy"
+                   name="{{ objectName }}[genotypes_attributes][{{ index }}][_destroy]">
+            <input type="hidden" value="{{ id }}" name="{{ objectName }}[genotypes_attributes][{{ index }}][id]"
+                   id="{{ objectName }}_genotypes_attributes_{{ index }}_id">
+        {{/if}}
+    </td>
+</tr>

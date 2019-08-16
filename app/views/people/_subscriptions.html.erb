@@ -14,8 +14,9 @@
       <ul id="project_subscription_list">
         <span class="none_text" id="no_project_text" style="display: <%= project_subscriptions.empty? ? 'block' : 'none' %>">None</span>
         <% project_subscriptions.each do |ps| %>
-          <li id="<%= ps.project_id %>_li">
-            <%= link_to_function h(ps.project.title), "$('select_project_subscription').value = #{ps.project.id};show_project_subscription();$('select_project_subscription').value =0;return false;" %>
+          <li>
+            <%= link_to h(ps.project.title), '#', data: { role: 'seek-project-sub-link',
+                                                          'project-id' => ps.project_id }, class: 'project' %>
           </li>
         <% end %>
       </ul>
@@ -28,97 +29,88 @@
         <label>Subscribe to additional <%= t('project').pluralize %>:</label>
         <%= select_tag :select_project_subscription,
                        options_for_select([["Select #{t('project')} ...", 0]]|projects.collect { |p| [truncate(h(p.title), length: select_truncate_length), p.id] }),
-                       { class: 'form-control',
-                         onchange: "show_project_subscription(); return(false);"} -%>
+                       { class: 'form-control' } -%>
       </div>
     </div>
 
     <div class="col-md-6">
       <%= f.fields_for :project_subscriptions, project_subscriptions_with_unsubscribed do |sub_form| %>
         <% project_subscription = sub_form.object %>
-        <div id="subscription<%= project_subscription.project_id %>" style="display:none;">
-          <%= panel "Subscription to: #{h(project_subscription.project.title)}" do %>
-            <%= sub_form.hidden_field :id unless sub_form.object.new_record? %>
-            <%= sub_form.hidden_field :project_id %>
-            <div class="checkbox">
+        <%= panel "Subscription to: #{h(project_subscription.project.title)}",
+                  data: { role: 'seek-project-sub-block',
+                          'project-id' => project_subscription.project_id,
+                          'project-title' => project_subscription.project.title }, style: 'display: none;' do %>
+
+          <%= sub_form.hidden_field :id unless sub_form.object.new_record? %>
+          <%= sub_form.hidden_field :project_id %>
+          <div class="checkbox">
+            <label>
+              <%= sub_form.check_box :_destroy, { checked: !sub_form.object.marked_for_destruction?,
+                                                  data: { role: 'seek-project-sub-destroy' }, autocomplete: 'off' }, 0, 1 %>
+              <strong>Subscription active?</strong>
+            </label>
+          </div>
+          <p class="help-block">
+            Uncheck to disable your subscription.
+          </p>
+
+          <strong>Receive emails:</strong>
+          <% Subscription::FREQUENCIES.each do |freq| %>
+            <div class="radio">
               <label>
-                <%= sub_form.check_box :_destroy, {:checked => !sub_form.object.marked_for_destruction?,:onclick=>"updateSubscribedProjectsList(this,#{project_subscription.project_id},'#{project_subscription.project.title}');"}, 0, 1 %>
-                <strong>Subscription active?</strong>
+                <%= sub_form.radio_button :frequency, freq %>
+                <%= "#{freq.capitalize}" %>
               </label>
             </div>
-            <p class="help-block">
-              Uncheck to disable your subscription.
-            </p>
-
-            <strong>Receive emails:</strong>
-            <% Subscription::FREQUENCIES.each do |freq| %>
-              <div class="radio">
-                <label>
-                  <%= sub_form.radio_button :frequency, freq %>
-                  <%= "#{freq.capitalize}" %>
-                </label>
-              </div>
-            <% end %>
           <% end %>
-        </div>
+        <% end %>
       <% end %>
     </div>
   </div>
 <% end %>
 
-<script type="text/javascript">
-    <%# MERGENOTE - whats this? and why use .invoke? (similar later on) %>
-    <% project_subscriptions_with_unsubscribed.map(&:project_id).each do |proj_id| %>
-      $$('#subscription<%= proj_id %> input').invoke('disable');
-    <% end %>
-
-    var project_subscription = "subscription";
-
-    function swap_subscription(old_div_id, new_div_id) {
-        var old_div = $(old_div_id);
-        if (old_div && old_div.style.display == "block") {
-            old_div.style.display = "none";
+<script>
+    $j(document).ready(function () {
+        function showSubscription(projectId) {
+            $j('[data-role=seek-project-sub-block]').hide();
+            $j('[data-project-id="' + projectId + '"]').show();
         }
-        var new_div = $(new_div_id);
-        if (new_div && new_div.style.display == "none") {
-            new_div.style.display = "block";
-            new_div.select('input').invoke('enable');
-        }
-    }
 
-    function show_project_subscription() {
-        var new_project_subscription = "subscription" + $F('select_project_subscription');
-        swap_subscription(project_subscription, new_project_subscription);
-        project_subscription = new_project_subscription;
-    }
+        $j('#select_project_subscription').change(function () {
+            showSubscription($j(this).val());
+        });
 
-    function updateSubscribedProjectsList(element, project_id, project_title) {
-        var child_id = project_id + '_li';
-        var child = $(child_id);
-        if (element.checked) {
-            if (!child) {
-                child = document.createElement('LI');
-                child.id = child_id;
-                child.onclick = function() {
-                    $('select_project_subscription').value = project_id;
-                    show_project_subscription();
-                    $('select_project_subscription').value = 0;
-                    return false;
-                } ;
-                var child_link = document.createElement('a');
-                child_link.href = "#";
-                child_link.textContent = project_title;
-                child.appendChild(child_link);
-                $('project_subscription_list').appendChild(child);
+        $j('#project_subscription_list').on('click', '[data-role=seek-project-sub-link]', function () {
+            showSubscription($j(this).data('projectId'));
+            return false;
+        });
+
+        $j('[data-role=seek-project-sub-destroy]').change(function () {
+            var container = $j(this).parents('[data-role="seek-project-sub-block"]');
+            var projectId = container.data('projectId');
+            var projectTitle = container.data('projectTitle');
+            var child = $j('#project_subscription_list [data-project-id="' + projectId + '"]').parent();
+            if (this.checked) {
+                if (!child.length) {
+                    var newItem = document.createElement('li');
+                    var newLink = document.createElement('a');
+                    newLink.setAttribute('data-project-id', projectId);
+                    newLink.setAttribute('data-role', 'seek-project-sub-link');
+                    newLink.href = "#";
+                    newLink.textContent = projectTitle;
+                    newItem.appendChild(newLink);
+                    $j('#project_subscription_list')[0].appendChild(newItem);
+                }
+            } else {
+                child.remove();
             }
-        }else
-         child.remove();
 
-        //hide/display -None-
-        if ($('project_subscription_list').getElementsByTagName('li').length > 0)
-           $('no_project_text').style['display'] = 'none';
-        else
-           $('no_project_text').style['display'] = 'block'
-    }
-
+            //hide/display -None-
+            if ($j('#project_subscription_list li').length > 0) {
+                $j('#no_project_text').hide();
+            } else {
+                $j('#no_project_text').show();
+            }
+        });
+    })
 </script>

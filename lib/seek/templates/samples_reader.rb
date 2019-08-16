@@ -67,7 +67,7 @@ module Seek
         sample = Sample.new(sample_type: sample_type)
         template_data.each do |entry|
           attribute = sample_type.attribute_for_column(entry.column)
-          sample.set_attribute(attribute.hash_key, entry.value) if attribute
+          sample.set_attribute(attribute, entry.value) if attribute
         end
         sample
       end

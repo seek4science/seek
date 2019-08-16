@@ -1,10 +1,8 @@
-# encoding: utf-8
 # frozen_string_literal: true
 
 require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
-require 'colorize'
 require 'seek/mime_types'
 
 include Seek::MimeTypes
@@ -13,11 +11,14 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
-    db:seed:model_formats
-    update_stored_orcids
+    convert_help_attachments
+    convert_help_images
+    update_help_image_links
     fix_sample_type_tag_annotations
+    sqlite_boolean_update
     delete_orphaned_permissions
     rebuild_sample_templates
+    fix_model_version_files
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -46,11 +47,61 @@ namespace :seek do
     end
   end
 
-  desc('updates stored orcid ids to be stored as https')
-  task(update_stored_orcids: :environment) do
-    Person.where('orcid is NOT NULL').each do |person|
-      person.update_column(:orcid, person.orcid_uri)
+  task(convert_help_attachments: :environment) do
+    count = 0
+    HelpAttachment.all.each do |ha|
+      next if ha.content_blob
+      data = ActiveRecord::Base.connection.select_one("SELECT data FROM db_files WHERE id=#{ha.db_file_id}")['data']
+      ContentBlob.create!(data: data,
+                          content_type: ha.content_type,
+                          original_filename: ha[:filename],
+                          asset: ha)
+      count += 1
     end
+
+    puts "#{count} HelpAttachments converted"
+  end
+
+  task(convert_help_images: :environment) do
+    count = 0
+    HelpImage.all.each do |hi|
+      next if hi.content_blob
+      file_path = Rails.root.join('public', 'help_images', *("%08d" % hi.id).scan(/..../), hi[:filename])
+      if File.exist?(file_path)
+        ContentBlob.create!(tmp_io_object: File.open(file_path),
+                            content_type: hi.content_type,
+                            original_filename: hi[:filename],
+                            asset: hi)
+        count += 1
+      end
+    end
+
+    puts "#{count} HelpImages converted"
+  end
+
+  task(update_help_image_links: :environment) do
+    count = 0
+    re = /!\/help_images((\/\d\d\d\d)(\/\d\d\d\d)+)\/[^!]+!/
+    HelpDocument.all.each do |hd|
+      body = hd.body
+      replacements = {}
+      body.scan(re) do |data|
+        old_path = Regexp.last_match[0]
+        next if replacements[old_path]
+        new_path = "!/help_images/#{data[0].tr('/', '').to_i}/view!"
+        replacements[old_path] = new_path
+      end
+
+      next if replacements.keys.empty?
+      replacements.each do |old, new|
+        body.gsub!(old, new)
+      end
+
+      hd.update_column(:body, body)
+      count += 1
+    end
+
+    puts "#{count} HelpDocuments updated"
   end
 
   desc('Fix sample type tag annotations')
@@ -204,6 +255,36 @@ namespace :seek do
   task(rebuild_sample_templates: :environment) do
     SampleType.all.reject{|st| st.uploaded_template?}.each do |sample_type|
       sample_type.queue_template_generation
+    end
+  end
+
+  task(fix_model_version_files: :environment) do
+    possible_affected_models = Model.where('version > 1').select{|m| m.versions.select{|mv| mv.created_at > '1 Oct 2018'}.any?}
+
+    # find those that aren't a webpage, and no file present
+    affected_models = possible_affected_models.select do |model|
+      model.versions.detect do |mv|
+        mv.content_blobs.detect do |blob|
+          !(blob.is_webpage? || blob.file_exists?)
+        end.present?
+      end.present?
+    end
+
+    affected_models.each do |model|
+      # all blobs that contain a file and aren't a webpage. reversed, as the later versions are more likely to contain the file
+      good_blobs = model.versions.reverse.collect{|mv| mv.content_blobs.reject(&:is_webpage?).select(&:file_exists?).select(&:sha1sum)}.flatten
+
+      # blobs that appear to have missing files
+      bad_blobs = model.versions.collect{|mv| mv.content_blobs.reject{|blob| blob.is_webpage? || blob.file_exists?}}.flatten
+      bad_blobs.each do |blob|
+        match = good_blobs.detect{|good_blob| blob.original_filename == good_blob.original_filename && blob.sha1sum == good_blob.sha1sum}
+        if match
+          FileUtils.cp match.file_path, blob.file_path
+        else
+          #try and retrieve from remote source. Method checks if the blob meets the criteria
+          blob.create_retrieval_job
+        end
+      end
     end
   end
 end

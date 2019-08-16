@@ -1,4 +1,4 @@
-class SiteAnnouncement < ActiveRecord::Base
+class SiteAnnouncement < ApplicationRecord
 
   class BodyHelper
     include ActionView::Helpers::TextHelper

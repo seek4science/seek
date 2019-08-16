@@ -1,4 +1,4 @@
-class Presentation < ActiveRecord::Base
+class Presentation < ApplicationRecord
 
    attr_accessor :orig_data_file_id
 

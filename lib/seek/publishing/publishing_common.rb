@@ -2,13 +2,13 @@ module Seek
   module Publishing
     module PublishingCommon
       def self.included(base)
-        base.before_filter :set_asset, only: [:check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :published]
-        base.before_filter :set_assets, only: [:batch_publishing_preview]
-        base.before_filter :set_items_for_publishing, only: [:check_gatekeeper_required, :publish]
-        base.before_filter :set_items_for_potential_publishing, only: [:check_related_items, :publish_related_items]
-        base.before_filter :publish_auth, only: [:batch_publishing_preview, :check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :waiting_approval_assets]
+        base.before_action :set_asset, only: [:check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :published]
+        base.before_action :set_assets, only: [:batch_publishing_preview]
+        base.before_action :set_items_for_publishing, only: [:check_gatekeeper_required, :publish]
+        base.before_action :set_items_for_potential_publishing, only: [:check_related_items, :publish_related_items]
+        base.before_action :publish_auth, only: [:batch_publishing_preview, :check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :waiting_approval_assets]
         # need to put request_publish_approval after log_publishing, so request_publish_approval will get run first.
-        base.after_filter :log_publishing, :request_publish_approval, only: [:create, :update]
+        base.after_action :log_publishing, :request_publish_approval, only: [:create, :update]
       end
 
       def batch_publishing_preview

@@ -18,7 +18,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     ep = Factory(:openbis_endpoint, project: @project)
     login_as(@project_administrator)
 
-    get :show, id: ep.id
+    get :show, params: { id: ep.id }
     assert_response :success
   end
 
@@ -28,7 +28,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     assert ep.can_delete?
 
     assert_difference('OpenbisEndpoint.count', -1) do
-      delete :destroy, id: ep.id, project_id: @project.id
+      delete :destroy, params: { id: ep.id, project_id: @project.id }
       assert_redirected_to project_openbis_endpoints_path(@project)
     end
 
@@ -39,7 +39,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     refute ep.can_delete?
 
     assert_no_difference('OpenbisEndpoint.count') do
-      delete :destroy, id: ep.id, project_id: project.id
+      delete :destroy, params: { id: ep.id, project_id: project.id }
       assert_redirected_to :root
       refute_nil flash[:error]
     end
@@ -55,7 +55,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
     assert_difference('OpenbisEndpoint.count') do
       assert_difference('Delayed::Job.count', 2) do
-        post :create, project_id: @project.id, openbis_endpoint:
+        post :create, params: { project_id: @project.id, openbis_endpoint:
             {
               as_endpoint: 'http://as.com',
               dss_endpoint: 'http://dss.com',
@@ -66,8 +66,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
               space_perm_id: 'space-id',
               study_types: 'ST1, ST2',
               assay_types: 'ASSAY, DEFAULT'
-            },
-                      policy_attributes: policy_attributes
+            }, policy_attributes: policy_attributes }
       end
     end
     assert assigns(:openbis_endpoint)
@@ -103,7 +102,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     policy_attributes = { access_type: Policy::ACCESSIBLE,
                           permissions_attributes: project_permissions([@project], Policy::ACCESSIBLE) }
 
-    put :update, id: ep.id, project_id: @project.id, openbis_endpoint:
+    put :update, params: { id: ep.id, project_id: @project.id, openbis_endpoint:
         {
           as_endpoint: 'http://as.com',
           dss_endpoint: 'http://dss.com',
@@ -114,8 +113,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
           space_perm_id: 'space-id',
           study_types: 'ST, ST2',
           assay_types: 'ASSAY, ASS'
-        },
-                 policy_attributes: policy_attributes
+        }, policy_attributes: policy_attributes }
 
     assert assigns(:openbis_endpoint)
     ep = assigns(:openbis_endpoint)
@@ -207,7 +205,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   test 'browse' do
     # project admin can browse
     login_as(@project_administrator)
-    get :browse, project_id: @project.id
+    get :browse, params: { project_id: @project.id }
     assert_response :success
 
     logout
@@ -216,7 +214,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     person = Factory(:person)
     project = person.projects.first
     login_as(person)
-    get :browse, project_id: project.id
+    get :browse, params: { project_id: project.id }
     assert_response :success
 
     logout
@@ -224,7 +222,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     # non project member cannot browse
     person = Factory(:person)
     login_as(person)
-    get :browse, project_id: Factory(:project).id
+    get :browse, params: { project_id: Factory(:project).id }
     assert_redirected_to :root
 
     logout
@@ -234,21 +232,20 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
       project_admin = Factory(:project_administrator)
       project = project_admin.projects.first
       login_as(project_admin)
-      get :browse, project_id: project.id
+      get :browse, params: { project_id: project.id }
       assert_redirected_to :root
     end
   end
 
   test 'fetch spaces' do
     login_as(@project_administrator)
-    post :fetch_spaces, project_id: @project.id,
-                        openbis_endpoint: {
+    post :fetch_spaces, params: { project_id: @project.id, openbis_endpoint: {
                           as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
                           dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
                           web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
                           username: 'wibble',
                           password: 'wobble'
-                        }
+                        } }
     assert_response :success
     assert @response.body.include?('API-SPACE')
 
@@ -260,36 +257,26 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     login_as(person)
 
     project = person.projects.first
-    post :fetch_spaces, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-                        username: 'wibble',
-                        password: 'wobble'
+    post :fetch_spaces, params: { project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis', dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server', web_endpoint: 'https://openbis-api.fair-dom.org/openbis', username: 'wibble', password: 'wobble' }
     assert_response :redirect
     refute @response.body.include?('API-SPACE')
 
     # none project member cannot
     project = Factory(:project)
-    post :fetch_spaces, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-                        username: 'wibble',
-                        password: 'wobble'
+    post :fetch_spaces, params: { project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis', dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server', web_endpoint: 'https://openbis-api.fair-dom.org/openbis', username: 'wibble', password: 'wobble' }
     assert_response :redirect
     refute @response.body.include?('API-SPACE')
   end
 
   test 'test endpoint' do
     login_as(@project_administrator)
-    get :test_endpoint, project_id: @project.id,
-                        openbis_endpoint: {
+    get :test_endpoint, params: { project_id: @project.id, openbis_endpoint: {
                           as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
                           dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
                           web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
                           username: 'wibble',
                           password: 'wobble'
-                        },
-                        format: :json
+                        }, format: :json }
     assert_response :success
     assert @response.body.include?('true')
 
@@ -301,26 +288,19 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     login_as(person)
 
     project = person.projects.first
-    get :test_endpoint, project_id: project.id,
-                        openbis_endpoint: {
+    get :test_endpoint, params: { project_id: project.id, openbis_endpoint: {
                           as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
                           dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
                           web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
                           username: 'wibble',
                           password: 'wobble'
-                        },
-                        format: :json
+                        }, format: :json }
     assert_response 400
     refute @response.body.include?('true')
 
     # none project member cannot
     project = Factory(:project)
-    get :test_endpoint, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-                        username: 'wibble',
-                        password: 'wobble',
-                        format: :json
+    get :test_endpoint, params: { project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis', dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server', web_endpoint: 'https://openbis-api.fair-dom.org/openbis', username: 'wibble', password: 'wobble', format: :json }
     assert_response 400
     refute @response.body.include?('true')
   end
@@ -328,7 +308,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   test 'refresh metadata store' do
     login_as(@project_administrator)
     endpoint = Factory(:openbis_endpoint, project: @project)
-    post :refresh, id: endpoint.id
+    post :refresh, params: { id: endpoint.id }
     assert_redirected_to endpoint
   end
 
@@ -342,7 +322,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     # should ignore that
     asset.sync_state = :failed
     assert asset.save
-    get :reset_fatals, id: ep.id
+    get :reset_fatals, params: { id: ep.id }
     assert_redirected_to ep
     asset.reload
     assert asset.failed?
@@ -351,7 +331,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     asset.sync_state = :fatal
     assert asset.save
 
-    get :reset_fatals, id: ep.id
+    get :reset_fatals, params: { id: ep.id }
     assert_redirected_to ep
     asset.reload
     refute asset.fatal?

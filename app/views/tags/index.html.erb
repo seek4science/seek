@@ -3,5 +3,11 @@
 </div>
 
 <div class="show_basic">
-  <%= render :partial=>"tags/tag_cloud",:locals=>{:tags=>TextValue.all_tags,:show_overall_count=>true,:id=>"super_tag_cloud",:tags_smaller=>false} %>
+  <%= render partial: "tags/tag_cloud",
+             locals: {
+                 tags: TextValue.all_tags,
+                 show_overall_count: true,
+                 id: "super_tag_cloud",
+                 tags_smaller: false
+             } %>
 </div>

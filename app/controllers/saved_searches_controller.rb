@@ -15,7 +15,7 @@ class SavedSearchesController < ApplicationController
         format.xml  { head :ok }
       else
         flash[:error]="Couldn't find the requested search."
-        format.html { redirect_to :back }
+        format.html { redirect_back fallback_location: root_path }
       end
     end
   end  

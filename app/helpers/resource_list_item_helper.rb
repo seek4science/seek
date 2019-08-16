@@ -185,27 +185,33 @@ module ResourceListItemHelper
   end
 
   def list_item_expandable_text(attribute, text, length = 200)
-    full_text  = text_or_not_specified(text, description: false, auto_link: false)
-    trunc_text = text_or_not_specified(text, description: false, auto_link: false, length: length)
-    # Don't bother with fancy stuff if not enough text to expand
-    if full_text == trunc_text
-      html = (attribute ? "<p class=\"list_item_attribute\"><b>#{attribute}</b>:</p>" : '') + '<div class="list_item_desc">'
-      html << trunc_text
-      html << '</div>'
-      html.html_safe
-    else
-      html = "<script type=\"text/javascript\">\n"
-      html << "fullResourceListItemExpandableText[#{text.object_id}] = '#{escape_javascript(full_text)}';\n"
-      html << "truncResourceListItemExpandableText[#{text.object_id}]  = '#{escape_javascript(trunc_text)}';\n"
-      html << "</script>\n"
-      html << (attribute ? "<p class=\"list_item_attribute\"><b>#{attribute}</b> " : '')
-      html << (link_to '(Expand)', '#', id: "expandableLink#{text.object_id}", onClick: "expandResourceListItemExpandableText(#{text.object_id});return false;")
-      html << '</p>'
-      html << "<div class=\"list_item_desc\"><div id=\"expandableText#{text.object_id}\">"
-      html << trunc_text
-      html << '</div>'
-      html << '</div>'
-      html.html_safe
+    full_text = text_or_not_specified(text, description: false, auto_link: false)
+
+    content_tag(:div, data: { role: 'seek-expandable' }) do
+      if attribute
+        html = content_tag(:p, class: 'list_item_attribute') do
+          content_tag(:b, attribute) +
+              (text.length <= length ? '' :  (' ' + link_to('(Expand)', '#', data: { role: 'seek-expandable-link' })).html_safe)
+        end
+      else
+        html = ''
+      end
+
+      # Don't bother with fancy stuff if not enough text to expand
+      if text.length <= length
+        (html + content_tag(:div, full_text, class: 'list_item_desc')).html_safe
+      else
+        truncated = truncate_without_splitting_words(text, length, false)
+        remainder = text[truncated.length..-1]
+        trunc_text = text_or_not_specified(truncated, description: false, auto_link: false)
+        remainder_text = text_or_not_specified(remainder, description: false, auto_link: false)
+
+        (html + content_tag(:div, class: 'list_item_desc') do
+          trunc_text +
+          content_tag(:span, " &hellip;".html_safe, data: { role: 'seek-expandable-ellipsis'}) +
+          content_tag(:span, remainder_text, data: { role: 'seek-expandable-hidden' }, style: 'display: none;')
+        end).html_safe
+      end
     end
   end
 

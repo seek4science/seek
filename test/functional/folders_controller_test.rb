@@ -15,7 +15,7 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'access as member' do
-    get :index, project_id: @project.id
+    get :index, params: { project_id: @project.id }
     assert_response :success
   end
 
@@ -28,7 +28,7 @@ class FoldersControllerTest < ActionController::TestCase
     unsorted_folder = Factory :project_folder, project_id: @project.id, incoming: true
 
     assert_difference('ProjectFolder.count', -2) do
-      delete :destroy, id: folder.id, project_id: @project.id
+      delete :destroy, params: { id: folder.id, project_id: @project.id }
     end
 
     assert_redirected_to :project_folders
@@ -47,7 +47,7 @@ class FoldersControllerTest < ActionController::TestCase
     unsorted_folder = Factory :project_folder, project_id: @project.id, incoming: true
 
     assert_no_difference('ProjectFolder.count') do
-      delete :destroy, id: folder.id, project_id: @project.id
+      delete :destroy, params: { id: folder.id, project_id: @project.id }
     end
 
     assert_redirected_to :project_folders
@@ -70,7 +70,7 @@ class FoldersControllerTest < ActionController::TestCase
     unsorted_folder = Factory :project_folder, project_id: project.id, incoming: true
 
     assert_no_difference('ProjectFolder.count') do
-      delete :destroy, id: folder, project_id: project.id
+      delete :destroy, params: { id: folder, project_id: project.id }
     end
 
     assert_redirected_to :root
@@ -88,7 +88,7 @@ class FoldersControllerTest < ActionController::TestCase
     assert ProjectFolder.root_folders(@project).empty?
 
     assert_difference('ProjectFolderAsset.count', 2) do
-      get :index, project_id: @project.id
+      get :index, params: { project_id: @project.id }
     end
     assert_response :success
     @project.reload
@@ -103,7 +103,7 @@ class FoldersControllerTest < ActionController::TestCase
     folder = Factory :project_folder, project: @project
     assert_equal 1, ProjectFolder.root_folders(@project).count
     assert_no_difference('ProjectFolder.count') do
-      get :index, project_id: @project.id
+      get :index, params: { project_id: @project.id }
     end
     assert_response :success
     assert_equal [folder], ProjectFolder.root_folders(@project)
@@ -111,14 +111,14 @@ class FoldersControllerTest < ActionController::TestCase
 
   test 'blocked access as non member' do
     login_as(Factory(:user))
-    get :index, project_id: @project.id
+    get :index, params: { project_id: @project.id }
     assert_redirected_to root_path
     assert_not_nil flash[:error]
   end
 
   test 'should not show when logged out' do
     logout
-    get :index, project_id: @project.id
+    get :index, params: { project_id: @project.id }
     assert_redirected_to root_path
   end
 
@@ -128,7 +128,7 @@ class FoldersControllerTest < ActionController::TestCase
     folder.add_assets(sop)
     folder.save!
 
-    xhr(:post, :display_contents, id: folder.id, project_id: folder.project.id)
+    get :display_contents, xhr: true, params: { id: folder.id, project_id: folder.project.id }
 
     assert_response :success
 
@@ -140,7 +140,7 @@ class FoldersControllerTest < ActionController::TestCase
     assay.study.investigation.projects = [@project]
     assay.study.investigation.save!
     assert assay.can_view?
-    xhr(:post, :display_contents, id: "Assay_#{assay.id}", project_id: @project.id)
+    get :display_contents, xhr: true, params: { id: "Assay_#{assay.id}", project_id: @project.id }
     assert_response :success
     assert @response.body.match(/Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv/)
     assert @response.body.match(/5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3/)
@@ -155,7 +155,7 @@ class FoldersControllerTest < ActionController::TestCase
                                          study: study, contributor: person)
 
     refute assay.can_view?
-    xhr(:post, :display_contents, id: "Assay_#{assay.id}", project_id: @project.id)
+    get :display_contents, xhr: true, params: { id: "Assay_#{assay.id}", project_id: @project.id }
     assert_redirected_to root_path
     refute @response.body.match(/Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv/)
     refute @response.body.match(/5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3/)
@@ -168,7 +168,7 @@ class FoldersControllerTest < ActionController::TestCase
     folder.add_assets(sop)
     folder.save!
 
-    xhr(:post, :display_contents, id: folder.id, project_id: folder.project.id)
+    get :display_contents, xhr: true, params: { id: folder.id, project_id: folder.project.id }
     assert_redirected_to root_path
     assert @response.body.match(/Description.*Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF/).nil?
   end
@@ -179,7 +179,7 @@ class FoldersControllerTest < ActionController::TestCase
     other_folder = Factory :project_folder, project_id: @project.id
     folder.add_assets(sop)
     folder.save!
-    xhr(:post, :move_asset_to, asset_id: sop.id, asset_type: 'Sop', id: folder.id, dest_folder_id: other_folder.id, project_id: folder.project.id)
+    post :move_asset_to, xhr: true, params: { asset_id: sop.id, asset_type: 'Sop', id: folder.id, dest_folder_id: other_folder.id, project_id: folder.project.id }
     assert_response :success
     sop.reload
     other_folder.reload
@@ -199,13 +199,13 @@ class FoldersControllerTest < ActionController::TestCase
     folder.save!
 
     assert_difference('AssayAsset.count') do
-      xhr(:post, :move_asset_to, asset_id: sop.id,
-                                 asset_type: 'Sop',
-                                 id: folder.id,
-                                 dest_folder_id: "Assay_#{assay.id}",
-                                 project_id: folder.project.id,
-                                 orig_folder_element_id: 'sdfhsdk',
-                                 dest_folder_element_id: 'oosdo')
+      post :move_asset_to, xhr: true, params: { asset_id: sop.id,
+                                                asset_type: 'Sop',
+                                                id: folder.id,
+                                                dest_folder_id: "Assay_#{assay.id}",
+                                                project_id: folder.project.id,
+                                                orig_folder_element_id: 'sdfhsdk',
+                                                dest_folder_element_id: 'oosdo' }
     end
     assert_response :success
     assay.reload
@@ -221,7 +221,7 @@ class FoldersControllerTest < ActionController::TestCase
     assay.associate(sop)
     folder = Seek::AssayFolder.new assay, @project
     assert_difference('AssayAsset.count', -1) do
-      xhr(:post, :remove_asset, asset_id: sop.id, asset_type: 'Sop', id: folder.id, project_id: folder.project.id, orig_folder_element_id: 'sdfhsdk')
+      post :remove_asset, xhr: true, params: { asset_id: sop.id, asset_type: 'Sop', id: folder.id, project_id: folder.project.id, orig_folder_element_id: 'sdfhsdk' }
     end
 
     assay.reload
@@ -235,7 +235,7 @@ class FoldersControllerTest < ActionController::TestCase
     other_folder = Factory :project_folder, project_id: Factory(:project).id
     folder.add_assets(sop)
     folder.save!
-    xhr(:post, :move_asset_to, asset_id: sop.id, asset_type: 'Sop', id: folder.id, dest_folder_id: other_folder.id, project_id: folder.project.id)
+    post :move_asset_to, xhr: true, params: { asset_id: sop.id, asset_type: 'Sop', id: folder.id, dest_folder_id: other_folder.id, project_id: folder.project.id }
     assert_response :success
     sop.reload
     other_folder.reload
@@ -248,7 +248,7 @@ class FoldersControllerTest < ActionController::TestCase
   test 'create a new child folder' do
     folder = Factory :project_folder, project: @project
     assert_difference('ProjectFolder.count') do
-      xhr(:post, :create_folder, project_id: @project.id, id: folder.id, title: 'fred')
+      post :create_folder, xhr: true, params: { project_id: @project.id, id: folder.id, title: 'fred' }
     end
     assert_response :success
   end
@@ -263,7 +263,7 @@ class FoldersControllerTest < ActionController::TestCase
       folder.save!
     end
 
-    xhr(:post, :display_contents, id: folder.id, project_id: folder.project.id)
+    get :display_contents, xhr: true, params: { id: folder.id, project_id: folder.project.id }
 
     assert_response :success
     assert @response.body.match(/Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF/)
@@ -274,12 +274,12 @@ class FoldersControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay, contributor: @member.person, policy: Factory(:public_policy)
     assay.study.investigation.projects = [@project]
     assay.study.investigation.save!
-    get :index, project_id: @project.id
+    get :index, params: { project_id: @project.id }
     assert_response :success
   end
 
   test 'breadcrumb for project folder' do
-    get :index, project_id: @project.id
+    get :index, params: { project_id: @project.id }
     assert_response :success
     assert_select 'div.breadcrumbs', text: /Home #{I18n.t('project').pluralize} Index #{@project.title} Folders Index/, count: 1 do
       assert_select 'a[href=?]', root_path, count: 1

@@ -1,0 +1,5 @@
+$j('#substance_list').tagsinput('removeAll')
+$j('#add_condition_or_factor_form')[0].reset();
+resetMeasuredItemSelects();
+$j('#condition-or-factor-table tbody').append("<%= escape_javascript(render partial: 'studied_factors/condition_or_factor_row', object: @experimental_condition, locals: { asset: 'sop', show_delete: true }) -%>");
+$j('#condition-or-factor-table tbody:last-child').highlight();

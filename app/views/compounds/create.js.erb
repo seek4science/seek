@@ -1,0 +1,4 @@
+$j('#add_compound_form')[0].reset();
+$j('#compound_rows').prepend("<%= escape_javascript(render partial: 'compound_row', object: @compound) -%>");
+$j('#edit-compound-modals').prepend("<%= escape_javascript(render partial: 'edit_compound', object: @compound, as: 'compound') -%>");
+$j('#compound_row_<%= @compound.id -%>').highlight();

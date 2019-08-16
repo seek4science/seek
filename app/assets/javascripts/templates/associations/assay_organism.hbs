@@ -1,0 +1,17 @@
+<li class="association-list-item" title="{{organism_title}}">
+    {{ truncate organism_title 100 }}
+    {{#if strain_info}}
+        : <span>{{strain_info}}</span>
+    {{/if}}
+    {{#if tissue_and_cell_type_title}}
+        : <span>{{tissue_and_cell_type_title}}</span>
+    {{/if}}
+    {{#if culture_growth}}
+        <span>({{culture_growth}})</span>
+    {{/if}}
+    <input type="hidden" name="assay_organism_ids[]"
+           value="{{organism_id}},{{strain_info}},{{strain_id}},{{culture_growth}},{{tissue_and_cell_type_id }},{{ tissue_and_cell_type_title}}"/>
+    <a class="remove-association clickable" title="Remove assay">
+        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+    </a>
+</li>

@@ -18,128 +18,14 @@
 module Seek
   module Permissions
     module AuthorizationEnforcement
-      def self.included(ar)
-        ar.const_get(:Base).class_eval { include BaseExtensions }
+      extend ActiveSupport::Concern
+
+      included do
+        before_save :changes_authorized?
+        before_destroy :destroy_authorized?
       end
 
-      module BaseExtensions
-        def self.included(base)
-          base.extend ClassMethods
-          base.before_save :changes_authorized?
-          base.before_destroy :destroy_authorized?
-        end
-
-        private
-
-        def changes_authorized?
-          result = true
-          if authorization_checks_enabled
-            result = authorized_changes_to_attributes? &&
-                     authorized_to_edit? &&
-                     authorized_associations_for_action? &&
-                     authorized_required_access_for_owner?
-          end
-          result
-        end
-
-        def authorization_checks_enabled
-          !$authorization_checks_disabled && Seek::Config.authorization_checks_enabled
-        end
-
-        def destroy_authorized?
-          result = true
-          if authorization_checks_enabled
-            unless can_delete?
-              result = false
-              errors.add(:base, "You are not authorized to destroy #{self.class.name.underscore.humanize}-#{id}")
-            end
-          end
-          result
-        end
-
-        def authorized_changes_to_attributes?
-          if self.class.respond_to?(:attributes_requiring_can_manage) && !self.class.attributes_requiring_can_manage.empty? && !can_manage?
-            authorized_changes_requiring_manage?
-          else
-            true
-          end
-        end
-
-        def authorized_to_edit?
-          result = true
-          unless safe_to_edit?
-            result = false
-            errors.add(:base, "You are not authorized to edit #{self.class.name.underscore.humanize}-#{id}")
-          end
-          result
-        end
-
-        def authorized_associations_for_action?
-          result = true
-          if self.class.respond_to?(:associations_and_actions_to_be_enforced)
-            self.class.associations_and_actions_to_be_enforced.keys.each do |association|
-              next unless respond_to?(association)
-              action = self.class.associations_and_actions_to_be_enforced[association]
-              auth_method = "can_#{self.class.associations_and_actions_to_be_enforced[association]}?"
-              reflection = self.class.reflections[association.to_s]
-              if !reflection.belongs_to? || changes.key?(reflection.foreign_key) || new_record?
-                items = Array(send(association))
-              else
-                items = []
-              end
-              items.each do |item|
-                next unless item.respond_to?(auth_method) && !item.send(auth_method)
-                result = false
-                errors.add(:base, "You do not have permission to #{action} #{item.class.name.underscore.humanize}-#{item.id}")
-                break
-              end
-            end
-          end
-
-          result
-        end
-
-        def authorized_required_access_for_owner?
-          result = true
-          if self.class.respond_to?(:associations_requiring_access_for_owner)
-            enforced_associations = self.class.associations_requiring_access_for_owner.keys
-            unless enforced_associations.empty?
-
-              autosave_associations = self.class.reflect_on_all_autosave_associations.select do |reflection|
-                enforced_associations.include?(reflection.name.to_s)
-              end
-              autosave_associations.each do |reflection|
-                next unless associations = association_instance_get(reflection.name)
-                associations = Array(associations)
-                next unless associations.detect { |association| association.target.changed_for_autosave? }
-                action = self.class.associations_requiring_access_for_owner[reflection.name.to_s]
-                action_method = "can_#{action}?"
-                next unless respond_to?(action_method) && !send(action_method)
-                result = false
-                errors.add(:base, "You are not permitted to change #{reflection.name} on #{self.class.name.underscore.humanize}-#{id} without #{action} rights")
-                break
-              end
-            end
-          end
-
-          result
-        end
-
-        def authorized_changes_requiring_manage?
-          offending_attributes = changed & self.class.attributes_requiring_can_manage
-          unless offending_attributes.empty?
-            errors.add(:base, "You are not permitted to change #{offending_attributes.join(',')} attributes on #{self.class.name.underscore.humanize}-#{id} without manage rights")
-          end
-          offending_attributes.empty?
-        end
-
-        def safe_to_edit?
-          not_requiring_edit = self.class.respond_to?(:attributes_not_requiring_edit) ? self.class.attributes_not_requiring_edit : []
-          can_edit? || (changed - not_requiring_edit).empty?
-        end
-      end
-
-      module ClassMethods
+      class_methods do
         def requires_can_manage(*attrs)
           class_attribute :attributes_requiring_can_manage unless respond_to?(:attributes_requiring_can_manage)
           self.attributes_requiring_can_manage ||= []
@@ -164,21 +50,115 @@ module Seek
           self.associations_requiring_access_for_owner[association.to_s] = action.to_s
         end
       end
+
+      private
+
+      def changes_authorized?
+        result = true
+        if authorization_checks_enabled
+          result = authorized_changes_to_attributes? &&
+              authorized_to_edit? &&
+              authorized_associations_for_action? &&
+              authorized_required_access_for_owner?
+        end
+        throw :abort unless result
+      end
+
+      def authorization_checks_enabled
+        !$authorization_checks_disabled && Seek::Config.authorization_checks_enabled
+      end
+
+      def destroy_authorized?
+        result = true
+        if authorization_checks_enabled
+          unless can_delete?
+            result = false
+            errors.add(:base, "You are not authorized to destroy #{self.class.name.underscore.humanize}-#{id}")
+          end
+        end
+        throw :abort unless result
+      end
+
+      def authorized_changes_to_attributes?
+        if self.class.respond_to?(:attributes_requiring_can_manage) && !self.class.attributes_requiring_can_manage.empty? && !can_manage?
+          authorized_changes_requiring_manage?
+        else
+          true
+        end
+      end
+
+      def authorized_to_edit?
+        result = true
+        unless safe_to_edit?
+          result = false
+          errors.add(:base, "You are not authorized to edit #{self.class.name.underscore.humanize}-#{id}")
+        end
+        result
+      end
+
+      def authorized_associations_for_action?
+        result = true
+        if self.class.respond_to?(:associations_and_actions_to_be_enforced)
+          self.class.associations_and_actions_to_be_enforced.keys.each do |association|
+            next unless respond_to?(association)
+            action = self.class.associations_and_actions_to_be_enforced[association]
+            auth_method = "can_#{self.class.associations_and_actions_to_be_enforced[association]}?"
+            reflection = self.class.reflections[association.to_s]
+            if !reflection.belongs_to? || changes.key?(reflection.foreign_key) || new_record?
+              items = Array(send(association))
+            else
+              items = []
+            end
+            items.each do |item|
+              next unless item.respond_to?(auth_method) && !item.send(auth_method)
+              result = false
+              errors.add(:base, "You do not have permission to #{action} #{item.class.name.underscore.humanize}-#{item.id}")
+              break
+            end
+          end
+        end
+
+        result
+      end
+
+      def authorized_required_access_for_owner?
+        result = true
+        if self.class.respond_to?(:associations_requiring_access_for_owner)
+          enforced_associations = self.class.associations_requiring_access_for_owner.keys
+          unless enforced_associations.empty?
+
+            autosave_associations = self.class.reflect_on_all_autosave_associations.select do |reflection|
+              enforced_associations.include?(reflection.name.to_s)
+            end
+            autosave_associations.each do |reflection|
+              next unless associations = association_instance_get(reflection.name)
+              associations = Array(associations)
+              next unless associations.detect { |association| association.target.changed_for_autosave? }
+              action = self.class.associations_requiring_access_for_owner[reflection.name.to_s]
+              action_method = "can_#{action}?"
+              next unless respond_to?(action_method) && !send(action_method)
+              result = false
+              errors.add(:base, "You are not permitted to change #{reflection.name} on #{self.class.name.underscore.humanize}-#{id} without #{action} rights")
+              break
+            end
+          end
+        end
+
+        result
+      end
+
+      def authorized_changes_requiring_manage?
+        offending_attributes = changed & self.class.attributes_requiring_can_manage
+        unless offending_attributes.empty?
+          errors.add(:base, "You are not permitted to change #{offending_attributes.join(',')} attributes on #{self.class.name.underscore.humanize}-#{id} without manage rights")
+        end
+        offending_attributes.empty?
+      end
+
+      def safe_to_edit?
+        not_requiring_edit = self.class.respond_to?(:attributes_not_requiring_edit) ? self.class.attributes_not_requiring_edit : []
+        can_edit? || (changed - not_requiring_edit).empty?
+      end
     end
   end
-end
-
-class Object
-  # Disables all authorization enforcement within the block passed to this method.
-  def disable_authorization_checks
-    saved = $authorization_checks_disabled
-    $authorization_checks_disabled = true
-    yield
-  ensure
-    $authorization_checks_disabled = saved
-  end
-end
-
-ActiveRecord.module_eval do
-  include Seek::Permissions::AuthorizationEnforcement
 end

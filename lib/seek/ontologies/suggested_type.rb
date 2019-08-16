@@ -56,11 +56,6 @@ module Seek
         super || self.class.find_by_id(parent_id).try(:ontology_uri)
       end
 
-      def descriptive_label
-        comment = " - this is a new suggested term that specialises #{ontology_parent.try(:label)}"
-        (label + content_tag('span', comment, class: 'none_text')).html_safe
-      end
-
       def humanize_term_type
         term_type.humanize.downcase if term_type
       end
@@ -180,7 +175,7 @@ module Seek
 
       # creates a job to update rdf if the suggested ontology uri changes
       def create_rdf_generation_job
-        return unless changes.include?(:ontology_uri)
+        return unless saved_changes.include?(:ontology_uri)
         assays.each do |assay|
           RdfGenerationJob.new(assay).queue_job
         end

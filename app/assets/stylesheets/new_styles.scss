@@ -750,6 +750,10 @@ span.required, label.required::after {
     padding: 5px 10px;
   }
 
+  .panel-body {
+    position: relative;
+  }
+
   .panel-body.loading::after {
     position: absolute;
     top: 0;
@@ -769,6 +773,46 @@ span.required, label.required::after {
   }
 }
 
+.js-highlight, .js-highlight-yellow, .js-highlight-warning {
+  animation: js-highlight-fadeout 1s;
+}
+@keyframes js-highlight-fadeout
+{
+  0%   { background-color: #ffffcc; }
+  100% { background-color: inherit; }
+}
+
+.js-highlight-danger, .js-highlight-error, .js-highlight-red, .js-highlight-failure {
+  animation: js-highlight-red-fadeout 1s;
+}
+@keyframes js-highlight-red-fadeout
+{
+  0%   { background-color: $brand-danger; }
+  100% { background-color: inherit; }
+}
+
+.js-highlight-success, .js-highlight-green { animation: js-highlight-green-fadeout 1s; }
+@keyframes js-highlight-green-fadeout
+{
+  0%   { background-color: $brand-success; }
+  100% { background-color: inherit; }
+}
+
+.js-highlight-blue { animation: js-highlight-blue-fadeout 1s; }
+@keyframes js-highlight-blue-fadeout
+{
+  0%   { background-color: #a7c7ff; }
+  100% { background-color: inherit; }
+}
+
 #null_license img {
   padding-right:1em;
+}
+
+.my-items-delete-btn {
+  display: none;
+}
+
+#my-items .my-items-delete-btn {
+  display: inline-block;
 }

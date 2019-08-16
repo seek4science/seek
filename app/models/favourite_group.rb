@@ -1,4 +1,4 @@
-class FavouriteGroup < ActiveRecord::Base
+class FavouriteGroup < ApplicationRecord
   validates_presence_of :name
   
   # allow same group names, but only if these belong to different users

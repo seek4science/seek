@@ -1,0 +1,5 @@
+<% if @item.try :can_view? %>
+  $j('#<%= @element %>').html('<%= escape_javascript(render(partial: @partial, locals: { resource: @item })) -%>');
+<% else %>
+  $j('#<%= @element %>').text('Nothing is selected to preview.');
+<% end %>

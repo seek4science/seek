@@ -1,4 +1,4 @@
-class Scaling < ActiveRecord::Base
+class Scaling < ApplicationRecord
    belongs_to :scale, :class_name => 'Scale'
    belongs_to :scalable, :polymorphic => true
    belongs_to :person

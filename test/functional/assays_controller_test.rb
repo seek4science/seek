@@ -21,7 +21,7 @@ class AssaysControllerTest < ActionController::TestCase
   test "shouldn't show unauthorized assays" do
     login_as Factory(:user)
     hidden = Factory(:experimental_assay, policy: Factory(:private_policy)) # ensure at least one hidden assay exists
-    get :index, page: 'all', format: 'xml'
+    get :index, params: { page: 'all', format: 'xml' }
     assert_response :success
     assert_equal assigns(:assays).sort_by(&:id), Assay.authorize_asset_collection(assigns(:assays), 'view', users(:aaron)).sort_by(&:id), "#{t('assays.assay').downcase.pluralize} haven't been authorized"
     assert !assigns(:assays).include?(hidden)
@@ -61,7 +61,7 @@ class AssaysControllerTest < ActionController::TestCase
     sop = sops(:sop_with_all_sysmo_users_policy)
     assert !assay.sops.include?(sop.latest_version)
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay: { sop_ids: [sop.id], title: assay.title }
+      put :update, params: { id: assay, assay: { sop_ids: [sop.id], title: assay.title } }
       assert_redirected_to assay_path(assay)
     end
 
@@ -77,7 +77,7 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:model_owner)
 
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay: { sop_ids: [sop.id], title: assay.title }
+      put :update, params: { id: assay, assay: { sop_ids: [sop.id], title: assay.title } }
       assert_redirected_to assay_path(assay)
     end
 
@@ -94,7 +94,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.sops.include?(sop.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay: { sop_ids: [sop.id], title: assay.title }
+      put :update, params: { id: assay, assay: { sop_ids: [sop.id], title: assay.title } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -113,8 +113,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.data_files.include?(df.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, id: assay,
-                   assay: { data_file_attributes: [{ asset_id: df.id, relationship_type_id: RelationshipType.find_by_title('Test data').id }], title: assay.title }
+      put :update, params: { id: assay, assay: { data_file_attributes: [{ asset_id: df.id, relationship_type_id: RelationshipType.find_by_title('Test data').id }], title: assay.title } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -133,7 +132,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.models.include?(model.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay: { model_ids: [model.id], title: assay.title }
+      put :update, params: { id: assay, assay: { model_ids: [model.id], title: assay.title } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -148,7 +147,7 @@ class AssaysControllerTest < ActionController::TestCase
                                          assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
                                          technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding')
     assert_difference('ActivityLog.count') do
-      get :show, id: assay.id
+      get :show, params: { id: assay.id }
     end
 
     assert_response :success
@@ -162,14 +161,14 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should not show tagging when not logged in' do
     logout
     public_assay = Factory(:experimental_assay, policy: Factory(:public_policy))
-    get :show, id: public_assay
+    get :show, params: { id: public_assay }
     assert_response :success
     assert_select 'div#tags_box', count: 0
   end
 
   test 'should show modelling assay' do
     assert_difference('ActivityLog.count') do
-      get :show, id: assays(:modelling_assay_with_data_and_relationship)
+      get :show, params: { id: assays(:modelling_assay_with_data_and_relationship) }
     end
 
     assert_response :success
@@ -188,7 +187,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should show new with study when id provided' do
     s = studies(:metabolomics_study)
-    get :new, study_id: s
+    get :new, params: { study_id: s }
     assert_response :success
     assert_not_nil assigns(:assay)
     assert_equal s, assigns(:assay).study
@@ -196,7 +195,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should show item with no study' do
     assert_difference('ActivityLog.count') do
-      get :show, id: assays(:assay_with_no_study_or_files)
+      get :show, params: { id: assays(:assay_with_no_study_or_files) }
     end
 
     assert_response :success
@@ -208,7 +207,7 @@ class AssaysControllerTest < ActionController::TestCase
     a = assays(:assay_with_no_study_or_files)
     s = studies(:metabolomics_study)
     assert_difference('ActivityLog.count') do
-      put :update, id: a, assay: { study_id: s }
+      put :update, params: { id: a, assay: { study_id: s } }
     end
 
     assert_redirected_to assay_path(a)
@@ -219,9 +218,9 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should create modelling assay with/without organisms' do
     assert_difference('Assay.count') do
-      post :create, assay: { title: 'test',
+      post :create, params: { assay: { title: 'test',
                              study_id: Factory(:study,contributor:User.current_user.person).id,
-                             assay_class_id: assay_classes(:modelling_assay_class).id }, policy_attributes: valid_sharing
+                             assay_class_id: assay_classes(:modelling_assay_class).id }, policy_attributes: valid_sharing }
     end
 
     assay = assigns(:assay)
@@ -233,10 +232,9 @@ class AssaysControllerTest < ActionController::TestCase
     strain = Factory(:strain, title: 'UUU', organism: organism)
     growth_type = Factory(:culture_growth_type, title: 'batch')
     assert_difference('Assay.count') do
-      post :create, assay: { title: 'test',
+      post :create, params: { assay: { title: 'test',
                              study_id: Factory(:study,contributor:User.current_user.person).id,
-                             assay_class_id: assay_classes(:modelling_assay_class).id },
-                    assay_organism_ids: [organism.id, strain.title, strain.id, growth_type.title].join(','), policy_attributes: valid_sharing
+                             assay_class_id: assay_classes(:modelling_assay_class).id }, assay_organism_ids: [organism.id, strain.title, strain.id, growth_type.title].join(','), policy_attributes: valid_sharing }
     end
     a = assigns(:assay)
     assert_equal 1, a.assay_organisms.count
@@ -247,12 +245,11 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should create assay with ontology assay and tech type' do
     assert_difference('Assay.count') do
-      post :create, assay: { title: 'test',
+      post :create, params: { assay: { title: 'test',
                              technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',
                              assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics',
                              study_id: Factory(:study,contributor:User.current_user.person).id,
-                             assay_class_id: Factory(:experimental_assay_class).id },
-                    policy_attributes: valid_sharing
+                             assay_class_id: Factory(:experimental_assay_class).id }, policy_attributes: valid_sharing }
     end
     assert assigns(:assay)
     assay = assigns(:assay)
@@ -266,12 +263,11 @@ class AssaysControllerTest < ActionController::TestCase
     assay_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'fish')
     tech_type = Factory(:suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', label: 'carrot')
     assert_difference('Assay.count') do
-      post :create, assay: { title: 'test',
+      post :create, params: { assay: { title: 'test',
                              technology_type_uri: tech_type.uri,
                              assay_type_uri: assay_type.uri,
                              study_id: Factory(:study,contributor:User.current_user.person).id,
-                             assay_class_id: Factory(:experimental_assay_class).id },
-                    policy_attributes: valid_sharing
+                             assay_class_id: Factory(:experimental_assay_class).id }, policy_attributes: valid_sharing }
     end
     assert assigns(:assay)
     assay = assigns(:assay)
@@ -288,10 +284,10 @@ class AssaysControllerTest < ActionController::TestCase
     assay_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'fish')
     tech_type = Factory(:suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', label: 'carrot')
 
-    post :update, id: assay.id, assay: {
+    post :update, params: { id: assay.id, assay: {
       technology_type_uri: tech_type.uri,
       assay_type_uri: assay_type.uri
-    },policy_attributes: valid_sharing
+    }, policy_attributes: valid_sharing }
 
     assay.reload
     assert_equal assay_type, assay.suggested_assay_type
@@ -317,10 +313,10 @@ class AssaysControllerTest < ActionController::TestCase
     refute_nil assay.assay_type_uri
     refute_nil assay.technology_type_uri
 
-    post :update, id: assay.id, assay: {
+    post :update, params: { id: assay.id, assay: {
         technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',
         assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics'
-    },policy_attributes: valid_sharing
+    }, policy_attributes: valid_sharing }
 
     assay.reload
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Metabolomics',assay.assay_type_uri
@@ -335,7 +331,7 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assert_difference('ActivityLog.count') do
       assert_difference('Assay.count', -1) do
-        delete :destroy, id: a
+        delete :destroy, params: { id: a }
       end
     end
 
@@ -348,7 +344,7 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:aaron)
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('Assay.count') do
-        delete :destroy, id: a
+        delete :destroy, params: { id: a }
       end
     end
 
@@ -361,7 +357,7 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:datafile_owner)
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('Assay.count') do
-        delete :destroy, id: a
+        delete :destroy, params: { id: a }
       end
     end
 
@@ -375,7 +371,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     Factory :assay_organism, assay: a, organism: o1
 
-    get :show, id: a.id
+    get :show, params: { id: a.id }
     assert_response :success
 
     assert_select 'p#organism' do
@@ -385,7 +381,7 @@ class AssaysControllerTest < ActionController::TestCase
     o2 = Factory(:organism, title: 'Slug')
     str = Factory :strain, title: 'AAA111', organism: o2
     Factory :assay_organism, assay: a, organism: o2, strain: str
-    get :show, id: a.id
+    get :show, params: { id: a.id }
     assert_response :success
     assert_select 'p#organism' do
       assert_select 'a[href=?]', organism_path(o1), text: 'Frog'
@@ -397,11 +393,11 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should show edit when not logged in' do
     logout
     a = Factory :experimental_assay, contributor: Factory(:person), policy: Factory(:editing_public_policy)
-    get :edit, id: a
+    get :edit, params: { id: a }
     assert_response :success
 
     a = Factory :modelling_assay, contributor: Factory(:person), policy: Factory(:editing_public_policy)
-    get :edit, id: a
+    get :edit, params: { id: a }
     assert_response :success
   end
 
@@ -410,7 +406,7 @@ class AssaysControllerTest < ActionController::TestCase
     a = Factory :assay, contributor: person, policy: Factory(:public_policy, access_type: Policy::EDITING)
     assert !a.can_manage?
     assert a.can_view?
-    get :show, id: a.id
+    get :show, params: { id: a.id }
     assert_response :success
     assert_select '#buttons' do
       assert_select 'li' do
@@ -428,7 +424,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert a.can_manage?
     assert_equal 1, a.assets.count
     assert !a.can_delete?
-    get :show, id: a.id
+    get :show, params: { id: a.id }
     assert_response :success
     assert_select '#buttons' do
       assert_select 'li' do
@@ -443,7 +439,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert a.can_manage?
     assert a.can_delete?
-    get :show, id: a.id
+    get :show, params: { id: a.id }
     assert_response :success
     assert_select '#buttons' do
       assert_select 'li' do
@@ -456,7 +452,7 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should not edit assay when not project pal' do
     a = assays(:assay_with_just_a_study)
     login_as(:datafile_owner)
-    get :edit, id: a
+    get :edit, params: { id: a }
     assert flash[:error]
     assert_redirected_to a
   end
@@ -464,7 +460,7 @@ class AssaysControllerTest < ActionController::TestCase
   test 'admin should not edit somebody elses assay' do
     a = assays(:assay_with_just_a_study)
     login_as(:quentin)
-    get :edit, id: a
+    get :edit, params: { id: a }
     assert flash[:error]
     assert_redirected_to a
   end
@@ -474,7 +470,7 @@ class AssaysControllerTest < ActionController::TestCase
     a = assays(:assay_with_no_study_but_has_some_files)
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('Assay.count') do
-        delete :destroy, id: a
+        delete :destroy, params: { id: a }
       end
     end
     assert flash[:error]
@@ -486,7 +482,7 @@ class AssaysControllerTest < ActionController::TestCase
     a = assays(:assay_with_a_model)
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('Assay.count') do
-        delete :destroy, id: a
+        delete :destroy, params: { id: a }
       end
     end
 
@@ -499,7 +495,7 @@ class AssaysControllerTest < ActionController::TestCase
     a = assays(:assay_with_a_publication)
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('Assay.count') do
-        delete :destroy, id: a
+        delete :destroy, params: { id: a }
       end
     end
 
@@ -512,7 +508,7 @@ class AssaysControllerTest < ActionController::TestCase
     a = assays(:assay_with_no_study_but_has_some_sops)
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('Assay.count') do
-        delete :destroy, id: a
+        delete :destroy, params: { id: a }
       end
     end
 
@@ -532,99 +528,26 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'get new with class doesnt present options for class' do
     login_as(:model_owner)
-    get :new, class: 'experimental'
+    get :new, params: { class: 'experimental' }
     assert_response :success
     assert_select 'a[href=?]', new_assay_path(class: :experimental), count: 0
     assert_select 'a', text: /An #{I18n.t('assays.experimental_assay')}/i, count: 0
     assert_select 'a[href=?]', new_assay_path(class: :modelling), count: 0
     assert_select 'a', text: /A #{I18n.t('assays.modelling_analysis')}/i, count: 0
 
-    get :new, class: 'modelling'
+    get :new, params: { class: 'modelling' }
     assert_response :success
     assert_select 'a[href=?]', new_assay_path(class: :experimental), count: 0
     assert_select 'a', text: /An #{I18n.t('assays.experimental_assay')}/i, count: 0
     assert_select 'a[href=?]', new_assay_path(class: :modelling), count: 0
     assert_select 'a', text: /A #{I18n.t('assays.modelling_analysis')}/i, count: 0
-  end
-
-  test 'download link for sop in lazy loaded tab' do
-    login_as(:owner_of_my_first_sop)
-
-    with_config_value :tabs_lazy_load_enabled, true do
-      get :resource_in_tab, resource_ids: [sops(:my_first_sop).id].join(','), resource_type: 'Sop', view_type: 'view_some', scale_title: 'all', actions_partial_disable: 'false'
-    end
-    assert_select 'div.list_item div.list_item_actions' do
-      path = download_sop_path(sops(:my_first_sop))
-      assert_select 'a[href=?]', path, minumum: 1
-    end
-  end
-
-  test 'show link for sop in lazy loaded tab' do
-    login_as(:owner_of_my_first_sop)
-
-    with_config_value :tabs_lazy_load_enabled, true do
-      get :resource_in_tab, resource_ids: [sops(:my_first_sop).id].join(','), resource_type: 'Sop', view_type: 'view_some', scale_title: 'all', actions_partial_disable: 'false'
-    end
-    assert_select 'div.list_item div.list_item_title' do
-      path = sop_path(sops(:my_first_sop))
-      assert_select 'a[href=?]', path, minumum: 1
-    end
-  end
-
-  test 'edit link for sop in lazy loaded tabs' do
-    login_as(:owner_of_my_first_sop)
-
-    with_config_value :tabs_lazy_load_enabled, true do
-      get :resource_in_tab, resource_ids: [sops(:my_first_sop).id].join(','), resource_type: 'Sop', view_type: 'view_some', scale_title: 'all', actions_partial_disable: 'false'
-    end
-    assert_select 'div.list_item div.list_item_actions' do
-      path = edit_sop_path(sops(:my_first_sop))
-      assert_select 'a[href=?]', path, minumum: 1
-    end
-  end
-
-  test 'download link for data_file in lazy loaded tabs' do
-    login_as(:owner_of_my_first_sop)
-
-    with_config_value :tabs_lazy_load_enabled, true do
-      get :resource_in_tab, resource_ids: [data_files(:picture).id].join(','), resource_type: 'DataFile', view_type: 'view_some', scale_title: 'all', actions_partial_disable: 'false'
-    end
-    assert_select 'div.list_item div.list_item_actions' do
-      path = download_data_file_path(data_files(:picture))
-      assert_select 'a[href=?]', path, minumum: 1
-    end
-  end
-
-  test 'show link for data_file in laz loaded tabs' do
-    login_as(:owner_of_my_first_sop)
-
-    with_config_value :tabs_lazy_load_enabled, true do
-      get :resource_in_tab, resource_ids: [data_files(:picture).id].join(','), resource_type: 'DataFile', view_type: 'view_some', scale_title: 'all', actions_partial_disable: 'false'
-    end
-    assert_select 'div.list_item div.list_item_title' do
-      path = data_file_path(data_files(:picture))
-      assert_select 'a[href=?]', path, minumum: 1
-    end
-  end
-
-  test 'edit link for data_file in lazy loaded tabs' do
-    login_as(:owner_of_my_first_sop)
-
-    with_config_value :tabs_lazy_load_enabled, true do
-      get :resource_in_tab, resource_ids: [data_files(:picture).id].join(','), resource_type: 'DataFile', view_type: 'view_some', scale_title: 'all', actions_partial_disable: 'false'
-    end
-
-    assert_select 'div.list_item div.list_item_actions' do
-      path = edit_data_file_path(data_files(:picture))
-      assert_select 'a[href=?]', path, minumum: 1
-    end
   end
 
   test 'links have nofollow in sop tabs' do
     assay = Factory(:assay, contributor:User.current_user.person)
     sop = Factory(:sop,description:'http://news.bbc.co.uk',assays:[assay],contributor: User.current_user.person)
     assert_difference('ActivityLog.count') do
-      get :show, id: assay
+      get :show, params: { id: assay }
     end
 
     assert_select 'div.list_item div.list_item_desc' do
@@ -638,7 +561,7 @@ class AssaysControllerTest < ActionController::TestCase
     data_file_version.description = 'http://news.bbc.co.uk'
     data_file_version.save!
     assert_difference('ActivityLog.count') do
-      get :show, id: assays(:metabolomics_assay)
+      get :show, params: { id: assays(:metabolomics_assay) }
     end
 
     assert_select 'div.list_item div.list_item_desc' do
@@ -648,7 +571,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   def test_should_add_nofollow_to_links_in_show_page
     assert_difference('ActivityLog.count') do
-      get :show, id: assays(:assay_with_links_in_description)
+      get :show, params: { id: assays(:assay_with_links_in_description) }
     end
 
     assert_select 'div#description' do
@@ -658,7 +581,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should not allow XSS in descriptions' do
     assay = Factory(:assay, description: 'hello <script>alert("HELLO")</script>')
-    get :show, id: assays(:assay_with_links_in_description)
+    get :show, params: { id: assays(:assay_with_links_in_description) }
 
     assert_select 'div#description' do
       assert_select 'script', count: 0
@@ -672,7 +595,7 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assay = assays(:assay_with_public_and_private_sops_and_datafiles)
     assert_difference('ActivityLog.count') do
-      get :show, id: assay.id
+      get :show, params: { id: assay.id }
     end
 
     assert_response :success
@@ -705,7 +628,7 @@ class AssaysControllerTest < ActionController::TestCase
       assert_no_difference('Assay.count', 'Should not have added assay because the title is blank') do
         assert_no_difference('AssayAsset.count', 'Should not have added assay assets because the assay validation failed') do
           # title is blank, so should fail validation
-          post :create, assay: {
+          post :create, params: { assay: {
             title: '',
             technology_type_uri: 'http://some-uri#tech',
             assay_type_uri: 'http://some-uri#assay',
@@ -714,13 +637,21 @@ class AssaysControllerTest < ActionController::TestCase
             sop_ids: ["#{sop.id}"],
             model_ids: ["#{model.id}"],
             data_files_attributes: [{ asset_id: datafile.id, relationship_type_id: rel.id }]
-          }, policy_attributes: valid_sharing
+          }, policy_attributes: valid_sharing }
         end
       end
     end
 
-    assert_select "#assay_sop_ids option[selected][value='#{sop.id}']", text: sop.title
-    assert_select "#assay_model_ids option[selected][value='#{model.id}']", text: model.title
+    sop_json = JSON.parse(select_node_contents('#add_sops_form [data-role="seek-existing-associations"]'))
+    assert_equal 1, sop_json.length
+    assert_equal sop.title, sop_json[0]['title']
+    assert_equal sop.id, sop_json[0]['id']
+
+    model_json = JSON.parse(select_node_contents('#add_models_form [data-role="seek-existing-associations"]'))
+    assert_equal 1, model_json.length
+    assert_equal model.title, model_json[0]['title']
+    assert_equal model.id, model_json[0]['id']
+
     df_json = JSON.parse(select_node_contents('#data_file_to_list script'))
     assert_equal 1, df_json.length
     assert_equal datafile.title, df_json[0]['title']
@@ -742,7 +673,7 @@ class AssaysControllerTest < ActionController::TestCase
       assert_difference('Assay.count') do
         assert_difference('AssayAsset.count', 3) do
           assert_difference('Relationship.count') do
-            post :create, assay: {
+            post :create, params: { assay: {
                 title: 'fish',
                 study_id: study.id,
                 assay_class_id: assay_classes(:modelling_assay_class).id,
@@ -750,8 +681,7 @@ class AssaysControllerTest < ActionController::TestCase
                 model_ids: ["#{model.id}"],
                 data_files_attributes: [{ asset_id: df.id, relationship_type_id: rel.id }],
                 publication_ids: ["#{pub.id}"]
-            },
-                 policy_attributes: valid_sharing # default policy is nil in VLN
+            }, policy_attributes: valid_sharing } # default policy is nil in VLN
           end
         end
       end
@@ -791,18 +721,25 @@ class AssaysControllerTest < ActionController::TestCase
       assert_no_difference('AssayAsset.count', 'Should not have added assay assets because the assay validation failed') do
         assert_no_difference('Assay.count', 'Should not have added assay because the title is blank') do
           # title is blank, so should fail validation
-          put :update, id: assay, assay: { title: '',
+          put :update, params: { id: assay, assay: { title: '',
                                            assay_class_id: assay_classes(:modelling_assay_class).id,
                                            sop_ids: ["#{sop.id}"],
                                            model_ids: ["#{model.id}"],
                                            data_files_attributes: [{ asset_id: datafile.id, relationship_type_id: rel.id }]
-          }
+          } }
         end
       end
     end
+    sop_json = JSON.parse(select_node_contents('#add_sops_form [data-role="seek-existing-associations"]'))
+    assert_equal 1, sop_json.length
+    assert_equal sop.title, sop_json[0]['title']
+    assert_equal sop.id, sop_json[0]['id']
 
-    assert_select "#assay_sop_ids option[selected][value='#{sop.id}']", text: sop.title
-    assert_select "#assay_model_ids option[selected][value='#{model.id}']", text: model.title
+    model_json = JSON.parse(select_node_contents('#add_models_form [data-role="seek-existing-associations"]'))
+    assert_equal 1, model_json.length
+    assert_equal model.title, model_json[0]['title']
+    assert_equal model.id, model_json[0]['id']
+
     df_json = JSON.parse(select_node_contents('#data_file_to_list script'))
     assert_equal 1, df_json.length
     assert_equal datafile.title, df_json[0]['title']
@@ -829,25 +766,25 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'filtering by study' do
     study = studies(:metabolomics_study)
-    get :index, filter: { study: study.id }
+    get :index, params: { filter: { study: study.id } }
     assert_response :success
   end
 
   test 'filtering by investigation' do
     inv = investigations(:metabolomics_investigation)
-    get :index, filter: { investigation: inv.id }
+    get :index, params: { filter: { investigation: inv.id } }
     assert_response :success
   end
 
   test 'filtering by project' do
     project = projects(:sysmo_project)
-    get :index, filter: { project: project.id }
+    get :index, params: { filter: { project: project.id } }
     assert_response :success
   end
 
   test 'filtering by person' do
     person = people(:person_for_model_owner)
-    get :index, filter: { person: person.id }, page: 'all'
+    get :index, params: { filter: { person: person.id }, page: 'all' }
     assert_response :success
     a = assays(:metabolomics_assay)
     a2 = assays(:modelling_assay_with_data_and_relationship)
@@ -866,7 +803,7 @@ class AssaysControllerTest < ActionController::TestCase
                             policy: Factory(:policy,
                                             access_type: Policy::NO_ACCESS,
                                             permissions: [Factory(:permission, contributor: proj, access_type: Policy::EDITING)]))
-    get :edit, id: assay.id
+    get :edit, params: { id: assay.id }
   end
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
@@ -879,9 +816,8 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_difference('ActivityLog.count') do
       assert_difference('Assay.count') do
-        post :create, assay: a,
-                      policy_attributes: { access_type: Policy::VISIBLE,
-                                           permissions_attributes: project_permissions(study.projects, Policy::ACCESSIBLE) }
+        post :create, params: { assay: a, policy_attributes: { access_type: Policy::VISIBLE,
+                                           permissions_attributes: project_permissions(study.projects, Policy::ACCESSIBLE) } }
       end
     end
 
@@ -916,9 +852,8 @@ class AssaysControllerTest < ActionController::TestCase
     assert assay.policy.permissions.empty?
 
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay: { title: assay.title },
-                   policy_attributes: { access_type: Policy::ACCESSIBLE,
-                                        permissions_attributes: project_permissions(study.projects, Policy::EDITING) }
+      put :update, params: { id: assay, assay: { title: assay.title }, policy_attributes: { access_type: Policy::ACCESSIBLE,
+                                        permissions_attributes: project_permissions(study.projects, Policy::EDITING) } }
     end
 
     assay.reload
@@ -945,7 +880,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert assay.save
     assert assay.is_modelling?
 
-    get :show, id: assay
+    get :show, params: { id: assay }
     assert_response :success
     assert_select 'a[href=?]', data_file_path(df), text: df.title
     assert_select 'a[href=?]', model_path(model), text: model.title
@@ -999,7 +934,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay.data_files << private_df
     assay.save!
     login_as Factory(:user)
-    xhr(:get, :preview, id: assay.id)
+    get :preview, xhr: true, params: { id: assay.id }
     assert_response :success
   end
 
@@ -1020,7 +955,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     login_as Factory(:person)
 
-    get :show, id: assay.id
+    get :show, params: { id: assay.id }
     assert_response :success
     assert_select 'div.data_model_relationship' do
       assert_select 'ul.related_models' do
@@ -1050,7 +985,7 @@ class AssaysControllerTest < ActionController::TestCase
                     contributor: User.current_user.person)
 
     logout
-    get :show, id: assay
+    get :show, params: { id: assay }
     assert_response :success
     assert_select 'p#investigation' do
       assert_select 'span.none_text', text: /hidden item/, count: 1
@@ -1062,7 +997,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'edit should include tags element' do
     assay = Factory(:assay, policy: Factory(:public_policy))
-    get :edit, id: assay.id
+    get :edit, params: { id: assay.id }
     assert_response :success
 
     assert_select 'div.panel-heading', text: /Tags/, count: 1
@@ -1070,7 +1005,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'new should include tags element' do
-    get :new, class: :experimental
+    get :new, params: { class: :experimental }
     assert_response :success
     assert_select 'div.panel-heading', text: /Tags/, count: 1
     assert_select 'input#tag_list', count: 1
@@ -1079,7 +1014,7 @@ class AssaysControllerTest < ActionController::TestCase
   test 'edit should include not include tags element when tags disabled' do
     with_config_value :tagging_enabled, false do
       assay = Factory(:assay, policy: Factory(:public_policy))
-      get :edit, id: assay.id
+      get :edit, params: { id: assay.id }
       assert_response :success
 
       assert_select 'div.panel-heading', text: /Tags/, count: 0
@@ -1089,7 +1024,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'new should not include tags element when tags disabled' do
     with_config_value :tagging_enabled, false do
-      get :new, class: :experimental
+      get :new, params: { class: :experimental }
       assert_response :success
       assert_select 'div.panel-heading', text: /Tags/, count: 0
       assert_select 'input#tag_list', count: 0
@@ -1103,7 +1038,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay = Factory(:assay, policy: Factory(:public_policy), title: 'the assay', study: study, contributor:person)
     assert assay.can_view?
     assert assay.study.can_edit?
-    get :new_object_based_on_existing_one, id: assay.id
+    get :new_object_based_on_existing_one, params: { id: assay.id }
     assert_response :success
     assert_select '#assay_title[value=?]', 'the assay'
     assert_select "select#assay_study_id option[selected][value='#{assay.study.id}']",count: 1
@@ -1112,7 +1047,7 @@ class AssaysControllerTest < ActionController::TestCase
   test 'new object based on existing one when unauthorised to view' do
     assay = Factory(:assay, policy: Factory(:private_policy), title: 'the assay')
     refute assay.can_view?
-    get :new_object_based_on_existing_one, id: assay.id
+    get :new_object_based_on_existing_one, params: { id: assay.id }
     assert_response :forbidden
   end
 
@@ -1120,13 +1055,13 @@ class AssaysControllerTest < ActionController::TestCase
     assay = Factory(:assay, policy: Factory(:public_policy))
     logout
     assert assay.can_view?
-    get :new_object_based_on_existing_one, id: assay.id
+    get :new_object_based_on_existing_one, params: { id: assay.id }
     assert_redirected_to assay
     refute_nil flash[:error]
   end
 
   test 'should show experimental assay types for new experimental assay' do
-    get :new, class: :experimental
+    get :new, params: { class: :experimental }
     assert_response :success
     assert_select 'label', text: /assay type/i
     assert_select 'select#assay_assay_type_uri' do
@@ -1136,7 +1071,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should show modelling assay types for new modelling assay' do
-    get :new, class: :modelling
+    get :new, params: { class: :modelling }
     assert_response :success
     assert_select 'label', text: /Biological problem addressed/i
     assert_select 'select#assay_assay_type_uri' do
@@ -1147,7 +1082,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should show experimental assay types when editing experimental assay' do
     a = Factory(:experimental_assay, contributor: User.current_user.person)
-    get :edit, id: a.id
+    get :edit, params: { id: a.id }
     assert_response :success
     assert_select 'label', text: /assay type/i
     assert_select 'select#assay_assay_type_uri' do
@@ -1158,7 +1093,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should show modelling assay types when editing modelling assay' do
     a = Factory(:modelling_assay, contributor: User.current_user.person)
-    get :edit, id: a.id
+    get :edit, params: { id: a.id }
     assert_response :success
     assert_select 'label', text: /Biological problem addressed/i
     assert_select 'select#assay_assay_type_uri' do
@@ -1174,7 +1109,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay2 = Factory(:assay, policy: Factory(:public_policy))
     refute_nil(inv)
     refute_equal assay.study.investigation, assay2.study.investigation
-    get :index, investigation_id: inv.id
+    get :index, params: { investigation_id: inv.id }
     assert_response :success
     assert_select 'div.list_item_title' do
       assert_select 'a[href=?]', assay_path(assay), text: assay.title
@@ -1189,7 +1124,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay2 = Factory(:assay, policy: Factory(:public_policy))
 
     refute_equal assay.study, assay2.study
-    get :index, study_id: study.id
+    get :index, params: { study_id: study.id }
     assert_response :success
     assert_select 'div.list_item_title' do
       assert_select 'a[href=?]', assay_path(assay), text: assay.title
@@ -1201,7 +1136,7 @@ class AssaysControllerTest < ActionController::TestCase
     Factory :assay # needs an assay to be sure that the problem being fixed is triggered
     study_id = 999
     assert_nil Study.find_by_id(study_id)
-    get :index, study_id: study_id
+    get :index, params: { study_id: study_id }
     assert_response :not_found
   end
 
@@ -1236,7 +1171,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert strain1.can_view?
     assert strain2.can_view?
 
-    get :index, strain_id: strain1.id
+    get :index, params: { strain_id: strain1.id }
     assert_response :success
 
     assert_select 'div.list_item_title' do
@@ -1248,7 +1183,7 @@ class AssaysControllerTest < ActionController::TestCase
   test 'faceted browsing config for Assay' do
     Factory(:assay, policy: Factory(:public_policy))
     with_config_value :faceted_browsing_enabled, true do
-      get :index, user_enable_facet: 'true'
+      get :index, params: { user_enable_facet: 'true' }
       assert_select "div[data-ex-facet-class='TextSearch']", count: 1
       assert_select "div[data-ex-role='facet'][data-ex-expression='.organism']", count: 1
       assert_select "div[data-ex-role='facet'][data-ex-expression='.assay_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", count: 1
@@ -1260,7 +1195,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'content config for Assay' do
     with_config_value :faceted_browsing_enabled, true do
-      get :index, user_enable_facet: 'true'
+      get :index, params: { user_enable_facet: 'true' }
       assert_select "div[data-ex-role='exhibit-view'][data-ex-label='Tiles'][data-ex-paginate='true']", count: 1
     end
   end
@@ -1272,7 +1207,7 @@ class AssaysControllerTest < ActionController::TestCase
       assert assay1.can_view?
       assert !assay2.can_view?
       @request.env['HTTP_REFERER'] = '/assays/items_for_result'
-      xhr :post, 'items_for_result', items: "Assay_#{assay1.id},Assay_#{assay2.id}"
+      post :items_for_result, xhr: true, params: { items: "Assay_#{assay1.id},Assay_#{assay2.id}" }
       items_for_result = ActiveSupport::JSON.decode(@response.body)['items_for_result']
       assert items_for_result.include?(assay1.title)
       assert !items_for_result.include?(assay2.title)
@@ -1284,7 +1219,7 @@ class AssaysControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert assay.creators.empty?
 
-    put :update, id: assay.id, assay: { title: assay.title, creator_ids: [creator.id] }
+    put :update, params: { id: assay.id, assay: { title: assay.title, creator_ids: [creator.id] } }
     assert_redirected_to assay_path(assay)
 
     assert assay.creators.include?(creator)
@@ -1293,7 +1228,7 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should have creators association box' do
     assay = Factory(:assay, policy: Factory(:public_policy))
 
-    get :edit, id: assay.id
+    get :edit, params: { id: assay.id }
     assert_response :success
 
     assert_select '#creators_list'
@@ -1310,7 +1245,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay.reload
     assert assay.creators.include?(creator)
 
-    get :show, id: assay.id
+    get :show, params: { id: assay.id }
     assert_response :success
     assert_select 'span.author_avatar a[href=?]', "/people/#{creator.id}"
   end
@@ -1322,7 +1257,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay.save
     assay.reload
 
-    get :show, id: assay.id
+    get :show, params: { id: assay.id }
     assert_response :success
     assert_select 'div.panel-body div', text: other_creators
   end
@@ -1339,7 +1274,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay = Factory(:assay, study: study, policy: Factory(:public_policy),contributor:person)
     assay2 = Factory(:assay, study: study2, policy: Factory(:public_policy),contributor:other_person)
 
-    get :index, programme_id: programme.id
+    get :index, params: { programme_id: programme.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -1356,7 +1291,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay2 = Factory(:assay, contributor:person)
     document = Factory(:document,assays:[assay],contributor:person)
 
-    get :index, document_id: document.id
+    get :index, params: { document_id: document.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -1369,12 +1304,12 @@ class AssaysControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person.user)
     project = person.projects.first
-    project.settings['nels_enabled'] = true
+    project.settings.set('nels_enabled', true)
     inv = Factory(:investigation, projects: [project], contributor:person)
     study = Factory(:study, investigation: inv, contributor:person)
     assay = Factory(:assay, contributor: person, study: study)
 
-    get :show, id: assay
+    get :show, params: { id: assay }
 
     assert_response :success
     assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 1
@@ -1384,13 +1319,13 @@ class AssaysControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person.user)
     project = person.projects.first
-    project.settings['nels_enabled'] = true
+    project.settings.set('nels_enabled', true)
     inv = Factory(:investigation, projects: [project],contributor: person)
     study = Factory(:study, investigation: inv,contributor: person)
     assay = Factory(:assay, contributor: person, study: study)
 
     with_config_value(:nels_enabled, false) do
-      get :show, id: assay
+      get :show, params: { id: assay }
     end
 
     assert_response :success
@@ -1405,7 +1340,7 @@ class AssaysControllerTest < ActionController::TestCase
     study = Factory(:study,investigation:inv,contributor: person )
     assay = Factory(:assay, contributor: person, study: study)
 
-    get :show, id: assay
+    get :show, params: { id: assay }
 
     assert_response :success
     assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0
@@ -1426,7 +1361,7 @@ class AssaysControllerTest < ActionController::TestCase
         Factory(:permission, contributor: nels_project, access_type: Policy::MANAGING),
         Factory(:permission, contributor: non_nels_project, access_type: Policy::MANAGING)]))
 
-    get :show, id: assay
+    get :show, params: { id: assay }
 
     assert_response :success
     assert_select 'a[href=?]', edit_assay_path, count: 1 # Can manage
@@ -1446,27 +1381,27 @@ class AssaysControllerTest < ActionController::TestCase
     person = assay.contributor
     login_as(person)
     assert assay.can_edit?
-    get :show,id:assay
+    get :show, params: { id:assay }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]':assay.id),text:'Add Data file',count:1
+      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]' => assay.id),text:'Add Data file',count:1
     end
 
     assay=Factory(:modelling_assay,contributor:person)
     assert assay.can_edit?
-    get :show,id:assay
+    get :show, params: { id:assay }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]':assay.id),text:'Add Data file',count:1
+      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]' => assay.id),text:'Add Data file',count:1
     end
 
     assay=Factory(:experimental_assay,policy:Factory(:publicly_viewable_policy))
     assert assay.can_view?
     refute assay.can_edit?
-    get :show,id:assay
+    get :show, params: { id:assay }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]':assay.id),text:'Add Data file',count:0
+      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]' => assay.id),text:'Add Data file',count:0
     end
   end
 
@@ -1475,19 +1410,19 @@ class AssaysControllerTest < ActionController::TestCase
     person = assay.contributor
     login_as(person)
     assert assay.can_edit?
-    get :show,id:assay
+    get :show, params: { id:assay }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]':assay.id),text:'Add Model',count:1
+      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]' => assay.id),text:'Add Model',count:1
     end
 
     assay=Factory(:modelling_assay,policy:Factory(:publicly_viewable_policy))
     assert assay.can_view?
     refute assay.can_edit?
-    get :show,id:assay
+    get :show, params: { id:assay }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]':assay.id),text:'Add Model',count:0
+      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]' => assay.id),text:'Add Model',count:0
     end
 
     #shouldn't show for an experimental assay, even if editable
@@ -1495,10 +1430,10 @@ class AssaysControllerTest < ActionController::TestCase
     assert assay.can_view?
     assert assay.can_edit?
     refute assay.is_modelling?
-    get :show,id:assay
+    get :show, params: { id:assay }
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]':assay.id),text:'Add Model',count:0
+      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]' => assay.id),text:'Add Model',count:0
     end
   end
 
@@ -1512,7 +1447,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_difference('Subscription.count', -2) do
       assert_difference('Assay.count', -1) do
-        delete :destroy, id: assay.id
+        delete :destroy, params: { id: assay.id }
       end
     end
 
@@ -1522,14 +1457,14 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should associate document' do
     person = Factory(:person)
     login_as(person)
-    assay = Factory(:assay, contributor: person)
+    assay = Factory(:assay, contributor: person, created_at: 1.day.ago, updated_at: 1.day.ago)
     document = Factory(:document, contributor: person)
     timestamp = assay.updated_at
 
     assert_not_includes assay.documents, document
 
     assert_difference('AssayAsset.count', 1) do
-      put :update, id: assay, assay: { title: assay.title, document_ids: [document.id] }
+      put :update, params: { id: assay, assay: { title: assay.title, document_ids: [document.id] } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -1547,7 +1482,7 @@ class AssaysControllerTest < ActionController::TestCase
     refute document.can_view?(person.user)
 
     assert_no_difference('AssayAsset.count') do
-      put :update, id: assay, assay: { title: assay.title, document_ids: [document.id] }
+      put :update, params: { id: assay, assay: { title: assay.title, document_ids: [document.id] } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -1563,7 +1498,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_includes assay.documents, document
 
     assert_difference('AssayAsset.count', -1) do
-      put :update, id: assay, assay: { title: assay.title, document_ids: [] }
+      put :update, params: { id: assay, assay: { title: assay.title, document_ids: [''] } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -1573,14 +1508,14 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should associate sop' do
     person = Factory(:person)
     login_as(person)
-    assay = Factory(:assay, contributor: person)
+    assay = Factory(:assay, contributor: person, created_at: 1.day.ago, updated_at: 1.day.ago)
     sop = Factory(:sop, contributor: person)
     timestamp = assay.updated_at
 
     assert_not_includes assay.sops, sop
 
     assert_difference('AssayAsset.count', 1) do
-      put :update, id: assay, assay: { title: assay.title, sop_ids: [sop.id] }
+      put :update, params: { id: assay, assay: { title: assay.title, sop_ids: [sop.id] } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -1598,7 +1533,7 @@ class AssaysControllerTest < ActionController::TestCase
     refute sop.can_view?(person.user)
 
     assert_no_difference('AssayAsset.count') do
-      put :update, id: assay, assay: { title: assay.title, sop_ids: [sop.id] }
+      put :update, params: { id: assay, assay: { title: assay.title, sop_ids: [sop.id] } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -1614,7 +1549,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_includes assay.sops, sop
 
     assert_difference('AssayAsset.count', -1) do
-      put :update, id: assay, assay: { title: assay.title, sop_ids: [] }
+      put :update, params: { id: assay, assay: { title: assay.title, sop_ids: [''] } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -1624,14 +1559,14 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should associate model' do
     person = Factory(:person)
     login_as(person)
-    assay = Factory(:assay, contributor: person)
+    assay = Factory(:assay, contributor: person, created_at: 1.day.ago, updated_at: 1.day.ago)
     model = Factory(:model, contributor: person)
     timestamp = assay.updated_at
 
     assert_not_includes assay.models, model
 
     assert_difference('AssayAsset.count', 1) do
-      put :update, id: assay, assay: { title: assay.title, model_ids: [model.id] }
+      put :update, params: { id: assay, assay: { title: assay.title, model_ids: [model.id] } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -1649,7 +1584,7 @@ class AssaysControllerTest < ActionController::TestCase
     refute model.can_view?(person.user)
 
     assert_no_difference('AssayAsset.count') do
-      put :update, id: assay, assay: { title: assay.title, model_ids: [model.id] }
+      put :update, params: { id: assay, assay: { title: assay.title, model_ids: [model.id] } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -1665,7 +1600,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_includes assay.models, model
 
     assert_difference('AssayAsset.count', -1) do
-      put :update, id: assay, assay: { title: assay.title, model_ids: [] }
+      put :update, params: { id: assay, assay: { title: assay.title, model_ids: [''] } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -1681,7 +1616,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert study.can_view?
     assert_empty person.projects & study.projects
     assert_no_difference('Assay.count') do
-      post :create, assay: { title: 'test', study_id: study.id, assay_class_id: AssayClass.experimental.id }, policy_attributes: valid_sharing
+      post :create, params: { assay: { title: 'test', study_id: study.id, assay_class_id: AssayClass.experimental.id }, policy_attributes: valid_sharing }
     end
     assert_response :unprocessable_entity
   end
@@ -1698,7 +1633,7 @@ class AssaysControllerTest < ActionController::TestCase
     refute_empty person.projects & study.projects
 
     assert_no_difference('Assay.count') do
-      post :create, assay: { title: 'test', study_id: study.id, assay_class_id: AssayClass.experimental.id }, policy_attributes: valid_sharing
+      post :create, params: { assay: { title: 'test', study_id: study.id, assay_class_id: AssayClass.experimental.id }, policy_attributes: valid_sharing }
     end
     assert_response :unprocessable_entity
   end
@@ -1716,7 +1651,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     refute_equal study,assay.study
 
-    put :update,id:assay.id,assay:{study_id:study.id}
+    put :update, params: { id:assay.id, assay:{study_id:study.id} }
 
     assert_response :unprocessable_entity
     assay.reload
@@ -1737,7 +1672,7 @@ class AssaysControllerTest < ActionController::TestCase
     refute_empty person.projects & study.projects
     refute_equal study,assay.study
 
-    put :update,id:assay.id,assay:{study_id:study.id}
+    put :update, params: { id:assay.id, assay:{study_id:study.id} }
 
     assert_response :unprocessable_entity
     assay.reload
@@ -1756,7 +1691,7 @@ class AssaysControllerTest < ActionController::TestCase
     refute bad_sop.can_view?
 
     assert_no_difference('AssayAsset.count') do
-      put :update, id: assay, assay: { title: assay.title, sop_ids: [bad_sop.id] }
+      put :update, params: { id: assay, assay: { title: assay.title, sop_ids: [bad_sop.id] } }
     end
     #FIXME: it currently ignores the bad asset, but ideally should respond with an error
     #assert_response :unprocessable_entity
@@ -1764,7 +1699,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_empty assay.sops
 
     assert_difference('AssayAsset.count') do
-      put :update, id: assay, assay: { title: assay.title, sop_ids: [good_sop.id] }
+      put :update, params: { id: assay, assay: { title: assay.title, sop_ids: [good_sop.id] } }
     end
     assay.reload
     assert_equal [good_sop],assay.sops
@@ -1785,11 +1720,10 @@ class AssaysControllerTest < ActionController::TestCase
     refute bad_sop.can_view?
 
     assert_no_difference('AssayAsset.count') do
-      post :create, assay: { title: 'testing',
+      post :create, params: { assay: { title: 'testing',
                              assay_class_id: AssayClass.experimental.id,
                              study_id: study.id,
-                             sop_ids: [bad_sop.id] },
-           policy_attributes: valid_sharing
+                             sop_ids: [bad_sop.id] }, policy_attributes: valid_sharing }
     end
     #FIXME: it currently ignores the bad asset, but ideally should respond with an error
     #assert_response :unprocessable_entity
@@ -1797,11 +1731,10 @@ class AssaysControllerTest < ActionController::TestCase
 
 
     assert_difference('AssayAsset.count') do
-      post :create, assay: { title: 'testing',
+      post :create, params: { assay: { title: 'testing',
                              assay_class_id: AssayClass.experimental.id,
                              study_id: study.id,
-                             sop_ids: [good_sop.id] },
-           policy_attributes: valid_sharing
+                             sop_ids: [good_sop.id] }, policy_attributes: valid_sharing }
     end
     assay = assigns(:assay)
     assert_equal [good_sop],assay.sops

@@ -1,7 +1,7 @@
 module Seek
   module AdminBulkAction
     def self.included(base)
-      base.before_filter :is_admin, only: [:bulk_destroy]
+      base.before_action :is_admin, only: [:bulk_destroy]
     end
 
     def bulk_destroy
@@ -9,7 +9,7 @@ module Seek
         model_class = controller_name.classify.constantize
         objects = model_class.find(params['ids'])
         objects.each(&:destroy)
-        redirect_back
+        redirect_back(fallback_location: root_path)
       end
     end
 
