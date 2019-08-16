@@ -7,9 +7,6 @@ module Seek
       'Institution' => { 'index' => 'title', 'related' => 'title' },
       'Event' => { 'index' => 'start_date DESC', 'related' => 'start_date DESC' },
       'Publication' => { 'index' => 'published_date DESC', 'related' => 'published_date DESC' },
-      'Investigation' => { 'index' => 'updated_at DESC' },
-      'Study' => { 'index' => 'updated_at DESC' },
-      'Assay' => { 'index' => 'updated_at DESC' },
       'Other' => { 'index' => 'title', 'related' => 'updated_at DESC' }
     }.freeze
 
