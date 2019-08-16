@@ -18,6 +18,8 @@
         <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_workflow} %>
       </div>
     </div>
+    <%= rendered_asset_view(@display_workflow) %>
+
     <%= render :partial=>"general/isa_graph", :locals => {:root_item => @workflow, :deep => true, :include_parents => true} %>
   </div>
 

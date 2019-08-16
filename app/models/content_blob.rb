@@ -289,11 +289,15 @@ class ContentBlob < ApplicationRecord
   def remote_content_handler
     return nil unless valid_url?(url)
     case URI(url).scheme
-    when 'ftp'
-      Seek::DownloadHandling::FTPHandler.new(url)
-    when 'http', 'https'
-      Seek::DownloadHandling::HTTPHandler.new(url)
-      end
+      when 'ftp'
+        Seek::DownloadHandling::FTPHandler.new(url)
+      when 'http', 'https'
+        if url =~ (/github/)
+          Seek::DownloadHandling::GithubHTTPHandler.new(url)
+        else
+          Seek::DownloadHandling::HTTPHandler.new(url)
+        end
+    end
   end
 
   def clear_sample_type_matches

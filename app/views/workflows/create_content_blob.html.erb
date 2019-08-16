@@ -19,21 +19,22 @@
 
     $j(document).ready(function () {
 
-        var request = $j.ajax({
+        $j.ajax({
             type: "POST",
             dataType: "html",
             timeout: 0,
             url: '<%= metadata_extraction_ajax_workflows_path -%>',
-            data: <%= {content_blob_id: @workflow.content_blob.id, workflow_class_id: @workflow.workflow_class.id}.to_json.html_safe %>
+            data: <%= {content_blob_id: @workflow.content_blob.id}.to_json.html_safe %>,
+            error: function (jqXHR, textStatus,errorThrown) {
+              $j('#in-progress').hide();
+              $j('#response-error').show();
+              $j('#error-message').html(jqXHR.responseText);
+            },
+            success: function (data) {
+              window.location='<%= provide_metadata_workflows_path %>'
+            }
         });
 
-        request.done(function (data) {
-           window.location='<%= provide_metadata_workflows_path() %>'
-        }).fail(function (jqXHR, textStatus,errorThrown) {
-            $j('#in-progress').hide();
-            $j('#response-error').show();
-            $j('#error-message').html(jqXHR.responseText);
-        })
-    });
+    })
 
 </script>

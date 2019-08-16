@@ -55,10 +55,20 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def clear_session_info
+    session.delete(:workflow_class_id)
+    session.delete(:uploaded_content_blob_id)
+    session.delete(:metadata)
+    session.delete(:extraction_exception_message)
+    session.delete(:processing_warnings)
+  end
+
   def create_content_blob
+    clear_session_info
+    session[:fred] = 'bob'
     @workflow = Workflow.new
-    @workflow.workflow_class = WorkflowClass.find_by_id(params[:workflow_class_id])
-    respond_to do |format|
+    session[:workflow_class_id] = params[:workflow_class_id]
+     respond_to do |format|
       if handle_upload_data && @workflow.content_blob.save
         session[:uploaded_content_blob_id] = @workflow.content_blob.id
         format.html {}
@@ -69,6 +79,15 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def retrieve_content blob
+    if !blob.file_exists?
+      if (caching_job = blob.caching_job).exists?
+        caching_job.first.destroy
+      end
+      blob.retrieve
+    end
+  end
+
   # AJAX call to trigger metadata extraction, and pre-populate the associated @workflow
   def metadata_extraction_ajax
     @workflow = Workflow.new
@@ -76,13 +95,16 @@ class WorkflowsController < ApplicationController
     critical_error_msg = nil
     session.delete :extraction_exception_message
 
-    @workflow.metadata = {}
+    session[:metadata] = {}
 
     begin
       if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
         @workflow.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
-        @workflow.workflow_class = WorkflowClass.find_by_id(params[:workflow_class_id])
-        metadata_name = "extract_#{@workflow.workflow_class.key}_metadata"
+        retrieve_content @workflow.content_blob
+
+        workflow_class = WorkflowClass.find_by_id (session[:workflow_class_id])
+        metadata_name = "extract_#{workflow_class.key}_metadata"
+        session[:metadata][:title] = metadata_name
         if defined? metadata_name
           self.send(metadata_name, @workflow)
         end
@@ -94,7 +116,6 @@ class WorkflowsController < ApplicationController
       session[:extraction_exception_message] = e.message
     end
 
-    session[:processed_workflow] = @workflow
     session[:processing_warnings] = @warnings
 
     respond_to do |format|
@@ -108,7 +129,7 @@ class WorkflowsController < ApplicationController
 
   # Displays the form Wizard for providing the metadata for the workflow
   def provide_metadata
-    @workflow ||= session[:processed_workflow]
+    @workflow = Workflow.new()
 
     @warnings ||= session[:processing_warnings] || []
     @exception_message ||= session[:extraction_exception_message]
@@ -133,17 +154,23 @@ class WorkflowsController < ApplicationController
     blob = ContentBlob.find(params[:content_blob_id])
     @workflow.content_blob = blob
 
-    @workflow.workflow_class = WorkflowClass.find(params[:workflow_class_id])
-    @workflow.metadata = eval (params[:metadata])
+    # @workflow.workflow_class = WorkflowClass.find(session[:workflow_class_id])
+#    @workflow.metadata = params[:metadata] FIX ME!!
     all_valid = @workflow.save && blob.save
 
     if all_valid
+
+      workflow_version = Workflow::Version.find_by workflow_id: @workflow.id, version: @workflow.version
+      workflow_version.workflow_class_id = session[:workflow_class_id]
+      workflow_version.metadata = params[:metadata]
+      workflow_version.save
+
       update_annotations(params[:tag_list], @workflow)
 
       update_relationships(@workflow, params)
 
       session.delete(:uploaded_content_blob_id)
-      session.delete(:processed_workflow)
+      session.delete(:processed_workflow_id)
       session.delete(:processed_warnings)
 
       respond_to do |format|
@@ -171,7 +198,8 @@ class WorkflowsController < ApplicationController
   private
 
   def workflow_params
-    params.require(:workflow).permit(:title, :description, :workflow_class_id, :metadata, { project_ids: [] }, :license, :other_creators,
+    params.require(:workflow).permit(:title, :description, :workflow_class_id, # :metadata,
+                                     { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                 { publication_ids: [] })
@@ -180,7 +208,62 @@ class WorkflowsController < ApplicationController
   alias_method :asset_params, :workflow_params
 
   def extract_CWL_metadata(w)
-    w.title = 'Bop Cop Dop'
+   begin
+      @content_blob = w.content_blob
+      cwl_string = @content_blob.read
+      cwl = YAML.load(cwl_string)
+      if cwl.has_key? :label
+        session[:metadata][:title] = cwl[:label]
+      else
+        flash[:warning] = 'Unable to determine title of workflow'
+      end
+      if cwl.has_key? :doc
+        session[:metadata][:description] = cwl[:doc]
+      end
+    rescue Exception => e
+      session[:extraction_exception_message] = e.message
+    end
+
+  end
+
+  def extract_GALAXY_metadata(w)
+    begin
+      @content_blob = w.content_blob
+      galaxy_string = @content_blob.read
+      galaxy = JSON.parse(galaxy_string)
+      if galaxy.has_key? "name"
+        session[:metadata][:title] = galaxy["name"]
+      else
+        flash[:warning] = 'Unable to determine title of workflow'
+      end
+    rescue Exception => e
+      session[:extraction_exception_message] = e.message
+    end
+
+  end
+
+  def extract_KNIME_metadata(w)
+    begin
+      @content_blob = w.content_blob
+      knime_string = @content_blob.read
+      knime = LibXML::XML::Parser.string(knime_string).parse
+      knime.root.namespaces.default_prefix = 'k'
+
+      title = knime.find('/k:config/k:entry[not(@isnull="true")][@key="name"]/@value').first.value
+      if !title.nil?
+        session[:metadata][:title] = title.to_s
+      else
+        session[:metadata][:title] = "missing_title"
+        flash[:warning] = 'Unable to determine title of workflow'
+      end
+      description = knime.find('/k:config/k:entry[not(@isnull="true")][@key="customDescription"]/@value').first.value
+      if !description.nil?
+        session[:metadata][:description] = description
+      end
+    rescue Exception => e
+      session[:extraction_exception_message] = e.message
+    end
+
   end
 
 end

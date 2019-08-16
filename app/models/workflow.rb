@@ -40,7 +40,7 @@ class Workflow < ApplicationRecord
   end
 
   def is_github_cwl?
-    return (!content_blob.url.nil?) && (content_blob.url.include? 'github.com') && (content_blob.url.end_with? 'cwl')
+    return (!content_blob.url.nil?) && (content_blob.url.include? 'github.com')
   end
 
   def is_myexperiment?
