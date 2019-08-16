@@ -642,54 +642,6 @@ class ProjectTest < ActiveSupport::TestCase
     refute_includes ps, p2
   end
 
-  test 'ancestor and dependants' do
-    p = Factory(:project)
-    p2 = Factory(:project)
-
-    assert_nil p2.lineage_ancestor
-    assert_empty p.lineage_descendants
-
-    p.lineage_ancestor = p
-    refute p.valid?
-
-    p2.lineage_ancestor = p
-    assert p2.valid?
-    disable_authorization_checks { p2.save! }
-    p2.reload
-    p.reload
-
-    assert_equal p, p2.lineage_ancestor
-    assert_equal [p2], p.lineage_descendants
-
-    # repeat, but assigning the other way around
-    p = Factory(:project)
-    p2 = Factory(:project)
-
-    assert_nil p2.lineage_ancestor
-    assert_empty p.lineage_descendants
-
-    disable_authorization_checks do
-      p2.lineage_descendants << p
-      assert p2.valid?
-      p2.save!
-    end
-
-    p2.reload
-    p.reload
-
-    assert_equal [p], p2.lineage_descendants
-    assert_equal p2, p.lineage_ancestor
-
-    p3 = Factory(:project)
-    disable_authorization_checks do
-      p2.lineage_descendants << p3
-      p2.save!
-    end
-
-    p2.reload
-    assert_equal [p, p3], p2.lineage_descendants.sort_by(&:id)
-  end
-
   test 'can create?' do
     User.current_user = nil
     refute Project.can_create?

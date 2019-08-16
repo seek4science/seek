@@ -50,20 +50,11 @@ class Project < ApplicationRecord
   after_save :handle_asset_housekeeper_ids, if: -> { @asset_housekeeper_ids }
 
 
-  # SEEK projects suffer from having 2 types of ancestor and descendant,that were added separately - those from the historical lineage of the project, and also from
-  # the hierarchical tree structure that can be. For this reason and to avoid the clash, these anscestors and descendants have been renamed.
-  # However, in the future it would probably be more appropriate to change these back to simply ancestor and descendant, and rename the hierarchy struture
-  # to use parents/children.
-  belongs_to :lineage_ancestor, class_name: 'Project', foreign_key: :ancestor_id
-  has_many :lineage_descendants, class_name: 'Project', foreign_key: :ancestor_id
-
   scope :default_order, -> { order('title') }
   scope :without_programme, -> { where('programme_id IS NULL') }
 
   validates :web_page, url: {allow_nil: true, allow_blank: true}
   validates :wiki_page, url: {allow_nil: true, allow_blank: true}
-
-  validate :lineage_ancestor_cannot_be_self
 
   validates :title, uniqueness: true
   validates :title, length: { maximum: 255 }
@@ -224,12 +215,6 @@ class Project < ApplicationRecord
         investigations.empty? && studies.empty? && assays.empty? && assets.empty? &&
         samples.empty? && sample_types.empty?
 
-  end
-
-  def lineage_ancestor_cannot_be_self
-    if lineage_ancestor == self
-      errors.add(:lineage_ancestor, 'cannot be the same as itself')
-    end
   end
 
   def self.can_create?
