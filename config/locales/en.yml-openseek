@@ -60,6 +60,8 @@ en:
 
   favourite_group: "favourite groups"
 
+  actions_button: "Actions"
+
   access:
     determined_by_group: "Individual access rights for each member"
     no_access: "No access"

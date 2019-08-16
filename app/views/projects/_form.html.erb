@@ -58,7 +58,7 @@
 <% end %>
 
 <% if Seek::Config.organisms_enabled %>
-  <%= f.fancy_multiselect :organisms, { possibilities: Organism.order(:title).all, with_new_link: true, hidden: false } %>
+  <%= f.fancy_multiselect :organisms, { possibilities: Organism.order(:title).all, hidden: false } %>
 <% end %>
 
 <% if @project.can_manage? %>

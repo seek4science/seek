@@ -53,11 +53,11 @@
           <%= render :partial => "assets/special_auth_code_form", :locals => {:f => f} if !@event.try(:new_record?)-%>
       <% end %>
 
-      <%= f.fancy_multiselect :publications,:with_new_link=>true,:other_projects_checkbox=>true -%>
+      <%= f.fancy_multiselect :publications ,:other_projects_checkbox=>true -%>
 
       <%= f.fancy_multiselect :data_files, :other_projects_checkbox=>true -%>
 
-      <%= f.fancy_multiselect :presentations,:with_new_link=>true,:other_projects_checkbox=>true %>
+      <%= f.fancy_multiselect :presentations, :other_projects_checkbox=>true %>
 
       <%= f.fancy_multiselect :documents, other_projects_checkbox: true %>
 

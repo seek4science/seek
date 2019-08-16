@@ -601,12 +601,10 @@ SEEK::Application.routes.draw do
       get :awaiting_activation
     end
     member do
-      get :initiate_spawn_project
       get :activation_review
       put :accept_activation
       put :reject_activation
       get :reject_activation_confirmation
-      post :spawn_project
       get :storage_report
       get :isa_children
     end
