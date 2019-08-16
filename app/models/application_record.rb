@@ -89,7 +89,7 @@ class ApplicationRecord < ActiveRecord::Base
     self.class.supports_doi?
   end
 
-  def default_order
-    order(Seek::ListSorter.sort_order(self.class.name, 'index'))
+  def self.default_order
+    order(Seek::ListSorter.sort_field(name, 'index'))
   end
 end
