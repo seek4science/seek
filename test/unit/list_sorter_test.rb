@@ -123,14 +123,16 @@ class ListSorterTest < ActiveSupport::TestCase
     paris = Address.new('France', 'Paris')
     unknown = Address.new('Unknown', nil)
     atlantis = Address.new(nil, 'Atlantis')
-    places = [beijing, nil_city, shanghai, paris, brisbane, marseille, shenzhen, unknown, atlantis]
+    valhalla = Address.new(nil, 'Valhalla')
+    carthage = Address.new(nil, 'Carthage')
+    places = [beijing, nil_city, valhalla, shanghai, paris, atlantis, brisbane, marseille, carthage, shenzhen, unknown]
 
     Seek::ListSorter.sort_by_field(places, 'country DESC, city ASC')
 
-    assert_equal places, [unknown, marseille, paris, beijing, shanghai, shenzhen, nil_city, brisbane, atlantis]
+    assert_equal places, [unknown, marseille, paris, beijing, shanghai, shenzhen, nil_city, brisbane, atlantis, carthage, valhalla]
 
     Seek::ListSorter.sort_by_field(places, 'country ASC, city DESC')
 
-    assert_equal places, [brisbane, shenzhen, shanghai, beijing, nil_city, paris, marseille, unknown, atlantis]
+    assert_equal places, [brisbane, shenzhen, shanghai, beijing, nil_city, paris, marseille, unknown, valhalla, carthage, atlantis]
   end
 end

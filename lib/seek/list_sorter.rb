@@ -55,7 +55,11 @@ module Seek
           x = a.send(field)
           y = b.send(field)
           val = if x.nil?
-                  1
+                  if y.nil?
+                    0
+                  else
+                    1
+                  end
                 elsif y.nil?
                   -1
                 else
