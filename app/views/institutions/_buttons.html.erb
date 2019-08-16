@@ -1,4 +1,4 @@
-<%= admin_dropdown do %>
+<%= item_actions_dropdown do %>
     <% if mine?(item) || item.try(:can_be_edited_by?, current_user) -%>
           <li><%= icon_link_to("Edit Institution Details", 'edit', edit_institution_path(item)) -%></li>
           <% if admin_logged_in? -%>

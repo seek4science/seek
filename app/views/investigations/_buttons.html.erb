@@ -7,7 +7,7 @@
   <%= button_link_to("Add a #{t('study')}", 'new', new_study_path(:investigation_id=>item,:create_from_asset=>item.create_from_asset)) -%>
 <% end -%>
 
-<%= admin_dropdown do %>
+<%= item_actions_dropdown do %>
     <% if item.can_manage? -%>
         <li><%= image_tag_for_key('manage', edit_investigation_path(item), nil, nil, "Manage #{t('investigation')}") -%></li>
         <%= render :partial => 'snapshots/new_snapshot_link', :locals => { :item => item } %>

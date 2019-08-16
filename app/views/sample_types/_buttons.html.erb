@@ -8,7 +8,7 @@
     <%= button_link_to("Create sample", 'new', new_sample_path(sample_type_id:sample_type.id)) %>
 <% end %>
 
-<%= admin_dropdown do %>
+<%= item_actions_dropdown do %>
 
     <% if sample_type.can_edit? -%>
         <li><%= image_tag_for_key('edit', edit_sample_type_path(sample_type), nil, nil, "Edit Sample Type") -%></li>
