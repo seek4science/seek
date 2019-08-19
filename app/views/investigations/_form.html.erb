@@ -12,11 +12,11 @@
   <%= f.text_area :description, :rows => 5, :class=>"form-control" -%>
 </div>
 
-<%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} -%>
+<%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_attributes? -%>
 
 <%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales?%>
 
-<%= render partial: 'assets/manage_properties', locals:{f:f} %>
+<%= render partial: 'assets/manage_properties', locals:{f:f} if show_form_manage_attributes? %>
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 

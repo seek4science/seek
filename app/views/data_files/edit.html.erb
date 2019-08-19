@@ -26,7 +26,7 @@
 
       <%# only the owner should be able to change sharing permissions -%>
       <% if current_user_authorized_to_manage && !@data_file.openbis?-%>
-          <%= render :partial => "projects/project_selector", :locals => {:resource => @data_file } %>
+          <%= render :partial => "projects/project_selector", :locals => {:resource => @data_file } if show_form_manage_attributes? %>
       <% end %>
 
       <%= render :partial => "scales/scales_selector", :locals => {:object => @data_file} if show_scales? %>

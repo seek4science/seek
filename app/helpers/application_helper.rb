@@ -460,6 +460,16 @@ module ApplicationHelper
     Rails::Html::WhiteListSanitizer.new.sanitize(text)
   end
 
+  # whether the current action is an edit action
+  def edit_view?
+    action_name == 'edit'
+  end
+
+  # whether manage attributes should be shown, dont show if editing (rather than new or managing)
+  def show_form_manage_attributes?
+    not edit_view?
+  end
+
   PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => 'Institutions', 'people' => 'People', 'sessions' => 'Login', 'users' => 'Signup', 'search' => 'Search',
                   'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize,
                   'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,

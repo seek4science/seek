@@ -55,9 +55,11 @@
     </div>
   </div>
 
-  <%= render :partial => 'projects/project_selector', :locals => {:resource => @strain} %>
+  <% if show_form_manage_attributes? && @strain.can_manage? %>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => @strain} %>
 
-  <%= render partial: 'assets/manage_properties', locals:{f:f} %>
+    <%= render partial: 'assets/manage_properties', locals:{f:f} %>
+  <% end %>
 
   <%
     button_text=action=="edit" ? "Update" : "Create"

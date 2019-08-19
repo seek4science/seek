@@ -183,4 +183,15 @@ class ApplicationHelperTest < ActionView::TestCase
       refute File.exist?(path)
     end
   end
+
+  test 'show form manage attributes' do
+    @controller.action_name = 'edit'
+    refute show_form_manage_attributes?
+
+    @controller.action_name = 'new'
+    assert show_form_manage_attributes?
+
+    @controller.action_name = 'manage'
+    assert show_form_manage_attributes?
+  end
 end
