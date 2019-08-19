@@ -10,6 +10,11 @@ module Seek
       'Other' => { 'index' => 'title', 'related' => 'updated_at DESC' }
     }.freeze
 
+    ORDER_OPTIONS = {
+      latest: { title: 'Latest', order: 'updated_at DESC' },
+      oldest: { title: 'Oldest', order: 'created_at ASC' } # Example... remove me
+    }.with_indifferent_access.freeze
+
     # sort items in the related items hash according the rule for its type
     def self.related_items(resource_hash)
       return if resource_hash.empty?
@@ -19,15 +24,13 @@ module Seek
       end
     end
 
-    # sort items for an index, according to the page according the rule for its type
-    #  if the page is 'latest', then they are always sorted by updated_at
-    def self.index_items(items, page)
+    # sort items for an index by the given sort parameter, or the default for its type
+    def self.index_items(items, order = nil)
       return if items.empty?
-      type_name = items.first.class.name
-      if page == 'latest'
-        sort_by_field(items, 'updated_at DESC')
+      if order && ORDER_OPTIONS[order]
+        sort_by_field(items, ORDER_OPTIONS[order][:order])
       else
-        sort_items(type_name, items, 'index')
+        sort_items(items.first.class.name, items, 'index')
       end
     end
 
@@ -40,15 +43,21 @@ module Seek
     # * `updated_at DESC`
     # * `first_letter ASC, updated_at DESC`
     def self.sort_by_field(items, fields)
-      fields = fields.split(",").map(&:strip)
-      fields_and_mods = fields.map do |f|
-        field, order = f.split(' ')
+      # Create an array of pairs: [<field>, <sort direction>]
+      # Direction 1 is ascending (default), -1 is descending
+      fields_and_directions = fields.split(',').map do |f|
+        field, order = f.strip.split(' ')
         [field, order&.match?(/desc/i) ? -1 : 1]
       end
 
       items.sort! do |a, b|
         val = 0
-        fields_and_mods.each do |field, mod|
+        # For each pair, sort by the first field/direction.
+        # If that sorting produces 0 (i.e. both are equal), try the next field until a non-zero value is returned,
+        #  or we run out of fields.
+        #
+        # nil values are always sorted to the end, regardless of direction.
+        fields_and_directions.each do |field, direction|
           x = a.send(field)
           y = b.send(field)
           val = if x.nil?
@@ -60,7 +69,7 @@ module Seek
                 elsif y.nil?
                   -1
                 else
-                  (x <=> y) * mod
+                  (x <=> y) * direction  # A direction of -1 inverts the sorting.
                 end
           break if val != 0
         end

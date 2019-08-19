@@ -46,20 +46,17 @@ class PeopleController < ApplicationController
       @people = Person.all
 
       @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
+      if params[:page] == 'latest' || params[:page].blank?
+        params[:order] ||= 'latest'
+      end
 
       unless view_context.index_with_facets?('people') && params[:user_enable_facet] == 'true'
         @people = Person.paginate_after_fetch(@people,
                                               page: (params[:page] || Seek::Config.default_page('people')),
-                                              latest_limit: Seek::Config.limit_latest)
+                                              latest_limit: Seek::Config.limit_latest,
+                                              order: params[:order])
       end
     end
-    if params[:page]=='latest' || params[:page].blank?
-      @people.sort_by!(&:updated_at).reverse!
-    else
-      Seek::ListSorter.index_items(@people,params[:page])
-    end
-
-
 
     respond_to do |format|
       format.html # index.html.erb

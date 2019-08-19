@@ -686,8 +686,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'people not in projects should be shown in index' do
-    person_not_in_project = Factory(:brand_new_person, first_name: 'Person Not In Project')
-    person_in_project = Factory(:person, first_name: 'Person in Project')
+    person_not_in_project = Factory(:brand_new_person, first_name: 'Person Not In Project', updated_at: 1.second.from_now)
+    person_in_project = Factory(:person, first_name: 'Person in Project', updated_at: 1.second.from_now)
     assert person_not_in_project.projects.empty?
     refute person_in_project.projects.empty?
 

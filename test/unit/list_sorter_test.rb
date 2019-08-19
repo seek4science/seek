@@ -91,22 +91,22 @@ class ListSorterTest < ActiveSupport::TestCase
     s3.update_attribute(:updated_at, 1.days.ago)
     sops = [s1, s2, s3]
 
-    Seek::ListSorter.index_items(people, 'all')
+    Seek::ListSorter.index_items(people)
     assert_equal [p6, p2, p1, p3, p5, p4], people
     Seek::ListSorter.index_items(people, 'latest')
     assert_equal [p3, p4, p2, p1, p6, p5], people
 
-    Seek::ListSorter.index_items(institutions, 'all')
+    Seek::ListSorter.index_items(institutions)
     assert_equal [i2, i4, i1, i3], institutions
     Seek::ListSorter.index_items(institutions, 'latest')
     assert_equal [i2, i4, i3, i1], institutions
 
-    Seek::ListSorter.index_items(events, 'all')
+    Seek::ListSorter.index_items(events)
     assert_equal [e2, e1, e3], events
     Seek::ListSorter.index_items(events, 'latest')
     assert_equal [e1, e2, e3], events
 
-    Seek::ListSorter.index_items(sops, 'all')
+    Seek::ListSorter.index_items(sops)
     assert_equal [s1, s3, s2], sops
     Seek::ListSorter.index_items(sops, 'latest')
     assert_equal [s3, s2, s1], sops

@@ -34,6 +34,7 @@ module Seek
 
         @latest_limit = options[:latest_limit] || @latest_limit
         @default_page = options[:default_page] || @default_page
+        order = options[:order] || nil
 
         default_page = @default_page
         default_page = @pages.first if default_page == 'first'
@@ -41,16 +42,16 @@ module Seek
         page = options[:page] || default_page
 
         records = collection.to_a
-        Seek::ListSorter.index_items(records, page)
-        if page == 'latest'
-          records = records.sort{ |x, y| y.updated_at <=> x.updated_at }[0...@latest_limit]
-        elsif @pages.include?(page)
-          records.select! { |i| i.first_letter == page }
-        end
-
         page_totals = {}
         @pages.each do |p|
           page_totals[p] = collection.count { |i| i.first_letter == p }
+        end
+
+        Seek::ListSorter.index_items(records, order)
+        if @pages.include?(page)
+          records = records.select { |i| i.first_letter == page }
+        else
+          records = records[0...@latest_limit]
         end
 
         result = Collection.new(records, page, @pages, page_totals)
