@@ -53,5 +53,15 @@ module Seek
         format.json { render json: items.to_json }
       end
     end
+
+    # the page to return to on an update validation failure, default to 'edit' if the referer is not found
+    def update_validation_error_return_action
+      previous = Rails.application.routes.recognize_path(request.referrer)
+      if previous && previous[:action]
+        previous[:action] || 'edit'
+      else
+        'edit'
+      end
+    end
   end
 end

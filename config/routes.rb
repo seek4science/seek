@@ -305,6 +305,7 @@ SEEK::Application.routes.draw do
       post :publish
       get :published
       get :isa_children
+      get :manage
     end
   end
 

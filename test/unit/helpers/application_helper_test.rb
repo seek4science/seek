@@ -188,10 +188,16 @@ class ApplicationHelperTest < ActionView::TestCase
     @controller.action_name = 'edit'
     refute show_form_manage_attributes?
 
+    @controller.action_name = 'update'
+    refute show_form_manage_attributes?
+
     @controller.action_name = 'new'
     assert show_form_manage_attributes?
 
     @controller.action_name = 'manage'
+    assert show_form_manage_attributes?
+
+    @controller.action_name = 'create'
     assert show_form_manage_attributes?
   end
 end

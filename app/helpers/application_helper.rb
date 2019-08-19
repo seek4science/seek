@@ -467,7 +467,7 @@ module ApplicationHelper
 
   # whether manage attributes should be shown, dont show if editing (rather than new or managing)
   def show_form_manage_attributes?
-    not edit_view?
+    !(edit_view? || action_name=='update')
   end
 
   PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => 'Institutions', 'people' => 'People', 'sessions' => 'Login', 'users' => 'Signup', 'search' => 'Search',

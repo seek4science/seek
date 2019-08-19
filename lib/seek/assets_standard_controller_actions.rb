@@ -49,6 +49,9 @@ module Seek
     def edit
     end
 
+    def manage
+    end
+
     def create
       item = initialize_asset
 
