@@ -20,12 +20,12 @@ module Seek
       respond_to do |format|
         format.html
         format.xml
-        format.json  do sorted_objects = objects.sort { |x, y| x.id <=> y.id }
-          render json: sorted_objects,
-                            each_serializer: SkeletonSerializer,
-                            meta: {:base_url =>   Seek::Config.site_base_host,
-                                   :api_version => ActiveModel::Serializer.config.api_version
-                            }
+        format.json do
+          render json: objects,
+                 each_serializer: SkeletonSerializer,
+                 meta: {:base_url =>   Seek::Config.site_base_host,
+                        :api_version => ActiveModel::Serializer.config.api_version
+                 }
           end
       end
     end
