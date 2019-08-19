@@ -70,16 +70,16 @@
 
     <%= render :partial=>"sharing/form" if @assay.can_manage? -%>
 
-    <% if @assay.is_taggable? %>
-        <%= render :partial=>"assets/select_tags" %>
-    <% end %>
-
     <%  existing_creators = @assay.creators
         existing_creators =  [current_user.person] if existing_creators.blank?
     %>
     <%= render :partial => "assets/author_form", :locals => {:form => f,
                                                              :existing_creators => existing_creators,
                                                              :other_creators => @assay.other_creators} -%>
+
+    <% if @assay.is_taggable? %>
+        <%= render :partial=>"assets/select_tags" %>
+    <% end %>
 
     <% if Seek::Config.samples_enabled %>
       <%= render :partial=>"samples/associate_sample",:locals=>{:f=>f, :resource => @assay} %>

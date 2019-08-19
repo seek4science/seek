@@ -30,11 +30,10 @@
 
       <%= render :partial => "scales/scales_selector_with_parameters",:locals=>{:object=>@model} if show_scales?%>
 
-      <% if current_user_authorized_to_manage -%>
-          <%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
 
-          <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
-      <% end -%>
+      <%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
+
+      <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
 
       <div>
         <%= preview_permission_popup_link(@model)-%>

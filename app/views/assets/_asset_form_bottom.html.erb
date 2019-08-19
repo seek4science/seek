@@ -19,6 +19,18 @@
     <%= render :partial => "sharing/form" -%>
 <% end -%>
 
+<% if creators_enable %>
+  <%= render :partial => "assets/author_form", :locals => {:form => f,
+                                                           :existing_creators => existing_creators,
+                                                           :other_creators => other_creators} -%>
+<% end %>
+
+<% if sharing_link %>
+  <% if f.try(:object).try(:is_a?, (Seek::Permissions::CodeBasedAuthorization)) && !f.try(:object).try(:new_record?) %>
+    <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f}%>
+  <% end %>
+<% end %>
+
 <% if taggable -%>
     <%= render :partial=>"assets/select_tags" -%>
 <% end -%>
@@ -26,18 +38,6 @@
 <% if attribution_enable %>
     <%= render :partial => "assets/attribution_form", :locals => {:resource_class => resource_class,
                                                                   :existing_attributions => existing_attributions }   -%>
-<% end %>
-
-<% if creators_enable %>
-    <%= render :partial => "assets/author_form", :locals => {:form => f,
-                                                             :existing_creators => existing_creators,
-                                                             :other_creators => other_creators} -%>
-<% end %>
-
-<% if sharing_link %>
-    <% if f.try(:object).try(:is_a?, (Seek::Permissions::CodeBasedAuthorization)) && !f.try(:object).try(:new_record?) %>
-        <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f}%>
-    <% end %>
 <% end %>
 
 <% if show_publications -%>

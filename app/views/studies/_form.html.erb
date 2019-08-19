@@ -14,7 +14,7 @@
 
 <div class="form-group">
   <%= f.label "Experimentalist(s)" %>
-  <%= f.text_area :experimentalists, :rows => 1, :class=>"form-control" %>
+  <%= f.text_field :experimentalists, :class=>"form-control" %>
 </div>
 
 <%= folding_panel("#{t('investigation')} details") do %>
@@ -34,15 +34,15 @@
     existing_creators =  [current_user.person] if existing_creators.blank?
 %>
 
-<%= render :partial => "assets/author_form", :locals => {:form => f,
-                                                         :existing_creators => existing_creators,
-                                                         :other_creators => @study.other_creators} -%>
-
 <% if show_scales? %>
     <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
 <% end %>
 
 <%= render :partial=>"sharing/form" if @study.can_manage? -%>
+
+<%= render :partial => "assets/author_form", :locals => {:form => f,
+                                                         :existing_creators => existing_creators,
+                                                         :other_creators => @study.other_creators} -%>
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
