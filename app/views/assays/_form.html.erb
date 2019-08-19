@@ -68,14 +68,7 @@
         <%= render :partial => "scales/scales_selector",:locals=>{:object=>@assay} %>
     <% end %>
 
-    <%= render :partial=>"sharing/form" if @assay.can_manage? -%>
-
-    <%  existing_creators = @assay.creators
-        existing_creators =  [current_user.person] if existing_creators.blank?
-    %>
-    <%= render :partial => "assets/author_form", :locals => {:form => f,
-                                                             :existing_creators => existing_creators,
-                                                             :other_creators => @assay.other_creators} -%>
+  <%= render partial: 'assets/manage_properties', locals:{f:f} %>
 
     <% if @assay.is_taggable? %>
         <%= render :partial=>"assets/select_tags" %>

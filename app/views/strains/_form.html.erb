@@ -57,9 +57,7 @@
 
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @strain} %>
 
-  <% if (action == 'create') || (action == 'edit' && @strain.can_manage?) %>
-    <%= render :partial => "sharing/form", :locals => {:object => @strain} -%>
-  <% end %>
+  <%= render partial: 'assets/manage_properties', locals:{f:f} %>
 
   <%
     button_text=action=="edit" ? "Update" : "Create"
