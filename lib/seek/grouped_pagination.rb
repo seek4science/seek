@@ -45,7 +45,7 @@ module Seek
         if page == 'latest'
           records = records.sort{ |x, y| y.updated_at <=> x.updated_at }[0...@latest_limit]
         elsif @pages.include?(page)
-          records.select! { |i| i.first_letter == page }
+          records = records.select { |i| i.first_letter == page }
         end
 
         page_totals = {}
