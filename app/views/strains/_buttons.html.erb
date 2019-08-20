@@ -1,6 +1,6 @@
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => item} %>
 
-<%= admin_dropdown do %>
+<%= item_actions_dropdown do %>
     <% if item.can_manage? %>
         <li><%= image_tag_for_key('manage', edit_strain_path, "Manage Strain", nil, 'Manage Strain') %></li>
     <% elsif item.can_edit? %>

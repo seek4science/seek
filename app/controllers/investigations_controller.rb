@@ -62,21 +62,17 @@ class InvestigationsController < ApplicationController
     update_relationships(@investigation, params)
 
     if @investigation.save
-       if @investigation.new_link_from_study=="true"
-          render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
-       else
-        respond_to do |format|
-          flash[:notice] = "The #{t('investigation')} was successfully created."
-          if @investigation.create_from_asset=="true"
-            flash.now[:notice] << "<br/> Now you can create new #{t('study')} for your #{t('assays.assay')} by clicking -Add a #{t('study')}- button".html_safe
-            format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
-            format.json {render json: @investigation}
-          else
-            format.html { redirect_to investigation_path(@investigation) }
-            format.json {render json: @investigation}
-          end
+      respond_to do |format|
+        flash[:notice] = "The #{t('investigation')} was successfully created."
+        if @investigation.create_from_asset == "true"
+          flash.now[:notice] << "<br/> Now you can create new #{t('study')} for your #{t('assays.assay')} by clicking -Add a #{t('study')}- button".html_safe
+          format.html { redirect_to investigation_path(:id => @investigation, :create_from_asset => @investigation.create_from_asset) }
+          format.json { render json: @investigation }
+        else
+          format.html { redirect_to investigation_path(@investigation) }
+          format.json { render json: @investigation }
         end
-       end
+      end
     else
       respond_to do |format|
         format.html { render :action => "new" }
@@ -89,7 +85,6 @@ class InvestigationsController < ApplicationController
   def new
     @investigation=Investigation.new
     @investigation.create_from_asset = params[:create_from_asset]
-    @investigation.new_link_from_study = params[:new_link_from_study]
 
     respond_to do |format|
       format.html
@@ -127,7 +122,7 @@ class InvestigationsController < ApplicationController
 
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, :other_creators,
-                                          :create_from_asset, :new_link_from_study, { creator_ids: [] },
+                                          :create_from_asset, { creator_ids: [] },
                                           { scales: [] }, { publication_ids: [] })
   end
 
