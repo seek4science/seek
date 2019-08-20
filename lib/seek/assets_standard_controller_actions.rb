@@ -46,6 +46,24 @@ module Seek
       end
     end
 
+    # handles update for manage properties, the action for the manage form
+    def manage_update
+      item = determine_asset_from_controller
+      raise 'shouldnt get this far without manage rights' unless item.can_manage?
+      item.update_attributes(params_for_controller)
+      update_sharing_policies item
+      respond_to do |format|
+        if item.save
+          flash[:notice] = "#{t('investigation')} was successfully updated."
+          format.html { redirect_to(item) }
+          format.json {render json: item}
+        else
+          format.html { render :action => 'manage' }
+          format.json { render json: json_api_errors(item), status: :unprocessable_entity }
+        end
+      end
+    end
+
     def edit
     end
 

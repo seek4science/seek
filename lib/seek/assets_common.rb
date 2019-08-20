@@ -63,5 +63,16 @@ module Seek
         'edit'
       end
     end
+
+    def determine_asset_from_controller
+      name = controller_name.singularize
+      eval("@#{name}")
+    end
+
+    def params_for_controller
+      name = controller_name.singularize
+      method = "#{name}_params"
+      send(method)
+    end
   end
 end

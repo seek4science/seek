@@ -1,20 +1,3 @@
 <h1>Manage <%= t('investigation') %></h1>
 
-<%= form_for @investigation do |f| %>
-  <%= f.error_messages -%>
-
-  <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} %>
-  <%= render partial: 'assets/manage_properties', locals:{f:f, sharing_link:false} %>
-
-  <%
-    button_text = "Update"
-  %>
-
-  <%= preview_permission_popup_link(@investigation)-%>
-  <%= f.submit button_text, :id => "investigation_submit_btn",
-               :onclick => "javascript: previewPermissions();return(false);",
-               :class => 'btn btn-primary' -%>
-
-  or <%= cancel_button(@investigation.id ? investigation_path(@investigation.id) : investigations_path) -%>
-
-<% end -%>
+<%= render partial:'assets/manage_form', locals:{resource:@investigation} %>

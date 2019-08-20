@@ -609,4 +609,93 @@ class StudiesControllerTest < ActionController::TestCase
       post :create, params: { study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing }
     end
   end
+
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    study = Factory(:study, contributor:person)
+    login_as(person)
+    assert study.can_manage?
+    get :manage, params: {id: study}
+    assert_response :success
+
+    #shouldn't be a projects block
+    assert_select 'div#add_projects_form', count:0
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    study = Factory(:study, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert study.can_edit?
+    refute study.can_manage?
+    get :manage, params: {id:study}
+    assert_redirected_to study
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+
+    study = Factory(:study, contributor:person, policy:Factory(:private_policy))
+
+    login_as(person)
+    assert study.can_manage?
+
+    patch :manage_update, params: {id: study,
+                                   study: {
+                                       creator_ids: [other_creator.id],
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to study
+
+    study.reload
+    assert_equal [other_creator],study.creators
+    assert_equal Policy::VISIBLE,study.policy.access_type
+    assert_equal 1,study.policy.permissions.count
+    assert_equal other_person,study.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,study.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+
+    person = Factory(:person, project:proj1)
+
+
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+
+
+    study = Factory(:study, policy:Factory(:private_policy, permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute study.can_manage?
+    assert study.can_edit?
+
+    assert_empty study.creators
+
+    patch :manage_update, params: {id: study,
+                                   study: {
+                                       creator_ids: [other_creator.id],
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    study.reload
+    assert_equal Policy::PRIVATE,study.policy.access_type
+    assert_equal 1,study.policy.permissions.count
+    assert_equal person,study.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,study.policy.permissions.first.access_type
+
+  end
 end

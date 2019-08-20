@@ -24,11 +24,6 @@ module Seek
       end
     end
 
-    def determine_asset_from_controller
-      name = controller_name.singularize
-      eval("@#{name}")
-    end
-
     def destroy_version
       asset = determine_asset_from_controller
       if Seek::Config.delete_asset_version_enabled
