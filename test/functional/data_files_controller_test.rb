@@ -1530,7 +1530,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file = data_files(:picture)
     data_file.other_creators = 'another creator'
     data_file.save
-    get :index
+    get :index, params: { page: 'P' }
 
     assert_select 'p.list_item_attribute', text: /another creator/, count: 1
   end
