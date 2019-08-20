@@ -90,6 +90,6 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def self.default_order
-    order(Seek::ListSorter.sort_field(name, 'index'))
+    order(Seek::ListSorter.sort_field(name, :index))
   end
 end

@@ -3,16 +3,36 @@ module Seek
   class ListSorter
     # potential to store definition in a config file, or database
     RULES = {
-      'Person' => { 'index' => 'last_name, first_name', 'related' => 'last_name, first_name' },
-      'Institution' => { 'index' => 'title', 'related' => 'title' },
-      'Event' => { 'index' => 'start_date DESC', 'related' => 'start_date DESC' },
-      'Publication' => { 'index' => 'published_date DESC', 'related' => 'published_date DESC' },
-      'Other' => { 'index' => 'title', 'related' => 'updated_at DESC' }
-    }.freeze
+      'Person' => {
+          defaults: { index: :name_asc, related: :name_asc },
+          options: [:name_desc, :name_asc, :created_at_asc, :created_at_desc] },
+      'Institution' => {
+          defaults: { index: :title_asc, related: :title_asc },
+          options: [:title_asc, :title_desc] },
+      'Event' => {
+          defaults: { index: :start_date_desc, related: :start_date_desc },
+          options: [:start_date_asc, :start_date_desc, :title_asc, :title_desc] },
+      'Publication' => {
+          defaults: { index: :published_at_desc, related: :published_at_desc },
+          options: [:published_at_asc, :published_at_desc, :created_at_asc, :created_at_desc, :title_asc, :title_desc] },
+      'Other' => {
+          defaults: { index: :title_asc, related: :updated_at_desc },
+          options: [:updated_at_asc, :updated_at_desc, :created_at_asc, :created_at_desc, :title_asc, :title_desc] },
+    }.with_indifferent_access.freeze
 
     ORDER_OPTIONS = {
-      latest: { title: 'Latest', order: 'updated_at DESC' },
-      oldest: { title: 'Oldest', order: 'created_at ASC' } # Example... remove me
+      title_asc: { title: 'Title (A-Z)', order: 'title' },
+      title_desc: { title: 'Title (Z-A)', order: 'title DESC' },
+      name_asc: { title: 'Name (A-Z)', order: 'last_name, first_name' },
+      name_desc: { title: 'Name (Z-A)', order: 'last_name DESC, first_name DESC' },
+      start_date_asc: { title: 'Date (Ascending)', order: 'start_date' },
+      start_date_desc: { title: 'Date (Descending)', order: 'start_date DESC' },
+      published_at_asc: { title: 'Publication date (Ascending)', order: 'published_date' },
+      published_at_desc: { title: 'Publication date (Descending)', order: 'published_date DESC' },
+      updated_at_asc: { title: 'Last updated (Descending)', order: 'updated_at' },
+      updated_at_desc: { title: 'Last updated (Ascending)', order: 'updated_at DESC' },
+      created_at_asc: { title: 'Last created (Descending)', order: 'created_at' },
+      created_at_desc: { title: 'Last created (Ascending)', order: 'created_at DESC' },
     }.with_indifferent_access.freeze
 
     # sort items in the related items hash according the rule for its type
@@ -20,7 +40,7 @@ module Seek
       return if resource_hash.empty?
 
       resource_hash.each do |key, res|
-        sort_items(key, res[:items], 'related')
+        sort_by_field(res[:items], sort_field(key, :related))
       end
     end
 
@@ -30,12 +50,21 @@ module Seek
       if order && ORDER_OPTIONS[order]
         sort_by_field(items, ORDER_OPTIONS[order][:order])
       else
-        sort_items(items.first.class.name, items, 'index')
+        sort_by_field(items, sort_field(items.first.class.name, :index))
       end
     end
 
-    def self.sort_items(type_name, items, view)
-      sort_by_field(items, sort_field(type_name, view))
+    def self.json_api_sort(items, sort)
+      fields = sort.split(',').map do |field|
+        if field.start_with?('-')
+          field = field[1..-1]
+          "#{field[1..-1]} desc"
+        else
+          field
+        end
+      end.join(', ')
+
+      sort_by_field(items, fields)
     end
 
     # Sort an array with SQL-style order by clauses, e.g.:
@@ -78,7 +107,8 @@ module Seek
     end
 
     def self.sort_field(type_name, view)
-      (RULES[type_name] || RULES['Other'])[view] || RULES['Other'][view]
+      key = (RULES[type_name] || RULES['Other'])[:defaults][view] || RULES['Other'][:defaults][view]
+      ORDER_OPTIONS[key][:order]
     end
   end
 end

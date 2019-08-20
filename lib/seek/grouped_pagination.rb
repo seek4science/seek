@@ -40,6 +40,9 @@ module Seek
         default_page = @pages.first if default_page == 'first'
 
         page = options[:page] || default_page
+        if page == 'latest'
+          order ||= 'updated_at_desc'
+        end
 
         records = collection.to_a
         page_totals = {}

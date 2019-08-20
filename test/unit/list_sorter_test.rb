@@ -2,12 +2,12 @@ require 'test_helper'
 
 class ListSorterTest < ActiveSupport::TestCase
   test 'rules' do
-    assert_equal 'last_name, first_name', Seek::ListSorter.sort_field('Person', 'index')
-    assert_equal 'title', Seek::ListSorter.sort_field('Sop', 'index')
-    assert_equal 'title', Seek::ListSorter.sort_field('NewModelThatDoesntExist', 'index')
-    assert_equal 'updated_at DESC', Seek::ListSorter.sort_field('NewModelThatDoesntExist', 'related')
-    assert_equal 'published_date DESC', Seek::ListSorter.sort_field('Publication', 'index')
-    assert_equal 'updated_at DESC', Seek::ListSorter.sort_field('Assay', 'related')
+    assert_equal 'last_name, first_name', Seek::ListSorter.sort_field('Person', :index)
+    assert_equal 'title', Seek::ListSorter.sort_field('Sop', :index)
+    assert_equal 'title', Seek::ListSorter.sort_field('NewModelThatDoesntExist', :index)
+    assert_equal 'updated_at DESC', Seek::ListSorter.sort_field('NewModelThatDoesntExist', :related)
+    assert_equal 'published_date DESC', Seek::ListSorter.sort_field('Publication', :index)
+    assert_equal 'updated_at DESC', Seek::ListSorter.sort_field('Assay', :related)
 
     assert Seek::ListSorter::RULES.frozen?
   end
@@ -93,22 +93,22 @@ class ListSorterTest < ActiveSupport::TestCase
 
     Seek::ListSorter.index_items(people)
     assert_equal [p6, p2, p1, p3, p5, p4], people
-    Seek::ListSorter.index_items(people, 'latest')
+    Seek::ListSorter.index_items(people, :updated_at_desc)
     assert_equal [p3, p4, p2, p1, p6, p5], people
 
     Seek::ListSorter.index_items(institutions)
     assert_equal [i2, i4, i1, i3], institutions
-    Seek::ListSorter.index_items(institutions, 'latest')
+    Seek::ListSorter.index_items(institutions, :updated_at_desc)
     assert_equal [i2, i4, i3, i1], institutions
 
     Seek::ListSorter.index_items(events)
     assert_equal [e2, e1, e3], events
-    Seek::ListSorter.index_items(events, 'latest')
+    Seek::ListSorter.index_items(events, :updated_at_desc)
     assert_equal [e1, e2, e3], events
 
     Seek::ListSorter.index_items(sops)
     assert_equal [s1, s3, s2], sops
-    Seek::ListSorter.index_items(sops, 'latest')
+    Seek::ListSorter.index_items(sops, :updated_at_desc)
     assert_equal [s3, s2, s1], sops
   end
 
