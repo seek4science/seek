@@ -50,7 +50,7 @@ module Seek
         Seek::ListSorter.index_items(records, order)
         if @pages.include?(page)
           records = records.select { |i| i.first_letter == page }
-        else
+        elsif page != 'all'
           records = records[0...@latest_limit]
         end
 

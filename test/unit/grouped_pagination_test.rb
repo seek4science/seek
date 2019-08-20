@@ -227,8 +227,8 @@ class GroupedPaginationTest < ActiveSupport::TestCase
       item2 = Factory(type, updated_at: 1.second.ago)
 
       klass = type.to_s.camelize.constantize
-      latest_items = klass.paginate_after_fetch(klass.default_order, page: 'latest')
-      assert latest_items.index(item2) < latest_items.index(item1)
+      latest_items = klass.paginate_after_fetch(klass.default_order, order: 'latest')
+      assert latest_items.index(item2) < latest_items.index(item1), "#{type} out of order"
     end
   end
 
