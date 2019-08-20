@@ -197,17 +197,15 @@ class Publication < ApplicationRecord
     self.title           = bibtex_record[:chapter].try(:to_s).gsub /{|}/, '' if (self.title.nil? && !bibtex_record[:chapter].nil?)
     self.title         += ( ":"+ (bibtex_record[:subtitle].try(:to_s).gsub /{|}/, '')) unless bibtex_record[:subtitle].nil?
 
-    unless check_bibtex_file (bibtex_record)
-      return false
-    else
-      self.abstract        = bibtex_record[:abstract].try(:to_s)
-      self.journal         = bibtex_record.journal.try(:to_s)
+    if check_bibtex_file (bibtex_record)
+      self.abstract = bibtex_record[:abstract].try(:to_s)
+      self.journal = bibtex_record.journal.try(:to_s)
       month = bibtex_record[:month].try(:to_s)
       year = bibtex_record[:year].try(:to_s)
-      self.published_date  = Date.new(bibtex_record.year.try(:to_i) || 1 , bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1)
+      self.published_date = Date.new(bibtex_record.year.try(:to_i) || 1, bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1)
       self.published_date = nil if self.published_date.to_s == "0001-01-01"
-      self.doi             = bibtex_record[:doi].try(:to_s)
-      self.pubmed_id       = bibtex_record[:pubmed_id].try(:to_s)
+      self.doi = bibtex_record[:doi].try(:to_s)
+      self.pubmed_id = bibtex_record[:pubmed_id].try(:to_s)
       self.booktitle = bibtex_record[:booktitle].try(:to_s)
       self.publisher = bibtex_record[:publisher].try(:to_s)
 
@@ -215,12 +213,12 @@ class Publication < ApplicationRecord
         plain_authors = bibtex_record[:author].split(' and ') # by bibtex definition
         plain_authors.each_with_index do |author, index| # multiselect
           next if author.empty?
-          last_name,first_name = author.split(', ') # by bibtex definition
+          last_name, first_name = author.split(', ') # by bibtex definition
           unless first_name.nil?
-            first_name =  first_name.try(:to_s).gsub /^{|}$/, ''
+            first_name = first_name.try(:to_s).gsub /^{|}$/, ''
           end
           unless last_name.nil?
-            last_name =  last_name.try(:to_s).gsub /^{|}$/, ''
+            last_name = last_name.try(:to_s).gsub /^{|}$/, ''
           end
           pa = PublicationAuthor.new(publication: self,
                                      first_name: first_name,
@@ -239,12 +237,12 @@ class Publication < ApplicationRecord
         plain_editors = self.editor.split(' and ') # by bibtex definition
         plain_editors.each_with_index do |editor, index| # multiselect
           next if editor.empty?
-          last_name,first_name = editor.split(', ') # by bibtex definition
+          last_name, first_name = editor.split(', ') # by bibtex definition
           unless first_name.nil?
-            first_name =  first_name.try(:to_s).gsub /^{|}$/, ''
+            first_name = first_name.try(:to_s).gsub /^{|}$/, ''
           end
           unless last_name.nil?
-            last_name =  last_name.try(:to_s).gsub /^{|}$/, ''
+            last_name = last_name.try(:to_s).gsub /^{|}$/, ''
           end
           pa = PublicationAuthor.new(publication: self,
                                      first_name: first_name,
@@ -258,7 +256,7 @@ class Publication < ApplicationRecord
       result = fetch_pubmed_or_doi_result(self.pubmed_id, self.doi) if self.pubmed_id.present? || self.doi.present?
 
       unless result.nil?
-        self.citation = result.citation  unless result.citation.nil?
+        self.citation = result.citation unless result.citation.nil?
 
         if self.journal.nil? && !result.journal.nil?
           self.journal = result.journal
@@ -271,6 +269,8 @@ class Publication < ApplicationRecord
         self.generate_citation(bibtex_record)
       end
       return true
+    else
+      return false
     end
   end
 
@@ -560,14 +560,16 @@ class Publication < ApplicationRecord
       return false
     end
 
-    if self.publication_type.is_inproceedings? && self.booktitle.nil?
+    if self.publication_type.is_inproceedings? && bibtex_record[:booktitle].nil?
         errors.add(:base, "An InProceedings needs to have a booktitle.")
         return false
     end
 
-    if bibtex_record[:author].nil? && self.editor.nil?
-      self.errors.add(:base,'You need at least one author or editor for your publication.')
-      return false
+    unless %w[Booklet Manual Misc Proceedings].include? self.publication_type.title
+      if bibtex_record[:author].nil? && self.editor.nil?
+        self.errors.add(:base,'You need at least one author or editor for your publication.')
+        return false
+      end
     end
 
     if self.publication_type.is_phd_thesis? || self.publication_type.is_masters_thesis?
@@ -576,7 +578,6 @@ class Publication < ApplicationRecord
         return false
       end
     end
-    
     return true
   end
 
