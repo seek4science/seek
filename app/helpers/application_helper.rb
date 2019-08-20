@@ -276,7 +276,12 @@ module ApplicationHelper
     if resource && resource.respond_to?(:title) && resource.title
       h(resource.title)
     elsif PAGE_TITLES[controller_name]
-      PAGE_TITLES[controller_name]
+      title = ''
+      if @parent_resource
+        title << "#{h(@parent_resource.title)} - "
+      end
+      title << PAGE_TITLES[controller_name]
+      title
     else
       "The #{Seek::Config.application_name}"
     end

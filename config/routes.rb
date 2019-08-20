@@ -188,7 +188,6 @@ SEEK::Application.routes.draw do
       get :items
     end
     resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :only=>[:index]
-    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :only=>[:index]
     resources :avatars do
       member do
         post :select

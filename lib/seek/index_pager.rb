@@ -35,6 +35,7 @@ module Seek
     end
 
     def fetch_and_filter_assets
+      detect_parent_resource
       found = apply_filters(fetch_all_viewable_assets)
       instance_variable_set("@#{controller_name.downcase}", found)
     end
@@ -52,6 +53,17 @@ module Seek
       @hidden = @total_count - found.count
 
       found
+    end
+
+    def detect_parent_resource
+      parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
+      if parent_id_param
+        parent_type = parent_id_param.to_s.chomp('_id')
+        parent_class = parent_type.camelize.constantize
+        if parent_class
+          @parent_resource = parent_class.find(params[parent_id_param])
+        end
+      end
     end
   end
 end
