@@ -461,6 +461,8 @@ SEEK::Application.routes.draw do
       post :edit_version_comment
       delete :destroy_version
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:publications,:events,:only=>[:index]
   end
@@ -565,6 +567,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end
@@ -592,6 +596,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end
