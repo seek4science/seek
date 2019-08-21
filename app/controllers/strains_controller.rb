@@ -1,11 +1,10 @@
 class StrainsController < ApplicationController
   include Seek::IndexPager
-  include Seek::AnnotationCommon
-  include Seek::DestroyHandling
+  include Seek::AssetsCommon
 
   before_action :organisms_enabled?
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: [:show, :edit, :update, :destroy]
+  before_action :find_and_authorize_requested_item, only: [:show, :edit, :update, :destroy, :manage, :manage_update]
 
   before_action :get_strains_for_organism, only: [:existing_strains_for_assay_organism]
 

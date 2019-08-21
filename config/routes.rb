@@ -652,6 +652,10 @@ SEEK::Application.routes.draw do
       get :preview
       post :items_for_result
     end
+    member do
+      get :manage
+      patch :manage_update
+    end
     resources :people,:projects,:data_files,:publications,:presentations,:only=>[:index]
   end
 
@@ -672,6 +676,8 @@ SEEK::Application.routes.draw do
     end
     member do
       post :update_annotations_ajax
+      get :manage
+      patch :manage_update
     end
     resources :specimens,:assays,:people,:projects,:samples,:only=>[:index]
   end
@@ -712,6 +718,8 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples, only:[:index]
   end

@@ -219,5 +219,101 @@ class EventsControllerTest < ActionController::TestCase
     assert_equal [doc],event.documents
   end
 
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    event = Factory(:event, contributor:person)
+    login_as(person)
+    assert event.can_manage?
+    get :manage, params: {id: event}
+    assert_response :success
+
+    # check the project form exists, studies and assays don't have this
+    assert_select 'div#add_projects_form', count:1
+
+    # should be a temporary sharing link
+    assert_select 'div#temporary_links', count:1
+
+    assert_select 'div#author_form', count:0
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    event = Factory(:event, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert event.can_edit?
+    refute event.can_manage?
+    get :manage, params: {id:event}
+    assert_redirected_to event
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    event = Factory(:event, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+
+    login_as(person)
+    assert event.can_manage?
+
+    patch :manage_update, params: {id: event,
+                                   event: {
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to event
+
+    event.reload
+    assert_equal [proj1,proj2],event.projects.sort_by(&:id)
+    assert_equal Policy::VISIBLE,event.policy.access_type
+    assert_equal 1,event.policy.permissions.count
+    assert_equal other_person,event.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,event.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person, project:proj1)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    other_person = Factory(:person)
+
+
+    event = Factory(:event, projects:[proj1], policy:Factory(:private_policy,
+                                                                           permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute event.can_manage?
+    assert event.can_edit?
+
+    assert_equal [proj1],event.projects
+
+    patch :manage_update, params: {id: event,
+                                   event: {
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    event.reload
+    assert_equal [proj1],event.projects
+    assert_equal Policy::PRIVATE,event.policy.access_type
+    assert_equal 1,event.policy.permissions.count
+    assert_equal person,event.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,event.policy.permissions.first.access_type
+
+  end
+
 
 end
