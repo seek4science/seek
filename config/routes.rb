@@ -531,6 +531,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :experimental_conditions do
       collection do
@@ -756,6 +758,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:only=>[:index]
   end
