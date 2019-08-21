@@ -372,6 +372,8 @@ SEEK::Application.routes.draw do
       get :published
       get :new_object_based_on_existing_one
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:strains,:organisms, :only=>[:index]
   end
