@@ -494,6 +494,9 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     # check the project form exists, studies and assays don't have this
     assert_select 'div#add_projects_form', count:1
+
+    #no sharing link, not for Investigation, Study and Assay
+    assert_select 'div#temporary_links', count:0
   end
 
   test 'cannot access manage page with edit rights' do

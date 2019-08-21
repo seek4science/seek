@@ -430,6 +430,8 @@ SEEK::Application.routes.draw do
       get :destroy_samples_confirm
       post :retrieve_nels_sample_metadata
       get :retrieve_nels_sample_metadata
+      get :manage
+      patch :manage_update
     end
     resources :studied_factors do
       collection do
@@ -493,6 +495,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :model_images do
       collection do

@@ -73,6 +73,10 @@
     <li><%= image_tag_for_key('edit', polymorphic_path(asset, action: :edit), nil, nil, "Edit #{human_name}") -%></li>
   <% end -%>
 
+  <% if asset.can_manage? %>
+    <li><%= image_tag_for_key('manage', polymorphic_path(asset, action: :manage), nil, nil, "Manage #{human_name}") -%></li>
+  <% end %>
+
   <% if show_publish_button %>
     <li><%= image_tag_for_key('publish', polymorphic_path(asset, action: :check_related_items), nil, { method: :post }, "Publish #{human_name}") -%></li>
   <% end -%>

@@ -1,6 +1,7 @@
 <%
   submit_button_id = "#{resource.model_name.singular}_submit_btn"
   show_projects = true if show_projects.nil?
+  sharing_link = true if sharing_link.nil?
 %>
 
 <%= form_for resource, url:{action: :manage_update} do |f| %>
@@ -9,7 +10,7 @@
   <% if show_projects %>
     <%= render :partial => 'projects/project_selector', :locals => {:resource => resource,:allow_nil=>false} %>
   <% end %>
-  <%= render partial: 'assets/manage_properties', locals:{f:f, sharing_link:false} %>
+  <%= render partial: 'assets/manage_properties', locals:{f:f, sharing_link:sharing_link} %>
 
   <%= preview_permission_popup_link(resource)-%>
   <%= f.submit 'Update', :id => submit_button_id,
