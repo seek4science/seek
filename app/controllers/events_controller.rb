@@ -1,6 +1,6 @@
 class EventsController < ApplicationController
   include Seek::PreviewHandling
-  include Seek::AssetsStandardControllerActions
+  include Seek::AssetsCommon
 
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
 

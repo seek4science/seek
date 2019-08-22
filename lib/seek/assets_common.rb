@@ -19,7 +19,7 @@ module Seek
     end
 
     def anonymous_request_for_previous_version?(asset, requested_version)
-      (!(User.logged_in_and_member?) && requested_version.to_i != asset.latest_version.version)
+      (!User.logged_in_and_member? && requested_version.to_i != asset.latest_version.version)
     end
 
     def update_relationships(asset, params)
@@ -52,6 +52,22 @@ module Seek
       respond_to do |format|
         format.json { render json: items.to_json }
       end
+    end
+
+    # the page to return to on an update validation failure, default to 'edit' if the referer is not found
+    def update_validation_error_return_action
+      previous = Rails.application.routes.recognize_path(request.referrer)
+      if previous && previous[:action]
+        previous[:action] || 'edit'
+      else
+        'edit'
+      end
+    end
+
+    def params_for_controller
+      name = controller_name.singularize
+      method = "#{name}_params"
+      send(method)
     end
   end
 end

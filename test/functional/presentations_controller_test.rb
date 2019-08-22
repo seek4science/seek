@@ -399,6 +399,120 @@ class PresentationsControllerTest < ActionController::TestCase
 
   end
 
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('presentation')
+  end
+
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, contributor:person)
+    login_as(person)
+    assert presentation.can_manage?
+    get :manage, params: {id: presentation}
+    assert_response :success
+
+    # check the project form exists, studies and assays don't have this
+    assert_select 'div#add_projects_form', count:1
+
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
+    # should be a temporary sharing link
+    assert_select 'div#temporary_links', count:1
+
+    assert_select 'div#author_form', count:1
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert presentation.can_edit?
+    refute presentation.can_manage?
+    get :manage, params: {id:presentation}
+    assert_redirected_to presentation
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    presentation = Factory(:presentation, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+
+    login_as(person)
+    assert presentation.can_manage?
+
+    patch :manage_update, params: {id: presentation,
+                                   presentation: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to presentation
+
+    presentation.reload
+    assert_equal [proj1,proj2],presentation.projects.sort_by(&:id)
+    assert_equal [other_creator],presentation.creators
+    assert_equal Policy::VISIBLE,presentation.policy.access_type
+    assert_equal 1,presentation.policy.permissions.count
+    assert_equal other_person,presentation.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,presentation.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person, project:proj1)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    presentation = Factory(:presentation, projects:[proj1], policy:Factory(:private_policy,
+                                                                           permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute presentation.can_manage?
+    assert presentation.can_edit?
+
+    assert_equal [proj1],presentation.projects
+    assert_empty presentation.creators
+
+    patch :manage_update, params: {id: presentation,
+                                   presentation: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    presentation.reload
+    assert_equal [proj1],presentation.projects
+    assert_empty presentation.creators
+    assert_equal Policy::PRIVATE,presentation.policy.access_type
+    assert_equal 1,presentation.policy.permissions.count
+    assert_equal person,presentation.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,presentation.policy.permissions.first.access_type
+
+  end
+
   def edit_max_object(presentation)
     add_tags_to_test_object(presentation)
     add_creator_to_test_object(presentation)

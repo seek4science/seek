@@ -9,6 +9,7 @@ class SopsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include RdfTestCases
   include HtmlHelper
+  include GeneralAuthorizationTestCases
 
   def setup
     @user = users(:quentin)
@@ -247,9 +248,6 @@ class SopsControllerTest < ActionController::TestCase
     get :edit, params: { id: sops(:my_first_sop) }
     assert_response :success
     assert_select 'h1', text: /Editing #{I18n.t('sop')}/
-
-    # this is to check the SOP is all upper case in the sharing form
-    assert_select 'div.alert-info', text: /the #{I18n.t('sop')}/i
   end
 
   test 'publications excluded in form for sops' do
@@ -821,10 +819,10 @@ class SopsControllerTest < ActionController::TestCase
   test 'should not lose project assignment when an asset is managed by a person from different project' do
     sop = Factory(:sop)
     sop.policy.permissions << Factory(:permission, contributor: User.current_user.person, access_type: Policy::MANAGING)
-    assert sop.can_edit?
+    assert sop.can_manage?
     assert_not_equal sop.projects.first, User.current_user.person.projects.first
 
-    get :edit, params: { id: sop }
+    get :manage, params: { id: sop }
     assert_response :success
 
     selected = JSON.parse(select_node_contents('#project-selector-selected-json'))
@@ -912,17 +910,17 @@ class SopsControllerTest < ActionController::TestCase
   test 'permission popup setting set in sharing form' do
     sop = Factory :sop, contributor: User.current_user.person
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_ON_CHANGE do
-      get :edit, params: { id: sop }
+      get :manage, params: { id: sop }
     end
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "on_change"/, count: 1
 
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_ALWAYS do
-      get :edit, params: { id: sop }
+      get :manage, params: { id: sop }
     end
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "always"/, count: 1
 
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_NEVER do
-      get :edit, params: { id: sop }
+      get :manage, params: { id: sop }
     end
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "never"/, count: 1
   end
@@ -1277,6 +1275,123 @@ class SopsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to items_person_path(person)
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('sop')
+  end
+
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    sop = Factory(:sop, contributor:person)
+    login_as(person)
+    assert sop.can_manage?
+    get :manage, params: {id: sop}
+    assert_response :success
+
+    # check the project form exists, studies and assays don't have this
+    assert_select 'div#add_projects_form', count:1
+
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
+    # should be a temporary sharing link
+    assert_select 'div#temporary_links', count:1
+
+    assert_select 'div#author_form', count:1
+
+    # this is to check the SOP is all upper case in the sharing form
+    assert_select 'div.alert-info', text: /the #{I18n.t('sop')}/
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    sop = Factory(:sop, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert sop.can_edit?
+    refute sop.can_manage?
+    get :manage, params: {id:sop}
+    assert_redirected_to sop
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    sop = Factory(:sop, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+
+    login_as(person)
+    assert sop.can_manage?
+
+    patch :manage_update, params: {id: sop,
+                                   sop: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to sop
+
+    sop.reload
+    assert_equal [proj1,proj2],sop.projects.sort_by(&:id)
+    assert_equal [other_creator],sop.creators
+    assert_equal Policy::VISIBLE,sop.policy.access_type
+    assert_equal 1,sop.policy.permissions.count
+    assert_equal other_person,sop.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,sop.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person, project:proj1)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    sop = Factory(:sop, projects:[proj1], policy:Factory(:private_policy,
+                                                                     permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute sop.can_manage?
+    assert sop.can_edit?
+
+    assert_equal [proj1],sop.projects
+    assert_empty sop.creators
+
+    patch :manage_update, params: {id: sop,
+                                   sop: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    sop.reload
+    assert_equal [proj1],sop.projects
+    assert_empty sop.creators
+    assert_equal Policy::PRIVATE,sop.policy.access_type
+    assert_equal 1,sop.policy.permissions.count
+    assert_equal person,sop.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,sop.policy.permissions.first.access_type
+
   end
 
   private

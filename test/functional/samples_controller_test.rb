@@ -6,6 +6,7 @@ class SamplesControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include HtmlHelper
+  include GeneralAuthorizationTestCases
 
   def rest_api_test_object
     @object = Factory(:sample, policy: Factory(:public_policy))
@@ -695,7 +696,108 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('sample')
+  end
 
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    sample = Factory(:sample, contributor:person)
+    login_as(person)
+    assert sample.can_manage?
+    get :manage, params: {id: sample}
+    assert_response :success
+
+    # check the project form exists, studies and assays don't have this
+    assert_select 'div#add_projects_form', count:1
+
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
+    # should be a temporary sharing link
+    assert_select 'div#temporary_links', count:0
+
+    assert_select 'div#author_form', count:1
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    sample = Factory(:sample, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert sample.can_edit?
+    refute sample.can_manage?
+    get :manage, params: {id:sample}
+    assert_redirected_to sample
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    sample = Factory(:sample, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+
+    login_as(person)
+    assert sample.can_manage?
+
+    patch :manage_update, params: {id: sample,
+                                   sample: {
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to sample
+
+    sample.reload
+    assert_equal [proj1,proj2],sample.projects.sort_by(&:id)
+    assert_equal Policy::VISIBLE,sample.policy.access_type
+    assert_equal 1,sample.policy.permissions.count
+    assert_equal other_person,sample.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,sample.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person, project:proj1)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    other_person = Factory(:person)
+
+
+    sample = Factory(:sample, projects:[proj1], policy:Factory(:private_policy,
+                                                             permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute sample.can_manage?
+    assert sample.can_edit?
+
+    assert_equal [proj1],sample.projects
+
+    patch :manage_update, params: {id: sample,
+                                   sample: {
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    sample.reload
+    assert_equal [proj1],sample.projects
+    assert_equal Policy::PRIVATE,sample.policy.access_type
+    assert_equal 1,sample.policy.permissions.count
+    assert_equal person,sample.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,sample.policy.permissions.first.access_type
+
+  end
 
   private
 

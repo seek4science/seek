@@ -1,10 +1,11 @@
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => item} %>
 
 <%= item_actions_dropdown do %>
-    <% if item.can_manage? %>
-        <li><%= image_tag_for_key('manage', edit_strain_path, "Manage Strain", nil, 'Manage Strain') %></li>
-    <% elsif item.can_edit? %>
+    <% if item.can_edit? %>
         <li><%= image_tag_for_key('edit', edit_strain_path(item), "Edit Strain", nil, 'Edit Strain') %></li>
     <% end %>
+  <% if item.can_manage? %>
+    <li><%= image_tag_for_key('manage', manage_strain_path(item), "Manage Strain", nil, 'Manage Strain') %></li>
+  <% end %>
     <%= delete_icon(item, current_user)-%>
 <% end %>
