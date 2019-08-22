@@ -45,11 +45,11 @@
         <%= f.country_select :country, nil, { :include_blank => 'Please select...' }, :class=>"form-control" -%>
       </div>
 
-      <% if show_form_manage_attributes? && @event.can_manage? %>
+      <% if show_form_manage_specific_attributes? && @event.can_manage? %>
           <%= render :partial => "projects/project_selector", :locals => {:resource => @event, :allow_nil => Seek::Config.is_virtualliver} -%>
       <% end %>
 
-      <%= render partial: 'assets/manage_properties', locals:{f:f} if show_form_manage_attributes? %>
+      <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
       <%= f.fancy_multiselect :publications ,:other_projects_checkbox=>true -%>
 

@@ -18,7 +18,7 @@
   </div>
 
   <div id="sample_extra_details">
-    <% if show_form_manage_attributes? && @sample.can_manage? -%>
+    <% if show_form_manage_specific_attributes? && @sample.can_manage? -%>
       <%= render :partial => "projects/project_selector", :locals => { :resource => @sample,:allow_nil=> false} %>
       <%= render :partial => "assets/asset_form_bottom", :locals=>{:f=>f,attribution_enable:false,show_publications:false,sharing_link:false} %>
     <% end %>

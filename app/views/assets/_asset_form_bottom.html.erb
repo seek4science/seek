@@ -17,13 +17,13 @@
   attribution_enable = true if attribution_enable.nil?
 %>
 
-<% if show_form_manage_attributes? %>
-  <%= render partial: 'assets/manage_properties',locals:{f:f,
-                                                         other_creators: other_creators,
-                                                         creators_enable: creators_enable,
-                                                         existing_creators: existing_creators,
-                                                         sharing_link: sharing_link,
-                                                         sharing_enable: sharing_enable } %>
+<% if show_form_manage_specific_attributes? %>
+  <%= render partial: 'assets/manage_specific_attributes', locals:{f:f,
+                                                                   other_creators: other_creators,
+                                                                   creators_enable: creators_enable,
+                                                                   existing_creators: existing_creators,
+                                                                   sharing_link: sharing_link,
+                                                                   sharing_enable: sharing_enable } %>
 <% end %>
 
 <% if taggable -%>

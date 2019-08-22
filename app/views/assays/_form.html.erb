@@ -68,7 +68,7 @@
         <%= render :partial => "scales/scales_selector",:locals=>{:object=>@assay} %>
     <% end %>
 
-  <%= render partial: 'assets/manage_properties', locals:{f:f} if show_form_manage_attributes? %>
+  <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
     <% if @assay.is_taggable? %>
         <%= render :partial=>"assets/select_tags" %>

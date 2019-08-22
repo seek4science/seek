@@ -15,7 +15,7 @@
         <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
       </div>
 
-      <% if show_form_manage_attributes? && @node.can_manage?  -%>
+      <% if show_form_manage_specific_attributes? && @node.can_manage?  -%>
           <%= render :partial => "projects/project_selector", :locals => { :resource => @node, :allow_nil => Seek::Config.is_virtualliver } -%>
       <% end -%>
 

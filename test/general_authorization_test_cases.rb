@@ -15,7 +15,6 @@ module GeneralAuthorizationTestCases
       get :show, params: { id: item.id, format: 'json' }
       assert_response :forbidden
     end
-
   end
 
   def test_private_item_not_accessible_by_another_user
@@ -55,29 +54,29 @@ module GeneralAuthorizationTestCases
   end
 
   def check_manage_edit_menu_for_type(type)
-    person=Factory(:person)
+    person = Factory(:person)
     login_as(person)
-    editable = Factory(type.to_sym, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
-    manageable = Factory(type.to_sym, contributor:person, policy:Factory(:private_policy))
+    editable = Factory(type.to_sym, policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: person, access_type: Policy::EDITING)]))
+    manageable = Factory(type.to_sym, contributor: person, policy: Factory(:private_policy))
 
     assert editable.can_edit?
     refute editable.can_manage?
     assert manageable.can_manage?
 
-    get :show, params:{id:editable.id}
+    get :show, params: { id: editable.id }
     assert_response :success
 
     assert_select 'ul#item-admin-menu' do
-      assert_select 'li > a[href=?]',send("edit_#{type}_path",editable), text:/Edit/, count:1
-      assert_select 'li > a[href=?]',send("manage_#{type}_path",editable), text:/Manage/, count:0
+      assert_select 'li > a[href=?]', send("edit_#{type}_path", editable), text: /Edit/, count: 1
+      assert_select 'li > a[href=?]', send("manage_#{type}_path", editable), text: /Manage/, count: 0
     end
 
-    get :show, params:{id:manageable.id}
+    get :show, params: { id: manageable.id }
     assert_response :success
 
     assert_select 'ul#item-admin-menu' do
-      assert_select 'li > a[href=?]',send("edit_#{type}_path",manageable), text:/Edit/, count:1
-      assert_select 'li > a[href=?]',send("manage_#{type}_path",manageable), text:/Manage/, count:1
+      assert_select 'li > a[href=?]', send("edit_#{type}_path", manageable), text: /Edit/, count: 1
+      assert_select 'li > a[href=?]', send("manage_#{type}_path", manageable), text: /Manage/, count: 1
     end
   end
 end

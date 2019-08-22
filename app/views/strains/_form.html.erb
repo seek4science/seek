@@ -55,10 +55,10 @@
     </div>
   </div>
 
-  <% if show_form_manage_attributes? && @strain.can_manage? %>
+  <% if show_form_manage_specific_attributes? && @strain.can_manage? %>
     <%= render :partial => 'projects/project_selector', :locals => {:resource => @strain} %>
 
-    <%= render partial: 'assets/manage_properties', locals:{f:f} %>
+    <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} %>
   <% end %>
 
   <%

@@ -19,7 +19,7 @@ module Seek
     end
 
     def anonymous_request_for_previous_version?(asset, requested_version)
-      (!(User.logged_in_and_member?) && requested_version.to_i != asset.latest_version.version)
+      (!User.logged_in_and_member? && requested_version.to_i != asset.latest_version.version)
     end
 
     def update_relationships(asset, params)
