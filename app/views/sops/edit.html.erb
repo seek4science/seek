@@ -15,11 +15,6 @@
         <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
       </div>
 
-      <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, and project selector was disabled) -%>
-      <% if show_form_manage_specific_attributes? && @sop.can_manage? -%>
-          <%= render :partial => "projects/project_selector", :locals => { :resource => @sop, :allow_nil => Seek::Config.is_virtualliver } -%>
-      <% end -%>
-
       <% if show_scales? %>
           <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} %>
       <% end %>

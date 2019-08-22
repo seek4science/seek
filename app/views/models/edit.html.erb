@@ -16,11 +16,6 @@
         <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
       </div>
 
-      <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
-      <% if show_form_manage_specific_attributes? && @model.can_manage? -%>
-          <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :disable_project_select => true, :allow_nil => Seek::Config.is_virtualliver } -%>
-      <% end -%>
-
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @model } %>
 
       <%= render :partial=>"model_metadata" -%>
