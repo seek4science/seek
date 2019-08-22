@@ -9,7 +9,7 @@ gem 'mysql2'
 gem 'pg'
 gem 'sqlite3'
 
-#gem 'feedjira', '~>1'
+gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
 gem 'hpricot', '~>0.8.2'
 gem 'libxml-ruby', '2.8.0', require: 'libxml'
