@@ -6,6 +6,7 @@ class SamplesControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include HtmlHelper
+  include GeneralAuthorizationTestCases
 
   def rest_api_test_object
     @object = Factory(:sample, policy: Factory(:public_policy))
@@ -693,6 +694,10 @@ class SamplesControllerTest < ActionController::TestCase
     # no referring sample required, ST is already visible
     assert_select 'a[href=?]',sample_type_path(sample_type2),text:/#{sample_type2.title}/
 
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('sample')
   end
 
   test 'can access manage page with manage rights' do

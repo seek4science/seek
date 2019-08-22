@@ -3537,6 +3537,10 @@ class DataFilesControllerTest < ActionController::TestCase
     get :provide_metadata unless skip_provide_metadata
   end
 
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('data_file')
+  end
+
   test 'can access manage page with manage rights' do
     person = Factory(:person)
     data_file = Factory(:data_file, contributor:person)

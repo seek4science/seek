@@ -9,6 +9,7 @@ class SopsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include RdfTestCases
   include HtmlHelper
+  include GeneralAuthorizationTestCases
 
   def setup
     @user = users(:quentin)
@@ -1274,6 +1275,10 @@ class SopsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to items_person_path(person)
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('sop')
   end
 
   test 'can access manage page with manage rights' do

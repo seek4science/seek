@@ -1729,6 +1729,10 @@ class AssaysControllerTest < ActionController::TestCase
 
   end
 
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('assay')
+  end
+
   test 'can access manage page with manage rights' do
     person = Factory(:person)
     assay = Factory(:assay, contributor:person)

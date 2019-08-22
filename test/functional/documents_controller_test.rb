@@ -9,6 +9,7 @@ class DocumentsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include MockHelper
   include HtmlHelper
+  include GeneralAuthorizationTestCases
 
   def test_json_content
     login_as(Factory(:user))
@@ -279,6 +280,10 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', document_path(document), text: document.title
       assert_select 'a[href=?]', document_path(document2), text: document2.title, count: 0
     end
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('document')
   end
 
   test 'can access manage page with manage rights' do

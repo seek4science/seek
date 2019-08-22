@@ -1223,6 +1223,10 @@ class ModelsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('model')
+  end
+
   test 'can access manage page with manage rights' do
     person = Factory(:person)
     model = Factory(:model, contributor:person)

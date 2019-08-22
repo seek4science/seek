@@ -6,7 +6,7 @@ class StrainsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
-#  include GeneralAuthorizationTestCases
+  include GeneralAuthorizationTestCases
   include HtmlHelper
 
   def setup
@@ -335,6 +335,10 @@ class StrainsControllerTest < ActionController::TestCase
 
       assert_select 'div.related-items a[href*=?]', samples_path, text: /Strain sample \d/, count: 2
     end
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('strain')
   end
 
   test 'can access manage page with manage rights' do

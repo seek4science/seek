@@ -19,6 +19,7 @@
   <% end %>
 
   <% if item.can_manage? -%>
+    <li><%= image_tag_for_key('manage', manage_assay_path(item), "Manage #{assay_word}", nil, "Manage #{assay_word}") -%></li>
     <%= render :partial => 'snapshots/new_snapshot_link', :locals => {:item => item} %>
   <% end -%>
 

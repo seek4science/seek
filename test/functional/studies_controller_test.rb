@@ -599,6 +599,10 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('study')
+  end
+
   test 'can access manage page with manage rights' do
     person = Factory(:person)
     study = Factory(:study, contributor:person)
