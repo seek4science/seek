@@ -247,9 +247,6 @@ class SopsControllerTest < ActionController::TestCase
     get :edit, params: { id: sops(:my_first_sop) }
     assert_response :success
     assert_select 'h1', text: /Editing #{I18n.t('sop')}/
-
-    # this is to check the SOP is all upper case in the sharing form
-    assert_select 'div.alert-info', text: /the #{I18n.t('sop')}/i
   end
 
   test 'publications excluded in form for sops' do
@@ -821,10 +818,10 @@ class SopsControllerTest < ActionController::TestCase
   test 'should not lose project assignment when an asset is managed by a person from different project' do
     sop = Factory(:sop)
     sop.policy.permissions << Factory(:permission, contributor: User.current_user.person, access_type: Policy::MANAGING)
-    assert sop.can_edit?
+    assert sop.can_manage?
     assert_not_equal sop.projects.first, User.current_user.person.projects.first
 
-    get :edit, params: { id: sop }
+    get :manage, params: { id: sop }
     assert_response :success
 
     selected = JSON.parse(select_node_contents('#project-selector-selected-json'))
@@ -1294,6 +1291,9 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'div#temporary_links', count:1
 
     assert_select 'div#author_form', count:1
+
+    # this is to check the SOP is all upper case in the sharing form
+    assert_select 'div.alert-info', text: /the #{I18n.t('sop')}/
   end
 
   test 'cannot access manage page with edit rights' do

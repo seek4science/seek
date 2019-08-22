@@ -1225,18 +1225,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert assay.creators.include?(creator)
   end
 
-  test 'should have creators association box' do
-    assay = Factory(:assay, policy: Factory(:public_policy))
-
-    get :edit, params: { id: assay.id }
-    assert_response :success
-
-    assert_select '#creators_list'
-    assert_select "input[type='text'][name='creator-typeahead']"
-    # assert_select "input[type='hidden'][name='creators']" This is set via JS
-    assert_select "input[type='text'][name='assay[other_creators]']"
-  end
-
   test 'should show creators' do
     assay = Factory(:assay, policy: Factory(:public_policy))
     creator = Factory(:person)

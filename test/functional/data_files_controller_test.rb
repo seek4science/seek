@@ -610,7 +610,6 @@ class DataFilesControllerTest < ActionController::TestCase
     get :edit, params: { id: data_files(:picture) }
     assert_response :success
     assert_select 'h1', text: /Editing #{I18n.t('data_file')}/
-    assert_select 'div.alert-info', text: /the #{I18n.t('data_file')}/i
   end
 
   test 'publications included in form for datafile' do
@@ -3512,30 +3511,6 @@ class DataFilesControllerTest < ActionController::TestCase
     parsed_response = JSON.parse(@response.body)
     assert_not parsed_response['data']['attributes'].key?('policy')
     logout
-  end
-
-  test 'sharing permissions should not show for edit' do
-    p = Factory(:person)
-    login_as(p.user)
-    df = Factory(:data_file, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:p, access_type:Policy::EDITING)]))
-
-    assert df.can_edit?(p.user)
-    refute df.can_manage?(p.user)
-
-    get :edit, params: { id:df.id }
-    assert_response :success
-
-    assert_select "div#sharing_form", count:0
-
-    # make sure it appears if can_manage
-
-    login_as(df.contributor.user)
-
-    get :edit, params: { id:df.id }
-    assert_response :success
-
-    assert_select "div#sharing_form", count:1
-
   end
 
   test 'should show view content button for image' do
