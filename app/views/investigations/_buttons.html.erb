@@ -8,12 +8,15 @@
 <% end -%>
 
 <%= item_actions_dropdown do %>
+    <% if item.can_edit? %>
+      <li><%= image_tag_for_key('edit', edit_investigation_path(item), "Edit #{t('investigation')}", nil, "Edit #{t('investigation')}") -%></li>
+    <% end %>
+
     <% if item.can_manage? -%>
-        <li><%= image_tag_for_key('manage', edit_investigation_path(item), nil, nil, "Manage #{t('investigation')}") -%></li>
+        <li><%= image_tag_for_key('manage', manage_investigation_path(item), "Manage #{t('investigation')}", nil, "Manage #{t('investigation')}") -%></li>
         <%= render :partial => 'snapshots/new_snapshot_link', :locals => { :item => item } %>
-    <% elsif item.can_edit?-%>
-        <li><%= image_tag_for_key('edit', edit_investigation_path(item), "Edit #{t('investigation')}", nil, "Edit #{t('investigation')}") -%></li>
     <% end -%>
+
     <% if (item.can_publish? || item.contains_publishable_items?) && item.can_manage? -%>
         <li><%= image_tag_for_key('publish', polymorphic_path(item, :action => :check_related_items), nil, {:method=>:post}, "Publish full #{t('investigation')}") -%></li>
     <% end -%>

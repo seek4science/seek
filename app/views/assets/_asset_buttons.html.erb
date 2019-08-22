@@ -58,7 +58,6 @@
 <% end -%>
 
 <%= item_actions_dropdown do %>
-  <% edit_verb = asset.can_manage? ? 'manage' : 'edit' %>
 
   <% if asset.can_edit? -%>
     <% if asset.versioned? -%>
@@ -71,8 +70,12 @@
       </li>
     <% end -%>
 
-    <li><%= image_tag_for_key(edit_verb, polymorphic_path(asset, action: :edit), nil, nil, "#{edit_verb.capitalize} #{human_name}") -%></li>
+    <li><%= image_tag_for_key('edit', polymorphic_path(asset, action: :edit), nil, nil, "Edit #{human_name}") -%></li>
   <% end -%>
+
+  <% if asset.can_manage? %>
+    <li><%= image_tag_for_key('manage', polymorphic_path(asset, action: :manage), nil, nil, "Manage #{human_name}") -%></li>
+  <% end %>
 
   <% if show_publish_button %>
     <li><%= image_tag_for_key('publish', polymorphic_path(asset, action: :check_related_items), nil, { method: :post }, "Publish #{human_name}") -%></li>

@@ -46,8 +46,27 @@ module Seek
       end
     end
 
-    def edit
+    # handles update for manage properties, the action for the manage form
+    def manage_update
+      item = determine_asset_from_controller
+      raise 'shouldnt get this far without manage rights' unless item.can_manage?
+      item.update_attributes(params_for_controller)
+      update_sharing_policies item
+      respond_to do |format|
+        if item.save
+          flash[:notice] = "#{t('investigation')} was successfully updated."
+          format.html { redirect_to(item) }
+          format.json { render json: item }
+        else
+          format.html { render action: 'manage' }
+          format.json { render json: json_api_errors(item), status: :unprocessable_entity }
+        end
+      end
     end
+
+    def edit; end
+
+    def manage; end
 
     def create
       item = initialize_asset
@@ -88,8 +107,8 @@ module Seek
       end
     end
 
-    #makes sure the asset it only associated with projects that match the current user
-    def filter_associated_projects(asset,user=User.current_user)
+    # makes sure the asset it only associated with projects that match the current user
+    def filter_associated_projects(asset, user = User.current_user)
       asset.projects = asset.projects & user.person.projects
     end
 
@@ -114,7 +133,7 @@ module Seek
 
     def edit_version_comment
       item = class_for_controller_name.find(params[:id])
-      @comment = item.versions.find_by(:version => params[:version])
+      @comment = item.versions.find_by(version: params[:version])
       if @comment.update(revision_comments: params[:revision_comments])
         flash[:notice] = "The comment of version #{params[:version]} was successfully updated."
       else
@@ -130,4 +149,3 @@ module Seek
     end
   end
 end
-
