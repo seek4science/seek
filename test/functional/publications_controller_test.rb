@@ -215,7 +215,6 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_difference('Publication.count', 3) do
       post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/publications.bibtex'), project_ids: [projects(:one).id] } }
-
     end
 
     publication0 = Publication.where(title: publications[0][:title]).first
@@ -244,6 +243,16 @@ class PublicationsControllerTest < ActionController::TestCase
       assert_select 'strong', text: 'Date Published:'
       assert_select 'span', text: /2013/, count: 1
       assert_select 'span', text: /Jan.* 2013/, count: 0
+    end
+  end
+
+  test 'should check the correctness of bibtex files' do
+    assert_difference('Publication.count', 0) do
+      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/inproceedings_no_booktitle.bib'), project_ids: [projects(:one).id] } }
+      assert_redirected_to publications_path
+      assert_includes flash[:error], 'An InProceedings needs to have a booktitle.'
+      assert_includes flash[:error], 'Please check your bibtex files, each publication should contain a title or a chapter name.'
+      assert_includes flash[:error], 'An InCollection needs to have a booktitle.'
     end
   end
 

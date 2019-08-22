@@ -555,13 +555,15 @@ class Publication < ApplicationRecord
 
   def check_bibtex_file (bibtex_record)
 
+    Rails.logger.info("publication_type:"+ self.publication_type.title)
+
     if self.title.blank?
       errors.add(:base, "Please check your bibtex files, each publication should contain a title or a chapter name.")
       return false
     end
 
-    if self.publication_type.is_inproceedings? && bibtex_record[:booktitle].nil?
-        errors.add(:base, "An InProceedings needs to have a booktitle.")
+    if (%w[InCollection InProceedings].include? self.publication_type.title) && (bibtex_record[:booktitle].blank?)
+        errors.add(:base, "An #{self.publication_type.title} needs to have a booktitle.")
         return false
     end
 
