@@ -292,6 +292,9 @@ class DocumentsControllerTest < ActionController::TestCase
     # check the project form exists, studies and assays don't have this
     assert_select 'div#add_projects_form', count:1
 
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 

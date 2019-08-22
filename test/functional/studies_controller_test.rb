@@ -610,6 +610,9 @@ class StudiesControllerTest < ActionController::TestCase
     #shouldn't be a projects block
     assert_select 'div#add_projects_form', count:0
 
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
     #no sharing link, not for Investigation, Study and Assay
     assert_select 'div#temporary_links', count:0
 
