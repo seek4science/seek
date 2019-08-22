@@ -98,7 +98,7 @@ module BootstrapHelper
 
   # A dropdown menu for admin commands. Will not display if the content is blank.
   # (Saves having to check privileges twice)
-  def item_actions_dropdown(text = t('actions_button'), icon = 'manage')
+  def item_actions_dropdown(text = t('actions_button'), icon = 'actions')
     opts = capture do
       yield
     end
