@@ -910,17 +910,17 @@ class SopsControllerTest < ActionController::TestCase
   test 'permission popup setting set in sharing form' do
     sop = Factory :sop, contributor: User.current_user.person
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_ON_CHANGE do
-      get :edit, params: { id: sop }
+      get :manage, params: { id: sop }
     end
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "on_change"/, count: 1
 
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_ALWAYS do
-      get :edit, params: { id: sop }
+      get :manage, params: { id: sop }
     end
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "always"/, count: 1
 
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_NEVER do
-      get :edit, params: { id: sop }
+      get :manage, params: { id: sop }
     end
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "never"/, count: 1
   end

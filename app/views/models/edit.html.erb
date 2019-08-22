@@ -30,7 +30,6 @@
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
 
       <div>
-        <%= preview_permission_popup_link(@model)-%>
         <%= f.submit "Update", :id => "model_submit_btn",
                      :onclick => "return validateResourceFields('model')",
                      :class => 'btn btn-primary' -%>

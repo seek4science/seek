@@ -28,7 +28,6 @@
       <%= fancy_multiselect @sop, :workflows, { other_projects_checkbox: false } if Seek::Config.workflows_enabled -%>
 
       <div>
-        <%= preview_permission_popup_link(@sop)-%>
         <%= f.submit "Update", :id => "sop_submit_btn",
                      :onclick => "return validateResourceFields('sop')",
                      :class => 'btn btn-primary' -%>

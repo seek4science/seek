@@ -63,7 +63,7 @@
          button_text=@new ? "Create" : "Update"
          disabled_text=@new ? "Creating..." : "Updating..."
       %>
-      <% if @event.can_manage? %>
+      <% if @event.can_manage?  && show_form_manage_specific_attributes? %>
           <%= preview_permission_popup_link(@event)-%>
           <%= f.submit button_text, :id => "event_submit_btn",
                        :onclick => "javascript: previewPermissions();return(false);", :class => 'btn btn-primary' -%>

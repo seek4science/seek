@@ -24,7 +24,6 @@
       <%= fancy_multiselect @document, :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
 
       <div>
-        <%= preview_permission_popup_link(@document)-%>
         <%= f.submit "Update", :id => "document_submit_btn",
                      :onclick => "return validateResourceFields('document');",
                      :class => 'btn btn-primary' -%>

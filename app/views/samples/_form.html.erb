@@ -23,7 +23,7 @@
       <%= render :partial => "assets/asset_form_bottom", :locals=>{:f=>f,attribution_enable:false,show_publications:false,sharing_link:false} %>
     <% end %>
   </div>
-  <%= preview_permission_popup_link(@sample)-%>
+  <%= preview_permission_popup_link(@sample) if show_form_manage_specific_attributes? %>
 
   <%= f.submit (@sample.new_record? ? "Create" : "Update"), :class => 'btn btn-primary',:id=>'sample_submit_btn',disabled:@sample.sample_type.nil? %>
     or
