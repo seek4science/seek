@@ -569,14 +569,14 @@ class Publication < ApplicationRecord
 
     unless %w[Booklet Manual Misc Proceedings].include? self.publication_type.title
       if bibtex_record[:author].nil? && self.editor.nil?
-        self.errors.add(:base,'You need at least one author or editor for your publication.')
+        self.errors.add(:base, "You need at least one author or editor for the #{self.publication_type.title}.")
         return false
       end
     end
 
     if self.publication_type.is_phd_thesis? || self.publication_type.is_masters_thesis?
       if bibtex_record[:school].try(:to_s).nil?
-        self.errors.add(:base,'A thesis needs to have a school.')
+        self.errors.add(:base,"A #{self.publication_type.title} needs to have a school.")
         return false
       end
     end

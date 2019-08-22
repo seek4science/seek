@@ -248,11 +248,14 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should check the correctness of bibtex files' do
     assert_difference('Publication.count', 0) do
-      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/inproceedings_no_booktitle.bib'), project_ids: [projects(:one).id] } }
+      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/error_bibtex.bib'), project_ids: [projects(:one).id] } }
       assert_redirected_to publications_path
       assert_includes flash[:error], 'An InProceedings needs to have a booktitle.'
       assert_includes flash[:error], 'Please check your bibtex files, each publication should contain a title or a chapter name.'
       assert_includes flash[:error], 'An InCollection needs to have a booktitle.'
+      assert_includes flash[:error], 'A Phd Thesis needs to have a school.'
+      assert_includes flash[:error], 'A Masters Thesis needs to have a school.'
+      assert_includes flash[:error], 'You need at least one author or editor for the Journal.'
     end
   end
 
