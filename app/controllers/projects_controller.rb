@@ -164,6 +164,7 @@ class ProjectsController < ApplicationController
     @project = Project.new(project_params)
     @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
 
+
     respond_to do |format|
       if @project.save
         if params[:default_member] && params[:default_member][:add_to_project] && params[:default_member][:add_to_project] == '1'
@@ -173,6 +174,19 @@ class ProjectsController < ApplicationController
           person.is_project_administrator = true, @project
           disable_authorization_checks { person.save }
         end
+        members = params[:project][:members]
+        if members.nil?
+          members = []
+        end
+        members.each { | member|
+          person = Person.find(member[:person_id])
+          institution = Institution.find(member[:institution_id])
+          unless person.nil? || institution.nil?
+            person.add_to_project_and_institution(@project, institution)
+            person.save!
+          end
+        }
+        update_administrative_roles
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
         # format.json {render json: @project, adapter: :json, status: 200 }
@@ -196,6 +210,7 @@ class ProjectsController < ApplicationController
             ProjectChangedEmailJob.new(@project).queue_job
           end
           expire_resource_list_item_content
+          @project.reload
           flash[:notice] = "#{t('project')} was successfully updated."
           format.html { redirect_to(@project) }
           format.xml  { head :ok }
@@ -317,7 +332,11 @@ class ProjectsController < ApplicationController
 
   def project_role_params
     params[:project].keys.each do |k|
-      params[:project][k] = params[:project][k].split(',')
+      unless params[:project][k].nil? then
+        params[:project][k] = params[:project][k].split(',')
+      else
+        params[:project][k] = []
+      end
     end
 
     params.require(:project).permit({ project_administrator_ids: [] },
@@ -327,9 +346,13 @@ class ProjectsController < ApplicationController
   end
 
   def project_params
-    permitted_params = [:title, :web_page, :wiki_page, :description, :programme_id, { organism_ids: [] },
+    permitted_params = [:title, :web_page, :wiki_page, :description, :programme_id, { organism_ids: [] }, {:members => [[:person_id, :institution_id]]},
                         { institution_ids: [] }, :default_license, :site_root_uri, :site_username, :site_password,
-                        :parent_id, :use_default_policy, :nels_enabled, :start_date, :end_date, :funding_codes]
+                        :parent_id, :use_default_policy, :default_policy, :nels_enabled, :start_date, :end_date, :funding_codes,
+                        { project_administrator_ids: [] },
+                        { asset_gatekeeper_ids: [] },
+                        { asset_housekeeper_ids: [] },
+                        { pal_ids: [] } ]
 
     if action_name == 'update'
       restricted_params =
@@ -337,7 +360,13 @@ class ProjectsController < ApplicationController
           site_username: User.admin_logged_in?,
           site_password: User.admin_logged_in?,
           nels_enabled: User.admin_logged_in?,
-          institution_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)) }
+          institution_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
+          members: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
+          project_administrator_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
+          asset_gatekeeper_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
+          asset_housekeeper_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
+          pal_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user))
+        }
       restricted_params.each do |param, allowed|
         permitted_params.delete(param) if params[:project] && !allowed
       end

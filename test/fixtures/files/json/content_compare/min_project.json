@@ -8,10 +8,25 @@
       "description": null,
       "web_page": null,
       "wiki_page": null,
-      "default_license": "CC-BY-4.0"
+      "default_license": "CC-BY-4.0",
+      "members": null,
+      "start_date": null,
+      "end_date": null
     },
     "relationships": {
       "organisms": {
+        "data": []
+      },
+      "pals": {
+        "data": []
+      },
+      "project_administrators": {
+        "data": []
+      },
+      "asset_housekeepers": {
+        "data": []
+      },
+      "asset_gatekeepers": {
         "data": []
       },
       "people": {

@@ -8,10 +8,36 @@
       "description": "A Taverna project",
       "web_page": "http://www.taverna.org.uk",
       "wiki_page": "http://www.mygrid.org.uk",
-      "default_license": "Other (Open)"
+      "default_license": "Other (Open)",
+      "default_policy": {
+        "access": "no_access",
+        "permissions": []
+      },
+      "members": [
+        {"person_id" : "1039987007", "institution_id" : "980191501"},
+        {"person_id" : "1039987008", "institution_id" : "980191503"},
+        {"person_id" : "1039987009", "institution_id" : "980191505"},
+        {"person_id" : "1039987010", "institution_id" : "980191507"},
+        {"person_id" : "1039987011", "institution_id" : "980191509"}
+      ],
+      "start_date" : "2010-01-01",
+      "end_date" : "2014-06-21",
+      "use_default_policy" : true
     },
     "relationships": {
       "organisms": {
+        "data": []
+      },
+      "pals": {
+        "data": []
+      },
+      "project_administrators": {
+        "data": []
+      },
+      "asset_housekeepers": {
+        "data": []
+      },
+      "asset_gatekeepers": {
         "data": []
       },
       "people": {
