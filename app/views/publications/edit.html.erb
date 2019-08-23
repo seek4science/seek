@@ -6,8 +6,9 @@
     <%# if @publication.registered_mode == 3 || @publication.registered_mode == 4 %>
       <%= render :partial => 'publicaiton_editor', :locals => { :publication_form => f }%>
     <%# end %>
+  
+  <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => Seek::Config.is_virtualliver } %>
 
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => Seek::Config.is_virtualliver }%>
 
         <div class="form-group">
           <label>Abstract</label>

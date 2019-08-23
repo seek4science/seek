@@ -9,7 +9,7 @@
   collapsed = existing_creators.blank? if collapsed.nil?
 %>
 
-<%= folding_panel(t('creator').capitalize.pluralize, collapsed, :body_options => {:id => 'creator_fold_content'},
+<%= folding_panel(t('creator').capitalize.pluralize, collapsed, :id=>'author_form',:body_options => {:id => 'creator_fold_content'},
                   :help_text => "Here you attribute this #{resource_type_text} to other people.") do %>
   <p>
     If this <%= resource_type_text %> was created, by or together with, other members, please list their names below.

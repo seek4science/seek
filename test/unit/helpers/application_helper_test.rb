@@ -32,7 +32,7 @@ class ApplicationHelperTest < ActionView::TestCase
       assert_match(/http:\/\/localhost:3000\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last.children.first.content)
 
       # handles sub uri
-      with_config_value(:site_base_host,'http://seek.org/fish') do
+      with_config_value(:site_base_host, 'http://seek.org/fish') do
         html = persistent_resource_id(assay)
         blocks = Nokogiri::HTML::DocumentFragment.parse(html).children.first.children
         assert_equal 'strong', blocks.first.name
@@ -53,11 +53,11 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   def test_join_with_and
-    assert_equal 'a, b and c', join_with_and(%w(a b c))
+    assert_equal 'a, b and c', join_with_and(%w[a b c])
     assert_equal 'a', join_with_and(['a'])
-    assert_equal 'a, b, c and d', join_with_and(%w(a b c d))
-    assert_equal 'a and b', join_with_and(%w(a b))
-    assert_equal 'a: b: c and d', join_with_and(%w(a b c d), ': ')
+    assert_equal 'a, b, c and d', join_with_and(%w[a b c d])
+    assert_equal 'a and b', join_with_and(%w[a b])
+    assert_equal 'a: b: c and d', join_with_and(%w[a b c d], ': ')
   end
 
   test 'instance of resource_type' do
@@ -92,9 +92,9 @@ class ApplicationHelperTest < ActionView::TestCase
     with_config_value :css_appended, 'fish' do
       with_config_value :css_prepended, 'apple' do
         tags = seek_stylesheet_tags 'carrot'
-        assert_includes tags, "<link rel=\"stylesheet\" media=\"screen\" href=\"/stylesheets/prepended/apple.css\" />"
-        assert_includes tags, "<link rel=\"stylesheet\" media=\"screen\" href=\"/stylesheets/carrot.css\" />"
-        assert_includes tags, "<link rel=\"stylesheet\" media=\"screen\" href=\"/stylesheets/appended/fish.css\" />"
+        assert_includes tags, '<link rel="stylesheet" media="screen" href="/stylesheets/prepended/apple.css" />'
+        assert_includes tags, '<link rel="stylesheet" media="screen" href="/stylesheets/carrot.css" />'
+        assert_includes tags, '<link rel="stylesheet" media="screen" href="/stylesheets/appended/fish.css" />'
         assert tags.index('fish.css') > tags.index('carrot.css')
         assert tags.index('carrot.css') > tags.index('apple.css')
         refute_equal 0, tags.index('apple.css')
@@ -106,9 +106,9 @@ class ApplicationHelperTest < ActionView::TestCase
     with_config_value :javascript_appended, 'fish' do
       with_config_value :javascript_prepended, 'apple' do
         tags = seek_javascript_tags 'carrot'
-        assert_includes tags, "<script src=\"/javascripts/prepended/apple.js\"></script>"
-        assert_includes tags, "<script src=\"/javascripts/carrot.js\"></script>"
-        assert_includes tags, "<script src=\"/javascripts/appended/fish.js\"></script>"
+        assert_includes tags, '<script src="/javascripts/prepended/apple.js"></script>'
+        assert_includes tags, '<script src="/javascripts/carrot.js"></script>'
+        assert_includes tags, '<script src="/javascripts/appended/fish.js"></script>'
         assert tags.index('fish.js') > tags.index('carrot.js')
         assert tags.index('carrot.js') > tags.index('apple.js')
         refute_equal 0, tags.index('apple.js')
@@ -182,5 +182,22 @@ class ApplicationHelperTest < ActionView::TestCase
       File.delete(path)
       refute File.exist?(path)
     end
+  end
+
+  test 'show form manage attributes' do
+    @controller.action_name = 'edit'
+    refute show_form_manage_specific_attributes?
+
+    @controller.action_name = 'update'
+    refute show_form_manage_specific_attributes?
+
+    @controller.action_name = 'new'
+    assert show_form_manage_specific_attributes?
+
+    @controller.action_name = 'manage'
+    assert show_form_manage_specific_attributes?
+
+    @controller.action_name = 'create'
+    assert show_form_manage_specific_attributes?
   end
 end

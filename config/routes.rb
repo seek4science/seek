@@ -188,7 +188,6 @@ SEEK::Application.routes.draw do
       get :items
     end
     resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :only=>[:index]
-    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -306,6 +305,8 @@ SEEK::Application.routes.draw do
       post :publish
       get :published
       get :isa_children
+      get :manage
+      patch :manage_update
     end
   end
 
@@ -332,6 +333,8 @@ SEEK::Application.routes.draw do
       post :publish
       get :published
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:assays,:investigations,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:only=>[:index]
   end
@@ -369,6 +372,8 @@ SEEK::Application.routes.draw do
       get :published
       get :new_object_based_on_existing_one
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:strains,:organisms, :only=>[:index]
   end
@@ -425,6 +430,8 @@ SEEK::Application.routes.draw do
       get :destroy_samples_confirm
       post :retrieve_nels_sample_metadata
       get :retrieve_nels_sample_metadata
+      get :manage
+      patch :manage_update
     end
     resources :studied_factors do
       collection do
@@ -454,6 +461,8 @@ SEEK::Application.routes.draw do
       post :edit_version_comment
       delete :destroy_version
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:publications,:events,:only=>[:index]
   end
@@ -488,6 +497,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :model_images do
       collection do
@@ -522,6 +533,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :experimental_conditions do
       collection do
@@ -554,6 +567,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end
@@ -581,6 +596,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end
@@ -635,6 +652,10 @@ SEEK::Application.routes.draw do
       get :preview
       post :items_for_result
     end
+    member do
+      get :manage
+      patch :manage_update
+    end
     resources :people,:projects,:data_files,:publications,:presentations,:only=>[:index]
   end
 
@@ -655,6 +676,8 @@ SEEK::Application.routes.draw do
     end
     member do
       post :update_annotations_ajax
+      get :manage
+      patch :manage_update
     end
     resources :specimens,:assays,:people,:projects,:samples,:only=>[:index]
   end
@@ -695,6 +718,8 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples, only:[:index]
   end
@@ -747,6 +772,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:only=>[:index]
   end

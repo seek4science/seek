@@ -6,7 +6,7 @@ class AssaysController < ApplicationController
   before_action :assays_enabled?
 
   before_action :find_assets, :only=>[:index]
-  before_action :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show,:new_object_based_on_existing_one]
+  before_action :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :manage, :manage_update, :show, :new_object_based_on_existing_one]
 
   #project_membership_required_appended is an alias to project_membership_required, but is necessary to include the actions
   #defined in the application controller

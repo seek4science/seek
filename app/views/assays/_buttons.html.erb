@@ -1,24 +1,27 @@
-<% assay_word=item.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay') %>
-<%= render :partial => "subscriptions/subscribe", :locals => {:object => item }%>
+<% assay_word = item.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay') %>
+<%= render :partial => "subscriptions/subscribe", :locals => {:object => item} %>
 <% if logged_in_and_member? %>
-    <%= button_link_to("New #{assay_word} based on this one", 'new',  new_object_based_on_existing_one_assay_path(item,:controller_name=>"assays")) %>
-    <% if item.can_edit? %>
-        <%= button_link_to("Add #{t('data_file')}",'add',new_data_file_path("assay_ids[]":item.id)) %>
-        <% if item.is_modelling? %>
-            <%= button_link_to("Add #{t('model')}",'add',new_model_path("assay_ids[]":item.id)) %>
-        <% end %>
+  <%= button_link_to("New #{assay_word} based on this one", 'new', new_object_based_on_existing_one_assay_path(item, :controller_name => "assays")) %>
+  <% if item.can_edit? %>
+    <%= button_link_to("Add #{t('data_file')}", 'add', new_data_file_path("assay_ids[]": item.id)) %>
+    <% if item.is_modelling? %>
+      <%= button_link_to("Add #{t('model')}", 'add', new_model_path("assay_ids[]": item.id)) %>
     <% end %>
+  <% end %>
 <% end %>
 <% if show_nels_button?(item) %>
-    <%= button_link_to('Add data from NeLS', 'add', assay_nels_path(item.id)) %>
+  <%= button_link_to('Add data from NeLS', 'add', assay_nels_path(item.id)) %>
 <% end -%>
 
 <%= item_actions_dropdown do %>
-    <% if item.can_manage? -%>
-        <li><%= icon_link_to("Manage #{assay_word}", 'manage', edit_assay_path) %></li>
-        <%= render :partial => 'snapshots/new_snapshot_link', :locals => { :item => item } %>
-    <% elsif item.can_edit?-%>
-        <li><%= icon_link_to("Edit #{assay_word} Details", 'edit', edit_assay_path) %></li>
-    <% end -%>
-    <%= delete_icon(item,current_user) %>
+  <% if item.can_edit? %>
+    <li><%= image_tag_for_key('edit', edit_assay_path(item), "Edit #{assay_word}", nil, "Edit #{assay_word}") -%></li>
+  <% end %>
+
+  <% if item.can_manage? -%>
+    <li><%= image_tag_for_key('manage', manage_assay_path(item), "Manage #{assay_word}", nil, "Manage #{assay_word}") -%></li>
+    <%= render :partial => 'snapshots/new_snapshot_link', :locals => {:item => item} %>
+  <% end -%>
+
+  <%= delete_icon(item, current_user) %>
 <% end %>

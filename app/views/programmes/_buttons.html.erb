@@ -1,7 +1,7 @@
 <%= item_actions_dropdown do %>
     <% if item.can_manage? -%>
 
-        <li><%= image_tag_for_key('manage', edit_programme_path(item), "Manage #{t('programme')}", nil, "Manage #{t('programme')}") %></li>
+        <li><%= image_tag_for_key('edit', edit_programme_path(item), "Edit #{t('programme')}", nil, "Edit #{t('programme')}") %></li>
 
         <% if item.is_activated? && can_create_projects? %>
             <li><%= image_tag_for_key('add',new_project_path(programme_id:item.id),"Create a #{t('project')}",nil, "Create a #{t('project')}") %></li>
