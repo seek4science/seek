@@ -21,18 +21,18 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   def test_latest_limit
-    assert_equal Seek::Config.limit_latest, Person.latest_limit
-    assert_equal Seek::Config.limit_latest, Project.latest_limit
-    assert_equal Seek::Config.limit_latest, Institution.latest_limit
-    assert_equal Seek::Config.limit_latest, Investigation.latest_limit
-    assert_equal Seek::Config.limit_latest, Study.latest_limit
-    assert_equal Seek::Config.limit_latest, Assay.latest_limit
-    assert_equal Seek::Config.limit_latest, DataFile.latest_limit
-    assert_equal Seek::Config.limit_latest, Model.latest_limit
-    assert_equal Seek::Config.limit_latest, Sop.latest_limit
-    assert_equal Seek::Config.limit_latest, Publication.latest_limit
-    assert_equal Seek::Config.limit_latest, Event.latest_limit
-    assert_equal Seek::Config.limit_latest, Strain.latest_limit
+    assert_equal Seek::Config.limit_latest, Person.page_limit
+    assert_equal Seek::Config.limit_latest, Project.page_limit
+    assert_equal Seek::Config.limit_latest, Institution.page_limit
+    assert_equal Seek::Config.limit_latest, Investigation.page_limit
+    assert_equal Seek::Config.limit_latest, Study.page_limit
+    assert_equal Seek::Config.limit_latest, Assay.page_limit
+    assert_equal Seek::Config.limit_latest, DataFile.page_limit
+    assert_equal Seek::Config.limit_latest, Model.page_limit
+    assert_equal Seek::Config.limit_latest, Sop.page_limit
+    assert_equal Seek::Config.limit_latest, Publication.page_limit
+    assert_equal Seek::Config.limit_latest, Event.page_limit
+    assert_equal Seek::Config.limit_latest, Strain.page_limit
   end
 
   def test_paginate_no_options
@@ -122,7 +122,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   def test_default_page_accessor
-    assert Person.default_page == 'latest' || Person.default_page == 'all'
+    assert Person.default_page == 'top' || Person.default_page == 'all'
   end
 
   def test_extra_condition_as_array_direct
@@ -227,11 +227,11 @@ class GroupedPaginationTest < ActiveSupport::TestCase
       item2 = Factory(type, updated_at: 1.second.ago)
 
       klass = type.to_s.camelize.constantize
-      latest_items = klass.paginate_after_fetch(klass.default_order, order: :updated_at_desc)
-      assert latest_items.index(item2) < latest_items.index(item1), "#{type} out of order when explicit ordering"
+      latest_items = klass.paginate_after_fetch(klass.all, order: 'updated_at DESC')
+      assert latest_items.index { |i| i.id == item2.id } < latest_items.index { |i| i.id == item1.id }, "#{type} out of order when explicit ordering"
 
-      latest_items = klass.paginate_after_fetch(klass.default_order, page: 'latest')
-      assert latest_items.index(item2) < latest_items.index(item1), "#{type} out of order when implicit ordering"
+      latest_items = klass.paginate_after_fetch(klass.all, page: 'top')
+      assert latest_items.index { |i| i.id == item2.id } < latest_items.index { |i| i.id == item1.id }, "#{type} out of order when implicit ordering"
     end
   end
 

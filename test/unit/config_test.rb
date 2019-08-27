@@ -249,15 +249,15 @@ class ConfigTest < ActiveSupport::TestCase
   end
   # pagination
   test 'default page' do
-    assert_equal 'latest', Seek::Config.default_page('sops')
+    assert_equal 'top', Seek::Config.default_page('sops')
   end
 
   test 'change default page' do
-    assert_equal 'latest', Seek::Config.default_page('models')
+    assert_equal 'top', Seek::Config.default_page('models')
     Seek::Config.set_default_page 'models', 'all'
     assert_equal 'all', Seek::Config.default_page('models')
     # seem to have to put it back else other tests fail later:
-    Seek::Config.set_default_page 'models', 'latest'
+    Seek::Config.set_default_page 'models', 'top'
   end
 
   test 'limit_latest' do

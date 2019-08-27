@@ -14,7 +14,7 @@
         <div class="form-group index-page-setting">
           <label><%= type[0] -%></label>
           <div class="btn-group" data-toggle="buttons">
-            <% ['latest', 'all'].each do |option| %>
+            <% ['top', 'all'].each do |option| %>
                 <% checked = Seek::Config.default_page(type[1]) == option %>
                 <label class="btn btn-default <%= 'active'.html_safe if checked -%>">
                   <%= radio_button_tag(type[1], option, checked) %> <%= option.capitalize -%>

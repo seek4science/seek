@@ -122,11 +122,11 @@ def load_seek_config_defaults!
   Seek::Config.default :is_virtualliver, false
 
 # Pagination
-  Seek::Config.default :default_pages,{people: 'latest', projects: 'latest', institutions: 'latest',
-                                                  investigations: 'latest',studies: 'latest', assays: 'latest',
-                                                  data_files: 'latest', models: 'latest',sops: 'latest',
-                                                  publications: 'latest',events: 'latest', strains: 'latest',
-                                                  presentations: 'latest', documents: 'latest', programmes: 'latest'}
+  Seek::Config.default :default_pages,{people: 'top', projects: 'top', institutions: 'top',
+                                                  investigations: 'top',studies: 'top', assays: 'top',
+                                                  data_files: 'top', models: 'top',sops: 'top',
+                                                  publications: 'top',events: 'top', strains: 'top',
+                                                  presentations: 'top', documents: 'top', programmes: 'top'}
 
   Seek::Config.default :limit_latest,7
 

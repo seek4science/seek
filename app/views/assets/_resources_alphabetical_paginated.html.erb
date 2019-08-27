@@ -14,6 +14,6 @@
 </div>
 
 
-<% if objects.respond_to?(:page) && objects.page == "latest" && visible_total > Seek::Config.limit_latest %>
+<% if objects.respond_to?(:page) && objects.page == "top" && visible_total > Seek::Config.limit_latest %>
     <%= render :partial => "general/paginate_see_all", :locals => {:visible_total => visible_total} %>
 <% end %>

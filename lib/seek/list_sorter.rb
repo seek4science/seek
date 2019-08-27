@@ -47,8 +47,8 @@ module Seek
     # sort items for an index by the given sort parameter, or the default for its type
     def self.index_items(items, order = nil)
       return if items.empty?
-      if order && ORDER_OPTIONS[order]
-        sort_by_field(items, ORDER_OPTIONS[order][:order])
+      if order
+        sort_by_field(items, order)
       else
         sort_by_field(items, sort_field(items.first.class.name, :index))
       end
@@ -106,9 +106,16 @@ module Seek
       end
     end
 
+    def self.sort_key(type_name, view)
+      (RULES[type_name] || RULES['Other'])[:defaults][view] || RULES['Other'][:defaults][view]
+    end
+
+    def self.sort_value(key)
+      ORDER_OPTIONS[key][:order] if ORDER_OPTIONS.key?(key)
+    end
+
     def self.sort_field(type_name, view)
-      key = (RULES[type_name] || RULES['Other'])[:defaults][view] || RULES['Other'][:defaults][view]
-      ORDER_OPTIONS[key][:order]
+      self.sort_value(self.sort_key(type_name, view))
     end
   end
 end
