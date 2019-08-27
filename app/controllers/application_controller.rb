@@ -450,6 +450,7 @@ class ApplicationController < ActionController::Base
     end
 
     filters = permitted_filters(filters).to_unsafe_h
+    @filters = filters
 
     if filters.size > 0
       params[:page] ||= 'all'
