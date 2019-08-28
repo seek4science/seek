@@ -49,6 +49,7 @@ module Seek
       # Paginate an ActiveRecord::Relation
       def paginate_relation(relation, *args)
         as_paginated_collection(*args) do |page_totals, page, order, limit, options|
+          relation = relation.where(options[:conditions]) if options.key?(:conditions)
           sql_order = Seek::ListSorter.strategy_for_relation(order)
 
           if page == 'top'
@@ -56,17 +57,15 @@ module Seek
           elsif page == 'all'
             records = relation.order(sql_order)
           elsif @pages.include?(page)
-            query_options = { conditions: options[:conditions] }
-            query_options.merge!(options.except(:conditions, :page, :default_page))
-            records = relation.where(@field.to_s => page).where(query_options[:conditions]).order(sql_order)
+            records = relation.where(@field.to_s => page).order(sql_order)
           else
             records = []
           end
 
+          # GROUP BY and COUNT to get page totals quickly
+          groups = relation.select(@field).reorder('').group(@field).count
           @pages.each do |p|
-            query_options = [conditions: options[:conditions]]
-            query_options[0].merge!(options.except(:conditions, :page, :default_page))
-            page_totals[p] = relation.where(@field.to_s => p).where(query_options[0][:conditions]).count
+            page_totals[p] = groups[p] || 0
           end
 
           records = records.to_a
