@@ -7,13 +7,7 @@ module Seek
       unless view_context.index_with_facets?(controller) && params[:user_enable_facet] == 'true'
         model_class = controller_name.classify.constantize
         objects = eval("@#{controller}")
-        if (request.format == 'json' && params[:page].nil?)
-          params[:page] = 'all'
-        else
-          objects = model_class.paginate_after_fetch(objects,
-                                                     page: params[:page],
-                                                     order: Seek::ListSorter.sort_value(params[:order])) unless objects.respond_to?('page_totals')
-        end
+        objects = model_class.paginate_after_fetch(objects, page_and_sort_params) unless objects.respond_to?('page_totals')
         instance_variable_set("@#{controller}", objects)
       end
       respond_to do |format|

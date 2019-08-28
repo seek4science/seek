@@ -286,4 +286,28 @@ class GroupedPaginationTest < ActiveSupport::TestCase
       assert pageA_items.index(item1) < pageA_items.index(item2)
     end
   end
+
+  test 'ensure pagination works the same for relations and arrays' do
+    check_both_pagination_methods(DataFile.all, page: 'A')
+    check_both_pagination_methods(DataFile.all, page: 'top', order: 'title asc')
+    check_both_pagination_methods(DataFile.all, page: 'top', order: 'title desc')
+    check_both_pagination_methods(Publication.all)
+    check_both_pagination_methods(Person.all)
+    check_both_pagination_methods(Person.all)
+    check_both_pagination_methods(Project.all)
+    check_both_pagination_methods(Project.all, page: 'Z')
+    check_both_pagination_methods(Investigation.all, page: 'banana')
+    check_both_pagination_methods(Investigation.all, page: 'top')
+  end
+
+  private
+
+  def check_both_pagination_methods(relation, opts = {})
+    klass = relation.klass
+    as_relation = klass.paginate_after_fetch(relation, opts)
+    as_array = klass.paginate_after_fetch(relation.to_a, opts)
+
+
+    assert_equal as_relation.map(&:id), as_array.map(&:id), "Mismatch for class #{klass.name} with opts: #{opts.inspect}"
+  end
 end

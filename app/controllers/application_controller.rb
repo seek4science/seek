@@ -130,8 +130,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  private
-
   def project_membership_required
     unless User.logged_in_and_member? || admin_logged_in?
       flash[:error] = 'Only members of known projects, institutions or work groups are allowed to create new content.'
@@ -580,5 +578,19 @@ class ApplicationController < ActionController::Base
 
   def param_converter_options
     {}
+  end
+
+  def page_and_sort_params
+    p = params.permit(:page, :sort, :order)
+    if p[:sort]
+      # TODO: This needs sanitizing, or can be used for SQL injection...
+      #p[:order] = Seek::ListSorter.json_api_sort_fields(params[:sort])
+    elsif params[:order]
+      p[:order] = Seek::ListSorter.sort_value(params[:order])
+    end
+
+    p[:page] ||= 'all' if json_api_request?
+
+    p
   end
 end

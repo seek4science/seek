@@ -54,17 +54,14 @@ module Seek
       end
     end
 
-    def self.json_api_sort(items, sort)
-      fields = sort.split(',').map do |field|
+    def self.json_api_sort_fields(sort)
+      sort.split(',').map do |field|
         if field.start_with?('-')
-          field = field[1..-1]
           "#{field[1..-1]} desc"
         else
           field
         end
       end.join(', ')
-
-      sort_by_field(items, fields)
     end
 
     # Sort an array with SQL-style order by clauses, e.g.:
@@ -98,7 +95,7 @@ module Seek
                 elsif y.nil?
                   -1
                 else
-                  (x <=> y) * direction  # A direction of -1 inverts the sorting.
+                  (x.is_a?(String) ? x.casecmp(y) : x <=> y) * direction  # A direction of -1 inverts the sorting.
                 end
           break if val != 0
         end

@@ -34,7 +34,7 @@ module Seek
         if collection.is_a?(ActiveRecord::Relation)
           paginate_relation(collection, *args)
         else
-          paginate_collection(collection, *args)
+          paginate_enumerable(collection, *args)
         end
       end
 
@@ -68,8 +68,8 @@ module Seek
         end
       end
 
-      # Paginate a collection that hopefully includes Enumerable
-      def paginate_collection(collection, *args)
+      # Paginate an Enumerable
+      def paginate_enumerable(collection, *args)
         as_paginated_collection(*args) do |page_totals, page, order, limit|
           @pages.each do |p|
             page_totals[p] = collection.count { |i| i.first_letter == p }

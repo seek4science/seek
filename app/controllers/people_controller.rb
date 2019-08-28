@@ -36,10 +36,6 @@ class PeopleController < ApplicationController
       @people = @people.reject { |p| (p.group_memberships & @project_position.group_memberships).empty? }
     end
 
-    if (request.format == 'json' && params[:page].nil?)
-      params[:page] = 'all'
-    end
-
     if @people
       @people = @people.select(&:can_view?)
     else
@@ -47,9 +43,7 @@ class PeopleController < ApplicationController
       @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
 
       unless view_context.index_with_facets?('people') && params[:user_enable_facet] == 'true'
-        @people = Person.paginate_after_fetch(@people,
-                                              page: params[:page],
-                                              order: Seek::ListSorter.sort_value(params[:order]))
+        @people = Person.paginate_after_fetch(@people, page_and_sort_params)
       end
     end
 
