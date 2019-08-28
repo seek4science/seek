@@ -673,14 +673,14 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should update page limit_latest when changing the setting from admin' do
-    assert_equal 'latest', Seek::Config.default_pages[:people]
+    assert_equal 'top', Seek::Config.default_pages[:people]
     assert_not_equal 5, Seek::Config.limit_latest
 
     Seek::Config.limit_latest = 5
     get :index
     assert_response :success
     assert_select '.pagination li.active' do
-      assert_select 'a[href=?]', people_path(page: 'latest')
+      assert_select 'a[href=?]', people_path(page: 'top')
     end
     assert_select 'div.list_item_title', count: 5
   end

@@ -769,11 +769,11 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should update page pagination when changing the setting from admin' do
-    assert_equal 'latest', Seek::Config.default_pages[:publications]
+    assert_equal 'top', Seek::Config.default_pages[:publications]
     get :index
     assert_response :success
     assert_select '.pagination li.active' do
-      assert_select 'a[href=?]', publications_path(page: 'latest')
+      assert_select 'a[href=?]', publications_path(page: 'top')
     end
 
     # change the setting

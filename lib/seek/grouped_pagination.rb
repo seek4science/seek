@@ -20,9 +20,8 @@ module Seek
       def grouped_pagination(options = {})
         @pages = options[:pages] || ('A'..'Z').to_a + ['?']
         @field = options[:field] || 'first_letter'
-        @page_limit = options[:limit] || Seek::Config.limit_latest
-        @default_page = options[:default_page] || Seek::Config.default_page(name.underscore.pluralize) || 'all'
-        @default_page = 'top' if @default_page == 'latest'
+        @page_limit = options[:limit]
+        @default_page = options[:default_page]
 
         before_save :update_first_letter
 
@@ -96,16 +95,20 @@ module Seek
         options = args.pop unless args.nil?
         options ||= {}
 
-        limit = options[:limit] || @page_limit
-        default_page = options[:default_page] || @default_page
+        limit = options[:limit] || @page_limit || Seek::Config.limit_latest
+
+        default_page = options[:default_page] || @default_page || Seek::Config.default_page(name.underscore.pluralize) || 'all'
         default_page = @pages.first if default_page == 'first'
+        default_page = 'top' if default_page == 'latest'
+
         page = options[:page] || default_page
+
         order = options[:order] || Seek::ListSorter.sort_field(name, :index)
         order = Seek::ListSorter.sort_value(:updated_at_desc) if !options.key?(:order) && page == 'top'
 
         page_totals = {}
 
-        records = block.call(page_totals, page, order, limit, options)
+        records = yield(page_totals, page, order, limit, options)
 
         # If there isn't anything on this page, go to the first page that has something (if there is one).
         if records.empty? && options[:page].nil?

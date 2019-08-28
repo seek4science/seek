@@ -477,7 +477,7 @@ class ProjectTest < ActiveSupport::TestCase
     project1 = Factory(:project, title: 'C', updated_at: 2.days.ago)
     project2 = Factory(:project, title: 'B', updated_at: 1.days.ago)
 
-    latest_projects = Project.paginate_after_fetch([project1, project2], page: 'latest')
+    latest_projects = Project.paginate_after_fetch([project1, project2], page: 'top')
     assert_equal project2, latest_projects.first
   end
 
