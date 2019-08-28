@@ -49,12 +49,8 @@ module Seek
       # Paginate an ActiveRecord::Relation
       def paginate_relation(relation, *args)
         as_paginated_collection(*args) do |page_totals, page, order, limit, options|
-          # The following fixes an inconsistency between sorting relations and enumerables.
-          # If, for example, you are sorting a relation by title, and multiple records have the same title, SQL will
-          # order the duplicates  most recent -> oldest.
-          # If you were sorting an enumerable however, it's likely it was already ordered oldest -> most recent, and
-          # thus will sort duplicates the same way.
-          sql_order = order + ', id asc'
+          sql_order = Seek::ListSorter.strategy_for_relation(order)
+
           if page == 'top'
             records = relation.order(sql_order).limit(limit)
           elsif page == 'all'
@@ -115,8 +111,8 @@ module Seek
 
         page = options[:page] || def_page
 
-        order = options[:order] || Seek::ListSorter.sort_field(name, :index)
-        order = Seek::ListSorter.sort_value(:updated_at_desc) if !options.key?(:order) && page == 'top'
+        order = options[:order] || Seek::ListSorter.order_for_view(name, :index)
+        order = Seek::ListSorter.order_from_key(:updated_at_desc) if !options.key?(:order) && page == 'top'
 
         page_totals = {}
 

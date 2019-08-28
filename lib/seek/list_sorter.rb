@@ -40,7 +40,7 @@ module Seek
       return if resource_hash.empty?
 
       resource_hash.each do |key, res|
-        sort_by_field(res[:items], sort_field(key, :related))
+        sort_by_order(res[:items], order_for_view(key, :related))
       end
     end
 
@@ -48,35 +48,61 @@ module Seek
     def self.index_items(items, order = nil)
       return if items.empty?
       if order
-        sort_by_field(items, order)
+        sort_by_order(items, order)
       else
-        sort_by_field(items, sort_field(items.first.class.name, :index))
+        sort_by_order(items, order_for_view(items.first.class.name, :index))
       end
     end
 
-    def self.json_api_sort_fields(sort)
-      sort.split(',').map do |field|
-        if field.start_with?('-')
-          "#{field[1..-1]} desc"
-        else
-          field
-        end
-      end.join(', ')
+    def self.sort_by_order(items, order)
+      items.sort!(&strategy_for_enum(order))
     end
 
-    # Sort an array with SQL-style order by clauses, e.g.:
-    # * `last_name`
-    # * `updated_at DESC`
-    # * `first_letter ASC, updated_at DESC`
-    def self.sort_by_field(items, fields)
+    def self.key_for_view(type_name, view)
+      (RULES[type_name] || RULES['Other'])[:defaults][view] || RULES['Other'][:defaults][view]
+    end
+
+    def self.order_from_key(key)
+      ORDER_OPTIONS[key][:order] if ORDER_OPTIONS.key?(key)
+    end
+
+    def self.order_from_json_api_sort(sort)
+      order = {}
+      sort.split(',').each do |field|
+        order[field.to_sym] = field.start_with?('-') ? :desc : :asc
+      end
+
+      order
+    end
+
+    def self.order_for_view(type_name, view)
+      self.order_from_key(self.key_for_view(type_name, view))
+    end
+
+    def self.strategy_for_relation(order)
+      # Turn string order into array of hash pairs to sanitize and avoid SQL injection
+      order = order.split(',').map do |f|
+        field, order = f.strip.split(' ')
+        [field => order&.match?(/desc/i) ? :desc : :asc]
+      end
+      # Note: The following fixes an inconsistency between sorting relations and enumerables.
+      # If, for example, you are sorting a relation by title, and multiple records have the same title, SQL will
+      # order the duplicates  most recent -> oldest.
+      # If you were sorting an enumerable however, it's likely it was already ordered oldest -> most recent, and
+      # thus will sort duplicates the same way.
+      order + [id: :asc]
+    end
+
+    def self.strategy_for_enum(order)
       # Create an array of pairs: [<field>, <sort direction>]
       # Direction 1 is ascending (default), -1 is descending
-      fields_and_directions = fields.split(',').map do |f|
+      fields_and_directions = order.split(',').map do |f|
         field, order = f.strip.split(' ')
         [field, order&.match?(/desc/i) ? -1 : 1]
       end
+      fields_and_directions << [:id, 1] # See above note
 
-      items.sort! do |a, b|
+      proc do |a, b|
         val = 0
         # For each pair, sort by the first field/direction.
         # If that sorting produces 0 (i.e. both are equal), try the next field until a non-zero value is returned,
@@ -95,24 +121,12 @@ module Seek
                 elsif y.nil?
                   -1
                 else
-                  (x.is_a?(String) ? x.casecmp(y) : x <=> y) * direction  # A direction of -1 inverts the sorting.
+                  (x.is_a?(String) && y.is_a?(String) ? x.casecmp(y) : x <=> y) * direction  # A direction of -1 inverts the sorting.
                 end
           break if val != 0
         end
         val
       end
-    end
-
-    def self.sort_key(type_name, view)
-      (RULES[type_name] || RULES['Other'])[:defaults][view] || RULES['Other'][:defaults][view]
-    end
-
-    def self.sort_value(key)
-      ORDER_OPTIONS[key][:order] if ORDER_OPTIONS.key?(key)
-    end
-
-    def self.sort_field(type_name, view)
-      self.sort_value(self.sort_key(type_name, view))
     end
   end
 end

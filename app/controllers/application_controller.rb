@@ -584,9 +584,9 @@ class ApplicationController < ActionController::Base
     p = params.permit(:page, :sort, :order)
     if p[:sort]
       # TODO: This needs sanitizing, or can be used for SQL injection...
-      #p[:order] = Seek::ListSorter.json_api_sort_fields(params[:sort])
+      p[:order] = Seek::ListSorter.order_from_json_api_sort(params[:sort])
     elsif params[:order]
-      p[:order] = Seek::ListSorter.sort_value(params[:order])
+      p[:order] = Seek::ListSorter.order_from_key(params[:order])
     end
 
     p[:page] ||= 'all' if json_api_request?

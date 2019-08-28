@@ -2,12 +2,12 @@ require 'test_helper'
 
 class ListSorterTest < ActiveSupport::TestCase
   test 'rules' do
-    assert_equal 'last_name, first_name', Seek::ListSorter.sort_field('Person', :index)
-    assert_equal 'title', Seek::ListSorter.sort_field('Sop', :index)
-    assert_equal 'title', Seek::ListSorter.sort_field('NewModelThatDoesntExist', :index)
-    assert_equal 'updated_at DESC', Seek::ListSorter.sort_field('NewModelThatDoesntExist', :related)
-    assert_equal 'published_date DESC', Seek::ListSorter.sort_field('Publication', :index)
-    assert_equal 'updated_at DESC', Seek::ListSorter.sort_field('Assay', :related)
+    assert_equal 'last_name, first_name', Seek::ListSorter.order_for_view('Person', :index)
+    assert_equal 'title', Seek::ListSorter.order_for_view('Sop', :index)
+    assert_equal 'title', Seek::ListSorter.order_for_view('NewModelThatDoesntExist', :index)
+    assert_equal 'updated_at DESC', Seek::ListSorter.order_for_view('NewModelThatDoesntExist', :related)
+    assert_equal 'published_date DESC', Seek::ListSorter.order_for_view('Publication', :index)
+    assert_equal 'updated_at DESC', Seek::ListSorter.order_for_view('Assay', :related)
 
     assert Seek::ListSorter::RULES.frozen?
   end
@@ -127,11 +127,11 @@ class ListSorterTest < ActiveSupport::TestCase
     carthage = Address.new(nil, 'Carthage')
     places = [beijing, nil_city, valhalla, shanghai, paris, atlantis, brisbane, marseille, carthage, shenzhen, unknown]
 
-    Seek::ListSorter.sort_by_field(places, 'country DESC, city ASC')
+    Seek::ListSorter.sort_by_order(places, 'country DESC, city ASC')
 
     assert_equal places, [unknown, marseille, paris, beijing, shanghai, shenzhen, nil_city, brisbane, atlantis, carthage, valhalla]
 
-    Seek::ListSorter.sort_by_field(places, 'country ASC, city DESC')
+    Seek::ListSorter.sort_by_order(places, 'country ASC, city DESC')
 
     assert_equal places, [brisbane, shenzhen, shanghai, beijing, nil_city, paris, marseille, unknown, valhalla, carthage, atlantis]
   end
