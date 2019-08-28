@@ -73,7 +73,9 @@ module Seek
             page_totals[p] = relation.where(@field.to_s => p).where(query_options[0][:conditions]).count
           end
 
-          records.to_a
+          records = records.to_a
+          Seek::ListSorter.index_items(records, order)
+          records
         end
       end
 
