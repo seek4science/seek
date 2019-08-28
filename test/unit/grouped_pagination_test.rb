@@ -3,24 +3,24 @@ require 'test_helper'
 
 class GroupedPaginationTest < ActiveSupport::TestCase
 
-  def test_first_letter
+  test 'first_letter' do
     p = Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     assert_not_nil p.first_letter
     assert_equal 'A', p.first_letter
   end
 
-  def test_pages_accessor
+  test 'pages_accessor' do
     pages = Person.pages
     assert pages.length > 1
     ('A'..'Z').to_a.each { |letter| assert pages.include?(letter) }
   end
 
-  def test_first_letter_ignore_space
+  test 'first_letter_ignore_space' do
     inv = Factory :investigation, title: ' Inv'
     assert_equal 'I', inv.first_letter
   end
 
-  def test_latest_limit
+  test 'latest_limit' do
     assert_equal Seek::Config.limit_latest, Person.page_limit
     assert_equal Seek::Config.limit_latest, Project.page_limit
     assert_equal Seek::Config.limit_latest, Institution.page_limit
@@ -35,7 +35,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal Seek::Config.limit_latest, Strain.page_limit
   end
 
-  def test_paginate_no_options
+  test 'paginate_no_options' do
     Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     @people = Person.paginate default_page: 'first'
     assert_equal(('A'..'Z').to_a, @people.pages)
@@ -49,7 +49,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     end
   end
 
-  def test_paginate_by_page
+  test 'paginate_by_page' do
     Factory :person, last_name: 'Bobbins', first_name: 'Fred'
     Factory :person, last_name: 'Brown', first_name: 'Fred'
     @people = Person.paginate page: 'B'
@@ -62,32 +62,32 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     end
   end
 
-  def test_sql_injection
+  test 'sql_injection' do
     @people = Person.paginate page: "A or first_letter='B'"
     assert_equal 0, @people.size
     assert_equal(('A'..'Z').to_a, @people.pages)
     assert_equal "A or first_letter='B'", @people.page
   end
 
-  def test_handle_oslash
+  test 'handle_oslash' do
     p = Person.new(last_name: 'Øyvind', email: 'sdfkjhsdfkjhsdf@email.com')
     assert p.save
     assert_equal 'O', p.first_letter
   end
 
-  def test_handle_umlaut
+  test 'handle_umlaut' do
     p = Person.new(last_name: 'Ümlaut', email: 'sdfkjhsdfkjhsdf@email.com')
     assert p.save
     assert_equal 'U', p.first_letter
   end
 
-  def test_handle_accent
+  test 'handle_accent' do
     p = Person.new(last_name: 'Ýiggle', email: 'sdfkjhsdfkjhsdf@email.com')
     assert p.save
     assert_equal 'Y', p.first_letter
   end
 
-  def test_extra_conditions_as_array
+  test 'extra_conditions_as_array' do
     Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     @people = Person.paginate page: 'A', conditions: ['last_name = ?', 'Aardvark']
     assert_equal 1, @people.size
@@ -101,7 +101,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   # should jump to the first page that has content if :page=> isn't defined. Will use first page if no content is available
-  def test_jump_to_first_page_with_content
+  test 'jump_to_first_page_with_content' do
     Factory :person, last_name: 'Bobbins', first_name: 'Fred'
     Factory :person, last_name: 'Davis', first_name: 'Fred'
     # delete those with A
@@ -121,11 +121,15 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal 'A', @people.page
   end
 
-  def test_default_page_accessor
-    assert Person.default_page == 'top' || Person.default_page == 'all'
+  class DummyThingXYZ < ApplicationRecord
+    grouped_pagination default_page: 'fish'
   end
 
-  def test_extra_condition_as_array_direct
+  test 'default_page_accessor' do
+    assert DummyThingXYZ.default_page == 'fish'
+  end
+
+  test 'extra_condition_as_array_direct' do
     Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     @people = Person.paginate page: 'A', conditions: ["last_name = 'Aardvark'"]
     assert_equal 1, @people.size
@@ -138,7 +142,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal 1, @people.page_totals['A']
   end
 
-  def test_extra_condition_as_string
+  test 'extra_condition_as_string' do
     Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     @people = Person.paginate page: 'A', conditions: "last_name = 'Aardvark'"
     assert_equal 1, @people.size
@@ -151,7 +155,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal 1, @people.page_totals['A']
   end
 
-  def test_condition_as_hash
+  test 'condition_as_hash' do
     Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     @people = Person.paginate page: 'A', conditions: { last_name: 'Aardvark' }
     assert_equal 1, @people.size
@@ -164,7 +168,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal 1, @people.page_totals['A']
   end
 
-  def test_order_by
+  test 'order_by' do
     p1 = Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     p2 = Factory :person, last_name: 'Azbo', first_name: 'John'
     @people = Person.paginate page: 'A', order: 'last_name ASC'
@@ -178,14 +182,14 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal p2, @people.first
   end
 
-  def test_show_all
+  test 'show_all' do
     Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     Factory :person, last_name: 'Jones', first_name: 'Fred'
     @people = Person.paginate page: 'all'
     assert_equal Person.all.size, @people.size
   end
 
-  def test_post_fetch_pagination
+  test 'post_fetch_pagination' do
     user = Factory :user
     Factory :sop, contributor: user.person
     Factory :sop, contributor: user.person
@@ -293,7 +297,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     check_both_pagination_methods(DataFile.all, page: 'top', order: 'title desc')
     check_both_pagination_methods(Publication.all)
     check_both_pagination_methods(Person.all)
-    check_both_pagination_methods(Person.all)
+    check_both_pagination_methods(Person.all, page: 'top')
     check_both_pagination_methods(Project.all)
     check_both_pagination_methods(Project.all, page: 'Z')
     check_both_pagination_methods(Investigation.all, page: 'banana')
@@ -306,7 +310,6 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     klass = relation.klass
     as_relation = klass.paginate_after_fetch(relation, opts)
     as_array = klass.paginate_after_fetch(relation.to_a, opts)
-
 
     assert_equal as_relation.map(&:id), as_array.map(&:id), "Mismatch for class #{klass.name} with opts: #{opts.inspect}"
   end

@@ -10,22 +10,26 @@ module Seek
       # this is the array of possible pages, defaults to A-Z. Can be set with the options[:pages] in grouped_pagination definition in model
       attr_reader :pages
 
-      # this is limit to the list when showing the 'top' page of results, defaults to 7.
-      # Can be set with the options[:page_limit] in grouped_pagination definition in model
-      attr_reader :page_limit
-
-      # this is the default page to use if :page is not provided when paginating.
-      attr_reader :default_page
-
       def grouped_pagination(options = {})
         @pages = options[:pages] || ('A'..'Z').to_a + ['?']
         @field = options[:field] || 'first_letter'
+        # this is limit to the list when showing the 'top' page of results, defaults to 7.
+        # Can be set with the options[:page_limit] in grouped_pagination definition in model
         @page_limit = options[:limit]
+        # this is the default page to use if :page is not provided when paginating.
         @default_page = options[:default_page]
 
         before_save :update_first_letter
 
         include Seek::GroupedPagination::InstanceMethods
+      end
+
+      def default_page
+        @default_page || Seek::Config.default_page(name.underscore.pluralize) || 'all'
+      end
+
+      def page_limit
+        @page_limit || Seek::Config.limit_latest
       end
 
       # Paginate a given collection/relation
@@ -45,14 +49,20 @@ module Seek
       # Paginate an ActiveRecord::Relation
       def paginate_relation(relation, *args)
         as_paginated_collection(*args) do |page_totals, page, order, limit, options|
+          # The following fixes an inconsistency between sorting relations and enumerables.
+          # If, for example, you are sorting a relation by title, and multiple records have the same title, SQL will
+          # order the duplicates  most recent -> oldest.
+          # If you were sorting an enumerable however, it's likely it was already ordered oldest -> most recent, and
+          # thus will sort duplicates the same way.
+          sql_order = order + ', id asc'
           if page == 'top'
-            records = relation.order(order).limit(limit)
+            records = relation.order(sql_order).limit(limit)
           elsif page == 'all'
-            records = relation.order(order)
+            records = relation.order(sql_order)
           elsif @pages.include?(page)
             query_options = { conditions: options[:conditions] }
             query_options.merge!(options.except(:conditions, :page, :default_page))
-            records = relation.where(@field.to_s => page).where(query_options[:conditions]).order(order)
+            records = relation.where(@field.to_s => page).where(query_options[:conditions]).order(sql_order)
           else
             records = []
           end
@@ -95,13 +105,13 @@ module Seek
         options = args.pop unless args.nil?
         options ||= {}
 
-        limit = options[:limit] || @page_limit || Seek::Config.limit_latest
+        limit = options[:limit] || page_limit
 
-        default_page = options[:default_page] || @default_page || Seek::Config.default_page(name.underscore.pluralize) || 'all'
-        default_page = @pages.first if default_page == 'first'
-        default_page = 'top' if default_page == 'latest'
+        def_page = options[:default_page] || default_page
+        def_page = @pages.first if def_page == 'first'
+        def_page = 'top' if def_page == 'latest'
 
-        page = options[:page] || default_page
+        page = options[:page] || def_page
 
         order = options[:order] || Seek::ListSorter.sort_field(name, :index)
         order = Seek::ListSorter.sort_value(:updated_at_desc) if !options.key?(:order) && page == 'top'
