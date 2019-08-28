@@ -259,6 +259,38 @@ class PublicationsControllerTest < ActionController::TestCase
     end
   end
 
+
+  test 'should associate authors to users when importing multiple publications from bibtex files' do
+
+    publications = [
+        {
+            #publications[0]
+            title: 'Taverna: a tool for building and running workflows of services.',
+            journal: 'Nucleic Acids Res',
+            published_date: Date.new(2006),
+            publication_type: Factory(:journal),
+            authors: [
+                PublicationAuthor.new(first_name: 'quentin', last_name: 'jones', author_index: 0),
+                PublicationAuthor.new(first_name: 'aaron', last_name: 'spiggle', author_index: 1),
+                PublicationAuthor.new(first_name: 'R.', last_name: 'Stevens', author_index: 2)
+            ]
+        }
+    ]
+
+    assert_difference('Publication.count') do
+        post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/author_match.bib'), project_ids: [projects(:one).id] } }
+    end
+
+
+     publication = Publication.where(title: publications[0][:title]).first
+
+    publication.publication_authors.collect(&:person_id).compact.each do |person_id|
+      assert_equal Person.where(id: person_id).first.last_name , PublicationAuthor.where(person_id: person_id).first.last_name
+      assert_equal Person.where(id: person_id).first.first_name , PublicationAuthor.where(person_id: person_id).first.first_name
+    end
+
+  end
+
   test 'should only show the year for 1st Jan in list view' do
     disable_authorization_checks { Publication.destroy_all }
     publication = Factory(:publication, published_date: Date.new(2013, 1, 1), title: 'blah blah blah science', publication_type: Factory(:journal))

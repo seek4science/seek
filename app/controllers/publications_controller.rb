@@ -451,6 +451,7 @@ class PublicationsController < ApplicationController
           else
             if current_publication.save
               publications << current_publication
+              associsate_authors_with_users(current_publication)
             else
               publications_with_errors << current_publication
             end
@@ -494,6 +495,16 @@ class PublicationsController < ApplicationController
         format.html { redirect_to(action: :index) }
         format.xml  { render xml: publications, status: :created, location: @publication }
         format.json  { render json: publications, status: :created, location: @publication }
+      end
+    end
+  end
+
+  def associsate_authors_with_users(current_publication)
+    current_publication.publication_authors.each do |author|
+      author.suggested_person = find_person_for_author(author, current_publication.projects)
+      unless author.suggested_person.nil?
+        author.person_id = author.suggested_person.id
+        author.save
       end
     end
   end
