@@ -123,6 +123,12 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
+  def determine_asset_from_controller
+    name = controller_name.singularize
+    eval("@#{name}")
+  end
+
   def restrict_guest_user
     if current_user && current_user.guest?
       flash[:error] = 'You cannot perform this action as a Guest User. Please sign in or register for an account first.'
@@ -137,7 +143,7 @@ class ApplicationController < ActionController::Base
       flash[:error] = 'Only members of known projects, institutions or work groups are allowed to create new content.'
       respond_to do |format|
         format.html do
-          object = eval('@' + controller_name.singularize)
+          object = determine_asset_from_controller
           if !object.nil? && object.try(:can_view?)
             redirect_to object
           else
@@ -444,6 +450,7 @@ class ApplicationController < ActionController::Base
     end
 
     filters = permitted_filters(filters).to_unsafe_h
+    @filters = filters
 
     if filters.size > 0
       params[:page] ||= 'all'
