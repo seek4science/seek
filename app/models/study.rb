@@ -42,7 +42,6 @@ class Study < ApplicationRecord
     related_data_files + related_sops + related_models + related_publications + related_documents
   end
 
-
   def state_allows_delete? *args
     assays.empty? && super
   end
@@ -58,4 +57,7 @@ class Study < ApplicationRecord
     external_asset ? external_asset.search_terms : []
   end
 
+  def self.filter_by_projects(projects)
+    joins(:projects).where(investigations: { investigations_projects: { project_id: projects } })
+  end
 end

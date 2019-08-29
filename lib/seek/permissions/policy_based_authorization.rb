@@ -54,37 +54,30 @@ module Seek
         END_EVAL
       end
 
+      module AuthLookupArrayExtensions
+        # Allows an Enumerable to be authorized in the same way as an ActiveRecord model or relation.
+        def all_authorized_for(action, user = User.current_user, filter_by_permissions = true)
+          x = select { |a| a.send("authorized_for_#{action}?", user) }
+          x = x.select { |a| a.send("state_allows_#{action}?", user) } if filter_by_permissions
+          x
+        end
+      end
+
       module AuthLookupClassMethods
-        # returns all the authorised items for a given action and optionally a user and set of projects. If user is nil, the items authorised for an
-        # anonymous user are returned. If one or more projects are provided, then only the assets linked to those projects are included.
-        # if filter_by_permissions is true, then as well as the authorization the state based permissions will also be applied
-        def all_authorized_for(action, user = User.current_user, projects = nil, filter_by_permissions = true)
-          projects = Array(projects) unless projects.nil?
-          user_id = user.nil? ? 0 : user.id
-          assets = []
-          programatic_project_filter = !projects.nil? && (!Seek::Config.auth_lookup_enabled || (self == Assay || self == Study))
-          if Seek::Config.auth_lookup_enabled
-            if lookup_table_consistent?(user_id)
-              Rails.logger.info("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
-              assets = lookup_for_action_and_user(action, user_id, projects)
-            else
-              Rails.logger.info("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
-              assets = all.select { |df| df.send("authorized_for_#{action}?", user) }
-              programatic_project_filter = !projects.nil?
-            end
+        # authorizes the current relation for a given action and optionally a user. If user is nil, the items authorised for an
+        # anonymous user are returned. if filter_by_permissions is true, then as well as the authorization the state based permissions will also be applied
+        def all_authorized_for(action, user = User.current_user, filter_by_permissions = true)
+          if Seek::Config.auth_lookup_enabled && lookup_table_consistent?(user_id)
+            assets = lookup_join(action, user&.id || 0)
           else
-            assets = all.select { |df| df.send("authorized_for_#{action}?", user) }
+            assets = all.to_a.all_authorized_for(action, user, false)
           end
 
-          if filter_by_permissions
+          if filter_by_permissions && method_defined?("state_allows_#{action}?")
             assets = assets.select { |a| a.send("state_allows_#{action}?", user) }
           end
 
-          if programatic_project_filter
-            assets.reject { |a| (a.projects & projects).empty? }
-          else
-            assets
-          end
+          assets
         end
 
         # returns the authorised items from the array of the same class items for a given action and optionally a user. If user is nil, the items authorised for an
@@ -92,19 +85,20 @@ module Seek
         # if filter_by_permissions is true, then as well as the authorization the state based permissions will also be applied
         def authorize_asset_collection(assets, action, user = User.current_user, filter_by_permissions = true)
           return assets if assets.empty?
-          user_id = user.nil? ? 0 : user.id
-          if Seek::Config.auth_lookup_enabled && lookup_table_consistent?(user_id)
+          if Seek::Config.auth_lookup_enabled && lookup_table_consistent?(user_id) && !assets.is_a?(ActiveRecord::Relation)
             ids = assets.collect(&:id)
             clause = "asset_id IN (#{ids.join(',')})"
-            sql =  "SELECT asset_id from #{lookup_table_name} WHERE user_id = #{user_id} AND (#{clause}) AND can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
+            sql =  "SELECT asset_id from #{lookup_table_name} WHERE user_id = #{user&.id || 0} AND (#{clause}) AND can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
             ids = ActiveRecord::Base.connection.select_all(sql).collect { |k| k['asset_id'].to_s }
             assets = assets.select { |asset| ids.include?(asset.id.to_s) }
           else
-            assets = assets.select { |a| a.send("authorized_for_#{action}?", user) }
+            assets = assets.all_authorized_for(action, user, false)
           end
-          if filter_by_permissions
+
+          if filter_by_permissions && method_defined?("state_allows_#{action}?")
             assets = assets.select { |a| a.send("state_allows_#{action}?", user) }
           end
+
           assets
         end
 

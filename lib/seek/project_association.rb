@@ -4,8 +4,8 @@ module Seek
       klass.class_eval do
         include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-        join_table_name = [table_name, 'projects'].sort.join('_')
-        has_and_belongs_to_many :projects, join_table: "#{join_table_name}",
+        @project_join_table ||= [table_name, 'projects'].sort.join('_')
+        has_and_belongs_to_many :projects, join_table: @project_join_table,
                                            before_add: :react_to_project_addition,
                                            before_remove: :react_to_project_removal
         has_many :programmes, through: :projects
@@ -31,6 +31,14 @@ module Seek
         def react_to_project_removal(project)
           RemoveSubscriptionsForItemJob.new(self, [project]).queue_job if self.subscribable?
           create_rdf_generation_job(true) if self.respond_to?(:create_rdf_generation_job)
+        end
+
+        def self.project_join_table
+          @project_join_table
+        end
+
+        def self.filter_by_projects(projects)
+          joins(:projects).where(project_join_table => { project_id: projects })
         end
       end
     end

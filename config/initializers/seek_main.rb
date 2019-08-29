@@ -87,3 +87,5 @@ SEEK::Application.configure do
       }
 
 end
+
+require 'array_extensions'
