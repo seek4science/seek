@@ -26,12 +26,6 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @workflow} -%>
 
-      <div>
-        <%= preview_permission_popup_link(@workflow)-%>
-        <%= create_button :id => "workflow_submit_btn",
-                       :onclick => "return validateResourceFields('workflow')",
-                       :class => 'btn btn-primary' -%>
-        or <%= cancel_button(workflows_path) -%>
-      </div>
+      <%= form_submit_buttons(@workflow, validate:true) %>
     </div>
 <% end -%>

@@ -20,17 +20,4 @@
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
-<%
-   button_text=action==:edit ? "Update" : "Create"
-   disabled_text=action==:edit ? "Updating..." : "Creating..."
-%>
-<% if @investigation.can_manage? && show_form_manage_specific_attributes? %>
-    <%= preview_permission_popup_link(@investigation)-%>
-    <%= f.submit button_text, :id => "investigation_submit_btn",
-                 :onclick => "javascript: previewPermissions();return(false);",
-                 :class => 'btn btn-primary' -%>
-<% else %>
-    <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "investigation_submit_btn",
-                 :class => 'btn btn-primary' -%>
-<% end %>
- or <%= cancel_button(@investigation.id ? investigation_path(@investigation.id) : investigations_path) -%>
+<%= form_submit_buttons(@investigation, validate:false) %>

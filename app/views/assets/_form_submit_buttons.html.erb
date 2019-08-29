@@ -1,0 +1,26 @@
+<div>
+  <%= preview_permission_popup_link(item) if preview_permissions -%>
+  <%= create_button id: button_id,
+                    button_text:button_text,
+                    :class => 'btn btn-primary' -%>
+  or <%= cancel_button(cancel_path) -%>
+</div>
+<script>
+    $j(document).ready(function () {
+        $j('#<%= button_id %>').click(function () {
+            <% if validate %>
+            var valid = validateResourceFields('<%= resource_name %>');
+            <% else %>
+            var valid = true;
+            <% end %>
+            if (valid) {
+                <% if preview_permissions %>
+                  previewPermissions();
+                <% else %>
+                  createOrUpdateResource('<%= resource_name %>');
+                <% end %>
+            }
+            return false;
+        });
+    });
+</script>

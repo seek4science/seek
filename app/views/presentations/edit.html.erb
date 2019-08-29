@@ -30,12 +30,7 @@
 
       <%= fancy_multiselect @presentation, :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
 
+      <%= form_submit_buttons(@presentation, validate:true) %>
 
-      <div>
-        <%= f.submit "Update", :id => "presentation_submit_btn",
-            :onclick => "return validateResourceFields('presentation')",
-            :class => 'btn btn-primary' -%>
-        or <%= cancel_button(presentation_path(@presentation)) -%>
-      </div>
     </div>
 <% end %>

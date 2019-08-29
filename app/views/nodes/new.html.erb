@@ -26,12 +26,7 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @node} -%>
 
-      <div>
-        <%= preview_permission_popup_link(@node)-%>
-        <%= create_button :id => "node_submit_btn",
-                       :onclick => "return validateResourceFields('node')",
-                       :class => 'btn btn-primary' -%>
-        or <%= cancel_button(nodes_path) -%>
-      </div>
+      <%= form_submit_buttons(@node, validate:true) %>
+
     </div>
 <% end -%>

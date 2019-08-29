@@ -29,11 +29,6 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
 
-      <div>
-        <%= f.submit "Update", :id => "model_submit_btn",
-                     :onclick => "return validateResourceFields('model')",
-                     :class => 'btn btn-primary' -%>
-        or <%= cancel_button(model_path(@model)) %>
-      </div>
+      <%= form_submit_buttons(@model, validate:true) %>
     </div>
 <% end %>
