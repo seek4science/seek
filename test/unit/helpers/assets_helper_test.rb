@@ -16,6 +16,23 @@ class AssetsHelperTest < ActionView::TestCase
     end
   end
 
+  test 'form_submit_buttons' do
+
+    new_study = Study.new
+
+    @controller.action_name = 'new'
+    html = form_submit_buttons(new_study)
+    assert_match /submit_button_clicked\(true, true, 'study'\);/,html
+    assert_match /id=\"study_submit_btn\"/,html
+
+    html = form_submit_buttons(new_study, validate:false)
+    assert_match /submit_button_clicked\(false, true, 'study'\);/,html
+
+    html = form_submit_buttons(new_study, validate:false, preview_permissions:false)
+    assert_match /submit_button_clicked\(false, false, 'study'\);/,html
+
+  end
+
   test 'submit button text' do
     new_assay = Assay.new
     new_model = Model.new
