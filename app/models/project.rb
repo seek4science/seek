@@ -153,11 +153,19 @@ class Project < ApplicationRecord
   end
 
   def studies
-    investigations.collect(&:studies).flatten.uniq
+    Study.where(investigation_id: investigation_ids).uniq
+  end
+
+  def study_ids
+    Study.select(:id).where(investigation_id: investigation_ids).uniq.pluck(:id)
   end
 
   def assays
-    studies.collect(&:assays).flatten.uniq
+    Assay.where(study_id: study_ids).uniq
+  end
+
+  def assay_ids
+    Assay.select(:id).where(study_id: study_ids).uniq.pluck(:id)
   end
 
   def site_password
