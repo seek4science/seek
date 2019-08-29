@@ -149,10 +149,6 @@ class ProjectTest < ActiveSupport::TestCase
     assert !project.has_member?(nil)
   end
 
-  def test_ordered_by_name
-    assert Project.all.sort_by { |p| p.title.downcase } == Project.default_order || Project.all.sort_by(&:title) == Project.default_order
-  end
-
   def test_title_trimmed
     p = Project.new(title: ' test project')
     disable_authorization_checks { p.save! }

@@ -34,10 +34,6 @@ class InstitutionTest < ActiveSupport::TestCase
     refute_includes proj3.institutions.first.programmes, prog1
   end
 
-  def test_ordered_by_title
-    assert Institution.all.sort_by { |i| i.title.downcase } == Institution.default_order || Institution.all.sort_by(&:title) == Institution.default_order
-  end
-
   def test_avatar_key
     i = institutions(:one)
     assert_nil i.avatar_key

@@ -63,7 +63,7 @@ module Seek
           end
 
           # GROUP BY and COUNT to get page totals quickly
-          groups = relation.select(@field).reorder('').group(@field).count
+          groups = relation.select(@field).group(@field).count
           @pages.each do |p|
             page_totals[p] = groups[p] || 0
           end
