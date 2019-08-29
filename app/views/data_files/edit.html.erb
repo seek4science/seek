@@ -34,6 +34,6 @@
 
       <%= fancy_multiselect @data_file, :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
 
-      <%= form_submit_buttons(@data_file, validate:true) %>
+      <%= form_submit_buttons(@data_file) %>
     </div>
 <% end %>

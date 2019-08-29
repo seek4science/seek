@@ -93,7 +93,7 @@
     <%= f.fancy_multiselect :documents, { other_projects_checkbox: true } %>
 <% end -%>
 
-<%= form_submit_buttons(@assay, validate:false) %>
+<%= form_submit_buttons(@assay) %>
 
 
 <%= render partial: 'projects/implicit_project_selector', locals: { action: action,

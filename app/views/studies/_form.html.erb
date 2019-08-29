@@ -40,7 +40,7 @@
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
-<%= form_submit_buttons(@study, validate:false) %>
+<%= form_submit_buttons(@study) %>
 
 <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                     select_id: '#study_investigation_id',

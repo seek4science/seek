@@ -3,17 +3,16 @@ module AssetsHelper
 
   def form_submit_buttons(item, options = {})
     # defaults
-    options[:validate] ||= false
+    options[:validate] = true if options[:validate].nil?
     if options[:preview_permissions].nil?
       options[:preview_permissions] = show_form_manage_specific_attributes?
     end
     options[:button_text] ||= submit_button_text(item)
+    options[:cancel_path] = polymorphic_path(item)
+    options[:resource_name] = item.class.name.underscore
+    options[:button_id] ||= "#{options[:resource_name]}_submit_btn"
 
-    cancel_path = polymorphic_path(item)
-
-    resource_name = item.class.name.underscore
-    button_id = "#{resource_name}_submit_btn"
-    render partial: 'assets/form_submit_buttons', locals: { cancel_path: cancel_path, item: item, resource_name: resource_name, button_id: button_id, **options }
+    render partial: 'assets/form_submit_buttons', locals: { item: item, **options }
   end
 
   # determine the text for the submit button, based on whether it is an edit or creation, and whether upload is required

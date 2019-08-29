@@ -34,7 +34,7 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
 
-      <%= form_submit_buttons(@model, validate:true) %>
+      <%= form_submit_buttons(@model) %>
     </div>
 <% end -%>
 

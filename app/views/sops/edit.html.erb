@@ -27,6 +27,6 @@
 
       <%= fancy_multiselect @sop, :workflows, { other_projects_checkbox: false } if Seek::Config.workflows_enabled -%>
 
-      <%= form_submit_buttons(@sop, validate:true) %>
+      <%= form_submit_buttons(@sop) %>
     </div>
 <% end %>
