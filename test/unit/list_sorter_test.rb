@@ -135,4 +135,15 @@ class ListSorterTest < ActiveSupport::TestCase
 
     assert_equal places, [brisbane, shenzhen, shanghai, beijing, nil_city, paris, marseille, unknown, valhalla, carthage, atlantis]
   end
+
+  test 'JSON API sorting' do
+    assert_equal 'title DESC', Seek::ListSorter.order_from_json_api_sort('-title')
+    assert_equal 'title', Seek::ListSorter.order_from_json_api_sort('title')
+    assert_equal 'created_at', Seek::ListSorter.order_from_json_api_sort('created_at')
+    assert_equal 'created_at, title DESC, updated_at', Seek::ListSorter.order_from_json_api_sort('created_at,-title,updated_at')
+    assert_equal 'created_at, updated_at, title DESC', Seek::ListSorter.order_from_json_api_sort('created_at,updated_at,-title')
+    assert_equal 'created_at, title DESC', Seek::ListSorter.order_from_json_api_sort('created_at,-title,banana')
+    injection = Seek::ListSorter.order_from_json_api_sort('created_at,updated_at,-title;drop table users;--')
+    refute injection.to_s.include?('drop table'), "#{injection} should not include injection"
+  end
 end

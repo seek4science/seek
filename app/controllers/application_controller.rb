@@ -583,7 +583,6 @@ class ApplicationController < ActionController::Base
   def page_and_sort_params
     p = params.permit(:page, :sort, :order)
     if p[:sort]
-      # TODO: This needs sanitizing, or can be used for SQL injection...
       p[:order] = Seek::ListSorter.order_from_json_api_sort(params[:sort])
     elsif params[:order]
       p[:order] = Seek::ListSorter.order_from_key(params[:order])

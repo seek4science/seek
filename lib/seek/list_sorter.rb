@@ -67,12 +67,15 @@ module Seek
     end
 
     def self.order_from_json_api_sort(sort)
-      order = {}
-      sort.split(',').each do |field|
-        order[field.to_sym] = field.start_with?('-') ? :desc : :asc
-      end
+      sort.split(',').map do |field|
+        if field.start_with?('-')
+          key = "#{field[1..-1]}_desc"
+        else
+          key = "#{field}_asc"
+        end
 
-      order
+        order_from_key(key.to_sym)
+      end.compact.join(', ')
     end
 
     def self.order_for_view(type_name, view)
