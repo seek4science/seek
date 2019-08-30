@@ -93,19 +93,8 @@
     <%= f.fancy_multiselect :documents, { other_projects_checkbox: true } %>
 <% end -%>
 
-<%
-   button_text=action==:edit ? "Update" : "Create"
-   disabled_text=action==:edit ? "Updating..." : "Creating..."
-%>
-<% if @assay.can_manage? && show_form_manage_specific_attributes? %>
-    <%= preview_permission_popup_link(@assay)-%>
-    <%= f.submit button_text, :id => "assay_submit_btn",
-                 :onclick => "javascript: previewPermissions();return(false);", :class => 'btn btn-primary' -%>
-<% else %>
-    <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "assay_submit_btn",
-                 :class => 'btn btn-primary' -%>
-<% end %>
- or <%= cancel_button(@assay.id ? assay_path(@assay.id) : assays_path) -%>
+<%= form_submit_buttons(@assay) %>
+
 
 <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                     select_id: '#assay_study_id',

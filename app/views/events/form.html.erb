@@ -59,18 +59,7 @@
 
       <%= f.fancy_multiselect :documents, other_projects_checkbox: true %>
 
-      <%
-         button_text=@new ? "Create" : "Update"
-         disabled_text=@new ? "Creating..." : "Updating..."
-      %>
-      <% if @event.can_manage?  && show_form_manage_specific_attributes? %>
-          <%= preview_permission_popup_link(@event)-%>
-          <%= f.submit button_text, :id => "event_submit_btn",
-                       :onclick => "javascript: previewPermissions();return(false);", :class => 'btn btn-primary' -%>
-      <% else %>
-          <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "event_submit_btn",
-                       :class => 'btn btn-primary' -%>
-      <% end %>
-      or <%= cancel_button(@event.id ? event_path(@event.id) : events_path) -%>
+      <%= form_submit_buttons(@event) %>
+
     </div>
 <% end %>
