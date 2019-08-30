@@ -121,12 +121,12 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal 'A', @people.page
   end
 
-  class DummyThingXYZ < ApplicationRecord
-    grouped_pagination default_page: 'fish'
-  end
-
   test 'default_page_accessor' do
-    assert DummyThingXYZ.default_page == 'fish'
+    thing = Class.new(ApplicationRecord) do
+      grouped_pagination default_page: 'fish'
+    end
+
+    assert thing.default_page == 'fish'
   end
 
   test 'extra_condition_as_array_direct' do
