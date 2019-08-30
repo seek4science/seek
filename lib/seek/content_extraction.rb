@@ -17,6 +17,12 @@ module Seek
           convert_to_pdf
         end
         content = extract_text_from_pdf
+        if content.blank?
+          []
+        else
+          content = filter_text_content content
+          content = split_content(content, 10 , 5)
+        end
       else
         Rails.logger.info("No local file contents for content blob #{id}, so no pdf contents for search available")
       end
@@ -56,24 +62,18 @@ module Seek
     end
 
     def extract_text_from_pdf
-      return [] unless is_pdf? || is_pdf_convertable?
+      return "" unless is_pdf? || is_pdf_convertable?
       pdf_filepath = filepath('pdf')
       txt_filepath = filepath('txt')
 
       if File.exist?(pdf_filepath)
         begin
           Docsplit.extract_text(pdf_filepath, output: converted_storage_directory) unless File.exist?(txt_filepath)
-          content = File.read(txt_filepath)
-          if content.blank?
-            []
-          else
-            content = filter_text_content content
-            content = split_content(content,10,5)
-          end
+          File.read(txt_filepath)
         rescue Docsplit::ExtractionFailed => e
           extract_text_from_pdf if double_check_mime_type
           Rails.logger.error("Problem with extracting text from pdf #{id} #{e}")
-          []
+          ""
         end
       end
     end
@@ -110,6 +110,7 @@ module Seek
         false
       end
     end
+
 
     # filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines
     def filter_text_content(content)
