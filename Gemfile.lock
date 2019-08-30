@@ -97,6 +97,8 @@ GEM
       activemodel (= 5.2.3)
       activesupport (= 5.2.3)
       arel (>= 9.0)
+    activerecord-import (1.0.2)
+      activerecord (>= 3.2)
     activerecord-session_store (1.1.1)
       actionpack (>= 4.0)
       activerecord (>= 4.0)
@@ -814,6 +816,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth (>= 4.3.0)
   active_model_serializers (~> 0.10.2)
+  activerecord-import
   activerecord-session_store
   acts-as-taggable-on
   acts_as_list

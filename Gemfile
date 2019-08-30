@@ -123,6 +123,8 @@ gem 'rails-html-sanitizer'
 # Rails 5.2 upgrade
 gem 'bootsnap', '>= 1.1.0', require: false
 
+gem 'activerecord-import'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do

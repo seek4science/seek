@@ -27,11 +27,11 @@ class AuthLookupTableTest < ActiveSupport::TestCase
     a.update_lookup_table_for_all_users
     d.update_lookup_table_for_all_users
 
-    assert_equal (User.count + 1), a.lookup_count
-    assert_equal (User.count + 1), d.lookup_count
+    assert_equal (User.count + 1), a.auth_lookup.count
+    assert_equal (User.count + 1), d.auth_lookup.count
 
-    assert_difference('a.lookup_count', -1) do
-      assert_difference('d.lookup_count', -1) do
+    assert_difference('a.auth_lookup.count', -1) do
+      assert_difference('d.auth_lookup.count', -1) do
         disable_authorization_checks { u.destroy }
       end
     end
@@ -42,7 +42,7 @@ class AuthLookupTableTest < ActiveSupport::TestCase
     assert_not_includes a_user_ids, u.id
     assert_not_includes d_user_ids, u.id
 
-    assert_equal (User.count + 1), a.lookup_count
-    assert_equal (User.count + 1), d.lookup_count
+    assert_equal (User.count + 1), a.auth_lookup.count
+    assert_equal (User.count + 1), d.auth_lookup.count
   end
 end

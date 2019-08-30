@@ -19,7 +19,7 @@ namespace :seek_dev do
         users.each do |user|
           user_id = user.nil? ? 0 : user.id
           %w[view edit download manage delete].each do |action|
-            lookup = type.lookup_for_asset(action, user_id, item.id)
+            lookup = item.lookup_for(action, user_id)
             actual = item.authorized_for_action(user, action)
             next if lookup == actual
             output.puts "  #{type.name} #{item.id} - User #{user_id}"
