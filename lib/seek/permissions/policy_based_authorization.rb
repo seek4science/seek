@@ -77,7 +77,7 @@ module Seek
             assets = all.to_a.all_authorized_for(action, user, false)
           end
 
-          if filter_by_permissions && method_defined?("state_allows_#{action}?")
+          if filter_by_permissions && should_check_state?(action)
             assets = assets.select { |a| a.send("state_allows_#{action}?", user) }
           end
 
@@ -97,11 +97,16 @@ module Seek
             assets = assets.all_authorized_for(action, user, false)
           end
 
-          if filter_by_permissions && method_defined?("state_allows_#{action}?")
+          if filter_by_permissions && should_check_state?(action)
             assets = assets.select { |a| a.send("state_allows_#{action}?", user) }
           end
 
           assets
+        end
+
+        # Only check `state_allows...` if it has been overridden.
+        def should_check_state?(action)
+          instance_method("state_allows_#{action}?").owner != Seek::Permissions::StateBasedPermissions
         end
 
         # deletes entries where the ID doesn't match that of an existing ID
