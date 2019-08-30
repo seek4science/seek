@@ -117,7 +117,9 @@ module AssetsHelper
   # if projects is provided, only authorizes the assets for that project
   # assets are sorted by title except if they are projects and scales (because of hierarchies)
   def authorised_assets(asset_class, projects = nil, action = 'view')
-    assets = asset_class.filter_by_projects(projects).all_authorized_for(action, User.current_user)
+    assets = asset_class
+    assets = assets.filter_by_projects(projects) if projects
+    assets = assets.all_authorized_for(action, User.current_user)
     assets = assets.sort_by(&:title) if !assets.blank? && !%w[Project Scale].include?(assets.first.class.name)
     assets
   end
