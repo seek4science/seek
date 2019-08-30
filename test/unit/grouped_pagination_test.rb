@@ -122,7 +122,8 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'default_page_accessor' do
-    thing = Class.new(ApplicationRecord) do
+    thing = Class.new(ActiveRecord::Base) do
+      include Seek::GroupedPagination
       grouped_pagination default_page: 'fish'
     end
 
