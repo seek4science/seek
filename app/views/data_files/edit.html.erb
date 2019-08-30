@@ -34,13 +34,6 @@
 
       <%= fancy_multiselect @data_file, :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
 
-      <div>
-
-        <%= f.submit "Update", :id => "data_file_submit_btn",
-                     :onclick => "return validateResourceFields('data_file');",
-                     :class => 'btn btn-primary' -%>
-        or <%= cancel_button(data_file_path(@data_file)) -%>
-
-      </div>
+      <%= form_submit_buttons(@data_file) %>
     </div>
 <% end %>
