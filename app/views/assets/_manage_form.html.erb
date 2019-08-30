@@ -1,5 +1,6 @@
+<h1>Manage <%= text_for_resource(resource) %> : <%= link_to(h(resource.title), resource) -%></h1>
+
 <%
-  submit_button_id = "#{resource.model_name.singular}_submit_btn"
   show_projects = true if show_projects.nil?
   sharing_link = true if sharing_link.nil?
 %>
