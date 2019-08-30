@@ -58,38 +58,50 @@ module Seek
       end
 
       module AuthLookupArrayExtensions
-        # Allows an Array to be authorized in the same way as an ActiveRecord model or relation.
-        def all_authorized_for(action, user = User.current_user)
-          m = "authorized_for_#{action}?".to_sym
-          select { |a| a.send(m, user) }
+        # Allows an Enumerable to be authorized in the same way as an ActiveRecord model or relation.
+        def all_authorized_for(action, user = User.current_user, filter_by_permissions = true)
+          x = select { |a| a.send("authorized_for_#{action}?", user) }
+          x = x.select { |a| a.send("state_allows_#{action}?", user) } if filter_by_permissions
+          x
         end
       end
 
       module AuthLookupClassMethods
         # authorizes the current relation for a given action and optionally a user. If user is nil, the items authorised for an
-        # anonymous user are returned.
-        def all_authorized_for(action, user = User.current_user)
+        # anonymous user are returned. if filter_by_permissions is true, then as well as the authorization the state based permissions will also be applied
+        def all_authorized_for(action, user = User.current_user, filter_by_permissions = true)
           user_id = user&.id || 0
           if Seek::Config.auth_lookup_enabled && lookup_table_consistent?(user_id)
-            lookup_join(action, user_id)
+            assets = lookup_join(action, user_id)
           else
-            all.to_a.all_authorized_for(action, user)
+            assets = all.to_a.all_authorized_for(action, user, false)
           end
+
+          if filter_by_permissions && method_defined?("state_allows_#{action}?")
+            assets = assets.select { |a| a.send("state_allows_#{action}?", user) }
+          end
+
+          assets
         end
 
         # returns the authorised items from the array of the same class items for a given action and optionally a user. If user is nil, the items authorised for an
         # anonymous user are returned. All assets must be of the same type and match the asset class this method was called on
-        def authorize_asset_collection(assets, action, user = User.current_user)
+        # if filter_by_permissions is true, then as well as the authorization the state based permissions will also be applied
+        def authorize_asset_collection(assets, action, user = User.current_user, filter_by_permissions = true)
           return assets if assets.empty?
           user_id = user&.id || 0
           if Seek::Config.auth_lookup_enabled && lookup_table_consistent?(user_id) && !assets.is_a?(ActiveRecord::Relation)
-            ids = lookup_class.where(asset_id: assets.collect(&:id),
-                                     user_id: user_id,
-                                     "can_#{action}" => true).pluck(:asset_id)
-            assets.select { |asset| ids.include?(asset.id.to_s) }
+            ids = lookup_class.select(:asset_id).where(asset_id: assets.collect(&:id), user_id: user_id, "can_#{action}" => true).pluck(:asset_id)
+            assets = assets.select { |asset| ids.include?(asset.id.to_s) }
           else
-            assets.all_authorized_for(action, user)
+            assets = assets.all_authorized_for(action, user, false)
           end
+
+          if filter_by_permissions && method_defined?("state_allows_#{action}?")
+            assets = assets.select { |a| a.send("state_allows_#{action}?", user) }
+          end
+
+          assets
         end
 
         # deletes entries where the ID doesn't match that of an existing ID
@@ -329,7 +341,13 @@ module Seek
       # looks up the entry in the authorization lookup table for a single authorised type, for a given action, user_id and asset_id. A user id of zero
       # indicates an anonymous user. Returns nil if there is no record available
       def lookup_for(action, user_id)
-        auth_lookup.where(user_id: user_id).limit(1).pluck("can_#{action}").first
+        attribute = "can_#{action}"
+        res = auth_lookup.select(attribute).where(user_id: user_id).first
+        if res.nil?
+          nil
+        else
+          ActiveRecord::Type::Boolean.new.cast(res[attribute])
+        end
       end
     end
   end
