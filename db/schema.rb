@@ -275,10 +275,10 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
   create_table "data_file_auth_lookup", id: false,  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
-    t.boolean "can_view"
-    t.boolean "can_manage"
-    t.boolean "can_edit"
-    t.boolean "can_download"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
     t.boolean "can_delete", default: false
     t.index ["user_id", "asset_id", "can_view"], name: "index_data_file_auth_lookup_user_asset_view"
     t.index ["user_id", "can_view"], name: "index_data_file_auth_lookup_on_user_id_and_can_view"
