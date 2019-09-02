@@ -40,8 +40,8 @@ class Person < ApplicationRecord
                                  source: :work_group
 
   has_many :projects,  -> { distinct }, through: :work_groups
-  has_many :current_projects,  -> { distinct }, through: :current_work_groups
-  has_many :former_projects,  -> { distinct }, through: :former_work_groups
+  has_many :current_projects,  -> { distinct }, through: :current_work_groups, source: :project
+  has_many :former_projects,  -> { distinct }, through: :former_work_groups, source: :project
 
   has_many :institutions, -> { distinct }, through: :work_groups
 
@@ -54,16 +54,26 @@ class Person < ApplicationRecord
                               Sample Event Investigation Study Assay Strain Workflow].freeze
 
   RELATED_RESOURCE_TYPES.each do |type|
-    has_many :"contributed_#{type.tableize}", foreign_key: :contributor_id, class_name: type
-    has_many :"created_#{type.tableize}", through: :assets_creators, source: :asset, source_type: type
+    plural = type.tableize
+    singular = plural.singularize
+    has_many :"contributed_#{plural}", foreign_key: :contributor_id, class_name: type
+    has_many :"created_#{plural}", through: :assets_creators, source: :asset, source_type: type
     t = type.constantize
     if t.method_defined?(:assets_creators)
-      define_method "related_#{type.tableize}" do
-        t.joins(:assets_creators).where("#{type.tableize}.contributor_id = :id OR assets_creators.creator_id = :id", id: id)
+      define_method "related_#{plural}" do
+        t.where(id: send("related_#{singular}_ids"))
+      end
+
+      define_method "related_#{singular}_ids" do
+        send("contributed_#{singular}_ids") | assets_creators.where(asset_type: type).pluck(:asset_id)
       end
     else
-      define_method "related_#{type.tableize}" do
-        send("contributed_#{type.tableize}")
+      define_method "related_#{plural}" do
+        send("contributed_#{plural}")
+      end
+
+      define_method "related_#{singular}_ids" do
+        send("contributed_#{singular}_ids")
       end
     end
   end
