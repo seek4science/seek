@@ -19,6 +19,27 @@ namespace :seek do
     5.times { AuthLookupUpdateJob.new.queue_job(1, 5.seconds.from_now) }
   end
 
+  desc 'Rebuild all authorization lookup table for all items.'
+  task(repopulate_auth_lookup_tables_sync: :environment) do
+    item_count = 0
+    start_time = Time.now
+    puts "Users: #{User.count}"
+    Seek::Util.authorized_types.each do |type|
+      puts "#{type.name} (#{type.count}):"
+      ActiveRecord::Base.connection.execute("delete from #{type.lookup_table_name}")
+      type.find_each do |item|
+        item.update_lookup_table_for_all_users
+        print '.'
+        item_count += 1
+      end
+      puts
+    end
+    seconds = Time.now - start_time
+    items_per_second = item_count.to_f / seconds.to_f
+    puts "Done - #{seconds}s elapsed (#{items_per_second} items per second)"
+  end
+
+
   desc 'Rebuilds all authorization tables for a given user - you are prompted for a user id'
   task(repopulate_auth_lookup_for_user: :environment) do
     puts 'Please provide the user id:'
