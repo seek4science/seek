@@ -1,3 +1,4 @@
+actions: 'crystal_project/16x16/actions/gear.png'
 activate: 'crystal_project/16x16/apps/clean.png'
 add: 'famfamfam_silk/add.png'
 announcement: 'famfamfam_silk/transmit.png'

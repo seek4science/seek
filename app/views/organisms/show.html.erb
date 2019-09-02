@@ -1,6 +1,6 @@
 <% if admin_logged_in? -%>
     <% content_for(:buttons) do -%>
-        <%= admin_dropdown do %>
+        <%= item_actions_dropdown do %>
           <li><%= image_tag_for_key('edit', edit_organism_path(@organism), "Edit Organism", nil, 'Edit Organism') -%></li>
           <li><%= image_tag_for_key('new', new_organism_path, "Add Organism", nil, 'Add Organism') -%></li>
           <li><%= delete_organism_icon(@organism)%></li>
@@ -8,7 +8,7 @@
     <% end %>
 <% elsif can_create_organisms? %>
     <% content_for(:buttons) do -%>
-        <%= admin_dropdown do %>
+        <%= item_actions_dropdown do %>
             <li><%= image_tag_for_key('new', new_organism_path, "Add Organism", nil, 'Add Organism') -%></li>
             <li><%= delete_organism_icon(@organism)%></li>
         <% end %>
