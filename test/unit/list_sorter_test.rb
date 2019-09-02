@@ -91,25 +91,17 @@ class ListSorterTest < ActiveSupport::TestCase
     s3.update_attribute(:updated_at, 1.days.ago)
     sops = [s1, s2, s3]
 
-    Seek::ListSorter.index_items(people)
-    assert_equal [p6, p2, p1, p3, p5, p4], people
-    Seek::ListSorter.index_items(people, 'updated_at DESC')
-    assert_equal [p3, p4, p2, p1, p6, p5], people
+    assert_equal [p6, p2, p1, p3, p5, p4], Seek::ListSorter.index_items(people)
+    assert_equal [p3, p4, p2, p1, p6, p5], Seek::ListSorter.index_items(people, 'updated_at DESC')
 
-    Seek::ListSorter.index_items(institutions)
-    assert_equal [i2, i4, i1, i3], institutions
-    Seek::ListSorter.index_items(institutions, 'updated_at DESC')
-    assert_equal [i2, i4, i3, i1], institutions
+    assert_equal [i2, i4, i1, i3], Seek::ListSorter.index_items(institutions)
+    assert_equal [i2, i4, i3, i1], Seek::ListSorter.index_items(institutions, 'updated_at DESC')
 
-    Seek::ListSorter.index_items(events)
-    assert_equal [e2, e1, e3], events
-    Seek::ListSorter.index_items(events, 'updated_at DESC')
-    assert_equal [e1, e2, e3], events
+    assert_equal [e2, e1, e3], Seek::ListSorter.index_items(events)
+    assert_equal [e1, e2, e3], Seek::ListSorter.index_items(events, 'updated_at DESC')
 
-    Seek::ListSorter.index_items(sops)
-    assert_equal [s1, s3, s2], sops
-    Seek::ListSorter.index_items(sops, 'updated_at DESC')
-    assert_equal [s3, s2, s1], sops
+    assert_equal [s1, s3, s2], Seek::ListSorter.index_items(sops)
+    assert_equal [s3, s2, s1], Seek::ListSorter.index_items(sops, 'updated_at DESC')
   end
 
   test 'complex sorting' do
