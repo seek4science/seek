@@ -40,7 +40,7 @@ module Seek
       return if resource_hash.empty?
 
       resource_hash.each do |key, res|
-        sort_by_order(res[:items], order_for_view(key, :related))
+        resource_hash[key][:items] = sort_by_order(res[:items], order_for_view(key, :related))
       end
     end
 
@@ -55,7 +55,11 @@ module Seek
     end
 
     def self.sort_by_order(items, order)
-      items.sort!(&strategy_for_enum(order))
+      if items.is_a?(ActiveRecord::Relation)
+        items.order(strategy_for_relation(order))
+      else
+        items.sort!(&strategy_for_enum(order))
+      end
     end
 
     def self.key_for_view(type_name, view)

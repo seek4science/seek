@@ -68,9 +68,7 @@ module Seek
             page_totals[p] = groups[p] || 0
           end
 
-          records = records.to_a
-          Seek::ListSorter.index_items(records, order)
-          records
+          Seek::ListSorter.index_items(records.to_a, order)
         end
       end
 
@@ -81,8 +79,7 @@ module Seek
             page_totals[p] = collection.count { |i| i.first_letter == p }
           end
 
-          records = collection
-          Seek::ListSorter.index_items(records, order)
+          records = Seek::ListSorter.index_items(collection, order)
           if page == 'top'
             records = records[0...limit]
           elsif page == 'all'
