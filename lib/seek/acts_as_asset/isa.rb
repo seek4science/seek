@@ -52,7 +52,7 @@ module Seek
           end
 
           unless reflect_on_association(:investigations)
-            has_many :investigation, -> { distinct }, through: :studies
+            has_many :investigations, -> { distinct }, through: :studies
           end
         end
       end
