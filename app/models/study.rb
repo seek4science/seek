@@ -26,16 +26,9 @@ class Study < ApplicationRecord
 
   enforce_authorization_on_association :investigation, :view
 
-  ["data_file","sop","model","document"].each do |type|
-    eval <<-END_EVAL
-      def #{type}_versions
-        assays.collect{|a| a.send(:#{type}_versions)}.flatten.uniq
-      end
-
-      def related_#{type}s
-        assays.collect{|a| a.send(:#{type}s)}.flatten.uniq
-      end
-    END_EVAL
+  %w[data_file sop model document].each do |type|
+    has_many "#{type}_versions".to_sym, through: :assays
+    has_many "related_#{type.pluralize}".to_sym, through: :assays, source: type.pluralize.to_sym
   end
 
   def assets

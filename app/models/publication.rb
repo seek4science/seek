@@ -205,14 +205,12 @@ class Publication < ApplicationRecord
 
   # includes those related directly, or through an assay
   def related_data_files
-    via_assay = assays.collect(&:data_files).flatten.uniq.compact
-    via_assay | data_files
+    DataFile.where(id: assays.inject(data_file_ids) { |ids, assay| ids + assay.data_file_ids }.uniq)
   end
 
   # includes those related directly, or through an assay
   def related_models
-    via_assay = assays.collect(&:models).flatten.uniq.compact
-    via_assay | models
+    Model.where(id: assays.inject(model_ids) { |ids, assay| ids + assay.data_file_ids }.uniq)
   end
 
   # indicates whether the publication has data files or models linked to it (either directly or via an assay)

@@ -39,6 +39,10 @@ class Person < ApplicationRecord
   has_many :current_work_groups, class_name: 'WorkGroup', through: :current_group_memberships,
                                  source: :work_group
 
+  has_many :projects,  -> { distinct }, through: :work_groups
+  has_many :current_projects,  -> { distinct }, through: :current_work_groups
+  has_many :former_projects,  -> { distinct }, through: :former_work_groups
+
   has_many :institutions, -> { distinct }, through: :work_groups
 
   has_many :favourite_group_memberships, dependent: :destroy
@@ -52,11 +56,15 @@ class Person < ApplicationRecord
   RELATED_RESOURCE_TYPES.each do |type|
     has_many :"contributed_#{type.tableize}", foreign_key: :contributor_id, class_name: type
     has_many :"created_#{type.tableize}", through: :assets_creators, source: :asset, source_type: type
-  end
-
-  RELATED_RESOURCE_TYPES.collect(&:tableize).each do |type|
-    define_method "related_#{type}" do
-      send("created_#{type}") | send("contributed_#{type}")
+    t = type.constantize
+    if t.method_defined?(:assets_creators)
+      define_method "related_#{type.tableize}" do
+        t.joins(:assets_creators).where("#{type.tableize}.contributor_id = :id OR assets_creators.creator_id = :id", id: id)
+      end
+    else
+      define_method "related_#{type.tableize}" do
+        send("contributed_#{type.tableize}")
+      end
     end
   end
 
@@ -195,22 +203,6 @@ class Person < ApplicationRecord
     Person.order('ID asc').collect do |p|
       { 'id' => p.id, 'name' => p.name, 'email' => p.email, 'projects' => p.projects.collect(&:title).join(', ') }
     end.to_json
-  end
-
-  def projects # ALL projects, former and current
-    # updating workgroups doesn't change groupmemberships until you save. And vice versa.
-    work_groups.collect(&:project).uniq | group_memberships.collect { |gm| gm.work_group.project }
-  end
-
-  def current_projects
-    (current_work_groups.collect(&:project).uniq | current_group_memberships.collect { |gm| gm.work_group.project })
-  end
-
-  # Projects that the person has let completely (i.e. not still involved with through a different institution)
-  def former_projects
-    old_projects = (former_work_groups.collect(&:project).uniq | former_group_memberships.collect { |gm| gm.work_group.project })
-
-    old_projects - current_projects
   end
 
   def member?

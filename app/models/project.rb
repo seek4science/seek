@@ -153,19 +153,19 @@ class Project < ApplicationRecord
   end
 
   def studies
-    Study.where(investigation_id: investigation_ids).uniq
+    Study.where(investigation_id: investigation_ids).distinct
   end
 
   def study_ids
-    Study.select(:id).where(investigation_id: investigation_ids).uniq.pluck(:id)
+    studies.pluck(:id)
   end
 
   def assays
-    Assay.where(study_id: study_ids).uniq
+    Assay.where(study_id: study_ids).distinct
   end
 
   def assay_ids
-    Assay.select(:id).where(study_id: study_ids).uniq.pluck(:id)
+    assays.pluck(:id)
   end
 
   def site_password

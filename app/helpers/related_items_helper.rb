@@ -79,18 +79,45 @@ module RelatedItemsHelper
   def get_related_resources(resource, limit = nil)
     return resource_hash_lazy_load(resource) if Seek::Config.tabs_lazy_load_enabled
 
-    related = collect_related_items(resource)
+    related = relatable_types
+    related.delete('Person') if resource.is_a?(Person) # to avoid the same person showing up
+    related.delete('Organism') unless resource.is_a?(Sample)
 
-    # Authorize
-    authorize_related_items(related)
+    related.each_key do |type|
+      method = related_items_method_name(resource, type)
+      related[type][:items] = method ? resource.send(method) : []
+      total_count = related[type][:items].respond_to?(:count) ? related[type][:items].count : 1
+      related[type][:hidden_items] = []
+      related[type][:hidden_count] = 0
+      related[type][:extra_count] = 0
+      related[type][:items] = [related[type][:items]].compact unless related[type][:items].is_a?(Enumerable)
 
-    Seek::ListSorter.related_items(related)
+      if related[type][:items].any?
+        if type == 'Project' || type == 'Institution' || type == 'SampleType'
+          related[type][:hidden_count] = 0
+        elsif (type == 'Workflow' || type == 'Node') && !Seek::Config.workflows_enabled
+          related[type][:items] = []
+          related[type][:hidden_count] = 0
+        elsif type == 'Person'
+          if Seek::Config.is_virtualliver && User.current_user.nil?
+            related[type][:items] = []
+            related[type][:hidden_count] = total_count
+          else
+            related[type][:hidden_count] = 0
+          end
+        elsif type.constantize.respond_to?(:all_authorized_for)
+          total = related[type][:items]
+          related[type][:items] = related[type][:items].all_authorized_for('view', User.current_user)
+          related[type][:hidden_count] = total_count - related[type][:items].count
+          related[type][:hidden_items] = total - related[type][:items]
+        end
 
-    # Limit items viewable, and put the excess count in extra_count
-    related.each_key do |key|
-      if limit && related[key][:items].size > limit && %w[Project Investigation Study Assay Person Specimen Sample Snapshot].include?(resource.class.name)
-        related[key][:extra_count] = related[key][:items].size - limit
-        related[key][:items] = related[key][:items][0...limit]
+        related[type][:items] = Seek::ListSorter.sort_by_order(related[type][:items], Seek::ListSorter.order_for_view(type, :related))
+
+        if limit && related[type][:items].size > limit && %w[Project Investigation Study Assay Person Specimen Sample Snapshot].include?(resource.class.name)
+          related[type][:extra_count] = related[type][:count] - limit
+          related[type][:items] = related[type][:items].first(limit)
+        end
       end
     end
 
@@ -104,19 +131,17 @@ module RelatedItemsHelper
       'Strain' => {}, 'Sample' => {}, 'Workflow' => {}, 'Node' => {} }
   end
 
-  def related_items_method(resource, item_type)
+  def related_items_method_name(resource, item_type)
     method_name = item_type.underscore.pluralize
 
-    if resource.respond_to? "related_#{method_name}"
-      resource.send "related_#{method_name}"
+    if resource.respond_to?("related_#{method_name}")
+      "related_#{method_name}"
     elsif resource.respond_to? "related_#{method_name.singularize}"
-      Array(resource.send("related_#{method_name.singularize}"))
-    elsif resource.respond_to? method_name
-      resource.send method_name
+      "related_#{method_name.singularize}"
+    elsif resource.respond_to?(method_name)
+      method_name
     elsif item_type != 'Person' && resource.respond_to?(method_name.singularize) # check is to avoid Person.person
-      Array(resource.send(method_name.singularize))
-    else
-      []
+      method_name.singularize
     end
   end
 
@@ -139,51 +164,6 @@ module RelatedItemsHelper
       end
     end
     method_hash
-  end
-
-  def authorize_related_items(related)
-    related.each do |key, res|
-      res[:items] = [] if res[:items].nil?
-      res[:items] = res[:items].uniq.compact
-      next if res[:items].empty? || res[:items].nil?
-      total_count = res[:items].size
-      if key == 'Project' || key == 'Institution' || key == 'SampleType'
-        res[:hidden_count] = 0
-      elsif (key == 'Workflow' || key == 'Node') && !Seek::Config.workflows_enabled
-        res[:items] = []
-        res[:hidden_count] = 0
-      elsif key == 'Person'
-        if Seek::Config.is_virtualliver && User.current_user.nil?
-          res[:items] = []
-          res[:hidden_count] = total_count
-        else
-          res[:hidden_count] = 0
-        end
-      else
-        total = res[:items]
-        if key.constantize.method_defined? :policy
-          res[:items] = key.constantize.authorize_asset_collection res[:items], 'view', User.current_user
-        end
-        res[:hidden_count] = total_count - res[:items].size
-        res[:hidden_items] = total - res[:items]
-      end
-    end
-    end
-
-  def collect_related_items(resource)
-    related = relatable_types
-    related.delete('Person') if resource.is_a?(Person) # to avoid the same person showing up
-    related.delete('Organism') unless resource.is_a?(Sample)
-
-    answerable = {}
-    related.each_key do |type|
-      related[type][:items] = related_items_method(resource, type)
-      related[type][:hidden_items] = []
-      related[type][:hidden_count] = 0
-      related[type][:extra_count] = 0
-      answerable[type] = !related[type][:items].nil?
-    end
-    related
   end
 
   def sort_project_member_by_status(resource, project_id)

@@ -67,7 +67,9 @@ class Organism < ApplicationRecord
   end
 
   def related_publications
-    assays.collect(&:publications).flatten | models.collect(&:publications).flatten
+    pubs = Publication.joins(:related_relationships)
+    pubs.where(relationships: { subject_type: 'Model', subject_id: model_ids }).or(
+        pubs.where(relationships: { subject_type: 'Assay', subject_id: assay_ids }))
   end
 
   # converts the concept uri into a common form of http://purl.bioontology.org/ontology/NCBITAXON/<Number> if:

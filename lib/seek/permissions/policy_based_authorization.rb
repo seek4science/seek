@@ -338,9 +338,13 @@ module Seek
       end
 
       def contributors
-        a = [contributor]
-        a += versions.map(&:contributor) if respond_to?(:versions)
-        a.compact.uniq
+        Person.where(id: contributor_ids)
+      end
+
+      def contributor_ids
+        ids = [contributor_id]
+        ids += versions.pluck(:contributor_id) if self.respond_to?(:versions)
+        ids.uniq
       end
 
       # looks up the entry in the authorization lookup table for a single authorised type, for a given action, user_id and asset_id. A user id of zero

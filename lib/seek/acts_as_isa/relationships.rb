@@ -4,13 +4,14 @@ module Seek
       module InstanceMethods
         # includes publications directly related, plus those related to associated assays
         def related_publications
-          child_isa.collect(&:related_publications).flatten.uniq | publications
+          ids = child_isa.inject(publication_ids) { |ids, isa| ids + isa.publication_ids }.uniq
+          Publication.where(id: ids).distinct
         end
 
         def related_people
-          related_people = creators | [contributor.try(:person)]
-          related_people << person_responsible if self.respond_to?(:person_responsible)
-          related_people.compact.uniq
+          ids = [contributor_id]
+          ids << [person_responsible_id] if self.respond_to?(:person_responsible)
+          Person.where(id: assets_creators.pluck(:creator_id) + ids).distinct
         end
       end
 

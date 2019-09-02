@@ -5,7 +5,6 @@ class Investigation < ApplicationRecord
   acts_as_snapshottable
 
   has_many :studies
-
   has_many :assays, through: :studies
 
   validates :projects, presence: true, projects: { self: true }
@@ -15,15 +14,8 @@ class Investigation < ApplicationRecord
   end
 
   %w[data_file sop model publication document].each do |type|
-    eval <<-END_EVAL
-      def related_#{type}s
-        studies.collect{|study| study.send(:related_#{type}s)}.flatten.uniq
-      end
-
-      def #{type}_versions
-        studies.collect{|study| study.send(:#{type}_versions)}.flatten.uniq
-      end
-    END_EVAL
+    has_many "#{type}_versions".to_sym, -> { distinct }, through: :studies
+    has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :studies
   end
 
   def assets
@@ -36,10 +28,5 @@ class Investigation < ApplicationRecord
     new_object.project_ids = project_ids
     new_object.publications = publications
     new_object
-  end
-
-  # includes publications directly related, plus those related to associated assays
-  def related_publications
-    studies.collect(&:related_publications).flatten.uniq | publications
   end
 end

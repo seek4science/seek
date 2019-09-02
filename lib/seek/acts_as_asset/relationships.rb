@@ -8,7 +8,7 @@ module Seek
         end
 
         def related_people
-          (creators | contributors.map { |c| c.try(:person) }).compact.uniq
+          Person.where(id: creator_ids | contributor_ids).distinct
         end
 
         def attributions_objects

@@ -4,9 +4,9 @@ module Seek
     module ISA
       module InstanceMethods
         def related_people
-          people = [contributor.try(:person)]
-          people |= creators if self.respond_to?(:creators)
-          people.compact.uniq
+          ids = [contributor_id]
+          ids += creator_ids if self.respond_to?(:creators)
+          Person.where(id: ids).distinct
         end
 
         def assay_type_titles
@@ -48,15 +48,11 @@ module Seek
           end
 
           unless reflect_on_association(:studies)
-            def studies
-              assays.map(&:study).uniq
-            end
+            has_many :studies, -> { distinct }, through: :assays
           end
 
           unless reflect_on_association(:investigations)
-            def investigations
-              studies.map(&:investigation).uniq
-            end
+            has_many :investigation, -> { distinct }, through: :studies
           end
         end
       end
