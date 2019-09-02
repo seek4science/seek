@@ -121,14 +121,15 @@ module Seek
           # cannot rely purely on the count, since an item could have been deleted and a new one added
           lookup_count = lookup_count_for_user(user_id)
           last_lookup_asset_id = last_asset_id_for_user(user_id)
-          last_id = maximum(:id)
+          last_id = unscoped.maximum(:id)
+          asset_count = unscoped.count
 
           # trigger off a full update for that user if the count is zero and items should exist for that type
           if lookup_count == 0 && !last_id.nil?
             AuthLookupUpdateJob.new.add_items_to_queue User.find_by_id(user_id)
           end
 
-          (lookup_count == count && (count == 0 || (last_lookup_asset_id == last_id)))
+          (lookup_count == asset_count && (asset_count == 0 || (last_lookup_asset_id == last_id)))
         end
 
         # the name of the lookup table, holding authorisation lookup information, for this given authorised type
