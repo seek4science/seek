@@ -27,8 +27,8 @@ class Study < ApplicationRecord
   enforce_authorization_on_association :investigation, :view
 
   %w[data_file sop model document].each do |type|
-    has_many "#{type}_versions".to_sym, through: :assays
-    has_many "related_#{type.pluralize}".to_sym, through: :assays, source: type.pluralize.to_sym
+    has_many "#{type}_versions".to_sym, -> { distinct }, through: :assays
+    has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :assays, source: type.pluralize.to_sym
   end
 
   def assets
