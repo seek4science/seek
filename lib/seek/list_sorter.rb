@@ -46,7 +46,7 @@ module Seek
 
     # sort items for an index by the given sort parameter, or the default for its type
     def self.index_items(items, order = nil)
-      return if items.empty?
+      return items if items.empty?
       if order
         sort_by_order(items, order)
       else
@@ -58,7 +58,7 @@ module Seek
       if items.is_a?(ActiveRecord::Relation)
         items.order(strategy_for_relation(order))
       else
-        items.sort!(&strategy_for_enum(order))
+        items.sort(&strategy_for_enum(order))
       end
     end
 
