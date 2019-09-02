@@ -21,10 +21,10 @@ module Seek
 
           const_set('AuthLookup', Class.new(::AuthLookup)).class_eval do |c|
             c.table_name = klass.lookup_table_name
-            belongs_to :asset, class_name: klass.name
+            belongs_to :asset, class_name: klass.name, inverse_of: :auth_lookup
           end
 
-          has_many :auth_lookup, foreign_key: :asset_id, dependent: :delete_all
+          has_many :auth_lookup, foreign_key: :asset_id, inverse_of: :asset, dependent: :delete_all
         end
       end
       # the can_#{action}? methods are split into 2 parts, to differentiate between pure authorization and additional permissions based upon the state of the object or other objects it depends upon)
@@ -346,13 +346,7 @@ module Seek
       # looks up the entry in the authorization lookup table for a single authorised type, for a given action, user_id and asset_id. A user id of zero
       # indicates an anonymous user. Returns nil if there is no record available
       def lookup_for(action, user_id)
-        attribute = "can_#{action}"
-        res = auth_lookup.select(attribute).where(user_id: user_id).first
-        if res.nil?
-          nil
-        else
-          ActiveRecord::Type::Boolean.new.cast(res[attribute])
-        end
+        auth_lookup.where(user_id: user_id).limit(1).pluck("can_#{action}").first
       end
     end
   end
