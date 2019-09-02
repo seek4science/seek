@@ -18,6 +18,7 @@ class Study < ApplicationRecord
   acts_as_snapshottable
 
   has_many :assays
+  has_many :assay_publications, through: :assays, source: :publications
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
   belongs_to :person_responsible, :class_name => "Person"
@@ -52,5 +53,9 @@ class Study < ApplicationRecord
 
   def self.filter_by_projects(projects)
     joins(:projects).where(investigations: { investigations_projects: { project_id: projects } })
+  end
+
+  def related_publication_ids
+    publication_ids | assay_publication_ids
   end
 end

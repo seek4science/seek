@@ -230,4 +230,8 @@ class Assay < ApplicationRecord
     self.assay_assets = (other_assay_assets + new_type_assay_assets)
     self.assay_assets
   end
+
+  def related_publication_ids
+    publication_ids
+  end
 end

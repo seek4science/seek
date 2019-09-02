@@ -10,7 +10,9 @@ class Organism < ApplicationRecord
 
   has_many :assay_organisms, inverse_of: :organism
   has_many :models
+  has_many :model_publications, through: :models, source: :publications
   has_many :assays, through: :assay_organisms, inverse_of: :organisms
+  has_many :assay_publications, through: :assays, source: :publications
   has_many :strains, dependent: :destroy
   has_many :samples, through: :strains
 
@@ -67,9 +69,11 @@ class Organism < ApplicationRecord
   end
 
   def related_publications
-    pubs = Publication.joins(:related_relationships)
-    pubs.where(relationships: { subject_type: 'Model', subject_id: model_ids }).or(
-        pubs.where(relationships: { subject_type: 'Assay', subject_id: assay_ids }))
+    Publication.where(id: related_publication_ids)
+  end
+
+  def related_publication_ids
+    assay_publication_ids | model_publication_ids
   end
 
   # converts the concept uri into a common form of http://purl.bioontology.org/ontology/NCBITAXON/<Number> if:
