@@ -5,27 +5,22 @@ class SearchController < ApplicationController
   include Seek::ExternalSearch
   include Seek::FacetedBrowsing
 
-  class InvalidSearchException < Exception; end;
+  class InvalidSearchException < RuntimeError; end
 
   def index
     @results = []
     if Seek::Config.solr_enabled
 
       begin
-        perform_search (request.format.json?)
-      rescue InvalidSearchException=>e
+        perform_search
+      rescue InvalidSearchException => e
         flash.now[:error] = e.message
-      rescue RSolr::Error::ConnectionRefused=>e
+      rescue RSolr::Error::ConnectionRefused => e
         flash.now[:error] = "The search service is currently not running, and we've been notified of the problem. Please try again later"
 
-        Seek::Errors::ExceptionForwarder.send_notification(e, env:request.env, data:{message: 'An error with search occurred, SOLR connection refused.'})
+        Seek::Errors::ExceptionForwarder.send_notification(e, env: request.env, data: { message: 'An error with search occurred, SOLR connection refused.' })
       end
     end
-
-    #strip out nils, which can occur if the index is out of sync
-    @results.compact!
-    #select only items, that can be viewed by the current_user
-    @results.select!(&:can_view?)
 
     @results_scaled = Scale.all.collect {|scale| [scale.key, @results.select {|item| !item.respond_to?(:scale_ids) or item.scale_ids.include? scale.id}]}
     @results_scaled << ['all', @results]
@@ -62,12 +57,12 @@ class SearchController < ApplicationController
     
   end
 
-  def perform_search (is_json = false)
+  def perform_search
     @search_query = ActionController::Base.helpers.sanitize(params[:q] || params[:search_query])
-    @search=@search_query # used for logging, and logs the origin search query - see ApplicationController#log_event
-    @search_query||=""
+    @search = @search_query # used for logging, and logs the origin search query - see ApplicationController#log_event
+    @search_query ||=""
     @search_type = params[:search_type]
-    type=@search_type.downcase unless @search_type.nil?
+    type = @search_type&.downcase
 
     @search_query = Seek::Search::SearchTermFilter.filter @search_query
 
@@ -79,42 +74,33 @@ class SearchController < ApplicationController
 
     raise InvalidSearchException.new("Query string is empty or blank") if downcase_query.blank?
 
-    if (Seek::Config.solr_enabled)
+    if Seek::Config.solr_enabled
       if type == "all"
-          sources = searchable_types
-          if is_json
-            sources -= [Strain, Sample]
-          end
-          sources.each do |source|
-            search = source.search do |query|
-              query.keywords(downcase_query)
-              query.paginate(:page => 1, :per_page => source.count ) if source.count > 30  # By default, Sunspot requests the first 30 results from Solr
-            end #.results
-            @search_hits = search.hits
-            search_result = search.results
-            @results |= search_result
-          end
+        sources = searchable_types
+        sources -= [Strain, Sample] if request.format.json?
       else
-           type_name = type.singularize.camelize
-           raise InvalidSearchException.new("#{type} is not a valid search type") unless searchable_types.map(&:to_s).include?(type_name)
-           search_type = type_name.constantize
-           search = search_type.search do |query|
-             query.keywords(downcase_query)
-             query.paginate(:page => 1, :per_page => search_type.count ) if search_type.count > 30 # By default, Sunspot requests the first 30 results from Solr
-           end #.results
-           @search_hits = search.hits
-           search_result = search.results
-           @results = search_result
+        type_name = type.singularize.camelize
+        raise InvalidSearchException.new("#{type} is not a valid search type") unless searchable_types.map(&:to_s).include?(type_name)
+        sources = [type_name.constantize]
       end
 
-      if (params[:include_external_search]=="1")
-        external_results = external_search downcase_query,type
+      sources.each do |source|
+        search = source.search do |query|
+          query.keywords(downcase_query)
+          query.paginate(:page => 1, :per_page => source.count ) if source.count > 30  # By default, Sunspot requests the first 30 results from Solr
+        end #.results
+        @search_hits = search.hits
+        search_result = search.results.compact.all_authorized_for('view')
+        @results |= search_result
+      end
+
+      if params[:include_external_search] == "1"
+        external_results = external_search(downcase_query, type)
         @results |= external_results
       end
 
       @results = apply_filters(@results)
     end
-
   end
 
   private

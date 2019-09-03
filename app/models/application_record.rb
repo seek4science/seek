@@ -20,6 +20,7 @@ class ApplicationRecord < ActiveRecord::Base
   include SiteAnnouncements
   include Seek::Permissions::AuthorizationEnforcement
   include Seek::Permissions::ActsAsAuthorized
+  include Seek::RelatedItems
 
   include Annotations::Acts::Annotatable
   include Annotations::Acts::AnnotationSource

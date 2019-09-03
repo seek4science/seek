@@ -19,6 +19,11 @@ module Seek #:nodoc:
         def authorization_supported?
           include?(Seek::Permissions::PolicyBasedAuthorization)
         end
+
+        # Allow `all_authorized_for` to be safely called on any collection of SEEK resources.
+        def all_authorized_for(action, user = User.current_user)
+          all.to_a.all_authorized_for(action, user)
+        end
       end
 
       # Sets up the basic interface for authorization hooks. All AR instances get these methods, and by default they return true.
@@ -31,7 +36,7 @@ module Seek #:nodoc:
       end
 
       def can_perform?(action, *args)
-        send "can_#{action}?", *args
+        send("can_#{action}?", *args)
       end
 
       def authorization_supported?

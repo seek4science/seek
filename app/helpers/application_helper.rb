@@ -176,8 +176,13 @@ module ApplicationHelper
 
     result_collection.each do |res|
       tab = res.respond_to?(:tab) ? res.tab : res.class.name
-      results[tab] = { items: [], hidden_count: 0, is_external: (res.respond_to?(:is_external_search_result?) && res.is_external_search_result?) } unless results[tab]
+      results[tab] ||= { items: [],
+                         items_count: 0,
+                         hidden_count: 0,
+                         is_external: (res.respond_to?(:is_external_search_result?) && res.is_external_search_result?) }
+
       results[tab][:items] << res
+      results[tab][:items_count] += 1
     end
 
     results
