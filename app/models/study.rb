@@ -58,4 +58,10 @@ class Study < ApplicationRecord
   def related_publication_ids
     publication_ids | assay_publication_ids
   end
+
+  def related_person_ids
+    ids = super
+    ids << person_responsible_id if person_responsible_id
+    ids.uniq
+  end
 end

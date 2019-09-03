@@ -8,9 +8,13 @@ module Seek
         end
 
         def related_people
-          ids = [contributor_id]
-          ids << [person_responsible_id] if respond_to?(:person_responsible)
-          Person.where(id: assets_creators.pluck(:creator_id) + ids).distinct
+          Person.where(id: related_person_ids)
+        end
+
+        def related_person_ids
+          ids = creator_ids
+          ids << contributor_id
+          ids.uniq
         end
       end
 
