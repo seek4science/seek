@@ -1039,7 +1039,7 @@ class PersonTest < ActiveSupport::TestCase
     refute_includes pa.administered_programmes, other_prog
 
     assert_empty Factory(:person).administered_programmes
-    assert_equal Programme.all.sort, admin.administered_programmes
+    assert_equal Programme.all.sort, admin.administered_programmes.sort
   end
 
   test 'not_registered_with_matching_email' do

@@ -291,6 +291,21 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     end
   end
 
+  test 'maintains page totals after paging' do
+    item1 = Factory(:sop, title: 'AAA', updated_at: 2.days.ago)
+    item2 = Factory(:sop, title: 'BBB', updated_at: 1.days.ago)
+    item3 = Factory(:sop, title: 'BBC', updated_at: 1.days.ago)
+    collection = [item1, item2, item3]
+
+    paged_collection = Sop.paginate_after_fetch(collection, page: 'A')
+    assert_equal 1, paged_collection.page_totals['A']
+    assert_equal 2, paged_collection.page_totals['B']
+
+    paged_collection = Sop.paginate_after_fetch(collection, page: 'B')
+    assert_equal 1, paged_collection.page_totals['A']
+    assert_equal 2, paged_collection.page_totals['B']
+  end
+
   test 'ensure pagination works the same for relations and arrays' do
     check_both_pagination_methods(DataFile.all, page: 'P')
     check_both_pagination_methods(DataFile.all, page: 'top', order: 'title asc')

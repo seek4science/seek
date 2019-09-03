@@ -1,4 +1,4 @@
-<% current_user_authorized_to_manage = @sop.can_manage? -%>
+
 <h1>Editing <%= t('sop') %>: <%= link_to(h(@sop.title), sop_path(@sop)) -%></h1>
 
 <%= form_for(@sop) do |f| %>
@@ -15,32 +15,18 @@
         <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
       </div>
 
-      <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, and project selector was disabled) -%>
-      <% if current_user_authorized_to_manage -%>
-          <%= render :partial => "projects/project_selector", :locals => { :resource => @sop, :allow_nil => Seek::Config.is_virtualliver } -%>
-      <% end -%>
-
       <% if show_scales? %>
           <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} %>
       <% end %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @sop } %>
 
-      <%# only the owner should be able to change sharing permissions -%>
-      <% if current_user_authorized_to_manage %>
-          <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
+      <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
 
-          <%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
+      <%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
 
-          <%= fancy_multiselect @sop, :workflows, { other_projects_checkbox: false } if Seek::Config.workflows_enabled -%>
-      <% end %>
+      <%= fancy_multiselect @sop, :workflows, { other_projects_checkbox: false } if Seek::Config.workflows_enabled -%>
 
-      <div>
-        <%= preview_permission_popup_link(@sop)-%>
-        <%= f.submit "Update", :id => "sop_submit_btn",
-                     :onclick => "return validateResourceFields('sop')",
-                     :class => 'btn btn-primary' -%>
-        or <%= cancel_button(sop_path(@sop)) -%>
-      </div>
+      <%= form_submit_buttons(@sop) %>
     </div>
 <% end %>

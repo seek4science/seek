@@ -104,7 +104,7 @@ class SamplesController < ApplicationController
 
   private
 
-  def sample_params(sample_type)
+  def sample_params(sample_type=nil)
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:accessor_name).collect(&:to_sym) | sample_type.sample_attributes.map(&:method_name).collect(&:to_sym) : []
     params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
                                    { data: sample_type_param_keys }, { creator_ids: [] },

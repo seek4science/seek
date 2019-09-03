@@ -16,6 +16,37 @@ class AssetsHelperTest < ActionView::TestCase
     end
   end
 
+  test 'form_submit_buttons' do
+
+    new_study = Study.new
+
+    @controller.action_name = 'new'
+    html = form_submit_buttons(new_study)
+    assert_match /submit_button_clicked\(true, true, 'study'\);/,html
+    assert_match /id=\"study_submit_btn\"/,html
+
+    html = form_submit_buttons(new_study, validate:false)
+    assert_match /submit_button_clicked\(false, true, 'study'\);/,html
+
+    html = form_submit_buttons(new_study, validate:false, preview_permissions:false)
+    assert_match /submit_button_clicked\(false, false, 'study'\);/,html
+
+  end
+
+  test 'submit button text' do
+    new_assay = Assay.new
+    new_model = Model.new
+    data_file = Factory(:data_file)
+    investigation = Factory(:investigation)
+
+    assert_equal 'Create', submit_button_text(new_assay)
+    assert_equal 'Upload and Save', submit_button_text(new_model)
+    assert_equal 'Update', submit_button_text(data_file)
+    assert_equal 'Update', submit_button_text(investigation)
+
+
+  end
+
   test 'rendered_asset_view' do
     slideshare_url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794/'
     slideshare_api_url = "http://www.slideshare.net/api/oembed/2?url=#{slideshare_url}&format=json"

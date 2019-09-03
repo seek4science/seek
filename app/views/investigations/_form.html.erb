@@ -12,32 +12,12 @@
   <%= f.text_area :description, :rows => 5, :class=>"form-control" -%>
 </div>
 
-<%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} -%>
+<%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? -%>
 
 <%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales?%>
 
-<%= render :partial=>"sharing/form" if @investigation.can_manage? -%>
-
-<%  existing_creators = @investigation.creators
-    existing_creators =  [current_user.person] if existing_creators.blank?
-%>
-<%= render :partial => "assets/author_form", :locals => {:form => f,
-                                                         :existing_creators => existing_creators,
-                                                         :other_creators => @investigation.other_creators} -%>
+<%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
-<%
-   button_text=action==:edit ? "Update" : "Create"
-   disabled_text=action==:edit ? "Updating..." : "Creating..."
-%>
-<% if @investigation.can_manage? %>
-    <%= preview_permission_popup_link(@investigation)-%>
-    <%= f.submit button_text, :id => "investigation_submit_btn",
-                 :onclick => "javascript: previewPermissions();return(false);",
-                 :class => 'btn btn-primary' -%>
-<% else %>
-    <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "investigation_submit_btn",
-                 :class => 'btn btn-primary' -%>
-<% end %>
- or <%= cancel_button(@investigation.id ? investigation_path(@investigation.id) : investigations_path) -%>
+<%= form_submit_buttons(@investigation) %>

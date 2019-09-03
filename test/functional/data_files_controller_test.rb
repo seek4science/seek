@@ -610,7 +610,6 @@ class DataFilesControllerTest < ActionController::TestCase
     get :edit, params: { id: data_files(:picture) }
     assert_response :success
     assert_select 'h1', text: /Editing #{I18n.t('data_file')}/
-    assert_select 'div.alert-info', text: /the #{I18n.t('data_file')}/i
   end
 
   test 'publications included in form for datafile' do
@@ -3516,30 +3515,6 @@ class DataFilesControllerTest < ActionController::TestCase
     logout
   end
 
-  test 'sharing permissions should not show for edit' do
-    p = Factory(:person)
-    login_as(p.user)
-    df = Factory(:data_file, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:p, access_type:Policy::EDITING)]))
-
-    assert df.can_edit?(p.user)
-    refute df.can_manage?(p.user)
-
-    get :edit, params: { id:df.id }
-    assert_response :success
-
-    assert_select "div#sharing_form", count:0
-
-    # make sure it appears if can_manage
-
-    login_as(df.contributor.user)
-
-    get :edit, params: { id:df.id }
-    assert_response :success
-
-    assert_select "div#sharing_form", count:1
-
-  end
-
   test 'should show view content button for image' do
     data_file = Factory(:data_file, content_blob: Factory(:image_content_blob))
     login_as(data_file.contributor)
@@ -3562,5 +3537,119 @@ class DataFilesControllerTest < ActionController::TestCase
     session[:uploaded_content_blob_id] = content_blob_id.to_s
     post :rightfield_extraction_ajax, params: { content_blob_id:content_blob_id.to_s, format:'js' }
     get :provide_metadata unless skip_provide_metadata
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('data_file')
+  end
+
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    data_file = Factory(:data_file, contributor:person)
+    login_as(person)
+    assert data_file.can_manage?
+    get :manage, params: {id: data_file}
+    assert_response :success
+
+    # check the project form exists, studies and assays don't have this
+    assert_select 'div#add_projects_form', count:1
+
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
+    # should be a temporary sharing link
+    assert_select 'div#temporary_links', count:1
+
+    assert_select 'div#author_form', count:1
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    data_file = Factory(:data_file, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert data_file.can_edit?
+    refute data_file.can_manage?
+    get :manage, params: {id:data_file}
+    assert_redirected_to data_file
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    data_file = Factory(:data_file, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+
+    login_as(person)
+    assert data_file.can_manage?
+
+    patch :manage_update, params: {id: data_file,
+                                   data_file: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to data_file
+
+    data_file.reload
+    assert_equal [proj1,proj2],data_file.projects.sort_by(&:id)
+    assert_equal [other_creator],data_file.creators
+    assert_equal Policy::VISIBLE,data_file.policy.access_type
+    assert_equal 1,data_file.policy.permissions.count
+    assert_equal other_person,data_file.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,data_file.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person, project:proj1)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    data_file = Factory(:data_file, projects:[proj1], policy:Factory(:private_policy,
+                                                                             permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute data_file.can_manage?
+    assert data_file.can_edit?
+
+    assert_equal [proj1],data_file.projects
+    assert_empty data_file.creators
+
+    patch :manage_update, params: {id: data_file,
+                                   data_file: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    data_file.reload
+    assert_equal [proj1],data_file.projects
+    assert_empty data_file.creators
+    assert_equal Policy::PRIVATE,data_file.policy.access_type
+    assert_equal 1,data_file.policy.permissions.count
+    assert_equal person,data_file.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,data_file.policy.permissions.first.access_type
+
   end
 end

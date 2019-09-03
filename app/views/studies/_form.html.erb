@@ -14,7 +14,7 @@
 
 <div class="form-group">
   <%= f.label "Experimentalist(s)" %>
-  <%= f.text_area :experimentalists, :rows => 1, :class=>"form-control" %>
+  <%= f.text_field :experimentalists, :class=>"form-control" %>
 </div>
 
 <%= folding_panel("#{t('investigation')} details") do %>
@@ -30,36 +30,17 @@
     </div>
 <% end %>
 
-<%  existing_creators = @study.creators
-    existing_creators =  [current_user.person] if existing_creators.blank?
-%>
 
-<%= render :partial => "assets/author_form", :locals => {:form => f,
-                                                         :existing_creators => existing_creators,
-                                                         :other_creators => @study.other_creators} -%>
 
 <% if show_scales? %>
     <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
 <% end %>
 
-<%= render :partial=>"sharing/form" if @study.can_manage? -%>
+<%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
-<%
-   button_text=action==:edit ? "Update" : "Create"
-   disabled_text=action==:edit ? "Updating..." : "Creating..."
-%>
-<% if @study.can_manage? %>
-    <%= preview_permission_popup_link(@study)-%>
-    <%= f.submit button_text, :id => "study_submit_btn",
-                 :onclick => "javascript: previewPermissions();return(false);",
-                 :class => 'btn btn-primary'-%>
-<% else %>
-    <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "study_submit_btn",
-                 :class => 'btn btn-primary'-%>
-<% end %>
- or <%= cancel_button(@study.id ? study_path(@study.id) : studies_path) -%>
+<%= form_submit_buttons(@study) %>
 
 <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                     select_id: '#study_investigation_id',

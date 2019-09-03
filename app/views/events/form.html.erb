@@ -45,13 +45,11 @@
         <%= f.country_select :country, nil, { :include_blank => 'Please select...' }, :class=>"form-control" -%>
       </div>
 
-      <% if current_user_authorized_to_manage -%>
+      <% if show_form_manage_specific_attributes? && @event.can_manage? %>
           <%= render :partial => "projects/project_selector", :locals => {:resource => @event, :allow_nil => Seek::Config.is_virtualliver} -%>
-
-          <%= render :partial => "sharing/form" -%>
-
-          <%= render :partial => "assets/special_auth_code_form", :locals => {:f => f} if !@event.try(:new_record?)-%>
       <% end %>
+
+      <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
       <%= f.fancy_multiselect :publications ,:other_projects_checkbox=>true -%>
 
@@ -61,18 +59,7 @@
 
       <%= f.fancy_multiselect :documents, other_projects_checkbox: true %>
 
-      <%
-         button_text=@new ? "Create" : "Update"
-         disabled_text=@new ? "Creating..." : "Updating..."
-      %>
-      <% if @event.can_manage? %>
-          <%= preview_permission_popup_link(@event)-%>
-          <%= f.submit button_text, :id => "event_submit_btn",
-                       :onclick => "javascript: previewPermissions();return(false);", :class => 'btn btn-primary' -%>
-      <% else %>
-          <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "event_submit_btn",
-                       :class => 'btn btn-primary' -%>
-      <% end %>
-      or <%= cancel_button(@event.id ? event_path(@event.id) : events_path) -%>
+      <%= form_submit_buttons(@event) %>
+
     </div>
 <% end %>
