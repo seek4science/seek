@@ -452,6 +452,7 @@ class PublicationsController < ApplicationController
             if current_publication.save
               publications << current_publication
               associsate_authors_with_users(current_publication)
+              current_publication.creators = current_publication.seek_authors.map(&:person)
             else
               publications_with_errors << current_publication
             end
@@ -546,7 +547,20 @@ class PublicationsController < ApplicationController
     # Get author by last name
     last_name_matches = Person.where(last_name: author.last_name)
     matches = last_name_matches
-    # If no results, try searching by normalised name, taken from grouped_pagination.rb
+
+    if matches.empty?
+      # if no results, try replacing umlaut to non_umlaut
+      if has_umlaut(author.last_name)
+        replaced_name = replace_to_non_umlaut(author.last_name)
+        #if no results, try replacing non_umlaut to umlaut
+      elsif has_non_umlaut(author.last_name)
+        replaced_name = replace_to_umlaut(author.last_name)
+      end
+      last_name_matches = Person.where(last_name: replaced_name)
+      matches = last_name_matches
+    end
+
+    # if no results, try searching by normalised name, taken from grouped_pagination.rb
     if matches.empty?
       text = author.last_name
       # handle the characters that can't be handled through normalization
@@ -577,5 +591,38 @@ class PublicationsController < ApplicationController
 
     # Take the first match as the guess
     matches.first
+  end
+
+  #ToDo move it to somewhere else
+  def has_umlaut(str)
+    !!(str =~ /[öäüÖÄÜß]/)
+  end
+
+  def has_non_umlaut(str)
+    ["ae","oe","ue","ss"].any? {|non_umlaut| str.include? non_umlaut}
+  end
+
+  def replace_to_non_umlaut (str)
+    str.gsub!(/[äöüß]/) do |match|
+      case match
+      when "ä" then 'ae'
+      when "ö" then 'oe'
+      when "ü" then 'ue'
+      when "ß" then 'ss'
+      end
+    end
+    str
+  end
+
+  def replace_to_umlaut (str)
+    str.gsub!(/(ae|oe|ue|ss)/) do |match|
+      case match
+      when "ae" then 'ä'
+      when "oe" then 'ö'
+      when "ue" then 'ü'
+      when "ss" then 'ß'
+      end
+    end
+    str
   end
 end

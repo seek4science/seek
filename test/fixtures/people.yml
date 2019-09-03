@@ -45,9 +45,15 @@ double_barrelled_lastname:
   last_name: "Smith-Jones"
   email: "Fred2@email.com"
 
+name_with_umlaut:
+  first_name: "Bob"
+  last_name: "Müller"
+  email: "bob@email.com"
 
-
-
+name_with_non_umlaut:
+  first_name: "Alice"
+  last_name: "Graeter"
+  email: "alice@email.com"
 
 
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********

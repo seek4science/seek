@@ -271,24 +271,37 @@ class PublicationsControllerTest < ActionController::TestCase
             publication_type: Factory(:journal),
             authors: [
                 PublicationAuthor.new(first_name: 'quentin', last_name: 'jones', author_index: 0),
-                PublicationAuthor.new(first_name: 'aaron', last_name: 'spiggle', author_index: 1),
-                PublicationAuthor.new(first_name: 'R.', last_name: 'Stevens', author_index: 2)
+                PublicationAuthor.new(first_name: 'aaron', last_name: 'spiggle', author_index: 1)]
+        },
+        {
+            #publications[1]
+            title: 'This is a real publication',
+            journal: 'Astronomy Astrophysics',
+            published_date: Date.new(2015),
+            publication_type: Factory(:journal),
+            authors: [
+                PublicationAuthor.new(first_name: 'Alice', last_name: 'Gräter', author_index: 0),
+                PublicationAuthor.new(first_name: 'Bob', last_name: 'Mueller', author_index: 1)
             ]
         }
     ]
 
-    assert_difference('Publication.count') do
+    assert_difference('Publication.count',2) do
         post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/author_match.bib'), project_ids: [projects(:one).id] } }
     end
 
 
-     publication = Publication.where(title: publications[0][:title]).first
-
+    publication = Publication.where(title: publications[0][:title]).first
+    assert_not_nil publication
     publication.publication_authors.collect(&:person_id).compact.each do |person_id|
       assert_equal Person.where(id: person_id).first.last_name , PublicationAuthor.where(person_id: person_id).first.last_name
       assert_equal Person.where(id: person_id).first.first_name , PublicationAuthor.where(person_id: person_id).first.first_name
     end
-
+    publication1 = Publication.where(title: publications[1][:title]).first
+    assert_not_nil publication1
+    publication1.publication_authors.collect(&:person_id).compact.each do |person_id|
+      assert_not_nil person_id
+    end
   end
 
   test 'should only show the year for 1st Jan in list view' do
