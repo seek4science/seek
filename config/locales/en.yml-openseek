@@ -61,6 +61,10 @@ en:
   favourite_group: "favourite groups"
 
   actions_button: "Actions"
+  submit_button:
+    upload: 'Upload and Save'
+    create: 'Create'
+    update: 'Update'
 
   access:
     determined_by_group: "Individual access rights for each member"

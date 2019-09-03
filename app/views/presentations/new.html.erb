@@ -29,12 +29,7 @@
       <%= fields_for(@presentation) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
 
       <%= fancy_multiselect @presentation, :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
-      <div>
-        <%= preview_permission_popup_link(@presentation)-%>
-        <%= create_button :id => "presentation_submit_btn",
-                       :onclick => "return validateResourceFields('presentation');",
-                       :class => 'btn btn-primary' -%>
-        or <%= cancel_button(presentations_path) -%>
-      </div>
+
+      <%= form_submit_buttons(@presentation) %>
     </div>
 <% end -%>

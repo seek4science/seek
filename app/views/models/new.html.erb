@@ -34,13 +34,7 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
 
-      <div>
-        <%= preview_permission_popup_link(@model)-%>
-        <%= create_button :id => "model_submit_btn",
-                       :onclick => "return validateResourceFields('model')",
-                       :class => 'btn btn-primary' -%>
-        or <%= cancel_button(models_path) -%>
-      </div>
+      <%= form_submit_buttons(@model) %>
     </div>
 <% end -%>
 
