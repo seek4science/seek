@@ -32,7 +32,7 @@ module RelatedItemsHelper
   def resource_type_tab_title(resource_type)
     "#{resource_type[:visible_resource_type]} "\
         "(#{(resource_type_total_visible_count(resource_type))}" +
-      ((resource_type[:hidden_count]) > 0 ? "+#{resource_type[:hidden_count]}" : '') + ')'
+        ((resource_type[:hidden_count]) > 0 ? "+#{resource_type[:hidden_count]}" : '') + ')'
   end
 
   def ordered_keys(resource_hash)
@@ -51,18 +51,39 @@ module RelatedItemsHelper
   def get_related_resources(resource, limit = nil)
     return resource_hash_lazy_load(resource) if Seek::Config.tabs_lazy_load_enabled
 
-    hash = {}
+    items_hash = {}
     resource.class.related_types.each do |type|
       next if type == 'Person' && resource.is_a?(Person) # to avoid the same person showing up
       next if type == 'Organism' && !resource.is_a?(Sample)
       next if type == 'Workflow' || type == 'Node' && !Seek::Config.workflows_enabled
 
-      hash[type] = {}
-
       items = resource.get_related(type)
       items = [] if items.nil?
       items = [items] if items.is_a?(ApplicationRecord)
+      items_hash[type] = items
+    end
 
+    related_items_hash(items_hash, limit)
+  end
+
+  def sort_project_member_by_status(resource, project_id)
+    project = Project.find(project_id)
+    resource.sort_by { |person| person.current_projects.include?(project) ? 0 : 1 }
+  end
+
+  def get_person_id
+    if !params[:id].nil?
+      person_id = params[:id]
+    elsif !params[:person_id].nil?
+      person_id = params[:person_id]
+    end
+    person_id
+  end
+
+  def related_items_hash(items_hash, limit = nil)
+    hash = {}
+    items_hash.each do |type, items|
+      hash[type] = {}
       hash[type][:items] = items
       hash[type][:items_count] = hash[type][:items].count
       hash[type][:hidden_items] = []
@@ -88,19 +109,5 @@ module RelatedItemsHelper
     end
 
     hash
-  end
-
-  def sort_project_member_by_status(resource, project_id)
-    project = Project.find(project_id)
-    resource.sort_by { |person| person.current_projects.include?(project) ? 0 : 1 }
-  end
-
-  def get_person_id
-    if !params[:id].nil?
-      person_id = params[:id]
-    elsif !params[:person_id].nil?
-      person_id = params[:person_id]
-    end
-    person_id
   end
 end
