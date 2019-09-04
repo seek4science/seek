@@ -215,31 +215,6 @@ class Project < ApplicationRecord
 
   end
 
-  def lineage_ancestor_cannot_be_self
-    if lineage_ancestor == self
-      errors.add(:lineage_ancestor, 'cannot be the same as itself')
-    end
-  end
-
-  # allows a new project to be spawned off as a descendant of this project, retaining the same membership but existing
-  # as a new project entity. attributes may be passed to override those being copied. The ancestor and memberships will
-  # automatically be assigned and carried over, and the avatar will be set to nil
-  def spawn(attributes = {})
-    child = dup
-    work_groups.each do |wg|
-      new_wg = WorkGroup.new(institution: wg.institution, project: child)
-      child.work_groups << new_wg
-      wg.group_memberships.each do |gm|
-        new_gm = GroupMembership.new(person: gm.person, work_group: wg)
-        new_wg.group_memberships << new_gm
-      end
-    end
-    child.assign_attributes(attributes)
-    child.avatar = nil
-    child.lineage_ancestor = self
-    child
-  end
-
   def self.can_create?
     User.admin_logged_in? || User.activated_programme_administrator_logged_in?
   end
