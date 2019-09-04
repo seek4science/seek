@@ -343,7 +343,7 @@ class PeopleController < ApplicationController
   end
 
   def find_assets
-    @people = []
+    @people = nil
     if params[:discipline_id]
       @discipline = Discipline.find_by_id(params[:discipline_id])
       @people = @discipline.try(:people) || []
