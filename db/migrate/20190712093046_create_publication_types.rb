@@ -1,4 +1,4 @@
-class CreatePublicationTypes < ActiveRecord::Migration
+class CreatePublicationTypes < ActiveRecord::Migration[4.2]
   def change
     create_table :publication_types do |t|
       t.string :title
