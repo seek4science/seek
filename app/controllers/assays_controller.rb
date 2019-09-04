@@ -69,7 +69,6 @@ class AssaysController < ApplicationController
 
   def new
     @assay=Assay.new
-    @assay.create_from_asset = params[:create_from_asset]
     study = Study.find(params[:study_id]) if params[:study_id]
     @assay.study = study if params[:study_id] if study.try :can_edit?
     @assay_class=params[:class]
@@ -116,14 +115,10 @@ class AssaysController < ApplicationController
     update_relationships(@assay, params)
 
     if @assay.save
-      if @assay.create_from_asset =="true"
-        render :action => :update_assays_list
-      else
-        respond_to do |format|
-          flash[:notice] = "#{t('assays.assay')} was successfully created."
-          format.html { redirect_to(@assay) }
-          format.json {render json: @assay}
-        end
+      respond_to do |format|
+        flash[:notice] = "#{t('assays.assay')} was successfully created."
+        format.html { redirect_to(@assay) }
+        format.json {render json: @assay}
       end
     else
       respond_to do |format|
@@ -176,7 +171,7 @@ class AssaysController < ApplicationController
 
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
-                                  :license, :other_creators, :create_from_asset, { document_ids: []}, { creator_ids: [] },
+                                  :license, :other_creators, { document_ids: []}, { creator_ids: [] },
                                   { scales: [] }, { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },

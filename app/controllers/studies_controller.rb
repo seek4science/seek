@@ -37,7 +37,6 @@ class StudiesController < ApplicationController
 
   def new
     @study = Study.new
-    @study.create_from_asset = params[:create_from_asset]
     investigation = nil
     investigation = Investigation.find(params[:investigation_id]) if params[:investigation_id]
 
@@ -85,7 +84,6 @@ class StudiesController < ApplicationController
 
   def show
     @study = Study.find(params[:id])
-    @study.create_from_asset = params[:create_from_asset]
 
     respond_to do |format|
       format.html
@@ -103,14 +101,8 @@ class StudiesController < ApplicationController
     if @study.save
       respond_to do |format|
         flash[:notice] = "The #{t('study')} was successfully created.<br/>".html_safe
-        if @study.create_from_asset == 'true'
-          flash.now[:notice] << "Now you can create new #{t('assays.assay')} by clicking -Add an #{t('assays.assay')}- button".html_safe
-          format.html { redirect_to study_path(id: @study, create_from_asset: @study.create_from_asset) }
-          format.json { render json: @study }
-        else
-          format.html { redirect_to study_path(@study) }
-          format.json { render json: @study }
-        end
+        format.html { redirect_to study_path(@study) }
+        format.json { render json: @study }
       end
     else
       respond_to do |format|
@@ -159,7 +151,6 @@ class StudiesController < ApplicationController
 
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
-                                  :other_creators, :create_from_asset, { creator_ids: [] },
-                                  { scales: [] }, { publication_ids: [] })
+                                  :other_creators, { creator_ids: [] }, { scales: [] }, { publication_ids: [] })
   end
 end
