@@ -3,12 +3,6 @@ module Seek
     # Acts as Asset behaviour that relates to the ISA framework
     module ISA
       module InstanceMethods
-        def related_people
-          ids = [contributor_id]
-          ids += creator_ids if self.respond_to?(:creators)
-          Person.where(id: ids).distinct
-        end
-
         def assay_type_titles
           assays.map { |at| at.try(:assay_type_label) }.compact
         end
