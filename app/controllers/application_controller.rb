@@ -595,7 +595,7 @@ class ApplicationController < ActionController::Base
     if p[:sort]
       p[:order] = Seek::ListSorter.keys_from_json_api_sort(params[:sort])
     elsif params[:order]
-      p[:order] = params[:order] if Seek::ListSorter.valid_key?(params[:order])
+      p[:order] = params[:order]
     end
 
     p

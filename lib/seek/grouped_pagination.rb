@@ -110,9 +110,8 @@ module Seek
         order_keys = options[:order]
         order_keys ||= :updated_at_desc if page == 'top'
         order_keys ||= Seek::ListSorter.key_for_view(name, :index)
-        order_keys = [order_keys] unless order_keys.respond_to?(:each)
-        order_keys.map!(&:to_sym)
-        order = Seek::ListSorter.order_from_keys(order_keys)
+        order_keys = Array.wrap(order_keys).map(&:to_sym)
+        order = Seek::ListSorter.order_from_keys(*order_keys)
 
         page_totals = {}
 
