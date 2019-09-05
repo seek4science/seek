@@ -80,7 +80,7 @@ module Seek
       ORDER_OPTIONS.key?(key)
     end
 
-    def self.order_from_keys(keys)
+    def self.order_from_keys(*keys)
       keys.map do |key|
         ORDER_OPTIONS[key][:order] if valid_key?(key)
       end.compact.join(", ")
