@@ -1,3 +1,9 @@
+<%
+  if @publication.publication_type_id == 0 || @publication.publication_type_id.nil?
+     @publication.publication_type_id = PublicationType.Journal.id
+  end
+%>
+
 <%= render :partial => "general/item_title",:locals => { :item => @publication, :buttons_partial => 'publications/buttons' } %>
 
 <div class="row">

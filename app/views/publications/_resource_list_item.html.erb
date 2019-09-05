@@ -1,4 +1,10 @@
-<% publication_type = PublicationType.find(resource.publication_type_id) %>
+<%
+  if resource.publication_type_id == 0 || resource.publication_type_id.nil?
+    resource.publication_type_id = PublicationType.Journal.id
+  end
+    publication_type = PublicationType.find(resource.publication_type_id) unless resource.publication_type_id == 0 && resource.publication_type_id.nil?
+
+%>
 
 <div class="list_item_desc"><%= list_item_expandable_text "Abstract", h(resource.abstract) %></div>
 
