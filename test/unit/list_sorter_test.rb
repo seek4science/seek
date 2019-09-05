@@ -119,13 +119,8 @@ class ListSorterTest < ActiveSupport::TestCase
     carthage = Address.new(nil, 'Carthage')
     places = [beijing, nil_city, valhalla, shanghai, paris, atlantis, brisbane, marseille, carthage, shenzhen, unknown]
 
-    Seek::ListSorter.sort_by_order(places, 'country DESC, city ASC')
-
-    assert_equal places, [unknown, marseille, paris, beijing, shanghai, shenzhen, nil_city, brisbane, atlantis, carthage, valhalla]
-
-    Seek::ListSorter.sort_by_order(places, 'country ASC, city DESC')
-
-    assert_equal places, [brisbane, shenzhen, shanghai, beijing, nil_city, paris, marseille, unknown, valhalla, carthage, atlantis]
+    assert_equal [unknown, marseille, paris, beijing, shanghai, shenzhen, nil_city, brisbane, atlantis, carthage, valhalla], Seek::ListSorter.sort_by_order(places, 'country DESC, city ASC')
+    assert_equal [brisbane, shenzhen, shanghai, beijing, nil_city, paris, marseille, unknown, valhalla, carthage, atlantis], Seek::ListSorter.sort_by_order(places, 'country ASC, city DESC')
   end
 
   test 'JSON API sorting' do
