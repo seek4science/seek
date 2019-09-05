@@ -459,7 +459,7 @@ class PublicationsControllerTest < ActionController::TestCase
     get :export, params: { query: { projects_id_in: [projects(:sysmo_project).id] } }
     assert_response :success
     p = assigns(:publications)
-    assert_equal 3, p.length
+    assert_equal 4, p.length
   end
 
   test 'should filter publications sort by published date for export' do

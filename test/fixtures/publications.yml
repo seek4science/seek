@@ -43,7 +43,7 @@ no_publication_type:
   title: "An old publication without type"
   journal: JOURNAL OF SCIENCE
   contributor: quentin_person
-  published_date: <%= 3.days.ago.to_s :db %>
+  published_date: <%= 2.days.ago.to_s :db %>
   pubmed_id: 30462164
   projects: [sysmo_project]
   policy: sysmo_member_edit
