@@ -171,12 +171,12 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   test 'order_by' do
     p1 = Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     p2 = Factory :person, last_name: 'Azbo', first_name: 'John'
-    @people = Person.paginate page: 'A', order: 'last_name ASC'
+    @people = Person.paginate page: 'A', order: 'name_asc'
     assert @people.size > 0
     assert_equal 'A', @people.page
     assert_equal p1, @people.first
 
-    @people = Person.paginate page: 'A', order: 'last_name DESC'
+    @people = Person.paginate page: 'A', order: 'name_desc'
     assert @people.size > 0
     assert_equal 'A', @people.page
     assert_equal p2, @people.first
@@ -231,7 +231,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
       item2 = Factory(type, updated_at: 1.second.ago)
 
       klass = type.to_s.camelize.constantize
-      latest_items = klass.paginate_after_fetch(klass.all, order: 'updated_at DESC')
+      latest_items = klass.paginate_after_fetch(klass.all, order: 'updated_at_desc')
       assert latest_items.index { |i| i.id == item2.id } < latest_items.index { |i| i.id == item1.id }, "#{type} out of order when explicit ordering"
 
       latest_items = klass.paginate_after_fetch(klass.all, page: 'top')
@@ -308,8 +308,8 @@ class GroupedPaginationTest < ActiveSupport::TestCase
 
   test 'ensure pagination works the same for relations and arrays' do
     check_both_pagination_methods(DataFile.all, page: 'P')
-    check_both_pagination_methods(DataFile.all, page: 'top', order: 'title asc')
-    check_both_pagination_methods(DataFile.all, page: 'top', order: 'title desc')
+    check_both_pagination_methods(DataFile.all, page: 'top', order: 'title_asc')
+    check_both_pagination_methods(DataFile.all, page: 'top', order: 'title_desc')
     check_both_pagination_methods(Publication.all)
     check_both_pagination_methods(Person.all)
     check_both_pagination_methods(Person.all, page: 'top')
