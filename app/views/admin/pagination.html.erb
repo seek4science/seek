@@ -2,7 +2,8 @@
 
 <%= form_tag :action=>"update_pagination" do -%>
     <p>
-      In each index page in the "Browse" section, either all items are listed, or only the latest. On this page you can select the default for each tab.
+      In each index page in the "Browse" section, either all items are listed, or only the top <em>n</em> items.
+      On this page you can select the default for each tab.
     </p>
 
     <% [['People','people'], [t('project').pluralize,'projects'], [t('programme').pluralize,'programmes'], ['Institutions','institutions'],
@@ -25,7 +26,7 @@
     <% end %>
 
     <%= admin_text_setting(:limit_latest, Seek::Config.limit_latest,
-                           'Latest list length', "This is the maximum number of items that are listed when viewing 'latest'.",
+                           'Top list length', "This is the maximum number of items that are listed when viewing the 'top' page.",
                            :onkeypress => "javascript: return onlyNumbers(event);") %>
 
     <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
