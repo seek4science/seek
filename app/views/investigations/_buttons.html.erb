@@ -4,7 +4,7 @@
 <% end %>
 
 <% if item.can_edit? -%>
-  <%= button_link_to("Add a #{t('study')}", 'new', new_study_path(:investigation_id=>item)) -%>
+  <%= add_to_dropdown(item) %>
 <% end -%>
 
 <%= item_actions_dropdown do %>

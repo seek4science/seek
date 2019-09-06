@@ -72,16 +72,6 @@ class InvestigationsController < ApplicationController
         format.json { render json: json_api_errors(@investigation), status: :unprocessable_entity }
       end
     end
-
-  end
-
-  def new
-    @investigation=Investigation.new
-
-    respond_to do |format|
-      format.html
-      format.xml { render :xml=>@investigation}
-    end
   end
 
   def edit
@@ -107,8 +97,6 @@ class InvestigationsController < ApplicationController
       end
     end
   end
-
-
 
   private
 

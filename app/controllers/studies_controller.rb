@@ -35,27 +35,6 @@ class StudiesController < ApplicationController
     end
   end
 
-  def new
-    @study = Study.new
-    investigation = nil
-    investigation = Investigation.find(params[:investigation_id]) if params[:investigation_id]
-
-    if investigation
-      if investigation.can_edit?
-        @study.investigation = investigation
-      else
-        flash.now[:error] = "You do not have permission to associate the new #{t('study')} with the #{t('investigation')} '#{investigation.title}'."
-      end
-    end
-    investigations = Investigation.all.select(&:can_view?)
-    respond_to do |format|
-      if investigations.blank?
-        flash.now[:notice] = "No #{t('investigation')} available, you have to create a new one before creating your Study!"
-      end
-      format.html
-    end
-  end
-
   def edit
     @study = Study.find(params[:id])
     respond_to do |format|

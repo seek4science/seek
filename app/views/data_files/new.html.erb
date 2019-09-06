@@ -3,7 +3,10 @@
 
 <%= form_tag({:action => :create_content_blob}, :multipart => true) do -%>
     <%= hidden_field_tag 'data_file[parent_name]', @data_file.parent_name%>
-    <%= hidden_field_tag 'assay_ids[]',params[:assay_ids] %>
+    <% if params[:data_file][:assay_assets_attributes] %>
+      <%= hidden_field_tag 'data_file[assay_assets_attributes[][assay_ids[]]',params[:data_file][:assay_assets_attributes].first[:assay_id] %>
+    <% end %>
+
 
     <div class="asset_form">
       <%= error_messages_for :data_file -%>

@@ -68,10 +68,9 @@ class AssaysController < ApplicationController
    end
 
   def new
-    @assay=Assay.new
-    study = Study.find(params[:study_id]) if params[:study_id]
-    @assay.study = study if params[:study_id] if study.try :can_edit?
+    @assay=setup_new_asset
     @assay_class=params[:class]
+    @permitted_params = assay_params
 
     #jump straight to experimental if modelling analysis is disabled
     @assay_class ||= "experimental" unless Seek::Config.modelling_analysis_enabled

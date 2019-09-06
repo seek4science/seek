@@ -316,7 +316,7 @@ class DataFilesController < ApplicationController
   # handles the uploading of the file to create a content blob, which is then associated with a new unsaved datafile
   # and stored on the session
   def create_content_blob
-    @data_file = DataFile.new
+    @data_file = setup_new_asset
     respond_to do |format|
       if handle_upload_data && @data_file.content_blob.save
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
@@ -333,7 +333,7 @@ class DataFilesController < ApplicationController
   # AJAX call to trigger any RightField extraction (if appropriate), and pre-populates the associated @data_file and
   # @assay
   def rightfield_extraction_ajax
-    @data_file = DataFile.new
+    @data_file = setup_new_asset
     @assay = Assay.new
     @warnings = nil
     critical_error_msg = nil
@@ -380,14 +380,6 @@ class DataFilesController < ApplicationController
     @exception_message ||= session[:extraction_exception_message]
     @create_new_assay = @assay && @assay.new_record? && !@assay.title.blank?
     @data_file.assay_assets.build(assay_id: @assay.id) if @assay.persisted?
-
-    # associate any assays passed through with :assay_ids param
-    if params[:assay_ids]
-      assays = Assay.authorize_asset_collection(Assay.find(params[:assay_ids]),:edit)
-      assays.each do |assay|
-        @data_file.assay_assets.build(assay_id: assay.id)
-      end
-    end
 
     respond_to do |format|
       format.html

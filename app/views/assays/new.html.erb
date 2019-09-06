@@ -3,6 +3,7 @@
    investigations.each do |i|
      studies << i.studies.select(&:can_view?)
    end
+
 -%>
 <% if investigations.blank? %>
     <div class="text-center">
@@ -22,13 +23,13 @@
             <div class="text-center">
               <p>Please select the class of <%= t('assays.assay') %> you wish to create</p>
 
-              <%= link_to new_assay_path(:class=>:experimental,:study_id=>params[:study_id]),
+              <%= link_to new_assay_path(:class=>:experimental, :assay=>@permitted_params),
                           :class => 'select_assay_class' do %>
                   <%= image("assay_experimental_avatar") %>
                   An <%= t('assays.experimental_assay') -%>
               <% end %>
 
-              <%= link_to new_assay_path(:class=>:modelling,:study_id=>params[:study_id]),
+              <%= link_to new_assay_path(:class=>:modelling, :assay=>@permitted_params),
                           :class => 'select_assay_class' do %>
                   <%= image("assay_modelling_avatar") %>
                   A <%= t('assays.modelling_analysis') -%>
