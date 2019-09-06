@@ -893,7 +893,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = models(:teusink)
     model.other_creators = 'another creator'
     model.save
-    get :index
+    get :index, params: { page: 'T' }
 
     assert_select 'p.list_item_attribute', text: /, another creator/, count: 1
   end

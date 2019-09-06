@@ -8,8 +8,6 @@ class Workflow < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
-  scope :default_order, -> { order("title") }
-
   validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
   # validate :is_myexperiment?
 

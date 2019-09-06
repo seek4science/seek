@@ -21,8 +21,6 @@ module Seek
 
         attr_accessor :create_from_asset
 
-        scope :default_order, -> { order('updated_at DESC') }
-
         validates :title, presence: true
         validates :title, length: { maximum: 255 }
         validates :description, length: { maximum: 65_535 }
