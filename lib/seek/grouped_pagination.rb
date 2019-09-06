@@ -107,8 +107,11 @@ module Seek
 
         page = options[:page] || def_page
 
-        order = options[:order] || Seek::ListSorter.order_for_view(name, :index)
-        order = Seek::ListSorter.order_from_key(:updated_at_desc) if !options.key?(:order) && page == 'top'
+        order_keys = options[:order]
+        order_keys ||= :updated_at_desc if page == 'top'
+        order_keys ||= Seek::ListSorter.key_for_view(name, :index)
+        order_keys = Array.wrap(order_keys).map(&:to_sym)
+        order = Seek::ListSorter.order_from_keys(*order_keys)
 
         page_totals = {}
 
@@ -124,7 +127,7 @@ module Seek
           end
         end
 
-        Collection.new(records, page, @pages, page_totals)
+        Collection.new(records, page, @pages, page_totals, order_keys)
       end
     end
 
@@ -150,13 +153,14 @@ module Seek
     end
 
     class Collection < Array
-      attr_reader :page, :page_totals, :pages
+      attr_reader :page, :page_totals, :pages, :order
 
-      def initialize(records, page, pages, page_totals)
+      def initialize(records, page, pages, page_totals, order)
         super(records)
         @page = page
         @page_totals = page_totals
         @pages = pages
+        @order = order
       end
     end
   end

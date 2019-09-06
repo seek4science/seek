@@ -29,10 +29,10 @@ module Seek
       start_date_desc: { title: 'Date (Descending)', order: 'start_date DESC' },
       published_at_asc: { title: 'Publication date (Ascending)', order: 'published_date' },
       published_at_desc: { title: 'Publication date (Descending)', order: 'published_date DESC' },
-      updated_at_asc: { title: 'Last updated (Descending)', order: 'updated_at' },
-      updated_at_desc: { title: 'Last updated (Ascending)', order: 'updated_at DESC' },
-      created_at_asc: { title: 'Last created (Descending)', order: 'created_at' },
-      created_at_desc: { title: 'Last created (Ascending)', order: 'created_at DESC' },
+      updated_at_asc: { title: 'Last updated (Ascending)', order: 'updated_at' },
+      updated_at_desc: { title: 'Last updated (Descending)', order: 'updated_at DESC' },
+      created_at_asc: { title: 'Last created (Ascending)', order: 'created_at' },
+      created_at_desc: { title: 'Last created (Descending)', order: 'created_at DESC' },
     }.with_indifferent_access.freeze
 
     # sort items in the related items hash according the rule for its type
@@ -62,15 +62,31 @@ module Seek
       end
     end
 
+    def self.options(type_name)
+      (RULES[type_name] || RULES['Other'])[:options]
+    end
+
+    def self.options_for_select(type_name)
+      options(type_name).map do |key|
+        [ORDER_OPTIONS[key][:title], key]
+      end
+    end
+
     def self.key_for_view(type_name, view)
       (RULES[type_name] || RULES['Other'])[:defaults][view] || RULES['Other'][:defaults][view]
     end
 
-    def self.order_from_key(key)
-      ORDER_OPTIONS[key][:order] if ORDER_OPTIONS.key?(key)
+    def self.valid_key?(key)
+      ORDER_OPTIONS.key?(key)
     end
 
-    def self.order_from_json_api_sort(sort)
+    def self.order_from_keys(*keys)
+      keys.map do |key|
+        ORDER_OPTIONS[key][:order] if valid_key?(key)
+      end.compact.join(", ")
+    end
+
+    def self.keys_from_json_api_sort(sort)
       sort.split(',').map do |field|
         if field.start_with?('-')
           key = "#{field[1..-1]}_desc"
@@ -78,12 +94,12 @@ module Seek
           key = "#{field}_asc"
         end
 
-        order_from_key(key.to_sym)
-      end.compact.join(', ')
+        key.to_sym if valid_key?(key)
+      end.compact
     end
 
     def self.order_for_view(type_name, view)
-      self.order_from_key(self.key_for_view(type_name, view))
+      self.order_from_keys(self.key_for_view(type_name, view))
     end
 
     def self.strategy_for_relation(order)

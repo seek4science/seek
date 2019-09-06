@@ -120,17 +120,16 @@ class ListSorterTest < ActiveSupport::TestCase
     places = [beijing, nil_city, valhalla, shanghai, paris, atlantis, brisbane, marseille, carthage, shenzhen, unknown]
 
     assert_equal [unknown, marseille, paris, beijing, shanghai, shenzhen, nil_city, brisbane, atlantis, carthage, valhalla], Seek::ListSorter.sort_by_order(places, 'country DESC, city ASC')
-    assert_equal  [brisbane, shenzhen, shanghai, beijing, nil_city, paris, marseille, unknown, valhalla, carthage, atlantis], Seek::ListSorter.sort_by_order(places, 'country ASC, city DESC')
+    assert_equal [brisbane, shenzhen, shanghai, beijing, nil_city, paris, marseille, unknown, valhalla, carthage, atlantis], Seek::ListSorter.sort_by_order(places, 'country ASC, city DESC')
   end
 
   test 'JSON API sorting' do
-    assert_equal 'title DESC', Seek::ListSorter.order_from_json_api_sort('-title')
-    assert_equal 'title', Seek::ListSorter.order_from_json_api_sort('title')
-    assert_equal 'created_at', Seek::ListSorter.order_from_json_api_sort('created_at')
-    assert_equal 'created_at, title DESC, updated_at', Seek::ListSorter.order_from_json_api_sort('created_at,-title,updated_at')
-    assert_equal 'created_at, updated_at, title DESC', Seek::ListSorter.order_from_json_api_sort('created_at,updated_at,-title')
-    assert_equal 'created_at, title DESC', Seek::ListSorter.order_from_json_api_sort('created_at,-title,banana')
-    injection = Seek::ListSorter.order_from_json_api_sort('created_at,updated_at,-title;drop table users;--')
-    refute injection.to_s.include?('drop table'), "#{injection} should not include injection"
+    assert_equal [:title_desc], Seek::ListSorter.keys_from_json_api_sort('-title')
+    assert_equal [:title_asc], Seek::ListSorter.keys_from_json_api_sort('title')
+    assert_equal [:created_at_asc], Seek::ListSorter.keys_from_json_api_sort('created_at')
+    assert_equal [:created_at_asc, :title_desc, :updated_at_asc], Seek::ListSorter.keys_from_json_api_sort('created_at,-title,updated_at')
+    assert_equal [:created_at_asc, :updated_at_asc, :title_desc], Seek::ListSorter.keys_from_json_api_sort('created_at,updated_at,-title')
+    assert_equal [:created_at_asc, :title_desc], Seek::ListSorter.keys_from_json_api_sort('created_at,-title,banana')
+    assert_equal [:created_at_asc, :updated_at_asc], Seek::ListSorter.keys_from_json_api_sort('created_at,updated_at,-title;drop table users;--')
   end
 end

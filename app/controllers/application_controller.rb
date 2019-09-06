@@ -589,14 +589,17 @@ class ApplicationController < ActionController::Base
 
   def page_and_sort_params
     p = params.permit(:page, :sort, :order)
-    if p[:sort]
-      p[:order] = Seek::ListSorter.order_from_json_api_sort(params[:sort])
-    elsif params[:order]
-      p[:order] = Seek::ListSorter.order_from_key(params[:order])
-    end
 
     p[:page] ||= 'all' if json_api_request?
 
+    if p[:sort]
+      p[:order] = Seek::ListSorter.keys_from_json_api_sort(params[:sort])
+    elsif params[:order]
+      p[:order] = params[:order]
+    end
+
     p
   end
+
+  helper_method :page_and_sort_params
 end
