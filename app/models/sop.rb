@@ -44,5 +44,4 @@ class Sop < ApplicationRecord
   def self.user_creatable?
     true
   end
-    
 end

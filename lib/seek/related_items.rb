@@ -7,10 +7,6 @@ module Seek
                        'Workflow', 'Node'].freeze
 
     class_methods do
-      def related_types
-        @related_types ||= related_type_methods.reject { |_,v| v.nil? }.keys
-      end
-
       def related_type_methods
         @related_type_methods ||= {}.tap do |hash|
           RELATABLE_TYPES.each do |type|

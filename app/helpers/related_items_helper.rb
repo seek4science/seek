@@ -52,10 +52,11 @@ module RelatedItemsHelper
     return resource_hash_lazy_load(resource) if Seek::Config.tabs_lazy_load_enabled
 
     items_hash = {}
-    resource.class.related_types.each do |type|
+    resource.class.related_type_methods.each_key do |type|
       next if type == 'Person' && resource.is_a?(Person) # to avoid the same person showing up
       next if type == 'Organism' && !resource.is_a?(Sample)
-      next if type == 'Workflow' || type == 'Node' && !Seek::Config.workflows_enabled
+      enabled_method = "#{type.pluralize.underscore}_enabled"
+      next if Seek::Config.respond_to?(enabled_method) && !Seek::Config.send(enabled_method)
 
       items = resource.get_related(type)
       items = [] if items.nil?
