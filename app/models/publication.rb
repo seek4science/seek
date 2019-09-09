@@ -203,14 +203,24 @@ class Publication < ApplicationRecord
     related_relationships.where(clause).first_or_create!
   end
 
+  has_many :assay_data_files, through: :assays, source: :data_files
   # includes those related directly, or through an assay
   def related_data_files
-    DataFile.where(id: assays.inject(data_file_ids) { |ids, assay| ids + assay.data_file_ids }.uniq)
+    DataFile.where(id: related_data_file_ids)
   end
 
+  def related_data_file_ids
+    data_file_ids | assay_data_file_ids
+  end
+
+  has_many :assay_models, through: :assays, source: :models
   # includes those related directly, or through an assay
   def related_models
-    Model.where(id: assays.inject(model_ids) { |ids, assay| ids + assay.data_file_ids }.uniq)
+    Model.where(id: related_model_ids)
+  end
+
+  def related_model_ids
+    model_ids | assay_model_ids
   end
 
   # indicates whether the publication has data files or models linked to it (either directly or via an assay)
@@ -222,9 +232,14 @@ class Publication < ApplicationRecord
     data_files | models | presentations
   end
 
-  # returns a list of related organisms, related through either the assay or the model
+  has_many :assays_organisms, through: :assays, source: :organisms
+  has_many :models_organisms, through: :models, source: :organism
   def related_organisms
-    (assays.collect(&:organisms).flatten | models.collect(&:organism).flatten).uniq
+    Organism.where(id: related_organism_ids)
+  end
+
+  def related_organism_ids
+    assays_organism_ids | models_organism_ids
   end
 
   def self.subscribers_are_notified_of?(action)
