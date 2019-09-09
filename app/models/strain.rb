@@ -99,7 +99,10 @@ class Strain < ApplicationRecord
   end
 
   def related_people
-    [contributor]
+    Person.where(id: related_person_ids)
   end
 
+  def related_person_ids
+    contributor_id
+  end
 end
