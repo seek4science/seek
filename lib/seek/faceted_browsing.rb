@@ -51,12 +51,7 @@ module Seek
       item_ids.collect!(&:to_i)
       unless item_type.blank?
         clazz = item_type.constantize
-        items = clazz.where(id: item_ids)
-        if clazz.respond_to?(:authorize_asset_collection)
-          items = clazz.authorize_asset_collection(items, 'view')
-        else
-          items = items.select(&:can_view?)
-        end
+        items = clazz.where(id: item_ids).authorized_for('view')
       end
 
       items.sort! { |a, b| item_ids.index(a.id) <=> item_ids.index(b.id) }

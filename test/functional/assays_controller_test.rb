@@ -23,7 +23,9 @@ class AssaysControllerTest < ActionController::TestCase
     hidden = Factory(:experimental_assay, policy: Factory(:private_policy)) # ensure at least one hidden assay exists
     get :index, params: { page: 'all', format: 'xml' }
     assert_response :success
-    assert_equal assigns(:assays).sort_by(&:id), Assay.authorize_asset_collection(assigns(:assays), 'view', users(:aaron)).sort_by(&:id), "#{t('assays.assay').downcase.pluralize} haven't been authorized"
+    assert_equal assigns(:assays).sort_by(&:id),
+                 assigns(:assays).authorized_for('view', users(:aaron)).sort_by(&:id),
+                 "#{t('assays.assay').downcase.pluralize} haven't been authorized"
     assert !assigns(:assays).include?(hidden)
   end
 

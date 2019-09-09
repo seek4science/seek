@@ -90,7 +90,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, params: { page: 'all' }
     assert_response :success
-    assert_equal assigns(:sops).sort_by(&:id), Sop.authorize_asset_collection(assigns(:sops), 'view', users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
+    assert_equal assigns(:sops).sort_by(&:id), assigns(:sops).authorized_for('view', users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
   end
 
   test 'should not show private sop to logged out user' do

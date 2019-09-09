@@ -197,14 +197,12 @@ class DataFilesController < ApplicationController
   end
 
   def filter
-    scope = DataFile
+    scope = DataFile.authorized_for('view')
     scope = scope.joins(:projects).where(projects: { id: current_user.person.projects }) unless (params[:all_projects] == 'true')
     scope = scope.where(simulation_data: true) if (params[:simulation_data] == 'true')
     scope = scope.with_extracted_samples if (params[:with_samples] == 'true')
 
-    @data_files = DataFile.authorize_asset_collection(
-      scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").distinct, 'view'
-    ).first(20)
+    @data_files = scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").distinct.first(20)
 
     respond_to do |format|
       format.html { render partial: 'data_files/association_preview', collection: @data_files, locals: { hide_sample_count: !params[:with_samples] } }
@@ -383,7 +381,7 @@ class DataFilesController < ApplicationController
 
     # associate any assays passed through with :assay_ids param
     if params[:assay_ids]
-      assays = Assay.authorize_asset_collection(Assay.find(params[:assay_ids]),:edit)
+      assays = Assay.where(id: params[:assay_ids]).authorized_for('edit')
       assays.each do |assay|
         @data_file.assay_assets.build(assay_id: assay.id)
       end

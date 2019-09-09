@@ -78,22 +78,6 @@ module Seek
           end
         end
 
-        # returns the authorised items from the array of the same class items for a given action and optionally a user. If user is nil, the items authorised for an
-        # anonymous user are returned. All assets must be of the same type and match the asset class this method was called on
-        def authorize_asset_collection(assets, action, user = User.current_user)
-          return assets if assets.empty?
-          user_id = user&.id || 0
-          if Seek::Config.auth_lookup_enabled && lookup_table_consistent?(user_id) && !assets.is_a?(ActiveRecord::Relation)
-            ids = lookup_class.select(:asset_id).where(asset_id: assets.collect(&:id), user_id: user_id, "can_#{action}" => true).pluck(:asset_id)
-            assets = assets.select { |asset| ids.include?(asset.id.to_s) }
-            assets = assets.select { |a| a.send("state_allows_#{action}?", user) } if should_check_state?(action)
-          else
-            assets = assets.authorized_for(action, user)
-          end
-
-          assets
-        end
-
         # Only check `state_allows...` if it has been overridden.
         def should_check_state?(action)
           instance_method("state_allows_#{action}?").owner != Seek::Permissions::StateBasedPermissions
