@@ -2474,7 +2474,7 @@ class DataFilesControllerTest < ActionController::TestCase
     Factory(:data_file, policy: Factory(:public_policy))
     Factory(:data_file, policy: Factory(:private_policy))
     total = DataFile.count
-    visible = DataFile.all_authorized_for(:view).count
+    visible = DataFile.authorized_for('view').count
     assert_not_equal total, visible
     assert_not_equal 0, total
     assert_not_equal 0, visible

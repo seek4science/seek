@@ -44,4 +44,4 @@
 
 <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                     select_id: '#study_investigation_id',
-                                                                    parents: Investigation.all_authorized_for(:edit) } %>
+                                                                    parents: Investigation.authorized_for('edit') } %>

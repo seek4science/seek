@@ -425,7 +425,7 @@ module ApplicationHelper
     klass = klass_from_controller(controller_name)
     full_total = klass.count
     visible_total = if klass.authorization_supported?
-                      klass.all_authorized_for('view').count
+                      klass.authorized_for('view').count
                     elsif klass.is_a?(Person) && Seek::Config.is_virtualliver && User.current_user.nil?
                       0
                     else

@@ -59,7 +59,7 @@ module Seek
 
       module AuthLookupArrayExtensions
         # Allows an Enumerable to be authorized in the same way as an ActiveRecord model or relation.
-        def all_authorized_for(action, user = User.current_user)
+        def authorized_for(action, user = User.current_user)
           select { |a| a.can_perform?(action, user) }
         end
       end
@@ -67,7 +67,7 @@ module Seek
       module AuthLookupClassMethods
         # authorizes the current relation for a given action and optionally a user. If user is nil, the items authorised for an
         # anonymous user are returned.
-        def all_authorized_for(action, user = User.current_user)
+        def authorized_for(action, user = User.current_user)
           user_id = user&.id || 0
           if Seek::Config.auth_lookup_enabled && lookup_table_consistent?(user_id)
             assets = lookup_join(action, user_id)
@@ -88,7 +88,7 @@ module Seek
             assets = assets.select { |asset| ids.include?(asset.id.to_s) }
             assets = assets.select { |a| a.send("state_allows_#{action}?", user) } if should_check_state?(action)
           else
-            assets = assets.all_authorized_for(action, user)
+            assets = assets.authorized_for(action, user)
           end
 
           assets

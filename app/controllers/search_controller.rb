@@ -90,7 +90,7 @@ class SearchController < ApplicationController
           query.paginate(:page => 1, :per_page => source.count ) if source.count > 30  # By default, Sunspot requests the first 30 results from Solr
         end #.results
         @search_hits = search.hits
-        search_result = search.results.compact.all_authorized_for('view')
+        search_result = search.results.compact.authorized_for('view')
         @results |= search_result
       end
 

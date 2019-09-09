@@ -20,9 +20,9 @@ module Seek #:nodoc:
           include?(Seek::Permissions::PolicyBasedAuthorization)
         end
 
-        # Allow `all_authorized_for` to be safely called on any collection of SEEK resources.
-        def all_authorized_for(action, user = User.current_user)
-          all.to_a.all_authorized_for(action, user)
+        # Allow `authorized_for` to be safely called on any collection of SEEK resources.
+        def authorized_for(action, user = User.current_user)
+          all.to_a.authorized_for(action, user)
         end
       end
 

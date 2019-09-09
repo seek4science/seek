@@ -94,7 +94,7 @@ module RelatedItemsHelper
       if hash[type][:items].any?
         total = hash[type][:items].to_a
         total_count = hash[type][:items_count]
-        hash[type][:items] = hash[type][:items].all_authorized_for('view', User.current_user).to_a
+        hash[type][:items] = hash[type][:items].authorized_for('view', User.current_user).to_a
         hash[type][:items_count] = hash[type][:items].count
         hash[type][:hidden_count] = total_count - hash[type][:items_count]
         hash[type][:hidden_items] = total - hash[type][:items]

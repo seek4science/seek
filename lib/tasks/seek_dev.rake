@@ -69,12 +69,12 @@ namespace :seek_dev do
     Seek::Util.authorized_types.each do |type|
       puts "#{type.name} (#{type.count}):"
       b = Benchmark.measure do
-        puts "\tAnon view: #{Benchmark.measure { 100.times { type.all_authorized_for('view') } } }"
-        puts "\tAnon edit: #{Benchmark.measure { 100.times { type.all_authorized_for('edit') } } }"
-        puts "\tUser edit: #{Benchmark.measure { 100.times { type.all_authorized_for('edit', u) } } }"
-        puts "\tUser view: #{Benchmark.measure { 100.times { type.all_authorized_for('view', u2) } } }"
-        puts "\tUser manage: #{Benchmark.measure { 100.times { type.all_authorized_for('manage', u2) } } }"
-        puts "\tUser delete: #{Benchmark.measure { 100.times { type.all_authorized_for('delete', u) } } }"
+        puts "\tAnon view: #{Benchmark.measure { 100.times { type.authorized_for('view') } } }"
+        puts "\tAnon edit: #{Benchmark.measure { 100.times { type.authorized_for('edit') } } }"
+        puts "\tUser edit: #{Benchmark.measure { 100.times { type.authorized_for('edit', u) } } }"
+        puts "\tUser view: #{Benchmark.measure { 100.times { type.authorized_for('view', u2) } } }"
+        puts "\tUser manage: #{Benchmark.measure { 100.times { type.authorized_for('manage', u2) } } }"
+        puts "\tUser delete: #{Benchmark.measure { 100.times { type.authorized_for('delete', u) } } }"
       end
       puts "Total #{b}"
       puts
