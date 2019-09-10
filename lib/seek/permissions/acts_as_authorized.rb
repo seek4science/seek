@@ -3,7 +3,7 @@ module Seek #:nodoc:
     module ActsAsAuthorized
       extend ActiveSupport::Concern
 
-      AUTHORIZATION_ACTIONS = %i[view edit download delete manage].freeze
+      AUTHORIZATION_ACTIONS = %i[view download edit manage delete].freeze
 
       class_methods do
         def acts_as_authorized
