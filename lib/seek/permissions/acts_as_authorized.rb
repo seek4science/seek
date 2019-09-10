@@ -22,7 +22,14 @@ module Seek #:nodoc:
 
         # Allow `authorized_for` to be safely called on any collection of SEEK resources.
         def authorized_for(action, user = User.current_user)
-          all.to_a.authorized_for(action, user)
+          assets = all
+          assets = assets.select { |a| a.send("can_#{action}?", user) } if should_check_can?(action)
+          assets
+        end
+
+        # Only check `can...` if it has been overridden.
+        def should_check_can?(action)
+          instance_method("can_#{action}?").owner != Seek::Permissions::ActsAsAuthorized
         end
       end
 
