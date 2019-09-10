@@ -16,6 +16,7 @@ module Seek
           belongs_to :policy, autosave: true
           enforce_required_access_for_owner :policy, :manage
 
+          after_create :add_initial_auth_lookup
           after_commit :check_to_queue_update_auth_table
           after_destroy { |record| record.policy.try(:destroy_if_redundant) }
 
@@ -152,6 +153,12 @@ module Seek
           end
           permissions
         end
+      end
+
+      # immediately update for the current user and anonymous user
+      def add_initial_auth_lookup
+        update_lookup_table(User.current_user) unless User.current_user.nil?
+        update_lookup_table(nil)
       end
 
       # triggers a background task to update or create the authorization lookup table records for this item

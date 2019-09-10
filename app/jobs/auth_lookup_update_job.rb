@@ -81,11 +81,6 @@ class AuthLookupUpdateJob < SeekJob
   end
 
   def add_item_to_queue(item, queuepriority)
-    # immediately update for the current user and anonymous user
-    if item.respond_to?(:authorization_supported?) && item.authorization_supported?
-      item.update_lookup_table(User.current_user)
-      item.update_lookup_table(nil) unless User.current_user.nil?
-    end
     # Could potentially delete the records for this item (either by asset_id or user_id) to ensure an immediate reflection of the change,
     # but with some slowdown until the changes have been reapplied.
     # for assets its simply - item.remove_from_lookup_table
