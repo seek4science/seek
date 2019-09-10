@@ -1,6 +1,8 @@
 module Seek
   module Permissions
     module PolicyBasedAuthorization
+      AuthPermissions = Struct.new(:can_view, :can_download, :can_edit, :can_manage, :can_delete)
+
       def self.included(klass)
         attr_accessor :permission_for
         klass.extend AuthLookupClassMethods
@@ -139,20 +141,25 @@ module Seek
       # allows access to each permission in a single database call (rather than calling can_download? can_edit? etc individually)
       def authorization_permissions(user = User.current_user)
         user_id = user&.id || 0
+        permissions = nil
         if Seek::Config.auth_lookup_enabled && self.class.lookup_table_consistent?(user_id)
-          permissions = auth_lookup.where(user_id: user_id).first
-          if permissions.nil?
-            raise 'Expected to find record in auth lookup table'
-          else
-            permissions
+          entry = auth_lookup.where(user_id: user_id).first
+          if entry
+            permissions = AuthPermissions.new
+            AuthLookup::ABILITIES.each do |a|
+              permissions.send("can_#{a}=", entry.send("can_#{a}") && send("state_allows_#{a}?"))
+            end
           end
-        else
-          permissions = auth_lookup.build
-          AuthLookup::ABILITIES.each do |a|
-            permissions.send("can_#{a}=", send("can_#{a}?"))
-          end
-          permissions
         end
+
+        if permissions.nil?
+          permissions = AuthPermissions.new
+          AuthLookup::ABILITIES.each do |a|
+            permissions.send("can_#{a}=", send("can_#{a}?", user))
+          end
+        end
+
+        permissions
       end
 
       # immediately update for the current user and anonymous user
