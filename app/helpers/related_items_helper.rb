@@ -41,27 +41,17 @@ module RelatedItemsHelper
     end
   end
 
-  def remove_empty_tabs(resource_hash)
-    resource_hash.each do |key, res|
-      resource_hash.delete(key) if (res[:items_count] + res[:hidden_count]) == 0
-    end
-  end
-
   # Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
   def get_related_resources(resource, limit = nil)
     return resource_hash_lazy_load(resource) if Seek::Config.tabs_lazy_load_enabled
 
     items_hash = {}
     resource.class.related_type_methods.each_key do |type|
-      next if type == 'Person' && resource.is_a?(Person) # to avoid the same person showing up
       next if type == 'Organism' && !resource.is_a?(Sample)
       enabled_method = "#{type.pluralize.underscore}_enabled"
       next if Seek::Config.respond_to?(enabled_method) && !Seek::Config.send(enabled_method)
 
-      items = resource.get_related(type)
-      items = [] if items.nil?
-      items = [items] if items.is_a?(ApplicationRecord)
-      items_hash[type] = items
+      items_hash[type] = resource.get_related(type)
     end
 
     related_items_hash(items_hash, limit)
