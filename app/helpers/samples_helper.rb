@@ -23,7 +23,7 @@ module SamplesHelper
       collection_select :sample, attribute_method_name, terms, :label, :label,
                         { include_blank: !attribute.required? }, class: "form-control #{clz}"
     when Seek::Samples::BaseType::SEEK_SAMPLE
-      terms = attribute.linked_sample_type.samples.authorized_for('view')
+      terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
       collection_select :sample, attribute_method_name, terms, :id, :title,
                         { include_blank: !attribute.required? }, class: "form-control #{clz}"
     else

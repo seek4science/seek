@@ -146,7 +146,7 @@ module AssetsHelper
   def authorised_assets(asset_class, projects = nil, action = 'view')
     assets = asset_class
     assets = assets.filter_by_projects(projects) if projects
-    assets = assets.authorized_for(action, User.current_user)
+    assets = assets.authorized_for(action, User.current_user).to_a
     assets = assets.sort_by(&:title) if !assets.blank? && !%w[Project Scale].include?(assets.first.class.name)
     assets
   end
