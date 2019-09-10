@@ -3,7 +3,7 @@ class AuthLookup < ActiveRecord::Base
   self.primary_key = [:user_id, :asset_id]
   belongs_to :user
 
-  ABILITIES = Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.freeze
+  ABILITIES = Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.map(&:to_s).freeze
 
   def self.prepare
     c = count
@@ -30,5 +30,9 @@ class AuthLookup < ActiveRecord::Base
     end
 
     update_all(updates) unless updates.empty?
+  end
+
+  def as_array
+    ABILITIES.map { |a| send("can_#{a}" )}
   end
 end
