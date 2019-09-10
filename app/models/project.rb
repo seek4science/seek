@@ -6,7 +6,8 @@ class Project < ApplicationRecord
   title_trimmer
 
   has_and_belongs_to_many :investigations
-
+  has_many :studies, through: :investigations
+  has_many :assays, through: :studies
   has_and_belongs_to_many :data_files
   has_and_belongs_to_many :models
   has_and_belongs_to_many :sops
@@ -70,9 +71,8 @@ class Project < ApplicationRecord
 
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
-    [programme].compact
+    Programme.where(id: programme_id)
   end
-
 
   def group_memberships_empty?(institution)
     work_group = WorkGroup.where(['project_id=? AND institution_id=?', id, institution.id]).first
@@ -140,22 +140,6 @@ class Project < ApplicationRecord
     # infer all project's locations from the institutions where the person is member of
     locations = institutions.collect(&:country).select { |l| !l.blank? }
     locations
-  end
-
-  def studies
-    Study.where(investigation_id: investigation_ids).distinct
-  end
-
-  def study_ids
-    studies.pluck(:id)
-  end
-
-  def assays
-    Assay.where(study_id: study_ids).distinct
-  end
-
-  def assay_ids
-    assays.pluck(:id)
   end
 
   def site_password

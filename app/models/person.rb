@@ -56,25 +56,17 @@ class Person < ApplicationRecord
   RELATED_RESOURCE_TYPES.each do |type|
     plural = type.tableize
     singular = plural.singularize
+    klass = type.constantize
+
     has_many :"contributed_#{plural}", foreign_key: :contributor_id, class_name: type
     has_many :"created_#{plural}", through: :assets_creators, source: :asset, source_type: type
-    t = type.constantize
-    if t.method_defined?(:assets_creators)
-      define_method "related_#{plural}" do
-        t.where(id: send("related_#{singular}_ids"))
-      end
 
-      define_method "related_#{singular}_ids" do
-        send("contributed_#{singular}_ids") | assets_creators.where(asset_type: type).pluck(:asset_id)
-      end
-    else
-      define_method "related_#{plural}" do
-        send("contributed_#{plural}")
-      end
+    define_method "related_#{plural}" do
+      klass.where(id: send("related_#{singular}_ids"))
+    end
 
-      define_method "related_#{singular}_ids" do
-        send("contributed_#{singular}_ids")
-      end
+    define_method "related_#{singular}_ids" do
+      send("contributed_#{singular}_ids") | send("created_#{singular}_ids")
     end
   end
 
