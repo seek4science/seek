@@ -3,14 +3,20 @@ class AuthLookup < ActiveRecord::Base
   self.primary_key = [:user_id, :asset_id]
   belongs_to :user
 
-  ABILITIES = ['view', 'download', 'edit', 'manage', 'delete'].freeze
+  ABILITIES = Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.freeze
 
-  def self.wipe
-    delete_all
-    # Only need to specify user ID on insert, since all permission fields are `false` by default.
-    import [:user_id], ([0] + User.pluck(:id)).map { |i| [i] },
-           validate: false,
-           batch_size: Seek::Util.bulk_insert_batch_size
+  def self.prepare
+    c = count
+    if c != (User.count + 1)  # 1 entry for each user + anonymous
+      delete_all unless c.zero?
+
+      # Only need to specify user ID on insert, since all permission fields are `false` by default.
+      import [:user_id], ([0] + User.pluck(:id)).map { |i| [i] },
+             validate: false,
+             batch_size: Seek::Util.bulk_insert_batch_size
+    else
+      batch_update([false, false, false, false, false])
+    end
   end
 
   def self.batch_update(permission, overwrite = true)

@@ -174,20 +174,14 @@ module Seek
 
       def update_lookup_table_for_all_users
         # Blank-out permissions first
-
-        # 1 entry for each user + anonymous
-        if auth_lookup.count != (User.count + 1)
-          auth_lookup.wipe
-        else
-          auth_lookup.batch_update([false, false, false, false, false])
-        end
+        auth_lookup.prepare
 
         # Specific permissions (Permission)
 
         # Sort permissions according to precedence, then access type, so the most direct (People), permissive (Manage)
         # permissions are applied last.
         sorted_permissions = policy.permissions
-                                 .sort_by { |p| -(Permission::PRECEDENCE.index(p.contributor_type) * 100 - p.access_type) }
+                                   .sort_by { |p| -(Permission::PRECEDENCE.index(p.contributor_type) * 100 - p.access_type) }
 
         # Extract the individual member permissions from each FavouriteGroup and ensure they are also sorted by access_type:
         # 1. Record the index where the FavouriteGroup permissions start
