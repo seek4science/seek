@@ -23,6 +23,7 @@ en:
     cwl_workflow: "CWL workflow"
     galaxy_workflow: "Galaxy workflow"
     knime_workflow: "KNIME workflow"
+    ro_workflow: "Research Object workflow"
   node: "Workflow Node"
   nodes:
     node: "Workflow Node"

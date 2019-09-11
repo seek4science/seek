@@ -19,8 +19,6 @@ class Workflow < ApplicationRecord
 
   belongs_to :workflow_class
 
-  serialize :metadata
-
   explicit_versioning(:version_column => "version") do
     acts_as_doi_mintable(proxy: :parent)
     acts_as_versioned_resource
@@ -28,6 +26,9 @@ class Workflow < ApplicationRecord
 
     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
             :primary_key => :workflow_id, :foreign_key => :asset_id
+
+    serialize :metadata
+
   end
 
   def use_mime_type_for_avatar?

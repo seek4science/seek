@@ -12,3 +12,8 @@ knime_workflow_class:
   id: 3
   title: <%= I18n.t('workflows.knime_workflow') %>
   key: KNIME
+
+ro_workflow_class:
+  id: 4
+  title: <%= I18n.t('workflows.ro_workflow') %>
+  key: RO

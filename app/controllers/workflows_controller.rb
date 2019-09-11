@@ -79,7 +79,7 @@ class WorkflowsController < ApplicationController
     end
   end
 
-  def retrieve_content blob
+  def retrieve_content (blob)
     if !blob.file_exists?
       if (caching_job = blob.caching_job).exists?
         caching_job.first.destroy
@@ -104,7 +104,6 @@ class WorkflowsController < ApplicationController
 
         workflow_class = WorkflowClass.find_by_id (session[:workflow_class_id])
         metadata_name = "extract_#{workflow_class.key}_metadata"
-        session[:metadata][:title] = metadata_name
         if defined? metadata_name
           self.send(metadata_name, @workflow)
         end
@@ -212,13 +211,13 @@ class WorkflowsController < ApplicationController
       @content_blob = w.content_blob
       cwl_string = @content_blob.read
       cwl = YAML.load(cwl_string)
-      if cwl.has_key? :label
-        session[:metadata][:title] = cwl[:label]
+      if cwl.has_key? 'label'
+        session[:metadata][:title] = cwl['label']
       else
         flash[:warning] = 'Unable to determine title of workflow'
       end
-      if cwl.has_key? :doc
-        session[:metadata][:description] = cwl[:doc]
+      if cwl.has_key? 'doc'
+        session[:metadata][:description] = cwl['doc']
       end
     rescue Exception => e
       session[:extraction_exception_message] = e.message
@@ -265,5 +264,26 @@ class WorkflowsController < ApplicationController
     end
 
   end
+
+  def extract_RO_metadata(w)
+    begin
+      @content_blob = w.content_blob
+      ro_string = @content_blob.read
+      ro = JSON.parse(ro_string)
+      if ro.has_key? "name"
+        session[:metadata][:title] = ro["name"]
+      else
+        flash[:warning] = 'Unable to determine title of workflow'
+      end
+      if ro.has_key? "description"
+        session[:metadata][:description] = ro["description"]
+      end
+    rescue Exception => e
+      session[:extraction_exception_message] = e.message
+    end
+
+  end
+
+
 
 end
