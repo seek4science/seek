@@ -12,11 +12,10 @@ module RdfHelper
           resource.to_json_ld.html_safe
         end
       rescue Exception => exception
-        if Seek::Config.exception_notification_enabled
-          data[:message] = 'Error embedding JSON-LD into page HEAD'
-          data[:item] = resource.inspect
-          ExceptionNotifier.notify_exception(exception, data: data)
-        end
+        data={}
+        data[:message] = 'Error embedding JSON-LD into page HEAD'
+        data[:item] = resource.inspect
+        Seek::Errors::ExceptionForwarder.send_notification(exception, data)
         ''
       end
     end
@@ -30,11 +29,11 @@ module RdfHelper
           resource.to_schema_ld.html_safe
         end
       rescue Exception => exception
-        if Seek::Config.exception_notification_enabled
-          data[:message] = 'Error embedding Schema JSON-LD into page HEAD'
-          data[:item] = resource.inspect
-          ExceptionNotifier.notify_exception(exception, data: data)
-        end
+        raise exception
+        data={}
+        data[:message] = 'Error embedding Schema JSON-LD into page HEAD'
+        data[:item] = resource.inspect
+        Seek::Errors::ExceptionForwarder.send_notification(exception, data)
         ''
       end
     end

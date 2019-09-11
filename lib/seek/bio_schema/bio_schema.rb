@@ -37,7 +37,7 @@ module Seek
 
       private
 
-      SUPPORTED_TYPES = [Person, Project].freeze
+      SUPPORTED_TYPES = [Person, Project, Event].freeze
 
       def resource_decorator
         @decorator ||= ResourceDecorators::Factory.instance.get(resource)

@@ -11,6 +11,7 @@ class Event < ApplicationRecord
   include Seek::Subscribable
   include Seek::Search::CommonFields
   include Seek::Search::BackgroundReindexing
+  include Seek::BioSchema::Generation
 
   scope :default_order, -> { order('start_date DESC') }
 

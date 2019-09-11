@@ -10,3 +10,10 @@ Person,member_of,memberOf
 Project,image,logo
 Project,url,url
 Project,member,member
+Event,contact,contact
+Event,start_date, startDate
+Event,end_date, endDate
+Event,event_type,eventType
+Event,location,location
+Event,url,url
+Event,host_institution, hostInstitution

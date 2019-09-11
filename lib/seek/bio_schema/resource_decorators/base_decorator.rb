@@ -61,6 +61,10 @@ module Seek
               end
             end
           end
+
+          def associated_item(pair)
+
+          end
         end
 
         private
