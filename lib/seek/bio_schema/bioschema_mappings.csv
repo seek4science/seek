@@ -32,3 +32,4 @@ Organism,concept_uri,sameAs
 Organism,synonyms,alternateName
 Sample,url,url
 Sample,properties,additionalProperty
+Sample,keywords,keywords

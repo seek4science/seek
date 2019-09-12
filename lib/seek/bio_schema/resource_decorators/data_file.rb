@@ -9,10 +9,6 @@ module Seek
 
         associated_items creator: :creators
 
-        def keywords
-          tags_as_text_array.join(", ")
-        end
-
         def url
           rdf_resource
         end

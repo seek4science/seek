@@ -35,6 +35,11 @@ module Seek
           rdf_resource
         end
 
+        # list of comma seperated tags, it the resource supports it
+        def keywords
+          tags_as_text_array.join(", ") if resource.respond_to?(:tags_as_text_array)
+        end
+
         # the minimal definition for the resource, used mainly for associated items
         # by default this includes just @type, @id, and name, but can be extended in the subclass if necessary
         def mini_definition
