@@ -28,3 +28,5 @@ Seek::BioSchema::DataCatalogueMockModel,url,url
 Seek::BioSchema::DataCatalogueMockModel,date_created,dateCreated
 Seek::BioSchema::DataCatalogueMockModel,keywords,keywords
 Seek::BioSchema::DataCatalogueMockModel,provider,provider
+Organism,concept_uri,sameAs
+Organism,synonyms,alternateName
