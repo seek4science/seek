@@ -10,7 +10,7 @@ module Seek
         end
 
         def schema_type
-          'Organization'
+          'Project'
         end
       end
     end
