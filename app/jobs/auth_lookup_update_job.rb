@@ -58,14 +58,13 @@ class AuthLookupUpdateJob < SeekJob
   end
 
   def update_assets_for_user(user)
-    User.transaction(requires_new: :true) do
+    User.transaction(requires_new: true) do
       Seek::Util.authorized_types.each do |type|
-        type.find_each do |item|
+        type.includes(policy: :permissions).find_each do |item|
           item.update_lookup_table(user)
         end
       end
     end
-    GC.start
   end
 
   def follow_on_job?
