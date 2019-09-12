@@ -2,11 +2,7 @@ module Seek
   module BioSchema
     module ResourceDecorators
       # Decorator that provides extensions for a Sample
-      class Sample < BaseDecorator
-
-        def url
-          identifier
-        end
+      class Sample < Thing
 
         def properties
           sample_type.sample_attributes.collect do |attr|

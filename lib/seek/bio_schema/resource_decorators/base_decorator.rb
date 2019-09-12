@@ -6,6 +6,8 @@ module Seek
       # for Schema.org (Bioschemas.org)
       class BaseDecorator
         include ActionView::Helpers::SanitizeHelper
+        include Rails.application.routes.url_helpers
+
         attr_reader :resource
 
         def initialize(resource)
@@ -35,9 +37,9 @@ module Seek
           rdf_resource
         end
 
-        # list of comma seperated tags, it the resource supports it
-        def keywords
-          tags_as_text_array.join(", ") if resource.respond_to?(:tags_as_text_array)
+        def rdf_resource
+          uri = polymorphic_url(resource,host: Seek::Config.site_base_host)
+          RDF::Resource.new(uri)
         end
 
         # the minimal definition for the resource, used mainly for associated items
@@ -65,10 +67,6 @@ module Seek
                 mini_definitions(send(collection))
               end
             end
-          end
-
-          def associated_item(pair)
-
           end
         end
 

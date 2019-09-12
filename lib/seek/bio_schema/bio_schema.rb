@@ -37,9 +37,9 @@ module Seek
 
       private
 
-      SUPPORTED_TYPES = [Person, Project, Event, DataFile,
-			 Seek::BioSchema::DataCatalogueMockModel, Organism, Sample, 
-			Document, Presentation].freeze
+      SUPPORTED_TYPES = [Person, Project, Event, DataFile, Organism,
+                         Seek::BioSchema::DataCatalogueMockModel, Sample,
+                         Document,Presentation].freeze
 
       def resource_decorator
         @decorator ||= ResourceDecorators::Factory.instance.get(resource)

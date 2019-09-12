@@ -2,7 +2,7 @@ module Seek
   module BioSchema
     module ResourceDecorators
       # Decorator that provides extensions for a Organism
-      class Organism < BaseDecorator
+      class Organism < Thing
 
         def synonyms
           if concept

@@ -2,7 +2,7 @@ module Seek
   module BioSchema
     module ResourceDecorators
       # Decorator that provides extensions for a Project
-      class Project < BaseDecorator
+      class Project < Thing
         associated_items member: :people
 
         def url

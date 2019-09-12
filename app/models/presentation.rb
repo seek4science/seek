@@ -1,5 +1,7 @@
 class Presentation < ApplicationRecord
 
+   include Seek::BioSchema::Generation
+
    attr_accessor :orig_data_file_id
 
    #searchable must come before acts_as_asset call - although empty is seems this is needed to avoid the autoindex
