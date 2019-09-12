@@ -20,7 +20,7 @@ module Seek
           data = {
               "@type"=>"PropertyValue",
               "name"=>attribute.title,
-              "value"=>get_attribute(attribute)
+              "value"=>get_attribute_value(attribute)
           }
 
           data

@@ -30,7 +30,7 @@
                             <%= content_tag(:div, data: {
                                 toggle: 'popover',
                                 content: errors.map { |e| "#{attribute.title} #{e}<br/>" }.join.html_safe }) do %>
-                                <%= text_or_not_specified(sample.get_attribute(attribute), auto_link: link) %>
+                                <%= text_or_not_specified(sample.get_attribute_value(attribute), auto_link: link) %>
                             <% end %>
                           </td>
                       <% else %>
