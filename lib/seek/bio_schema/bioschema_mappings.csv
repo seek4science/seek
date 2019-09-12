@@ -24,3 +24,7 @@ DataFile,doi,identifier
 DataFile,license,license
 DataFile,creator,creator
 DataFile,distribution,distribution
+Seek::BioSchema::DataCatalogueMockModel,url,url
+Seek::BioSchema::DataCatalogueMockModel,date_created,dateCreated
+Seek::BioSchema::DataCatalogueMockModel,keywords,keywords
+Seek::BioSchema::DataCatalogueMockModel,provider,provider

@@ -22,9 +22,9 @@ module RdfHelper
   end
 
   def schema_ld_script_block
-    return unless action_name == 'show'
-    resource = eval('@' + controller_name.singularize)
-    if resource.respond_to?(:schema_org_supported?) && resource.schema_org_supported?
+    resource = determine_resource_for_schema_ld
+
+    if resource && resource.respond_to?(:schema_org_supported?) && resource.schema_org_supported?
       begin
         content_tag :script, type: 'application/ld+json' do
           resource.to_schema_ld.html_safe
@@ -37,6 +37,14 @@ module RdfHelper
         Seek::Errors::ExceptionForwarder.send_notification(exception, data)
         ''
       end
+    end
+  end
+
+  def determine_resource_for_schema_ld
+    if controller_name=='homes' && action_name=='index'
+      Seek::BioSchema::DataCatalogueMockModel.new
+    elsif action_name == 'show'
+      eval('@' + controller_name.singularize)
     end
   end
 

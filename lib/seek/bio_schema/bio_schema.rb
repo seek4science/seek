@@ -30,14 +30,14 @@ module Seek
         BioSchema.supported?(resource)
       end
 
-      # test directly (without intializing) whether a resource is supported
+      # test directly (without initializing) whether a resource is supported
       def self.supported?(resource)
         SUPPORTED_TYPES.include?(resource.class)
       end
 
       private
 
-      SUPPORTED_TYPES = [Person, Project, Event, DataFile].freeze
+      SUPPORTED_TYPES = [Person, Project, Event, DataFile, Seek::BioSchema::DataCatalogueMockModel].freeze
 
       def resource_decorator
         @decorator ||= ResourceDecorators::Factory.instance.get(resource)
