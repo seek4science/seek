@@ -113,7 +113,7 @@ class Person < ApplicationRecord
 
   def queue_update_auth_table
     if saved_changes.keys.include?('roles_mask')
-      AuthLookupUpdateJob.new.add_items_to_queue self
+      AuthLookupUpdateQueue.enqueue(self)
     end
   end
 

@@ -103,7 +103,7 @@ module Seek
 
           # trigger off a full update for that user if the count is zero and items should exist for that type
           if lookup_count == 0 && !last_id.nil?
-            AuthLookupUpdateJob.new.add_items_to_queue User.find_by_id(user_id)
+            AuthLookupUpdateQueue.enqueue(User.find_by_id(user_id))
           end
 
           (lookup_count == asset_count && (asset_count == 0 || (last_lookup_asset_id == last_id)))
@@ -172,7 +172,7 @@ module Seek
       def check_to_queue_update_auth_table
         return if destroyed?
         if try(:creators_changed?) || (previous_changes.keys & %w[contributor_id owner_id]).any?
-          AuthLookupUpdateJob.new.add_items_to_queue self
+          AuthLookupUpdateQueue.enqueue(self)
         end
       end
 

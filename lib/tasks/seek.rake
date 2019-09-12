@@ -12,7 +12,7 @@ namespace :seek do
     Seek::Util.authorized_types.each do |type|
       type.remove_invalid_auth_lookup_entries
       type.find_each do |item|
-        AuthLookupUpdateQueue.create(item: item, priority: 1) unless AuthLookupUpdateQueue.exists?(item)
+        AuthLookupUpdateQueue.create(item: item, priority: 1) # Duplicates will be caught by uniqueness check
       end
     end
     # 5 is an arbitrary number to take advantage of there being more than 1 worker dedicated to auth refresh
