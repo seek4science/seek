@@ -22,6 +22,7 @@ module RdfHelper
   end
 
   def schema_ld_script_block
+    return unless action_name == 'show'
     resource = eval('@' + controller_name.singularize)
     if resource.respond_to?(:schema_org_supported?) && resource.schema_org_supported?
       begin

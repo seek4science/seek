@@ -17,3 +17,9 @@ Event,event_type,eventType
 Event,location,location
 Event,url,url
 Event,host_institution, hostInstitution
+DataFile,keywords,keywords
+DataFile,url,url
+DataFile,doi,identifier
+DataFile,license,license
+DataFile,creator,creator
+DataFile,distribution,distribution

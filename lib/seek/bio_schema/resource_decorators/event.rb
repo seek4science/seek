@@ -1,7 +1,7 @@
 module Seek
   module BioSchema
     module ResourceDecorators
-      # Decorator that provides extensions for a Person
+      # Decorator that provides extensions for a Event
       class Event < BaseDecorator
 
         associated_items contact: :contributors

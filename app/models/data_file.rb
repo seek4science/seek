@@ -3,6 +3,7 @@ require_dependency 'seek/util'
 class DataFile < ApplicationRecord
   include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
+  include Seek::BioSchema::Generation
 
   attr_accessor :parent_name
 
