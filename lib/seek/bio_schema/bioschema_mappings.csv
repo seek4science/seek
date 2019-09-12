@@ -30,3 +30,5 @@ Seek::BioSchema::DataCatalogueMockModel,keywords,keywords
 Seek::BioSchema::DataCatalogueMockModel,provider,provider
 Organism,concept_uri,sameAs
 Organism,synonyms,alternateName
+Sample,url,url
+Sample,properties,additionalProperty
