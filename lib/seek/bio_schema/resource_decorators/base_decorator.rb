@@ -92,6 +92,7 @@ module Seek
         private
 
         def mini_definitions(collection)
+          return if collection.empty?
           collection.collect do |item|
             Factory.instance.get(item).mini_definition
           end
