@@ -46,22 +46,6 @@ class AuthLookupTableTest < ActiveSupport::TestCase
     assert_equal (User.count + 1), d.auth_lookup.count
   end
 
-  test 'Adds a user to the lookup tables when they are created' do
-    assay_count = Assay.count
-    sop_count = Sop.count
-    user = nil
-    assert_difference(-> { Assay::AuthLookup.count }, assay_count) do
-      assert_difference(-> { Sop::AuthLookup.count }, sop_count) do
-        assert_difference(-> { AuthLookupUpdateQueue.count }, 1) do
-          user = Factory(:user)
-        end
-      end
-    end
-
-    assert_equal assay_count, Assay::AuthLookup.where(user: user).count
-    assert_equal sop_count, Sop::AuthLookup.where(user: user).count
-  end
-
   test 'Updates auth lookup for all users' do
     person = Factory(:person)
     User.current_user = person.user
