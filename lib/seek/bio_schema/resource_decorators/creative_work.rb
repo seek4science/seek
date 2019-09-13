@@ -4,14 +4,16 @@ module Seek
       # Decorator that provides extensions for a Event
       class CreativeWork < Thing
         associated_items provider: :projects,
-                         creator: :creators
+                         creator: :creators,
+                         subject_of: :events
 
         schema_mappings license: :license,
                         creator: :creator,
                         provider: :provider,
                         created_at: :dateCreated,
                         updated_at: :dateModified,
-                        content_type: :encodingFormat
+                        content_type: :encodingFormat,
+                        subject_of: :subjectOf
 
         # list of comma seperated tags, it the resource supports it
         def keywords

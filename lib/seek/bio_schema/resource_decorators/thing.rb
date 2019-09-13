@@ -7,16 +7,12 @@ module Seek
         schema_mappings description: :description,
                         title: :name,
                         url: :url,
-                        keywords: :keywords,
-                        subject_of: :subjectOf
+                        keywords: :keywords
 
         def url
           identifier
         end
 
-        def subject_of
-          events if self.respond_to?(:events)
-        end
       end
     end
   end
