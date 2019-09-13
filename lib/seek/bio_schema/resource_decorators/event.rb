@@ -3,7 +3,6 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a Event
       class Event < Thing
-
         associated_items contact: :contributors,
                          host_institution: :projects
         schema_mappings contact: :contact,
@@ -30,13 +29,12 @@ module Seek
         end
 
         def location
-          [address,city,country].reject(&:blank?).join(", ")
+          [address, city, country].reject(&:blank?).join(', ')
         end
 
         def country
           CountryCodes. country(resource.country)
         end
-
       end
     end
   end

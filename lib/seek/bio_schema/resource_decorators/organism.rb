@@ -3,7 +3,6 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a Organism
       class Organism < Thing
-
         schema_mappings synonyms: :alternateName,
                         concept_uri: :sameAs
 

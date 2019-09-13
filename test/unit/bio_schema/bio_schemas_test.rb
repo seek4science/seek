@@ -91,7 +91,6 @@ class BioSchemaTest < ActiveSupport::TestCase
 
     refute_nil project.avatar
     json = Seek::BioSchema::BioSchema.new(project).json_ld
-    puts json
     json = JSON.parse(json)
 
     assert_equal "http://localhost:3000/projects/#{project.id}", json['@id']

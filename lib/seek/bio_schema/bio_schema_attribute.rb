@@ -1,7 +1,6 @@
 module Seek
   module BioSchema
     class BioSchemaAttribute
-
       include ActionView::Helpers::SanitizeHelper
 
       attr_reader :method
@@ -13,14 +12,16 @@ module Seek
       end
 
       def invoke(decorator)
-        value = decorator.try(method)
+        value = nil
+        if decorator.respond_to?(method)
+          value = decorator.send(method)
+        end
         if value.is_a?(String)
           sanitize(value)
         else
           value
         end
       end
-
     end
   end
 end

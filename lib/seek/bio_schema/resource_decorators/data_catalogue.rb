@@ -3,7 +3,6 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a DataCatalogue
       class DataCatalogue < Thing
-
         schema_mappings date_created: :dateCreated,
                         provider: :provider
 
@@ -18,8 +17,6 @@ module Seek
         def url
           resource.url
         end
-
-
       end
     end
   end

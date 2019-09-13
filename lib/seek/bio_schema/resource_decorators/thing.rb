@@ -3,7 +3,6 @@ module Seek
     module ResourceDecorators
       class Thing < BaseDecorator
 
-        associated_items subject_of: :events
 
         schema_mappings description: :description,
                         title: :name,
@@ -15,6 +14,9 @@ module Seek
           identifier
         end
 
+        def subject_of
+          events if self.respond_to?(:events)
+        end
       end
     end
   end

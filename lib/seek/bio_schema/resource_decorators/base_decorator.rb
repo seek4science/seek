@@ -15,16 +15,14 @@ module Seek
         end
 
         def mappings
-          [[:identifier,"@id"]]
+          [[:identifier, '@id']]
         end
 
         def attributes
-          mappings.collect do |method,property|
+          mappings.collect do |method, property|
             Seek::BioSchema::BioSchemaAttribute.new(method, property)
           end
         end
-
-
 
         # The @context to be used for the JSON-LD
         def context
@@ -50,7 +48,7 @@ module Seek
         end
 
         def rdf_resource
-          uri = polymorphic_url(resource,host: Seek::Config.site_base_host)
+          uri = polymorphic_url(resource, host: Seek::Config.site_base_host)
           RDF::Resource.new(uri)
         end
 
