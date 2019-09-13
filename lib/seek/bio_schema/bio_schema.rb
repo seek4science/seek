@@ -20,7 +20,7 @@ module Seek
         json = {}
         json['@context'] = resource_decorator.context
         json['@type'] = resource_decorator.schema_type
-        json.merge!(attributes_from_csv_mappings)
+        json.merge!(attributes_json)
 
         JSON.pretty_generate(json)
       end
@@ -43,6 +43,16 @@ module Seek
 
       def resource_decorator
         @decorator ||= ResourceDecorators::Factory.instance.get(resource)
+      end
+
+      def attributes_json
+        result = {}
+        resource_decorator.attributes.each do |attr|
+          if (value = attr.invoke(resource_decorator))
+            result[attr.property.to_s] = value
+          end
+        end
+        result
       end
 
       def attributes_from_csv_mappings

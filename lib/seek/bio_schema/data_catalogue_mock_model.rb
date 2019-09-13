@@ -23,7 +23,7 @@ module Seek
         }
       end
 
-      def data_created
+      def date_created
         ActivityLog.first.created_at
       end
 

@@ -4,6 +4,8 @@ module Seek
       # Decorator that provides extensions for a Sample
       class Sample < Thing
 
+        schema_mappings properties: :additionalProperty
+
         def properties
           sample_type.sample_attributes.collect do |attr|
             describe_attribute(attr)

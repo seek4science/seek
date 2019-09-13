@@ -37,7 +37,10 @@ class BioSchemaTest < ActiveSupport::TestCase
     refute_nil project
     refute_nil p.avatar
     json = Seek::BioSchema::BioSchema.new(p).json_ld
+
     json = JSON.parse(json)
+
+
     assert_equal "http://localhost:3000/people/#{p.id}", json['@id']
     assert_equal 'Bob Monkhouse', json['name']
     assert_equal 'Person', json['@type']
@@ -88,6 +91,7 @@ class BioSchemaTest < ActiveSupport::TestCase
 
     refute_nil project.avatar
     json = Seek::BioSchema::BioSchema.new(project).json_ld
+    puts json
     json = JSON.parse(json)
 
     assert_equal "http://localhost:3000/projects/#{project.id}", json['@id']

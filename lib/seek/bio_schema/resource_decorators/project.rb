@@ -5,6 +5,9 @@ module Seek
       class Project < Thing
         associated_items member: :people
 
+        schema_mappings image: :logo,
+                        member: :member
+
         def url
           web_page.blank? ? identifier : web_page
         end

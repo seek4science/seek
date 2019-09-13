@@ -6,6 +6,9 @@ module Seek
 
         include ActionView::Helpers::NumberHelper
 
+        schema_mappings doi: :identifier,
+                        distribution: :distribution
+
         def doi
           if resource.doi
             "https://doi.org/#{resource.doi}"

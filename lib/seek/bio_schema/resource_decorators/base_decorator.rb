@@ -14,6 +14,18 @@ module Seek
           @resource = resource
         end
 
+        def mappings
+          [[:identifier,"@id"]]
+        end
+
+        def attributes
+          mappings.collect do |method,property|
+            Seek::BioSchema::BioSchemaAttribute.new(method, property)
+          end
+        end
+
+
+
         # The @context to be used for the JSON-LD
         def context
           'http://schema.org'
@@ -61,11 +73,20 @@ module Seek
           #   associated_items member: :people
           #   create a method 'member' that returns a collection of Hash objects containing the
           #   minimal definition for each item resulting from calling 'people' on the resource
-          def associated_items(pairs)
+          def associated_items(**pairs)
             pairs.each do |method, collection|
               define_method(method) do
                 mini_definitions(send(collection))
               end
+            end
+          end
+
+          def schema_mappings(**pairs)
+            mappings = pairs.collect do |method, property|
+              [method, property]
+            end
+            define_method(:mappings) do
+              super() | mappings
             end
           end
         end

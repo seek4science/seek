@@ -4,8 +4,14 @@ module Seek
       # Decorator that provides extensions for a Event
       class Event < Thing
 
-        associated_items contact: :contributors
-        associated_items host_institution: :projects
+        associated_items contact: :contributors,
+                         host_institution: :projects
+        schema_mappings contact: :contact,
+                        start_date: :startDate,
+                        end_date: :endDate,
+                        event_type: :eventType,
+                        location: :location,
+                        host_institution: :hostInstitution
 
         def contributors
           [contributor]

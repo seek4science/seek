@@ -5,6 +5,12 @@ module Seek
       class Person < Thing
         associated_items member_of: :projects
 
+        schema_mappings first_name: :givenName,
+                        last_name: :familyName,
+                        image: :image,
+                        member_of: :memberOf,
+                        orcidid: :orcidid
+
         def url
           web_page.blank? ? identifier : web_page
         end
