@@ -13,9 +13,7 @@ module Seek
 
       def invoke(decorator)
         value = nil
-        if decorator.respond_to?(method)
-          value = decorator.send(method)
-        end
+        value = decorator.send(method) if decorator.respond_to?(method)
         if value.is_a?(String)
           sanitize(value)
         else

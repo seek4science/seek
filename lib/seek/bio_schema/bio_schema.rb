@@ -54,21 +54,6 @@ module Seek
         end
         result
       end
-
-      def attributes_from_csv_mappings
-        result = {}
-        CSVReader.instance.each_row do |row|
-          next unless row.matches?(resource)
-          if (value = row.invoke(resource_decorator))
-            result[row.property.strip] = value
-          end
-        end
-        result
-      end
-
-      def process_mapping(method)
-        resource.try(method)
-      end
     end
   end
 end
