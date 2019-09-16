@@ -15,11 +15,6 @@ module Seek
                         content_type: :encodingFormat,
                         subject_of: :subjectOf
 
-        # list of comma seperated tags, it the resource supports it
-        def keywords
-          tags_as_text_array.join(', ') if resource.respond_to?(:tags_as_text_array)
-        end
-
         def content_type
           if resource.respond_to?(:content_blob) && resource.content_blob
             resource.content_blob.content_type

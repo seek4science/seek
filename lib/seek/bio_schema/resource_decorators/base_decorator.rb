@@ -24,6 +24,11 @@ module Seek
           end
         end
 
+        # list of comma seperated tags, it the resource supports it
+        def keywords
+          tags_as_text_array.join(', ') if resource.respond_to?(:tags_as_text_array)
+        end
+
         # The @context to be used for the JSON-LD
         def context
           'http://schema.org'
@@ -49,7 +54,7 @@ module Seek
 
         def rdf_resource
           uri = polymorphic_url(resource, host: Seek::Config.site_base_host)
-          RDF::Resource.new(uri)
+          RDF::Resource.new(uri).to_s
         end
 
         # the minimal definition for the resource, used mainly for associated items
@@ -61,6 +66,8 @@ module Seek
             'name': sanitize(title)
           }
         end
+
+        def json_ld; end
 
         instance_eval do
           private
@@ -94,7 +101,7 @@ module Seek
         def mini_definitions(collection)
           return if collection.empty?
           collection.collect do |item|
-            Factory.instance.get(item).mini_definition
+            Seek::BioSchema::ResourceDecorators::Factory.instance.get(item).mini_definition
           end
         end
 
