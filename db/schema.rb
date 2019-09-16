@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_29_144713) do
+ActiveRecord::Schema.define(version: 2019_09_13_105005) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -375,7 +375,7 @@ ActiveRecord::Schema.define(version: 2019_08_29_144713) do
     t.index ["person_id"], name: "index_disciplines_people_on_person_id"
   end
 
-  create_table "document_auth_lookup", id: :integer,  force: :cascade do |t|
+  create_table "document_auth_lookup", id: false,  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
