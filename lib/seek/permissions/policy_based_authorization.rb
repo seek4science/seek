@@ -24,7 +24,6 @@ module Seek
 
           const_set('AuthLookup', Class.new(::AuthLookup)).class_eval do |c|
             c.table_name = klass.lookup_table_name
-            c.primary_keys = AuthLookup.primary_keys
             belongs_to :asset, class_name: klass.name, inverse_of: :auth_lookup
           end
 

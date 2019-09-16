@@ -1,6 +1,6 @@
 class AuthLookup < ActiveRecord::Base
   self.abstract_class = true
-  self.primary_keys = :user_id, :asset_id
+  self.primary_key = [:user_id, :asset_id]
   belongs_to :user, required: false
 
   ABILITIES = Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.map(&:to_s).freeze
