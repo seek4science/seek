@@ -4,12 +4,11 @@ module Seek
 
     def index
       controller = controller_name.downcase
-      unless view_context.index_with_facets?(controller) && params[:user_enable_facet] == 'true'
-        model_class = controller_name.classify.constantize
-        objects = eval("@#{controller}")
-        objects = model_class.paginate_after_fetch(objects, page_and_sort_params) unless objects.respond_to?('page_totals')
-        instance_variable_set("@#{controller}", objects)
-      end
+      model_class = controller_name.classify.constantize
+      objects = eval("@#{controller}")
+      objects = model_class.paginate_after_fetch(objects, page_and_sort_params) unless objects.respond_to?('page_totals')
+      instance_variable_set("@#{controller}", objects)
+
       respond_to do |format|
         format.html
         format.xml
@@ -29,16 +28,19 @@ module Seek
 
     def fetch_and_filter_assets
       detect_parent_resource
-      found = apply_filters(fetch_all_viewable_assets)
+      found = fetch_all_viewable_assets
       instance_variable_set("@#{controller_name.downcase}", found)
     end
 
     def fetch_all_viewable_assets
-      model_class = controller_name.classify.constantize
+      if @parent_resource
+        found = @parent_resource.send(controller_name)
+      else
+        found = controller_name.classify.constantize
+      end
 
-      found = model_class.authorized_for('view', User.current_user)
-
-      @total_count = model_class.count
+      @total_count = found.count
+      found = found.authorized_for('view', User.current_user)
       @hidden = @total_count - found.count
 
       found

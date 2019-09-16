@@ -422,6 +422,12 @@ module ApplicationHelper
   # returns the count of the total visible items, and also the count of the all items, according to controller_name
   # primarily used for the metrics on the item index page
   def resource_count_stats
+    if @total_count && @hidden
+      return [@total_count - @hidden, @total_count]
+    else
+      raise "@total_count && @hidden were not set!"
+    end
+
     klass = klass_from_controller(controller_name)
     full_total = klass.count
     visible_total = if klass.authorization_supported?
