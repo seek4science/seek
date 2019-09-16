@@ -29,6 +29,7 @@ module Seek
     def fetch_and_filter_assets
       detect_parent_resource
       found = fetch_all_viewable_assets
+      found = apply_filters(found)
       instance_variable_set("@#{controller_name.downcase}", found)
     end
 

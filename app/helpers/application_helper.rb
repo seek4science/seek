@@ -424,8 +424,6 @@ module ApplicationHelper
   def resource_count_stats
     if @total_count && @hidden
       return [@total_count - @hidden, @total_count]
-    else
-      raise "@total_count && @hidden were not set!"
     end
 
     klass = klass_from_controller(controller_name)
