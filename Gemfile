@@ -124,6 +124,7 @@ gem 'rails-html-sanitizer'
 gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'activerecord-import'
+gem 'composite_primary_keys', '~> 11.2.0'
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'

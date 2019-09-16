@@ -177,6 +177,8 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
+    composite_primary_keys (11.2.0)
+      activerecord (~> 5.2.1)
     concurrent-ruby (1.1.5)
     countries (2.1.4)
       i18n_data (~> 0.8.0)
@@ -834,6 +836,7 @@ DEPENDENCIES
   citeproc (~> 1.0.4)
   citeproc-ruby (~> 1.1.4)
   coffee-rails (~> 4.2)
+  composite_primary_keys (~> 11.2.0)
   convert_office!
   country_select
   csl-styles (~> 1.0.1.7)
