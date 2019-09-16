@@ -49,35 +49,37 @@ class AuthLookupTableTest < ActiveSupport::TestCase
   test 'Updates auth lookup for all users' do
     person = Factory(:person)
     User.current_user = person.user
-    doc = Factory(:document, contributor: person, policy: Factory(:private_policy))
+    [:assay, :document, :data_file, :sample].each do |type|
+      item = Factory(type, contributor: person, policy: Factory(:private_policy))
 
-    assert_equal 2, doc.auth_lookup.count, "Should have 1 entry each for logged in user and anonymous user (nil)"
-    auth = doc.auth_lookup.to_a
+      assert_equal 2, item.auth_lookup.count, "Should have 1 entry each for logged in user and anonymous user (nil)"
+      auth = item.auth_lookup.to_a
 
-    anon_auth = auth.detect { |a| a.user_id == 0 }
-    refute anon_auth.can_view
-    refute anon_auth.can_edit
-    refute anon_auth.can_download
-    refute anon_auth.can_manage
-    refute anon_auth.can_delete
+      anon_auth = auth.detect { |a| a.user_id == 0 }
+      refute anon_auth.can_view
+      refute anon_auth.can_edit
+      refute anon_auth.can_download
+      refute anon_auth.can_manage
+      refute anon_auth.can_delete
 
-    user_auth = auth.detect { |a| a.user_id != 0 }
-    assert_equal person.user, user_auth.user
-    assert user_auth.can_view
-    assert user_auth.can_edit
-    assert user_auth.can_download
-    assert user_auth.can_manage
-    assert user_auth.can_delete
+      user_auth = auth.detect { |a| a.user_id != 0 }
+      assert_equal person.user, user_auth.user
+      assert user_auth.can_view
+      assert user_auth.can_edit
+      assert user_auth.can_download
+      assert user_auth.can_manage
+      assert user_auth.can_delete
 
-    doc.update_lookup_table_for_all_users
+      item.update_lookup_table_for_all_users
 
-    assert_equal (User.count + 1), doc.auth_lookup.count, "Should have 1 entry for each user, and 1 extra for the anonymous user"
+      assert_equal (User.count + 1), item.auth_lookup.count, "Should have 1 entry for each user, and 1 extra for the anonymous user"
 
-    # Check each auth entry
-    doc.auth_lookup.includes(:user).find_each do |entry|
-      user = entry.user
-      AuthLookup::ABILITIES.each do |ability|
-        assert_equal doc.authorized_for_action(user, ability), entry.send("can_#{ability}"), "Mismatch in auth lookup for user: #{user} and ability: #{ability}"
+      # Check each auth entry
+      item.auth_lookup.includes(:user).each do |entry|
+        user = entry.user
+        AuthLookup::ABILITIES.each do |ability|
+          assert_equal item.authorized_for_action(user, ability), entry.send("can_#{ability}"), "Mismatch in #{type} auth lookup for user: #{user} and ability: #{ability}"
+        end
       end
     end
   end
