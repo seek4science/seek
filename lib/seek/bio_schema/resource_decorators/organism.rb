@@ -4,10 +4,10 @@ module Seek
       # Decorator that provides extensions for a Organism
       class Organism < Thing
         schema_mappings synonyms: :alternateName,
-                        concept_uri: :sameAs
+                        ncbi_uri: :sameAs
 
         def synonyms
-          if concept
+          if concept && concept[:synonyms]
             concept[:synonyms]
           else
             []

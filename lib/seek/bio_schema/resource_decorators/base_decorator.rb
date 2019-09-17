@@ -29,6 +29,10 @@ module Seek
           tags_as_text_array.join(', ') if resource.respond_to?(:tags_as_text_array)
         end
 
+        def date_created
+          resource.date_created.utc if resource.respond_to?(:date_created)
+        end
+
         # The @context to be used for the JSON-LD
         def context
           'http://schema.org'

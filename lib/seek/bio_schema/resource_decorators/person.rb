@@ -9,7 +9,7 @@ module Seek
                         last_name: :familyName,
                         image: :image,
                         member_of: :memberOf,
-                        orcidid: :orcidid
+                        orcid: :orcid
 
         def url
           web_page.blank? ? identifier : web_page

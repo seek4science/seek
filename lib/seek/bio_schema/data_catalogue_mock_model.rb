@@ -12,9 +12,7 @@ module Seek
       end
 
       def keywords
-        if Seek::Config.project_keywords
-          Seek::Config.project_keywords.split(',').collect(&:strip).reject(&:blank?).join(', ')
-        end
+        Seek::Config.project_keywords&.split(',')&.collect(&:strip)&.reject(&:blank?)&.join(', ')
       end
 
       def provider
