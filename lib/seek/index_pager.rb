@@ -26,25 +26,36 @@ module Seek
       fetch_and_filter_assets
     end
 
-    def fetch_and_filter_assets
-      detect_parent_resource
-      found = fetch_all_viewable_assets
-      found = apply_filters(found)
-      instance_variable_set("@#{controller_name.downcase}", found)
+    def filter_params
+      # placed this in a separate method so that other controllers could override it if necessary
+      return {} unless params.key?(:filter)
+      permitted = Seek::Filtering::APPLICABLE_FILTERS[controller_name.classify.to_sym] || {}
+      params.require(:filter).permit(*permitted).to_h
     end
 
-    def fetch_all_viewable_assets
-      found = if @parent_resource
-                @parent_resource.get_related(controller_name.classify)
-              else
-                controller_name.classify.constantize
-              end
+    def fetch_and_filter_assets
+      detect_parent_resource
+      found = fetch_all_assets
+      @filters = filter_params
+      filtered_collection = Seek::Filtering.filter(found, @filters)
+      @active_filters = filtered_collection.active_filters
+      found = filtered_collection.collection
 
       @total_count = found.count
       found = found.authorized_for('view', User.current_user)
       @hidden = @total_count - found.count
 
-      found
+      @available_filters = Seek::Filtering.available_filters(found)
+
+      instance_variable_set("@#{controller_name.downcase}", found)
+    end
+
+    def fetch_all_assets
+      if @parent_resource
+        @parent_resource.get_related(controller_name.classify)
+      else
+        controller_name.classify.constantize
+      end
     end
 
     def detect_parent_resource

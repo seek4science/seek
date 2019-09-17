@@ -432,34 +432,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # Strips any unexpected filter, which protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
-  def filter_params
-    # placed this in a separate method so that other controllers could override it if necessary
-    return {} unless params.key?(:filter)
-    permitted = Seek::Util.persistent_classes.select { |c| c.respond_to? :find_by_id }.map { |c| c.name.underscore }
-    params.require(:filter).permit(*permitted).to_h
-  end
-
-  def apply_filters(resources)
-    @filters = filter_params
-
-    if @filters.any?
-      params[:page] ||= 'all'
-      params[:filtered] = true
-      resources.select do |res|
-        @filters.all? do |filter, value|
-          filter = filter.to_s
-          klass = filter.camelize.constantize
-          value = klass.find value.to_i
-
-          detect_for_filter(filter, res, value)
-        end
-      end
-    else
-      resources
-    end
-  end
-
   def detect_for_filter(filter, resource, value)
     case
       when resource.respond_to?(filter.pluralize)

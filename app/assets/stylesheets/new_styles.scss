@@ -816,3 +816,40 @@ span.required, label.required::after {
 #my-items .my-items-delete-btn {
   display: inline-block;
 }
+
+div.index-container {
+  display: flex;
+}
+
+div.index-content {
+  flex-grow: 1;
+}
+
+div.index-filters {
+  width: 250px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.filter-category-title {
+  font-size: larger;
+  font-weight: bold;
+  background: #eee;
+  padding: 5px;
+}
+.filter-category {
+  padding: 10px 10px 0 0;
+}
+
+.filter-option {
+  padding: 0 5px;
+  .filter-link { }
+  .filter-title { }
+  .filter-count {
+    float: right;
+    color: #999;
+  }
+}
+
+.filter-active {
+  background-color: #d9e5f9;
+}

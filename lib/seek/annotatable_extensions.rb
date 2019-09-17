@@ -8,7 +8,7 @@ module Seek
     module ClassMethods
       def has_annotation_type(type, method_name: nil)
         method_name ||= type.to_s.pluralize
-        has_many "#{type}_annotations".to_sym, -> { with_attribute_name(type) },
+        has_many "#{type}_annotations".to_sym, -> { where(attribute_id: AnnotationAttribute.find_by_name(type).id) },
                  class_name: 'Annotation',
                  as: :annotatable,
                  dependent: :destroy,
