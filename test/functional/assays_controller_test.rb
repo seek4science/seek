@@ -786,7 +786,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'filtering by person' do
     person = people(:person_for_model_owner)
-    get :index, params: { filter: { person: person.id }, page: 'all' }
+    get :index, params: { filter: { contributor: person.id }, page: 'all' }
     assert_response :success
     a = assays(:metabolomics_assay)
     a2 = assays(:modelling_assay_with_data_and_relationship)
