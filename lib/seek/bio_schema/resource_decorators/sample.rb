@@ -14,11 +14,11 @@ module Seek
         private
 
         def describe_attribute(attribute)
-          value = get_attribute_value(attribute)
+          value = get_attribute_value(attribute) || ''
           data = {
             '@type' => 'PropertyValue',
             'name' => attribute.title,
-            'value' => value
+            'value' => value.to_s
           }
           resolved = attribute.resolve(value)
           data['identifier'] = resolved if resolved

@@ -66,7 +66,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'dataset' do
     df = travel_to(@current_time) do
-      Factory(:max_datafile, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df = Factory(:max_datafile, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df.add_annotations('keyword', 'tag', User.first)
+      disable_authorization_checks { df.save! }
+      df
     end
 
     assert df.can_download?
@@ -77,7 +80,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
       'description' => df.description,
-      'keywords' => '',
+      'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'provider' => [{
         '@type' => 'Project',
@@ -110,13 +113,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     organism = Factory(:organism, bioportal_concept: Factory(:bioportal_concept))
 
     expected = {
-        "@context"=>"http://schema.org",
-        "@type"=>"Taxon",
-        "@id"=>"http://localhost:3000/organisms/#{organism.id}",
-        "name"=>"An Organism",
-        "url"=>"http://localhost:3000/organisms/#{organism.id}",
-        "sameAs"=>"http://purl.bioontology.org/ontology/NCBITAXON/2287",
-        "alternateName"=>[]
+      '@context' => 'http://schema.org',
+      '@type' => 'Taxon',
+      '@id' => "http://localhost:3000/organisms/#{organism.id}",
+      'name' => 'An Organism',
+      'url' => "http://localhost:3000/organisms/#{organism.id}",
+      'sameAs' => 'http://purl.bioontology.org/ontology/NCBITAXON/2287',
+      'alternateName' => []
     }
 
     json = JSON.parse(organism.to_schema_ld)
@@ -124,27 +127,81 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   end
 
   test 'project' do
-    @project.avatar=Factory(:avatar)
-    @project.web_page="http://testing.com"
-    @project.description="a lovely project"
+    @project.avatar = Factory(:avatar)
+    @project.web_page = 'http://testing.com'
+    @project.description = 'a lovely project'
     disable_authorization_checks { @project.save! }
     expected = {
-        "@context"=>"http://schema.org",
-        "@type"=>"Project",
-        "@id"=>"http://localhost:3000/projects/#{@project.id}",
-        "name"=>@project.title,
-        "description"=>"a lovely project",
-        "logo"=>"http://localhost:3000/projects/#{@project.id}/avatars/#{@project.avatar.id}?size=250",
-        "url"=>@project.web_page,
-        "member"=>[
-            {"@type"=>"Person",
-            "@id"=>"http://localhost:3000/people/#{@person.id}",
-            "name"=>@person.name}
-        ]
+      '@context' => 'http://schema.org',
+      '@type' => 'Project',
+      '@id' => "http://localhost:3000/projects/#{@project.id}",
+      'name' => @project.title,
+      'description' => 'a lovely project',
+      'logo' => "http://localhost:3000/projects/#{@project.id}/avatars/#{@project.avatar.id}?size=250",
+      'url' => @project.web_page,
+      'member' => [
+        { '@type' => 'Person',
+          '@id' => "http://localhost:3000/people/#{@person.id}",
+          'name' => @person.name }
+      ]
     }
     json = JSON.parse(@project.to_schema_ld)
     assert_equal expected, json
-
   end
 
+  test 'sample' do
+    sample = Factory(:patient_sample, contributor: @person)
+    sample.add_annotations('keyword', 'tag', User.first)
+    sample.set_attribute_value('postcode', 'M13 4PP')
+    sample.set_attribute_value('weight', '88700.2')
+    disable_authorization_checks { sample.save! }
+
+    expected = {
+      '@context' => 'http://schema.org',
+      '@type' => 'Sample',
+      '@id' => "http://localhost:3000/samples/#{sample.id}",
+      'name' => 'Fred Bloggs',
+      'url' => "http://localhost:3000/samples/#{sample.id}",
+      'keywords' => 'keyword',
+      'additionalProperty' => [
+        { '@type' => 'PropertyValue', 'name' => 'full name', 'value' => 'Fred Bloggs' },
+        { '@type' => 'PropertyValue', 'name' => 'age', 'value' => '44' },
+        { '@type' => 'PropertyValue', 'name' => 'weight', 'value' => '88700.2', 'unitCode' => 'g', 'unitText' => 'gram' },
+        { '@type' => 'PropertyValue', 'name' => 'address', 'value' => '' },
+        { '@type' => 'PropertyValue', 'name' => 'postcode', 'value' => 'M13 4PP' }
+      ]
+    }
+    json = JSON.parse(sample.to_schema_ld)
+    assert_equal expected, json
+  end
+
+  test 'event' do
+    event = Factory(:max_event, contributor: @person)
+    expected = {
+      '@context' => 'http://schema.org',
+      '@id' => "http://localhost:3000/events/#{event.id}",
+      '@type' => 'Event',
+      'name' => 'A Maximal Event',
+      'description' => 'All you ever wanted to know about headaches',
+      'url' => "http://localhost:3000/events/#{event.id}",
+      'contact' => [{
+        '@type' => 'Person',
+        '@id' => "http://localhost:3000/people/#{@person.id}",
+        'name' => 'Maximilian Maxi-Mum'
+      }],
+      'startDate' => '2017-01-01 00:20:00 UTC',
+      'endDate' => '2017-01-01 00:22:00 UTC',
+      'eventType' => [],
+      'location' => 'Sofienstr 2, Heidelberg, Germany',
+      'hostInstitution' => [
+        {
+          '@type' => 'Project',
+          '@id' => "http://localhost:3000/projects/#{event.projects.first.id}",
+          'name' => event.projects.first.title
+        }
+      ]
+    }
+    json = JSON.parse(event.to_schema_ld)
+    assert_equal expected, json
+  end
 end
