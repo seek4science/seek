@@ -10,12 +10,14 @@
   <% if @available_filters && @available_filters.any? %>
     <div class="index-filters">
       <% (@available_filters || {}).each do |key, filters| %>
-        <div class="filter-category">
-          <div class="filter-category-title"><%= key.to_s.humanize %></div>
-          <% sorted_filters(key, filters).each do |filter| %>
-            <%= filter_link(key, filter) %>
-          <% end %>
-        </div>
+        <% if filters.any? %>
+          <div class="filter-category">
+            <div class="filter-category-title"><%= key.to_s.humanize %></div>
+            <% sorted_filters(key, filters).each do |filter| %>
+              <%= filter_link(key, filter) %>
+            <% end %>
+          </div>
+        <% end %>
       <% end %>
     </div>
   <% end %>
