@@ -826,26 +826,42 @@ div.index-content {
 }
 
 div.index-filters {
-  width: 250px;
-  margin-right: 10px;
+  width: 240px;
+  margin-right: 20px;
   flex-shrink: 0;
 }
-.filter-category-title {
-  font-size: larger;
-  background: #eee;
-  padding: 5px;
-}
+
 .filter-category {
-  padding-right: 10px;
+  .filter-category-title {
+    font-size: larger;
+    background: #eee;
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+  }
+  border-top: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  &:last-child {
+    border-bottom: 1px solid #ddd;
+  }
 }
 
 .filter-option {
   padding: 5px;
-  .filter-link { }
-  .filter-title { }
+  .filter-link {
+    display: flex;
+  }
+  .filter-title {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+  }
   .filter-count {
-    float: right;
+    flex-shrink: 0;
     color: #999;
+    display: inline-block;
   }
 }
 
