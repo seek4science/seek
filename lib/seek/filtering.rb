@@ -23,14 +23,14 @@ module Seek
         },
         contributor: {
             field: 'people.id',
-            title_field: 'concat(people.first_name, " ", people.last_name)',
+            title_field: "concat(people.first_name, ' ', people.last_name)",
             includes: [:contributor],
             title_method: :title,
             value_method: :id
         },
         creator: {
             field: 'assets_creators.creator_id',
-            title_field: 'concat(people.first_name, " ", people.last_name)',
+            title_field: "concat(people.first_name, ' ', people.last_name)",
             joins: [:creators],
             title_method: :title,
             value_method: :id
@@ -65,26 +65,32 @@ module Seek
       filtered_collection = collection
       active_filters = {}
 
-      filters.each do |key, value|
+      filters.each do |key, values|
         filter = FILTERS[key.to_sym]
         if filter
-          filtered_collection = apply_filter(filtered_collection, filter, value)
-          active_filters[key.to_sym] = value
+          filtered_collection = apply_filter(filtered_collection, filter, values)
+          active_filters[key.to_sym] = [values].flatten
         end
       end
 
       FilteredCollection.new(filtered_collection, active_filters)
     end
 
-    def self.available_filters(collection)
-      return {} if collection.empty?
+    def self.available_filters(unfiltered_collection, active_filters)
+      return {} if unfiltered_collection.empty?
 
       available_filters = {}
-      type = collection.first.class.name.to_sym
-      (APPLICABLE_FILTERS[type] || {}).each do |name|
-        filter = FILTERS[name]
-        available_filters[name] = available_filter_values(collection, filter).map do |value, count, title|
-          [title || 'Untitled', value.to_s, count]
+      type = unfiltered_collection.first.class.name.to_sym
+      (APPLICABLE_FILTERS[type] || {}).each do |key|
+        filter = FILTERS[key]
+        without_current_filter = filter(unfiltered_collection, active_filters.except(key)).collection
+        available_filters[key] = available_filter_values(without_current_filter, filter).map do |value, count, title|
+          {
+            title: title,
+            value: value.to_s,
+            count: count,
+            active: active_filters[key]&.include?(value.to_s)
+          }
         end
       end
 

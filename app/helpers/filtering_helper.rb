@@ -1,18 +1,15 @@
 module FilteringHelper
   def sorted_filters(key, filters)
-    filters.sort_by do |title, value, count|
-      is_active = @active_filters[key] && @active_filters[key][value.to_s]
-      val = is_active ? -1000 : 0
-      val - count
+    filters.sort_by do |filter|
+      (filter[:active] ? -1000 : 0) - filter[:count]
     end
   end
 
-  def filter_link(key, title, value, count)
-    is_active = @active_filters[key] && @active_filters[key][value.to_s]
-    content_tag(:div, class: "filter-option#{' filter-active' if is_active}") do
-      link_to({ filter: is_active ? without_filter(key, value) : with_filter(key, value) }, class: 'filter-link') do
-        content_tag(:span, title, class: 'filter-title') +
-            content_tag(:span, count, class: 'filter-count')
+  def filter_link(key, filter)
+    content_tag(:div, class: "filter-option#{' filter-active' if filter[:active]}") do
+      link_to({ filter: filter[:active] ? without_filter(key, filter[:value]) : with_filter(key, filter[:value]) }, class: 'filter-link') do
+        content_tag(:span, filter[:title], class: 'filter-title') +
+            content_tag(:span, filter[:count], class: 'filter-count')
       end
     end
   end
