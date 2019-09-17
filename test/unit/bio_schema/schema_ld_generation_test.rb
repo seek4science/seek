@@ -204,4 +204,58 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     json = JSON.parse(event.to_schema_ld)
     assert_equal expected, json
   end
+
+  test 'document' do
+    document = travel_to(@current_time) do
+      document = Factory(:document, contributor: @person)
+      document.add_annotations('wibble', 'tag', User.first)
+      disable_authorization_checks { document.save! }
+      document
+    end
+
+    expected = {
+      '@context' => 'http://schema.org',
+      '@type' => 'DigitalDocument',
+      '@id' => "http://localhost:3000/documents/#{document.id}",
+      'name' => 'This Document',
+      'url' => "http://localhost:3000/documents/#{document.id}",
+      'keywords' => 'wibble',
+      'dateCreated' => @current_time.to_s,
+      'dateModified' => @current_time.to_s,
+      'encodingFormat' => 'application/pdf',
+      'provider' => [
+        { '@type' => 'Project', '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
+      ]
+    }
+
+    json = JSON.parse(document.to_schema_ld)
+    assert_equal expected, json
+  end
+
+  test 'presentation' do
+    presentation = travel_to(@current_time) do
+      presentation = Factory(:presentation, title: 'This presentation', contributor: @person)
+      presentation.add_annotations('wibble', 'tag', User.first)
+      disable_authorization_checks { presentation.save! }
+      presentation
+    end
+
+    expected = {
+      '@context' => 'http://schema.org',
+      '@type' => 'PresentationDigitalDocument',
+      '@id' => "http://localhost:3000/presentations/#{presentation.id}",
+      'name' => 'This presentation',
+      'url' => "http://localhost:3000/presentations/#{presentation.id}",
+      'keywords' => 'wibble',
+      'dateCreated' => @current_time.to_s,
+      'dateModified' => @current_time.to_s,
+      'encodingFormat' => 'application/pdf',
+      'provider' => [
+        { '@type' => 'Project', '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
+      ]
+    }
+
+    json = JSON.parse(presentation.to_schema_ld)
+    assert_equal expected, json
+  end
 end

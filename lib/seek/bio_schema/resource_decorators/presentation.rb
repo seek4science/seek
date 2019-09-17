@@ -4,7 +4,7 @@ module Seek
       # Decorator that provides extensions for a Event
       class Presentation < Seek::BioSchema::ResourceDecorators::Document
         def schema_type
-          'PresentationdDigitalDocument'
+          'PresentationDigitalDocument'
         end
       end
     end
