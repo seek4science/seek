@@ -26,7 +26,7 @@ class Programme < ApplicationRecord
   has_many :investigations, -> { distinct }, through: :projects
   has_many :studies, -> { distinct }, through: :investigations
   has_many :assays, -> { distinct }, through: :studies
-  %i[data_files documents models sops presentations events publications].each do |type|
+  %i[data_files documents models sops presentations events publications workflows nodes].each do |type|
     has_many type, -> { distinct }, through: :projects
   end
   accepts_nested_attributes_for :projects
