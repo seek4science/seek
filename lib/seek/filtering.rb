@@ -11,53 +11,37 @@ module Seek
             field: 'projects.id',
             title_field: 'projects.title',
             joins: [:projects],
-            title_method: :title,
-            value_method: :id
         },
         programme: {
             field: 'programmes.id',
             title_field: 'programmes.title',
             joins: [:programmes],
-            title_method: :title,
-            value_method: :id
         },
         contributor: {
             field: 'people.id',
-            title_field: "concat(people.first_name, ' ', people.last_name)",
+            title_mapping: ->(values) { Person.where(id: values).map(&:name) },
             includes: [:contributor],
-            title_method: :title,
-            value_method: :id
         },
         creator: {
             field: 'assets_creators.creator_id',
-            title_field: "concat(people.first_name, ' ', people.last_name)",
+            title_mapping: ->(values) { Person.where(id: values).map(&:name) },
             joins: [:creators],
-            title_method: :title,
-            value_method: :id
         },
         assay_class: {
             field: 'assay_classes.id',
             title_field: 'assay_classes.title',
             joins: [:assay_class],
-            title_method: :title,
-            value_method: :id
         },
         assay_type: {
             field: 'assay_type_uri',
-            title_method: :to_s,
-            value_method: :to_s
         },
         technology_type: {
             field: 'technology_type_uri',
-            title_method: :to_s,
-            value_method: :to_s
         },
         tag: {
             field: 'text_values.id',
             title_field: 'text_values.text',
             joins: [:tags_as_text],
-            title_method: :text,
-            value_method: :id
         }
     }.freeze
 
@@ -108,7 +92,13 @@ module Seek
       collection = collection.select(*select)
       collection = collection.joins(filter[:joins]) if filter[:joins]
       collection = collection.includes(filter[:includes]) if filter[:includes]
-      collection.group(filter[:field]).pluck(*select)
+      groups = collection.group(filter[:field]).pluck(*select)
+      if filter[:title_mapping]
+        filter[:title_mapping].call(groups.map(&:first)).each.with_index do |title, index|
+          groups[index][2] = title
+        end
+      end
+      groups
     end
   end
 end
