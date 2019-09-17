@@ -30,7 +30,7 @@ module Seek
         end
 
         def date_created
-          resource.date_created.utc if resource.respond_to?(:date_created)
+          resource.date_created.try(:utc) if resource.respond_to?(:date_created)
         end
 
         # The @context to be used for the JSON-LD
