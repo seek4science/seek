@@ -4,22 +4,24 @@ module Seek
       include Seek::BioSchema::Generation
 
       def description
-        Seek::Config.application_description
+        Seek::Config.project_description
       end
 
       def title
-        Seek::Config.application_name
+        Seek::Config.project_name
       end
 
       def keywords
-        Seek::Config.application_keywords
+        if Seek::Config.project_keywords
+          Seek::Config.project_keywords.split(',').collect(&:strip).reject(&:blank?).join(', ')
+        end
       end
 
       def provider
         {
           '@type' => 'Organization',
-          'name' => Seek::Config.project_name,
-          'url' => Seek::Config.project_link
+          'name' => Seek::Config.dm_project_name,
+          'url' => Seek::Config.dm_project_link
         }
       end
 

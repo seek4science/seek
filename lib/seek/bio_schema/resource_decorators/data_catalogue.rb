@@ -17,6 +17,10 @@ module Seek
         def url
           resource.url
         end
+
+        def keywords
+          resource.keywords
+        end
       end
     end
   end

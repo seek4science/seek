@@ -11,7 +11,7 @@ class DecoratorTest < ActiveSupport::TestCase
     assert_equal identifier, decorator.identifier
     assert_equal identifier, decorator.url
     assert_equal 'http://schema.org', decorator.context
-    assert_equal 'red, green, blue', decorator.keywords
+    assert_equal ['blue','green','red'], decorator.keywords.split(',').collect(&:strip).sort
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
     assert_equal ['@id', 'description', 'keywords', 'name', 'url'], properties
