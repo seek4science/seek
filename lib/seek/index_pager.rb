@@ -35,7 +35,7 @@ module Seek
 
     def fetch_and_filter_assets
       detect_parent_resource
-      unfiltered_assets = fetch_all_assets
+      unfiltered_assets = relationify_collection(fetch_all_assets)
       @filters = filter_params
       filtered_collection = Seek::Filtering.filter(unfiltered_assets, @filters)
       @active_filters = filtered_collection.active_filters
@@ -44,7 +44,7 @@ module Seek
       authorized_filtered_assets = filtered_assets.authorized_for('view', User.current_user)
       @hidden = @total_count - authorized_filtered_assets.count
       # We need the un-filtered, but authorized, collection to work out which filters are available.
-      authorized_unfiltered_assets = unfiltered_assets.authorized_for('view', User.current_user)
+      authorized_unfiltered_assets = relationify_collection(unfiltered_assets.unscoped.authorized_for('view', User.current_user))
       @available_filters = Seek::Filtering.available_filters(authorized_unfiltered_assets, @active_filters)
       instance_variable_set("@#{controller_name.downcase}", authorized_filtered_assets)
     end
@@ -65,6 +65,21 @@ module Seek
         if parent_class
           @parent_resource = parent_class.find(params[parent_id_param])
         end
+      end
+    end
+
+    private
+
+    # This is a silly method to turn an Array of AR objects back into an AR relation so we can do joins etc. on it.
+    def relationify_collection(collection)
+      if collection.is_a?(Array)
+        if collection.empty?
+          Sop.where('1=0') # Sop chosen arbitrarily. Will always return an empty relation.
+        else
+          collection.first.class.where(id: collection.map(&:id))
+        end
+      else
+        collection
       end
     end
   end
