@@ -44,7 +44,7 @@ module Seek
       authorized_filtered_assets = filtered_assets.authorized_for('view', User.current_user)
       @hidden = @total_count - authorized_filtered_assets.count
       # We need the un-filtered, but authorized, collection to work out which filters are available.
-      authorized_unfiltered_assets = relationify_collection(unfiltered_assets.unscoped.authorized_for('view', User.current_user))
+      authorized_unfiltered_assets = relationify_collection(unfiltered_assets.authorized_for('view', User.current_user))
       @available_filters = Seek::Filtering.available_filters(authorized_unfiltered_assets, @active_filters)
       instance_variable_set("@#{controller_name.downcase}", authorized_filtered_assets)
     end
