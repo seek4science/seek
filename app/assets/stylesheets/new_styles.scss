@@ -832,16 +832,15 @@ div.index-filters {
 }
 .filter-category-title {
   font-size: larger;
-  font-weight: bold;
   background: #eee;
   padding: 5px;
 }
 .filter-category {
-  padding: 10px 10px 0 0;
+  padding-right: 10px;
 }
 
 .filter-option {
-  padding: 0 5px;
+  padding: 5px;
   .filter-link { }
   .filter-title { }
   .filter-count {
