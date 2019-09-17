@@ -34,11 +34,11 @@ module Seek
     end
 
     def fetch_all_viewable_assets
-      if @parent_resource
-        found = @parent_resource.send(controller_name)
-      else
-        found = controller_name.classify.constantize
-      end
+      found = if @parent_resource
+                @parent_resource.get_related(controller_name.classify)
+              else
+                controller_name.classify.constantize
+              end
 
       @total_count = found.count
       found = found.authorized_for('view', User.current_user)
