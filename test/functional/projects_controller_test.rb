@@ -626,13 +626,14 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'filter projects by person' do
+  test "get a person's projects" do
     person = Factory(:person)
     project = person.projects.first
-    get :index, params: { filter: { person: person.id } }
+    get :index, params: { person_id: person.id }
     assert_response :success
     projects = assigns(:projects)
     assert_equal [project], projects
+    assert_equal person, assigns(:parent_resource)
     assert projects.count < Project.all.count
   end
 
