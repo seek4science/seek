@@ -30,6 +30,7 @@ module Seek
 
           has_many :assets_creators, dependent: :destroy, as: :asset, foreign_key: :asset_id
           has_many :creators, class_name: 'Person', through: :assets_creators, after_remove: :update_timestamp, after_add: :update_timestamp
+          has_filter :creator
 
           has_many :publication_relationships, -> { where(predicate: Relationship::RELATED_TO_PUBLICATION) },
                    class_name: 'Relationship', as: :subject, dependent: :destroy, inverse_of: :subject

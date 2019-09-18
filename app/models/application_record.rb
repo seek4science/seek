@@ -1,6 +1,7 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
+  include HasFilters
   include Seek::AnnotatableExtensions
   include Seek::VersionedResource
   include Seek::ExplicitVersioning

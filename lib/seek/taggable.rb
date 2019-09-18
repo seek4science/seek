@@ -6,6 +6,7 @@ module Seek
       include Seek::Annotatable
       has_annotation_type :tag
       has_many :tags_as_text, through: :tag_annotations, source: :value, source_type: 'TextValue'
+      has_filter :tag
     end
 
     class_methods do

@@ -8,6 +8,7 @@ module Seek
         klass.extend AuthLookupClassMethods
         klass.class_eval do
           belongs_to :contributor, class_name: 'Person' unless method_defined? :contributor
+          has_filter :contributor
           after_initialize :contributor_or_default_if_new
 
           # checks a policy exists, and if missing resorts to using a private policy

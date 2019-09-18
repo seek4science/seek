@@ -1007,7 +1007,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'filtering by person' do
     person = people(:person_for_datafile_owner)
-    get :index, params: { filter: { person: person.id }, page: 'all' }
+    get :index, params: { filter: { contributor: person.id }, page: 'all' }
     assert_response :success
     non_owned_df = data_files(:sysmo_data_file)
 

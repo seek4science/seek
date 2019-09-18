@@ -42,6 +42,11 @@ class Project < ApplicationRecord
   has_annotation_type :funding_code
 
   belongs_to :programme
+  has_filter programme: {
+      field: 'programmes.id',
+      title_field: 'programmes.title',
+      joins: [:programme],
+  }
 
   # for handling the assignment for roles
   attr_accessor :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids

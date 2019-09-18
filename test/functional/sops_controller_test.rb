@@ -476,7 +476,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:owner_of_my_first_sop)
     person = people(:person_for_owner_of_my_first_sop)
     p = projects(:sysmo_project)
-    get :index, params: { filter: { person: person.id }, page: 'all' }
+    get :index, params: { filter: { contributor: person.id }, page: 'all' }
     assert_response :success
     sop  = sops(:downloadable_sop)
     sop2 = sops(:sop_with_fully_public_policy)

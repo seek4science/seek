@@ -29,12 +29,8 @@ module Seek
     def filter_params
       # placed this in a separate method so that other controllers could override it if necessary
       return {} unless params.key?(:filter)
-      permitted = (Seek::Filtering::APPLICABLE_FILTERS[controller_name.classify.to_sym] || []).flat_map { |p| [p, { p => [] }] }
+      permitted = controller_name.classify.constantize.applicable_filters.flat_map { |p| [p, { p => [] }] }
       params.require(:filter).permit(*permitted).to_h
-    end
-
-    def valid_filters
-      Seek::Filtering.valid_filters(controller_name.classify.to_sym, filter_params)
     end
 
     def fetch_and_filter_assets
@@ -42,10 +38,11 @@ module Seek
       unfiltered_assets = fetch_all_assets
       authorized_unfiltered_assets = relationify_collection(unfiltered_assets.authorized_for('view', User.current_user))
       @filters = filter_params
-      @active_filters = Seek::Filtering.active_filters(@filters)
-      @available_filters = Seek::Filtering.available_filters(authorized_unfiltered_assets, @active_filters)
+      filterer = Seek::Filter.new(controller_name.classify.constantize)
+      @active_filters = filterer.active_filters(@filters)
+      @available_filters = filterer.available_filters(authorized_unfiltered_assets, @active_filters)
       if @active_filters.any?
-        authorized_filtered_assets = Seek::Filtering.filter(authorized_unfiltered_assets, @active_filters)
+        authorized_filtered_assets = filterer.filter(authorized_unfiltered_assets, @active_filters)
         @visible_count = authorized_filtered_assets.count
       else
         authorized_filtered_assets = authorized_unfiltered_assets

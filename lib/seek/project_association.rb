@@ -9,6 +9,7 @@ module Seek
                                            before_add: :react_to_project_addition,
                                            before_remove: :react_to_project_removal
         has_many :programmes, through: :projects
+        has_filter :project, :programme
 
         after_save -> { @project_additions = [] }
 

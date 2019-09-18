@@ -718,7 +718,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'filtering by person' do
     person = people(:person_for_model_owner)
-    get :index, params: { filter: { person: person.id }, page: 'all' }
+    get :index, params: { filter: { contributor: person.id }, page: 'all' }
     assert_response :success
     m = models(:model_with_format_and_type)
     m2 = models(:model_with_different_owner)
