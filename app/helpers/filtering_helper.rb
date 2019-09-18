@@ -1,7 +1,7 @@
 module FilteringHelper
   def sorted_filters(filters)
     filters.sort_by do |filter|
-      (filter[:active] ? -1000 : 0) - filter[:count]
+      filter[:active] ? 0 : 1
     end
   end
 

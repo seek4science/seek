@@ -9,7 +9,8 @@ module Seek
         @title_mapping = title_mapping
         @joins = joins
         @includes = includes
-        @select_fields = [field, "COUNT(#{field})", title_field].compact.map { |f| Arel.sql(f) }
+        @count_field = "COUNT(#{field})"
+        @select_fields = [field, @count_field, title_field].compact.map { |f| Arel.sql(f) }
       end
 
       def apply(collection, values)
@@ -22,7 +23,7 @@ module Seek
         collection = collection.select(*@select_fields)
         collection = collection.joins(joins) if joins
         collection = collection.includes(includes) if includes
-        groups = collection.group(field).pluck(*@select_fields).reject { |g| g[1].zero? } # Remove 0 count results
+        groups = collection.group(field).order("#{@count_field} DESC").pluck(*@select_fields).reject { |g| g[1].zero? } # Remove 0 count results
         if title_mapping
           title_mapping.call(groups.map(&:first)).each.with_index do |title, index|
             groups[index][2] = title
