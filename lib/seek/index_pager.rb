@@ -6,6 +6,7 @@ module Seek
       controller = controller_name.downcase
       model_class = controller_name.classify.constantize
       objects = eval("@#{controller}")
+      @visible_count = objects.count
       objects = model_class.paginate_after_fetch(objects, page_and_sort_params) unless objects.respond_to?('page_totals')
       instance_variable_set("@#{controller}", objects)
 
@@ -43,10 +44,8 @@ module Seek
       @available_filters = filterer.available_filters(authorized_unfiltered_assets, @active_filters)
       if @active_filters.any?
         authorized_filtered_assets = filterer.filter(authorized_unfiltered_assets, @active_filters)
-        @visible_count = authorized_filtered_assets.count
       else
         authorized_filtered_assets = authorized_unfiltered_assets
-        @visible_count = authorized_filtered_assets.count
         @total_count = unfiltered_assets.count
       end
       # We need the un-filtered, but authorized, collection to work out which filters are available.
