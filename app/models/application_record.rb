@@ -90,4 +90,7 @@ class ApplicationRecord < ActiveRecord::Base
   def supports_doi?
     self.class.supports_doi?
   end
+
+  has_filter created_at: Seek::Filtering::DateFilter.new(field: :created_at,
+                                                         date_ranges: [24.hours, 1.week, 1.month, 1.year, 5.years])
 end

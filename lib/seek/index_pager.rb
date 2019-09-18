@@ -32,7 +32,7 @@ module Seek
       unfiltered_assets = fetch_all_assets
       authorized_unfiltered_assets = relationify_collection(unfiltered_assets.authorized_for('view', User.current_user))
       @filters = page_and_sort_params[:filter].to_h
-      filterer = Seek::Filter.new(controller_model)
+      filterer = Seek::Filterer.new(controller_model)
       @active_filters = filterer.active_filters(@filters)
       @available_filters = filterer.available_filters(authorized_unfiltered_assets, @active_filters)
       if @active_filters.any?

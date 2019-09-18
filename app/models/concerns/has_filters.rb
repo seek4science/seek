@@ -3,7 +3,7 @@ module HasFilters
 
   class_methods do
     def has_filter(*filters)
-      self.applicable_filters.push(*filters.map do |f|
+      available_filters.push(*filters.map do |f|
         case f
         when Symbol
           f
@@ -16,12 +16,12 @@ module HasFilters
       end)
     end
 
-    def applicable_filters
-      @applicable_filters ||= []
+    def available_filters
+      @available_filters ||= superclass.respond_to?(:available_filters) ? superclass.available_filters.dup : []
     end
 
     def custom_filters
-      @custom_filters ||= {}
+      @custom_filters ||= superclass.respond_to?(:custom_filters) ? superclass.custom_filters.dup : {}
     end
   end
 end

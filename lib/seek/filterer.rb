@@ -1,7 +1,7 @@
 module Seek
-  class Filter
-    APPLICABLE_FILTERS = {
-        Event: []
+  class Filterer
+    AVAILABLE_FILTERS = {
+        Event: [:created_at]
     }.freeze
 
     FILTERS = {
@@ -61,7 +61,8 @@ module Seek
       filtered_collection = collection
 
       active_filters.each do |key, values|
-        filtered_collection = apply_filter(filtered_collection, get_filter(key), values)
+        filter = get_filter(key)
+        filtered_collection = filter.apply(filtered_collection, values)
       end
 
       filtered_collection
@@ -71,10 +72,10 @@ module Seek
       return {} if unfiltered_collection.empty?
 
       available_filters = {}
-      get_applicable_filters.each do |key|
+      available_filter_keys.each do |key|
         filter = get_filter(key)
         without_current_filter = filter(unfiltered_collection, active_filters.except(key))
-        available_filters[key] = available_filter_values(without_current_filter, filter).map do |value, count, title|
+        available_filters[key] = filter.options(without_current_filter).map do |value, count, title|
           {
             title: title || value.to_s,
             value: value.to_s,
@@ -87,34 +88,16 @@ module Seek
       available_filters
     end
 
-    def get_applicable_filters
-      APPLICABLE_FILTERS[@klass.name.to_sym] || @klass.applicable_filters
-    end
-
-    private
-
-    def apply_filter(collection, filter, value)
-      collection = collection.joins(filter[:joins]) if filter[:joins]
-      collection = collection.includes(filter[:includes]) if filter[:includes]
-      collection.where(filter[:field] => value)
-    end
-
-    def available_filter_values(collection, filter)
-      select = [filter[:field], "COUNT(#{filter[:field]})", filter[:title_field]].compact.map { |f| Arel.sql(f) }
-      collection = collection.select(*select)
-      collection = collection.joins(filter[:joins]) if filter[:joins]
-      collection = collection.includes(filter[:includes]) if filter[:includes]
-      groups = collection.group(filter[:field]).pluck(*select).reject { |g| g[1].zero? } # Remove 0 count results
-      if filter[:title_mapping]
-        filter[:title_mapping].call(groups.map(&:first)).each.with_index do |title, index|
-          groups[index][2] = title
-        end
-      end
-      groups
+    def available_filter_keys
+      AVAILABLE_FILTERS[@klass.name.to_sym] || @klass.available_filters
     end
 
     def get_filter(key)
-      @klass.custom_filters[key.to_sym] || FILTERS[key.to_sym]
+      val = @klass.custom_filters[key.to_sym] || FILTERS[key.to_sym]
+      pp @klass.custom_filters
+      pp key
+      pp val
+      val.is_a?(Hash) ? Seek::Filtering::Filter.new(val) : val
     end
   end
 end
