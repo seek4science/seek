@@ -96,7 +96,7 @@ module Seek
       collection = collection.select(*select)
       collection = collection.joins(filter[:joins]) if filter[:joins]
       collection = collection.includes(filter[:includes]) if filter[:includes]
-      groups = collection.group(filter[:field]).pluck(*select)
+      groups = collection.group(filter[:field]).pluck(*select).reject { |g| g[1].zero? } # Remove 0 count results
       if filter[:title_mapping]
         filter[:title_mapping].call(groups.map(&:first)).each.with_index do |title, index|
           groups[index][2] = title
