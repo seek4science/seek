@@ -3,7 +3,7 @@ module Seek
     include ISAHelper
 
     def isa_children
-      root_item = controller_name.classify.constantize.find(params[:id])
+      root_item = controller_model.find(params[:id])
 
       @hash = Seek::IsaGraphGenerator.new(root_item).generate(depth: 1, include_self: false, parent_depth: 0)
 

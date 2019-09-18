@@ -224,7 +224,7 @@ class ApplicationController < ActionController::Base
 
     return if privilege.nil?
 
-    object = controller_name.classify.constantize.find(params[:id])
+    object = controller_model.find(params[:id])
 
     if is_auth?(object, privilege)
       eval "@#{name} = object"
@@ -255,7 +255,7 @@ class ApplicationController < ActionController::Base
   end
 
   def auth_to_create
-    unless controller_name.classify.constantize.can_create?
+    unless controller_model.can_create?
       error('You do not have permission', 'No permission')
       return false
     end
@@ -506,7 +506,7 @@ class ApplicationController < ActionController::Base
   # filter that responds with :not_acceptable if request rdf for non rdf capable resource
   def rdf_enabled?
     return unless request.format.rdf?
-    unless Seek::Util.rdf_capable_types.include?(controller_name.classify.constantize)
+    unless Seek::Util.rdf_capable_types.include?(controller_model)
       respond_to do |format|
         format.rdf { render plain: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
       end
@@ -538,7 +538,7 @@ class ApplicationController < ActionController::Base
   end
 
   def page_and_sort_params
-    permitted = controller_name.classify.constantize.applicable_filters.flat_map { |p| [p, { p => [] }] }
+    permitted = controller_model.applicable_filters.flat_map { |p| [p, { p => [] }] }
     permitted_filter_params = { filter: permitted }
     p = params.permit(:page, :sort, :order, permitted_filter_params)
 
@@ -554,4 +554,10 @@ class ApplicationController < ActionController::Base
   end
 
   helper_method :page_and_sort_params
+
+  def controller_model
+    @controller_model ||= controller_name.classify.constantize
+  end
+
+  helper_method :controller_model
 end

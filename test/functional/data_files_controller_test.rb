@@ -2472,7 +2472,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_not_equal 0, visible
     get :index
     assert_response :success
-    assert_select '#resource-count-stats', text: /#{visible} Data files visible.*#{total}/
+    assert_equal total, assigns(:total_count)
+    assert_equal visible, assigns(:visible_count)
   end
 
   test 'delete with data file with extracted samples' do

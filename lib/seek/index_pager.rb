@@ -4,7 +4,7 @@ module Seek
 
     def index
       controller = controller_name.downcase
-      model_class = controller_name.classify.constantize
+      model_class = controller_model
       objects = eval("@#{controller}")
       @visible_count = objects.count
       objects = model_class.paginate_after_fetch(objects, page_and_sort_params) unless objects.respond_to?('page_totals')
@@ -32,7 +32,7 @@ module Seek
       unfiltered_assets = fetch_all_assets
       authorized_unfiltered_assets = relationify_collection(unfiltered_assets.authorized_for('view', User.current_user))
       @filters = page_and_sort_params[:filter].to_h
-      filterer = Seek::Filter.new(controller_name.classify.constantize)
+      filterer = Seek::Filter.new(controller_model)
       @active_filters = filterer.active_filters(@filters)
       @available_filters = filterer.available_filters(authorized_unfiltered_assets, @active_filters)
       if @active_filters.any?
@@ -49,7 +49,7 @@ module Seek
       if @parent_resource
         @parent_resource.get_related(controller_name.classify)
       else
-        controller_name.classify.constantize
+        controller_model
       end
     end
 

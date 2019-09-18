@@ -102,7 +102,7 @@ module Seek
 
       def set_asset
         unless controller_name == 'people'
-          @asset = controller_name.classify.constantize.find(params[:id])
+          @asset = controller_model.find(params[:id])
         end
       rescue ActiveRecord::RecordNotFound
         error('This resource is not found', 'not found resource')
