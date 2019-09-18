@@ -76,7 +76,7 @@ module Seek
         without_current_filter = filter(unfiltered_collection, active_filters.except(key))
         available_filters[key] = available_filter_values(without_current_filter, filter).map do |value, count, title|
           {
-            title: title,
+            title: title || value.to_s,
             value: value.to_s,
             count: count,
             active: active_filters[key]&.include?(value.to_s)
