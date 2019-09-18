@@ -121,6 +121,31 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
+
+  def page_and_sort_params
+    permitted = Seek::Filter.new(controller_model).get_applicable_filters.flat_map { |p| [p, { p => [] }] }
+    permitted_filter_params = { filter: permitted }
+    p = params.permit(:page, :sort, :order, permitted_filter_params)
+
+    p[:page] ||= 'all' if json_api_request?
+
+    if p[:sort]
+      p[:order] = Seek::ListSorter.keys_from_json_api_sort(params[:sort])
+    elsif params[:order]
+      p[:order] = params[:order]
+    end
+
+    p
+  end
+
+  helper_method :page_and_sort_params
+
+  def controller_model
+    @controller_model ||= controller_name.classify.constantize
+  end
+
+  helper_method :controller_model
+
   private
 
   # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
@@ -536,28 +561,4 @@ class ApplicationController < ActionController::Base
   def param_converter_options
     {}
   end
-
-  def page_and_sort_params
-    permitted = controller_model.applicable_filters.flat_map { |p| [p, { p => [] }] }
-    permitted_filter_params = { filter: permitted }
-    p = params.permit(:page, :sort, :order, permitted_filter_params)
-
-    p[:page] ||= 'all' if json_api_request?
-
-    if p[:sort]
-      p[:order] = Seek::ListSorter.keys_from_json_api_sort(params[:sort])
-    elsif params[:order]
-      p[:order] = params[:order]
-    end
-
-    p
-  end
-
-  helper_method :page_and_sort_params
-
-  def controller_model
-    @controller_model ||= controller_name.classify.constantize
-  end
-
-  helper_method :controller_model
 end
