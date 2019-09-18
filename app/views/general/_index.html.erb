@@ -7,28 +7,16 @@
 
 <%= index_title %>
 <div class="index-container">
-  <% if @available_filters && @available_filters.any? %>
-    <div class="index-filters">
-      <% (@available_filters || {}).each do |key, filters| %>
-        <% if filters.any? %>
-          <div class="filter-category">
-            <div class="filter-category-title"><%= key.to_s.humanize %></div>
-            <% sorted_filters(key, filters).each do |filter| %>
-              <%= filter_link(key, filter) %>
-            <% end %>
-          </div>
-        <% end %>
-      <% end %>
-    </div>
-  <% end %>
+  <%= render partial: 'assets/resource_filtering' %>
   <div class="index-content">
-    <%= render :partial => "assets/resource_counts" %>
-    <%= render :partial => "assets/resource_sorting", locals: { items: items } if items.is_a?(Seek::GroupedPagination::Collection)%>
+    <%= render partial: 'assets/resource_sorting', locals: { items: items } if items.is_a?(Seek::GroupedPagination::Collection)%>
+    <%= render partial: 'assets/resource_counts' %>
+    <%= render partial: 'assets/resource_active_filters' %>
 
     <% if show_new_button %>
-      <%= render :partial => "assets/new_button", :locals => {:new_object_path => new_item_path, :label => new_item_label} %>
+      <%= render partial: 'assets/new_button', locals: { new_object_path: new_item_path, label: new_item_label } %>
     <% end %>
 
-    <%= render :partial => "general/index_facets_or_paged",:locals=>{:items=>items} %>
+    <%= render partial: 'general/index_facets_or_paged', locals: { items: items } %>
   </div>
 </div>
