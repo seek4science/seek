@@ -419,25 +419,6 @@ module ApplicationHelper
     eval "@#{c.singularize}"
   end
 
-  # returns the count of the total visible items, and also the count of the all items, according to controller_name
-  # primarily used for the metrics on the item index page
-  def resource_count_stats
-    if @total_count && @hidden
-      return [@total_count - @hidden, @total_count]
-    end
-
-    klass = klass_from_controller(controller_name)
-    full_total = klass.count
-    visible_total = if klass.authorization_supported?
-                      klass.authorized_for('view').count
-                    elsif klass.is_a?(Person) && Seek::Config.is_virtualliver && User.current_user.nil?
-                      0
-                    else
-                      klass.count
-                    end
-    [visible_total, full_total]
-  end
-
   def cancel_button(path, html_options = {})
     html_options[:class] ||= ''
     html_options[:class] << ' btn btn-default'

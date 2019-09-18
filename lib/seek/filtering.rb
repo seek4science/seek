@@ -45,19 +45,24 @@ module Seek
         }
     }.freeze
 
-    def self.filter(collection, filters)
-      filtered_collection = collection
+    def self.active_filters(filter_params)
       active_filters = {}
 
-      filters.each do |key, values|
-        filter = FILTERS[key.to_sym]
-        if filter
-          filtered_collection = apply_filter(filtered_collection, filter, values)
-          active_filters[key.to_sym] = [values].flatten
-        end
+      filter_params.each do |key, values|
+        active_filters[key.to_sym] = [values].flatten if FILTERS.key?(key.to_sym)
       end
 
-      FilteredCollection.new(filtered_collection, active_filters)
+      active_filters
+    end
+
+    def self.filter(collection, active_filters)
+      filtered_collection = collection
+
+      active_filters.each do |key, values|
+        filtered_collection = apply_filter(filtered_collection, FILTERS[key.to_sym], values)
+      end
+
+      filtered_collection
     end
 
     def self.available_filters(unfiltered_collection, active_filters)
@@ -67,7 +72,7 @@ module Seek
       type = unfiltered_collection.first.class.name.to_sym
       (APPLICABLE_FILTERS[type] || {}).each do |key|
         filter = FILTERS[key]
-        without_current_filter = filter(unfiltered_collection, active_filters.except(key)).collection
+        without_current_filter = filter(unfiltered_collection, active_filters.except(key))
         available_filters[key] = available_filter_values(without_current_filter, filter).map do |value, count, title|
           {
             title: title,

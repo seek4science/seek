@@ -33,19 +33,26 @@ module Seek
       params.require(:filter).permit(*permitted).to_h
     end
 
+    def valid_filters
+      Seek::Filtering.valid_filters(controller_name.classify.to_sym, filter_params)
+    end
+
     def fetch_and_filter_assets
       detect_parent_resource
-      unfiltered_assets = relationify_collection(fetch_all_assets)
-      @filters = filter_params
-      filtered_collection = Seek::Filtering.filter(unfiltered_assets, @filters)
-      @active_filters = filtered_collection.active_filters
-      filtered_assets = filtered_collection.collection
-      @total_count = filtered_assets.count
-      authorized_filtered_assets = filtered_assets.authorized_for('view', User.current_user)
-      @hidden = @total_count - authorized_filtered_assets.count
-      # We need the un-filtered, but authorized, collection to work out which filters are available.
+      unfiltered_assets = fetch_all_assets
       authorized_unfiltered_assets = relationify_collection(unfiltered_assets.authorized_for('view', User.current_user))
+      @filters = filter_params
+      @active_filters = Seek::Filtering.active_filters(@filters)
       @available_filters = Seek::Filtering.available_filters(authorized_unfiltered_assets, @active_filters)
+      if @active_filters.any?
+        authorized_filtered_assets = Seek::Filtering.filter(authorized_unfiltered_assets, @active_filters)
+        @visible_count = authorized_filtered_assets.count
+      else
+        authorized_filtered_assets = authorized_unfiltered_assets
+        @visible_count = authorized_filtered_assets.count
+        @total_count = unfiltered_assets.count
+      end
+      # We need the un-filtered, but authorized, collection to work out which filters are available.
       instance_variable_set("@#{controller_name.downcase}", authorized_filtered_assets)
     end
 
