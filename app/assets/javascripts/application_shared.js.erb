@@ -256,4 +256,17 @@ $j(document).ready(function () {
             $j('[value=' + item.id + ']', listElement).parent().highlight('blue');
         }
     });
+
+    $j('.expand-filter-category-link').click(function () {
+        var cat = $j(this).parents(".filter-category");
+        cat.toggleClass("collapsed");
+
+        if (cat.hasClass("collapsed")) {
+            $j(this).text("More...");
+        } else {
+            $j(this).text("Less");
+        }
+
+        return false;
+    })
 });

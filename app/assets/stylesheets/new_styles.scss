@@ -858,6 +858,12 @@ div.index-filters {
       flex-shrink: 0;
     }
   }
+
+  &.collapsed {
+    .filter-hidden {
+      display: none;
+    }
+  }
 }
 
 .filter-option {
@@ -906,5 +912,19 @@ div.index-filters {
     padding: 0 5px;
     border-radius: 4px;
     margin-bottom: 4px;
+  }
+}
+
+.expand-filter-category-link {
+  display: block;
+  color: #999;
+  background: #f9f9f9;
+  padding: 2px 5px;
+  &:hover, &:active, &:visited {
+    text-decoration: none;
+    color: #999;
+  }
+  &:hover {
+    background: #eee;
   }
 }
