@@ -22,7 +22,7 @@
     </div>
   <% end %>
   <div class="index-content">
-    <%= render :partial => "assets/resource_counts" unless params[:filtered] %>
+    <%= render :partial => "assets/resource_counts" %>
     <%= render :partial => "assets/resource_sorting", locals: { items: items } if items.is_a?(Seek::GroupedPagination::Collection)%>
 
     <% if show_new_button %>

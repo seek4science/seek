@@ -27,18 +27,11 @@ module Seek
       fetch_and_filter_assets
     end
 
-    def filter_params
-      # placed this in a separate method so that other controllers could override it if necessary
-      return {} unless params.key?(:filter)
-      permitted = controller_name.classify.constantize.applicable_filters.flat_map { |p| [p, { p => [] }] }
-      params.require(:filter).permit(*permitted).to_h
-    end
-
     def fetch_and_filter_assets
       detect_parent_resource
       unfiltered_assets = fetch_all_assets
       authorized_unfiltered_assets = relationify_collection(unfiltered_assets.authorized_for('view', User.current_user))
-      @filters = filter_params
+      @filters = page_and_sort_params[:filter].to_h
       filterer = Seek::Filter.new(controller_name.classify.constantize)
       @active_filters = filterer.active_filters(@filters)
       @available_filters = filterer.available_filters(authorized_unfiltered_assets, @active_filters)

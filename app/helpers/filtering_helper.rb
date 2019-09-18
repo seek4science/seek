@@ -7,7 +7,7 @@ module FilteringHelper
 
   def filter_link(key, filter)
     content_tag(:div, class: "filter-option#{' filter-active' if filter[:active]}") do
-      link_to({ filter: filter[:active] ? without_filter(key, filter[:value]) : with_filter(key, filter[:value]) },
+      link_to(page_and_sort_params.merge({ filter: filter[:active] ? without_filter(key, filter[:value]) : with_filter(key, filter[:value]) }),
               title: filter[:title],
               class: 'filter-link') do
         content_tag(:span, filter[:title], class: 'filter-title') +

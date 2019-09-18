@@ -432,19 +432,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def detect_for_filter(filter, resource, value)
-    case
-      when resource.respond_to?(filter.pluralize)
-        resource.send(filter.pluralize).include? value
-      when resource.respond_to?("related_#{filter.pluralize}")
-        resource.send("related_#{filter.pluralize}").include?(value)
-      when resource.respond_to?(filter)
-        resource.send(filter) == value
-      else
-        false
-    end
-  end
-
   # checks if a captcha has been filled out correctly, if enabled, and returns false if not
   def check_captcha
     if Seek::Config.recaptcha_setup?
@@ -458,8 +445,6 @@ class ApplicationController < ActionController::Base
     super
     payload[:user_agent] = request.user_agent
   end
-
-
 
   def redirect_to_sign_up_when_no_user
     redirect_to signup_path if User.count == 0
@@ -553,7 +538,9 @@ class ApplicationController < ActionController::Base
   end
 
   def page_and_sort_params
-    p = params.permit(:page, :sort, :order)
+    permitted = controller_name.classify.constantize.applicable_filters.flat_map { |p| [p, { p => [] }] }
+    permitted_filter_params = { filter: permitted }
+    p = params.permit(:page, :sort, :order, permitted_filter_params)
 
     p[:page] ||= 'all' if json_api_request?
 
