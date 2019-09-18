@@ -225,8 +225,8 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal @events.page, Seek::Config.default_pages[:events]
   end
 
-  test 'order by updated_at for -latest- pagination for all item types' do
-    item_types = [:person, :project, :institution, :investigation, :study, :assay, :data_file, :model, :sop, :presentation, :publication, :event, :strain]
+  test 'order by updated_at for -top- pagination for applicable item types' do
+    item_types = [:project, :investigation, :study, :assay, :data_file, :model, :sop, :presentation, :strain]
     item_types.each do |type|
       item1 = Factory(type, updated_at: 2.second.ago)
       item2 = Factory(type, updated_at: 1.second.ago)
@@ -270,10 +270,10 @@ class GroupedPaginationTest < ActiveSupport::TestCase
 
       klass = type.to_s.camelize.constantize
       all_items = klass.paginate_after_fetch(klass.all, page: 'all')
-      assert all_items.index(item1) < all_items.index(item2)
+      assert all_items.index(item1) < all_items.index(item2), "out of order for #{type}"
 
       pageA_items = klass.paginate_after_fetch(klass.all, page: 'A')
-      assert pageA_items.index(item1) < pageA_items.index(item2)
+      assert pageA_items.index(item1) < pageA_items.index(item2), "out of order for #{type}"
     end
   end
 
@@ -285,10 +285,10 @@ class GroupedPaginationTest < ActiveSupport::TestCase
 
       klass = type.to_s.camelize.constantize
       all_items = klass.paginate_after_fetch(klass.all, page: 'all')
-      assert all_items.index(item1) < all_items.index(item2)
+      assert all_items.index(item1) < all_items.index(item2), "out of order for #{type}"
 
       pageA_items = klass.paginate_after_fetch(klass.all, page: 'A')
-      assert pageA_items.index(item1) < pageA_items.index(item2)
+      assert pageA_items.index(item1) < pageA_items.index(item2), "out of order for #{type}"
     end
   end
 

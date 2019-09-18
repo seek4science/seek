@@ -108,7 +108,7 @@ module Seek
         page = options[:page] || def_page
 
         order_keys = options[:order]
-        order_keys ||= :updated_at_desc if page == 'top'
+        order_keys ||= :updated_at_desc if page == 'top' && Seek::ListSorter.options(name).include?(:updated_at_desc)
         order_keys ||= Seek::ListSorter.key_for_view(name, :index)
         order_keys = Array.wrap(order_keys).map(&:to_sym)
         order = Seek::ListSorter.order_from_keys(*order_keys)
