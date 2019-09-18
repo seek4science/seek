@@ -1,4 +1,4 @@
-<% if @available_filters&.any? %>
+<% if @available_filters&.any? { |_, filters| filters.any? } %>
   <div class="index-filters">
     <% @available_filters.each do |key, filters| %>
       <% if filters.any? %>
