@@ -24,15 +24,6 @@ module Seek
           end
         end
 
-        # list of comma seperated tags, it the resource supports it
-        def keywords
-          tags_as_text_array.join(', ') if resource.respond_to?(:tags_as_text_array)
-        end
-
-        def date_created
-          resource.date_created.try(:utc) if resource.respond_to?(:date_created)
-        end
-
         # The @context to be used for the JSON-LD
         def context
           'http://schema.org'
@@ -42,18 +33,6 @@ module Seek
         # defaults to the resource class name, but can be overridden
         def schema_type
           @resource.class.name
-        end
-
-        # If the resource has an avatar, then returns the image url
-        def image
-          return unless resource.avatar
-          "#{Seek::Config.site_base_host}/#{resource.class.table_name}" \
-            "/#{resource.id}/avatars/#{resource.avatar.id}?size=250"
-        end
-
-        # the rdf indentifier for the resource, which is its URL
-        def identifier
-          rdf_resource
         end
 
         def rdf_resource
@@ -70,8 +49,6 @@ module Seek
             'name': sanitize(title)
           }
         end
-
-        def json_ld; end
 
         instance_eval do
           private
@@ -90,6 +67,12 @@ module Seek
             end
           end
 
+          # used to define the mapping between the method to be call, and the property
+          # for e.g
+          #   schema_mappings doi: :identifier
+          # calls the method 'doi' on the decorator, and then the value will be used with the schema.org property
+          # 'identifier'. Multiple mappings can be provided, separated with a comma.
+          # The method defined, could also be a method defined with 'assocated_items'
           def schema_mappings(**pairs)
             mappings = pairs.collect do |method, property|
               [method, property]

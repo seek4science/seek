@@ -1,5 +1,7 @@
 module Seek
   module BioSchema
+    # Object to represent a bioschema attribute, providing the method to call, and the associated property.
+    # Handles invoking the method and carrying out any sanitization on the result.
     class BioSchemaAttribute
       include ActionView::Helpers::SanitizeHelper
 

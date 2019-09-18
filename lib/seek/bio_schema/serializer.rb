@@ -2,8 +2,8 @@ module Seek
   module BioSchema
     # Main entry point for generating Schema.org JSON-LD for a given resource.
     #
-    # Example: Seek::BioSchema::BioSchema.new(Person.find(id)).json_ld
-    class BioSchema
+    # Example: Seek::BioSchema::Serializer.new(Person.find(id)).json_ld
+    class Serializer
       include ActionView::Helpers::SanitizeHelper
       attr_reader :resource
 
@@ -17,23 +17,29 @@ module Seek
         unless supported?
           raise UnsupportedTypeException, "Bioschema not supported for #{resource.class.name}"
         end
-        json = {}
-        json['@context'] = resource_decorator.context
-        json['@type'] = resource_decorator.schema_type
-        json.merge!(attributes_json)
+        json = {
+          '@context' => resource_decorator.context,
+          '@type' => resource_decorator.schema_type
+        }.merge(attributes_json)
 
         JSON.pretty_generate(json)
       end
 
       # whether the resource BioSchema was initialized with is supported
       def supported?
-        BioSchema.supported?(resource)
+        Serializer.supported?(resource)
       end
 
       # test directly (without initializing) whether a resource is supported
       def self.supported?(resource)
-        SUPPORTED_TYPES.include?(resource.class)
+        supported_types.include?(resource.class)
       end
+
+      def self.supported_types
+        SUPPORTED_TYPES
+      end
+
+      private_class_method :supported_types
 
       private
 

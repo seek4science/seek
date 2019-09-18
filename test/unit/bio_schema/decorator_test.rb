@@ -11,7 +11,7 @@ class DecoratorTest < ActiveSupport::TestCase
     assert_equal identifier, decorator.identifier
     assert_equal identifier, decorator.url
     assert_equal 'http://schema.org', decorator.context
-    assert_equal ['blue','green','red'], decorator.keywords.split(',').collect(&:strip).sort
+    assert_equal %w[blue green red], decorator.keywords.split(',').collect(&:strip).sort
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
     assert_equal ['@id', 'description', 'keywords', 'name', 'url'], properties
@@ -26,7 +26,7 @@ class DecoratorTest < ActiveSupport::TestCase
     decorator = Seek::BioSchema::ResourceDecorators::Document.new(document)
     identifier = "http://localhost:3000/documents/#{document.id}"
     assert_equal identifier, decorator.identifier
-    assert_equal ['lorry','yellow'], decorator.keywords.split(',').collect(&:strip).sort
+    assert_equal %w[lorry yellow], decorator.keywords.split(',').collect(&:strip).sort
     assert_equal 'https://creativecommons.org/licenses/by/4.0/', decorator.license
     assert_equal 'application/pdf', decorator.content_type
     project = document.projects.first

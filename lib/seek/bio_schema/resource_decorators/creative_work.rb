@@ -16,16 +16,13 @@ module Seek
                         subject_of: :subjectOf
 
         def content_type
-          if resource.respond_to?(:content_blob) && resource.content_blob
-            resource.content_blob.content_type
-          end
+          return unless resource.respond_to?(:content_blob) && resource.content_blob
+          resource.content_blob.content_type
         end
 
         def license
-          if resource.license
-            license = Seek::License.find(resource.license)
-            license&.url
-          end
+          return unless resource.license
+          Seek::License.find(resource.license)&.url
         end
       end
     end

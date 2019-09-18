@@ -1,7 +1,7 @@
 class Document < ApplicationRecord
 
   include Seek::Rdf::RdfGeneration
-  include Seek::BioSchema::Generation
+  include Seek::BioSchema::Support
 
   acts_as_asset
 

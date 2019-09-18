@@ -2,7 +2,7 @@ class Sample < ApplicationRecord
 
 
   include Seek::Rdf::RdfGeneration
-  include Seek::BioSchema::Generation
+  include Seek::BioSchema::Support
 
   searchable(auto_index: false) do
     text :attribute_values do

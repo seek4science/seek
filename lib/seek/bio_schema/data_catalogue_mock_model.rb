@@ -1,7 +1,10 @@
 module Seek
   module BioSchema
+    # mock object, to represent a model to support DataCatalogue.
+    # Since DataCatalogue maps to the whole system, rather than an individual entity,
+    # this allows the attributes required to appear and behave like a normal database record backed entity.
     class DataCatalogueMockModel
-      include Seek::BioSchema::Generation
+      include Seek::BioSchema::Support
 
       def description
         Seek::Config.project_description

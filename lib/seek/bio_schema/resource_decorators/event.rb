@@ -17,10 +17,10 @@ module Seek
         end
 
         def end_date
-          if resource.end_date.blank?
+          if (end_date = resource.end_date).blank?
             resource.start_date
           else
-            resource.end_date
+            end_date
           end
         end
 
@@ -33,7 +33,7 @@ module Seek
         end
 
         def country
-          CountryCodes. country(resource.country)
+          CountryCodes.country(resource.country)
         end
       end
     end
