@@ -1,5 +1,9 @@
 module Seek
   class Filter
+    APPLICABLE_FILTERS = {
+        Event: []
+    }.freeze
+
     FILTERS = {
         project: {
             field: 'projects.id',
@@ -67,7 +71,7 @@ module Seek
       return {} if unfiltered_collection.empty?
 
       available_filters = {}
-      @klass.applicable_filters.each do |key|
+      get_applicable_filters.each do |key|
         filter = get_filter(key)
         without_current_filter = filter(unfiltered_collection, active_filters.except(key))
         available_filters[key] = available_filter_values(without_current_filter, filter).map do |value, count, title|
@@ -81,6 +85,10 @@ module Seek
       end
 
       available_filters
+    end
+
+    def get_applicable_filters
+      APPLICABLE_FILTERS[@klass.name.to_sym] || @klass.applicable_filters
     end
 
     private
