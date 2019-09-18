@@ -12,10 +12,12 @@ module CountryCodes
   #puts "countries = " + @@codes.to_s
 
   def self.country(code)
-    @@codes[code]
+    return nil if code.nil?
+    @@codes[code.upcase]
   end
 
   def self.code(country)
+    return nil if country.nil?
     c = nil
     @@codes.each do |key, val|
       if(country.downcase.strip == val.downcase)

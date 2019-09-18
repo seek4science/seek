@@ -98,7 +98,6 @@ module ApiTestHelper
       # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
       assert_difference("#{@clz.classify}.count") do
         post "/#{@plural_clz}.json", params: @to_post.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
-        #puts "returned response: ", response.body
         assert_response :success
       end
 
