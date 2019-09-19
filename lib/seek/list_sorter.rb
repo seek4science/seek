@@ -21,10 +21,10 @@ module Seek
     }.with_indifferent_access.freeze
 
     ORDER_OPTIONS = {
-      title_asc: { title: 'Title (A-Z)', order: 'title' },
-      title_desc: { title: 'Title (Z-A)', order: 'title DESC' },
-      name_asc: { title: 'Name (A-Z)', order: 'last_name, first_name' },
-      name_desc: { title: 'Name (Z-A)', order: 'last_name DESC, first_name DESC' },
+      title_asc: { title: 'Title (A-Z)', order: 'LOWER(title)' },
+      title_desc: { title: 'Title (Z-A)', order: 'LOWER(title) DESC' },
+      name_asc: { title: 'Name (A-Z)', order: 'last_name IS NULL, LOWER(last_name), LOWER(first_name)' },
+      name_desc: { title: 'Name (Z-A)', order: 'last_name IS NULL, LOWER(last_name) DESC, LOWER(first_name) DESC' },
       start_date_asc: { title: 'Date (Ascending)', order: 'start_date' },
       start_date_desc: { title: 'Date (Descending)', order: 'start_date DESC' },
       published_at_asc: { title: 'Publication date (Ascending)', order: 'published_date' },
@@ -56,7 +56,7 @@ module Seek
 
     def self.sort_by_order(items, order)
       if items.is_a?(ActiveRecord::Relation)
-        items.order(strategy_for_relation(order))
+        items.order(strategy_for_relation(order, items))
       else
         items.sort(&strategy_for_enum(order))
       end
@@ -102,27 +102,38 @@ module Seek
       self.order_from_keys(self.key_for_view(type_name, view))
     end
 
-    def self.strategy_for_relation(order)
-      # Turn string order into array of hash pairs to sanitize and avoid SQL injection
-      order = order.split(',').map do |f|
-        field, order = f.strip.split(' ')
-        [field => order&.match?(/desc/i) ? :desc : :asc]
+    def self.strategy_for_relation(order, relation)
+      fields_and_directions = order.split(',').map do |f|
+        field, order = f.strip.split(' ', 2)
+        m = field.match(/LOWER\((.+)\)/)
+        field = m[1] if m
+        arel_field = relation.arel_table[field.to_sym]
+        arel_field = arel_field.eq(nil) if order == 'IS NULL'
+        arel_field = arel_field.lower if m
+        arel_field = arel_field.desc if order&.match?(/desc/i)
+        arel_field
       end
+
       # Note: The following fixes an inconsistency between sorting relations and enumerables.
       # If, for example, you are sorting a relation by title, and multiple records have the same title, SQL will
       # order the duplicates  most recent -> oldest.
       # If you were sorting an enumerable however, it's likely it was already ordered oldest -> most recent, and
       # thus will sort duplicates the same way.
-      order + [id: :asc]
+      fields_and_directions << relation.arel_table[:id].asc
+      fields_and_directions
     end
 
     def self.strategy_for_enum(order)
       # Create an array of pairs: [<field>, <sort direction>]
       # Direction 1 is ascending (default), -1 is descending
       fields_and_directions = order.split(',').map do |f|
-        field, order = f.strip.split(' ')
+        field, order = f.strip.split(' ', 2)
+        m = field.match(/LOWER\((.+)\)/)
+        field = m[1] if m
+        next if order == 'IS NULL'
         [field, order&.match?(/desc/i) ? -1 : 1]
-      end
+      end.compact
+
       fields_and_directions << [:id, 1] # See above note
 
       proc do |a, b|

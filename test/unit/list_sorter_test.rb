@@ -2,9 +2,9 @@ require 'test_helper'
 
 class ListSorterTest < ActiveSupport::TestCase
   test 'rules' do
-    assert_equal 'last_name, first_name', Seek::ListSorter.order_for_view('Person', :index)
-    assert_equal 'title', Seek::ListSorter.order_for_view('Sop', :index)
-    assert_equal 'title', Seek::ListSorter.order_for_view('NewModelThatDoesntExist', :index)
+    assert_equal 'last_name IS NULL, LOWER(last_name), LOWER(first_name)', Seek::ListSorter.order_for_view('Person', :index)
+    assert_equal 'LOWER(title)', Seek::ListSorter.order_for_view('Sop', :index)
+    assert_equal 'LOWER(title)', Seek::ListSorter.order_for_view('NewModelThatDoesntExist', :index)
     assert_equal 'updated_at DESC', Seek::ListSorter.order_for_view('NewModelThatDoesntExist', :related)
     assert_equal 'published_date DESC', Seek::ListSorter.order_for_view('Publication', :index)
     assert_equal 'updated_at DESC', Seek::ListSorter.order_for_view('Assay', :related)

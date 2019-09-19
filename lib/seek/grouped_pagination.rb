@@ -50,7 +50,7 @@ module Seek
       def paginate_relation(relation, *args)
         as_paginated_collection(*args) do |page_totals, page, order, limit, options|
           relation = relation.where(options[:conditions]) if options.key?(:conditions)
-          sql_order = Seek::ListSorter.strategy_for_relation(order)
+          sql_order = Seek::ListSorter.strategy_for_relation(order, relation)
 
           if page == 'top'
             records = relation.order(sql_order).limit(limit)
@@ -68,7 +68,7 @@ module Seek
             page_totals[p] = groups[p] || 0
           end
 
-          Seek::ListSorter.index_items(records.to_a, order)
+          records.to_a
         end
       end
 
