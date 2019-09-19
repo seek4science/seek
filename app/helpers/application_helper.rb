@@ -5,6 +5,7 @@ module ApplicationHelper
   include FancyMultiselectHelper
   include Recaptcha::ClientHelper
   include VersionHelper
+  include ImagesHelper
 
   def no_items_to_list_text
     content_tag :div, id: 'no-index-items-text' do
