@@ -1,8 +1,14 @@
 class CountriesController < ApplicationController
   # GET /countries/:country_name
   def show
-    @country = helpers.white_list(params[:country_name])
-    @institutions = Institution.where(["country LIKE ?", @country])
+    country_code = CountryCodes.force_code(helpers.white_list(params[:country_code]))
+    @country = CountryCodes.country(country_code)
+    @institutions = if @country
+                      Institution.where(country:country_code.upcase)
+                    else
+                      []
+                    end
+
 
     # needed as @country is a unique case of being a string rather than instance of ActiveRecord
     @country.class_eval do
@@ -12,17 +18,15 @@ class CountriesController < ApplicationController
     end
     
     respond_to do |format|
-      if Seek::Config.is_virtualliver
-        unless current_user
-          format.html # show.html.erb
-        else
-          store_return_to_location
-          flash[:error] = "You are not authorized to view institutions and people in this country, you may need to login first."
-          format.html { redirect_to home_url}
-        end
+      if @country
+        format.html
       else
-        format.html # show.html.erb
+        format.html { render 'errors/error_404',
+                             layout: 'layouts/errors',
+                             status: :not_found
+        }
       end
+
     end
   end
 end

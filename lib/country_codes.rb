@@ -16,6 +16,16 @@ module CountryCodes
     @@codes[code.upcase]
   end
 
+  #always return the code, whether country is the name or already the code
+  def self.force_code(country)
+    return nil if country.nil?
+    if country.length == 2
+      code(country(country))
+    else
+      code(country)
+    end
+  end
+
   def self.code(country)
     return nil if country.nil?
     c = nil

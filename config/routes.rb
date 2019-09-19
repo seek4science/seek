@@ -797,7 +797,7 @@ SEEK::Application.routes.draw do
   get '/tags/:id' => 'tags#show', :as => :show_tag
   get '/tags' => 'tags#index', :as => :all_anns
   get '/tags/:id' => 'tags#show', :as => :show_ann
-  get '/countries/:country_name' => 'countries#show', :as => :country
+  get '/countries/:country_code' => 'countries#show', :as => :country
 
   get '/data_fuse/' => 'data_fuse#show', :as => :data_fuse
   post '/favourite_groups/new' => 'favourite_groups#new', :as => :new_favourite_group
