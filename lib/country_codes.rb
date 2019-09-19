@@ -9,8 +9,6 @@ module CountryCodes
     @@codes[parts[0]] = parts[1].strip
   end
 
-  #puts "countries = " + @@codes.to_s
-
   def self.country(code)
     return nil if code.nil?
     @@codes[code.upcase]

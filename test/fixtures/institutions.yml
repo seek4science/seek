@@ -3,27 +3,27 @@
 one:
   title: Institution1
   address: MyText
-  city: MyString  
-  country: MyString
+  city: MyString
+  country: GB
 
 two:
   title: Institution2
   address: MyText
   city: MyString  
-  country: MyString
+  country: GB
 
 three:
   title: Institution3
   address: MyText
   city: MyString  
-  country: MyString
+  country: GB
 
 #an institution not associated with any workgroups or people
 four:
   title: Institution4
   address: MyText
   city: MyString  
-  country: MyString
+  country: GB
 
 
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
@@ -34,7 +34,7 @@ manchester_uni_inst:
 
 ebi_inst:
   title: "European Bioinformatics Institute"
-  country: "uk"
+  country: "GB"
   address: "address"
   city: "city"
 

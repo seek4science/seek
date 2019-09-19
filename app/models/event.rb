@@ -47,6 +47,8 @@ class Event < ApplicationRecord
   # validates_is_url_string :url
   validates :url, url: {allow_nil: true, allow_blank: true}
 
+  validates :country, country:true, allow_blank: true
+
   def show_contributor_avatars?
     false
   end
