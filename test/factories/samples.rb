@@ -8,16 +8,16 @@ Factory.define(:sample) do |f|
     sample.projects = [sample.contributor.projects.first] if sample.projects.empty?
   end
   f.after_build do |sample|
-    sample.set_attribute(:the_title, sample.title) if sample.data.key?(:the_title)
+    sample.set_attribute_value(:the_title, sample.title) if sample.data.key?(:the_title)
   end
 end
 
 Factory.define(:patient_sample, parent: :sample) do |f|
   f.association :sample_type, factory: :patient_sample_type
   f.after_build do |sample|
-    sample.set_attribute(:full_name, 'Fred Bloggs')
-    sample.set_attribute(:age, 44)
-    sample.set_attribute(:weight, 88.7)
+    sample.set_attribute_value(:full_name, 'Fred Bloggs')
+    sample.set_attribute_value(:age, 44)
+    sample.set_attribute_value(:weight, 88.7)
   end
 end
 
@@ -26,8 +26,8 @@ Factory.define(:sample_from_file, parent: :sample) do |f|
   f.association :sample_type, factory: :strain_sample_type
 
   f.after_build do |sample|
-    sample.set_attribute(:name, sample.title) if sample.data.key?(:name)
-    sample.set_attribute(:seekstrain, '1234')
+    sample.set_attribute_value(:name, sample.title) if sample.data.key?(:name)
+    sample.set_attribute_value(:seekstrain, '1234')
   end
 
   f.after_build do |sample|

@@ -2,6 +2,7 @@ class Sample < ApplicationRecord
 
 
   include Seek::Rdf::RdfGeneration
+  include Seek::BioSchema::Support
 
   searchable(auto_index: false) do
     text :attribute_values do
@@ -78,7 +79,7 @@ class Sample < ApplicationRecord
 
   def referenced_resources
     sample_type.sample_attributes.select(&:seek_resource?).map do |sa|
-      value = get_attribute(sa)
+      value = get_attribute_value(sa)
       type = sa.sample_attribute_type.base_type_handler.type
       type.constantize.find_by_id(value['id']) if value && type
     end.compact
@@ -92,13 +93,13 @@ class Sample < ApplicationRecord
     referenced_resources.select { |r| r.is_a?(Sample) }
   end
 
-  def get_attribute(attr)
+  def get_attribute_value(attr)
     attr = attr.accessor_name if attr.is_a?(SampleAttribute)
 
     data[attr]
   end
 
-  def set_attribute(attr, value)
+  def set_attribute_value(attr, value)
     attr = attr.accessor_name if attr.is_a?(SampleAttribute)
 
     data[attr] = value
@@ -133,7 +134,7 @@ class Sample < ApplicationRecord
   def title_from_data
     attr = title_attribute
     if attr
-      value = get_attribute(title_attribute)
+      value = get_attribute_value(title_attribute)
       if attr.seek_resource?
         value[:title] || value[:id]
       else
@@ -161,7 +162,7 @@ class Sample < ApplicationRecord
     Rails.cache.fetch("sample-organisms-#{cache_key}-#{Organism.order('updated_at DESC').first.try(:cache_key)}") do
       sample_type.sample_attributes.collect do |attribute|
         next unless attribute.sample_attribute_type.title == 'NCBI ID'
-        value = get_attribute(attribute)
+        value = get_attribute_value(attribute)
         if value
           Organism.all.select { |o| o.ncbi_id && o.ncbi_id.to_s == value }
         end
@@ -173,7 +174,7 @@ class Sample < ApplicationRecord
     return [] unless sample_type
     seek_sample_attributes = sample_type.sample_attributes.select { |attr| attr.sample_attribute_type.seek_sample? }
     seek_sample_attributes.map do |attr|
-      value = get_attribute(attr)
+      value = get_attribute_value(attr)
       Sample.find_by_id(value['id']) if value
     end.compact
   end
@@ -219,8 +220,8 @@ class Sample < ApplicationRecord
       setter = name.end_with?('=')
       attribute_name = name.sub(SampleAttribute::METHOD_PREFIX, '').chomp('=')
       if data.key?(attribute_name)
-        set_attribute(attribute_name, args.first) if setter
-        get_attribute(attribute_name)
+        set_attribute_value(attribute_name, args.first) if setter
+        get_attribute_value(attribute_name)
       else
         super
       end

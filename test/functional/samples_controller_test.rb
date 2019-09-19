@@ -64,10 +64,10 @@ class SamplesControllerTest < ActionController::TestCase
     assert assigns(:sample)
     sample = assigns(:sample)
     assert_equal 'Fred Smith', sample.title
-    assert_equal 'Fred Smith', sample.get_attribute(:full_name)
-    assert_equal '22', sample.get_attribute(:age)
-    assert_equal '22.1', sample.get_attribute(:weight)
-    assert_equal 'M13 9PL', sample.get_attribute(:postcode)
+    assert_equal 'Fred Smith', sample.get_attribute_value(:full_name)
+    assert_equal '22', sample.get_attribute_value(:age)
+    assert_equal '22.1', sample.get_attribute_value(:weight)
+    assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
     assert_equal person, sample.contributor
     assert_equal [creator], sample.creators
     assert_equal 'frank, mary',sample.other_creators
@@ -89,10 +89,10 @@ class SamplesControllerTest < ActionController::TestCase
     assert assigns(:sample)
     sample = assigns(:sample)
     assert_equal 'Fred Smith', sample.title
-    assert_equal 'Fred Smith', sample.get_attribute(:full_name)
-    assert_equal '22', sample.get_attribute(:age)
-    assert_equal '22.1', sample.get_attribute(:weight)
-    assert_equal 'M13 9PL', sample.get_attribute(:postcode)
+    assert_equal 'Fred Smith', sample.get_attribute_value(:full_name)
+    assert_equal '22', sample.get_attribute_value(:age)
+    assert_equal '22.1', sample.get_attribute_value(:weight)
+    assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
     assert_equal person, sample.contributor
     assert_equal [creator], sample.creators
 
@@ -112,14 +112,14 @@ class SamplesControllerTest < ActionController::TestCase
                               project_ids: [person.projects.first.id] } }
     end
     assert_not_nil sample = assigns(:sample)
-    assert_equal 'ttt', sample.get_attribute(:the_title)
-    assert sample.get_attribute(:bool)
+    assert_equal 'ttt', sample.get_attribute_value(:the_title)
+    assert sample.get_attribute_value(:bool)
     assert_no_difference('Sample.count') do
       put :update, params: { id: sample.id, sample: { data: { the_title: 'ttt', bool: '0' } } }
     end
     assert_not_nil sample = assigns(:sample)
-    assert_equal 'ttt', sample.get_attribute(:the_title)
-    assert !sample.get_attribute(:bool)
+    assert_equal 'ttt', sample.get_attribute_value(:the_title)
+    assert !sample.get_attribute_value(:bool)
   end
 
   test 'create and update with boolean' do
@@ -133,14 +133,14 @@ class SamplesControllerTest < ActionController::TestCase
                               project_ids: [person.projects.first.id] } }
     end
     assert_not_nil sample = assigns(:sample)
-    assert_equal 'ttt', sample.get_attribute(:the_title)
-    assert sample.get_attribute(:bool)
+    assert_equal 'ttt', sample.get_attribute_value(:the_title)
+    assert sample.get_attribute_value(:bool)
     assert_no_difference('Sample.count') do
       put :update, params: { id: sample.id, sample: { data: { the_title: 'ttt', bool: '0' } } }
     end
     assert_not_nil sample = assigns(:sample)
-    assert_equal 'ttt', sample.get_attribute(:the_title)
-    assert !sample.get_attribute(:bool)
+    assert_equal 'ttt', sample.get_attribute_value(:the_title)
+    assert !sample.get_attribute_value(:bool)
   end
 
   test 'show sample with boolean' do
@@ -150,8 +150,8 @@ class SamplesControllerTest < ActionController::TestCase
     type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
     sample = Factory(:sample, sample_type: type, contributor: person)
-    sample.set_attribute(:the_title, 'ttt')
-    sample.set_attribute(:bool, true)
+    sample.set_attribute_value(:the_title, 'ttt')
+    sample.set_attribute_value(:bool, true)
     sample.save!
     get :show, params: { id: sample.id }
     assert_response :success
@@ -197,10 +197,10 @@ class SamplesControllerTest < ActionController::TestCase
     updated_sample = Sample.find(updated_sample.id)
     assert_equal type_id, updated_sample.sample_type.id
     assert_equal 'Jesus Jones', updated_sample.title
-    assert_equal 'Jesus Jones', updated_sample.get_attribute(:full_name)
-    assert_equal '47', updated_sample.get_attribute(:age)
-    assert_nil updated_sample.get_attribute(:weight)
-    assert_equal 'M13 9QL', updated_sample.get_attribute(:postcode)
+    assert_equal 'Jesus Jones', updated_sample.get_attribute_value(:full_name)
+    assert_equal '47', updated_sample.get_attribute_value(:age)
+    assert_nil updated_sample.get_attribute_value(:weight)
+    assert_equal 'M13 9QL', updated_sample.get_attribute_value(:postcode)
     # job should have been triggered
     assert SampleTypeUpdateJob.new(sample.sample_type, false).exists?
   end
@@ -225,10 +225,10 @@ class SamplesControllerTest < ActionController::TestCase
     updated_sample = Sample.find(updated_sample.id)
     assert_equal type_id, updated_sample.sample_type.id
     assert_equal 'Jesus Jones', updated_sample.title
-    assert_equal 'Jesus Jones', updated_sample.get_attribute(:full_name)
-    assert_equal '47', updated_sample.get_attribute(:age)
-    assert_nil updated_sample.get_attribute(:weight)
-    assert_equal 'M13 9QL', updated_sample.get_attribute(:postcode)
+    assert_equal 'Jesus Jones', updated_sample.get_attribute_value(:full_name)
+    assert_equal '47', updated_sample.get_attribute_value(:age)
+    assert_nil updated_sample.get_attribute_value(:weight)
+    assert_equal 'M13 9QL', updated_sample.get_attribute_value(:postcode)
     # job should have been triggered
     assert SampleTypeUpdateJob.new(sample.sample_type, false).exists?
   end
@@ -475,8 +475,8 @@ class SamplesControllerTest < ActionController::TestCase
     type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
     sample = Factory(:sample, sample_type: type, contributor: person)
-    sample.set_attribute(:the_title, 'ttt')
-    sample.set_attribute(:bool, true)
+    sample.set_attribute_value(:the_title, 'ttt')
+    sample.set_attribute_value(:bool, true)
     sample.save!
     get :index, params: { sample_type_id: type.id }
     assert_response :success
@@ -510,8 +510,8 @@ class SamplesControllerTest < ActionController::TestCase
     strain = Factory(:strain)
 
     sample = Sample.new(sample_type: sample_type, contributor: person, project_ids: [person.projects.first.id])
-    sample.set_attribute(:name, 'Strain sample')
-    sample.set_attribute(:seekstrain, strain.id)
+    sample.set_attribute_value(:name, 'Strain sample')
+    sample.set_attribute_value(:seekstrain, strain.id)
     sample.save!
 
     get :show, params: { id: sample }
@@ -527,8 +527,8 @@ class SamplesControllerTest < ActionController::TestCase
     strain = Factory(:strain)
 
     sample = Sample.new(sample_type: sample_type, contributor: person, project_ids: [person.projects.first.id])
-    sample.set_attribute(:name, 'Strain sample')
-    sample.set_attribute(:seekstrain, strain.id)
+    sample.set_attribute_value(:name, 'Strain sample')
+    sample.set_attribute_value(:seekstrain, strain.id)
     sample.save!
 
     get :show, params: { id: sample }
@@ -807,8 +807,8 @@ class SamplesControllerTest < ActionController::TestCase
                         project_ids:person.projects.collect(&:id),contributor:person
     sample.sample_type = Factory(:patient_sample_type)
     sample.title = 'My sample'
-    sample.set_attribute(:full_name, 'Fred Bloggs')
-    sample.set_attribute(:age, 22)
+    sample.set_attribute_value(:full_name, 'Fred Bloggs')
+    sample.set_attribute_value(:age, 22)
     sample.save!
     sample
   end
