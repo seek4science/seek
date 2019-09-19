@@ -69,11 +69,7 @@ module Seek
     # This is a silly method to turn an Array of AR objects back into an AR relation so we can do joins etc. on it.
     def relationify_collection(collection)
       if collection.is_a?(Array)
-        if collection.empty?
-          Sop.where('1=0') # Sop chosen arbitrarily. Will always return an empty relation.
-        else
-          collection.first.class.where(id: collection.map(&:id))
-        end
+        controller_model.where(id: collection.map(&:id))
       else
         collection
       end
