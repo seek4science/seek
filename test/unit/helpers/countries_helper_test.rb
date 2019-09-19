@@ -4,20 +4,20 @@ class CountriesHelperTest < ActionView::TestCase
 
   test 'country_text_or_not_specified' do
     text = country_text_or_not_specified('gb')
-    assert_match /<a href="\/countries\/gb">United Kingdom<\/a>/,text
+    assert_match /<a href="\/countries\/GB">United Kingdom<\/a>/,text
     assert_match /famfamfam_flags\/gb.png/, text
 
     #ignore case
     text = country_text_or_not_specified('GB')
-    assert_match /<a href="\/countries\/gb">United Kingdom<\/a>/,text
+    assert_match /<a href="\/countries\/GB">United Kingdom<\/a>/,text
     assert_match /famfamfam_flags\/gb.png/, text
 
     text = country_text_or_not_specified('Germany')
-    assert_match /<a href="\/countries\/de">Germany<\/a>/,text
+    assert_match /<a href="\/countries\/DE">Germany<\/a>/,text
     assert_match /famfamfam_flags\/de.png/, text
 
     text = country_text_or_not_specified('GERMANY')
-    assert_match /<a href="\/countries\/de">Germany<\/a>/,text
+    assert_match /<a href="\/countries\/DE">Germany<\/a>/,text
     assert_match /famfamfam_flags\/de.png/, text
 
     text = country_text_or_not_specified(nil)

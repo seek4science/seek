@@ -8,14 +8,6 @@ class CountriesController < ApplicationController
                     else
                       []
                     end
-
-
-    # needed as @country is a unique case of being a string rather than instance of ActiveRecord
-    @country.class_eval do
-      def schema_org_supported?
-        false
-      end
-    end
     
     respond_to do |format|
       if @country
