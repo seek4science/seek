@@ -40,6 +40,9 @@ module Seek
             field: 'text_values.id',
             title_field: 'text_values.text',
             joins: [:tags_as_text],
+        },
+        country: {
+            field: 'country'
         }
     }.freeze
 
@@ -94,9 +97,6 @@ module Seek
 
     def get_filter(key)
       val = @klass.custom_filters[key.to_sym] || FILTERS[key.to_sym]
-      pp @klass.custom_filters
-      pp key
-      pp val
       val.is_a?(Hash) ? Seek::Filtering::Filter.new(val) : val
     end
   end
