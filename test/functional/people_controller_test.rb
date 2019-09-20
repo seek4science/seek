@@ -284,7 +284,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'finding by role' do
     p1 = Factory(:pal)
     p2 = Factory(:person)
-    get :index, params: { project_position_id: ProjectPosition.pal_position.id }
+    get :index, params: { filter: { project_position: ProjectPosition.pal_position.id } }
     assert_response :success
     assert assigns(:people)
     assert assigns(:people).include?(p1)
@@ -1074,7 +1074,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_includes experimentalist.disciplines, exp
     refute_includes modeller.disciplines, exp
 
-    get :index, params: { discipline_id: exp.id }
+    get :index, params: { filter: { discipline: exp.id } }
     assert_response :success
 
     assert_select 'h2', text: /People with the discipline 'experimentalist'/
@@ -1087,7 +1087,7 @@ class PeopleControllerTest < ActionController::TestCase
     end
 
     # handles an unknown discipline id
-    get :index, params: { discipline_id: Discipline.last.id + 1 }
+    get :index, params: { filter: { discipline: Discipline.last.id + 1 } }
     assert_response :success
 
     assert_select '.list_items_container', count: 0
