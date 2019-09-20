@@ -136,8 +136,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  private
-
   def project_membership_required
     unless User.logged_in_and_member? || admin_logged_in?
       flash[:error] = 'Only members of known projects, institutions or work groups are allowed to create new content.'
@@ -450,6 +448,7 @@ class ApplicationController < ActionController::Base
     end
 
     filters = permitted_filters(filters).to_unsafe_h
+    @filters = filters
 
     if filters.size > 0
       params[:page] ||= 'all'
@@ -587,4 +586,20 @@ class ApplicationController < ActionController::Base
   def param_converter_options
     {}
   end
+
+  def page_and_sort_params
+    p = params.permit(:page, :sort, :order)
+
+    p[:page] ||= 'all' if json_api_request?
+
+    if p[:sort]
+      p[:order] = Seek::ListSorter.keys_from_json_api_sort(params[:sort])
+    elsif params[:order]
+      p[:order] = params[:order]
+    end
+
+    p
+  end
+
+  helper_method :page_and_sort_params
 end

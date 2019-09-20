@@ -19,6 +19,7 @@ namespace :seek do
     delete_orphaned_permissions
     rebuild_sample_templates
     fix_model_version_files
+    fix_country_codes
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -285,6 +286,15 @@ namespace :seek do
           blob.create_retrieval_job
         end
       end
+    end
+  end
+
+  task(fix_country_codes: :environment) do
+    Institution.where('length(country) > 2').each do |institution|
+      institution.update_attribute(:country, CountryCodes.code(institution.country))
+    end
+    Event.where('length(country) > 2').each do |event|
+      event.update_attribute(:country, CountryCodes.code(event.country))
     end
   end
 end

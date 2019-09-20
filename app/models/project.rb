@@ -49,8 +49,6 @@ class Project < ApplicationRecord
   after_save :handle_pal_ids, if: -> { @pal_ids }
   after_save :handle_asset_housekeeper_ids, if: -> { @asset_housekeeper_ids }
 
-
-  scope :default_order, -> { order('title') }
   scope :without_programme, -> { where('programme_id IS NULL') }
 
   validates :web_page, url: {allow_nil: true, allow_blank: true}

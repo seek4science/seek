@@ -51,4 +51,7 @@ SEEK::Application.configure do
   # disable SQL logs from active record by TZ
   ActiveRecord::Base.logger = Logger.new(STDOUT)
   ActiveRecord::Base.logger.level = 1
+
+  # Don't log asset requests
+  config.assets.quiet = true
 end

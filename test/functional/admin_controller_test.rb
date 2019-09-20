@@ -338,4 +338,31 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 1,Delayed::Job.where('failed_at IS NOT NULL').count
   end
 
+  test 'update branding' do
+    settings = {project_name: 'project name', project_type: 'project type', project_description: 'project description', project_keywords: 'project,    keywords, ',
+                project_link: 'http://project-link.com',application_name: 'app name',
+                dm_project_name: 'dm project name', dm_project_link: 'http://dm-project-link.com',
+                header_image_link: 'http://header-link.com/image.jpg', header_image_title: 'header image title',
+                copyright_addendum_content: 'copyright content', imprint_description: 'imprint description',
+                terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page'}
+    post :update_rebrand, params: settings
+    assert_redirected_to admin_path
+
+    assert_equal 'project name', Seek::Config.project_name
+    assert_equal 'project type', Seek::Config.project_type
+    assert_equal 'project description', Seek::Config.project_description
+    assert_equal 'project, keywords', Seek::Config.project_keywords
+    assert_equal 'http://project-link.com', Seek::Config.project_link
+    assert_equal 'app name', Seek::Config.application_name
+    assert_equal 'dm project name', Seek::Config.dm_project_name
+    assert_equal 'http://dm-project-link.com', Seek::Config.dm_project_link
+    assert_equal 'http://header-link.com/image.jpg', Seek::Config.header_image_link
+    assert_equal 'header image title', Seek::Config.header_image_title
+    assert_equal 'copyright content', Seek::Config.copyright_addendum_content
+    assert_equal 'imprint description', Seek::Config.imprint_description
+    assert_equal 'terms page', Seek::Config.terms_page
+    assert_equal 'privacy page', Seek::Config.privacy_page
+    assert_equal 'about page', Seek::Config.about_page
+  end
+
 end

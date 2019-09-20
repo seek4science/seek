@@ -4,10 +4,9 @@
   <div class="alphabetical_pagination text-center">
     <ul class="pagination pagination-sm">
       <% unless filtered %>
-          <li class="<%= current_page == "latest" ? selected_classes : "" %>"><%= link_to "Latest", {:id => params[:id], :page => "latest"} %></li>
+          <li class="<%= current_page == "top" ? selected_classes : "" %>"><%= link_to "Top", {:id => params[:id], page: "top"} %></li>
       <% end %>
       <% pages.each do |page| -%>
-
           <% current_page_class = page==current_page ? selected_classes : "" -%>
           <% page_title = page=="?" ? "Other" : page -%>
           <% if page_totals[page]>0 -%>

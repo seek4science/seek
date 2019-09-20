@@ -1,12 +1,13 @@
 <%
     new_item_label ||= "New #{t(controller_name.singularize)}"
     new_item_path = eval("new_#{controller_name.singularize}_path")
-    items ||= nil
+    items ||= instance_variable_get("@#{controller_name}")
     show_new_button=true if show_new_button.nil?
 %>
 
 <%= index_title %>
 <%= render :partial => "assets/resource_counts" unless params[:filtered] %>
+<%= render :partial => "assets/resource_sorting", locals: { items: items } if items.is_a?(Seek::GroupedPagination::Collection)%>
 
 <% if show_new_button %>
     <%= render :partial => "assets/new_button", :locals => {:new_object_path => new_item_path, :label => new_item_label} %>
