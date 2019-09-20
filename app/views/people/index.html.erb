@@ -1,20 +1,9 @@
-<%= index_title -%>
-<% if @expertise -%>
-  <h2><%= "People with expertise in '"+h(@expertise)+"' ... " -%></h2>
-<% end %>
+<%
+  subtitle = nil
+  subtitle = "People with expertise in '"+h(@expertise)+"' ... " if @expertise
+  subtitle = "People with experience in '"+h(@tools)+"' ... " if @tools
+  subtitle = "People with the discipline '#{h(@discipline.title)}'" if @discipline
+  subtitle = "People with the role '#{h(@project_position.name)}'" if @project_position
+%>
 
-<% if @tools -%>
-  <h2><%= "People with experience in '"+h(@tools)+"' ... " -%></h2>
-<% end %>
-
-<% if @discipline -%>
-  <h2><%= "People with the discipline '#{h(@discipline.title)}'" %></h2>
-<%  end -%>
-
-<% if @project_position -%>
-  <h2><%= "People with the role '#{h(@project_position.name)}'" %></h2>
-<% end -%>
-
-<%= render :partial => "general/index_facets_or_paged" %>
-
-
+<%= render partial: 'general/index', locals: { subtitle: subtitle } %>

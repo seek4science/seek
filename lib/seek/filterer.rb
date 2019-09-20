@@ -1,7 +1,8 @@
 module Seek
   class Filterer
     AVAILABLE_FILTERS = {
-        Event: [:created_at]
+        Event: [:created_at],
+        Person: [:programme, :project, :institution, :project_position, :expertise, :tool]
     }.freeze
 
     FILTERS = {
@@ -14,6 +15,11 @@ module Seek
             field: 'programmes.id',
             title_field: 'programmes.title',
             joins: [:programmes],
+        },
+        institution: {
+            field: 'institutions.id',
+            title_field: 'institutions.title',
+            joins: [:institutions],
         },
         contributor: {
             field: 'people.id',
@@ -43,6 +49,11 @@ module Seek
         },
         country: {
             field: 'country'
+        },
+        organism: {
+            field: 'organisms.id',
+            title_field: 'organisms.title',
+            joins: [:organisms],
         }
     }.freeze
 

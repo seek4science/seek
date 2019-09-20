@@ -39,10 +39,19 @@ class Person < ApplicationRecord
   has_many :current_work_groups, class_name: 'WorkGroup', through: :current_group_memberships,
                                  source: :work_group
 
-  has_many :projects,  -> { distinct }, through: :work_groups
+  has_many :group_memberships_project_positions, -> { distinct }, through: :group_memberships
+  has_many :project_positions, -> { distinct }, through: :group_memberships_project_positions
+  has_filter project_position: {
+      field: 'project_positions.id',
+      title_field: 'project_positions.name',
+      joins: [:project_positions]
+  }
+
+  has_many :projects, -> { distinct }, through: :work_groups
   has_many :current_projects,  -> { distinct }, through: :current_work_groups, source: :project
   has_many :former_projects,  -> { distinct }, through: :former_work_groups, source: :project
 
+  has_many :programmes, -> { distinct }, through: :projects
   has_many :institutions, -> { distinct }, through: :work_groups
 
   has_many :favourite_group_memberships, dependent: :destroy
@@ -71,7 +80,19 @@ class Person < ApplicationRecord
   end
 
   has_annotation_type :expertise, method_name: :expertise
+  has_many :expertise_as_text, through: :expertise_annotations, source: :value, source_type: 'TextValue'
+  has_filter expertise: {
+      field: 'text_values.id',
+      title_field: 'text_values.text',
+      joins: [:expertise_as_text],
+  }
   has_annotation_type :tool
+  has_many :tools_as_text, through: :tool_annotations, source: :value, source_type: 'TextValue'
+  has_filter tool: {
+      field: 'text_values.id',
+      title_field: 'text_values.text',
+      joins: [:tools_as_text],
+  }
 
   has_many :publication_authors
 
@@ -155,10 +176,6 @@ class Person < ApplicationRecord
     end
   end
 
-  def programmes
-    projects.collect(&:programme).uniq
-  end
-
   # whether this person belongs to a programme in common with the other item - generally a person or project
   def shares_programme?(other_item)
     (programmes & other_item.programmes).any?
@@ -237,14 +254,6 @@ class Person < ApplicationRecord
     Person.count == 1 && [self] == Person.all && Person.first.is_admin?
   end
 
-  def project_positions
-    project_positions = []
-    group_memberships.each do |gm|
-      project_positions |= gm.project_positions
-    end
-    project_positions
-  end
-
   def update_first_letter
     no_last_name = last_name.nil? || last_name.strip.blank?
     first_letter = strip_first_letter(last_name) unless no_last_name
@@ -254,10 +263,7 @@ class Person < ApplicationRecord
   end
 
   def project_positions_of_project(projects_or_project)
-    # Get intersection of all project memberships + person's memberships to find project membership
-    projects_or_project = Array(projects_or_project)
-    memberships = group_memberships.select { |g| projects_or_project.include? g.work_group.project }
-    memberships.collect(&:project_positions).flatten
+    project_positions.joins(group_memberships: :work_group).where(work_groups: { project_id: projects_or_project }).distinct.to_a
   end
 
   # all items, assets, ISA and samples that are linked to this person as a creator

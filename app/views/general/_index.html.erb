@@ -3,9 +3,15 @@
     new_item_path = eval("new_#{controller_name.singularize}_path")
     items ||= instance_variable_get("@#{controller_name}")
     show_new_button=true if show_new_button.nil?
+    title ||= nil
+    subtitle ||= nil
 %>
 
-<%= index_title %>
+<%= index_title(title) %>
+<% if subtitle %>
+  <h2><%= subtitle %></h2>
+<% end %>
+
 <div class="index-container">
   <%= render partial: 'assets/resource_filtering' %>
   <div class="index-content">
