@@ -37,7 +37,7 @@ class ScalableTest < ActiveSupport::TestCase
 
   test 'updating scales correctly resolves differences' do
     @model.scales = [@small_scale.id]
-    @model.save
+    @model.save!
     assert_no_difference('Annotation.count') do
       @model.scales = [@medium_scale.id]
       @model.save!
@@ -75,14 +75,17 @@ class ScalableTest < ActiveSupport::TestCase
     assert_empty @model.fetch_additional_scale_info(@large_scale.id)
 
     @model.scales = []
-    assert_empty @model.fetch_additional_scale_info(@small_scale.id)
+    @model.save!
+    assert_empty @model.reload.fetch_additional_scale_info(@small_scale.id)
   end
 
   test 'attaching multiple additional info' do
     @model.scales = [@small_scale]
     @model.attach_additional_scale_info @small_scale.id, param: 'fish', unit: 'meter'
     @model.attach_additional_scale_info @small_scale.id, param: 'soup', unit: 'cm'
-    @model.save!
+    assert_difference('Annotation.count', 3) do
+      @model.save!
+    end
     info = @model.fetch_additional_scale_info(@small_scale.id)
     assert_equal 2, info.count
     info.sort! { |a, b| a['param'] <=> b['param'] }
@@ -92,6 +95,7 @@ class ScalableTest < ActiveSupport::TestCase
     assert_equal 'cm', info[1]['unit']
 
     @model.scales = []
-    assert_empty @model.fetch_additional_scale_info(@small_scale.id)
+    @model.save!
+    assert_empty @model.reload.fetch_additional_scale_info(@small_scale.id)
   end
 end
