@@ -99,7 +99,7 @@ class SearchController < ApplicationController
         @results |= external_results
       end
 
-      @results = apply_filters(@results)
+      @results
     end
   end
 
