@@ -91,6 +91,7 @@ class Project < ApplicationRecord
   alias_attribute :internal_webpage, :wiki_page
 
   has_and_belongs_to_many :organisms, before_add: :update_rdf_on_associated_change, before_remove: :update_rdf_on_associated_change
+  has_filter :organism
   has_many :project_subscriptions, dependent: :destroy
 
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
