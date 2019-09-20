@@ -1032,12 +1032,6 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test 'no resource count stats' do
-    get :index
-    assert_response :success
-    assert_select '#resource-count-stats', count: 0
-  end
-
   test 'autocomplete' do
     Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Johnson')
     Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Bohnson')
