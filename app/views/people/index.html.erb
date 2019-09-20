@@ -1,9 +1,1 @@
-<%
-  subtitle = nil
-  subtitle = "People with expertise in '"+h(@expertise)+"' ... " if @expertise
-  subtitle = "People with experience in '"+h(@tools)+"' ... " if @tools
-  subtitle = "People with the discipline '#{h(@discipline.title)}'" if @discipline
-  subtitle = "People with the role '#{h(@project_position.name)}'" if @project_position
-%>
-
-<%= render partial: 'general/index', locals: { subtitle: subtitle } %>
+<%= render partial: 'general/index' %>
