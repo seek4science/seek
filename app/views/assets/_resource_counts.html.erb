@@ -1,14 +1,13 @@
 <% resource_text = resource_text_from_controller.pluralize(@visible_count) %>
-<% if klass_from_controller.authorization_supported? %>
-  <span id='resource-count-stats'>
-    <strong><%= @visible_count %></strong>
-    <% if @filters&.any? -%>
-      <%= resource_text %> matching the given criteria:
-      <%= link_to("(Clear all filters)", page_and_sort_params.merge(filter: nil)) %>
-    <% elsif @total_count %>
-      <%= resource_text %> visible to you, out of a total of <strong><%= @total_count %></strong>.
-    <% else %>
-      <%= resource_text %> visible to you.
-    <% end %>
-  </span>
-<% end %>
+
+<div id="resource-count-stats">
+  <strong><%= @visible_count %></strong>
+  <% if @filters&.any? -%>
+    <%= resource_text %> matching the given criteria:
+    <%= link_to("(Clear all filters)", page_and_sort_params.merge(filter: nil)) %>
+  <% elsif @total_count && klass_from_controller.authorization_supported? %>
+    <%= resource_text %> visible to you, out of a total of <strong><%= @total_count %></strong>
+  <% else %>
+    <%= resource_text %> found
+  <% end %>
+</div>
