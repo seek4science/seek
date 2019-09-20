@@ -1,11 +1,12 @@
 module RdfHelper
+  include ApplicationHelper
   def asset_rdf
-    eval('@' + controller_name.singularize).to_rdf
+    resource_for_controller.to_rdf
   end
 
   # FIXME: currently experimental and may not be used.
   def json_ld_script_block
-    resource = eval('@' + controller_name.singularize)
+    resource = resource_for_controller
     if resource && resource.rdf_supported?
       begin
         content_tag :script, type: 'application/ld+json' do
@@ -44,7 +45,7 @@ module RdfHelper
     if controller_name=='homes' && action_name=='index'
       Seek::BioSchema::DataCatalogueMockModel.new
     elsif action_name == 'show'
-      eval('@' + controller_name.singularize)
+      resource_for_controller
     end
   end
 
