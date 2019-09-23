@@ -42,17 +42,17 @@ class ScalableTest < ActiveSupport::TestCase
       @model.scales = [@medium_scale.id]
       @model.save!
     end
-    assert_equal [@medium_scale], @model.scales
+    assert_equal [@medium_scale].sort, @model.scales.to_a.sort
     assert_difference('Annotation.count', 1) do
       @model.scales = [@medium_scale.id, @large_scale.id]
       @model.save!
     end
-    assert_equal [@medium_scale, @large_scale], @model.scales
+    assert_equal [@medium_scale, @large_scale].sort, @model.scales.to_a.sort
     assert_difference('Annotation.count', -2) do
       @model.scales = []
       @model.save!
     end
-    assert_equal [], @model.scales
+    assert_equal [], @model.scales.to_a
   end
 
   test 'retrieved scales are ordered' do

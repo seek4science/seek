@@ -19,16 +19,18 @@ module Seek
 
         has_annotation_type(:additional_scale_info)
 
-        after_save :remove_additional_scale_info
+        attr_reader :scales_changed
+        after_save :remove_additional_scale_info, if: ->{ scales_changed }
       end
     end
 
     module InstanceMethods
-      def scales=(scales, source = User.current_user)
-        scales = Array(scales).map { |scale| scale.is_a?(Scale) ? scale : Scale.find_by_id(scale) }.compact.uniq
-        self.scale_annotations = scales.map do |scale|
+      def scales=(vals, source = User.current_user)
+        scale_values = Array(vals).map { |scale| scale.is_a?(Scale) ? scale : Scale.find_by_id(scale) }.compact.uniq
+        self.scale_annotations = scale_values.map do |scale|
           self.scale_annotations.build(source: source, value: scale)
         end
+        @scales_changed = true
 
         scales
       end
@@ -63,7 +65,7 @@ module Seek
       end
 
       def remove_additional_scale_info
-        ids = reload.scale_ids.map(&:to_s)
+        ids = self.scales.reload.map { |s| s.id.to_s }
         self.additional_scale_info_annotations.to_a.reject do |an|
           json = JSON.parse(an.value.text)
           ids.include?(json['scale_id'].to_s)
