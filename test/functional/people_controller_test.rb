@@ -1066,33 +1066,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal res.map { |r| r['name'] }.uniq, ['Jon Bon Jovi']
   end
 
-  test 'list by discipline' do
-    exp = Factory(:discipline, title: 'experimentalist')
-    mod = Factory(:discipline, title: 'modeller')
-    experimentalist = Factory(:person, disciplines: [exp])
-    modeller = Factory(:person, disciplines: [mod])
-    assert_includes experimentalist.disciplines, exp
-    refute_includes modeller.disciplines, exp
-
-    get :index, params: { filter: { discipline: exp.id } }
-    assert_response :success
-
-    assert_select 'h2', text: /People with the discipline 'experimentalist'/
-
-    assert_select '.list_items_container' do
-      assert_select '.list_item_title' do
-        assert_select 'a', text: experimentalist.name, count: 1
-        assert_select 'a', text: modeller.name, count: 0
-      end
-    end
-
-    # handles an unknown discipline id
-    get :index, params: { filter: { discipline: Discipline.last.id + 1 } }
-    assert_response :success
-
-    assert_select '.list_items_container', count: 0
-  end
-
   test 'related samples are checked for authorization' do
     person = Factory(:person)
     other_person = Factory(:person)
