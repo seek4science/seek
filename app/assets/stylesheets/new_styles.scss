@@ -928,3 +928,30 @@ div.index-filters {
     background: #eee;
   }
 }
+
+.filter-search-box {
+  display: flex;
+  line-height: 24px;
+
+  .filter-search-field {
+    flex-grow: 1;
+    min-width: 10em;
+    border: none;
+    padding: 5px 10px;
+  }
+  .filter-search-button {
+    flex: 1;
+    color: inherit;
+    border-left: 1px solid #ccc;
+    padding: 5px 10px;
+    display: block;
+  }
+  .filter-search-clear {
+    flex: 1;
+    color: #999;
+    text-decoration: none;
+    font-size: 26px;
+    padding: 5px;
+    font-weight: bold;
+  }
+}

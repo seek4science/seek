@@ -1,5 +1,5 @@
 module FilteringHelper
-  def sorted_filters(filters)
+  def sorted_filter_options(filters)
     filters.sort_by do |filter|
       filter[:active] ? 0 : 1
     end
@@ -21,9 +21,9 @@ module FilteringHelper
     end
   end
 
-  def with_filter(key, value)
+  def with_filter(key, value, replace: false)
     existing = @filters[key]
-    if existing
+    if existing && !replace
       existing = [existing] unless existing.is_a?(Array)
       existing |= [value]
     else

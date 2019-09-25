@@ -12,11 +12,16 @@ module Seek
         collection.where("#{collection.table_name}.#{field} > ?", coerce_date(date))
       end
 
-      def options(collection)
+      def options(collection, active_values)
         @date_ranges.map do |max_age|
           count = apply(collection, max_age.ago).count
-          [max_age.to_i.to_s, count, "in the last #{max_age.inspect}"]
-        end.reject { |g| g[1].zero? }
+          {
+              title: "in the last #{max_age.inspect}",
+              value: max_age.to_i.to_s,
+              count: count,
+              active: active_values.include?(max_age.to_s)
+          }
+        end.reject { |g| g[:count].zero? }
       end
 
       private

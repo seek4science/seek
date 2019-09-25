@@ -10,8 +10,10 @@ module Seek
         collection.with_search_query(q)
       end
 
-      def options(collection)
-        []
+      def options(collection, active_values)
+        return [] unless collection.searchable? && Seek::Config.solr_enabled
+        q = active_values.join(' ')
+        [{ title: q, value: q, count: nil, active: active_values.any? }]
       end
     end
   end

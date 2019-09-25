@@ -65,7 +65,7 @@ module Seek
       active_filters = {}
 
       filter_params.each do |key, values|
-        active_filters[key.to_sym] = [values].flatten if get_filter(key)
+        active_filters[key.to_sym] = [values].flatten.reject(&:blank?) if get_filter(key)
       end
 
       active_filters
@@ -89,14 +89,7 @@ module Seek
       available_filter_keys.each do |key|
         filter = get_filter(key)
         without_current_filter = filter(unfiltered_collection, active_filters.except(key))
-        available_filters[key] = filter.options(without_current_filter).map do |value, count, title|
-          {
-            title: title || value.to_s,
-            value: value.to_s,
-            count: count,
-            active: active_filters[key]&.include?(value.to_s)
-          }
-        end
+        available_filters[key] = filter.options(without_current_filter, active_filters[key] || [])
       end
 
       available_filters

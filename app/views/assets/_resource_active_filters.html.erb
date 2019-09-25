@@ -1,15 +1,16 @@
 <% if @active_filters&.any? %>
   <div class="active-filters">
-    <% @active_filters.each do |key, values| %>
+    <% @active_filters.each_key do |key| %>
+      <% active_filters = @available_filters[key].select {|f| f[:active] } %>
+      <% next unless active_filters.any? %>
       <div class="active-filter-category">
         <strong class="active-filter-category-title"><%= key.to_s.humanize %>:</strong>
         <% first = true %>
-        <% values.each do |value| %>
-          <% title = @available_filters[key].detect { |f| f[:value] == value }.try(:[], :title) || value %>
+        <% active_filters.each do |filter| %>
           <% unless first %>
             or
           <% end; first = false %>
-          <%= active_filter_link(key, title, value) %>
+          <%= active_filter_link(key, filter[:title], filter[:value]) %>
         <% end %>
       </div>
     <% end %>

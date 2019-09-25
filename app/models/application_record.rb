@@ -91,9 +91,6 @@ class ApplicationRecord < ActiveRecord::Base
     self.class.supports_doi?
   end
 
-  has_filter created_at: Seek::Filtering::DateFilter.new(field: :created_at,
-                                                         date_ranges: [24.hours, 1.week, 1.month, 1.year, 5.years])
-
   def self.with_search_query(q)
     if searchable? && Seek::Config.solr_enabled
       search = search do |query|
@@ -108,4 +105,6 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   has_filter query: Seek::Filtering::SearchFilter.new
+  has_filter created_at: Seek::Filtering::DateFilter.new(field: :created_at,
+                                                         date_ranges: [24.hours, 1.week, 1.month, 1.year, 5.years])
 end

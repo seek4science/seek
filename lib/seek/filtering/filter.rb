@@ -19,18 +19,25 @@ module Seek
         collection.where(field => values)
       end
 
-      def options(collection)
+      def options(collection, active_values)
         collection = collection.select(*@select_fields)
         collection = collection.joins(joins) if joins
         collection = collection.includes(includes) if includes
-        groups = collection.group(field).pluck(*@select_fields).reject { |g| g[1].zero? } # Remove 0 count results
+        opts = collection.group(field).pluck(*@select_fields).reject { |g| g[1].zero? } # Remove 0 count results
         if title_mapping
-          title_mapping.call(groups.map(&:first)).each.with_index do |title, index|
-            groups[index][2] = title
+          title_mapping.call(opts.map(&:first)).each.with_index do |title, index|
+            opts[index][2] = title
           end
         end
 
-        groups.sort_by { |g| -g[1] }
+        opts.map do |value, count, title|
+          {
+              title: title || value.to_s,
+              value: value.to_s,
+              count: count,
+              active: active_values.include?(value.to_s)
+          }
+        end.sort_by { |g| -g[:count] }
       end
     end
   end
