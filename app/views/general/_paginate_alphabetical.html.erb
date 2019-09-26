@@ -1,6 +1,6 @@
 <% selected_classes = "active" -%>
-<nav>
-  <div class="alphabetical_pagination text-center">
+<nav class="pagination-container">
+  <div class="alphabetical_pagination">
     <ul class="pagination pagination-sm">
       <li class="<%= current_page == "top" ? selected_classes : "" %>"><%= link_to "Top", page_and_sort_params.merge(id: params[:id], page: 'top') %></li>
       <% pages.each do |page| -%>

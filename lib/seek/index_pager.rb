@@ -18,10 +18,15 @@ module Seek
 
     def find_assets
       detect_parent_resource
+      Rails.logger.debug("--- Fetching #{controller_name}")
       assets = fetch_assets
+      Rails.logger.debug("--- Filtering")
       assets = filter_assets(assets)
+      Rails.logger.debug("--- Sorting")
       assets = sort_assets(assets)
+      Rails.logger.debug("--- Paging")
       assets = paginate_assets(assets)
+      Rails.logger.debug("--- Done!")
       instance_variable_set("@#{controller_name}", assets)
     end
 
@@ -72,7 +77,7 @@ module Seek
     def paginate_assets(assets)
       page = page_and_sort_params[:page]
       if page.blank? || page.match?(/[0-9]+/) # Standard pagination
-        assets.paginate(page: page, per_page: params[:per_page] || 30)
+        assets.paginate(page: page, per_page: params[:per_page] || Seek::Config.limit_latest)
       elsif page == 'all' # No pagination
         assets.paginate(page: 1, per_page: 1_000_000)
       else # Alphabetical pagination
