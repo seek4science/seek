@@ -37,7 +37,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
 
   test 'paginate_no_options' do
     Factory :person, last_name: 'Aardvark', first_name: 'Fred'
-    @people = Person.paginate default_page: 'first'
+    @people = Person.grouped_paginate default_page: 'first'
     assert_equal(('A'..'Z').to_a, @people.pages)
     assert @people.size > 0
     assert_equal 'A', @people.page
@@ -52,7 +52,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   test 'paginate_by_page' do
     Factory :person, last_name: 'Bobbins', first_name: 'Fred'
     Factory :person, last_name: 'Brown', first_name: 'Fred'
-    @people = Person.paginate page: 'B'
+    @people = Person.grouped_paginate page: 'B'
     assert_equal(('A'..'Z').to_a, @people.pages)
     assert @people.size > 0
     assert_equal 'B', @people.page
@@ -63,7 +63,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'sql_injection' do
-    @people = Person.paginate page: "A or first_letter='B'"
+    @people = Person.grouped_paginate page: "A or first_letter='B'"
     assert_equal 0, @people.size
     assert_equal(('A'..'Z').to_a, @people.pages)
     assert_equal "A or first_letter='B'", @people.page
@@ -89,13 +89,13 @@ class GroupedPaginationTest < ActiveSupport::TestCase
 
   test 'extra_conditions_as_array' do
     Factory :person, last_name: 'Aardvark', first_name: 'Fred'
-    @people = Person.paginate page: 'A', conditions: ['last_name = ?', 'Aardvark']
+    @people = Person.grouped_paginate page: 'A', conditions: ['last_name = ?', 'Aardvark']
     assert_equal 1, @people.size
     assert(@people.page_totals.select do |k, v|
       k != 'A' && v > 0
     end.empty?, 'All of the page totals should be 0')
 
-    @people = Person.paginate page: 'B', conditions: ['last_name = ?', 'Aardvark']
+    @people = Person.grouped_paginate page: 'B', conditions: ['last_name = ?', 'Aardvark']
     assert_equal 0, @people.size
     assert_equal 1, @people.page_totals['A']
   end
@@ -106,17 +106,17 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     Factory :person, last_name: 'Davis', first_name: 'Fred'
     # delete those with A
     Person.where(['first_letter = ?', 'A']).each(&:delete)
-    @people = Person.paginate default_page: 'first'
+    @people = Person.grouped_paginate default_page: 'first'
     assert @people.size > 0
     assert_equal 'B', @people.page
 
-    @people = Person.paginate page: 'A'
+    @people = Person.grouped_paginate page: 'A'
     assert_equal 0, @people.size
     assert_equal 'A', @people.page
 
     # delete every person, and check it still returns the first page with empty content
     Person.all.each(&:delete)
-    @people = Person.paginate default_page: 'first'
+    @people = Person.grouped_paginate default_page: 'first'
     assert_equal 0, @people.size
     assert_equal 'A', @people.page
   end
@@ -132,39 +132,39 @@ class GroupedPaginationTest < ActiveSupport::TestCase
 
   test 'extra_condition_as_array_direct' do
     Factory :person, last_name: 'Aardvark', first_name: 'Fred'
-    @people = Person.paginate page: 'A', conditions: ["last_name = 'Aardvark'"]
+    @people = Person.grouped_paginate page: 'A', conditions: ["last_name = 'Aardvark'"]
     assert_equal 1, @people.size
     assert(@people.page_totals.select do |k, v|
       k != 'A' && v > 0
     end.empty?, 'All of the page totals should be 0')
 
-    @people = Person.paginate page: 'B', conditions: ["last_name = 'Aardvark'"]
+    @people = Person.grouped_paginate page: 'B', conditions: ["last_name = 'Aardvark'"]
     assert_equal 0, @people.size
     assert_equal 1, @people.page_totals['A']
   end
 
   test 'extra_condition_as_string' do
     Factory :person, last_name: 'Aardvark', first_name: 'Fred'
-    @people = Person.paginate page: 'A', conditions: "last_name = 'Aardvark'"
+    @people = Person.grouped_paginate page: 'A', conditions: "last_name = 'Aardvark'"
     assert_equal 1, @people.size
     assert(@people.page_totals.select do |k, v|
       k != 'A' && v > 0
     end.empty?, 'All of the page totals should be 0')
 
-    @people = Person.paginate page: 'B', conditions: "last_name = 'Aardvark'"
+    @people = Person.grouped_paginate page: 'B', conditions: "last_name = 'Aardvark'"
     assert_equal 0, @people.size
     assert_equal 1, @people.page_totals['A']
   end
 
   test 'condition_as_hash' do
     Factory :person, last_name: 'Aardvark', first_name: 'Fred'
-    @people = Person.paginate page: 'A', conditions: { last_name: 'Aardvark' }
+    @people = Person.grouped_paginate page: 'A', conditions: { last_name: 'Aardvark' }
     assert_equal 1, @people.size
     assert(@people.page_totals.select do |k, v|
       k != 'A' && v > 0
     end.empty?, 'All of the page totals should be 0')
 
-    @people = Person.paginate page: 'B', conditions: { last_name: 'Aardvark' }
+    @people = Person.grouped_paginate page: 'B', conditions: { last_name: 'Aardvark' }
     assert_equal 0, @people.size
     assert_equal 1, @people.page_totals['A']
   end
@@ -172,12 +172,12 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   test 'order_by' do
     p1 = Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     p2 = Factory :person, last_name: 'Azbo', first_name: 'John'
-    @people = Person.paginate page: 'A', order: 'name_asc'
+    @people = Person.grouped_paginate page: 'A', order: 'name_asc'
     assert @people.size > 0
     assert_equal 'A', @people.page
     assert_equal p1, @people.first
 
-    @people = Person.paginate page: 'A', order: 'name_desc'
+    @people = Person.grouped_paginate page: 'A', order: 'name_desc'
     assert @people.size > 0
     assert_equal 'A', @people.page
     assert_equal p2, @people.first
@@ -186,7 +186,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   test 'show_all' do
     Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     Factory :person, last_name: 'Jones', first_name: 'Fred'
-    @people = Person.paginate page: 'all'
+    @people = Person.grouped_paginate page: 'all'
     assert_equal Person.all.size, @people.size
   end
 
@@ -201,27 +201,27 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'pagination for default page using rails-setting plugin' do
-    @people = Person.paginate
+    @people = Person.grouped_paginate
     assert_equal @people.page, Seek::Config.default_page('people')
-    @projects = Project.paginate
+    @projects = Project.grouped_paginate
     assert_equal @projects.page, Seek::Config.default_page('projects')
-    @institutions = Institution.paginate
+    @institutions = Institution.grouped_paginate
     assert_equal @institutions.page, Seek::Config.default_pages[:institutions]
-    @investigations = Investigation.paginate
+    @investigations = Investigation.grouped_paginate
     assert_equal @investigations.page, Seek::Config.default_pages[:investigations]
-    @studies = Study.paginate
+    @studies = Study.grouped_paginate
     assert_equal @studies.page, Seek::Config.default_pages[:studies]
-    @assays = Assay.paginate
+    @assays = Assay.grouped_paginate
     assert_equal @assays.page, Seek::Config.default_pages[:assays]
-    @data_files = DataFile.paginate
+    @data_files = DataFile.grouped_paginate
     assert_equal @data_files.page, Seek::Config.default_pages[:data_files]
-    @models = Model.paginate
+    @models = Model.grouped_paginate
     assert_equal @models.page, Seek::Config.default_page('models')
-    @sops = Sop.paginate
+    @sops = Sop.grouped_paginate
     assert_equal @sops.page, Seek::Config.default_pages[:sops]
-    @publications = Publication.paginate
+    @publications = Publication.grouped_paginate
     assert_equal @publications.page, Seek::Config.default_pages[:publications]
-    @events = Event.paginate
+    @events = Event.grouped_paginate
     assert_equal @events.page, Seek::Config.default_pages[:events]
   end
 

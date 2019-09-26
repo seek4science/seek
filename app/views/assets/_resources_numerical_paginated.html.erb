@@ -1,0 +1,9 @@
+<% objects = resources_numerical_paginated %>
+
+<%= render partial: 'general/paginate_numerical', locals: { objects: objects } if objects.respond_to?(:current_page) %>
+
+<div class="list_items_container">
+  <%= render partial: 'assets/resource_list_item', collection: objects %>
+</div>
+
+<%= render partial: 'general/paginate_numerical', locals: { objects: objects } if objects.respond_to?(:current_page) %>

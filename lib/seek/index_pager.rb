@@ -3,13 +3,6 @@ module Seek
     include Seek::FacetedBrowsing
 
     def index
-      controller = controller_name.downcase
-      model_class = controller_model
-      objects = eval("@#{controller}")
-      @visible_count = objects.count
-      objects = model_class.paginate_after_fetch(objects, page_and_sort_params) unless objects.respond_to?('page_totals')
-      instance_variable_set("@#{controller}", objects)
-
       respond_to do |format|
         format.html
         format.xml
@@ -24,12 +17,24 @@ module Seek
     end
 
     def find_assets
-      fetch_and_filter_assets
+      detect_parent_resource
+      assets = fetch_assets
+      assets = filter_assets(assets)
+      assets = sort_assets(assets)
+      assets = paginate_assets(assets)
+      instance_variable_set("@#{controller_name}", assets)
     end
 
-    def fetch_and_filter_assets
-      detect_parent_resource
-      unfiltered_assets = fetch_all_assets
+    def fetch_assets
+      if @parent_resource
+        @parent_resource.get_related(controller_name.classify)
+      else
+        controller_model
+      end
+    end
+
+    def filter_assets(assets)
+      unfiltered_assets = assets
       authorized_unfiltered_assets = relationify_collection(unfiltered_assets.authorized_for('view', User.current_user))
       @filters = page_and_sort_params[:filter].to_h
       filterer = Seek::Filterer.new(controller_model)
@@ -43,19 +48,32 @@ module Seek
         @total_count = unfiltered_assets.count
       end
 
+      @visible_count = authorized_filtered_assets.count
+
       @active_filters = {}
       active_filter_values.each_key do |key|
         active = @available_filters[key].select(&:active?)
         @active_filters[key] = active if active.any?
       end
-      instance_variable_set("@#{controller_name.downcase}", authorized_filtered_assets)
+
+      authorized_filtered_assets
     end
 
-    def fetch_all_assets
-      if @parent_resource
-        @parent_resource.get_related(controller_name.classify)
-      else
-        controller_model
+    def sort_assets(assets)
+      order_keys = page_and_sort_params[:order]
+      order_keys ||= :updated_at_desc if page_and_sort_params[:page] == 'top' && Seek::ListSorter.options(name).include?(:updated_at_desc)
+      order_keys ||= Seek::ListSorter.key_for_view(controller_model.name, :index)
+      order_keys = Array.wrap(order_keys).map(&:to_sym)
+      order = Seek::ListSorter.order_from_keys(*order_keys)
+
+      Seek::ListSorter.index_items(assets, order)
+    end
+
+    def paginate_assets(assets)
+      if true # Standard pagination
+        assets.paginate(page: page_and_sort_params[:page], per_page: page_and_sort_params[:per_page])
+      else # Alphabetical pagination
+        controller_model.paginate_after_fetch(assets, page_and_sort_params)
       end
     end
 

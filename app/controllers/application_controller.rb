@@ -128,6 +128,7 @@ class ApplicationController < ActionController::Base
     p = params.permit(:page, :sort, :order, permitted_filter_params)
 
     p[:page] ||= 'all' if json_api_request?
+    p[:per_page] ||= 30
 
     if p[:sort]
       p[:order] = Seek::ListSorter.keys_from_json_api_sort(params[:sort])

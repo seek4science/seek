@@ -3,18 +3,20 @@
    items ||= eval("@#{controller_name}")
 %>
 
-<% unless items.empty? %>
-    <% if index_with_facets?(controller_name)  %>
-        <%= render :partial => "assets/filter_button", :locals => {:index_path => index_path} %>
+<% if items.any? %>
+  <% if index_with_facets?(controller_name)  %>
+    <%= render partial: 'assets/filter_button', locals: {index_path: index_path} %>
+  <% end %>
 
-        <% if params[:user_enable_facet] == 'true' %>
-            <%= render :partial => "faceted_browsing/faceted_browsing", :object => items %>
-        <% else %>
-            <%= render :partial => "assets/resources_alphabetical_paginated", :object => items %>
-        <% end %>
+  <% if index_with_facets?(controller_name) && params[:user_enable_facet] == 'true' %>
+    <%= render partial: 'faceted_browsing/faceted_browsing', object: items %>
+  <% else %>
+    <% if items.is_a?(Seek::GroupedPagination::Collection) %>
+      <%= render partial: 'assets/resources_alphabetical_paginated', object: items %>
     <% else %>
-        <%= render :partial => "assets/resources_alphabetical_paginated", :object => items %>
+      <%= render partial: 'assets/resources_numerical_paginated', object: items %>
     <% end %>
+  <% end %>
 <% else %>
     <%= no_items_to_list_text %>
 <% end %>
