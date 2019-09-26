@@ -7,7 +7,7 @@ module Seek
         format.html
         format.xml
         format.json do
-          render json: objects,
+          render json: instance_variable_get("@#{controller_name}"),
                  each_serializer: SkeletonSerializer,
                  meta: {:base_url =>   Seek::Config.site_base_host,
                         :api_version => ActiveModel::Serializer.config.api_version
@@ -61,7 +61,7 @@ module Seek
 
     def sort_assets(assets)
       order_keys = page_and_sort_params[:order]
-      order_keys ||= :updated_at_desc if page_and_sort_params[:page] == 'top' && Seek::ListSorter.options(name).include?(:updated_at_desc)
+      order_keys ||= :updated_at_desc if page_and_sort_params[:page] == 'top' && Seek::ListSorter.options(controller_model.name).include?(:updated_at_desc)
       order_keys ||= Seek::ListSorter.key_for_view(controller_model.name, :index)
       order_keys = Array.wrap(order_keys).map(&:to_sym)
       order = Seek::ListSorter.order_from_keys(*order_keys)
@@ -70,8 +70,11 @@ module Seek
     end
 
     def paginate_assets(assets)
-      if true # Standard pagination
-        assets.paginate(page: page_and_sort_params[:page], per_page: page_and_sort_params[:per_page])
+      page = page_and_sort_params[:page]
+      if page.blank? || page.match?(/[0-9]+/) # Standard pagination
+        assets.paginate(page: page, per_page: params[:per_page] || 30)
+      elsif page == 'all' # No pagination
+        assets.paginate(page: 1, per_page: 1_000_000)
       else # Alphabetical pagination
         controller_model.paginate_after_fetch(assets, page_and_sort_params)
       end
