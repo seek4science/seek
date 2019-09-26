@@ -2,8 +2,8 @@
 <% if options.any? %>
   <div class="filter-category collapsed">
     <div class="filter-category-title"><%= key.to_s.humanize %></div>
-    <% sorted_filter_options(options).each_with_index do |filter, i| %>
-      <%= filter_link(key, filter, i >= filter_limit) %>
+    <% options.each_with_index do |filter, i| %>
+      <%= filter_link(key, filter, hidden: i >= filter_limit, replace: true) %>
     <% end %>
     <% if options.length > filter_limit %>
       <%= link_to "More...", '#', class: 'expand-filter-category-link' %>

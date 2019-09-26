@@ -31,13 +31,8 @@ module Seek
         end
 
         opts.map do |value, count, title|
-          {
-              title: title || value.to_s,
-              value: value.to_s,
-              count: count,
-              active: active_values.include?(value.to_s)
-          }
-        end.sort_by { |g| -g[:count] }
+          Seek::Filtering::Option.new(title || value.to_s, value.to_s, count, active_values.include?(value.to_s))
+        end.sort
       end
     end
   end

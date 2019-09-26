@@ -3,13 +3,13 @@
   <div class="filter-category collapsed">
     <div class="filter-category-title">Query</div>
     <div class="filter-search-box">
-      <%= text_field_tag(nil, options.first[:value], data: { url: url_template },
+      <%= text_field_tag(nil, options.first.value, data: { url: url_template },
                          placeholder: 'Search here...',
                          id: 'filter-search-field',
                          autocomplete: 'off',
                          class: 'filter-search-field') -%>
-      <% if options.first[:active] %>
-        <%= link_to(page_and_sort_params.merge({ page: nil, filter: without_filter(key, options.first[:value])}),
+      <% if options.first.active? %>
+        <%= link_to(page_and_sort_params.merge({ page: nil, filter: without_filter(key, options.first.value)}),
                     title: "Clear the search field.",
                     class: 'filter-search-clear') do %>
           &times;

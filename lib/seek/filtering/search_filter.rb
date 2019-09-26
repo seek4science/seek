@@ -13,7 +13,7 @@ module Seek
       def options(collection, active_values)
         return [] unless collection.searchable? && Seek::Config.solr_enabled
         q = active_values.join(' ')
-        [{ title: q, value: q, count: nil, active: active_values.any? }]
+        [Seek::Filtering::Option.new(q, q, nil, active_values.any?)]
       end
     end
   end

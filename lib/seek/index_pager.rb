@@ -45,7 +45,7 @@ module Seek
 
       @active_filters = {}
       active_filter_values.each_key do |key|
-        active = @available_filters[key].select { |f| f[:active] }
+        active = @available_filters[key].select(&:active?)
         @active_filters[key] = active if active.any?
       end
       instance_variable_set("@#{controller_name.downcase}", authorized_filtered_assets)
