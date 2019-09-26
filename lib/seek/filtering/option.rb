@@ -17,7 +17,7 @@ module Seek
       def <=>(other)
         if active?
           if other.active?
-            count <=> other.count
+            other.count <=> count
           else
             -1
           end
@@ -25,7 +25,7 @@ module Seek
           if other.active?
             1
           else
-            count <=> other.count
+            other.count <=> count
           end
         end
       end
