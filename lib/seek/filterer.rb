@@ -61,14 +61,14 @@ module Seek
       @klass = klass
     end
 
-    def active_filters(filter_params)
-      active_filters = {}
+    def active_filter_values(filter_params)
+      hash = {}
 
       filter_params.each do |key, values|
-        active_filters[key.to_sym] = [values].flatten.reject(&:blank?) if get_filter(key)
+        hash[key.to_sym] = [values].flatten.reject(&:blank?) if get_filter(key)
       end
 
-      active_filters
+      hash
     end
 
     def filter(collection, active_filters)

@@ -5,13 +5,6 @@ module FilteringHelper
     end
   end
 
-  def active_filter_link(key, title, value)
-    link_to(page_and_sort_params.merge({ page: nil, filter: without_filter(key, value)}),
-            title: title, class: 'filter-option filter-active') do
-      content_tag(:span, title, class: 'filter-title')
-    end
-  end
-
   def filter_link(key, filter, hidden = false)
     link_to(page_and_sort_params.merge({ page: nil, filter: filter[:active] ? without_filter(key, filter[:value]) : with_filter(key, filter[:value]) }),
             title: filter[:title],

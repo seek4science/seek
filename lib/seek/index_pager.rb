@@ -33,15 +33,21 @@ module Seek
       authorized_unfiltered_assets = relationify_collection(unfiltered_assets.authorized_for('view', User.current_user))
       @filters = page_and_sort_params[:filter].to_h
       filterer = Seek::Filterer.new(controller_model)
-      @active_filters = filterer.active_filters(@filters)
-      @available_filters = filterer.available_filters(authorized_unfiltered_assets, @active_filters)
-      if @active_filters.any?
-        authorized_filtered_assets = filterer.filter(authorized_unfiltered_assets, @active_filters)
+      active_filter_values = filterer.active_filter_values(@filters)
+      # We need the un-filtered, but authorized, collection to work out which filters are available.
+      @available_filters = filterer.available_filters(authorized_unfiltered_assets, active_filter_values)
+      if active_filter_values.any?
+        authorized_filtered_assets = filterer.filter(authorized_unfiltered_assets, active_filter_values)
       else
         authorized_filtered_assets = authorized_unfiltered_assets
         @total_count = unfiltered_assets.count
       end
-      # We need the un-filtered, but authorized, collection to work out which filters are available.
+
+      @active_filters = {}
+      active_filter_values.each_key do |key|
+        active = @available_filters[key].select { |f| f[:active] }
+        @active_filters[key] = active if active.any?
+      end
       instance_variable_set("@#{controller_name.downcase}", authorized_filtered_assets)
     end
 
