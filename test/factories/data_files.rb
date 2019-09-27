@@ -32,7 +32,9 @@ Factory.define(:max_datafile, class: DataFile) do |f|
   f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |data_file|
-    data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
+    if data_file.content_blob.blank?
+      data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
+    end
   end
   f.other_creators 'Blogs, Joe'
 end

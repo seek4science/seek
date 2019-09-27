@@ -6,10 +6,22 @@ module Seek
       # for Schema.org (Bioschemas.org)
       class BaseDecorator
         include ActionView::Helpers::SanitizeHelper
+        include Rails.application.routes.url_helpers
+
         attr_reader :resource
 
         def initialize(resource)
           @resource = resource
+        end
+
+        def mappings
+          [[:identifier, '@id']]
+        end
+
+        def attributes
+          mappings.collect do |method, property|
+            Seek::BioSchema::BioSchemaAttribute.new(method, property)
+          end
         end
 
         # The @context to be used for the JSON-LD
@@ -23,16 +35,9 @@ module Seek
           @resource.class.name
         end
 
-        # If the resource has an avatar, then returns the image url
-        def image
-          return unless resource.avatar
-          "#{Seek::Config.site_base_host}/#{resource.class.table_name}" \
-            "/#{resource.id}/avatars/#{resource.avatar.id}?size=250"
-        end
-
-        # the rdf indentifier for the resource, which is its URL
-        def identifier
-          rdf_resource
+        def rdf_resource
+          uri = polymorphic_url(resource, host: Seek::Config.site_base_host)
+          RDF::Resource.new(uri).to_s
         end
 
         # the minimal definition for the resource, used mainly for associated items
@@ -54,11 +59,26 @@ module Seek
           #   associated_items member: :people
           #   create a method 'member' that returns a collection of Hash objects containing the
           #   minimal definition for each item resulting from calling 'people' on the resource
-          def associated_items(pairs)
+          def associated_items(**pairs)
             pairs.each do |method, collection|
               define_method(method) do
                 mini_definitions(send(collection))
               end
+            end
+          end
+
+          # used to define the mapping between the method to be call, and the property
+          # for e.g
+          #   schema_mappings doi: :identifier
+          # calls the method 'doi' on the decorator, and then the value will be used with the schema.org property
+          # 'identifier'. Multiple mappings can be provided, separated with a comma.
+          # The method defined, could also be a method defined with 'assocated_items'
+          def schema_mappings(**pairs)
+            mappings = pairs.collect do |method, property|
+              [method, property]
+            end
+            define_method(:mappings) do
+              super() | mappings
             end
           end
         end
@@ -66,8 +86,9 @@ module Seek
         private
 
         def mini_definitions(collection)
+          return if collection.empty?
           collection.collect do |item|
-            Factory.instance.get(item).mini_definition
+            Seek::BioSchema::ResourceDecorators::Factory.instance.get(item).mini_definition
           end
         end
 

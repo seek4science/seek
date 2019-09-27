@@ -26,6 +26,10 @@ Factory.define(:url_content_blob, parent: :content_blob) do |f|
   f.data nil
 end
 
+Factory.define(:website_content_blob, parent: :url_content_blob) do |f|
+  f.content_type 'text/html'
+end
+
 Factory.define(:pdf_content_blob, parent: :content_blob) do |f|
   f.original_filename 'a_pdf_file.pdf'
   f.content_type 'application/pdf'

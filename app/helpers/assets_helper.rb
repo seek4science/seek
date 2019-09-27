@@ -140,6 +140,14 @@ module AssetsHelper
     end
   end
 
+  def manage_resource_path(resource)
+    if resource.class.name.include?('::Version')
+      polymorphic_path(resource.parent, action:'manage')
+    else
+      polymorphic_path(resource, action:'manage')
+    end
+  end
+
   # provides a list of assets, according to the class, that are authorized according the 'action' which defaults to view
   # if projects is provided, only authorizes the assets for that project
   # assets are sorted by title except if they are projects and scales (because of hierarchies)
