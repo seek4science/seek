@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SchemaLdGenerationTest < ActiveSupport::TestCase
+
   def setup
     @person = Factory(:max_person, description: 'a lovely person')
     @project = @person.projects.first
@@ -73,6 +74,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     assert df.can_download?
+    refute df.content_blob.show_as_external_link?
 
     expected = {
       '@context' => 'http://schema.org',
@@ -103,6 +105,47 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         'encodingFormat' => 'application/pdf',
         'name' => 'a_pdf_file.pdf'
       }
+    }
+
+    json = JSON.parse(df.to_schema_ld)
+    assert_equal expected, json
+  end
+
+  test 'dataset with weblink' do
+    df = travel_to(@current_time) do
+      df = Factory(:max_datafile, content_blob:Factory(:website_content_blob),
+                   contributor: @person, projects: [@project],
+                   policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df.add_annotations('keyword', 'tag', User.first)
+      disable_authorization_checks { df.save! }
+      df
+    end
+
+    assert df.can_download?
+    assert df.content_blob.show_as_external_link?
+
+    expected = {
+        '@context' => 'http://schema.org',
+        '@type' => 'DataSet',
+        '@id' => "http://localhost:3000/data_files/#{df.id}",
+        'name' => df.title,
+        'description' => df.description,
+        'keywords' => 'keyword',
+        'url' => "http://www.abc.com",
+        'provider' => [{
+                           '@type' => 'Project',
+                           '@id' => "http://localhost:3000/projects/#{@project.id}",
+                           'name' => @project.title
+                       }],
+        'dateCreated' => @current_time.to_s,
+        'dateModified' => @current_time.to_s,
+        'encodingFormat' => 'text/html',
+        'identifier' => 'https://doi.org/10.10.10.10/test.1',
+        'subjectOf' => [
+            { '@type' => 'Event',
+              '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+              'name' => df.events.first.title }
+        ]
     }
 
     json = JSON.parse(df.to_schema_ld)
