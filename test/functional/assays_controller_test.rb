@@ -187,7 +187,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should show new with study when id provided' do
     s = studies(:metabolomics_study)
-    get :new, params: { study_id: s }
+    get :new, params: {assay: { study_id: s.id }}
     assert_response :success
     assert_not_nil assigns(:assay)
     assert_equal s, assigns(:assay).study

@@ -5,8 +5,6 @@ class DataFile < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
 
-  attr_accessor :parent_name
-
   # searchable must come before acts_as_asset call
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do

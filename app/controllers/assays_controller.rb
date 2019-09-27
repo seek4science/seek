@@ -70,7 +70,7 @@ class AssaysController < ApplicationController
   def new
     @assay=setup_new_asset
     @assay_class=params[:class]
-    @permitted_params = assay_params
+    @permitted_params = assay_params if params[:assay]
 
     #jump straight to experimental if modelling analysis is disabled
     @assay_class ||= "experimental" unless Seek::Config.modelling_analysis_enabled

@@ -2,8 +2,7 @@
 <h1><%= @page_title %></h1>
 
 <%= form_tag({:action => :create_content_blob}, :multipart => true) do -%>
-    <%= hidden_field_tag 'data_file[parent_name]', @data_file.parent_name%>
-    <% if params[:data_file][:assay_assets_attributes] %>
+    <% if params[:data_file] && params[:data_file][:assay_assets_attributes] %>
       <%= hidden_field_tag 'data_file[assay_assets_attributes[][assay_ids[]]',params[:data_file][:assay_assets_attributes].first[:assay_id] %>
     <% end %>
 

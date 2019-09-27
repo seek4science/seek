@@ -75,11 +75,6 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'correct title and text for associating an assay for new' do
     login_as(Factory(:user))
-    as_virtualliver do
-      register_content_blob
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
-    end
     as_not_virtualliver do
       register_content_blob
       assert_response :success
@@ -93,11 +88,6 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'correct title and text for associating an assay for edit' do
     df = Factory :data_file
     login_as(df.contributor.user)
-    as_virtualliver do
-      get :edit, params: { id: df.id }
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
-    end
     as_not_virtualliver do
       get :edit, params: { id: df.id }
       assert_response :success
@@ -3307,45 +3297,6 @@ class DataFilesControllerTest < ActionController::TestCase
     refute_nil assigns(:create_new_assay)
     refute assigns(:create_new_assay)
     assert_select "input#assay_create_assay[checked=checked]", count:0
-  end
-
-  test 'should select assay ids when passed to provide metadata' do
-    assay1 = Factory(:assay, contributor:User.current_user.person)
-    assay2 = Factory(:assay, contributor:User.current_user.person)
-
-
-    assert assay1.can_edit?
-    assert assay2.can_edit?
-
-
-    register_content_blob(skip_provide_metadata:true)
-
-    get :provide_metadata, params: { assay_ids:[assay1.id] }
-    assert_response :success
-
-    assert df=assigns(:data_file)
-    assert_includes df.assay_assets.collect(&:assay),assay1
-    refute_includes df.assay_assets.collect(&:assay),assay2
-  end
-
-  test 'should select multiple assay ids when passed to provide metadata' do
-    assay1 = Factory(:assay, contributor:User.current_user.person)
-    assay2 = Factory(:assay, contributor:User.current_user.person)
-    assay3 = Factory(:assay, contributor:User.current_user.person)
-
-    assert assay1.can_edit?
-    assert assay2.can_edit?
-    assert assay3.can_edit?
-
-    register_content_blob(skip_provide_metadata:true)
-
-    get :provide_metadata, params: { assay_ids:[assay1.id,assay2.id] }
-    assert_response :success
-
-    assert df=assigns(:data_file)
-    assert_includes df.assay_assets.collect(&:assay),assay1
-    assert_includes df.assay_assets.collect(&:assay),assay2
-    refute_includes df.assay_assets.collect(&:assay),assay3
   end
 
   test 'should not select non editable assay ids when passed to provide metadata' do
