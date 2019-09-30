@@ -79,4 +79,64 @@ class AssayAssetTest < ActiveSupport::TestCase
     end
 
   end
+
+  test 'validate assay is editable' do
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      asset = Factory(:sop, contributor:person)
+      assay1 = Factory(:assay, contributor:person)
+      assay2 = Factory(:assay)
+
+      assert assay1.can_edit?
+      refute assay2.can_edit?
+
+      a = AssayAsset.new asset: asset, assay: assay1
+      assert a.valid?
+
+      a = AssayAsset.new asset: asset, assay: assay2
+      refute a.valid?
+    end
+  end
+
+  test 'validate with model requires modelling assay' do
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      asset = Factory(:model, contributor:person)
+      assay1 = Factory(:modelling_assay, contributor:person)
+      assay2 = Factory(:experimental_assay, contributor:person)
+
+      assert assay1.can_edit?
+      assert assay2.can_edit?
+
+      assert assay1.is_modelling?
+      refute assay2.is_modelling?
+
+      a = AssayAsset.new asset: asset, assay: assay1
+      assert a.valid?
+
+      a = AssayAsset.new asset: asset, assay: assay2
+      refute a.valid?
+    end
+  end
+
+  test 'validate with data file requires any assay' do
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      asset = Factory(:data_file, contributor:person)
+      assay1 = Factory(:modelling_assay, contributor:person)
+      assay2 = Factory(:experimental_assay, contributor:person)
+
+      assert assay1.can_edit?
+      assert assay2.can_edit?
+
+      assert assay1.is_modelling?
+      refute assay2.is_modelling?
+
+      a = AssayAsset.new asset: asset, assay: assay1
+      assert a.valid?
+
+      a = AssayAsset.new asset: asset, assay: assay2
+      assert a.valid?
+    end
+  end
 end
