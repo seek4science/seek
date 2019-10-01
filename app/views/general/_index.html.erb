@@ -14,7 +14,7 @@
     <%= button_link_to(new_item_label, "new", new_item_path) %>
   <% end %>
 
-  <% if faceted_browsing_enabled %>
+  <% if faceted_browsing_enabled && items.any? %>
     <%= button_link_to('Advanced filtering', 'filter', { user_enable_facet: true }, { style: params[:user_enable_facet] == 'true' ? 'display: none' : ''}) %>
     <%= button_link_to('Stop filtering', 'filter', { user_enable_facet: false }, { style: params[:user_enable_facet] == 'true' ? '' : 'display: none'}) %>
   <% end %>

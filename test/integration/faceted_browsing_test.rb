@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class FacetedBrowsingTest < ActionDispatch::IntegrationTest
-  ASSETS_WITH_FACET = Seek::Config.facet_enable_for_pages.keys
+  ASSETS_WITH_FACET = Seek::Config.facet_enable_for_pages.keys - ['publications']
 
   def setup
     User.current_user = Factory(:user, login: 'test')
@@ -38,6 +38,7 @@ class FacetedBrowsingTest < ActionDispatch::IntegrationTest
       facet_enabled_pages = {}
       facet_disabled_pages = {}
       Seek::Config.facet_enable_for_pages.each do |key, value|
+        next if key == 'publications'
         if value == true
           facet_enabled_pages[key] = value
         else
