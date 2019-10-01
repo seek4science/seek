@@ -1,6 +1,7 @@
 module Seek
   class Filterer
     AVAILABLE_FILTERS = {
+        Publication: [],
         Event: [:query, :created_at],
         Person: [:query, :programme, :project, :institution, :project_position, :expertise, :tool]
     }.freeze

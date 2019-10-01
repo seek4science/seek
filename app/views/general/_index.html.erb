@@ -2,22 +2,28 @@
     new_item_label ||= "New #{t(controller_name.singularize)}"
     new_item_path = eval("new_#{controller_name.singularize}_path")
     items ||= instance_variable_get("@#{controller_name}")
-    show_new_button=true if show_new_button.nil?
+    unless defined? show_new_button
+      show_new_button = true
+    end
     title ||= nil
     subtitle ||= nil
+    faceted_browsing ||= index_with_facets?(controller_name) && params[:user_enable_facet] == 'true'
 %>
 
 <%= index_title(title) %>
+
 <% if subtitle %>
   <h2><%= subtitle %></h2>
 <% end %>
 
 <div class="index-container">
-  <%= render partial: 'assets/resource_filtering' %>
+  <%= render partial: 'assets/resource_filtering' unless faceted_browsing %>
   <div class="index-content">
-    <%= render partial: 'assets/resource_sorting', locals: { items: items } %>
-    <%= render partial: 'assets/resource_counts' %>
-    <%= render partial: 'assets/resource_active_filters' %>
+    <% unless faceted_browsing %>
+      <%= render partial: 'assets/resource_counts' %>
+      <%= render partial: 'assets/resource_sorting', locals: { items: items } %>
+      <%= render partial: 'assets/resource_active_filters' %>
+    <% end %>
 
     <% if show_new_button %>
       <%= render partial: 'assets/new_button', locals: { new_object_path: new_item_path, label: new_item_label } %>
