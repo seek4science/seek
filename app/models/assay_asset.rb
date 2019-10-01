@@ -47,7 +47,7 @@ class AssayAsset < ApplicationRecord
   def validate_model_requires_modelling_assay
     if asset && asset.is_a?(Model)
       if assay && !assay.is_modelling?
-        errors.add(:assay, "must be a #{t('assays.modelling_analysis')}")
+        errors.add(:assay, "must be a #{I18n.t('assays.modelling_analysis')}")
       end
     end
   end

@@ -124,11 +124,12 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should update timestamp when associating model' do
-    login_as(:model_owner)
-    assay = assays(:metabolomics_assay)
+    person = Factory(:person)
+    login_as(person.user)
+    assay = Factory(:modelling_assay, contributor:person)
     timestamp = assay.updated_at
 
-    model = models(:teusink)
+    model = Factory(:model, contributor:person)
     assert !assay.models.include?(model.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
@@ -904,27 +905,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'a[href=?]', data_file_path(df), text: df.title
     assert_select 'a[href=?]', model_path(model), text: model.title
-    assert_select 'a[href=?]', sop_path(sop), text: sop.title
-  end
-
-  test 'should have only associated datafiles and sops on assay index page for experimental assays' do
-    Assay.delete_all
-    df = Factory(:data_file, contributor: User.current_user.person)
-    model = Factory(:model, contributor: User.current_user.person)
-    sop = Factory(:sop, contributor: User.current_user.person)
-    investigation = Factory(:investigation, contributor:User.current_user.person)
-    assay = Factory(:experimental_assay, contributor: User.current_user.person,
-                    study: Factory(:study, investigation: investigation, contributor:User.current_user.person))
-    assay.data_files << df
-    assay.models << model
-    assay.sops << sop
-    assert assay.save
-    assert assay.is_experimental?
-
-    get :index
-    assert_response :success
-    assert_select 'a[href=?]', data_file_path(df), text: df.title
-    assert_select 'a[href=?]', model_path(model), text: model.title, count: 0
     assert_select 'a[href=?]', sop_path(sop), text: sop.title
   end
 
