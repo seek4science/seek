@@ -1,7 +1,4 @@
 class SearchController < ApplicationController
-
-  before_action :set_default_search_params
-
   include Seek::ExternalSearch
   include Seek::FacetedBrowsing
 
@@ -26,10 +23,10 @@ class SearchController < ApplicationController
     @results_scaled << ['all', @results]
     @results_scaled = Hash[*@results_scaled.flatten(1)]
     logger.info @results_scaled.inspect
-    if params[:scale]
-      # when user does not login, params[:scale] is nil
-      @results = @results_scaled[params[:scale]]
-      @scale_key = params[:scale]
+    if search_params[:scale]
+      # when user does not login, search_params[:scale] is nil
+      @results = @results_scaled[search_params[:scale]]
+      @scale_key = search_params[:scale]
     else
        @results = @results_scaled['all']
        @scale_key = 'all'
@@ -42,26 +39,29 @@ class SearchController < ApplicationController
       flash.now[:notice]="#{@results.size} #{@results.size==1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content.".html_safe
     end
 
-    @include_external_search = params[:include_external_search]=="1"
+    @include_external_search = search_params[:include_external_search]=="1"
 
     view_context.ie_support_faceted_browsing? if Seek::Config.faceted_search_enabled
 
     respond_to do |format|
       format.html
-      format.json {render json: @results,
-                          each_serializer: SkeletonSerializer,
-                          meta: {:base_url =>   Seek::Config.site_base_host,
-                                 :api_version => ActiveModel::Serializer.config.api_version
-                          }}
+      format.json do
+        render json: @results,
+               each_serializer: SkeletonSerializer,
+               links: { self: search_path(search_params) },
+               meta: {
+                   base_url: Seek::Config.site_base_host,
+                   api_version: ActiveModel::Serializer.config.api_version
+               }
+      end
     end
-    
   end
 
   def perform_search
-    @search_query = ActionController::Base.helpers.sanitize(params[:q] || params[:search_query])
+    @search_query = ActionController::Base.helpers.sanitize(search_params[:q] || search_params[:search_query])
     @search = @search_query # used for logging, and logs the origin search query - see ApplicationController#log_event
     @search_query ||=""
-    @search_type = params[:search_type]
+    @search_type = search_params[:search_type] || 'all'
     type = @search_type&.downcase
 
     @search_query = Seek::Search::SearchTermFilter.filter @search_query
@@ -94,7 +94,7 @@ class SearchController < ApplicationController
         @results |= search_result
       end
 
-      if params[:include_external_search] == "1"
+      if search_params[:include_external_search] == "1"
         external_results = external_search(downcase_query, type)
         @results |= external_results
       end
@@ -105,13 +105,12 @@ class SearchController < ApplicationController
 
   private
 
-  def set_default_search_params
-    params[:include_external_search] ||= 0
-    params[:search_type] = 'all' if params[:search_type].blank?
+  def search_params
+    params.permit(:search_type, :q, :search_query, :include_external_search, :scale)
   end
 
   def include_external_search?
-    Seek::Config.external_search_enabled && params[:include_external_search]
+    Seek::Config.external_search_enabled && search_params[:include_external_search]
   end
 
 end

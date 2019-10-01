@@ -356,6 +356,9 @@
       ],
       "additionalProperties": false
     },
+    "indexLinks": {
+      "$ref": "#/definitions/linksType"
+    },
     "linksType": {
       "type": "object",
       "properties": {
@@ -1649,6 +1652,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5117,6 +5123,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5137,6 +5146,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5197,6 +5209,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5257,6 +5272,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5317,6 +5335,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5377,6 +5398,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5437,6 +5461,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5497,6 +5524,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5557,6 +5587,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5617,6 +5650,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5677,6 +5713,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5737,6 +5776,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5797,6 +5839,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5857,6 +5902,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5917,6 +5965,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5977,6 +6028,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [

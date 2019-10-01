@@ -9,10 +9,12 @@ module Seek
         format.json do
           render json: instance_variable_get("@#{controller_name}"),
                  each_serializer: SkeletonSerializer,
-                 meta: {:base_url =>   Seek::Config.site_base_host,
-                        :api_version => ActiveModel::Serializer.config.api_version
+                 links: json_api_links,
+                 meta: {
+                     base_url: Seek::Config.site_base_host,
+                     api_version: ActiveModel::Serializer.config.api_version
                  }
-          end
+        end
       end
     end
 
@@ -105,6 +107,18 @@ module Seek
       else
         collection
       end
+    end
+
+    def json_api_links
+      if @parent_resource
+        base = [@parent_resource, controller_name.to_sym]
+      else
+        base = controller_name.to_sym
+      end
+
+      {
+        self: polymorphic_path(base, page_and_sort_params)
+      }
     end
   end
 end
