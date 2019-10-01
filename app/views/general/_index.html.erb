@@ -2,13 +2,27 @@
     new_item_label ||= "New #{t(controller_name.singularize)}"
     new_item_path = eval("new_#{controller_name.singularize}_path")
     items ||= instance_variable_get("@#{controller_name}")
-    unless defined? show_new_button
-      show_new_button = true
-    end
+    show_new_button = true unless local_assigns.has_key?(:show_new_button)
     title ||= nil
     subtitle ||= nil
-    faceted_browsing ||= index_with_facets?(controller_name) && params[:user_enable_facet] == 'true'
+    faceted_browsing_enabled = index_with_facets?(controller_name) unless local_assigns.has_key?(:faceted_browsing_enabled)
+    faceted_browsing = faceted_browsing_enabled && params[:user_enable_facet] == 'true'
 %>
+
+<div class="pull-right">
+  <% if show_new_button && logged_in_and_member? %>
+    <%= button_link_to(new_item_label, "new", new_item_path) %>
+  <% end %>
+
+  <% if faceted_browsing_enabled %>
+    <%= button_link_to('Advanced filtering', 'filter', { user_enable_facet: true }, { style: params[:user_enable_facet] == 'true' ? 'display: none' : ''}) %>
+    <%= button_link_to('Stop filtering', 'filter', { user_enable_facet: false }, { style: params[:user_enable_facet] == 'true' ? '' : 'display: none'}) %>
+  <% end %>
+
+  <% if content_for?(:buttons) %>
+    <%= content_for :buttons %>
+  <% end %>
+</div>
 
 <%= index_title(title) %>
 
@@ -25,10 +39,10 @@
       <%= render partial: 'assets/resource_active_filters' %>
     <% end %>
 
-    <% if show_new_button %>
-      <%= render partial: 'assets/new_button', locals: { new_object_path: new_item_path, label: new_item_label } %>
+    <% if faceted_browsing %>
+      <%= render partial: 'faceted_browsing/faceted_browsing', object: items %>
+    <% else %>
+      <%= render partial: 'general/index_facets_or_paged', locals: { items: items } %>
     <% end %>
-
-    <%= render partial: 'general/index_facets_or_paged', locals: { items: items } %>
   </div>
 </div>

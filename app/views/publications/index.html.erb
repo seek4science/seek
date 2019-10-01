@@ -1,5 +1,5 @@
-<div class="pull-right">
+<% content_for :buttons do %>
   <%= button_link_to('Filter and export', 'filter', export_publications_path) %>
-</div>
+<% end %>
 
-<%= render partial: 'general/index' %>
+<%= render partial: 'general/index', locals: { faceted_browsing_enabled: false } %>
