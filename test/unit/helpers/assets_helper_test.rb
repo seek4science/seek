@@ -135,11 +135,6 @@ class AssetsHelperTest < ActionView::TestCase
 
   end
 
-  test 'add_to_dropdown' do
-    investigation = Factory(:investigation)
-    puts add_to_dropdown(investigation)
-  end
-
   private
 
   def update_lookup_tables

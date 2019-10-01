@@ -66,13 +66,14 @@ Factory.define(:min_assay, class: Assay) do |f|
 end
 
 Factory.define(:max_assay, class: Assay) do |f|
-  f.title "A Maximal Assay"
+  f.title "A Maximal Modelling Assay"
   f.description "A Western Blot Assay"
   f.other_creators "Anonymous creator"
-  f.association :assay_class, factory: :experimental_assay_class
+  f.association :assay_class, factory: :modelling_assay_class
   f.association :contributor,  factory: :person
   f.assay_assets {[Factory(:assay_asset, asset: Factory(:data_file, policy: Factory(:public_policy))),
                    Factory(:assay_asset, asset: Factory(:sop, policy: Factory(:public_policy))),
+                   Factory(:assay_asset, asset: Factory(:model, policy: Factory(:public_policy))),
                    Factory(:assay_asset, asset: Factory(:document, policy: Factory(:public_policy)))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_build do |a|
