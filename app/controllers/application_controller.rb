@@ -125,17 +125,7 @@ class ApplicationController < ActionController::Base
   def page_and_sort_params
     permitted = Seek::Filterer.new(controller_model).available_filter_keys.flat_map { |p| [p, { p => [] }] }
     permitted_filter_params = { filter: permitted }
-    p = params.permit(:page, :sort, :order, permitted_filter_params)
-
-    p[:page] ||= 'all' if json_api_request?
-
-    if p[:sort]
-      p[:order] = Seek::ListSorter.keys_from_json_api_sort(params[:sort])
-    elsif params[:order]
-      p[:order] = params[:order]
-    end
-
-    p
+    params.permit(:page, :sort, :order, permitted_filter_params)
   end
 
   helper_method :page_and_sort_params

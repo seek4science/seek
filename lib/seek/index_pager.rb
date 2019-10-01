@@ -67,7 +67,11 @@ module Seek
     end
 
     def sort_assets(assets)
-      order_keys = page_and_sort_params[:order]
+      order_keys = if page_and_sort_params[:sort]
+                     Seek::ListSorter.keys_from_json_api_sort(page_and_sort_params[:sort])
+                   else
+                     page_and_sort_params[:order]
+                   end
       order_keys ||= :updated_at_desc if page_and_sort_params[:page] == 'top' && Seek::ListSorter.options(controller_model.name).include?(:updated_at_desc)
       order_keys ||= Seek::ListSorter.key_for_view(controller_model.name, :index)
       order_keys = Array.wrap(order_keys).map(&:to_sym)
@@ -78,6 +82,8 @@ module Seek
 
     def paginate_assets(assets)
       page = page_and_sort_params[:page]
+      page ||= 'all' if json_api_request?
+
       if page.blank? || page.match?(/[0-9]+/) # Standard pagination
         assets.paginate(page: page, per_page: params[:per_page] || Seek::Config.limit_latest)
       elsif page == 'all' # No pagination
