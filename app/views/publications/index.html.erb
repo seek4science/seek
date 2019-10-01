@@ -1,11 +1,5 @@
-<%= index_title -%>
-<div class="row">
-  <div class="col-sm-2">
-    <%= render :partial => "assets/new_button", :locals => { :new_object_path => new_publication_path, :label => "Register a publication" } %>
-  </div>
-  <div class="col-sm-2">
-    <%= button_link_to('Filter and export', 'filter', export_publications_path) %>
-  </div>
+<div class="pull-right">
+  <%= button_link_to('Filter and export', 'filter', export_publications_path) %>
 </div>
 
-<%= render :partial => "general/index_facets_or_paged" %>
+<%= render partial: 'general/index' %>
