@@ -19,7 +19,7 @@ module Seek
     end
 
     def find_assets
-      detect_parent_resource
+      setup
       Rails.logger.debug("--- Fetching #{controller_name}")
       assets = fetch_assets
       Rails.logger.debug("--- Filtering")
@@ -43,7 +43,6 @@ module Seek
     def filter_assets(assets)
       unfiltered_assets = assets
       authorized_unfiltered_assets = relationify_collection(unfiltered_assets.authorized_for('view', User.current_user))
-      @filters = page_and_sort_params[:filter].to_h
       filterer = Seek::Filterer.new(controller_model)
       active_filter_values = filterer.active_filter_values(@filters)
       # We need the un-filtered, but authorized, collection to work out which filters are available.
@@ -57,7 +56,6 @@ module Seek
 
       @visible_count = authorized_filtered_assets.count
 
-      @active_filters = {}
       active_filter_values.each_key do |key|
         active = @available_filters[key].select(&:active?)
         @active_filters[key] = active if active.any?
@@ -67,33 +65,25 @@ module Seek
     end
 
     def sort_assets(assets)
-      order_keys = if page_and_sort_params[:sort]
-                     Seek::ListSorter.keys_from_json_api_sort(page_and_sort_params[:sort])
-                   else
-                     page_and_sort_params[:order]
-                   end
-      order_keys ||= :updated_at_desc if page_and_sort_params[:page] == 'top' && Seek::ListSorter.options(controller_model.name).include?(:updated_at_desc)
-      order_keys ||= Seek::ListSorter.key_for_view(controller_model.name, :index)
-      order_keys = Array.wrap(order_keys).map(&:to_sym)
-      order = Seek::ListSorter.order_from_keys(*order_keys)
+      order = Seek::ListSorter.order_from_keys(*@order)
 
       Seek::ListSorter.index_items(assets, order)
     end
 
     def paginate_assets(assets)
-      page = page_and_sort_params[:page]
-      page ||= 'all' if json_api_request?
-
-      if page.blank? || page.match?(/[0-9]+/) # Standard pagination
-        assets.paginate(page: page, per_page: params[:per_page] || Seek::Config.limit_latest)
-      elsif page == 'all' # No pagination
+      if @page.match?(/[0-9]+/) # Standard pagination
+        assets.paginate(page: @page, per_page: params[:per_page] || Seek::Config.limit_latest)
+      elsif @page == 'all' # No pagination
         assets.paginate(page: 1, per_page: 1_000_000)
       else # Alphabetical pagination
         controller_model.paginate_after_fetch(assets, page_and_sort_params)
       end
     end
 
-    def detect_parent_resource
+    private
+
+    def setup
+      # Parent resource
       parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
       if parent_id_param
         parent_type = parent_id_param.to_s.chomp('_id')
@@ -102,9 +92,30 @@ module Seek
           @parent_resource = parent_class.find(params[parent_id_param])
         end
       end
-    end
 
-    private
+      # Page
+      @page = page_and_sort_params[:page]
+      @page ||= 'all' if json_api_request?
+      @page ||= '1'
+
+      # Order
+      @order = if page_and_sort_params[:sort]
+                 Seek::ListSorter.keys_from_json_api_sort(page_and_sort_params[:sort])
+               else
+                 page_and_sort_params[:order]
+               end
+      # Sort by `updated_at` if on the "top", and its a valid sort option for this type.
+      @order ||= :updated_at_desc if @page == 'top' && Seek::ListSorter.options(controller_model.name).include?(:updated_at_desc)
+      # Sort by `title` if on an alphabetical page, and its a valid sort option for this type.
+      @order ||= :title_asc if @page.match?(/[?A-Z]+/) && Seek::ListSorter.options(controller_model.name).include?(:title_asc)
+      @order ||= Seek::ListSorter.key_for_view(controller_model.name, :index)
+      @order = Array.wrap(@order).map(&:to_sym)
+
+      # Filters
+      @filters = page_and_sort_params[:filter].to_h
+      @active_filters = {}
+      @available_filters = {}
+    end
 
     # This is a silly method to turn an Array of AR objects back into an AR relation so we can do joins etc. on it.
     def relationify_collection(collection)

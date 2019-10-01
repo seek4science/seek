@@ -16,7 +16,7 @@ module Seek
           defaults: { index: :published_at_desc, related: :published_at_desc },
           options: [:published_at_asc, :published_at_desc, :created_at_asc, :created_at_desc, :title_asc, :title_desc] },
       'Other' => {
-          defaults: { index: :title_asc, related: :updated_at_desc },
+          defaults: { index: :updated_at_desc, related: :updated_at_desc },
           options: [:updated_at_asc, :updated_at_desc, :created_at_asc, :created_at_desc, :title_asc, :title_desc] },
     }.with_indifferent_access.freeze
 

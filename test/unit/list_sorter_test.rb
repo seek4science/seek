@@ -3,8 +3,8 @@ require 'test_helper'
 class ListSorterTest < ActiveSupport::TestCase
   test 'rules' do
     assert_equal 'last_name IS NULL, LOWER(last_name), LOWER(first_name)', Seek::ListSorter.order_for_view('Person', :index)
-    assert_equal 'LOWER(title)', Seek::ListSorter.order_for_view('Sop', :index)
-    assert_equal 'LOWER(title)', Seek::ListSorter.order_for_view('NewModelThatDoesntExist', :index)
+    assert_equal 'updated_at DESC', Seek::ListSorter.order_for_view('Sop', :index)
+    assert_equal 'updated_at DESC', Seek::ListSorter.order_for_view('NewModelThatDoesntExist', :index)
     assert_equal 'updated_at DESC', Seek::ListSorter.order_for_view('NewModelThatDoesntExist', :related)
     assert_equal 'published_date DESC', Seek::ListSorter.order_for_view('Publication', :index)
     assert_equal 'updated_at DESC', Seek::ListSorter.order_for_view('Assay', :related)
@@ -100,8 +100,8 @@ class ListSorterTest < ActiveSupport::TestCase
     assert_equal [e2, e1, e3], Seek::ListSorter.index_items(events)
     assert_equal [e1, e2, e3], Seek::ListSorter.index_items(events, 'updated_at DESC')
 
-    assert_equal [s1, s3, s2], Seek::ListSorter.index_items(sops)
-    assert_equal [s3, s2, s1], Seek::ListSorter.index_items(sops, 'updated_at DESC')
+    assert_equal [s1, s3, s2], Seek::ListSorter.index_items(sops, 'LOWER(title)')
+    assert_equal [s3, s2, s1], Seek::ListSorter.index_items(sops)
   end
 
   test 'complex sorting' do
