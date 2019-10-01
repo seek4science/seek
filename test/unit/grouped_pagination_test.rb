@@ -169,15 +169,15 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal 1, @people.page_totals['A']
   end
 
-  test 'order_by' do
+  test 'order_by is preserved during pagination' do
     p1 = Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     p2 = Factory :person, last_name: 'Azbo', first_name: 'John'
-    @people = Person.grouped_paginate page: 'A', order: 'name_asc'
+    @people = Person.order('last_name ASC').grouped_paginate(page: 'A')
     assert @people.size > 0
     assert_equal 'A', @people.page
     assert_equal p1, @people.first
 
-    @people = Person.grouped_paginate page: 'A', order: 'name_desc'
+    @people = Person.order('last_name DESC').grouped_paginate(page: 'A')
     assert @people.size > 0
     assert_equal 'A', @people.page
     assert_equal p2, @people.first
@@ -223,73 +223,6 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal @publications.page, Seek::Config.default_pages[:publications]
     @events = Event.grouped_paginate
     assert_equal @events.page, Seek::Config.default_pages[:events]
-  end
-
-  test 'order by updated_at for -top- pagination for applicable item types' do
-    item_types = [:project, :investigation, :study, :assay, :data_file, :model, :sop, :presentation, :strain]
-    item_types.each do |type|
-      item1 = Factory(type, updated_at: 2.second.ago)
-      item2 = Factory(type, updated_at: 1.second.ago)
-
-      klass = type.to_s.camelize.constantize
-      latest_items = klass.paginate_after_fetch(klass.all, order: 'updated_at_desc')
-      assert latest_items.index { |i| i.id == item2.id } < latest_items.index { |i| i.id == item1.id }, "#{type} out of order when explicit ordering"
-
-      latest_items = klass.paginate_after_fetch(klass.all, page: 'top')
-      assert latest_items.index { |i| i.id == item2.id } < latest_items.index { |i| i.id == item1.id }, "#{type} out of order when implicit ordering"
-    end
-  end
-
-  test 'order by published_date for publications, for -all- and -alphabet- pagnation' do
-    publication1 = Factory(:publication, title: 'AB', published_date: 2.days.ago)
-    publication2 = Factory(:publication, title: 'AC', published_date: 1.days.ago)
-
-    all_items = Publication.paginate_after_fetch(Publication.all, page: 'all')
-    assert all_items.index(publication2) < all_items.index(publication1)
-
-    pageA_items = Publication.paginate_after_fetch(Publication.all, page: 'A')
-    assert pageA_items.index(publication2) < pageA_items.index(publication1)
-  end
-
-  test 'order by start_date for events, for -all- and -alphabet- pagnation' do
-    event1 = Factory(:event, title: 'AB', start_date: 2.days.ago)
-    event2 = Factory(:event, title: 'AC', start_date: 1.days.ago)
-
-    all_items = Event.paginate_after_fetch(Event.all, page: 'all')
-    assert all_items.index(event2) < all_items.index(event1)
-
-    pageA_items = Event.paginate_after_fetch(Event.all, page: 'A')
-    assert pageA_items.index(event2) < pageA_items.index(event1)
-  end
-
-  test 'order by title for projects and institutions, for -all- and -alphabet- pagnation' do
-    yellow_pages = [:project, :institution]
-    yellow_pages.each do |type|
-      item1 = Factory(type, title: 'AB', updated_at: 2.days.ago)
-      item2 = Factory(type, title: 'AC', updated_at: 1.days.ago)
-
-      klass = type.to_s.camelize.constantize
-      all_items = klass.paginate_after_fetch(klass.all, page: 'all')
-      assert all_items.index(item1) < all_items.index(item2), "out of order for #{type}"
-
-      pageA_items = klass.paginate_after_fetch(klass.all, page: 'A')
-      assert pageA_items.index(item1) < pageA_items.index(item2), "out of order for #{type}"
-    end
-  end
-
-  test 'order by title for the rest of item types,  for -all- and -alphabet- pagnation' do
-    item_types = [:investigation, :study, :assay, :data_file, :model, :sop, :presentation, :strain]
-    item_types.each do |type|
-      item1 = Factory(type, title: 'AB', updated_at: 2.days.ago)
-      item2 = Factory(type, title: 'AC', updated_at: 1.days.ago)
-
-      klass = type.to_s.camelize.constantize
-      all_items = klass.paginate_after_fetch(klass.all, page: 'all')
-      assert all_items.index(item1) < all_items.index(item2), "out of order for #{type}"
-
-      pageA_items = klass.paginate_after_fetch(klass.all, page: 'A')
-      assert pageA_items.index(item1) < pageA_items.index(item2), "out of order for #{type}"
-    end
   end
 
   test 'maintains page totals after paging' do
