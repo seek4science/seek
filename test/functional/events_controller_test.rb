@@ -98,6 +98,16 @@ class EventsControllerTest < ActionController::TestCase
     assert_difference('Event.count', 1) do
       post :create, params: { event: valid_event, sharing: valid_sharing }
     end
+    assert_equal 'FR',assigns(:event).country
+  end
+
+  test 'should create valid event with country name' do
+    assert_difference('Event.count', 1) do
+      event_params = valid_event
+      event_params[:country]='Germany'
+      post :create, params: { event:event_params, sharing: valid_sharing }
+    end
+    assert_equal 'DE',assigns(:event).country
   end
 
   test 'should not create invalid event' do
@@ -115,7 +125,7 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   def valid_event
-    { title: 'Barn Raising', start_date: DateTime.now, end_date: DateTime.now, project_ids: [@project.id] }
+    { title: 'Barn Raising', start_date: DateTime.now, end_date: DateTime.now, project_ids: [@project.id], country:'FR' }
   end
 
   test 'should get edit' do

@@ -317,8 +317,8 @@ class OrganismsControllerTest < ActionController::TestCase
     organism = strain.organism
 
     sample = Sample.new(sample_type: sample_type, contributor: person, project_ids: [person.projects.first.id])
-    sample.set_attribute(:name, 'Strain sample')
-    sample.set_attribute(:seekstrain, strain.id)
+    sample.set_attribute_value(:name, 'Strain sample')
+    sample.set_attribute_value(:seekstrain, strain.id)
     sample.save!
 
     get :show, params: { id: organism }

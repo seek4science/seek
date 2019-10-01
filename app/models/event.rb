@@ -11,6 +11,7 @@ class Event < ApplicationRecord
   include Seek::Subscribable
   include Seek::Search::CommonFields
   include Seek::Search::BackgroundReindexing
+  include Seek::BioSchema::Support
 
   searchable(ignore_attribute_changes_of: [:updated_at], auto_index: false) do
     text :address, :city, :country, :url
@@ -43,6 +44,8 @@ class Event < ApplicationRecord
 
   # validates_is_url_string :url
   validates :url, url: {allow_nil: true, allow_blank: true}
+
+  validates :country, country:true, allow_blank: true
 
   def show_contributor_avatars?
     false

@@ -2346,7 +2346,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert(samples = assigns(:samples))
     assert_equal 3, samples.count
-    assert_not_includes samples.map { |s| s.get_attribute(:full_name) }, 'Bob'
+    assert_not_includes samples.map { |s| s.get_attribute_value(:full_name) }, 'Bob'
 
     samples.each do |sample|
       assert_equal data_file, sample.originating_data_file

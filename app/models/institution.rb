@@ -5,7 +5,7 @@ class Institution < ApplicationRecord
 
   validates :title, uniqueness: true
   validates :web_page, url: {allow_nil: true, allow_blank: true}
-  validates :country, :presence => true
+  validates :country, country:true, :presence => true
 
   has_many :work_groups, dependent: :destroy, inverse_of: :institution
   has_many :projects, through: :work_groups,  inverse_of: :institutions

@@ -28,7 +28,7 @@ SEEK::Application.configure do
   config.active_record.migration_error = :page_load
 
   # Debug mode disables concatenation and preprocessing of assets.
-  config.assets.debug = true
+  config.assets.debug = false
 
   # Asset digests allow you to set far-future HTTP expiration dates on all assets,
   # yet still be able to expire them through the digest params.
@@ -38,7 +38,6 @@ SEEK::Application.configure do
   # Checks for improperly declared sprockets dependencies.
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
-
 
   config.public_file_server.enabled = true
 
@@ -50,8 +49,8 @@ SEEK::Application.configure do
   # config.log_level = :warn
   # disable SQL logs from active record by TZ
   ActiveRecord::Base.logger = Logger.new(STDOUT)
-  ActiveRecord::Base.logger.level = 1
+  #ActiveRecord::Base.logger.level = 1
 
   # Don't log asset requests
-  config.assets.quiet = true
+  config.assets.quiet = false
 end

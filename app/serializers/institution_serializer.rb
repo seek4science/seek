@@ -4,7 +4,11 @@ class InstitutionSerializer < AvatarObjSerializer
              :country
 
   attribute :country_code do
-    CountryCodes.code(object.country)
+    object.country
+  end
+
+  attribute :country do
+    CountryCodes.country(object.country)
   end
 
   attributes :city, :address, :web_page
