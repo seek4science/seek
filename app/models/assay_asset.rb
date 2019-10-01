@@ -19,7 +19,7 @@ class AssayAsset < ApplicationRecord
   enforce_authorization_on_association :assay, :edit
   enforce_authorization_on_association :asset, :view
 
-  validate :validate_model_requires_modelling_assay, :validate_assay_is_editable
+  validate :validate_model_requires_modelling_assay
 
   def set_version
     return if destroyed?
@@ -52,7 +52,5 @@ class AssayAsset < ApplicationRecord
     end
   end
 
-  def validate_assay_is_editable
-    errors.add(:assay, 'must be editable') if assay && !assay.can_edit?
-  end
+
 end

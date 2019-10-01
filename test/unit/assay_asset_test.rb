@@ -80,24 +80,6 @@ class AssayAssetTest < ActiveSupport::TestCase
 
   end
 
-  test 'validate assay is editable' do
-    person = Factory(:person)
-    User.with_current_user(person.user) do
-      asset = Factory(:sop, contributor:person)
-      assay1 = Factory(:assay, contributor:person)
-      assay2 = Factory(:assay)
-
-      assert assay1.can_edit?
-      refute assay2.can_edit?
-
-      a = AssayAsset.new asset: asset, assay: assay1
-      assert a.valid?
-
-      a = AssayAsset.new asset: asset, assay: assay2
-      refute a.valid?
-    end
-  end
-
   test 'validate with model requires modelling assay' do
     person = Factory(:person)
     User.with_current_user(person.user) do
