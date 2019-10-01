@@ -1394,26 +1394,26 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
-  test 'default sorting on top page' do
+  test 'sort by update by default on index' do
     s1 = Factory(:sop, title: 'AAABSop', updated_at: 10.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     s2 = Factory(:sop, title: 'AAAASop', updated_at: 9.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
 
     get :index
 
-    assert_equal 'top', assigns(:sops).page
-    assert_equal [:updated_at_desc], assigns(:sops).order
+    assert_equal '1', assigns(:page)
+    assert_equal [:updated_at_desc], assigns(:order)
     assert_equal s1.id, assigns(:sops)[0].id
     assert_equal s2.id, assigns(:sops)[1].id
   end
 
-  test 'default sorting on A page' do
+  test 'sort by title by default on A page' do
     s1 = Factory(:sop, title: 'AAABSop', updated_at: 10.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     s2 = Factory(:sop, title: 'AAAASop', updated_at: 9.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
 
     get :index, params: { page: 'A' }
 
-    assert_equal 'A', assigns(:sops).page
-    assert_equal [:title_asc], assigns(:sops).order
+    assert_equal 'A', assigns(:page)
+    assert_equal [:title_asc], assigns(:order)
     assert_equal s2.id, assigns(:sops)[0].id
     assert_equal s1.id, assigns(:sops)[1].id
   end
@@ -1425,8 +1425,8 @@ class SopsControllerTest < ActionController::TestCase
 
     get :index, params: { order: 'title_desc' }
 
-    assert_equal 'top', assigns(:sops).page
-    assert_equal [:title_desc], assigns(:sops).order
+    assert_equal '1', assigns(:page)
+    assert_equal [:title_desc], assigns(:order)
     assert_equal s1.id, assigns(:sops)[0].id
     assert_equal s3.id, assigns(:sops)[1].id
     assert_equal s2.id, assigns(:sops)[2].id
@@ -1439,8 +1439,8 @@ class SopsControllerTest < ActionController::TestCase
 
     get :index, params: { page: 'G', order: 'created_at_asc' }
 
-    assert_equal 'G', assigns(:sops).page
-    assert_equal [:created_at_asc], assigns(:sops).order
+    assert_equal 'G', assigns(:page)
+    assert_equal [:created_at_asc], assigns(:order)
     assert_equal s3.id, assigns(:sops)[0].id
     assert_equal s1.id, assigns(:sops)[1].id
     assert_equal s2.id, assigns(:sops)[2].id
@@ -1454,8 +1454,8 @@ class SopsControllerTest < ActionController::TestCase
 
     get :index, params: { page: 'Z', sort: 'title,-created_at' }
 
-    assert_equal 'Z', assigns(:sops).page
-    assert_equal [:title_asc, :created_at_desc], assigns(:sops).order
+    assert_equal 'Z', assigns(:page)
+    assert_equal [:title_asc, :created_at_desc], assigns(:order)
     assert_equal s2.id, assigns(:sops)[0].id
     assert_equal s3.id, assigns(:sops)[1].id
     assert_equal s4.id, assigns(:sops)[2].id

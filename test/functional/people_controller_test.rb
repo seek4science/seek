@@ -398,8 +398,10 @@ class PeopleControllerTest < ActionController::TestCase
     6.times do
       Factory(:asset_housekeeper)
     end
-    get :index
-    asset_housekeeper_number = assigns(:people).count(&:is_asset_housekeeper_of_any_project?)
+
+    get :index, params: { page: 'all' }
+
+    asset_housekeeper_number = assigns(:people).select(&:is_asset_housekeeper_of_any_project?).count
     assert_select 'img[src*=?]', role_image(:asset_housekeeper), count: asset_housekeeper_number
   end
 
@@ -414,9 +416,9 @@ class PeopleControllerTest < ActionController::TestCase
       Factory(:project_administrator)
     end
 
-    get :index
+    get :index, params: { page: 'all' }
 
-    project_administrator_count = assigns(:people).count(&:is_project_administrator_of_any_project?)
+    project_administrator_count = assigns(:people).select(&:is_project_administrator_of_any_project?).count
     assert_select 'img[src*=?]', role_image(:project_administrator), count: project_administrator_count
   end
 
@@ -583,8 +585,10 @@ class PeopleControllerTest < ActionController::TestCase
     6.times do
       Factory(:asset_gatekeeper)
     end
-    get :index
-    gatekeeper_number = assigns(:people).count(&:is_asset_gatekeeper_of_any_project?)
+
+    get :index, params: { page: 'all' }
+
+    gatekeeper_number = assigns(:people).select(&:is_asset_gatekeeper_of_any_project?).count
     assert_select 'img[src*=?]', role_image(:asset_gatekeeper), count: gatekeeper_number
   end
 
@@ -676,13 +680,13 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal 'top', Seek::Config.default_pages[:people]
     assert_not_equal 5, Seek::Config.limit_latest
 
-    Seek::Config.limit_latest = 5
-    get :index
-    assert_response :success
-    assert_select '.pagination li.active' do
-      assert_select 'a[href=?]', people_path(page: 'top')
+    with_config_value(:limit_latest, 5) do
+      assert_equal 5, Seek::Config.limit_latest
+      get :index
+      assert_response :success
+      assert_select '.pagination-container li.active', text: '1'
+      assert_select 'div.list_item_title', count: 5
     end
-    assert_select 'div.list_item_title', count: 5
   end
 
   test 'people not in projects should be shown in index' do
