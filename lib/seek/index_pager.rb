@@ -19,7 +19,8 @@ module Seek
     end
 
     def find_assets
-      setup
+      assign_index_variables
+
       Rails.logger.debug("--- Fetching #{controller_name}")
       assets = fetch_assets
       Rails.logger.debug("--- Filtering")
@@ -29,6 +30,7 @@ module Seek
       Rails.logger.debug("--- Paging")
       assets = paginate_assets(assets)
       Rails.logger.debug("--- Done!")
+
       instance_variable_set("@#{controller_name}", assets)
     end
 
@@ -82,7 +84,7 @@ module Seek
 
     private
 
-    def setup
+    def assign_index_variables
       # Parent resource
       parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
       if parent_id_param
