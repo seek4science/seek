@@ -54,7 +54,7 @@ module Seek
           if page == 'top'
             records = relation.limit(limit)
           elsif page == 'all'
-            records = relation
+            records = relation.all
           elsif @pages.include?(page)
             records = relation.where(@field.to_s => page)
           else
