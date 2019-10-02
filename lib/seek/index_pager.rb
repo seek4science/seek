@@ -21,15 +21,11 @@ module Seek
     def find_assets
       assign_index_variables
 
-      Rails.logger.debug("--- Fetching #{controller_name}")
-      assets = fetch_assets
-      Rails.logger.debug("--- Filtering")
-      assets = filter_assets(assets)
-      Rails.logger.debug("--- Sorting")
-      assets = sort_assets(assets)
-      Rails.logger.debug("--- Paging")
-      assets = paginate_assets(assets)
-      Rails.logger.debug("--- Done!")
+      assets = nil
+      log_with_time("  - Fetched #{controller_name}") { assets = fetch_assets }
+      log_with_time("  - Filtered") { assets = filter_assets(assets) }
+      log_with_time("  - Sorted") { assets = sort_assets(assets) }
+      log_with_time("  - Paged") { assets = paginate_assets(assets) }
 
       instance_variable_set("@#{controller_name}", assets)
     end
@@ -138,6 +134,12 @@ module Seek
       {
         self: polymorphic_path(base, page_and_sort_params)
       }
+    end
+
+    def log_with_time(message, &block)
+      t = Time.now
+      block.call
+      Rails.logger.debug("#{message} (#{((Time.now - t) * 1000.0).round(1)}ms)")
     end
   end
 end
