@@ -39,9 +39,19 @@ module Seek
         },
         assay_type: {
             field: 'assay_type_uri',
+            title_mapping: ->(values) {
+              values.map do |value|
+                value = RDF::URI(value)
+                Seek::Ontologies::AssayTypeReader.instance.fetch_label_for(value) ||
+                    Seek::Ontologies::ModellingAnalysisTypeReader.instance.fetch_label_for(value)
+              end
+            }
         },
         technology_type: {
             field: 'technology_type_uri',
+            title_mapping: ->(values) {
+              values.map { |value| Seek::Ontologies::TechnologyTypeReader.instance.fetch_label_for(RDF::URI(value)) }
+            }
         },
         tag: {
             field: 'text_values.id',
