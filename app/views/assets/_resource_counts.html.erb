@@ -1,6 +1,6 @@
 <% resource_text = resource_text_from_controller.pluralize(@visible_count) %>
 
-<div id="resource-count-stats">
+<span id="resource-count-stats">
   <strong><%= @visible_count %></strong>
   <% if @filters&.any? -%>
     <%= resource_text %> matching the given criteria:
@@ -10,4 +10,4 @@
   <% else %>
     <%= resource_text %> found
   <% end %>
-</div>
+</span>

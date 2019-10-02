@@ -34,8 +34,8 @@
   <%= render partial: 'assets/resource_filtering' unless faceted_browsing %>
   <div class="index-content">
     <% unless faceted_browsing %>
-      <%= render partial: 'assets/resource_counts' %>
       <%= render partial: 'assets/resource_sorting', locals: { items: items } %>
+      <%= render partial: 'assets/resource_counts' %>
       <%= render partial: 'assets/resource_active_filters' %>
     <% end %>
 
