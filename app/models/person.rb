@@ -42,8 +42,8 @@ class Person < ApplicationRecord
   has_many :group_memberships_project_positions, -> { distinct }, through: :group_memberships
   has_many :project_positions, -> { distinct }, through: :group_memberships_project_positions
   has_filter project_position: {
-      field: 'project_positions.id',
-      title_field: 'project_positions.name',
+      value_field: 'project_positions.id',
+      label_field: 'project_positions.name',
       joins: [:project_positions]
   }
 
@@ -82,15 +82,15 @@ class Person < ApplicationRecord
   has_annotation_type :expertise, method_name: :expertise
   has_many :expertise_as_text, through: :expertise_annotations, source: :value, source_type: 'TextValue'
   has_filter expertise: {
-      field: 'text_values.id',
-      title_field: 'text_values.text',
+      value_field: 'text_values.id',
+      label_field: 'text_values.text',
       joins: [:expertise_as_text],
   }
   has_annotation_type :tool
   has_many :tools_as_text, through: :tool_annotations, source: :value, source_type: 'TextValue'
   has_filter tool: {
-      field: 'text_values.id',
-      title_field: 'text_values.text',
+      value_field: 'text_values.id',
+      label_field: 'text_values.text',
       joins: [:tools_as_text],
   }
 

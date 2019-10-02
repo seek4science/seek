@@ -1,10 +1,10 @@
 module Seek
   module Filtering
     class Option
-      attr_accessor :title, :value, :count, :active
+      attr_accessor :label, :value, :count, :active
 
-      def initialize(title, value, count, active = false)
-        @title = title
+      def initialize(label, value, count, active = false)
+        @label = label
         @value = value
         @count = count
         @active = active

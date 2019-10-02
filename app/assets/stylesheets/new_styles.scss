@@ -848,19 +848,19 @@ div.index-filters {
   .filter-option {
     display: flex;
     padding: 5px;
-    .filter-title {
+    .filter-option-label {
       flex-grow: 1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .filter-count {
+    .filter-option-count {
       flex-shrink: 0;
     }
   }
 
   &.collapsed {
-    .filter-hidden {
+    .filter-option-hidden {
       display: none;
     }
   }
@@ -870,11 +870,11 @@ div.index-filters {
   display: flex;
   padding: 5px;
 
-  .filter-title {
+  .filter-option-label {
     display: inline-block;
   }
 
-  .filter-count {
+  .filter-option-count {
     color: #999;
     display: inline-block;
   }
@@ -885,10 +885,10 @@ div.index-filters {
     background-color: $pagination-hover-bg;
   }
 
-  &.filter-active {
+  &.filter-option-active {
     color: $pagination-active-color;
     background-color: $pagination-active-bg;
-    .filter-count {
+    .filter-option-count {
       display: none;
     }
 

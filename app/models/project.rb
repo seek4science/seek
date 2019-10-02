@@ -43,8 +43,8 @@ class Project < ApplicationRecord
 
   belongs_to :programme
   has_filter programme: {
-      field: 'programmes.id',
-      title_field: 'programmes.title',
+      value_field: 'programmes.id',
+      label_field: 'programmes.title',
       joins: [:programme],
   }
 

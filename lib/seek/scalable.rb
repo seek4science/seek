@@ -12,8 +12,8 @@ module Seek
         has_annotation_type(:scale, method_name: 'scale_values')
         has_many :scales, -> { order(:pos) }, through: :scale_annotations, source: :value, source_type: 'Scale'
         has_filter scale: {
-            field: 'scales.id',
-            title_field: 'scales.title',
+            value_field: 'scales.id',
+            label_field: 'scales.title',
             joins: [:scales]
         }
 

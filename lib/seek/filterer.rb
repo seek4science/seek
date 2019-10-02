@@ -8,38 +8,38 @@ module Seek
 
     FILTERS = {
         project: {
-            field: 'projects.id',
-            title_field: 'projects.title',
+            value_field: 'projects.id',
+            label_field: 'projects.title',
             joins: [:projects],
         },
         programme: {
-            field: 'programmes.id',
-            title_field: 'programmes.title',
+            value_field: 'programmes.id',
+            label_field: 'programmes.title',
             joins: [:programmes],
         },
         institution: {
-            field: 'institutions.id',
-            title_field: 'institutions.title',
+            value_field: 'institutions.id',
+            label_field: 'institutions.title',
             joins: [:institutions],
         },
         contributor: {
-            field: 'people.id',
-            title_mapping: ->(values) { Person.where(id: values).map(&:name) },
+            value_field: 'people.id',
+            label_mapping: ->(values) { Person.where(id: values).map(&:name) },
             includes: [:contributor],
         },
         creator: {
-            field: 'assets_creators.creator_id',
-            title_mapping: ->(values) { Person.where(id: values).map(&:name) },
+            value_field: 'assets_creators.creator_id',
+            label_mapping: ->(values) { Person.where(id: values).map(&:name) },
             joins: [:creators],
         },
         assay_class: {
-            field: 'assay_classes.id',
-            title_field: 'assay_classes.title',
+            value_field: 'assay_classes.id',
+            label_field: 'assay_classes.title',
             joins: [:assay_class],
         },
         assay_type: {
-            field: 'assay_type_uri',
-            title_mapping: ->(values) {
+            value_field: 'assay_type_uri',
+            label_mapping: ->(values) {
               values.map do |value|
                 value = RDF::URI(value)
                 Seek::Ontologies::AssayTypeReader.instance.fetch_label_for(value) ||
@@ -48,22 +48,22 @@ module Seek
             }
         },
         technology_type: {
-            field: 'technology_type_uri',
-            title_mapping: ->(values) {
+            value_field: 'technology_type_uri',
+            label_mapping: ->(values) {
               values.map { |value| Seek::Ontologies::TechnologyTypeReader.instance.fetch_label_for(RDF::URI(value)) }
             }
         },
         tag: {
-            field: 'text_values.id',
-            title_field: 'text_values.text',
+            value_field: 'text_values.id',
+            label_field: 'text_values.text',
             joins: [:tags_as_text],
         },
         country: {
-            field: 'country'
+            value_field: 'country'
         },
         organism: {
-            field: 'organisms.id',
-            title_field: 'organisms.title',
+            value_field: 'organisms.id',
+            label_field: 'organisms.title',
             joins: [:organisms],
         }
     }.freeze
