@@ -30,7 +30,6 @@ module Seek
               assay_assets.reset
 
               new_assay_assets = []
-
               attributes.each do |attrs|
                 existing = assay_assets.detect { |aa| aa.assay_id.to_s == attrs['assay_id'] }
                 if existing

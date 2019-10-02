@@ -3,7 +3,7 @@
 
 <%= form_tag({:action => :create_content_blob}, :multipart => true) do -%>
     <% if params[:data_file] && params[:data_file][:assay_assets_attributes] %>
-      <%= hidden_field_tag 'data_file[assay_assets_attributes[][assay_ids[]]',params[:data_file][:assay_assets_attributes].first[:assay_id] %>
+      <%= hidden_field_tag 'data_file[assay_assets_attributes[][assay_id]]',params[:data_file][:assay_assets_attributes].first[:assay_id] %>
     <% end %>
 
 

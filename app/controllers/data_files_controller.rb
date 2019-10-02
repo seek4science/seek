@@ -320,8 +320,6 @@ class DataFilesController < ApplicationController
     respond_to do |format|
       if handle_upload_data && @data_file.content_blob.save
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
-        # assay ids passed forwards, e.g from "Add Datafile" button
-        @source_assay_ids = (params[:assay_ids] || [] ).reject(&:blank?)
         format.html {}
       else
         session.delete(:uploaded_content_blob_id)
@@ -340,7 +338,7 @@ class DataFilesController < ApplicationController
     session.delete :extraction_exception_message
 
     begin
-      if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
+      if params[:content_blob_id].to_s == session[:uploaded_content_blob_id].to_s
         @data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
         @warnings = @data_file.populate_metadata_from_template
         @assay, warnings = @data_file.initialise_assay_from_template
@@ -372,7 +370,7 @@ class DataFilesController < ApplicationController
     @data_file ||= session[:processed_datafile]
     @assay ||= session[:processed_assay]
 
-    #this peculiar line avoids a no method error when calling super later on, when there are no assays in the database
+    # this peculiar line avoids a no method error when calling super later on, when there are no assays in the database
     # this I believe is caused by accessing the unmarshalled @assay before the Assay class has been encountered. Adding this line
     # avoids the error
     Assay.new

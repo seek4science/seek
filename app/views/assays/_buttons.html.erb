@@ -4,10 +4,6 @@
   <%= button_link_to("New #{assay_word} based on this one", 'new', new_object_based_on_existing_one_assay_path(item, :controller_name => "assays")) %>
   <% if item.can_edit? %>
     <%= add_to_dropdown(item) %>
-    <%= button_link_to("Add #{t('data_file')}", 'add', new_data_file_path("assay_ids[]": item.id)) %>
-    <% if item.is_modelling? %>
-      <%= button_link_to("Add #{t('model')}", 'add', new_model_path("assay_ids[]": item.id)) %>
-    <% end %>
   <% end %>
 <% end %>
 <% if show_nels_button?(item) %>

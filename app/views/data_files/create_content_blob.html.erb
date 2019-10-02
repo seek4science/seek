@@ -14,23 +14,30 @@
 </div>
 
 
-
 <script type="application/javascript">
 
+    <%
+      ajax_payload = {content_blob_id:@data_file.content_blob.id}
+      ajax_payload[:data_file] = {assay_assets_attributes: @data_file.assay_assets.collect(&:assay_id).collect{|id| {assay_id:id.to_s}}}
+    %>
+
     $j(document).ready(function () {
+        var payload = <%= raw ajax_payload.to_json %>;
 
         var request = $j.ajax({
             type: "POST",
+            contentType: "application/json",
             dataType: "html",
             timeout: 0,
             url: '<%= rightfield_extraction_ajax_data_files_path -%>',
-            data: <%= {content_blob_id:@data_file.content_blob.id}.to_json.html_safe %>
+            data: JSON.stringify(payload)
         });
 
         request.done(function (data) {
-            <% options = @source_assay_ids.present? ? {assay_ids:@source_assay_ids} : {} %>
-            window.location='<%= provide_metadata_data_files_path(options) %>'
+            window.location='<%= provide_metadata_data_files_path %>'
         }).fail(function (jqXHR, textStatus,errorThrown) {
+            alert(errorThrown);
+            alert(textStatus);
             $j('#in-progress').hide();
             $j('#response-error').show();
             $j('#error-message').html(jqXHR.responseText);

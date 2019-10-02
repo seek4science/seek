@@ -2743,6 +2743,23 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df.content_blob.id, session[:uploaded_content_blob_id]
   end
 
+  test 'create content blob with assay params' do
+    # assay params may be passed when adding via the link from an existing assay
+    person = Factory(:person)
+    assay = Factory(:assay,contributor:person)
+    login_as(person)
+    blob = { data: picture_file }
+    assert_difference('ContentBlob.count') do
+      post :create_content_blob, params: {
+          content_blobs: [blob],
+          data_file: { assay_assets_attributes: [{ assay_id: assay.id.to_s }] }
+      }
+    end
+    assert_response :success
+    assert df = assigns(:data_file)
+    assert_includes df.assay_assets.collect(&:assay), assay
+  end
+
   test 'create content blob requires login' do
     logout
     blob = { data: picture_file }
@@ -2759,7 +2776,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     session[:uploaded_content_blob_id] = content_blob.id.to_s
 
-    post :rightfield_extraction_ajax, params: { content_blob_id: content_blob.id.to_s, format: 'js' }
+    post :rightfield_extraction_ajax, params: { content_blob_id: content_blob.id.to_s }, format: 'js'
 
     assert_response :success
     assert data_file = assigns(:data_file)
@@ -2773,6 +2790,24 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response', assay.assay_type_uri
     assert_equal 'http://jermontology.org/ontology/JERMOntology#2-hybrid_system', assay.technology_type_uri
 
+  end
+
+  test 'rightfield extraction with assay params passed' do
+    person = Factory(:person)
+    assay = Factory(:assay, contributor:person)
+    login_as(person)
+    content_blob = Factory(:rightfield_master_template_with_assay)
+
+    session[:uploaded_content_blob_id] = content_blob.id.to_s
+
+    post :rightfield_extraction_ajax, params: {
+        content_blob_id: content_blob.id.to_s,
+        data_file: {assay_assets_attributes:[{assay_id:assay.id.to_s}]}
+    }, format: 'js'
+
+    assert_response :success
+    assert data_file = assigns(:data_file)
+    assert_equal [assay],data_file.assay_assets.collect(&:assay)
   end
 
   test 'create metadata' do
