@@ -22,10 +22,23 @@ module Seek
       assign_index_variables
 
       assets = nil
-      log_with_time("  - Fetched #{controller_name}") { assets = fetch_assets }
-      log_with_time("  - Filtered") { assets = filter_assets(assets) }
-      log_with_time("  - Sorted") { assets = sort_assets(assets) }
-      log_with_time("  - Paged") { assets = paginate_assets(assets) }
+      log_with_time("  - Fetched #{controller_name}") do
+        assets = fetch_assets
+        @total_count = assets.count
+      end
+      log_with_time("  - Authorized") do
+        assets = authorize_assets(assets)
+      end
+      log_with_time("  - Filtered") do
+        assets = filter_assets(assets)
+        @visible_count = assets.count
+      end
+      log_with_time("  - Sorted") do
+        assets = sort_assets(assets)
+      end
+      log_with_time("  - Paged") do
+        assets = paginate_assets(assets)
+      end
 
       instance_variable_set("@#{controller_name}", assets)
     end
@@ -38,28 +51,24 @@ module Seek
       end
     end
 
+    def authorize_assets(assets)
+      assets.authorized_for('view', User.current_user)
+    end
+
     def filter_assets(assets)
-      unfiltered_assets = assets
-      authorized_unfiltered_assets = relationify_collection(unfiltered_assets.authorized_for('view', User.current_user))
+      assets = relationify_collection(assets)
       filterer = Seek::Filterer.new(controller_model)
       active_filter_values = filterer.active_filter_values(@filters)
       # We need the un-filtered, but authorized, collection to work out which filters are available.
-      @available_filters = filterer.available_filters(authorized_unfiltered_assets, active_filter_values)
-      if active_filter_values.any?
-        authorized_filtered_assets = filterer.filter(authorized_unfiltered_assets, active_filter_values)
-      else
-        authorized_filtered_assets = authorized_unfiltered_assets
-        @total_count = unfiltered_assets.count
-      end
-
-      @visible_count = authorized_filtered_assets.count
+      @available_filters = filterer.available_filters(assets, active_filter_values)
+      assets = filterer.filter(assets, active_filter_values) if active_filter_values.any?
 
       active_filter_values.each_key do |key|
         active = @available_filters[key].select(&:active?)
         @active_filters[key] = active if active.any?
       end
 
-      authorized_filtered_assets
+      assets
     end
 
     def sort_assets(assets)

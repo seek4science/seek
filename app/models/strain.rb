@@ -15,6 +15,11 @@ class Strain < ApplicationRecord
   grouped_pagination
 
   belongs_to :organism
+  has_filter organism: {
+      value_field: 'organisms.id',
+      label_field: 'organisms.title',
+      includes: [:organism]
+  }
 
   has_many :assay_organisms
   has_many :assays,:through=>:assay_organisms

@@ -53,6 +53,10 @@ class Person < ApplicationRecord
 
   has_many :programmes, -> { distinct }, through: :projects
   has_many :institutions, -> { distinct }, through: :work_groups
+  has_filter location: {
+      value_field: 'institutions.country',
+      joins: [:institutions]
+  }
 
   has_many :favourite_group_memberships, dependent: :destroy
   has_many :favourite_groups, through: :favourite_group_memberships

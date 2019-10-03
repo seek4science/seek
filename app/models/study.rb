@@ -12,6 +12,7 @@ class Study < ApplicationRecord
 
   belongs_to :investigation
   has_many :projects, through: :investigation
+  has_filter :project
 
   #FIXME: needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
   acts_as_isa

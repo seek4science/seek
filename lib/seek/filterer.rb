@@ -1,41 +1,41 @@
 module Seek
   class Filterer
     AVAILABLE_FILTERS = {
-        Publication: [],
+        Publication: [:query, :programme, :project, :published_year, :author, :organism, :tag],
         Event: [:query, :created_at],
-        Person: [:query, :programme, :project, :institution, :project_position, :expertise, :tool]
+        Person: [:query, :programme, :project, :institution, :location, :project_position, :expertise, :tool]
     }.freeze
 
     FILTERS = {
         project: {
             value_field: 'projects.id',
             label_field: 'projects.title',
-            joins: [:projects],
+            joins: [:projects]
         },
         programme: {
             value_field: 'programmes.id',
             label_field: 'programmes.title',
-            joins: [:programmes],
+            joins: [:programmes]
         },
         institution: {
             value_field: 'institutions.id',
             label_field: 'institutions.title',
-            joins: [:institutions],
+            joins: [:institutions]
         },
         contributor: {
             value_field: 'people.id',
             label_mapping: ->(values) { Person.where(id: values).map(&:name) },
-            includes: [:contributor],
+            includes: [:contributor]
         },
         creator: {
             value_field: 'assets_creators.creator_id',
             label_mapping: ->(values) { Person.where(id: values).map(&:name) },
-            joins: [:creators],
+            joins: [:creators]
         },
         assay_class: {
             value_field: 'assay_classes.id',
             label_field: 'assay_classes.title',
-            joins: [:assay_class],
+            joins: [:assay_class]
         },
         assay_type: {
             value_field: 'assay_type_uri',
@@ -56,7 +56,7 @@ module Seek
         tag: {
             value_field: 'text_values.id',
             label_field: 'text_values.text',
-            joins: [:tags_as_text],
+            joins: [:tags_as_text]
         },
         country: {
             value_field: 'country'
@@ -64,8 +64,29 @@ module Seek
         organism: {
             value_field: 'organisms.id',
             label_field: 'organisms.title',
-            joins: [:organisms],
-        }
+            joins: [:organisms]
+        },
+        model_type: {
+            value_field: 'model_types.id',
+            label_field: 'model_types.title',
+            joins: [:model_type]
+        },
+        model_format: {
+            value_field: 'model_formats.id',
+            label_field: 'model_formats.title',
+            joins: [:model_format]
+        },
+        recommended_environment: {
+            value_field: 'recommended_model_environments.id',
+            label_field: 'recommended_model_environments.title',
+            joins: [:recommended_environment]
+        },
+        author: {
+            value_field: 'people.id',
+            label_mapping: ->(values) { Person.where(id: values).map(&:name) },
+            joins: [:people]
+        },
+        published_year: Seek::Filtering::YearFilter.new(field: 'published_date')
     }.freeze
 
     def initialize(klass)

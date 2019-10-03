@@ -32,7 +32,7 @@ class Publication < ApplicationRecord
   validates :title, length: { maximum: 65_535 }
 
   has_many :publication_authors, dependent: :destroy, autosave: true
-  has_many :persons, through: :publication_authors
+  has_many :people, through: :publication_authors
 
   VALID_DOI_REGEX = /\A(10[.][0-9]{4,}(?:[.][0-9]+)*\/(?:(?!["&\'<>])\S)+)\z/
   VALID_PUBMED_REGEX = /\A(([1-9])([0-9]{0,7}))\z/
@@ -242,6 +242,12 @@ class Publication < ApplicationRecord
     assays_organism_ids | models_organism_ids
   end
 
+  has_filter organism: {
+      value_field: 'organisms.id',
+      label_field: 'organisms.title',
+      joins: [:assays_organisms, :models_organisms]
+  }
+
   def self.subscribers_are_notified_of?(action)
     action == 'create'
   end
@@ -254,16 +260,7 @@ class Publication < ApplicationRecord
   end
 
   def publication_author_names
-    author_names = []
-    publication_authors.each do |author|
-      seek_author = author.person
-      author_names << if seek_author.nil?
-                        author.first_name + ' ' + author.last_name
-                      else
-                        seek_author.name
-                      end
-    end
-    author_names
+    publication_authors.map(&:name)
   end
 
   def has_doi?

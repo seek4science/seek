@@ -37,6 +37,13 @@ class Model < ApplicationRecord
   belongs_to :model_type
   belongs_to :model_format
 
+  has_filter organism: {
+      value_field: 'organisms.id',
+      label_field: 'organisms.title',
+      includes: [:organism],
+  }
+  has_filter  :model_type, :model_format, :recommended_environment
+
   explicit_versioning(:version_column => "version") do
     include Seek::Models::ModelExtraction
     acts_as_doi_mintable(proxy: :parent)

@@ -18,6 +18,7 @@ class Assay < ApplicationRecord
   # needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
   belongs_to :study
   has_many :projects, through: :study
+  has_filter :project
 
   acts_as_isa
   acts_as_snapshottable
@@ -28,6 +29,7 @@ class Assay < ApplicationRecord
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
   has_many :organisms, through: :assay_organisms, inverse_of: :assays
+  has_filter :organism
   has_many :strains, through: :assay_organisms
   has_many :tissue_and_cell_types, through: :assay_organisms
 
