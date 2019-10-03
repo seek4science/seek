@@ -84,7 +84,7 @@ class StudiesControllerTest < ActionController::TestCase
     inv = investigations(:metabolomics_investigation)
 
     assert inv.can_edit?, 'model owner should be able to edit this investigation'
-    get :new, params: { investigation_id: inv }
+    get :new, params: { study: { investigation_id: inv } }
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
@@ -97,7 +97,7 @@ class StudiesControllerTest < ActionController::TestCase
     inv = investigations(:metabolomics_investigation)
 
     assert inv.can_edit?, 'model owner should be able to edit this investigation'
-    get :new, params: { investigation_id: inv }
+    get :new, params: { study:{investigation_id: inv }}
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
@@ -110,16 +110,14 @@ class StudiesControllerTest < ActionController::TestCase
     user = Factory(:user)
     login_as(user)
 
-    assert !inv.projects.map(&:people).flatten.include?(user.person), 'this person should not be a member of the investigations project'
-    assert !inv.can_edit?(user)
-    get :new, params: { investigation_id: inv }
+    refute inv.projects.map(&:people).flatten.include?(user.person), 'this person should not be a member of the investigations project'
+    refute inv.can_edit?(user)
+    get :new, params: { study: { investigation_id: inv } }
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
       assert_select "option[selected='selected'][value='0']"
     end
-
-    assert_not_nil flash.now[:error]
   end
 
   test 'should get edit' do

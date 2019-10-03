@@ -1,4 +1,6 @@
 module BootstrapHelper
+  include ImagesHelper
+
   # A link with an icon next to it
   def icon_link_to(text, icon_key, url, options = {})
     icon = icon_tag(icon_key, options.delete(:icon_options) || {})
