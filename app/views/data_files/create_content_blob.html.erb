@@ -19,6 +19,7 @@
     <%
       ajax_payload = {content_blob_id:@data_file.content_blob.id}
       ajax_payload[:data_file] = {assay_assets_attributes: @data_file.assay_assets.collect(&:assay_id).collect{|id| {assay_id:id.to_s}}}
+      ajax_payload[:data_file] = {event_ids: @data_file.events.collect(&:id)}
     %>
 
     $j(document).ready(function () {
