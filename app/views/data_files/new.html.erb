@@ -2,14 +2,8 @@
 <h1><%= @page_title %></h1>
 
 <%= form_tag({:action => :create_content_blob}, :multipart => true) do -%>
-    <% if params[:data_file] %>
-      <% if params[:data_file][:assay_assets_attributes] %>
-        <%= hidden_field_tag 'data_file[assay_assets_attributes[][assay_id]]',params[:data_file][:assay_assets_attributes].first[:assay_id] %>
-      <% end %>
-      <% if params[:data_file][:event_ids] %>
-        <%= hidden_field_tag 'data_file[event_ids][]',params[:data_file][:event_ids] %>
-      <% end %>
-    <% end %>
+  <%= forward_params(:data_file) %>
+
 
 
     <div class="asset_form">

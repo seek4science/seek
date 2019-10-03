@@ -1344,67 +1344,6 @@ class AssaysControllerTest < ActionController::TestCase
     assay.associate_organism(org)
   end
 
-  test 'add data file button' do
-    assay=Factory(:experimental_assay)
-    person = assay.contributor
-    login_as(person)
-    assert assay.can_edit?
-    get :show, params: { id:assay }
-    assert_response :success
-    assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]' => assay.id),text:'Add Data file',count:1
-    end
-
-    assay=Factory(:modelling_assay,contributor:person)
-    assert assay.can_edit?
-    get :show, params: { id:assay }
-    assert_response :success
-    assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]' => assay.id),text:'Add Data file',count:1
-    end
-
-    assay=Factory(:experimental_assay,policy:Factory(:publicly_viewable_policy))
-    assert assay.can_view?
-    refute assay.can_edit?
-    get :show, params: { id:assay }
-    assert_response :success
-    assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]' => assay.id),text:'Add Data file',count:0
-    end
-  end
-
-  test 'add model button' do
-    assay=Factory(:modelling_assay)
-    person = assay.contributor
-    login_as(person)
-    assert assay.can_edit?
-    get :show, params: { id:assay }
-    assert_response :success
-    assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]' => assay.id),text:'Add Model',count:1
-    end
-
-    assay=Factory(:modelling_assay,policy:Factory(:publicly_viewable_policy))
-    assert assay.can_view?
-    refute assay.can_edit?
-    get :show, params: { id:assay }
-    assert_response :success
-    assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]' => assay.id),text:'Add Model',count:0
-    end
-
-    #shouldn't show for an experimental assay, even if editable
-    assay=Factory(:experimental_assay,policy:Factory(:publicly_viewable_policy),contributor:person)
-    assert assay.can_view?
-    assert assay.can_edit?
-    refute assay.is_modelling?
-    get :show, params: { id:assay }
-    assert_response :success
-    assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]' => assay.id),text:'Add Model',count:0
-    end
-  end
-
   test 'can delete an assay with subscriptions' do
     assay = Factory(:assay, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     p = Factory(:person)
