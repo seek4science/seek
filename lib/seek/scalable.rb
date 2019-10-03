@@ -11,11 +11,11 @@ module Seek
         include Seek::Scalable::WithParamsInstanceMethods
         has_annotation_type(:scale, method_name: 'scale_values')
         has_many :scales, -> { order(:pos) }, through: :scale_annotations, source: :value, source_type: 'Scale'
-        has_filter scale: {
+        has_filter scale: Seek::Filtering::Filter.new(
             value_field: 'scales.id',
             label_field: 'scales.title',
             joins: [:scales]
-        }
+        )
 
         has_annotation_type(:additional_scale_info)
 

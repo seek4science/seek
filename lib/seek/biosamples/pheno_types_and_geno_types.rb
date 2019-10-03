@@ -4,11 +4,11 @@ module Seek
       def self.included(base)
         base.has_many :phenotypes
         base.has_many :genotypes
-        base.has_filter modified_gene: {
+        base.has_filter modified_gene: Seek::Filtering::Filter.new(
             value_field: 'genes.id',
             label_field: 'genes.title',
             joins: [{ genotypes: :gene }]
-        }
+        )
         base.accepts_nested_attributes_for :genotypes, allow_destroy: true
         base.accepts_nested_attributes_for :phenotypes, allow_destroy: true
         base.before_destroy :destroy_genotypes_phenotypes

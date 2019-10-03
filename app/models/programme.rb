@@ -47,6 +47,12 @@ class Programme < ApplicationRecord
   scope :rejected, -> { where('is_activated = ? AND activation_rejection_reason IS NOT NULL', false) }
 
   has_annotation_type :funding_code
+  has_many :funding_codes_as_text, through: :funding_code_annotations, source: :value, source_type: 'TextValue'
+  has_filter funding_code: Seek::Filtering::Filter.new(
+      value_field: 'text_values.id',
+      label_field: 'text_values.text',
+      joins: [:funding_codes_as_text]
+  )
 
   def assets
     (data_files + models + sops + presentations + events + publications + documents).uniq.compact

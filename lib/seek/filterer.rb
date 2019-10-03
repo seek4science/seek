@@ -2,42 +2,42 @@ module Seek
   class Filterer
     AVAILABLE_FILTERS = {
         Publication: [:query, :programme, :project, :published_year, :author, :organism, :tag],
-        Event: [:query, :created_at],
+        Event: [:query, :created_at, :country],
         Person: [:query, :programme, :project, :institution, :location, :project_position, :expertise, :tool]
     }.freeze
 
     FILTERS = {
-        project: {
+        project: Seek::Filtering::Filter.new(
             value_field: 'projects.id',
             label_field: 'projects.title',
             joins: [:projects]
-        },
-        programme: {
+        ),
+        programme: Seek::Filtering::Filter.new(
             value_field: 'programmes.id',
             label_field: 'programmes.title',
             joins: [:programmes]
-        },
-        institution: {
+        ),
+        institution: Seek::Filtering::Filter.new(
             value_field: 'institutions.id',
             label_field: 'institutions.title',
             joins: [:institutions]
-        },
-        contributor: {
+        ),
+        contributor: Seek::Filtering::Filter.new(
             value_field: 'people.id',
             label_mapping: ->(values) { Person.where(id: values).map(&:name) },
             includes: [:contributor]
-        },
-        creator: {
+        ),
+        creator: Seek::Filtering::Filter.new(
             value_field: 'assets_creators.creator_id',
             label_mapping: ->(values) { Person.where(id: values).map(&:name) },
             joins: [:creators]
-        },
-        assay_class: {
+        ),
+        assay_class: Seek::Filtering::Filter.new(
             value_field: 'assay_classes.id',
             label_field: 'assay_classes.title',
             joins: [:assay_class]
-        },
-        assay_type: {
+        ),
+        assay_type: Seek::Filtering::Filter.new(
             value_field: 'assay_type_uri',
             label_mapping: ->(values) {
               values.map do |value|
@@ -46,46 +46,46 @@ module Seek
                     Seek::Ontologies::ModellingAnalysisTypeReader.instance.fetch_label_for(value)
               end
             }
-        },
-        technology_type: {
+        ),
+        technology_type: Seek::Filtering::Filter.new(
             value_field: 'technology_type_uri',
             label_mapping: ->(values) {
               values.map { |value| Seek::Ontologies::TechnologyTypeReader.instance.fetch_label_for(RDF::URI(value)) }
             }
-        },
-        tag: {
+        ),
+        tag: Seek::Filtering::Filter.new(
             value_field: 'text_values.id',
             label_field: 'text_values.text',
             joins: [:tags_as_text]
-        },
-        country: {
+        ),
+        country: Seek::Filtering::Filter.new(
             value_field: 'country'
-        },
-        organism: {
+        ),
+        organism: Seek::Filtering::Filter.new(
             value_field: 'organisms.id',
             label_field: 'organisms.title',
             joins: [:organisms]
-        },
-        model_type: {
+        ),
+        model_type: Seek::Filtering::Filter.new(
             value_field: 'model_types.id',
             label_field: 'model_types.title',
             joins: [:model_type]
-        },
-        model_format: {
+        ),
+        model_format: Seek::Filtering::Filter.new(
             value_field: 'model_formats.id',
             label_field: 'model_formats.title',
             joins: [:model_format]
-        },
-        recommended_environment: {
+        ),
+        recommended_environment: Seek::Filtering::Filter.new(
             value_field: 'recommended_model_environments.id',
             label_field: 'recommended_model_environments.title',
             joins: [:recommended_environment]
-        },
-        author: {
+        ),
+        author: Seek::Filtering::Filter.new(
             value_field: 'people.id',
             label_mapping: ->(values) { Person.where(id: values).map(&:name) },
             joins: [:people]
-        },
+        ),
         published_year: Seek::Filtering::YearFilter.new(field: 'published_date')
     }.freeze
 
@@ -132,8 +132,7 @@ module Seek
     end
 
     def get_filter(key)
-      val = @klass.custom_filters[key.to_sym] || FILTERS[key.to_sym]
-      val.is_a?(Hash) ? Seek::Filtering::Filter.new(val) : val
+      @klass.custom_filters[key.to_sym] || FILTERS[key.to_sym]
     end
   end
 end

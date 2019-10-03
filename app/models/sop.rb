@@ -20,6 +20,25 @@ class Sop < ApplicationRecord
 
   has_and_belongs_to_many :workflows
 
+  has_filter assay_type: Seek::Filtering::Filter.new(
+      value_field: 'assays.assay_type_uri',
+      label_mapping: ->(values) {
+        values.map do |value|
+          value = RDF::URI(value)
+          Seek::Ontologies::AssayTypeReader.instance.fetch_label_for(value) ||
+              Seek::Ontologies::ModellingAnalysisTypeReader.instance.fetch_label_for(value)
+        end
+      },
+      joins: [:assays]
+  )
+  has_filter technology_type: Seek::Filtering::Filter.new(
+      value_field: 'assays.technology_type_uri',
+      label_mapping: ->(values) {
+        values.map { |value| Seek::Ontologies::TechnologyTypeReader.instance.fetch_label_for(RDF::URI(value)) }
+      },
+      joins: [:assays]
+  )
+
   explicit_versioning(:version_column => "version") do
     acts_as_doi_mintable(proxy: :parent)
     acts_as_versioned_resource

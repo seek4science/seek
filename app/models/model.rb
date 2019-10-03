@@ -37,12 +37,22 @@ class Model < ApplicationRecord
   belongs_to :model_type
   belongs_to :model_format
 
-  has_filter organism: {
+  has_filter organism: Seek::Filtering::Filter.new(
       value_field: 'organisms.id',
       label_field: 'organisms.title',
-      includes: [:organism],
-  }
+      includes: [:organism]
+  )
+
   has_filter  :model_type, :model_format, :recommended_environment
+  has_filter modelling_analysis_type: Seek::Filtering::Filter.new(
+      value_field: 'assays.assay_type_uri',
+      label_mapping: ->(values) {
+        values.map do |value|
+          Seek::Ontologies::ModellingAnalysisTypeReader.instance.fetch_label_for(RDF::URI(value))
+        end
+      },
+      joins: [:assays]
+  )
 
   explicit_versioning(:version_column => "version") do
     include Seek::Models::ModelExtraction

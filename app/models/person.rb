@@ -41,11 +41,11 @@ class Person < ApplicationRecord
 
   has_many :group_memberships_project_positions, -> { distinct }, through: :group_memberships
   has_many :project_positions, -> { distinct }, through: :group_memberships_project_positions
-  has_filter project_position: {
+  has_filter project_position: Seek::Filtering::Filter.new(
       value_field: 'project_positions.id',
       label_field: 'project_positions.name',
       joins: [:project_positions]
-  }
+  )
 
   has_many :projects, -> { distinct }, through: :work_groups
   has_many :current_projects,  -> { distinct }, through: :current_work_groups, source: :project
@@ -53,10 +53,10 @@ class Person < ApplicationRecord
 
   has_many :programmes, -> { distinct }, through: :projects
   has_many :institutions, -> { distinct }, through: :work_groups
-  has_filter location: {
+  has_filter location: Seek::Filtering::Filter.new(
       value_field: 'institutions.country',
       joins: [:institutions]
-  }
+  )
 
   has_many :favourite_group_memberships, dependent: :destroy
   has_many :favourite_groups, through: :favourite_group_memberships
@@ -85,18 +85,19 @@ class Person < ApplicationRecord
 
   has_annotation_type :expertise, method_name: :expertise
   has_many :expertise_as_text, through: :expertise_annotations, source: :value, source_type: 'TextValue'
-  has_filter expertise: {
+  has_filter expertise: Seek::Filtering::Filter.new(
       value_field: 'text_values.id',
       label_field: 'text_values.text',
-      joins: [:expertise_as_text],
-  }
+      joins: [:expertise_as_text]
+  )
+
   has_annotation_type :tool
   has_many :tools_as_text, through: :tool_annotations, source: :value, source_type: 'TextValue'
-  has_filter tool: {
+  has_filter tool: Seek::Filtering::Filter.new(
       value_field: 'text_values.id',
       label_field: 'text_values.text',
-      joins: [:tools_as_text],
-  }
+      joins: [:tools_as_text]
+  )
 
   has_many :publication_authors
 

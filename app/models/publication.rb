@@ -242,11 +242,11 @@ class Publication < ApplicationRecord
     assays_organism_ids | models_organism_ids
   end
 
-  has_filter organism: {
+  has_filter organism: Seek::Filtering::Filter.new(
       value_field: 'organisms.id',
       label_field: 'organisms.title',
       joins: [:assays_organisms, :models_organisms]
-  }
+  )
 
   def self.subscribers_are_notified_of?(action)
     action == 'create'

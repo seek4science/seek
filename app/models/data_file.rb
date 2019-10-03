@@ -33,6 +33,25 @@ class DataFile < ApplicationRecord
 
   scope :simulation_data, -> { where(simulation_data: true) }
 
+  has_filter assay_type: Seek::Filtering::Filter.new(
+      value_field: 'assays.assay_type_uri',
+      label_mapping: ->(values) {
+        values.map do |value|
+          value = RDF::URI(value)
+          Seek::Ontologies::AssayTypeReader.instance.fetch_label_for(value) ||
+              Seek::Ontologies::ModellingAnalysisTypeReader.instance.fetch_label_for(value)
+        end
+      },
+      joins: [:assays]
+  )
+  has_filter technology_type: Seek::Filtering::Filter.new(
+      value_field: 'assays.technology_type_uri',
+      label_mapping: ->(values) {
+        values.map { |value| Seek::Ontologies::TechnologyTypeReader.instance.fetch_label_for(RDF::URI(value)) }
+      },
+      joins: [:assays]
+  )
+
   explicit_versioning(version_column: 'version') do
     include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent)
