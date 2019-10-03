@@ -32,6 +32,32 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select 'title', text: I18n.t('assays.assay').pluralize, count: 1
   end
 
+  test 'add model button' do
+    # should show for modelling analysis but not experimental
+    person = Factory(:person)
+    login_as(person)
+    exp = Factory(:experimental_assay, contributor:person)
+    mod = Factory(:modelling_assay, contributor: person)
+
+    assert exp.is_experimental?
+    assert mod.is_modelling?
+
+    assert exp.can_edit?
+    assert mod.can_edit?
+
+    get :show, params: { id: exp.id }
+    assert_response :success
+    assert_select "a[href=?]",new_model_path('model[assay_assets_attributes[][assay_id]]'=>exp.id),text:/Add Model/, count:0
+    assert_select "a[href=?]",new_data_file_path('data_file[assay_assets_attributes[][assay_id]]'=>exp.id),text:/Add Data file/
+
+    get :show, params: { id: mod.id }
+    assert_response :success
+    assert_select "a[href=?]",new_model_path('model[assay_assets_attributes[][assay_id]]'=>mod.id),text:/Add Model/
+    assert_select "a[href=?]",new_data_file_path('data_file[assay_assets_attributes[][assay_id]]'=>mod.id),text:/Add Data file/
+
+  end
+
+
   test 'should show index' do
     get :index
     assert_response :success
