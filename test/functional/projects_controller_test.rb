@@ -1179,6 +1179,48 @@ class ProjectsControllerTest < ActionController::TestCase
     refute_includes person2.project_subscriptions.collect(&:project), project
   end
 
+  test 'update members_json' do
+    login_as(Factory(:admin))
+    project = Factory(:project)
+    wg = Factory(:work_group, project: project)
+    group_membership = Factory(:group_membership, work_group: wg)
+    person = Factory(:person, group_memberships: [group_membership])
+    group_membership2 = Factory(:group_membership, work_group: wg)
+    person2 = Factory(:person, group_memberships: [group_membership2])
+    new_institution = Factory(:institution)
+    new_person = Factory(:person)
+    new_person2 = Factory(:person)
+    new_person3 = Factory(:person)
+
+    put :update, params: { id:project.id, project: { members: [{ 'person_id' => "#{new_person.id}", 'institution_id' => "#{new_institution.id}" },
+                                                                          { 'person_id' => "#{new_person2.id}", 'institution_id' => "#{new_institution.id}" },
+                                                                          { 'person_id' => "#{new_person3.id}", 'institution_id' => "#{new_institution.id}" }] } }
+
+    assert_redirected_to project_path(project)
+    assert_nil flash[:error]
+
+    assert_includes project.institutions, new_institution
+    assert_includes project.people, new_person
+    assert_includes project.people, new_person2
+
+    person.reload
+    new_person.reload
+    new_person2.reload
+
+    refute_includes person.projects, project
+    refute_includes person2.projects, project
+    assert_includes new_person.projects, project
+    assert_includes new_person2.projects, project
+    assert_includes new_person.institutions, new_institution
+    assert_includes new_person2.institutions, new_institution
+
+    assert_includes new_person.project_subscriptions.collect(&:project), project
+    assert_includes new_person2.project_subscriptions.collect(&:project), project
+
+    refute_includes person.project_subscriptions.collect(&:project), project
+    refute_includes person2.project_subscriptions.collect(&:project), project
+  end
+
   test 'update members as project administrator' do
     person = Factory(:project_administrator)
     project = person.projects.first
@@ -1736,6 +1778,7 @@ class ProjectsControllerTest < ActionController::TestCase
     for i in 1..5 do
       Factory(:person).add_to_project_and_institution(project, Factory(:institution))
     end
+    project.default_policy = Factory(:private_policy)
     project.programme_id = (Factory(:programme)).id
     add_avatar_to_test_object(project)
   end

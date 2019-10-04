@@ -818,6 +818,8 @@ SEEK::Application.routes.draw do
   get '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
   get '/fail'=>'fail#index',:as=>:fail
 
+  get '/whoami' => 'users#whoami'
+
   #feedback
   get '/home/feedback' => 'homes#feedback', :as=> :feedback
 
