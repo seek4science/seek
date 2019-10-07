@@ -19,7 +19,7 @@ module Seek
 
         title_trimmer
 
-        attr_accessor :create_from_asset
+        
 
         validates :title, presence: true
         validates :title, length: { maximum: 255 }

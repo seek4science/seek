@@ -13,7 +13,7 @@ module Seek
         end
 
         def distribution
-          return unless resource.can_download?
+          return if resource.content_blob && resource.content_blob.show_as_external_link?
           blob = resource.content_blob
           data = {
             '@type': 'DataDownload',
@@ -24,6 +24,14 @@ module Seek
           }
           data['license'] = license if license
           data
+        end
+
+        def url
+          if resource.content_blob && resource.content_blob.show_as_external_link?
+            resource.content_blob.try(:url)
+          else
+            super
+          end
         end
 
         def schema_type

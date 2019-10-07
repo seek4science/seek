@@ -22,4 +22,10 @@ class AssayClass < ApplicationRecord
   def is_experimental?
     key == 'EXP'
   end
+
+  # for cases where a longer more descriptive key is useful, but can't rely on the title
+  #  which may have been changed over time
+  def long_key
+    {'EXP'=>'Experimental Assay','MODEL'=>'Modelling Analysis'}[key]
+  end
 end

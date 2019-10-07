@@ -33,4 +33,31 @@ module MultiStepWizardHelper
       ('Fields marked with a ' + star + ' are required, other fields are optional ' + help).html_safe
     end
   end
+
+  def forward_params(key)
+    html = ''
+    if params[key]
+      params[key][:assay_assets_attributes]&.each do |p|
+        html << hidden_field_tag('data_file[assay_assets_attributes[][assay_id]]', p[:assay_id])
+      end
+      if params[key][:event_ids]
+        html << hidden_field_tag('data_file[event_ids][]', params[key][:event_ids])
+      end
+      if params[key][:publication_ids]
+        html << hidden_field_tag('data_file[publication_ids][]', params[key][:publication_ids])
+      end
+    end
+    html.html_safe
+  end
+
+  def extraction_forward_payload_json(resource, key)
+    {
+      content_blob_id: resource.content_blob.id,
+      key => {
+        assay_assets_attributes: resource.assay_assets.collect(&:assay_id).collect { |id| { assay_id: id.to_s } },
+        event_ids: resource.events.collect(&:id),
+        publication_ids: resource.publications.collect(&:id)
+      }
+    }
+  end
 end

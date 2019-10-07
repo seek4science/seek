@@ -154,11 +154,6 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'correct title and text for associating a modelling analysis for new' do
     login_as(Factory(:user))
-    as_virtualliver do
-      get :new
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
-    end
     as_not_virtualliver do
       get :new
       assert_response :success
@@ -171,11 +166,6 @@ class ModelsControllerTest < ActionController::TestCase
   test 'correct title and text for associating a modelling analysis for edit' do
     model = Factory :model
     login_as(model.contributor.user)
-    as_virtualliver do
-      get :edit, params: { id: model.id }
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
-    end
     as_not_virtualliver do
       get :edit, params: { id: model.id }
       assert_response :success
@@ -1192,8 +1182,8 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert good_assay.can_edit?
     assert good_assay2.can_edit?
-    assert bad_assay2.can_edit?
     refute bad_assay.can_edit?
+    assert bad_assay2.can_edit?
 
     assert good_assay.is_modelling?
     assert good_assay2.is_modelling?
@@ -1203,13 +1193,15 @@ class ModelsControllerTest < ActionController::TestCase
 
     ids = [good_assay,good_assay2,bad_assay,bad_assay2].collect(&:id).collect(&:to_s)
 
-    get :new, params: { assay_ids: ids }
+    id_params = ids.collect{|id| {assay_id: id} }
+
+    get :new, params: {model: {assay_assets_attributes: id_params } }
 
     assert_response :success
 
     model = assigns(:model)
-    refute_empty model.assays
-    assert_equal [good_assay,good_assay2].sort,model.assays.sort
+    refute_empty model.assay_assets.collect(&:assay)
+    assert_equal [good_assay,good_assay2].collect(&:id).sort, model.assay_assets.collect(&:assay).collect(&:id).sort
 
     # dirty way to check that they end up in the embedded JSON script block.
     # Cannot test the elements itself as the javascript needs to execute first
