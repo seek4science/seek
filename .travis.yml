@@ -4,6 +4,7 @@ cache: bundler
 
 jdk:
   - openjdk8
+  - openjdk11
 
 services:
   - docker
