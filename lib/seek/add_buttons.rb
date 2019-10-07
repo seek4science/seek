@@ -26,7 +26,7 @@ module Seek
       'Event' => [[DataFile, 'data_file[event_ids][]'],
                   [Presentation, 'presentation[event_ids][]'],
                   [Document, 'document[event_ids][]']],
-      'DataFile' => [[Assay, 'assay[data_file_ids][]'],
+      'DataFile' => [[Assay, 'assay[data_files_attributes[][asset_id]]'],
                      [Event, 'event[data_file_ids][]']]
     }.freeze
 
