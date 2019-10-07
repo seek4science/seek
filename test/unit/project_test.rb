@@ -243,6 +243,21 @@ class ProjectTest < ActiveSupport::TestCase
     assert another_proj.can_be_administered_by?(admin.user)
   end
 
+  test 'can manage' do
+    admin = Factory(:admin)
+    project_administrator = Factory(:project_administrator)
+    normal = Factory(:person)
+    another_proj = Factory(:project)
+
+    assert project_administrator.projects.first.can_manage?(project_administrator.user)
+    refute normal.projects.first.can_manage?(normal.user)
+
+    refute another_proj.can_manage?(nil)
+    refute another_proj.can_manage?(normal.user)
+    refute another_proj.can_manage?(project_administrator.user)
+    assert another_proj.can_manage?(admin.user)
+  end
+
   test 'can be administered by programme administrator' do
     # programme administrator should be able to administer projects belonging to programme
     pa = Factory(:programme_administrator)
