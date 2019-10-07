@@ -1,5 +1,5 @@
 class Project < ApplicationRecord
-  include Seek::Annotatable  
+  include Seek::Annotatable
   include HasSettings
 
   acts_as_yellow_pages
@@ -21,7 +21,7 @@ class Project < ApplicationRecord
   has_and_belongs_to_many :documents
 
   has_many :work_groups, dependent: :destroy, inverse_of: :project
-  has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?, inverse_of: :projects
+  has_many :institutions, through: :work_groups, inverse_of: :projects
   has_many :group_memberships, through: :work_groups, inverse_of: :project
   # OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
   has_many :people, -> { order('last_name ASC').distinct }, through: :group_memberships
@@ -71,15 +71,6 @@ class Project < ApplicationRecord
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
     [programme].compact
-  end
-
-
-  def group_memberships_empty?(institution)
-    work_group = WorkGroup.where(['project_id=? AND institution_id=?', id, institution.id]).first
-    unless work_group.people.empty?
-      fail WorkGroupDeleteError.new('You can not delete the ' + work_group.description + '. This Work Group has ' + work_group.people.size.to_s + " people associated with it.
-                           Please disassociate first the people from this Work Group.")
-    end
   end
 
   alias_attribute :webpage, :web_page
@@ -237,6 +228,10 @@ class Project < ApplicationRecord
 
   def can_edit?(user = User.current_user)
     new_record? || can_be_edited_by?(user)
+  end
+
+  def can_manage?(user = User.current_user)
+    new_record? || can_be_administered_by?(user)
   end
 
   def can_delete?(user = User.current_user)

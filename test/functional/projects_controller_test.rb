@@ -514,6 +514,24 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 'asd', assigns(:project).title
   end
 
+  test 'normal member cannot edit protected attributes' do
+    p = Factory(:person)
+    login_as(p)
+
+    get :show, params: { id: p.projects.first }
+    assert_select 'a', text: /Edit #{I18n.t('project')}/, count: 1
+    assert_select 'a', text: /Manage #{I18n.t('project')}/, count: 0
+
+    get :edit, params: { id: p.projects.first }
+    assert_response :success
+
+    put :update, params: { id: p.projects.first.id, project: { title: 'asd', default_license: 'fish' } }
+
+    assert_redirected_to project_path(assigns(:project))
+    assert_equal 'asd', assigns(:project).title
+    assert_not_equal 'fish', assigns(:project).default_license
+  end
+
   test 'links have nofollow in sop tabs' do
     user = Factory :user
     project = user.person.projects.first
@@ -684,18 +702,18 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'non admin cannot administer project' do
+  test 'non admin cannot administer secure project settings' do
     person = Factory(:person)
     login_as(person.user)
-    get :admin, params: { id: person.projects.first }
-    assert_response :redirect
-    assert_not_nil flash[:error]
+    get :edit, params: { id: person.projects.first }
+    assert_response :success
+    assert_select '#sharing_form', count: 0
   end
 
   test 'admin can administer project' do
-    get :admin, params: { id: projects(:sysmo_project) }
+    get :edit, params: { id: projects(:sysmo_project) }
     assert_response :success
-    assert_nil flash[:error]
+    assert_select '#sharing_form', count: 1
   end
 
   test 'non admin has no option to administer project' do
@@ -760,6 +778,28 @@ class ProjectsControllerTest < ActionController::TestCase
     assert Permission.find_by_policy_id(project.default_policy).contributor_id == person.id
   end
 
+  test 'cannot changing default policy even if not project admin' do
+    project_member = Factory(:person)
+    project = project_member.projects.first
+    login_as(project_member.user)
+
+    assert project.default_policy.nil?
+
+    person = Factory(:person)
+    sharing = {}
+    sharing[:permissions_attributes] = {}
+    sharing[:permissions_attributes]['1'] = { contributor_type: 'Person', contributor_id: person.id, access_type: Policy::NO_ACCESS }
+    sharing[:access_type] = Policy::VISIBLE
+
+    assert_no_difference('Permission.count') do
+      put :update, params: { id: project.id, project: valid_project, policy_attributes: sharing }
+    end
+
+    project = Project.find(project.id)
+    assert_redirected_to project
+    assert project.default_policy.nil?
+  end
+
   test 'project administrator can administer their projects' do
     project_administrator = Factory(:project_administrator)
     project = project_administrator.projects.first
@@ -769,14 +809,12 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'a[href=?]', admin_members_project_path(project), text: /Administer #{I18n.t('project')} members/, count: 1
 
-    get :admin, params: { id: project }
+    get :edit, params: { id: project }
     assert_response :success
 
-    new_institution = Institution.create(title: 'a test institution', country: 'Canada')
-    put :update, params: { id: project, project: { institution_ids: (project.institutions + [new_institution]).collect(&:id) } }
+    put :update, params: { id: project, project: { title: 'banana' } }
     assert_redirected_to project
-    project.reload
-    assert project.institutions.include? new_institution
+    assert_equal 'banana', project.reload.title
   end
 
   test 'project administrator can not administer the projects that they are not in' do
@@ -789,59 +827,14 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'a', text: /Project administration/, count: 0
 
-    get :admin, params: { id: a_project }
+    get :edit, params: { id: a_project }
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    new_institution = Institution.create(title: 'a test institution')
-    put :update, params: { id: a_project, project: { institution_ids: (a_project.institutions + [new_institution]).collect(&:id) } }
+    put :update, params: { id: a_project, project: { title: 'banana' } }
     assert_redirected_to :root
     assert_not_nil flash[:error]
-    a_project.reload
-    assert !(a_project.institutions.include? new_institution)
-  end
-
-  test 'jerm details not shown if disabled' do
-    project = Factory(:project)
-    with_config_value :jerm_enabled, false do
-      get :admin, params: { id: project.id }
-      assert_response :success
-      assert_select 'div#details_for_jerm', count: 0
-    end
-  end
-
-  test 'jerm details shown is enabled' do
-    project = Factory(:project)
-    with_config_value :jerm_enabled, true do
-      get :admin, params: { id: project.id }
-      assert_response :success
-      assert_select 'div#details_for_jerm', count: 1
-    end
-  end
-
-  test 'project administrator can only see all institutions' do
-    project_admin = Factory(:project_administrator)
-    project = project_admin.projects.first
-    login_as(project_admin.user)
-    Factory(:institution)
-
-    get :admin, params: { id: project }
-    assert_response :success
-    Institution.all.each do |institution|
-      assert_select "input[type='checkbox'][id='institution_#{institution.id}'][value='#{institution.id}']", count: 1
-    end
-  end
-
-  test 'project administrator can assign all institutions to their project' do
-    project_administrator = Factory(:project_administrator)
-    project = project_administrator.projects.first
-    login_as(project_administrator.user)
-    a_institution = Factory(:institution)
-
-    put :update, params: { id: project, project: { institution_ids: Institution.all.collect(&:id) } }
-    assert_redirected_to project
-    project.reload
-    assert_equal Institution.count, project.institutions.count
+    assert_not_equal 'banana', a_project.reload.title
   end
 
   test 'project administrator can administer sharing policy' do
@@ -877,54 +870,6 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_nil project.site_username
       assert_nil project.site_password
     end
-  end
-
-  test 'unassign institution out of project' do
-    project = Factory(:project)
-    project.institutions << Factory(:institution)
-
-    login_as(:quentin)
-
-    put :update, params: { id: project, project: { title: project.title, institution_ids: [''] } }
-    assert_redirected_to project
-    assert_nil flash[:error]
-    project.reload
-    assert project.institutions.empty?
-  end
-
-  test 'should not unassign institution out of project if there are people in this workgroup' do
-    wg = Factory(:person).work_groups.first
-    assert !wg.people.empty?
-    project = wg.project
-
-    login_as(:quentin)
-    # exception is rescued
-    assert_no_difference('WorkGroup.count') do
-      post :update, params: { id: project, project: { title: project.title, institution_ids: [''] } }
-      assert_redirected_to project
-      assert_not_nil flash[:error]
-    end
-    project.reload
-    assert !project.institutions.empty?
-  end
-
-  test 'can not remove workgroup if it contains people' do
-    project = Factory(:project)
-    institution = Factory(:institution)
-    work_group = Factory(:work_group, project: project, institution: institution)
-    a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
-
-    assert !project.institutions.empty?
-    assert !work_group.people.empty?
-
-    assert_no_difference('WorkGroup.count') do
-      post :update, params: { id: project, project: { title: project.title, institution_ids: [''] } }
-    end
-
-    assert_redirected_to project
-    assert_not_nil flash[:error]
-    assert !project.reload.institutions.empty?
-    assert !work_group.reload.people.empty?
   end
 
   test 'email job created when edited by a member' do

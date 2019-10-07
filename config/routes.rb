@@ -203,7 +203,6 @@ SEEK::Application.routes.draw do
     end
     member do
       get :asset_report
-      get :admin
       get :admin_members
       get :admin_member_roles
       get :storage_report

@@ -80,12 +80,6 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def admin
-    respond_to do |format|
-      format.html # admin.html.erb
-    end
-  end
-
   # GET /projects/1
   # GET /projects/1.xml
   def show
@@ -201,7 +195,9 @@ class ProjectsController < ApplicationController
   # PUT /projects/1   , polymorphic: [:organism]
   # PUT /projects/1.xml
   def update
-    @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
+    if @project.can_be_administered_by?(current_user)
+      @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
+    end
 
     begin
       respond_to do |format|
@@ -221,11 +217,6 @@ class ProjectsController < ApplicationController
           format.xml  { render xml: @project.errors, status: :unprocessable_entity }
           format.json { render json: json_api_errors(@project), status: :unprocessable_entity }
         end
-      end
-    rescue WorkGroupDeleteError => e
-      respond_to do |format|
-        flash[:error] = e.message
-        format.html { redirect_to(@project) }
       end
     end
   end
@@ -347,7 +338,7 @@ class ProjectsController < ApplicationController
 
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, :programme_id, { organism_ids: [] }, {:members => [[:person_id, :institution_id]]},
-                        { institution_ids: [] }, :default_license, :site_root_uri, :site_username, :site_password,
+                        :default_license, :site_root_uri, :site_username, :site_password,
                         :parent_id, :use_default_policy, :default_policy, :nels_enabled, :start_date, :end_date, :funding_codes,
                         { project_administrator_ids: [] },
                         { asset_gatekeeper_ids: [] },
@@ -360,12 +351,14 @@ class ProjectsController < ApplicationController
           site_username: User.admin_logged_in?,
           site_password: User.admin_logged_in?,
           nels_enabled: User.admin_logged_in?,
-          institution_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
-          members: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
-          project_administrator_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
-          asset_gatekeeper_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
-          asset_housekeeper_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)),
-          pal_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user))
+          use_default_policy: @project.can_be_administered_by?(current_user),
+          default_policy: @project.can_be_administered_by?(current_user),
+          default_license: @project.can_be_administered_by?(current_user),
+          members: @project.can_be_administered_by?(current_user),
+          project_administrator_ids: @project.can_be_administered_by?(current_user),
+          asset_gatekeeper_ids: @project.can_be_administered_by?(current_user),
+          asset_housekeeper_ids: @project.can_be_administered_by?(current_user),
+          pal_ids: @project.can_be_administered_by?(current_user)
         }
       restricted_params.each do |param, allowed|
         permitted_params.delete(param) if params[:project] && !allowed
