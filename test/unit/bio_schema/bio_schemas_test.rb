@@ -53,7 +53,7 @@ class BioSchemaTest < ActiveSupport::TestCase
     member_of = json['memberOf']
 
     assert_equal 1, member_of.count
-    expected = { '@type' => 'Project', '@id' => project.rdf_resource, 'name' => project.title }
+    expected = { '@type' => ['Project','Organization'], '@id' => project.rdf_resource, 'name' => project.title }
     assert_equal expected, member_of.first
   end
 
@@ -92,7 +92,7 @@ class BioSchemaTest < ActiveSupport::TestCase
 
     assert_equal "http://localhost:3000/projects/#{project.id}", json['@id']
     assert_equal 'my project', json['name']
-    assert_equal 'Project', json['@type']
+    assert_equal ['Project','Organization'], json['@type']
     assert_equal 'i am a project', json['description']
     assert_equal "http://localhost:3000/projects/#{project.id}/avatars/#{project.avatar.id}?size=250", json['logo']
     assert_equal 'http://project.com', json['url']

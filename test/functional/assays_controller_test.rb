@@ -45,15 +45,16 @@ class AssaysControllerTest < ActionController::TestCase
     assert exp.can_edit?
     assert mod.can_edit?
 
+
     get :show, params: { id: exp.id }
     assert_response :success
-    assert_select "a[href=?]",new_model_path('model[assay_assets_attributes[][assay_id]]'=>exp.id),text:/Add Model/, count:0
-    assert_select "a[href=?]",new_data_file_path('data_file[assay_assets_attributes[][assay_id]]'=>exp.id),text:/Add Data file/
+    assert_select "a[href=?]",new_model_path('model[assay_assets_attributes[][assay_id]]'=>exp.id),text:/#{I18n.t('add_new_dropdown.option')} Model/, count:0
+    assert_select "a[href=?]",new_data_file_path('data_file[assay_assets_attributes[][assay_id]]'=>exp.id),text:/#{I18n.t('add_new_dropdown.option')} Data file/
 
     get :show, params: { id: mod.id }
     assert_response :success
-    assert_select "a[href=?]",new_model_path('model[assay_assets_attributes[][assay_id]]'=>mod.id),text:/Add Model/
-    assert_select "a[href=?]",new_data_file_path('data_file[assay_assets_attributes[][assay_id]]'=>mod.id),text:/Add Data file/
+    assert_select "a[href=?]",new_model_path('model[assay_assets_attributes[][assay_id]]'=>mod.id),text:/#{I18n.t('add_new_dropdown.option')} Model/
+    assert_select "a[href=?]",new_data_file_path('data_file[assay_assets_attributes[][assay_id]]'=>mod.id),text:/#{I18n.t('add_new_dropdown.option')} Data file/
 
   end
 
