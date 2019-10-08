@@ -60,7 +60,10 @@ en:
 
   favourite_group: "favourite groups"
 
-  add_to_button: "Add"
+  add_new_dropdown:
+    button: "Add new"
+    option: "Add new"
+
   actions_button: "Actions"
   submit_button:
     upload: 'Upload and Save'

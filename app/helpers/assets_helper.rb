@@ -232,7 +232,7 @@ module AssetsHelper
 
   def add_to_dropdown(item)
     return unless Seek::AddButtons.add_dropdown_for(item)
-    dropdown_button(t('add_to_button'), 'attach', menu_options: {class: 'pull-right', id: 'item-admin-menu'}) do
+    dropdown_button(t('add_new_dropdown.button'), 'attach', menu_options: {class: 'pull-right', id: 'item-admin-menu'}) do
       add_item_to_options(item) do |text, path|
         content_tag(:li) do
           image_tag_for_key('add', path, text, nil, text)
@@ -245,7 +245,7 @@ module AssetsHelper
     elements = []
     Seek::AddButtons.add_for_item(item).each do |type,param|
 
-      text='Add ' + t(type.name.underscore)
+      text="#{t('add_new_dropdown.option')} #{t(type.name.underscore)}"
       path = new_polymorphic_path(type,param=>item.id)
       elements << yield(text,path)
     end
