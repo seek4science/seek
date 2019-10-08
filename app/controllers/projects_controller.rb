@@ -195,14 +195,14 @@ class ProjectsController < ApplicationController
   # PUT /projects/1   , polymorphic: [:organism]
   # PUT /projects/1.xml
   def update
-    if @project.can_be_administered_by?(current_user)
+    if @project.can_manage?(current_user)
       @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
     end
 
     begin
       respond_to do |format|
         if @project.update_attributes(project_params)
-          if Seek::Config.email_enabled && !@project.can_be_administered_by?(current_user)
+          if Seek::Config.email_enabled && !@project.can_manage?(current_user)
             ProjectChangedEmailJob.new(@project).queue_job
           end
           expire_resource_list_item_content
@@ -398,7 +398,7 @@ class ProjectsController < ApplicationController
 
   def editable_by_user
     @project = Project.find(params[:id])
-    unless User.admin_logged_in? || @project.can_be_edited_by?(current_user)
+    unless User.admin_logged_in? || @project.can_edit?(current_user)
       error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
@@ -417,7 +417,7 @@ class ProjectsController < ApplicationController
 
   def administerable_by_user
     @project = Project.find(params[:id])
-    unless @project.can_be_administered_by?(current_user)
+    unless @project.can_manage?(current_user)
       error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end

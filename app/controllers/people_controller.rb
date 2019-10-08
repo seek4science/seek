@@ -342,7 +342,8 @@ class PeopleController < ApplicationController
   def set_project_related_roles(person)
     return unless params[:roles]
 
-    administered_project_ids = Project.all_can_be_administered.collect { |p| p.id.to_s }
+    # TODO: Replace this with `Project.authorized_for` after `auth_perf` merged
+    administered_project_ids = Project.all.select { |project| project.can_manage?(user) }.map { |p| p.id.to_s }
 
     Seek::Roles::ProjectRelatedRoles.role_names.each do |role_name|
       # remove for the project ids that can be administered
@@ -376,7 +377,7 @@ class PeopleController < ApplicationController
   end
 
   def editable_by_user
-    unless @person.can_be_edited_by?(current_user)
+    unless @person.can_edit?(current_user)
       error('Insufficient privileges', 'is invalid (insufficient_privileges)')
       false
     end

@@ -211,36 +211,21 @@ class Project < ApplicationRecord
     person_project_membership.project_positions
   end
 
-  def can_be_edited_by?(user)
-    user && (has_member?(user) || can_be_administered_by?(user))
-  end
-
-  # whether this project can be administered by the given user, or current user if none is specified
-  def can_be_administered_by?(user = User.current_user)
-    return false unless user
-    user.is_admin? || user.is_project_administrator?(self) || user.is_programme_administrator?(programme)
-  end
-
-  # all projects that can be administered by the given user, or ghe current user if none is specified
-  def self.all_can_be_administered(user = User.current_user)
-    Project.all.select do |project|
-      project.can_be_administered_by?(user)
-    end
-  end
-
   def can_edit?(user = User.current_user)
-    new_record? || can_be_edited_by?(user)
+    return false unless user
+    return true if new_record? && self.class.can_create?
+    has_member?(user) || can_manage?(user)
   end
 
   def can_manage?(user = User.current_user)
-    new_record? || can_be_administered_by?(user)
+    return false unless user
+    user.is_admin? || user.is_project_administrator?(self) || user.is_programme_administrator?(programme)
   end
 
   def can_delete?(user = User.current_user)
     user && user.is_admin? && work_groups.collect(&:people).flatten.empty? &&
         investigations.empty? && studies.empty? && assays.empty? && assets.empty? &&
         samples.empty? && sample_types.empty?
-
   end
 
   def self.can_create?
