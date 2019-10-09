@@ -70,20 +70,17 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'handle_oslash' do
-    p = Person.new(last_name: 'Øyvind', email: 'sdfkjhsdfkjhsdf@email.com')
-    assert p.save
+    p = Factory(:brand_new_person, last_name: 'Øyvind', email: 'sdfkjhsdfkjhsdf@email.com')
     assert_equal 'O', p.first_letter
   end
 
   test 'handle_umlaut' do
-    p = Person.new(last_name: 'Ümlaut', email: 'sdfkjhsdfkjhsdf@email.com')
-    assert p.save
+    p = Factory(:brand_new_person, last_name: 'Ümlaut', email: 'sdfkjhsdfkjhsdf@email.com')
     assert_equal 'U', p.first_letter
   end
 
   test 'handle_accent' do
-    p = Person.new(last_name: 'Ýiggle', email: 'sdfkjhsdfkjhsdf@email.com')
-    assert p.save
+    p = Factory(:brand_new_person, last_name: 'Ýiggle', email: 'sdfkjhsdfkjhsdf@email.com')
     assert_equal 'Y', p.first_letter
   end
 

@@ -30,7 +30,7 @@ module WorkGroupsHelper
                     WorkGroup.includes(:project, :institution)
                   end
 
-    work_groups = work_groups.to_a.select { |wg| wg.project.can_be_administered_by?(current_user) }
+    work_groups = work_groups.to_a.select { |wg| wg.project.can_manage?(current_user) }
 
     work_groups |= person.work_groups
 
@@ -43,7 +43,7 @@ module WorkGroupsHelper
     work_groups.each do |wg|
       if last_project.nil? || last_project.project != wg.project
         options << last_project unless last_project.nil?
-        last_project = ProjectType.new(wg.project, wg.project.can_be_administered_by?(current_user))
+        last_project = ProjectType.new(wg.project, wg.project.can_manage?(current_user))
       end
       last_project << WorkGroupOption.new(wg.id, wg.institution.title)
     end

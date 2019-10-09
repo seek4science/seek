@@ -10,20 +10,20 @@
         "permissions":[]
       },
       "other_creators":  "Anonymous creator",
-      "title": "A Maximal Assay",
+      "title": "A Maximal Modelling Assay",
       "description": "A Western Blot Assay",
       "assay_class": {
-        "title": "Experimental assay",
-        "key": "EXP",
-        "description": "An experimental assay class description"
+        "title": "Modelling analysis",
+        "key": "MODEL",
+        "description": null
       },
       "assay_type": {
-        "label": "Experimental assay type",
-        "uri": "http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
+        "label": "Model analysis type",
+        "uri": "http://jermontology.org/ontology/JERMOntology#Model_analysis_type"
       },
       "technology_type": {
-        "label": "Technology type",
-        "uri": "http://jermontology.org/ontology/JERMOntology#Technology_type"
+        "label": null,
+        "uri": null
       }
     },
     "relationships": {

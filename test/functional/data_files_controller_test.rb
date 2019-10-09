@@ -75,11 +75,6 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'correct title and text for associating an assay for new' do
     login_as(Factory(:user))
-    as_virtualliver do
-      register_content_blob
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
-    end
     as_not_virtualliver do
       register_content_blob
       assert_response :success
@@ -93,11 +88,6 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'correct title and text for associating an assay for edit' do
     df = Factory :data_file
     login_as(df.contributor.user)
-    as_virtualliver do
-      get :edit, params: { id: df.id }
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
-    end
     as_not_virtualliver do
       get :edit, params: { id: df.id }
       assert_response :success
@@ -2748,6 +2738,23 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df.content_blob.id, session[:uploaded_content_blob_id]
   end
 
+  test 'create content blob with assay params' do
+    # assay params may be passed when adding via the link from an existing assay
+    person = Factory(:person)
+    assay = Factory(:assay,contributor:person)
+    login_as(person)
+    blob = { data: picture_file }
+    assert_difference('ContentBlob.count') do
+      post :create_content_blob, params: {
+          content_blobs: [blob],
+          data_file: { assay_assets_attributes: [{ assay_id: assay.id.to_s }] }
+      }
+    end
+    assert_response :success
+    assert df = assigns(:data_file)
+    assert_includes df.assay_assets.collect(&:assay), assay
+  end
+
   test 'create content blob requires login' do
     logout
     blob = { data: picture_file }
@@ -2764,7 +2771,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     session[:uploaded_content_blob_id] = content_blob.id.to_s
 
-    post :rightfield_extraction_ajax, params: { content_blob_id: content_blob.id.to_s, format: 'js' }
+    post :rightfield_extraction_ajax, params: { content_blob_id: content_blob.id.to_s }, format: 'js'
 
     assert_response :success
     assert data_file = assigns(:data_file)
@@ -2778,6 +2785,24 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response', assay.assay_type_uri
     assert_equal 'http://jermontology.org/ontology/JERMOntology#2-hybrid_system', assay.technology_type_uri
 
+  end
+
+  test 'rightfield extraction with assay params passed' do
+    person = Factory(:person)
+    assay = Factory(:assay, contributor:person)
+    login_as(person)
+    content_blob = Factory(:rightfield_master_template_with_assay)
+
+    session[:uploaded_content_blob_id] = content_blob.id.to_s
+
+    post :rightfield_extraction_ajax, params: {
+        content_blob_id: content_blob.id.to_s,
+        data_file: {assay_assets_attributes:[{assay_id:assay.id.to_s}]}
+    }, format: 'js'
+
+    assert_response :success
+    assert data_file = assigns(:data_file)
+    assert_equal [assay],data_file.assay_assets.collect(&:assay)
   end
 
   test 'create metadata' do
@@ -3302,45 +3327,6 @@ class DataFilesControllerTest < ActionController::TestCase
     refute_nil assigns(:create_new_assay)
     refute assigns(:create_new_assay)
     assert_select "input#assay_create_assay[checked=checked]", count:0
-  end
-
-  test 'should select assay ids when passed to provide metadata' do
-    assay1 = Factory(:assay, contributor:User.current_user.person)
-    assay2 = Factory(:assay, contributor:User.current_user.person)
-
-
-    assert assay1.can_edit?
-    assert assay2.can_edit?
-
-
-    register_content_blob(skip_provide_metadata:true)
-
-    get :provide_metadata, params: { assay_ids:[assay1.id] }
-    assert_response :success
-
-    assert df=assigns(:data_file)
-    assert_includes df.assay_assets.collect(&:assay),assay1
-    refute_includes df.assay_assets.collect(&:assay),assay2
-  end
-
-  test 'should select multiple assay ids when passed to provide metadata' do
-    assay1 = Factory(:assay, contributor:User.current_user.person)
-    assay2 = Factory(:assay, contributor:User.current_user.person)
-    assay3 = Factory(:assay, contributor:User.current_user.person)
-
-    assert assay1.can_edit?
-    assert assay2.can_edit?
-    assert assay3.can_edit?
-
-    register_content_blob(skip_provide_metadata:true)
-
-    get :provide_metadata, params: { assay_ids:[assay1.id,assay2.id] }
-    assert_response :success
-
-    assert df=assigns(:data_file)
-    assert_includes df.assay_assets.collect(&:assay),assay1
-    assert_includes df.assay_assets.collect(&:assay),assay2
-    refute_includes df.assay_assets.collect(&:assay),assay3
   end
 
   test 'should not select non editable assay ids when passed to provide metadata' do

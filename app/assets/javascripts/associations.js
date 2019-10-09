@@ -94,7 +94,7 @@ Associations.List.prototype.find = function (func) {
 
 Associations.List.prototype.findDuplicate = function(association) {
     return this.items.find(function(item) {
-        return item.id = association.id;
+        return item.data.id === association.id;
     });
 }
 

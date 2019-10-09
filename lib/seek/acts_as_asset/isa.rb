@@ -17,22 +17,27 @@ module Seek
         included do
           unless reflect_on_association(:assays)
             has_many :assay_assets, dependent: :destroy, as: :asset, foreign_key: :asset_id, autosave: true, # change this to validate: true in the future
-                     inverse_of: :asset
+                                    inverse_of: :asset
             has_many :assays, through: :assay_assets
 
-            def assay_assets_attributes= attributes
-              self.assay_assets.reset
+            def assay_assets_attributes=(attributes)
+              assay_assets.reset
 
               new_assay_assets = []
-
               attributes.each do |attrs|
-                existing = self.assay_assets.detect { |aa| aa.assay_id.to_s == attrs['assay_id'] }
+                existing = assay_assets.detect { |aa| aa.assay_id.to_s == attrs['assay_id'] }
                 if existing
                   new_assay_assets << existing.tap { |e| e.assign_attributes(attrs) }
                 else
                   assay = Assay.find_by_id(attrs['assay_id'])
-                  if assay && assay.can_edit?
-                    new_assay_assets << self.assay_assets.build(attrs)
+                  if assay&.can_edit?
+                    if is_a?(Model) # check the assay is a modelling analysis
+                      if assay.is_modelling?
+                        new_assay_assets << assay_assets.build(attrs)
+                      end
+                    else
+                      new_assay_assets << assay_assets.build(attrs)
+                    end
                   end
                 end
               end

@@ -7,7 +7,16 @@ module Seek
 
     def new
       setup_new_asset
+      #associate_by_presented_params
       respond_for_new
+    end
+
+    def associate_by_presented_params
+      item = object_for_request
+      return unless item && params[:assay_ids] && params[:assay_ids].any?
+      assays = Assay.find(params[:assay_ids])
+      assays = assays.select{|assay| assay.assay_class.is_modelling?}.select{|assay| assay.can_edit?}
+      item.assign_attributes({assay_ids:assays.collect(&:id)})
     end
 
     def show
@@ -28,11 +37,16 @@ module Seek
     end
 
     def setup_new_asset
-      item = class_for_controller_name.new
+      attr={}
+      if params["#{controller_name.singularize}"]
+        attr = send("#{controller_name.singularize}_params")
+      end
+      item = class_for_controller_name.new(attr)
       item.parent_name = params[:parent_name] if item.respond_to?(:parent_name)
       set_shared_item_variable(item)
       @content_blob = ContentBlob.new
       @page_title = params[:page_title]
+      item
     end
 
     def respond_for_new

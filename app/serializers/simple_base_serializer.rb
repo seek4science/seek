@@ -47,7 +47,9 @@ class SimpleBaseSerializer < ActiveModel::Serializer
   def attributes(*args)
     hash = super
     hash.each do |key, value|
-      hash[key] = value.presence
+      if !(value.equal? false)
+        hash[key] = value.presence
+      end
     end
     hash
   end

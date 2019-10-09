@@ -131,8 +131,6 @@ class AssetsHelperTest < ActionView::TestCase
       assert_equal 1, authorised.count
       assert_equal ['A'], authorised.collect(&:title)
     end
-
-
   end
 
   private

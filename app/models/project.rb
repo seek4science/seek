@@ -1,5 +1,5 @@
 class Project < ApplicationRecord
-  include Seek::Annotatable  
+  include Seek::Annotatable
   include HasSettings
 
   acts_as_yellow_pages
@@ -22,7 +22,7 @@ class Project < ApplicationRecord
   has_and_belongs_to_many :documents
 
   has_many :work_groups, dependent: :destroy, inverse_of: :project
-  has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?, inverse_of: :projects
+  has_many :institutions, through: :work_groups, inverse_of: :projects
   has_many :group_memberships, through: :work_groups, inverse_of: :project
   # OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
   has_many :people, -> { distinct }, through: :group_memberships
@@ -77,14 +77,6 @@ class Project < ApplicationRecord
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
     Programme.where(id: programme_id)
-  end
-
-  def group_memberships_empty?(institution)
-    work_group = WorkGroup.where(['project_id=? AND institution_id=?', id, institution.id]).first
-    unless work_group.people.empty?
-      fail WorkGroupDeleteError.new('You can not delete the ' + work_group.description + '. This Work Group has ' + work_group.people.size.to_s + " people associated with it.
-                           Please disassociate first the people from this Work Group.")
-    end
   end
 
   alias_attribute :webpage, :web_page
@@ -178,6 +170,37 @@ class Project < ApplicationRecord
     people.include? user_or_person
   end
 
+  def members= replacement_members
+    current = self.current_group_memberships.collect {|g| {:person_id => g.person_id, :institution_id => g.institution.id}}
+    replacement = replacement_members.collect {|rm| {:person_id => rm['person_id'].to_i, :institution_id => rm['institution_id'].to_i}}
+
+    to_remove = current - replacement
+    to_add = replacement - current
+
+    unless to_add.nil?
+      to_add.each do |new_info|
+        person = Person.find(new_info[:person_id])
+        institution = Institution.find(new_info[:institution_id])
+        unless person.nil? || institution.nil?
+          person.add_to_project_and_institution(self, institution)
+          person.save!
+        end
+      end
+    end
+
+    unless to_remove.nil?
+      to_remove.each do |r|
+        person = Person.find(r[:person_id])
+        institution = Institution.find(r[:institution_id])
+        gms = self.current_group_memberships.all.select {|gm| gm.person.id == r[:person_id] && gm.institution.id == r[:institution_id]}
+        unless gms.empty?
+          person.group_memberships.destroy(gms.first)
+        end
+      end
+
+    end
+  end
+
   def person_roles(person)
     # Get intersection of all project memberships + person's memberships to find project membership
     project_memberships = work_groups.collect(&:group_memberships).flatten
@@ -185,32 +208,21 @@ class Project < ApplicationRecord
     person_project_membership.project_positions
   end
 
-  def can_be_edited_by?(user)
-    user && (has_member?(user) || can_be_administered_by?(user))
+  def can_edit?(user = User.current_user)
+    return false unless user
+    return true if new_record? && self.class.can_create?
+    has_member?(user) || can_manage?(user)
   end
 
-  # whether this project can be administered by the given user, or current user if none is specified
-  def can_be_administered_by?(user = User.current_user)
+  def can_manage?(user = User.current_user)
     return false unless user
     user.is_admin? || user.is_project_administrator?(self) || user.is_programme_administrator?(programme)
-  end
-
-  # all projects that can be administered by the given user, or ghe current user if none is specified
-  def self.all_can_be_administered(user = User.current_user)
-    Project.all.select do |project|
-      project.can_be_administered_by?(user)
-    end
-  end
-
-  def can_edit?(user = User.current_user)
-    new_record? || can_be_edited_by?(user)
   end
 
   def can_delete?(user = User.current_user)
     user && user.is_admin? && work_groups.collect(&:people).flatten.empty? &&
         investigations.empty? && studies.empty? && assays.empty? && assets.empty? &&
         samples.empty? && sample_types.empty?
-
   end
 
   def self.can_create?

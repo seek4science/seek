@@ -58,10 +58,6 @@ class Programme < ApplicationRecord
     (data_files + models + sops + presentations + events + publications + documents).uniq.compact
   end
 
-  def can_be_edited_by?(user)
-    can_edit?(user)
-  end
-
   def has_member?(user_or_person)
     projects.detect { |proj| proj.has_member?(user_or_person.try(:person)) }
   end
