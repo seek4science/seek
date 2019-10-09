@@ -141,10 +141,10 @@ class ProgrammeTest < ActiveSupport::TestCase
     programme_administrator = Factory(:programme_administrator)
     programme = programme_administrator.programmes.first
 
-    assert programme.can_be_edited_by?(admin)
-    assert programme.can_be_edited_by?(programme_administrator)
-    refute programme.can_be_edited_by?(person)
-    refute programme.can_be_edited_by?(nil)
+    assert programme.can_edit?(admin)
+    assert programme.can_edit?(programme_administrator)
+    refute programme.can_edit?(person)
+    refute programme.can_edit?(nil)
   end
 
   test 'programme_administrators' do

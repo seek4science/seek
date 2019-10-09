@@ -155,9 +155,9 @@ class ProjectsController < ApplicationController
   # POST /projects
   # POST /projects.xml
   def create
-    @project = Project.new(project_params)
+    @project = Project.new
+    @project.assign_attributes(project_params)
     @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
-
 
     respond_to do |format|
       if @project.save
@@ -195,14 +195,14 @@ class ProjectsController < ApplicationController
   # PUT /projects/1   , polymorphic: [:organism]
   # PUT /projects/1.xml
   def update
-    if @project.can_be_administered_by?(current_user)
+    if @project.can_manage?(current_user)
       @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
     end
 
     begin
       respond_to do |format|
         if @project.update_attributes(project_params)
-          if Seek::Config.email_enabled && !@project.can_be_administered_by?(current_user)
+          if Seek::Config.email_enabled && !@project.can_manage?(current_user)
             ProjectChangedEmailJob.new(@project).queue_job
           end
           expire_resource_list_item_content
@@ -323,7 +323,7 @@ class ProjectsController < ApplicationController
 
   def project_role_params
     params[:project].keys.each do |k|
-      unless params[:project][k].nil? then
+      unless params[:project][k].nil?
         params[:project][k] = params[:project][k].split(',')
       else
         params[:project][k] = []
@@ -337,36 +337,21 @@ class ProjectsController < ApplicationController
   end
 
   def project_params
-    permitted_params = [:title, :web_page, :wiki_page, :description, :programme_id, { organism_ids: [] }, {:members => [[:person_id, :institution_id]]},
-                        :default_license, :site_root_uri, :site_username, :site_password,
-                        :parent_id, :use_default_policy, :default_policy, :nels_enabled, :start_date, :end_date, :funding_codes,
-                        { project_administrator_ids: [] },
-                        { asset_gatekeeper_ids: [] },
-                        { asset_housekeeper_ids: [] },
-                        { pal_ids: [] } ]
+    permitted_params = [:title, :web_page, :wiki_page, :description, { organism_ids: [] }, :parent_id, :start_date,
+                        :end_date, :funding_codes]
 
-    if action_name == 'update'
-      restricted_params =
-        { site_root_uri: User.admin_logged_in?,
-          site_username: User.admin_logged_in?,
-          site_password: User.admin_logged_in?,
-          nels_enabled: User.admin_logged_in?,
-          use_default_policy: @project.can_be_administered_by?(current_user),
-          default_policy: @project.can_be_administered_by?(current_user),
-          default_license: @project.can_be_administered_by?(current_user),
-          members: @project.can_be_administered_by?(current_user),
-          project_administrator_ids: @project.can_be_administered_by?(current_user),
-          asset_gatekeeper_ids: @project.can_be_administered_by?(current_user),
-          asset_housekeeper_ids: @project.can_be_administered_by?(current_user),
-          pal_ids: @project.can_be_administered_by?(current_user)
-        }
-      restricted_params.each do |param, allowed|
-        permitted_params.delete(param) if params[:project] && !allowed
-      end
+    if User.admin_logged_in?
+      permitted_params += [:site_root_uri, :site_username, :site_password, :nels_enabled]
     end
 
-    if params[:project][:programme_id].present? && !Programme.find(params[:project][:programme_id]).can_manage?
-      permitted_params.delete(:programme_id)
+    if @project.new_record? || @project.can_manage?(current_user)
+      permitted_params += [:use_default_policy, :default_policy, :default_license,
+                           { members: [:person_id, :institution_id] }, { project_administrator_ids: [] },
+                           { asset_gatekeeper_ids: [] }, { asset_housekeeper_ids: [] }, { pal_ids: [] }]
+    end
+
+    if params[:project][:programme_id].present? && Programme.find_by_id(params[:project][:programme_id])&.can_manage?
+      permitted_params += [:programme_id]
     end
 
     params.require(:project).permit(permitted_params)
@@ -413,7 +398,7 @@ class ProjectsController < ApplicationController
 
   def editable_by_user
     @project = Project.find(params[:id])
-    unless User.admin_logged_in? || @project.can_be_edited_by?(current_user)
+    unless User.admin_logged_in? || @project.can_edit?(current_user)
       error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
@@ -432,7 +417,7 @@ class ProjectsController < ApplicationController
 
   def administerable_by_user
     @project = Project.find(params[:id])
-    unless @project.can_be_administered_by?(current_user)
+    unless @project.can_manage?(current_user)
       error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
