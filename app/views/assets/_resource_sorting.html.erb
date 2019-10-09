@@ -1,5 +1,5 @@
 <% options = Seek::ListSorter.options_for_select(controller_name.classify) %>
-<% url_template = url_for(page_and_sort_params.merge(order: '_order_')) %>
+<% url_template = url_for(page_and_sort_params.merge(page: nil, order: '_order_')) %>
 
 <form class="form-inline pull-right">
   <div class="form-group">
