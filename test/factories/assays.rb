@@ -43,6 +43,7 @@ end
 
 Factory.define(:modelling_assay, parent: :assay_base) do |f|
   f.association :assay_class, factory: :modelling_assay_class
+  f.assay_type_uri 'http://jermontology.org/ontology/JERMOntology#Model_analysis_type'
 end
 
 Factory.define(:modelling_assay_with_organism, parent: :modelling_assay) do |f|
