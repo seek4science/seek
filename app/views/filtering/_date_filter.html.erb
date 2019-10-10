@@ -21,75 +21,34 @@
     else
       selected_option_value = nil
     end
+
+    apply_url = url_for({ page: nil, filter: with_filter(key, '_date_', replace: true) })
+    remove_url = url_for({ page: nil, filter: without_filter(key) })
   %>
 
-  <div class="filter-category collapsed">
+  <%= content_tag(:div, class: 'filter-category', data: { role: 'seek-date-filter',
+                                                          'apply-filter-url' => apply_url,
+                                                          'remove-filter-url' => remove_url  }) do %>
     <div class="filter-category-title"><%= key.to_s.humanize %></div>
-    <% select_name = "filter-by-date--#{key}" %>
-    <% apply_url = url_for({ page: nil, filter: with_filter(key, '_date_', replace: true) }) %>
-    <% remove_url = url_for({ page: nil, filter: without_filter(key) }) %>
-    <%= select_tag(select_name, options_for_select(option_pairs, selected_option_value),
-                   data: { 'apply-url' => apply_url, 'remove-url' => remove_url },
+    <%= select_tag(nil,
+                   options_for_select(option_pairs, selected_option_value),
+                   data: { role: 'seek-date-filter-select' },
                    autocomplete: 'off',
                    include_blank: 'Any time',
                    class: 'form-control filter-dropdown')
     %>
-    <%= content_tag(:div, { class: 'filter-date-range-wrapper', style: 'display: none;', id: "#{select_name}-custom-range" }) do %>
+    <%= content_tag(:div, { class: 'filter-date-range-wrapper', style: 'display: none;', data: { role: 'seek-date-filter-custom' } }) do %>
       <%= text_field_tag(nil, start_date,
+                         data: { role: 'seek-date-filter-period-start' },
                          placeholder: 'Start',
-                         id: "#{select_name}-start",
                          autocomplete: 'off',
                          class: 'filter-date-range-field') -%>
       <%= text_field_tag(nil, end_date,
+                         data: { role: 'seek-date-filter-period-end' },
                          placeholder: 'End (optional)',
-                         id: "#{select_name}-end",
                          autocomplete: 'off',
                          class: 'filter-date-range-field') -%>
-      <%= link_to('Go', '#', id: "#{select_name}-btn", class: 'filter-date-range-button') %>
+      <%= link_to('Go', '#', data: { role: 'seek-date-filter-btn' }, class: 'filter-date-range-button') %>
     <% end %>
-    <script>
-        (function () {
-            var select = $j('#<%= select_name -%>');
-            var custom = $j('#<%= select_name -%>-custom-range');
-            var button = $j('#<%= select_name -%>-btn');
-            var start = $j('#<%= select_name -%>-start');
-            var end = $j('#<%= select_name -%>-end');
-
-            if (select.val() === 'custom') {
-                custom.show();
-            } else {
-                custom.hide();
-            }
-
-            button.click(function () {
-                if (start.val()) {
-                    var val = start.val();
-                    if (end.val()) {
-                        val += ('/' + end.val());
-                    }
-                    window.location = select.data('applyUrl').replace('_date_',  val);
-                }
-            });
-
-            select.change(function () {
-                var val = $j(this).val();
-
-                if (val) {
-                    if (val === 'custom') {
-                        custom.fadeIn();
-                    } else {
-                        custom.fadeOut();
-                        window.location = $j(this).data('applyUrl').replace('_date_',  val);
-                    }
-                } else {
-                    window.location = $j(this).data('removeUrl');
-                }
-            });
-
-            $j('input', custom).datetimepicker({
-                format: 'YYYY-MM-DD'
-            });
-        })();
-    </script>
-  </div>
+  <% end %>
 <% end %>
