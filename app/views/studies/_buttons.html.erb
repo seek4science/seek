@@ -5,7 +5,7 @@
 <% end %>
 
 <% if item.can_edit? -%>
-  <%= button_link_to("Add an #{t('assays.assay')}", 'new', new_assay_path(:study_id=>item,:create_from_asset=>item.create_from_asset)) -%>
+  <%= add_to_dropdown(item) %>
 <% end -%>
 
 <%= item_actions_dropdown do %>

@@ -27,8 +27,8 @@
 <% end -%>
 
 <%= item_actions_dropdown do %>
-  <% if mine?(item) || item.can_be_edited_by?(current_user) -%>
-    <% if item.try(:can_be_administered_by?, current_user) -%>
+  <% if item.can_edit? -%>
+    <% if item.can_manage? -%>
       <li><%= image_tag_for_key('manage', edit_project_path(item), "Manage #{t('project')}", nil, "Manage #{t('project')}") -%></li>
       <li><%= image_tag_for_key "group_edit", admin_members_project_path(item), "Administer", nil, "Administer #{t('project')} members" -%></li>
       <li><%= image_tag_for_key "group_edit", admin_member_roles_project_path(item), "Administer", nil, "Administer #{t('project')} members roles" -%></li>

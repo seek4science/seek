@@ -195,12 +195,6 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_select 'a', text: /Add a #{I18n.t('study')}/i, count: 0
   end
 
-  test 'add study button for person that can edit' do
-    inv = investigations(:metabolomics_investigation)
-    get :show, params: { id: inv }
-    assert_select 'a[href=?]', new_study_path(investigation_id: inv), text: /Add a #{I18n.t('study')}/i, count: 1
-  end
-
   test "unauthorized user can't edit investigation" do
     i = Factory(:investigation, policy: Factory(:private_policy))
     login_as(Factory(:user))

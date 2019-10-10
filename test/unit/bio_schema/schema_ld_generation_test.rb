@@ -53,7 +53,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'image' => "http://localhost:3000/people/#{@person.id}/avatars/#{@person.avatar.id}?size=250",
       'memberOf' => [
         {
-          '@type' => 'Project',
+          '@type' => ['Project','Organization'],
           '@id' => "http://localhost:3000/projects/#{@project.id}",
           'name' => @project.title
         }
@@ -85,7 +85,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'provider' => [{
-        '@type' => 'Project',
+        '@type' => ['Project','Organization'],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
         'name' => @project.title
       }],
@@ -133,7 +133,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         'keywords' => 'keyword',
         'url' => "http://www.abc.com",
         'provider' => [{
-                           '@type' => 'Project',
+                           '@type' => ['Project','Organization'],
                            '@id' => "http://localhost:3000/projects/#{@project.id}",
                            'name' => @project.title
                        }],
@@ -176,7 +176,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     disable_authorization_checks { @project.save! }
     expected = {
       '@context' => 'http://schema.org',
-      '@type' => 'Project',
+      '@type' => ['Project','Organization'],
       '@id' => "http://localhost:3000/projects/#{@project.id}",
       'name' => @project.title,
       'description' => 'a lovely project',
@@ -238,7 +238,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'location' => 'Sofienstr 2, Heidelberg, Germany',
       'hostInstitution' => [
         {
-          '@type' => 'Project',
+          '@type' => ['Project','Organization'],
           '@id' => "http://localhost:3000/projects/#{event.projects.first.id}",
           'name' => event.projects.first.title
         }
@@ -267,7 +267,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => @current_time.to_s,
       'encodingFormat' => 'application/pdf',
       'provider' => [
-        { '@type' => 'Project', '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
+        { '@type' => ['Project','Organization'], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
       ]
     }
 
@@ -294,7 +294,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => @current_time.to_s,
       'encodingFormat' => 'application/pdf',
       'provider' => [
-        { '@type' => 'Project', '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
+        { '@type' => ['Project','Organization'], '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
       ]
     }
 

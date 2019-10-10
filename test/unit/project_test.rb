@@ -195,10 +195,10 @@ class ProjectTest < ActiveSupport::TestCase
   def test_can_be_edited_by
     u = Factory(:project_administrator).user
     p = u.person.projects.first
-    assert p.can_be_edited_by?(u), 'Project should be editable by user :project_administrator'
+    assert p.can_edit?(u), 'Project should be editable by user :project_administrator'
 
     p = Factory(:project)
-    assert !p.can_be_edited_by?(u), 'other project should not be editable by project administrator, since it is not a project he administers'
+    assert !p.can_edit?(u), 'other project should not be editable by project administrator, since it is not a project he administers'
   end
 
   test 'can be edited by programme adminstrator' do
@@ -206,8 +206,8 @@ class ProjectTest < ActiveSupport::TestCase
     project = pa.programmes.first.projects.first
     other_project = Factory(:project)
 
-    assert project.can_be_edited_by?(pa.user)
-    refute other_project.can_be_edited_by?(pa.user)
+    assert project.can_edit?(pa.user)
+    refute other_project.can_edit?(pa.user)
   end
 
   test 'can be edited by project member' do
@@ -217,8 +217,8 @@ class ProjectTest < ActiveSupport::TestCase
     refute_nil project
     another_person = Factory(:person)
 
-    assert project.can_be_edited_by?(person.user)
-    refute project.can_be_edited_by?(another_person.user)
+    assert project.can_edit?(person.user)
+    refute project.can_edit?(another_person.user)
 
     User.with_current_user person.user do
       assert project.can_edit?
@@ -235,12 +235,27 @@ class ProjectTest < ActiveSupport::TestCase
     normal = Factory(:person)
     another_proj = Factory(:project)
 
-    assert project_administrator.projects.first.can_be_administered_by?(project_administrator.user)
-    assert !normal.projects.first.can_be_administered_by?(normal.user)
+    assert project_administrator.projects.first.can_manage?(project_administrator.user)
+    assert !normal.projects.first.can_manage?(normal.user)
 
-    assert !another_proj.can_be_administered_by?(normal.user)
-    assert !another_proj.can_be_administered_by?(project_administrator.user)
-    assert another_proj.can_be_administered_by?(admin.user)
+    assert !another_proj.can_manage?(normal.user)
+    assert !another_proj.can_manage?(project_administrator.user)
+    assert another_proj.can_manage?(admin.user)
+  end
+
+  test 'can manage' do
+    admin = Factory(:admin)
+    project_administrator = Factory(:project_administrator)
+    normal = Factory(:person)
+    another_proj = Factory(:project)
+
+    assert project_administrator.projects.first.can_manage?(project_administrator.user)
+    refute normal.projects.first.can_manage?(normal.user)
+
+    refute another_proj.can_manage?(nil)
+    refute another_proj.can_manage?(normal.user)
+    refute another_proj.can_manage?(project_administrator.user)
+    assert another_proj.can_manage?(admin.user)
   end
 
   test 'can be administered by programme administrator' do
@@ -249,8 +264,8 @@ class ProjectTest < ActiveSupport::TestCase
     project = pa.programmes.first.projects.first
     other_project = Factory(:project)
 
-    assert project.can_be_administered_by?(pa.user)
-    refute other_project.can_be_administered_by?(pa.user)
+    assert project.can_manage?(pa.user)
+    refute other_project.can_manage?(pa.user)
   end
 
   test 'update with attributes for project_administrator_ids ids' do
@@ -741,7 +756,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert project_administrator.is_project_administrator?(project)
     assert project_administrator.user.is_project_administrator?(project)
     assert project_administrator.user.person.is_project_administrator?(project)
-    assert project.can_be_administered_by?(project_administrator.user)
+    assert project.can_manage?(project_administrator.user)
 
     project_administrator.group_memberships.destroy_all
     project_administrator = project_administrator.reload
@@ -749,7 +764,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_not_includes project_administrator.roles, 'project_administrator'
     assert_not_includes project.project_administrators, project_administrator
     assert !project_administrator.is_project_administrator?(project)
-    assert !project.can_be_administered_by?(project_administrator.user)
+    assert !project.can_manage?(project_administrator.user)
   end
 
   test 'project role removed when marked as left project' do
@@ -761,7 +776,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert project_administrator.is_project_administrator?(project)
     assert project_administrator.user.is_project_administrator?(project)
     assert project_administrator.user.person.is_project_administrator?(project)
-    assert project.can_be_administered_by?(project_administrator.user)
+    assert project.can_manage?(project_administrator.user)
 
     project_administrator.group_memberships.first.update_attributes(time_left_at: 1.day.ago)
     project_administrator = project_administrator.reload
@@ -769,7 +784,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_not_includes project_administrator.roles, 'project_administrator'
     assert_not_includes project.project_administrators, project_administrator
     assert !project_administrator.is_project_administrator?(project)
-    assert !project.can_be_administered_by?(project_administrator.user)
+    assert !project.can_manage?(project_administrator.user)
   end
 
   test 'stores project settings' do
