@@ -20,14 +20,14 @@ module FilteringHelper
     @filters.merge(key => existing)
   end
 
-  def without_filter(key, value)
+  def without_filter(key, value = nil)
     existing = @filters[key]
     if existing
       existing = [existing] unless existing.is_a?(Array)
       existing -= [value]
     end
 
-    if existing.empty?
+    if existing.blank? || value.nil?
       @filters.except(key)
     else
       @filters.merge(key => existing)

@@ -30,7 +30,7 @@ class ApplicationRecord < ActiveRecord::Base
   def self.is_taggable?
     false # defaults to false, unless it includes Taggable which will override this and check the configuration
   end
-  
+
   # takes and ignores arguments for use in :after_add => :update_timestamp, etc.
   def update_timestamp(*_args)
     current_time = current_time_from_proper_timezone
@@ -106,5 +106,5 @@ class ApplicationRecord < ActiveRecord::Base
 
   has_filter query: Seek::Filtering::SearchFilter.new
   has_filter created_at: Seek::Filtering::DateFilter.new(field: :created_at,
-                                                         date_ranges: [24.hours, 1.week, 1.month, 1.year, 5.years])
+                                                         presets: [24.hours, 1.week, 1.month, 1.year, 5.years])
 end

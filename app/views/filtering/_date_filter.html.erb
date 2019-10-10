@@ -1,12 +1,95 @@
-<% filter_limit = 6 %>
 <% if options.any? %>
+  <%
+    start_date = nil
+    end_date = nil
+    # User supplied options (not one of the presets), should not appear as options in the dropdown menu.
+    option_pairs = options.select { |o| o.data[:preset] }.map { |option| ["#{option.label} (#{option.count})", option.value] } + [['Custom range', 'custom']]
+    active_options = options.select(&:active?)
+    if active_options.any?
+      selected_preset = active_options.detect { |o| o.data[:preset] }
+      if selected_preset
+        selected_option_value = selected_preset.value
+      elsif active_options.length == 1
+        date_range = active_options.first.data[:date_range]
+        start_date = date_range.begin.iso8601
+        end_date = date_range.end.iso8601 unless date_range.end.is_a?(Date::Infinity)
+        selected_option_value = 'custom'
+      else # If the user has crafted some complex query with multiple ranges, we can't hope to fit it into the date range form.
+        option_pairs += [['Other', 'other']]
+        selected_option_value = 'other'
+      end
+    else
+      selected_option_value = nil
+    end
+  %>
+
   <div class="filter-category collapsed">
     <div class="filter-category-title"><%= key.to_s.humanize %></div>
-    <% options.each_with_index do |filter, i| %>
-      <%= filter_link(key, filter, hidden: i >= filter_limit, replace: true) %>
+    <% select_name = "filter-by-date--#{key}" %>
+    <% apply_url = url_for({ page: nil, filter: with_filter(key, '_date_', replace: true) }) %>
+    <% remove_url = url_for({ page: nil, filter: without_filter(key) }) %>
+    <%= select_tag(select_name, options_for_select(option_pairs, selected_option_value),
+                   data: { 'apply-url' => apply_url, 'remove-url' => remove_url },
+                   autocomplete: 'off',
+                   include_blank: 'Any time',
+                   class: 'form-control filter-dropdown')
+    %>
+    <%= content_tag(:div, { class: 'filter-date-range-wrapper', style: 'display: none;', id: "#{select_name}-custom-range" }) do %>
+      <%= text_field_tag(nil, start_date,
+                         placeholder: 'Start',
+                         id: "#{select_name}-start",
+                         autocomplete: 'off',
+                         class: 'filter-date-range-field') -%>
+      <%= text_field_tag(nil, end_date,
+                         placeholder: 'End (optional)',
+                         id: "#{select_name}-end",
+                         autocomplete: 'off',
+                         class: 'filter-date-range-field') -%>
+      <%= link_to('Go', '#', id: "#{select_name}-btn", class: 'filter-date-range-button') %>
     <% end %>
-    <% if options.length > filter_limit %>
-      <%= link_to "More...", '#', class: 'expand-filter-category-link' %>
-    <% end %>
+    <script>
+        (function () {
+            var select = $j('#<%= select_name -%>');
+            var custom = $j('#<%= select_name -%>-custom-range');
+            var button = $j('#<%= select_name -%>-btn');
+            var start = $j('#<%= select_name -%>-start');
+            var end = $j('#<%= select_name -%>-end');
+
+            if (select.val() === 'custom') {
+                custom.show();
+            } else {
+                custom.hide();
+            }
+
+            button.click(function () {
+                if (start.val()) {
+                    var val = start.val();
+                    if (end.val()) {
+                        val += ('/' + end.val());
+                    }
+                    window.location = select.data('applyUrl').replace('_date_',  val);
+                }
+            });
+
+            select.change(function () {
+                var val = $j(this).val();
+
+                if (val) {
+                    if (val === 'custom') {
+                        custom.fadeIn();
+                    } else {
+                        custom.fadeOut();
+                        window.location = $j(this).data('applyUrl').replace('_date_',  val);
+                    }
+                } else {
+                    window.location = $j(this).data('removeUrl');
+                }
+            });
+
+            $j('input', custom).datetimepicker({
+                format: 'YYYY-MM-DD'
+            });
+        })();
+    </script>
   </div>
 <% end %>

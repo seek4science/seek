@@ -1,12 +1,12 @@
 <%
-    new_item_label ||= "New #{t(controller_name.singularize)}"
-    new_item_path = eval("new_#{controller_name.singularize}_path")
-    items ||= instance_variable_get("@#{controller_name}")
-    show_new_button = true unless local_assigns.has_key?(:show_new_button)
-    title ||= nil
-    subtitle ||= nil
-    faceted_browsing_enabled = index_with_facets?(controller_name) unless local_assigns.has_key?(:faceted_browsing_enabled)
-    faceted_browsing = faceted_browsing_enabled && params[:user_enable_facet] == 'true'
+  new_item_label ||= "New #{t(controller_name.singularize)}"
+  new_item_path = eval("new_#{controller_name.singularize}_path")
+  items ||= instance_variable_get("@#{controller_name}")
+  show_new_button = true unless local_assigns.has_key?(:show_new_button)
+  title ||= nil
+  subtitle ||= nil
+  faceted_browsing_enabled = index_with_facets?(controller_name) unless local_assigns.has_key?(:faceted_browsing_enabled)
+  faceted_browsing = faceted_browsing_enabled && params[:user_enable_facet] == 'true'
 %>
 
 <div class="pull-right">
@@ -34,6 +34,17 @@
   <%= render partial: 'assets/resource_filtering' unless faceted_browsing %>
   <div class="index-content">
     <% unless faceted_browsing %>
+      <%# filter debugging - remove me eventually %>
+      <% if false %>
+        <div>
+          <div>
+            <%= @active_filters.inspect %>
+          </div>
+          <div>
+            <%= @filters.inspect %>
+          </div>
+        </div>
+      <% end %>
       <%= render partial: 'assets/resource_sorting', locals: { items: items } %>
       <%= render partial: 'assets/resource_counts' %>
       <%= render partial: 'assets/resource_active_filters' %>

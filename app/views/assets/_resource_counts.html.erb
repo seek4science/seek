@@ -2,7 +2,7 @@
 
 <span id="resource-count-stats">
   <strong><%= @visible_count %></strong>
-  <% if @filters&.any? -%>
+  <% if @active_filters&.any? -%>
     <%= resource_text %> matching the given criteria:
     <%= link_to("(Clear all filters)", page_and_sort_params.merge(filter: nil)) %>
   <% elsif @total_count && klass_from_controller.authorization_supported? %>

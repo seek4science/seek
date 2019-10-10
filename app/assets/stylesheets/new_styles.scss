@@ -956,6 +956,35 @@ div.index-filters {
   }
 }
 
+.filter-dropdown {
+  border: none;
+  background: transparent;
+  width: 100%;
+  border-radius: 0;
+}
+
+.filter-date-range-wrapper {
+  border-top: 1px solid #ccc;
+  display: flex;
+  line-height: 24px;
+
+  .filter-date-range-field {
+    flex-grow: 1;
+    min-width: 6em;
+    padding: 5px;
+    border-style: solid;
+    border-color: #ccc;
+    border-width: 0 1px 0 0;
+  }
+
+  .filter-date-range-button {
+    flex: 1;
+    color: inherit;
+    padding: 5px 10px;
+    display: block;
+  }
+}
+
 .pagination-container {
   text-align: center;
   clear: both;
