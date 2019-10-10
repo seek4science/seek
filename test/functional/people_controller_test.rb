@@ -70,8 +70,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   def test_second_registered_person_is_not_admin
     Person.delete_all
-    person = Person.new(first_name: 'fred', email: 'fred@dddd.com')
-    person.save!
+    person = Factory(:brand_new_person, first_name: 'fred', email: 'fred@dddd.com')
     assert_equal 1, Person.count, 'There should be 1 person in the database'
     user = Factory(:activated_user)
     login_as user

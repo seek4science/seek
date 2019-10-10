@@ -41,14 +41,12 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   def test_title_trimmed
-    i = Institution.new(title: ' an institution', country: 'LY')
-    i.save!
+    i = Factory(:institution, title: ' an institution', country: 'LY')
     assert_equal('an institution', i.title)
   end
 
   def test_update_first_letter
-    i = Institution.new(title: 'an institution', country: 'NL')
-    i.save!
+    i = Factory(:institution, title: 'an institution', country: 'NL')
     assert_equal 'A', i.first_letter
   end
 
@@ -56,12 +54,12 @@ class InstitutionTest < ActiveSupport::TestCase
     pm = Factory(:project_administrator)
     i = pm.institutions.first
     i2 = Factory(:institution)
-    assert i.can_be_edited_by?(pm.user), 'This institution should be editable as this user is project administrator of a project this institution is linked to'
-    assert !i2.can_be_edited_by?(pm.user), 'This institution should be not editable as this user is project administrator but not of a project this institution is linked to'
+    assert i.can_edit?(pm.user), 'This institution should be editable as this user is project administrator of a project this institution is linked to'
+    assert !i2.can_edit?(pm.user), 'This institution should be not editable as this user is project administrator but not of a project this institution is linked to'
 
     i = Factory(:institution)
     u = Factory(:admin).user
-    assert i.can_be_edited_by?(u), "Institution :one should be editable by this user, as he's an admin"
+    assert i.can_edit?(u), "Institution :one should be editable by this user, as he's an admin"
   end
 
   def test_valid

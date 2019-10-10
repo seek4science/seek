@@ -278,41 +278,35 @@ class Person < ApplicationRecord
     end.flatten.uniq.compact
   end
 
-  # can be edited by:
-  # (admin or project managers of this person) and (this person does not have a user or not the other admin)
-  # themself
-  def can_be_edited_by?(user)
-    return false unless user
-    user = user.user if user.is_a?(Person)
-    (user == self.user) || user.is_admin? || (is_project_administered_by?(user) && self.user.nil?)
-  end
-
   def me?
     user && user == User.current_user
-  end
-
-  # admin can administer other people, project manager can administer other people except other admins and themself
-  def can_be_administered_by?(user)
-    person = user.is_a?(User) ? user.person : user
-    return false unless user && person
-    is_proj_or_prog_admin = person.is_project_administrator_of_any_project? || person.is_programme_administrator_of_any_programme?
-    user.is_admin? || (is_proj_or_prog_admin && (is_admin? || self != person))
   end
 
   def can_view?(user = User.current_user)
     !user.nil? || !Seek::Config.is_virtualliver
   end
 
+  # can be edited by:
+  # (admin or project managers of this person) and (this person does not have a user or not the other admin)
+  # themself
   def can_edit?(user = User.current_user)
-    new_record? || can_be_edited_by?(user)
+    return false unless user
+    return true if new_record? && self.class.can_create?
+    user = user.user if user.is_a?(Person)
+    (user == self.user) || user.is_admin? || (is_project_administered_by?(user) && self.user.nil?)
   end
 
+  # admin can administer other people, project manager can administer other people except other admins and themself
   def can_manage?(user = User.current_user)
-    user.try(:is_admin?)
+    return false unless user
+    person = user.person
+    return false unless person
+    is_proj_or_prog_admin = person.is_project_administrator_of_any_project? || person.is_programme_administrator_of_any_programme?
+    user.is_admin? || (is_proj_or_prog_admin && (is_admin? || self != person))
   end
 
   def can_delete?(user = User.current_user)
-    can_manage? user
+    user&.is_admin?
   end
 
   def title_is_public?

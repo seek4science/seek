@@ -1,4 +1,6 @@
-# This controller handles the login/logout function of the site.  
+require 'securerandom' #to set the seek user password to something random when the user is created
+
+# This controller handles the login/logout function of the site.
 class SessionsController < ApplicationController
 
   before_action :redirect_to_sign_up_when_no_user,:only=>:new
@@ -9,7 +11,7 @@ class SessionsController < ApplicationController
 
   # render new.html.erb
   def new
-    
+
   end
 
   def index
@@ -51,7 +53,7 @@ class SessionsController < ApplicationController
       check_login
     else
       failed_login "Invalid username/password. Have you <b> #{view_context.link_to "forgotten your password?", main_app.forgot_password_url }</b>".html_safe
-    end  
+    end
   end
 
   private
@@ -67,7 +69,7 @@ class SessionsController < ApplicationController
       successful_login
     end
   end
-  
+
   def successful_login
     self.current_user = @user
     flash[:notice] = "You have successfully logged in, #{@user.display_name}."
@@ -114,11 +116,9 @@ class SessionsController < ApplicationController
   end
 
   def create_omniauth(auth)
-    require 'securerandom' #to set the seek user password to something random when the user is created
-
     # info contains username, first_ and last_name and email
     info = auth['info']
-    
+
     # check if there is a user with that username as login
     user_by_omniauth = User.find_by_login( info['nickname'])
     if user_by_omniauth
@@ -142,7 +142,7 @@ class SessionsController < ApplicationController
         # when user was saved successfully, also create the Profile and save with the user
         person = Person.create(auth['info'].slice(:first_name, :last_name, :email))
         person.user = @user
-        person.save
+        disable_authorization_checks { person.save! }
         check_login
       end
     end

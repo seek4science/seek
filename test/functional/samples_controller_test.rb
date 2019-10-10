@@ -799,6 +799,25 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
+  test 'hide manage menu for manageable but not editable items' do
+    # an odd case, where you can manage but not edit, see https://jira-bsse.ethz.ch/browse/OPSK-2041
+    person = Factory(:person)
+    sample = Factory(:sample_from_file, contributor:person)
+    login_as(person)
+    assert sample.can_manage?
+    assert sample.can_view?
+    refute sample.can_edit?
+
+    get :show, params:{ id:sample.id }
+    assert_response :success
+
+    assert_select 'a[href=?]',manage_sample_path(sample),text:/manage sample/i, count:0
+    assert_select 'a[href=?]',edit_sample_path(sample),text:/edit sample/i, count:0
+    assert_select 'a[data-method="delete"][href=?]',sample_path(sample),text:/delete sample/i, count:1
+
+  end
+
+
   private
 
   def populated_patient_sample
