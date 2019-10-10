@@ -496,13 +496,8 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal 'new fluxomics', assay.assay_type_label
 
     suggested_ma = Factory(:suggested_modelling_analysis_type, label: 'new metabolism')
-    assay = Factory(:experimental_assay, suggested_assay_type: suggested_ma)
-    # not valid due to assay_type_uri and assay class mismatch
-    refute assay.valid?
-
     assay = Factory(:modelling_assay, suggested_assay_type: suggested_ma)
     assert_equal 'new metabolism', assay.assay_type_label
-    assert assay.valid?
   end
 
   test 'technology type label from ontology or suggested technology type' do
