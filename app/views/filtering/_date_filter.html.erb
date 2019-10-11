@@ -35,20 +35,20 @@
                    data: { role: 'seek-date-filter-select' },
                    autocomplete: 'off',
                    include_blank: 'Any time',
-                   class: 'form-control filter-dropdown')
+                   class: 'filter-option-dropdown')
     %>
-    <%= content_tag(:div, { class: 'filter-date-range-wrapper', style: 'display: none;', data: { role: 'seek-date-filter-custom' } }) do %>
+    <%= content_tag(:div, { class: 'filter-option-field-group', style: 'border-top: 1px solid #ccc;', data: { role: 'seek-date-filter-custom' } }) do %>
       <%= text_field_tag(nil, start_date,
                          data: { role: 'seek-date-filter-period-start' },
                          placeholder: 'Start',
                          autocomplete: 'off',
-                         class: 'filter-date-range-field') -%>
+                         class: 'filter-option-field') -%>
       <%= text_field_tag(nil, end_date,
                          data: { role: 'seek-date-filter-period-end' },
                          placeholder: 'End (optional)',
                          autocomplete: 'off',
-                         class: 'filter-date-range-field') -%>
-      <%= link_to('Go', '#', data: { role: 'seek-date-filter-btn' }, class: 'filter-date-range-button') %>
+                         class: 'filter-option-field') -%>
+      <%= link_to('Go', '#', data: { role: 'seek-date-filter-btn' }, class: 'filter-option-field-button') %>
     <% end %>
   <% end %>
 <% end %>

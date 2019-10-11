@@ -831,7 +831,6 @@ div.index-filters {
   flex-shrink: 0;
 }
 
-
 .filter-category {
   .filter-category-title {
     background: #eee;
@@ -882,7 +881,7 @@ div.index-filters {
   &:hover {
     text-decoration: none;
     color: $pagination-hover-color;
-    background-color: $pagination-hover-bg;
+    background-color: #fafafa;
   }
 
   &.filter-option-active {
@@ -929,25 +928,30 @@ div.index-filters {
   }
 }
 
-.filter-search-box {
+.filter-option-field-group {
   display: flex;
   line-height: 24px;
 
-  .filter-search-field {
+  .filter-option-field {
     flex-grow: 1;
-    min-width: 10em;
-    border: none;
-    padding: 5px 10px;
+    min-width: 5em;
+    padding: 5px;
+    border-style: solid;
+    border-width: 0 0 0 1px;
+    border-color: #ccc;
+    &:first-child {
+      border-width: 0;
+    }
   }
-  .filter-search-button {
-    flex: 1;
+  .filter-option-field-button {
+    flex-shrink: 1;
     color: inherit;
     border-left: 1px solid #ccc;
     padding: 5px 10px;
     display: block;
   }
-  .filter-search-clear {
-    flex: 1;
+  .filter-option-field-clear {
+    flex-shrink: 1;
     color: #999;
     text-decoration: none;
     font-size: 26px;
@@ -956,33 +960,15 @@ div.index-filters {
   }
 }
 
-.filter-dropdown {
+.filter-option-dropdown {
   border: none;
   background: transparent;
   width: 100%;
   border-radius: 0;
-}
-
-.filter-date-range-wrapper {
-  border-top: 1px solid #ccc;
-  display: flex;
-  line-height: 24px;
-
-  .filter-date-range-field {
-    flex-grow: 1;
-    min-width: 6em;
-    padding: 5px;
-    border-style: solid;
-    border-color: #ccc;
-    border-width: 0 1px 0 0;
-  }
-
-  .filter-date-range-button {
-    flex: 1;
-    color: inherit;
-    padding: 5px 10px;
-    display: block;
-  }
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  color: #555555;
 }
 
 .pagination-container {

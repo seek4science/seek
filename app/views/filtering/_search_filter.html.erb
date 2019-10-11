@@ -2,20 +2,20 @@
   <% url_template = url_for(page_and_sort_params.merge({ page: nil, filter: with_filter(:query, '_query_', replace: true) })) %>
   <div class="filter-category collapsed">
     <div class="filter-category-title">Query</div>
-    <div class="filter-search-box">
+    <div class="filter-option-field-group">
       <%= text_field_tag(nil, options.first.value, data: { url: url_template },
                          placeholder: 'Search here...',
                          id: 'filter-search-field',
                          autocomplete: 'off',
-                         class: 'filter-search-field') -%>
+                         class: 'filter-option-field') -%>
       <% if options.first.active? %>
         <%= link_to(page_and_sort_params.merge({ page: nil, filter: without_filter(key, options.first.value)}),
                     title: "Clear the search field.",
-                    class: 'filter-search-clear') do %>
+                    class: 'filter-option-field-clear') do %>
           &times;
         <% end %>
       <% end %>
-      <%= link_to('Go', '#', id: 'filter-search-button', class: 'filter-search-button') %>
+      <%= link_to('Go', '#', id: 'filter-search-button', class: 'filter-option-field-button') %>
     </div>
 
     <script>
