@@ -100,7 +100,7 @@ class ApplicationRecord < ActiveRecord::Base
 
       where(id: search.hits.map(&:primary_key))
     else
-      self
+      where('1=1')
     end
   end
 
