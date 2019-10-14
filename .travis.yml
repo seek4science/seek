@@ -26,6 +26,9 @@ env:
   - SUITE="rspec spec" DB_TYPE=mysql
   - SUITE="rake assets:precompile RAILS_ENV=production" DB_TYPE=mysql
   - SUITE="rake db:setup RAILS_ENV=production" DB_TYPE=mysql
+  - SUITE="rake db:setup RAILS_ENV=development" DB_TYPE=mysql
+  - SUITE="rake db:setup RAILS_ENV=production" DB_TYPE=sqlite3
+  - SUITE="rake db:setup RAILS_ENV=production" DB_TYPE=postgres
 #  - SUITE="rake teaspoon" RAILS_ENV=test DB_TYPE=mysql
 
 before_install:
