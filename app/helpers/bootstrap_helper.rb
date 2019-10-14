@@ -86,9 +86,10 @@ module BootstrapHelper
 
   # A button that displays a dropdown menu when clicked
   def dropdown_button(text, icon_key = nil, options = {})
+
     content_tag(:div, class: 'btn-group') do
       content_tag(:div, :type => 'button', :class => "btn dropdown-toggle #{options[:type] || 'btn-default'}".strip,
-                        'data-toggle' => 'dropdown', 'aria-expanded' => 'false') do
+                        'data-toggle' => 'dropdown', 'aria-expanded' => 'false','data-tooltip'=>options[:tooltip]) do
         ((icon_key ? icon_tag(icon_key, options.delete(:icon_options) || {}) : '') +
             text + ' <span class="caret"></span>'.html_safe)
       end +
