@@ -20,7 +20,7 @@ module Seek
       end
 
       def options(collection, active_values)
-        select_fields = [value_field, "COUNT(#{value_field})", label_field].compact.map { |f| Arel.sql(f) }
+        select_fields = [value_field, Arel.sql("COUNT(#{value_field})"), label_field].compact
         collection = collection.select(*select_fields)
         collection = collection.joins(joins) if joins
         collection = collection.includes(includes) if includes

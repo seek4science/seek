@@ -1,11 +1,22 @@
 module Seek
   class Filterer
+    # Hard-coded list of available filters for types. Overrides the automatically discovered filters (via `has_filter`).
     AVAILABLE_FILTERS = {
         Publication: [:query, :programme, :project, :published_year, :author, :organism, :tag],
         Event: [:query, :created_at, :country],
         Person: [:query, :programme, :project, :institution, :location, :project_position, :expertise, :tool]
     }.freeze
 
+    # Misc mappings/transformations that might be used in multiple filters.
+    MAPPINGS = {
+        # Map a list of person IDs to peoples' names.
+        person_name: ->(ids) do
+          people = Person.select(:id, :first_name, :last_name).where(id: ids).to_a
+          ids.map { |v| (people.detect { |p| p.id == v })&.name }
+        end
+    }.freeze
+
+    # Pre-defined filters that may or may not be re-used for multiple types.
     FILTERS = {
         project: Seek::Filtering::Filter.new(
             value_field: 'projects.id',
@@ -24,18 +35,12 @@ module Seek
         ),
         contributor: Seek::Filtering::Filter.new(
             value_field: 'people.id',
-            label_mapping: ->(values) do
-              people = Person.where(id: values).to_a
-              values.map { |v| (people.detect { |p| p.id == v })&.name }
-            end,
+            label_mapping: MAPPINGS[:person_name],
             includes: [:contributor]
         ),
         creator: Seek::Filtering::Filter.new(
             value_field: 'assets_creators.creator_id',
-            label_mapping: ->(values) do
-              people = Person.where(id: values).to_a
-              values.map { |v| people.detect { |p| p.id == v }&.name }
-            end,
+            label_mapping: MAPPINGS[:person_name],
             joins: [:creators]
         ),
         assay_class: Seek::Filtering::Filter.new(
@@ -90,10 +95,7 @@ module Seek
         ),
         author: Seek::Filtering::Filter.new(
             value_field: 'people.id',
-            label_mapping: ->(values) do
-              people = Person.where(id: values).to_a
-              values.map { |v| people.detect { |p| p.id == v }&.name }
-            end,
+            label_mapping: MAPPINGS[:person_name],
             joins: [:people]
         ),
         published_year: Seek::Filtering::YearFilter.new(field: 'published_date')

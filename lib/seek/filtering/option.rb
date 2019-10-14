@@ -16,6 +16,7 @@ module Seek
         active
       end
 
+      # Bumps active filter options ahead of non-active ones, then sorts by count.
       def <=>(other)
         if active?
           return -1 unless other.active?
