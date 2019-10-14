@@ -29,10 +29,10 @@ module Seek
       start_date_desc: { title: 'Date (Descending)', order: 'start_date DESC' },
       published_at_asc: { title: 'Publication date (Ascending)', order: 'published_date' },
       published_at_desc: { title: 'Publication date (Descending)', order: 'published_date DESC' },
-      updated_at_asc: { title: 'Last updated (Ascending)', order: 'updated_at' },
-      updated_at_desc: { title: 'Last updated (Descending)', order: 'updated_at DESC' },
-      created_at_asc: { title: 'Last created (Ascending)', order: 'created_at' },
-      created_at_desc: { title: 'Last created (Descending)', order: 'created_at DESC' },
+      updated_at_asc: { title: 'Last update date (Ascending)', order: 'updated_at' },
+      updated_at_desc: { title: 'Last update date (Descending)', order: 'updated_at DESC' },
+      created_at_asc: { title: 'Creation date (Ascending)', order: 'created_at' },
+      created_at_desc: { title: 'Creation date (Descending)', order: 'created_at DESC' },
     }.with_indifferent_access.freeze
 
     # sort items in the related items hash according the rule for its type
