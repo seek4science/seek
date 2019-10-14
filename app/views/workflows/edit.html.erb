@@ -21,11 +21,7 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @workflow} -%>
 
-      <div>
-        <%= f.submit "Update", :id => "workflow_submit_btn",
-                     :onclick => "return validateResourceFields('workflow')",
-                     :class => 'btn btn-primary' -%>
-        or <%= cancel_button(workflow_path(@workflow)) -%>
-      </div>
+      <%= form_submit_buttons(@workflow) %>
+
     </div>
 <% end %>

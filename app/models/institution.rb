@@ -7,7 +7,7 @@ class Institution < ApplicationRecord
   scope :default_order, -> { order('title') }
 
   validates :web_page, url: {allow_nil: true, allow_blank: true}
-  validates :country, :presence => true
+  validates :country, country:true, :presence => true
 
   has_many :work_groups, dependent: :destroy, inverse_of: :institution
   has_many :projects, through: :work_groups,  inverse_of: :institutions
@@ -20,17 +20,17 @@ class Institution < ApplicationRecord
     text :city, :address
   end if Seek::Config.solr_enabled
 
-  def can_be_edited_by?(user)
-    return false if user.nil?
+  def can_edit?(user = User.current_user)
+    return false unless user
+    return true if new_record? && self.class.can_create?
     user.is_admin? || self.is_managed_by?(user)
   end
 
   # determines if this person is the member of a project for which the user passed is a project manager
   def is_managed_by?(user)
-    match = projects.find do |p|
+    projects.any? do |p|
       user.person.is_project_administrator?(p)
     end
-    !match.nil?
   end
 
   # get a listing of all known institutions
@@ -39,12 +39,11 @@ class Institution < ApplicationRecord
   end
 
   def can_delete?(user = User.current_user)
-    user.nil? ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
+    (user&.is_admin? && work_groups.collect(&:people).flatten.empty?)
   end
 
   def self.can_create?
     User.admin_or_project_administrator_logged_in? ||
       User.activated_programme_administrator_logged_in?
   end
-  
 end

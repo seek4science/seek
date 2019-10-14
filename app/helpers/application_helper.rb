@@ -5,6 +5,7 @@ module ApplicationHelper
   include FancyMultiselectHelper
   include Recaptcha::ClientHelper
   include VersionHelper
+  include ImagesHelper
 
   def no_items_to_list_text
     content_tag :div, id: 'no-index-items-text' do
@@ -217,7 +218,7 @@ module ApplicationHelper
       res = mail_to(res) if options[:email]
       res = link_to(res, res, popup: true) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
-      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(res)) if options[:link_as_country]
+      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(CountryCodes.code(text))) if options[:link_as_country]
     end
     res.html_safe
   end

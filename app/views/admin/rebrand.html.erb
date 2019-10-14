@@ -4,11 +4,21 @@
   <%= admin_text_setting(:project_name, Seek::Config.project_name,
                          "#{t('project')} name", "A name for your #{t('project')}, this is the text that is used in sentences. Example Sysmo, Virtual Liver") %>
 
+  <%= admin_textarea_setting(:project_description, Seek::Config.project_description,
+                         "Project description", "A description about the project.") %>
+
+  <%= admin_text_setting(:project_keywords, Seek::Config.project_keywords,
+                             "Project keywords", "A comma separated list of keywords that describe the project.") %>
+
   <%= admin_text_setting(:project_type, Seek::Config.project_type,
                          "#{t('project')} type", "Whether your #{t('project')} is a group, consortium, network etc.") %>
 
   <%= admin_text_setting(:project_link, Seek::Config.project_link,
                          "#{t('project')} Link", "A URL that is used as a link to your #{t('project')} website.") %>
+
+  <%= admin_text_setting(:application_name, Seek::Config.application_name,
+                         "Application name", "The name of your application, as used in sentences, if you are extending SEEK and wish to give it a different name.") %>
+
 
   <%= admin_text_setting(:application_name, Seek::Config.application_name,
                          "Application name", "The name of your application, as used in sentences, if you are extending SEEK and wish to give it a different name.") %>

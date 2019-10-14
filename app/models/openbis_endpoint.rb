@@ -33,7 +33,7 @@ class OpenbisEndpoint < ApplicationRecord
   end
 
   def can_edit?(user = User.current_user)
-    user && project.can_be_administered_by?(user) && Seek::Config.openbis_enabled
+    user && project.can_manage?(user) && Seek::Config.openbis_enabled
   end
 
   def can_delete?(user = User.current_user)

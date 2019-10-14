@@ -44,7 +44,7 @@ module SamplesHelper
   end
 
   def display_attribute(sample, attribute, options = {})
-    value = sample.get_attribute(attribute)
+    value = sample.get_attribute_value(attribute)
     if value.blank?
       text_or_not_specified(value)
     else

@@ -37,11 +37,7 @@
      end
    end
 
-   if Seek::Config.is_virtualliver
-     add_new_assay_title = " or create #{link_to(h("new #{single_assay_class_text}"), new_assay_path(:create_from_asset => :true), :onclick => "window.open(this.href);return false;")}".html_safe
-   else
-     add_new_assay_title = ""
-   end
+   add_new_assay_title = ""
 
   collapsed = associated_assays.blank? if collapsed.nil?
   assay_asset_json = associations_json_from_assay_assets(resource.assay_assets, type: resource.class.name.underscore)
