@@ -148,13 +148,15 @@ class FiltererTest < ActiveSupport::TestCase
     assert_equal 1, filtered_docs.length
     assert_includes filtered_docs, project_doc
 
-    # All documents filtered by project and contributor and query (useless since solr is not enabled, but should cover some code)
-    docs = Document.all
-    filtered_docs = document_filterer.filter(docs, { project: [project.id.to_s],
-                                                     contributor: [project_doc.contributor.id.to_s],
-                                                     query: ['hello']})
-    assert_equal 1, filtered_docs.length
-    assert_includes filtered_docs, project_doc
+    with_config_value(:solr_enabled, false) do
+      # All documents filtered by project and contributor and query (useless since solr is not enabled, but should cover some code)
+      docs = Document.all
+      filtered_docs = document_filterer.filter(docs, { project: [project.id.to_s],
+                                                       contributor: [project_doc.contributor.id.to_s],
+                                                       query: ['hello']})
+      assert_equal 1, filtered_docs.length
+      assert_includes filtered_docs, project_doc
+    end
 
     # Public documents filtered by project
     docs = Document.where(id: Document.authorized_for('view').map(&:id)) # We have to do this because auth lookup is not enabled in tests :(

@@ -19,7 +19,6 @@ SEEK::Application.configure do
       Settings.defaults[:workflows_enabled] = true
 
       Settings.defaults[:email_enabled] = true
-      Settings.defaults[:solr_enabled] = false
 
       Settings.defaults[:publish_button_enabled] = true
       Settings.defaults[:auth_lookup_enabled] = false
