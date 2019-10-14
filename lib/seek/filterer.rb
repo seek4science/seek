@@ -24,12 +24,18 @@ module Seek
         ),
         contributor: Seek::Filtering::Filter.new(
             value_field: 'people.id',
-            label_mapping: ->(values) { Person.where(id: values).map(&:name) },
+            label_mapping: ->(values) do
+              people = Person.where(id: values).to_a
+              values.map { |v| (people.detect { |p| p.id == v })&.name }
+            end,
             includes: [:contributor]
         ),
         creator: Seek::Filtering::Filter.new(
             value_field: 'assets_creators.creator_id',
-            label_mapping: ->(values) { Person.where(id: values).map(&:name) },
+            label_mapping: ->(values) do
+              people = Person.where(id: values).to_a
+              values.map { |v| people.detect { |p| p.id == v }&.name }
+            end,
             joins: [:creators]
         ),
         assay_class: Seek::Filtering::Filter.new(
@@ -55,6 +61,7 @@ module Seek
         ),
         tag: Seek::Filtering::Filter.new(
             value_field: 'text_values.id',
+            value_mapping: ->(values) { values.map { |v| v.to_i }.reject(&:zero?) },
             label_field: 'text_values.text',
             joins: [:tags_as_text]
         ),
@@ -83,7 +90,10 @@ module Seek
         ),
         author: Seek::Filtering::Filter.new(
             value_field: 'people.id',
-            label_mapping: ->(values) { Person.where(id: values).map(&:name) },
+            label_mapping: ->(values) do
+              people = Person.where(id: values).to_a
+              values.map { |v| people.detect { |p| p.id == v }&.name }
+            end,
             joins: [:people]
         ),
         published_year: Seek::Filtering::YearFilter.new(field: 'published_date')
