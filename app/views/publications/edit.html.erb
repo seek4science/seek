@@ -3,7 +3,8 @@
 
 <%= form_for @publication do |f| %>
 
-    <%# if @publication.registered_mode == 3 || @publication.registered_mode == 4 %>
+<!--  when registered manually or from bibtex file -->
+    <%#if @publication.registered_mode == 3 || @publication.registered_mode == 4 %>
       <%= render :partial => 'publicaiton_editor', :locals => { :publication_form => f }%>
     <%# end %>
 

@@ -180,6 +180,8 @@ class Publication < ApplicationRecord
   # @param doi_record DOI::Record
   # @see https://github.com/SysMO-DB/doi_query_tool/blob/master/lib/doi_record.rb
   def extract_doi_metadata(doi_record)
+    Rails.logger.debug("doi_record:")
+    Rails.logger.debug(puts (doi_record))
     self.registered_mode = 2
     self.title = doi_record.title
     self.published_date = doi_record.date_published
@@ -418,6 +420,9 @@ class Publication < ApplicationRecord
       begin
         query = DOI::Query.new(Seek::Config.crossref_api_email)
         result = query.fetch(doi)
+        Rails.logger.debug("fetch_pubmed_or_doi_result:")
+        Rails.logger.debug(result)
+
         @error = 'Unable to get result' if result.blank?
         @error = 'Unable to get DOI' if result.title.blank?
       rescue DOI::MalformedDOIException

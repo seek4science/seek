@@ -184,7 +184,7 @@
                     jQuery('#publication_pubmed_id').parents('.form-group').removeClass('has-error');
                     jQuery('#publication_pubmed_id').parents('.form-group').addClass('has-success');
                     var doc = jQuery(data);
-                    //console.log("Pudmed ID:", data);
+                    console.log("Pudmed ID:", data);
                     var doi_elem = jQuery(data).find('PubmedArticleSet > PubmedArticle > PubmedData > ArticleIdList > ArticleId[IdType="doi"]');
                     if( doi_elem.length != 0) {
                         jQuery('#publication_doi').val(doi_elem.html());

@@ -11,6 +11,12 @@ Factory.define(:phdthesis, class: PublicationType) do |f|
   f.key 'phdthesis'
 end
 
+
+Factory.define(:inproceedings, class: PublicationType) do |f|
+  f.title 'InProceedings'
+  f.key 'inproceedings'
+end
+
 # Publication
 Factory.define(:publication) do |f|
   f.sequence(:title) { |n| "A Publication #{n}" }
