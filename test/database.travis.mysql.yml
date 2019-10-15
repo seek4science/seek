@@ -3,6 +3,11 @@ test:
   database: seek_test
   username: root
 
+development:
+  adapter: mysql2
+  database: seek_dev
+  username: root
+
 production:
   adapter: mysql2
   database: seek_prod
