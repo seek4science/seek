@@ -47,11 +47,8 @@ module Seek
     # sort items for an index by the given sort parameter, or the default for its type
     def self.index_items(items, order = nil)
       return items if items.empty?
-      if order
-        sort_by_order(items, order)
-      else
-        sort_by_order(items, order_for_view(items.first.class.name, :index))
-      end
+      order ||= order_for_view(items.first.class.name, :index)
+      sort_by_order(items, order)
     end
 
     def self.sort_by_order(items, order)

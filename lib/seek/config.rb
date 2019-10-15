@@ -242,6 +242,26 @@ module Seek
       p == 'latest' ? 'top' : p
     end
 
+    def sorting_for(controller)
+      hash = sorting.with_indifferent_access
+      hash[controller.to_s]
+    end
+
+    def set_sorting_for(controller, value)
+      merge!(:sorting, controller.to_s => value.blank? ? nil : value)
+      value
+    end
+
+    def results_per_page_for(controller)
+      hash = results_per_page.with_indifferent_access
+      hash[controller.to_s]
+    end
+
+    def set_results_per_page_for(controller, value)
+      merge!(:results_per_page, controller.to_s => value.blank? ? nil : value.to_i)
+      value
+    end
+
     # FIXME: change to standard setter=
     def set_default_page(controller, value)
       merge! :default_pages, controller => value

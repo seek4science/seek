@@ -191,3 +191,7 @@ nels_use_dummy_client:
 allow_private_address_access:
 session_store_timeout:
 filtering_enabled:
+sorting:
+results_per_page_default:
+  convert: :to_i
+results_per_page:
