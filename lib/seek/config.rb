@@ -241,8 +241,8 @@ module Seek
       if value
         value = nil unless Seek::ListSorter.options(controller.to_s.classify).include?(value.to_sym)
       end
-      merge!(:sorting, controller.to_s => value)
-      value
+      merge!(:sorting, controller.to_s => value.to_s)
+      value&.to_sym
     end
 
     def results_per_page_for(controller)

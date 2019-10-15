@@ -677,12 +677,12 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'should update pagination when changing the relevant settings' do
     assert_not_equal 5, Seek::Config.results_per_page_for('people')
-    assert_not_equal 'created_at_asc', Seek::Config.sorting_for('people')
+    assert_not_equal :created_at_asc, Seek::Config.sorting_for('people')
 
     with_config_value(:sorting, { 'people' => 'created_at_asc' }) do
       with_config_value(:results_per_page, { 'people' => 5 }) do
         assert_equal 5, Seek::Config.results_per_page_for('people')
-        assert_equal 'created_at_asc', Seek::Config.sorting_for('people')
+        assert_equal :created_at_asc, Seek::Config.sorting_for('people')
         get :index
         assert_response :success
         assert_equal [:created_at_asc], assigns(:order)
