@@ -31,7 +31,7 @@
 <% end %>
 
 <div class="index-container">
-  <%= render partial: 'assets/resource_filtering' unless faceted_browsing %>
+  <%= render partial: 'assets/resource_filtering' if Seek::Config.filtering_enabled && !faceted_browsing %>
   <div class="index-content">
     <% unless faceted_browsing %>
       <%# filter debugging - remove me eventually %>
@@ -47,7 +47,7 @@
       <% end %>
       <%= render partial: 'assets/resource_sorting', locals: { items: items } %>
       <%= render partial: 'assets/resource_counts' %>
-      <%= render partial: 'assets/resource_active_filters' %>
+      <%= render partial: 'assets/resource_active_filters' if Seek::Config.filtering_enabled %>
     <% end %>
 
     <% if faceted_browsing %>

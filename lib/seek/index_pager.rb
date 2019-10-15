@@ -22,23 +22,13 @@ module Seek
       assign_index_variables
 
       assets = nil
-      log_with_time("  - Fetched #{controller_name}") do
-        assets = fetch_assets
-        @total_count = assets.count
-      end
-      log_with_time("  - Authorized") do
-        assets = authorize_assets(assets)
-      end
-      log_with_time("  - Filtered") do
-        assets = filter_assets(assets)
-        @visible_count = assets.count
-      end
-      log_with_time("  - Sorted") do
-        assets = sort_assets(assets)
-      end
-      log_with_time("  - Paged") do
-        assets = paginate_assets(assets)
-      end
+      log_with_time("  - Fetched #{controller_name}") { assets = fetch_assets }
+      @total_count = assets.count
+      log_with_time("  - Authorized") { assets = authorize_assets(assets) }
+      log_with_time("  - Filtered") { assets = filter_assets(assets) } if Seek::Config.filtering_enabled
+      @visible_count = assets.count
+      log_with_time("  - Sorted") { assets = sort_assets(assets) }
+      log_with_time("  - Paged") { assets = paginate_assets(assets) }
 
       instance_variable_set("@#{controller_name}", assets)
     end
