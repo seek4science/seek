@@ -20,6 +20,8 @@ namespace :seek do
     rebuild_sample_templates
     fix_model_version_files
     fix_country_codes
+
+    convert_old_pagination_settings
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -295,6 +297,26 @@ namespace :seek do
     end
     Event.where('length(country) > 2').each do |event|
       event.update_attribute(:country, CountryCodes.code(event.country))
+    end
+  end
+
+  task(convert_old_pagination_settings: :environment) do
+    limit_latest = Settings.where(var: 'limit_latest').first
+    if limit_latest&.value
+      puts "Setting 'results_per_page_default' to #{limit_latest.value}"
+      Seek::Config.results_per_page_default = limit_latest.value
+      limit_latest.destroy!
+    end
+
+    default_pages = Settings.where(var: 'default_pages').first
+    if default_pages&.value
+      default_pages.value.each do |controller, default_page|
+        if default_page == 'all'
+          puts "Setting 'results_per_page' for #{controller} to 999999"
+          Seek::Config.set_results_per_page_for(controller.to_s, 999999)
+        end
+      end
+      default_pages.destroy!
     end
   end
 end
