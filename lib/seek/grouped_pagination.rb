@@ -16,20 +16,14 @@ module Seek
         # this is limit to the list when showing the 'top' page of results, defaults to 7.
         # Can be set with the options[:page_limit] in grouped_pagination definition in model
         @page_limit = options[:limit]
-        # this is the default page to use if :page is not provided when paginating.
-        @default_page = options[:default_page]
 
         before_save :update_first_letter
 
         include Seek::GroupedPagination::InstanceMethods
       end
 
-      def default_page
-        @default_page || Seek::Config.default_page(name.underscore.pluralize) || 'all'
-      end
-
       def page_limit
-        @page_limit || Seek::Config.limit_latest
+        @page_limit || Seek::Config.results_per_page_for(name.underscore.pluralize) || Seek::Config.results_per_page_default
       end
 
       # Paginate a given collection/relation
@@ -100,7 +94,7 @@ module Seek
 
         limit = options[:limit] || page_limit
 
-        def_page = options[:default_page] || default_page
+        def_page = options[:default_page]
         def_page = @pages.first if def_page == 'first'
         def_page = 'top' if def_page == 'latest'
 

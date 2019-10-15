@@ -5,7 +5,7 @@ module Seek
     RULES = {
       'Person' => {
           defaults: { index: :name_asc, related: :name_asc },
-          options: [:name_desc, :name_asc, :created_at_asc, :created_at_desc] },
+          options: [:name_asc, :name_desc, :created_at_asc, :created_at_desc] },
       'Institution' => {
           defaults: { index: :title_asc, related: :title_asc },
           options: [:title_asc, :title_desc] },

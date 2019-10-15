@@ -675,16 +675,22 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test 'should update page limit_latest when changing the setting from admin' do
-    assert_equal 'top', Seek::Config.default_pages[:people]
-    assert_not_equal 5, Seek::Config.limit_latest
+  test 'should update pagination when changing the relevant settings' do
+    assert_not_equal 5, Seek::Config.results_per_page_for('people')
+    assert_not_equal 'created_at_asc', Seek::Config.sorting_for('people')
 
-    with_config_value(:limit_latest, 5) do
-      assert_equal 5, Seek::Config.limit_latest
-      get :index
-      assert_response :success
-      assert_select '.pagination-container li.active', text: '1'
-      assert_select 'div.list_item_title', count: 5
+    with_config_value(:sorting, { 'people' => 'created_at_asc' }) do
+      with_config_value(:results_per_page, { 'people' => 5 }) do
+        assert_equal 5, Seek::Config.results_per_page_for('people')
+        assert_equal 'created_at_asc', Seek::Config.sorting_for('people')
+        get :index
+        assert_response :success
+        assert_equal [:created_at_asc], assigns(:order)
+        assert_equal 5, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select 'div.list_item_title', count: 5
+        assert_select '#index_sort_order option[selected=selected][value=created_at_asc]', count: 1
+      end
     end
   end
 

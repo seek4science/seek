@@ -231,24 +231,17 @@ module Seek
       facet_enable_for_pages.with_indifferent_access[controller.to_s]
     end
 
-    def default_page(controller)
-      pages = default_pages.with_indifferent_access
-      p = if pages.key?(controller.to_s)
-            pages[controller.to_s]
-          else
-            Settings.defaults['default_pages'][controller.to_s] || 'top'
-          end
-
-      p == 'latest' ? 'top' : p
-    end
-
     def sorting_for(controller)
       hash = sorting.with_indifferent_access
-      hash[controller.to_s]
+      hash[controller.to_s]&.to_sym
     end
 
     def set_sorting_for(controller, value)
-      merge!(:sorting, controller.to_s => value.blank? ? nil : value)
+      value = value.blank? ? nil : value
+      if value
+        value = nil unless Seek::ListSorter.options(controller.to_s.classify).include?(value.to_sym)
+      end
+      merge!(:sorting, controller.to_s => value)
       value
     end
 
@@ -259,12 +252,6 @@ module Seek
 
     def set_results_per_page_for(controller, value)
       merge!(:results_per_page, controller.to_s => value.blank? ? nil : value.to_i)
-      value
-    end
-
-    # FIXME: change to standard setter=
-    def set_default_page(controller, value)
-      merge! :default_pages, controller => value
       value
     end
 

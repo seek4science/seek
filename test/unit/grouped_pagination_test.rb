@@ -20,19 +20,10 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal 'I', inv.first_letter
   end
 
-  test 'latest_limit' do
-    assert_equal Seek::Config.limit_latest, Person.page_limit
-    assert_equal Seek::Config.limit_latest, Project.page_limit
-    assert_equal Seek::Config.limit_latest, Institution.page_limit
-    assert_equal Seek::Config.limit_latest, Investigation.page_limit
-    assert_equal Seek::Config.limit_latest, Study.page_limit
-    assert_equal Seek::Config.limit_latest, Assay.page_limit
-    assert_equal Seek::Config.limit_latest, DataFile.page_limit
-    assert_equal Seek::Config.limit_latest, Model.page_limit
-    assert_equal Seek::Config.limit_latest, Sop.page_limit
-    assert_equal Seek::Config.limit_latest, Publication.page_limit
-    assert_equal Seek::Config.limit_latest, Event.page_limit
-    assert_equal Seek::Config.limit_latest, Strain.page_limit
+  test 'results_per_page_default' do
+    assert_equal Seek::Config.results_per_page_default, Person.page_limit
+    assert_equal Seek::Config.results_per_page_default, Investigation.page_limit
+    assert_equal Seek::Config.results_per_page_default, Model.page_limit
   end
 
   test 'paginate_no_options' do
@@ -118,15 +109,6 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal 'A', @people.page
   end
 
-  test 'default_page_accessor' do
-    thing = Class.new(ActiveRecord::Base) do
-      include Seek::GroupedPagination
-      grouped_pagination default_page: 'fish'
-    end
-
-    assert thing.default_page == 'fish'
-  end
-
   test 'extra_condition_as_array_direct' do
     Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     @people = Person.grouped_paginate page: 'A', conditions: ["last_name = 'Aardvark'"]
@@ -195,31 +177,6 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert !sops.empty?
     sops.each { |s| User.current_user = s.contributor; s.save if s.valid? } # Set first letters
     refute_empty Sop.paginate_after_fetch(sops) # Check there's something on the first page
-  end
-
-  test 'pagination for default page using rails-setting plugin' do
-    @people = Person.grouped_paginate
-    assert_equal @people.page, Seek::Config.default_page('people')
-    @projects = Project.grouped_paginate
-    assert_equal @projects.page, Seek::Config.default_page('projects')
-    @institutions = Institution.grouped_paginate
-    assert_equal @institutions.page, Seek::Config.default_pages[:institutions]
-    @investigations = Investigation.grouped_paginate
-    assert_equal @investigations.page, Seek::Config.default_pages[:investigations]
-    @studies = Study.grouped_paginate
-    assert_equal @studies.page, Seek::Config.default_pages[:studies]
-    @assays = Assay.grouped_paginate
-    assert_equal @assays.page, Seek::Config.default_pages[:assays]
-    @data_files = DataFile.grouped_paginate
-    assert_equal @data_files.page, Seek::Config.default_pages[:data_files]
-    @models = Model.grouped_paginate
-    assert_equal @models.page, Seek::Config.default_page('models')
-    @sops = Sop.grouped_paginate
-    assert_equal @sops.page, Seek::Config.default_pages[:sops]
-    @publications = Publication.grouped_paginate
-    assert_equal @publications.page, Seek::Config.default_pages[:publications]
-    @events = Event.grouped_paginate
-    assert_equal @events.page, Seek::Config.default_pages[:events]
   end
 
   test 'maintains page totals after paging' do

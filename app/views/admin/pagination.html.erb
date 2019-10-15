@@ -1,16 +1,23 @@
 <h1>Index page behaviour</h1>
 
-<%= form_tag :action=>"update_pagination" do -%>
-  <p>
-    In each index page in the "Browse" section, either all items are listed, or only the top <em>n</em> items.
-    On this page you can select the default for each tab.
+<%= form_tag action: 'update_pagination' do %>
+  <p class="help-block">
+    On this page you can configure the default sorting that is applied for each index page in the "Browse" section,
+    and how many items should appear per page by default.
   </p>
 
-  <h2>Sorting</h2>
+  <div class="row">
+    <div class="col-sm-4">
+      <%= admin_text_setting(:results_per_page_default, Seek::Config.results_per_page_default,
+                             'Default items per page', "The number of items shown per page by default.",
+                             onkeypress: "javascript: return onlyNumbers(event);") %>
+    </div>
+  </div>
+
   <table class="table table-condensed" style="width: auto">
     <thead>
     <tr>
-      <th style="width: 15em">Type</th>
+      <th style="width: 10em">Type</th>
       <th style="width: 30em">Default Sorting</th>
       <th style="width: 15em">
         Items per page<br/>
@@ -41,10 +48,6 @@
     <% end %>
     </tbody>
   </table>
-
-  <%= admin_text_setting(:results_per_page_default, Seek::Config.results_per_page_default,
-                         'Default items per page', "The number of items shown per page by default.",
-                         onkeypress: "javascript: return onlyNumbers(event);") %>
 
   <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
   <%= cancel_button admin_path %>
