@@ -393,7 +393,135 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal 1,document.policy.permissions.count
     assert_equal person,document.policy.permissions.first.contributor
     assert_equal Policy::EDITING,document.policy.permissions.first.access_type
+  end
 
+  test 'show filters on index' do
+    Factory(:public_document)
+
+    get :index
+    assert_select '.index-filters', count: 1
+  end
+
+  test 'do not show filters on index if disabled' do
+    Factory(:public_document)
+
+    with_config_value(:filtering_enabled, false) do
+      get :index
+      assert_select '.index-filters', count: 0
+    end
+  end
+
+  test 'available filters are listed' do
+    project = Factory(:project)
+    project_doc = Factory(:public_document, created_at: 3.days.ago, projects: [project])
+    project_doc.annotate_with('tag1', 'tag', project_doc.contributor)
+    disable_authorization_checks { project_doc.save! }
+    old_project_doc = Factory(:public_document, created_at: 10.years.ago, projects: [project])
+    other_project = Factory(:project)
+    other_project_doc = Factory(:public_document, created_at: 3.days.ago, projects: [other_project])
+    FactoryGirl.create_list(:public_document, 5, projects: [project])
+
+    get :index
+
+    assert_equal 8, assigns(:available_filters)[:contributor].length
+    assert_equal 2, assigns(:available_filters)[:project].length
+
+    assert_select '.filter-category[data-filter-category="query"]' do
+      assert_select '.filter-category-title', text: 'Query'
+    end
+
+    assert_select '.filter-category[data-filter-category="project"]' do
+      assert_select '.filter-category-title', text: 'Project'
+      assert_select '.filter-option', count: 2
+      assert_select '.filter-option.filter-option-active', count: 0
+      assert_select ".filter-option[title='#{project.title}']" do
+        assert_select '.filter-option-label', text: project.title
+        assert_select '.filter-option-count', text: '7'
+      end
+      assert_select ".filter-option[title='#{other_project.title}']" do
+        assert_select '.filter-option-label', text: other_project.title
+        assert_select '.filter-option-count', text: '1'
+      end
+      assert_select '.expand-filter-category-link', count: 0
+    end
+
+    assert_select '.filter-category[data-filter-category="contributor"]' do
+      assert_select '.filter-category-title', text: 'Contributor'
+      assert_select '.filter-option', count: 8
+      assert_select '.filter-option.filter-option-active', count: 0
+      # Should show 6 options and hide the rest
+      assert_select '.filter-option.filter-option-hidden', count: 2
+      assert_select '.expand-filter-category-link', count: 1
+    end
+
+    assert_select '.filter-category[data-filter-category="tag"]' do
+      assert_select '.filter-category-title', text: 'Tag'
+      assert_select '.filter-option', count: 1
+      assert_select '.filter-option.filter-option-active', count: 0
+      assert_select ".filter-option[title='tag1']" do
+        assert_select '.filter-option-label', text: 'tag1'
+        assert_select '.filter-option-count', text: '1'
+      end
+    end
+
+    assert_select '.active-filters', count: 0
+  end
+
+  test 'active filters are listed' do
+    project = Factory(:project)
+    project_doc = Factory(:public_document, created_at: 3.days.ago, projects: [project])
+    project_doc.annotate_with('tag1', 'tag', project_doc.contributor)
+    disable_authorization_checks { project_doc.save! }
+    old_project_doc = Factory(:public_document, created_at: 10.years.ago, projects: [project])
+    other_project = Factory(:project)
+    other_project_doc = Factory(:public_document, created_at: 3.days.ago, projects: [other_project])
+    FactoryGirl.create_list(:public_document, 5, projects: [project])
+
+    get :index, params: { filter: { project: other_project.id } }
+
+    assert_equal 1, assigns(:available_filters)[:contributor].length
+    assert_equal 2, assigns(:available_filters)[:project].length
+
+    assert_select '.filter-category[data-filter-category="query"]' do
+      assert_select '.filter-category-title', text: 'Query'
+    end
+
+    # Should show other project in projects category
+    assert_select '.filter-category[data-filter-category="project"]' do
+      assert_select '.filter-category-title', text: 'Project'
+      assert_select '.filter-option.filter-option-active', count: 1
+      assert_select '.filter-option', count: 2
+      assert_select ".filter-option[title='#{project.title}']" do
+        assert_select '.filter-option-label', text: project.title
+        assert_select '.filter-option-count', text: '7'
+      end
+      assert_select ".filter-option[title='#{other_project.title}'].filter-option-active" do
+        assert_select '.filter-option-label', text: other_project.title
+        assert_select '.filter-option-count', text: '1'
+      end
+      assert_select '.expand-filter-category-link', count: 0
+    end
+
+    assert_select '.filter-category[data-filter-category="contributor"]' do
+      assert_select '.filter-category-title', text: 'Contributor'
+      assert_select '.filter-option', count: 1
+      assert_select '.filter-option.filter-option-active', count: 0
+      assert_select '.filter-option.filter-option-hidden', count: 0
+      assert_select ".filter-option[title='#{other_project_doc.contributor.name}']"
+      assert_select '.filter-option-label', text: other_project_doc.contributor.name
+      assert_select '.filter-option-count', text: '1'
+      assert_select '.expand-filter-category-link', count: 0
+    end
+
+    # Nothing in the filtered set has a tag, so the whole category should be hidden
+    assert_select '.filter-category[data-filter-category="tag"]', count: 0
+
+    assert_select '.active-filters' do
+      assert_select '.active-filter-category-title', count: 1
+      assert_select ".filter-option[title='#{other_project.title}'].filter-option-active" do
+        assert_select '.filter-option-label', text: other_project.title
+      end
+    end
   end
 
   private

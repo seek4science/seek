@@ -28,7 +28,8 @@
     remove_url = url_for({ page: nil, filter: without_filter(key) })
   %>
 
-  <%= content_tag(:div, class: 'filter-category', data: { role: 'seek-date-filter',
+  <%= content_tag(:div, class: 'filter-category', data: { 'filter-category' => key.to_s,
+                                                          role: 'seek-date-filter',
                                                           'apply-filter-url' => apply_url,
                                                           'remove-filter-url' => remove_url  }) do %>
     <div class="filter-category-title"><%= key.to_s.humanize %></div>
