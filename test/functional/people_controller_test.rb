@@ -694,6 +694,32 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test 'controller-specific results_per_page should override default' do
+    with_config_value(:results_per_page_default, 2) do
+      get :index
+      assert_response :success
+      assert_equal 2, assigns(:per_page)
+      assert_select '.pagination-container li.active', text: '1'
+      assert_select 'div.list_item_title', count: 2
+
+      with_config_value(:results_per_page, { 'people' => 3 }) do
+        get :index
+        assert_response :success
+        assert_equal 3, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select 'div.list_item_title', count: 3
+      end
+
+      with_config_value(:results_per_page, { 'people' => nil }) do
+        get :index
+        assert_response :success
+        assert_equal 2, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select 'div.list_item_title', count: 2
+      end
+    end
+  end
+
   test 'people not in projects should be shown in index' do
     person_not_in_project = Factory(:brand_new_person, first_name: 'Person Not In Project', last_name: 'Petersen', updated_at: 1.second.from_now)
     person_in_project = Factory(:person, first_name: 'Person in Project', last_name: 'Petersen', updated_at: 1.second.from_now)
