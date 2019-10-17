@@ -1,6 +1,6 @@
 <% if options.first %>
   <% url_template = url_for(page_and_sort_params.merge({ page: nil, filter: with_filter(:query, '_query_', replace: true) })) %>
-  <div class="filter-category collapsed">
+  <div class="filter-category collapsed" data-filter-category="<%= key.to_s -%>">
     <div class="filter-category-title">Query</div>
     <div class="filter-option-field-group">
       <%= text_field_tag(nil, options.first.value, data: { url: url_template },

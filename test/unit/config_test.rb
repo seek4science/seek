@@ -251,7 +251,7 @@ class ConfigTest < ActiveSupport::TestCase
   test 'change default sorting' do
     assert_nil Seek::Config.sorting_for('models')
     Seek::Config.set_sorting_for 'models', 'created_at_asc'
-    assert_equal 'created_at_asc', Seek::Config.sorting_for('models')
+    assert_equal :created_at_asc, Seek::Config.sorting_for('models')
     # seem to have to put it back else other tests fail later:
     Seek::Config.set_sorting_for('models', nil)
     assert_nil Seek::Config.sorting_for('models')

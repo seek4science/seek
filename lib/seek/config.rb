@@ -236,13 +236,15 @@ module Seek
       hash[controller.to_s]&.to_sym
     end
 
-    def set_sorting_for(controller, value)
-      value = value.blank? ? nil : value
-      if value
-        value = nil unless Seek::ListSorter.options(controller.to_s.classify).include?(value.to_sym)
+    def set_sorting_for(controller, value)      
+      # Store value as a string, unless nil, or not a valid sorting option for that controller.
+      if value.blank? || !Seek::ListSorter.options(controller.to_s.classify).include?(value.to_sym)
+        value = nil
+      else
+        value = value.to_s
       end
       merge!(:sorting, controller.to_s => value)
-      value
+      value&.to_sym
     end
 
     def results_per_page_for(controller)
