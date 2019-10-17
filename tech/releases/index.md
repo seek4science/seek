@@ -11,9 +11,27 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.9.1
+
+Release date: _17th October 2019_
+
+  * Minor User Interface improvements
+    * More consistent sorting of lists.
+    * Consistent Add New button to add new items linked to the current item. This replaces buttons that only appeared in
+    some places - such as the "Add New Data File" for "Assay".
+    * Split Edit and Manage action between 2 separate pages, rather than being handled through the same form.
+  * Initial support for [bioschemas.org](https://bioschemas.org) / [schema.org](https://schema.org) JSON-LD markup
+    * Supporting Project, Taxon, Sample, Event, DataSet, DataCatalogue, DigitalDocument, and PresentationDigitalDocument
+  * Validating assay and technology type URI's (particularly when submitting through the API).
+  * Managing project members through the API.
+  * Fix to an problem and inconsistency with how countries and the country codes are stored and displayed
+  
+There have also been several minor bug fixes and improvements, 
+which are described more within the [SEEK v1.9.1 release notes](release-notes-1.9.1.html)
+
 ## Version 1.9.0
 
-Release date; _16th July 2019_
+Release date: _16th July 2019_
 
   * Major upgrade of the underlying platform
     * Rails 4.2 → Rails 5.2

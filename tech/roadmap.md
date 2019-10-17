@@ -15,9 +15,7 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| Further integration with openBIS, with improved metadata mappings | Winter 2019  |
-| Project dashboard, showing details and graphs for projects | Winter 2019  |
-| Metadata search and querying | Spring 2019  |
+| Metadata search and querying | Winter 2019  |
 
 <br/>
 
@@ -33,6 +31,10 @@ You can find more details about each release in our [Change Logs](/tech/releases
 
 | Feature | SEEK version |
 | --- | --- | --- |
+| Bioschemas.org support | 1.9.1 |
+| Rails 5.2 upgrade | 1.9 |
+| Project dashboard, showing details and graphs for projects | 1.8  |
+| Further integration with openBIS, with improved metadata mappings | 1.8  |
 | Programme wide sharing permissions | 1.7  |
 | ISA graph improvements | 1.7  |
 | JSON Write API (Application Programming Interface) | 1.6  |
