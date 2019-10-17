@@ -25,6 +25,7 @@ module FilteringHelper
     if existing
       existing = [existing] unless existing.is_a?(Array)
       existing -= [value]
+      existing = existing.first if existing.length == 1
     end
 
     if existing.blank? || value.nil?

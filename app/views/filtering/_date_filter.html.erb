@@ -5,23 +5,27 @@
     # User supplied options (not one of the presets), should not appear as options in the dropdown menu.
     option_pairs = options.select { |o| o.data[:preset] }.map { |option| ["#{option.label} (#{option.count})", option.value] } + [['Custom range', 'custom']]
     active_options = options.select(&:active?)
+    selected_option_value = nil
+
     if active_options.any?
       if active_options.length == 1
         active_option = active_options.first
         if active_option.data[:preset]
           selected_option_value = active_option.value
-        else
+        elsif active_option.data[:date_range].begin.is_a?(Date) # It might be a Time if a custom duration was used (e.g. PT2H), and the field only fits YYYY-MM-DD.
           date_range = active_option.data[:date_range]
           start_date = date_range.begin.iso8601
           end_date = date_range.end.iso8601 unless date_range.end.is_a?(Date::Infinity)
           selected_option_value = 'custom'
         end
-      else # If the user has crafted some complex filter with multiple values, we can't hope to fit it into the date range form.
+      end
+
+      # If the user has used a custom duration, or crafted some complex filter with multiple values,
+      # we can't hope to fit it into the date range form, so just add an "Other" option to the dropdown.
+      if selected_option_value.nil?
         option_pairs += [['Other', 'other']]
         selected_option_value = 'other'
       end
-    else
-      selected_option_value = nil
     end
 
     apply_url = url_for({ page: nil, filter: with_filter(key, '_date_', replace: true) })

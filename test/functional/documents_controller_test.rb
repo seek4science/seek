@@ -585,7 +585,7 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', documents_path, text: /Clear all filters/
   end
 
-  test 'filtering system obeys authorization' do
+  test 'filtering system obeys authorization and does not leak info on private resources' do
     programme = Factory(:programme)
     project = Factory(:project, programme: programme)
     FactoryGirl.create_list(:public_document, 3, projects: [project])
@@ -601,6 +601,15 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal 3, assigns(:available_filters)[:contributor].length
     assert_equal 1, assigns(:available_filters)[:project].length
     assert_equal 0, assigns(:available_filters)[:tag].length
+    assert_select '.filter-category[data-filter-category="created_at"]' do
+      assert_select '.filter-option-dropdown' do
+        assert_select 'option[value="PT24H"]', text: 'in the last 24 hours (3)'
+        assert_select 'option[value="P1W"]', text: 'in the last 1 week (3)'
+        assert_select 'option[value="P1M"]', text: 'in the last 1 month (3)'
+        assert_select 'option[value="P1Y"]', text: 'in the last 1 year (3)'
+        assert_select 'option[value="P5Y"]', text: 'in the last 5 years (3)'
+      end
+    end
 
     get :index, params: { filter: { programme: programme.id, tag: [tag1] } }
 
@@ -615,11 +624,234 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal 4, assigns(:available_filters)[:contributor].length
     assert_equal 1, assigns(:available_filters)[:project].length
     assert_equal 1, assigns(:available_filters)[:tag].length
+    assert_select '.filter-category[data-filter-category="created_at"]' do
+      assert_select '.filter-option-dropdown' do
+        assert_select 'option[value="PT24H"]', text: 'in the last 24 hours (3)'
+        assert_select 'option[value="P1W"]', text: 'in the last 1 week (3)'
+        assert_select 'option[value="P1M"]', text: 'in the last 1 month (3)'
+        assert_select 'option[value="P1Y"]', text: 'in the last 1 year (3)'
+        assert_select 'option[value="P5Y"]', text: 'in the last 5 years (4)'
+      end
+    end
 
     get :index, params: { filter: { programme: programme.id, tag: [tag1] } }
 
     assert_equal 1, assigns(:documents).length
     assert_includes assigns(:documents), private_document
+  end
+
+  test 'filtering with search terms' do
+    programme = Factory(:programme)
+    project = Factory(:project, programme: programme)
+    FactoryGirl.create_list(:public_document, 3, projects: [project])
+
+    get :index, params: { filter: { programme: programme.id, query: 'hello' } }
+
+    assert_empty assigns(:documents)
+    assert assigns(:available_filters).except(:query).values.all?(&:empty?)
+    assert_equal 1, assigns(:available_filters)[:query].count
+    assert_equal 1, assigns(:active_filters)[:query].count
+
+    assert_select '.filter-category', count: 1
+
+    assert_select '.filter-category[data-filter-category="query"]' do
+      assert_select '.filter-category-title', text: 'Query'
+      assert_select '#filter-search-field[value=?]', 'hello'
+      assert_select '.filter-option-field-clear', count: 1, href: documents_path(filter: { programme: programme.id })
+    end
+
+    assert_select '.active-filters' do
+      assert_select ".filter-option[title='hello'].filter-option-active" do
+        assert_select '[href=?]', documents_path(filter: { programme: programme.id })
+        assert_select '.filter-option-label', text: 'hello'
+      end
+    end
+  end
+
+  test 'filtering by creation date' do
+    programme = Factory(:programme)
+    project = Factory(:project, programme: programme)
+    FactoryGirl.create_list(:public_document, 1, projects: [project], created_at: 1.hour.ago)
+    FactoryGirl.create_list(:public_document, 2, projects: [project], created_at: 2.days.ago) # 3
+    FactoryGirl.create_list(:public_document, 3, projects: [project], created_at: 2.weeks.ago) # 6
+    FactoryGirl.create_list(:public_document, 4, projects: [project], created_at: 2.months.ago) # 10
+    FactoryGirl.create_list(:public_document, 5, projects: [project], created_at: 2.years.ago) # 15
+    FactoryGirl.create_list(:public_document, 6, projects: [project], created_at: 10.years.ago) # 21
+
+    # No creation date filter
+    get :index, params: { filter: { programme: programme.id } }
+
+    assert_equal 21, assigns(:visible_count)
+    assert_select '.filter-category[data-filter-category="created_at"]' do
+      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-option-dropdown' do
+        assert_select "option[value='other']", text: 'Other', count: 0
+        assert_select 'option[value="custom"]', text: 'Custom range'
+        assert_select 'option[value=""]', text: 'Any time'
+        assert_select 'option[value="PT24H"]', text: 'in the last 24 hours (1)'
+        assert_select 'option[value="P1W"]', text: 'in the last 1 week (3)'
+        assert_select 'option[value="P1M"]', text: 'in the last 1 month (6)'
+        assert_select 'option[value="P1Y"]', text: 'in the last 1 year (10)'
+        assert_select 'option[value="P5Y"]', text: 'in the last 5 years (15)'
+      end
+    end
+
+    # Preset duration filter
+    get :index, params: { filter: { programme: programme.id, created_at: 'P1M' } }
+
+    assert_equal 6, assigns(:visible_count)
+    assert_select '.filter-category[data-filter-category="created_at"]' do
+      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-option-dropdown' do
+        assert_select 'option[value="custom"]', text: 'Custom range'
+        assert_select 'option[value=""]', text: 'Any time'
+        assert_select 'option[value="PT24H"]', text: 'in the last 24 hours (1)'
+        assert_select 'option[value="P1W"]', text: 'in the last 1 week (3)'
+        assert_select "option[value='P1M'][selected='selected']", text: 'in the last 1 month (6)'
+        assert_select 'option[value="P1Y"]', text: 'in the last 1 year (10)'
+        assert_select 'option[value="P5Y"]', text: 'in the last 5 years (15)'
+      end
+    end
+    assert_select '.active-filters' do
+      assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
+        assert_select '[href=?]', documents_path(filter: { created_at: 'P1M' })
+        assert_select '.filter-option-label', text: programme.title
+      end
+      assert_select ".filter-option[title='in the last 1 month'].filter-option-active" do
+        assert_select '[href=?]', documents_path(filter: { programme: programme.id })
+        assert_select '.filter-option-label', text: 'in the last 1 month'
+      end
+    end
+
+    # Custom single date
+    date = 1.year.ago.to_date.iso8601
+    get :index, params: { filter: { programme: programme.id, created_at: date } }
+
+    assert_equal 10, assigns(:visible_count)
+    assert_select '.filter-category[data-filter-category="created_at"]' do
+      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-option-dropdown' do
+        assert_select "option[value='custom'][selected='selected']", text: 'Custom range'
+        assert_select 'option[value=""]', text: 'Any time'
+        assert_select 'option[value="PT24H"]', text: 'in the last 24 hours (1)'
+        assert_select 'option[value="P1W"]', text: 'in the last 1 week (3)'
+        assert_select "option[value='P1M']", text: 'in the last 1 month (6)'
+        assert_select 'option[value="P1Y"]', text: 'in the last 1 year (10)'
+        assert_select 'option[value="P5Y"]', text: 'in the last 5 years (15)'
+      end
+      assert_select '[data-role="seek-date-filter-period-start"]' do
+        assert_select '[value=?]', date
+      end
+    end
+    assert_select '.active-filters' do
+      assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
+        assert_select '[href=?]', documents_path(filter: { created_at: date })
+        assert_select '.filter-option-label', text: programme.title
+      end
+      assert_select ".filter-option[title='since #{date}'].filter-option-active" do
+        assert_select '[href=?]', documents_path(filter: { programme: programme.id })
+        assert_select '.filter-option-label', text: "since #{date}"
+      end
+    end
+
+    # Custom date range
+    start_date = 3.years.ago.to_date.iso8601
+    end_date = 3.weeks.ago.to_date.iso8601
+    range = "#{start_date}/#{end_date}"
+    get :index, params: { filter: { programme: programme.id, created_at: range } }
+
+    assert_equal 9, assigns(:visible_count)
+    assert_select '.filter-category[data-filter-category="created_at"]' do
+      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-option-dropdown' do
+        assert_select "option[value='custom'][selected='selected']", text: 'Custom range'
+        assert_select 'option[value=""]', text: 'Any time'
+        assert_select 'option[value="PT24H"]', text: 'in the last 24 hours (1)'
+        assert_select 'option[value="P1W"]', text: 'in the last 1 week (3)'
+        assert_select "option[value='P1M']", text: 'in the last 1 month (6)'
+        assert_select 'option[value="P1Y"]', text: 'in the last 1 year (10)'
+        assert_select 'option[value="P5Y"]', text: 'in the last 5 years (15)'
+      end
+      assert_select '[data-role="seek-date-filter-period-start"]' do
+        assert_select '[value=?]', start_date
+      end
+      assert_select '[data-role="seek-date-filter-period-end"]' do
+        assert_select '[value=?]', end_date
+      end
+    end
+    assert_select '.active-filters' do
+      assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
+        assert_select '[href=?]', documents_path(filter: { created_at: range })
+        assert_select '.filter-option-label', text: programme.title
+      end
+      assert_select ".filter-option[title='between #{start_date} and #{end_date}'].filter-option-active" do
+        assert_select '[href=?]', documents_path(filter: { programme: programme.id })
+        assert_select '.filter-option-label', text: "between #{start_date} and #{end_date}"
+      end
+    end
+
+    # Custom duration
+    get :index, params: { filter: { programme: programme.id, created_at: 'P3D' } }
+
+    assert_equal 3, assigns(:visible_count)
+    assert_select '.filter-category[data-filter-category="created_at"]' do
+      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-option-dropdown' do
+        assert_select "option[value='other'][selected='selected']", text: 'Other'
+        assert_select "option[value='custom']", text: 'Custom range'
+        assert_select 'option[value=""]', text: 'Any time'
+        assert_select 'option[value="PT24H"]', text: 'in the last 24 hours (1)'
+        assert_select 'option[value="P1W"]', text: 'in the last 1 week (3)'
+        assert_select "option[value='P1M']", text: 'in the last 1 month (6)'
+        assert_select 'option[value="P1Y"]', text: 'in the last 1 year (10)'
+        assert_select 'option[value="P5Y"]', text: 'in the last 5 years (15)'
+      end
+    end
+    assert_select '.active-filters' do
+      assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
+        assert_select '[href=?]', documents_path(filter: { created_at: 'P3D' })
+        assert_select '.filter-option-label', text: programme.title
+      end
+      assert_select ".filter-option[title='in the last 3 days'].filter-option-active" do
+        assert_select '[href=?]', documents_path(filter: { programme: programme.id })
+        assert_select '.filter-option-label', text: "in the last 3 days"
+      end
+    end
+
+    # Complex query
+    start_date = 12.years.ago.to_date.iso8601
+    end_date = 9.years.ago.to_date.iso8601
+    range = "#{start_date}/#{end_date}"
+    get :index, params: { filter: { programme: programme.id, created_at: ['PT2H3M', range] } }
+
+    assert_equal 7, assigns(:visible_count)
+    assert_select '.filter-category[data-filter-category="created_at"]' do
+      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-option-dropdown' do
+        assert_select "option[value='other'][selected='selected']", text: 'Other'
+        assert_select "option[value='custom']", text: 'Custom range'
+        assert_select 'option[value=""]', text: 'Any time'
+        assert_select 'option[value="PT24H"]', text: 'in the last 24 hours (1)'
+        assert_select 'option[value="P1W"]', text: 'in the last 1 week (3)'
+        assert_select "option[value='P1M']", text: 'in the last 1 month (6)'
+        assert_select 'option[value="P1Y"]', text: 'in the last 1 year (10)'
+        assert_select 'option[value="P5Y"]', text: 'in the last 5 years (15)'
+      end
+    end
+    assert_select '.active-filters' do
+      assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
+        assert_select '[href=?]', documents_path(filter: { created_at: ['PT2H3M', range] })
+        assert_select '.filter-option-label', text: programme.title
+      end
+      assert_select ".filter-option[title='in the last 2 hours and 3 minutes'].filter-option-active" do
+        assert_select '[href=?]', documents_path(filter: { programme: programme.id, created_at: range })
+        assert_select '.filter-option-label', text: "in the last 2 hours and 3 minutes"
+      end
+      assert_select ".filter-option[title='between #{start_date} and #{end_date}'].filter-option-active" do
+        assert_select '[href=?]', documents_path(filter: { programme: programme.id, created_at: 'PT2H3M' })
+        assert_select '.filter-option-label', text: "between #{start_date} and #{end_date}"
+      end
+    end
   end
 
   private
