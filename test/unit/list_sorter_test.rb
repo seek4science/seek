@@ -50,7 +50,7 @@ class ListSorterTest < ActiveSupport::TestCase
     assert_equal [s2, s3, s1], related_items_hash['Sop'][:items]
   end
 
-  test 'index items' do
+  test 'sort by order' do
     p1 = Factory(:person, last_name: 'jones', first_name: nil)
     p2 = Factory(:person, last_name: 'davis', first_name: nil)
     p3 = Factory(:person, last_name: 'smith', first_name: 'dave')
@@ -91,17 +91,17 @@ class ListSorterTest < ActiveSupport::TestCase
     s3.update_attribute(:updated_at, 1.days.ago)
     sops = [s1, s2, s3]
 
-    assert_equal [p6, p2, p1, p3, p5, p4], Seek::ListSorter.index_items(people)
-    assert_equal [p3, p4, p2, p1, p6, p5], Seek::ListSorter.index_items(people, 'updated_at DESC')
+    assert_equal [p6, p2, p1, p3, p5, p4], Seek::ListSorter.sort_by_order(people)
+    assert_equal [p3, p4, p2, p1, p6, p5], Seek::ListSorter.sort_by_order(people, 'updated_at DESC')
 
-    assert_equal [i2, i4, i1, i3], Seek::ListSorter.index_items(institutions)
-    assert_equal [i2, i4, i3, i1], Seek::ListSorter.index_items(institutions, 'updated_at DESC')
+    assert_equal [i2, i4, i1, i3], Seek::ListSorter.sort_by_order(institutions)
+    assert_equal [i2, i4, i3, i1], Seek::ListSorter.sort_by_order(institutions, 'updated_at DESC')
 
-    assert_equal [e2, e1, e3], Seek::ListSorter.index_items(events)
-    assert_equal [e1, e2, e3], Seek::ListSorter.index_items(events, 'updated_at DESC')
+    assert_equal [e2, e1, e3], Seek::ListSorter.sort_by_order(events)
+    assert_equal [e1, e2, e3], Seek::ListSorter.sort_by_order(events, 'updated_at DESC')
 
-    assert_equal [s1, s3, s2], Seek::ListSorter.index_items(sops, 'LOWER(title)')
-    assert_equal [s3, s2, s1], Seek::ListSorter.index_items(sops)
+    assert_equal [s1, s3, s2], Seek::ListSorter.sort_by_order(sops, 'LOWER(title)')
+    assert_equal [s3, s2, s1], Seek::ListSorter.sort_by_order(sops)
   end
 
   test 'complex sorting' do
@@ -124,12 +124,50 @@ class ListSorterTest < ActiveSupport::TestCase
   end
 
   test 'JSON API sorting' do
-    assert_equal [:title_desc], Seek::ListSorter.keys_from_json_api_sort('-title')
-    assert_equal [:title_asc], Seek::ListSorter.keys_from_json_api_sort('title')
-    assert_equal [:created_at_asc], Seek::ListSorter.keys_from_json_api_sort('created_at')
-    assert_equal [:created_at_asc, :title_desc, :updated_at_asc], Seek::ListSorter.keys_from_json_api_sort('created_at,-title,updated_at')
-    assert_equal [:created_at_asc, :updated_at_asc, :title_desc], Seek::ListSorter.keys_from_json_api_sort('created_at,updated_at,-title')
-    assert_equal [:created_at_asc, :title_desc], Seek::ListSorter.keys_from_json_api_sort('created_at,-title,banana')
-    assert_equal [:created_at_asc, :updated_at_asc], Seek::ListSorter.keys_from_json_api_sort('created_at,updated_at,-title;drop table users;--')
+    assert_equal [:title_desc], Seek::ListSorter.keys_from_json_api_sort('Sop', '-title')
+    assert_equal [:title_asc], Seek::ListSorter.keys_from_json_api_sort('Sop', 'title')
+    assert_equal [], Seek::ListSorter.keys_from_json_api_sort('Sop', '-published_at')
+    assert_equal [:created_at_asc], Seek::ListSorter.keys_from_json_api_sort('Sop', 'created_at')
+    assert_equal [:created_at_asc, :title_desc, :updated_at_asc], Seek::ListSorter.keys_from_json_api_sort('Sop', 'created_at,,-title,updated_at')
+    assert_equal [:created_at_asc, :updated_at_asc, :title_desc], Seek::ListSorter.keys_from_json_api_sort('Sop', 'created_at,dsgsg,updated_at,-title')
+    assert_equal [:created_at_asc, :title_desc], Seek::ListSorter.keys_from_json_api_sort('Sop', 'created_at,-title,banana')
+    assert_equal [:created_at_asc, :updated_at_asc], Seek::ListSorter.keys_from_json_api_sort('Sop', 'created_at,updated_at,-title;drop table users;--')
+    assert_equal [:created_at_asc], Seek::ListSorter.keys_from_json_api_sort('Person', 'created_at,-title')
+    assert_equal [:created_at_asc], Seek::ListSorter.keys_from_json_api_sort('Banana', 'created_at')
+  end
+
+  test 'keys from params' do
+    assert_equal [:title_desc], Seek::ListSorter.keys_from_params('Sop', [:title_desc])
+    assert_equal [], Seek::ListSorter.keys_from_params('Sop', [:published_at_desc])
+    assert_equal [:title_asc], Seek::ListSorter.keys_from_params('Sop', ['title_asc'])
+    assert_equal [:created_at_asc], Seek::ListSorter.keys_from_params('Sop', ['created_at_asc'])
+    assert_equal [], Seek::ListSorter.keys_from_params('Sop', ['created_at'])
+    assert_equal [:created_at_asc, :title_desc, :updated_at_asc], Seek::ListSorter.keys_from_params('Sop', ['created_at_asc', [], 'title_desc', 'updated_at_asc'])
+    assert_equal [:created_at_asc, :updated_at_asc, :title_desc], Seek::ListSorter.keys_from_params('Sop', [:created_at_asc, 'updated_at_asc', 'title_desc'])
+    assert_equal [:created_at_asc, :title_desc], Seek::ListSorter.keys_from_params('Sop', ['created_at_asc', nil, 'title_desc', '', 'banana'])
+    assert_equal [:created_at_asc, :updated_at_asc], Seek::ListSorter.keys_from_params('Sop', ['created_at_asc', :updated_at_asc, '-title;drop table users;--'])
+    assert_equal [:created_at_asc], Seek::ListSorter.keys_from_params('Person', ['created_at_asc', 'title_desc', 'junk'])
+    assert_equal [:created_at_asc], Seek::ListSorter.keys_from_params('Banana', ['created_at_asc'])
+    assert_equal [], Seek::ListSorter.keys_from_params('Banana', ['fred'])
+  end
+
+  test 'sort arrays and relations the same way' do
+    Document.destroy_all
+    Factory(:document, title: 'document a', updated_at: 3.days.ago, created_at: 1.days.ago)
+    Factory(:document, title: 'document c', updated_at: 2.days.ago, created_at: 4.days.ago)
+    Factory(:document, title: 'document b', updated_at: 1.days.ago, created_at: 3.days.ago)
+    Factory(:document, title: 'document e', updated_at: 1.year.ago, created_at: 2.days.ago)
+    Factory(:document, title: 'document d', updated_at: 1.days.from_now, created_at: 2.years.ago)
+
+    [:updated_at_asc, :updated_at_desc, :title_desc, :created_at_desc, :created_at_asc, :title_asc].each do |order|
+      sort_order = Seek::ListSorter.order_from_keys(order)
+      as_relation = Seek::ListSorter.sort_by_order(Document.all, sort_order)
+      as_array = Seek::ListSorter.sort_by_order(Document.all.to_a, sort_order)
+
+      assert_equal as_relation.map(&:id), as_array.map(&:id),
+                   "Mismatch with order: #{order}.\n\n"+
+                       "Rel: #{as_relation.map { |x| "#{x.id} - #{x.title}" }.inspect}\n\n"+
+                       "Arr: #{as_array.map { |x| "#{x.id} - #{x.title}" }.inspect}"
+    end
   end
 end

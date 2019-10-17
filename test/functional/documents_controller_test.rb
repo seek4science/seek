@@ -395,6 +395,48 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal Policy::EDITING,document.policy.permissions.first.access_type
   end
 
+  test 'numeric pagination' do
+    FactoryGirl.create_list(:public_document, 20)
+
+    with_config_value(:results_per_page_default, 5) do
+      get :index
+
+      assert_equal 5, assigns(:documents).length
+      assert_equal '1', assigns(:page)
+      assert_equal 5, assigns(:per_page)
+      assert_select '.pagination-container a', href: documents_path(page: 2), text: /Next/
+      assert_select '.pagination-container a', href: documents_path(page: 2), text: /2/
+      assert_select '.pagination-container a', href: documents_path(page: 3), text: /3/
+
+      get :index, params: { page: 2 }
+
+      assert_equal 5, assigns(:documents).length
+      assert_equal '2', assigns(:page)
+      assert_select '.pagination-container a', href: documents_path(page: 3), text: /Next/
+      assert_select '.pagination-container a', href: documents_path(page: 1), text: /Previous/
+      assert_select '.pagination-container a', href: documents_path(page: 1), text: /1/
+      assert_select '.pagination-container a', href: documents_path(page: 3), text: /3/
+    end
+  end
+
+  test 'user can change results per page' do
+    FactoryGirl.create_list(:public_document, 15)
+
+    with_config_value(:results_per_page_default, 5) do
+      get :index, params: { per_page: 15 }
+      assert_equal 15, assigns(:documents).length
+      assert_equal '1', assigns(:page)
+      assert_equal 15, assigns(:per_page)
+      assert_select '.pagination-container a', text: /Next/, count: 0
+
+      get :index, params: { per_page: 15, page: 2 }
+      assert_equal 0, assigns(:documents).length
+      assert_equal '2', assigns(:page)
+      assert_equal 15, assigns(:per_page)
+      assert_select '.pagination-container a', text: /Next/, count: 0
+    end
+  end
+
   test 'show filters on index' do
     Factory(:public_document)
 
@@ -541,6 +583,43 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     assert_select 'a[href=?]', documents_path, text: /Clear all filters/
+  end
+
+  test 'filtering system obeys authorization' do
+    programme = Factory(:programme)
+    project = Factory(:project, programme: programme)
+    FactoryGirl.create_list(:public_document, 3, projects: [project])
+    private_document = Factory(:private_document, created_at: 2.years.ago, projects: [project])
+    private_document.annotate_with('tag1', 'tag', private_document.contributor)
+    disable_authorization_checks { private_document.save! }
+    tag1 = TextValue.where(text: 'tag1').first.id
+
+    get :index, params: { filter: { programme: programme.id } }
+
+    assert_equal 3, assigns(:documents).length
+    assert_not_includes assigns(:documents), private_document
+    assert_equal 3, assigns(:available_filters)[:contributor].length
+    assert_equal 1, assigns(:available_filters)[:project].length
+    assert_equal 0, assigns(:available_filters)[:tag].length
+
+    get :index, params: { filter: { programme: programme.id, tag: [tag1] } }
+
+    assert_empty assigns(:documents)
+    assert assigns(:available_filters).values.all?(&:empty?)
+
+    login_as(private_document.contributor)
+
+    get :index, params: { filter: { programme: programme.id } }
+
+    assert_equal 4, assigns(:documents).length
+    assert_equal 4, assigns(:available_filters)[:contributor].length
+    assert_equal 1, assigns(:available_filters)[:project].length
+    assert_equal 1, assigns(:available_filters)[:tag].length
+
+    get :index, params: { filter: { programme: programme.id, tag: [tag1] } }
+
+    assert_equal 1, assigns(:documents).length
+    assert_includes assigns(:documents), private_document
   end
 
   private

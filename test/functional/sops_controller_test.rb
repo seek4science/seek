@@ -1446,6 +1446,55 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal s2.id, assigns(:sops)[2].id
   end
 
+  test 'sorting on numeric paging' do
+    Sop.delete_all
+
+    s1 = Factory(:sop, title: 'GZSop', created_at: 2.years.ago, updated_at: 1.week.ago,
+                 policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s2 = Factory(:sop, title: 'GXSop', created_at: 1.years.ago, updated_at: 2.weeks.ago,
+                 policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s3 = Factory(:sop, title: 'GYSop', created_at: 10.years.ago, updated_at: 3.weeks.ago,
+                 policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+
+    with_config_value(:results_per_page_default, 2) do
+      get :index, params: { page: 1, order: 'created_at_desc' }
+      assert_equal [:created_at_desc], assigns(:order)
+      assert_equal 2, assigns(:sops).length
+      assert_equal [s2, s1], assigns(:sops).to_a
+      assert_equal '1', assigns(:page)
+
+      get :index, params: { page: 2, order: 'created_at_desc' }
+      assert_equal [:created_at_desc], assigns(:order)
+      assert_equal 1, assigns(:sops).length
+      assert_includes assigns(:sops), s3
+      assert_equal '2', assigns(:page)
+
+      get :index, params: { page: 1, order: 'title_asc' }
+      assert_equal [:title_asc], assigns(:order)
+      assert_equal 2, assigns(:sops).length
+      assert_equal [s2, s3], assigns(:sops).to_a
+      assert_equal '1', assigns(:page)
+
+      get :index, params: { page: 2, order: 'title_asc' }
+      assert_equal [:title_asc], assigns(:order)
+      assert_equal 1, assigns(:sops).length
+      assert_includes assigns(:sops), s1
+      assert_equal '2', assigns(:page)
+
+      get :index, params: { order: 'fish' }
+      assert_equal [:updated_at_desc], assigns(:order)
+      assert_equal 2, assigns(:sops).length
+      assert_equal [s1, s2], assigns(:sops).to_a
+      assert_equal '1', assigns(:page)
+
+      get :index, params: { page: 2, order: 'fish' }
+      assert_equal [:updated_at_desc], assigns(:order)
+      assert_equal 1, assigns(:sops).length
+      assert_includes assigns(:sops), s3
+      assert_equal '2', assigns(:page)
+    end
+  end
+
   test 'JSON-API multiple sorting' do
     s1 = Factory(:sop, title: 'ZZSop', created_at: 2.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     s2 = Factory(:sop, title: 'ZXSop', created_at: 1.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))

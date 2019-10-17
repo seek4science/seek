@@ -62,9 +62,7 @@ module Seek
     end
 
     def sort_assets(assets)
-      order = Seek::ListSorter.order_from_keys(*@order)
-
-      Seek::ListSorter.index_items(assets, order)
+      Seek::ListSorter.sort_by_order(assets, Seek::ListSorter.order_from_keys(*@order))
     end
 
     def paginate_assets(assets)
@@ -95,22 +93,25 @@ module Seek
       @page = page_and_sort_params[:page]
       @page ||= 'all' if json_api_request?
       @page ||= '1'
-      @per_page = params[:per_page] ||
+      @per_page = params[:per_page]&.to_i ||
           Seek::Config.results_per_page_for(controller_name) ||
           Seek::Config.results_per_page_default
 
       # Order
       @order = if page_and_sort_params[:sort]
-                 Seek::ListSorter.keys_from_json_api_sort(page_and_sort_params[:sort])
+                 Seek::ListSorter.keys_from_json_api_sort(controller_model.name, page_and_sort_params[:sort])
                else
-                 page_and_sort_params[:order]
+                 Seek::ListSorter.keys_from_params(controller_model.name, page_and_sort_params[:order])
                end
-      # Sort by `updated_at` if on the "top", and its a valid sort option for this type.
-      @order ||= :updated_at_desc if @page == 'top' && Seek::ListSorter.options(controller_model.name).include?(:updated_at_desc)
-      # Sort by `title` if on an alphabetical page, and its a valid sort option for this type.
-      @order ||= :title_asc if @page.match?(/[?A-Z]+/) && Seek::ListSorter.options(controller_model.name).include?(:title_asc)
-      @order ||= Seek::Config.sorting_for(controller_name)&.to_sym
-      @order ||= Seek::ListSorter.key_for_view(controller_model.name, :index)
+      if @order.empty?
+        @order = nil
+        # Sort by `updated_at` if on the "top", and its a valid sort option for this type.
+        @order = :updated_at_desc if @page == 'top' && Seek::ListSorter.options(controller_model.name).include?(:updated_at_desc)
+        # Sort by `title` if on an alphabetical page, and its a valid sort option for this type.
+        @order = :title_asc if @page.match?(/[?A-Z]+/) && Seek::ListSorter.options(controller_model.name).include?(:title_asc)
+        @order ||= Seek::Config.sorting_for(controller_name)&.to_sym
+        @order ||= Seek::ListSorter.key_for_view(controller_model.name, :index)
+      end
       @order = Array.wrap(@order).map(&:to_sym)
 
       # Filters

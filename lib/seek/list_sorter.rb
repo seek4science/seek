@@ -44,14 +44,8 @@ module Seek
       end
     end
 
-    # sort items for an index by the given sort parameter, or the default for its type
-    def self.index_items(items, order = nil)
-      return items if items.empty?
+    def self.sort_by_order(items, order = nil)
       order ||= order_for_view(items.first.class.name, :index)
-      sort_by_order(items, order)
-    end
-
-    def self.sort_by_order(items, order)
       if items.is_a?(ActiveRecord::Relation)
         items.order(strategy_for_relation(order, items))
       else
@@ -73,17 +67,17 @@ module Seek
       (RULES[type_name] || RULES['Other'])[:defaults][view] || RULES['Other'][:defaults][view]
     end
 
-    def self.valid_key?(key)
-      ORDER_OPTIONS.key?(key)
+    def self.valid_key?(type, key)
+      options(type).include?(key.to_sym) && ORDER_OPTIONS.key?(key.to_sym)
     end
 
     def self.order_from_keys(*keys)
       keys.map do |key|
-        ORDER_OPTIONS[key][:order] if valid_key?(key)
+        ORDER_OPTIONS[key][:order]
       end.compact.join(", ")
     end
 
-    def self.keys_from_json_api_sort(sort)
+    def self.keys_from_json_api_sort(type, sort)
       sort.split(',').map do |field|
         if field.start_with?('-')
           key = "#{field[1..-1]}_desc"
@@ -91,8 +85,13 @@ module Seek
           key = "#{field}_asc"
         end
 
-        key.to_sym if valid_key?(key)
+        key.to_sym if valid_key?(type, key)
       end.compact
+    end
+
+    def self.keys_from_params(type, params)
+      params = Array(params) unless params.is_a?(Array)
+      params.reject(&:blank?).map(&:to_sym).select { |key| valid_key?(type, key) }
     end
 
     def self.order_for_view(type_name, view)
