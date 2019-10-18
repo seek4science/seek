@@ -256,7 +256,7 @@ class SessionsControllerTest < ActionController::TestCase
 
     post :create
     assert_redirected_to root_path
-    assert_match(/You have successfully logged in, New Ldap_user./, flash[:notice])
+    assert_match(/You have successfully logged in, new ldap_user./, flash[:notice])
     new_user = User.find_by_login('new_ldap_user')
     assert_not_nil new_user
     assert new_user.active?

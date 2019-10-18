@@ -571,14 +571,14 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_name
     p = people(:quentin_person)
-    assert_equal 'quentin jones', p.name
+    assert_equal 'Quentin Jones', p.name
     p.first_name = 'Tom'
-    assert_equal 'Tom jones', p.name
+    assert_equal 'Tom Jones', p.name
   end
 
   def test_email_with_name
     p = people(:quentin_person)
-    assert_equal('quentin jones <quentin@email.com>', p.email_with_name)
+    assert_equal('Quentin Jones <quentin@email.com>', p.email_with_name)
   end
 
   def test_email_with_name_no_last_name
@@ -588,12 +588,12 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_capitalization_with_nil_last_name
     p = people(:no_first_name)
-    assert_equal 'lastname', p.name
+    assert_equal 'Lastname', p.name
   end
 
   def test_capitalization_with_nil_first_name
     p = people(:no_last_name)
-    assert_equal 'firstname', p.name
+    assert_equal 'Firstname', p.name
   end
 
   def test_double_firstname_capitalised
