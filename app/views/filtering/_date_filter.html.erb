@@ -28,7 +28,7 @@
       end
     end
 
-    apply_url = url_for({ page: nil, filter: with_filter(key, '_date_', replace: true) })
+    apply_url = url_for({ page: nil, filter: with_filter(key, '_date_', replace: true) }) # We will replace _date_ using JS
     remove_url = url_for({ page: nil, filter: without_filter(key) })
   %>
 

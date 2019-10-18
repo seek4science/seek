@@ -65,9 +65,7 @@ module Seek
             }
         ),
         tag: Seek::Filtering::Filter.new(
-            value_field: 'text_values.id',
-            value_mapping: ->(values) { values.map { |v| v.to_i }.reject(&:zero?) },
-            label_field: 'text_values.text',
+            value_field: 'text_values.text',
             joins: [:tags_as_text]
         ),
         country: Seek::Filtering::Filter.new(

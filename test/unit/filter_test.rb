@@ -7,16 +7,13 @@ class FilterTest < ActiveSupport::TestCase
     abc_doc = Factory(:document)
     abc_doc.annotate_with('abctag', 'tag', abc_doc.contributor)
     disable_authorization_checks { abc_doc.save! }
-    abc = TextValue.where(text: 'abctag').first.id
     xyz_doc = Factory(:document)
     xyz_doc.annotate_with('xyztag', 'tag', xyz_doc.contributor)
     disable_authorization_checks { xyz_doc.save! }
-    xyz = TextValue.where(text: 'xyztag').first.id
 
-    assert_includes_all tag_filter.apply(Document.all, [abc]).to_a, [abc_doc]
-    assert_includes_all tag_filter.apply(Document.all, [xyz]).to_a, [xyz_doc]
-    assert_includes_all tag_filter.apply(Document.all, [abc, xyz]).to_a, [abc_doc, xyz_doc]
-    assert_includes_all tag_filter.apply(Document.all, [abc.to_s, xyz.to_s]).to_a, [abc_doc, xyz_doc]
+    assert_includes_all tag_filter.apply(Document.all, ['abctag']).to_a, [abc_doc]
+    assert_includes_all tag_filter.apply(Document.all, ['xyztag']).to_a, [xyz_doc]
+    assert_includes_all tag_filter.apply(Document.all, ['abctag', 'xyztag']).to_a, [abc_doc, xyz_doc]
     assert_empty tag_filter.apply(Document.all, [2_000_000_000]).to_a
     assert_empty tag_filter.apply(Document.all, ['banana']).to_a
   end
@@ -118,41 +115,39 @@ class FilterTest < ActiveSupport::TestCase
     abc_doc = Factory(:document)
     abc_doc.annotate_with('abctag', 'tag', abc_doc.contributor)
     disable_authorization_checks { abc_doc.save! }
-    abc = TextValue.where(text: 'abctag').first.id.to_s
     xyz_doc = Factory(:document)
     xyz_doc.annotate_with('xyztag', 'tag', xyz_doc.contributor)
     disable_authorization_checks { xyz_doc.save! }
-    xyz = TextValue.where(text: 'xyztag').first.id.to_s
 
     options = tag_filter.options(Document.all, [])
     assert_equal 2, options.length
-    abc_opt = get_option(options, abc)
+    abc_opt = get_option(options, 'abctag')
     assert_equal 1, abc_opt.count
     assert_equal 'abctag', abc_opt.label
     refute abc_opt.active?
-    xyz_opt = get_option(options, xyz)
+    xyz_opt = get_option(options, 'xyztag')
     assert_equal 1, xyz_opt.count
     assert_equal 'xyztag', xyz_opt.label
     refute xyz_opt.active?
 
-    options = tag_filter.options(Document.all, [abc])
+    options = tag_filter.options(Document.all, ['abctag'])
     assert_equal 2, options.length
-    abc_opt = get_option(options, abc)
+    abc_opt = get_option(options, 'abctag')
     assert_equal 1, abc_opt.count
     assert_equal 'abctag', abc_opt.label
     assert abc_opt.active?
-    xyz_opt = get_option(options, xyz)
+    xyz_opt = get_option(options, 'xyztag')
     assert_equal 1, xyz_opt.count
     assert_equal 'xyztag', xyz_opt.label
     refute xyz_opt.active?
 
-    options = tag_filter.options(Document.all, [abc, xyz])
+    options = tag_filter.options(Document.all, ['abctag', 'xyztag'])
     assert_equal 2, options.length
-    abc_opt = get_option(options, abc)
+    abc_opt = get_option(options, 'abctag')
     assert_equal 1, abc_opt.count
     assert_equal 'abctag', abc_opt.label
     assert abc_opt.active?
-    xyz_opt = get_option(options, xyz)
+    xyz_opt = get_option(options, 'xyztag')
     assert_equal 1, xyz_opt.count
     assert_equal 'xyztag', xyz_opt.label
     assert xyz_opt.active?

@@ -456,7 +456,7 @@ class DocumentsControllerTest < ActionController::TestCase
   test 'available filters are listed' do
     project = Factory(:project)
     project_doc = Factory(:public_document, created_at: 3.days.ago, projects: [project])
-    project_doc.annotate_with('tag1', 'tag', project_doc.contributor)
+    project_doc.annotate_with('awkward&id=1unsafe[]tag !', 'tag', project_doc.contributor)
     disable_authorization_checks { project_doc.save! }
     old_project_doc = Factory(:public_document, created_at: 10.years.ago, projects: [project])
     other_project = Factory(:project)
@@ -503,8 +503,8 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_select '.filter-category-title', text: 'Tag'
       assert_select '.filter-option', count: 1
       assert_select '.filter-option.filter-option-active', count: 0
-      assert_select ".filter-option[title='tag1']" do
-        assert_select '.filter-option-label', text: 'tag1'
+      assert_select ".filter-option[title='awkward&id=1unsafe[]tag !']" do
+        assert_select '.filter-option-label', text: 'awkward&id=1unsafe[]tag !'
         assert_select '.filter-option-count', text: '1'
       end
     end
@@ -517,7 +517,7 @@ class DocumentsControllerTest < ActionController::TestCase
     programme = Factory(:programme)
     project = Factory(:project, programme: programme)
     project_doc = Factory(:public_document, created_at: 3.days.ago, projects: [project])
-    project_doc.annotate_with('tag1', 'tag', project_doc.contributor)
+    project_doc.annotate_with('awkward&id=1unsafe[]tag !', 'tag', project_doc.contributor)
     disable_authorization_checks { project_doc.save! }
     old_project_doc = Factory(:public_document, created_at: 10.years.ago, projects: [project])
     other_project = Factory(:project, programme: programme)
@@ -590,9 +590,8 @@ class DocumentsControllerTest < ActionController::TestCase
     project = Factory(:project, programme: programme)
     FactoryGirl.create_list(:public_document, 3, projects: [project])
     private_document = Factory(:private_document, created_at: 2.years.ago, projects: [project])
-    private_document.annotate_with('tag1', 'tag', private_document.contributor)
+    private_document.annotate_with('awkward&id=1unsafe[]tag !', 'tag', private_document.contributor)
     disable_authorization_checks { private_document.save! }
-    tag1 = TextValue.where(text: 'tag1').first.id
 
     get :index, params: { filter: { programme: programme.id } }
 
@@ -611,7 +610,7 @@ class DocumentsControllerTest < ActionController::TestCase
       end
     end
 
-    get :index, params: { filter: { programme: programme.id, tag: [tag1] } }
+    get :index, params: { filter: { programme: programme.id, tag: ['awkward&id=1unsafe[]tag !'] } }
 
     assert_empty assigns(:documents)
     assert assigns(:available_filters).values.all?(&:empty?)
@@ -634,7 +633,7 @@ class DocumentsControllerTest < ActionController::TestCase
       end
     end
 
-    get :index, params: { filter: { programme: programme.id, tag: [tag1] } }
+    get :index, params: { filter: { programme: programme.id, tag: ['awkward&id=1unsafe[]tag !'] } }
 
     assert_equal 1, assigns(:documents).length
     assert_includes assigns(:documents), private_document
