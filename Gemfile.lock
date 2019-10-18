@@ -41,18 +41,19 @@ GIT
       rdf (>= 1.99)
 
 GIT
+  remote: https://github.com/seek4science/DOI-query-tool.git
+  revision: a389b760db2a1d00cc79319ad0bd48fd86b9d960
+  specs:
+    doi_query_tool (1.0.0)
+      libxml-ruby (>= 2.6.0)
+
+GIT
   remote: https://github.com/seek4science/zenodo-client.git
   revision: 2a3489780b6f863a66cf07ed14429bf797fc0f75
   specs:
     zenodo-client (0.2.0)
       json (~> 1.8)
       rest-client (~> 2.0)
-
-PATH
-  remote: /Users/whomingbird/Work/code/RubymineProjects/DOI-query-tool
-  specs:
-    doi_query_tool (1.0.0)
-      libxml-ruby (>= 2.6.0)
 
 GEM
   remote: https://rubygems.org/
