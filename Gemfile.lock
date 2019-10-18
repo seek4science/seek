@@ -42,7 +42,7 @@ GIT
 
 GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
-  revision: ccbb90b56c223aee67cff37c5dce50c52b1205c8
+  revision: 0922f614d46af0fd0b7b9efcd092bc32ed23009a
   branch: more-publication-types
   specs:
     doi_query_tool (1.0.0)

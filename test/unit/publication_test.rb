@@ -38,7 +38,7 @@ class PublicationTest < ActiveSupport::TestCase
     publication_hash = {
         title: 'SEEK publication',
         journal: 'The testing journal',
-        pub_date: Date.new(2011, 12, 24),
+        date_published: Date.new(2011, 12, 24),
         pubmed_id: nil,
         doi: nil
     }
@@ -47,7 +47,7 @@ class PublicationTest < ActiveSupport::TestCase
     publication.extract_doi_metadata(doi_record)
     assert_equal publication_hash[:title], publication.title
     assert_equal publication_hash[:journal], publication.journal
-    assert_equal publication_hash[:pub_date], publication.published_date
+    assert_equal publication_hash[:date_published], publication.published_date
     assert_nil publication.pubmed_id
     assert_nil publication.doi
     assert_equal 2, publication.registered_mode
@@ -208,7 +208,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal :book_chapter, result.publication_type
     assert_equal 'Prediction with Confidence Based on a Random Forest Classifier', result.title
     assert_equal 2, result.authors.size
-    assert_equal 'IFIP Advances in Information and Communication Technology 339 : 37', result.citation
+    assert_equal 'Artificial Intelligence Applications and Innovations 339:37-44,Springer Berlin Heidelberg.2010', result.citation
     last_names = %w(Devetyarov Nouretdinov)
     result.authors.each do |auth|
       assert last_names.include? auth.last_name
