@@ -282,7 +282,7 @@ class PublicationsControllerTest < ActionController::TestCase
             published_date: Date.new(2006),
             publication_type: Factory(:journal),
             authors: [
-                PublicationAuthor.new(first_name: 'quentin', last_name: 'jones', author_index: 0),
+                PublicationAuthor.new(first_name: 'quentin', last_name: 'Jones', author_index: 0),
                 PublicationAuthor.new(first_name: 'aaron', last_name: 'spiggle', author_index: 1)]
         },
         {
