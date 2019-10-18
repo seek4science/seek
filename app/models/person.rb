@@ -235,9 +235,7 @@ class Person < ApplicationRecord
   def name
     firstname = first_name || ''
     lastname = last_name || ''
-    # capitalize, including double barrelled names
-    # TODO: why not just store them like this rather than processing each time? Will need to reprocess exiting entries if we do this.
-    (firstname.gsub(/\b\w/, &:upcase) + ' ' + lastname.gsub(/\b\w/, &:upcase)).strip
+    "#{firstname} #{lastname}".strip
   end
 
   # returns true this is an admin person, and they are the only one defined - indicating they are person creating during setting up SEEK
