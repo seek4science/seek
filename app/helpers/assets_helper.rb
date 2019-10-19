@@ -234,7 +234,8 @@ module AssetsHelper
 
   def add_to_dropdown(item)
     return unless Seek::AddButtons.add_dropdown_for(item)
-    dropdown_button(t('add_new_dropdown.button'), 'attach', menu_options: {class: 'pull-right', id: 'item-admin-menu'}) do
+    tooltip = "This option allows you to add a new item, whilst associating it with this #{text_for_resource(item)}"
+    dropdown_button(t('add_new_dropdown.button'), 'attach', menu_options: {class: 'pull-right', id: 'item-admin-menu'}, tooltip:tooltip) do
       add_item_to_options(item) do |text, path|
         content_tag(:li) do
           image_tag_for_key('add', path, text, nil, text)

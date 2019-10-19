@@ -45,8 +45,10 @@ class Assay < ApplicationRecord
   has_one :investigation, through: :study
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
-  validates_presence_of :assay_type_uri
-  validates_presence_of :technology_type_uri, unless: :is_modelling?
+  validates :assay_type_uri, presence:true
+  validates_with AssayTypeUriValidator
+  validates :technology_type_uri, absence:true, if: :is_modelling?
+  validates_with TechnologyTypeUriValidator
   validates_presence_of :contributor
   validates_presence_of :assay_class
   validates :study, presence: { message: ' must be selected and valid' }, projects: true
