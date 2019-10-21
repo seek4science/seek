@@ -22,6 +22,7 @@ namespace :seek do
     fix_country_codes
 
     convert_old_pagination_settings
+    set_assay_and_technology_type_uris
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -318,5 +319,22 @@ namespace :seek do
       end
       default_pages.destroy!
     end
+  end
+
+  task(set_assay_and_technology_type_uris: :environment) do
+    assays = Assay.where('suggested_assay_type_id IS NOT NULL OR suggested_technology_type_id IS NOT NULL')
+    count = 0
+
+    assays.each do |assay|
+      needs_assay_type_update = assay.suggested_assay_type&.ontology_uri && assay[:assay_type_uri] != assay.suggested_assay_type.ontology_uri
+      needs_tech_type_update = assay.suggested_technology_type&.ontology_uri && assay[:technology_type_uri] != assay.suggested_technology_type.ontology_uri
+      if needs_assay_type_update || needs_tech_type_update
+        count += 1
+        assay.update_column(:assay_type_uri, assay.suggested_assay_type.ontology_uri) if needs_assay_type_update
+        assay.update_column(:technology_type_uri, assay.suggested_technology_type.ontology_uri) if needs_tech_type_update
+      end
+    end
+
+    puts "Updated #{count} assays' technology/assay type URIs" if count > 0
   end
 end
