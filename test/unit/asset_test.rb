@@ -63,7 +63,6 @@ class AssetTest < ActiveSupport::TestCase
     assay = Factory :experimental_assay
     assay2 = Factory :modelling_assay
     assay3 = Factory :modelling_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Cell_cycle'
-    assay4 = Factory :modelling_assay, assay_type_uri: 'http://some-made-up-uri-not-resolvable-from-ontology.org/types#to_force_nil_label'
 
     disable_authorization_checks do
       assay.associate(df)
@@ -72,8 +71,6 @@ class AssetTest < ActiveSupport::TestCase
       assay2.reload
       assay3.associate(df)
       assay3.reload
-      assay4.associate(df)
-      assay4.reload
       df.reload
     end
 

@@ -1,4 +1,4 @@
-<% admins = Person.all.select(&:is_admin?).sort_by{ |p| (p.last_name.nil? ? p.name : p.last_name) } %>
+<% admins = Person.admins.sort_by{ |p| (p.last_name.nil? ? p.name : p.last_name) } %>
 
 <h4 class="text_align">Add/remove Administrators</h4>
 

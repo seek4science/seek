@@ -233,11 +233,13 @@ module Seek
 
     def default_page(controller)
       pages = default_pages.with_indifferent_access
-      if pages.key?(controller.to_s)
-        pages[controller.to_s]
-      else
-        Settings.defaults['default_pages'][controller.to_s] || 'latest'
-      end
+      p = if pages.key?(controller.to_s)
+            pages[controller.to_s]
+          else
+            Settings.defaults['default_pages'][controller.to_s] || 'top'
+          end
+
+      p == 'latest' ? 'top' : p
     end
 
     # FIXME: change to standard setter=
@@ -417,6 +419,10 @@ module Seek
 
     read_project_setting_attributes.each do |method, opts|
       register_encrypted_setting(method) if opts && opts[:encrypt]
+    end
+
+    def self.schema_org_supported?
+      true
     end
   end
 end

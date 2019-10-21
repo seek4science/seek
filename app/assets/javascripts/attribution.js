@@ -16,7 +16,7 @@ function updateAttributionSettings() {
 
     // update the page
     if(html.length == 0) {
-        $j('#attributed_to_list').html('<li><span class="none_text">No attributions</span></li>');
+        $j('#attributed_to_list').html('<li class="association-list-item"><span class="none_text">No attributions</span></li>');
     }
     else {
         $j('#attributed_to_list').html(html);

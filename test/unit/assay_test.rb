@@ -67,11 +67,12 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'is_modelling' do
-    assay = assays(:metabolomics_assay)
-    User.current_user = assay.contributor.user
-    assert !assay.is_modelling?
-    assay.assay_class = assay_classes(:modelling_assay_class)
-    assay.save!
+    assay = Factory(:experimental_assay)
+    assert_equal 'EXP',assay.assay_class.key
+    refute assay.is_modelling?
+
+    assay = Factory(:modelling_assay)
+    assert_equal 'MODEL',assay.assay_class.key
     assert assay.is_modelling?
   end
 
@@ -86,11 +87,12 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'is_experimental' do
-    assay = assays(:metabolomics_assay)
-    User.current_user = assay.contributor.user
+    assay = Factory(:experimental_assay)
+    assert_equal 'EXP',assay.assay_class.key
     assert assay.is_experimental?
-    assay.assay_class = assay_classes(:modelling_assay_class)
-    assay.save!
+
+    assay = Factory(:modelling_assay)
+    assert_equal 'MODEL',assay.assay_class.key
     assert !assay.is_experimental?
   end
 
@@ -144,13 +146,12 @@ class AssayTest < ActiveSupport::TestCase
       assay.contributor = people(:person_for_model_owner)
 
       # an modelling assay can be valid without a technology type, or organism
-      assay.assay_class = assay_classes(:modelling_assay_class)
+      assay = Factory(:modelling_assay)
       assay.technology_type_uri = nil
 
       assert assay.valid?
       # an experimental assay can be invalid without a sample nor a organism
-      assay.assay_class = assay_classes(:experimental_assay_class)
-      assay.technology_type_uri = nil
+      assay = Factory(:experimental_assay)
       assay.organisms = []
 
       as_not_virtualliver do
@@ -160,6 +161,75 @@ class AssayTest < ActiveSupport::TestCase
       assay.assay_organisms = [Factory(:assay_organism)]
       assert assay.valid?
     end
+  end
+
+  test 'validate assay and tech type' do
+
+    assay = Factory(:experimental_assay)
+    assert assay.valid?
+
+    # not from ontology
+    assay.assay_type_uri = "http://someontology.org/science"
+    refute assay.valid?
+
+    # modelling instead of experimental
+    assay.assay_type_uri = 'http://jermontology.org/ontology/JERMOntology#Metabolic_redesign'
+    refute assay.valid?
+
+    # valid assay type uri
+    assay.assay_type_uri = 'http://jermontology.org/ontology/JERMOntology#Extracellular_metabolite_concentration'
+    assert assay.valid?
+
+    # not from ontology
+    assay.technology_type_uri = 'http://someontology.org/science'
+    refute assay.valid?
+
+    # not a tech type
+    assay.technology_type_uri = 'http://jermontology.org/ontology/JERMOntology#Metabolite_concentration'
+    refute assay.valid?
+
+    #valid tech type
+    assay.technology_type_uri = 'http://jermontology.org/ontology/JERMOntology#UPLC'
+    assert assay.valid?
+
+    ## now for modelling
+    assay = Factory(:modelling_assay)
+    assert assay.valid?
+
+    # not from ontology
+    assay.assay_type_uri = "http://someontology.org/science"
+    refute assay.valid?
+
+    # experimental instead of modelling
+    assay.assay_type_uri = 'http://jermontology.org/ontology/JERMOntology#Enzymatic_assay'
+    refute assay.valid?
+
+    # valid assay type uri
+    assay.assay_type_uri = 'http://jermontology.org/ontology/JERMOntology#Translation'
+    assert assay.valid?
+
+    assert_nil assay.technology_type_uri
+
+    # tech type not required
+    # tech type required
+    assay.technology_type_uri=nil
+    assert assay.valid?
+    assay.technology_type_uri=''
+    assert assay.valid?
+
+    # validate with uri from suggested assay type
+    assay = Factory(:experimental_assay)
+    assay.suggested_assay_type = Factory(:suggested_assay_type)
+    assert assay.valid?
+    assay.suggested_assay_type = Factory(:suggested_modelling_analysis_type)
+    refute assay.valid?
+
+    assay = Factory(:modelling_assay)
+    assay.suggested_assay_type = Factory(:suggested_assay_type)
+    refute assay.valid?
+    assay.suggested_assay_type = Factory(:suggested_modelling_analysis_type)
+    assert assay.valid?
+
   end
 
   test 'publications' do
@@ -426,7 +496,7 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal 'new fluxomics', assay.assay_type_label
 
     suggested_ma = Factory(:suggested_modelling_analysis_type, label: 'new metabolism')
-    assay = Factory(:experimental_assay, suggested_assay_type: suggested_ma)
+    assay = Factory(:modelling_assay, suggested_assay_type: suggested_ma)
     assert_equal 'new metabolism', assay.assay_type_label
   end
 
@@ -689,4 +759,6 @@ class AssayTest < ActiveSupport::TestCase
     refute item.has_jerm_contributor?
     assert item2.has_jerm_contributor?
   end
+
+
 end

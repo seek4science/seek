@@ -4,8 +4,6 @@ class Investigation < ApplicationRecord
   acts_as_isa
   acts_as_snapshottable
 
-  attr_accessor :new_link_from_study
-
   has_many :studies
 
   has_many :assays, through: :studies

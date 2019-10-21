@@ -1,4 +1,5 @@
 class PeopleController < ApplicationController
+  include Seek::IndexPager
   include Seek::AnnotationCommon
   include Seek::Publishing::PublishingCommon
   include Seek::Publishing::GatekeeperPublish
@@ -7,6 +8,7 @@ class PeopleController < ApplicationController
   include Seek::AdminBulkAction
   include RelatedItemsHelper
 
+  before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[show edit update destroy items]
   before_action :current_user_exists, only: %i[register create new]
   before_action :is_during_registration, only: [:register]
@@ -22,55 +24,6 @@ class PeopleController < ApplicationController
   include Seek::BreadCrumbs
 
   protect_from_forgery only: []
-
-  # GET /people
-  # GET /people.xml
-  def index
-    if params[:discipline_id]
-      @discipline = Discipline.find_by_id(params[:discipline_id])
-      @people = @discipline.try(:people) || []
-    elsif params[:project_position_id]
-      @project_position = ProjectPosition.find(params[:project_position_id])
-      @people = Person.includes(:group_memberships)
-      # FIXME: this needs double checking, (a) not sure its right, (b) can be paged when using find.
-      @people = @people.reject { |p| (p.group_memberships & @project_position.group_memberships).empty? }
-    end
-
-    if (request.format == 'json' && params[:page].nil?)
-      params[:page] = 'all'
-    end
-
-    if @people
-      @people = @people.select(&:can_view?)
-    else
-      @people = if params[:page].blank? || params[:page] == 'latest' || params[:page] == 'all'
-                  Person.active
-                else
-                  Person.all
-                end
-
-      @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
-      if request.format.to_s == "text/html" && !params[:project_id].nil?
-        @people = sort_project_member_by_status(@people, params[:project_id])
-      end
-      unless view_context.index_with_facets?('people') && params[:user_enable_facet] == 'true'
-        @people = Person.paginate_after_fetch(@people,
-                                              page: (params[:page] || Seek::Config.default_page('people')),
-                                              reorder: false,
-                                              latest_limit: Seek::Config.limit_latest)
-      end
-    end
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml
-      format.json  { render json: @people,
-                            each_serializer: SkeletonSerializer,
-                            meta: {:base_url =>   Seek::Config.site_base_host,
-                                   :api_version => ActiveModel::Serializer.config.api_version
-                            } }
-    end
-  end
 
   # GET /people/1
   # GET /people/1.xml
@@ -342,7 +295,8 @@ class PeopleController < ApplicationController
   def set_project_related_roles(person)
     return unless params[:roles]
 
-    administered_project_ids = Project.all_can_be_administered.collect { |p| p.id.to_s }
+    # TODO: Replace this with `Project.authorized_for` after `auth_perf` merged
+    administered_project_ids = Project.all.select { |project| project.can_manage?(user) }.map { |p| p.id.to_s }
 
     Seek::Roles::ProjectRelatedRoles.role_names.each do |role_name|
       # remove for the project ids that can be administered
@@ -376,7 +330,7 @@ class PeopleController < ApplicationController
   end
 
   def editable_by_user
-    unless @person.can_be_edited_by?(current_user)
+    unless @person.can_edit?(current_user)
       error('Insufficient privileges', 'is invalid (insufficient_privileges)')
       false
     end
@@ -387,5 +341,22 @@ class PeopleController < ApplicationController
       error('You cannot register a new profile to yourself as you are already registered', 'Is invalid (already registered)')
       false
     end
+  end
+
+  def find_assets
+    @people = nil
+    if params[:discipline_id]
+      @discipline = Discipline.find_by_id(params[:discipline_id])
+      @people = @discipline.try(:people) || []
+    elsif params[:project_position_id]
+      @project_position = ProjectPosition.find(params[:project_position_id])
+      @people = Person.includes(:group_memberships)
+      # FIXME: this needs double checking, (a) not sure its right, (b) can be paged when using find.
+      @people = @people.reject { |p| (p.group_memberships & @project_position.group_memberships).empty? }
+    end
+
+    super unless @people
+
+    @people = @people.select(&:can_view?)
   end
 end

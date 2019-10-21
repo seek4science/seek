@@ -9,6 +9,7 @@ class DocumentsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include MockHelper
   include HtmlHelper
+  include GeneralAuthorizationTestCases
 
   def test_json_content
     login_as(Factory(:user))
@@ -279,6 +280,120 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', document_path(document), text: document.title
       assert_select 'a[href=?]', document_path(document2), text: document2.title, count: 0
     end
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('document')
+  end
+
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    document = Factory(:document, contributor:person)
+    login_as(person)
+    assert document.can_manage?
+    get :manage, params: {id: document}
+    assert_response :success
+
+    # check the project form exists, studies and assays don't have this
+    assert_select 'div#add_projects_form', count:1
+
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
+    # should be a temporary sharing link
+    assert_select 'div#temporary_links', count:1
+
+    assert_select 'div#author_form', count:1
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    document = Factory(:document, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert document.can_edit?
+    refute document.can_manage?
+    get :manage, params: {id:document}
+    assert_redirected_to document
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    document = Factory(:document, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+
+    login_as(person)
+    assert document.can_manage?
+
+    patch :manage_update, params: {id: document,
+                                   document: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to document
+
+    document.reload
+    assert_equal [proj1,proj2],document.projects.sort_by(&:id)
+    assert_equal [other_creator],document.creators
+    assert_equal Policy::VISIBLE,document.policy.access_type
+    assert_equal 1,document.policy.permissions.count
+    assert_equal other_person,document.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,document.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person, project:proj1)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    document = Factory(:document, projects:[proj1], policy:Factory(:private_policy,
+                                                         permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute document.can_manage?
+    assert document.can_edit?
+
+    assert_equal [proj1],document.projects
+    assert_empty document.creators
+
+    patch :manage_update, params: {id: document,
+                                   document: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    document.reload
+    assert_equal [proj1],document.projects
+    assert_empty document.creators
+    assert_equal Policy::PRIVATE,document.policy.access_type
+    assert_equal 1,document.policy.permissions.count
+    assert_equal person,document.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,document.policy.permissions.first.access_type
+
   end
 
   private

@@ -18,7 +18,7 @@
         <%= text_area_tag 'sop[description]', sop_description_value, :class=>"form-control" -%>
       </div>
 
-      <%= render :partial => "projects/project_selector", :locals => { :resource => @sop, :allow_nil => Seek::Config.is_virtualliver } -%>
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @sop, :allow_nil => Seek::Config.is_virtualliver } %>
 
       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} if show_scales?%>
 
@@ -29,12 +29,7 @@
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
       <%= fancy_multiselect @sop, :workflows, { other_projects_checkbox: false } if Seek::Config.workflows_enabled -%>
 
-      <div>
-        <%= preview_permission_popup_link(@sop)-%>
-        <%= create_button :id => "sop_submit_btn",
-                       :onclick => "return validateResourceFields('sop')",
-                       :class => 'btn btn-primary' -%>
-        or <%= cancel_button(sops_path) -%>
-      </div>
+      <%= form_submit_buttons(@sop) %>
+
     </div>
 <% end -%>

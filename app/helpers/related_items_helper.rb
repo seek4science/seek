@@ -3,7 +3,7 @@ module RelatedItemsHelper
     perform_authorization(resource_hash) unless authorization_already_done
     limit_items(resource_hash, limit) unless limit.nil?
     remove_empty_tabs(resource_hash) unless show_empty_tabs
-    sort_items(resource_hash)
+    update_item_details(resource_hash)
   end
 
   private
@@ -33,7 +33,7 @@ module RelatedItemsHelper
     end
   end
 
-  def sort_items(resource_hash)
+  def update_item_details(resource_hash)
     ordered_keys(resource_hash).map { |key| resource_hash[key].merge(type: key) }.each do |resource_type|
       update_resource_type(resource_type)
     end
@@ -84,7 +84,7 @@ module RelatedItemsHelper
     # Authorize
     authorize_related_items(related)
 
-    order_related_items(related)
+    Seek::ListSorter.related_items(related)
 
     # Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
@@ -141,16 +141,6 @@ module RelatedItemsHelper
     method_hash
   end
 
-  def order_related_items(related)
-    related.each do |key, res|
-      if key == 'Person' && !@project.nil?
-        res[:items] = sort_project_member_by_status(res[:items], @project.id)
-      else
-        res[:items].sort! { |item, item2| item2.updated_at <=> item.updated_at }
-      end
-    end
-  end
-
   def authorize_related_items(related)
     related.each do |key, res|
       res[:items] = [] if res[:items].nil?
@@ -183,9 +173,7 @@ module RelatedItemsHelper
   def collect_related_items(resource)
     related = relatable_types
     related.delete('Person') if resource.is_a?(Person) # to avoid the same person showing up
-    if !resource.is_a?(Sample)
-      related.delete('Organism')
-    end
+    related.delete('Organism') unless resource.is_a?(Sample)
 
     answerable = {}
     related.each_key do |type|
@@ -200,7 +188,7 @@ module RelatedItemsHelper
 
   def sort_project_member_by_status(resource, project_id)
     project = Project.find(project_id)
-    resource.sort_by {|person| person.current_projects.include?(project) ? 0 : 1}
+    resource.sort_by { |person| person.current_projects.include?(project) ? 0 : 1 }
   end
 
   def get_person_id

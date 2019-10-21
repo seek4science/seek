@@ -24,11 +24,6 @@
 
       </div>
 
-      <%# only the owner should be able to change sharing permissions -%>
-      <% if current_user_authorized_to_manage && !@data_file.openbis?-%>
-          <%= render :partial => "projects/project_selector", :locals => {:resource => @data_file } %>
-      <% end %>
-
       <%= render :partial => "scales/scales_selector", :locals => {:object => @data_file} if show_scales? %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @data_file } %>
@@ -39,14 +34,6 @@
 
       <%= fancy_multiselect @data_file, :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
 
-      <div>
-
-        <%= preview_permission_popup_link(@data_file)-%>
-        <%= f.submit "Update", :id => "data_file_submit_btn",
-                     :onclick => "return validateResourceFields('data_file');",
-                     :class => 'btn btn-primary' -%>
-        or <%= cancel_button(data_file_path(@data_file)) -%>
-
-      </div>
+      <%= form_submit_buttons(@data_file) %>
     </div>
 <% end %>

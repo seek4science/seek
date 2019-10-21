@@ -98,7 +98,6 @@ module ApiTestHelper
       # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
       assert_difference("#{@clz.classify}.count") do
         post "/#{@plural_clz}.json", params: @to_post.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
-        #puts "returned response: ", response.body
         assert_response :success
       end
 
@@ -107,6 +106,7 @@ module ApiTestHelper
       # content check
       h = JSON.parse(response.body)
       to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes : []
+      
       hash_comparison(@to_post['data']['attributes'].except(*to_ignore), h['data']['attributes'])
 
       if @to_post['data'].has_key?('relationships')

@@ -18,23 +18,12 @@
   </div>
 
   <div id="sample_extra_details">
-    <%= render :partial => "projects/project_selector", :locals => { :resource => @sample,:allow_nil=> false} -%>
-    <% if @sample.can_manage? -%>
-        <%= render :partial => "assets/asset_form_bottom", :locals=>{:f=>f,attribution_enable:false,show_publications:false,sharing_link:false} %>
+    <% if show_form_manage_specific_attributes? && @sample.can_manage? -%>
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @sample,:allow_nil=> false} %>
+      <%= render :partial => "assets/asset_form_bottom", :locals=>{:f=>f,attribution_enable:false,show_publications:false,sharing_link:false} %>
     <% end %>
   </div>
-  <%= preview_permission_popup_link(@sample)-%>
 
-  <%= f.submit (@sample.new_record? ? "Create" : "Update"), :class => 'btn btn-primary',:id=>'sample_submit_btn',disabled:@sample.sample_type.nil? %>
-    or
-  <%= cancel_button(@sample.new_record? ? sample_type_path(@sample.sample_type) : sample_path(@sample)) %>
+  <%= form_submit_buttons(@sample, validate:false) %>
+
 </div>
-
-<script>
-
-    $j('#sample_submit_btn').on('click', function() {
-        previewPermissions();
-        return(false);
-    });
-
-</script>

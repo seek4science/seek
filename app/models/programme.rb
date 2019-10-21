@@ -35,7 +35,6 @@ class Programme < ApplicationRecord
   before_create :activate_on_create
 
   # scopes
-  scope :default_order, -> { order('title') }
   scope :activated, -> { where(is_activated: true) }
   scope :not_activated, -> { where(is_activated: false) }
   scope :rejected, -> { where('is_activated = ? AND activation_rejection_reason IS NOT NULL', false) }
@@ -66,10 +65,6 @@ class Programme < ApplicationRecord
 
   def assets
     (data_files + models + sops + presentations + events + publications + documents).uniq.compact
-  end
-
-  def can_be_edited_by?(user)
-    can_edit?(user)
   end
 
   def has_member?(user_or_person)

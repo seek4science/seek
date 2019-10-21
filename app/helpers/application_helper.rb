@@ -5,6 +5,7 @@ module ApplicationHelper
   include FancyMultiselectHelper
   include Recaptcha::ClientHelper
   include VersionHelper
+  include ImagesHelper
 
   def no_items_to_list_text
     content_tag :div, id: 'no-index-items-text' do
@@ -70,18 +71,17 @@ module ApplicationHelper
   # provide the block that shows the URL to the resource, including the version if it is a versioned resource
   # label is based on the application name, for example <label>FAIRDOMHUB ID: </label>
   def persistent_resource_id(resource)
-
     # FIXME: this contains some duplication of Seek::Rdf::RdfGeneration#rdf_resource - however not every model includes that Module at this time.
     # ... its also a bit messy handling the version
-    url= if resource.class.name.include?("::Version")
-      URI.join(Seek::Config.site_base_host + "/", "#{resource.parent.class.name.tableize}/","#{resource.parent.id}?version=#{resource.version}").to_s
-    else
-      URI.join(Seek::Config.site_base_host + "/", "#{resource.class.name.tableize}/","#{resource.id}").to_s
+    url = if resource.class.name.include?('::Version')
+            URI.join(Seek::Config.site_base_host + '/', "#{resource.parent.class.name.tableize}/", "#{resource.parent.id}?version=#{resource.version}").to_s
+          else
+            URI.join(Seek::Config.site_base_host + '/', "#{resource.class.name.tableize}/", resource.id.to_s).to_s
     end
 
     content_tag :p, class: :id do
       content_tag(:strong) do
-        t('seek_id')+":"
+        t('seek_id') + ':'
       end + ' ' + link_to(url, url)
     end
   end
@@ -215,7 +215,7 @@ module ApplicationHelper
       res = mail_to(res) if options[:email]
       res = link_to(res, res, popup: true) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
-      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(res)) if options[:link_as_country]
+      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(CountryCodes.code(text))) if options[:link_as_country]
     end
     res.html_safe
   end
@@ -242,7 +242,7 @@ module ApplicationHelper
     list_item.html_safe
   end
 
-  def contributor(contributor, avatar = false, size = 100, you_text = false)
+  def contributor(contributor, _avatar = false, _size = 100, _you_text = false)
     return unless contributor
 
     contributor_name = h(contributor.name)
@@ -276,7 +276,12 @@ module ApplicationHelper
     if resource && resource.respond_to?(:title) && resource.title
       h(resource.title)
     elsif PAGE_TITLES[controller_name]
-      PAGE_TITLES[controller_name]
+      title = ''
+      if @parent_resource
+        title << "#{h(@parent_resource.title)} - "
+      end
+      title << PAGE_TITLES[controller_name]
+      title
     else
       "The #{Seek::Config.application_name}"
     end
@@ -312,7 +317,7 @@ module ApplicationHelper
       truncated_result += "\n"
     end
     # Need some kind of whitespace before elipses or auto-link breaks
-    html = truncated_result.strip + ((truncated && ellipsis) ? "\n..." : '')
+    html = truncated_result.strip + (truncated && ellipsis ? "\n..." : '')
     html.html_safe
   end
 
@@ -435,11 +440,11 @@ module ApplicationHelper
   # to display funding codes on the 'show' page if present
   def show_funding_codes(item)
     return if item.funding_codes.empty?
-    html = content_tag(:strong,'Funding codes:')
-    html << content_tag(:ul,class:'funding-codes') do
+    html = content_tag(:strong, 'Funding codes:')
+    html << content_tag(:ul, class: 'funding-codes') do
       inner = ''
       item.funding_codes.each do |code|
-        inner += content_tag(:li,code)
+        inner += content_tag(:li, code)
       end
       inner.html_safe
     end
@@ -453,6 +458,11 @@ module ApplicationHelper
 
   def white_list(text)
     Rails::Html::WhiteListSanitizer.new.sanitize(text)
+  end
+
+  # whether manage attributes should be shown, dont show if editing (rather than new or managing)
+  def show_form_manage_specific_attributes?
+    !(action_name == 'edit' || action_name == 'update')
   end
 
   PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => 'Institutions', 'people' => 'People', 'sessions' => 'Login', 'users' => 'Signup', 'search' => 'Search',

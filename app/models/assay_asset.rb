@@ -19,6 +19,8 @@ class AssayAsset < ApplicationRecord
   enforce_authorization_on_association :assay, :edit
   enforce_authorization_on_association :asset, :view
 
+  validate :validate_model_requires_modelling_assay
+
   def set_version
     return if destroyed?
     return unless asset && asset.respond_to?(:latest_version) && asset.latest_version
@@ -39,4 +41,16 @@ class AssayAsset < ApplicationRecord
     OUTGOING = 2
     NODIRECTION = 0
   end
+
+  private
+
+  def validate_model_requires_modelling_assay
+    if asset && asset.is_a?(Model)
+      if assay && !assay.is_modelling?
+        errors.add(:assay, "must be a #{I18n.t('assays.modelling_analysis')}")
+      end
+    end
+  end
+
+
 end

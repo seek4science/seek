@@ -1,0 +1,18 @@
+<h1>Manage <%= text_for_resource(resource) %> : <%= link_to(h(resource.title), resource) -%></h1>
+
+<%
+  show_projects = true if show_projects.nil?
+  sharing_link = true if sharing_link.nil?
+%>
+
+<%= form_for resource, url: {action: :manage_update} do |f| %>
+  <%= f.error_messages -%>
+
+  <% if show_projects %>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => resource, :allow_nil => false} %>
+  <% end %>
+  <%= render partial: 'assets/manage_specific_attributes', locals: {f: f, sharing_link: sharing_link} %>
+
+  <%= form_submit_buttons(resource, validate:false) %>
+
+<% end -%>

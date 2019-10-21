@@ -3,8 +3,7 @@ require_dependency 'seek/util'
 class DataFile < ApplicationRecord
   include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
-
-  attr_accessor :parent_name
+  include Seek::BioSchema::Support
 
   # searchable must come before acts_as_asset call
   if Seek::Config.solr_enabled
@@ -18,8 +17,6 @@ class DataFile < ApplicationRecord
   acts_as_doi_parent(child_accessor: :versions)
 
   validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
-
-  scope :default_order, -> { order('title') }
 
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."

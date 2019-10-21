@@ -28,7 +28,7 @@ downloadable_data_file:
 
 non_downloadable_data_file:
   contributor: person_for_datafile_owner
-  title: Download Only
+  title: No Download
   description: A spreadsheet
   last_used_at: 2009-04-03 11:09:18
   version: 1
