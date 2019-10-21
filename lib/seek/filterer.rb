@@ -52,16 +52,15 @@ module Seek
             value_field: 'assay_type_uri',
             label_mapping: ->(values) {
               values.map do |value|
-                value = RDF::URI(value)
-                Seek::Ontologies::AssayTypeReader.instance.fetch_label_for(value) ||
-                    Seek::Ontologies::ModellingAnalysisTypeReader.instance.fetch_label_for(value)
+                Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri[value]&.label ||
+                    Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[value]&.label
               end
             }
         ),
         technology_type: Seek::Filtering::Filter.new(
             value_field: 'technology_type_uri',
             label_mapping: ->(values) {
-              values.map { |value| Seek::Ontologies::TechnologyTypeReader.instance.fetch_label_for(RDF::URI(value)) }
+              values.map { |value| Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_uri[value]&.label }
             }
         ),
         tag: Seek::Filtering::Filter.new(

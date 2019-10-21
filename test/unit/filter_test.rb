@@ -18,6 +18,41 @@ class FilterTest < ActiveSupport::TestCase
     assert_empty tag_filter.apply(Document.all, ['banana']).to_a
   end
 
+  test 'apply ontology filter' do
+    assay_type_filter = Seek::Filterer::FILTERS[:assay_type]
+    tech_type_filter = Seek::Filterer::FILTERS[:technology_type]
+    metab_exp_assay = Factory(:experimental_assay,
+                              assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics',
+                              technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography')
+    gen_model_assay = Factory(:modelling_assay,
+                              assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Genome_scale')
+
+    suggested_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'bla')
+    sug_type_exp_assay = Factory(:experimental_assay,
+                                 assay_type_uri: "suggested_assay_type:#{suggested_type.id}",
+                                 technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography')
+
+    assays = Assay.where(id: [metab_exp_assay.id, gen_model_assay.id, sug_type_exp_assay.id])
+
+    # Assay type
+    assert_includes_all assay_type_filter.apply(assays, ['http://jermontology.org/ontology/JERMOntology#Metabolomics']).to_a,
+                        [metab_exp_assay, sug_type_exp_assay]
+    assert_includes_all assay_type_filter.apply(assays, ['http://jermontology.org/ontology/JERMOntology#Metabolomics',
+                                                         'http://jermontology.org/ontology/JERMOntology#Genome_scale']).to_a,
+                        [metab_exp_assay, gen_model_assay, sug_type_exp_assay]
+    assert_includes_all assay_type_filter.apply(assays, ['http://jermontology.org/ontology/JERMOntology#Genome_scale',
+                                                         'http://jermontology.org/ontology/JERMOntology#Metabolite_profiling']).to_a,
+                        [gen_model_assay]
+    assert_empty assay_type_filter.apply(assays, ['http://jermontology.org/ontology/JERMOntology#Metabolite_profiling']).to_a
+    assert_empty assay_type_filter.apply(assays, ['100000']).to_a
+
+    # Tech type
+    assert_includes_all tech_type_filter.apply(assays, ['http://jermontology.org/ontology/JERMOntology#Gas_chromatography']).to_a,
+                        [metab_exp_assay, sug_type_exp_assay]
+    assert_empty tech_type_filter.apply(assays, ['http://jermontology.org/ontology/JERMOntology#HPLC']).to_a
+    assert_empty tech_type_filter.apply(assays, ['100000']).to_a
+  end
+
   test 'apply search filter' do
     search_filter = Seek::Filtering::SearchFilter.new
 
@@ -153,6 +188,74 @@ class FilterTest < ActiveSupport::TestCase
     assert xyz_opt.active?
   end
 
+  test 'get filter options for ontology filters' do
+    assay_type_filter = Seek::Filterer::FILTERS[:assay_type]
+    tech_type_filter = Seek::Filterer::FILTERS[:technology_type]
+    metab_exp_assay = Factory(:experimental_assay,
+                              assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics',
+                              technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography')
+    gen_model_assay = Factory(:modelling_assay,
+                              assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Genome_scale')
+
+    suggested_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'bla')
+    sug_type_exp_assay = Factory(:experimental_assay,
+                                 assay_type_uri: "suggested_assay_type:#{suggested_type.id}",
+                                 technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography')
+
+    assays = Assay.where(id: [metab_exp_assay.id, gen_model_assay.id, sug_type_exp_assay.id])
+
+    # Assay type
+    options = assay_type_filter.options(assays, [])
+    assert_equal 2, options.length
+    metab_opt = get_option(options, 'http://jermontology.org/ontology/JERMOntology#Metabolomics')
+    assert_equal 2, metab_opt.count, "Should include the Metabolomics assay and the suggested type assay."
+    assert_equal 'Metabolomics', metab_opt.label
+    refute metab_opt.active?
+    gen_opt = get_option(options, 'http://jermontology.org/ontology/JERMOntology#Genome_scale')
+    assert_equal 1, gen_opt.count
+    assert_equal 'Genome scale', gen_opt.label
+    refute gen_opt.active?
+    # Tech type
+    options = tech_type_filter.options(assays, [])
+    assert_equal 1, options.length
+    gas_opt = get_option(options, 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography')
+    assert_equal 2, gas_opt.count
+    assert_equal 'Gas chromatography', gas_opt.label
+    refute gas_opt.active?
+
+    # Assay type
+    options = assay_type_filter.options(assays, ['http://jermontology.org/ontology/JERMOntology#Metabolomics'])
+    assert_equal 2, options.length
+    metab_opt = get_option(options, 'http://jermontology.org/ontology/JERMOntology#Metabolomics')
+    assert_equal 2, metab_opt.count
+    assert_equal 'Metabolomics', metab_opt.label
+    assert metab_opt.active?
+    gen_opt = get_option(options, 'http://jermontology.org/ontology/JERMOntology#Genome_scale')
+    assert_equal 1, gen_opt.count
+    assert_equal 'Genome scale', gen_opt.label
+    refute gen_opt.active?
+    # Tech type
+    options = tech_type_filter.options(assays, ['http://jermontology.org/ontology/JERMOntology#Gas_chromatography'])
+    assert_equal 1, options.length
+    gas_opt = get_option(options, 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography')
+    assert_equal 2, gas_opt.count
+    assert_equal 'Gas chromatography', gas_opt.label
+    assert gas_opt.active?
+
+    # Assay type
+    options = assay_type_filter.options(assays,['http://jermontology.org/ontology/JERMOntology#Metabolomics',
+                                                'http://jermontology.org/ontology/JERMOntology#Genome_scale'])
+    assert_equal 2, options.length
+    metab_opt = get_option(options, 'http://jermontology.org/ontology/JERMOntology#Metabolomics')
+    assert_equal 2, metab_opt.count, "Should include the Metabolomics assay and the suggested type assay."
+    assert_equal 'Metabolomics', metab_opt.label
+    assert metab_opt.active?
+    gen_opt = get_option(options, 'http://jermontology.org/ontology/JERMOntology#Genome_scale')
+    assert_equal 1, gen_opt.count
+    assert_equal 'Genome scale', gen_opt.label
+    assert gen_opt.active?
+  end
+
   test 'get filter options for filter with label mapping' do
     contributor_filter = Seek::Filterer::FILTERS[:contributor]
 
@@ -220,17 +323,18 @@ class FilterTest < ActiveSupport::TestCase
   end
 
   test 'get date filter options' do
-    presets = [24.hours, 1.year]
+    presets = [24.hours, 1.year, Date.parse('1990-01-01')..Date.parse('2000-01-01')] # Very unlikely that a range will ever be used as a preset value...
     created_at_filter = Seek::Filtering::DateFilter.new(field: :created_at, presets: presets)
 
     new_thing = Factory(:document)
     last_weeks_thing = Factory(:document, created_at: 1.week.ago)
     last_months_thing = Factory(:document, created_at: 1.month.ago)
     old_thing = Factory(:document, created_at: 2.years.ago)
+    ancient_thing = Factory(:document, created_at: Time.parse('1995-01-01'))
 
     # No actives
     options = created_at_filter.options(Document.all, [])
-    assert_equal 2, options.length
+    assert_equal 3, options.length
     p1_opt = get_option(options, 'PT24H')
     refute p1_opt.active?
     assert_equal 'in the last 24 hours', p1_opt.label
@@ -239,10 +343,14 @@ class FilterTest < ActiveSupport::TestCase
     refute p2_opt.active?
     assert_equal 'in the last 1 year', p2_opt.label
     assert_equal 3, p2_opt.count
+    range_opt = get_option(options, '1990-01-01/2000-01-01')
+    refute range_opt.active?
+    assert_equal 'between 1990-01-01 and 2000-01-01', range_opt.label
+    assert_equal 1, range_opt.count
 
     # Preset duration active
     options = created_at_filter.options(Document.all, ['PT24H'])
-    assert_equal 2, options.length
+    assert_equal 3, options.length
     p1_opt = get_option(options, 'PT24H')
     assert p1_opt.active?
     assert_equal 'in the last 24 hours', p1_opt.label
@@ -251,10 +359,14 @@ class FilterTest < ActiveSupport::TestCase
     refute p2_opt.active?
     assert_equal 'in the last 1 year', p2_opt.label
     assert_equal 3, p2_opt.count
+    range_opt = get_option(options, '1990-01-01/2000-01-01')
+    refute range_opt.active?
+    assert_equal 'between 1990-01-01 and 2000-01-01', range_opt.label
+    assert_equal 1, range_opt.count
 
-    # Custom duration active
-    options = created_at_filter.options(Document.all, ['P2Y2M3D'])
-    assert_equal 3, options.length, "Should be 1 option per preset, plus the user-specified option."
+    # Preset range active
+    options = created_at_filter.options(Document.all, ['1990-01-01/2000-01-01'])
+    assert_equal 3, options.length
     p1_opt = get_option(options, 'PT24H')
     refute p1_opt.active?
     assert_equal 'in the last 24 hours', p1_opt.label
@@ -263,6 +375,26 @@ class FilterTest < ActiveSupport::TestCase
     refute p2_opt.active?
     assert_equal 'in the last 1 year', p2_opt.label
     assert_equal 3, p2_opt.count
+    range_opt = get_option(options, '1990-01-01/2000-01-01')
+    assert range_opt.active?
+    assert_equal 'between 1990-01-01 and 2000-01-01', range_opt.label
+    assert_equal 1, range_opt.count
+
+    # Custom duration active
+    options = created_at_filter.options(Document.all, ['P2Y2M3D'])
+    assert_equal 4, options.length, "Should be 1 option per preset, plus the user-specified option."
+    p1_opt = get_option(options, 'PT24H')
+    refute p1_opt.active?
+    assert_equal 'in the last 24 hours', p1_opt.label
+    assert_equal 1, p1_opt.count
+    p2_opt = get_option(options, 'P1Y')
+    refute p2_opt.active?
+    assert_equal 'in the last 1 year', p2_opt.label
+    assert_equal 3, p2_opt.count
+    range_opt = get_option(options, '1990-01-01/2000-01-01')
+    refute range_opt.active?
+    assert_equal 'between 1990-01-01 and 2000-01-01', range_opt.label
+    assert_equal 1, range_opt.count
     user_opt = get_option(options, 'P2Y2M3D')
     assert user_opt.active?
     assert_equal 'in the last 2 years, 2 months, and 3 days', user_opt.label
@@ -270,7 +402,7 @@ class FilterTest < ActiveSupport::TestCase
 
     # Date active
     options = created_at_filter.options(Document.all, ['1970-01-01'])
-    assert_equal 3, options.length, "Should be 1 option per preset, plus the user-specified option."
+    assert_equal 4, options.length, "Should be 1 option per preset, plus the user-specified option."
     p1_opt = get_option(options, 'PT24H')
     refute p1_opt.active?
     assert_equal 'in the last 24 hours', p1_opt.label
@@ -279,6 +411,10 @@ class FilterTest < ActiveSupport::TestCase
     refute p2_opt.active?
     assert_equal 'in the last 1 year', p2_opt.label
     assert_equal 3, p2_opt.count
+    range_opt = get_option(options, '1990-01-01/2000-01-01')
+    refute range_opt.active?
+    assert_equal 'between 1990-01-01 and 2000-01-01', range_opt.label
+    assert_equal 1, range_opt.count
     user_opt = get_option(options, '1970-01-01')
     assert user_opt.active?
     assert_equal 'since 1970-01-01', user_opt.label
@@ -286,7 +422,7 @@ class FilterTest < ActiveSupport::TestCase
 
     # Date range active
     options = created_at_filter.options(Document.all, ['1970-01-01/1980-01-01'])
-    assert_equal 3, options.length, "Should be 1 option per preset, plus the user-specified option."
+    assert_equal 4, options.length, "Should be 1 option per preset, plus the user-specified option."
     p1_opt = get_option(options, 'PT24H')
     refute p1_opt.active?
     assert_equal 'in the last 24 hours', p1_opt.label
@@ -295,6 +431,10 @@ class FilterTest < ActiveSupport::TestCase
     refute p2_opt.active?
     assert_equal 'in the last 1 year', p2_opt.label
     assert_equal 3, p2_opt.count
+    range_opt = get_option(options, '1990-01-01/2000-01-01')
+    refute range_opt.active?
+    assert_equal 'between 1990-01-01 and 2000-01-01', range_opt.label
+    assert_equal 1, range_opt.count
     user_opt = get_option(options, '1970-01-01/1980-01-01')
     assert user_opt.active?
     assert_equal 'between 1970-01-01 and 1980-01-01', user_opt.label
@@ -302,7 +442,7 @@ class FilterTest < ActiveSupport::TestCase
 
     # Multiple active options
     options = created_at_filter.options(Document.all, ['1970-01-01/1980-01-01', 'P3W'])
-    assert_equal 4, options.length, "Should be 1 option per preset, plus the user-specified options."
+    assert_equal 5, options.length, "Should be 1 option per preset, plus the user-specified options."
     p1_opt = get_option(options, 'PT24H')
     refute p1_opt.active?
     assert_equal 'in the last 24 hours', p1_opt.label
@@ -311,6 +451,10 @@ class FilterTest < ActiveSupport::TestCase
     refute p2_opt.active?
     assert_equal 'in the last 1 year', p2_opt.label
     assert_equal 3, p2_opt.count
+    range_opt = get_option(options, '1990-01-01/2000-01-01')
+    refute range_opt.active?
+    assert_equal 'between 1990-01-01 and 2000-01-01', range_opt.label
+    assert_equal 1, range_opt.count
     user_opt1 = get_option(options, '1970-01-01/1980-01-01')
     assert user_opt1.active?
     assert_equal 'between 1970-01-01 and 1980-01-01', user_opt1.label

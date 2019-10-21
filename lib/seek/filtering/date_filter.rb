@@ -76,10 +76,8 @@ module Seek
           "in the last #{object.inspect}"
         when Range
           "between #{object.begin} and #{object.end}"
-        when Date
-          "since #{object.iso8601}"
         else
-          object.to_s
+          "since #{object.iso8601}"
         end
       end
 
