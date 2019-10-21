@@ -2,3 +2,13 @@ test:
   adapter: postgresql
   database: travis_ci_test
   username: postgres
+
+development:
+  adapter: postgresql
+  database: travis_ci_dev
+  username: postgres
+
+production:
+  adapter: postgresql
+  database: travis_ci_prod
+  username: postgres
