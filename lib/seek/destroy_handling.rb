@@ -15,18 +15,13 @@ module Seek
         flash[:notice] = "#{asset_type_text} was successfully deleted."
         format.html { redirect_to(redirect_location_on_success) }
         format.xml { head :ok }
-        format.json {render json: {status: :ok}, status: :ok}
+        format.json { render json: { status: :ok }, status: :ok }
       else
         flash.now[:error] = "Unable to delete the #{controller_name.singularize}"
         format.html { render action: 'show' }
         format.xml { render xml: asset.errors, status: :unprocessable_entity }
-        format.json {render json: {"title": asset.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
+        format.json { render json: { "title": asset.errors, status: :unprocessable_entity }, status: :unprocessable_entity }
       end
-    end
-
-    def determine_asset_from_controller
-      name = controller_name.singularize
-      eval("@#{name}")
     end
 
     def destroy_version
@@ -45,7 +40,7 @@ module Seek
 
     def redirect_location_on_success
       if params[:return_to] && params[:return_to] == 'my_items'
-         items_person_path(current_person)
+        items_person_path(current_person)
       else
         url_for action: :index
       end

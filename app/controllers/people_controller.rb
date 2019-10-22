@@ -43,23 +43,23 @@ class PeopleController < ApplicationController
     if @people
       @people = @people.select(&:can_view?)
     else
-      @people = if params[:page].blank? || params[:page] == 'latest' || params[:page] == 'all'
-                  Person.active
-                else
-                  Person.all
-                end
+      @people = Person.all
 
       @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
-      if request.format.to_s == "text/html" && !params[:project_id].nil?
-        @people = sort_project_member_by_status(@people, params[:project_id])
-      end
+
       unless view_context.index_with_facets?('people') && params[:user_enable_facet] == 'true'
         @people = Person.paginate_after_fetch(@people,
                                               page: (params[:page] || Seek::Config.default_page('people')),
-                                              reorder: false,
                                               latest_limit: Seek::Config.limit_latest)
       end
     end
+    if params[:page]=='latest' || params[:page].blank?
+      @people.sort_by!(&:updated_at).reverse!
+    else
+      Seek::ListSorter.index_items(@people,params[:page])
+    end
+
+
 
     respond_to do |format|
       format.html # index.html.erb
@@ -355,7 +355,8 @@ class PeopleController < ApplicationController
   def set_project_related_roles(person)
     return unless params[:roles]
 
-    administered_project_ids = Project.all_can_be_administered.collect { |p| p.id.to_s }
+    # TODO: Replace this with `Project.authorized_for` after `auth_perf` merged
+    administered_project_ids = Project.all.select { |project| project.can_manage?(user) }.map { |p| p.id.to_s }
 
     Seek::Roles::ProjectRelatedRoles.role_names.each do |role_name|
       # remove for the project ids that can be administered
@@ -389,7 +390,7 @@ class PeopleController < ApplicationController
   end
 
   def editable_by_user
-    unless @person.can_be_edited_by?(current_user)
+    unless @person.can_edit?(current_user)
       error('Insufficient privileges', 'is invalid (insufficient_privileges)')
       false
     end

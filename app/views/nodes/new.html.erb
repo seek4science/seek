@@ -18,7 +18,7 @@
         <%= text_area_tag 'node[description]', node_description_value, :class=>"form-control" -%>
       </div>
 
-      <%= render :partial => "projects/project_selector", :locals => { :resource => @node, :allow_nil => Seek::Config.is_virtualliver } -%>
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @node, :allow_nil => Seek::Config.is_virtualliver } %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @node } %>
 
@@ -26,12 +26,7 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @node} -%>
 
-      <div>
-        <%= preview_permission_popup_link(@node)-%>
-        <%= create_button :id => "node_submit_btn",
-                       :onclick => "return validateResourceFields('node')",
-                       :class => 'btn btn-primary' -%>
-        or <%= cancel_button(nodes_path) -%>
-      </div>
+      <%= form_submit_buttons(@node) %>
+
     </div>
 <% end -%>

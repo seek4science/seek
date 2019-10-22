@@ -35,8 +35,8 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
     if(options.ajax) {
         options.columns = [{ data: 'id'},{ data: 'title'}];
         $j('table thead th', selector).each(function (index, column) {
-            if($j(column).data('hashKey'))
-                options.columns.push({ data: 'data.' + $j(column).data('hashKey') });
+            if($j(column).data('accessorName'))
+                options.columns.push({ data: 'data.' + $j(column).data('accessorName') });
         });
     }
 

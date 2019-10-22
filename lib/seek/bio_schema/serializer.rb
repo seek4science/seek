@@ -2,8 +2,8 @@ module Seek
   module BioSchema
     # Main entry point for generating Schema.org JSON-LD for a given resource.
     #
-    # Example: Seek::BioSchema::BioSchema.new(Person.find(id)).json_ld
-    class BioSchema
+    # Example: Seek::BioSchema::Serializer.new(Person.find(id)).json_ld
+    class Serializer
       include ActionView::Helpers::SanitizeHelper
       attr_reader :resource
 
@@ -17,45 +17,48 @@ module Seek
         unless supported?
           raise UnsupportedTypeException, "Bioschema not supported for #{resource.class.name}"
         end
-        json = {}
-        json['@context'] = resource_decorator.context
-        json['@type'] = resource_decorator.schema_type
-        json.merge!(attributes_from_csv_mappings)
+        json = {
+          '@context' => resource_decorator.context,
+          '@type' => resource_decorator.schema_type
+        }.merge(attributes_json)
 
         JSON.pretty_generate(json)
       end
 
       # whether the resource BioSchema was initialized with is supported
       def supported?
-        BioSchema.supported?(resource)
+        Serializer.supported?(resource)
       end
 
-      # test directly (without intializing) whether a resource is supported
+      # test directly (without initializing) whether a resource is supported
       def self.supported?(resource)
-        SUPPORTED_TYPES.include?(resource.class)
+        supported_types.include?(resource.class)
       end
+
+      def self.supported_types
+        SUPPORTED_TYPES
+      end
+
+      private_class_method :supported_types
 
       private
 
-      SUPPORTED_TYPES = [Person, Project].freeze
+      SUPPORTED_TYPES = [Person, Project, Event, DataFile, Organism,
+                         Seek::BioSchema::DataCatalogueMockModel, Sample,
+                         Document, Presentation].freeze
 
       def resource_decorator
         @decorator ||= ResourceDecorators::Factory.instance.get(resource)
       end
 
-      def attributes_from_csv_mappings
+      def attributes_json
         result = {}
-        CSVReader.instance.each_row do |row|
-          next unless row.matches?(resource)
-          if (value = row.invoke(resource_decorator))
-            result[row.property.strip] = value
+        resource_decorator.attributes.each do |attr|
+          if (value = attr.invoke(resource_decorator))
+            result[attr.property.to_s] = value
           end
         end
         result
-      end
-
-      def process_mapping(method)
-        resource.try(method)
       end
     end
   end

@@ -19,13 +19,6 @@ class ModelsController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
-  # override new to associate assays
-  def new
-    setup_new_asset
-    associate_presented_assays
-    respond_for_new
-  end
-
   def find_other_version
     version = params[:other_version]
     @other_version = @model.find_version(version)
@@ -42,7 +35,8 @@ class ModelsController < ApplicationController
         json = compare @blob1.filepath, @blob2.filepath, ["reportHtml", "crnJson", "json", "SBML"]
         @crn = JSON.parse(json)["crnJson"]
         @comparison_html = JSON.parse(json)["reportHtml"]
-      rescue Exception => e
+      rescue StandardError => e
+        raise e unless Rails.env.production?
         flash.now[:error]="there was an error trying to compare the two versions - #{e.message}"
       end
     else
@@ -182,14 +176,6 @@ class ModelsController < ApplicationController
     latest_version = model_object.latest_version
     latest_version.model_image_id = model_object.model_image_id
     latest_version.save
-  end
-
-  # before_filter that links modelling analyses passed by assay_id, filtering out incorrect types and those none editable
-  def associate_presented_assays
-    return unless @model && params[:assay_ids] && params[:assay_ids].any?
-    assays = Assay.find(params[:assay_ids])
-    assays = assays.select{|assay| assay.assay_class.is_modelling?}.select{|assay| assay.can_edit?}
-    @model.assign_attributes({assay_ids:assays.collect(&:id)})
   end
 
   private

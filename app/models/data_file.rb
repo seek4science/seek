@@ -3,8 +3,7 @@ require_dependency 'seek/util'
 class DataFile < ApplicationRecord
   include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
-
-  attr_accessor :parent_name
+  include Seek::BioSchema::Support
 
   # searchable must come before acts_as_asset call
   if Seek::Config.solr_enabled

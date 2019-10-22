@@ -15,7 +15,6 @@ hide_details_enabled:
 registration_disabled:
 registration_disabled_description:
 activation_required_enabled:
-project_name:
 smtp:
   encrypt: true
 default_pages:
@@ -32,6 +31,9 @@ noreply_sender:
 solr_enabled:
 application_name:
 project_long_name:
+project_name:
+project_description:
+project_keywords:
 dm_project_name:
 dm_project_link:
 header_image_link:

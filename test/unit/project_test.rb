@@ -195,10 +195,10 @@ class ProjectTest < ActiveSupport::TestCase
   def test_can_be_edited_by
     u = Factory(:project_administrator).user
     p = u.person.projects.first
-    assert p.can_be_edited_by?(u), 'Project should be editable by user :project_administrator'
+    assert p.can_edit?(u), 'Project should be editable by user :project_administrator'
 
     p = Factory(:project)
-    assert !p.can_be_edited_by?(u), 'other project should not be editable by project administrator, since it is not a project he administers'
+    assert !p.can_edit?(u), 'other project should not be editable by project administrator, since it is not a project he administers'
   end
 
   test 'can be edited by programme adminstrator' do
@@ -206,8 +206,8 @@ class ProjectTest < ActiveSupport::TestCase
     project = pa.programmes.first.projects.first
     other_project = Factory(:project)
 
-    assert project.can_be_edited_by?(pa.user)
-    refute other_project.can_be_edited_by?(pa.user)
+    assert project.can_edit?(pa.user)
+    refute other_project.can_edit?(pa.user)
   end
 
   test 'can be edited by project member' do
@@ -217,8 +217,8 @@ class ProjectTest < ActiveSupport::TestCase
     refute_nil project
     another_person = Factory(:person)
 
-    assert project.can_be_edited_by?(person.user)
-    refute project.can_be_edited_by?(another_person.user)
+    assert project.can_edit?(person.user)
+    refute project.can_edit?(another_person.user)
 
     User.with_current_user person.user do
       assert project.can_edit?
@@ -235,12 +235,27 @@ class ProjectTest < ActiveSupport::TestCase
     normal = Factory(:person)
     another_proj = Factory(:project)
 
-    assert project_administrator.projects.first.can_be_administered_by?(project_administrator.user)
-    assert !normal.projects.first.can_be_administered_by?(normal.user)
+    assert project_administrator.projects.first.can_manage?(project_administrator.user)
+    assert !normal.projects.first.can_manage?(normal.user)
 
-    assert !another_proj.can_be_administered_by?(normal.user)
-    assert !another_proj.can_be_administered_by?(project_administrator.user)
-    assert another_proj.can_be_administered_by?(admin.user)
+    assert !another_proj.can_manage?(normal.user)
+    assert !another_proj.can_manage?(project_administrator.user)
+    assert another_proj.can_manage?(admin.user)
+  end
+
+  test 'can manage' do
+    admin = Factory(:admin)
+    project_administrator = Factory(:project_administrator)
+    normal = Factory(:person)
+    another_proj = Factory(:project)
+
+    assert project_administrator.projects.first.can_manage?(project_administrator.user)
+    refute normal.projects.first.can_manage?(normal.user)
+
+    refute another_proj.can_manage?(nil)
+    refute another_proj.can_manage?(normal.user)
+    refute another_proj.can_manage?(project_administrator.user)
+    assert another_proj.can_manage?(admin.user)
   end
 
   test 'can be administered by programme administrator' do
@@ -249,8 +264,8 @@ class ProjectTest < ActiveSupport::TestCase
     project = pa.programmes.first.projects.first
     other_project = Factory(:project)
 
-    assert project.can_be_administered_by?(pa.user)
-    refute other_project.can_be_administered_by?(pa.user)
+    assert project.can_manage?(pa.user)
+    refute other_project.can_manage?(pa.user)
   end
 
   test 'update with attributes for project_administrator_ids ids' do
@@ -642,141 +657,6 @@ class ProjectTest < ActiveSupport::TestCase
     refute_includes ps, p2
   end
 
-  test 'ancestor and dependants' do
-    p = Factory(:project)
-    p2 = Factory(:project)
-
-    assert_nil p2.lineage_ancestor
-    assert_empty p.lineage_descendants
-
-    p.lineage_ancestor = p
-    refute p.valid?
-
-    p2.lineage_ancestor = p
-    assert p2.valid?
-    disable_authorization_checks { p2.save! }
-    p2.reload
-    p.reload
-
-    assert_equal p, p2.lineage_ancestor
-    assert_equal [p2], p.lineage_descendants
-
-    # repeat, but assigning the other way around
-    p = Factory(:project)
-    p2 = Factory(:project)
-
-    assert_nil p2.lineage_ancestor
-    assert_empty p.lineage_descendants
-
-    disable_authorization_checks do
-      p2.lineage_descendants << p
-      assert p2.valid?
-      p2.save!
-    end
-
-    p2.reload
-    p.reload
-
-    assert_equal [p], p2.lineage_descendants
-    assert_equal p2, p.lineage_ancestor
-
-    p3 = Factory(:project)
-    disable_authorization_checks do
-      p2.lineage_descendants << p3
-      p2.save!
-    end
-
-    p2.reload
-    assert_equal [p, p3], p2.lineage_descendants.sort_by(&:id)
-  end
-
-  test 'spawn' do
-    p = Factory(:programme,
-                projects: [Factory(:project, description: 'proj', avatar: Factory(:avatar))]).projects.first
-    wg1 = Factory(:work_group, project: p)
-    wg2 = Factory(:work_group, project: p)
-    person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: wg1)])
-    person2 = Factory(:person, group_memberships: [Factory(:group_membership, work_group: wg1)])
-    person3 = Factory(:person, group_memberships: [Factory(:group_membership, work_group: wg2)])
-    p.reload
-
-    assert_equal 3, p.people.size
-    assert_equal 2, p.work_groups.size
-    assert_includes p.people, person
-    assert_includes p.people, person2
-    assert_includes p.people, person3
-    refute_nil p.avatar
-
-    p2 = p.spawn
-    assert p2.new_record?
-
-    assert_equal p2.title, p.title
-    assert_equal p2.description, p.description
-    assert_equal p2.programme, p.programme
-
-    p2.title = 'sdfsdflsdfoosdfsdf' # to allow it to save
-
-    disable_authorization_checks { p2.save! }
-    p2.reload
-    p.reload
-
-    assert_nil p2.avatar
-    refute_equal p, p2
-    refute_includes p2.work_groups, wg1
-    refute_includes p2.work_groups, wg2
-
-    assert_equal 2, p2.work_groups.size
-
-    assert_equal p.institutions.sort, p2.institutions.sort
-    assert_equal p.people.sort, p2.people.sort
-    assert_equal 3, p2.people.size
-
-    assert_includes p2.people, person
-    assert_includes p2.people, person2
-    assert_includes p2.people, person3
-
-    assert_equal p, p2.lineage_ancestor
-    assert_equal [p2], p.lineage_descendants
-
-    prog2 = Factory(:programme)
-    p2 = p.spawn(title: 'fish project', programme_id: prog2.id, description: 'about doing fishing')
-    assert p2.new_record?
-
-    assert_equal 'fish project', p2.title
-    assert_equal prog2, p2.programme
-    assert_equal 'about doing fishing', p2.description
-  end
-
-  test 'spawn consolidates workgroups' do
-    p = Factory(:programme, projects: [Factory(:project, avatar: Factory(:avatar))]).projects.first
-    wg1 = Factory(:work_group, project: p)
-    wg2 = Factory(:work_group, project: p)
-    Factory(:group_membership, work_group: wg1, person: Factory(:person))
-    Factory(:group_membership, work_group: wg1, person: Factory(:person))
-    Factory(:group_membership, work_group: wg1, person: Factory(:person))
-    Factory(:group_membership, work_group: wg2, person: Factory(:person))
-    Factory(:group_membership, work_group: wg2, person: Factory(:person))
-    p.reload
-    assert_equal 5, p.people.count
-    assert_equal 2, p.work_groups.count
-    p2 = nil
-    assert_difference('WorkGroup.count', 2) do
-      assert_difference('GroupMembership.count', 5) do
-        assert_difference('Project.count', 1) do
-          assert_no_difference('Person.count') do
-            p2 = p.spawn(title: 'sdfsdfsdfsdf')
-            disable_authorization_checks { p2.save! }
-          end
-        end
-      end
-    end
-    p2.reload
-    assert_equal 5, p2.people.count
-    assert_equal 2, p2.work_groups.count
-    refute_equal p.work_groups.sort, p2.work_groups.sort
-    assert_equal p.people.sort, p2.people.sort
-  end
-
   test 'can create?' do
     User.current_user = nil
     refute Project.can_create?
@@ -876,7 +756,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert project_administrator.is_project_administrator?(project)
     assert project_administrator.user.is_project_administrator?(project)
     assert project_administrator.user.person.is_project_administrator?(project)
-    assert project.can_be_administered_by?(project_administrator.user)
+    assert project.can_manage?(project_administrator.user)
 
     project_administrator.group_memberships.destroy_all
     project_administrator = project_administrator.reload
@@ -884,7 +764,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_not_includes project_administrator.roles, 'project_administrator'
     assert_not_includes project.project_administrators, project_administrator
     assert !project_administrator.is_project_administrator?(project)
-    assert !project.can_be_administered_by?(project_administrator.user)
+    assert !project.can_manage?(project_administrator.user)
   end
 
   test 'project role removed when marked as left project' do
@@ -896,7 +776,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert project_administrator.is_project_administrator?(project)
     assert project_administrator.user.is_project_administrator?(project)
     assert project_administrator.user.person.is_project_administrator?(project)
-    assert project.can_be_administered_by?(project_administrator.user)
+    assert project.can_manage?(project_administrator.user)
 
     project_administrator.group_memberships.first.update_attributes(time_left_at: 1.day.ago)
     project_administrator = project_administrator.reload
@@ -904,7 +784,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_not_includes project_administrator.roles, 'project_administrator'
     assert_not_includes project.project_administrators, project_administrator
     assert !project_administrator.is_project_administrator?(project)
-    assert !project.can_be_administered_by?(project_administrator.user)
+    assert !project.can_manage?(project_administrator.user)
   end
 
   test 'stores project settings' do

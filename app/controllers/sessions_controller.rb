@@ -1,4 +1,6 @@
-# This controller handles the login/logout function of the site.  
+require 'securerandom' #to set the seek user password to something random when the user is created
+
+# This controller handles the login/logout function of the site.
 class SessionsController < ApplicationController
 
   before_action :redirect_to_sign_up_when_no_user,:only=>:new
@@ -124,8 +126,7 @@ class SessionsController < ApplicationController
     end
   end
 
-  def create_omniauth(auth)
-    require 'securerandom' #to set the seek user password to something random when the user is created
+  def create_omniauth(auth)    
 
     # info contains username, first_ and last_name and email
     info = auth['info']

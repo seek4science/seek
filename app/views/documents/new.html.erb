@@ -18,7 +18,7 @@
         <%= text_area_tag 'document[description]', document_description_value, :class=>"form-control" -%>
       </div>
 
-      <%= render :partial => "projects/project_selector", :locals => { :resource => @document, :allow_nil => Seek::Config.is_virtualliver } -%>
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @document, :allow_nil => Seek::Config.is_virtualliver } %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @document } %>
 
@@ -28,12 +28,7 @@
 
       <%= fancy_multiselect @document, :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
 
-      <div>
-        <%= preview_permission_popup_link(@document)-%>
-        <%= create_button :id => "document_submit_btn",
-                       :onclick => "return validateResourceFields('document')",
-                       :class => 'btn btn-primary' -%>
-        or <%= cancel_button(documents_path) -%>
-      </div>
+      <%= form_submit_buttons(@document) %>
+
     </div>
 <% end -%>

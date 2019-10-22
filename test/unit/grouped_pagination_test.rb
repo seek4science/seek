@@ -2,6 +2,7 @@
 require 'test_helper'
 
 class GroupedPaginationTest < ActiveSupport::TestCase
+
   def test_first_letter
     p = Factory :person, last_name: 'Aardvark', first_name: 'Fred'
     assert_not_nil p.first_letter
@@ -69,20 +70,17 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   def test_handle_oslash
-    p = Person.new(last_name: 'Øyvind', email: 'sdfkjhsdfkjhsdf@email.com')
-    assert p.save
+    p = Factory(:brand_new_person, last_name: 'Øyvind', email: 'sdfkjhsdfkjhsdf@email.com')
     assert_equal 'O', p.first_letter
   end
 
   def test_handle_umlaut
-    p = Person.new(last_name: 'Ümlaut', email: 'sdfkjhsdfkjhsdf@email.com')
-    assert p.save
+    p = Factory(:brand_new_person, last_name: 'Ümlaut', email: 'sdfkjhsdfkjhsdf@email.com')
     assert_equal 'U', p.first_letter
   end
 
   def test_handle_accent
-    p = Person.new(last_name: 'Ýiggle', email: 'sdfkjhsdfkjhsdf@email.com')
-    assert p.save
+    p = Factory(:brand_new_person, last_name: 'Ýiggle', email: 'sdfkjhsdfkjhsdf@email.com')
     assert_equal 'Y', p.first_letter
   end
 
@@ -281,5 +279,20 @@ class GroupedPaginationTest < ActiveSupport::TestCase
       pageA_items = klass.paginate_after_fetch(klass.default_order, page: 'A')
       assert pageA_items.index(item1) < pageA_items.index(item2)
     end
+  end
+
+  test 'maintains page totals after paging' do
+    item1 = Factory(:sop, title: 'AAA', updated_at: 2.days.ago)
+    item2 = Factory(:sop, title: 'BBB', updated_at: 1.days.ago)
+    item3 = Factory(:sop, title: 'BBC', updated_at: 1.days.ago)
+    collection = [item1, item2, item3]
+
+    paged_collection = Sop.paginate_after_fetch(collection, page: 'A')
+    assert_equal 1, paged_collection.page_totals['A']
+    assert_equal 2, paged_collection.page_totals['B']
+
+    paged_collection = Sop.paginate_after_fetch(collection, page: 'B')
+    assert_equal 1, paged_collection.page_totals['A']
+    assert_equal 2, paged_collection.page_totals['B']
   end
 end

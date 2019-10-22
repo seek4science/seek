@@ -1,4 +1,3 @@
-<% current_user_authorized_to_manage = @presentation.can_manage? -%>
 <h1>Editing <%= t('presentation') %>: <%= link_to(h(@presentation.title), edit_presentation_path) -%></h1>
 
 <%= form_for(@presentation) do |f| %>
@@ -16,7 +15,7 @@
       </div>
 
       <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
-      <% if current_user_authorized_to_manage -%>
+      <% if @presentation.can_manage? -%>
           <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => Seek::Config.is_virtualliver } -%>
       <% end -%>
 
@@ -26,19 +25,12 @@
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @presentation } %>
 
-      <%# only the owner should be able to change sharing permissions -%>
-      <% if current_user_authorized_to_manage -%>
-          <%= render :partial=>"assets/asset_form_bottom", :locals=> {:f => f} -%>
 
-          <%= fancy_multiselect @presentation, :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
-      <% end -%>
+      <%= render :partial=>"assets/asset_form_bottom", :locals=> {:f => f} -%>
 
-      <div>
-        <%= preview_permission_popup_link(@presentation)-%>
-        <%= f.submit "Update", :id => "presentation_submit_btn",
-            :onclick => "return validateResourceFields('presentation')",
-            :class => 'btn btn-primary' -%>
-        or <%= cancel_button(presentation_path(@presentation)) -%>
-      </div>
+      <%= fancy_multiselect @presentation, :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
+
+      <%= form_submit_buttons(@presentation) %>
+
     </div>
 <% end %>

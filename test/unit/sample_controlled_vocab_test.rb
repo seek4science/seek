@@ -130,7 +130,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
         contributor=Factory(:person)
         sample = Sample.new(sample_type: Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test2'),
                             title: 'testing cv can edit', project_ids: person.projects.collect(&:id), contributor: person)
-        sample.set_attribute(:apples, 'Bramley')
+        sample.set_attribute_value(:apples, 'Bramley')
         disable_authorization_checks do
           assert sample.save!
         end

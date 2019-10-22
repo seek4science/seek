@@ -1,5 +1,33 @@
 module AssetsHelper
   include ApplicationHelper
+  include BootstrapHelper
+
+  def form_submit_buttons(item, options = {})
+    # defaults
+    options[:validate] = true if options[:validate].nil?
+    if options[:preview_permissions].nil?
+      options[:preview_permissions] = show_form_manage_specific_attributes?
+    end
+    options[:button_text] ||= submit_button_text(item)
+    options[:cancel_path] = polymorphic_path(item)
+    options[:resource_name] = item.class.name.underscore
+    options[:button_id] ||= "#{options[:resource_name]}_submit_btn"
+
+    render partial: 'assets/form_submit_buttons', locals: { item: item, **options }
+  end
+
+  # determine the text for the submit button, based on whether it is an edit or creation, and whether upload is required
+  def submit_button_text(item)
+    if item.new_record?
+      if item.is_downloadable?
+        t('submit_button.upload')
+      else
+        t('submit_button.create')
+      end
+    else
+      t('submit_button.update')
+    end
+  end
 
   # the prefix used on some field id's, e.g. data_files_data_url
   def asset_field_prefix
@@ -99,7 +127,7 @@ module AssetsHelper
     if resource.class.name.include?('::Version')
       polymorphic_path(resource.parent, version: resource.version)
     elsif resource.is_a?(Snapshot)
-      polymorphic_path([resource.resource,resource])
+      polymorphic_path([resource.resource, resource])
     else
       polymorphic_path(resource)
     end
@@ -110,6 +138,14 @@ module AssetsHelper
       edit_polymorphic_path(resource.parent)
     else
       edit_polymorphic_path(resource)
+    end
+  end
+
+  def manage_resource_path(resource)
+    if resource.class.name.include?('::Version')
+      polymorphic_path(resource.parent, action:'manage')
+    else
+      polymorphic_path(resource, action:'manage')
     end
   end
 
@@ -186,7 +222,7 @@ module AssetsHelper
   end
 
   def create_button(opts)
-    text = opts.delete(:button_text) || 'Upload and Save'
+    text = opts.delete(:button_text) || t('submit_button.upload')
     submit_tag(text, opts.merge('data-upload-button' => ''))
   end
 
@@ -194,4 +230,26 @@ module AssetsHelper
     image_tag_for_key('download', polymorphic_path([fileinfo.asset, fileinfo], action: :download, code: params[:code]), 'Download', { title: 'Download this file' }, '')
   end
 
+  def add_to_dropdown(item)
+    return unless Seek::AddButtons.add_dropdown_for(item)
+    tooltip = "This option allows you to add a new item, whilst associating it with this #{text_for_resource(item)}"
+    dropdown_button(t('add_new_dropdown.button'), 'attach', menu_options: {class: 'pull-right', id: 'item-admin-menu'}, tooltip:tooltip) do
+      add_item_to_options(item) do |text, path|
+        content_tag(:li) do
+          image_tag_for_key('add', path, text, nil, text)
+        end
+      end.join(" ").html_safe
+    end
+  end
+
+  def add_item_to_options(item)
+    elements = []
+    Seek::AddButtons.add_for_item(item).each do |type,param|
+
+      text="#{t('add_new_dropdown.option')} #{t(type.name.underscore)}"
+      path = new_polymorphic_path(type,param=>item.id)
+      elements << yield(text,path)
+    end
+    elements
+  end
 end
