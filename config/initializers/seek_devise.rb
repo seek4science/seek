@@ -254,7 +254,7 @@ Devise.setup do |config|
   config.sign_out_via = :delete
 
   # This is hackery because of a race condition
-  secrets = YAML::load(File.read("#{Rails.root}/config/secrets.yml"))[Rails.env]
+  secrets = YAML::load(ERB.new(File.read("#{Rails.root}/config/secrets.yml")).result)[Rails.env]
 
   # ==> OmniAuth
   # Add a new OmniAuth provider. Check the wiki for more information on setting
