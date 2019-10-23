@@ -379,7 +379,7 @@ If you moved away from the default Sunspot/SOLR config, by making your own copy 
 
 If you don't have a _config/sunspot.yml_ you don't need to do anything.
    
-Update your _sunspot.yml_ based on the new format in _[config/sunspot.default.yml](https://github.com/seek4science/seek/blob/seek-1.4/config/sunspot.default.yml)_   
+Update your _sunspot.yml_ based on the new format in _[config/sunspot.default.yml](https://raw.githubusercontent.com/seek4science/seek/v1.4.1/config/sunspot.default.yml)_   
 
 ### Restarting services
 
