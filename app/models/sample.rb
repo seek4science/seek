@@ -30,8 +30,6 @@ class Sample < ApplicationRecord
   has_many :linked_samples, through: :sample_resource_links, source: :resource, source_type: 'Sample'
   has_many :linking_samples, through: :reverse_sample_resource_links, source: :sample
 
-  scope :default_order, -> { order('title') }
-
   validates :title, :sample_type, presence: true
   include ActiveModel::Validations
   validates_with SampleAttributeValidator

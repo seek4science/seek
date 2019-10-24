@@ -1,0 +1,22 @@
+<% options = Seek::ListSorter.options_for_select(controller_name.classify) %>
+<% selected = items.order.first %>
+<% url_template = url_for(page_and_sort_params.merge(order: '_order_')) %>
+
+<form class="form-inline pull-right">
+  <div class="form-group">
+    <div class="input-group">
+      <span class="input-group-addon"><i title="Sort by" class="glyphicon glyphicon-sort"aria-hidden="true"></i></span>
+      <%= select_tag(:index_sort_order, options_for_select(options, selected),
+                     data: { url: url_template },
+                     autocomplete: 'off',
+                     class: 'form-control')
+      %>
+    </div>
+  </div>
+</form>
+
+<script>
+  $j('#index_sort_order').change(function () {
+      window.location = $j(this).data('url').replace("_order_",  $j(this).val());
+  });
+</script>

@@ -129,8 +129,6 @@ class Publication < ApplicationRecord
     end
   end
 
-  scope :default_order, -> { order('published_date DESC') }
-
   def seek_authors
     publication_authors.select(&:person)
   end

@@ -8,8 +8,6 @@ class Presentation < ApplicationRecord
    #even though in Seek::ActsAsAsset::Search it is already set to false!
    acts_as_asset
 
-   scope :default_order, -> { order("title") }
-
    has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
    validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }

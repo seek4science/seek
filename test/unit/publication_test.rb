@@ -259,10 +259,6 @@ class PublicationTest < ActiveSupport::TestCase
     assert_not_nil x.attributes['uuid']
   end
 
-  test 'sort by published_date' do
-    assert_equal Publication.all.sort_by(&:published_date).reverse, Publication.default_order
-  end
-
   test 'title trimmed' do
     x = Factory :publication, title: ' a pub'
     assert_equal('a pub', x.title)

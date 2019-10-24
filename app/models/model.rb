@@ -22,8 +22,6 @@ class Model < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
-  scope :default_order, -> { order("title") }
-
   include Seek::Models::ModelExtraction
 
   before_save :check_for_sbml_format

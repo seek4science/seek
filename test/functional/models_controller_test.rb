@@ -883,7 +883,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = models(:teusink)
     model.other_creators = 'another creator'
     model.save
-    get :index
+    get :index, params: { page: 'T' }
 
     assert_select 'p.list_item_attribute', text: /, another creator/, count: 1
   end
@@ -1164,13 +1164,13 @@ class ModelsControllerTest < ActionController::TestCase
 
     get :show, params: { id: model }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+    assert_select '#citation', text: /Bacall, F/, count:0
 
     model.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
     get :show, params: { id: model }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+    assert_select '#citation', text: /Bacall, F/, count:1
   end
 
   test 'associated with assay_ids params' do

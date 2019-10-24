@@ -754,6 +754,21 @@ class PublicationsControllerTest < ActionController::TestCase
     p.reload
   end
 
+  test 'should associate authors_but_leave_json' do
+    min_person = Factory(:min_person)
+    author = Factory(:publication_author, suggested_person: min_person)
+    p = Factory(:publication, publication_authors: [author])
+    assert_equal 1, p.publication_authors.size
+    assert_equal 0, p.creators.size
+
+    get :show, params: { id: p.id }, format: :json
+    assert_response :success
+    json = JSON.parse(@response.body)
+    authors = json["data"]["attributes"]["authors"]
+    matching_count = authors.count { |a| a.include? min_person.name }
+    assert_equal 0, matching_count
+  end
+
   test 'should disassociate authors' do
     mock_pubmed(content_file: 'pubmed_5.txt')
     p = publications(:one)
@@ -883,11 +898,11 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should update page pagination when changing the setting from admin' do
-    assert_equal 'latest', Seek::Config.default_pages[:publications]
+    assert_equal 'top', Seek::Config.default_pages[:publications]
     get :index
     assert_response :success
     assert_select '.pagination li.active' do
-      assert_select 'a[href=?]', publications_path(page: 'latest')
+      assert_select 'a[href=?]', publications_path(page: 'top')
     end
 
     # change the setting

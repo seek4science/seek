@@ -933,13 +933,13 @@ class SopsControllerTest < ActionController::TestCase
 
     get :show, params: { id: sop }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+    assert_select '#citation', text: /Bacall, F/, count:0
 
     sop.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
     get :show, params: { id: sop }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+    assert_select '#citation', text: /Bacall, F/, count:1
   end
 
   def edit_max_object(sop)
@@ -1392,6 +1392,74 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal person,sop.policy.permissions.first.contributor
     assert_equal Policy::EDITING,sop.policy.permissions.first.access_type
 
+  end
+
+  test 'default sorting on top page' do
+    s1 = Factory(:sop, title: 'AAABSop', updated_at: 10.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s2 = Factory(:sop, title: 'AAAASop', updated_at: 9.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+
+    get :index
+
+    assert_equal 'top', assigns(:sops).page
+    assert_equal [:updated_at_desc], assigns(:sops).order
+    assert_equal s1.id, assigns(:sops)[0].id
+    assert_equal s2.id, assigns(:sops)[1].id
+  end
+
+  test 'default sorting on A page' do
+    s1 = Factory(:sop, title: 'AAABSop', updated_at: 10.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s2 = Factory(:sop, title: 'AAAASop', updated_at: 9.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+
+    get :index, params: { page: 'A' }
+
+    assert_equal 'A', assigns(:sops).page
+    assert_equal [:title_asc], assigns(:sops).order
+    assert_equal s2.id, assigns(:sops)[0].id
+    assert_equal s1.id, assigns(:sops)[1].id
+  end
+
+  test 'custom sorting on top page' do
+    s1 = Factory(:sop, title: 'ZZZZZSop', updated_at: 10.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s2 = Factory(:sop, title: 'ZZZZXSop', updated_at: 9.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s3 = Factory(:sop, title: 'ZZZZYSop', updated_at: 8.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+
+    get :index, params: { order: 'title_desc' }
+
+    assert_equal 'top', assigns(:sops).page
+    assert_equal [:title_desc], assigns(:sops).order
+    assert_equal s1.id, assigns(:sops)[0].id
+    assert_equal s3.id, assigns(:sops)[1].id
+    assert_equal s2.id, assigns(:sops)[2].id
+  end
+
+  test 'custom sorting on G page' do
+    s1 = Factory(:sop, title: 'GZSop', created_at: 2.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s2 = Factory(:sop, title: 'GXSop', created_at: 1.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s3 = Factory(:sop, title: 'GYSop', created_at: 10.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+
+    get :index, params: { page: 'G', order: 'created_at_asc' }
+
+    assert_equal 'G', assigns(:sops).page
+    assert_equal [:created_at_asc], assigns(:sops).order
+    assert_equal s3.id, assigns(:sops)[0].id
+    assert_equal s1.id, assigns(:sops)[1].id
+    assert_equal s2.id, assigns(:sops)[2].id
+  end
+
+  test 'JSON-API multiple sorting' do
+    s1 = Factory(:sop, title: 'ZZSop', created_at: 2.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s2 = Factory(:sop, title: 'ZXSop', created_at: 1.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s3 = Factory(:sop, title: 'ZXSop', created_at: 10.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s4 = Factory(:sop, title: 'ZYSop', created_at: 10.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+
+    get :index, params: { page: 'Z', sort: 'title,-created_at' }
+
+    assert_equal 'Z', assigns(:sops).page
+    assert_equal [:title_asc, :created_at_desc], assigns(:sops).order
+    assert_equal s2.id, assigns(:sops)[0].id
+    assert_equal s3.id, assigns(:sops)[1].id
+    assert_equal s4.id, assigns(:sops)[2].id
+    assert_equal s1.id, assigns(:sops)[3].id
   end
 
   private

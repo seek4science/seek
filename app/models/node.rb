@@ -6,8 +6,6 @@ class Node < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
-  scope :default_order, -> { order("title") }
-
   validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates

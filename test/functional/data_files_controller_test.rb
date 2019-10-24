@@ -998,11 +998,13 @@ class DataFilesControllerTest < ActionController::TestCase
     person = people(:person_for_datafile_owner)
     get :index, params: { filter: { person: person.id }, page: 'all' }
     assert_response :success
-    df = data_files(:downloadable_data_file)
-    df2 = data_files(:sysmo_data_file)
+    non_owned_df = data_files(:sysmo_data_file)
+
     assert_select 'div.list_items_container' do
-      assert_select 'a', text: df.title, count: 2
-      assert_select 'a', text: df2.title, count: 0
+      person.contributed_data_files.each do |df|
+        assert_select 'a', text: df.title, count: 1
+      end
+      assert_select 'a', text: non_owned_df.title, count: 0
     end
   end
 
@@ -1519,7 +1521,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file = data_files(:picture)
     data_file.other_creators = 'another creator'
     data_file.save
-    get :index
+    get :index, params: { page: 'P' }
 
     assert_select 'p.list_item_attribute', text: /another creator/, count: 1
   end
@@ -2449,13 +2451,13 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, params: { id: data_file }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+    assert_select '#citation', text: /Bacall, F/, count:0
 
     data_file.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
     get :show, params: { id: data_file }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+    assert_select '#citation', text: /Bacall, F/, count:1
   end
 
   test 'resource count stats' do
@@ -2568,7 +2570,7 @@ class DataFilesControllerTest < ActionController::TestCase
       end
     end
 
-    assert assigns(:data_file).errors.any?    
+    assert assigns(:data_file).errors.any?
     assert_template :new
   end
 

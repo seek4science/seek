@@ -233,11 +233,13 @@ module Seek
 
     def default_page(controller)
       pages = default_pages.with_indifferent_access
-      if pages.key?(controller.to_s)
-        pages[controller.to_s]
-      else
-        Settings.defaults['default_pages'][controller.to_s] || 'latest'
-      end
+      p = if pages.key?(controller.to_s)
+            pages[controller.to_s]
+          else
+            Settings.defaults['default_pages'][controller.to_s] || 'top'
+          end
+
+      p == 'latest' ? 'top' : p
     end
 
     # FIXME: change to standard setter=

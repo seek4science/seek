@@ -11,8 +11,6 @@ class Person < ApplicationRecord
 
   acts_as_yellow_pages
 
-  scope :default_order, -> { order('last_name, first_name') }
-
   before_save :first_person_admin_and_add_to_default_project
 
   acts_as_notifiee
