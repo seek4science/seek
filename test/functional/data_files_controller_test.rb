@@ -2451,13 +2451,13 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, params: { id: data_file }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+    assert_select '#citation', text: /Bacall, F/, count:0
 
     data_file.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
     get :show, params: { id: data_file }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+    assert_select '#citation', text: /Bacall, F/, count:1
   end
 
   test 'resource count stats' do
@@ -2570,7 +2570,7 @@ class DataFilesControllerTest < ActionController::TestCase
       end
     end
 
-    assert assigns(:data_file).errors.any?    
+    assert assigns(:data_file).errors.any?
     assert_template :new
   end
 

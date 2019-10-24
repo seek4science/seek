@@ -256,4 +256,31 @@ $j(document).ready(function () {
             $j('[value=' + item.id + ']', listElement).parent().highlight('blue');
         }
     });
+
+    $j('#citation-style-select').change(function () {
+        var style = $j(this).val();
+        var url = $j(this).data('url');
+        var target = $j('#citation');
+        var currentStyle = $j('#citation').data('citationStyle');
+
+        if (style && style !== currentStyle) {
+            $j.ajax({
+                url: url,
+                data: { style: style },
+                dataType: 'html',
+                success: function (html) {
+                    target.html(html);
+                },
+                error: function () {
+                    target.html('Could not generate citation in that style.');
+                },
+                complete: function () {
+                    target.spinner('remove');
+                }
+            });
+            target.spinner('add');
+        }
+    }).change();
+
+    new Clipboard('.clipboard-btn');
 });
