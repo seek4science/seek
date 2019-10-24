@@ -15,7 +15,7 @@
             </li>
             <% Devise.omniauth_providers.each do |provider, options| %>
               <li role="presentation">
-                <a href="#<%= provider.to_s %>_login" aria-controls="<%= provider.to_s %>_login" role="tab" data-toggle="tab"><%= provider.to_s %> login</a>
+                <a href="#<%= provider.to_s %>_login" aria-controls="<%= provider.to_s %>_login" role="tab" data-toggle="tab"><%= t('login.'+provider.to_s) %> login</a>
               </li>
             <% end #each provider %>
           </ul>
@@ -55,7 +55,9 @@
             <% Devise.omniauth_providers.each do |provider, options| %>
               <div role="tabpanel" class="tab-pane" id="<%= provider.to_s %>_login">
                 <% if provider.to_s == "elixir_aai" %>
-                  <%= link_to "Sign in with ELIXIR AAI", identity_elixir_aai_omniauth_authorize_path%>
+                  <div class='text-center'>
+                    <%= link_to image(:elixir_aai_login,width:'150'), identity_elixir_aai_omniauth_authorize_path %>
+                  </div>
                 <% else %>
                   <div class="alert alert-danger">No link for that omniauth provider yet</div>
                 <% end %>

@@ -4,6 +4,9 @@ en:
   search_prompt: "Search here..."
   seek_id: "SEEK ID"
 
+  login:
+    elixir_aai: 'ELIXIR AAI'
+
   investigation: "Investigation"
   study: "Study"
   assay: "Assay"
