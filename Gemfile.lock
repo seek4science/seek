@@ -42,8 +42,7 @@ GIT
 
 GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
-  revision: 0922f614d46af0fd0b7b9efcd092bc32ed23009a
-  branch: more-publication-types
+  revision: b4527548f545fa49ee64a89d962e75358101947c
   specs:
     doi_query_tool (1.0.0)
       libxml-ruby (>= 2.6.0)
