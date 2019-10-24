@@ -8,12 +8,13 @@
 
       <div class="panel-body">
         <%# tabs if omniauth authentication with providers is enabled %>
-        <% if Seek::Config.omniauth_enabled && !Devise.omniauth_providers.empty? && !Identity.current_identity %>
+        <% if show_omniauth_login? && !Identity.current_identity %>
           <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
               <a href="#password_login" aria-controls="password_login" role="tab" data-toggle="tab">SEEK login</a>
             </li>
             <% Devise.omniauth_providers.each do |provider, options| %>
+              <% next if provider==:elixir_aai && !show_elixir_login? %>
               <li role="presentation">
                 <a href="#<%= provider.to_s %>_login" aria-controls="<%= provider.to_s %>_login" role="tab" data-toggle="tab"><%= t('login.'+provider.to_s) %> login</a>
               </li>
@@ -51,10 +52,10 @@
             <% end #form %>
           </div>
 
-          <% if Seek::Config.omniauth_enabled && !Devise.omniauth_providers.empty? %>
+          <% if show_omniauth_login? %>
             <% Devise.omniauth_providers.each do |provider, options| %>
               <div role="tabpanel" class="tab-pane" id="<%= provider.to_s %>_login">
-                <% if provider.to_s == "elixir_aai" %>
+                <% if provider.to_s == "elixir_aai" && show_elixir_login? %>
                   <div class='text-center'>
                     <%= link_to image(:elixir_aai_login,width:'150'), identity_elixir_aai_omniauth_authorize_path %>
                   </div>
