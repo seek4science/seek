@@ -1,3 +1,9 @@
+<%
+  if @publication.publication_type_id == 0 || @publication.publication_type_id.nil?
+     @publication.publication_type_id = PublicationType.Journal.id
+  end
+%>
+
 <%= render :partial => "general/item_title",:locals => { :item => @publication, :buttons_partial => 'publications/buttons' } %>
 
 <div class="row">
@@ -23,9 +29,37 @@
         <%= render :partial => 'projects/show_project_relationship', :locals => { :resource => @publication } %>
 
         <p>
-          <strong><%= publication_type_text @publication.publication_type -%>:</strong>
-          <%=h @publication.journal -%>
+          <strong><%= "Publication type" -%>:</strong>
+          <%=h PublicationType.find(@publication.publication_type_id).title -%>
         </p>
+
+        <% unless @publication.journal.nil? || @publication.journal.empty? %>
+          <p>
+            <strong><%= "Journal" -%>:</strong>
+            <%=h @publication.journal -%>
+          </p>
+        <% end %>
+
+        <% unless @publication.booktitle.nil? || @publication.booktitle.empty? %>
+          <p>
+          <strong><%= "Book Title" -%>:</strong>
+          <%=h @publication.booktitle -%>
+          </p>
+        <% end %>
+
+        <% unless @publication.editor.nil? || @publication.editor.empty? %>
+          <p>
+            <strong>Editor<%= @publication.editor.size > 1 ? "s" : "" -%>:</strong>
+            <%=h @publication.editor -%>
+          </p>
+        <% end %>
+
+        <% unless @publication.publisher.nil? || @publication.publisher.empty? %>
+          <p>
+            <strong>Publisher:</strong>
+            <%=h @publication.publisher -%>
+          </p>
+        <% end %>
 
       </div>
       <div class="col-md-6">
@@ -35,12 +69,13 @@
         </p>
         <p>
           <strong for="date_published">Date Published:</strong>
-          <span><%= date_as_string(@publication.published_date,false,true) -%></span>
+            <span><%= date_as_string(@publication.published_date,false,true) -%></span>
         </p>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12 col-sm-10">
+        <% unless @publication.publication_authors.size == 0 %>
         <p>
           <strong>Author<%= @publication.publication_authors.size > 1 ? "s" : "" -%>:</strong>
           <% if @publication.publication_authors.empty? %>
@@ -55,6 +90,7 @@
               end.join(', ').html_safe %>
           <% end %>
         </p>
+        <% end %>
       </div>
     </div>
     <%= render :partial => "general/isa_graph", :locals => { :root_item => @publication, :deep => true, :include_parents => true } %>

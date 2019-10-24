@@ -7,7 +7,7 @@
     </p>
 
     <p class="country">
-      <strong>Country: </strong><%= text_or_not_specified @institution.country, :link_as_country => true -%>
+      <strong>Country: </strong><%= country_text_or_not_specified @institution.country -%>
     </p>
 
     <p class="city">

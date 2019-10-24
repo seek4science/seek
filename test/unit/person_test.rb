@@ -2,7 +2,7 @@ require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
   fixtures :users, :people
-  
+
   def test_work_groups
     p = Factory(:person_in_multiple_projects)
     assert_equal 3, p.work_groups.size
@@ -27,14 +27,14 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal person.projects, project_administrator.projects
     assert_not_equal person.projects, project_administrator2.projects
 
-    assert person.can_be_edited_by?(person.user)
-    assert !person.can_be_edited_by?(project_administrator.user), 'should not be editable by the project administrator of the same project, as user is registered'
-    assert person.can_be_edited_by?(admin.user)
-    assert !person.can_be_edited_by?(another_person.user)
-    assert !person.can_be_edited_by?(project_administrator2.user), 'should be not editable by the project administrator of another project'
+    assert person.can_edit?(person.user)
+    assert !person.can_edit?(project_administrator.user), 'should not be editable by the project administrator of the same project, as user is registered'
+    assert person.can_edit?(admin.user)
+    assert !person.can_edit?(another_person.user)
+    assert !person.can_edit?(project_administrator2.user), 'should be not editable by the project administrator of another project'
 
-    assert person.can_be_edited_by?(person), 'You can also ask by passing in a person'
-    assert !person.can_be_edited_by?(project_administrator), 'You can also ask by passing in a person'
+    assert person.can_edit?(person), 'You can also ask by passing in a person'
+    assert !person.can_edit?(project_administrator), 'You can also ask by passing in a person'
   end
 
   test 'userless profile can be edited by' do
@@ -47,12 +47,12 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal profile.projects, project_administrator.projects
     assert_not_equal profile.projects, project_administrator2.projects
 
-    assert profile.can_be_edited_by?(project_administrator.user), 'should be editable by the project administrator of the same project, as user is not registered'
-    assert profile.can_be_edited_by?(admin.user)
-    assert !profile.can_be_edited_by?(another_person.user)
-    assert !profile.can_be_edited_by?(project_administrator2.user), 'should be not editable by the project administrator of another project'
+    assert profile.can_edit?(project_administrator.user), 'should be editable by the project administrator of the same project, as user is not registered'
+    assert profile.can_edit?(admin.user)
+    assert !profile.can_edit?(another_person.user)
+    assert !profile.can_edit?(project_administrator2.user), 'should be not editable by the project administrator of another project'
 
-    assert profile.can_be_edited_by?(project_administrator), 'You can also ask by passing in a person'
+    assert profile.can_edit?(project_administrator), 'You can also ask by passing in a person'
   end
 
   test 'me?' do
@@ -82,24 +82,24 @@ class PersonTest < ActiveSupport::TestCase
     person_in_same_project = Factory :person, group_memberships: [Factory(:group_membership, work_group: project_administrator.group_memberships.first.work_group)]
     person_in_different_project = Factory :person
 
-    assert admin.can_be_administered_by?(admin.user), 'admin can administer themself'
-    assert admin2.can_be_administered_by?(admin.user), 'admin can administer another admin'
+    assert admin.can_manage?(admin.user), 'admin can administer themself'
+    assert admin2.can_manage?(admin.user), 'admin can administer another admin'
 
-    assert project_administrator.can_be_administered_by?(admin.user), 'admin should be able to administer another project administrator'
-    assert person_in_same_project.can_be_administered_by?(project_administrator.user), 'project administrator should be able to administer someone from same project'
-    assert person_in_different_project.can_be_administered_by?(project_administrator.user), 'project administrator should be able to administer someone from another project'
+    assert project_administrator.can_manage?(admin.user), 'admin should be able to administer another project administrator'
+    assert person_in_same_project.can_manage?(project_administrator.user), 'project administrator should be able to administer someone from same project'
+    assert person_in_different_project.can_manage?(project_administrator.user), 'project administrator should be able to administer someone from another project'
 
-    assert !project_administrator.can_be_administered_by?(person_in_same_project.user), 'a normal person cannot administer someone else'
-    assert !project_administrator.can_be_administered_by?(project_administrator.user), 'project administrator should not administer himself'
-    assert !person_in_same_project.can_be_administered_by?(person_in_same_project.user), 'person should not administer themself'
-    assert !person_in_same_project.can_be_administered_by?(nil)
+    assert !project_administrator.can_manage?(person_in_same_project.user), 'a normal person cannot administer someone else'
+    assert !project_administrator.can_manage?(project_administrator.user), 'project administrator should not administer himself'
+    assert !person_in_same_project.can_manage?(person_in_same_project.user), 'person should not administer themself'
+    assert !person_in_same_project.can_manage?(nil)
 
-    assert project_administrator.can_be_administered_by?(admin), 'you can also ask by passing a person'
-    assert person_in_same_project.can_be_administered_by?(project_administrator), 'you can also ask by passing a person'
+    assert project_administrator.can_manage?(admin), 'you can also ask by passing a person'
+    assert person_in_same_project.can_manage?(project_administrator), 'you can also ask by passing a person'
 
     # can be administered by a programme administrator
     pa = Factory :programme_administrator
-    assert Factory(:person).can_be_administered_by?(pa.user)
+    assert Factory(:person).can_manage?(pa.user)
   end
 
   test 'project administrator cannot edit an admin within their project' do
@@ -108,7 +108,7 @@ class PersonTest < ActiveSupport::TestCase
 
     assert !(admin.projects & project_administrator.projects).empty?
 
-    assert !admin.can_be_edited_by?(project_administrator)
+    assert !admin.can_edit?(project_administrator)
   end
 
   # checks the updated_at doesn't get artificially changed between created and reloading
@@ -309,15 +309,6 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal sorted, Person.active
   end
 
-  def test_ordered_by_last_name
-    sorted = Person.all.sort_by do |p|
-      lname = '' || p.last_name.try(:downcase)
-      fname = '' || p.first_name.try(:downcase)
-      lname + fname
-    end
-    assert_equal sorted, Person.all
-  end
-
   def test_is_asset
     assert !Person.is_asset?
     assert !people(:quentin_person).is_asset?
@@ -340,14 +331,13 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_first_person_is_admin
     assert Person.count > 0 # should already be people from fixtures
-    p = Person.new(first_name: 'XXX', email: 'xxx@email.com')
-    p.save!
+    p = Factory(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
     assert !p.is_admin?, 'Should not automatically be admin, since people already exist'
 
     Person.delete_all
 
     assert_equal 0, Person.count # no people should exist
-    p = Person.new(first_name: 'XXX', email: 'xxx@email.com')
+    p = Factory(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
     p.save
     p.reload
     assert p.is_admin?, 'Should automatically be admin, since it is the first created person'
@@ -358,8 +348,7 @@ class PersonTest < ActiveSupport::TestCase
 
     assert Person.count > 0
     assert Project.count > 0
-    p = Person.new(first_name: 'XXX', email: 'xxx@email.com')
-    p.save!
+    p = Factory(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
     assert !p.is_admin?, 'Should not automatically be admin, since people already exist'
     assert_empty p.projects
     assert_empty p.institutions
@@ -372,8 +361,7 @@ class PersonTest < ActiveSupport::TestCase
     refute_nil institution
 
     assert_equal 0, Person.count # no people should exist
-    p = Person.new(first_name: 'XXX', email: 'xxx@email.com')
-    p.save!
+    p = Factory(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
     p.reload
     assert_equal [project], p.projects
     assert_equal [institution], p.institutions
@@ -671,7 +659,7 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 1,p.errors.full_messages.count
     assert_equal "Full name can't be blank",p.errors.full_messages.first
 
-    
+
 
 
   end
@@ -712,34 +700,30 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_update_first_letter
-    p = Person.new(first_name: 'Fred', last_name: 'Monkhouse', email: 'blahblah@email.com')
+    p = Factory(:brand_new_person, first_name: 'Fred', last_name: 'Monkhouse', email: 'blahblah@email.com')
     assert p.valid?, 'The new person should be valid'
-    p.save
     assert_equal 'M', p.first_letter
 
-    p = Person.new(first_name: 'Freddy', email: 'blahbddlah@email.com')
+    p = Factory(:brand_new_person, first_name: 'Freddy', last_name: nil, email: 'blahbddlah@email.com')
     assert p.valid?, 'The new person should be valid'
-    p.save
     assert_equal 'F', p.first_letter
 
-    p = Person.new(first_name: 'Zebedee', email: 'zz@email.com')
+    p = Factory(:brand_new_person, first_name: 'Zebedee', last_name: nil, email: 'zz@email.com')
     assert p.valid?, 'The new person should be valid'
-    p.save
     assert_equal 'Z', p.first_letter
   end
 
   def test_update_first_letter_blank_last_name
-    p = Person.new(first_name: 'Zebedee', last_name: '', email: 'zz@email.com')
+    p = Factory(:brand_new_person, first_name: 'Zebedee', last_name: '', email: 'zz@email.com')
     assert p.valid?, 'The new person should be valid'
-    p.save
     assert_equal 'Z', p.first_letter
   end
 
   def test_notifiee_info_inserted
-    p = Person.new(first_name: 'Zebedee', last_name: '', email: 'zz@email.com')
+    p = Factory.build(:brand_new_person, first_name: 'Zebedee', last_name: '', email: 'zz@email.com')
     assert_nil p.notifiee_info
     assert_difference('NotifieeInfo.count') do
-      p.save!
+      disable_authorization_checks { p.save! }
     end
     p = Person.find(p.id)
     assert_not_nil p.notifiee_info
@@ -747,8 +731,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_dependent_notifiee_info_is_destroyed_with_person
-    p = Person.new(first_name: 'Zebedee', last_name: '', email: 'zz@email.com')
-    p.save!
+    p = Factory(:brand_new_person, first_name: 'Zebedee', last_name: '', email: 'zz@email.com')
     assert_not_nil p.notifiee_info
     assert_difference('NotifieeInfo.count', -1) do
       disable_authorization_checks { p.destroy }
@@ -1039,7 +1022,7 @@ class PersonTest < ActiveSupport::TestCase
     refute_includes pa.administered_programmes, other_prog
 
     assert_empty Factory(:person).administered_programmes
-    assert_equal Programme.all.sort, admin.administered_programmes
+    assert_equal Programme.all.sort, admin.administered_programmes.sort
   end
 
   test 'not_registered_with_matching_email' do

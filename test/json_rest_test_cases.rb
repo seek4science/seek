@@ -126,7 +126,7 @@ module JsonRestTestCases
     end
 
     diff.delete_if do |el|
-      el['path'] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|download|md5sum|sha1sum|project_id|position_id|tags/
+      el['path'] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|download|md5sum|sha1sum|project_id|position_id|tags|members/
     end
 
     assert_equal [], diff
@@ -153,7 +153,7 @@ module JsonRestTestCases
   def get_test_object(m)
     type = @controller.controller_name.classify
     opts = type.constantize.method_defined?(:policy) ? { policy: Factory(:publicly_viewable_policy) } : {}
-
+    opts[:publication_type] = Factory(:journal) if type.constantize.method_defined?(:publication_type)
     Factory("#{m}_#{type.downcase}".to_sym, opts)
   end
 

@@ -25,6 +25,22 @@ class UsersControllerTest < ActionController::TestCase
     assert_nil session[:user_id]
   end
 
+  test 'whoami_no_login' do
+    get :whoami, format: :json
+    assert_response :not_found
+  end
+
+  test 'whoami_login' do
+    person = Factory :person
+
+    login_as person.user
+
+    get :whoami, format: :json
+    assert_response :redirect
+    assert_redirected_to person_path(person)
+
+  end
+
   test 'cancel registration doesnt destroy user with profile' do
     person = Factory :person
 

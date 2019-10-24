@@ -5,6 +5,7 @@ module ApplicationHelper
   include FancyMultiselectHelper
   include Recaptcha::ClientHelper
   include VersionHelper
+  include ImagesHelper
 
   def no_items_to_list_text
     content_tag :div, id: 'no-index-items-text' do
@@ -52,7 +53,10 @@ module ApplicationHelper
 
   def date_as_string(date, show_time_of_day = false, year_only_1st_jan = false)
     # for publications, if it is the first of jan, then it can be assumed it is just the year (unlikely have a publication on New Years Day)
-    if year_only_1st_jan && !date.blank? && date.month == 1 && date.day == 1
+
+    if date.to_s == nil
+      str = "<span class='none_text'>No date defined</span>"
+    elsif year_only_1st_jan && !date.blank? && date.month == 1 && date.day == 1
       str = date.year.to_s
     else
       date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
@@ -214,7 +218,7 @@ module ApplicationHelper
       res = mail_to(res) if options[:email]
       res = link_to(res, res, popup: true) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
-      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(res)) if options[:link_as_country]
+      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(CountryCodes.code(text))) if options[:link_as_country]
     end
     res.html_safe
   end

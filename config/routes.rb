@@ -203,7 +203,6 @@ SEEK::Application.routes.draw do
     end
     member do
       get :asset_report
-      get :admin
       get :admin_members
       get :admin_member_roles
       get :storage_report
@@ -797,7 +796,7 @@ SEEK::Application.routes.draw do
   get '/tags/:id' => 'tags#show', :as => :show_tag
   get '/tags' => 'tags#index', :as => :all_anns
   get '/tags/:id' => 'tags#show', :as => :show_ann
-  get '/countries/:country_name' => 'countries#show', :as => :country
+  get '/countries/:country_code' => 'countries#show', :as => :country
 
   get '/data_fuse/' => 'data_fuse#show', :as => :data_fuse
   post '/favourite_groups/new' => 'favourite_groups#new', :as => :new_favourite_group
@@ -817,6 +816,8 @@ SEEK::Application.routes.draw do
   get '/forgot_password' => 'users#forgot_password', :as => :forgot_password
   get '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
   get '/fail'=>'fail#index',:as=>:fail
+
+  get '/whoami' => 'users#whoami'
 
   #feedback
   get '/home/feedback' => 'homes#feedback', :as=> :feedback

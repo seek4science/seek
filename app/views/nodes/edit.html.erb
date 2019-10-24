@@ -21,11 +21,6 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @node} -%>
 
-      <div>
-        <%= f.submit "Update", :id => "node_submit_btn",
-                     :onclick => "return validateResourceFields('node')",
-                     :class => 'btn btn-primary' -%>
-        or <%= cancel_button(node_path(@node)) -%>
-      </div>
+      <%= form_submit_buttons(@node) %>
     </div>
 <% end %>

@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "927855014",
+    "id": "980191145",
     "type": "publications",
     "attributes": {
       "policy":
@@ -15,7 +15,11 @@
       "pubmed_id": 873864488,
       "abstract": "Amazing insights into the mechanism of TF2",
       "citation": "JMB Oct 2017, 12:234-245",
+      "editor":	"Richling, S. and Baumann, M. and Heuveline, V.",
+      "booktitle":	"Proceedings of the 3rd bwHPC-Symposium: Heidelberg 2016",
+      "publisher":	"Heidelberg University Library, heiBOOKS",
       "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/873864488",
+      "publication_type":"Journal",
       "authors": ["Person1 Last", "Person2 Last"]
     },
     "relationships": {
