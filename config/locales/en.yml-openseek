@@ -6,6 +6,7 @@ en:
 
   login:
     elixir_aai: 'ELIXIR AAI'
+    ldap: 'LDAP'
 
   investigation: "Investigation"
   study: "Study"

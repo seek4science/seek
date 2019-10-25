@@ -3,7 +3,7 @@ require 'sessions_controller'
 
 # Re-raise errors caught by the controller.
 class SessionsController; def rescue_action(e)
-                            fail e
+                            raise e
                           end; end
 
 class SessionsControllerTest < ActionController::TestCase
@@ -188,65 +188,73 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'should have only seek login' do
-    Seek::Config.omniauth_enabled   = false
-    assert !Seek::Config.omniauth_enabled
-    get :new
-    assert_response :success
-    assert_select 'title', text: 'Login', count: 1
-    assert_select '#login-panel form', 1
+    with_config_value(:omniauth_enabled, false) do
+      get :new
+      assert_response :success
+      assert_select 'title', text: 'Login', count: 1
+      assert_select '#login-panel form', 1
+    end
   end
 
   test 'should have provider login' do
     # change the setting
-    Seek::Config.omniauth_enabled   = true
-    Devise.setup do |config|
-      config.omniauth :ldap,  {
-          name: :ldap,
-          title: 'organization-ldap',
-          host: 'localhost',
-          port: 389,
-          method: :plain,
-          base: 'DC=example,DC=com',
-          uid: 'samaccountname',
-          password: '',
-          bind_dn: ''
-      }
+    with_config_value(:omniauth_enabled, true) do
+      with_config_value(:elixir_aai_client_id, 'xxx') do
+        with_config_value(:elixir_aai_secret, 'yyy') do
+          Devise.setup do |config|
+            config.omniauth :ldap, name: :ldap,
+                            title: 'organization-ldap',
+                            host: 'localhost',
+                            port: 389,
+                            method: :plain,
+                            base: 'DC=example,DC=com',
+                            uid: 'samaccountname',
+                            password: '',
+                            bind_dn: ''
+          end
+
+          assert Devise.omniauth_providers.include? :ldap
+
+          get :new
+          assert_response :success
+
+          assert_select '#login-panel li', Devise.omniauth_providers.length + 1
+
+          # LDAP login is known about
+          assert_select '#login-panel div[id="ldap_login"]', 1
+
+          # No login specified for LDAP
+          assert_select '#login-panel div[class="alert alert-danger"]', 1
+        end
+      end
     end
-
-    assert Devise.omniauth_providers.include? :ldap
-
-    get :new
-    assert_response :success
-    assert_select '#login-panel li', Devise.omniauth_providers.length + 1
-
-    # LDAP login is known about
-    assert_select '#login-panel div[id="ldap_login"]', 1
-
-    # No login specified for LDAP
-    assert_select '#login-panel div[class="alert alert-danger"]', 1
- end
+  end
 
   test 'should not create omni authenticated user' do
     # change the setting
-    Seek::Config.omniauth_enabled     = true
-    Seek::Config.omniauth_user_create = false
-    @request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:ldap]
+    with_config_value(:omniauth_enabled, true) do
+      with_config_value(:omniauth_user_create, false) do
+        @request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:ldap]
 
-    post :create
-    assert_redirected_to login_path
-    assert_match(/the authenticated user: cannot be found/, flash[:error])
-    assert_nil User.find_by_login('new_ldap_user')
+        post :create
+        assert_redirected_to login_path
+        assert_match(/the authenticated user: cannot be found/, flash[:error])
+        assert_nil User.find_by_login('new_ldap_user')
+      end
+    end
   end
 
   test 'should create omni authenticated user' do
     # change the setting
-    Seek::Config.omniauth_enabled       = true
-    Seek::Config.omniauth_user_create   = true
-    @request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:ldap]
+    with_config_value(:omniauth_enabled, true) do
+      with_config_value(:omniauth_user_create, true) do
+        @request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:ldap]
 
-    post :create
-    assert_redirected_to login_path
-    assert_match(/You need to login directly to link accounts/, flash[:notice])
+        post :create
+        assert_redirected_to login_path
+        assert_match(/You need to login directly to link accounts/, flash[:notice])
+      end
+    end
   end
 
   protected
