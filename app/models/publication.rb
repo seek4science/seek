@@ -179,7 +179,7 @@ class Publication < ApplicationRecord
   # @see https://github.com/SysMO-DB/doi_query_tool/blob/master/lib/doi_record.rb
   def extract_doi_metadata(doi_record)
     Rails.logger.debug("doi_record:")
-    Rails.logger.debug(puts (doi_record))
+    Rails.logger.debug(doi_record)
     self.registered_mode = 2
     self.title = doi_record.title
     self.published_date = doi_record.date_published

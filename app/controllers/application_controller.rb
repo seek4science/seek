@@ -82,7 +82,6 @@ class ApplicationController < ActionController::Base
       end
     end
     @version ||= @default
-    puts "api version: ", @version
   end
 
   def is_current_user_auth
