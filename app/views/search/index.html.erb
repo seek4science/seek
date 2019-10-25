@@ -35,23 +35,13 @@
               <% resource_hash = classify_for_tabs @results -%>
               <%= render :partial => "assets/resource_listing_tabbed_by_class",
                          :locals => {:resource_hash => resource_hash,
-                                     :display_immediately => false,
-                                     :narrow_view => true,
-                                     :authorization_already_done => true} -%>
+                                     :display_immediately => false } -%>
           <% end %>
       <% else %>
           <% resource_hash = classify_for_tabs @results -%>
           <%= render :partial => "assets/resource_listing_tabbed_by_class",
                      :locals => {:resource_hash => resource_hash,
-                                 :display_immediately => true,
-                                 :narrow_view => true,
-                                 :authorization_already_done => true} -%>
+                                 :display_immediately => true } -%>
       <% end %>
   <% end %>
 </div>
-
-<style>
-  ul li.unfilter_button{
-      margin-right: 15%;
-  }
-</style>

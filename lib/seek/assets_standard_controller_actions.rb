@@ -94,7 +94,7 @@ module Seek
 
     # i.e. Model, or DataFile according to the controller name
     def class_for_controller_name
-      controller_name.classify.constantize
+      controller_model
     end
 
     # i.e. @model = item, or @data_file = item - according to the item class name

@@ -171,7 +171,8 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, params: { page: 'all' }
     assert_response :success
-    assert_equal assigns(:data_files).sort_by(&:id), DataFile.authorize_asset_collection(assigns(:data_files), 'view', users(:aaron)).sort_by(&:id), "data files haven't been authorized properly"
+    assert_equal assigns(:data_files).sort_by(&:id),
+                 assigns(:data_files).authorized_for('view', users(:aaron)).sort_by(&:id), "data files haven't been authorized properly"
   end
 
   test 'should get new' do
@@ -996,7 +997,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'filtering by person' do
     person = people(:person_for_datafile_owner)
-    get :index, params: { filter: { person: person.id }, page: 'all' }
+    get :index, params: { filter: { contributor: person.id }, page: 'all' }
     assert_response :success
     non_owned_df = data_files(:sysmo_data_file)
 
@@ -1585,15 +1586,6 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', data_file_path(df), text: df.title
       assert_select 'a[href=?]', data_file_path(df2), text: df2.title, count: 0
     end
-  end
-
-  test 'dont show resource count for nested route' do
-    df = Factory(:data_file, policy: Factory(:public_policy))
-    project = df.projects.first
-    df2 = Factory(:data_file, policy: Factory(:public_policy))
-    get :index, params: { project_id: project.id }
-    assert_response :success
-    assert_select '#resource-count-stats', count: 0
   end
 
   test 'filtered data files for non existent study' do
@@ -2464,13 +2456,14 @@ class DataFilesControllerTest < ActionController::TestCase
     Factory(:data_file, policy: Factory(:public_policy))
     Factory(:data_file, policy: Factory(:private_policy))
     total = DataFile.count
-    visible = DataFile.all_authorized_for(:view).count
+    visible = DataFile.authorized_for('view').count
     assert_not_equal total, visible
     assert_not_equal 0, total
     assert_not_equal 0, visible
     get :index
     assert_response :success
-    assert_select '#resource-count-stats', text: /#{visible} Data files visible.*#{total}/
+    assert_equal total, assigns(:total_count)
+    assert_equal visible, assigns(:visible_count)
   end
 
   test 'delete with data file with extracted samples' do

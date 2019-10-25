@@ -33,7 +33,7 @@ class Publication < ApplicationRecord
   validates :title, length: { maximum: 65_535 }
 
   has_many :publication_authors, dependent: :destroy, autosave: true
-  has_many :persons, through: :publication_authors
+  has_many :people, through: :publication_authors
 
   belongs_to :publication_type
 
@@ -450,16 +450,24 @@ class Publication < ApplicationRecord
     related_relationships.where(clause).first_or_create!
   end
 
+  has_many :assay_data_files, through: :assays, source: :data_files
   # includes those related directly, or through an assay
   def related_data_files
-    via_assay = assays.collect(&:data_files).flatten.uniq.compact
-    via_assay | data_files
+    DataFile.where(id: related_data_file_ids)
   end
 
+  def related_data_file_ids
+    data_file_ids | assay_data_file_ids
+  end
+
+  has_many :assay_models, through: :assays, source: :models
   # includes those related directly, or through an assay
   def related_models
-    via_assay = assays.collect(&:models).flatten.uniq.compact
-    via_assay | models
+    Model.where(id: related_model_ids)
+  end
+
+  def related_model_ids
+    model_ids | assay_model_ids
   end
 
   # indicates whether the publication has data files or models linked to it (either directly or via an assay)
@@ -471,10 +479,21 @@ class Publication < ApplicationRecord
     data_files | models | presentations
   end
 
-  # returns a list of related organisms, related through either the assay or the model
+  has_many :assays_organisms, through: :assays, source: :organisms
+  has_many :models_organisms, through: :models, source: :organism
   def related_organisms
-    (assays.collect(&:organisms).flatten | models.collect(&:organism).flatten).uniq
+    Organism.where(id: related_organism_ids)
   end
+
+  def related_organism_ids
+    assays_organism_ids | models_organism_ids
+  end
+
+  has_filter organism: Seek::Filtering::Filter.new(
+      value_field: 'organisms.id',
+      label_field: 'organisms.title',
+      joins: [:assays_organisms, :models_organisms]
+  )
 
   def self.subscribers_are_notified_of?(action)
     action == 'create'
@@ -488,16 +507,7 @@ class Publication < ApplicationRecord
   end
 
   def publication_author_names
-    author_names = []
-    publication_authors.each do |author|
-      seek_author = author.person
-      author_names << if seek_author.nil?
-                        author.first_name + ' ' + author.last_name
-                      else
-                        seek_author.name
-                      end
-    end
-    author_names
+    publication_authors.map(&:name)
   end
 
   def has_doi?

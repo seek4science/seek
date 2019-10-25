@@ -3,7 +3,6 @@ class Workflow < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::UploadHandling::ExamineUrl
 
-
   acts_as_asset
 
   acts_as_doi_parent(child_accessor: :versions)
@@ -29,9 +28,8 @@ class Workflow < ApplicationRecord
     true
   end
 
-  #defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
-    true
+    Seek::Config.workflows_enabled
   end
 
   def is_github_cwl?
@@ -47,5 +45,4 @@ class Workflow < ApplicationRecord
   def cwl_viewer_url
     return content_blob.url.sub('https://', 'https://view.commonwl.org/workflows/')
   end
-    
 end

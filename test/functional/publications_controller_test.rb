@@ -897,24 +897,6 @@ class PublicationsControllerTest < ActionController::TestCase
     assert @response.body.include?(joined_original_authors)
   end
 
-  test 'should update page pagination when changing the setting from admin' do
-    assert_equal 'top', Seek::Config.default_pages[:publications]
-    get :index
-    assert_response :success
-    assert_select '.pagination li.active' do
-      assert_select 'a[href=?]', publications_path(page: 'top')
-    end
-
-    # change the setting
-    Seek::Config.default_pages[:publications] = 'all'
-    get :index
-    assert_response :success
-
-    assert_select '.pagination li.active' do
-      assert_select 'a[href=?]', publications_path(page: 'all')
-    end
-  end
-
   test 'should avoid XSS in association forms' do
     project = Factory(:project)
     c = Factory(:person, group_memberships: [Factory(:group_membership, work_group: Factory(:work_group, project: project))])

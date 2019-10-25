@@ -218,7 +218,7 @@
       "required": [
         "snapshot",
         "url"
-        ]
+      ]
     },
     "nonEmptySnapshotsList": {
       "type": "array",
@@ -365,6 +365,9 @@
         "version"
       ],
       "additionalProperties": false
+    },
+    "indexLinks": {
+      "$ref": "#/definitions/linksType"
     },
     "linksType": {
       "type": "object",
@@ -1659,6 +1662,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -4260,14 +4266,14 @@
         }
       }
     },
-"membersList": {
-  "type": "array",
-  "minItems": 0,
-  "uniqueItems": true,
-  "items": {
-    "$ref": "#/definitions/member"
-  }
-},
+    "membersList": {
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/member"
+      }
+    },
     "nullableMembersList": {
       "oneOf": [
         {
@@ -4280,13 +4286,13 @@
     },
 
     "personList": {
-  "type": "array",
-  "minItems": 0,
-  "uniqueItems": true,
-  "items": {
-    "$ref": "#/definitions/nonEmptyString"
-  }
-},
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/nonEmptyString"
+      }
+    },
     "projectResponse": {
       "type": "object",
       "properties": {
@@ -5251,6 +5257,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5271,6 +5280,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5331,6 +5343,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5391,6 +5406,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5451,6 +5469,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5511,6 +5532,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5571,6 +5595,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5631,6 +5658,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5691,6 +5721,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5751,6 +5784,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5811,6 +5847,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5871,6 +5910,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5931,6 +5973,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5991,6 +6036,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -6051,6 +6099,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -6111,6 +6162,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [

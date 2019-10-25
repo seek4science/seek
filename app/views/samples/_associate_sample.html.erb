@@ -5,9 +5,9 @@
   assay_assets = resource.assay_assets.select { |aa| aa.asset_type == 'Sample' }
 
   samples = Sample.joins(:projects).where(projects: { id: current_user.person.projects.map(&:id) }).limit(100).order('updated_at DESC')
-  authorized_samples = Sample.authorize_asset_collection(samples, :view)
+  authorized_samples = samples.authorized_for('view')
 
-  data_files = DataFile.with_extracted_samples.all_authorized_for('view').select { |d| d.extracted_samples.any? }.first(20)
+  data_files = DataFile.with_extracted_samples.authorized_for('view').select { |d| d.extracted_samples.any? }.first(20)
 
   field_name = "#{resource.class.name.underscore}[samples_attributes]"
   collapse_panel = assay_assets.empty?

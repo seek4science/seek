@@ -121,6 +121,21 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
+
+  def page_and_sort_params
+    permitted = Seek::Filterer.new(controller_model).available_filter_keys.flat_map { |p| [p, { p => [] }] }
+    permitted_filter_params = { filter: permitted }
+    params.permit(:page, :sort, :order, permitted_filter_params)
+  end
+
+  helper_method :page_and_sort_params
+
+  def controller_model
+    @controller_model ||= controller_name.classify.constantize
+  end
+
+  helper_method :controller_model
+
   private
 
   # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
@@ -224,7 +239,7 @@ class ApplicationController < ActionController::Base
 
     return if privilege.nil?
 
-    object = controller_name.classify.constantize.find(params[:id])
+    object = controller_model.find(params[:id])
 
     if is_auth?(object, privilege)
       eval "@#{name} = object"
@@ -255,7 +270,7 @@ class ApplicationController < ActionController::Base
   end
 
   def auth_to_create
-    unless controller_name.classify.constantize.can_create?
+    unless controller_model.can_create?
       error('You do not have permission', 'No permission')
       return false
     end
@@ -432,54 +447,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # Strips any unexpected filter, which protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
-  def permitted_filters(filters)
-    # placed this in a separate method so that other controllers could override it if necessary
-    permitted = Seek::Util.persistent_classes.select { |c| c.respond_to? :find_by_id }.map { |c| c.name.underscore }
-    filters.permit(*permitted)
-  end
-
-  def apply_filters(resources)
-    filters = params[:filter] || ActionController::Parameters.new
-
-    # translate params that are send as an _id, like project_id=12 - which will usually be a consequence of nested routing
-    params.keys.each do |key|
-      filters[key.gsub('_id', '')] = params[key] if key.end_with?('_id')
-    end
-
-    filters = permitted_filters(filters).to_unsafe_h
-    @filters = filters
-
-    if filters.size > 0
-      params[:page] ||= 'all'
-      params[:filtered] = true
-      resources.select do |res|
-        filters.all? do |filter, value|
-          filter = filter.to_s
-          klass = filter.camelize.constantize
-          value = klass.find value.to_i
-
-          detect_for_filter(filter, res, value)
-        end
-      end
-    else
-      resources
-    end
-  end
-
-  def detect_for_filter(filter, resource, value)
-    case
-      when resource.respond_to?(filter.pluralize)
-        resource.send(filter.pluralize).include? value
-      when resource.respond_to?("related_#{filter.pluralize}")
-        resource.send("related_#{filter.pluralize}").include?(value)
-      when resource.respond_to?(filter)
-        resource.send(filter) == value
-      else
-        false
-    end
-  end
-
   # checks if a captcha has been filled out correctly, if enabled, and returns false if not
   def check_captcha
     if Seek::Config.recaptcha_setup?
@@ -493,8 +460,6 @@ class ApplicationController < ActionController::Base
     super
     payload[:user_agent] = request.user_agent
   end
-
-
 
   def redirect_to_sign_up_when_no_user
     redirect_to signup_path if User.count == 0
@@ -556,7 +521,7 @@ class ApplicationController < ActionController::Base
   # filter that responds with :not_acceptable if request rdf for non rdf capable resource
   def rdf_enabled?
     return unless request.format.rdf?
-    unless Seek::Util.rdf_capable_types.include?(controller_name.classify.constantize)
+    unless Seek::Util.rdf_capable_types.include?(controller_model)
       respond_to do |format|
         format.rdf { render plain: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
       end
@@ -586,20 +551,4 @@ class ApplicationController < ActionController::Base
   def param_converter_options
     {}
   end
-
-  def page_and_sort_params
-    p = params.permit(:page, :sort, :order)
-
-    p[:page] ||= 'all' if json_api_request?
-
-    if p[:sort]
-      p[:order] = Seek::ListSorter.keys_from_json_api_sort(params[:sort])
-    elsif params[:order]
-      p[:order] = params[:order]
-    end
-
-    p
-  end
-
-  helper_method :page_and_sort_params
 end

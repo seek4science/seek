@@ -9,7 +9,7 @@ include SysMODB::SpreadsheetExtractor
 
 namespace :seek_dev do
   task(check_auth_lookup: :environment) do
-    output = StringIO.new('')
+    output = STDOUT
     Seek::Util.authorized_types.each do |type|
       puts "Checking #{type.name.pluralize}"
       puts
@@ -19,7 +19,7 @@ namespace :seek_dev do
         users.each do |user|
           user_id = user.nil? ? 0 : user.id
           %w[view edit download manage delete].each do |action|
-            lookup = type.lookup_for_asset(action, user_id, item.id)
+            lookup = item.lookup_for(action, user_id)
             actual = item.authorized_for_action(user, action)
             next if lookup == actual
             output.puts "  #{type.name} #{item.id} - User #{user_id}"
@@ -58,6 +58,30 @@ namespace :seek_dev do
     puts JSON.pretty_generate(hashes).gsub(':', ' =>')
     puts
     puts 'Done'
+  end
+
+  task(benchmark_auth_lookup: :environment) do
+    start_time = Time.now
+    puts "Benchmarking!"
+    puts "Auth lookup enabled: #{Seek::Config.auth_lookup_enabled}"
+    u = User.first
+    u2 = User.last
+    Seek::Util.authorized_types.each do |type|
+      puts "#{type.name} (#{type.count}):"
+      b = Benchmark.measure do
+        puts "\tAnon view: #{Benchmark.measure { 100.times { type.authorized_for('view') } } }"
+        puts "\tAnon edit: #{Benchmark.measure { 100.times { type.authorized_for('edit') } } }"
+        puts "\tUser edit: #{Benchmark.measure { 100.times { type.authorized_for('edit', u) } } }"
+        puts "\tUser view: #{Benchmark.measure { 100.times { type.authorized_for('view', u2) } } }"
+        puts "\tUser manage: #{Benchmark.measure { 100.times { type.authorized_for('manage', u2) } } }"
+        puts "\tUser delete: #{Benchmark.measure { 100.times { type.authorized_for('delete', u) } } }"
+      end
+      puts "Total #{b}"
+      puts
+    end
+
+    seconds = Time.now - start_time
+    puts "Done - #{seconds}s elapsed"
   end
 
   task(initial_membership: :environment) do

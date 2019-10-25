@@ -484,14 +484,6 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal x.uuid, uuid
   end
 
-  test 'Should order Latest list of projects by updated_at' do
-    project1 = Factory(:project, title: 'C', updated_at: 2.days.ago)
-    project2 = Factory(:project, title: 'B', updated_at: 1.days.ago)
-
-    latest_projects = Project.paginate_after_fetch([project1, project2], page: 'top')
-    assert_equal project2, latest_projects.first
-  end
-
   test 'can_delete?' do
     project = Factory(:project)
 
