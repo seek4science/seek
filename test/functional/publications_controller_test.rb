@@ -757,7 +757,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should associate authors_but_leave_json' do
     min_person = Factory(:min_person)
     author = Factory(:publication_author, suggested_person: min_person)
-    p = Factory(:publication, publication_authors: [author])
+    p = Factory(:publication, publication_authors: [author], publication_type: Factory(:journal))
     assert_equal 1, p.publication_authors.size
     assert_equal 0, p.creators.size
 
