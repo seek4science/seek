@@ -44,4 +44,31 @@ namespace :seek do
     end
     puts Publication.where("citation LIKE '%volume%'").count
   end
+
+  task :remove_vol_pp_in_journal => :environment do
+
+
+    Publication.where("citation LIKE '%vol.%' AND citation LIKE '%pp.%' AND publication_type_id=1").each do |t|
+      parts =t.citation.split(',')
+
+      parts.each do |part|
+        if part.include? 'vol.'
+          part.gsub!("vol. ","")
+        end
+        if part.include? 'pp.'
+          part.gsub!("pp. ",":")
+        end
+        if part.include? 'p.'
+          part.gsub!("p. ",":")
+        end
+      end
+
+      join = parts.join(',')
+      remove_comma = join.slice!(0..(join.index(':')-3))+join.slice((join.index(':'))..-1)
+      t.update_column(:citation,remove_comma)
+      puts t.citation
+    end
+
+
+  end
 end
