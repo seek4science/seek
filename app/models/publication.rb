@@ -492,7 +492,7 @@ class Publication < ApplicationRecord
     publication_authors.each do |author|
       seek_author = author.person
       author_names << if seek_author.nil?
-                        author.first_name + ' ' + author.last_name
+                        author.first_name.nil? ? author.last_name : author.first_name + ' ' + author.last_name
                       else
                         seek_author.name
                       end
