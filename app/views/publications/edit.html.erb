@@ -2,7 +2,7 @@
 <%= error_messages_for('publication', :message => nil) %>
 
 <%= form_for @publication do |f| %>
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => Seek::Config.is_virtualliver }%>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => Seek::Config.is_virtualliver } %>
 
     <% if @publication.pubmed_id.nil? && @publication.doi %>
         <div class="form-group">

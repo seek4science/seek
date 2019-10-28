@@ -1,4 +1,4 @@
-FROM ruby:2.4
+FROM ruby:2.4-stretch
 
 MAINTAINER Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall
 
@@ -12,7 +12,7 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends build-essential git \
 		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
-		libxslt1-dev locales mysql-client nginx nodejs openjdk-8-jdk \
+		libxslt1-dev locales default-mysql-client nginx nodejs openjdk-8-jdk \
 		poppler-utils postgresql-client sqlite3 links telnet vim-tiny  && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \

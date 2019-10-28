@@ -66,14 +66,14 @@ module Seek
           if Seek::Config.auth_lookup_enabled
             if lookup_table_consistent?(user_id)
               Rails.logger.info("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
-              assets = lookup_for_action_and_user action, user_id, projects
+              assets = lookup_for_action_and_user(action, user_id, projects)
             else
               Rails.logger.info("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
-              assets = default_order.select { |df| df.send("authorized_for_#{action}?", user) }
+              assets = all.select { |df| df.send("authorized_for_#{action}?", user) }
               programatic_project_filter = !projects.nil?
             end
           else
-            assets = default_order.select { |df| df.send("authorized_for_#{action}?", user) }
+            assets = all.select { |df| df.send("authorized_for_#{action}?", user) }
           end
 
           if filter_by_permissions
@@ -157,7 +157,7 @@ module Seek
             query = query.joins(:projects).where('projects.id' => projects.map(&:id))
           end
 
-          query.default_order
+          query
         end
 
         def lookup_join(action, user_id)
@@ -277,7 +277,7 @@ module Seek
         # Sort permissions according to precedence, then access type, so the most direct (People), permissive (Manage)
         # permissions are applied last.
         sorted_permissions = policy.permissions
-                                   .sort_by { |p| Permission.precedence.index(p.contributor_type) * 100 - p.access_type }
+                                   .sort_by { |p| Permission::PRECEDENCE.index(p.contributor_type) * 100 - p.access_type }
                                    .reverse
 
         # Extract the individual member permissions from each FavouriteGroup and ensure they are also sorted by access_type:

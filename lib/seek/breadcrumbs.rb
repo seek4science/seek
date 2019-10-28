@@ -58,6 +58,7 @@ module Seek
       when 'suggested_technology_types'
         add_index_breadcrumb(controller_name, 'Technology types')
       else
+        add_parent_breadcrumb if @parent_resource
         add_index_breadcrumb(controller_name)
       end
       resource = eval('@' + controller_name.singularize) || try_block { controller_name.singularize.camelize.constantize.find_by_id(params[:id]) }
@@ -97,6 +98,11 @@ module Seek
     def add_edit_breadcrumb(resource, breadcrumb_name = nil)
       breadcrumb_name ||= 'Edit'
       add_breadcrumb breadcrumb_name, url_for(controller: resource.class.name.underscore.pluralize, action: 'edit', id: resource.id)
+    end
+
+    def add_parent_breadcrumb
+      add_index_breadcrumb @parent_resource.class.name.underscore.pluralize
+      add_show_breadcrumb @parent_resource
     end
   end
 end

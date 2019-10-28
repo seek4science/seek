@@ -1,4 +1,3 @@
-<% current_user_authorized_to_manage = @model.can_manage? -%>
 <h1>Editing <%= t('model') %>: <%= link_to(h(@model.title), model_path(@model)) -%></h1>
 
 <%= form_for(@model ,:html => {:multipart => true, :method => :put}) do |f| %>
@@ -17,11 +16,6 @@
         <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
       </div>
 
-      <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
-      <% if current_user_authorized_to_manage -%>
-          <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :disable_project_select => true, :allow_nil => Seek::Config.is_virtualliver } -%>
-      <% end -%>
-
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @model } %>
 
       <%= render :partial=>"model_metadata" -%>
@@ -30,18 +24,11 @@
 
       <%= render :partial => "scales/scales_selector_with_parameters",:locals=>{:object=>@model} if show_scales?%>
 
-      <% if current_user_authorized_to_manage -%>
-          <%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
 
-          <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
-      <% end -%>
+      <%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
 
-      <div>
-        <%= preview_permission_popup_link(@model)-%>
-        <%= f.submit "Update", :id => "model_submit_btn",
-                     :onclick => "return validateResourceFields('model')",
-                     :class => 'btn btn-primary' -%>
-        or <%= cancel_button(model_path(@model)) %>
-      </div>
+      <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
+
+      <%= form_submit_buttons(@model) %>
     </div>
 <% end %>

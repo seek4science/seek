@@ -19,9 +19,7 @@ module Seek
 
         title_trimmer
 
-        attr_accessor :create_from_asset
-
-        scope :default_order, -> { order('title') }
+        
 
         validates :title, presence: true
         validates :title, length: { maximum: 255 }

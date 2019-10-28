@@ -1,12 +1,7 @@
 #keys that create the Seek::Config settings.
 #e.g. Seek::Config.home_description
 home_description:
-home_feeds_cache_timeout:
-events_enabled:
 bioportal_api_key:
-jerm_enabled:
-email_enabled:
-jws_enabled:
 jws_online_root:
 internal_help_enabled:
 external_help_url:
@@ -15,7 +10,6 @@ hide_details_enabled:
 registration_disabled:
 registration_disabled_description:
 activation_required_enabled:
-project_name:
 smtp:
   encrypt: true
 default_pages:
@@ -32,6 +26,9 @@ noreply_sender:
 solr_enabled:
 application_name:
 project_long_name:
+project_name:
+project_description:
+project_keywords:
 dm_project_name:
 dm_project_link:
 header_image_link:
@@ -71,8 +68,6 @@ delete_asset_version_enabled:
 recaptcha_enabled:
 project_hierarchy_enabled:
 tabs_lazy_load_enabled:
-admin_impersonation_enabled:
-auth_lookup_enabled:
 publish_button_enabled:
 project_browser_enabled:
 experimental_features_enabled:
@@ -115,7 +110,6 @@ datacite_password:
 datacite_url:
 doi_prefix:
 doi_suffix:
-time_lock_doi_for:
 max_extractable_spreadsheet_size:
 jvm_memory_allocation:
 max_indexable_text_size:
@@ -157,6 +151,8 @@ default_associated_projects_access_type:
 default_all_visitors_access_type:
   convert: :to_i
 default_project_members_access_type:
+  convert: :to_i
+max_all_visitors_access_type:
   convert: :to_i
 news_enabled:
 news_feed_urls:

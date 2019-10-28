@@ -12,7 +12,11 @@
   <% end %>
 <% end %>
 
-<%= admin_dropdown do %>
+<% if item.can_edit? %>
+  <%= add_to_dropdown(item) %>
+<% end %>
+
+<%= item_actions_dropdown do %>
   <% if item.can_edit? -%>
     <li><%= image_tag_for_key('manage', edit_publication_path(item), nil, nil, 'Manage Publication') -%></li>
   <% end -%>

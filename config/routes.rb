@@ -188,7 +188,6 @@ SEEK::Application.routes.draw do
       get :items
     end
     resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :only=>[:index]
-    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -204,7 +203,6 @@ SEEK::Application.routes.draw do
     end
     member do
       get :asset_report
-      get :admin
       get :admin_members
       get :admin_member_roles
       get :storage_report
@@ -306,6 +304,8 @@ SEEK::Application.routes.draw do
       post :publish
       get :published
       get :isa_children
+      get :manage
+      patch :manage_update
     end
   end
 
@@ -332,6 +332,8 @@ SEEK::Application.routes.draw do
       post :publish
       get :published
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:assays,:investigations,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:only=>[:index]
   end
@@ -369,6 +371,8 @@ SEEK::Application.routes.draw do
       get :published
       get :new_object_based_on_existing_one
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:strains,:organisms, :only=>[:index]
   end
@@ -425,6 +429,8 @@ SEEK::Application.routes.draw do
       get :destroy_samples_confirm
       post :retrieve_nels_sample_metadata
       get :retrieve_nels_sample_metadata
+      get :manage
+      patch :manage_update
     end
     resources :studied_factors do
       collection do
@@ -454,6 +460,8 @@ SEEK::Application.routes.draw do
       post :edit_version_comment
       delete :destroy_version
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:publications,:events,:only=>[:index]
   end
@@ -488,6 +496,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :model_images do
       collection do
@@ -522,6 +532,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :experimental_conditions do
       collection do
@@ -554,6 +566,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end
@@ -581,6 +595,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end
@@ -601,12 +617,10 @@ SEEK::Application.routes.draw do
       get :awaiting_activation
     end
     member do
-      get :initiate_spawn_project
       get :activation_review
       put :accept_activation
       put :reject_activation
       get :reject_activation_confirmation
-      post :spawn_project
       get :storage_report
       get :isa_children
     end
@@ -638,6 +652,10 @@ SEEK::Application.routes.draw do
       get :preview
       post :items_for_result
     end
+    member do
+      get :manage
+      patch :manage_update
+    end
     resources :people,:projects,:data_files,:publications,:presentations,:only=>[:index]
   end
 
@@ -658,6 +676,8 @@ SEEK::Application.routes.draw do
     end
     member do
       post :update_annotations_ajax
+      get :manage
+      patch :manage_update
     end
     resources :specimens,:assays,:people,:projects,:samples,:only=>[:index]
   end
@@ -698,6 +718,8 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples, only:[:index]
   end
@@ -750,6 +772,8 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:only=>[:index]
   end
@@ -773,7 +797,7 @@ SEEK::Application.routes.draw do
   get '/tags/:id' => 'tags#show', :as => :show_tag
   get '/tags' => 'tags#index', :as => :all_anns
   get '/tags/:id' => 'tags#show', :as => :show_ann
-  get '/countries/:country_name' => 'countries#show', :as => :country
+  get '/countries/:country_code' => 'countries#show', :as => :country
 
   get '/data_fuse/' => 'data_fuse#show', :as => :data_fuse
   post '/favourite_groups/new' => 'favourite_groups#new', :as => :new_favourite_group
@@ -793,6 +817,8 @@ SEEK::Application.routes.draw do
   get '/forgot_password' => 'users#forgot_password', :as => :forgot_password
   get '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
   get '/fail'=>'fail#index',:as=>:fail
+
+  get '/whoami' => 'users#whoami'
 
   #feedback
   get '/home/feedback' => 'homes#feedback', :as=> :feedback

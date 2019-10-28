@@ -26,7 +26,7 @@ class Subscription < ApplicationRecord
   end
 
   def can_delete?(user = User.current_user)
-    can_manage?(user) || subscribable.try(:can_delete?, user) || person.try(:can_be_administered_by?, user)
+    can_manage?(user) || subscribable.try(:can_delete?, user) || person&.can_manage?(user)
   end
 
   def can_edit?(user = User.current_user)

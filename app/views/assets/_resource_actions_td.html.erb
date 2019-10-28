@@ -1,17 +1,22 @@
-<%
-   user_id = current_user_id
--%>
-<% cache "rli_actions_#{resource.cache_key}_#{user_id}", skip_digest: true do -%>
-    <%
-       permissions = resource.authorization_permissions
-    -%>
+<% cache "rli_actions_#{resource.cache_key}_#{current_user_id}", skip_digest: true do -%>
+    <% permissions = resource.authorization_permissions -%>
 
     <% if can_download_asset?(resource, params[:code],permissions.can_download)-%>
-      <%= download_or_link_button resource, download_resource_path(resource, params[:code]), resource.single_content_blob.try(:url), nil, :class => 'btn btn-default btn-xs' %>
+        <%= download_or_link_button resource, download_resource_path(resource, params[:code]),
+                                    resource.single_content_blob.try(:url), nil, class: 'btn btn-default btn-xs' %>
     <% end -%>
+
+    <% if permissions.can_edit -%>
+      <%= button_link_to 'Edit', 'edit', edit_resource_path(resource), class: 'btn-xs' -%>
+    <% end -%>
+
     <% if permissions.can_manage -%>
-      <%= button_link_to 'Manage', 'manage', edit_resource_path(resource), :class => 'btn-xs' -%>
-    <% elsif permissions.can_edit -%>
-      <%= button_link_to 'Edit', 'edit', edit_resource_path(resource), :class => 'btn-xs' -%>
+        <%= button_link_to 'Manage', 'manage', manage_resource_path(resource), class: 'btn-xs' -%>
+    <% end %>
+
+    <% if permissions.can_delete -%>
+        <%= button_link_to 'Delete', 'destroy', polymorphic_path(resource, return_to: 'my_items'),
+                           data: { confirm: 'Are you sure you want to delete this?' }, method: :delete,
+                           class: 'btn-xs my-items-delete-btn' -%>
     <% end -%>
 <% end -%>

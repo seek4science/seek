@@ -66,6 +66,7 @@ module ISAHelper
       item_type = item.is_a?(Seek::ObjectAggregation) ? "#{item.type} collection" : item.class.name
       data = { id: node_id(item) }
 
+      data['seek_id'] = item.rdf_resource.to_s if item.respond_to?(:rdf_resource)
       if node.can_view?
         data['description'] = if item.respond_to?(:description)
                                 truncate(item.description, length: 500)

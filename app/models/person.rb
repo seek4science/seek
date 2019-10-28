@@ -11,11 +11,7 @@ class Person < ApplicationRecord
 
   acts_as_yellow_pages
 
-  scope :default_order, -> { order('last_name, first_name') }
-
   before_save :first_person_admin_and_add_to_default_project
-  before_destroy :clean_up_and_assign_permissions
-  after_destroy :updated_contributed_items_contributor_after_destroy
 
   acts_as_notifiee
 
@@ -51,7 +47,7 @@ class Person < ApplicationRecord
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
 
   RELATED_RESOURCE_TYPES = %w[DataFile Sop Model Document Publication Presentation
-                              Sample Event Investigation Study Assay Strain].freeze
+                              Sample Event Investigation Study Assay Strain Workflow].freeze
 
   RELATED_RESOURCE_TYPES.each do |type|
     has_many :"contributed_#{type.tableize}", foreign_key: :contributor_id, class_name: type
@@ -90,12 +86,15 @@ class Person < ApplicationRecord
 
   after_commit :queue_update_auth_table
 
+  has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
+  before_destroy :reassign_contribution_permissions
+  after_destroy :updated_contributed_items_contributor_after_destroy
   after_destroy :update_publication_authors_after_destroy
-  
+
   # to make it look like a User
   def person
     self
-  end    
+  end
 
   # not registered profiles that match this email
   def self.not_registered_with_matching_email(email)
@@ -279,41 +278,35 @@ class Person < ApplicationRecord
     end.flatten.uniq.compact
   end
 
-  # can be edited by:
-  # (admin or project managers of this person) and (this person does not have a user or not the other admin)
-  # themself
-  def can_be_edited_by?(user)
-    return false unless user
-    user = user.user if user.is_a?(Person)
-    (user == self.user) || user.is_admin? || (is_project_administered_by?(user) && self.user.nil?)
-  end
-
   def me?
     user && user == User.current_user
-  end
-
-  # admin can administer other people, project manager can administer other people except other admins and themself
-  def can_be_administered_by?(user)
-    person = user.is_a?(User) ? user.person : user
-    return false unless user && person
-    is_proj_or_prog_admin = person.is_project_administrator_of_any_project? || person.is_programme_administrator_of_any_programme?
-    user.is_admin? || (is_proj_or_prog_admin && (is_admin? || self != person))
   end
 
   def can_view?(user = User.current_user)
     !user.nil? || !Seek::Config.is_virtualliver
   end
 
+  # can be edited by:
+  # (admin or project managers of this person) and (this person does not have a user or not the other admin)
+  # themself
   def can_edit?(user = User.current_user)
-    new_record? || can_be_edited_by?(user)
+    return false unless user
+    return true if new_record? && self.class.can_create?
+    user = user.user if user.is_a?(Person)
+    (user == self.user) || user.is_admin? || (is_project_administered_by?(user) && self.user.nil?)
   end
 
+  # admin can administer other people, project manager can administer other people except other admins and themself
   def can_manage?(user = User.current_user)
-    user.try(:is_admin?)
+    return false unless user
+    person = user.person
+    return false unless person
+    is_proj_or_prog_admin = person.is_project_administrator_of_any_project? || person.is_programme_administrator_of_any_programme?
+    user.is_admin? || (is_proj_or_prog_admin && (is_admin? || self != person))
   end
 
   def can_delete?(user = User.current_user)
-    can_manage? user
+    user&.is_admin?
   end
 
   def title_is_public?
@@ -349,10 +342,7 @@ class Person < ApplicationRecord
     permissions.each(&:destroy)
   end
 
-  def clean_up_and_assign_permissions
-    # remove the permissions which are set on this person
-    remove_permissions
-
+  def reassign_contribution_permissions
     # retrieve the items that this person is contributor (owner for assay), and that also has policy authorization
     person_related_items = contributed_items.select{|item| item.respond_to?(:policy)}
 

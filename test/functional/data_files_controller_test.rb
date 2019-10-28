@@ -75,11 +75,6 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'correct title and text for associating an assay for new' do
     login_as(Factory(:user))
-    as_virtualliver do
-      register_content_blob
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
-    end
     as_not_virtualliver do
       register_content_blob
       assert_response :success
@@ -93,11 +88,6 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'correct title and text for associating an assay for edit' do
     df = Factory :data_file
     login_as(df.contributor.user)
-    as_virtualliver do
-      get :edit, params: { id: df.id }
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
-    end
     as_not_virtualliver do
       get :edit, params: { id: df.id }
       assert_response :success
@@ -610,7 +600,6 @@ class DataFilesControllerTest < ActionController::TestCase
     get :edit, params: { id: data_files(:picture) }
     assert_response :success
     assert_select 'h1', text: /Editing #{I18n.t('data_file')}/
-    assert_select 'div.alert-info', text: /the #{I18n.t('data_file')}/i
   end
 
   test 'publications included in form for datafile' do
@@ -654,6 +643,30 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_select '#usage_count' do
       assert_select 'strong', text: /Downloads/, count: 1
+    end
+  end
+
+  test 'show explore button' do
+    df = Factory(:small_test_spreadsheet_datafile)
+    login_as(df.contributor.user)
+    get :show, params: { id: df }
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 1
+      assert_select 'span.disabled-button', text: 'Explore', count: 0
+    end
+  end
+
+  test 'show disabled explore button if spreadsheet too big' do
+    df = Factory(:small_test_spreadsheet_datafile)
+    login_as(df.contributor.user)
+    with_config_value(:max_extractable_spreadsheet_size, 0) do
+      get :show, params: { id: df }
+    end
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
+      assert_select 'span.disabled-button', text: 'Explore', count: 1
     end
   end
 
@@ -985,11 +998,13 @@ class DataFilesControllerTest < ActionController::TestCase
     person = people(:person_for_datafile_owner)
     get :index, params: { filter: { person: person.id }, page: 'all' }
     assert_response :success
-    df = data_files(:downloadable_data_file)
-    df2 = data_files(:sysmo_data_file)
+    non_owned_df = data_files(:sysmo_data_file)
+
     assert_select 'div.list_items_container' do
-      assert_select 'a', text: df.title, count: 2
-      assert_select 'a', text: df2.title, count: 0
+      person.contributed_data_files.each do |df|
+        assert_select 'a', text: df.title, count: 1
+      end
+      assert_select 'a', text: non_owned_df.title, count: 0
     end
   end
 
@@ -1506,7 +1521,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file = data_files(:picture)
     data_file.other_creators = 'another creator'
     data_file.save
-    get :index
+    get :index, params: { page: 'P' }
 
     assert_select 'p.list_item_attribute', text: /another creator/, count: 1
   end
@@ -2329,7 +2344,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert(samples = assigns(:samples))
     assert_equal 3, samples.count
-    assert_not_includes samples.map { |s| s.get_attribute(:full_name) }, 'Bob'
+    assert_not_includes samples.map { |s| s.get_attribute_value(:full_name) }, 'Bob'
 
     samples.each do |sample|
       assert_equal data_file, sample.originating_data_file
@@ -2436,13 +2451,13 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, params: { id: data_file }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+    assert_select '#citation', text: /Bacall, F/, count:0
 
     data_file.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
     get :show, params: { id: data_file }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+    assert_select '#citation', text: /Bacall, F/, count:1
   end
 
   test 'resource count stats' do
@@ -2555,7 +2570,7 @@ class DataFilesControllerTest < ActionController::TestCase
       end
     end
 
-    assert assigns(:data_file).errors.any?    
+    assert assigns(:data_file).errors.any?
     assert_template :new
   end
 
@@ -2730,6 +2745,23 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df.content_blob.id, session[:uploaded_content_blob_id]
   end
 
+  test 'create content blob with assay params' do
+    # assay params may be passed when adding via the link from an existing assay
+    person = Factory(:person)
+    assay = Factory(:assay,contributor:person)
+    login_as(person)
+    blob = { data: picture_file }
+    assert_difference('ContentBlob.count') do
+      post :create_content_blob, params: {
+          content_blobs: [blob],
+          data_file: { assay_assets_attributes: [{ assay_id: assay.id.to_s }] }
+      }
+    end
+    assert_response :success
+    assert df = assigns(:data_file)
+    assert_includes df.assay_assets.collect(&:assay), assay
+  end
+
   test 'create content blob requires login' do
     logout
     blob = { data: picture_file }
@@ -2746,7 +2778,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     session[:uploaded_content_blob_id] = content_blob.id.to_s
 
-    post :rightfield_extraction_ajax, params: { content_blob_id: content_blob.id.to_s, format: 'js' }
+    post :rightfield_extraction_ajax, params: { content_blob_id: content_blob.id.to_s }, format: 'js'
 
     assert_response :success
     assert data_file = assigns(:data_file)
@@ -2760,6 +2792,24 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response', assay.assay_type_uri
     assert_equal 'http://jermontology.org/ontology/JERMOntology#2-hybrid_system', assay.technology_type_uri
 
+  end
+
+  test 'rightfield extraction with assay params passed' do
+    person = Factory(:person)
+    assay = Factory(:assay, contributor:person)
+    login_as(person)
+    content_blob = Factory(:rightfield_master_template_with_assay)
+
+    session[:uploaded_content_blob_id] = content_blob.id.to_s
+
+    post :rightfield_extraction_ajax, params: {
+        content_blob_id: content_blob.id.to_s,
+        data_file: {assay_assets_attributes:[{assay_id:assay.id.to_s}]}
+    }, format: 'js'
+
+    assert_response :success
+    assert data_file = assigns(:data_file)
+    assert_equal [assay],data_file.assay_assets.collect(&:assay)
   end
 
   test 'create metadata' do
@@ -3286,45 +3336,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "input#assay_create_assay[checked=checked]", count:0
   end
 
-  test 'should select assay ids when passed to provide metadata' do
-    assay1 = Factory(:assay, contributor:User.current_user.person)
-    assay2 = Factory(:assay, contributor:User.current_user.person)
-
-
-    assert assay1.can_edit?
-    assert assay2.can_edit?
-
-
-    register_content_blob(skip_provide_metadata:true)
-
-    get :provide_metadata, params: { assay_ids:[assay1.id] }
-    assert_response :success
-
-    assert df=assigns(:data_file)
-    assert_includes df.assay_assets.collect(&:assay),assay1
-    refute_includes df.assay_assets.collect(&:assay),assay2
-  end
-
-  test 'should select multiple assay ids when passed to provide metadata' do
-    assay1 = Factory(:assay, contributor:User.current_user.person)
-    assay2 = Factory(:assay, contributor:User.current_user.person)
-    assay3 = Factory(:assay, contributor:User.current_user.person)
-
-    assert assay1.can_edit?
-    assert assay2.can_edit?
-    assert assay3.can_edit?
-
-    register_content_blob(skip_provide_metadata:true)
-
-    get :provide_metadata, params: { assay_ids:[assay1.id,assay2.id] }
-    assert_response :success
-
-    assert df=assigns(:data_file)
-    assert_includes df.assay_assets.collect(&:assay),assay1
-    assert_includes df.assay_assets.collect(&:assay),assay2
-    refute_includes df.assay_assets.collect(&:assay),assay3
-  end
-
   test 'should not select non editable assay ids when passed to provide metadata' do
     assay1 = Factory(:assay, contributor:User.current_user.person)
     assay2 = Factory(:assay, contributor:User.current_user.person)
@@ -3490,28 +3501,14 @@ class DataFilesControllerTest < ActionController::TestCase
     logout
   end
 
-  test 'sharing permissions should not show for edit' do
-    p = Factory(:person)
-    login_as(p.user)
-    df = Factory(:data_file, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:p, access_type:Policy::EDITING)]))
+  test 'should show view content button for image' do
+    data_file = Factory(:data_file, content_blob: Factory(:image_content_blob))
+    login_as(data_file.contributor)
 
-    assert df.can_edit?(p.user)
-    refute df.can_manage?(p.user)
+    get :show, params: { id: data_file }
 
-    get :edit, params: { id:df.id }
     assert_response :success
-
-    assert_select "div#sharing_form", count:0
-
-    # make sure it appears if can_manage
-
-    login_as(df.contributor.user)
-
-    get :edit, params: { id:df.id }
-    assert_response :success
-
-    assert_select "div#sharing_form", count:1
-
+    assert_select 'a.btn[data-lightbox]', count: 1
   end
 
   # registers a new content blob, and triggers the javascript 'rightfield_extraction_ajax' call, and results in the metadata form HTML in the response
@@ -3526,5 +3523,119 @@ class DataFilesControllerTest < ActionController::TestCase
     session[:uploaded_content_blob_id] = content_blob_id.to_s
     post :rightfield_extraction_ajax, params: { content_blob_id:content_blob_id.to_s, format:'js' }
     get :provide_metadata unless skip_provide_metadata
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('data_file')
+  end
+
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    data_file = Factory(:data_file, contributor:person)
+    login_as(person)
+    assert data_file.can_manage?
+    get :manage, params: {id: data_file}
+    assert_response :success
+
+    # check the project form exists, studies and assays don't have this
+    assert_select 'div#add_projects_form', count:1
+
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
+    # should be a temporary sharing link
+    assert_select 'div#temporary_links', count:1
+
+    assert_select 'div#author_form', count:1
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    data_file = Factory(:data_file, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert data_file.can_edit?
+    refute data_file.can_manage?
+    get :manage, params: {id:data_file}
+    assert_redirected_to data_file
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    data_file = Factory(:data_file, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+
+    login_as(person)
+    assert data_file.can_manage?
+
+    patch :manage_update, params: {id: data_file,
+                                   data_file: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to data_file
+
+    data_file.reload
+    assert_equal [proj1,proj2],data_file.projects.sort_by(&:id)
+    assert_equal [other_creator],data_file.creators
+    assert_equal Policy::VISIBLE,data_file.policy.access_type
+    assert_equal 1,data_file.policy.permissions.count
+    assert_equal other_person,data_file.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,data_file.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person, project:proj1)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    data_file = Factory(:data_file, projects:[proj1], policy:Factory(:private_policy,
+                                                                             permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute data_file.can_manage?
+    assert data_file.can_edit?
+
+    assert_equal [proj1],data_file.projects
+    assert_empty data_file.creators
+
+    patch :manage_update, params: {id: data_file,
+                                   data_file: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    data_file.reload
+    assert_equal [proj1],data_file.projects
+    assert_empty data_file.creators
+    assert_equal Policy::PRIVATE,data_file.policy.access_type
+    assert_equal 1,data_file.policy.permissions.count
+    assert_equal person,data_file.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,data_file.policy.permissions.first.access_type
+
   end
 end

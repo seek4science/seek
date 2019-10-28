@@ -6,17 +6,17 @@
 
 <p style="font-weight: bolder;">
   <% if AuthLookupUpdateQueue.count>0 -%>
-      There are <%= AuthLookupUpdateQueue.count -%> items queued to be processed.
+    There are <%= AuthLookupUpdateQueue.count -%> items queued to be processed.
   <% else -%>
-      There are no items waiting to be processed.
+    There are no items waiting to be processed.
   <% end -%>
 </p>
 
 <p style="font-weight: bolder;">
   <% if AuthLookupUpdateJob.new.count(false)>0 -%>
-      There are <%= AuthLookupUpdateJob.new.count(false) -%> jobs waiting to run, or currently running.
+    There are <%= AuthLookupUpdateJob.new.count(false) -%> jobs waiting to run, or currently running.
   <% else -%>
-      There are no jobs waiting to be run, or currently running.
+    There are no jobs waiting to be run, or currently running.
   <% end -%>
 </p>
 
@@ -31,24 +31,20 @@
     <th>Asset last ID</th>
   </tr>
   </thead>
-  <% User.where('person_id IS NOT NULL').all.push(nil).each do |user| -%>
-      <% Seek::Util.authorized_types.each do |type| -%>
-
-           <%  if !type.lookup_table_consistent?(user)
-                asset_count = type.count
-                lookup_count = type.lookup_count_for_user user
-                last_asset_id = type.order(:id).last.try(:id)
-                last_stored_asset_id = type.last_asset_id_for_user user
-           %>
-              <tr>
-                <td><%= user.nil? ? "anon" : user.id -%></td>
-                <td><%= type.name -%></td>
-                <td><%= lookup_count -%></td>
-                <td><%= asset_count -%></td>
-                <td><%= last_stored_asset_id -%></td>
-                <td><%= last_asset_id -%></td>
-              </tr>
-          <% end -%>
+  <tbody>
+  <% User.where('person_id IS NOT NULL').to_a.push(nil).each do |user| -%>
+    <% Seek::Util.authorized_types.each do |type| -%>
+      <% unless type.lookup_table_consistent?(user) -%>
+        <tr>
+          <td><%= user.nil? ? "anon" : user.id -%></td>
+          <td><%= type.name -%></td>
+          <td><%= type.lookup_count_for_user(user) -%></td>
+          <td><%= type.count -%></td>
+          <td><%= type.order(:id).last.try(:id) -%></td>
+          <td><%= type.last_asset_id_for_user(user)-%></td>
+        </tr>
       <% end -%>
+    <% end -%>
   <% end -%>
+  </tbody>
 </table>

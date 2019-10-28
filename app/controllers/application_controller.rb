@@ -123,6 +123,12 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
+  def determine_asset_from_controller
+    name = controller_name.singularize
+    eval("@#{name}")
+  end
+
   def restrict_guest_user
     if current_user && current_user.guest?
       flash[:error] = 'You cannot perform this action as a Guest User. Please sign in or register for an account first.'
@@ -130,14 +136,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  private
-
   def project_membership_required
     unless User.logged_in_and_member? || admin_logged_in?
       flash[:error] = 'Only members of known projects, institutions or work groups are allowed to create new content.'
       respond_to do |format|
         format.html do
-          object = eval('@' + controller_name.singularize)
+          object = determine_asset_from_controller
           if !object.nil? && object.try(:can_view?)
             redirect_to object
           else
@@ -444,6 +448,7 @@ class ApplicationController < ActionController::Base
     end
 
     filters = permitted_filters(filters).to_unsafe_h
+    @filters = filters
 
     if filters.size > 0
       params[:page] ||= 'all'
@@ -581,4 +586,20 @@ class ApplicationController < ActionController::Base
   def param_converter_options
     {}
   end
+
+  def page_and_sort_params
+    p = params.permit(:page, :sort, :order)
+
+    p[:page] ||= 'all' if json_api_request?
+
+    if p[:sort]
+      p[:order] = Seek::ListSorter.keys_from_json_api_sort(params[:sort])
+    elsif params[:order]
+      p[:order] = params[:order]
+    end
+
+    p
+  end
+
+  helper_method :page_and_sort_params
 end

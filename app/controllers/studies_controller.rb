@@ -3,7 +3,7 @@ class StudiesController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[edit update destroy show new_object_based_on_existing_one]
+  before_action :find_and_authorize_requested_item, only: %i[edit update destroy manage manage_update show new_object_based_on_existing_one]
 
   # project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
   # defined in the application controller
@@ -35,29 +35,6 @@ class StudiesController < ApplicationController
     end
   end
 
-  def new
-    @study = Study.new
-    @study.create_from_asset = params[:create_from_asset]
-    @study.new_link_from_assay = params[:new_link_from_assay]
-    investigation = nil
-    investigation = Investigation.find(params[:investigation_id]) if params[:investigation_id]
-
-    if investigation
-      if investigation.can_edit?
-        @study.investigation = investigation
-      else
-        flash.now[:error] = "You do not have permission to associate the new #{t('study')} with the #{t('investigation')} '#{investigation.title}'."
-      end
-    end
-    investigations = Investigation.all.select(&:can_view?)
-    respond_to do |format|
-      if investigations.blank?
-        flash.now[:notice] = "No #{t('investigation')} available, you have to create a new one before creating your Study!"
-      end
-      format.html
-    end
-  end
-
   def edit
     @study = Study.find(params[:id])
     respond_to do |format|
@@ -86,7 +63,6 @@ class StudiesController < ApplicationController
 
   def show
     @study = Study.find(params[:id])
-    @study.create_from_asset = params[:create_from_asset]
 
     respond_to do |format|
       format.html
@@ -102,20 +78,10 @@ class StudiesController < ApplicationController
     update_relationships(@study, params)
     ### TO DO: what about validation of person responsible? is it already included (for json?)
     if @study.save
-      if @study.new_link_from_assay == 'true'
-        render partial: 'assets/back_to_singleselect_parent', locals: { child: @study, parent: 'assay' }
-      else
-        respond_to do |format|
-          flash[:notice] = "The #{t('study')} was successfully created.<br/>".html_safe
-          if @study.create_from_asset == 'true'
-            flash.now[:notice] << "Now you can create new #{t('assays.assay')} by clicking -Add an #{t('assays.assay')}- button".html_safe
-            format.html { redirect_to study_path(id: @study, create_from_asset: @study.create_from_asset) }
-            format.json {render json: @study}
-          else
-            format.html { redirect_to study_path(@study) }
-            format.json {render json: @study}
-          end
-        end
+      respond_to do |format|
+        flash[:notice] = "The #{t('study')} was successfully created.<br/>".html_safe
+        format.html { redirect_to study_path(@study) }
+        format.json { render json: @study }
       end
     else
       respond_to do |format|
@@ -164,7 +130,6 @@ class StudiesController < ApplicationController
 
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
-                                  :other_creators, :create_from_asset, :new_link_from_assay, { creator_ids: [] },
-                                  { scales: [] }, { publication_ids: [] })
+                                  :other_creators, { creator_ids: [] }, { scales: [] }, { publication_ids: [] })
   end
 end

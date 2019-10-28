@@ -808,3 +808,11 @@ span.required, label.required::after {
 #null_license img {
   padding-right:1em;
 }
+
+.my-items-delete-btn {
+  display: none;
+}
+
+#my-items .my-items-delete-btn {
+  display: inline-block;
+}
