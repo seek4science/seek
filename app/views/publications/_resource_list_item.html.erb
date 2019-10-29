@@ -1,13 +1,30 @@
+<%
+  if resource.publication_type_id == 0 || resource.publication_type_id.nil?
+    resource.publication_type_id = PublicationType.Journal.id
+  end
+    publication_type = PublicationType.find(resource.publication_type_id) unless resource.publication_type_id == 0 && resource.publication_type_id.nil?
+
+%>
+
 <div class="list_item_desc"><%= list_item_expandable_text "Abstract", h(resource.abstract) %></div>
 
 <p class="list_item_attribute">
-  <%= list_item_author_list(resource.publication_authors) %>
+  <% if resource.publication_authors.size == 0 %>
+  <%= list_item_attribute "Editor", h(resource.editor)%>
+ <% else %>
+    <%= list_item_author_list(resource.publication_authors) %>
+  <% end %>
 </p>
 
 <div class="row">
   <div class="col-sm-6">
     <%= list_item_attribute "Date Published", date_as_string(resource.published_date,false,true) %>
-    <%= list_item_optional_attribute publication_type_text(resource.publication_type), h(resource.journal) %>
+
+    <% if publication_type.is_incollection? || publication_type.is_inbook? || publication_type.is_inproceedings? %>
+      <%= list_item_optional_attribute PublicationType.find(resource.publication_type_id).title, h(resource.booktitle) %>
+    <% else %>
+      <%= list_item_optional_attribute PublicationType.find(resource.publication_type_id).title, h(resource.journal) %>
+    <% end %>
   </div>
 
   <div class="col-sm-6 hidden-xs">

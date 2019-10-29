@@ -1,7 +1,7 @@
 <% filter_hash = { filter: @filters }
    visible_total ||= nil
    see_all_text = 'See all'
-   authorized = controller_name.classify.constantize.authorization_supported?
+   authorized = controller_model.authorization_supported?
    see_all_text << " #{visible_total} #{'visible' if authorized} items" unless visible_total.nil?
 %>
 

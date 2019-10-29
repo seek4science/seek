@@ -17,7 +17,7 @@ class Permission < ApplicationRecord
     unless (saved_changes.keys - ["updated_at"]).empty?
       assets = policy.assets
       assets = assets | (Policy.find_by_id(policy_id_before_last_save).try(:assets) || []) unless policy_id_before_last_save.blank?
-      AuthLookupUpdateJob.new.add_items_to_queue assets.compact
+      AuthLookupUpdateQueue.enqueue(assets.compact)
     end
   end
 

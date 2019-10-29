@@ -61,6 +61,7 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
+    Seek::Config.filtering_enabled = string_to_boolean params[:filtering_enabled]
     Seek::Config.jws_enabled = string_to_boolean params[:jws_enabled]
     Seek::Config.jws_online_root = params[:jws_online_root]
 
@@ -185,14 +186,15 @@ class AdminController < ApplicationController
   end
 
   def update_pagination
-    update_flag = true
     %w[people projects projects programmes institutions investigations
         studies assays data_files models sops publications presentations events documents].each do |type|
-      Seek::Config.set_default_page type, params[type.to_sym]
+      Seek::Config.set_sorting_for(type, params[:sorting][type])
+      Seek::Config.set_results_per_page_for(type, params[:results_per_page][type])
     end
 
-    Seek::Config.limit_latest = params[:limit_latest] if only_positive_integer params[:limit_latest], 'latest limit'
-    update_redirect_to (only_positive_integer params[:limit_latest], 'latest limit'), 'pagination'
+    valid = only_positive_integer(params[:results_per_page_default], 'default items per page')
+    Seek::Config.results_per_page_default = params[:results_per_page_default] if valid
+    update_redirect_to(valid, 'pagination')
   end
 
   def update_settings

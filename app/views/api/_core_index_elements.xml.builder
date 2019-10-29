@@ -2,13 +2,13 @@ parent_xml.parameters do
   parent_xml.page params[:page]
 end
 
-@hidden ||= 0
-@total_count ||= (items.any? ? items.first.class.count : 0)
+@visible_count ||= (items.any? ? items.first.class.count : 0)
+@total_count ||= @visible_count
 
 parent_xml.statistics do
-  parent_xml.total @total_count
+  parent_xml.total @visible_count
   parent_xml.total_displayed items.size
-  parent_xml.hidden @hidden
+  parent_xml.hidden (@total_count - @visible_count)
   if items.is_a?(Seek::GroupedPagination::Collection)
     pages = items.pages + ["top","all"]
     parent_xml.pages pages.join(", ")

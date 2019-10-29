@@ -2,9 +2,15 @@
 <%= error_messages_for('publication', :message => nil) %>
 
 <%= form_for @publication do |f| %>
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => Seek::Config.is_virtualliver } %>
 
-    <% if @publication.pubmed_id.nil? && @publication.doi %>
+<!--  when registered manually or from bibtex file -->
+    <%#if @publication.registered_mode == 3 || @publication.registered_mode == 4 %>
+      <%= render :partial => 'publicaiton_editor', :locals => { :publication_form => f }%>
+    <%# end %>
+
+  <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => Seek::Config.is_virtualliver } %>
+
+
         <div class="form-group">
           <label>Abstract</label>
           <p class="help-block">
@@ -13,7 +19,6 @@
           </p>
           <%= text_area(:publication, :abstract, :cols => 90, :rows => 8, :class => 'form-control') %>
         </div>
-    <% end %>
 
     <%= render partial: 'associate_authors_form', locals: { publication: @publication, f: f } %>
 

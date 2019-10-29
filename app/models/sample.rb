@@ -1,6 +1,4 @@
 class Sample < ApplicationRecord
-
-
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
 
@@ -65,7 +63,11 @@ class Sample < ApplicationRecord
   end
 
   def related_samples
-    linked_samples + linking_samples
+    Sample.where(id: related_sample_ids)
+  end
+
+  def related_sample_ids
+    linked_sample_ids | linking_sample_ids
   end
 
   # Mass assignment of attributes
@@ -151,7 +153,11 @@ class Sample < ApplicationRecord
   end
 
   def related_organisms
-    organisms | ncbi_linked_organisms
+    Organism.where(id: related_organism_ids)
+  end
+
+  def related_organism_ids
+    organism_ids | ncbi_linked_organisms.map(&:id)
   end
 
   private

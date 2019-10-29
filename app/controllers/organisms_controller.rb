@@ -27,21 +27,6 @@ class OrganismsController < ApplicationController
     end
   end
 
-  def index
-    if request.format.html?
-      super
-    else
-      respond_to do |format|
-        format.xml
-        format.json {render json: @organisms,
-                            each_serializer: SkeletonSerializer,
-                            meta: {:base_url =>   Seek::Config.site_base_host,
-                                   :api_version => ActiveModel::Serializer.config.api_version
-        }}
-      end
-    end
-  end
-
   def visualise
     @no_sidebar=true
     respond_to do |format|

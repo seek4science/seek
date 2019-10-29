@@ -19,7 +19,6 @@ SEEK::Application.configure do
       Settings.defaults[:workflows_enabled] = true
 
       Settings.defaults[:email_enabled] = true
-      Settings.defaults[:solr_enabled] = false
 
       Settings.defaults[:publish_button_enabled] = true
       Settings.defaults[:auth_lookup_enabled] = false
@@ -77,6 +76,8 @@ SEEK::Application.configure do
       #enable solr for testing, but use mockup sunspot session
       Settings.defaults[:solr_enabled] = true
       Sunspot.session = SunspotMatchers::SunspotSessionSpy.new(Sunspot.session)
+
+      Settings.defaults[:filtering_enabled] = true
 
       Settings.defaults[:imprint_enabled]= false
       Settings.defaults[:imprint_description]= 'Here is imprint example'

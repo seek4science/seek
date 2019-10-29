@@ -201,10 +201,7 @@ class DataFilesController < ApplicationController
     scope = scope.joins(:projects).where(projects: { id: current_user.person.projects }) unless (params[:all_projects] == 'true')
     scope = scope.where(simulation_data: true) if (params[:simulation_data] == 'true')
     scope = scope.with_extracted_samples if (params[:with_samples] == 'true')
-
-    @data_files = DataFile.authorize_asset_collection(
-      scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").distinct, 'view'
-    ).first(20)
+    @data_files = scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").distinct.authorized_for('view').first(20)
 
     respond_to do |format|
       format.html { render partial: 'data_files/association_preview', collection: @data_files, locals: { hide_sample_count: !params[:with_samples] } }

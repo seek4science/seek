@@ -13,12 +13,15 @@
       <div class="col-md-8 col-md-pull-4">
         <% unless publication.publication_authors.empty? %>
           <div class="form-horizontal">
-            <% publication.publication_authors.each do |author| %>
+            <% publication.publication_authors.each_with_index do |author,index| %>
+
               <%= f.fields_for(:publication_authors, author) do |author_fields| %>
                 <div class="form-group">
-                  <label class="control-label col-sm-4">
+                  <label id = "author-<%= index %>" class="control-label col-sm-4">
                     <%= author.first_name -%> <%= author.last_name -%>
                   </label>
+                  <input type="hidden" id = "publication_publication_authors_attributes_<%= index %>_person_first_name" name = "publication[publication_authors_attributes][<%= index %>][first_name]" value="<%= author.first_name -%>" >
+                  <input type="hidden" id = "publication_publication_authors_attributes_<%= index %>_person_last_name" name = "publication[publication_authors_attributes][<%= index %>][last_name]" value="<%= author.last_name -%>" >
                   <div class="col-sm-8">
                     <% options = author_to_person_options(author.person_id, author.suggested_person) %>
                     <%= author_fields.select :person_id, options, { include_blank: 'None' }, { class: 'form-control' } %>

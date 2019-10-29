@@ -96,4 +96,4 @@
 
 <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                     select_id: '#assay_study_id',
-                                                                    parents: Study.all_authorized_for(:edit) } %>
+                                                                    parents: Study.authorized_for('edit') } %>

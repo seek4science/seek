@@ -4,12 +4,7 @@ div.exhibit-viewPanel {
     text-align: center;
 }
 
-div.faceted_browsing {
-    width: 99%;
-    margin-left: 1em;
-    margin-right: 1em;
-    margin-top: 2em;
-}
+div.faceted_browsing { }
 
 div.ajax_loading {
     display:none;

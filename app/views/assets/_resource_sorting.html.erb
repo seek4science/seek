@@ -1,12 +1,11 @@
 <% options = Seek::ListSorter.options_for_select(controller_name.classify) %>
-<% selected = items.order.first %>
-<% url_template = url_for(page_and_sort_params.merge(order: '_order_')) %>
+<% url_template = url_for(page_and_sort_params.merge(page: nil, order: '_order_')) %>
 
 <form class="form-inline pull-right">
   <div class="form-group">
     <div class="input-group">
-      <span class="input-group-addon"><i title="Sort by" class="glyphicon glyphicon-sort"aria-hidden="true"></i></span>
-      <%= select_tag(:index_sort_order, options_for_select(options, selected),
+      <span class="input-group-addon"><i title="Sort by" class="glyphicon glyphicon-sort" aria-hidden="true"></i></span>
+      <%= select_tag(:index_sort_order, options_for_select(options, @order.first),
                      data: { url: url_template },
                      autocomplete: 'off',
                      class: 'form-control')

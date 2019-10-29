@@ -247,21 +247,18 @@ class ConfigTest < ActiveSupport::TestCase
   test 'header_image_title' do
     assert_equal 'SysMO-DB', Seek::Config.header_image_title
   end
-  # pagination
-  test 'default page' do
-    assert_equal 'top', Seek::Config.default_page('sops')
-  end
 
-  test 'change default page' do
-    assert_equal 'top', Seek::Config.default_page('models')
-    Seek::Config.set_default_page 'models', 'all'
-    assert_equal 'all', Seek::Config.default_page('models')
+  test 'change default sorting' do
+    assert_nil Seek::Config.sorting_for('models')
+    Seek::Config.set_sorting_for 'models', 'created_at_asc'
+    assert_equal :created_at_asc, Seek::Config.sorting_for('models')
     # seem to have to put it back else other tests fail later:
-    Seek::Config.set_default_page 'models', 'top'
+    Seek::Config.set_sorting_for('models', nil)
+    assert_nil Seek::Config.sorting_for('models')
   end
 
-  test 'limit_latest' do
-    assert_equal 7, Seek::Config.limit_latest
+  test 'results_per_page_default' do
+    assert_equal 7, Seek::Config.results_per_page_default
   end
   # others
   test 'type_managers' do
@@ -325,8 +322,8 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'convert setting from database' do
-    Settings.global.set('limit_latest', '6')
-    assert_equal 6, Seek::Config.limit_latest
+    Settings.global.set('results_per_page_default', '6')
+    assert_equal 6, Seek::Config.results_per_page_default
   end
 
   test 'default associated projects access permission is accessible' do
