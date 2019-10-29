@@ -209,6 +209,7 @@ class Publication < ApplicationRecord
       self.pubmed_id = bibtex_record[:pubmed_id].try(:to_s)
       self.booktitle = bibtex_record[:booktitle].try(:to_s)
       self.publisher = bibtex_record[:publisher].try(:to_s)
+      self.editor = bibtex_record[:editors].try(:to_s)
 
       unless bibtex_record[:author].nil?
         plain_authors = bibtex_record[:author].split(' and ') # by bibtex definition
