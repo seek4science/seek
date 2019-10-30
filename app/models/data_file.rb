@@ -33,20 +33,12 @@ class DataFile < ApplicationRecord
 
   has_filter assay_type: Seek::Filtering::Filter.new(
       value_field: 'assays.assay_type_uri',
-      label_mapping: ->(values) {
-        values.map do |value|
-          value = RDF::URI(value)
-          Seek::Ontologies::AssayTypeReader.instance.fetch_label_for(value) ||
-              Seek::Ontologies::ModellingAnalysisTypeReader.instance.fetch_label_for(value)
-        end
-      },
+      label_mapping: Seek::Filterer::MAPPINGS[:assay_type_label],
       joins: [:assays]
   )
   has_filter technology_type: Seek::Filtering::Filter.new(
       value_field: 'assays.technology_type_uri',
-      label_mapping: ->(values) {
-        values.map { |value| Seek::Ontologies::TechnologyTypeReader.instance.fetch_label_for(RDF::URI(value)) }
-      },
+      label_mapping: Seek::Filterer::MAPPINGS[:technology_type_label],
       joins: [:assays]
   )
 

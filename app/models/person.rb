@@ -55,6 +55,7 @@ class Person < ApplicationRecord
   has_many :institutions, -> { distinct }, through: :work_groups
   has_filter location: Seek::Filtering::Filter.new(
       value_field: 'institutions.country',
+      label_mapping: Seek::Filterer::MAPPINGS[:country_name],
       joins: [:institutions]
   )
 

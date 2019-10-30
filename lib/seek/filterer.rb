@@ -13,7 +13,17 @@ module Seek
         person_name: ->(ids) do
           people = Person.select(:id, :first_name, :last_name).where(id: ids).to_a
           ids.map { |v| (people.detect { |p| p.id == v })&.name }
-        end
+        end,
+        assay_type_label:->(uris) {
+          uris.map do |uri|
+            Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri[uri]&.label ||
+                Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[uri]&.label
+          end
+        },
+        technology_type_label: ->(uris) {
+          uris.map { |uri| Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_uri[uri]&.label }
+        },
+        country_name: ->(codes) { codes.map { |code| CountryCodes.country(code) } }
     }.freeze
 
     # Pre-defined filters that may or may not be re-used for multiple types.
@@ -50,25 +60,19 @@ module Seek
         ),
         assay_type: Seek::Filtering::Filter.new(
             value_field: 'assay_type_uri',
-            label_mapping: ->(values) {
-              values.map do |value|
-                Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri[value]&.label ||
-                    Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[value]&.label
-              end
-            }
+            label_mapping: MAPPINGS[:assay_type_label]
         ),
         technology_type: Seek::Filtering::Filter.new(
             value_field: 'technology_type_uri',
-            label_mapping: ->(values) {
-              values.map { |value| Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_uri[value]&.label }
-            }
+            label_mapping: MAPPINGS[:technology_type_label]
         ),
         tag: Seek::Filtering::Filter.new(
             value_field: 'text_values.text',
             joins: [:tags_as_text]
         ),
         country: Seek::Filtering::Filter.new(
-            value_field: 'country'
+            value_field: 'country',
+            label_mapping: MAPPINGS[:country_name]
         ),
         organism: Seek::Filtering::Filter.new(
             value_field: 'organisms.id',

@@ -22,20 +22,12 @@ class Sop < ApplicationRecord
 
   has_filter assay_type: Seek::Filtering::Filter.new(
       value_field: 'assays.assay_type_uri',
-      label_mapping: ->(values) {
-        values.map do |value|
-          value = RDF::URI(value)
-          Seek::Ontologies::AssayTypeReader.instance.fetch_label_for(value) ||
-              Seek::Ontologies::ModellingAnalysisTypeReader.instance.fetch_label_for(value)
-        end
-      },
+      label_mapping: Seek::Filterer::MAPPINGS[:assay_type_label],
       joins: [:assays]
   )
   has_filter technology_type: Seek::Filtering::Filter.new(
       value_field: 'assays.technology_type_uri',
-      label_mapping: ->(values) {
-        values.map { |value| Seek::Ontologies::TechnologyTypeReader.instance.fetch_label_for(RDF::URI(value)) }
-      },
+      label_mapping: Seek::Filterer::MAPPINGS[:technology_type_label],
       joins: [:assays]
   )
 
@@ -48,7 +40,7 @@ class Sop < ApplicationRecord
             :primary_key => :sop_id, :foreign_key => :asset_id
     has_many :experimental_conditions, -> (r) { where('experimental_conditions.sop_version =?', r.version) },
         :primary_key => "sop_id", :foreign_key => "sop_id"
-    
+
   end
 
   def organism_title
