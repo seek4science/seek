@@ -163,7 +163,7 @@ group :test do
   gem 'minitest', '5.10.3'
   gem 'minitest-reporters'
   gem 'sunspot_matchers'
-  gem 'database_cleaner'
+  gem 'database_cleaner', '~> 1.7.0'
   gem 'vcr', '~> 2.9'
   gem 'rails-controller-testing'
   gem 'simplecov'
@@ -174,4 +174,5 @@ group :test, :development do
   gem 'webmock'
   gem 'teaspoon'
   gem 'teaspoon-mocha'
+  gem 'puma'
 end

@@ -195,7 +195,7 @@ GEM
       csl (~> 1.0)
     curb (0.9.3)
     daemons (1.1.9)
-    database_cleaner (1.5.3)
+    database_cleaner (1.7.0)
     delayed_job (4.1.5)
       activesupport (>= 3.0, < 5.3)
     delayed_job_active_record (4.1.3)
@@ -838,7 +838,7 @@ DEPENDENCIES
   country_select
   csl-styles (~> 1.0.1.7)
   daemons
-  database_cleaner
+  database_cleaner (~> 1.7.0)
   delayed_job_active_record
   docsplit
   doi_query_tool!
@@ -946,4 +946,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.17.3
+   2.0.2
