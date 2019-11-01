@@ -125,6 +125,8 @@ gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'activerecord-import'
 
+gem 'puma' # Used for docker, and also teaspoon tests
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do
@@ -141,7 +143,6 @@ end
 
 group :production do
   gem 'passenger'
-  gem 'puma'
 end
 
 group :development do
@@ -174,5 +175,4 @@ group :test, :development do
   gem 'webmock'
   gem 'teaspoon'
   gem 'teaspoon-mocha'
-  gem 'puma'
 end
