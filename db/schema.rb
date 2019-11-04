@@ -624,6 +624,25 @@ ActiveRecord::Schema.define(version: 2019_09_13_105005) do
     t.datetime "updated_at"
   end
 
+  create_table "identities", id: :integer,  force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "provider"
+    t.string "uid"
+    t.string "token"
+    t.integer "expires_at"
+    t.boolean "expires"
+    t.integer "user_id"
+    t.index ["email"], name: "index_identities_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_identities_on_reset_password_token", unique: true
+    t.index ["user_id"], name: "index_user_id"
+  end
+
   create_table "institutions", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.text "address", limit: 16777215

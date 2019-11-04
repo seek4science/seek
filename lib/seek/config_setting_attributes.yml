@@ -187,6 +187,7 @@ nels_permalink_base:
 nels_use_dummy_client:
 allow_private_address_access:
 session_store_timeout:
+elixir_aai_client_id:
 filtering_enabled:
 sorting:
 results_per_page_default:

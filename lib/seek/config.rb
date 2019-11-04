@@ -157,6 +157,11 @@ module Seek
       File.join(dir, 'key')
     end
 
+    def elixir_aai_secret_path
+      dir = append_filestore_path 'elixir_aai'
+      File.join(dir, 'secret')
+    end
+
     def attr_encrypted_key
       if File.exist?(attr_encrypted_key_path)
         File.binread(attr_encrypted_key_path)[0..31]
@@ -172,6 +177,20 @@ module Seek
       else
         write_secret_key_base
         secret_key_base
+      end
+    end
+
+    def elixir_aai_secret
+      if File.exists?(elixir_aai_secret_path)
+        File.read(elixir_aai_secret_path)
+      else
+        ''
+      end
+    end
+
+    def elixir_aai_secret=(secret)
+      File.open(elixir_aai_secret_path, 'wb') do |f|
+        f << secret
       end
     end
 

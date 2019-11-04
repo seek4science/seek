@@ -42,6 +42,19 @@ class PeopleController < ApplicationController
     end
   end
 
+  def current
+    respond_to do |format|
+      format.json {
+        if logged_in?
+          render json: current_user.person
+        else
+          render json: { errors: [{ title: 'Not found'}] ,
+                            status: :not_found }
+        end
+      }
+    end
+  end
+
   # GET /people/new
   # GET /people/new.xml
   def new

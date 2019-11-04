@@ -9,7 +9,7 @@
       <p class="form-control-static"><%= @user.login %></p>
     </div>
 
-    <h3>Change password</h3>
+     <h3>Change password</h3>
     <%= form_for @user do |f| -%>
         <%= f.error_messages %>
 
@@ -26,5 +26,7 @@
 
         <%= submit_tag 'Update', data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
     <% end -%>
+
+
 <% end %>
 

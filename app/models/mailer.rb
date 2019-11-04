@@ -1,5 +1,7 @@
 class Mailer < ActionMailer::Base
 
+  require 'yaml'
+
   def feedback(user, topic, details, send_anonymously)
     @anon = send_anonymously
     @anon = true if user.try(:person).nil?
@@ -22,6 +24,13 @@ class Mailer < ActionMailer::Base
          to: [uploader.person.email_with_name, receiver.email_with_name],
          subject: "#{Seek::Config.application_name} - File Upload",
          reply_to: uploader.person.email_with_name)
+  end
+
+  def omniauth_failed_login(auth_string)
+    @auth_string = auth_string
+    mail(from: Seek::Config.noreply_sender,
+         to: admin_emails,
+         subject: "#{Seek::Config.application_name} - Omniauth failure")
   end
 
   def request_publishing(owner, publisher, resources)

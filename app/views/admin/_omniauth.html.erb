@@ -6,7 +6,10 @@
                              "Omniauth user creation on login", "When a user logs in through an omniauth provider and does not exist as a seek user, they will be created with the information given by the provider."
                              ) %>
 
-  <%= admin_checkbox_setting(:omniauth_user_activate, 1, Seek::Config.omniauth_user_activate,
-                             "Omniauth user activation on login", "The user created through login by omniauth is also activated."
-                             ) %>
+  <%= admin_text_setting(:elixir_aai_client_id, Seek::Config.elixir_aai_client_id,
+                         'ELIXIR AAI Client ID', 'The client id provided by ELIXIR AAI for your installation') %>
+
+  <%= admin_password_setting(:elixir_aai_secret, Seek::Config.elixir_aai_secret,
+                         'ELIXIR AAI Secret', 'The secret key provided by ELIXIR AAI for your installation') %>
+
 </div>

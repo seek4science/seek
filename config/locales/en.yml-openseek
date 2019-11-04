@@ -4,6 +4,10 @@ en:
   search_prompt: "Search here..."
   seek_id: "SEEK ID"
 
+  login:
+    elixir_aai: 'ELIXIR AAI'
+    ldap: 'LDAP'
+
   investigation: "Investigation"
   study: "Study"
   assay: "Assay"

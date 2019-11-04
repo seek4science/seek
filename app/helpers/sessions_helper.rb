@@ -31,4 +31,12 @@ module SessionsHelper
   def logged_in_and_member?
     User.logged_in_and_member?
   end
+
+  def show_omniauth_login?
+    Seek::Config.omniauth_enabled && Devise.omniauth_providers.any?
+  end
+
+  def show_elixir_login?
+    Seek::Config.elixir_aai_client_id.present? && Seek::Config.elixir_aai_secret.present?
+  end
 end

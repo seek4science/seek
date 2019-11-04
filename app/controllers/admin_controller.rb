@@ -58,7 +58,8 @@ class AdminController < ApplicationController
 
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
-    Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
+    Seek::Config.elixir_aai_client_id = params[:elixir_aai_client_id]
+    Seek::Config.elixir_aai_secret = params[:elixir_aai_secret]
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
     Seek::Config.filtering_enabled = string_to_boolean params[:filtering_enabled]
