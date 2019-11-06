@@ -9,7 +9,7 @@ Devise.setup do |config|
   # Devise will use the `secret_key_base` as its `secret_key`
   # by default. You can change it below and use your own secret key.
   # config.secret_key = '966a571571907b0883a0266bc69cbddedbb474c66ff9f752c41ffd825ac1d6e6f5ab83b983a7e854172e4d2227cefaf992a435166d67962f553c6b82a7f5e082'
-  
+
   # ==> Controller configuration
   # Configure the parent class to the devise controllers.
   # config.parent_controller = 'DeviseController'
@@ -253,9 +253,6 @@ Devise.setup do |config|
   # The default HTTP method used to sign out a resource. Default is :delete.
   config.sign_out_via = :delete
 
-  # This is hackery because of a race condition
-  secrets = YAML::load(ERB.new(File.read("#{Rails.root}/config/secrets.yml")).result)[Rails.env]
-
   # ==> OmniAuth
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
@@ -270,8 +267,8 @@ Devise.setup do |config|
       client_signing_alg: :RS256,
       client_jwk_signing_key: '{"keys":[{"kty":"RSA","e":"AQAB","kid":"rsa1","alg":"RS256","n":"uVHPfUHVEzpgOnDNi3e2pVsbK1hsINsTy_1mMT7sxDyP-1eQSjzYsGSUJ3GHq9LhiVndpwV8y7Enjdj0purywtwk_D8z9IIN36RJAh1yhFfbyhLPEZlCDdzxas5Dku9k0GrxQuV6i30Mid8OgRQ2q3pmsks414Afy6xugC6u3inyjLzLPrhR0oRPTGdNMXJbGw4sVTjnh5AzTgX-GrQWBHSjI7rMTcvqbbl7M8OOhE3MQ_gfVLXwmwSIoKHODC0RO-XnVhqd7Qf0teS1JiILKYLl5FS_7Uy2ClVrAYd2T6X9DIr_JlpRkwSD899pq6PR9nhKguipJE0qUXxamdY9nw"}]}',
       client_options: {
-          identifier: secrets['elixir_aai']['client_id'],
-          secret: secrets['elixir_aai']['secret'],
+          identifier: Seek::Config.elixir_aai_client_id,
+          secret: Seek::Config.elixir_aai_secret,
           redirect_uri: 'http://localhost:3000/identities/auth/elixir_aai/callback',
           scheme: 'https',
           host: 'login.elixir-czech.org',
@@ -280,7 +277,14 @@ Devise.setup do |config|
           token_endpoint: '/oidc/token',
           userinfo_endpoint: '/oidc/userinfo',
           jwks_uri: '/oidc/jwk',
-      }
+      },
+      setup: lambda do |env|
+        env['omniauth.strategy'].options[:client_options].merge!(
+            identifier: Seek::Config.elixir_aai_client_id,
+            secret: Seek::Config.elixir_aai_secret,
+            redirect_uri: "#{Seek::Config.site_base_host.chomp('/')}/identities/auth/elixir_aai/callback"
+        )
+      end
   }
 
   # ==> Warden configuration
