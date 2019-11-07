@@ -1,7 +1,11 @@
 class Workflow < ApplicationRecord
-
   include Seek::Rdf::RdfGeneration
   include Seek::UploadHandling::ExamineUrl
+
+  belongs_to :workflow_class
+  has_filter workflow_type: Seek::Filtering::Filter.new(value_field: 'workflow_classes.key',
+                                               label_field: 'workflow_classes.title',
+                                               joins: [:workflow_class])
 
   acts_as_asset
 
@@ -13,8 +17,6 @@ class Workflow < ApplicationRecord
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   has_and_belongs_to_many :sops
-
-  belongs_to :workflow_class
 
   explicit_versioning(:version_column => "version") do
     acts_as_doi_mintable(proxy: :parent)
