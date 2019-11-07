@@ -41,6 +41,7 @@ taverna_paper_pubmed:
 
 no_publication_type:
   title: "An old publication without type"
+  publication_type_id: null
   journal: JOURNAL OF SCIENCE
   contributor: quentin_person
   published_date: <%= 2.days.ago.to_s :db %>

@@ -48,7 +48,7 @@ class Model < ApplicationRecord
       value_field: 'assays.assay_type_uri',
       label_mapping: ->(values) {
         values.map do |value|
-          Seek::Ontologies::ModellingAnalysisTypeReader.instance.fetch_label_for(RDF::URI(value))
+          Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[value]&.label
         end
       },
       joins: [:assays]
@@ -104,5 +104,5 @@ class Model < ApplicationRecord
   def check_for_sbml_format
     self.model_format = self.model_format
   end
-  
+
 end

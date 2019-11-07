@@ -178,8 +178,7 @@ class Publication < ApplicationRecord
   # @param doi_record DOI::Record
   # @see https://github.com/SysMO-DB/doi_query_tool/blob/master/lib/doi_record.rb
   def extract_doi_metadata(doi_record)
-    Rails.logger.debug("doi_record:")
-    Rails.logger.debug(doi_record)
+
     self.registered_mode = 2
     self.title = doi_record.title
     self.published_date = doi_record.date_published
@@ -208,6 +207,7 @@ class Publication < ApplicationRecord
       self.pubmed_id = bibtex_record[:pubmed_id].try(:to_s)
       self.booktitle = bibtex_record[:booktitle].try(:to_s)
       self.publisher = bibtex_record[:publisher].try(:to_s)
+      self.editor = bibtex_record[:editors].try(:to_s)
 
       unless bibtex_record[:author].nil?
         plain_authors = bibtex_record[:author].split(' and ') # by bibtex definition
@@ -278,7 +278,7 @@ class Publication < ApplicationRecord
   def generate_citation(bibtex_record)
     month = bibtex_record[:month].try(:to_s)
     year = bibtex_record[:year].try(:to_s)
-    page_or_pages = (bibtex_record[:pages].try(:to_s).match?(/[^0-9]/) ? "page".pluralize : "page" ) unless bibtex_record[:pages].nil?
+    page_or_pages = (bibtex_record[:pages].try(:to_s).match?(/[^0-9]/) ? "pp." : "p." ) unless bibtex_record[:pages].nil?
     pages = bibtex_record[:pages].try(:to_s)
     volume = bibtex_record[:volume].try(:to_s)
     series = bibtex_record[:series].try(:to_s)
@@ -297,10 +297,9 @@ class Publication < ApplicationRecord
     if publication_type.is_journal?
       self.citation = ''
       self.citation += self.journal.nil? ? '':self.journal
-      self.citation += volume.blank? ? '': ', volume '+ volume
+      self.citation += volume.blank? ? '': ' '+volume
       self.citation += number.nil? ? '' : '('+ number+')'
-      self.citation += pages.blank? ? '' : (', '+ page_or_pages + ' '+pages)
-      self.citation += self.editor.blank? ? '' : (', Eds: '+ self.editor)
+      self.citation += pages.blank? ? '' : (':'+pages)
       unless month.nil? && year.nil?
         self.citation += month.nil? ? ',' : (', '+ month.capitalize)
         self.citation += year.nil? ? '' : (' '+year)
@@ -339,7 +338,7 @@ class Publication < ApplicationRecord
       # InProceedings / InCollection
       self.citation = ''
       self.citation += self.booktitle.nil? ? '' : ('In '+ self.booktitle)
-      self.citation += volume.blank? ? '' : (', volume '+ volume)
+      self.citation += volume.blank? ? '' : (', vol. '+ volume)
       self.citation += series.blank? ? '' : (' of '+series)
       self.citation += pages.blank? ? '' : (', '+ page_or_pages + ' '+pages)
       self.citation += self.editor.blank? ? '' : (', Eds: '+ self.editor)
@@ -376,7 +375,7 @@ class Publication < ApplicationRecord
       # Book
       self.journal = self.title
       self.citation = ''
-      self.citation += volume.blank? ? '' : ('volume '+ volume)
+      self.citation += volume.blank? ? '' : ('vol. '+ volume)
       self.citation += series.blank? ? '' : (' of '+series)
       self.citation += self.publisher.blank? ? '' : (', '+ self.publisher)
       unless month.nil? && year.nil?

@@ -23,6 +23,7 @@ namespace :seek do
 
     convert_old_pagination_settings
     set_assay_and_technology_type_uris
+    db:seed:publication_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change

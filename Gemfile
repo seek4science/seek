@@ -127,6 +127,8 @@ gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'activerecord-import'
 
+gem 'puma' # Used for docker, and also teaspoon tests
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do
@@ -143,7 +145,6 @@ end
 
 group :production do
   gem 'passenger'
-  gem 'puma'
 end
 
 group :development do
@@ -165,7 +166,7 @@ group :test do
   gem 'minitest', '5.10.3'
   gem 'minitest-reporters'
   gem 'sunspot_matchers'
-  gem 'database_cleaner'
+  gem 'database_cleaner', '~> 1.7.0'
   gem 'vcr', '~> 2.9'
   gem 'rails-controller-testing'
   gem 'simplecov'

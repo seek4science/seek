@@ -519,10 +519,36 @@ class FilterTest < ActiveSupport::TestCase
     assert_equal 1, y1970_opt.count
   end
 
+  test 'filter should not return duplicates' do
+    institution1 = Factory(:institution, country: 'NZ')
+    institution2 = Factory(:institution, country: 'NZ')
+    institution3 = Factory(:institution, country: 'NZ')
+    project1 = Factory(:project)
+    project2 = Factory(:project)
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    person1.add_to_project_and_institution(project1, institution1)
+    person1.add_to_project_and_institution(project2, institution2)
+    person1.add_to_project_and_institution(project2, institution3)
+    person2.add_to_project_and_institution(project1, institution3)
+    person2.add_to_project_and_institution(project2, institution2)
+
+    people = Person.where(id: [person1.id, person2.id])
+
+    location_filter = Person.custom_filters[:location]
+
+    assert_includes_all location_filter.apply(people, ['NZ']).to_a, [person1, person2]
+    options = location_filter.options(people, [])
+    nz_opt = get_option(options, 'NZ')
+    refute nz_opt.active?
+    assert_equal 'New Zealand', nz_opt.label
+    assert_equal 2, nz_opt.count
+  end
+
   private
 
   def assert_includes_all(collection, things)
-    assert_equal collection.length, things.length
+    assert_equal things.length, collection.length
     things.each do |thing|
       assert_includes collection, thing
     end
