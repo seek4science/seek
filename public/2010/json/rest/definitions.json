@@ -5342,7 +5342,100 @@
               "$ref": "#/definitions/workflowType"
             },
             "attributes": {
-              "$ref": "#/definitions/contributedTypeAttributes"
+              "type": "object",
+              "properties": {
+                "tags": {
+                  "$ref": "#/definitions/tagsType"
+                },
+                "title": {
+                  "$ref": "#/definitions/nonEmptyString"
+                },
+                "description": {
+                  "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "workflow_class": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "$ref": "#/definitions/nonEmptyString"
+                    },
+                    "key": {
+                      "$ref": "#/definitions/nonEmptyString"
+                    },
+                    "description": {
+                      "$ref": "#/definitions/nullableNonEmptyString"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "key"
+                  ],
+                  "additionalProperties": false
+                },
+                "license": {
+                  "$ref": "#/definitions/nullableLicense"
+                },
+                "latest_version": {
+                  "type": "number"
+                },
+                "versions": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "properties": {
+                      "version": {
+                        "type": "number"
+                      },
+                      "revision_comments": {
+                        "$ref": "#/definitions/nullableNonEmptyString"
+                      },
+                      "url": {
+                        "$ref": "#/definitions/uriString"
+                      }
+                    },
+                    "required": [
+                      "version",
+                      "revision_comments",
+                      "url"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "version": {
+                  "type": "number"
+                },
+                "revision_comments": {
+                  "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "created_at": {
+                  "$ref": "#/definitions/dateTimeString"
+                },
+                "updated_at": {
+                  "$ref": "#/definitions/dateTimeString"
+                },
+                "content_blobs": {
+                  "$ref": "#/definitions/contentBlobsList"
+                },
+                "policy": {
+                  "$ref": "#/definitions/policy"
+                },
+                "other_creators": {
+                  "$ref": "#/definitions/nullableOtherCreatorsString"
+                }
+              },
+              "required": [
+                "title",
+                "workflow_class",
+                "license",
+                "latest_version",
+                "versions",
+                "version",
+                "created_at",
+                "updated_at",
+                "content_blobs"
+              ],
+              "additionalProperties": false
             },
             "relationships": {
               "type": "object",
@@ -5436,6 +5529,17 @@
                 "description": {
                   "$ref": "#/definitions/nullableNonEmptyString"
                 },
+                "workflow_class": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "$ref": "#/definitions/nonEmptyString"
+                    }
+                  },
+                  "required": [
+                    "key"
+                  ]
+                },
                 "license": {
                   "$ref": "#/definitions/nullableLicense"
                 },
@@ -5451,6 +5555,7 @@
               },
               "required": [
                 "title",
+                "workflow_class",
                 "content_blobs"
               ],
               "additionalProperties": false
@@ -5516,6 +5621,17 @@
                 },
                 "description": {
                   "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "workflow_class": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "$ref": "#/definitions/nonEmptyString"
+                    }
+                  },
+                  "required": [
+                    "key"
+                  ]
                 },
                 "license": {
                   "$ref": "#/definitions/nullableLicense"

@@ -7,6 +7,7 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
   def setup
     admin_login
     @clz = 'workflow'
+    Factory(:cwl_workflow_class) # Make sure the CWL class is present
     @plural_clz = @clz.pluralize
     @project = @current_user.person.projects.first
     investigation = Factory(:investigation, projects: [@project], contributor: @current_person)

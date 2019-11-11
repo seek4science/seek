@@ -91,7 +91,14 @@ module Seek
 
           assay_ids: ->(value) {
             value.map { |i| { assay_id: i } }
-          }
+          },
+
+          workflow_class: ->(value) {
+            if value && value[:key]
+              WorkflowClass.where(key: value[:key]).pluck(:id).first
+            end
+          },
+
       }
       CONVERSIONS[:default_policy] = CONVERSIONS[:policy]
       CONVERSIONS.freeze
@@ -110,6 +117,7 @@ module Seek
           environment: :recommended_environment_id,
           data_file_ids: :data_files_attributes,
           assay_ids: :assay_assets_attributes,
+          workflow_class: :workflow_class_id
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.
