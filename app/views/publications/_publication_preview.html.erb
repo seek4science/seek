@@ -12,13 +12,20 @@
 
     <%= list_item_simple_list(authors, "Author(s)") {|a| a.first_name + " " + a.last_name} -%>
 
-    <%= list_item_expandable_text "Abstract", h(publication.abstract) %>
+    <%= list_item_expandable_text "Abstract:", h(publication.abstract) %>
 
     <%= list_item_optional_attribute PublicationType.find(publication.publication_type_id).title, h(publication.journal) %>
 
     <%= list_item_attribute "Date Published", date_as_string(publication.published_date) %>
 
     <%= list_item_attribute "Citation", publication.citation%>
+
+    <%= list_item_attribute "Book title", publication.booktitle unless publication.booktitle.nil? %>
+  
+   <%= list_item_attribute "Editors", publication.editor unless publication.editor.nil? || publication.editor.empty? %>
+
+    <%= list_item_attribute "Publisher", publication.publisher unless publication.publisher.nil? %>
+
 <% end %>
 
 <%= form_for @publication do |f| %>
