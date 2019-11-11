@@ -1,0 +1,24 @@
+{
+  "data": {
+    "type": "workflows",
+    "attributes": {
+      "title": "A Minimal Workflow",
+      "content_blobs": [
+        {
+          "original_filename": "rp2-to-rp2path.cwl",
+          "content_type": "application/x-yaml"
+        }
+      ]
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      }
+    }
+  }
+}

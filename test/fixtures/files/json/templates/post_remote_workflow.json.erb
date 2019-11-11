@@ -1,0 +1,33 @@
+{
+  "data": {
+    "type": "workflows",
+    "attributes": {
+      "title": "A Remote Workflow",
+      "content_blobs": [
+        {
+          "url": "http://mockedlocation.com/workflow.cwl",
+          "original_filename": "workflow.cwl",
+          "content_type": "text/plain"
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= @creator.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      }
+    }
+  }
+}

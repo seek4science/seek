@@ -504,7 +504,8 @@
         "publications",
         "sample_types",
         "sops",
-        "studies"
+        "studies",
+        "workflows"
       ]
     },
     "permissionResource" : {
@@ -1196,6 +1197,25 @@
     "tagsType": {
       "$ref": "#/definitions/nullableNonEmptyStringList"
     },
+    "workflowType": {
+      "type": "string",
+      "minLength": 1,
+      "enum": [
+        "workflows"
+      ]
+    },
+    "workflowReferencesList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/workflowReferences"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "additionalProperties": false
+    },
     "anySkeleton": {
       "properties": {
         "id": {
@@ -1649,6 +1669,69 @@
       "uniqueItems": true,
       "items": {
         "$ref": "#/definitions/studyReference"
+      }
+    },
+    "workflowReferences": {
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/workflowReference"
+      }
+    },
+    "workflowReference": {
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/workflowType"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "workflowSkeleton": {
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/workflowType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links": {
+          "$ref": "#/definitions/linksType"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "attributes",
+        "links"
+      ],
+      "additionalProperties": false
+    },
+    "workflowSkeletons": {
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/workflowSkeleton"
       }
     },
     "searchResponse": {
@@ -5246,6 +5329,240 @@
       ],
       "additionalProperties": false
     },
+    "workflowResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/definitions/nonEmptyString"
+            },
+            "type": {
+              "$ref": "#/definitions/workflowType"
+            },
+            "attributes": {
+              "$ref": "#/definitions/contributedTypeAttributes"
+            },
+            "relationships": {
+              "type": "object",
+              "properties": {
+                "creators": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "submitter": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "people": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "projects": {
+                  "$ref": "#/definitions/projectReferencesList"
+                },
+                "investigations": {
+                  "$ref": "#/definitions/investigationReferencesList"
+                },
+                "studies": {
+                  "$ref": "#/definitions/studyReferencesList"
+                },
+                "assays": {
+                  "$ref": "#/definitions/assayReferencesList"
+                },
+                "publications": {
+                  "$ref": "#/definitions/publicationReferencesList"
+                },
+                "sops": {
+                  "$ref": "#/definitions/sopReferencesList"
+                }
+              },
+              "required": [
+                "creators",
+                "submitter",
+                "people",
+                "projects",
+                "investigations",
+                "studies",
+                "assays",
+                "publications",
+                "sops"
+              ],
+              "additionalProperties": false
+            },
+            "links": {
+              "$ref": "#/definitions/linksType"
+            },
+            "meta": {
+              "$ref": "#/definitions/metaType"
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "attributes",
+            "relationships",
+            "links",
+            "meta"
+          ],
+          "additionalProperties": false
+        },
+        "jsonapi": {
+          "$ref": "#/definitions/JsonApiVersion"
+        }
+      },
+      "required": [
+        "data",
+        "jsonapi"
+      ],
+      "additionalProperties": false
+    },
+    "workflowPost": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "$ref": "#/definitions/workflowType"
+            },
+            "attributes": {
+              "type": "object",
+              "properties": {
+                "tags": {
+                  "$ref": "#/definitions/nullableNonEmptyStringList"
+                },
+                "title": {
+                  "$ref": "#/definitions/nonEmptyString"
+                },
+                "description": {
+                  "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "license": {
+                  "$ref": "#/definitions/nullableLicense"
+                },
+                "policy": {
+                  "$ref": "#/definitions/policy"
+                },
+                "content_blobs": {
+                  "$ref": "#/definitions/contentBlobSlotsList"
+                },
+                "other_creators": {
+                  "$ref": "#/definitions/nullableOtherCreatorsString"
+                }
+              },
+              "required": [
+                "title",
+                "content_blobs"
+              ],
+              "additionalProperties": false
+            },
+            "relationships": {
+              "type": "object",
+              "properties": {
+                "creators": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "projects": {
+                  "$ref": "#/definitions/projectReferencesList"
+                },
+                "assays": {
+                  "$ref": "#/definitions/assayReferencesList"
+                },
+                "publications": {
+                  "$ref": "#/definitions/publicationReferencesList"
+                },
+                "sops": {
+                  "$ref": "#/definitions/sopReferencesList"
+                }
+              },
+              "required": [
+                "projects"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "type",
+            "attributes",
+            "relationships"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "workflowPatch": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/definitions/nonEmptyString"
+            },
+            "type": {
+              "$ref": "#/definitions/workflowType"
+            },
+            "attributes": {
+              "type": "object",
+              "properties": {
+                "tags": {
+                  "$ref": "#/definitions/nullableNonEmptyStringList"
+                },
+                "title": {
+                  "$ref": "#/definitions/nonEmptyString"
+                },
+                "description": {
+                  "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "license": {
+                  "$ref": "#/definitions/nullableLicense"
+                },
+                "policy": {
+                  "$ref": "#/definitions/policy"
+                },
+                "other_creators": {
+                  "$ref": "#/definitions/nullableOtherCreatorsString"
+                }
+              },
+              "additionalProperties": false
+            },
+            "relationships": {
+              "type": "object",
+              "properties": {
+                "creators": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "projects": {
+                  "$ref": "#/definitions/projectReferencesList"
+                },
+                "assays": {
+                  "$ref": "#/definitions/assayReferencesList"
+                },
+                "publications": {
+                  "$ref": "#/definitions/publicationReferencesList"
+                },
+                "sops": {
+                  "$ref": "#/definitions/sopReferencesList"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "id",
+            "type"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "additionalProperties": false
+    },
     "assaysResponse": {
       "type": "object",
       "properties": {
@@ -6156,6 +6473,29 @@
       "properties": {
         "data": {
           "$ref": "#/definitions/studySkeletons"
+        },
+        "jsonapi": {
+          "$ref": "#/definitions/JsonApiVersion"
+        },
+        "meta": {
+          "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
+        }
+      },
+      "required": [
+        "data",
+        "jsonapi",
+        "meta"
+      ],
+      "additionalProperties": false
+    },
+    "workflowsResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/workflowSkeletons"
         },
         "jsonapi": {
           "$ref": "#/definitions/JsonApiVersion"
