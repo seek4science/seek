@@ -10,15 +10,12 @@
   <p>
     Please try again later.
   </p>
-  <p class="text-right small">Error: <span id="error-message"/></p>
+  Error:
+  <pre id="error-message"></pre>
 </div>
 
-
-
 <script type="application/javascript">
-
     $j(document).ready(function () {
-
         $j.ajax({
             type: "POST",
             dataType: "html",
@@ -34,7 +31,5 @@
               window.location='<%= provide_metadata_workflows_path %>'
             }
         });
-
     })
-
 </script>

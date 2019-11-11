@@ -1,7 +1,5 @@
 class WorkflowsController < ApplicationController
-  
   include Seek::IndexPager
-
   include Seek::AssetsCommon
 
   # before_action Seek::Config.workflows_enabled
@@ -10,31 +8,25 @@ class WorkflowsController < ApplicationController
   before_action :find_display_asset, :only=>[:show, :download]
 
   include Seek::Publishing::PublishingCommon
-
   include Seek::BreadCrumbs
   include Seek::Doi::Minting
-
   include Seek::IsaGraphExtensions
 
   def new_version
     if handle_upload_data(true)
-      comments=params[:revision_comments]
-
-
+      comments = params[:revision_comments]
       respond_to do |format|
         if @workflow.save_as_new_version(comments)
-
           flash[:notice]="New version uploaded - now on version #{@workflow.version}"
         else
-          flash[:error]="Unable to save new version"          
+          flash[:error]="Unable to save new version"
         end
         format.html {redirect_to @workflow }
       end
     else
-      flash[:error]=flash.now[:error] 
+      flash[:error] = flash.now[:error]
       redirect_to @workflow
     end
-    
   end
 
   # PUT /Workflows/1
@@ -65,13 +57,12 @@ class WorkflowsController < ApplicationController
 
   def create_content_blob
     clear_session_info
-    session[:fred] = 'bob'
     @workflow = Workflow.new
     session[:workflow_class_id] = params[:workflow_class_id]
-     respond_to do |format|
+    respond_to do |format|
       if handle_upload_data && @workflow.content_blob.save
         session[:uploaded_content_blob_id] = @workflow.content_blob.id
-        format.html {}
+        format.html
       else
         session.delete(:uploaded_content_blob_id)
         format.html { render action: :new }
@@ -90,7 +81,7 @@ class WorkflowsController < ApplicationController
 
   # AJAX call to trigger metadata extraction, and pre-populate the associated @workflow
   def metadata_extraction_ajax
-    @workflow = Workflow.new
+    @workflow = Workflow.new(workflow_class_id: session[:workflow_class_id])
     @warnings = nil
     critical_error_msg = nil
     session.delete :extraction_exception_message
@@ -101,16 +92,15 @@ class WorkflowsController < ApplicationController
       if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
         @workflow.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
         retrieve_content @workflow.content_blob
-
-        workflow_class = WorkflowClass.find_by_id (session[:workflow_class_id])
-        metadata_name = "extract_#{workflow_class.key}_metadata"
+        metadata_name = "extract_#{@workflow.workflow_class.key}_metadata"
         if defined? metadata_name
           self.send(metadata_name, @workflow)
         end
       else
         critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
       end
-    rescue Exception => e
+    rescue StandardError => e
+      raise e unless Rails.env.production?
       Seek::Errors::ExceptionForwarder.send_notification(e, data:{message: "Problem attempting to extract metadata for content blob #{params[:content_blob_id]}"})
       session[:extraction_exception_message] = e.message
     end
@@ -128,7 +118,7 @@ class WorkflowsController < ApplicationController
 
   # Displays the form Wizard for providing the metadata for the workflow
   def provide_metadata
-    @workflow = Workflow.new()
+    @workflow = Workflow.new
 
     @warnings ||= session[:processing_warnings] || []
     @exception_message ||= session[:extraction_exception_message]
@@ -154,13 +144,11 @@ class WorkflowsController < ApplicationController
     @workflow.content_blob = blob
 
     # @workflow.workflow_class = WorkflowClass.find(session[:workflow_class_id])
-#    @workflow.metadata = params[:metadata] FIX ME!!
+    #    @workflow.metadata = params[:metadata] FIX ME!!
     all_valid = @workflow.save && blob.save
 
     if all_valid
-
       workflow_version = Workflow::Version.find_by workflow_id: @workflow.id, version: @workflow.version
-      workflow_version.workflow_class_id = session[:workflow_class_id]
       workflow_version.metadata = params[:metadata]
       workflow_version.save
 
@@ -175,10 +163,9 @@ class WorkflowsController < ApplicationController
       respond_to do |format|
         flash[:notice] = "#{t('workflow')} was successfully uploaded and saved." if flash.now[:notice].nil?
 
-         format.html { redirect_to workflow_path(@workflow) }
+        format.html { redirect_to workflow_path(@workflow) }
         format.json { render json: @workflow }
       end
-
     else
       @workflow.errors.add(:base, "The file uploaded doesn't match") unless uploaded_blob_matches
 
@@ -192,98 +179,73 @@ class WorkflowsController < ApplicationController
     end
   end
 
-
-
   private
 
   def workflow_params
     params.require(:workflow).permit(:title, :description, :workflow_class_id, # :metadata,
                                      { project_ids: [] }, :license, :other_creators,
-                                { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                { publication_ids: [] })
+                                     { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                                     { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
+                                     { publication_ids: [] })
   end
 
   alias_method :asset_params, :workflow_params
 
   def extract_CWL_metadata(w)
-   begin
-      @content_blob = w.content_blob
-      cwl_string = @content_blob.read
-      cwl = YAML.load(cwl_string)
-      if cwl.has_key? 'label'
-        session[:metadata][:title] = cwl['label']
-      else
-        flash[:warning] = 'Unable to determine title of workflow'
-      end
-      if cwl.has_key? 'doc'
-        session[:metadata][:description] = cwl['doc']
-      end
-    rescue Exception => e
-      session[:extraction_exception_message] = e.message
+    @content_blob = w.content_blob
+    cwl_string = @content_blob.read
+    cwl = YAML.load(cwl_string)
+    if cwl.has_key? 'label'
+      session[:metadata][:title] = cwl['label']
+    else
+      flash[:warning] = 'Unable to determine title of workflow'
     end
-
+    if cwl.has_key? 'doc'
+      session[:metadata][:description] = cwl['doc']
+    end
   end
 
   def extract_GALAXY_metadata(w)
-    begin
-      @content_blob = w.content_blob
-      galaxy_string = @content_blob.read
-      galaxy = JSON.parse(galaxy_string)
-      if galaxy.has_key? "name"
-        session[:metadata][:title] = galaxy["name"]
-      else
-        flash[:warning] = 'Unable to determine title of workflow'
-      end
-    rescue Exception => e
-      session[:extraction_exception_message] = e.message
+    @content_blob = w.content_blob
+    galaxy_string = @content_blob.read
+    galaxy = JSON.parse(galaxy_string)
+    if galaxy.has_key? "name"
+      session[:metadata][:title] = galaxy["name"]
+    else
+      flash[:warning] = 'Unable to determine title of workflow'
     end
-
   end
 
   def extract_KNIME_metadata(w)
-    begin
-      @content_blob = w.content_blob
-      knime_string = @content_blob.read
-      knime = LibXML::XML::Parser.string(knime_string).parse
-      knime.root.namespaces.default_prefix = 'k'
+    @content_blob = w.content_blob
+    knime_string = @content_blob.read
+    knime = LibXML::XML::Parser.string(knime_string).parse
+    knime.root.namespaces.default_prefix = 'k'
 
-      title = knime.find('/k:config/k:entry[not(@isnull="true")][@key="name"]/@value').first.value
-      if !title.nil?
-        session[:metadata][:title] = title.to_s
-      else
-        session[:metadata][:title] = "missing_title"
-        flash[:warning] = 'Unable to determine title of workflow'
-      end
-      description = knime.find('/k:config/k:entry[not(@isnull="true")][@key="customDescription"]/@value').first.value
-      if !description.nil?
-        session[:metadata][:description] = description
-      end
-    rescue Exception => e
-      session[:extraction_exception_message] = e.message
+    title = knime.find('/k:config/k:entry[not(@isnull="true")][@key="name"]/@value').first.value
+    if !title.nil?
+      session[:metadata][:title] = title.to_s
+    else
+      session[:metadata][:title] = "missing_title"
+      flash[:warning] = 'Unable to determine title of workflow'
     end
-
+    description = knime.find('/k:config/k:entry[not(@isnull="true")][@key="customDescription"]/@value').first.value
+    if !description.nil?
+      session[:metadata][:description] = description
+    end
   end
 
   def extract_RO_metadata(w)
-    begin
-      @content_blob = w.content_blob
-      ro_string = @content_blob.read
-      ro = JSON.parse(ro_string)
-      if ro.has_key? "name"
-        session[:metadata][:title] = ro["name"]
-      else
-        flash[:warning] = 'Unable to determine title of workflow'
-      end
-      if ro.has_key? "description"
-        session[:metadata][:description] = ro["description"]
-      end
-    rescue Exception => e
-      session[:extraction_exception_message] = e.message
+    @content_blob = w.content_blob
+    ro_string = @content_blob.read
+    ro = JSON.parse(ro_string)
+    if ro.has_key? "name"
+      session[:metadata][:title] = ro["name"]
+    else
+      flash[:warning] = 'Unable to determine title of workflow'
     end
-
+    if ro.has_key? "description"
+      session[:metadata][:description] = ro["description"]
+    end
   end
-
-
-
 end
