@@ -184,7 +184,7 @@ class WorkflowsController < ApplicationController
   def diagram
     respond_to do |format|
       format.html do
-        path = @workflow.diagram
+        path = @display_workflow.diagram
         send_file(path, type: 'image/png', disposition: 'inline')
         headers['Content-Length'] = File.size(path).to_s
       end

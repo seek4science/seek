@@ -28,6 +28,24 @@ class Workflow < ApplicationRecord
 
     serialize :metadata
 
+    belongs_to :workflow_class
+
+    def extractor_class
+      self.class.const_get("Seek::WorkflowExtractors::#{workflow_class.key}")
+    end
+
+    def extractor
+      extractor_class.new(content_blob)
+    end
+
+    def diagram
+      path = content_blob.filepath('diagram.png')
+      unless File.exist?(path)
+        File.binwrite(path, extractor.diagram)
+      end
+
+      path
+    end
   end
 
   def use_mime_type_for_avatar?
@@ -57,7 +75,7 @@ class Workflow < ApplicationRecord
   end
 
   def extractor
-    extractor_class.new(self.content_blob)
+    extractor_class.new(content_blob)
   end
 
   def diagram

@@ -8,7 +8,7 @@
     <%= item_description @display_workflow.description -%>
 
     <div class="workflow-diagram">
-      <%= image_tag(diagram_workflow_path) %>
+      <%= image_tag(diagram_workflow_path(@workflow, version: @display_workflow.version)) %>
     </div>
     <div class="row">
       <div class="col-md-6">
