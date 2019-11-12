@@ -576,6 +576,7 @@ SEEK::Application.routes.draw do
       get :isa_children
       get :manage
       patch :manage_update
+      get :diagram
     end
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end

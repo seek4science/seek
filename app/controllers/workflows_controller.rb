@@ -3,9 +3,9 @@ class WorkflowsController < ApplicationController
   include Seek::AssetsCommon
 
   # before_action Seek::Config.workflows_enabled
-  before_action :find_assets, :only => [ :index ]
-  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
-  before_action :find_display_asset, :only=>[:show, :download]
+  before_action :find_assets, only: [:index]
+  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_display_asset, only: [:show, :download, :diagram]
 
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
@@ -92,10 +92,12 @@ class WorkflowsController < ApplicationController
       if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
         @workflow.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
         retrieve_content @workflow.content_blob
-        metadata_name = "extract_#{@workflow.workflow_class.key}_metadata"
-        if defined? metadata_name
-          self.send(metadata_name, @workflow)
-        end
+        metadata = @workflow.extractor.metadata
+        errors = metadata.delete(:errors)
+        warnings = metadata.delete(:warnings)
+        flash[:error] = errors if errors.any?
+        flash[:warning] = warnings if warnings.any?
+        session[:metadata] = metadata
       else
         critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
       end
@@ -179,6 +181,16 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def diagram
+    respond_to do |format|
+      format.html do
+        path = @workflow.diagram
+        send_file(path, type: 'image/png', disposition: 'inline')
+        headers['Content-Length'] = File.size(path).to_s
+      end
+    end
+  end
+
   private
 
   def workflow_params
@@ -190,62 +202,4 @@ class WorkflowsController < ApplicationController
   end
 
   alias_method :asset_params, :workflow_params
-
-  def extract_CWL_metadata(w)
-    @content_blob = w.content_blob
-    cwl_string = @content_blob.read
-    cwl = YAML.load(cwl_string)
-    if cwl.has_key? 'label'
-      session[:metadata][:title] = cwl['label']
-    else
-      flash[:warning] = 'Unable to determine title of workflow'
-    end
-    if cwl.has_key? 'doc'
-      session[:metadata][:description] = cwl['doc']
-    end
-  end
-
-  def extract_GALAXY_metadata(w)
-    @content_blob = w.content_blob
-    galaxy_string = @content_blob.read
-    galaxy = JSON.parse(galaxy_string)
-    if galaxy.has_key? "name"
-      session[:metadata][:title] = galaxy["name"]
-    else
-      flash[:warning] = 'Unable to determine title of workflow'
-    end
-  end
-
-  def extract_KNIME_metadata(w)
-    @content_blob = w.content_blob
-    knime_string = @content_blob.read
-    knime = LibXML::XML::Parser.string(knime_string).parse
-    knime.root.namespaces.default_prefix = 'k'
-
-    title = knime.find('/k:config/k:entry[not(@isnull="true")][@key="name"]/@value').first.value
-    if !title.nil?
-      session[:metadata][:title] = title.to_s
-    else
-      session[:metadata][:title] = "missing_title"
-      flash[:warning] = 'Unable to determine title of workflow'
-    end
-    description = knime.find('/k:config/k:entry[not(@isnull="true")][@key="customDescription"]/@value').first.value
-    if !description.nil?
-      session[:metadata][:description] = description
-    end
-  end
-
-  def extract_RO_metadata(w)
-    @content_blob = w.content_blob
-    ro_string = @content_blob.read
-    ro = JSON.parse(ro_string)
-    if ro.has_key? "name"
-      session[:metadata][:title] = ro["name"]
-    else
-      flash[:warning] = 'Unable to determine title of workflow'
-    end
-    if ro.has_key? "description"
-      session[:metadata][:description] = ro["description"]
-    end
-  end
 end

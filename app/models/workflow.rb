@@ -51,4 +51,21 @@ class Workflow < ApplicationRecord
   def cwl_viewer_url
     return content_blob.url.sub('https://', 'https://view.commonwl.org/workflows/')
   end
+
+  def extractor_class
+    self.class.const_get("Seek::WorkflowExtractors::#{workflow_class.key}")
+  end
+
+  def extractor
+    extractor_class.new(self.content_blob)
+  end
+
+  def diagram
+    path = content_blob.filepath('diagram.png')
+    unless File.exist?(path)
+      File.binwrite(path, extractor.diagram)
+    end
+
+    path
+  end
 end

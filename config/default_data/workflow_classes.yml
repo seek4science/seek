@@ -6,7 +6,7 @@ cwl_workflow_class:
 galaxy_workflow_class:
   id: 2
   title: <%= I18n.t('workflows.galaxy_workflow') %>
-  key: GALAXY
+  key: Galaxy
 
 knime_workflow_class:
   id: 3
