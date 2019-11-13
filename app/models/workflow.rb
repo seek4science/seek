@@ -1,6 +1,7 @@
 class Workflow < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::UploadHandling::ExamineUrl
+  include WorkflowExtraction
 
   belongs_to :workflow_class
   has_filter workflow_type: Seek::Filtering::Filter.new(value_field: 'workflow_classes.key',
@@ -29,23 +30,7 @@ class Workflow < ApplicationRecord
     serialize :metadata
 
     belongs_to :workflow_class
-
-    def extractor_class
-      self.class.const_get("Seek::WorkflowExtractors::#{workflow_class.key}")
-    end
-
-    def extractor
-      extractor_class.new(content_blob)
-    end
-
-    def diagram
-      path = content_blob.filepath('diagram.png')
-      unless File.exist?(path)
-        File.binwrite(path, extractor.diagram)
-      end
-
-      path
-    end
+    include WorkflowExtraction
   end
 
   def use_mime_type_for_avatar?
@@ -68,22 +53,5 @@ class Workflow < ApplicationRecord
 
   def cwl_viewer_url
     return content_blob.url.sub('https://', 'https://view.commonwl.org/workflows/')
-  end
-
-  def extractor_class
-    self.class.const_get("Seek::WorkflowExtractors::#{workflow_class.key}")
-  end
-
-  def extractor
-    extractor_class.new(content_blob)
-  end
-
-  def diagram
-    path = content_blob.filepath('diagram.png')
-    unless File.exist?(path)
-      File.binwrite(path, extractor.diagram)
-    end
-
-    path
   end
 end

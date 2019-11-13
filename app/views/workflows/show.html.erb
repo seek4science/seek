@@ -7,9 +7,11 @@
   <div class="col-md-9 col-sm-8 box_about_actor">
     <%= item_description @display_workflow.description -%>
 
-    <div class="workflow-diagram">
-      <%= image_tag(diagram_workflow_path(@workflow, version: @display_workflow.version)) %>
-    </div>
+    <% if @display_workflow.diagram_available? %>
+      <div class="workflow-diagram">
+        <%= image_tag(diagram_workflow_path(@workflow, version: @display_workflow.version)) %>
+      </div>
+    <% end %>
     <div class="row">
       <div class="col-md-6">
         <%= persistent_resource_id(@display_workflow) %>

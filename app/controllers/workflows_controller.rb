@@ -48,29 +48,26 @@ class WorkflowsController < ApplicationController
   end
 
   def clear_session_info
-    session.delete(:workflow_class_id)
     session.delete(:uploaded_content_blob_id)
     session.delete(:metadata)
-    session.delete(:extraction_exception_message)
+    session.delete(:processing_errors)
     session.delete(:processing_warnings)
   end
 
   def create_content_blob
     clear_session_info
     @workflow = Workflow.new
-    session[:workflow_class_id] = params[:workflow_class_id]
     respond_to do |format|
       if handle_upload_data && @workflow.content_blob.save
         session[:uploaded_content_blob_id] = @workflow.content_blob.id
         format.html
       else
-        session.delete(:uploaded_content_blob_id)
         format.html { render action: :new }
       end
     end
   end
 
-  def retrieve_content (blob)
+  def retrieve_content(blob)
     if !blob.file_exists?
       if (caching_job = blob.caching_job).exists?
         caching_job.first.destroy
@@ -81,12 +78,9 @@ class WorkflowsController < ApplicationController
 
   # AJAX call to trigger metadata extraction, and pre-populate the associated @workflow
   def metadata_extraction_ajax
-    @workflow = Workflow.new(workflow_class_id: session[:workflow_class_id])
-    @warnings = nil
-    critical_error_msg = nil
-    session.delete :extraction_exception_message
-
+    @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
     session[:metadata] = {}
+    critical_error_msg = nil
 
     begin
       if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
@@ -95,19 +89,18 @@ class WorkflowsController < ApplicationController
         metadata = @workflow.extractor.metadata
         errors = metadata.delete(:errors)
         warnings = metadata.delete(:warnings)
-        flash[:error] = errors if errors.any?
-        flash[:warning] = warnings if warnings.any?
+        session[:processing_errors] = errors if errors.any?
+        session[:processing_warnings] = warnings if warnings.any?
         session[:metadata] = metadata
       else
         critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
       end
     rescue StandardError => e
       raise e unless Rails.env.production?
-      Seek::Errors::ExceptionForwarder.send_notification(e, data:{message: "Problem attempting to extract metadata for content blob #{params[:content_blob_id]}"})
-      session[:extraction_exception_message] = e.message
+      Seek::Errors::ExceptionForwarder.send_notification(e, data: {
+          message: "Problem attempting to extract metadata for content blob #{params[:content_blob_id]}" })
+      session[:processing_errors] = [e.message]
     end
-
-    session[:processing_warnings] = @warnings
 
     respond_to do |format|
       if critical_error_msg
@@ -120,10 +113,9 @@ class WorkflowsController < ApplicationController
 
   # Displays the form Wizard for providing the metadata for the workflow
   def provide_metadata
-    @workflow = Workflow.new
-
+    @workflow ||= Workflow.new(session[:metadata].merge(workflow_class_id: params[:workflow_class_id]))
     @warnings ||= session[:processing_warnings] || []
-    @exception_message ||= session[:extraction_exception_message]
+    @errors ||= session[:processing_errors] || []
 
     respond_to do |format|
       format.html
@@ -133,34 +125,22 @@ class WorkflowsController < ApplicationController
   # Receives the submitted metadata and registers the workflow
   def create_metadata
     @workflow = Workflow.new(workflow_params)
-
     update_sharing_policies(@workflow)
-
     filter_associated_projects(@workflow)
 
     # check the content blob id matches that previously uploaded and recorded on the session
-    all_valid = uploaded_blob_matches = (params[:content_blob_id].to_s == session[:uploaded_content_blob_id].to_s)
+    uploaded_blob_matches = (params[:content_blob_id].to_s == session[:uploaded_content_blob_id].to_s)
+    @workflow.errors.add(:base, "The file uploaded doesn't match") unless uploaded_blob_matches
 
     #associate the content blob with the workflow
     blob = ContentBlob.find(params[:content_blob_id])
     @workflow.content_blob = blob
 
-    # @workflow.workflow_class = WorkflowClass.find(session[:workflow_class_id])
-    #    @workflow.metadata = params[:metadata] FIX ME!!
-    all_valid = @workflow.save && blob.save
-
-    if all_valid
-      workflow_version = Workflow::Version.find_by workflow_id: @workflow.id, version: @workflow.version
-      workflow_version.metadata = params[:metadata]
-      workflow_version.save
-
+    if uploaded_blob_matches && @workflow.save && blob.save
       update_annotations(params[:tag_list], @workflow)
-
       update_relationships(@workflow, params)
 
-      session.delete(:uploaded_content_blob_id)
-      session.delete(:processed_workflow_id)
-      session.delete(:processed_warnings)
+      clear_session_info
 
       respond_to do |format|
         flash[:notice] = "#{t('workflow')} was successfully uploaded and saved." if flash.now[:notice].nil?
@@ -169,10 +149,6 @@ class WorkflowsController < ApplicationController
         format.json { render json: @workflow }
       end
     else
-      @workflow.errors.add(:base, "The file uploaded doesn't match") unless uploaded_blob_matches
-
-      @workflow.valid? if uploaded_blob_matches
-
       respond_to do |format|
         format.html do
           render :provide_metadata, status: :unprocessable_entity
@@ -185,8 +161,8 @@ class WorkflowsController < ApplicationController
     respond_to do |format|
       format.html do
         path = @display_workflow.diagram
-        send_file(path, type: 'image/png', disposition: 'inline')
-        headers['Content-Length'] = File.size(path).to_s
+        send_file(path, filename: "workflow-diagram-#{@workflow.id}-#{@display_workflow.version}.png",
+                  type: 'image/png', disposition: 'inline')
       end
     end
   end
