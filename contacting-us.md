@@ -31,7 +31,9 @@ For community related questions, you can use [community@fair-dom.org](mailto:com
 
 ## Reporting bugs and feature requests
 
-Please visit [Reporting Bugs and raising Feature Requests](/tech/reporting-bugs-and-features.html)
+Bugs and feature requests can be reported through [Github Issues](https://fair-dom.org/issues).
+
+For more details and guidelines please visit [Reporting Bugs and raising Feature Requests](/tech/reporting-bugs-and-features.html)
 
 
 

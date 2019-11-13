@@ -5,9 +5,9 @@ layout: page
 
 # Reporting Bugs and raising Feature Requests
 
-You can report bugs or request new features using the any of the [methods to contact us](/contacting-us.html). Preferably use our [Support Forum](http://fair-dom.org/support).
+You can report bugs or request new features using the any of the [methods to contact us](/contacting-us.html). Preferably submit a [Github issue](http://fair-dom.org/issues).
 
-Check our [JIRA Issue Tracker](http://fair-dom.org/issues) issue tracker in order to see if your planned contribution is new.
+First check [Existing Issues](http://fair-dom.org/issues) in order to see if your planned contribution is new.
 
 If you find a feature or bug has already been reported, please don't let this deter you from reporting it yourself. Doing so will help prioritise issues.
 
@@ -33,15 +33,6 @@ For complex requests it may be necessary to provide additional supplementary mat
 When raising a **bug** or problem, please provide any details that would help to reproduce it. An numbered list of steps is often the most useful. In some cases a screenshot may be helpful.
 
 
-## What happens next?
-
-Within **2 work days** you will receive a receipt, stating that and who will be processing your request.
-
-Within **7 work days** we will contact you to discuss the feature in more detail; whether it is something you can contribute and how we can help; or details about how the feature fits in with our other priorities and timeline.
-
-Usually, an issue will be raised in our [JIRA Issue Tracker](http://fair-dom.org/issues) and you will be provided with a link to follow its progress.
-
-If the feature gets developed by ourselves, we will keep in touch with you and ask for feedback and final testing.
 
 
 
