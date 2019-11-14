@@ -1,16 +1,8 @@
 module Seek
   module WorkflowExtractors
-    class KNIME
-      def initialize(io)
-        @io = io
-      end
-
-      def diagram
-        nil
-      end
-
+    class KNIME < Base
       def metadata
-        metadata = { warnings: [], errors: [] }
+        metadata = super
         knime_string = @io.read
         knime = LibXML::XML::Parser.string(knime_string).parse
         knime.root.namespaces.default_prefix = 'k'

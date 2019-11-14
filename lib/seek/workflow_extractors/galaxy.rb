@@ -1,16 +1,8 @@
 module Seek
   module WorkflowExtractors
-    class Galaxy
-      def initialize(io)
-        @io = io
-      end
-
-      def diagram
-        nil
-      end
-
+    class Galaxy < Base
       def metadata
-        metadata = { warnings: [], errors: [] }
+        metadata = super
         galaxy_string = @io.read
         galaxy = JSON.parse(galaxy_string)
         if galaxy.has_key? "name"

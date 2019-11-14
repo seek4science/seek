@@ -12,6 +12,10 @@ class WorkflowsController < ApplicationController
   include Seek::Doi::Minting
   include Seek::IsaGraphExtensions
 
+  rescue_from WorkflowDiagram::UnsupportedFormat do
+    head :not_acceptable
+  end
+
   def new_version
     if handle_upload_data(true)
       comments = params[:revision_comments]
@@ -158,11 +162,14 @@ class WorkflowsController < ApplicationController
   end
 
   def diagram
+    diagram_format = params.key?(:diagram_format) ? params[:diagram_format] : @workflow.default_diagram_format
+    @diagram = @workflow.diagram(diagram_format)
     respond_to do |format|
       format.html do
-        path = @display_workflow.diagram
-        send_file(path, filename: "workflow-diagram-#{@workflow.id}-#{@display_workflow.version}.png",
-                  type: 'image/png', disposition: 'inline')
+        send_file(@diagram.path,
+                  filename: @diagram.filename,
+                  type: @diagram.content_type,
+                  disposition: 'inline')
       end
     end
   end

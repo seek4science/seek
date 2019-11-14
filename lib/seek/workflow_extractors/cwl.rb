@@ -2,20 +2,19 @@ require 'rest-client'
 
 module Seek
   module WorkflowExtractors
-    class CWL
-      CWL_VIEWER_URL = 'http://localhost:8080'
-      DIAGRAM_PATH = '/graph/png'
+    class CWL < Base
+      DIAGRAM_PATH = '/graph/%{format}'
 
-      def initialize(io)
-        @io = io
-      end
+      available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', default: :svg)
 
-      def diagram
-        RestClient.post(CWL_VIEWER_URL + DIAGRAM_PATH, @io.read, content_type: 'text/plain', accept: 'image/png')
+      def diagram(format = self.class.default_digram_format)
+        content_type = self.class.diagram_formats[format]
+        url = URI.join(Seek::Config.cwl_viewer_url, DIAGRAM_PATH % { format: format }).to_s
+        RestClient.post(url, @io.read, content_type: 'text/plain', accept: content_type)
       end
 
       def metadata
-        metadata = { warnings: [], errors: [] }
+        metadata = super
         cwl_string = @io.read
         cwl = YAML.load(cwl_string)
         if cwl.has_key? 'label'

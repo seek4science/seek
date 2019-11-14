@@ -1,16 +1,8 @@
 module Seek
   module WorkflowExtractors
-    class RO
-      def initialize(io)
-        @io = io
-      end
-
-      def diagram
-        nil
-      end
-
+    class RO < Base
       def metadata
-        metadata = { warnings: [], errors: [] }
+        metadata = super
         ro_string = @io.read
         ro = JSON.parse(ro_string)
         if ro.has_key? "name"
