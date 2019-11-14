@@ -61,6 +61,10 @@ module Seek
           def latest_version?
             parent.latest_version == self
           end
+
+          def is_a_version?
+            true
+          end
         end
 
         versioned_class.table_name = versioned_table_name
@@ -171,6 +175,10 @@ module Seek
       end
 
       def empty_callback() end #:nodoc:
+
+      def is_a_version?
+        false
+      end
 
       protected
 
