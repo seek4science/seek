@@ -5,9 +5,29 @@
   <%= hidden_field_tag 'workflow[workflow_class_id]', @workflow.workflow_class_id %>
 
   <div class="asset_form">
-      <%= extraction_exception_message @errors.join(', ') if @errors %>
-      <%= extraction_warnings_messages_for @warnings if @warnings%>
-      <%= error_messages_for :workflow -%>
+    <% if @errors && @errors.any? %>
+      <div class="alert alert-danger">
+        <strong>Extraction errors:</strong>
+        <ul>
+          <% @errors.each do |error| %>
+            <li><%= error %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <% if @warnings && @warnings.any? %>
+
+      <div class="alert alert-warning">
+        <strong>Extraction warnings:</strong>
+        <ul>
+          <% @warnings.each do |warning| %>
+            <li><%= warning %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= error_messages_for :workflow -%>
 
       <div class="form-group">
         <label class="required">Title</label>
