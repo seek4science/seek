@@ -70,6 +70,7 @@ class AdminController < ApplicationController
     Seek::Config.external_help_url = params[:external_help_url]
 
     Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
+    Seek::Config.cwl_viewer_url = params[:cwl_viewer_url]
 
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]
