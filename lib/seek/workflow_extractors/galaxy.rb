@@ -8,7 +8,7 @@ module Seek
         if galaxy.has_key? "name"
           metadata[:title] = galaxy["name"]
         else
-          metadata[:warnings] = 'Unable to determine title of workflow'
+          metadata[:warnings] << 'Unable to determine title of workflow'
         end
 
         metadata
