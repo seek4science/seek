@@ -27,10 +27,6 @@ module WorkflowExtraction
     WorkflowDiagram.new(workflow, version, path, format, content_type)
   end
 
-  def diagram_available?(format = default_diagram_format)
-    File.exist?(diagram_path(format))
-  end
-
   private
 
   def diagram_path(format)

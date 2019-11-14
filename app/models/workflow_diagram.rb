@@ -18,4 +18,8 @@ class WorkflowDiagram
   def size
     File.size(@path)
   end
+
+  def exists?
+    File.exist?(@path)
+  end
 end
