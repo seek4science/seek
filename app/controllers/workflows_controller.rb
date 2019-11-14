@@ -60,7 +60,7 @@ class WorkflowsController < ApplicationController
 
   def create_content_blob
     clear_session_info
-    @workflow = Workflow.new
+    @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
     respond_to do |format|
       if handle_upload_data && @workflow.content_blob.save
         session[:uploaded_content_blob_id] = @workflow.content_blob.id
@@ -163,7 +163,7 @@ class WorkflowsController < ApplicationController
 
   def diagram
     diagram_format = params.key?(:diagram_format) ? params[:diagram_format] : @workflow.default_diagram_format
-    @diagram = @workflow.diagram(diagram_format)
+    @diagram = @display_workflow.diagram(diagram_format)
     respond_to do |format|
       format.html do
         send_file(@diagram.path,
