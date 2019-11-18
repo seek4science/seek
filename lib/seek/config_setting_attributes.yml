@@ -5,7 +5,6 @@ bioportal_api_key:
 jws_online_root:
 internal_help_enabled:
 external_help_url:
-workflows_enabled:
 hide_details_enabled:
 registration_disabled:
 registration_disabled_description:
@@ -50,12 +49,7 @@ is_virtualliver:
 sabiork_ws_base_url:
 filestore_path:
 tagline_prefix:
-events_enabled:
 modelling_analysis_enabled:
-organisms_enabled:
-models_enabled:
-assays_enabled:
-publications_enabled:
 jerm_enabled:
 email_enabled:
 jws_enabled:
@@ -80,7 +74,6 @@ documentation_enabled:
 tagging_enabled:
 authorization_checks_enabled:
 magic_guest_enabled:
-programmes_enabled:
 assay_type_ontology_file:
 technology_type_ontology_file:
 modelling_analysis_type_ontology_file:
@@ -160,7 +153,6 @@ permissions_popup:
   convert: :to_i
 auth_lookup_update_batch_size:
   convert: :to_i
-samples_enabled:
 project_admin_sample_type_restriction:
 omniauth_enabled:
 omniauth_user_create:
@@ -194,3 +186,13 @@ results_per_page_default:
   convert: :to_i
 results_per_page:
 cwl_viewer_url:
+# Types enabled
+documents_enabled:
+events_enabled:
+isa_enabled:
+models_enabled:
+organisms_enabled:
+programmes_enabled:
+publications_enabled:
+samples_enabled:
+workflows_enabled:

@@ -4,7 +4,6 @@ class AssaysController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :assays_enabled?
-
   before_action :find_assets, :only=>[:index]
   before_action :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :manage, :manage_update, :show, :new_object_based_on_existing_one]
 

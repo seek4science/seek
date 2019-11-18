@@ -37,12 +37,9 @@ class AdminController < ApplicationController
   end
 
   def update_features_enabled
-    Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
     Seek::Config.email_enabled = string_to_boolean params[:email_enabled]
     Seek::Config.pdf_conversion_enabled = string_to_boolean params[:pdf_conversion_enabled]
     # Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
-    Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
-    Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
     Seek::Config.project_admin_sample_type_restriction = string_to_boolean params[:project_admin_sample_type_restriction]
     Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
 
@@ -69,8 +66,17 @@ class AdminController < ApplicationController
     Seek::Config.internal_help_enabled = string_to_boolean params[:internal_help_enabled]
     Seek::Config.external_help_url = params[:external_help_url]
 
-    Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
     Seek::Config.cwl_viewer_url = params[:cwl_viewer_url]
+    # Types enabled
+    Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
+    Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
+    Seek::Config.isa_enabled = string_to_boolean params[:isa_enabled]
+    Seek::Config.models_enabled = string_to_boolean params[:models_enabled]
+    Seek::Config.organisms_enabled = string_to_boolean params[:organisms_enabled]
+    Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
+    Seek::Config.publications_enabled = string_to_boolean params[:publications_enabled]
+    Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
+    Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
 
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]

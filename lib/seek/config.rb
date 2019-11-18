@@ -255,7 +255,7 @@ module Seek
       hash[controller.to_s]&.to_sym
     end
 
-    def set_sorting_for(controller, value)      
+    def set_sorting_for(controller, value)
       # Store value as a string, unless nil, or not a valid sorting option for that controller.
       if value.blank? || !Seek::ListSorter.options(controller.to_s.classify).include?(value.to_sym)
         value = nil
@@ -312,6 +312,18 @@ module Seek
       rescue
         false
       end
+    end
+
+    def studies_enabled
+      isa_enabled
+    end
+
+    def investigations_enabled
+      isa_enabled
+    end
+
+    def assays_enabled
+      isa_enabled
     end
   end
 

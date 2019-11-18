@@ -4,6 +4,7 @@ class InvestigationsController < ApplicationController
   include Seek::DestroyHandling
   include Seek::AssetsCommon
 
+  before_action :investigations_enabled?
   before_action :find_assets, :only=>[:index]
   before_action :find_and_authorize_requested_item,:only=>[:edit, :manage, :update, :manage_update, :destroy, :show,:new_object_based_on_existing_one]
 

@@ -6,7 +6,6 @@ class PublicationsController < ApplicationController
   include Seek::PreviewHandling
 
   before_action :publications_enabled?
-
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[show edit update destroy]
   before_action :suggest_authors, only: :edit

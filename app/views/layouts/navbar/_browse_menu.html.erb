@@ -14,10 +14,12 @@
     <li><%= link_to t("institution").pluralize, institutions_path %></li>
     <li><%= link_to t("person").pluralize, people_path %></li>
 
-    <li role="presentation" class="dropdown-header"><%= t("menu.isa") -%></li>
-    <li><%= link_to t("investigation").pluralize, investigations_path %></li>
-    <li><%= link_to t("study").pluralize, studies_path %></li>
-    <li><%= link_to t("assays.assay").pluralize, assays_path %></li>
+    <% if Seek::Config.isa_enabled %>
+      <li role="presentation" class="dropdown-header"><%= t("menu.isa") -%></li>
+      <li><%= link_to t("investigation").pluralize, investigations_path %></li>
+      <li><%= link_to t("study").pluralize, studies_path %></li>
+      <li><%= link_to t("assays.assay").pluralize, assays_path %></li>
+    <% end %>
 
     <li role="presentation" class="dropdown-header"><%= t("menu.assets") -%></li>
     <li><%= link_to t("data_file").pluralize, data_files_path %></li>
@@ -27,10 +29,16 @@
     <li><%= link_to t("sop").pluralize, sops_path %></li>
     <% if Seek::Config.workflows_enabled %>
       <li><%= link_to t("workflow").pluralize, workflows_path %></li>
-      <li><%= link_to t("node").pluralize, nodes_path %></li>
+      <% if false %>
+        <li><%= link_to t("node").pluralize, nodes_path %></li>
+      <% end %>
     <% end %>
-    <li><%= link_to t("publication").pluralize, publications_path %></li>
-    <li><%= link_to t("document").pluralize, documents_path %></li>
+    <% if Seek::Config.publications_enabled %>
+      <li><%= link_to t("publication").pluralize, publications_path %></li>
+    <% end %>
+    <% if Seek::Config.documents_enabled %>
+      <li><%= link_to t("document").pluralize, documents_path %></li>
+    <% end %>
 
     <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
     <li><%= link_to t("presentation").pluralize, presentations_path %></li>
