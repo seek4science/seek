@@ -1,19 +1,19 @@
 cwl_workflow_class:
   id: 1
-  title: <%= I18n.t('workflows.cwl_workflow') %>
+  title: Common Workflow Language
   key: CWL
 
 galaxy_workflow_class:
   id: 2
-  title: <%= I18n.t('workflows.galaxy_workflow') %>
+  title: Galaxy
   key: Galaxy
 
 knime_workflow_class:
   id: 3
-  title: <%= I18n.t('workflows.knime_workflow') %>
+  title: KNIME
   key: KNIME
 
 ro_workflow_class:
   id: 4
-  title: <%= I18n.t('workflows.ro_workflow') %>
+  title: Research Object
   key: RO

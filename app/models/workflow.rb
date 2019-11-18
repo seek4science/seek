@@ -33,8 +33,8 @@ class Workflow < ApplicationRecord
     include WorkflowExtraction
   end
 
-  def use_mime_type_for_avatar?
-    true
+  def avatar_key
+    "#{workflow_class.key.downcase}_workflow"
   end
 
   def self.user_creatable?
