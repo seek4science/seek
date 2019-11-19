@@ -1,0 +1,4 @@
+$j('#publication_error').hide();
+$j('#publication_refetch_container').show().highlight();
+$j('#publication_preview').highlight();
+$j('#publication_refetch_container').html('<%= escape_javascript(render(partial: 'publications/publication_doi_refetch_preview')) -%>');

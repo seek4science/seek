@@ -636,6 +636,7 @@ SEEK::Application.routes.draw do
       get :query_authors_typeahead
       get :export
       post :fetch_preview
+      post :update_metadata
       post :items_for_result
     end
     member do

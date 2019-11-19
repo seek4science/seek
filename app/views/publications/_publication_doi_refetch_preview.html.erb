@@ -1,0 +1,34 @@
+
+<%
+
+   help_text_preview =  "Here is re-fetched metadata of the publication."
+
+%>
+
+<%#= folding_panel("Updated Metadata", false, :id => "publication_refetch_preview",
+                  :help_text=> help_text_preview , :class => 'list_item' ) do %>
+
+<%= panel("Updated Metadata", :id => 'publication_refetch_preview', :help_text=> help_text_preview,:class => 'list_item') do %>
+
+  <%= list_item_attribute "Title", @publication.title %>
+
+  <%= list_item_attribute "PubMed ID", @publication.pubmed_id, @publication.pubmed_uri,{:target => "_blank"} unless @publication.pubmed_id.nil? %>
+
+  <%= list_item_attribute "DOI", @publication.doi, @publication.doi_uri, {:target => "_blank"} unless @publication.doi.nil? %>
+
+  <%= list_item_expandable_text "Abstract:", h(@publication.abstract) %>
+
+  <%= list_item_attribute "Date Published", date_as_string(@publication.published_date) %>
+
+  <%= list_item_attribute "Citation", @publication.citation%>
+
+  <%= list_item_attribute "Book title", @publication.booktitle unless @publication.booktitle.nil? %>
+
+  <%= list_item_attribute "Editors", @publication.editor unless @publication.editor.nil? || @publication.editor.empty? %>
+
+  <%= list_item_attribute "Publisher", @publication.publisher unless @publication.publisher.nil? %>
+
+  <% unless @publication.publication_type_id.nil? %>
+  <%= list_item_optional_attribute PublicationType.find(@publication.publication_type_id).title, h(@publication.journal) %>
+  <% end %>
+<% end %>
