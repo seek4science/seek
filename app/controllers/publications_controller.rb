@@ -156,23 +156,35 @@ class PublicationsController < ApplicationController
   def update_metadata
 
     @publication = Publication.new(publication_params)
-    doi= params[:publication][:doi]
-    doi= params[:publication][:publication_type_id]
-
-    Rails.logger.info ("params:#{params}")
-    Rails.logger.info ("params[:doi]:#{params[:publication][:doi]}")
-    Rails.logger.info ("params[:id]:#{params[:publication][:id]}")
-    Rails.logger.info ("params[:publication_type_id]:#{params[:publication][:publication_type_id]}")
-
+    publication_type_id= params[:publication][:publication_type_id]
     doi= params[:publication][:doi]
     id= params[:publication][:id]
 
-    result = get_data(@publication, nil, doi)
-    @publication.publication_type_id = Publication.find(id).publication_type_id
-    Rails.logger.info ("publication_type_id:#{@publication.publication_type_id}")
+
+    Rails.logger.info ("params:#{params}")
+    Rails.logger.info ("params[:doi]:#{doi}")
+    Rails.logger.info ("params[:id]:#{id}")
+    Rails.logger.info ("params[:publication_type_id]:#{publication_type_id}")
+
+    if publication_type_id.blank?
+      @error = "Please choose a publication type."
+    else
+      result = get_data(@publication, nil, doi)
+    end
+
+    @error =  @publication.errors.full_messages.join('<br>') if @publication.errors.any?
+
+
+    if !@error.nil?
+      @error_text = @error
+      respond_to do |format|
+        format.js { render status: 500 }
+      end
+    else
       respond_to do |format|
         format.js
       end
+    end
   end
 
   def query_authors
