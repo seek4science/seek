@@ -4,7 +4,7 @@ class SampleTypesController < ApplicationController
   include Seek::IndexPager
 
   before_action :samples_enabled?
-  before_action :find_sample_type, only: [:show, :edit, :update, :destroy, :template_details]
+  before_action :find_sample_type, only: [:show, :edit, :update, :destroy, :template_details, :batch_upload]
   before_action :check_no_created_samples, only: [:destroy]
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: [:new, :create]
@@ -122,6 +122,10 @@ class SampleTypesController < ApplicationController
       end
     end
     render partial: 'sample_types/select/filtered_sample_types'
+  end
+
+  def batch_upload
+
   end
 
   private
