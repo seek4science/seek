@@ -1,0 +1,23 @@
+<% @page_title ||= "New #{t('data_file')}" %>
+<h1><%= @page_title %></h1>
+
+<%= form_tag({:action => :create_content_blob}, :multipart => true) do -%>
+  <%= forward_params(:data_file) %>
+
+
+
+  <div class="asset_form">
+    <%= error_messages_for :data_file -%>
+
+    <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file} -%>
+
+    <div>
+      <%= create_button id:"data_file_submit_btn",
+                        onclick:"return validateResourceFields('data_file');",
+                        class:'btn btn-primary',
+                        button_text:'Upload',
+                        'data-upload-file-text' => 'Upload' %>
+      or <%= cancel_button(data_files_path) -%>
+    </div>
+  </div>
+<% end -%>

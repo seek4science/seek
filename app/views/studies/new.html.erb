@@ -7,6 +7,8 @@
 <% else %>
 <h1>New <%= t('study') %></h1>
 
+  <%= link_to "Batch Study Upload", batch_uploader_studies_path, class: "btn btn-primary" %>
+
 <div class="show_basic">
 
 	<%= form_for @study do |f| %>
