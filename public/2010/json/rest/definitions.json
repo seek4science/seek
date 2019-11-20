@@ -5482,7 +5482,19 @@
               "additionalProperties": false
             },
             "links": {
-              "$ref": "#/definitions/linksType"
+              "type": "object",
+              "properties": {
+                "self": {
+                  "$ref": "#/definitions/uriString"
+                },
+                "diagram": {
+                  "$ref": "#/definitions/uriString"
+                }
+              },
+              "required": [
+                "self"
+              ],
+              "additionalProperties": false
             },
             "meta": {
               "$ref": "#/definitions/metaType"

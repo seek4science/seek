@@ -14,4 +14,12 @@ class WorkflowSerializer < ContributedResourceSerializer
   has_many :assays
   has_many :publications
   has_many :sops
+
+  def _links
+    if get_version.diagram.exists?
+      super.merge(diagram: diagram_workflow_path(object, version: get_version.version))
+    else
+      super
+    end
+  end
 end
