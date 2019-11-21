@@ -42,7 +42,7 @@ Factory.define(:broken_pdf_content_blob, parent: :content_blob) do |f|
 end
 
 Factory.define(:image_content_blob, parent: :content_blob) do |f|
-  f.original_filename 'image_file.pngsam'
+  f.original_filename 'image_file.png'
   f.content_type 'image/png'
   f.data { File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb').read }
 end
@@ -205,9 +205,9 @@ Factory.define(:binary_content_blob, parent: :content_blob) do |f|
 end
 
 Factory.define(:study_template_content_blob, parent: :content_blob) do |f|
-  f.original_filename 'sample-type-example.xlsx'
-  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  f.data { File.new("#{Rails.root}/test/fixtures/files/study-example.xlsx", 'rb').read }
+  f.original_filename 'study_batch.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/study_batch.zip", 'rb').read }
 end
 
 Factory.define(:sample_type_template_content_blob, parent: :content_blob) do |f|
