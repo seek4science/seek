@@ -5,6 +5,8 @@ class CustomMetadata < ApplicationRecord
 
   before_validation :update_json_metadata
 
+  validates_with CustomMetadataValidator
+
   def get_attribute_value(attr)
     attr = attr.accessor_name if attr.is_a?(CustomMetadataAttribute)
 
@@ -19,6 +21,12 @@ class CustomMetadata < ApplicationRecord
 
   def data
     @data ||= build_json_hash
+  end
+
+  def blank_attribute?(attr)
+    attr = attr.accessor_name if attr.is_a?(CustomMetadataAttribute)
+
+    data[attr].blank? || (data[attr].is_a?(Hash) && data[attr]['id'].blank?)
   end
 
   private

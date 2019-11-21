@@ -4,6 +4,7 @@ class CustomMetadataTest < ActiveSupport::TestCase
 
   test 'initialise' do
     cm = simple_test_object
+    cm.set_attribute_value('name','fred')
 
     assert cm.valid?
     cm.save!
@@ -18,6 +19,21 @@ class CustomMetadataTest < ActiveSupport::TestCase
     cm.save!
     cm = CustomMetadata.find(cm.id)
     assert_equal 'fred', cm.get_attribute_value('name')
+  end
+
+  test 'validate values' do
+    cm = simple_test_object
+    refute cm.valid?
+    cm.set_attribute_value('name','bob')
+    assert cm.valid?
+    cm.set_attribute_value('age','not a number')
+    refute cm.valid?
+    cm.set_attribute_value('age','78')
+    assert cm.valid?
+    cm.set_attribute_value('date','not a date')
+    refute cm.valid?
+    cm.set_attribute_value('date',Time.now.to_s)
+    assert cm.valid?
   end
 
   private
