@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_17_140928) do
+ActiveRecord::Schema.define(version: 2019_11_20_162028) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -353,6 +353,23 @@ ActiveRecord::Schema.define(version: 2020_07_17_140928) do
     t.integer "age_at_sampling"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "custom_metadata",  force: :cascade do |t|
+    t.text "json_metadata"
+    t.string "item_type"
+    t.bigint "item_id"
+    t.index ["item_type", "item_id"], name: "index_custom_metadata_on_item_type_and_item_id"
+  end
+
+  create_table "custom_metadata_attributes",  force: :cascade do |t|
+    t.bigint "custom_metadata_id"
+    t.bigint "sample_attribute_type_id"
+    t.boolean "required", default: false
+    t.integer "pos"
+    t.string "title"
+    t.index ["custom_metadata_id"], name: "index_custom_metadata_attributes_on_custom_metadata_id"
+    t.index ["sample_attribute_type_id"], name: "index_custom_metadata_attributes_on_sample_attribute_type_id"
   end
 
   create_table "data_file_auth_lookup", id: false,  force: :cascade do |t|
@@ -1129,7 +1146,7 @@ ActiveRecord::Schema.define(version: 2020_07_17_140928) do
     t.string "email"
     t.string "phone"
     t.string "skype_name"
-    t.text "web_page"
+    t.string "web_page"
     t.text "description"
     t.integer "avatar_id"
     t.integer "status_id", default: 0
