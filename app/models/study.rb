@@ -36,6 +36,21 @@ class Study < ApplicationRecord
     has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :assays, source: type.pluralize.to_sym
   end
 
+  def self.unzip_batch file_path
+      unzipped_files = Zip::File.open(file_path) 
+
+      data_files = []
+      studies = []
+      unzipped_files.entries.each do |file|
+        if file.name.starts_with?('data') && file.ftype != :directory
+          data_files << file
+        elsif file.ftype == :file
+          studies << file
+        end
+      end
+      [data_files, studies]
+  end
+
   def assets
     related_data_files + related_sops + related_models + related_publications + related_documents
   end
