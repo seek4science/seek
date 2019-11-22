@@ -122,6 +122,19 @@ class StudiesController < ApplicationController
 
   end
 
+  def preview_content
+    tempzip_path = params[:content_blobs][0][:data].tempfile.path
+    data_files, studies = Study.unzip_batch tempzip_path
+
+    study_filename = studies.first.name
+    studies_file = ContentBlob.new
+    studies_file.tmp_io_object=File.open("#{Rails.root}/tmp/#{study_filename}")
+    studies_file.original_filename="#{study_filename}"
+    studies_file.save!
+    @studies = Study.extract_studies_from_file(studies_file)
+    render "studies/batch_preview"
+  end
+
   private
   def validate_person_responsible(p)
     if (!p[:person_responsible_id].nil?) && (!Person.exists?(p[:person_responsible_id]))
