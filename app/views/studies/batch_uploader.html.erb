@@ -1,7 +1,7 @@
 <% @page_title ||= "New #{t('data_file')}" %>
 <h1><%= @page_title %></h1>
 
-<%= form_tag({:action => :create_content_blob}, :multipart => true) do -%>
+<%= form_tag({:action => :preview_content}, :multipart => true) do -%>
   <%= forward_params(:data_file) %>
 
 
