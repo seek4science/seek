@@ -32,7 +32,7 @@ class Sop < ApplicationRecord
   )
 
   explicit_versioning(:version_column => "version") do
-    acts_as_doi_mintable(proxy: :parent)
+    acts_as_doi_mintable(proxy: :parent, general_type: 'Text')
     acts_as_versioned_resource
     acts_as_favouritable
 

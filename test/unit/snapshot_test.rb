@@ -84,9 +84,11 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   test 'generates valid DataCite metadata' do
-    snapshot = @investigation.create_snapshot
+    types = [@investigation.create_snapshot, @study.create_snapshot, @assay.create_snapshot]
 
-    assert snapshot.datacite_metadata.validate
+    types.each do |type|
+      assert type.datacite_metadata.validate, "#{type.class.name} did not generate valid metadata."
+    end
   end
 
   test 'creates DOI via datacite' do
