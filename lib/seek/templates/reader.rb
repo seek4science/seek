@@ -5,8 +5,36 @@ module Seek
 
       attr_reader :template_content_blob
 
+      ColumnDetails = Struct.new(:label, :column)
+      Data = Struct.new(:column, :value)
+
       def initialize(template_content_blob)
         @template_content_blob = template_content_blob
+      end
+
+      def column_details
+        return nil unless compatible?
+        cells = template_xml_document.find("//ss:sheet[@index='#{sheet_index}']/ss:rows/ss:row[@index=1]/ss:cell")
+        cells.collect do |cell|
+          unless (heading = cell.content).blank?
+            ColumnDetails.new(heading, cell.attributes['column'].to_i)
+          end
+        end.compact
+      end
+
+      def each_record(columns = nil)
+        rows = template_xml_document.find("//ss:sheet[@index='#{sheet_index}']/ss:rows/ss:row")
+        rows.each do |row|
+          next if (row_index = row.attributes['index'].to_i) <= 1
+          data = row.children.collect do |cell|
+            column = cell.attributes['column'].to_i
+            if !cell.content.strip.blank? && (columns.nil? || columns.include?(column))
+              Data.new(column, cell.content)
+            end
+          end.compact
+          next if data.empty?
+          yield(row_index, data)
+        end
       end
 
       def compatible?

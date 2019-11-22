@@ -36,16 +36,33 @@ class Study < ApplicationRecord
     has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :assays, source: type.pluralize.to_sym
   end
 
+  def self.extract_studies_from_file(studies_file)
+    studies = []
+    parsed_sheet = Seek::Templates::StudiesReader.new(studies_file)
+    column_details =  parsed_sheet.column_details
+
+    parsed_sheet.each_record([2,3,4]) do |index, data|
+      if index > 4
+        studies << data
+      end
+    end
+    studies
+  end
+
+
   def self.unzip_batch file_path
       unzipped_files = Zip::File.open(file_path) 
-
+      tmp_dir = "#{Rails.root}/tmp/"
       data_files = []
       studies = []
       unzipped_files.entries.each do |file|
         if file.name.starts_with?('data') && file.ftype != :directory
           data_files << file
+          Dir.mkdir "#{tmp_dir}/data" unless File.exists? "#{tmp_dir}/data"
+          file.extract("#{tmp_dir}#{file.name}") unless File.exists? "#{tmp_dir}#{file.name}"     
         elsif file.ftype == :file
           studies << file
+          file.extract("#{Rails.root}/tmp/#{file.name}") unless File.exists? "#{tmp_dir}#{file.name}"
         end
       end
       [data_files, studies]
