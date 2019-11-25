@@ -8,6 +8,7 @@
 
 one:
   title: A paper on blabla
+  publication_type_id: 236642001
   abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
   journal: JOURNAL OF SCIENCE
   contributor: quentin_person
@@ -18,6 +19,7 @@ one:
   
 pubmed_2:
   title: Another paper on blabla
+  publication_type_id: 236642001
   abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
   journal: JOURNAL OF SCIENCE
   contributor: quentin_person
@@ -28,10 +30,21 @@ pubmed_2:
   
 taverna_paper_pubmed:
   title: "Taverna: a tool for building and running workflows of services"
+  publication_type_id: 236642001
   abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
   journal: JOURNAL OF SCIENCE
   contributor: quentin_person
   published_date: <%= 3.days.ago.to_s :db %>
   pubmed_id: 16845108
+  projects: [sysmo_project]
+  policy: sysmo_member_edit
+
+no_publication_type:
+  title: "An old publication without type"
+  publication_type_id: null
+  journal: JOURNAL OF SCIENCE
+  contributor: quentin_person
+  published_date: <%= 2.days.ago.to_s :db %>
+  pubmed_id: 30462164
   projects: [sysmo_project]
   policy: sysmo_member_edit

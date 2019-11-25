@@ -31,7 +31,7 @@ class Policy < ApplicationRecord
 
   def queue_update_auth_table
     unless (saved_changes.keys - ['updated_at']).empty? || assets.empty?
-      AuthLookupUpdateJob.new.add_items_to_queue(assets)
+      AuthLookupUpdateQueue.enqueue(assets)
     end
   end
 

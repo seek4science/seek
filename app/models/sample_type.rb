@@ -93,7 +93,7 @@ class SampleType < ApplicationRecord
   def can_edit?(user = User.current_user)
     return false if user.nil? || user.person.nil? || !Seek::Config.samples_enabled
     return true if user.is_admin?
-    contributor == user.person || projects.detect { |project| project.can_be_administered_by?(user)}.present?
+    contributor == user.person || projects.detect { |project| project.can_manage?(user)}.present?
   end
 
   def can_delete?(user = User.current_user)
@@ -107,12 +107,6 @@ class SampleType < ApplicationRecord
   def can_view?(user = User.current_user, referring_sample = nil)
     project_membership = (user && user.person && (user.person.projects & projects).any?)
     project_membership || public_samples? || check_referring_sample_permission(user,referring_sample)
-  end
-
-  # ducktyping to behave like a Policy based authorized item, in particular the index view
-  def self.all_authorized_for action, user = User.current_user
-    action = "can_#{action.to_s}?"
-    SampleType.all.select{|st| st.send(action,user)}
   end
 
   def editing_constraints

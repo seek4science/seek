@@ -3,8 +3,7 @@ require_dependency 'seek/util'
 class DataFile < ApplicationRecord
   include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
-
-  attr_accessor :parent_name
+  include Seek::BioSchema::Support
 
   # searchable must come before acts_as_asset call
   if Seek::Config.solr_enabled
@@ -32,9 +31,20 @@ class DataFile < ApplicationRecord
 
   scope :simulation_data, -> { where(simulation_data: true) }
 
+  has_filter assay_type: Seek::Filtering::Filter.new(
+      value_field: 'assays.assay_type_uri',
+      label_mapping: Seek::Filterer::MAPPINGS[:assay_type_label],
+      joins: [:assays]
+  )
+  has_filter technology_type: Seek::Filtering::Filter.new(
+      value_field: 'assays.technology_type_uri',
+      label_mapping: Seek::Filterer::MAPPINGS[:technology_type_label],
+      joins: [:assays]
+  )
+
   explicit_versioning(version_column: 'version') do
     include Seek::Data::SpreadsheetExplorerRepresentation
-    acts_as_doi_mintable(proxy: :parent)
+    acts_as_doi_mintable(proxy: :parent, type: 'Dataset', general_type: 'Dataset')
     acts_as_versioned_resource
     acts_as_favouritable
 

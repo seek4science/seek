@@ -231,20 +231,29 @@ module Seek
       facet_enable_for_pages.with_indifferent_access[controller.to_s]
     end
 
-    def default_page(controller)
-      pages = default_pages.with_indifferent_access
-      p = if pages.key?(controller.to_s)
-            pages[controller.to_s]
-          else
-            Settings.defaults['default_pages'][controller.to_s] || 'top'
-          end
-
-      p == 'latest' ? 'top' : p
+    def sorting_for(controller)
+      hash = sorting.with_indifferent_access
+      hash[controller.to_s]&.to_sym
     end
 
-    # FIXME: change to standard setter=
-    def set_default_page(controller, value)
-      merge! :default_pages, controller => value
+    def set_sorting_for(controller, value)      
+      # Store value as a string, unless nil, or not a valid sorting option for that controller.
+      if value.blank? || !Seek::ListSorter.options(controller.to_s.classify).include?(value.to_sym)
+        value = nil
+      else
+        value = value.to_s
+      end
+      merge!(:sorting, controller.to_s => value)
+      value&.to_sym
+    end
+
+    def results_per_page_for(controller)
+      hash = results_per_page.with_indifferent_access
+      hash[controller.to_s]
+    end
+
+    def set_results_per_page_for(controller, value)
+      merge!(:results_per_page, controller.to_s => value.blank? ? nil : value.to_i)
       value
     end
 
@@ -419,6 +428,10 @@ module Seek
 
     read_project_setting_attributes.each do |method, opts|
       register_encrypted_setting(method) if opts && opts[:encrypt]
+    end
+
+    def self.schema_org_supported?
+      true
     end
   end
 end

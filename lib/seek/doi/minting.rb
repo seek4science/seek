@@ -33,7 +33,7 @@ module Seek
       private
 
       def set_asset_version
-        asset = controller_name.classify.constantize.find(params[:id])
+        asset = controller_model.find(params[:id])
         @asset_version = if params[:version]
                            # find version
                            # TODO @asset_version could be nil

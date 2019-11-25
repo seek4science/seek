@@ -66,7 +66,7 @@ module Seek
         add_parent_breadcrumb if @parent_resource
         add_index_breadcrumb(controller_name)
       end
-      resource = eval('@' + controller_name.singularize) || try_block { controller_name.singularize.camelize.constantize.find_by_id(params[:id]) }
+      resource = instance_variable_get("@#{controller_name.singularize}")
 
       add_show_breadcrumb resource if resource && resource.respond_to?(:new_record?) && !resource.new_record?
 

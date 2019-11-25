@@ -15,6 +15,11 @@ class Strain < ApplicationRecord
   grouped_pagination
 
   belongs_to :organism
+  has_filter organism: Seek::Filtering::Filter.new(
+      value_field: 'organisms.id',
+      label_field: 'organisms.title',
+      includes: [:organism]
+  )
 
   has_many :assay_organisms
   has_many :assays,:through=>:assay_organisms
@@ -99,7 +104,10 @@ class Strain < ApplicationRecord
   end
 
   def related_people
-    [contributor]
+    Person.where(id: related_person_ids)
   end
 
+  def related_person_ids
+    contributor_id
+  end
 end

@@ -22,27 +22,9 @@ class EventsController < ApplicationController
     end
   end
 
-  def new
-    @event = Event.new
-    @new = true
-    respond_to do |format|
-      if User.logged_in_and_member?
-        format.html { render 'events/form' }
-      else
-        flash[:error] = 'You are not authorized to create new Events. Only members of known projects, institutions or work groups are allowed to create new content.'
-        format.html { redirect_to events_path }
-      end
-    end
-  end
-
   def create
     @event = Event.new(event_params)
     handle_update_or_create(true)
-  end
-
-  def edit
-    @new = false
-    render 'events/form'
   end
 
   def update
@@ -51,7 +33,8 @@ class EventsController < ApplicationController
   end
 
   def handle_update_or_create(is_new)
-    @new = is_new
+
+    re_render_view = is_new ? 'events/new' : 'events/edit'
 
     update_sharing_policies @event
 
@@ -61,7 +44,7 @@ class EventsController < ApplicationController
         format.html { redirect_to @event }
         format.json { render json: @event }
       else
-        format.html { render 'events/form' }
+        format.html { render re_render_view }
         format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
       end
     end

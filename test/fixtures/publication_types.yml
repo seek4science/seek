@@ -1,0 +1,51 @@
+Journal:
+  title: Journal
+  key: article
+
+Book:
+  title: Book
+  key: book
+
+Booklet:
+  title: Booklet
+  key: booklet
+
+InBook:
+  title: InBook
+  key: inbook
+
+InCollection:
+  title: InCollection
+  key: incollection
+
+InProceedings:
+  title: InProceedings
+  key: inproceedings
+
+Manual:
+  title: Manual
+  key: manual
+
+MastersThesis:
+  title: Masters Thesis
+  key: mastersthesis
+
+Misc:
+  title: Misc
+  key: misc
+
+PhdThesis:
+  title: Phd Thesis
+  key: phdthesis
+
+Proceedings:
+  title: Proceedings
+  key: proceedings
+
+Techreport:
+  title: Tech report
+  key: techreport
+
+Unpublished:
+  title: Unpublished
+  key: unpublished

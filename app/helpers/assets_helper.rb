@@ -1,5 +1,6 @@
 module AssetsHelper
   include ApplicationHelper
+  include BootstrapHelper
 
   def form_submit_buttons(item, options = {})
     # defaults
@@ -140,11 +141,21 @@ module AssetsHelper
     end
   end
 
+  def manage_resource_path(resource)
+    if resource.class.name.include?('::Version')
+      polymorphic_path(resource.parent, action:'manage')
+    else
+      polymorphic_path(resource, action:'manage')
+    end
+  end
+
   # provides a list of assets, according to the class, that are authorized according the 'action' which defaults to view
   # if projects is provided, only authorizes the assets for that project
   # assets are sorted by title except if they are projects and scales (because of hierarchies)
   def authorised_assets(asset_class, projects = nil, action = 'view')
-    assets = asset_class.all_authorized_for action, User.current_user, projects
+    assets = asset_class
+    assets = assets.filter_by_projects(projects) if projects
+    assets = assets.authorized_for(action, User.current_user).to_a
     assets = assets.sort_by(&:title) if !assets.blank? && !%w[Project Scale].include?(assets.first.class.name)
     assets
   end
@@ -219,5 +230,28 @@ module AssetsHelper
 
   def mini_file_download_icon(fileinfo)
     image_tag_for_key('download', polymorphic_path([fileinfo.asset, fileinfo], action: :download, code: params[:code]), 'Download', { title: 'Download this file' }, '')
+  end
+
+  def add_to_dropdown(item)
+    return unless Seek::AddButtons.add_dropdown_for(item)
+    tooltip = "This option allows you to add a new item, whilst associating it with this #{text_for_resource(item)}"
+    dropdown_button(t('add_new_dropdown.button'), 'attach', menu_options: {class: 'pull-right', id: 'item-admin-menu'}, tooltip:tooltip) do
+      add_item_to_options(item) do |text, path|
+        content_tag(:li) do
+          image_tag_for_key('add', path, text, nil, text)
+        end
+      end.join(" ").html_safe
+    end
+  end
+
+  def add_item_to_options(item)
+    elements = []
+    Seek::AddButtons.add_for_item(item).each do |type,param|
+
+      text="#{t('add_new_dropdown.option')} #{t(type.name.underscore)}"
+      path = new_polymorphic_path(type,param=>item.id)
+      elements << yield(text,path)
+    end
+    elements
   end
 end

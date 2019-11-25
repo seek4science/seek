@@ -39,7 +39,6 @@ SEEK::Application.configure do
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
 
-
   config.public_file_server.enabled = true
 
   I18n.enforce_available_locales = true

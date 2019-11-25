@@ -1,23 +1,37 @@
-<%= panel(publication.title, :id => 'publication_preview', :class => 'list_item') do %>
+<% publication_type = PublicationType.find(publication.publication_type_id) %>
+
+<%= panel("Publication overview", :id => 'publication_preview', :class => 'list_item') do %>
+
+    <%= list_item_attribute "Title", publication.title %>
+
+    <%= list_item_attribute "Publication Type", PublicationType.find(publication.publication_type_id).title %>
+
     <%= list_item_attribute "PubMed ID", publication.pubmed_id, publication.pubmed_uri,{:target => "_blank"} unless publication.pubmed_id.nil? %>
 
     <%= list_item_attribute "DOI", publication.doi, publication.doi_uri, {:target => "_blank"} unless publication.doi.nil? %>
 
     <%= list_item_simple_list(authors, "Author(s)") {|a| a.first_name + " " + a.last_name} -%>
 
-    <%= list_item_expandable_text "Abstract", h(publication.abstract) %>
+    <%= list_item_expandable_text "Abstract:", h(publication.abstract) %>
 
-    <%= list_item_optional_attribute publication_type_text(publication.publication_type), h(publication.journal) %>
+    <%= list_item_optional_attribute PublicationType.find(publication.publication_type_id).title, h(publication.journal) %>
 
     <%= list_item_attribute "Date Published", date_as_string(publication.published_date) %>
 
     <%= list_item_attribute "Citation", publication.citation%>
+
+    <%= list_item_attribute "Book title", publication.booktitle unless publication.booktitle.nil? %>
+  
+   <%= list_item_attribute "Editors", publication.editor unless publication.editor.nil? || publication.editor.empty? %>
+
+    <%= list_item_attribute "Publisher", publication.publisher unless publication.publisher.nil? %>
+
 <% end %>
 
 <%= form_for @publication do |f| %>
     <%= f.hidden_field :parent_name %>
     <%= f.hidden_field :pubmed_id %>
     <%= f.hidden_field :doi %>
-
+    <%= f.hidden_field :publication_type_id %>
     <%= f.submit 'Register', :name => "subaction", :value => 'Register', :onclick => "transferProjectIds();", :class => 'btn btn-primary' %>
 <% end %>

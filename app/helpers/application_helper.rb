@@ -5,6 +5,7 @@ module ApplicationHelper
   include FancyMultiselectHelper
   include Recaptcha::ClientHelper
   include VersionHelper
+  include ImagesHelper
 
   def no_items_to_list_text
     content_tag :div, id: 'no-index-items-text' do
@@ -52,7 +53,10 @@ module ApplicationHelper
 
   def date_as_string(date, show_time_of_day = false, year_only_1st_jan = false)
     # for publications, if it is the first of jan, then it can be assumed it is just the year (unlikely have a publication on New Years Day)
-    if year_only_1st_jan && !date.blank? && date.month == 1 && date.day == 1
+
+    if date.to_s == nil
+      str = "<span class='none_text'>No date defined</span>"
+    elsif year_only_1st_jan && !date.blank? && date.month == 1 && date.day == 1
       str = date.year.to_s
     else
       date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
@@ -176,8 +180,13 @@ module ApplicationHelper
 
     result_collection.each do |res|
       tab = res.respond_to?(:tab) ? res.tab : res.class.name
-      results[tab] = { items: [], hidden_count: 0, is_external: (res.respond_to?(:is_external_search_result?) && res.is_external_search_result?) } unless results[tab]
+      results[tab] ||= { items: [],
+                         items_count: 0,
+                         hidden_count: 0,
+                         is_external: (res.respond_to?(:is_external_search_result?) && res.is_external_search_result?) }
+
       results[tab][:items] << res
+      results[tab][:items_count] += 1
     end
 
     results
@@ -214,7 +223,7 @@ module ApplicationHelper
       res = mail_to(res) if options[:email]
       res = link_to(res, res, popup: true) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
-      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(res)) if options[:link_as_country]
+      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(CountryCodes.code(text))) if options[:link_as_country]
     end
     res.html_safe
   end
@@ -412,21 +421,6 @@ module ApplicationHelper
   # returns the instance for the resource for the controller, e.g @data_file for data_files
   def resource_for_controller(c = controller_name)
     eval "@#{c.singularize}"
-  end
-
-  # returns the count of the total visible items, and also the count of the all items, according to controller_name
-  # primarily used for the metrics on the item index page
-  def resource_count_stats
-    klass = klass_from_controller(controller_name)
-    full_total = klass.count
-    visible_total = if klass.authorization_supported?
-                      klass.all_authorized_for('view').count
-                    elsif klass.is_a?(Person) && Seek::Config.is_virtualliver && User.current_user.nil?
-                      0
-                    else
-                      klass.count
-                    end
-    [visible_total, full_total]
   end
 
   def cancel_button(path, html_options = {})

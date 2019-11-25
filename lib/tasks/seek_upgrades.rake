@@ -19,6 +19,11 @@ namespace :seek do
     delete_orphaned_permissions
     rebuild_sample_templates
     fix_model_version_files
+    fix_country_codes
+
+    convert_old_pagination_settings
+    set_assay_and_technology_type_uris
+    db:seed:publication_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -286,5 +291,51 @@ namespace :seek do
         end
       end
     end
+  end
+
+  task(fix_country_codes: :environment) do
+    Institution.where('length(country) > 2').each do |institution|
+      institution.update_attribute(:country, CountryCodes.code(institution.country))
+    end
+    Event.where('length(country) > 2').each do |event|
+      event.update_attribute(:country, CountryCodes.code(event.country))
+    end
+  end
+
+  task(convert_old_pagination_settings: :environment) do
+    limit_latest = Settings.where(var: 'limit_latest').first
+    if limit_latest&.value
+      puts "Setting 'results_per_page_default' to #{limit_latest.value}"
+      Seek::Config.results_per_page_default = limit_latest.value
+      limit_latest.destroy!
+    end
+
+    default_pages = Settings.where(var: 'default_pages').first
+    if default_pages&.value
+      default_pages.value.each do |controller, default_page|
+        if default_page == 'all'
+          puts "Setting 'results_per_page' for #{controller} to 999999"
+          Seek::Config.set_results_per_page_for(controller.to_s, 999999)
+        end
+      end
+      default_pages.destroy!
+    end
+  end
+
+  task(set_assay_and_technology_type_uris: :environment) do
+    assays = Assay.where('suggested_assay_type_id IS NOT NULL OR suggested_technology_type_id IS NOT NULL')
+    count = 0
+
+    assays.each do |assay|
+      needs_assay_type_update = assay.suggested_assay_type&.ontology_uri && assay[:assay_type_uri] != assay.suggested_assay_type.ontology_uri
+      needs_tech_type_update = assay.suggested_technology_type&.ontology_uri && assay[:technology_type_uri] != assay.suggested_technology_type.ontology_uri
+      if needs_assay_type_update || needs_tech_type_update
+        count += 1
+        assay.update_column(:assay_type_uri, assay.suggested_assay_type.ontology_uri) if needs_assay_type_update
+        assay.update_column(:technology_type_uri, assay.suggested_technology_type.ontology_uri) if needs_tech_type_update
+      end
+    end
+
+    puts "Updated #{count} assays' technology/assay type URIs" if count > 0
   end
 end

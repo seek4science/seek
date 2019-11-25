@@ -39,7 +39,7 @@ class ModelTest < ActiveSupport::TestCase
 
   test 'to_rdf' do
     User.with_current_user Factory(:user) do
-      object = Factory :model, assay_ids: [Factory(:assay).id], policy: Factory(:public_policy)
+      object = Factory :model, assay_ids: [Factory(:assay, contributor:User.current_user.person).id], policy: Factory(:public_policy)
       assert object.contains_sbml?
       pub = Factory :publication
       Factory :relationship, subject: object, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub

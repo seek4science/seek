@@ -1,6 +1,1 @@
-<%= index_title -%>
-<% if @organisms -%>
-  <h2><%= "#{t('project').pluralize} involved with the organism '"+h(@organisms)+"' ... " -%></h2>
-<% end %>
-
-<%= render :partial => "general/index_facets_or_paged" %>
+<%= render partial: 'general/index' %>

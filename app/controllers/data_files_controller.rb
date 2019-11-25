@@ -201,10 +201,7 @@ class DataFilesController < ApplicationController
     scope = scope.joins(:projects).where(projects: { id: current_user.person.projects }) unless (params[:all_projects] == 'true')
     scope = scope.where(simulation_data: true) if (params[:simulation_data] == 'true')
     scope = scope.with_extracted_samples if (params[:with_samples] == 'true')
-
-    @data_files = DataFile.authorize_asset_collection(
-      scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").distinct, 'view'
-    ).first(20)
+    @data_files = scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").distinct.authorized_for('view').first(20)
 
     respond_to do |format|
       format.html { render partial: 'data_files/association_preview', collection: @data_files, locals: { hide_sample_count: !params[:with_samples] } }
@@ -316,12 +313,10 @@ class DataFilesController < ApplicationController
   # handles the uploading of the file to create a content blob, which is then associated with a new unsaved datafile
   # and stored on the session
   def create_content_blob
-    @data_file = DataFile.new
+    @data_file = setup_new_asset
     respond_to do |format|
       if handle_upload_data && @data_file.content_blob.save
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
-        # assay ids passed forwards, e.g from "Add Datafile" button
-        @source_assay_ids = (params[:assay_ids] || [] ).reject(&:blank?)
         format.html {}
       else
         session.delete(:uploaded_content_blob_id)
@@ -333,14 +328,14 @@ class DataFilesController < ApplicationController
   # AJAX call to trigger any RightField extraction (if appropriate), and pre-populates the associated @data_file and
   # @assay
   def rightfield_extraction_ajax
-    @data_file = DataFile.new
+    @data_file = setup_new_asset
     @assay = Assay.new
     @warnings = nil
     critical_error_msg = nil
     session.delete :extraction_exception_message
 
     begin
-      if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
+      if params[:content_blob_id].to_s == session[:uploaded_content_blob_id].to_s
         @data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
         @warnings = @data_file.populate_metadata_from_template
         @assay, warnings = @data_file.initialise_assay_from_template
@@ -372,7 +367,7 @@ class DataFilesController < ApplicationController
     @data_file ||= session[:processed_datafile]
     @assay ||= session[:processed_assay]
 
-    #this peculiar line avoids a no method error when calling super later on, when there are no assays in the database
+    # this peculiar line avoids a no method error when calling super later on, when there are no assays in the database
     # this I believe is caused by accessing the unmarshalled @assay before the Assay class has been encountered. Adding this line
     # avoids the error
     Assay.new
@@ -380,14 +375,6 @@ class DataFilesController < ApplicationController
     @exception_message ||= session[:extraction_exception_message]
     @create_new_assay = @assay && @assay.new_record? && !@assay.title.blank?
     @data_file.assay_assets.build(assay_id: @assay.id) if @assay.persisted?
-
-    # associate any assays passed through with :assay_ids param
-    if params[:assay_ids]
-      assays = Assay.authorize_asset_collection(Assay.find(params[:assay_ids]),:edit)
-      assays.each do |assay|
-        @data_file.assay_assets.build(assay_id: assay.id)
-      end
-    end
 
     respond_to do |format|
       format.html
@@ -511,8 +498,8 @@ class DataFilesController < ApplicationController
   private
 
   def data_file_params
-    params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] }, :license, :other_creators,
-                                      :parent_name, { event_ids: [] },
+    params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] },
+                                      :license, :other_creators,{ event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       { scales: [] }, { publication_ids: [] })

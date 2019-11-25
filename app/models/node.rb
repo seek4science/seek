@@ -11,7 +11,7 @@ class Node < ApplicationRecord
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
   explicit_versioning(:version_column => "version") do
-    acts_as_doi_mintable(proxy: :parent)
+    acts_as_doi_mintable(proxy: :parent, general_type: 'Software')
     acts_as_versioned_resource
     acts_as_favouritable
 
@@ -25,11 +25,10 @@ class Node < ApplicationRecord
 
   #defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
-    true
+    Seek::Config.workflows_enabled
   end
 
   def is_github_cwl?
     return (!content_blob.url.nil?) && (content_blob.url.include? 'github.com') && (content_blob.url.end_with? 'cwl')
   end
-
 end

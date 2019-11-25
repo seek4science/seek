@@ -141,7 +141,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, params: { page: 'all' }
     assert_response :success
-    assert_equal assigns(:models).sort_by(&:id), Model.authorize_asset_collection(assigns(:models), 'view', users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
+    assert_equal assigns(:models).sort_by(&:id), assigns(:models).authorized_for('view', users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
   end
 
   test 'should contain only model assays ' do
@@ -154,11 +154,6 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'correct title and text for associating a modelling analysis for new' do
     login_as(Factory(:user))
-    as_virtualliver do
-      get :new
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
-    end
     as_not_virtualliver do
       get :new
       assert_response :success
@@ -171,11 +166,6 @@ class ModelsControllerTest < ActionController::TestCase
   test 'correct title and text for associating a modelling analysis for edit' do
     model = Factory :model
     login_as(model.contributor.user)
-    as_virtualliver do
-      get :edit, params: { id: model.id }
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
-    end
     as_not_virtualliver do
       get :edit, params: { id: model.id }
       assert_response :success
@@ -718,7 +708,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'filtering by person' do
     person = people(:person_for_model_owner)
-    get :index, params: { filter: { person: person.id }, page: 'all' }
+    get :index, params: { filter: { contributor: person.id }, page: 'all' }
     assert_response :success
     m = models(:model_with_format_and_type)
     m2 = models(:model_with_different_owner)
@@ -1174,13 +1164,13 @@ class ModelsControllerTest < ActionController::TestCase
 
     get :show, params: { id: model }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+    assert_select '#citation', text: /Bacall, F/, count:0
 
     model.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
     get :show, params: { id: model }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+    assert_select '#citation', text: /Bacall, F/, count:1
   end
 
   test 'associated with assay_ids params' do
@@ -1192,8 +1182,8 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert good_assay.can_edit?
     assert good_assay2.can_edit?
-    assert bad_assay2.can_edit?
     refute bad_assay.can_edit?
+    assert bad_assay2.can_edit?
 
     assert good_assay.is_modelling?
     assert good_assay2.is_modelling?
@@ -1203,13 +1193,15 @@ class ModelsControllerTest < ActionController::TestCase
 
     ids = [good_assay,good_assay2,bad_assay,bad_assay2].collect(&:id).collect(&:to_s)
 
-    get :new, params: { assay_ids: ids }
+    id_params = ids.collect{|id| {assay_id: id} }
+
+    get :new, params: {model: {assay_assets_attributes: id_params } }
 
     assert_response :success
 
     model = assigns(:model)
-    refute_empty model.assays
-    assert_equal [good_assay,good_assay2].sort,model.assays.sort
+    refute_empty model.assay_assets.collect(&:assay)
+    assert_equal [good_assay,good_assay2].collect(&:id).sort, model.assay_assets.collect(&:assay).collect(&:id).sort
 
     # dirty way to check that they end up in the embedded JSON script block.
     # Cannot test the elements itself as the javascript needs to execute first

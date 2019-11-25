@@ -64,7 +64,8 @@ class EventsControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, params: { page: 'all' }
     assert_response :success
-    assert_equal assigns(:events).sort_by(&:id), Event.authorize_asset_collection(assigns(:events), 'view', users(:aaron)).sort_by(&:id), "events haven't been authorized properly"
+    assert_equal assigns(:events).sort_by(&:id),
+                 assigns(:events).authorized_for('view', users(:aaron)).sort_by(&:id), "events haven't been authorized properly"
     assert assigns(:events).count < Event.count # fails if all events are assigned to @events
   end
 
@@ -97,6 +98,16 @@ class EventsControllerTest < ActionController::TestCase
     assert_difference('Event.count', 1) do
       post :create, params: { event: valid_event, sharing: valid_sharing }
     end
+    assert_equal 'FR',assigns(:event).country
+  end
+
+  test 'should create valid event with country name' do
+    assert_difference('Event.count', 1) do
+      event_params = valid_event
+      event_params[:country]='Germany'
+      post :create, params: { event:event_params, sharing: valid_sharing }
+    end
+    assert_equal 'DE',assigns(:event).country
   end
 
   test 'should not create invalid event' do
@@ -114,7 +125,7 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   def valid_event
-    { title: 'Barn Raising', start_date: DateTime.now, end_date: DateTime.now, project_ids: [@project.id] }
+    { title: 'Barn Raising', start_date: DateTime.now, end_date: DateTime.now, project_ids: [@project.id], country:'FR' }
   end
 
   test 'should get edit' do

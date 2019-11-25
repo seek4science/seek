@@ -128,6 +128,16 @@
       "minLength": 1,
       "format": "date-time"
     },
+    "nullableDateTimeString": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/dateTimeString"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "nonEmptyString": {
       "type": "string",
       "minLength": 1
@@ -208,7 +218,7 @@
       "required": [
         "snapshot",
         "url"
-        ]
+      ]
     },
     "nonEmptySnapshotsList": {
       "type": "array",
@@ -355,6 +365,9 @@
         "version"
       ],
       "additionalProperties": false
+    },
+    "indexLinks": {
+      "$ref": "#/definitions/linksType"
     },
     "linksType": {
       "type": "object",
@@ -1649,6 +1662,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -4239,6 +4255,44 @@
       ],
       "additionalProperties": false
     },
+    "member": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "institution_id": {
+          "$ref": "#/definitions/nonEmptyString"
+        }
+      }
+    },
+    "membersList": {
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/member"
+      }
+    },
+    "nullableMembersList": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/membersList"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+
+    "personList": {
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/nonEmptyString"
+      }
+    },
     "projectResponse": {
       "type": "object",
       "properties": {
@@ -4274,7 +4328,20 @@
                 },
                 "default_license": {
                   "$ref": "#/definitions/nullableLicense"
+                },
+                "members": {
+                  "$ref": "#/definitions/nullableMembersList"
+                },
+                "start_date": {
+                  "$ref": "#/definitions/nullableDateTimeString"
+                },
+                "end_date": {
+                  "$ref": "#/definitions/nullableDateTimeString"
+                },
+                "use_default_policy":  {
+                  "type": "boolean"
                 }
+
               },
               "required": [
                 "title",
@@ -4289,6 +4356,18 @@
               "properties": {
                 "organisms": {
                   "$ref": "#/definitions/organismReferencesList"
+                },
+                "pals": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "project_administrators": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "asset_housekeepers": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "asset_gatekeepers": {
+                  "$ref": "#/definitions/peopleReferenceList"
                 },
                 "people": {
                   "$ref": "#/definitions/peopleReferenceList"
@@ -4410,6 +4489,18 @@
                 },
                 "default_license": {
                   "$ref": "#/definitions/nullableLicense"
+                },
+                "members": {
+                  "$ref": "#/definitions/nullableMembersList"
+                },
+                "start_date": {
+                  "$ref": "#/definitions/nullableDateTimeString"
+                },
+                "end_date": {
+                  "$ref": "#/definitions/nullableDateTimeString"
+                },
+                "use_default_policy":  {
+                  "type": "boolean"
                 }
               },
               "additionalProperties": false
@@ -4417,6 +4508,18 @@
             "relationships": {
               "type": "object",
               "properties": {
+                "pals": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "project_administrators": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "asset_housekeepers": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "asset_gatekeepers": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
                 "programmes": {
                   "$ref": "#/definitions/programmeReferencesList"
                 },
@@ -4471,6 +4574,19 @@
                 },
                 "default_license": {
                   "$ref": "#/definitions/nullableLicense"
+                },
+                "members": {
+                  "$ref": "#/definitions/nullableMembersList"
+                },
+                "start_date": {
+                  "$ref": "#/definitions/nullableDateTimeString"
+                },
+                "end_date": {
+                  "$ref": "#/definitions/nullableDateTimeString"
+                },
+                "use_default_policy":  {
+                  "type": "boolean",
+                  "default": false
                 }
               },
               "required": [
@@ -4481,6 +4597,18 @@
             "relationships": {
               "type": "object",
               "properties": {
+                "pals": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "project_administrators": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "asset_housekeepers": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "asset_gatekeepers": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
                 "programmes": {
                   "$ref": "#/definitions/programmeReferencesList"
                 },
@@ -4539,8 +4667,20 @@
                 "citation": {
                   "$ref": "#/definitions/nullableNonEmptyString"
                 },
+                "editor": {
+                  "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "booktitle": {
+                  "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "publisher": {
+                  "$ref": "#/definitions/nullableNonEmptyString"
+                },
                 "link_to_pub": {
                   "$ref": "#/definitions/nullableUriString"
+                },
+                "publication_type": {
+                  "$ref": "#/definitions/nullableNonEmptyString"
                 },
                 "authors": {
                   "$ref": "#/definitions/nullableNonEmptyStringList"
@@ -5117,6 +5257,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5137,6 +5280,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5197,6 +5343,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5257,6 +5406,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5317,6 +5469,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5377,6 +5532,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5437,6 +5595,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5497,6 +5658,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5557,6 +5721,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5617,6 +5784,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5677,6 +5847,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5737,6 +5910,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5797,6 +5973,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5857,6 +6036,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5917,6 +6099,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [
@@ -5977,6 +6162,9 @@
         },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
+        },
+        "links": {
+          "$ref": "#/definitions/indexLinks"
         }
       },
       "required": [

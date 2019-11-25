@@ -313,12 +313,12 @@ class User < ApplicationRecord
   end
 
   def queue_update_auth_table
-    AuthLookupUpdateJob.new.add_items_to_queue(self)
+    AuthLookupUpdateQueue.enqueue(self)
   end
 
   def remove_from_auth_tables
     Seek::Util.authorized_types.each do |type|
-      ActiveRecord::Base.connection.execute("delete from #{type.lookup_table_name} where user_id=#{id}")
+      type.lookup_class.where(user: id).delete_all
     end
   end
 end

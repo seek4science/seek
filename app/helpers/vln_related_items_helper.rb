@@ -3,7 +3,7 @@ module VlnRelatedItemsHelper
   # Each hash value
   def resource_hash_lazy_load(resource)
     resource_hash = {}
-    all_related_items_hash = collect_related_items(resource)
+    all_related_items_hash = get_related_resources(resource)
     all_related_items_hash.each_key do |resource_type|
       all_related_items_hash[resource_type][:items] = all_related_items_hash[resource_type][:items].uniq.compact
       unless all_related_items_hash[resource_type][:items].empty?

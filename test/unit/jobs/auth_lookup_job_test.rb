@@ -58,20 +58,26 @@ class AuthLookupJobTest < ActiveSupport::TestCase
 
     assert_difference('Delayed::Job.count', 1) do
       assert_difference('AuthLookupUpdateQueue.count', 2) do
-        AuthLookupUpdateJob.new.add_items_to_queue [sop, data, sop]
+        AuthLookupUpdateQueue.enqueue(sop, data, sop)
       end
     end
 
     assert_equal [data, sop], AuthLookupUpdateQueue.all.collect(&:item).sort_by { |i| i.class.name }
+    items = AuthLookupUpdateJob.new.send(:gather_items)
+    assert_equal 2, items.length
+    assert_includes items, sop
+    assert_includes items, data
 
     AuthLookupUpdateQueue.destroy_all
     Delayed::Job.destroy_all
     assert_difference('Delayed::Job.count', 1) do
       assert_difference('AuthLookupUpdateQueue.count', 1) do
-        AuthLookupUpdateJob.new.add_items_to_queue nil
+        AuthLookupUpdateQueue.enqueue(nil)
       end
     end
     assert_nil AuthLookupUpdateQueue.first.item
+    items = AuthLookupUpdateJob.new.send(:gather_items)
+    assert_includes items, nil
   end
 
   test 'perform' do
@@ -80,26 +86,23 @@ class AuthLookupJobTest < ActiveSupport::TestCase
     other_user = Factory :user
     sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
     AuthLookupUpdateQueue.destroy_all
-    AuthLookupUpdateJob.new.add_items_to_queue sop
+    AuthLookupUpdateQueue.enqueue(sop)
     Sop.clear_lookup_table
 
     assert_difference('AuthLookupUpdateQueue.count', -1) do
       AuthLookupUpdateJob.new.perform
     end
 
-    c = ActiveRecord::Base.connection.select_one('select count(*) from sop_auth_lookup;').values[0].to_i
     #+1 to User count to include anonymous user
-    assert_equal User.count + 1, c
+    assert_equal User.count + 1, Sop::AuthLookup.count
 
     assert Sop.lookup_table_consistent?(user.id)
     assert Sop.lookup_table_consistent?(other_user.id)
   end
 
   test 'takes items from queue according to batch size configuration' do
-    sop = Factory(:sop)
-    20.times do
-      AuthLookupUpdateQueue.create(item: sop, priority: 0)
-    end
+    # Creating SOPs will automatically enqueue them in the AuthLookupUpdateQueue on save
+    FactoryGirl.create_list(:sop, 10)
 
     with_config_value(:auth_lookup_update_batch_size, 3) do
       assert_difference('AuthLookupUpdateQueue.count', -3) do

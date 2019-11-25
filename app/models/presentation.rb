@@ -1,37 +1,25 @@
 class Presentation < ApplicationRecord
 
-   attr_accessor :orig_data_file_id
+  include Seek::BioSchema::Support
 
-   #searchable must come before acts_as_asset call - although empty is seems this is needed to avoid the autoindex
-   #even though in Seek::ActsAsAsset::Search it is already set to false!
-   acts_as_asset
+  attr_accessor :orig_data_file_id
 
-   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
+  #searchable must come before acts_as_asset call - although empty is seems this is needed to avoid the autoindex
+  #even though in Seek::ActsAsAsset::Search it is already set to false!
+  acts_as_asset
 
-   validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
+  has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
-   explicit_versioning(:version_column => "version") do
-     acts_as_versioned_resource
-     acts_as_favouritable
-     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
-             :primary_key => :presentation_id,:foreign_key => :asset_id
+  validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
+
+  explicit_versioning(:version_column => "version") do
+    acts_as_versioned_resource
+    acts_as_favouritable
+    has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
+            :primary_key => :presentation_id,:foreign_key => :asset_id
   end
 
-   if Seek::Config.events_enabled
-    has_and_belongs_to_many :events
-  else
-    def events
-      []
-    end
-
-    def event_ids
-      []
-    end
-
-    def event_ids= events_ids
-
-    end
-  end
+  has_and_belongs_to_many :events
 
   # get a list of Presentations with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)

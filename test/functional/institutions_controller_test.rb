@@ -32,7 +32,7 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   def test_should_create_institution
     assert_difference('Institution.count') do
-      post :create, params: { institution: { title: 'test', country: 'Finland' } }
+      post :create, params: { institution: { title: 'test', country: 'FI' } }
     end
 
     assert_redirected_to institution_path(assigns(:institution))
@@ -137,7 +137,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_difference('Institution.count') do
-      post :create, params: { institution: { title: 'a test institution', country: 'Thailand' } }
+      post :create, params: { institution: { title: 'a test institution', country: 'TH' } }
     end
   end
 
@@ -210,12 +210,6 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal institution, log.activity_loggable
     assert_equal 'update', log.action
     assert_equal person.user, log.culprit
-  end
-
-  test 'no resource count stats' do
-    get :index
-    assert_response :success
-    assert_select '#resource-count-stats', count: 0
   end
 
   def edit_max_object(inst)

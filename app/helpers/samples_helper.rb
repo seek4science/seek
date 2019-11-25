@@ -23,7 +23,7 @@ module SamplesHelper
       collection_select :sample, attribute_method_name, terms, :label, :label,
                         { include_blank: !attribute.required? }, class: "form-control #{clz}"
     when Seek::Samples::BaseType::SEEK_SAMPLE
-      terms = Sample.authorize_asset_collection(attribute.linked_sample_type.samples, :view)
+      terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
       collection_select :sample, attribute_method_name, terms, :id, :title,
                         { include_blank: !attribute.required? }, class: "form-control #{clz}"
     else
@@ -44,7 +44,7 @@ module SamplesHelper
   end
 
   def display_attribute(sample, attribute, options = {})
-    value = sample.get_attribute(attribute)
+    value = sample.get_attribute_value(attribute)
     if value.blank?
       text_or_not_specified(value)
     else

@@ -67,20 +67,4 @@ class HomesController < ApplicationController
       format.html
     end
   end
-
-  private
-
-  RECENT_SIZE = 3
-
-  def classify_for_tabs(result_collection)
-    # FIXME: this is duplicated in application_helper - but of course you can't call that from within controller
-    results = {}
-
-    result_collection.each do |res|
-      results[res.class.name] = [] unless results[res.class.name]
-      results[res.class.name] << res
-    end
-
-    results
-  end
 end

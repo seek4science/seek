@@ -27,13 +27,11 @@ module Seek
         end
       end
 
-      resource_hash = classify_for_tabs items
+      resource_hash = ApplicationHelper.classify_for_tabs(items)
       active_tab = params[:active_tab]
 
       render_to_string partial: 'assets/resource_tabbed_one_facet',
                        locals: { resource_hash: resource_hash,
-                                 narrow_view: true,
-                                 authorization_already_done: true,
                                  display_immediately: true,
                                  active_tab: active_tab }
     end
@@ -53,28 +51,11 @@ module Seek
       item_ids.collect!(&:to_i)
       unless item_type.blank?
         clazz = item_type.constantize
-        items = clazz.where(id: item_ids)
-        if clazz.respond_to?(:authorize_asset_collection)
-          items = clazz.authorize_asset_collection(items, 'view')
-        else
-          items = items.select(&:can_view?)
-        end
+        items = clazz.where(id: item_ids).authorized_for('view').to_a
       end
 
       items.sort! { |a, b| item_ids.index(a.id) <=> item_ids.index(b.id) }
       items
-    end
-
-    def classify_for_tabs(result_collection)
-      results = {}
-
-      result_collection.each do |res|
-        tab = res.respond_to?(:tab) ? res.tab : res.class.name
-        results[tab] = { items: [], hidden_count: 0, is_external: (res.respond_to?(:is_external_search_result?) && res.is_external_search_result?) } unless results[tab]
-        results[tab][:items] << res
-      end
-
-      results
     end
 
     def get_type_id_hash
