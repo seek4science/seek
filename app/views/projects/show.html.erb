@@ -1,5 +1,12 @@
 <%= render :partial => "general/item_title",:locals => {:item=>@project, :buttons_partial => 'projects/buttons'} %>
+  <div>
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+                <img src="/assets/guidance.png" alt="user guidance" style=" width: 100%; height: auto;margin-bottom:20px" />
+            </div>
+            <div class="col-lg-2"></div>
 
+        </div>
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
     <%= item_description @project.description -%>
