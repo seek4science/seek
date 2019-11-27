@@ -19,11 +19,11 @@
     <%= admin_textarea_setting(:home_description, Seek::Config.home_description,
                                "Home page description", "Sets the description text on the front page") %>
 
-<!--
+
     <%= admin_checkbox_setting(:front_page_buttons_enabled, 1, Seek::Config.front_page_buttons_enabled,
                                "Home page buttons enabled", "Display the three large buttons on the home page.") %>
 
--->
+
     <%= admin_text_setting(:tag_threshold, Seek::Config.tag_threshold,
                            'Tag threshold', 'Tags must have a count above or equal to this value to appear in either expanded or collapsed left hand tag cloud.',
                            :onkeypress => "javascript: return onlyNumbers(event);") %>
