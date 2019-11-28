@@ -25,6 +25,14 @@ GIT
     my_responds_to_parent (1.0.0)
 
 GIT
+  remote: https://github.com/fbacall/ro-crate-ruby.git
+  revision: c68cd464f6fe577c1354e9c577871f86d1149155
+  specs:
+    ro-crate-ruby (0.0.1)
+      addressable
+      rubyzip
+
+GIT
   remote: https://github.com/myGrid/search_biomodel.git
   revision: e109ac6d8b102f7ecb65140c17d263b85e066870
   specs:
@@ -964,6 +972,7 @@ DEPENDENCIES
   rfc-822
   rmagick (= 2.15.2)
   ro-bundle
+  ro-crate-ruby!
   rspec-rails
   rubocop
   ruby-prof (= 0.15.9)
@@ -996,4 +1005,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-  1.17.3 
+   2.0.2

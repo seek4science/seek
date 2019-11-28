@@ -293,6 +293,14 @@ class Project < ApplicationRecord
     errors.add(:end_date, 'is before start date.') unless end_date.nil? || start_date.nil? || end_date >= start_date
   end
 
+  def ro_crate_metadata
+    {
+        id: "#project-#{id}",
+        name: title,
+        identifier: rdf_seek_id
+    }
+  end
+
   # should put below at the bottom in order to override methods for hierarchies,
   # Try to find a better way for overriding methods regardless where to include the module
   if Seek::Config.project_hierarchy_enabled

@@ -577,6 +577,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
       get :diagram
+      get :ro_crate
     end
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end

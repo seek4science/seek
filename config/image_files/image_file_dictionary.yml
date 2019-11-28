@@ -191,6 +191,7 @@ cwl_workflow: 'avatars/workflow_types/avatar-cwl.svg'
 galaxy_workflow: 'avatars/workflow_types/avatar-galaxy.png'
 knime_workflow: 'avatars/workflow_types/avatar-knime.svg'
 ro_workflow: 'avatars/workflow_types/avatar-ro.png'
+ro_crate_avatar: 'file_icons/ro-crate.svg'
 
 # roles
 project_administrator: 'roles/role-project-admin.png'
@@ -217,6 +218,7 @@ txt_file: 'file_icons/small/txt.png'
 xls_file: 'file_icons/small/xls.png'
 xml_file: 'file_icons/small/xml.png'
 zip_file: 'file_icons/small/zip.png'
+ro_crate_file: 'file_icons/small/ro-crate.png'
 
 #missing mime types files added by script
 3ds_file: 'file_icons/small/3ds.png'

@@ -34,6 +34,9 @@
                                 display_asset.single_content_blob.try(:url),
                                 human_name,
                                 class: 'btn btn-default', disabled: asset.download_disabled? %>
+    <% if asset.is_a?(Workflow) %>
+      <%= button_link_to('RO Crate', 'ro_crate_file', ro_crate_workflow_path(asset, version: version, code: params[:code])) %>
+    <% end %>
     <% if show_explore_btn %>
       <% if display_asset.contains_extractable_spreadsheet? %>
         <%= button_link_to('Explore', 'spreadsheet', polymorphic_path(asset, version: version, action: :explore, code: params[:code])) %>

@@ -5,7 +5,7 @@ class WorkflowsController < ApplicationController
   before_action :workflows_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
-  before_action :find_display_asset, only: [:show, :download, :diagram]
+  before_action :find_display_asset, only: [:show, :download, :diagram, :ro_crate]
 
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
@@ -169,6 +169,23 @@ class WorkflowsController < ApplicationController
         send_file(@diagram.path,
                   filename: @diagram.filename,
                   type: @diagram.content_type,
+                  disposition: 'inline')
+      end
+    end
+  end
+
+  def ro_crate
+    crate = @display_workflow.ro_crate
+    path = nil
+    Tempfile.open('crate') do |f|
+      path = f.path
+      ROCrate::Writer.new(crate).write_zip(path)
+    end
+    respond_to do |format|
+      format.html do
+        send_file(path,
+                  filename: "workflow-#{@workflow.id}-#{@display_workflow.version}-ro-crate.zip",
+                  type: 'application/zip',
                   disposition: 'inline')
       end
     end
