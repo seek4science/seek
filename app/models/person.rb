@@ -390,7 +390,7 @@ class Person < ApplicationRecord
 
   def ro_crate_metadata
     {
-        id: orcid.present? ? orcid : "#person-#{id}",
+        '@id' => orcid.present? ? orcid : "#person-#{id}",
         name: name,
         identifier: orcid.present? ? orcid : rdf_seek_id
     }

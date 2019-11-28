@@ -29,14 +29,6 @@ module WorkflowExtraction
     WorkflowDiagram.new(workflow, version, path, format, content_type)
   end
 
-  def ro_crate_metadata
-    {
-        id: "#workflow-#{id}",
-        name: title,
-        identifier: doi ? doi : rdf_seek_id
-    }
-  end
-
   def ro_crate
     ROCrate::Crate.new.tap do |crate|
       c = content_blob
@@ -52,7 +44,9 @@ module WorkflowExtraction
       wdf.properties['about'] = wf.reference
       crate.date_published = Time.now
       crate.author = related_people.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
+      crate.publisher = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata) }
       crate.license = license
+      crate.url = ro_crate_identifier.sub('?version', '/ro_crate?version') #awful hack
     end
   end
 

@@ -295,7 +295,7 @@ class Project < ApplicationRecord
 
   def ro_crate_metadata
     {
-        id: "#project-#{id}",
+        '@id' => "#project-#{id}",
         name: title,
         identifier: rdf_seek_id
     }
