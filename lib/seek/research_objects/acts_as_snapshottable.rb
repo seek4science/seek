@@ -28,13 +28,17 @@ module Seek #:nodoc:
 
       module InstanceMethods
         def create_snapshot
-          ro_file = Seek::ResearchObjects::Generator.new(self).generate
+          Rails.logger.debug("Creating snapshot for: #{self.class.name} #{id}")
           snapshot = snapshots.create
-          blob = ContentBlob.new(tmp_io_object: ro_file,
-                                 content_type: Mime::Type.lookup_by_extension('ro').to_s,
-                                 original_filename: "#{self.class.name.underscore}-#{id}-#{snapshot.snapshot_number}.ro.zip")
-          blob.asset = snapshot
-          blob.save
+          filename = "#{self.class.name.underscore}-#{id}-#{snapshot.snapshot_number}.ro.zip"
+          blob = snapshot.build_content_blob(content_type: Mime::Type.lookup_by_extension('ro').to_s,
+                                             original_filename: filename)
+          Rails.logger.debug("Generating RO...")
+          ro_file = Seek::ResearchObjects::Generator.new(self).generate
+          Rails.logger.debug("Writing zip file to content blob (and fixing)...")
+          `zip -FF #{ro_file.path} --out #{blob.filepath}`
+          blob.save!
+          Rails.logger.debug("Done!")
           snapshot
         end
 
