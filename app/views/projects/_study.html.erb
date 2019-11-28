@@ -1,0 +1,34 @@
+    <div class="simpleForm">
+        <ul class="nav nav-tabs">
+            <li class="active "><a data-toggle="tab" href="#home"><i class="glyphicon glyphicon-th-list"></i>
+                    Details</a></li>
+            <li><a data-toggle="tab" href="#menu1"><i class="glyphicon glyphicon-pencil"></i> Design</a></li>
+            <li><a data-toggle="tab" href="#menu2"
+                    onclick="setTimeout(() => { loadWorkflow(getCookie('whichWorkflow'))}, 250);"><i
+                        class="glyphicon glyphicon-random"></i> Workflow</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="home" class="tab-pane fade in active" style="padding:10px">
+                <p id="title"><strong style="text-align: center;">Title:</strong> <span
+                        id="studytitleContent">Transcriptomics</span></p>
+                <p id="description"> <strong>Description:</strong> <span id="StudyDescriptionContent">How temperature
+                        affects gene expression</span> </p>
+                <p><strong>Hypothesis: </strong> <span id="Hypothesis">Warm temperature affect pathogenicity
+                        genes</span></p>
+                <p><strong>Experimentalists: </strong> experimentalists description</p>
+                <div class="form-group">
+                    <label>Shared with: </label>
+                    <div class="bootstrap-tagsinput"><span class="tag label label-default">Vahid Kiani<span
+                                data-role="remove"></span></span>
+                        <input type="text" />
+                    </div>
+                </div>
+            </div>
+            <div id="menu1" class="tab-pane fade" style="padding:10px">
+                <%=  render partial: 'study_design' %>
+            </div>
+            <div id="menu2" class="tab-pane fade" style="padding:10px">
+                <%=  render partial: 'workflow' %>
+            </div>
+        </div>
+    </div>

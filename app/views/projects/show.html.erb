@@ -1,166 +1,197 @@
 <%= render :partial => "general/item_title",:locals => {:item=>@project, :buttons_partial => 'projects/buttons'} %>
-  <div>
-            <div class="col-lg-2"></div>
-            <div class="col-lg-8">
-                <img src="/assets/guidance.png" alt="user guidance" style=" width: 100%; height: auto;margin-bottom:20px" />
-            </div>
-            <div class="col-lg-2"></div>
-
-        </div>
+<div>
+  <div class="col-lg-2"></div>
+  <div class="col-lg-8">
+    <img src="/assets/guidance.png" alt="user guidance" style=" width: 100%; height: auto;margin-bottom:20px" />
+  </div>
+  <div class="col-lg-2"></div>
+</div>
 <div class="row">
-  <div class="col-md-9 col-sm-8 box_about_actor">
+  <div class="col-md-12  box_about_actor">
     <%= item_description @project.description -%>
-
     <div class="row">
-      <div class="col-md-6">
-        <% if Seek::Config.programmes_enabled %>
-            <p>
-              <strong><%= t('programme') -%>:</strong>
-              <%= programme_link(@project) -%>
-            </p>
-        <% end %>
-
-        <%= persistent_resource_id(@project) %>
-
-        <%= show_funding_codes(@project) %>
-
-        <p>
-          <strong>Public web page:</strong>
-          <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
-        </p>
-
-        <% unless hide_contact_details?(@project) %>
-            <p>
-              <strong>Internal web page:</strong>
-              <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
-            </p>
-        <% end %>
-
-        <% if Seek::Config.organisms_enabled %>
-            <p>
-              <strong>Organisms:</strong>
-              <%= organisms_link_list @project.organisms -%>
-            </p>
-        <% end %>
+      <div class=col-lg-3>
+        <div id="treeview" class="col-lg-12 project_treeview">
+          <div id="html" class="demo"></div>
+        </div>
       </div>
+      <div class="col-lg-9">
 
-      <div class="col-md-6">
-        <p class="pals">
-          <strong><%= Seek::Config.dm_project_name %> <%= t('pal').pluralize %>:</strong>
-          <%= pals_link_list @project -%>
-        </p>
-
-        <% if @project.respond_to?(:project_coordinators) %>
-            <p class="project_coordinators">
-              <strong>Project Coordinators:</strong>
-              <%= project_coordinators_link_list @project %>
-            </p>
-        <% end%>
-
-        <% if logged_in_and_registered? %>
-            <p class="project_administrators">
-              <strong><%= t('project_administrator').pluralize %>:</strong>
-              <%= project_administrator_link_list @project %>
-            </p>
-        <% end %>
+        <div style="padding:10px;background-color: aliceblue;border-radius: 5px; border: #ddd 1px solid">
+          <div id="container" class="container-fluid">
 
 
-        <% if admin_logged_in? || @project.has_member?(current_user) %>
-            <p class="asset_housekeepers">
-              <strong><%= t('asset_housekeeper').pluralize %>:</strong>
-              <%= asset_housekeepers_link_list @project %>
-            </p>
+            PROJECT DETAIL
 
-            <p class="asset_gatekeepers">
-              <strong><%= t('asset_gatekeeper').pluralize %>:</strong>
-              <%= gatekeepers_link_list @project %>
-            </p>
-        <% end %>
-        <p>
-          <% if @project.start_date %>
-            <strong><%= t('project') -%> start date:</strong>
-            <%= date_as_string(@project.start_date, false) -%>
-          <% else %>
-            <strong><%= t('project') -%> created:</strong>
-            <%= date_as_string(@project.created_at, false) %>
-          <% end %>
-        </p>
-        <% if @project.end_date %>
-          <p>
-            <strong><%= t('project') -%> end date:</strong>
-            <%= date_as_string(@project.end_date, false) -%>
-          </p>
-        <% end %>
+            <div id="projectDetailContainer" class="row">
+
+              <div class="col-lg-8 simpleForm">
+                <%= render :partial => "project_details" -%>
+              </div>
+              <div class="col-lg-4">
+                <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project } -%>
+                <% if @project.can_manage? %>
+                <%= render :partial => 'general/storage_usage_box', locals: { programme: @project,
+                                                                    url: storage_report_project_path(@project)} %>
+                <% end %>
+              </div>
+
+            </div>
+
+            FILE MANAGER
+
+            <div id="fileManagerContainer" class="row">
+              <%= render :partial => "filemanager" -%>
+
+            </div>
+
+            INVESTIGATION
+
+            <div id="investigationContainer" class="row">
+              <%= render :partial => "investigation_details" -%>
+
+            </div>
+
+            STUDY
+
+            <div id="studyContainer" class="row">
+              <%= render :partial => "study" -%>
+
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-
-  </div>
-
-  <div class="col-md-3 col-sm-4">
-    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project } -%>
-    <% if @project.can_manage? %>
-      <%= render :partial => 'general/storage_usage_box', locals: { programme: @project,
-                                                                    url: storage_report_project_path(@project)} %>
-    <% end %>
-  </div>
-</div>
-
-<% if Seek::Config.project_hierarchy_enabled && logged_in_and_member? -%>
+    <% if Seek::Config.project_hierarchy_enabled && logged_in_and_member? -%>
     <div style="clear:both;">
       <b>
         Project Hierarchies
         (<%= link_to "hide", '#', id: 'project-hierarchy-toggle' -%>):
-      </b><br/><br/>
-
+      </b>
+      <br />
+      <br />
       <div id="project_hierarchy">
-        <ul><%= Rails.cache.fetch([:project_tree_editor, @project.cache_key]) { tree_editor_display Project, false, false, @project.id, "Person", true, true } %></ul>
+        <ul>
+          <%= Rails.cache.fetch([:project_tree_editor, @project.cache_key]) { tree_editor_display Project, false, false, @project.id, "Person", true, true } %>
+        </ul>
       </div>
     </div>
-    <br/>
+    <br />
     <div style="clear:both;">
       <b>
         <%= t('project') %> Members
         (<%= link_to "show", '#', id: 'project-hierarchy-members-toggle' %>):
-      </b><br/><br/>
+      </b>
+      <br />
+      <br />
       <div id="project_mailing_list" style="display: none;">
         <%= project_mailing_list @project %>
       </div>
     </div>
-<% end %>
-
-<%# get, classify and authorize all assets for this project -%>
-<%= render :partial=>"general/items_related_to",:object => @project %>
-
-<% if request_project_membership_button_enabled?(@project) %>
+    <% end %>
+    <% if false%>
+    <%# get, classify and authorize all assets for this project -%>
+    <%= render :partial=>"general/items_related_to",:object => @project %>
+    <%end%>
+    <% if request_project_membership_button_enabled?(@project) %>
     <%= render partial: 'request_membership_form', locals: { project: @project } %>
-<% end %>
+    <% end %>
+  </div>
+</div>
 
 <script>
   $j('#project-hierarchy-toggle').click(function () {
-      var el = $j('#project_hierarchy');
+    var el = $j('#project_hierarchy');
 
-      if (el[0].style.display === 'none') {
-          el.fadeIn();
-          $j(this).text('hide');
-      } else {
-          el.fadeOut();
-          $j(this).text('show');
-      }
+    if (el[0].style.display === 'none') {
+      el.fadeIn();
+      $j(this).text('hide');
+    } else {
+      el.fadeOut();
+      $j(this).text('show');
+    }
 
-      return false;
+    return false;
   });
 
   $j('#project-hierarchy-members-toggle').click(function () {
-      var el = $j('#project_mailing_list');
+    var el = $j('#project_mailing_list');
 
-      if (el[0].style.display === 'none') {
-          el.fadeIn();
-          $j(this).text('hide');
-      } else {
-          el.fadeOut();
-          $j(this).text('show');
-      }
+    if (el[0].style.display === 'none') {
+      el.fadeIn();
+      $j(this).text('hide');
+    } else {
+      el.fadeOut();
+      $j(this).text('show');
+    }
 
-      return false;
+    return false;
   });
+</script>
+
+<script>
+  (function ($, undefined) {
+    "use strict";
+    $j.jstree.plugins.separate = function (options, parent) {
+      this.redraw_node = function (obj, deep, callback, force_draw) {
+        obj = parent.redraw_node.apply(this, arguments);
+        var n = this.get_node(obj),
+          d = document;
+        if (obj) {
+          if (n.original.count) {
+            obj.childNodes[1].innerHTML += " <span class='badge badge-secondary'>" + n.original.count +
+              "</span>"
+            if (n.original._type) $j(obj.childNodes[1]).attr('_type', n.original._type)
+            if (n.original._id) $j(obj.childNodes[1]).attr('_id', n.original._id)
+          }
+          if (n.state.separate) {
+            let p = d.createElement('p')
+            p.innerHTML = n.state.separate.label;
+            p.className = 'separator';
+            if (n.state.separate.action) {
+              let a = d.createElement('a')
+              a.href = n.state.separate.action;
+              a.className = 'treeaction glyphicon glyphicon-plus';
+              obj.prepend(a)
+            }
+            obj.prepend(p);
+          }
+        }
+        return obj;
+      };
+    }
+  })(jQuery);
+
+  $j('#html').on('changed.jstree', function (e, data) {})
+    .jstree({
+      'core': {
+        'data': [
+          'Simple root node',
+          {
+            'text': 'Root node 2',
+            '_type': 'project',
+            '_id': '333',
+            'count': 5,
+            'state': {
+              'opened': true,
+              'selected': true,
+              'separate': {
+                'label': 'Studies',
+                'action': 'http://www.google.com'
+              }
+
+            },
+            'children': [{
+                'text': 'Child 1',
+                '_type': 'project',
+                '_id': '333',
+                'count': 10,
+              },
+              'Child 2',
+            ]
+          }
+        ]
+      },
+      plugins: ["separate"]
+    });
 </script>

@@ -1,0 +1,321 @@
+<div id="content-wrapper">
+    <div class="inner">
+
+        <div id="tableContainer" style="text-align: center;margin-right: auto; margin-left: auto;">
+            <h2>Experimental factors</h1>
+
+                <a class="btn btn-primary " style="font-size:10px;float:left" onClick="addVar()"> <i
+                        class="glyphicon glyphicon-plus"></i> Add Variable</a>
+
+                <table class="table tableXs indtable">
+                    <thead class="thead-dark">
+                        <th>Experimental factors</th>
+                        <th></th>
+                        <th>Factors levels</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="2">Temperature (°c)</td>
+                            <td rowspan="2">
+                                <a class="btn btn-primary" style="font-size:10px" onClick="addLevel()"> <i
+                                        class="glyphicon glyphicon-plus"></i> Add Level</a>
+                            </td>
+                            <td>25 </td>
+                        </tr>
+                        <tr>
+
+                            <td>37</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                <h2>Response variables</h1>
+
+                    <a class="btn btn-primary " style="font-size:10px;float:left" onClick="addDepVar()"> <i
+                            class="glyphicon glyphicon-plus"></i> Add Variable</a>
+
+                    <a class="btn btn-primary " style="font-size:10px;float:left;margin-left:5px" onClick="addDepCol()">
+                        <i class="glyphicon glyphicon-plus"></i> Add sub-sample</a>
+
+                    <table class="table tableXs deptable">
+                        <thead class="thead-dark">
+                            <th>Response variables (what will you quantify?)</th>
+                            <th>Material (quantification on what?)</th>
+                            <th>Sub-sample of</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Gene expression</td>
+                                <td>L. Theobromae</td>
+                                <td>N/A</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                    <h2>Blocking variables</h1>
+
+                        <a class="btn btn-primary " style="font-size:10px;float:left" onClick="addBlockVar()"> <i
+                                class="glyphicon glyphicon-plus"></i> Add Variable</a>
+
+                        <table class="table tableXs blocktable">
+                            <thead class="thead-dark">
+                                <th>Blocking variables</th>
+                                <th></th>
+                                <th>Levels</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td rowspan="1">N/A</td>
+                                    <td rowspan="1">
+                                        <a class="btn btn-primary" style="font-size:10px" onClick="addLevel()"> <i
+                                                class="glyphicon glyphicon-plus"></i> Add Level</a>
+                                    </td>
+                                    <td>N/A </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+
+
+                        <h2>Covariates</h1>
+
+                            <a class="btn btn-primary " style="font-size:10px;float:left" onClick="addCovVar()"> <i
+                                    class="glyphicon glyphicon-plus"></i> Add Variable</a>
+
+                            <table class="table tableXs covtable">
+                                <thead class="thead-dark">
+                                    <th>Covariates (Variables of no interest that might affect response variables)</th>
+                                    <th></th>
+                                    <th>Levels</th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="2">Experimentalist</td>
+                                        <td rowspan="2">
+                                            <a class="btn btn-primary" style="font-size:10px" onClick="addLevel()"> <i
+                                                    class="glyphicon glyphicon-plus"></i> Add Level</a>
+                                        </td>
+                                        <td>fldan </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>vakia </td>
+
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+
+                            <h2>Confounding variables</h2>
+
+
+                            <a class="btn btn-primary " style="font-size:10px;float:left" onClick="addConfVar()"> <i
+                                    class="glyphicon glyphicon-plus"></i> Add Variable</a>
+
+                            <table class="table tableXs conftable">
+                                <thead class="thead-dark">
+                                    <th>Confounding variables (Variables of no interest that might affect experimental
+                                        factors and response variables)</th>
+                                    <th></th>
+                                    <th>Levels</th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="1">N/A</td>
+                                        <td rowspan="1">
+                                            <a class="btn btn-primary" style="font-size:10px" onClick="addLevel()"> <i
+                                                    class="glyphicon glyphicon-plus"></i> Add Level</a>
+                                        </td>
+                                        <td>N/A </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                            <h2>Control variables</h2>
+
+
+                            <a class="btn btn-primary " style="font-size:10px;float:left" onClick="addControlVar()"> <i
+                                    class="glyphicon glyphicon-plus"></i> Add Variable</a>
+
+                            <table class="table tableXs controltable">
+                                <thead class="thead-dark">
+                                    <th>Control variables (Variable that stay unchanged)</th>
+                                    <th>Description</th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Geographical coordinates</td>
+                                        <td>Long, lat, etc...</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Time of treatment (days)</td>
+                                        <td>4</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+                            <h2>Replicates</h2>
+
+
+                            <a class="btn btn-primary " style="font-size:10px;float:left" onClick="addRep()"> <i
+                                    class="glyphicon glyphicon-plus"></i> Add Variable</a>
+
+                            <table class="table tableXs reptable">
+                                <thead class="thead-dark">
+                                    <th>Replicates</th>
+                                    <th>Number</th>
+                                    <th>Description</th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Biological</td>
+                                        <td>3</td>
+                                        <td>independent</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Technical</td>
+                                        <td>N/A</td>
+                                        <td>N/A</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+
+                            <h2>Design of experiment</h2>
+                            <div class="form-inline" style="text-align:left">
+                                <select id="expDesign" class="form-control">
+                                    <option value="">Please select an item</option>
+                                    <option value="1">One-factor experiment</option>
+
+                                </select>
+
+                                <input typ e="text" class="form-control" style="min-width:400px"
+                                    placeholder="Description"
+                                    value="Compare two temperature. Three independent replicates">
+                            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+</div>
+
+<script>
+    //Table population
+    $j(document).ready(function () {
+        $j(".table").on('click', 'td', function () {
+            if ($j(this).attr("contentEditable") == true) {
+                $j(this).attr("contentEditable", "false");
+            } else {
+                $j(this).attr("contentEditable", "true");
+            }
+        });
+
+
+    });
+
+    function addLevel() {
+        var tr = event.target.closest('tr');
+        var firstCol = $j(tr).find('td:eq(0)');
+        var rowspan = parseInt($j(firstCol).attr('rowspan'));
+        $j(firstCol).attr('rowspan', rowspan + 1);
+        $j(tr).find('td:eq(1)').attr('rowspan', rowspan + 1);
+        $j(tr).after('<tr><td>Level name </td> </tr>')
+    }
+
+    function addVar() {
+        let tag =
+            " <tr><td rowspan='1'>variable name</td><td rowspan='1'><a  class='btn btn-primary'  style='font-size:10px' onClick='addLevel()'> <i class='glyphicon glyphicon-plus'></i> Add Level</a></td><td>level name </td></tr>"
+        $j('.indtable tbody').append(tag)
+    }
+
+    function addDepVar() {
+
+        let rowCount = $j('.deptable').rowcount() + 1;
+
+        // console.log($j('.table tbody tr:last-child').html())
+        let newRow;
+        $j('.deptable thead tr').find('th').each(function () {
+            newRow += '<td>TBD</td>'
+        });
+        $j('.deptable tbody').append('<tr>' + newRow + '</tr>')
+
+
+    }
+
+    function addDepCol() {
+        let colCount = $j('.deptable').columnCount() + 1;
+        $j('.deptable').find('thead').find('th').eq(colCount - 2).after('<th>sub-sample of</th>');
+        $j('.deptable').find('tr').each(function () {
+            $j(this).find('td').eq(colCount - 2).after('<td>TBD</td>');
+        });
+    }
+
+    function addBlockVar() {
+        let tag =
+            " <tr><td rowspan='1'>variable name</td><td rowspan='1'><a  class='btn btn-primary'  style='font-size:10px' onClick='addLevel()'> <i class='glyphicon glyphicon-plus'></i> Add Level</a></td><td>level name </td></tr>"
+        $j('.blocktable tbody').append(tag)
+    }
+
+    function addCovVar() {
+        let tag =
+            " <tr><td rowspan='1'>variable name</td><td rowspan='1'><a  class='btn btn-primary'  style='font-size:10px' onClick='addLevel()'> <i class='glyphicon glyphicon-plus'></i> Add Level</a></td><td>level name </td></tr>"
+        $j('.covtable tbody').append(tag)
+    }
+
+    function addConfVar() {
+        let tag =
+            " <tr><td rowspan='1'>variable name</td><td rowspan='1'><a  class='btn btn-primary'  style='font-size:10px' onClick='addLevel()'> <i class='glyphicon glyphicon-plus'></i> Add Level</a></td><td>level name </td></tr>"
+        $j('.conftable tbody').append(tag)
+    }
+
+    function addControlVar() {
+        let tag = " <tr><td rowspan='1'>variable name</td><td>description</td></tr>"
+        $j('.controltable tbody').append(tag)
+    }
+
+    function addRep() {
+        let tag = " <tr><td rowspan='1'>variable name</td><td>number</td><td>description</td></tr>"
+        $j('.reptable tbody').append(tag)
+    }
+</script>
+
+<style>
+    h2 {
+        overflow: hidden;
+        text-align: left;
+        font-size: 16px !important;
+        font-weight: bold !important;
+        color: #888 !important;
+
+    }
+
+
+
+    h2:after {
+        background-color: #bbb;
+        content: "";
+        display: inline-block;
+        height: 1px;
+        position: relative;
+        vertical-align: middle;
+        width: 100%;
+
+    }
+
+
+
+    h2:after {
+        left: 0.5em;
+        margin-right: -50%;
+    }
+</style>
