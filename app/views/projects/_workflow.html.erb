@@ -109,7 +109,7 @@
                             var selectedOperatorId = $flowchart.flowchart('getSelectedOperatorId');
                             if (selectedOperatorId != null) {
                                 $flowchart.flowchart('setOperatorTitle', selectedOperatorId, $operatorTitle
-                                .val());
+                                    .val());
                             }
                         });
 
@@ -224,13 +224,12 @@
                     function loadWorkflow(cookieName) {
 
                         var $flowchart = $j('#chart_canvas');
-                        let data = getCookie(cookieName);
+                        let data =  ""//getCookie(cookieName);
                         if (!data) {
                             $flowchart.flowchart('setData', "");
                             return;
                         }
 
-                        //console .log(data);
                         console.log(JSON.parse(data));
 
                         //
@@ -249,7 +248,7 @@
                             }
 
                         })
-                        let currentStudy = getCookie("whichWorkflow");
+                        let currentStudy = ""// getCookie("whichWorkflow");
                         setCookie(currentStudy + "_Methods", methods, 1000000);
                         if (currentStudy === "wf") {
                             let origin = $j("#j1_13_anchor span")
@@ -284,7 +283,7 @@
                             }
                         })
 
-                        let currentStudy = getCookie("whichWorkflow");
+                        let currentStudy =""// getCookie("whichWorkflow");
                         setCookie(currentStudy + "_TBLs", TableNames, 1000000);
 
                     }

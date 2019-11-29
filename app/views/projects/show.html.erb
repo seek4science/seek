@@ -1,4 +1,6 @@
 <%= render :partial => "general/item_title",:locals => {:item=>@project, :buttons_partial => 'projects/buttons'} %>
+<%=  @treeData.html_safe %>
+
 <div>
   <div class="col-lg-2"></div>
   <div class="col-lg-8">
@@ -16,15 +18,9 @@
         </div>
       </div>
       <div class="col-lg-9">
-
         <div style="padding:10px;background-color: aliceblue;border-radius: 5px; border: #ddd 1px solid">
           <div id="container" class="container-fluid">
-
-
-            PROJECT DETAIL
-
             <div id="projectDetailContainer" class="row">
-
               <div class="col-lg-8 simpleForm">
                 <%= render :partial => "project_details" -%>
               </div>
@@ -35,28 +31,15 @@
                                                                     url: storage_report_project_path(@project)} %>
                 <% end %>
               </div>
-
             </div>
-
-            FILE MANAGER
-
             <div id="fileManagerContainer" class="row">
               <%= render :partial => "filemanager" -%>
-
             </div>
-
-            INVESTIGATION
-
             <div id="investigationContainer" class="row">
               <%= render :partial => "investigation_details" -%>
-
             </div>
-
-            STUDY
-
             <div id="studyContainer" class="row">
               <%= render :partial => "study" -%>
-
             </div>
           </div>
         </div>
@@ -162,35 +145,43 @@
     }
   })(jQuery);
 
-  $j('#html').on('changed.jstree', function (e, data) {})
+  $j(document).ready(function () {
+    hide_all_containers()
+    $j("#projectDetailContainer").show()
+  })
+
+  function hide_all_containers() {
+    $j("#projectDetailContainer").hide()
+    $j("#fileManagerContainer").hide()
+    $j("#investigationContainer").hide()
+    $j("#studyContainer").hide()
+  }
+
+  $j('#html').on('changed.jstree', function (e, data) {
+      let item_id = data.instance.get_node(data.selected[0]).original._id
+      let item_type = data.instance.get_node(data.selected[0]).original._type
+      hide_all_containers();
+      switch (item_type) {
+        case "prj":
+          $j("#projectDetailContainer").show()
+          break;
+        case "inv":
+          $j("#investigationContainer").show()
+          break;
+        case "std":
+          $j("#studyContainer").show()
+          break;
+        case "asy":
+          $j("#fileManagerContainer").show()
+          break;
+        case "fld":
+          $j("#fileManagerContainer").show()
+          break;
+      }
+    })
     .jstree({
       'core': {
-        'data': [
-          'Simple root node',
-          {
-            'text': 'Root node 2',
-            '_type': 'project',
-            '_id': '333',
-            'count': 5,
-            'state': {
-              'opened': true,
-              'selected': true,
-              'separate': {
-                'label': 'Studies',
-                'action': 'http://www.google.com'
-              }
-
-            },
-            'children': [{
-                'text': 'Child 1',
-                '_type': 'project',
-                '_id': '333',
-                'count': 10,
-              },
-              'Child 2',
-            ]
-          }
-        ]
+        'data': <%= @treeData.html_safe%>
       },
       plugins: ["separate"]
     });

@@ -25,6 +25,7 @@ class ProjectsController < ApplicationController
   include Seek::IsaGraphExtensions
 
   respond_to :html, :json
+ 
 
   def asset_report
     @no_sidebar = true
@@ -80,9 +81,56 @@ class ProjectsController < ApplicationController
     end
   end
 
+  
   # GET /projects/1
   # GET /projects/1.xml
   def show
+    #Create JStree core data
+    # dataStructure =[]
+    # children = []
+    # if (@project)
+    #   dataStructure.push({'text': @project.title, '_type':'prj', '_id':50, 'a_attr': {'style': 'font-weight:bold'}, 'state':{'opened':true, 'separate':{'label':'Project'}}})
+    #   children.push({'text':'Documents', "state": {"separate": {'label': 'Investigations','action': '#'}}})
+    # end
+    # if (@project.investigations)
+    #     @project.investigations.each do |inv|
+    #       children.push({'text': inv.title, '_type':'inv', '_id':50, 'a_attr': {'style': 'font-weight:bold'}})
+    #     end
+    #   dataStructure[0]["children"] = children
+    # end
+    # @treeData = dataStructure
+    # @treeData = JSON[@treeData]
+
+    inv =[]
+     std =[]
+      prj =[]
+      @project.investigations.each do |investigation|
+        puts '********invvv********************************'
+        investigation.studies.each do |study| 
+          if study.assays
+            asy = [{'text': study.assays.title, '_type':'asy', '_id': 70, 'state':{'opened': true}}]
+            std.push( {'text': study.title, '_type': 'std', '_id': 60, 'children': asy})
+            puts '*******std*********************************'
+            puts JSON[std]
+            puts '****************************************'
+          end
+        end
+        
+
+        inv.push({'text': investigation.title, '_type': 'inv', '_id': 50, 'children': (if defined?(std)== nil then [] else std end) })
+        puts '********inv********************************'
+        puts JSON[inv]
+        puts '****************************************'
+        std=nil
+      end
+      
+      prj.push({'text': @project.title, '_type':'prj', '_id':50, 'a_attr': {'style': 'font-weight:bold'}, 'state':{'opened': true, 'separate':{'label': 'Project'}}, 'children': inv })
+      @treeData = JSON[prj]
+    puts '****************************************'
+    puts JSON[prj]
+    puts '****************************************'
+   
+
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
@@ -429,4 +477,5 @@ class ProjectsController < ApplicationController
       false
     end
   end
+  
 end

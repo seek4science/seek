@@ -1,14 +1,14 @@
     <div class="simpleForm">
         <ul class="nav nav-tabs">
-            <li class="active "><a data-toggle="tab" href="#home"><i class="glyphicon glyphicon-th-list"></i>
+            <li class="active "><a data-toggle="tab" href="#details"><i class="glyphicon glyphicon-th-list"></i>
                     Details</a></li>
-            <li><a data-toggle="tab" href="#menu1"><i class="glyphicon glyphicon-pencil"></i> Design</a></li>
-            <li><a data-toggle="tab" href="#menu2"
-                    onclick="setTimeout(() => { loadWorkflow(getCookie('whichWorkflow'))}, 250);"><i
-                        class="glyphicon glyphicon-random"></i> Workflow</a></li>
+            <li><a data-toggle="tab" href="#design"><i class="glyphicon glyphicon-pencil"></i> Design</a></li>
+            <li><a data-toggle="tab" href="#workflow" onclick="setTimeout(() => { 
+                        //LOAD WORKFLOW
+                    }, 250);"><i class="glyphicon glyphicon-random"></i> Workflow</a></li>
         </ul>
         <div class="tab-content">
-            <div id="home" class="tab-pane fade in active" style="padding:10px">
+            <div id="details" class="tab-pane fade in active" style="padding:10px">
                 <p id="title"><strong style="text-align: center;">Title:</strong> <span
                         id="studytitleContent">Transcriptomics</span></p>
                 <p id="description"> <strong>Description:</strong> <span id="StudyDescriptionContent">How temperature
@@ -24,10 +24,10 @@
                     </div>
                 </div>
             </div>
-            <div id="menu1" class="tab-pane fade" style="padding:10px">
+            <div id="design" class="tab-pane fade" style="padding:10px">
                 <%=  render partial: 'study_design' %>
             </div>
-            <div id="menu2" class="tab-pane fade" style="padding:10px">
+            <div id="workflow" class="tab-pane fade" style="padding:10px">
                 <%=  render partial: 'workflow' %>
             </div>
         </div>
