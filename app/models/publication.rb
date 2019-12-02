@@ -173,6 +173,11 @@ class Publication < ApplicationRecord
     self.pubmed_id = reference.pubmed
     self.published_date = reference.published_date
     self.citation = reference.citation
+    #currently the metadata fetched by pubmed id doesn't contain the following items.
+    # TODO
+    self.publisher = nil
+    self.booktitle = nil
+    self.editor = nil
   end
 
   # @param doi_record DOI::Record
@@ -185,6 +190,9 @@ class Publication < ApplicationRecord
     self.journal = doi_record.journal
     self.doi = doi_record.doi
     self.citation = doi_record.citation
+    self.publisher = doi_record.publisher
+    self.booktitle = doi_record.booktitle
+    self.editor = doi_record.editors.map(&:name).join(" and ")
   end
 
   # @param bibtex_record BibTeX entity from bibtex-ruby gem

@@ -56,7 +56,7 @@ class Model < ApplicationRecord
 
   explicit_versioning(:version_column => "version") do
     include Seek::Models::ModelExtraction
-    acts_as_doi_mintable(proxy: :parent)
+    acts_as_doi_mintable(proxy: :parent, general_type: 'Model')
     acts_as_versioned_resource
     acts_as_favouritable
 
