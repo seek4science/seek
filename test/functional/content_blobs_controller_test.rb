@@ -88,6 +88,27 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal 'webpage', assigns(:type)
   end
 
+  test 'examine url to github' do
+    stub_request(:any, 'https://github.com/bob/workflows/blob/master/dir/the_workflow.cwl').to_return(status: 200)
+    stub_request(:any, 'https://raw.githubusercontent.com/bob/workflows/master/dir/the_workflow.cwl').to_return(
+        body: File.new("#{Rails.root}/test/fixtures/files/rp2-to-rp2path.cwl"),
+        status: 200,
+        headers: { 'Content-Length' => 1118,
+                   'Content-Type' => 'text/plain' })
+
+    get :examine_url, xhr: true, params: { data_url: 'https://github.com/bob/workflows/blob/master/dir/the_workflow.cwl' }
+    assert_response :success
+    assert @response.body.include?('GitHub')
+    assert_equal 200, assigns(:info)[:code]
+    assert_equal 'github', assigns(:type)
+    assert_equal 'bob', assigns(:info)[:github_user]
+    assert_equal 'workflows', assigns(:info)[:github_repo]
+    assert_equal 'master', assigns(:info)[:github_branch]
+    assert_equal 'dir/the_workflow.cwl', assigns(:info)[:github_path]
+    assert_equal 1118, assigns(:info)[:file_size]
+    assert_equal 'the_workflow.cwl', assigns(:info)[:file_name]
+  end
+
   test 'examine url forbidden' do
     # forbidden
     stub_request(:head, 'http://unauth.com/file.pdf').to_return(status: 403, headers: { 'Content-Type' => 'application/pdf' })
