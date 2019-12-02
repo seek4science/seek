@@ -210,6 +210,8 @@ SEEK::Application.routes.draw do
       post :request_membership
       get :isa_children
       get :overview
+      post :update_investigation_permission
+      get :investigation_shared_with
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:search,:organisms,:documents, :only=>[:index]

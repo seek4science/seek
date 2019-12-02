@@ -5,6 +5,7 @@ class ProjectsController < ApplicationController
   include CommonSweepers
   include Seek::DestroyHandling
   include ApiHelper
+  include Seek::AssetsStandardControllerActions
 
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
                                                admin_member_roles update_members storage_report request_membership overview]
@@ -86,51 +87,41 @@ class ProjectsController < ApplicationController
   # GET /projects/1.xml
   def show
     #Create JStree core data
-    # dataStructure =[]
-    # children = []
-    # if (@project)
-    #   dataStructure.push({'text': @project.title, '_type':'prj', '_id':50, 'a_attr': {'style': 'font-weight:bold'}, 'state':{'opened':true, 'separate':{'label':'Project'}}})
-    #   children.push({'text':'Documents', "state": {"separate": {'label': 'Investigations','action': '#'}}})
-    # end
-    # if (@project.investigations)
-    #     @project.investigations.each do |inv|
-    #       children.push({'text': inv.title, '_type':'inv', '_id':50, 'a_attr': {'style': 'font-weight:bold'}})
-    #     end
-    #   dataStructure[0]["children"] = children
-    # end
-    # @treeData = dataStructure
-    # @treeData = JSON[@treeData]
-
     inv =[]
-     std =[]
-      prj =[]
-      @project.investigations.each do |investigation|
-        puts '********invvv********************************'
-        investigation.studies.each do |study| 
-          if study.assays
-            asy = [{'text': study.assays.title, '_type':'asy', '_id': 70, 'state':{'opened': true}}]
-            std.push( {'text': study.title, '_type': 'std', '_id': 60, 'children': asy})
-            puts '*******std*********************************'
-            puts JSON[std]
-            puts '****************************************'
+    std =[]
+    prj =[]
+    asy =[]
+    bold_style = {'style': 'font-weight:bold'}
+    @project.investigations.each do |investigation|
+       investigation.studies.each do |study| 
+        if study.assays
+          study.assays.each do |assay|
+            asy.push({'text': assay.title, '_type': 'asy', '_id': assay.id,'a_attr': bold_style, 'state':{'opened': true}, 
+              'children':[{'text': 'Methods', '_type': 'fld', 'count': '0'}]})
           end
+          if asy.length >0 then asy[0]['state'] =  {'opened': true, 'separate': {'label': 'Assay'}} end
+          std.push( {'text': study.title, '_type': 'std', '_id': study.id,'a_attr': bold_style,'state':{'opened': true},
+             'children': asy})
+          asy=[]
         end
-        
-
-        inv.push({'text': investigation.title, '_type': 'inv', '_id': 50, 'children': (if defined?(std)== nil then [] else std end) })
-        puts '********inv********************************'
-        puts JSON[inv]
-        puts '****************************************'
-        std=nil
-      end
-      
-      prj.push({'text': @project.title, '_type':'prj', '_id':50, 'a_attr': {'style': 'font-weight:bold'}, 'state':{'opened': true, 'separate':{'label': 'Project'}}, 'children': inv })
-      @treeData = JSON[prj]
-    puts '****************************************'
-    puts JSON[prj]
-    puts '****************************************'
-   
-
+       end
+       if std.length >0 then std[0]['state'] =  { 'opened': true, 'separate': {'label': 'Studies', 'action': '#'}} end
+       inv.push({'text': investigation.title, '_type': 'inv', '_id': investigation.id,'a_attr': bold_style,
+         'state': {'opened': true}, 'children': std })
+       std=[]
+    end
+    #Documents folder
+    if inv.length >0 then inv[0]['state'] =  {'opened': true,  'separate': {'label': 'Investigations', 'action': '#'}} end
+  
+    inv.unshift({'text': 'Documents', '_type': 'fld', 'state': {'opened': true},
+     'children': [{'text': 'Presentations', '_type': 'fld', 'count': '0'},
+      {'text': 'Slideshows', '_type': 'fld', 'count': '0'},
+      {'text': 'Articles', '_type': 'fld', 'count': '0'},
+      {'text': 'Posters', '_type': 'fld', 'count': '0'}]})
+    prj.push({'text': @project.title, '_type': 'prj', '_id': @project.id, 'a_attr': bold_style, 'state':{'opened': true,
+       'separate':{'label': 'Project'}}, 'children': inv })
+    @treeData = JSON[prj]
+  
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
@@ -139,6 +130,37 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def update_investigation_permission
+    # item: finding investigation based on investigation id
+    investigation_id = params[:inv_id]
+    @investigation = Investigation.find(investigation_id)    
+    update_sharing_policies @investigation
+      if @investigation.save
+        render :json => {message: 'Permission was successfully updated'} 
+      else
+        puts '__________________'
+        puts @investigation.errors
+        format.xml  { render xml: @investigation.errors, status: :unprocessable_entity }
+
+        #render :json => {message: 'Error'} ,  status: :unprocessable_entity
+      end
+  end
+
+  def investigation_shared_with
+    #Passing list of 'Shared with people'
+    investigation_id = params[:inv_id]
+    inv_policy_id = Investigation.find(investigation_id).policy.id
+    permissions  = Permission.where(policy_id: inv_policy_id, contributor_type: 'Person')
+    user_ids=[]
+    permissions.each do |perm|
+      user_ids.push(perm.contributor.id) 
+    end
+    sharedwith =[]
+    sharedwith = Person.where(id: user_ids).select("id, CONCAT(first_name,' ',  last_name) as nam")
+  
+    render :json => {people: sharedwith} 
+    
+  end
   # GET /projects/new
   # GET /projects/new.xml
   def new

@@ -1,10 +1,9 @@
 <%= render :partial => "general/item_title",:locals => {:item=>@project, :buttons_partial => 'projects/buttons'} %>
-<%=  @treeData.html_safe %>
-
 <div>
   <div class="col-lg-2"></div>
   <div class="col-lg-8">
     <img src="/assets/guidance.png" alt="user guidance" style=" width: 100%; height: auto;margin-bottom:20px" />
+    <%= hidden_field_tag 'selected_item', ''  %>
   </div>
   <div class="col-lg-2"></div>
 </div>
@@ -36,7 +35,9 @@
               <%= render :partial => "filemanager" -%>
             </div>
             <div id="investigationContainer" class="row">
+
               <%= render :partial => "investigation_details" -%>
+
             </div>
             <div id="studyContainer" class="row">
               <%= render :partial => "study" -%>
@@ -124,9 +125,9 @@
           if (n.original.count) {
             obj.childNodes[1].innerHTML += " <span class='badge badge-secondary'>" + n.original.count +
               "</span>"
-            if (n.original._type) $j(obj.childNodes[1]).attr('_type', n.original._type)
-            if (n.original._id) $j(obj.childNodes[1]).attr('_id', n.original._id)
           }
+          if (n.original._type) $j(obj.childNodes[1]).attr('_type', n.original._type)
+          if (n.original._id) $j(obj.childNodes[1]).attr('_id', n.original._id)
           if (n.state.separate) {
             let p = d.createElement('p')
             p.innerHTML = n.state.separate.label;
@@ -160,6 +161,7 @@
   $j('#html').on('changed.jstree', function (e, data) {
       let item_id = data.instance.get_node(data.selected[0]).original._id
       let item_type = data.instance.get_node(data.selected[0]).original._type
+      $j("#selected_item").val(item_id)
       hide_all_containers();
       switch (item_type) {
         case "prj":
@@ -167,6 +169,7 @@
           break;
         case "inv":
           $j("#investigationContainer").show()
+          populate_tags(item_id)
           break;
         case "std":
           $j("#studyContainer").show()
@@ -181,8 +184,32 @@
     })
     .jstree({
       'core': {
-        'data': <%= @treeData.html_safe%>
+        'data': <%= @treeData.html_safe %>
       },
       plugins: ["separate"]
     });
+
+
+  function populate_tags(investigation_id) {
+    //Populate the tags input with list of 'Shared with people'
+    let pid = <%= params[:id] %>
+      $j.ajax({
+        type: 'GET',
+        url: pid + '/investigation_shared_with?inv_id=' + investigation_id,
+        
+        success: s => {
+          if (s.people)
+          $j("#permission-people-ids").tagsinput('removeAll');
+            s.people.map((person) => {
+              $j('#permission-people-ids').tagsinput('add', {
+                id: person.id,
+                name: person.nam
+              })
+            })
+        },
+        error: e => {
+          alert("Error retrieving investigation sharing list")
+        }
+      })
+  }
 </script>
