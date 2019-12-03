@@ -8,23 +8,22 @@ module Seek
         url = params[:data_url]
         @info = {}
         @type = 'file'
+        @content_blob = ContentBlob.new(url: url)
         begin
           uri = URI(url)
-          case scheme = uri.scheme
-          when 'ftp'
-            handler = Seek::DownloadHandling::FTPHandler.new(url)
+          handler = @content_blob.remote_content_handler
+          if handler
             @info = handler.info
-          when 'http', 'https', nil
-            handler = Seek::DownloadHandling::HTTPHandler.new(url)
-            @info = handler.info
-            if @info[:code] == 200
-              handle_good_http_response(handler)
-            else
-              handle_bad_http_response(@info[:code])
+            if @info[:code]
+              if @info[:code] == 200
+                handle_good_http_response(handler)
+              else
+                handle_bad_http_response(@info[:code])
+              end
             end
           else
             @type = 'warning'
-            @warning_msg = "Unhandled URL scheme: #{scheme}. The given URL will be presented as a clickable link."
+            @warning_msg = "Unhandled URL scheme: #{uri.scheme}. The given URL will be presented as a clickable link."
           end
         rescue StandardError => e
           handle_exception_response(e)
@@ -38,21 +37,8 @@ module Seek
       private
 
       def handle_good_http_response(handler)
-        if is_github_url?(handler.url)
+        if handler.is_a?(Seek::DownloadHandling::GithubHTTPHandler)
           @type = 'github'
-          uri = URI(handler.url)
-          if uri.hostname.include?('github.com')
-            user, repo, format, branch, path = uri.path.split('/', 6)[1..-1]
-          else
-            user, repo, branch, path = uri.path.split('/', 5)[1..-1]
-          end
-          @info[:github_user] = user
-          @info[:github_repo] = repo
-          @info[:github_branch] = branch
-          @info[:github_path] = path
-          raw_url = "https://raw.githubusercontent.com/#{user}/#{repo}/#{branch}/#{path}"
-          raw_handler = Seek::DownloadHandling::HTTPHandler.new(raw_url)
-          @info.merge!(raw_handler.info)
         elsif is_myexperiment_url?(handler.url)
           @type = 'webpage'
           xml_url = url[0..-6] + '.xml'
@@ -105,29 +91,9 @@ module Seek
         end
       end
 
-      def handle_myexperiment_response
-        xml_url = url[0..-6] + '.xml'
-
-        xml_doc = Nokogiri::XML(open(xml_url))
-        xml_doc.xpath('/*/description').each do |node|
-          @description = node.text
-        end
-        xml_doc.xpath('/*/title').each do |node|
-          @title = node.text
-        end
-        xml_doc.xpath('/*/preview').each do |node|
-          @image = node.text
-        end
-      end
-
       def is_myexperiment_url?(url)
         URI uri = URI(url)
         uri.hostname.include?('myexperiment.org') && uri.path.end_with?('.html')
-      end
-
-      def is_github_url?(url)
-        URI uri = URI(url)
-        uri.hostname.include?('github.com') || uri.hostname.include?('raw.githubusercontent.com')
       end
     end
   end

@@ -229,6 +229,21 @@ class ContentBlob < ApplicationRecord
     (!file_size || file_size == 0) && url.blank?
   end
 
+  def remote_content_handler
+    return nil unless valid_url?(url)
+    uri = URI(url)
+    case uri.scheme
+    when 'ftp'
+      Seek::DownloadHandling::FTPHandler.new(url)
+    when 'http', 'https'
+      if uri.hostname.include?('github.com') || uri.hostname.include?('raw.githubusercontent.com')
+        Seek::DownloadHandling::GithubHTTPHandler.new(url)
+      else
+        Seek::DownloadHandling::HTTPHandler.new(url)
+      end
+    end
+  end
+
   private
 
   def remote_headers
@@ -283,20 +298,6 @@ class ContentBlob < ApplicationRecord
   def create_retrieval_job
     if Seek::Config.cache_remote_files && !file_exists? && !url.blank? && (make_local_copy || cachable?) && remote_content_handler
       RemoteContentFetchingJob.new(self).queue_job
-    end
-  end
-
-  def remote_content_handler
-    return nil unless valid_url?(url)
-    case URI(url).scheme
-      when 'ftp'
-        Seek::DownloadHandling::FTPHandler.new(url)
-      when 'http', 'https'
-        if url =~ (/github/)
-          Seek::DownloadHandling::GithubHTTPHandler.new(url)
-        else
-          Seek::DownloadHandling::HTTPHandler.new(url)
-        end
     end
   end
 
