@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_13_105005) do
+ActiveRecord::Schema.define(version: 2019_12_03_155950) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -346,6 +346,13 @@ ActiveRecord::Schema.define(version: 2019_09_13_105005) do
 
   create_table "db_files", id: :integer,  force: :cascade do |t|
     t.binary "data"
+  end
+
+  create_table "default_project_folders",  force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "delayed_jobs", id: :integer,  force: :cascade do |t|
@@ -946,6 +953,20 @@ ActiveRecord::Schema.define(version: 2019_09_13_105005) do
     t.integer "project_id"
     t.index ["organism_id", "project_id"], name: "index_organisms_projects_on_organism_id_and_project_id"
     t.index ["project_id"], name: "index_organisms_projects_on_project_id"
+  end
+
+  create_table "other_project_files",  force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.string "uuid"
+    t.integer "default_project_folders_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "other_project_files_projects", id: false,  force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "other_project_file_id"
   end
 
   create_table "people", id: :integer,  force: :cascade do |t|
