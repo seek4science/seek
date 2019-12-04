@@ -4,6 +4,7 @@
   <div class="col-lg-8">
     <img src="/assets/guidance.png" alt="user guidance" style=" width: 100%; height: auto;margin-bottom:20px" />
     <%= hidden_field_tag 'selected_item', ''  %>
+    <%= hidden_field_tag 'selected_folder', ''  %>
   </div>
   <div class="col-lg-2"></div>
 </div>
@@ -159,8 +160,9 @@
   }
 
   $j('#html').on('changed.jstree', function (e, data) {
-      let item_id = data.instance.get_node(data.selected[0]).original._id
-      let item_type = data.instance.get_node(data.selected[0]).original._type
+      let item = data.instance.get_node(data.selected[0])
+      let item_id = item.original._id
+      let item_type = item.original._type
       $j("#selected_item").val(item_id)
       hide_all_containers();
       switch (item_type) {
@@ -179,6 +181,7 @@
           break;
         case "fld":
           $j("#fileManagerContainer").show()
+          $j("#selected_folder").val(item.text)
           break;
       }
     })

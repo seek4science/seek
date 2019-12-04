@@ -1,4 +1,6 @@
  <div class="col-lg-12">
+     <input type="file" id="file" style="display:none">
+     <input id="upload_btn" type="submit" value="Upload File" class="btn btn-primary">
      <div class="row">
          <div id=files class="simpleForm">
              <ul class="fileManager">
@@ -10,3 +12,27 @@
          <textarea placeholder="Insert content here!" id="txt_file_content" class="form-control"></textarea>
      </div>
  </div>
+
+ <script>
+     $j("#upload_btn").on('click', () => {
+         $j('#file').click();
+     })
+
+     $j('#file').on('change', () => {
+         let formData = new FormData();
+         formData.append('file', $j('#file')[0].files[0]);
+         formData.append('folder', $j('#selected_folder').val())
+         formData.append('description', 'description...')
+         let pid = <%= params[:id]%>
+             $j.ajax({
+                 type: 'POST',
+                 url: pid + '/upload_project_file',
+                 data: formData,
+                 processData: false,
+                 contentType: false,
+                 success: s => {
+                     alert(s.message)
+                 }
+             })
+     })
+ </script>

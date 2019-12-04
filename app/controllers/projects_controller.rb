@@ -113,7 +113,7 @@ class ProjectsController < ApplicationController
     #Documents folder
     if inv.length >0 then inv[0]['state'] =  {'opened': true,  'separate': {'label': 'Investigations', 'action': '#'}} end
   
-    inv.unshift({'text': 'Documents', '_type': 'fld', 'state': {'opened': true},
+    inv.unshift({'text': 'Documents', 'state': {'opened': true},
      'children': [{'text': 'Presentations', '_type': 'fld', 'count': '0'},
       {'text': 'Slideshows', '_type': 'fld', 'count': '0'},
       {'text': 'Articles', '_type': 'fld', 'count': '0'},
@@ -138,11 +138,7 @@ class ProjectsController < ApplicationController
       if @investigation.save
         render :json => {message: 'Permission was successfully updated'} 
       else
-        puts '__________________'
-        puts @investigation.errors
         format.xml  { render xml: @investigation.errors, status: :unprocessable_entity }
-
-        #render :json => {message: 'Error'} ,  status: :unprocessable_entity
       end
   end
 
@@ -161,6 +157,27 @@ class ProjectsController < ApplicationController
     render :json => {people: sharedwith} 
     
   end
+
+  #/POST /projects/upload_file
+  def upload_project_file
+    unique_id = SecureRandom.uuid
+    new_file = OtherProjectFile.new(uuid: unique_id, title:params[:file].original_filename);
+    new_file.description = params[:description]
+    folder_id = DefaultProjectFolder.where(title: params[:folder]).first().id
+    unless params[:file].nil? && folder_id.nil?
+      new_file.default_project_folders_id = folder_id
+      path = File.join(Seek::Config.other_project_files_path, unique_id)
+      File.open(path, "wb") { |f| f.write(params[:file].read) }
+      if new_file.save
+        return render :json => {message: 'file uploaded!'}
+      else
+        return render :json => {message: 'file NOT uploaded!'} 
+      end
+    end
+    render :json => {message: 'Error saving the uplloaded file!'}
+  end
+
+
   # GET /projects/new
   # GET /projects/new.xml
   def new

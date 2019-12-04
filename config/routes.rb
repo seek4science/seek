@@ -212,6 +212,7 @@ SEEK::Application.routes.draw do
       get :overview
       post :update_investigation_permission
       get :investigation_shared_with
+      post :upload_project_file
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:search,:organisms,:documents, :only=>[:index]

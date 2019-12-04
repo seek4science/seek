@@ -207,6 +207,10 @@ module Seek
       append_filestore_path 'rebranding'
     end
 
+    def other_project_files_path
+      append_filestore_path 'other_project_files'
+    end
+
     def append_filestore_path(inner_dir)
       path = filestore_path
       path = File.join(Rails.root, path) unless path.start_with? '/'
