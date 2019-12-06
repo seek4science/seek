@@ -206,10 +206,11 @@
           break;
         case "inv":
           $j("#investigationContainer").show()
-          populate_tags(item_id)
+          populate_tags(item_id, 'inv')
           break;
         case "std":
           $j("#studyContainer").show()
+          populate_tags(item_id, 'std')
           break;
         case "asy":
           $j("#fileManagerContainer").show()
@@ -227,30 +228,6 @@
       },
       plugins: ["separate"]
     });
-
-
-  function populate_tags(investigation_id) {
-    //Populate the tags input with list of 'Shared with people'
-    let pid = <%= params[:id] %>
-      $j.ajax({
-        type: 'GET',
-        url: pid + '/investigation_shared_with?inv_id=' + investigation_id,
-
-        success: s => {
-          if (s.people)
-            $j("#permission-people-ids").tagsinput('removeAll');
-          s.people.map((person) => {
-            $j('#permission-people-ids').tagsinput('add', {
-              id: person.id,
-              name: person.nam
-            })
-          })
-        },
-        error: e => {
-          alert("Error retrieving investigation sharing list")
-        }
-      })
-  }
 
   function addInvestigations(t) {
     $j('#data-file-modal-inv').modal({
@@ -283,7 +260,8 @@
       append_Form("investigation[creator_ids][]", uid, f)
       append_Form("policy_attributes[permissions_attributes][0][contributor_type]", "Project", f)
       append_Form("policy_attributes[permissions_attributes][0][contributor_id]", pid, f)
-      append_Form("policy_attributes[permissions_attributes][0][access_type]", "2", f) //Project access type
+      //TO_DO: set current Project access type:
+      append_Form("policy_attributes[permissions_attributes][0][access_type]", "2", f) 
       append_Form("redirect", "false", f)
       f.submit()
     })
@@ -297,6 +275,7 @@
       append_Form("policy_attributes[access_type]", "0", f)
       append_Form("policy_attributes[permissions_attributes][0][contributor_type]", "Project", f)
       append_Form("policy_attributes[permissions_attributes][0][contributor_id]", pid, f)
+      //TO_DO: set current Project access type:
       append_Form("policy_attributes[permissions_attributes][0][access_type]", "2", f)
       append_Form("redirect", "false", f)
       f.submit()
@@ -310,4 +289,28 @@
       .attr("name", name).val(val);
     form.append(input);
   }
+
+  function populate_tags(item_id, item_type) {
+           //Populate the tags input with list of 'Shared with people'
+           let pid = <%= params[:id] %>
+               let geturl = item_type == 'inv' ? '/investigation_shared_with?inv_id=' : '/study_shared_with?std_id='
+           let tag_input = item_type == 'inv' ? '#investigation-permission-people-ids' : '#study-permission-people-ids'
+           $j.ajax({
+               type: 'GET',
+               url: pid + geturl + item_id,
+               success: s => {
+                   if (s.people)
+                       $j(tag_input).tagsinput('removeAll');
+                   s.people.map((person) => {
+                       $j(tag_input).tagsinput('add', {
+                           id: person.id,
+                           name: person.nam
+                       })
+                   })
+               },
+               error: e => {
+                   alert("Error retrieving investigation sharing list")
+               }
+           })
+       }
 </script>

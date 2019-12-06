@@ -145,6 +145,7 @@ class ProjectsController < ApplicationController
 
   def update_investigation_permission
     # item: finding investigation based on investigation id
+    # TODO: use determine_asset_from_controller method to authorize user
     investigation_id = params[:inv_id]
     @investigation = Investigation.find(investigation_id)    
     update_sharing_policies @investigation
@@ -153,6 +154,35 @@ class ProjectsController < ApplicationController
       else
         format.xml  { render xml: @investigation.errors, status: :unprocessable_entity }
       end
+  end
+
+  def update_study_permission
+    # item: finding study based on investigation id
+    # TODO: use determine_asset_from_controller method to authorize user
+    study_id = params[:std_id]
+    study = Study.find(study_id)    
+    update_sharing_policies study
+      if study.save
+        render :json => {message: 'Permission was successfully updated'} 
+      else
+        format.xml  { render xml: study.errors, status: :unprocessable_entity }
+      end
+  end
+
+  def study_shared_with
+    #Passing list of 'Shared with people'
+    study_id = params[:std_id]
+    std_policy_id = Study.find(study_id).policy.id
+    permissions  = Permission.where(policy_id: std_policy_id, contributor_type: 'Person')
+    user_ids=[]
+    permissions.each do |perm|
+      user_ids.push(perm.contributor.id) 
+    end
+    sharedwith =[]
+    sharedwith = Person.where(id: user_ids).select("id, CONCAT(first_name,' ',  last_name) as nam")
+  
+    render :json => {people: sharedwith} 
+    
   end
 
   def investigation_shared_with

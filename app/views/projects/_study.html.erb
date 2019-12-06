@@ -17,12 +17,18 @@
                         genes</span></p>
                 <p><strong>Experimentalists: </strong> experimentalists description</p>
                 <div class="form-group">
-                    <label>Shared with: </label>
-                    <div class="bootstrap-tagsinput"><span class="tag label label-default">Vahid Kiani<span
-                                data-role="remove"></span></span>
-                        <input type="text" />
-                    </div>
+                    <label>The following people...</label>
+                    <%= objects_input('study-permission-people-ids', [], typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.typeahead_hint } } }, name: nil) -%>
+                    <p class="help-block">Start typing a person's name and select from the list that appears. You can
+                        select
+                        multiple people.</p>
                 </div>
+                <div class="form-group">
+                    <label>can...</label>
+                    <%= select_tag('permission-people-access-type', policy_selection_options(nil, nil, Policy::ACCESSIBLE), name: nil, class: 'form-control') -%>
+                </div>
+
+                <input type="submit" id="study_permission_submit_btn" value="Update" class="btn btn-primary">
             </div>
             <div id="design" class="tab-pane fade" style="padding:10px">
                 <%=  render partial: 'study_design' %>
@@ -32,3 +38,43 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Add a person permission to the table
+        $j('#study_permission_submit_btn').on('click', e => {
+            let people = $j('#study-permission-people-ids').tagsinput('items');
+            let pid = <%= params[:id] %>
+                let url = pid + '/update_study_permission';
+            let std_id = $j("#selected_item_id").val()
+            if (!std_id) return
+            let data = {
+                std_id,
+                'policy_attributes': {
+                    'access_type': '0',
+                    'permissions_attributes': [{
+                        'contributor_type': 'Project',
+                        'contributor_id': pid
+                    }]
+                }
+            }
+            people.forEach(function (person, index) {
+                data.policy_attributes.permissions_attributes.push({
+                    'contributor_type': 'Person',
+                    'contributor_id': person.id,
+                    'access_type': parseInt($j('#permission-people-access-type').val())
+                })
+            });
+            $j.ajax({
+                type: 'POST',
+                url,
+                data,
+                success: s => {
+                    alert(s.message)
+                },
+                error: (e) => {
+                    console.log(e)
+                    alert('Error')
+                }
+            })
+        });
+    </script>

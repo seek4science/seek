@@ -211,7 +211,9 @@ SEEK::Application.routes.draw do
       get :isa_children
       get :overview
       post :update_investigation_permission
+      post :update_study_permission
       get :investigation_shared_with
+      get :study_shared_with
       post :upload_project_file
       get :get_file_list
     end
