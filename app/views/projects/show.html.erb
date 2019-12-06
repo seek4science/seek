@@ -3,8 +3,10 @@
   <div class="col-lg-2"></div>
   <div class="col-lg-8">
     <img src="/assets/guidance.png" alt="user guidance" style=" width: 100%; height: auto;margin-bottom:20px" />
-    <%= hidden_field_tag 'selected_item', ''  %>
+    <%= hidden_field_tag 'selected_item_id', ''  %>
     <%= hidden_field_tag 'selected_folder', ''  %>
+    <%= hidden_field_tag 'selected_tree_item_id', ''  %>
+
   </div>
   <div class="col-lg-2"></div>
 </div>
@@ -84,6 +86,36 @@
   </div>
 </div>
 
+<div class="modal" tabindex="-1" role="dialog" id="data-file-modal-inv">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <%= render :partial=>"investigations/new" %>
+        <div class="row" style="padding:15px">
+          <a id="submit_investigation" type="button" class="btn btn-primary">Create</a>
+          &nbsp;
+          <a type="button" class="btn btn-default">Cancel</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="data-file-modal-std">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <%= render :partial=>"studies/new" %>
+        <div class="row" style="padding:15px">
+          <a id="submit_study" type="button" class="btn btn-primary">Create</a>
+          &nbsp;
+          <a type="button" class="btn btn-default">Cancel</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   $j('#project-hierarchy-toggle').click(function () {
     var el = $j('#project_hierarchy');
@@ -137,7 +169,9 @@
               let a = d.createElement('a')
               a.href = n.state.separate.action;
               a.className = 'treeaction glyphicon glyphicon-plus';
+              $j(a).attr('onclick', `add${n.state.separate.label}()`)
               obj.prepend(a)
+
             }
             obj.prepend(p);
           }
@@ -163,7 +197,8 @@
       let item = data.instance.get_node(data.selected[0])
       let item_id = item.original._id
       let item_type = item.original._type
-      $j("#selected_item").val(item_id)
+      $j("#selected_item_id").val(item_id)
+      $j("#selected_tree_item_id").val(item.id)
       hide_all_containers();
       switch (item_type) {
         case "prj":
@@ -182,6 +217,7 @@
         case "fld":
           $j("#fileManagerContainer").show()
           $j("#selected_folder").val(item.text)
+          load_files()
           break;
       }
     })
@@ -199,20 +235,67 @@
       $j.ajax({
         type: 'GET',
         url: pid + '/investigation_shared_with?inv_id=' + investigation_id,
-        
+
         success: s => {
           if (s.people)
-          $j("#permission-people-ids").tagsinput('removeAll');
-            s.people.map((person) => {
-              $j('#permission-people-ids').tagsinput('add', {
-                id: person.id,
-                name: person.nam
-              })
+            $j("#permission-people-ids").tagsinput('removeAll');
+          s.people.map((person) => {
+            $j('#permission-people-ids').tagsinput('add', {
+              id: person.id,
+              name: person.nam
             })
+          })
         },
         error: e => {
           alert("Error retrieving investigation sharing list")
         }
       })
+  }
+
+  function addInvestigations() {
+    $j('#data-file-modal-inv').modal({
+      backdrop: 'static',
+      keyboard: true
+    });
+  }
+
+  function addStudies() {
+    $j('#data-file-modal-std').modal({
+      backdrop: 'static',
+      keyboard: true
+    });
+  }
+
+  $j(document).ready(function () {
+     let pid = <%= params[:id] %>
+    $j("a:contains('Cancel')").click(function (e) {
+      e.preventDefault();
+      $j('#data-file-modal-inv').modal('hide');
+      $j('#data-file-modal-std').modal('hide');
+    })
+    $j("#submit_investigation").click(function () {
+
+     append_Form("investigation[project_ids][]",pid)      //PID
+     append_Form("policy_attributes[access_type]","0")    // default
+     append_Form("investigation[creator_ids][]",<%= current_user.id %>)    //User ID
+
+     append_Form("policy_attributes[permissions_attributes][0][contributor_type]","Project")     
+     append_Form("policy_attributes[permissions_attributes][0][contributor_id]",pid)     //PID
+     append_Form("policy_attributes[permissions_attributes][0][access_type]","2")     //Project access type
+
+     append_Form("redirect", "false")
+
+      $j("#new_investigation").submit()
+
+    })
+
+  })
+
+  function append_Form(name, val)
+  {
+       let input = $j("<input>")
+        .attr("type", "hidden")
+        .attr("name", name).val(val);
+      $j('#new_investigation').append(input);
   }
 </script>
