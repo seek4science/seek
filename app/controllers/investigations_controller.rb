@@ -63,7 +63,12 @@ class InvestigationsController < ApplicationController
     if @investigation.save
       respond_to do |format|
         flash[:notice] = "The #{t('investigation')} was successfully created."
-        format.html { redirect_to investigation_path(@investigation) }
+        if params[:redirect]
+          format.html { redirect_to request.referrer }
+        else
+          format.html { redirect_to investigation_path(@investigation) }
+        end
+        
         format.json { render json: @investigation }
       end
     else

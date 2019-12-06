@@ -1,5 +1,4 @@
    <div class="simpleForm">
-       <input type="hidden" id="selected_item" value="">
        <p id="investigationTitle"><strong style="text-align: center;">Title:</strong> <span
                id="investigationTitleC">Investigation</span></p>
        <p id="investigationDes"> <strong>Description:</strong> <span id="investigationDesC">inv content</span> </p>
@@ -23,7 +22,7 @@
            let people = $j('#permission-people-ids').tagsinput('items');
            let pid = <%= params[:id] %>
                let url = pid + '/update_investigation_permission';
-           let inv_id = $j("#selected_item").val()
+           let inv_id = $j("#selected_item_id").val()
            if (!inv_id) return
            let data = {
                inv_id,
