@@ -1,12 +1,7 @@
-
 <%
-
-   help_text_preview =  "Here is re-fetched metadata of the publication."
-
+  help_text_preview =  "Here is re-fetched metadata of the publication."
+  id = params[:publication][:id]
 %>
-
-<%#= folding_panel("Updated Metadata", false, :id => "publication_refetch_preview",
-                  :help_text=> help_text_preview , :class => 'list_item' ) do %>
 
 <%= panel("Updated Metadata", :id => 'publication_refetch_preview', :help_text=> help_text_preview,:class => 'list_item') do %>
 
@@ -32,3 +27,25 @@
   <%= list_item_optional_attribute PublicationType.find(@publication.publication_type_id).title, h(@publication.journal) %>
   <% end %>
 <% end %>
+
+
+<%= form_for @publication, :id => 'edit_publication', url: publication_path(id), method: :patch do |f| %>
+  <%= f.hidden_field :parent_name %>
+  <%= f.hidden_field :title %>
+  <%= f.hidden_field :pubmed_id %>
+  <%= f.hidden_field :doi %>
+  <%= f.hidden_field :publication_type_id %>
+  <%= f.hidden_field :citation %>
+  <%= f.hidden_field :publisher %>
+  <%= f.hidden_field :journal %>
+  <%= f.hidden_field :booktitle %>
+  <%= f.hidden_field :published_date %>
+  <%= f.hidden_field :pubmed_id %>
+  <%= f.hidden_field :abstract %>
+  <%= f.hidden_field :editor %>
+  <%= f.hidden_field :subaction, :value => "update_associated_publication_data" %>
+  <%= f.submit 'Save', :class => 'btn btn-primary' %>
+
+<% end %>
+
+

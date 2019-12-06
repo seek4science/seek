@@ -642,6 +642,7 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
       post :disassociate_authors
+      post :update_metadata
     end
     resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :events,:only=>[:index]
   end
