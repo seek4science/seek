@@ -1662,7 +1662,18 @@ table#storage-stats thead {
     z-index: -1
 }
 
-.treeaction {
+.big_plus {
+    color: #555;
+    border: none;
+    background-color: white;
+    transition: all .2s ease-in-out;
+    font-size: 22px;
+    cursor: pointer;
+    top: 4px;
+}
+
+.treeaction,
+.treeaction:visited {
     color: #555;
     margin-left: 3px;
     padding: 2px;
@@ -1671,16 +1682,17 @@ table#storage-stats thead {
     border: none;
     background-color: white;
     transition: all .2s ease-in-out;
-    text-decoration: none;
+    text-decoration: none !important;
     float: right;
     margin-right: 2px;
     top: 4px;
 }
 
-.treeaction:hover {
+.treeaction:hover,
+.big_plus:hover {
     color: green;
     text-decoration: none;
-    transform: scale(1.5);
+    transform: scale(1.5)
 }
 
 .project_treeview {
@@ -1715,7 +1727,10 @@ table#storage-stats thead {
 }
 
 .fileManager li a {
-    cursor: pointer
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    z-index: 1;
 }
 
 .fileManager {
@@ -1758,4 +1773,9 @@ table#storage-stats thead {
 
 .tableXs td {
     border-radius: 5px
+}
+
+.file_selected {
+    background-color: aliceblue;
+    color: white
 }

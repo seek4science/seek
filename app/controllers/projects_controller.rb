@@ -86,6 +86,7 @@ class ProjectsController < ApplicationController
   # GET /projects/1
   # GET /projects/1.xml
   def show
+    retrieve_project_files
     #Create JStree core data
     inv =[]
     std =[]
@@ -114,13 +115,17 @@ class ProjectsController < ApplicationController
     if inv.length >0 then inv[0]['state'] =  {'opened': true,  'separate': {'label': 'Investigations', 'action': '#'}} end
   
     inv.unshift({'text': 'Documents', 'state': {'opened': true},
-     'children': [{'text': 'Presentations', '_type': 'fld', 'count': '0'},
-      {'text': 'Slideshows', '_type': 'fld', 'count': '0'},
-      {'text': 'Articles', '_type': 'fld', 'count': '0'},
-      {'text': 'Posters', '_type': 'fld', 'count': '0'}]})
+     'children': [{'text': 'Presentations', '_type': 'fld', 'count': get_files_count(1)},
+      {'text': 'Slideshows', '_type': 'fld', 'count': get_files_count(2)},
+      {'text': 'Articles', '_type': 'fld', 'count': get_files_count(3)},
+      {'text': 'Posters', '_type': 'fld', 'count': get_files_count(4)}]})
     prj.push({'text': @project.title, '_type': 'prj', '_id': @project.id, 'a_attr': bold_style, 'state':{'opened': true,
        'separate':{'label': 'Project'}}, 'children': inv })
     @treeData = JSON[prj]
+    #For creating new investigation and study in Project view page
+    @investigation = Investigation.new({})
+    @study = Study.new({})
+
   
     respond_to do |format|
       format.html # show.html.erb
@@ -128,6 +133,14 @@ class ProjectsController < ApplicationController
       format.xml
       format.json { render json: @project }
     end
+  end
+
+  def retrieve_project_files
+    @PFiles = @project.other_project_files
+  end
+
+  def get_files_count(folder_id)
+    (@PFiles.select {|file| file.default_project_folders_id == folder_id}).length.to_s
   end
 
   def update_investigation_permission
@@ -161,20 +174,32 @@ class ProjectsController < ApplicationController
   #/POST /projects/upload_file
   def upload_project_file
     unique_id = SecureRandom.uuid
-    new_file = OtherProjectFile.new(uuid: unique_id, title:params[:file].original_filename);
-    new_file.description = params[:description]
+    new_file = OtherProjectFile.new(uuid: unique_id, title:params[:file].original_filename, description: params[:description]);
+    new_file.project.push(Project.find(params[:pid]))
     folder_id = DefaultProjectFolder.where(title: params[:folder]).first().id
     unless params[:file].nil? && folder_id.nil?
       new_file.default_project_folders_id = folder_id
       path = File.join(Seek::Config.other_project_files_path, unique_id)
       File.open(path, "wb") { |f| f.write(params[:file].read) }
       if new_file.save
-        return render :json => {message: 'file uploaded!'}
+        return render :json => {message: 'file uploaded!', id: new_file.id}
       else
         return render :json => {message: 'file NOT uploaded!'} 
       end
     end
-    render :json => {message: 'Error saving the uplloaded file!'}
+    render :json => {message: 'Error saving the uploaded file!'}
+  end
+
+  def get_file_list
+    folder_id = DefaultProjectFolder.where(title: params[:folder]).first().id
+    pid = params[:id]
+    file_list_return =[]
+    file_list = Project.find(pid).other_project_files.select{|file| file.default_project_folders_id == folder_id}
+    file_list.each do |file|
+      file_list_return.push({name:file.title, id: file.id, extension: File.extname(file.title)})
+    end
+    render :json => file_list_return
+
   end
 
 

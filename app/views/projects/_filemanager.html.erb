@@ -1,10 +1,14 @@
  <div class="col-lg-12">
      <input type="file" id="file" style="display:none">
-     <input id="upload_btn" type="submit" value="Upload File" class="btn btn-primary">
+
+
      <div class="row">
          <div id=files class="simpleForm">
              <ul class="fileManager">
                  <li>empty</li>
+                 <li style="border-left: 2px dotted #aaa; border-radius:0">
+                     <span id="upload_btn" title="Upload a file" class="big_plus glyphicon glyphicon-plus"></span>
+                 </li>
              </ul>
          </div>
      </div>
@@ -14,25 +18,123 @@
  </div>
 
  <script>
+     let pid
+     let folderName
+
      $j("#upload_btn").on('click', () => {
          $j('#file').click();
      })
 
      $j('#file').on('change', () => {
          let formData = new FormData();
-         formData.append('file', $j('#file')[0].files[0]);
-         formData.append('folder', $j('#selected_folder').val())
+         let file = $j('#file')[0].files[0]
+         formData.append('file', file);
+         formData.append('folder', folderName)
          formData.append('description', 'description...')
-         let pid = <%= params[:id]%>
-             $j.ajax({
-                 type: 'POST',
-                 url: pid + '/upload_project_file',
-                 data: formData,
-                 processData: false,
-                 contentType: false,
-                 success: s => {
-                     alert(s.message)
-                 }
-             })
+         formData.append('pid', pid)
+         $j.ajax({
+             type: 'POST',
+             url: pid + '/upload_project_file',
+             data: formData,
+             processData: false,
+             contentType: false,
+             success: s => {
+                console.log('Uploaded')
+                let ext = $j('#file').val().split('.').pop();
+                addFile(s.id, file_icon(ext), file.name)
+                let origin = $j( "#" + $j("#selected_tree_item_id").val() + " a span")
+                bounce(origin,parseInt(origin.text())+1)
+             }
+         })
      })
+
+
+     function load_files() {
+         pid = <%= params[:id] %>
+             folderName = $j('#selected_folder').val()
+         let base = $j(".fileManager");
+         $j('.fileManager li:not(:last-child)').remove();
+
+         base.not(':last').remove()
+         $j.ajax({
+             type: 'GET',
+             url: pid + '/get_file_list?folder=' + folderName,
+             success: result => {
+                 if (!result) {
+                     base.empty()
+                     base.append("<li>Error!</li>")
+                     return
+                 }
+                 if (result.length > 0) {
+                     result.forEach(function (file) {
+                         addFile(file.id, file_icon(file.extension), file.name)
+                     })
+                 } else {
+                     base.prepend('<li>empty</li>')
+                 }
+             }
+         })
+     }
+
+     function addFile(id, ext, name) {
+         if ($j(".fileManager li:first").text() == "empty")
+            $j(".fileManager li:first").remove();
+
+         $j(".fileManager").prepend(
+             '<li class="file" data-id=' + id + '><img src="/assets/' +
+             ext +
+             '.png"> <br><a data-filetype="txt" class="file">' +
+             name + '</a></li>')
+     }
+
+     function file_icon(extension) {
+         switch (extension.toLowerCase().replace('.', '')) {
+             case 'txt':
+                 return 'txt'
+
+             case 'doc', 'docx':
+                 return 'doc'
+
+             case 'jpg':
+                 return 'jpg'
+             case 'png':
+                 return 'png'
+             case 'ppt', 'pptx':
+                 return 'ppt'
+
+             case 'svg':
+                 return 'svg'
+
+             case 'xls', 'xlsx':
+                 return 'xls'
+
+             case 'csv':
+                 return 'csv'
+             case 'pdf':
+                 return 'pdf'
+             default:
+                 return 'general'
+         }
+
+     }
+
+     $j(".fileManager").on("click", ".file", function (event) {
+         $j('.file').each(function () {
+             $j(this).removeClass("file_selected")
+         });
+         $j(this).addClass("file_selected")
+     })
+
+     function bounce(item, text) {
+         item.addClass('animate')
+         setTimeout(() => {
+             item.css('transform', 'scale(2)')
+             item.css('opacity', '0')
+         }, 1);
+         setTimeout(() => {
+             item.css('transform', 'scale(1)')
+             item.css('opacity', '1')
+             item.text(text)
+         }, 300);
+     }
  </script>
