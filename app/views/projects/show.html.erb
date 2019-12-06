@@ -169,7 +169,7 @@
               let a = d.createElement('a')
               a.href = n.state.separate.action;
               a.className = 'treeaction glyphicon glyphicon-plus';
-              $j(a).attr('onclick', `add${n.state.separate.label}()`)
+              $j(a).attr('onclick', `add${n.state.separate.label}(this)`)
               obj.prepend(a)
 
             }
@@ -252,14 +252,16 @@
       })
   }
 
-  function addInvestigations() {
+  function addInvestigations(t) {
     $j('#data-file-modal-inv').modal({
       backdrop: 'static',
       keyboard: true
     });
   }
 
-  function addStudies() {
+  function addStudies(t) {
+    //Change the JStree active item to the associated Investigation id
+    $j("#selected_item_id").val($j(t).parent().children('.jstree-anchor').attr('_id'))
     $j('#data-file-modal-std').modal({
       backdrop: 'static',
       keyboard: true
@@ -267,35 +269,45 @@
   }
 
   $j(document).ready(function () {
-     let pid = <%= params[:id] %>
-    $j("a:contains('Cancel')").click(function (e) {
-      e.preventDefault();
-      $j('#data-file-modal-inv').modal('hide');
-      $j('#data-file-modal-std').modal('hide');
-    })
+    let pid = <%= params[:id] %>
+    let uid = <%= current_user.id %>
+      $j("a:contains('Cancel')").click(function (e) {
+        e.preventDefault();
+        $j('#data-file-modal-inv').modal('hide');
+        $j('#data-file-modal-std').modal('hide');
+      })
     $j("#submit_investigation").click(function () {
+      let f = $j('#new_investigation')
+      append_Form("investigation[project_ids][]", pid, f)
+      append_Form("policy_attributes[access_type]", "0", f)
+      append_Form("investigation[creator_ids][]", uid, f)
+      append_Form("policy_attributes[permissions_attributes][0][contributor_type]", "Project", f)
+      append_Form("policy_attributes[permissions_attributes][0][contributor_id]", pid, f)
+      append_Form("policy_attributes[permissions_attributes][0][access_type]", "2", f) //Project access type
+      append_Form("redirect", "false", f)
+      f.submit()
+    })
 
-     append_Form("investigation[project_ids][]",pid)      //PID
-     append_Form("policy_attributes[access_type]","0")    // default
-     append_Form("investigation[creator_ids][]",<%= current_user.id %>)    //User ID
-
-     append_Form("policy_attributes[permissions_attributes][0][contributor_type]","Project")     
-     append_Form("policy_attributes[permissions_attributes][0][contributor_id]",pid)     //PID
-     append_Form("policy_attributes[permissions_attributes][0][access_type]","2")     //Project access type
-
-     append_Form("redirect", "false")
-
-      $j("#new_investigation").submit()
-
+    $j("#submit_study").click(function () {
+      let f = $j('#new_study')
+      let inv_id = $j("#selected_item_id").val()
+      append_Form("study[investigation_id]", inv_id, f)
+      append_Form("study[person_responsible_id]", uid, f)
+      append_Form("study[creator_ids][]", uid, f)
+      append_Form("policy_attributes[access_type]", "0", f)
+      append_Form("policy_attributes[permissions_attributes][0][contributor_type]", "Project", f)
+      append_Form("policy_attributes[permissions_attributes][0][contributor_id]", pid, f)
+      append_Form("policy_attributes[permissions_attributes][0][access_type]", "2", f)
+      append_Form("redirect", "false", f)
+      f.submit()
     })
 
   })
 
-  function append_Form(name, val)
-  {
-       let input = $j("<input>")
-        .attr("type", "hidden")
-        .attr("name", name).val(val);
-      $j('#new_investigation').append(input);
+  function append_Form(name, val, form) {
+    let input = $j("<input>")
+      .attr("type", "hidden")
+      .attr("name", name).val(val);
+    form.append(input);
   }
 </script>
