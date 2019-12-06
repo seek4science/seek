@@ -106,13 +106,13 @@ class ProjectsController < ApplicationController
           asy=[]
         end
        end
-       if std.length >0 then std[0]['state'] =  { 'opened': true, 'separate': {'label': 'Studies', 'action': '#'}} end
+       if std.length >0 then std[0]['state'] =  { 'opened': true} end
        inv.push({'text': investigation.title, '_type': 'inv', '_id': investigation.id,'a_attr': bold_style,
-         'state': {'opened': true}, 'children': std })
+         'state': {'opened': true, 'separate': {'label': 'Studies', 'action': '#'}}, 'children': std })
        std=[]
     end
     #Documents folder
-    if inv.length >0 then inv[0]['state'] =  {'opened': true,  'separate': {'label': 'Investigations', 'action': '#'}} end
+    #if inv.length >0 then inv[0]['state'] =  {'opened': true,  'separate': {'label': 'Studies', 'action': '#'}} end
   
     inv.unshift({'text': 'Documents', 'state': {'opened': true},
      'children': [{'text': 'Presentations', '_type': 'fld', 'count': get_files_count(1)},
@@ -120,7 +120,7 @@ class ProjectsController < ApplicationController
       {'text': 'Articles', '_type': 'fld', 'count': get_files_count(3)},
       {'text': 'Posters', '_type': 'fld', 'count': get_files_count(4)}]})
     prj.push({'text': @project.title, '_type': 'prj', '_id': @project.id, 'a_attr': bold_style, 'state':{'opened': true,
-       'separate':{'label': 'Project'}}, 'children': inv })
+       'separate':{'label': 'Investigations', 'action': '#'}}, 'children': inv })
     @treeData = JSON[prj]
     #For creating new investigation and study in Project view page
     @investigation = Investigation.new({})
