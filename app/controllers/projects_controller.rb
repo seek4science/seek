@@ -88,45 +88,11 @@ class ProjectsController < ApplicationController
   def show
     retrieve_project_files
     #Create JStree core data
-    inv =[]
-    std =[]
-    prj =[]
-    asy =[]
-    bold_style = {'style': 'font-weight:bold'}
-    @project.investigations.each do |investigation|
-       investigation.studies.each do |study| 
-        if study.assays
-          study.assays.each do |assay|
-            asy.push({'text': assay.title, '_type': 'asy', '_id': assay.id,'a_attr': bold_style, 'state':{'opened': true}, 
-              'children':[{'text': 'Methods', '_type': 'fld', 'count': '0'}]})
-          end
-          if asy.length >0 then asy[0]['state'] =  {'opened': true, 'separate': {'label': 'Assay'}} end
-          std.push( {'text': study.title, '_type': 'std', '_id': study.id,'a_attr': bold_style,'state':{'opened': true},
-             'children': asy})
-          asy=[]
-        end
-       end
-       if std.length >0 then std[0]['state'] =  { 'opened': true} end
-       inv.push({'text': investigation.title, '_type': 'inv', '_id': investigation.id,'a_attr': bold_style,
-         'state': {'opened': true, 'separate': {'label': 'Studies', 'action': '#'}}, 'children': std })
-       std=[]
-    end
-    #Documents folder
-    #if inv.length >0 then inv[0]['state'] =  {'opened': true,  'separate': {'label': 'Studies', 'action': '#'}} end
-  
-    inv.unshift({'text': 'Documents', 'state': {'opened': true},
-     'children': [{'text': 'Presentations', '_type': 'fld', 'count': get_files_count(1)},
-      {'text': 'Slideshows', '_type': 'fld', 'count': get_files_count(2)},
-      {'text': 'Articles', '_type': 'fld', 'count': get_files_count(3)},
-      {'text': 'Posters', '_type': 'fld', 'count': get_files_count(4)}]})
-    prj.push({'text': @project.title, '_type': 'prj', '_id': @project.id, 'a_attr': bold_style, 'state':{'opened': true,
-       'separate':{'label': 'Investigations', 'action': '#'}}, 'children': inv })
-    @treeData = JSON[prj]
+    @treeData = build_tree_data
     #For creating new investigation and study in Project view page
     @investigation = Investigation.new({})
     @study = Study.new({})
 
-  
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
@@ -135,27 +101,21 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def retrieve_project_files
-    @PFiles = @project.other_project_files
-  end
-
-  def get_files_count(folder_id)
-    (@PFiles.select {|file| file.default_project_folders_id == folder_id}).length.to_s
-  end
-
+  #POST
   def update_investigation_permission
     # item: finding investigation based on investigation id
-    # TODO: use determine_asset_from_controller method to authorize user
+    # TODO: authorize user
     investigation_id = params[:inv_id]
     @investigation = Investigation.find(investigation_id)    
     update_sharing_policies @investigation
       if @investigation.save
         render :json => {message: 'Permission was successfully updated'} 
       else
-        format.xml  { render xml: @investigation.errors, status: :unprocessable_entity }
+        render :json => {message: @investigation.errors} 
       end
   end
 
+  #POST
   def update_study_permission
     # item: finding study based on investigation id
     # TODO: use determine_asset_from_controller method to authorize user
@@ -165,10 +125,11 @@ class ProjectsController < ApplicationController
       if study.save
         render :json => {message: 'Permission was successfully updated'} 
       else
-        format.xml  { render xml: study.errors, status: :unprocessable_entity }
+        render :json => {message: study.errors} 
       end
   end
 
+  #GET
   def study_shared_with
     #Passing list of 'Shared with people'
     study_id = params[:std_id]
@@ -185,6 +146,7 @@ class ProjectsController < ApplicationController
     
   end
 
+  #GET
   def investigation_shared_with
     #Passing list of 'Shared with people'
     investigation_id = params[:inv_id]
@@ -220,18 +182,16 @@ class ProjectsController < ApplicationController
     render :json => {message: 'Error saving the uploaded file!'}
   end
 
+   #GET
   def get_file_list
     folder_id = DefaultProjectFolder.where(title: params[:folder]).first().id
-    pid = params[:id]
     file_list_return =[]
-    file_list = Project.find(pid).other_project_files.select{|file| file.default_project_folders_id == folder_id}
+    file_list = Project.find(params[:id]).other_project_files.select{|file| file.default_project_folders_id == folder_id}
     file_list.each do |file|
       file_list_return.push({name:file.title, id: file.id, extension: File.extname(file.title)})
     end
     render :json => file_list_return
-
   end
-
 
   # GET /projects/new
   # GET /projects/new.xml
@@ -572,4 +532,54 @@ class ProjectsController < ApplicationController
     end
   end
   
+ 
+
+  def build_tree_data
+    inv,std,prj,asy = Array.new(4) { [] }
+    bold = {'style': 'font-weight:bold'}
+    @project.investigations.each do |investigation|
+       investigation.studies.each do |study| 
+        if study.assays
+          study.assays.each_with_index do |assay, i|
+            asy.push(create_node(assay.title, 'asy',nil, assay.id, bold, true, i==0 ? 'Assay' : nil, nil,
+               [create_node('Methods', 'fld','0')]))
+          end
+          std.push(create_node(study.title, 'std', nil, study.id, bold, true, nil, nil, asy))
+          asy=[]
+        end
+       end
+       inv.push(create_node(investigation.title, 'inv',nil, investigation.id, bold, true, 'Studies', '#', std))
+       std=[]
+    end
+    #Documents folder  
+      chld = [create_node('Presentations', 'fld',f_count(1)), create_node('Slideshows', 'fld', f_count(2)),
+        create_node('Articles', 'fld',f_count(3)), create_node('Posters', 'fld', f_count(4))]
+      inv.unshift(create_node('Documents', nil, nil, nil, nil, true, nil, nil, chld))
+    prj.push(create_node(@project.title, 'prj',nil,  @project.id, bold, true, 'Investigations', '#', inv))
+    JSON[prj]
+  end
+
+  def retrieve_project_files
+    @PFiles = @project.other_project_files
+  end
+
+  def create_node(text, _type, count=nil, _id=nil, a_attr=nil, opened=true, label=nil, action=nil, children=nil)
+    nodes = {text: text, _type: _type, _id: _id, a_attr: a_attr, count: count, 
+      state: tidy_array({opened: opened, separate: tidy_array({label: label, action: action})}), children: children}
+    return  nodes.reject { |k,v| v.nil? }
+  end
+
+  def tidy_array(arr)
+    arr = arr.reject { |k,v| v.nil? }
+    if arr == {}
+      return nil
+    else
+      return arr
+    end
+  end
+
+  def f_count(folder_id)
+    (@PFiles.select {|file| file.default_project_folders_id == folder_id}).length.to_s
+  end
+
 end
