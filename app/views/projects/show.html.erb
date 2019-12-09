@@ -247,7 +247,7 @@
 
   $j(document).ready(function () {
     let pid = <%= params[:id] %>
-    let uid = <%= current_user.id %>
+    let uid = <%= current_user.id if current_user %>
       $j("a:contains('Cancel')").click(function (e) {
         e.preventDefault();
         $j('#data-file-modal-inv').modal('hide');
