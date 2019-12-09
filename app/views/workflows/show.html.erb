@@ -8,10 +8,13 @@
     <%= item_description @display_workflow.description -%>
 
     <% if @display_workflow.diagram.exists? %>
-      <div class="workflow-diagram">
-        <%= image_tag(diagram_workflow_path(@workflow, version: @display_workflow.version)) %>
+      <div class="row">
+        <div class="workflow-diagram">
+          <%= image_tag(diagram_workflow_path(@workflow, version: @display_workflow.version)) %>
+        </div>
       </div>
     <% end %>
+
     <div class="row">
       <div class="col-md-6">
         <%= persistent_resource_id(@display_workflow) %>
@@ -23,6 +26,13 @@
         <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_workflow} %>
       </div>
     </div>
+
+    <% unless @display_workflow.internals.empty? %>
+      <div class="row">
+        <%= render partial: 'workflows/workflow_internals', locals: { workflow: @display_workflow } %>
+      </div>
+    <% end %>
+
     <%= rendered_asset_view(@display_workflow) %>
 
     <%= render :partial=>"general/isa_graph", :locals => {:root_item => @workflow, :deep => true, :include_parents => true} %>

@@ -43,6 +43,8 @@
     <%= render :partial => 'assets/license_selector', :locals => { :resource => @workflow } %>
     <%= render :partial => 'sharing/form' -%>
 
+    <%= hidden_field_tag 'workflow[internals]', raw(@workflow.internals.to_json) -%>
+
     <div>
       <%= preview_permission_popup_link(@workflow)-%>
       <%= create_button :id => "workflow_submit_btn",

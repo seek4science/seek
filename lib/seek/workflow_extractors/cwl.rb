@@ -18,14 +18,25 @@ module Seek
         metadata = super
         cwl_string = @io.read
         cwl = YAML.load(cwl_string)
-        if cwl.has_key? 'label'
+        if cwl.key?('label')
           metadata[:title] = cwl['label']
         else
           metadata[:warnings] << 'Unable to determine title of workflow'
         end
-        if cwl.has_key? 'doc'
+        if cwl.key?('doc')
           metadata[:description] = cwl['doc']
         end
+
+        metadata[:internals] = {
+            inputs: [
+                { name: 'in1', description: '', type: '', format: '', default_value: '123' },
+                { name: 'in2', description: '', type: '', format: '', default_value: '456' }
+            ],
+            outputs: [
+                { name: 'in1', description: '', type: '' },
+                { name: 'in2', description: '', type: '' }
+            ]
+        }
 
         metadata
       end

@@ -1,0 +1,75 @@
+<div class="workflow-internals">
+  <% if workflow.inputs.any? %>
+    <h2>Inputs</h2>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover steps">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Type</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% workflow.inputs.each do |input| %>
+          <tr>
+            <td class="id"><%= input.id %></td>
+            <td class="name"><%= input.name %></td>
+            <td class="description"><%= input.description %></td>
+            <td class="type"><%= input.type %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+  <% if workflow.steps.any? %>
+    <h2>Steps</h2>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover steps">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% workflow.steps.each do |step| %>
+          <tr>
+            <td class="id"><%= step.id %></td>
+            <td class="name"><%= step.name %></td>
+            <td class="description"><%= step.description %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+  <% if workflow.outputs.any? %>
+    <h2>Outputs</h2>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover steps">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Type</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% workflow.outputs.each do |output| %>
+          <tr>
+            <td class="id"><%= output.id %></td>
+            <td class="name"><%= output.name %></td>
+            <td class="description"><%= output.description %></td>
+            <td class="type"><%= output.type %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

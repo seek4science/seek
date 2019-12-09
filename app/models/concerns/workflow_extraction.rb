@@ -66,6 +66,32 @@ module WorkflowExtraction
     doi.present? ? doi : URI.join(Seek::Config.site_base_host + '/', "#{self.class.name.tableize}/", id.to_s).to_s
   end
 
+  def internals
+    JSON.parse(metadata || '{}').with_indifferent_access
+  end
+
+  def internals=(meta)
+    self.metadata = meta.is_a?(String) ? meta : meta.to_json
+  end
+
+  def inputs
+    (internals[:inputs] || []).map do |i|
+      WorkflowInput.new(self, **i.symbolize_keys)
+    end
+  end
+
+  def outputs
+    (internals[:outputs] || []).map do |o|
+      WorkflowOutput.new(self, **o.symbolize_keys)
+    end
+  end
+
+  def steps
+    (internals[:steps] || []).map do |s|
+      WorkflowStep.new(self, **s.symbolize_keys)
+    end
+  end
+
   private
 
   def diagram_path(format)
