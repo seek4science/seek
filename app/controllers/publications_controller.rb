@@ -9,7 +9,7 @@ class PublicationsController < ApplicationController
 
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[show edit update destroy]
-  before_action :suggest_authors, only: :edit
+  before_action :suggest_authors, only: :mange
 
   include Seek::BreadCrumbs
 
@@ -69,6 +69,11 @@ class PublicationsController < ApplicationController
 
   # GET /publications/1/edit
   def edit; end
+
+  # GET /publications/1/manage
+  def manage
+    @publication = Publication.find(params[:id])
+  end
 
   # POST /publications
   # POST /publications.xml
@@ -159,22 +164,12 @@ class PublicationsController < ApplicationController
     publication_type_id= params[:publication][:publication_type_id]
     doi= params[:publication][:doi]
     id= params[:publication][:id]
-
-
-    Rails.logger.info ("params:#{params}")
-    Rails.logger.info ("params[:doi]:#{doi}")
-    Rails.logger.info ("params[:id]:#{id}")
-    Rails.logger.info ("params[:publication_type_id]:#{publication_type_id}")
-
     if publication_type_id.blank?
       @error = "Please choose a publication type."
     else
       result = get_data(@publication, nil, doi)
     end
-
     @error =  @publication.errors.full_messages.join('<br>') if @publication.errors.any?
-
-
     if !@error.nil?
       @error_text = @error
       respond_to do |format|
@@ -309,7 +304,7 @@ class PublicationsController < ApplicationController
 
 
     respond_to do |format|
-      format.html {redirect_to(edit_publication_url(@publication))}
+      format.html {redirect_to(manage_publication_url(@publication))}
       format.xml {head :ok}
     end
   end
@@ -367,7 +362,7 @@ class PublicationsController < ApplicationController
       else
         respond_to do |format|
           flash[:notice] = 'Publication was successfully created.'
-          format.html { redirect_to(edit_publication_url(@publication)) }
+          format.html { redirect_to(manage_publication_url(@publication)) }
           format.xml  { render xml: @publication, status: :created, location: @publication }
           format.json  { render json: @publication, status: :created, location: @publication }
         end
@@ -404,7 +399,7 @@ class PublicationsController < ApplicationController
       else
         respond_to do |format|
           flash[:notice] = 'Publication was successfully created.'
-          format.html { redirect_to(edit_publication_url(@publication)) }
+          format.html { redirect_to(manage_publication_url(@publication)) }
           format.xml  { render xml: @publication, status: :created, location: @publication }
           format.json { render json: @publication, status: :created, location: @publication }
         end

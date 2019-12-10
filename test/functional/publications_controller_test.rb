@@ -319,13 +319,13 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should show old unspecified publication type' do
     get :index
     assert_response :success
-    assert_select 'span.none_text', { text:'Not specified', :count=>6 }
+    assert_select 'span.none_text', { text:'Not specified', :count=> 9 }
   end
 
   test 'should show the publication with unspecified publication type as Not specified' do
     get :show, params: { id: publications(:no_publication_type) }
     assert_response :success
-    assert_select 'span.none_text', { text:'Not specified', :count=>2 }
+    assert_select 'span.none_text', { text:'Not specified', :count=>3 }
   end
 
   test 'should only show the year for 1st Jan in list view' do
@@ -473,7 +473,7 @@ class PublicationsControllerTest < ActionController::TestCase
     get :export, params: { query: { projects_id_in: [projects(:sysmo_project).id] } }
     assert_response :success
     p = assigns(:publications)
-    assert_equal 4, p.length
+    assert_equal 5, p.length
   end
 
   test 'should filter publications sort by published date for export' do
@@ -510,6 +510,11 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should get edit' do
     get :edit, params: { id: publications(:one) }
+    assert_response :success
+  end
+
+  test 'should get manage' do
+    get :manage, params: { id: publications(:one) }
     assert_response :success
   end
 
@@ -913,7 +918,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
 
-    get :edit, params: { id: p.id }
+    get :manage, params: { id: p.id }
 
     assert_response :success
     assert_not_includes response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'

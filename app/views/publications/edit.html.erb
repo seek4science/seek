@@ -5,15 +5,7 @@
 <%if @publication.registered_mode == 3 || @publication.registered_mode == 4 %>
   <%= form_for @publication do |f| %>
     <%= render :partial => 'publicaiton_editor', :locals => { :publication_form => f }%>
-    <%= render :partial => 'associated_publication_data', :locals => { :publication_form => f }%>
   <% end %>
-
 <% elsif !@publication.doi.nil? %>
-  <%if @subaction.nil? %>
   <%= render :partial => 'publication_doi_refetch_metadata', :locals => { :publication => @publication } %>
-  <% else %>
-    <%= form_for @publication do |f| %>
-      <%= render :partial => 'associated_publication_data', :locals => { :publication_form => f }%>
-    <% end %>
-  <%end %>
 <%end %>

@@ -21,10 +21,10 @@
 <%= publication_form.fancy_multiselect :investigations, other_projects_checkbox: true %>
 
 <%= publication_form.fancy_multiselect :studies, { other_projects_checkbox: true,
-                                    group_options_by: ->(s) { s.investigation.try(:title) }  } %>
+                                                   group_options_by: ->(s) { s.investigation.try(:title) }  } %>
 
 <%= publication_form.fancy_multiselect :assays, { other_projects_checkbox: true,
-                                   group_options_by: ->(a) { a.study.try(:title) }  } %>
+                                                  group_options_by: ->(a) { a.study.try(:title) }  } %>
 
 <%= publication_form.fancy_multiselect :data_files, other_projects_checkbox: true %>
 
