@@ -9,10 +9,10 @@ module DataCite
     def build
       Nokogiri::XML::Builder.new do |xml|
         @xml = xml
-        @xml.resource('xmlns' => 'http://datacite.org/schema/kernel-3',
+        @xml.resource('xmlns' => 'http://datacite.org/schema/kernel-4',
                       'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-                      'xsi:schemaLocation' => 'http://datacite.org/schema/kernel-3 '\
-                                           'http://schema.datacite.org/meta/kernel-3/metadata.xsd') do
+                      'xsi:schemaLocation' => 'http://datacite.org/schema/kernel-4 '\
+                                           'http://schema.datacite.org/meta/kernel-4.3/metadata.xsd') do
           @hash.each do |key, value|
             if respond_to?(key, true)
               send(key, value)
@@ -35,6 +35,7 @@ module DataCite
         creator_list.each do |creator|
           @xml.creator do
             @xml.creatorName "#{creator.last_name}, #{creator.first_name}"
+            @xml.nameIdentifier creator.orcid_uri, 'nameIdentifierScheme' => 'ORCID', 'schemeURI' => 'https://orcid.org' if creator.orcid.present?
           end
         end
       end
@@ -64,7 +65,7 @@ module DataCite
       @xml.publicationYear year
     end
 
-    def content_type(types)
+    def resource_type(types)
       @xml.resourceType types[0], 'resourceTypeGeneral' => types[1]
     end
   end

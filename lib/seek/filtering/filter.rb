@@ -22,10 +22,11 @@ module Seek
       def options(collection, active_values)
         count_exp = collection.arel_table[:id].count(true) # This produces something like "COUNT(DISTINCT people.id)"
         select_fields = [value_field, count_exp, label_field].compact
+        group_fields = [value_field, label_field].compact
         collection = collection.select(*select_fields)
         collection = collection.joins(joins) if joins
         collection = collection.includes(includes) if includes
-        opts = collection.group(value_field).having(count_exp.gt(0)).pluck(*select_fields).reject { |g| g[0].nil? }
+        opts = collection.group(group_fields).having(count_exp.gt(0)).pluck(*select_fields).reject { |g| g[0].nil? }
         if label_mapping
           label_mapping.call(opts.map(&:first)).each.with_index do |label, index|
             opts[index][2] = label

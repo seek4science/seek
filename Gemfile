@@ -40,7 +40,7 @@ gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'
 gem 'json-schema'
 gem 'json-diff'
-gem 'rubyzip', '~> 1.2.2'
+gem 'rubyzip'
 
 gem 'equivalent-xml'
 gem 'breadcrumbs_on_rails'
@@ -87,7 +87,7 @@ gem 'bootstrap-sass', '>=3.4.1'
 gem 'sass-rails', '~> 5.0'
 gem 'sprockets-rails'
 
-gem 'ro-bundle'
+gem 'ro-bundle', '~> 0.2.4'
 gem 'handlebars_assets'
 gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 

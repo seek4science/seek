@@ -44,7 +44,7 @@ class DataFile < ApplicationRecord
 
   explicit_versioning(version_column: 'version') do
     include Seek::Data::SpreadsheetExplorerRepresentation
-    acts_as_doi_mintable(proxy: :parent)
+    acts_as_doi_mintable(proxy: :parent, type: 'Dataset', general_type: 'Dataset')
     acts_as_versioned_resource
     acts_as_favouritable
 

@@ -91,7 +91,11 @@ class Settings < ActiveRecord::Base
   alias_method :attr_enc_value, :value
   def value
     if encrypted?
-      attr_enc_value
+      begin
+        attr_enc_value
+      rescue OpenSSL::Cipher::CipherError
+        raise "Unable to decrypt setting '#{var}'. Was the key (filestore/attr_encrypted/key) changed?"
+      end
     elsif self[:value].present?
       YAML::load(self[:value])
     else
