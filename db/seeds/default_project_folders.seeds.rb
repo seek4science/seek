@@ -7,4 +7,7 @@ titles.each do |title|
   end
 end
 
+puts "Seeded default project folders"
+
+
 
