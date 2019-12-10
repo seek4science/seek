@@ -42,7 +42,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     p = assigns(:publication)
     assert_equal 0, p.assays.count
   end
@@ -57,7 +57,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     p = assigns(:publication)
     assert_equal 1, p.assays.count
     assert p.assays.include? assay
@@ -69,7 +69,7 @@ class PublicationsControllerTest < ActionController::TestCase
       post :create, params: { publication: { doi: '10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
   end
 
 
@@ -80,7 +80,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
 
   end
 
@@ -91,7 +91,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     assigns(:publication).destroy
 
     # formatted slightly different
@@ -100,7 +100,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     assigns(:publication).destroy
 
     # with url
@@ -109,7 +109,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     assigns(:publication).destroy
 
     # with url but no protocol
@@ -118,7 +118,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     assigns(:publication).destroy
 
     # also test with spaces around
@@ -126,7 +126,7 @@ class PublicationsControllerTest < ActionController::TestCase
       post :create, params: { publication: { doi: '  10.1371/journal.pone.0004803  ', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
   end
 
   test 'should create publication from details' do
@@ -145,7 +145,7 @@ class PublicationsControllerTest < ActionController::TestCase
       post :create, params: { subaction: 'Create', publication: publication }
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     p = assigns(:publication)
 
     assert_nil p.pubmed_id
