@@ -39,7 +39,7 @@ class ProjectsControllerTest < ActionController::TestCase
    p = Factory(:project)
    post :upload_project_file , params: {id: p.id, description: 'test description', pid: p.id, folder: 'presentations', file: uploadable_file}
    @controller.instance_variable_set(:@PFiles, p.other_project_files)
-   assert_equal @controller.send(:f_count, 1).to_i, 1 
+   assert_equal @controller.send(:f_count, 'presentations').to_i, 1 
  end
 
  test 'build tree data' do

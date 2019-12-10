@@ -552,8 +552,8 @@ class ProjectsController < ApplicationController
        std=[]
     end
     #Documents folder  
-      chld = [create_node('Presentations', 'fld',f_count(1)), create_node('Slideshows', 'fld', f_count(2)),
-        create_node('Articles', 'fld',f_count(3)), create_node('Posters', 'fld', f_count(4))]
+      chld = [create_node('Presentations', 'fld',f_count('Presentations')), create_node('Slideshows', 'fld', f_count('Slideshows')),
+        create_node('Articles', 'fld',f_count('Articles')), create_node('Posters', 'fld', f_count('Articles'))]
       inv.unshift(create_node('Documents', nil, nil, nil, nil, true, nil, nil, chld))
     prj.push(create_node(@project.title, 'prj',nil,  @project.id, bold, true, 'Investigations', '#', inv))
     JSON[prj]
@@ -578,7 +578,8 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def f_count(folder_id)
+  def f_count(folder_name)
+    folder_id = DefaultProjectFolder.where(title: folder_name).first().id
     (@PFiles.select {|file| file.default_project_folders_id == folder_id}).length.to_s
   end
 
