@@ -229,16 +229,18 @@ class PresentationsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'should not be able to view ms/open office ppt content if soffice not available' do
+  test 'view content disabled for ms/open office ppt content if soffice not available and conversion required' do
     Seek::Config.stub(:soffice_available?, false) do
       ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-      refute ms_ppt_presentation.content_blob.is_content_viewable?
+      assert ms_ppt_presentation.content_blob.file_exists?
+      refute ms_ppt_presentation.content_blob.file_exists?('pdf')
       get :show, params: { id: ms_ppt_presentation.id }
       assert_response :success
       assert_select 'span.disabled-button', text: /View content/, count: 1
 
       openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-      refute openoffice_ppt_presentation.content_blob.is_content_viewable?
+      assert openoffice_ppt_presentation.content_blob.file_exists?
+      refute openoffice_ppt_presentation.content_blob.file_exists?('pdf')
       get :show, params: { id: openoffice_ppt_presentation.id }
       assert_response :success
       assert_select 'span.disabled-button', text: /View content/, count: 1
