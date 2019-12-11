@@ -304,6 +304,7 @@ SEEK::Application.routes.draw do
       post :publish
       get :published
       get :isa_children
+      get :export_isatab_json
       get :manage
       patch :manage_update
     end
