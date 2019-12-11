@@ -297,7 +297,7 @@ module IsaTabConverter
     isa_sample[:name] = sample.title
     isa_sample[:characteristics] = []
     sample.sample_type.sample_attributes.each do |attribute|
-      value = sample.get_attribute(attribute.hash_key)
+      value = sample.get_attribute_value(attribute.hash_key)
       next if value.blank?
 
       material_attribute_value = {}
