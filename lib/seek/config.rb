@@ -283,9 +283,9 @@ module Seek
       end
     end
 
-    def soffice_available?(cached=true)
+    def soffice_available?(cached=false)
       @@soffice_available = nil unless cached
-      @@soffice_available ||= begin
+      begin
         port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
         soc = TCPSocket.new('localhost', port)
         soc.close
