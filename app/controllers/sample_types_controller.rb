@@ -67,7 +67,7 @@ class SampleTypesController < ApplicationController
     respond_to do |format|
       if @sample_type.save
         format.html { redirect_to @sample_type, notice: 'Sample type was successfully created.' }
-        format.json { render json: @sample_type, status: :created, location: @sample_type}
+        format.json { render json: @sample_type, status: :created, location: @sample_type, include: [params[:include]]}
       else
         format.html { render action: 'new' }
         format.json { render json: @sample_type.errors, status: :unprocessable_entity}
@@ -83,7 +83,7 @@ class SampleTypesController < ApplicationController
     flash[:notice] = 'Sample type was successfully updated.' if @sample_type.save
     respond_to do |format|
       format.html { respond_with(@sample_type) }
-      format.json {render json: @sample_type}
+      format.json {render json: @sample_type, include: [params[:include]]}
     end
 
   end

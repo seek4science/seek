@@ -53,7 +53,7 @@ class SopsController < ApplicationController
       if @sop.update_attributes(sop_params)
         flash[:notice] = "#{t('sop')} metadata was successfully updated."
         format.html { redirect_to sop_path(@sop) }
-        format.json { render json: @sop }
+        format.json { render json: @sop, include: [params[:include]] }
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@sop), status: :unprocessable_entity }

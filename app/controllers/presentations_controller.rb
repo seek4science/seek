@@ -60,7 +60,7 @@ class PresentationsController < ApplicationController
         end
         flash[:notice] = "#{t('presentation')} metadata was successfully updated."
         format.html { redirect_to presentation_path(@presentation) }
-        format.json { render json: @presentation }
+        format.json { render json: @presentation, include: [params[:include]] }
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@presentation), status: :unprocessable_entity }

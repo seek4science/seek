@@ -59,7 +59,7 @@ class ContentBlobsController < ApplicationController
   
   def show
     respond_to do |format|
-      format.json { render json: @content_blob }
+      format.json { render json: @content_blob, include: [params[:include]] }
       format.html { render plain: 'Format not supported', status: :not_acceptable }
       format.xml { render plain: 'Format not supported', status: :not_acceptable }
       format.csv { csv_data }

@@ -44,7 +44,7 @@ class DocumentsController < ApplicationController
       if @document.update_attributes(document_params)
         flash[:notice] = "#{t('document')} metadata was successfully updated."
         format.html { redirect_to document_path(@document) }
-        format.json { render json: @document }
+        format.json { render json: @document, include: [params[:include]] }
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@document), status: :unprocessable_entity }
