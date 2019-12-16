@@ -9,8 +9,10 @@
 
     <% if @display_workflow.diagram.exists? %>
       <div class="row">
-        <div class="workflow-diagram">
-          <%= image_tag(diagram_workflow_path(@workflow, version: @display_workflow.version)) %>
+        <div class="col-md-12">
+          <div class="workflow-diagram">
+            <%= image_tag(diagram_workflow_path(@workflow, version: @display_workflow.version)) %>
+          </div>
         </div>
       </div>
     <% end %>
@@ -29,7 +31,9 @@
 
     <% unless @display_workflow.internals.empty? %>
       <div class="row">
-        <%= render partial: 'workflows/workflow_internals', locals: { workflow: @display_workflow } %>
+        <div class="col-md-12">
+          <%= render partial: 'workflows/workflow_internals', locals: { workflow: @display_workflow } %>
+        </div>
       </div>
     <% end %>
 
