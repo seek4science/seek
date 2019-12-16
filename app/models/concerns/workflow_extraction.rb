@@ -46,24 +46,22 @@ module WorkflowExtraction
       crate.author = related_people.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
       crate.publisher = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata) }
       crate.license = license
-      crate.url = ro_crate_identifier.sub('?version', '/ro_crate?version') #awful hack
+      crate.url = ro_crate_url('ro_crate')
     end
   end
 
   def ro_crate_identifier
-    if doi.present?
-      doi
-    else
-      parts = [Seek::Config.site_base_host.chomp('/')]
-      if is_a_version?
-        parts += [parent.class.name.tableize, parent.id.to_s, "?version=#{version}"]
-      else
-        parts += [self.class.name.tableize, self.id.to_s, "?version=#{version}"]
-      end
+    doi.present? ? doi : ro_crate_url
+  end
 
-      URI.join(*parts)
-    end
-    doi.present? ? doi : URI.join(Seek::Config.site_base_host + '/', "#{self.class.name.tableize}/", id.to_s).to_s
+  def ro_crate_url(action = nil)
+    url = Seek::Config.site_base_host.chomp('/')
+    wf = is_a_version? ? parent : self
+    url += "/#{wf.class.name.tableize}/#{wf.id}"
+    url += "/#{action}" if action
+    url += "?version=#{version}"
+
+    url
   end
 
   def internals
