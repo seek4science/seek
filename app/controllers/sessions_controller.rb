@@ -132,16 +132,32 @@ class SessionsController < ApplicationController
     # check if there is a user with that username as login
     identity = Identity.from_omniauth(auth)
     user_by_omniauth = identity.user
+
     if user_by_omniauth
       @user = user_by_omniauth
       check_login
-    # there is no such user, should we not create the user?
+      # there is no such user, should we not create the user?
     elsif !Seek::Config.omniauth_user_create
-      failed_login 'the authenticated user: cannot be found; administrators have been informed'
-      Mailer.omniauth_failed_login(auth.to_yaml).deliver_later
+      failed_login "the authenticated user: #{info['nickname']} cannot be found"
     else
-      flash[:notice] = 'You need to login directly to link accounts. If you do not have an account then you must register.'
-      redirect_to login_path
+      # create the user from the omniauth info
+      @user = User.create({:login => info['nickname']})
+      # some random password, since authentication should happen through omniauth in the future
+      length = User::MIN_PASSWORD_LENGTH
+      @user.password              = SecureRandom.urlsafe_base64(length * 2).first(length)
+      @user.password_confirmation = @user.password
+      # try to save
+      if !@user.save
+        failed_login "Cannot create a new user: #{info['nickname']}"
+      else
+        # should we activate the user?
+        @user.activate if Seek::Config.omniauth_user_activate
+        # when user was saved successfully, also create the Profile and save with the user
+        person = Person.create(auth['info'].slice(:first_name, :last_name, :email))
+        person.user = @user
+        disable_authorization_checks { person.save! }
+        check_login
+      end
     end
   end
 end

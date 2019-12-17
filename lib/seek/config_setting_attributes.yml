@@ -175,7 +175,8 @@ samples_enabled:
 project_admin_sample_type_restriction:
 omniauth_enabled:
 omniauth_user_create:
-omniauth_providers:
+omniauth_user_activate:
+#omniauth_providers:
 openbis_enabled:
 openbis_download_limit:
 openbis_debug:

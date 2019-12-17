@@ -302,6 +302,44 @@ module Seek
         false
       end
     end
+
+    def omniauth_providers
+      {
+          # https://github.com/intridea/omniauth-ldap
+          ldap: {
+              title: "organization-ldap",
+              host: 'localhost',
+              port: 389,
+              method: :plain,
+              base: 'DC=example,DC=com',
+              uid: 'samaccountname',
+              password: '',
+              bind_dn: ''
+          },
+          openid_connect: {
+              name: :elixir_aai,
+              scope: [:openid, :email],
+              response_type: 'code',
+              issuer: 'https://login.elixir-czech.org/oidc/',
+              discovery: false,
+              send_nonce: true,
+              client_signing_alg: :RS256,
+              client_jwk_signing_key: '{"keys":[{"kty":"RSA","e":"AQAB","kid":"rsa1","alg":"RS256","n":"uVHPfUHVEzpgOnDNi3e2pVsbK1hsINsTy_1mMT7sxDyP-1eQSjzYsGSUJ3GHq9LhiVndpwV8y7Enjdj0purywtwk_D8z9IIN36RJAh1yhFfbyhLPEZlCDdzxas5Dku9k0GrxQuV6i30Mid8OgRQ2q3pmsks414Afy6xugC6u3inyjLzLPrhR0oRPTGdNMXJbGw4sVTjnh5AzTgX-GrQWBHSjI7rMTcvqbbl7M8OOhE3MQ_gfVLXwmwSIoKHODC0RO-XnVhqd7Qf0teS1JiILKYLl5FS_7Uy2ClVrAYd2T6X9DIr_JlpRkwSD899pq6PR9nhKguipJE0qUXxamdY9nw"}]}',
+              client_options: {
+                  identifier: Seek::Config.elixir_aai_client_id,
+                  secret: Seek::Config.elixir_aai_secret,
+                  redirect_uri: 'http://localhost:3000/identities/auth/elixir_aai/callback',
+                  scheme: 'https',
+                  host: 'login.elixir-czech.org',
+                  port: 443,
+                  authorization_endpoint: '/oidc/authorize',
+                  token_endpoint: '/oidc/token',
+                  userinfo_endpoint: '/oidc/userinfo',
+                  jwks_uri: '/oidc/jwk',
+              }
+          }
+      }
+    end
   end
 
   # The inner wiring. Ideally this should be hidden away,
