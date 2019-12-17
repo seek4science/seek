@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
-  revision: e5e8e317e0158b184d7f4c4a451b217d5250c678
+  revision: 93869b90b2dd4fbff2cdd51417fbfa08479ab446
   specs:
     doi_query_tool (1.0.0)
       libxml-ruby (>= 2.6.0)
@@ -511,8 +511,8 @@ GEM
       pry (~> 0.9)
       slop (~> 3.0)
     psych (2.2.4)
-    public_suffix (4.0.1)
-    puma (3.8.2)
+    public_suffix (3.0.3)
+    puma (3.12.2)
     pyu-ruby-sasl (0.0.3.3)
     rack (2.0.6)
     rack-attack (5.0.1)

@@ -48,3 +48,13 @@ no_publication_type:
   pubmed_id: 30462164
   projects: [sysmo_project]
   policy: sysmo_member_edit
+
+old_publication_metadata:
+  title: "An old title"
+  publication_type_id: null
+  journal: "old journal"
+  contributor: quentin_person
+  published_date: <%= 2.days.ago.to_s :db %>
+  doi: 10.1051/0004-6361/201424801
+  projects: [sysmo_project]
+  policy: sysmo_member_edit

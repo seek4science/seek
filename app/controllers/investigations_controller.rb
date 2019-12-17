@@ -20,6 +20,9 @@ class InvestigationsController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
+  require "isatab_converter"
+  include IsaTabConverter
+
   def new_object_based_on_existing_one
     @existing_investigation =  Investigation.find(params[:id])
     if @existing_investigation.can_view?
@@ -30,6 +33,11 @@ class InvestigationsController < ApplicationController
       redirect_to @existing_investigation
     end
 
+  end
+
+  def export_isatab_json
+    the_hash = convert_investigation Investigation.find(params[:id])
+    send_data JSON.pretty_generate(the_hash) , filename: 'isatab.json'
   end
 
   def show

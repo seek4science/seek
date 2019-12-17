@@ -308,6 +308,7 @@ SEEK::Application.routes.draw do
       post :publish
       get :published
       get :isa_children
+      get :export_isatab_json
       get :manage
       patch :manage_update
     end
@@ -646,11 +647,14 @@ SEEK::Application.routes.draw do
       get :query_authors_typeahead
       get :export
       post :fetch_preview
+      post :update_metadata
       post :items_for_result
     end
     member do
+      get :manage
       post :update_annotations_ajax
       post :disassociate_authors
+      post :update_metadata
     end
     resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :events,:only=>[:index]
   end
@@ -734,7 +738,7 @@ SEEK::Application.routes.draw do
   end
 
   ### SAMPLE TYPES ###
-
+  #
   resources :sample_types do
     collection do
       post :create_from_template
@@ -743,6 +747,7 @@ SEEK::Application.routes.draw do
     end
     member do
       get :template_details
+      get :batch_upload
     end
     resources :samples
     resources :content_blobs do

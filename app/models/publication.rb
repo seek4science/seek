@@ -425,8 +425,8 @@ class Publication < ApplicationRecord
       begin
         query = DOI::Query.new(Seek::Config.crossref_api_email)
         result = query.fetch(doi)
-        Rails.logger.debug("fetch_pubmed_or_doi_result:")
-        Rails.logger.debug(result)
+
+        Rails.logger.debug("fetch_pubmed_or_doi_result:#{result}")
 
         @error = 'Unable to get result' if result.blank?
         @error = 'Unable to get DOI' if result.title.blank?

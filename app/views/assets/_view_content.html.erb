@@ -25,14 +25,20 @@
       <% options = { 'data-lightbox' => "view_content_blob_#{content_blob.id}_#{Time.now.to_i}_#{rand(10000000)}", :title => 'Preview'} %>
     <% else %>
       <%#param code is used for temporary link %>
-      <% url = polymorphic_path([asset, content_blob], :action => 'view_content', :code => params[:code]) %>
-      <% options = {:onclick => "checkSupportedBrowser();", :title => 'View contents of this file'} %>
+      <% if view_content_available?(content_blob) %>
+        <% url = polymorphic_path([asset, content_blob], :action => 'view_content', :code => params[:code]) %>
+        <% options = {:onclick => "checkSupportedBrowser();", :title => 'View contents of this file'} %>
+      <% else %>
+        <%= render partial:'assets/disabled_view_content_button', locals:{icon_view:icon_view, explanation:'The conversion to a format for display is currently unavailable, please try again later'} %>
+      <% end %>
     <% end %>
 
-    <% if icon_view %>
-      <%= link_to(image('show'), url, options) %>
-    <% else %>
-      <%= button_link_to('View content', "show", url, options) %>
+    <% if url && options %>
+      <% if icon_view %>
+        <%= link_to(image('show'), url, options) %>
+      <% else %>
+        <%= button_link_to('View content', "show", url, options) %>
+      <% end %>
     <% end %>
   <% elsif !asset.is_a?(Model) && asset.is_downloadable_asset? %>
     <% if content_blob.file_exists? %>
@@ -44,15 +50,7 @@
     <% else %>
       <% explanation = "This content is stored externally and cannot be previewed." %>
     <% end %>
-    <span data-tooltip='<%= tooltip(explanation) %>'>
-          <% if icon_view %>
-              <%= image('show', :onclick => "alert('#{explanation}');") %>
-          <% else %>
-            <span class='disabled_icon disabled-button btn btn-default' onclick='alert("<%=explanation%>")'>
-              <%= image('show', {:alt=>"View Content",:class=>"disabled"}) %> View content
-            </span>
-          <% end %>
-        </span>
+    <%= render partial:'assets/disabled_view_content_button', locals:{icon_view:icon_view, explanation:explanation} %>
   <% end %>
 <% end %>
 

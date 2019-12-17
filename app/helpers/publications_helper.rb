@@ -21,7 +21,7 @@ module PublicationsHelper
     elsif mode == 3
       'manually'
     elsif mode == 4
-      'from a bibtex file'
+      'imported from a bibtex file'
     else
       `unknown`
     end
@@ -30,8 +30,6 @@ module PublicationsHelper
   def authorised_publications(projects = nil)
     authorised_assets(Publication, projects)
   end
-
-  
 end
 
 

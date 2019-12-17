@@ -1,5 +1,3 @@
-<% publication_type = PublicationType.find(publication.publication_type_id) %>
-
 <%= panel("Publication overview", :id => 'publication_preview', :class => 'list_item') do %>
 
     <%= list_item_attribute "Title", publication.title %>

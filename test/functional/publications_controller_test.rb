@@ -42,7 +42,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     p = assigns(:publication)
     assert_equal 0, p.assays.count
   end
@@ -57,7 +57,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     p = assigns(:publication)
     assert_equal 1, p.assays.count
     assert p.assays.include? assay
@@ -69,7 +69,7 @@ class PublicationsControllerTest < ActionController::TestCase
       post :create, params: { publication: { doi: '10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
   end
 
 
@@ -80,7 +80,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
 
   end
 
@@ -91,7 +91,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     assigns(:publication).destroy
 
     # formatted slightly different
@@ -100,7 +100,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     assigns(:publication).destroy
 
     # with url
@@ -109,7 +109,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     assigns(:publication).destroy
 
     # with url but no protocol
@@ -118,7 +118,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     assigns(:publication).destroy
 
     # also test with spaces around
@@ -126,7 +126,7 @@ class PublicationsControllerTest < ActionController::TestCase
       post :create, params: { publication: { doi: '  10.1371/journal.pone.0004803  ', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
   end
 
   test 'should create publication from details' do
@@ -145,7 +145,7 @@ class PublicationsControllerTest < ActionController::TestCase
       post :create, params: { subaction: 'Create', publication: publication }
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     p = assigns(:publication)
 
     assert_nil p.pubmed_id
@@ -319,13 +319,13 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should show old unspecified publication type' do
     get :index
     assert_response :success
-    assert_select 'span.none_text', { text:'Not specified', :count=>6 }
+    assert_select 'span.none_text', { text:'Not specified', :count=> 9 }
   end
 
   test 'should show the publication with unspecified publication type as Not specified' do
     get :show, params: { id: publications(:no_publication_type) }
     assert_response :success
-    assert_select 'span.none_text', { text:'Not specified', :count=>2 }
+    assert_select 'span.none_text', { text:'Not specified', :count=>3 }
   end
 
   test 'should only show the year for 1st Jan in list view' do
@@ -473,7 +473,7 @@ class PublicationsControllerTest < ActionController::TestCase
     get :export, params: { query: { projects_id_in: [projects(:sysmo_project).id] } }
     assert_response :success
     p = assigns(:publications)
-    assert_equal 4, p.length
+    assert_equal 5, p.length
   end
 
   test 'should filter publications sort by published date for export' do
@@ -510,6 +510,11 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should get edit' do
     get :edit, params: { id: publications(:one) }
+    assert_response :success
+  end
+
+  test 'should get manage' do
+    get :manage, params: { id: publications(:one) }
     assert_response :success
   end
 
@@ -913,7 +918,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
 
-    get :edit, params: { id: p.id }
+    get :manage, params: { id: p.id }
 
     assert_response :success
     assert_not_includes response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
@@ -1116,6 +1121,17 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert response.body.include?('FAIRDOMHub: a repository')
+  end
+
+
+  test 'should handle blank publication type when refetching doi metadata' do
+    VCR.use_cassette('publications/refetch_by_doi_non_publication_type_error.yml') do
+      with_config_value :crossref_api_email, 'sowen@cs.man.ac.uk' do
+        post :update_metadata, xhr: true, params: { doi: '10.1136/gutjnl-2018-317872', publication: { project_ids: [User.current_user.person.projects.first.id], publication_type_id: nil } }
+      end
+    end
+    assert_response :internal_server_error
+    assert_match /An error has occurred.*Please choose a publication type./,response.body
   end
 
   test 'should handle blank pubmed' do

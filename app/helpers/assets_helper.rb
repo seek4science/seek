@@ -254,4 +254,14 @@ module AssetsHelper
     end
     elements
   end
+
+  # whether the viewable content is available, or converted to pdf, or capable to be converted to pdf
+  def view_content_available?(content_blob)
+    return true if content_blob.is_text? || content_blob.is_pdf? || content_blob.is_cwl? || content_blob.is_image?
+    if content_blob.is_pdf_viewable?
+      content_blob.file_exists?('pdf') || Seek::Config.soffice_available?
+    else
+      false
+    end
+  end
 end

@@ -18,7 +18,14 @@
 
 <%= item_actions_dropdown do %>
   <% if item.can_edit? -%>
-    <li><%= image_tag_for_key('manage', edit_publication_path(item), nil, nil, 'Manage Publication') -%></li>
+    <%if item.registered_mode == 3 || item.registered_mode == 4 || !item.doi.nil?%>
+      <li><%= image_tag_for_key('edit', edit_publication_path(item), nil, nil, 'Edit Publication') -%></li>
+    <% elsif current_user.person.is_admin? %>
+      <li><%= image_tag_for_key('edit', edit_publication_path(item), nil, nil, 'Admin Edit Publication') -%></li>
+    <% end %>
+  <% end -%>
+  <% if item.can_manage? -%>
+    <li><%= image_tag_for_key('manage', manage_publication_path(item), nil, nil, 'Manage Publication') -%></li>
   <% end -%>
 
   <% if item.can_delete? -%>

@@ -181,7 +181,7 @@ class ProjectTest < ActiveSupport::TestCase
   def test_publications_association
     project = projects(:sysmo_project)
 
-    assert_equal 4, project.publications.count
+    assert_equal 5, project.publications.count
 
     assert project.publications.include?(publications(:one))
     assert project.publications.include?(publications(:pubmed_2))

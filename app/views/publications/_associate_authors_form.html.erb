@@ -30,10 +30,6 @@
               <% end %>
             <% end %>
           </div>
-          <div>
-            <%= button_link_to("Disassociate All Authors", 'destroy', disassociate_authors_publication_url(publication),
-                               { class: 'btn-xs pull-right', data: { confirm: "This will reset the publication's links to people in SEEK, are you sure you wish to do this?" }, :method => :post}) -%>
-          </div>
         <% else %>
             <span class="none_text">No authors listed</span>
         <% end %>
