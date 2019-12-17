@@ -9,7 +9,9 @@ class SessionsController < ApplicationController
   prepend_before_action :strip_root_for_xml_requests
 
   # render new.html.erb
-  def newsave!; end
+  def new
+
+  end
 
   def index
     redirect_to root_path
@@ -33,7 +35,6 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    Identity.current_identity = nil
     logout_user
     flash[:notice] = 'You have been logged out.'
 
@@ -74,10 +75,7 @@ class SessionsController < ApplicationController
 
   def successful_login
     self.current_user = @user
-    if Identity.current_identity
-      Identity.current_identity.user = current_user
-      Identity.current_identity.save!
-    end
+
     flash[:notice] = "You have successfully logged in, #{@user.display_name}."
     if params[:remember_me] == 'on'
       @user.remember_me unless @user.remember_token?
@@ -141,7 +139,7 @@ class SessionsController < ApplicationController
       failed_login "the authenticated user: #{info['nickname']} cannot be found"
     else
       # create the user from the omniauth info
-      @user = User.create({:login => info['nickname']})
+      @user = User.new(login: info['nickname'])
       # some random password, since authentication should happen through omniauth in the future
       length = User::MIN_PASSWORD_LENGTH
       @user.password              = SecureRandom.urlsafe_base64(length * 2).first(length)
@@ -150,6 +148,8 @@ class SessionsController < ApplicationController
       if !@user.save
         failed_login "Cannot create a new user: #{info['nickname']}"
       else
+        identity.user = @user
+        identity.save!
         # should we activate the user?
         @user.activate if Seek::Config.omniauth_user_activate
         # when user was saved successfully, also create the Profile and save with the user

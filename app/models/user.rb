@@ -9,8 +9,8 @@ class User < ApplicationRecord
 
   belongs_to :person
 
-  has_many :identities
-  
+  has_many :identities, dependent: :destroy
+
   has_many :oauth_sessions, dependent: :destroy
 
   # restful_authentication plugin generated code ...

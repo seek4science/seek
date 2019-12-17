@@ -307,6 +307,7 @@ module Seek
       {
           # https://github.com/intridea/omniauth-ldap
           ldap: {
+              form: SessionsController.action(:new),
               title: "organization-ldap",
               host: 'localhost',
               port: 389,
@@ -317,6 +318,7 @@ module Seek
               bind_dn: ''
           },
           openid_connect: {
+              callback_path: '/identities/auth/elixir_aai/callback',
               name: :elixir_aai,
               scope: [:openid, :email],
               response_type: 'code',
