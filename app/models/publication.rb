@@ -37,7 +37,7 @@ class Publication < ApplicationRecord
 
   belongs_to :publication_type
 
-  VALID_DOI_REGEX = /\A(10[.][0-9]{4,}(?:[.][0-9]+)*\/(?:(?!["&\'<>])\S)+)\z/
+  VALID_DOI_REGEX = /\A10.\d{4,9}\/[<>\-._;()\/:A-Za-z0-9]+\z/
   VALID_PUBMED_REGEX = /\A(([1-9])([0-9]{0,7}))\z/
   # Note that the PubMed regex deliberately does not allow versions
 
