@@ -157,11 +157,6 @@ module Seek
       File.join(dir, 'key')
     end
 
-    def elixir_aai_secret_path
-      dir = append_filestore_path 'elixir_aai'
-      File.join(dir, 'secret')
-    end
-
     def attr_encrypted_key
       if File.exist?(attr_encrypted_key_path)
         File.binread(attr_encrypted_key_path)[0..31]
@@ -177,20 +172,6 @@ module Seek
       else
         write_secret_key_base
         secret_key_base
-      end
-    end
-
-    def elixir_aai_secret
-      if File.exists?(elixir_aai_secret_path)
-        File.read(elixir_aai_secret_path)
-      else
-        ''
-      end
-    end
-
-    def elixir_aai_secret=(secret)
-      File.open(elixir_aai_secret_path, 'wb') do |f|
-        f << secret
       end
     end
 
@@ -303,44 +284,39 @@ module Seek
       end
     end
 
-    def omniauth_providers
+    def omniauth_elixir_aai_config
+      callback_path = '/identities/auth/elixir_aai/callback'
+
       {
-          # https://github.com/intridea/omniauth-ldap
-          ldap: {
-              form: SessionsController.action(:new),
-              title: "organization-ldap",
-              host: 'localhost',
-              port: 389,
-              method: :plain,
-              base: 'DC=example,DC=com',
-              uid: 'samaccountname',
-              password: '',
-              bind_dn: ''
-          },
-          openid_connect: {
-              callback_path: '/identities/auth/elixir_aai/callback',
-              name: :elixir_aai,
-              scope: [:openid, :email],
-              response_type: 'code',
-              issuer: 'https://login.elixir-czech.org/oidc/',
-              discovery: false,
-              send_nonce: true,
-              client_signing_alg: :RS256,
-              client_jwk_signing_key: '{"keys":[{"kty":"RSA","e":"AQAB","kid":"rsa1","alg":"RS256","n":"uVHPfUHVEzpgOnDNi3e2pVsbK1hsINsTy_1mMT7sxDyP-1eQSjzYsGSUJ3GHq9LhiVndpwV8y7Enjdj0purywtwk_D8z9IIN36RJAh1yhFfbyhLPEZlCDdzxas5Dku9k0GrxQuV6i30Mid8OgRQ2q3pmsks414Afy6xugC6u3inyjLzLPrhR0oRPTGdNMXJbGw4sVTjnh5AzTgX-GrQWBHSjI7rMTcvqbbl7M8OOhE3MQ_gfVLXwmwSIoKHODC0RO-XnVhqd7Qf0teS1JiILKYLl5FS_7Uy2ClVrAYd2T6X9DIr_JlpRkwSD899pq6PR9nhKguipJE0qUXxamdY9nw"}]}',
-              client_options: {
-                  identifier: Seek::Config.elixir_aai_client_id,
-                  secret: Seek::Config.elixir_aai_secret,
-                  redirect_uri: 'http://localhost:3000/identities/auth/elixir_aai/callback',
-                  scheme: 'https',
-                  host: 'login.elixir-czech.org',
-                  port: 443,
-                  authorization_endpoint: '/oidc/authorize',
-                  token_endpoint: '/oidc/token',
-                  userinfo_endpoint: '/oidc/userinfo',
-                  jwks_uri: '/oidc/jwk',
-              }
+          callback_path: callback_path,
+          name: :elixir_aai,
+          scope: [:openid, :email],
+          response_type: 'code',
+          issuer: 'https://login.elixir-czech.org/oidc/',
+          discovery: false,
+          send_nonce: true,
+          client_signing_alg: :RS256,
+          client_jwk_signing_key: '{"keys":[{"kty":"RSA","e":"AQAB","kid":"rsa1","alg":"RS256","n":"uVHPfUHVEzpgOnDNi3e2pVsbK1hsINsTy_1mMT7sxDyP-1eQSjzYsGSUJ3GHq9LhiVndpwV8y7Enjdj0purywtwk_D8z9IIN36RJAh1yhFfbyhLPEZlCDdzxas5Dku9k0GrxQuV6i30Mid8OgRQ2q3pmsks414Afy6xugC6u3inyjLzLPrhR0oRPTGdNMXJbGw4sVTjnh5AzTgX-GrQWBHSjI7rMTcvqbbl7M8OOhE3MQ_gfVLXwmwSIoKHODC0RO-XnVhqd7Qf0teS1JiILKYLl5FS_7Uy2ClVrAYd2T6X9DIr_JlpRkwSD899pq6PR9nhKguipJE0qUXxamdY9nw"}]}',
+          client_options: {
+              identifier: omniauth_elixir_aai_client_id,
+              secret: omniauth_elixir_aai_secret,
+              redirect_uri: "#{site_base_host.chomp('/')}#{callback_path}",
+              scheme: 'https',
+              host: 'login.elixir-czech.org',
+              port: 443,
+              authorization_endpoint: '/oidc/authorize',
+              token_endpoint: '/oidc/token',
+              userinfo_endpoint: '/oidc/userinfo',
+              jwks_uri: '/oidc/jwk',
           }
       }
+    end
+
+    def omniauth_providers
+      providers = {}
+      providers[:ldap] = omniauth_ldap_config.merge(name: :ldap, form: SessionsController.action(:new)) if omniauth_ldap_enabled
+      providers[:openid_connect] = omniauth_elixir_aai_config if omniauth_elixir_aai_enabled
+      providers
     end
   end
 

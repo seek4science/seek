@@ -37,10 +37,10 @@ module SessionsHelper
   end
 
   def show_elixir_login?
-    Seek::Config.elixir_aai_client_id.present? && Seek::Config.elixir_aai_secret.present?
+    Seek::Config.omniauth_elixir_aai_enabled
   end
 
   def show_ldap_login?
-    Seek::Config.omniauth_providers[:openid_connect]
+    Seek::Config.omniauth_ldap_enabled
   end
 end

@@ -474,25 +474,6 @@ class ConfigTest < ActiveSupport::TestCase
     refute_equal key, Seek::Config.secret_key_base
   end
 
-  test 'elixir aai secret' do
-    path = "#{Rails.root}/tmp/testing-filestore/elixir_aai/secret"
-    assert_equal path, Seek::Config.elixir_aai_secret_path
-    FileUtils.rm(path) if File.exist?(path)
-    assert_equal '', Seek::Config.elixir_aai_secret
-    refute File.exist?(path)
-    Seek::Config.elixir_aai_secret = "sparrow hawk"
-    assert File.exist?(path)
-    assert_equal 'sparrow hawk', File.read(path)
-    assert_equal 'sparrow hawk', Seek::Config.elixir_aai_secret
-
-    Seek::Config.elixir_aai_secret = "wibble"
-    assert File.exist?(path)
-    assert_equal 'wibble', File.read(path)
-    assert_equal 'wibble', Seek::Config.elixir_aai_secret
-
-    FileUtils.rm(path) if File.exist?(path)
-  end
-
   test 'project-specific setting' do
     many_bananas_project = Factory(:project)
     no_bananas_project = Factory(:project)

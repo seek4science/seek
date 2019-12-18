@@ -173,10 +173,6 @@ auth_lookup_update_batch_size:
   convert: :to_i
 samples_enabled:
 project_admin_sample_type_restriction:
-omniauth_enabled:
-omniauth_user_create:
-omniauth_user_activate:
-#omniauth_providers:
 openbis_enabled:
 openbis_download_limit:
 openbis_debug:
@@ -198,4 +194,14 @@ nels_permalink_base:
 nels_use_dummy_client:
 allow_private_address_access:
 session_store_timeout:
-elixir_aai_client_id:
+omniauth_enabled:
+omniauth_user_create:
+omniauth_user_activate:
+#omniauth_providers:
+omniauth_elixir_aai_enabled:
+omniauth_elixir_aai_client_id:
+omniauth_elixir_aai_secret:
+  encrypt: true
+omniauth_ldap_enabled:
+omniauth_ldap_config:
+  encrypt: true

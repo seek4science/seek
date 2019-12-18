@@ -20,6 +20,9 @@ namespace :seek do
     rebuild_sample_templates
     fix_model_version_files
     fix_country_codes
+
+    convert_old_ldap_settings
+    convert_old_elixir_aai_settings
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -295,6 +298,60 @@ namespace :seek do
     end
     Event.where('length(country) > 2').each do |event|
       event.update_attribute(:country, CountryCodes.code(event.country))
+    end
+  end
+
+  task(convert_old_ldap_settings: :environment) do
+    providers_setting = Settings.where(var: 'omniauth_providers').first
+    if providers_setting
+      unless providers_setting.value.blank?
+        puts "Found existing 'omniauth_providers' setting:\n #{providers_setting.value.inspect}"
+        ldap_setting = providers_setting.value[:ldap] || providers_setting.value['ldap']
+        if ldap_setting
+          puts "Setting 'omniauth_ldap_config' to:\n #{ldap_setting.inspect}"
+          Seek::Config.omniauth_ldap_config = ldap_setting
+          puts "Setting 'omniauth_ldap_enabled' to: #{Seek::Config.omniauth_enabled }"
+          Seek::Config.omniauth_ldap_enabled = Seek::Config.omniauth_enabled
+        else
+          puts "No relevant LDAP settings found."
+        end
+      end
+      puts "Destroying old 'omniauth_providers' setting."
+      providers_setting.destroy!
+    end
+  end
+
+  task(convert_old_elixir_aai_settings: :environment) do
+    client_id_setting = Settings.where(var: 'elixir_aai_client_id').first
+    client_id = nil
+
+    if client_id_setting
+      client_id = client_id_setting.value
+      unless client_id.blank?
+        puts "Setting 'omniauth_elixir_aai_client_id' to: #{client_id}"
+        Seek::Config.omniauth_elixir_aai_client_id = client_id
+      end
+      puts "Destroying old 'elixir_aai_client_id' setting."
+      client_id_setting.destroy!
+    end
+
+    elixir_aai_secret_dir_path = File.join(Rails.root, Seek::Config.filestore_path, 'elixir_aai')
+    elixir_aai_secret_path = File.join(elixir_aai_secret_dir_path, 'secret')
+    if File.exists?(elixir_aai_secret_path)
+      secret = File.read(elixir_aai_secret_path)
+      unless secret.blank?
+        puts "Setting 'omniauth_elixir_aai_secret'"
+        Seek::Config.omniauth_elixir_aai_secret = secret
+      end
+      puts "Deleting old file: #{elixir_aai_secret_path}"
+      FileUtils.rm(elixir_aai_secret_path)
+      puts "Deleting directory: #{elixir_aai_secret_dir_path}"
+      FileUtils.rmdir(elixir_aai_secret_dir_path)
+
+      unless secret.blank? || client_id.blank? # If there was both a client ID and secret, enable ELIXIR AAI
+        puts "Setting 'omniauth_elixir_aai_enabled' to: true"
+        Seek::Config.omniauth_elixir_aai_enabled = true
+      end
     end
   end
 end

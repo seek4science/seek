@@ -1,15 +1,22 @@
 <%= admin_checkbox_setting(:omniauth_enabled, 1, Seek::Config.omniauth_enabled,
-                           "Omniauth enabled", "Enables use of omniauth for authentication an user creation.",
-                           :onchange=>toggle_appear_javascript('omniauth_settings')) %>
+                           "Omniauth enabled", "Enables use of external providers (such as LDAP) for authentication and user creation.",
+                           onchange: toggle_appear_javascript('omniauth_settings')) %>
 <div id="omniauth_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_enabled) -%>;">
   <%= admin_checkbox_setting(:omniauth_user_create, 1, Seek::Config.omniauth_user_create,
-                             "Omniauth user creation on login", "When a user logs in through an omniauth provider and does not exist as a seek user, they will be created with the information given by the provider."
-                             ) %>
+                             "Omniauth user creation on login", "When a user logs in through an omniauth provider and does not exist as a #{Seek::Config.application_name} user, they will be created using the information given by the provider."                             ) %>
+  <%= admin_checkbox_setting(:omniauth_user_activate, 1, Seek::Config.omniauth_user_activate,
+                             "Omniauth user activation on login", "The user created through login by omniauth is automatically activated and does not require email confirmation.") %>
 
-  <%= admin_text_setting(:elixir_aai_client_id, Seek::Config.elixir_aai_client_id,
-                         'ELIXIR AAI Client ID', 'The client id provided by ELIXIR AAI for your installation') %>
+  <%= admin_checkbox_setting(:omniauth_ldap_enabled, 1, Seek::Config.omniauth_ldap_enabled,
+                             "LDAP authentication", "Enables use of LDAP for authentication.") %>
 
-  <%= admin_password_setting(:elixir_aai_secret, Seek::Config.elixir_aai_secret,
-                         'ELIXIR AAI Secret', 'The secret key provided by ELIXIR AAI for your installation') %>
-
+  <%= admin_checkbox_setting(:omniauth_elixir_aai_enabled, 1, Seek::Config.omniauth_elixir_aai_enabled,
+                             "ELIXIR AAI authentication", "Enables use of ELIXIR AAI for authentication.",
+                             onchange: toggle_appear_javascript('omniauth_elixir_aai_settings')) %>
+  <div id="omniauth_elixir_aai_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_elixir_aai_enabled) -%>;">
+    <%= admin_text_setting(:omniauth_elixir_aai_client_id, Seek::Config.omniauth_elixir_aai_client_id,
+                           'ELIXIR AAI Client ID', 'The client ID provided by ELIXIR AAI for your installation.') %>
+    <%= admin_password_setting(:omniauth_elixir_aai_secret, Seek::Config.omniauth_elixir_aai_secret,
+                               'ELIXIR AAI Secret', 'The secret key provided by ELIXIR AAI for your installation.') %>
+  </div>
 </div>
