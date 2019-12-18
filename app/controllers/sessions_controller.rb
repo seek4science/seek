@@ -22,10 +22,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    auth = session[:auth]
-    session.delete :auth
-
-    auth ||= request.env['omniauth.auth']
+    auth = request.env['omniauth.auth']
     # authentication through omniauth?
     if Seek::Config.omniauth_enabled && auth
       create_omniauth(auth)
@@ -61,22 +58,22 @@ class SessionsController < ApplicationController
 
   private
 
-  def check_login
+  def check_login(success_notice = nil, person_params: {})
     session[:user_id] = @user.id
     if !@user.registration_complete?
       flash[:notice] = 'You have successfully registered your account, but you need to create a profile'
-      redirect_to(register_people_path)
+      redirect_to(register_people_path(person_params))
     elsif !@user.active?
       failed_login 'You still need to activate your account. A validation email should have been sent to you.'
     else
-      successful_login
+      successful_login(success_notice)
     end
   end
 
-  def successful_login
+  def successful_login(notice = nil)
     self.current_user = @user
 
-    flash[:notice] = "You have successfully logged in, #{@user.display_name}."
+    flash[:notice] = notice || "You have successfully logged in, #{@user.display_name}."
     if params[:remember_me] == 'on'
       @user.remember_me unless @user.remember_token?
       cookies[:auth_token] = { value: @user.remember_token, expires: @user.remember_token_expires_at }
@@ -124,39 +121,47 @@ class SessionsController < ApplicationController
   end
 
   def create_omniauth(auth)
-    # info contains username, first_ and last_name and email
-    info = auth['info']
+    # Check if there is an existing identity for this provider/uid
+    @identity = Identity.from_omniauth(auth)
 
-    # check if there is a user with that username as login
-    identity = Identity.from_omniauth(auth)
-    user_by_omniauth = identity.user
-
-    if user_by_omniauth
-      @user = user_by_omniauth
+    if @identity.user # The identity has a user
+      @user = @identity.user
       check_login
-      # there is no such user, should we not create the user?
-    elsif !Seek::Config.omniauth_user_create
-      failed_login "the authenticated user: #{info['nickname']} cannot be found"
-    else
-      # create the user from the omniauth info
-      @user = User.new(login: info['nickname'])
-      # some random password, since authentication should happen through omniauth in the future
-      length = User::MIN_PASSWORD_LENGTH
-      @user.password              = SecureRandom.urlsafe_base64(length * 2).first(length)
-      @user.password_confirmation = @user.password
-      # try to save
-      if !@user.save
-        failed_login "Cannot create a new user: #{info['nickname']}"
+    else # The identity does not have an associated user
+      # *** LEGACY SUPPORT ***
+      if auth.provider.to_s == 'ldap' # If using LDAP, attempt to find user by login.
+        @user = User.find_by_login(auth['info']['nickname'])
+        if @user
+          @identity.user = @user
+          @identity.save! # Update identity so we don't have to do this again
+          check_login
+          return
+        end
+      end
+
+      if logged_in? # If they are logged in, link the identity to the current user
+        @user = current_user
+        @identity.user = @user
+        @identity.save!
+        check_login "Successfully linked #{t("login.#{auth.provider}")} identity to your account."
       else
-        identity.user = @user
-        identity.save!
-        # should we activate the user?
-        @user.activate if Seek::Config.omniauth_user_activate
-        # when user was saved successfully, also create the Profile and save with the user
-        person = Person.create(auth['info'].slice(:first_name, :last_name, :email))
-        person.user = @user
-        disable_authorization_checks { person.save! }
-        check_login
+        if Seek::Config.omniauth_user_create # Create a new user if allowed.
+          @user = User.from_omniauth(auth)
+          saved = nil
+          @user.check_email_present = false
+          disable_authorization_checks { saved = @user.save }
+          if saved
+            # should we activate the user?
+            @user.activate if Seek::Config.omniauth_user_activate && !@user.active?
+            @identity.user = @user
+            @identity.save!
+            check_login(nil, person_params: auth['info'].slice(:first_name, :last_name, :email))
+          else # An unexpected error occurred whilst saving the user.
+            failed_login "Cannot create a new user: #{@user.errors.full_messages.join(', ')}."
+          end
+        else # If user creation is not allowed, too bad
+          failed_login "The authenticated user: #{auth['info']['nickname']} does not have a #{Seek::Config.application_name} account."
+        end
       end
     end
   end

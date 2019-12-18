@@ -10,6 +10,6 @@ class Identity < ActiveRecord::Base
                   uid: auth.uid }
     auth_info[:email] = auth.info.email if auth.info.email
 
-    Identity.where(provider: auth.provider, uid: auth.uid).first_or_create(auth_info)
+    Identity.where(provider: auth.provider, uid: auth.uid).first_or_initialize(auth_info)
   end
 end

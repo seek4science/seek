@@ -289,6 +289,14 @@ class User < ApplicationRecord
     self.reset_password_code_until = nil
   end
 
+  def self.from_omniauth(auth)
+    User.new.tap do |user|
+      user.login = unique_login(['info']['nickname'] || 'user')
+      user.password = SecureRandom.urlsafe_base64(MIN_PASSWORD_LENGTH * 2).first(MIN_PASSWORD_LENGTH)
+      user.password_confirmation = @user.password
+    end
+  end
+
   protected
 
   # before filter
@@ -322,5 +330,14 @@ class User < ApplicationRecord
     Seek::Util.authorized_types.each do |type|
       ActiveRecord::Base.connection.execute("delete from #{type.lookup_table_name} where user_id=#{id}")
     end
+  end
+
+  def self.unique_login(original_login)
+    login = original_login
+    while User.find_by_login(login) do
+      login = "#{original_login}#{rand(9999).to_s.rjust(4, '0')}"
+    end
+
+    login
   end
 end

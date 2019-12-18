@@ -287,6 +287,20 @@ class SessionsControllerTest < ActionController::TestCase
     assert_equal User.sha256_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password
   end
 
+  # Branches to test:
+  #     Identity exists - log in
+  #     Identity does not exist
+    #     Using LDAP
+      #     SEEK user with matching login to LDAP username exists - log in and link identity
+      #     SEEK user does not exist
+    #     Not using LDAP, or SEEK user did not exist (Test with AAI and LDAP)
+      #     User is logged in - link identity
+      #     User is not logged in
+        #     OmniAuth user creation allowed
+          #     User with email exists - create user, log in, direct to "is this me?" page
+          #     User with email does not exist - create user, log in, direct to registration page
+        #     OmniAuth user creation not allowed - display error
+
   protected
 
   def cookie_for(user)

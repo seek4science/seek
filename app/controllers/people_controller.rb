@@ -149,7 +149,10 @@ class PeopleController < ApplicationController
     if email && Person.not_registered_with_matching_email(email).any?
       render :is_this_you, locals: { email: email }
     else
-      @person = Person.new(email: email)
+      p = { email: email }
+      p[:first_name] = params[:first_name] if params[:first_name]
+      p[:last_name] = params[:last_name] if params[:last_name]
+      @person = Person.new(p)
     end
   end
 
