@@ -291,9 +291,9 @@ class User < ApplicationRecord
 
   def self.from_omniauth(auth)
     User.new.tap do |user|
-      user.login = unique_login(['info']['nickname'] || 'user')
-      user.password = SecureRandom.urlsafe_base64(MIN_PASSWORD_LENGTH * 2).first(MIN_PASSWORD_LENGTH)
-      user.password_confirmation = @user.password
+      user.login = unique_login(auth['info']['nickname'] || 'user')
+      user.password = random_password
+      user.password_confirmation = user.password
     end
   end
 
@@ -339,5 +339,9 @@ class User < ApplicationRecord
     end
 
     login
+  end
+
+  def self.random_password
+    SecureRandom.urlsafe_base64(MIN_PASSWORD_LENGTH * 2).first(MIN_PASSWORD_LENGTH)
   end
 end
