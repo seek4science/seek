@@ -27,13 +27,17 @@ class SessionsControllerTest < ActionController::TestCase
     #  }
     #}
 
-    # add an omniauth user
-    auth_hash = {
-      provider: 'ldap',
-      uid: 'new_ldap_user',
-      info: { 'nickname' => 'new_ldap_user', 'first_name' => 'new', 'last_name' => 'ldap_user', 'email' => 'new_ldap_user@example.com' }
-    }
-    OmniAuth.config.add_mock(:ldap, auth_hash)
+    OmniAuth.config.add_mock(:ldap, {
+        provider: 'ldap',
+        uid: 'new_ldap_user',
+        info: { 'nickname' => 'new_ldap_user', 'first_name' => 'new', 'last_name' => 'ldap_user', 'email' => 'new_ldap_user@example.com' }
+    })
+
+    OmniAuth.config.add_mock(:elixir_aai, {
+        provider: 'elixir_aai',
+        uid: 'new_aai_user',
+        info: { 'nickname' => 'new_aai_user', 'first_name' => 'new', 'last_name' => 'aai_user', 'email' => 'new_aai_user@example.com' }
+    })
   end
 
   test 'sessions#index redirects to session#new' do
@@ -199,7 +203,6 @@ class SessionsControllerTest < ActionController::TestCase
 
   test 'should have ldap login' do
     # change the setting
-    Seek::Config.omniauth_enabled   = true
     #Seek::Config.omniauth_providers = {
     #  ldap: {
     #    title: 'organization-ldap',
@@ -228,7 +231,7 @@ class SessionsControllerTest < ActionController::TestCase
 
         post :create
         assert_redirected_to login_path
-        assert_match(/the authenticated user: .+ cannot be found/, flash[:error])
+        assert_match(/the authenticated user: .+ does not have a .+/, flash[:error])
         assert_nil User.find_by_login('new_ldap_user')
       end
     end
@@ -286,20 +289,6 @@ class SessionsControllerTest < ActionController::TestCase
     sha1_user.reload
     assert_equal User.sha256_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password
   end
-
-  # Branches to test:
-  #     Identity exists - log in
-  #     Identity does not exist
-    #     Using LDAP
-      #     SEEK user with matching login to LDAP username exists - log in and link identity
-      #     SEEK user does not exist
-    #     Not using LDAP, or SEEK user did not exist (Test with AAI and LDAP)
-      #     User is logged in - link identity
-      #     User is not logged in
-        #     OmniAuth user creation allowed
-          #     User with email exists - create user, log in, direct to "is this me?" page
-          #     User with email does not exist - create user, log in, direct to registration page
-        #     OmniAuth user creation not allowed - display error
 
   protected
 
