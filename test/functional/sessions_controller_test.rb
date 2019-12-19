@@ -13,33 +13,6 @@ class SessionsControllerTest < ActionController::TestCase
 
   fixtures :users, :people
 
-  def setup
-    #Seek::Config.omniauth_providers = {
-    #  ldap: {
-    #    title: 'organization-ldap',
-    #    host: 'localhost',
-    #    port: 389,
-    #    method: :plain,
-    #    base: 'DC=example,DC=com',
-    #    uid: 'samaccountname',
-    #    password: '',
-    #    bind_dn: ''
-    #  }
-    #}
-
-    OmniAuth.config.add_mock(:ldap, {
-        provider: 'ldap',
-        uid: 'new_ldap_user',
-        info: { 'nickname' => 'new_ldap_user', 'first_name' => 'new', 'last_name' => 'ldap_user', 'email' => 'new_ldap_user@example.com' }
-    })
-
-    OmniAuth.config.add_mock(:elixir_aai, {
-        provider: 'elixir_aai',
-        uid: 'new_aai_user',
-        info: { 'nickname' => 'new_aai_user', 'first_name' => 'new', 'last_name' => 'aai_user', 'email' => 'new_aai_user@example.com' }
-    })
-  end
-
   test 'sessions#index redirects to session#new' do
     get :index
     assert_redirected_to root_path
