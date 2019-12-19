@@ -153,7 +153,9 @@ class SessionsController < ApplicationController
         @user = current_user
         @identity.user = @user
         @identity.save!
-        check_login "Successfully linked #{t("login.#{auth.provider}")} identity to your account."
+        flash[:notice] = "Successfully linked #{t("login.#{auth.provider}")} identity to your account."
+        redirect_to user_identities_path(@user)
+        return
       else
         if Seek::Config.omniauth_user_create # Create a new user if allowed.
           @user = User.from_omniauth(auth)

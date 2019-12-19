@@ -147,6 +147,7 @@ SEEK::Application.routes.draw do
       post :resend_activation_email
     end
     resources :oauth_sessions, only: [:index, :destroy]
+    resources :identities, only: [:index, :destroy]
   end
 
   resource :session do

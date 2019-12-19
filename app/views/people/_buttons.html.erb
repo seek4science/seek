@@ -20,6 +20,14 @@
           <li>
             <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", nil, "Manage Account" -%>
           </li>
+          <% if Seek::Config.omniauth_enabled %>
+            <li>
+              <%= image_tag_for_key "identity", user_identities_path(@person.user), "Manage Identities", nil, "Manage Identities" -%>
+            </li>
+          <% end -%>
+          <li>
+            <%= image_tag_for_key "oauth", user_oauth_sessions_path(@person.user), "OAuth Sessions", nil, "OAuth Sessions" -%>
+          </li>
       <% end -%>
       <% if admin_logged_in? -%>
           <li>

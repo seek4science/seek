@@ -36,3 +36,10 @@ Factory.define(:sha1_pass_user, parent: :brand_new_user) do |f|
     user.update_column(:crypted_password, user.sha1_encrypt(test_password))
   end
 end
+
+# Identity
+Factory.define(:identity) do |f|
+  f.association :user, factory: :user
+  f.provider 'ldap'
+  f.sequence(:uid) { |n| "ldap-user-#{n}" }
+end

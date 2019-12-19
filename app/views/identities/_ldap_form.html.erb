@@ -1,0 +1,21 @@
+<%= form_tag omniauth_callback_path(:ldap) do %>
+  <% original_path ||= request.original_fullpath %>
+  <%= hidden_field_tag "called_from[path]", original_path -%>
+  <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
+  <%= hidden_field_tag "called_from[action]", controller.action_name -%>
+  <%= hidden_field_tag "called_from[id]", params[:id] -%>
+
+  <div class="form-group">
+    <label>Username</label>
+    <%= text_field_tag 'username', nil, class: 'form-control', placeholder: 'LDAP username' -%>
+  </div>
+
+  <div class="form-group">
+    <label>Password</label>
+    <%= password_field_tag 'password', nil, class: 'form-control', id: "login_ldap_password", placeholder: 'LDAP password' -%>
+  </div>
+
+  <div class="form-group">
+    <%= submit_tag "Log in", class: 'btn btn-default', id: "login_ldap_button" %>
+  </div>
+<% end #form %>

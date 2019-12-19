@@ -33,6 +33,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     })
   end
 
+  # This test is to support the legacy LDAP integration that matched users having the same SEEK and LDAP usernames
   test 'should authenticate existing LDAP user without identity' do
     OmniAuth.config.mock_auth[:ldap] = @ldap_mock_auth
     existing_user = Factory(:user, login: 'new_ldap_user')
@@ -135,7 +136,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     assert_difference('User.count', 0) do
       assert_difference('Identity.count', 1) do
         post omniauth_callback_path(:ldap)
-        assert_redirected_to root_path
+        assert_redirected_to user_identities_path(existing_user)
       end
     end
 
