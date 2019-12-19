@@ -1,5 +1,4 @@
 class OauthSessionsController < ApplicationController
-
   before_action :find_and_check_user
 
   def index
@@ -7,7 +6,7 @@ class OauthSessionsController < ApplicationController
   end
 
   def destroy
-    @oauth_session = OauthSession.find(params[:id])
+    @oauth_session = @user.oauth_sessions.find(params[:id])
 
     @oauth_session.destroy
     redirect_to user_oauth_sessions_path(@user)
@@ -23,5 +22,4 @@ class OauthSessionsController < ApplicationController
       false
     end
   end
-
 end

@@ -105,3 +105,6 @@ en:
       attributes:
         person:
           title: "Full name"
+
+  oauth_session: 'OAuth Session'
+  identity: 'Identity'
