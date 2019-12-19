@@ -23,12 +23,22 @@ class SessionsController < ApplicationController
 
   def create
     auth = request.env['omniauth.auth']
-    # authentication through omniauth?
-    if Seek::Config.omniauth_enabled && auth
-      create_omniauth(auth)
-    else
-      password_authentication
+    if auth && Seek::Config.omniauth_enabled
+      provider_enabled = case auth.provider
+                         when 'ldap'
+                           Seek::Config.omniauth_ldap_enabled
+                         when 'elixir_aai'
+                           Seek::Config.omniauth_elixir_aai_enabled
+                         else
+                           true
+                         end
+      if provider_enabled
+        create_omniauth(auth)
+        return
+      end
     end
+
+    password_authentication
   end
 
   def destroy
