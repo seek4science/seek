@@ -99,7 +99,6 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     assert_nil session[:user_id]
   end
 
-
   test 'should authenticate existing ELIXIR AAI user if LDAP disabled' do
     OmniAuth.config.mock_auth[:elixir_aai] = @elixir_aai_mock_auth
     OmniAuth.config.mock_auth[:ldap] = @ldap_mock_auth
@@ -153,7 +152,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     assert_difference('User.count', 1) do
       assert_difference('Identity.count', 1) do
         post omniauth_callback_path(:ldap) # With LDAP we post directly to the callback, since the form is in SEEK
-        assert_redirected_to /#{register_people_path}/
+        assert_redirected_to(/#{register_people_path}/)
 
         follow_redirect! # New profile
       end
@@ -180,7 +179,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     assert_difference('User.count', 1) do
       assert_difference('Identity.count', 1) do
         post omniauth_callback_path(:ldap)
-        assert_redirected_to /#{register_people_path}/
+        assert_redirected_to(/#{register_people_path}/)
 
         follow_redirect!
 
@@ -198,7 +197,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
       assert_difference('Identity.count', 1) do
         post omniauth_authorize_path(:elixir_aai)
         follow_redirect! # OmniAuth callback
-        assert_redirected_to /#{register_people_path}/
+        assert_redirected_to(/#{register_people_path}/)
         follow_redirect! # New profile
       end
     end
@@ -227,7 +226,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
           assert_redirected_to login_path
 
           assert_nil session[:user_id]
-          assert_match /does not have a .+ account/, flash[:error]
+          assert_match(/does not have a .+ account/, flash[:error])
         end
       end
     end
@@ -240,7 +239,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
       assert_difference('User.count', 1) do
         assert_difference('Identity.count', 1) do
           post omniauth_callback_path(:ldap)
-          assert_redirected_to /#{register_people_path}/
+          assert_redirected_to(/#{register_people_path}/)
 
           assert session[:user_id]
           user = User.find_by_id(session[:user_id])

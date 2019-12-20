@@ -812,10 +812,11 @@ SEEK::Application.routes.draw do
   get '/logout' => 'sessions#destroy', :as => :logout
   get '/login' => 'sessions#new', :as => :login
   get '/create' => 'sessions#create', :as => :create_session
-  get '/auth/:provider' => 'sessions#create', as: :omniauth_authorize
-  post '/auth/:provider/callback' => 'sessions#create', as: :omniauth_callback
-  get '/identities/auth/:provider/callback' => 'sessions#create'
-  post '/identities/auth/:provider/callback' => 'sessions#create'
+  # Omniauth
+  post '/auth/:provider' => 'sessions#create', as: :omniauth_authorize # For security, ONLY POST should be enabled on this route.
+  match '/auth/:provider/callback' => 'sessions#create', as: :omniauth_callback, via: [:get, :post] # Callback routes need both GET and POST enabled.
+  match '/identities/auth/:provider/callback' => 'sessions#create', via: [:get, :post] # Needed for legacy support..
+
   get '/activate(/:activation_code)' => 'users#activate', :as => :activate
   get '/forgot_password' => 'users#forgot_password', :as => :forgot_password
   get '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
