@@ -231,18 +231,29 @@ module Seek
       facet_enable_for_pages.with_indifferent_access[controller.to_s]
     end
 
-    def default_page(controller)
-      pages = default_pages.with_indifferent_access
-      if pages.key?(controller.to_s)
-        pages[controller.to_s]
-      else
-        Settings.defaults['default_pages'][controller.to_s] || 'latest'
-      end
+    def sorting_for(controller)
+      hash = sorting.with_indifferent_access
+      hash[controller.to_s]&.to_sym
     end
 
-    # FIXME: change to standard setter=
-    def set_default_page(controller, value)
-      merge! :default_pages, controller => value
+    def set_sorting_for(controller, value)      
+      # Store value as a string, unless nil, or not a valid sorting option for that controller.
+      if value.blank? || !Seek::ListSorter.options(controller.to_s.classify).include?(value.to_sym)
+        value = nil
+      else
+        value = value.to_s
+      end
+      merge!(:sorting, controller.to_s => value)
+      value&.to_sym
+    end
+
+    def results_per_page_for(controller)
+      hash = results_per_page.with_indifferent_access
+      hash[controller.to_s]
+    end
+
+    def set_results_per_page_for(controller, value)
+      merge!(:results_per_page, controller.to_s => value.blank? ? nil : value.to_i)
       value
     end
 
@@ -272,9 +283,9 @@ module Seek
       end
     end
 
-    def soffice_available?(cached=true)
+    def soffice_available?(cached=false)
       @@soffice_available = nil unless cached
-      @@soffice_available ||= begin
+      begin
         port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
         soc = TCPSocket.new('localhost', port)
         soc.close

@@ -14,7 +14,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object = Factory(:publication, published_date: Date.new(2013, 1, 1))
+    @object = Factory(:publication, published_date: Date.new(2013, 1, 1), publication_type: Factory(:journal))
   end
 
   def test_title
@@ -37,10 +37,12 @@ class PublicationsControllerTest < ActionController::TestCase
     mock_pubmed(content_file: 'pubmed_1.txt')
     assay = assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, params: { publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s] } }
+
+      post :create, params: { publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s],publication_type_id: Factory(:journal).id } }
+
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     p = assigns(:publication)
     assert_equal 0, p.assays.count
   end
@@ -50,10 +52,12 @@ class PublicationsControllerTest < ActionController::TestCase
     login_as(:model_owner) # can edit assay
     assay = assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, params: { publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s] } }
+
+      post :create, params: { publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s],publication_type_id: Factory(:journal).id } }
+
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     p = assigns(:publication)
     assert_equal 1, p.assays.count
     assert p.assays.include? assay
@@ -62,55 +66,67 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should create doi publication' do
     mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1371/journal.pone.0004803', content_file: 'cross_ref3.xml')
     assert_difference('Publication.count') do
-      post :create, params: { publication: { doi: '10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, params: { publication: { doi: '10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
+  end
+
+
+  test 'should create an inproceedings with booktitle' do
+    mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1117/12.2275959', content_file: 'cross_ref6.xml')
+    assert_difference('Publication.count') do
+      post :create, params: { publication: { doi: '10.1117/12.2275959', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:inproceedings).id } }
+    end
+
+    assert_not_nil assigns(:publication)
+    assert_redirected_to manage_publication_path(assigns(:publication))
+
   end
 
   test 'should create doi publication with various doi prefixes' do
     mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1371/journal.pone.0004803', content_file: 'cross_ref3.xml')
     assert_difference('Publication.count') do
-      post :create, params: { publication: { doi: 'DOI: 10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, params: { publication: { doi: 'DOI: 10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     assigns(:publication).destroy
 
     # formatted slightly different
     assert_difference('Publication.count') do
-      post :create, params: { publication: { doi: ' doi:10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, params: { publication: { doi: 'doi:10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     assigns(:publication).destroy
 
     # with url
     assert_difference('Publication.count') do
-      post :create, params: { publication: { doi: 'https://doi.org/10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, params: { publication: { doi: 'https://doi.org/10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     assigns(:publication).destroy
 
     # with url but no protocol
     assert_difference('Publication.count') do
-      post :create, params: { publication: { doi: 'doi.org/10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, params: { publication: { doi: 'doi.org/10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     assigns(:publication).destroy
 
     # also test with spaces around
     assert_difference('Publication.count') do
-      post :create, params: { publication: { doi: '  10.1371/journal.pone.0004803  ', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, params: { publication: { doi: '  10.1371/journal.pone.0004803  ', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
   end
 
   test 'should create publication from details' do
@@ -121,14 +137,15 @@ class PublicationsControllerTest < ActionController::TestCase
       publication_authors: ['Johan Bollen', 'Herbert Van de Sompel', 'Aric Hagberg', 'Luis Bettencourt', 'Ryan Chute', 'Marko A. Rodriguez', 'Lyudmila Balakireva'],
       journal: 'Public Library of Science (PLoS)',
       published_date: Date.new(2011, 3),
-      project_ids: [projects(:sysmo_project).id]
+      project_ids: [projects(:sysmo_project).id],
+      publication_type_id: Factory(:journal).id
     }
 
     assert_difference('Publication.count') do
       post :create, params: { subaction: 'Create', publication: publication }
     end
 
-    assert_redirected_to edit_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication))
     p = assigns(:publication)
 
     assert_nil p.pubmed_id
@@ -145,6 +162,7 @@ class PublicationsControllerTest < ActionController::TestCase
     publication = {
       title: 'Taverna: a tool for building and running workflows of services.',
       journal: 'Nucleic Acids Res',
+      publication_type: Factory(:journal),
       authors: [
         PublicationAuthor.new(first_name: 'D.', last_name: 'Hull', author_index: 0),
         PublicationAuthor.new(first_name: 'K.', last_name: 'Wolstencroft', author_index: 1),
@@ -162,34 +180,52 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal publication[:journal], p.journal
     assert_equal publication[:authors].collect(&:full_name), p.publication_authors.collect(&:full_name)
     assert_equal publication[:published_date], p.published_date
+    assert_equal  publication[:publication_type].title, p.publication_type.title
   end
 
   test 'should import multiple from bibtex file' do
-    publications = [{
-      title: 'Taverna: a tool for building and running workflows of services.',
-      journal: 'Nucleic Acids Res',
-      authors: [
-        PublicationAuthor.new(first_name: 'D.', last_name: 'Hull', author_index: 0),
-        PublicationAuthor.new(first_name: 'K.', last_name: 'Wolstencroft', author_index: 1),
-        PublicationAuthor.new(first_name: 'R.', last_name: 'Stevens', author_index: 2),
-        PublicationAuthor.new(first_name: 'C.', last_name: 'Goble', author_index: 3),
-        PublicationAuthor.new(first_name: 'M. R.', last_name: 'Pocock', author_index: 4),
-        PublicationAuthor.new(first_name: 'P.', last_name: 'Li', author_index: 5),
-        PublicationAuthor.new(first_name: 'T.', last_name: 'Oinn', author_index: 6)
-      ],
-      published_date: Date.new(2006)
-    },
-                    {
-                      authors: [
-                        PublicationAuthor.new(first_name: 'J.', last_name: 'Shmoe', author_index: 0),
-                        PublicationAuthor.new(first_name: 'M.', last_name: 'Mustermann', author_index: 1)
-                      ],
-                      title: 'Yet another tool for importing publications',
-                      journal: 'The second best journal',
-                      published_date: Date.new(2016)
-                    }]
 
-    assert_difference('Publication.count', 2) do
+    publications = [
+        {
+            #publications[0]
+            title: 'Taverna: a tool for building and running workflows of services.',
+            journal: 'Nucleic Acids Res',
+            published_date: Date.new(2006),
+            publication_type: Factory(:journal),
+            authors: [
+                PublicationAuthor.new(first_name: 'D.', last_name: 'Hull', author_index: 0),
+                PublicationAuthor.new(first_name: 'K.', last_name: 'Wolstencroft', author_index: 1),
+                PublicationAuthor.new(first_name: 'R.', last_name: 'Stevens', author_index: 2),
+                PublicationAuthor.new(first_name: 'C.', last_name: 'Goble', author_index: 3),
+                PublicationAuthor.new(first_name: 'M. R.', last_name: 'Pocock', author_index: 4),
+                PublicationAuthor.new(first_name: 'P.', last_name: 'Li', author_index: 5),
+                PublicationAuthor.new(first_name: 'T.', last_name: 'Oinn', author_index: 6)
+            ]
+        },
+        {
+            #publications[1]
+            title: 'Yet another tool for importing publications',
+            journal: 'The second best journal',
+            published_date: Date.new(2016),
+            publication_type: Factory(:journal),
+            authors: [
+                PublicationAuthor.new(first_name: 'J.', last_name: 'Shmoe', author_index: 0),
+                PublicationAuthor.new(first_name: 'M.', last_name: 'Mustermann', author_index: 1)
+            ]
+        },
+        {
+            #publications[2]
+            title: 'Hydrodynamics of the Common Envelope Phase in Binary Stellar Evolution',
+            published_date: Date.new(2016),
+            publication_type: Factory(:phdthesis),
+            authors: [
+                PublicationAuthor.new(first_name: 'J.', last_name: 'Shmoe', author_index: 0),
+            ]
+        }
+
+    ]
+
+    assert_difference('Publication.count', 3) do
       post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/publications.bibtex'), project_ids: [projects(:one).id] } }
     end
 
@@ -198,17 +234,22 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal publications[0][:journal], publication0.journal
     assert_equal publications[0][:authors].collect(&:full_name), publication0.publication_authors.collect(&:full_name)
     assert_equal publications[0][:published_date], publication0.published_date
-
+    assert_equal publications[0][:publication_type].title, publication0.publication_type.title
     publication1 = Publication.where(title: publications[1][:title]).first
     assert_not_nil publication1
     assert_equal publications[1][:journal], publication1.journal
     assert_equal publications[1][:authors].collect(&:full_name), publication1.publication_authors.collect(&:full_name)
     assert_equal publications[1][:published_date], publication1.published_date
+
+    publication2 = Publication.where(title: publications[2][:title]).first
+    assert_equal  publications[2][:publication_type].title, publication2.publication_type.title
   end
 
   test 'should only show the year for 1st Jan' do
-    publication = Factory(:publication, published_date: Date.new(2013, 1, 1))
+
+    publication = Factory(:publication, published_date: Date.new(2013, 1, 1), publication_type: Factory(:journal))
     get :show, params: { id: publication }
+
     assert_response :success
     assert_select('p') do
       assert_select 'strong', text: 'Date Published:'
@@ -217,9 +258,79 @@ class PublicationsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should check the correctness of bibtex files' do
+    assert_difference('Publication.count', 0) do
+      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/error_bibtex.bib'), project_ids: [projects(:one).id] } }
+      assert_redirected_to publications_path
+      assert_includes flash[:error], 'An InProceedings needs to have a booktitle.'
+      assert_includes flash[:error], 'Please check your bibtex files, each publication should contain a title or a chapter name.'
+      assert_includes flash[:error], 'An InCollection needs to have a booktitle.'
+      assert_includes flash[:error], 'A Phd Thesis needs to have a school.'
+      assert_includes flash[:error], 'A Masters Thesis needs to have a school.'
+      assert_includes flash[:error], 'You need at least one author or editor for the Journal.'
+    end
+  end
+
+
+  test 'should associate authors to users when importing multiple publications from bibtex files' do
+
+    publications = [
+        {
+            #publications[0]
+            title: 'Taverna: a tool for building and running workflows of services.',
+            journal: 'Nucleic Acids Res',
+            published_date: Date.new(2006),
+            publication_type: Factory(:journal),
+            authors: [
+                PublicationAuthor.new(first_name: 'quentin', last_name: 'Jones', author_index: 0),
+                PublicationAuthor.new(first_name: 'aaron', last_name: 'spiggle', author_index: 1)]
+        },
+        {
+            #publications[1]
+            title: 'This is a real publication',
+            journal: 'Astronomy Astrophysics',
+            published_date: Date.new(2015),
+            publication_type: Factory(:journal),
+            authors: [
+                PublicationAuthor.new(first_name: 'Alice', last_name: 'Gräter', author_index: 0),
+                PublicationAuthor.new(first_name: 'Bob', last_name: 'Mueller', author_index: 1)
+            ]
+        }
+    ]
+
+    assert_difference('Publication.count',2) do
+        post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/author_match.bib'), project_ids: [projects(:one).id] } }
+    end
+
+
+    publication = Publication.where(title: publications[0][:title]).first
+    assert_not_nil publication
+    publication.publication_authors.collect(&:person_id).compact.each do |person_id|
+      assert_equal Person.where(id: person_id).first.last_name , PublicationAuthor.where(person_id: person_id).first.last_name
+      assert_equal Person.where(id: person_id).first.first_name , PublicationAuthor.where(person_id: person_id).first.first_name
+    end
+    publication1 = Publication.where(title: publications[1][:title]).first
+    assert_not_nil publication1
+    publication1.publication_authors.collect(&:person_id).compact.each do |person_id|
+      assert_not_nil person_id
+    end
+  end
+
+  test 'should show old unspecified publication type' do
+    get :index
+    assert_response :success
+    assert_select 'span.none_text', { text:'Not specified', :count=> 9 }
+  end
+
+  test 'should show the publication with unspecified publication type as Not specified' do
+    get :show, params: { id: publications(:no_publication_type) }
+    assert_response :success
+    assert_select 'span.none_text', { text:'Not specified', :count=>3 }
+  end
+
   test 'should only show the year for 1st Jan in list view' do
     disable_authorization_checks { Publication.destroy_all }
-    publication = Factory(:publication, published_date: Date.new(2013, 1, 1), title: 'blah blah blah science')
+    publication = Factory(:publication, published_date: Date.new(2013, 1, 1), title: 'blah blah blah science', publication_type: Factory(:journal))
     assert_equal 1, Publication.count
     get :index
     assert_response :success
@@ -316,7 +427,8 @@ class PublicationsControllerTest < ActionController::TestCase
     pub = Factory(:publication, title: 'A paper on blabla',
                       abstract: 'WORD ' * 20,
                       published_date: 5.days.ago.to_s(:db),
-                      pubmed_id: 404)
+                      pubmed_id: 404,
+                      publication_type: Factory(:journal))
 
     with_config_value :pubmed_api_email, 'fred@email.com' do
       get :show, params: { id: pub, format: 'enw' }
@@ -339,7 +451,8 @@ class PublicationsControllerTest < ActionController::TestCase
     pub = Factory(:publication, title: 'A paper on blabla',
                   abstract: 'WORD ' * 20,
                   published_date: 5.days.ago.to_s(:db),
-                  pubmed_id: 999)
+                  pubmed_id: 999,
+                  publication_type: Factory(:journal))
 
     with_config_value :pubmed_api_email, 'fred@email.com' do
       get :show, params: { id: pub, format: 'enw' }
@@ -352,6 +465,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should filter publications by projects_id for export' do
     # project without publications
     get :export, params: { query: { projects_id_in: [projects(:sysmo_project).id + 1] } }
+
     assert_response :success
     p = assigns(:publications)
     assert_equal 0, p.length
@@ -359,7 +473,7 @@ class PublicationsControllerTest < ActionController::TestCase
     get :export, params: { query: { projects_id_in: [projects(:sysmo_project).id] } }
     assert_response :success
     p = assigns(:publications)
-    assert_equal 3, p.length
+    assert_equal 5, p.length
   end
 
   test 'should filter publications sort by published date for export' do
@@ -396,6 +510,11 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should get edit' do
     get :edit, params: { id: publications(:one) }
+    assert_response :success
+  end
+
+  test 'should get manage' do
+    get :manage, params: { id: publications(:one) }
     assert_response :success
   end
 
@@ -642,6 +761,21 @@ class PublicationsControllerTest < ActionController::TestCase
     p.reload
   end
 
+  test 'should associate authors_but_leave_json' do
+    min_person = Factory(:min_person)
+    author = Factory(:publication_author, suggested_person: min_person)
+    p = Factory(:publication, publication_authors: [author], publication_type: Factory(:journal))
+    assert_equal 1, p.publication_authors.size
+    assert_equal 0, p.creators.size
+
+    get :show, params: { id: p.id }, format: :json
+    assert_response :success
+    json = JSON.parse(@response.body)
+    authors = json["data"]["attributes"]["authors"]
+    matching_count = authors.count { |a| a.include? min_person.name }
+    assert_equal 0, matching_count
+  end
+
   test 'should disassociate authors' do
     mock_pubmed(content_file: 'pubmed_5.txt')
     p = publications(:one)
@@ -695,7 +829,9 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should retrieve the right author order after a publication is created and after some authors are associate/disassociated with seek profiles' do
     mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1016/j.future.2011.08.004', content_file: 'cross_ref5.xml')
     assert_difference('Publication.count') do
-      post :create, params: { publication: { doi: '10.1016/j.future.2011.08.004', project_ids: [projects(:sysmo_project).id] } }
+
+      post :create, params: { publication: { doi: '10.1016/j.future.2011.08.004', project_ids: [projects(:sysmo_project).id], publication_type_id: Factory(:journal).id } }
+
     end
     publication = assigns(:publication)
     original_authors = ['Sean Bechhofer', 'Iain Buchan', 'David De Roure', 'Paolo Missier', 'John Ainsworth', 'Jiten Bhagat', 'Philip Couch', 'Don Cruickshank',
@@ -739,7 +875,7 @@ class PublicationsControllerTest < ActionController::TestCase
     doi_citation_mock
     mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1016/j.future.2011.08.004', content_file: 'cross_ref5.xml')
     assert_difference('Publication.count') do
-      post :create, params: { publication: { doi: '10.1016/j.future.2011.08.004', project_ids: [projects(:sysmo_project).id] } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, params: { publication: { doi: '10.1016/j.future.2011.08.004', project_ids: [projects(:sysmo_project).id], publication_type_id: Factory(:journal).id } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
     assert assigns(:publication)
     publication = assigns(:publication)
@@ -768,24 +904,6 @@ class PublicationsControllerTest < ActionController::TestCase
     assert @response.body.include?(joined_original_authors)
   end
 
-  test 'should update page pagination when changing the setting from admin' do
-    assert_equal 'latest', Seek::Config.default_pages[:publications]
-    get :index
-    assert_response :success
-    assert_select '.pagination li.active' do
-      assert_select 'a[href=?]', publications_path(page: 'latest')
-    end
-
-    # change the setting
-    Seek::Config.default_pages[:publications] = 'all'
-    get :index
-    assert_response :success
-
-    assert_select '.pagination li.active' do
-      assert_select 'a[href=?]', publications_path(page: 'all')
-    end
-  end
-
   test 'should avoid XSS in association forms' do
     project = Factory(:project)
     c = Factory(:person, group_memberships: [Factory(:group_membership, work_group: Factory(:work_group, project: project))])
@@ -800,7 +918,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
 
-    get :edit, params: { id: p.id }
+    get :manage, params: { id: p.id }
 
     assert_response :success
     assert_not_includes response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
@@ -814,8 +932,8 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'programme publications through nested routing' do
     assert_routing 'programmes/2/publications', controller: 'publications', action: 'index', programme_id: '2'
     programme = Factory(:programme)
-    publication = Factory(:publication, projects: programme.projects, policy: Factory(:public_policy))
-    publication2 = Factory(:publication, policy: Factory(:public_policy))
+    publication = Factory(:publication, projects: programme.projects, policy: Factory(:public_policy),publication_type: Factory(:journal))
+    publication2 = Factory(:publication, policy: Factory(:public_policy),publication_type: Factory(:journal))
 
     get :index, params: { programme_id: programme.id }
 
@@ -834,8 +952,8 @@ class PublicationsControllerTest < ActionController::TestCase
     a1 = Factory(:assay,organisms:[o1])
     a2 = Factory(:assay,organisms:[o2])
 
-    publication1 = Factory(:publication, assays:[a1])
-    publication2 = Factory(:publication, assays:[a2])
+    publication1 = Factory(:publication, assays:[a1],publication_type: Factory(:journal))
+    publication2 = Factory(:publication, assays:[a2],publication_type: Factory(:journal))
 
     o1.reload
     assert_equal [publication1],o1.related_publications
@@ -905,6 +1023,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'automatically extracts DOI from full DOI url' do
     project = Factory(:project)
+    journal = Factory(:journal)
 
     assert_difference('Publication.count') do
       post :create, params: { publication: { project_ids: ['', project.id.to_s],
@@ -913,11 +1032,16 @@ class PublicationsControllerTest < ActionController::TestCase
                                    publication_authors: ['', User.current_user.person.name],
                                    abstract: 'We did stuff',
                                    journal: 'Journal of Interesting Stuff',
-                                   published_date: '2017-05-23' }, subaction: 'Create' }
+                                   published_date: '2017-05-23',
+                                   publication_type_id: journal.id
+
+                                  }, subaction: 'Create'}
+
 
     end
 
     assert_equal '10.5072/abcd', assigns(:publication).doi
+    assert_equal journal.id, assigns(:publication).publication_type.id
   end
 
   def edit_max_object(pub)
@@ -969,7 +1093,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should fetch pubmed preview' do
     VCR.use_cassette('publications/fairdom_by_pubmed') do
       with_config_value :pubmed_api_email, 'fred@email.com' do
-        post :fetch_preview, xhr: true, params: { key: '27899646', protocol: 'pubmed', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+        post :fetch_preview, xhr: true, params: { key: '27899646', protocol: 'pubmed', publication: { project_ids: [User.current_user.person.projects.first.id], publication_type_id: Factory(:journal).id } }
       end
     end
 
@@ -980,7 +1104,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should handle missing pubmed preview' do
     VCR.use_cassette('publications/missing_by_pubmed') do
       with_config_value :pubmed_api_email, 'fred@email.com' do
-        post :fetch_preview, xhr: true, params: { key: '40404040404', protocol: 'pubmed', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+        post :fetch_preview, xhr: true, params: { key: '40404040404', protocol: 'pubmed', publication: { project_ids: [User.current_user.person.projects.first.id], publication_type_id: Factory(:journal).id } }
       end
     end
 
@@ -991,7 +1115,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should fetch doi preview' do
     VCR.use_cassette('publications/fairdom_by_doi') do
       with_config_value :pubmed_api_email, 'fred@email.com' do
-        post :fetch_preview, xhr: true, params: { key: '10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+        post :fetch_preview, xhr: true, params: { key: '10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id], publication_type_id: Factory(:journal).id } }
       end
     end
 
@@ -999,10 +1123,21 @@ class PublicationsControllerTest < ActionController::TestCase
     assert response.body.include?('FAIRDOMHub: a repository')
   end
 
+
+  test 'should handle blank publication type when refetching doi metadata' do
+    VCR.use_cassette('publications/refetch_by_doi_non_publication_type_error.yml') do
+      with_config_value :crossref_api_email, 'sowen@cs.man.ac.uk' do
+        post :update_metadata, xhr: true, params: { doi: '10.1136/gutjnl-2018-317872', publication: { project_ids: [User.current_user.person.projects.first.id], publication_type_id: nil } }
+      end
+    end
+    assert_response :internal_server_error
+    assert_match /An error has occurred.*Please choose a publication type./,response.body
+  end
+
   test 'should handle blank pubmed' do
     VCR.use_cassette('publications/fairdom_by_doi') do
       with_config_value :pubmed_api_email, 'fred@email.com' do
-        post :fetch_preview, xhr: true, params: { key: ' ', protocol: 'pubmed', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+        post :fetch_preview, xhr: true, params: { key: ' ', protocol: 'pubmed', publication: { project_ids: [User.current_user.person.projects.first.id], publication_type_id: Factory(:journal).id  } }
       end
     end
 
@@ -1013,7 +1148,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should handle blank doi' do
     VCR.use_cassette('publications/fairdom_by_doi') do
       with_config_value :pubmed_api_email, 'fred@email.com' do
-        post :fetch_preview, xhr: true, params: { key: ' ', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+        post :fetch_preview, xhr: true, params: { key: ' ', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id],publication_type_id: Factory(:journal).id } }
       end
     end
 
@@ -1024,7 +1159,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should fetch doi preview with prefixes' do
     VCR.use_cassette('publications/fairdom_by_doi') do
       with_config_value :pubmed_api_email, 'fred@email.com' do
-        post :fetch_preview, xhr: true, params: { key: 'doi: 10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+        post :fetch_preview, xhr: true, params: { key: 'doi: 10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id],publication_type_id: Factory(:journal).id } }
       end
     end
 
@@ -1033,7 +1168,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     VCR.use_cassette('publications/fairdom_by_doi') do
       with_config_value :pubmed_api_email, 'fred@email.com' do
-        post :fetch_preview, xhr: true, params: { key: 'doi.org/10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+        post :fetch_preview, xhr: true, params: { key: 'doi.org/10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id],publication_type_id: Factory(:journal).id } }
       end
     end
 
@@ -1042,7 +1177,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     VCR.use_cassette('publications/fairdom_by_doi') do
       with_config_value :pubmed_api_email, 'fred@email.com' do
-        post :fetch_preview, xhr: true, params: { key: 'https://doi.org/10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id] } }
+        post :fetch_preview, xhr: true, params: { key: 'https://doi.org/10.1093/nar/gkw1032', protocol: 'doi', publication: { project_ids: [User.current_user.person.projects.first.id],publication_type_id: Factory(:journal).id } }
       end
     end
 
@@ -1056,7 +1191,10 @@ class PublicationsControllerTest < ActionController::TestCase
     Factory(:publication, title: 'A paper on blabla',
                           abstract: 'WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD',
                           published_date: 5.days.ago.to_s(:db),
-                          pubmed_id: 5)
+                          pubmed_id: 5,
+                          publication_type: Factory(:journal)
+
+    )
   end
 
   def pre_print_publication_for_export_tests
@@ -1064,6 +1202,8 @@ class PublicationsControllerTest < ActionController::TestCase
                           abstract: 'WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD',
                           pubmed_id: nil,
                           publication_authors: [Factory(:publication_author),
-                                                Factory(:publication_author)])
+                                                Factory(:publication_author)],
+                          publication_type: Factory(:journal)
+            )
   end
 end

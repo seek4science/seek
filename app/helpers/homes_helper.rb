@@ -4,8 +4,6 @@ module HomesHelper
   include ImagesHelper
   include AvatarsHelper
 
-  RECENT_SIZE = 5
-
   DOWNLOAD_ACTIVITY_CACHE_PREFIX = 'download_activity_'.freeze
   CREATE_ACTIVITY_CACHE_PREFIX = 'create_activity_'.freeze
 

@@ -35,10 +35,10 @@ class ProjectsController < ApplicationController
     @restricted_assets = {}
     @types.each do |type|
       action = type.is_isa? ? 'view' : 'download'
-      @public_assets[type] = type.all_authorized_for action, nil, @project
+      @public_assets[type] = @project.send(type.table_name).authorized_for(action, nil)
       # to reduce the initial list - will start with all assets that can be seen by the first user fouund to be in a project
       user = User.all.detect { |user| !user.try(:person).nil? && !user.person.projects.empty? }
-      projects_shared = user.nil? ? [] : type.all_authorized_for('download', user, @project)
+      projects_shared = user.nil? ? [] : @project.send(type.table_name).authorized_for('download', user)
       # now select those with a policy set to downloadable to all-sysmo-users
       projects_shared = projects_shared.select do |item|
         access_type = type.is_isa? ? Policy::VISIBLE : Policy::ACCESSIBLE
@@ -87,7 +87,7 @@ class ProjectsController < ApplicationController
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
-      format.json { render json: @project }
+      format.json { render json: @project, include: [params[:include]] }
     end
   end
 
@@ -184,7 +184,7 @@ class ProjectsController < ApplicationController
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
         # format.json {render json: @project, adapter: :json, status: 200 }
-        format.json { render json: @project }
+        format.json { render json: @project, include: [params[:include]] }
       else
         format.html { render action: 'new' }
         format.json { render json: json_api_errors(@project), status: :unprocessable_entity }
@@ -210,7 +210,7 @@ class ProjectsController < ApplicationController
           flash[:notice] = "#{t('project')} was successfully updated."
           format.html { redirect_to(@project) }
           format.xml  { head :ok }
-          format.json { render json: @project }
+          format.json { render json: @project, include: [params[:include]] }
         #            format.json {render json: @project, adapter: :json, status: 200 }
         else
           format.html { render action: 'edit' }

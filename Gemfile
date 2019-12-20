@@ -40,7 +40,7 @@ gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'
 gem 'json-schema'
 gem 'json-diff'
-gem 'rubyzip', '~> 1.2.2'
+gem 'rubyzip'
 
 gem 'equivalent-xml'
 gem 'breadcrumbs_on_rails'
@@ -87,7 +87,7 @@ gem 'bootstrap-sass', '>=3.4.1'
 gem 'sass-rails', '~> 5.0'
 gem 'sprockets-rails'
 
-gem 'ro-bundle'
+gem 'ro-bundle', '~> 0.2.4'
 gem 'handlebars_assets'
 gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 
@@ -125,6 +125,10 @@ gem 'rails-html-sanitizer'
 # Rails 5.2 upgrade
 gem 'bootsnap', '>= 1.1.0', require: false
 
+gem 'activerecord-import'
+
+gem 'puma' # Used for docker, and also teaspoon tests
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do
@@ -141,7 +145,6 @@ end
 
 group :production do
   gem 'passenger'
-  gem 'puma'
 end
 
 group :development do
@@ -163,7 +166,7 @@ group :test do
   gem 'minitest', '5.10.3'
   gem 'minitest-reporters'
   gem 'sunspot_matchers'
-  gem 'database_cleaner'
+  gem 'database_cleaner', '~> 1.7.0'
   gem 'vcr', '~> 2.9'
   gem 'rails-controller-testing'
   gem 'simplecov'

@@ -65,7 +65,7 @@ module Seek
     # the class methods that get added when calling acts_as_asset
     module SingletonMethods
       def get_all_as_json(user)
-        all = all_authorized_for 'view', user
+        all = authorized_for 'view', user
         with_contributors = all.map do |d|
           contributor = d.contributor
           { 'id' => d.id,

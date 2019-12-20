@@ -1,0 +1,255 @@
+<% text = publication_form;
+   help_text =  "Here you can edit the metadata of the publication. These data can be edited only when the publication is registered manually or with a bibtex file."
+
+%>
+
+<%= folding_panel("Publication", false, id: "edit_publication_form",
+    help_text: help_text ) do %>
+
+  <div role="tabpanel" class="tab-pane" id="Create">
+
+      <%= publication_form.hidden_field :parent_name %>
+      <%= publication_form.hidden_field :registered_mode %>
+
+      <div class="form-horizontal">
+        <div class="form-group">
+          <%= label_tag "Publication type", nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-3">
+            <span id="publication_type_info" style="display:none;"></span>
+            <span id="publication_type_selection">
+        <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
+                              {:include_blank => "Publication type"},
+                              {:class => 'form-control'} -%>
+      </span>
+          </div>
+        </div>
+      <div class="form-group">
+        <%= label_tag :pubmed_id, "Pubmed ID", :class => 'control-label col-sm-2', 'data-tooltip' => "Search metedata by PubMed ID" %>
+        <div class="col-sm-6">
+          <%= publication_form.text_field :pubmed_id, :class => 'form-control' %>
+        </div>
+        <div class="col-sm-4">
+          <button id="retrieve_from_pubmed" class="btn btn-default">PUBMED</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <%= label_tag :doi, "DOI", :class => 'control-label col-sm-2','data-tooltip' => "Search metedata by DOI" %>
+        <div class="col-sm-6">
+          <%= publication_form.text_field :doi, :class => 'form-control'%>
+        </div>
+        <div class=" col-sm-4">
+          <button id="retrieve_from_crossref" class="btn btn-default">DOI</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <%= label_tag :title, 'Title', :class => 'control-label col-sm-2' %>
+        <div class="col-sm-10">
+          <%= publication_form.text_area :title, :class => 'form-control', :rows => 2, :cols => 100 %>
+        </div>
+      </div>
+      <div class="form-group">
+        <%= label_tag :journal, nil, :class => 'control-label col-sm-2' %>
+        <div class="col-sm-10">
+          <%= publication_form.text_field :journal, :class => 'form-control' %>
+        </div>
+      </div>
+      <div class="form-group">
+        <%= label_tag :citation, nil, :class => 'control-label col-sm-2' %>
+        <div class="col-sm-10">
+          <%= publication_form.text_field :citation, :class => 'form-control' %>
+        </div>
+      </div>
+      <div class="form-group">
+        <%= label_tag :published_date, nil, :class => 'control-label col-sm-2' %>
+        <div class="col-sm-10">
+          <%= publication_form.text_field :published_date, data: { calendar: true }, class: 'calendar form-control' %>
+        </div>
+      </div>
+        <div class="form-group">
+          <%= label_tag :editor, nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-10">
+            <%= publication_form.text_field :editor, :class => 'form-control' %>
+          </div>
+        </div>
+          <div class="form-group">
+            <%= label_tag :booktitle, nil, :class => 'control-label col-sm-2' %>
+            <div class="col-sm-10">
+              <%= publication_form.text_field :booktitle, :class => 'form-control' %>
+            </div>
+          </div>
+        <div class="form-group">
+          <%= label_tag :publisher, nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-10">
+            <%= publication_form.text_field :publisher, :class => 'form-control' %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag nil, nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-10">
+            <%= publication_form.submit  'Update',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
+            or <%= cancel_button(publication_path(@publication)) %>          </div>
+        </div>
+      </div>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+
+
+    jQuery('#retrieve_from_crossref').on('click', function(e){
+            e.preventDefault(); // prevent the default form submit action
+
+            var doi = jQuery('#publication_doi').val();
+            doi = doi.replace(/^(https?:\/\/)?(dx\.)?doi\.org/, '');
+
+            jQuery.ajax({
+                url: 'https://doi.org/' + doi,
+                accepts: { 'citeproc': "application/vnd.citationstyles.csl+json" },
+                dataType: 'json',
+                success: function(data, textStatus, jqXHR) {
+                    //console.log("DOI:", data);
+                    jQuery('#publication_doi').parents('.form-group').removeClass('has-error');
+                    jQuery('#publication_doi').parents('.form-group').addClass('has-success');
+                    jQuery('#crossref_id').val(data.DOI);
+                    jQuery('#publication_title').val(data.title);
+                    jQuery('#publication_journal').val(data["container-title"]);
+                    jQuery('#publication_publisher').val(data["publisher"]);
+                    jQuery('#publication_publisher').val(data["publisher"]);
+
+                    if (typeof data["abstract"] !== 'undefined') {
+                        var regex = /(<([^>]+)>)/ig
+                        var  result = data["abstract"].replace(regex, "").slice(9);
+                        //console.log("abstract:",result);
+                        jQuery('#publication_abstract').val(result);
+                    }
+
+                    if (!jQuery('#publication_citation').val()) {
+                        var publication_citation = data["container-title"];
+
+                        if (typeof data["volume"] !== 'undefined') {
+                            publication_citation += ','+data["volume"];
+                        }
+
+                        if (typeof data["issue"] !== 'undefined') {
+                            publication_citation += '('+ data["issue"]+')';
+                        }
+
+                        if (typeof data["page"] !== 'undefined') {
+                            publication_citation += ':' + data["page"];
+                        }
+                        console.log("citation:",publication_citation);
+                        jQuery('#publication_citation').val(publication_citation);
+                    }
+
+                    published_data = data["published-online"] || data["published-print"] || data["accepted"];
+                    //console.log("published_data:", published_data);
+                    year=published_data["date-parts"][0][0];
+                    month= published_data["date-parts"][0][1];
+                    day= published_data["date-parts"][0][2];
+                    var date_published = year+"-"+month+"-"+day;
+                    jQuery('#publication_published_date').val(date_published);
+
+                    var authorlist = [];
+                    data.author.forEach(function(item,index){
+                        author_name = item.given+' '+item.family;
+                        //console.log ('author_name:'+ author_name);
+                        //console.log ('index:'+ index);
+                        jQuery('#author-'+index).text (author_name);
+                        jQuery('#publication_publication_authors_attributes_'+index+'_person_first_name').val (item.given);
+                        jQuery('#publication_publication_authors_attributes_'+index+'_person_last_name').val (item.family);
+                    });
+
+                },
+
+                statusCode: {
+                    // 200: function() { console.log("DOI: " + doi + " The request was OK.");},
+                    204: function() { console.log("DOI: " + doi + " The request was OK but there was no metadata available.");},
+                    404: function() { console.log("DOI: " + doi + " The DOI requested doesn't exist.");},
+                    406: function() { console.log("DOI: " + doi + " Can't serve any requested content type.");}
+                },
+                error: function() {
+                    jQuery('#publication_doi').parents('.form-group').removeClass('has-success');
+                    jQuery('#publication_doi').parents('.form-group').addClass('has-error');
+                }
+            });
+        });
+    jQuery('#retrieve_from_pubmed').on('click', function(e){
+            e.preventDefault(); // prevent the default form submit action
+            var pubmedid = jQuery('#publication_pubmed_id').val();
+            jQuery.ajax({
+                url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi',
+                data: {
+                    'db': 'pubmed',
+                    'id': pubmedid,
+                    'retmode': 'xml',
+                    'retmax': 1
+                },
+                dataType: 'xml',
+                success: function(data, textStatus, jqXHR) {
+                    jQuery('#publication_pubmed_id').parents('.form-group').removeClass('has-error');
+                    jQuery('#publication_pubmed_id').parents('.form-group').addClass('has-success');
+                    var doc = jQuery(data);
+                    console.log("Pudmed ID:", data);
+                    var doi_elem = jQuery(data).find('PubmedArticleSet > PubmedArticle > PubmedData > ArticleIdList > ArticleId[IdType="doi"]');
+                    if( doi_elem.length != 0) {
+                        jQuery('#publication_doi').val(doi_elem.html());
+                    }
+                    var article = jQuery(data).find('PubmedArticleSet > PubmedArticle > MedlineCitation > Article');
+                    var title_elem = article.find('ArticleTitle');
+                    if( title_elem.length != 0) {
+                        jQuery('#publication_title').val(title_elem.html());
+                    }
+                    var abstract_elem = article.find('Abstract > AbstractText');
+                    if( abstract_elem.length != 0) {
+                        jQuery('#publication_abstract').val(abstract_elem.html());
+                    }
+                    var journal_elem = article.find('Journal > Title');
+                    if( journal_elem.length != 0) {
+                        jQuery('#publication_journal').val(journal_elem.html())
+                    }
+
+                    if (!jQuery('#publication_citation').val()) {
+                        var journalIssue_Title = article.find('Journal > Title');
+                        var publication_citation = journalIssue_Title.html();
+                        //console.log("JournalIssue_Title:", journalIssue_Title.html());
+
+                        if (article.find('Journal > JournalIssue > Volume').length > 0) {
+                            publication_citation += ','+article.find('Journal > JournalIssue > Volume').html();
+                            //console.log("JournalIssue_Volume:", article.find('Journal > JournalIssue > Volume').html());
+                        }
+
+                        if (article.find('Journal > JournalIssue > Issue').length > 0) {
+                            publication_citation += '('+article.find('Journal > JournalIssue > Issue').html()+')';
+                            //console.log("JournalIssue_Issue:", article.find('Journal > JournalIssue > Issue').html());
+                        }
+
+                        if (article.find('Pagination > MedlinePgn').length > 0) {
+                            publication_citation += ':' + article.find('Pagination > MedlinePgn').html();
+                            //console.log("Page:", article.find('Pagination > MedlinePgn').html());
+                        }
+                         gjQuery('#publication_citation').val(publication_citation);
+                    }
+
+                    var published_date1 = article.find('Journal > JournalIssue > PubDate');
+                    var published_date2 = article.find('ArticleDate');
+
+                    if(  published_date1.find('Year').length == 0 ||
+                         published_date1.find('Month').length == 0 ||
+                         published_date1.find('Day').length == 0){
+
+                        var date_published = published_date2.find('Year').html()+"-"+published_date2.find('Month').html()+"-"+published_date2.find('Day').html();
+                        jQuery('#publication_published_date').val(date_published);
+
+                    }else {
+                        var date_published = published_date1.find('Year').html()+"-"+published_date1.find('Month').html()+"-"+published_date1.find('Day').html();
+                        jQuery('#publication_published_date').val(date_published);
+                    }
+                },
+                error: function() {
+                    jQuery('#publication_pubmed_id').parents('.form-group').removeClass('has-success');
+                    jQuery('#publication_pubmed_id').parents('.form-group').addClass('has-error');
+                }
+            });
+        });
+
+</script>

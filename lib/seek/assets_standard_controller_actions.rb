@@ -32,7 +32,7 @@ module Seek
         format.html
         format.xml
         format.rdf { render template: 'rdf/show' }
-        format.json { render json: asset, scope: { requested_version: params[:version] } }
+        format.json { render json: asset, scope: { requested_version: params[:version] }, include: [params[:include]] }
       end
     end
 
@@ -70,7 +70,7 @@ module Seek
         if item.save
           flash[:notice] = "#{t('investigation')} was successfully updated."
           format.html { redirect_to(item) }
-          format.json { render json: item }
+          format.json { render json: item, include: [params[:include]] }
         else
           format.html { render action: 'manage' }
           format.json { render json: json_api_errors(item), status: :unprocessable_entity }
@@ -94,7 +94,7 @@ module Seek
 
     # i.e. Model, or DataFile according to the controller name
     def class_for_controller_name
-      controller_name.classify.constantize
+      controller_model
     end
 
     # i.e. @model = item, or @data_file = item - according to the item class name
@@ -110,7 +110,7 @@ module Seek
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully uploaded and saved."
           respond_to do |format|
             format.html { redirect_to item }
-            format.json { render json: item }
+            format.json { render json: item, include: [params[:include]] }
           end
         end
       else

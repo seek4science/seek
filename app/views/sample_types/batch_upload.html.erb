@@ -1,0 +1,29 @@
+
+<h2>Sample Batch Upload</h2>
+<ol>
+  <li>
+    Download the template file: <div style='padding-left:2em;'><%= render :partial=>"template" %></div>
+  </li>
+  <li>
+    Fill the <i>Samples</i> sheet (<b>Please don't rename the Samples sheet</b>).
+  </li>
+  <li>
+    Upload the filled Excel file using
+    <%= link_to "Data file uploader", new_data_file_path(), target: "_blank" %>
+  </li>
+  <li>
+    Fill the necessary information in the shown form
+    (See the <%= help_link(:data_file_wizard, link_text: 'Wizard guide', include_icon: false) %> for more details) and click the <b>end</b> button the <b>create</b>.
+  </li>
+  <li>
+    After uploading the samples file we can extract them by clicking <b>Extract samples</b>
+    on the top right (It will take some time).
+  </li>
+  <li>
+    When the extraction process ends click the <b>Review Extracted Samples</b> button
+    if everything seems good click <b>Confirm</b>.
+  </li>
+  <li>
+    The extracted added samples are added in the sample type.
+  </li>
+</ol>

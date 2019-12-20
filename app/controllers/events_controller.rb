@@ -18,7 +18,7 @@ class EventsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml
-      format.json {render json: @event}
+      format.json {render json: @event, include: [params[:include]]}
     end
   end
 
@@ -42,7 +42,7 @@ class EventsController < ApplicationController
       if @event.update(event_params) && @event.save
         flash.now[:notice] = "#{t('event')} was updated successfully." if flash.now[:notice].nil?
         format.html { redirect_to @event }
-        format.json { render json: @event }
+        format.json { render json: @event, include: [params[:include]] }
       else
         format.html { render re_render_view }
         format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }

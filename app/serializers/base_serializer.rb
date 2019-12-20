@@ -11,12 +11,13 @@ class BaseSerializer < SimpleBaseSerializer
   end
 
   def associated(name)
-    @associated ||= if object.class.name.include?('::Version')
-                      associated_resources(object.parent)
-                    else
-                      associated_resources(object)
-                    end
-    @associated[name].blank? ? nil : @associated[name][:items]
+    @associated ||= {}
+    if @associated.key?(name)
+      @associated[name]
+    else
+      items = (object.class.name.include?('::Version') ? object.parent : object).get_related(name).authorized_for('view')
+      @associated[name] = items.empty? ? nil : items
+    end
   end
 
   def people

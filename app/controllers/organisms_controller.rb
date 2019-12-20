@@ -23,22 +23,7 @@ class OrganismsController < ApplicationController
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show'}
-      format.json {render json: @organism}
-    end
-  end
-
-  def index
-    if request.format.html?
-      super
-    else
-      respond_to do |format|
-        format.xml
-        format.json {render json: @organisms,
-                            each_serializer: SkeletonSerializer,
-                            meta: {:base_url =>   Seek::Config.site_base_host,
-                                   :api_version => ActiveModel::Serializer.config.api_version
-        }}
-      end
+      format.json {render json: @organism, include: [params[:include]]}
     end
   end
 
@@ -79,7 +64,7 @@ class OrganismsController < ApplicationController
         flash[:notice] = 'Organism was successfully created.'
         format.html { redirect_to organism_path(@organism) }
         format.xml  { head :ok }
-        format.json {render json: @organism, status: :created, location: @organism}
+        format.json {render json: @organism, status: :created, location: @organism, include: [params[:include]]}
       else
         format.html { render :action => "new" }
         format.xml  { render :xml => @organism.errors, :status => :unprocessable_entity }
@@ -95,7 +80,7 @@ class OrganismsController < ApplicationController
         flash[:notice] = 'Organism was successfully updated.'
         format.html { redirect_to organism_path(@organism) }
         format.xml  { head :ok }
-        format.json {render json: @organism}
+        format.json {render json: @organism, include: [params[:include]]}
       else
         format.html { render :action => "edit" }
         format.xml  { render :xml => @organism.errors, :status => :unprocessable_entity }

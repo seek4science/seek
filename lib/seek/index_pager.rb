@@ -3,59 +3,83 @@ module Seek
     include Seek::FacetedBrowsing
 
     def index
-      controller = controller_name.downcase
-      unless view_context.index_with_facets?(controller) && params[:user_enable_facet] == 'true'
-        model_class = controller_name.classify.constantize
-        objects = eval("@#{controller}")
-        if (request.format == 'json' && params[:page].nil?)
-          params[:page] = 'all'
-        else
-          params[:page] ||= Seek::Config.default_page(controller)
-          objects = model_class.paginate_after_fetch(objects, page: params[:page],
-                                                     latest_limit: Seek::Config.limit_latest
-          ) unless objects.respond_to?('page_totals')
-        end
-        instance_variable_set("@#{controller}", objects)
-      end
       respond_to do |format|
         format.html
         format.xml
-        format.json  do sorted_objects = objects.sort { |x, y| x.id <=> y.id }
-          render json: sorted_objects,
-                            each_serializer: SkeletonSerializer,
-                            meta: {:base_url =>   Seek::Config.site_base_host,
-                                   :api_version => ActiveModel::Serializer.config.api_version
-                            }
-          end
+        format.json do
+          render json: instance_variable_get("@#{controller_name}"),
+                 each_serializer: SkeletonSerializer,
+                 links: json_api_links,
+                 meta: {
+                     base_url: Seek::Config.site_base_host,
+                     api_version: ActiveModel::Serializer.config.api_version
+                 }
+        end
       end
     end
 
     def find_assets
-      fetch_and_filter_assets
+      assign_index_variables
+
+      assets = nil
+      log_with_time("  - Fetched #{controller_name}") { assets = fetch_assets }
+      @total_count = assets.count
+      log_with_time("  - Authorized") { assets = authorize_assets(assets) }
+      log_with_time("  - Relation-ified") { assets = relationify_collection(assets) } if assets.is_a?(Array)
+      log_with_time("  - Filtered") { assets = filter_assets(assets) } if Seek::Config.filtering_enabled
+      @visible_count = assets.count
+      log_with_time("  - Sorted") { assets = sort_assets(assets) }
+      log_with_time("  - Paged") { assets = paginate_assets(assets) }
+
+      instance_variable_set("@#{controller_name}", assets)
     end
 
-    def fetch_and_filter_assets
-      detect_parent_resource
-      found = apply_filters(fetch_all_viewable_assets)
-      instance_variable_set("@#{controller_name.downcase}", found)
-    end
-
-    def fetch_all_viewable_assets
-      model_class = controller_name.classify.constantize
-
-      if model_class.respond_to? :all_authorized_for
-        found = model_class.all_authorized_for 'view', User.current_user
+    def fetch_assets
+      if @parent_resource
+        @parent_resource.get_related(controller_name.classify)
       else
-        found = (model_class.respond_to?(:default_order) ? model_class.default_order : model_class.all).to_a
+        controller_model
+      end
+    end
+
+    def authorize_assets(assets)
+      assets.authorized_for('view', User.current_user)
+    end
+
+    def filter_assets(assets)
+      filterer = Seek::Filterer.new(controller_model)
+      active_filter_values = filterer.active_filter_values(@filters)
+      # We need the un-filtered, but authorized, collection to work out which filters are available.
+      @available_filters = filterer.available_filters(assets, active_filter_values)
+      assets = filterer.filter(assets, active_filter_values) if active_filter_values.any?
+
+      active_filter_values.each_key do |key|
+        active = @available_filters[key].select(&:active?)
+        @active_filters[key] = active if active.any?
       end
 
-      @total_count = model_class.count
-      @hidden = @total_count - found.count
-
-      found
+      assets
     end
 
-    def detect_parent_resource
+    def sort_assets(assets)
+      Seek::ListSorter.sort_by_order(assets, Seek::ListSorter.order_from_keys(*@order))
+    end
+
+    def paginate_assets(assets)
+      if @page.match?(/[0-9]+/) # Standard pagination
+        assets.paginate(page: @page,
+                        per_page: @per_page)
+      elsif @page == 'all' # No pagination
+        assets.paginate(page: 1, per_page: 1_000_000)
+      else # Alphabetical pagination
+        controller_model.paginate_after_fetch(assets, page_and_sort_params)
+      end
+    end
+
+    private
+
+    def assign_index_variables
+      # Parent resource
       parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
       if parent_id_param
         parent_type = parent_id_param.to_s.chomp('_id')
@@ -64,6 +88,63 @@ module Seek
           @parent_resource = parent_class.find(params[parent_id_param])
         end
       end
+
+      # Page
+      @page = page_and_sort_params[:page]
+      @page ||= 'all' if json_api_request?
+      @page ||= '1'
+      @per_page = params[:per_page]&.to_i ||
+          Seek::Config.results_per_page_for(controller_name) ||
+          Seek::Config.results_per_page_default
+
+      # Order
+      @order = if page_and_sort_params[:sort]
+                 Seek::ListSorter.keys_from_json_api_sort(controller_model.name, page_and_sort_params[:sort])
+               else
+                 Seek::ListSorter.keys_from_params(controller_model.name, page_and_sort_params[:order])
+               end
+      if @order.empty?
+        @order = nil
+        # Sort by `updated_at` if on the "top", and its a valid sort option for this type.
+        @order = :updated_at_desc if @page == 'top' && Seek::ListSorter.options(controller_model.name).include?(:updated_at_desc)
+        # Sort by `title` if on an alphabetical page, and its a valid sort option for this type.
+        @order = :title_asc if @page.match?(/[?A-Z]+/) && Seek::ListSorter.options(controller_model.name).include?(:title_asc)
+        @order ||= Seek::Config.sorting_for(controller_name)&.to_sym
+        @order ||= Seek::ListSorter.key_for_view(controller_model.name, :index)
+      end
+      @order = Array.wrap(@order).map(&:to_sym)
+
+      # Filters
+      @filters = page_and_sort_params[:filter].to_h
+      @active_filters = {}
+      @available_filters = {}
+    end
+
+    # This is a silly method to turn an Array of AR objects back into an AR relation so we can do joins etc. on it.
+    def relationify_collection(collection)
+      if collection.is_a?(Array)
+        controller_model.where(id: collection.map(&:id))
+      else
+        collection
+      end
+    end
+
+    def json_api_links
+      if @parent_resource
+        base = [@parent_resource, controller_name.to_sym]
+      else
+        base = controller_name.to_sym
+      end
+
+      {
+        self: polymorphic_path(base, page_and_sort_params)
+      }
+    end
+
+    def log_with_time(message, &block)
+      t = Time.now
+      block.call
+      Rails.logger.debug("#{message} (#{((Time.now - t) * 1000.0).round(1)}ms)")
     end
   end
 end

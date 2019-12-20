@@ -9,16 +9,17 @@ class PublicationsController < ApplicationController
 
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[show edit update destroy]
-  before_action :suggest_authors, only: :edit
+  before_action :suggest_authors, only: :mange
 
   include Seek::BreadCrumbs
 
   include Seek::IsaGraphExtensions
+  include PublicationsHelper
 
   def export
     @query = Publication.ransack(params[:query])
     @publications = @query.result(distinct: true)
-                          .includes(:publication_authors, :projects)
+                        .includes(:publication_authors, :projects)
     # @query.build_condition
     @query.build_sort if @query.sorts.empty?
 
@@ -41,7 +42,7 @@ class PublicationsController < ApplicationController
       format.html # show.html.erb
       format.xml
       format.rdf { render template: 'rdf/show' }
-      format.json {render json: @publication}
+      format.json {render json: @publication, include: [params[:include]]}
       format.any( *Publication::EXPORT_TYPES.keys ) do
         begin
           send_data @publication.export(request.format.to_sym), type: request.format.to_sym, filename: "#{@publication.title}.#{request.format.to_sym}"
@@ -68,6 +69,11 @@ class PublicationsController < ApplicationController
 
   # GET /publications/1/edit
   def edit; end
+
+  # GET /publications/1/manage
+  def manage
+    @publication = Publication.find(params[:id])
+  end
 
   # POST /publications
   # POST /publications.xml
@@ -106,7 +112,7 @@ class PublicationsController < ApplicationController
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
         format.xml  { head :ok }
-        format.json { render json: @publication, status: :ok}
+        format.json { render json: @publication, status: :ok, include: [params[:include]]}
       end
     else
       respond_to do |format|
@@ -124,15 +130,21 @@ class PublicationsController < ApplicationController
     @publication = Publication.new(publication_params)
     key = params[:key]
     protocol = params[:protocol]
-    pubmed_id = nil
-    doi = nil
-    if protocol == 'pubmed' && key.present?
-      pubmed_id = key
-    elsif protocol == 'doi' && key.present?
-      doi = key
+
+    if params[:publication][:publication_type_id].blank?
+      @error = "Please choose a publication type."
+    else
+      doi = nil
+      pubmed_id = nil
+      if protocol == 'pubmed' && key.present?
+        pubmed_id = key
+      elsif protocol == 'doi' && key.present?
+        doi = key
+      end
+      pubmed_id, doi = preprocess_pubmed_or_doi pubmed_id, doi
+      result = get_data(@publication, pubmed_id, doi)
     end
-    pubmed_id, doi = preprocess_pubmed_or_doi pubmed_id, doi
-    result = get_data(@publication, pubmed_id, doi)
+    @error =  @publication.errors.full_messages.join('<br>') if @publication.errors.any?
     if !@error.nil?
       @error_text = @error
       respond_to do |format|
@@ -140,6 +152,30 @@ class PublicationsController < ApplicationController
       end
     else
       @authors = result.authors
+      respond_to do |format|
+        format.js
+      end
+    end
+  end
+
+  def update_metadata
+
+    @publication = Publication.new(publication_params)
+    publication_type_id= params[:publication][:publication_type_id]
+    doi= params[:publication][:doi]
+    id= params[:publication][:id]
+    if publication_type_id.blank?
+      @error = "Please choose a publication type."
+    else
+      result = get_data(@publication, nil, doi)
+    end
+    @error =  @publication.errors.full_messages.join('<br>') if @publication.errors.any?
+    if !@error.nil?
+      @error_text = @error
+      respond_to do |format|
+        format.js { render status: 500 }
+      end
+    else
       respond_to do |format|
         format.js
       end
@@ -242,63 +278,39 @@ class PublicationsController < ApplicationController
 
   def disassociate_authors
     @publication = Publication.find(params[:id])
-    @publication.creators.clear # get rid of author links
-    @publication.publication_authors.clear
 
-    # Query pubmed article to fetch authors
-    result = fetch_pubmed_or_doi_result @publication.pubmed_id, @publication.doi
+    if @publication.pubmed_id.present? || @publication.doi.present?
+      @publication.creators.clear # get rid of author links
+      @publication.publication_authors.clear
 
-    unless result.nil?
-      result.authors.each_with_index do |author, index|
-        pa = PublicationAuthor.new(publication: @publication,
-                                   first_name: author.first_name,
-                                   last_name: author.last_name,
-                                   author_index: index)
-        pa.save
-      end
-    end
-    respond_to do |format|
-      format.html { redirect_to(edit_publication_url(@publication)) }
-      format.xml  { head :ok }
-    end
-  end
+      # Query pubmed article to fetch authors
+      result = @publication.fetch_pubmed_or_doi_result @publication.pubmed_id, @publication.doi
 
-  def fetch_pubmed_or_doi_result(pubmed_id, doi)
-    result = nil
-    @error = nil
-    if pubmed_id
-      begin
-        result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
-        @error = result.error
-      rescue => exception
-        raise exception unless Rails.env.production?
-        result ||= Bio::Reference.new({})
-        @error = 'There was a problem contacting the PubMed query service. Please try again later'
-        Seek::Errors::ExceptionForwarder.send_notification(exception, data: { message: "Problem accessing ncbi using pubmed id #{pubmed_id}" })
-      end
-    elsif doi
-      begin
-        query = DOI::Query.new(Seek::Config.crossref_api_email)
-        result = query.fetch(doi)
-        @error = 'Unable to get result' if result.blank?
-        @error = 'Unable to get DOI' if result.title.blank?
-      rescue DOI::MalformedDOIException
-        @error = 'The DOI you entered appears to be malformed.'
-      rescue DOI::NotFoundException
-        @error = 'The DOI you entered could not be resolved.'
-      rescue RuntimeError => exception
-        @error = 'There was an problem contacting the DOI query service. Please try again later'
-        Seek::Errors::ExceptionForwarder.send_notification(exception, data:{ message: "Problem accessing crossref using DOI #{doi}" })
+      unless result.nil?
+        result.authors.each_with_index do |author, index|
+          pa = PublicationAuthor.new(publication: @publication,
+                                     first_name: author.first_name,
+                                     last_name: author.last_name,
+                                     author_index: index)
+          pa.save
+        end
       end
     else
+      @publication.publication_authors.each do |author|
+        author.update_attributes(person_id: nil) unless author.person_id.nil?
+      end
       @error = 'Please enter either a DOI or a PubMed ID for the publication.'
     end
-    result
+
+
+    respond_to do |format|
+      format.html {redirect_to(manage_publication_url(@publication))}
+      format.xml {head :ok}
+    end
   end
 
   def get_data(publication, pubmed_id, doi = nil)
-    result = fetch_pubmed_or_doi_result(pubmed_id, doi)
-    publication.extract_metadata(result) unless @error
+    result = publication.extract_metadata(pubmed_id, doi)
     result
   end
 
@@ -309,11 +321,11 @@ class PublicationsController < ApplicationController
   end
 
   def publication_params
-    params.require(:publication).permit(:pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,
-                                        :published_date, :bibtex_file, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
+    params.require(:publication).permit(:publication_type_id, :pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,:editor,
+                                        :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
                                         { data_file_ids: [] }, { scales: [] },
-                                        { publication_authors_attributes: [:person_id, :id] }).tap do |pub_params|
+                                        { publication_authors_attributes: [:person_id, :id, :first_name, :last_name ] }).tap do |pub_params|
       filter_association_params(pub_params, :assay_ids, Assay, :can_edit?)
       filter_association_params(pub_params, :study_ids, Study, :can_view?)
       filter_association_params(pub_params, :investigation_ids, Investigation, :can_view?)
@@ -350,9 +362,9 @@ class PublicationsController < ApplicationController
       else
         respond_to do |format|
           flash[:notice] = 'Publication was successfully created.'
-          format.html { redirect_to(edit_publication_url(@publication)) }
+          format.html { redirect_to(manage_publication_url(@publication)) }
           format.xml  { render xml: @publication, status: :created, location: @publication }
-          format.json  { render json: @publication, status: :created, location: @publication }
+          format.json  { render json: @publication, status: :created, location: @publication, include: [params[:include]] }
         end
       end
     else # Publication save not successful
@@ -365,6 +377,8 @@ class PublicationsController < ApplicationController
 
   # create a publication from a form that contains all the data
   def create_publication
+
+    @publication.registered_mode = @publication.registered_mode || 3
     assay_ids = params[:assay_ids] || []
     # create publication authors
     plain_authors = params[:publication][:publication_authors]
@@ -385,9 +399,9 @@ class PublicationsController < ApplicationController
       else
         respond_to do |format|
           flash[:notice] = 'Publication was successfully created.'
-          format.html { redirect_to(edit_publication_url(@publication)) }
+          format.html { redirect_to(manage_publication_url(@publication)) }
           format.xml  { render xml: @publication, status: :created, location: @publication }
-          format.json { render json: @publication, status: :created, location: @publication }
+          format.json { render json: @publication, status: :created, location: @publication, include: [params[:include]] }
         end
       end
     else # Publication save not successful
@@ -402,25 +416,24 @@ class PublicationsController < ApplicationController
   # create a publication from a reference file, at the moment supports only bibtex
   # only sets the @publication and redirects to the create_publication with content from the bibtex file
   def import_publication
+
     @publication = Publication.new(publication_projects_params)
 
     require 'bibtex'
     if !params.key?(:publication) || !params[:publication].key?(:bibtex_file)
-      @publication.errors[:bibtex_file] = 'Upload a file!'
+      flash[:error] = 'Please upload a bibtex file!'
     else
       bibtex_file = params[:publication].delete(:bibtex_file)
-      bibtex = BibTeX.parse(bibtex_file.read)
-      if bibtex['@article'].empty?
-        @publication.errors[:bibtex_file] = 'The bibtex file should contain at least one @article'
+      data = bibtex_file.read.force_encoding('UTF-8')
+      bibtex = BibTeX.parse(data,:filter => :latex)
+      if bibtex[0].nil?
+        flash[:error] =  'The bibtex file should contain at least one item.'
       else
         # warning if there are more than one article
-        if bibtex['@article'].length > 1
-          flash[:error] = "The bibtex file did contain more than one @article: #{bibtex['@article'].length}; only the first one is parsed"
+        if bibtex.length > 1
+          flash[:error] = "The bibtex file did contain #{bibtex.length} items; only the first one is parsed."
         end
-        article = bibtex['@article'][0]
-        @publication.extract_bibtex_metadata(article)
-        # the new form will be rendered with the information from the imported bibtex article
-        @subaction = 'Create'
+        @publication.extract_bibtex_metadata(bibtex[0])
       end
     end
 
@@ -429,13 +442,13 @@ class PublicationsController < ApplicationController
         format.html { render action: 'new' }
         format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json { render json: @publication.errors, status: :unprocessable_entity }
-
       end
     else
-      respond_to do |format|
-        format.html { render action: 'new' }
-        format.json { render json: @publication, status: :ok }
-      end
+        @subaction = 'Create'
+        respond_to do |format|
+          format.html { render action: 'new' }
+          format.json { render json: @publication, status: :ok, include: [params[:include]] }
+        end
     end
   end
 
@@ -445,42 +458,58 @@ class PublicationsController < ApplicationController
 
     require 'bibtex'
     if !params.key?(:publication) || !params[:publication].key?(:bibtex_file)
-      @publication.errors[:bibtex_file] = 'Upload a file!'
+      flash[:error] =  'Please upload a bibtex file!'
     else
       bibtex_file = params[:publication].delete(:bibtex_file)
-      bibtex = BibTeX.parse(bibtex_file.read)
-      if bibtex['@article'].empty?
-        @publication.errors[:bibtex_file] = 'The bibtex file should contain at least one @article'
+      data = bibtex_file.read.force_encoding('UTF-8')
+      bibtex = BibTeX.parse(data,:filter => :latex)
+
+
+      if bibtex[0].nil?
+        flash[:error] = 'The bibtex file should contain at least one item.'
       else
-        articles = bibtex['@article']
+        articles = bibtex
         publications = []
         publications_with_errors = []
 
         # create publications from articles
         articles.each do |article|
           current_publication = Publication.new(publication_params)
-          current_publication.extract_bibtex_metadata(article)
-          if current_publication.save
-            publications << current_publication
-          else
+          unless current_publication.extract_bibtex_metadata(article)
             publications_with_errors << current_publication
+          else
+            if current_publication.save
+              publications << current_publication
+              associsate_authors_with_users(current_publication)
+              current_publication.creators = current_publication.seek_authors.map(&:person)
+            else
+              publications_with_errors << current_publication
+            end
           end
         end
 
         if publications.any?
-          flash[:notice] = "Successfully imported #{publications.length} publications"
+          flash[:notice] = "Successfully imported #{publications.length} publications. <br>"
+          publications.each_with_index do |publication, index|
+            flash[:notice]+= "<br>"+(index+1).to_s+": "+ publication.title + "<br>"
+          end
+          flash[:notice] = flash[:notice].html_safe
         else
-          @publication.errors[:bibtex_file] = 'No article could be imported successfully'
+          flash[:error] = 'No article could be imported successfully'
         end
 
         if publications_with_errors.any?
           flash[:error] = "There are #{publications_with_errors.length} publications that could not be saved"
-          publications_with_errors.each do |publication|
-            flash[:error] += '<br>' + publication.errors.full_messages.join('<br>')
+          publications_with_errors.each_with_index do |publication, index|
+            flash[:error]+= "<br>"
+            if publication.title.nil?
+              flash[:error]+= "<br>"+(index+1).to_s+": No title.<br>"+ "Please check your bibtex files, each publication should contain a title or a chapter name."
+            else
+              flash[:error]+= "<br>"+(index+1).to_s+": "+ publication.title + "<br>"+ publication.errors.full_messages.join('<br>')
+            end
           end
           flash[:error] = flash[:error].html_safe
         end
-
       end
     end
 
@@ -496,6 +525,16 @@ class PublicationsController < ApplicationController
         format.html { redirect_to(action: :index) }
         format.xml  { render xml: publications, status: :created, location: @publication }
         format.json  { render json: publications, status: :created, location: @publication }
+      end
+    end
+  end
+
+  def associsate_authors_with_users(current_publication)
+    current_publication.publication_authors.each do |author|
+      author.suggested_person = find_person_for_author(author, current_publication.projects)
+      unless author.suggested_person.nil?
+        author.person_id = author.suggested_person.id
+        author.save
       end
     end
   end
@@ -537,7 +576,20 @@ class PublicationsController < ApplicationController
     # Get author by last name
     last_name_matches = Person.where(last_name: author.last_name)
     matches = last_name_matches
-    # If no results, try searching by normalised name, taken from grouped_pagination.rb
+
+    if matches.empty?
+      # if no results, try replacing umlaut to non_umlaut
+      if has_umlaut(author.last_name)
+        replaced_name = replace_to_non_umlaut(author.last_name)
+        #if no results, try replacing non_umlaut to umlaut
+      elsif has_non_umlaut(author.last_name)
+        replaced_name = replace_to_umlaut(author.last_name)
+      end
+      last_name_matches = Person.where(last_name: replaced_name)
+      matches = last_name_matches
+    end
+
+    # if no results, try searching by normalised name, taken from grouped_pagination.rb
     if matches.empty?
       text = author.last_name
       # handle the characters that can't be handled through normalization
@@ -568,5 +620,38 @@ class PublicationsController < ApplicationController
 
     # Take the first match as the guess
     matches.first
+  end
+
+  #ToDo move it to somewhere else
+  def has_umlaut(str)
+    !!(str =~ /[öäüÖÄÜß]/)
+  end
+
+  def has_non_umlaut(str)
+    ["ae","oe","ue","ss"].any? {|non_umlaut| str.include? non_umlaut}
+  end
+
+  def replace_to_non_umlaut (str)
+    str.gsub!(/[äöüß]/) do |match|
+      case match
+      when "ä" then 'ae'
+      when "ö" then 'oe'
+      when "ü" then 'ue'
+      when "ß" then 'ss'
+      end
+    end
+    str
+  end
+
+  def replace_to_umlaut (str)
+    str.gsub!(/(ae|oe|ue|ss)/) do |match|
+      case match
+      when "ae" then 'ä'
+      when "oe" then 'ö'
+      when "ue" then 'ü'
+      when "ss" then 'ß'
+      end
+    end
+    str
   end
 end

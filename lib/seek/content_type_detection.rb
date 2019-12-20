@@ -102,8 +102,9 @@ module Seek
     end
 
     def is_viewable_format?(blob = self)
-      is_text?(blob) || is_image_viewable?(blob) || is_pdf?(blob) ||
-          (Seek::Config.pdf_conversion_enabled && is_pdf_viewable?(blob) && Seek::Config.soffice_available?)
+      is_text?(blob) || is_image_viewable?(blob) ||
+          is_pdf?(blob) ||
+          (is_pdf_viewable?(blob) && Seek::Config.pdf_conversion_enabled)
     end
 
     def is_content_viewable?(blob = self)

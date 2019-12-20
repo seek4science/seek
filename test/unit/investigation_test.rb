@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class InvestigationTest < ActiveSupport::TestCase
+
+  require "isatab_converter"
+  include IsaTabConverter
+
   fixtures :investigations, :projects, :studies, :assays, :assay_assets, :permissions, :policies
 
   test 'associations' do
@@ -51,7 +55,35 @@ class InvestigationTest < ActiveSupport::TestCase
     end
   end
 
-  # the lib/sysmo/title_trimmer mixin should automatically trim the title :before_save
+  test 'to_isatab' do
+    object = Factory(:max_investigation, description: 'Max investigation')
+    assay = object.assays.first
+
+    sample = Factory(:sample, policy: Factory(:publicly_viewable_policy))
+    patient_sample = Factory(:patient_sample, policy: Factory(:publicly_viewable_policy))
+
+    User.with_current_user(assay.contributor.user) do
+      assay.associate(sample)
+      assay.associate(patient_sample)
+      assay.save!
+    end
+
+    the_hash = convert_investigation (object)
+    json = JSON.pretty_generate(the_hash)
+
+    # write out to a temporary file
+    t = Tempfile.new("test_temp")
+    t << json
+    t.close()
+
+    result = `python script/check-isa.py #{t.path}`
+
+    output_file = '/tmp/check-isa-output'
+
+    assert !(File.file?(output_file) && !File.zero?(output_file))
+  end
+
+# the lib/sysmo/title_trimmer mixin should automatically trim the title :before_save
   test 'title trimmed' do
     inv = Factory(:investigation, title: ' Test')
     assert_equal 'Test', inv.title

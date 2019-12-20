@@ -275,10 +275,10 @@ ActiveRecord::Schema.define(version: 2019_12_19_134954) do
   create_table "data_file_auth_lookup", id: false,  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
-    t.boolean "can_view"
-    t.boolean "can_manage"
-    t.boolean "can_edit"
-    t.boolean "can_download"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
     t.boolean "can_delete", default: false
     t.index ["user_id", "asset_id", "can_view"], name: "index_data_file_auth_lookup_user_asset_view"
     t.index ["user_id", "can_view"], name: "index_data_file_auth_lookup_on_user_id_and_can_view"
@@ -375,7 +375,7 @@ ActiveRecord::Schema.define(version: 2019_12_19_134954) do
     t.index ["person_id"], name: "index_disciplines_people_on_person_id"
   end
 
-  create_table "document_auth_lookup", id: :integer,  force: :cascade do |t|
+  create_table "document_auth_lookup", id: false,  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -1204,6 +1204,13 @@ ActiveRecord::Schema.define(version: 2019_12_19_134954) do
     t.integer "person_id"
   end
 
+  create_table "publication_types", id: :integer,  force: :cascade do |t|
+    t.string "title"
+    t.string "key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "publications", id: :integer,  force: :cascade do |t|
     t.integer "pubmed_id"
     t.text "title", limit: 16777215
@@ -1218,9 +1225,13 @@ ActiveRecord::Schema.define(version: 2019_12_19_134954) do
     t.string "doi"
     t.string "uuid"
     t.integer "policy_id"
-    t.integer "publication_type", default: 1
     t.string "citation"
     t.string "deleted_contributor"
+    t.integer "registered_mode"
+    t.string "booktitle"
+    t.string "publisher"
+    t.string "editor"
+    t.integer "publication_type_id"
     t.index ["contributor_id"], name: "index_publications_on_contributor"
   end
 

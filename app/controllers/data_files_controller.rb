@@ -79,7 +79,7 @@ class DataFilesController < ApplicationController
           flash[:error] = 'Unable to save newflash[:error] version'
         end
         format.html { redirect_to @data_file }
-        format.json { render json: @data_file}
+        format.json { render json: @data_file, include: [params[:include]]}
       end
     else
       flash[:error] = flash.now[:error]
@@ -146,7 +146,7 @@ class DataFilesController < ApplicationController
           respond_to do |format|
             flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
             format.html { redirect_to data_file_path(@data_file) }
-            format.json { render json: @data_file }
+            format.json { render json: @data_file, include: [params[:include]] }
           end
         end
       else
@@ -169,7 +169,7 @@ class DataFilesController < ApplicationController
       if @data_file.update_attributes(data_file_params)
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
-        format.json {render json: @data_file}
+        format.json {render json: @data_file, include: [params[:include]]}
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@data_file), status: :unprocessable_entity }
@@ -201,10 +201,7 @@ class DataFilesController < ApplicationController
     scope = scope.joins(:projects).where(projects: { id: current_user.person.projects }) unless (params[:all_projects] == 'true')
     scope = scope.where(simulation_data: true) if (params[:simulation_data] == 'true')
     scope = scope.with_extracted_samples if (params[:with_samples] == 'true')
-
-    @data_files = DataFile.authorize_asset_collection(
-      scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").distinct, 'view'
-    ).first(20)
+    @data_files = scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").distinct.authorized_for('view').first(20)
 
     respond_to do |format|
       format.html { render partial: 'data_files/association_preview', collection: @data_files, locals: { hide_sample_count: !params[:with_samples] } }
@@ -432,7 +429,7 @@ class DataFilesController < ApplicationController
         # the assay_id param can also contain the relationship type
         @data_file.assays << @assay if @create_new_assay
         format.html { redirect_to data_file_path(@data_file) }
-        format.json { render json: @data_file }
+        format.json { render json: @data_file, include: [params[:include]] }
       end
 
     else

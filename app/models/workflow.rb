@@ -3,12 +3,9 @@ class Workflow < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::UploadHandling::ExamineUrl
 
-
   acts_as_asset
 
   acts_as_doi_parent(child_accessor: :versions)
-
-  scope :default_order, -> { order("title") }
 
   validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
   # validate :is_myexperiment?
@@ -19,7 +16,7 @@ class Workflow < ApplicationRecord
   has_and_belongs_to_many :sops
 
   explicit_versioning(:version_column => "version") do
-    acts_as_doi_mintable(proxy: :parent)
+    acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
     acts_as_versioned_resource
     acts_as_favouritable
 
@@ -31,9 +28,8 @@ class Workflow < ApplicationRecord
     true
   end
 
-  #defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
-    true
+    Seek::Config.workflows_enabled
   end
 
   def is_github_cwl?
@@ -49,5 +45,4 @@ class Workflow < ApplicationRecord
   def cwl_viewer_url
     return content_blob.url.sub('https://', 'https://view.commonwl.org/workflows/')
   end
-    
 end

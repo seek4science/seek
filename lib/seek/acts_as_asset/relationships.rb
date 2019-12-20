@@ -8,7 +8,7 @@ module Seek
         end
 
         def related_people
-          (creators | contributors.map { |c| c.try(:person) }).compact.uniq
+          Person.where(id: creator_ids | contributor_ids).distinct
         end
 
         def attributions_objects
@@ -48,7 +48,8 @@ module Seek
                    inverse_of: :other_object
 
           has_many :assets_creators, dependent: :destroy, as: :asset, foreign_key: :asset_id
-          has_many :creators, -> { order('assets_creators.id') }, class_name: 'Person', through: :assets_creators, after_remove: %i[update_timestamp record_creators_changed], after_add: %i[update_timestamp record_creators_changed]
+          has_many :creators, class_name: 'Person', through: :assets_creators, after_remove: %i[update_timestamp record_creators_changed], after_add: %i[update_timestamp record_creators_changed]
+          has_filter :creator
 
           has_many :publication_relationships, -> { where(predicate: Relationship::RELATED_TO_PUBLICATION) },
                    class_name: 'Relationship', as: :subject, dependent: :destroy, inverse_of: :subject

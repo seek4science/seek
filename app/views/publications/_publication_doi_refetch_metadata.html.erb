@@ -1,0 +1,124 @@
+
+
+<%
+  help_text =  "Here you can refetch the metadata of the publication."
+%>
+
+<%= form_tag(update_metadata_publications_path, { remote: true, id: 'refetch_metadata_publication' }) do %>
+
+  <div id="publication_error" class="error_div alert alert-danger" style="display:none"></div>
+
+
+    <%= panel("Currrent Metadata", :id => 'update_publication_medadata', :help_text=> help_text) do %>
+
+
+      <div role="tabpanel" class="tab-pane" id="Create">
+
+      <div class="row">
+
+        <div class="form-group">
+
+          <div class="col-md-12">
+            <p>
+          <%= label_tag "Publication type:", nil, :class => '' %>
+
+              <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
+                                    {:include_blank => "Please choose"},
+                                    {:class => ''} -%>
+          </p>
+
+            <p>
+              <strong><%= "Title" -%>:</strong>
+              <%=h publication.title -%>
+            </p>
+
+            <p>
+              <strong><%= "Abstract" -%>:</strong>
+              <% if publication.abstract %>
+                <%=h publication.abstract -%>
+              <% else -%>
+                <%= text_or_not_specified(nil) %>
+              <% end -%>
+            </p>
+
+            <%= persistent_resource_id(publication) %>
+
+            <p>
+              <strong><%= "Publication type" -%>:</strong>
+              <% if publication.publication_type_id %>
+                <%=h PublicationType.find(publication.publication_type_id).title -%>
+              <% else -%>
+                <%= text_or_not_specified(nil) %>
+              <% end -%>
+            </p>
+            <% unless publication.pubmed_id.nil? %>
+              <p>
+                <strong>PubMed ID:</strong>
+                <%= link_to publication.pubmed_id, publication.pubmed_uri, { :target => "_blank" } %>
+              </p>
+            <% end %>
+            <% unless publication.doi.nil? %>
+              <p>
+                <strong>DOI:</strong>
+                <%= doi_link(publication.doi, { :target => "_blank" }) %>
+              </p>
+            <% end %>
+
+            <% unless publication.journal.nil? || publication.journal.empty? %>
+              <p>
+                <strong><%= "Journal" -%>:</strong>
+                <%=h publication.journal -%>
+              </p>
+            <% end %>
+
+            <% unless publication.booktitle.nil? || publication.booktitle.empty? %>
+              <p>
+                <strong><%= "Book Title" -%>:</strong>
+                <%=h publication.booktitle -%>
+              </p>
+            <% end %>
+
+            <% unless publication.editor.nil? || publication.editor.empty? %>
+              <p>
+                <strong>Editor<%= publication.editor.size > 1 ? "s" : "" -%>:</strong>
+                <%=h publication.editor -%>
+              </p>
+            <% end %>
+
+            <% unless publication.publisher.nil? || publication.publisher.empty? %>
+              <p>
+                <strong>Publisher:</strong>
+                <%=h publication.publisher -%>
+              </p>
+            <% end %>
+
+            <p>
+              <strong><%= "Citation:" -%></strong>
+              <%=h publication.citation -%>
+            </p>
+            <p>
+              <strong for="date_published">Date Published:</strong>
+              <span><%= date_as_string(publication.published_date,false,true) -%></span>
+            </p>
+
+            <%= fields_for(publication) do |f| %>
+              <%= f.hidden_field :parent_name %>
+              <%= f.hidden_field :registered_mode %>
+              <%= f.hidden_field :doi %>
+              <%= f.hidden_field :id %>
+            <% end %>
+
+            <%= submit_tag 'Refresh',:id=>"fetch_button", :class => 'btn btn-default' %>
+            <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%>
+  <% end %>
+  </div>
+  </div>
+
+
+      </div>
+    </div>
+<% end %>
+
+<div id="publication_refetch_container" style="display:none;"></div>
+
+

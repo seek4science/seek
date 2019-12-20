@@ -24,9 +24,7 @@ class ContentBlobsController < ApplicationController
   end
 
   def view_content
-    if @content_blob.is_text?
-      view_text_content
-    elsif @content_blob.is_cwl?
+    if @content_blob.is_text? || @content_blob.is_cwl?
       view_text_content
     else
       @pdf_url = pdf_url
@@ -61,7 +59,7 @@ class ContentBlobsController < ApplicationController
   
   def show
     respond_to do |format|
-      format.json { render json: @content_blob }
+      format.json { render json: @content_blob, include: [params[:include]] }
       format.html { render plain: 'Format not supported', status: :not_acceptable }
       format.xml { render plain: 'Format not supported', status: :not_acceptable }
       format.csv { csv_data }

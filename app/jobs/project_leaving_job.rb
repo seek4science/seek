@@ -8,8 +8,8 @@ class ProjectLeavingJob < SeekJob
   end
 
   def perform_job(item)
-    if item[:project] && Seek::Config.auth_lookup_enabled
-      AuthLookupUpdateJob.new.add_items_to_queue(([item[:person]] + item[:project].asset_housekeepers).compact.uniq)
+    if item[:project]
+      AuthLookupUpdateQueue.enqueue(([item[:person]] + item[:project].asset_housekeepers).compact.uniq)
     end
   end
 

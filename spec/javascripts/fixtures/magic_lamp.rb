@@ -22,25 +22,25 @@ MagicLamp.register_fixture(controller: SopsController, name: 'sops/new') do
   render :new
 end
 
-MagicLamp.register_fixture(controller: SopsController, name: 'sops/edit') do
+MagicLamp.register_fixture(controller: SopsController, name: 'sops/manage') do
   @sop = Factory(:sop, policy: Factory(:public_policy))
   @sop.valid?
   @display_sop = @sop.latest_version
-  User.current_user = @sop.contributor
+  User.current_user = @sop.contributor.user
   session[:user_id] = User.current_user.id.to_s
   request.env["action_dispatch.request.path_parameters"] = {
-      action: "edit",
+      action: "manage",
       controller: "sops",
       id: @sop.id
   }
-  render :edit
+  render :manage
 end
 
 MagicLamp.register_fixture(name: 'sharing/form') do
   @sop = Factory(:sop, policy: Factory(:public_policy))
   @sop.valid?
   @display_sop = @sop.latest_version
-  User.current_user = @sop.contributor
+  User.current_user = @sop.contributor.user
   session[:user_id] = User.current_user.id.to_s
   request.env["action_dispatch.request.path_parameters"] = {
       action: "edit",
@@ -55,7 +55,7 @@ MagicLamp.register_fixture(name: 'projects-selector') do
   @sop = Factory(:sop, policy: Factory(:public_policy))
   @sop.valid?
   @display_sop = @sop.latest_version
-  User.current_user = @sop.contributor
+  User.current_user = @sop.contributor.user
   session[:user_id] = User.current_user.id.to_s
   request.env["action_dispatch.request.path_parameters"] = {
       action: "edit",

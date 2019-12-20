@@ -40,7 +40,6 @@ SEEK::Application.configure do
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
 
-
   config.public_file_server.enabled = true
 
   I18n.enforce_available_locales = true
@@ -52,4 +51,7 @@ SEEK::Application.configure do
   # disable SQL logs from active record by TZ
   ActiveRecord::Base.logger = Logger.new(STDOUT)
   ActiveRecord::Base.logger.level = 1
+
+  # Don't log asset requests
+  config.assets.quiet = true
 end

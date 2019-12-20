@@ -44,9 +44,9 @@ class InvestigationsControllerTest < ActionController::TestCase
       assay1 = Factory :assay, policy: Factory(:public_policy),contributor:person
       assay2 = Factory :assay, policy: Factory(:public_policy),contributor:person
 
-      pub1 = Factory :publication, title: 'pub 1',contributor:person
-      pub2 = Factory :publication, title: 'pub 2',contributor:person
-      pub3 = Factory :publication, title: 'pub 3',contributor:person
+      pub1 = Factory :publication, title: 'pub 1',contributor:person, publication_type: Factory(:journal)
+      pub2 = Factory :publication, title: 'pub 2',contributor:person, publication_type: Factory(:journal)
+      pub3 = Factory :publication, title: 'pub 3',contributor:person, publication_type: Factory(:journal)
       Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub1
       Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
 
