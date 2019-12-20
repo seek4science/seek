@@ -37,11 +37,7 @@
 
           <div class="form-group">
             <label>Email address</label>
-            <% if (params.key?(:email)) -%>
-              <%= f.text_field :email, :class => 'form-control', :value => params[:email] %>
-            <% else %>
-              <%= f.text_field :email, :class => 'form-control' %>
-            <% end -%>
+            <%= f.text_field :email, :class => 'form-control' %>
           </div>
 
           <div class="form-group">
