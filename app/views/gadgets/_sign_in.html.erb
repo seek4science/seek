@@ -1,3 +1,5 @@
+<% original_path ||= request.original_fullpath %>
+
 <% unless logged_in_and_registered? -%>
     <div class="panel panel-default" id="login-panel">
       <div class="panel-heading">
@@ -29,7 +31,6 @@
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="password_login">
             <%= form_tag main_app.session_path do %>
-              <% original_path ||= request.original_fullpath %>
               <%= hidden_field_tag "called_from[path]", original_path -%>
               <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
               <%= hidden_field_tag "called_from[action]", controller.action_name -%>
@@ -66,7 +67,7 @@
             <% end %>
             <% if show_ldap_login? %>
               <div role="tabpanel" class="tab-pane" id="ldap_login">
-                <%= render partial: 'identities/ldap_form' %>
+                <%= render partial: 'identities/ldap_form', locals: { original_path: original_path } %>
               </div>
             <% end %>
           <% end #omniauth enabled and providers available %>
