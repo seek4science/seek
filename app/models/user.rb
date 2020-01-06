@@ -334,7 +334,7 @@ class User < ApplicationRecord
 
   def self.unique_login(original_login)
     login = original_login
-    while User.find_by_login(login) do
+    while User.where(login: login).exists? do
       login = "#{original_login}#{rand(9999).to_s.rjust(4, '0')}"
     end
 
@@ -342,6 +342,6 @@ class User < ApplicationRecord
   end
 
   def self.random_password
-    SecureRandom.urlsafe_base64(MIN_PASSWORD_LENGTH * 2).first(MIN_PASSWORD_LENGTH)
+    SecureRandom.urlsafe_base64(MIN_PASSWORD_LENGTH).first(MIN_PASSWORD_LENGTH)
   end
 end
