@@ -1157,6 +1157,24 @@ class PeopleControllerTest < ActionController::TestCase
     assert_select '#project-positions label', text: /#{pos.name}/, count: 1
   end
 
+  test 'current should show current person' do
+    get :current, format: :json
+
+    assert_response :success
+    body = JSON.parse(@response.body)
+    assert_equal people(:quentin_person).id.to_s, body['data']['id']
+  end
+
+  test 'current should return not found if no one logged in' do
+    logout
+
+    get :current, format: :json
+
+    assert_response :not_found
+    body = JSON.parse(@response.body)
+    assert_nil body['data']
+  end
+
   def edit_max_object(person)
     Factory :expertise, value: 'golf', annotatable: person
     Factory :expertise, value: 'fishing', annotatable: person

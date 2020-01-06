@@ -167,6 +167,7 @@ SEEK::Application.routes.draw do
     collection do
       get :typeahead
       get :register
+      get :current
       get :is_this_you
       get :get_work_group
       post :userless_project_selected_ajax

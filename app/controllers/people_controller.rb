@@ -44,14 +44,13 @@ class PeopleController < ApplicationController
 
   def current
     respond_to do |format|
-      format.json {
+      format.json do
         if logged_in?
           render json: current_user.person
         else
-          render json: { errors: [{ title: 'Not found'}] ,
-                            status: :not_found }
+          render json: { errors: [{ title: 'No user logged in'}] }, status: :not_found
         end
-      }
+      end
     end
   end
 
