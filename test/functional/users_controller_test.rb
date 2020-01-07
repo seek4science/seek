@@ -362,6 +362,36 @@ class UsersControllerTest < ActionController::TestCase
     end
   end
 
+  test 'can re-generate api token' do
+    user = Factory(:user)
+    token = user.api_token
+    login_as(user)
+
+    assert_not_nil token
+
+    post :refresh_api_token, params: { id: user }
+
+    assert_redirected_to edit_user_path(user)
+    user.reload
+    assert_not_nil user.api_token
+    assert_not_equal token, user.api_token
+  end
+
+  test 'cannot re-generate api token of another user' do
+    user = Factory(:user)
+    token = user.api_token
+    login_as(Factory(:user))
+
+    assert_not_nil token
+
+    post :refresh_api_token, params: { id: user }
+
+    assert_redirected_to root_path
+    user.reload
+    assert_not_nil user.api_token
+    assert_equal token, user.api_token
+  end
+
   protected
 
   def create_user(options = {})
