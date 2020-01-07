@@ -400,9 +400,13 @@ namespace :seek do
   task(generate_user_api_tokens: :environment) do
     count = 0
 
-    User.where(api_token: nil).find_each do |user|
-      user.generate_api_token
-      count += 1
+    disable_authorization_checks do
+      User.where(api_token: nil).find_each do |user|
+        user.generate_api_token
+        user.save!
+
+        count += 1
+      end
     end
 
     puts "Generated API tokens for #{count} users" unless count.zero?

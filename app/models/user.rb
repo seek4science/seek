@@ -32,6 +32,7 @@ class User < ApplicationRecord
 
   before_save :encrypt_password
   before_create :make_activation_code
+  before_create :generate_api_token
 
   # virtual attribute to hold email used to determine whether this user links to an existing
   attr_accessor :email
@@ -299,7 +300,7 @@ class User < ApplicationRecord
   end
 
   def generate_api_token
-    update_column(:api_token, self.class.random_api_token)
+    self.api_token = self.class.random_api_token
   end
 
   protected

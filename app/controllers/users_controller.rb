@@ -178,6 +178,7 @@ class UsersController < ApplicationController
 
   def refresh_api_token
     @user.generate_api_token
+    @user.save!
 
     respond_to do |format|
       flash[:notice] = 'API token refreshed'
