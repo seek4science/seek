@@ -85,16 +85,11 @@ class ApplicationController < ActionController::Base
   end
 
   def is_current_user_auth
-    begin
-      @user = User.where(['id = ?', current_user.try(:id)]).find(params[:id])
-    rescue ActiveRecord::RecordNotFound
-      error('User not found (id not authorized)', 'is invalid (not owner)')
-      return false
-    end
-
-    unless @user
+    if current_user.nil? || params[:id].to_s != current_user.id.to_s
       error('User not found (or not authorized)', 'is invalid (not owner)')
-      return false
+      false
+    else
+      @user = current_user
     end
   end
 

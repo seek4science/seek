@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :is_current_user_auth, only: %i[edit update]
+  before_action :is_current_user_auth, only: %i[edit update refresh_api_token]
   before_action :is_user_admin_auth, only: %i[impersonate resend_activation_email destroy]
 
   skip_before_action :restrict_guest_user
@@ -105,12 +105,10 @@ class UsersController < ApplicationController
   end
 
   def edit
-    @user = User.find(params[:id])
     render action: :edit
   end
 
   def update
-    @user = User.find(params[:id])
     if @user == current_user && !@user.registration_complete? && (params[:user][:person_id]) && (params[:user][:email])
       person_id = params[:user][:person_id]
       email = params[:user][:email]
@@ -175,6 +173,15 @@ class UsersController < ApplicationController
     else
       flash[:error] = 'User not found'
       redirect_to admin_path
+    end
+  end
+
+  def refresh_api_token
+    @user.generate_api_token
+
+    respond_to do |format|
+      flash[:notice] = 'API token refreshed'
+      format.html { redirect_to(edit_user_path(@user)) }
     end
   end
 

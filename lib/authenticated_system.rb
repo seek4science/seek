@@ -12,7 +12,7 @@ module AuthenticatedSystem
     if defined? @current_user
       @current_user
     else
-      @current_user = (login_from_session || login_from_basic_auth || login_from_cookie || User.guest)
+      @current_user = (login_from_session || login_from_basic_auth || login_from_token || login_from_cookie || User.guest)
     end
   end
 
@@ -130,4 +130,13 @@ module AuthenticatedSystem
     end
   end
 
+  def login_from_token
+    authenticate_or_request_with_http_token do |token, _options|
+      if token.length > 1
+        self.current_user = User.find_by(api_token: token)
+        sleep 2 if Rails.env.production? && (username.present? && !self.current_user) # Throttle incorrect login
+        self.current_user
+      end
+    end
+  end
 end

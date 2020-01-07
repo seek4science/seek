@@ -2,29 +2,54 @@
 
 <h1>Manage Account</h1>
 
-<%= panel('User Details') do %>
-    <div class="form-group">
-      <label>Username</label>
+<%= panel('User info') do %>
+  <label>Username</label>
 
-      <p class="form-control-static"><%= @user.login %></p>
-    </div>
-
-    <h3>Change password</h3>
-    <%= form_for @user do |f| -%>
-        <%= f.error_messages %>
-
-        <div class="form-group">
-          <label>New password</label>
-          <%= f.password_field :password, :placeholder => 'Password', :class => 'form-control' %>
-          <p class="help-block">Password should contain a minimum of <%= User::MIN_PASSWORD_LENGTH %> characters.</p>
-        </div>
-
-        <div class="form-group">
-          <label>Confirm new password</label>
-          <%= f.password_field :password_confirmation, :class => 'form-control' %>
-        </div>
-
-        <%= submit_tag 'Update', data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
-    <% end -%>
+  <p class="form-control-static"><%= @user.login %></p>
 <% end %>
 
+<%= folding_panel('API token', true) do %>
+  <div class="alert alert-warning">
+    Keep this token secret!
+  </div>
+
+  <div class="form-group">
+    <label>
+      API token
+    </label>
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="input-group">
+          <%= text_field_tag(nil, @user.api_token, class: 'form-control', readonly: 'readonly') -%>
+          <span class="input-group-btn">
+            <%= button_link_to('Re-generate', 'refresh', refresh_api_token_user_path(@user), method: :post) %>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="help-block">
+    You can use this token to authenticate when performing API requests.
+    Pass it into the <code>Authorization</code> header in the form <code>Authorization: Token <em>your_token_here</em></code>
+  </p>
+<% end %>
+
+<%= panel('Change password') do %>
+  <%= form_for @user do |f| -%>
+    <%= f.error_messages %>
+
+    <div class="form-group">
+      <label>New password</label>
+      <%= f.password_field :password, :placeholder => 'Password', :class => 'form-control' %>
+      <p class="help-block">Password should contain a minimum of <%= User::MIN_PASSWORD_LENGTH %> characters.</p>
+    </div>
+
+    <div class="form-group">
+      <label>Confirm new password</label>
+      <%= f.password_field :password_confirmation, :class => 'form-control' %>
+    </div>
+
+    <%= submit_tag 'Update', data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
+  <% end -%>
+<% end %>

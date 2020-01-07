@@ -2,6 +2,7 @@ require 'digest/sha1'
 
 class User < ApplicationRecord
   MIN_PASSWORD_LENGTH=10
+  API_TOKEN_LENGTH=40
 
   acts_as_annotation_source
 
@@ -297,6 +298,10 @@ class User < ApplicationRecord
     end
   end
 
+  def generate_api_token
+    update_column(:api_token, self.class.random_api_token)
+  end
+
   protected
 
   # before filter
@@ -343,5 +348,9 @@ class User < ApplicationRecord
 
   def self.random_password
     SecureRandom.urlsafe_base64(MIN_PASSWORD_LENGTH).first(MIN_PASSWORD_LENGTH)
+  end
+
+  def self.random_api_token
+    SecureRandom.urlsafe_base64(API_TOKEN_LENGTH).first(API_TOKEN_LENGTH)
   end
 end
