@@ -296,7 +296,7 @@ GEM
     httpclient (2.8.3)
     httpi (1.1.1)
       rack
-    i18n (1.6.0)
+    i18n (1.7.0)
       concurrent-ruby (~> 1.0)
     i18n_data (0.8.0)
     ice_nine (0.11.2)
@@ -313,7 +313,7 @@ GEM
       railties (>= 3.2.16)
     json (1.8.6)
     json-diff (0.4.1)
-    json-jwt (1.10.0)
+    json-jwt (1.11.0)
       activesupport (>= 4.2)
       aes_key_wrap
       bindata
@@ -797,7 +797,7 @@ GEM
     thor (0.20.3)
     thread_safe (0.3.6)
     tilt (2.0.9)
-    tzinfo (1.2.5)
+    tzinfo (1.2.6)
       thread_safe (~> 0.1)
     ucf (2.0.2)
       zip-container (~> 4.0.1)
