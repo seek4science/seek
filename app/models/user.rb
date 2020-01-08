@@ -9,8 +9,8 @@ class User < ApplicationRecord
 
   belongs_to :person
 
-  has_many :identities
-  
+  has_many :identities, dependent: :destroy
+
   has_many :oauth_sessions, dependent: :destroy
 
   # restful_authentication plugin generated code ...
@@ -289,6 +289,14 @@ class User < ApplicationRecord
     self.reset_password_code_until = nil
   end
 
+  def self.from_omniauth(auth)
+    User.new.tap do |user|
+      user.login = unique_login(auth['info']['nickname'] || 'user')
+      user.password = random_password
+      user.password_confirmation = user.password
+    end
+  end
+
   protected
 
   # before filter
@@ -322,5 +330,18 @@ class User < ApplicationRecord
     Seek::Util.authorized_types.each do |type|
       type.lookup_class.where(user: id).delete_all
     end
+  end
+
+  def self.unique_login(original_login)
+    login = original_login
+    while User.where(login: login).exists? do
+      login = "#{original_login}#{rand(9999).to_s.rjust(4, '0')}"
+    end
+
+    login
+  end
+
+  def self.random_password
+    SecureRandom.urlsafe_base64(MIN_PASSWORD_LENGTH).first(MIN_PASSWORD_LENGTH)
   end
 end

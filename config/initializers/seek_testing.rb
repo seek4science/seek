@@ -1,6 +1,5 @@
 #Default values required for the automated unit, functional and integration testing to behave as expected.
-SEEK::Application.configure do
-  if Rails.env.test?
+def load_seek_testing_defaults!
     silence_warnings do
       Settings.defaults[:is_virtualliver] = false
       Settings.defaults[:project_hierarchy_enabled] = true
@@ -111,7 +110,25 @@ SEEK::Application.configure do
       Settings.defaults[:nels_oauth_url] = 'https://test-fe.cbu.uib.no/oauth2'
       Settings.defaults[:nels_permalink_base] = 'https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml'
       Settings.defaults[:nels_use_dummy_client] = false
+
+      Settings.defaults[:omniauth_enabled] = true
+      Settings.defaults[:omniauth_user_create] = true
+      Settings.defaults[:omniauth_user_activate] = true
+      Settings.defaults[:omniauth_elixir_aai_enabled] = true
+      Settings.defaults[:omniauth_elixir_aai_client_id] = 'xyz'
+      Settings.defaults[:omniauth_elixir_aai_secret] = '123'
+      Settings.defaults[:omniauth_ldap_enabled] = true
+      # See: https://github.com/intridea/omniauth-ldap
+      Settings.defaults[:omniauth_ldap_config] = {
+          title: "organization-ldap",
+          host: 'localhost',
+          port: 389,
+          method: :plain,
+          base: 'DC=example,DC=com',
+          uid: 'samaccountname',
+          password: '',
+          bind_dn: ''
+      }
     end
-  end
 end
 

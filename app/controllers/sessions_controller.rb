@@ -9,7 +9,9 @@ class SessionsController < ApplicationController
   prepend_before_action :strip_root_for_xml_requests
 
   # render new.html.erb
-  def newsave!; end
+  def new
+
+  end
 
   def index
     redirect_to root_path
@@ -20,20 +22,29 @@ class SessionsController < ApplicationController
   end
 
   def create
-    auth = session[:auth]
-    session.delete :auth
-
-    auth ||= request.env['omniauth.auth']
-    # authentication through omniauth?
-    if Seek::Config.omniauth_enabled && auth
-      create_omniauth(auth)
-    else
-      password_authentication
+   auth = request.env['omniauth.auth'] # `omniauth.auth` comes from the omniauth rack middleware.
+                                       # See: https://github.com/omniauth/omniauth/wiki/Auth-Hash-Schema for schema.
+    if auth && Seek::Config.omniauth_enabled
+      # This check is only necessary if the server has not been restarted after an omniauth option was disabled.
+      # Should be handled by `config/initializers/seek_omniauth.rb`.
+      provider_enabled = case auth.provider
+                         when 'ldap'
+                           Seek::Config.omniauth_ldap_enabled
+                         when 'elixir_aai'
+                           Seek::Config.omniauth_elixir_aai_enabled
+                         else
+                           true
+                         end
+      if provider_enabled
+        create_omniauth(auth)
+        return
+      end
     end
+
+    password_authentication
   end
 
   def destroy
-    Identity.current_identity = nil
     logout_user
     flash[:notice] = 'You have been logged out.'
 
@@ -60,25 +71,22 @@ class SessionsController < ApplicationController
 
   private
 
-  def check_login
+  def check_login(success_notice = nil, person_params: {})
     session[:user_id] = @user.id
     if !@user.registration_complete?
       flash[:notice] = 'You have successfully registered your account, but you need to create a profile'
-      redirect_to(register_people_path)
+      redirect_to(register_people_path(person_params))
     elsif !@user.active?
       failed_login 'You still need to activate your account. A validation email should have been sent to you.'
     else
-      successful_login
+      successful_login(success_notice)
     end
   end
 
-  def successful_login
+  def successful_login(notice = nil)
     self.current_user = @user
-    if Identity.current_identity
-      Identity.current_identity.user = current_user
-      Identity.current_identity.save!
-    end
-    flash[:notice] = "You have successfully logged in, #{@user.display_name}."
+
+    flash[:notice] = notice || "You have successfully logged in, #{@user.display_name}."
     if params[:remember_me] == 'on'
       @user.remember_me unless @user.remember_token?
       cookies[:auth_token] = { value: @user.remember_token, expires: @user.remember_token_expires_at }
@@ -126,22 +134,50 @@ class SessionsController < ApplicationController
   end
 
   def create_omniauth(auth)
-    # info contains username, first_ and last_name and email
-    info = auth['info']
+    # Check if there is an existing identity for this provider/uid, or initialize a new one.
+    @identity = Identity.from_omniauth(auth)
 
-    # check if there is a user with that username as login
-    identity = Identity.from_omniauth(auth)
-    user_by_omniauth = identity.user
-    if user_by_omniauth
-      @user = user_by_omniauth
+    if @identity.user # The identity has a user.
+      @user = @identity.user
       check_login
-    # there is no such user, should we not create the user?
-    elsif !Seek::Config.omniauth_user_create
-      failed_login 'the authenticated user: cannot be found; administrators have been informed'
-      Mailer.omniauth_failed_login(auth.to_yaml).deliver_later
-    else
-      flash[:notice] = 'You need to login directly to link accounts. If you do not have an account then you must register.'
-      redirect_to login_path
+    else # The identity does not have an associated user.
+      # *** LEGACY SUPPORT ***
+      if auth.provider.to_s == 'ldap' # If using LDAP, attempt to find user by login.
+        @user = User.find_by_login(auth['info']['nickname'])
+        if @user
+          @identity.user = @user
+          @identity.save! # Update identity so we don't have to do this again.
+          check_login
+          return
+        end
+      end
+
+      if logged_in? # There is a user logged in, so link the identity to the current user.
+        @user = current_user
+        @identity.user = @user
+        @identity.save!
+        flash[:notice] = "Successfully linked #{t("login.#{auth.provider}")} identity to your account."
+        redirect_to user_identities_path(@user)
+        return
+      else # There is no user currently logged in.
+        if Seek::Config.omniauth_user_create # Create a new user if allowed.
+          @user = User.from_omniauth(auth)
+          saved = nil
+          @user.check_email_present = false
+          disable_authorization_checks { saved = @user.save }
+          if saved
+            # should we activate the user?
+            @user.activate if Seek::Config.omniauth_user_activate && !@user.active?
+            @identity.user = @user
+            @identity.save!
+            check_login(nil, person_params: auth['info'].slice(:first_name, :last_name, :email))
+          else # An unexpected error occurred whilst saving the user.
+            failed_login "Cannot create a new user: #{@user.errors.full_messages.join(', ')}."
+          end
+        else # If user creation is not allowed, too bad.
+          failed_login "The authenticated user: #{auth['info']['nickname']} does not have a #{Seek::Config.application_name} account."
+        end
+      end
     end
   end
 end

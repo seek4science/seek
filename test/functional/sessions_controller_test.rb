@@ -3,7 +3,7 @@ require 'sessions_controller'
 
 # Re-raise errors caught by the controller.
 class SessionsController; def rescue_action(e)
-                            raise e
+                            fail e
                           end; end
 
 class SessionsControllerTest < ActionController::TestCase
@@ -12,29 +12,6 @@ class SessionsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   fixtures :users, :people
-
-  def setup
-    Seek::Config.omniauth_providers = {
-      ldap: {
-        title: 'organization-ldap',
-        host: 'localhost',
-        port: 389,
-        method: :plain,
-        base: 'DC=example,DC=com',
-        uid: 'samaccountname',
-        password: '',
-        bind_dn: ''
-      }
-    }
-
-    # add an omniauth user
-    auth_hash = {
-      provider: 'ldap',
-      uid: 'new_ldap_user',
-      info: { 'nickname' => 'new_ldap_user', 'first_name' => 'new', 'last_name' => 'ldap_user', 'email' => 'new_ldap_user@example.com' }
-    }
-    OmniAuth.config.add_mock(:ldap, auth_hash)
-  end
 
   test 'sessions#index redirects to session#new' do
     get :index
@@ -189,6 +166,7 @@ class SessionsControllerTest < ActionController::TestCase
 
   test 'should have only seek login' do
     with_config_value(:omniauth_enabled, false) do
+      assert !Seek::Config.omniauth_enabled
       get :new
       assert_response :success
       assert_select 'title', text: 'Login', count: 1
@@ -196,65 +174,54 @@ class SessionsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'should have provider login' do
-    # change the setting
+  test 'should have omniauth login options' do
+    with_config_value(:omniauth_enabled, true) do # This should be true by default in test env
+      get :new
+      assert_response :success
+      assert_select '#login-panel form', 2
+      assert_select '#ldap_login input[name="username"]', 1
+      assert_select '#ldap_login input[name="password"]', 1
+      assert_select '#elixir_aai_login a', 1
+    end
+  end
+
+  test 'should only have enabled omniauth login options' do
     with_config_value(:omniauth_enabled, true) do
-      with_config_value(:elixir_aai_client_id, 'xxx') do
-        with_config_value(:elixir_aai_secret, 'yyy') do
-          Devise.setup do |config|
-            config.omniauth :ldap, name: :ldap,
-                            title: 'organization-ldap',
-                            host: 'localhost',
-                            port: 389,
-                            method: :plain,
-                            base: 'DC=example,DC=com',
-                            uid: 'samaccountname',
-                            password: '',
-                            bind_dn: ''
-          end
-
-          assert Devise.omniauth_providers.include? :ldap
-
+      with_config_value(:omniauth_ldap_enabled, false) do
+        with_config_value(:omniauth_elixir_aai_enabled, true) do
           get :new
           assert_response :success
-
-          assert_select '#login-panel li', Devise.omniauth_providers.length + 1
-
-          # LDAP login is known about
-          assert_select '#login-panel div[id="ldap_login"]', 1
-
-          # No login specified for LDAP
-          assert_select '#login-panel div[class="alert alert-danger"]', 1
+          assert_select '#login-panel form', 1
+          assert_select '#ldap_login input[name="username"]', 0
+          assert_select '#ldap_login input[name="password"]', 0
+          assert_select '#elixir_aai_login a', 1
+        end
+      end
+      with_config_value(:omniauth_ldap_enabled, true) do
+        with_config_value(:omniauth_elixir_aai_enabled, false) do
+          get :new
+          assert_response :success
+          assert_select '#login-panel form', 2
+          assert_select '#ldap_login input[name="username"]', 1
+          assert_select '#ldap_login input[name="password"]', 1
+          assert_select '#elixir_aai_login a', 0
         end
       end
     end
   end
 
-  test 'should not create omni authenticated user' do
-    # change the setting
-    with_config_value(:omniauth_enabled, true) do
-      with_config_value(:omniauth_user_create, false) do
-        @request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:ldap]
+  test 'should authenticate user with legacy encryption and update password' do
+    sha1_user = Factory(:sha1_pass_user)
+    test_password = generate_user_password
 
-        post :create
-        assert_redirected_to login_path
-        assert_match(/the authenticated user: cannot be found/, flash[:error])
-        assert_nil User.find_by_login('new_ldap_user')
-      end
-    end
-  end
+    assert_equal User.sha1_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password
 
-  test 'should create omni authenticated user' do
-    # change the setting
-    with_config_value(:omniauth_enabled, true) do
-      with_config_value(:omniauth_user_create, true) do
-        @request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:ldap]
+    post :create, params: { login: sha1_user.login, password: test_password }
+    assert session[:user_id]
+    assert_response :redirect
 
-        post :create
-        assert_redirected_to login_path
-        assert_match(/You need to login directly to link accounts/, flash[:notice])
-      end
-    end
+    sha1_user.reload
+    assert_equal User.sha256_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password
   end
 
   protected

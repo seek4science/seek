@@ -33,10 +33,14 @@ module SessionsHelper
   end
 
   def show_omniauth_login?
-    Seek::Config.omniauth_enabled && Devise.omniauth_providers.any?
+    Seek::Config.omniauth_enabled && Seek::Config.omniauth_providers.any?
   end
 
   def show_elixir_login?
-    Seek::Config.elixir_aai_client_id.present? && Seek::Config.elixir_aai_secret.present?
+    Seek::Config.omniauth_elixir_aai_enabled
+  end
+
+  def show_ldap_login?
+    Seek::Config.omniauth_ldap_enabled
   end
 end

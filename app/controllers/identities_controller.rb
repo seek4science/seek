@@ -1,4 +1,4 @@
-class OauthSessionsController < ApplicationController
+class IdentitiesController < ApplicationController
   before_action :find_and_check_user
 
   include Seek::BreadCrumbs
@@ -6,14 +6,15 @@ class OauthSessionsController < ApplicationController
   skip_before_action :add_breadcrumbs, only: :destroy
 
   def index
-    @oauth_sessions = @user.oauth_sessions
+    @identities = @user.identities
   end
 
   def destroy
-    @oauth_session = @user.oauth_sessions.find(params[:id])
+    @identity = @user.identities.find(params[:id])
 
-    @oauth_session.destroy
-    redirect_to user_oauth_sessions_path(@user)
+    @identity.destroy
+    flash[:notice] = "Unlinked #{t("login.#{@identity.provider}")} identity from your account."
+    redirect_to user_identities_path(@user)
   end
 
   private
