@@ -82,14 +82,13 @@ class ProjectsController < ApplicationController
     end
   end
 
-  
   # GET /projects/1
   # GET /projects/1.xml
   def show
     retrieve_project_files
-    #Create JStree core data
-    @treeData = build_tree_data
-    #For creating new investigation and study in Project view page
+    # Create JStree core data
+    @tree_data = build_tree_data
+    # For creating new investigation and study in Project view page
     @investigation = Investigation.new({})
     @study = Study.new({})
 
@@ -101,41 +100,35 @@ class ProjectsController < ApplicationController
     end
   end
 
-  #GET
+  # GET
   def study_shared_with
-    #Passing list of 'Shared with people'
+    # Passing list of 'Shared with people'
     study_id = params[:std_id]
     std_policy_id = Study.find(study_id).policy.id
-    permissions  = Permission.where(policy_id: std_policy_id, contributor_type: 'Person')
-    user_ids=[]
+    permissions = Permission.where(policy_id: std_policy_id, contributor_type: 'Person')
+    user_ids = []
     permissions.each do |perm|
-      user_ids.push(perm.contributor.id) 
+      user_ids.push(perm.contributor.id)
     end
-    sharedwith =[]
-    sharedwith = Person.where(id: user_ids).select("id, CONCAT(first_name,' ',  last_name) as nam")
-  
-    render :json => {people: sharedwith} 
-    
+    shared_with = Person.where(id: user_ids).select("id, CONCAT(first_name,' ',  last_name) as nam")
+    render :json => { people: shared_with }
   end
 
-  #GET
+  # GET
   def investigation_shared_with
-    #Passing list of 'Shared with people'
+    # Passing list of 'Shared with people'
     investigation_id = params[:inv_id]
     inv_policy_id = Investigation.find(investigation_id).policy.id
-    permissions  = Permission.where(policy_id: inv_policy_id, contributor_type: 'Person')
-    user_ids=[]
+    permissions = Permission.where(policy_id: inv_policy_id, contributor_type: 'Person')
+    user_ids = []
     permissions.each do |perm|
-      user_ids.push(perm.contributor.id) 
+      user_ids.push(perm.contributor.id)
     end
-    sharedwith =[]
-    sharedwith = Person.where(id: user_ids).select("id, CONCAT(first_name,' ',  last_name) as nam")
-  
-    render :json => {people: sharedwith} 
-    
+    shared_with = Person.where(id: user_ids).select("id, CONCAT(first_name,' ',  last_name) as nam")
+    render :json => { people: shared_with }
   end
 
-  #/POST /projects/upload_file
+  # /POST /projects/upload_file
   def upload_project_file
     unique_id = SecureRandom.uuid
     new_file = OtherProjectFile.new(uuid: unique_id, title:params[:file].original_filename, description: params[:description]);
@@ -144,23 +137,23 @@ class ProjectsController < ApplicationController
     unless params[:file].nil? && folder_id.nil?
       new_file.default_project_folders_id = folder_id
       path = File.join(Seek::Config.other_project_files_path, unique_id)
-      File.open(path, "wb") { |f| f.write(params[:file].read) }
+      File.open(path, 'wb') { |f| f.write(params[:file].read) }
       if new_file.save
-        return render :json => {message: 'file uploaded!', id: new_file.id}
+        return render :json => { message: 'file uploaded!', id: new_file.id }
       else
-        return render :json => {message: 'file NOT uploaded!'} 
+        return render :json => { message: 'file NOT uploaded!' }
       end
     end
-    render :json => {message: 'Error saving the uploaded file!'}
+    render :json => {message: 'Error saving the uploaded file!' }
   end
 
-   #GET
+  # GET
   def get_file_list
     folder_id = DefaultProjectFolder.where(title: params[:folder]).first().id
     file_list_return =[]
     file_list = Project.find(params[:id]).other_project_files.select{|file| file.default_project_folders_id == folder_id}
     file_list.each do |file|
-      file_list_return.push({name:file.title, id: file.id, extension: File.extname(file.title)})
+      file_list_return.push({ name:file.title, id: file.id, extension: File.extname(file.title)})
     end
     render :json => file_list_return
   end
