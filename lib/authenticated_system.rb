@@ -136,7 +136,7 @@ module AuthenticatedSystem
     authenticate_with_http_token do |api_token, _options|
       return unless api_token.length > 1
 
-      user = User.find_by(api_token: api_token)
+      user = User.from_api_token(api_token)
       sleep 2 if Rails.env.production? && !user # Throttle incorrect login
       user
     end

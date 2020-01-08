@@ -28,6 +28,9 @@
           <li>
             <%= image_tag_for_key "oauth", user_oauth_sessions_path(@person.user), "OAuth Sessions", nil, "OAuth Sessions" -%>
           </li>
+          <li>
+            <%= image_tag_for_key "lock", user_api_tokens_path(@person.user), "API Tokens", nil, "API Tokens" -%>
+          </li>
       <% end -%>
       <% if admin_logged_in? -%>
           <li>

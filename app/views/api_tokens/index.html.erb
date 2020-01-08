@@ -1,0 +1,59 @@
+<%= button_link_to('Return to profile', 'back', person_path(@user.person)) -%>
+
+<h1>API Tokens</h1>
+
+<%= modal(id: 'api-token-form', size: 'm') do %>
+  <%= modal_header("New API Token") %>
+  <%= modal_body do %>
+    <%= form_for [@user, @user.api_tokens.build] do |f| -%>
+      <%= f.error_messages %>
+
+      <div class="form-group">
+        <label>Title</label>
+        <%= f.text_field :title, placeholder: 'Title', class: 'form-control' %>
+        <p class="help-block">Give your token a title to help you remember what it was used for.</p>
+      </div>
+
+      <%= submit_tag 'Create', data: { disable_with: 'Creating...' }, class: 'btn btn-primary' %>
+    <% end -%>
+  <% end %>
+<% end %>
+
+<div class="row">
+  <div class="col-sm-12">
+    <div class="alert alert-info" role="alert">
+      For security reasons, you will only be shown the API token once after generating.
+      If you lose this token, simply generate another.
+      <br/><br/>
+      It is good practice to create a new API token for each application you intend to use it for.
+    </div>
+
+    <div>
+      <%= button_link_to('New API token', 'add', '#', 'data-toggle' => 'modal', 'data-target' => "#api-token-form") -%>
+    </div>
+
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Title</th>
+        <th>Created At</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @api_tokens.each do |api_token| %>
+        <tr>
+          <td><%= api_token.title %></td>
+          <td><%= api_token.created_at %></td>
+          <td>
+            <%= link_to 'Revoke', user_api_token_path(current_user, api_token),
+                        method: :delete,
+                        data: { confirm: 'Are you sure you want to revoke this API token?' },
+                        class: 'btn btn-xs btn-danger' %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

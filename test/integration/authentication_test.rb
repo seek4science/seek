@@ -6,7 +6,8 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
                     login: 'my-user',
                     password: 'my-password',
                     password_confirmation: 'my-password')
-    @user.update_column(:api_token, 'my-api-token')
+    api_token = @user.api_tokens.create!(title: 'my token')
+    @token = api_token.token
     @user.person.update_column(:email, 'my-user@example.com')
 
     @document = Factory(:private_document, contributor: @user.person)
@@ -27,19 +28,10 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   test 'authenticate using API token' do
-    get document_path(@document), headers: { 'Authorization' => token_auth('my-api-token') }
+    get document_path(@document), headers: { 'Authorization' => token_auth(@token) }
 
     assert_response :success
     assert_equal @user.id, session[:user_id]
-  end
-
-  test 'do not authenticate using blank API token' do
-    @user.update_column(:api_token, '')
-
-    get document_path(@document), headers: { 'Authorization' => token_auth('') }
-
-    assert_response :forbidden
-    assert_nil session[:user_id]
   end
 
   test 'authenticate using session' do

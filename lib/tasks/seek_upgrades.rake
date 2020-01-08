@@ -26,8 +26,6 @@ namespace :seek do
     db:seed:publication_types
     convert_old_ldap_settings
     convert_old_elixir_aai_settings
-
-    generate_user_api_tokens
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -395,20 +393,5 @@ namespace :seek do
         Seek::Config.omniauth_elixir_aai_enabled = true
       end
     end
-  end
-
-  task(generate_user_api_tokens: :environment) do
-    count = 0
-
-    disable_authorization_checks do
-      User.where(api_token: nil).find_each do |user|
-        user.generate_api_token
-        user.save!
-
-        count += 1
-      end
-    end
-
-    puts "Generated API tokens for #{count} users" unless count.zero?
   end
 end

@@ -1,8 +1,7 @@
 require 'digest/sha1'
 
 class User < ApplicationRecord
-  MIN_PASSWORD_LENGTH=10
-  API_TOKEN_LENGTH=40
+  MIN_PASSWORD_LENGTH = 10
 
   acts_as_annotation_source
 
@@ -11,8 +10,8 @@ class User < ApplicationRecord
   belongs_to :person
 
   has_many :identities, dependent: :destroy
-
   has_many :oauth_sessions, dependent: :destroy
+  has_many :api_tokens, dependent: :destroy
 
   # restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
@@ -32,7 +31,6 @@ class User < ApplicationRecord
 
   before_save :encrypt_password
   before_create :make_activation_code
-  before_create :generate_api_token
 
   # virtual attribute to hold email used to determine whether this user links to an existing
   attr_accessor :email
@@ -299,8 +297,8 @@ class User < ApplicationRecord
     end
   end
 
-  def generate_api_token
-    self.api_token = self.class.random_api_token
+  def self.from_api_token(token)
+    joins(:api_tokens).where(api_tokens: { encrypted_token: ApiToken.encrypt_token(token) }).first
   end
 
   protected
@@ -349,9 +347,5 @@ class User < ApplicationRecord
 
   def self.random_password
     SecureRandom.urlsafe_base64(MIN_PASSWORD_LENGTH).first(MIN_PASSWORD_LENGTH)
-  end
-
-  def self.random_api_token
-    SecureRandom.urlsafe_base64(API_TOKEN_LENGTH).first(API_TOKEN_LENGTH)
   end
 end

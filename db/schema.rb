@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_07_131352) do
+ActiveRecord::Schema.define(version: 2020_01_08_136137) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -98,6 +98,16 @@ ActiveRecord::Schema.define(version: 2020_01_07_131352) do
     t.index ["attribute_id"], name: "index_annotations_on_attribute_id"
     t.index ["source_type", "source_id"], name: "index_annotations_on_source_type_and_source_id", length: { source_type: 191 }
     t.index ["value_type", "value_id"], name: "index_annotations_on_value_type_and_value_id"
+  end
+
+  create_table "api_tokens",  force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "title"
+    t.string "encrypted_token"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["encrypted_token"], name: "index_api_tokens_on_encrypted_token"
+    t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
   create_table "assay_assets", id: :integer,  force: :cascade do |t|
@@ -1696,8 +1706,6 @@ ActiveRecord::Schema.define(version: 2020_01_07_131352) do
     t.integer "posts_count", default: 0
     t.datetime "last_seen_at"
     t.string "uuid"
-    t.string "api_token"
-    t.index ["api_token"], name: "index_users_on_api_token"
   end
 
   create_table "work_groups", id: :integer,  force: :cascade do |t|

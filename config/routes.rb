@@ -145,10 +145,10 @@ SEEK::Application.routes.draw do
     member do
       put :set_openid
       post :resend_activation_email
-      post :refresh_api_token
     end
     resources :oauth_sessions, only: [:index, :destroy]
     resources :identities, only: [:index, :destroy]
+    resources :api_tokens, only: [:index, :create, :destroy]
   end
 
   resource :session do
