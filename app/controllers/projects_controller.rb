@@ -85,9 +85,9 @@ class ProjectsController < ApplicationController
   # GET /projects/1
   # GET /projects/1.xml
   def show
-    retrieve_project_files
     # Create JStree core data
-    @tree_data = build_tree_data
+    tree_builder = TreeviewBuilder.new @project.other_project_files, @project
+    @tree_data = tree_builder.build_tree_data
     # For creating new investigation and study in Project view page
     @investigation = Investigation.new({})
     @study = Study.new({})
@@ -132,7 +132,7 @@ class ProjectsController < ApplicationController
   def upload_project_file
     unique_id = SecureRandom.uuid
     new_file = OtherProjectFile.new(uuid: unique_id, title:params[:file].original_filename, description: params[:description]);
-    new_file.project.push(Project.find(params[:pid]))
+    new_file.projects.push(Project.find(params[:pid]))
     folder_id = DefaultProjectFolder.where(title: params[:folder]).first().id
     unless params[:file].nil? && folder_id.nil?
       new_file.default_project_folders_id = folder_id
@@ -496,56 +496,4 @@ class ProjectsController < ApplicationController
       false
     end
   end
-  
- 
-
-  def build_tree_data
-    inv,std,prj,asy = Array.new(4) { [] }
-    bold = {'style': 'font-weight:bold'}
-    @project.investigations.each do |investigation|
-       investigation.studies.each do |study| 
-        if study.assays
-          study.assays.each_with_index do |assay, i|
-            asy.push(create_node(assay.title, 'asy',nil, assay.id, bold, true, i==0 ? 'Assay' : nil, nil,
-               [create_node('Methods', 'fld','0')]))
-          end
-          std.push(create_node(study.title, 'std', nil, study.id, bold, true, nil, nil, asy))
-          asy=[]
-        end
-       end
-       inv.push(create_node(investigation.title, 'inv',nil, investigation.id, bold, true, 'Studies', '#', std))
-       std=[]
-    end
-    #Documents folder  
-      chld = [create_node('Presentations', 'fld',f_count('Presentations')), create_node('Slideshows', 'fld', f_count('Slideshows')),
-        create_node('Articles', 'fld',f_count('Articles')), create_node('Posters', 'fld', f_count('Articles'))]
-      inv.unshift(create_node('Documents', nil, nil, nil, nil, true, nil, nil, chld))
-    prj.push(create_node(@project.title, 'prj',nil,  @project.id, bold, true, 'Investigations', '#', inv))
-    JSON[prj]
-  end
-
-  def retrieve_project_files
-    @PFiles = @project.other_project_files
-  end
-
-  def create_node(text, _type, count=nil, _id=nil, a_attr=nil, opened=true, label=nil, action=nil, children=nil)
-    nodes = {text: text, _type: _type, _id: _id, a_attr: a_attr, count: count, 
-      state: tidy_array({opened: opened, separate: tidy_array({label: label, action: action})}), children: children}
-    return  nodes.reject { |k,v| v.nil? }
-  end
-
-  def tidy_array(arr)
-    arr = arr.reject { |k,v| v.nil? }
-    if arr == {}
-      return nil
-    else
-      return arr
-    end
-  end
-
-  def f_count(folder_name)
-    folder_id = DefaultProjectFolder.where(title: folder_name).first().id
-    (@PFiles.select {|file| file.default_project_folders_id == folder_id}).length.to_s
-  end
-
 end
