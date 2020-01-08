@@ -1,0 +1,133 @@
+.separator {
+    border-bottom: 1px solid;
+    border-image-source: linear-gradient(45deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
+    border-image-slice: 1;
+    width: 100%;
+    left: 0;
+    color: #aaa;
+    font-size: 10px;
+    font-weight: normal;
+    float: right;
+    text-align: right;
+    padding-right: 35px;
+    position: absolute;
+    z-index: -1
+}
+
+.big_plus {
+    color: #555;
+    border: none;
+    background-color: white;
+    transition: all .2s ease-in-out;
+    font-size: 22px;
+    cursor: pointer;
+    top: 4px;
+}
+
+.treeaction,
+.treeaction:visited {
+    color: #555;
+    margin-left: 3px;
+    padding: 2px;
+    font-weight: bold;
+    font-size: 10px;
+    border: none;
+    background-color: white;
+    transition: all .2s ease-in-out;
+    text-decoration: none !important;
+    float: right;
+    margin-right: 2px;
+    top: 4px;
+}
+
+.treeaction:hover,
+.big_plus:hover {
+    color: green;
+    text-decoration: none;
+    transform: scale(1.5)
+}
+
+.project_treeview {
+    border: #ddd 1px solid;
+    border-radius: 5px;
+    overflow-x: scroll;
+    min-height: 500px
+}
+
+.simpleForm {
+    background-color: white;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    padding: 15px;
+    border: #ddd solid 1px
+}
+
+.fileManager li {
+    padding-bottom: 10px;
+    text-align: center;
+    width: 110px;
+    word-wrap: break-word;
+    display: table-cell;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.fileManager li img {
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 75px
+}
+
+.fileManager li a {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    z-index: 1;
+}
+
+.fileManager {
+    display: table-row;
+    list-style: none;
+    font-size: 14px;
+    /* font-family: 'Archivo Narrow', sans-serif; */
+    padding: 0;
+}
+
+.tableXs {
+    background-color: white;
+}
+
+.tableXs td {
+    border: 1px #ddd solid
+}
+
+.tableXs th {
+    background-color: #000;
+    color: white;
+    text-align: center
+}
+
+.tableXs tr:nth-child(even) {
+    background: aliceblue
+}
+
+.tableXs tr:nth-child(odd) {
+    background: white
+}
+
+.tableXs th:first-child {
+    border-top-left-radius: 5px
+}
+
+.tableXs th:last-child {
+    border-top-right-radius: 5px
+}
+
+.tableXs td {
+    border-radius: 5px
+}
+
+.file_selected {
+    background-color: aliceblue;
+    color: white
+}
