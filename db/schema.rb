@@ -962,11 +962,13 @@ ActiveRecord::Schema.define(version: 2019_12_03_155950) do
     t.integer "default_project_folders_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["default_project_folders_id"], name: "index_default_project_folders_id"
   end
 
   create_table "other_project_files_projects", id: false,  force: :cascade do |t|
     t.integer "project_id"
     t.integer "other_project_file_id"
+    t.index ["project_id", "other_project_file_id"], name: "index_project_id_other_project_file_id"
   end
 
   create_table "people", id: :integer,  force: :cascade do |t|
