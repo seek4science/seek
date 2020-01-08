@@ -101,34 +101,6 @@ class ProjectsController < ApplicationController
     end
   end
 
-  #POST
-  def update_investigation_permission
-    # item: finding investigation based on investigation id
-    # TODO: authorize user
-    investigation_id = params[:inv_id]
-    @investigation = Investigation.find(investigation_id)    
-    update_sharing_policies @investigation
-      if @investigation.save
-        render :json => {message: 'Permission was successfully updated'} 
-      else
-        render :json => {message: @investigation.errors} 
-      end
-  end
-
-  #POST
-  def update_study_permission
-    # item: finding study based on investigation id
-    # TODO: use determine_asset_from_controller method to authorize user
-    study_id = params[:std_id]
-    study = Study.find(study_id)    
-    update_sharing_policies study
-      if study.save
-        render :json => {message: 'Permission was successfully updated'} 
-      else
-        render :json => {message: study.errors} 
-      end
-  end
-
   #GET
   def study_shared_with
     #Passing list of 'Shared with people'

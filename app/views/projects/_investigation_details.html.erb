@@ -21,41 +21,58 @@
        $j('#submit_btn').on('click', e => {
            let people = $j('#investigation-permission-people-ids').tagsinput('items');
            let pid = <%= params[:id] %>
-               let url = pid + '/update_investigation_permission';
            let inv_id = $j("#selected_item_id").val()
            if (!inv_id) return
+           let url = `/investigations/${inv_id}`;
            let data = {
-               inv_id,
-               'investigation': {
-                   'project_ids': pid //We need to update the permissions of the investigation of current project only
-               },
-               'policy_attributes': {
-                   'access_type': '0',
-                   'permissions_attributes': [{
-                       'contributor_type': 'Project',
-                       'contributor_id': pid
-                   }]
+               "data": {
+                   "type": "investigations",
+                   "id": inv_id,
+                   "attributes": {
+                       "policy": {
+                           "access": "download",
+                           "permissions": []
+                       }
+                   }
                }
            }
            people.forEach(function (person, index) {
-               data.policy_attributes.permissions_attributes.push({
-                   'contributor_type': 'Person',
-                   'contributor_id': person.id,
-                   'access_type': parseInt($j('#permission-people-access-type').val())
+               data.data.attributes.policy.permissions.push({
+                   'resource': {
+                       'id': person.id,
+                       'type': 'people'
+                   },
+                   'access': get_permission(parseInt($j('#permission-people-access-type')
+                   .val()))
                })
            });
            $j.ajax({
-               type: 'POST',
+               method: 'PUT',
+               "headers": {
+                   "Content-Type": "application/json",
+                   "Accept": "application/json"
+               },
                url,
-               data,
+               data: JSON.stringify(data),
                success: s => {
-                   alert(s.message)
+                   alert('Sharing policy updated successfully!')
                },
                error: (e) => {
-                   console.log(e)
-                   alert('Error')
+                   alert('error!')
                }
            })
        });
 
+       function get_permission(permission) {
+           switch (permission) {
+               case 0:
+                   return 'no_access'
+               case 1:
+                   return 'view'
+               case 3:
+                   return 'edit'
+               case 4:
+                   return 'manage'
+           }
+       }
    </script>
