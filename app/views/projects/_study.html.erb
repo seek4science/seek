@@ -44,37 +44,77 @@
         $j('#study_permission_submit_btn').on('click', e => {
             let people = $j('#study-permission-people-ids').tagsinput('items');
             let pid = <%= params[:id] %>
-                let url = pid + '/update_study_permission';
+            // let url = pid + '/update_study_permission';
             let std_id = $j("#selected_item_id").val()
             if (!std_id) return
+            let url = `/studies/${std_id}`;
+
+            // let data = {
+            //     std_id,
+            //     'policy_attributes': {
+            //         'access_type': '0',
+            //         'permissions_attributes': [{
+            //             'contributor_type': 'Project',
+            //             'contributor_id': pid
+            //         }]
+            //     }
+            // }
             let data = {
-                std_id,
-                'policy_attributes': {
-                    'access_type': '0',
-                    'permissions_attributes': [{
-                        'contributor_type': 'Project',
-                        'contributor_id': pid
-                    }]
-                }
-            }
-            people.forEach(function (person, index) {
-                data.policy_attributes.permissions_attributes.push({
-                    'contributor_type': 'Person',
-                    'contributor_id': person.id,
-                    'access_type': parseInt($j('#permission-people-access-type').val())
-                })
-            });
-            $j.ajax({
-                type: 'POST',
-                url,
-                data,
-                success: s => {
-                    alert(s.message)
-                },
-                error: (e) => {
-                    console.log(e)
-                    alert('Error')
-                }
-            })
+               "data": {
+                   "type": "studies",
+                   "id": std_id,
+                   "attributes": {
+                       "policy": {
+                           "access": "download",
+                           "permissions": []
+                       }
+                   }
+               }
+           }
+            // people.forEach(function (person, index) {
+            //     data.policy_attributes.permissions_attributes.push({
+            //         'contributor_type': 'Person',
+            //         'contributor_id': person.id,
+            //         'access_type': parseInt($j('#permission-people-access-type').val())
+            //     })
+            // });
+             people.forEach(function (person, index) {
+               data.data.attributes.policy.permissions.push({
+                   'resource': {
+                       'id': person.id,
+                       'type': 'people'
+                   },
+                   'access': get_permission(parseInt($j('#permission-people-access-type')
+                   .val()))
+               })
+           });
+            // $j.ajax({
+            //     type: 'POST',
+            //     url,
+            //     data,
+            //     success: s => {
+            //         alert(s.message)
+            //     },
+            //     error: (e) => {
+            //         console.log(e)
+            //         alert('Error')
+            //     }
+            // })
+
+             $j.ajax({
+               method: 'PATCH',
+               "headers": {
+                   "Content-Type": "application/json",
+                   "Accept": "application/json"
+               },
+               url,
+               data: JSON.stringify(data),
+               success: s => {
+                   alert('Sharing policy updated successfully!')
+               },
+               error: (e) => {
+                   alert('error!')
+               }
+           })
         });
     </script>
