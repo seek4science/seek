@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :is_current_user_auth, only: %i[edit update refresh_api_token]
+  before_action :is_current_user_auth, only: %i[edit update]
   before_action :is_user_admin_auth, only: %i[impersonate resend_activation_email destroy]
 
   skip_before_action :restrict_guest_user
@@ -173,16 +173,6 @@ class UsersController < ApplicationController
     else
       flash[:error] = 'User not found'
       redirect_to admin_path
-    end
-  end
-
-  def refresh_api_token
-    @user.generate_api_token
-    @user.save!
-
-    respond_to do |format|
-      flash[:notice] = 'API token refreshed'
-      format.html { redirect_to(edit_user_path(@user)) }
     end
   end
 
