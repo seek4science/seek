@@ -12,7 +12,7 @@ module AuthenticatedSystem
     if defined? @current_user
       @current_user
     else
-      self.current_user = (user_from_session || user_from_basic_auth || user_from_cookie || user_from_api_token || User.guest)
+      self.current_user = (user_from_session || user_from_basic_auth || user_from_cookie || user_from_api_token || user_from_doorkeeper || User.guest)
     end
   end
 
@@ -139,6 +139,13 @@ module AuthenticatedSystem
       user = User.from_api_token(api_token)
       sleep 2 if Rails.env.production? && !user # Throttle incorrect login
       user
+    end
+  end
+
+  # Is the user authenticated through an OAuth application?
+  def user_from_doorkeeper
+    if doorkeeper_token
+      User.find(doorkeeper_token.resource_owner_id)
     end
   end
 end

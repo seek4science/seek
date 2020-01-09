@@ -12,6 +12,17 @@ class User < ApplicationRecord
   has_many :identities, dependent: :destroy
   has_many :oauth_sessions, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
+  # Doorkeeper-related
+  has_many :access_grants,
+           class_name: "Doorkeeper::AccessGrant",
+           foreign_key: :resource_owner_id,
+           dependent: :destroy
+  has_many :access_tokens,
+           class_name: "Doorkeeper::AccessToken",
+           foreign_key: :resource_owner_id,
+           dependent: :destroy
+  has_many :oauth_applications,
+           class_name: "Doorkeeper::Application"
 
   # restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
