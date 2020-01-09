@@ -12,7 +12,15 @@
 
     <div class="form-group">
       <label>Your token is</label>
-      <%= text_field_tag nil, @api_token.token, readonly: 'readonly', class: 'form-control' %>
+      <div class="input-group">
+        <%= text_field_tag 'token', @api_token.token, readonly: 'readonly', class: 'form-control' %>
+        <span class="input-group-btn">
+          <button class="btn-default btn clipboard-btn" data-clipboard-target="#token">
+            <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
+            Copy
+          </button>
+        </span>
+      </div>
     </div>
 
     <%= link_to('Back to API tokens', user_api_tokens_path, class: 'btn btn-default') %>

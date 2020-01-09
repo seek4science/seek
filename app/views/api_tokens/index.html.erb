@@ -5,6 +5,10 @@
 <%= modal(id: 'api-token-form', size: 'm') do %>
   <%= modal_header("New API Token") %>
   <%= modal_body do %>
+    <div class="alert alert-warning" role="alert">
+      For security reasons, you will only be shown your API token once after clicking "Create".
+      If you lose this token, you will have to generate another and update your code.
+    </div>
     <%= form_for [@user, @user.api_tokens.build] do |f| -%>
       <%= f.error_messages %>
 
@@ -20,11 +24,10 @@
 <% end %>
 
 <div class="row">
-  <div class="col-sm-12">
+  <div class="col-md-8">
     <div class="alert alert-info" role="alert">
-      For security reasons, you will only be shown the API token once after generating.
-      If you lose this token, simply generate another.
-      <br/><br/>
+      API tokens can be used to authenticate you when performing API requests.<br/>
+      Pass it into the <code>Authorization</code> header in the form: <code>Authorization: Token <em>your_token_here</em></code><br/>
       It is good practice to create a new API token for each application you intend to use it for.
     </div>
 
