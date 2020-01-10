@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_03_155950) do
+ActiveRecord::Schema.define(version: 2020_01_09_125937) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1614,6 +1614,14 @@ ActiveRecord::Schema.define(version: 2019_12_03_155950) do
     t.boolean "can_delete", default: false
     t.index ["user_id", "asset_id", "can_view"], name: "index_study_auth_lookup_on_user_id_and_asset_id_and_can_view"
     t.index ["user_id", "can_view"], name: "index_study_auth_lookup_on_user_id_and_can_view"
+  end
+
+  create_table "study_designs",  force: :cascade do |t|
+    t.integer "study_id"
+    t.text "data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["study_id"], name: "index_study_id"
   end
 
   create_table "subscriptions", id: :integer,  force: :cascade do |t|

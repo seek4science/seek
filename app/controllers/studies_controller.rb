@@ -78,6 +78,9 @@ class StudiesController < ApplicationController
     update_relationships(@study, params)
     ### TO DO: what about validation of person responsible? is it already included (for json?)
     if @study.save
+      # create a record in study_designs table
+      study_design = StudyDesign.new(:study_id => @study.id)
+      study_design.save
       respond_to do |format|
         flash[:notice] = "The #{t('study')} was successfully created.<br/>".html_safe
         if params[:redirect]

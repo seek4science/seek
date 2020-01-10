@@ -21,6 +21,7 @@ class Study < ApplicationRecord
   has_many :assays
   has_many :assay_publications, through: :assays, source: :publications
   has_one :external_asset, as: :seek_entity, dependent: :destroy
+  belongs_to :study_design
 
   belongs_to :person_responsible, :class_name => "Person"
 
