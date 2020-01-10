@@ -1,0 +1,53 @@
+<%= form_for application, url: doorkeeper_submit_path(application), html: { role: 'form' } do |f| %>
+  <% if application.errors.any? %>
+    <div class="alert alert-danger" data-alert><p><%= t('doorkeeper.applications.form.error') %></p></div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :name %>
+    <%= f.text_field :name, class: "form-control #{ 'is-invalid' if application.errors[:name].present? }", required: true %>
+    <%= doorkeeper_errors_for application, :name %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :redirect_uri %>
+    <%= f.text_area :redirect_uri, class: "form-control #{ 'is-invalid' if application.errors[:redirect_uri].present? }" %>
+    <%= doorkeeper_errors_for application, :redirect_uri %>
+    <p class="help-block">
+      <%= t('doorkeeper.applications.help.redirect_uri') %>
+    </p>
+
+    <% if Doorkeeper.configuration.allow_blank_redirect_uri?(application) %>
+      <p class="help-block">
+        <%= t('doorkeeper.applications.help.blank_redirect_uri') %>
+      </p>
+    <% end %>
+  </div>
+
+  <div class="form-group">
+    <div class="checkbox">
+      <label>
+        <%= f.check_box :confidential, class: "checkbox #{ 'is-invalid' if application.errors[:confidential].present? }" %>
+        Confidential?
+      </label>
+    </div>
+    <%= doorkeeper_errors_for application, :confidential %>
+    <p class="help-block">
+      <%= t('doorkeeper.applications.help.confidential') %>
+    </p>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :scopes %>
+    <%= f.text_field :scopes, class: "form-control #{ 'has-error' if application.errors[:scopes].present? }" %>
+    <%= doorkeeper_errors_for application, :scopes %>
+    <p class="help-block">
+      <%= t('doorkeeper.applications.help.scopes') %>
+    </p>
+  </div>
+
+  <div class="form-group">
+    <%= f.submit t('doorkeeper.applications.buttons.submit'), class: 'btn btn-primary' %> or
+    <%= link_to t('doorkeeper.applications.buttons.cancel'), oauth_applications_path, class: 'btn btn-default' %>
+  </div>
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_09_135025) do
+ActiveRecord::Schema.define(version: 2020_01_10_140905) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -960,14 +960,15 @@ ActiveRecord::Schema.define(version: 2020_01_09_135025) do
     t.string "name", null: false
     t.string "uid", null: false
     t.string "secret", null: false
-    t.bigint "user_id"
     t.text "redirect_uri", null: false
     t.string "scopes", default: "", null: false
     t.boolean "confidential", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "owner_id"
+    t.string "owner_type"
+    t.index ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type"
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
-    t.index ["user_id"], name: "index_oauth_applications_on_user_id"
   end
 
   create_table "oauth_sessions", id: :integer,  force: :cascade do |t|

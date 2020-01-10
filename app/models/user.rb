@@ -22,7 +22,8 @@ class User < ApplicationRecord
            foreign_key: :resource_owner_id,
            dependent: :destroy
   has_many :oauth_applications,
-           class_name: "Doorkeeper::Application"
+           class_name: "Doorkeeper::Application",
+           as: :owner
 
   # restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password

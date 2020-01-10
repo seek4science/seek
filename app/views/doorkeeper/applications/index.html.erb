@@ -1,0 +1,38 @@
+<% content_for(:buttons) do %>
+  <%= button_link_to(t('.new'), 'add', new_oauth_application_path) %>
+<% end -%>
+
+<%= render partial: 'general/page_title', locals: { title: t('.title') } %>
+
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th><%= t('.name') %></th>
+    <th><%= t('.callback_url') %></th>
+    <th><%= t('.confidential') %></th>
+    <th><%= t('.actions') %></th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @applications.each do |application| %>
+    <tr>
+      <td>
+        <%= link_to application.name, oauth_application_path(application) %>
+      </td>
+      <td>
+        <%= simple_format(application.redirect_uri) %>
+      </td>
+      <td>
+        <%= application.confidential? ? t('doorkeeper.applications.index.confidentiality.yes') : t('doorkeeper.applications.index.confidentiality.no') %>
+      </td>
+      <td>
+        <%= link_to t('doorkeeper.applications.buttons.edit'), edit_oauth_application_path(application), class: 'btn btn-xs btn-default' %>
+        <%= link_to t('doorkeeper.applications.buttons.destroy'), oauth_application_path(application),
+                    method: :delete,
+                    data: { confirm: "Are you sure you wish to delete this application?" },
+                    class: 'btn btn-xs btn-danger' %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
