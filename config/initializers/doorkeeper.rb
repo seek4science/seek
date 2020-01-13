@@ -7,7 +7,15 @@ Doorkeeper.configure do
 
   # This block will be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do
-    current_user
+    if current_user
+      current_user
+    else
+      session[:return_to] = request.fullpath # This will be the authorization path i.e. /oauth/authorize?client_id=...
+                                             # The user will be redirected here after successfully authenticating.
+      redirect_to(login_path)
+      nil
+    end
+
   end
 
   # If you didn't skip applications controller from Doorkeeper routes in your application routes.rb

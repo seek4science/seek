@@ -72,19 +72,20 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_equal @user.id, session[:user_id]
   end
 
-  test 'authenticate using doorkeeper with token in header' do
-    oauth_access_token = Factory(:oauth_access_token, resource_owner_id: @user.id)
+  test 'do not authenticate using doorkeeper with expired token' do
+    oauth_access_token = Factory(:oauth_access_token, resource_owner_id: @user.id, created_at: 3.years.ago)
 
     get document_path(@document), headers: { 'Authorization' => bearer_auth(oauth_access_token.token) }
 
-    assert_response :success
-    assert_equal @user.id, session[:user_id]
+    assert_response :unauthorized
+    assert_nil session[:user_id]
   end
+
 
   private
 
   def token_auth(token)
-    ActionController::HttpAuthentication::Token.encode_credentials(token)
+    "Token #{token}"
   end
 
   def bearer_auth(token)

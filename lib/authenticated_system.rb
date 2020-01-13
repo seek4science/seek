@@ -144,7 +144,7 @@ module AuthenticatedSystem
 
   # Is the user authenticated through an OAuth application?
   def user_from_doorkeeper
-    if doorkeeper_token
+    if doorkeeper_token&.accessible?
       User.find(doorkeeper_token.resource_owner_id)
     end
   end

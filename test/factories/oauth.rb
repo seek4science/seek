@@ -7,6 +7,6 @@ end
 
 Factory.define(:oauth_access_token, class: Doorkeeper::AccessToken) do |f|
   f.association :application, factory: :oauth_application
-  f.expires_in { 2.weeks.from_now }
+  f.expires_in 3600
   f.scopes 'read'
 end
