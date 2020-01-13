@@ -26,7 +26,7 @@ class ApiExamplesTest < ActiveSupport::TestCase
     end
   end
 
-  examples_path = File.join(Rails.root, 'test', 'examples')
+  examples_path = File.join(Rails.root, 'public', 'api', 'examples')
 
     Dir.foreach(examples_path) do |item|
       next if item == '.' or item == '..'
