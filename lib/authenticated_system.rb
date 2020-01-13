@@ -12,7 +12,7 @@ module AuthenticatedSystem
     if defined? @current_user
       @current_user
     else
-      self.current_user = (user_from_session || user_from_basic_auth || user_from_cookie || user_from_api_token || user_from_doorkeeper || User.guest)
+      self.current_user = (user_from_session || user_from_doorkeeper  || user_from_basic_auth || user_from_cookie || user_from_api_token || User.guest)
     end
   end
 

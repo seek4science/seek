@@ -25,6 +25,8 @@ class PeopleController < ApplicationController
 
   protect_from_forgery only: []
 
+  api_actions :index, :show, :create, :update, :destroy, :current
+
   # GET /people/1
   # GET /people/1.xml
   def show

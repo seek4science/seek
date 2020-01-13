@@ -28,6 +28,7 @@ class ApplicationController < ActionController::Base
 
   before_action :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
 
+  before_action :check_doorkeeper_scopes, if: :doorkeeper_token
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
   before_action :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
 
@@ -129,6 +130,10 @@ class ApplicationController < ActionController::Base
   end
 
   helper_method :controller_model
+
+  def self.api_actions(*actions)
+    @api_actions ||= (superclass.respond_to?(:api_actions) ? superclass.api_actions.dup : []) + actions.map(&:to_sym)
+  end
 
   private
 
@@ -544,5 +549,20 @@ class ApplicationController < ActionController::Base
 
   def param_converter_options
     {}
+  end
+
+  def check_doorkeeper_scopes
+    if self.class.api_actions.include?(action_name.to_sym)
+      privilege = Seek::Permissions::Translator.translate(action_name)
+      scopes = [:view, :download].include?(privilege) ? [:read, :write] : [:write]
+      doorkeeper_authorize!(*scopes)
+    else
+      respond_to do |format|
+        format.html { render plain: 'This action is not permitted for API clients using OAuth.', status: :forbidden }
+        format.json { render json: {
+            errors: [{ title: 'Forbidden',
+                       details: 'This action is not permitted for API clients using OAuth.' }] }, status: :forbidden }
+      end
+    end
   end
 end
