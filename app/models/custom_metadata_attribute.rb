@@ -1,6 +1,6 @@
 class CustomMetadataAttribute < ApplicationRecord
-
   belongs_to :sample_attribute_type
+  belongs_to :custom_metadata_type
 
   def validate_value?(value)
     return false if required? && value.blank?
@@ -11,6 +11,5 @@ class CustomMetadataAttribute < ApplicationRecord
     title.parameterize.underscore
   end
 
-  alias_method :accessor_name, :hash_key
-
+  alias accessor_name hash_key
 end

@@ -39,11 +39,14 @@ class CustomMetadataTest < ActiveSupport::TestCase
   private
 
   def simple_test_object
-    cm = CustomMetadata.new(item: Factory(:investigation))
-    cm.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: Factory(:integer_sample_attribute_type))
-    cm.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: Factory(:string_sample_attribute_type))
-    cm.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: Factory(:datetime_sample_attribute_type))
-    cm
+    cmt = CustomMetadataType.new(title: 'test metadata', supported_type:'Investigation')
+    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: Factory(:integer_sample_attribute_type))
+    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: Factory(:string_sample_attribute_type))
+    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: Factory(:datetime_sample_attribute_type))
+    cmt
+
+    CustomMetadata.new(custom_metadata_type: cmt, item: Factory(:investigation))
+
   end
 
 end
