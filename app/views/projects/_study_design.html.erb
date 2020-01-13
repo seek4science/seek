@@ -231,7 +231,7 @@
         }
         data.replicates = get_table_JSON(".reptable", item_structure, [])
         data.design_of_experiment = {
-            "item": $j("#expDesign option:selected").html(),
+            "item": $j("#expDesign option:selected").val(),
             "description": $j("#experiment_design_desc").val()
         }
         return data
@@ -314,7 +314,7 @@
             let temp = data.replicates[key]
             add_rep('.reptable', temp)
         }
-        $j("#expDesignd").val(data.design_of_experiment.item)
+        $j("#expDesign").val(data.design_of_experiment.item)
         $j("#experiment_design_desc").val(data.design_of_experiment.description)
 
     }
