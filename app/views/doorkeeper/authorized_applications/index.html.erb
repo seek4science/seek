@@ -16,7 +16,7 @@
     <% @applications.each do |application| %>
       <tr>
         <td><%= application.name %></td>
-        <td><%= link_to(application.user.person.name, application.user, target: :_blank) %></td>
+        <td><%= link_to(application.owner.person.name, application.owner, target: :_blank) %></td>
         <td><%= application.created_at.strftime(t('doorkeeper.authorized_applications.index.date_format')) %></td>
         <td>
           <%= link_to t('doorkeeper.authorized_applications.buttons.revoke'),
