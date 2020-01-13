@@ -8,8 +8,7 @@ class ApiExamplesTest < ActiveSupport::TestCase
   require 'yaml'
 
   def definitions_path
-    File.join(Rails.root, 'public', '2010', 'json', 'rest',
-              'definitions.json')
+    File.join(Rails.root, 'public', 'api', 'definitions.json')
   end
 
   def validate_json_against_fragment (item, json, fragment)
