@@ -23,40 +23,38 @@
   <% end %>
 <% end %>
 
-<div class="row">
-  <div class="col-md-8">
-    <div class="alert alert-info" role="alert">
-      API tokens can be used to authenticate you when performing API requests.<br/>
-      Pass it into the <code>Authorization</code> header in the form: <code>Authorization: Token <em>your_token_here</em></code><br/>
-      It is good practice to create a new API token for each application you intend to use it for.
-    </div>
-
-    <div>
-      <%= button_link_to('New API token', 'add', '#', 'data-toggle' => 'modal', 'data-target' => "#api-token-form") -%>
-    </div>
-
-    <table class="table">
-      <thead>
-      <tr>
-        <th>Title</th>
-        <th>Created At</th>
-        <th>Actions</th>
-      </tr>
-      </thead>
-      <tbody>
-      <% @api_tokens.each do |api_token| %>
-        <tr>
-          <td><%= api_token.title %></td>
-          <td><%= api_token.created_at %></td>
-          <td>
-            <%= link_to 'Revoke', user_api_token_path(current_user, api_token),
-                        method: :delete,
-                        data: { confirm: 'Are you sure you want to revoke this API token?' },
-                        class: 'btn btn-xs btn-danger' %>
-          </td>
-        </tr>
-      <% end %>
-      </tbody>
-    </table>
-  </div>
+<div class="alert alert-info" role="alert">
+  API tokens can be used to authenticate you when performing API requests.<br/>
+  Pass it into the <code>Authorization</code> header in the form: <code>Authorization: Token <em>your_token_here</em></code><br/><br/>
+  API tokens should be kept confidential and used for testing and developing personal scripts.
+  If you are developing an application for other <%= Seek::Config.application_name %> users to interact with,
+  consider <%= link_to 'registering an OAuth application', oauth_applications_path %>.
 </div>
+
+<div>
+  <%= button_link_to('New API token', 'add', '#', 'data-toggle' => 'modal', 'data-target' => "#api-token-form") -%>
+</div>
+
+<table class="table">
+  <thead>
+  <tr>
+    <th>Title</th>
+    <th>Created At</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @api_tokens.each do |api_token| %>
+    <tr>
+      <td><%= api_token.title %></td>
+      <td><%= api_token.created_at %></td>
+      <td>
+        <%= link_to 'Revoke', user_api_token_path(current_user, api_token),
+                    method: :delete,
+                    data: { confirm: 'Are you sure you want to revoke this API token?' },
+                    class: 'btn btn-xs btn-danger' %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

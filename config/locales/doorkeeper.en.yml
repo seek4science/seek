@@ -38,7 +38,7 @@ en:
       edit:
         title: 'Edit application'
       index:
-        title: 'Your applications'
+        title: 'API Applications'
         new: 'New Application'
         name: 'Name'
         callback_url: 'Callback URL'
@@ -77,7 +77,7 @@ en:
       buttons:
         revoke: 'Revoke'
       index:
-        title: 'Your authorized applications'
+        title: 'Authorized Applications'
         application: 'Application'
         created_at: 'Created At'
         date_format: '%Y-%m-%d %H:%M:%S'
@@ -143,5 +143,5 @@ en:
       application:
         title: 'OAuth authorization required'
     scopes:
-      read: 'Read'
-      write: 'Write'
+      read: 'Read data and metadata (including that of private resources)'
+      write: 'Create, modify and delete data and metadata'
