@@ -225,7 +225,7 @@
     })
     .jstree({
       'core': {
-        'data': <%= @tree_data.html_safe %>
+        'data': <%=@tree_data.html_safe%>
       },
       plugins: ["separate"]
     });
@@ -248,7 +248,7 @@
 
   $j(document).ready(function () {
     let pid = <%= params[:id] %>
-    let uid = <%= current_user.id if current_user %>
+      let uid = <%= current_user.id if current_user %>
       $j("a:contains('Cancel')").click(function (e) {
         e.preventDefault();
         $j('#data-file-modal-inv').modal('hide');
@@ -262,7 +262,7 @@
       append_Form("policy_attributes[permissions_attributes][0][contributor_type]", "Project", f)
       append_Form("policy_attributes[permissions_attributes][0][contributor_id]", pid, f)
       //TO_DO: set current Project access type:
-      append_Form("policy_attributes[permissions_attributes][0][access_type]", "2", f) 
+      append_Form("policy_attributes[permissions_attributes][0][access_type]", "2", f)
       append_Form("redirect", "false", f)
       f.submit()
     })
@@ -292,26 +292,65 @@
   }
 
   function populate_tags(item_id, item_type) {
-           //Populate the tags input with list of 'Shared with people'
-           let pid = <%= params[:id] %>
-               let geturl = item_type == 'inv' ? '/investigation_shared_with?inv_id=' : '/study_shared_with?std_id='
-           let tag_input = item_type == 'inv' ? '#investigation-permission-people-ids' : '#study-permission-people-ids'
-           $j.ajax({
-               type: 'GET',
-               url: pid + geturl + item_id,
-               success: s => {
-                   if (s.people)
-                       $j(tag_input).tagsinput('removeAll');
-                   s.people.map((person) => {
-                       $j(tag_input).tagsinput('add', {
-                           id: person.id,
-                           name: person.nam
-                       })
-                   })
-               },
-               error: e => {
-                   alert("Error retrieving investigation sharing list")
-               }
-           })
-       }
+    //Populate the tags input with list of 'Shared with people'
+    let pid = <%=params[:id]%>
+      let geturl = item_type == 'inv' ? '/investigation_shared_with?inv_id=' : '/study_shared_with?std_id='
+    let tag_input = item_type == 'inv' ? '#investigation-permission-people-ids' : '#study-permission-people-ids'
+    $j.ajax({
+      type: 'GET',
+      url: pid + geturl + item_id,
+      success: s => {
+        if (s.people)
+          $j(tag_input).tagsinput('removeAll');
+        s.people.map((person) => {
+          $j(tag_input).tagsinput('add', {
+            id: person.id,
+            name: person.nam
+          })
+        })
+        if (item_type == 'inv') get_investigation()
+        else get_study()
+      },
+      error: e => {
+        alert("Error retrieving investigation sharing list")
+      }
+    })
+  }
+
+  function get_study() {
+    $j.ajax({
+      method: 'GET',
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      url: `/studies/${$j("#selected_item_id").val()}`,
+      success: s => {
+        $j('#studytitleContent').text(s.data.attributes.title)
+        $j('#StudyDescriptionContent').text(s.data.attributes.description)
+        $j('#experimentalists').text(s.data.attributes.experimentalists)
+      },
+      error: (e) => {
+        console.log('error gettign study!')
+      }
+    })
+  }
+
+  function get_investigation() {
+    $j.ajax({
+      method: 'GET',
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      url: `/investigations/${$j("#selected_item_id").val()}`,
+      success: s => {
+        $j('#investigationTitleC').text(s.data.attributes.title)
+        $j('#investigationDesC').text(s.data.attributes.description)
+      },
+      error: (e) => {
+        console.log('error gettign investigation!')
+      }
+    })
+  }
 </script>

@@ -10,12 +10,10 @@
         <div class="tab-content">
             <div id="details" class="tab-pane fade in active" style="padding:10px">
                 <p id="title"><strong style="text-align: center;">Title:</strong> <span
-                        id="studytitleContent">Transcriptomics</span></p>
-                <p id="description"> <strong>Description:</strong> <span id="StudyDescriptionContent">How temperature
-                        affects gene expression</span> </p>
-                <p><strong>Hypothesis: </strong> <span id="Hypothesis">Warm temperature affect pathogenicity
-                        genes</span></p>
-                <p><strong>Experimentalists: </strong> experimentalists description</p>
+                        id="studytitleContent"></span></p>
+                <p id="description"> <strong>Description:</strong> <span id="StudyDescriptionContent"></span> </p>
+                <p><strong>Hypothesis: </strong> <span id="Hypothesis"></span></p>
+                <p><strong>Experimentalists: </strong> <span id="experimentalists"></span></p>
                 <div class="form-group">
                     <label>The following people...</label>
                     <%= objects_input('study-permission-people-ids', [], typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.typeahead_hint } } }, name: nil) -%>

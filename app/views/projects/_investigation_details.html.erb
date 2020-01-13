@@ -1,7 +1,7 @@
    <div class="simpleForm">
        <p id="investigationTitle"><strong style="text-align: center;">Title:</strong> <span
-               id="investigationTitleC">Investigation</span></p>
-       <p id="investigationDes"> <strong>Description:</strong> <span id="investigationDesC">inv content</span> </p>
+               id="investigationTitleC"></span></p>
+       <p id="investigationDes"> <strong>Description:</strong> <span id="investigationDesC"></span> </p>
        <div class="form-group">
            <label>The following people...</label>
            <%= objects_input('investigation-permission-people-ids', [], typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.typeahead_hint } } }, name: nil) -%>
