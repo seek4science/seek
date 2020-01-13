@@ -158,6 +158,23 @@ class ProjectsController < ApplicationController
     render :json => file_list_return
   end
 
+  # PATCH
+  def update_study_design
+    study_design = StudyDesign.find(params[:std_id])
+    study_design.data = params[:data]
+    if study_design.save
+      return render :json => { message: 'Study design was updated!' }
+    else
+      return render :json => { message: 'Error updating study design' }
+    end
+  end
+
+  # Get
+  def get_study_design
+    study_design = StudyDesign.find(params[:std_id])
+    return render :json => { data: study_design.data }
+  end
+
   # GET /projects/new
   # GET /projects/new.xml
   def new

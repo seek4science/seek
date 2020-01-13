@@ -216,6 +216,8 @@ SEEK::Application.routes.draw do
       get :study_shared_with
       post :upload_project_file
       get :get_file_list
+      patch :update_study_design
+      get :get_study_design
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:search,:organisms,:documents, :only=>[:index]
