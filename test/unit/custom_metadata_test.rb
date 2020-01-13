@@ -36,6 +36,22 @@ class CustomMetadataTest < ActiveSupport::TestCase
     assert cm.valid?
   end
 
+  test 'mass assign data' do
+    cm = simple_test_object
+    date = Time.now.to_s
+    refute cm.valid?
+    cm.update_attributes(data: { name: 'Fred', age: 25, date:date })
+    assert cm.valid?
+    assert_equal 'Fred',cm.get_attribute_value('name')
+    assert_equal 25,cm.get_attribute_value('age')
+    assert_equal date,cm.get_attribute_value('date')
+
+    # also handles symbols
+    assert_equal 'Fred',cm.get_attribute_value(:name)
+    assert_equal 25,cm.get_attribute_value(:age)
+    assert_equal date,cm.get_attribute_value(:date)
+  end
+
   private
 
   def simple_test_object

@@ -13,7 +13,7 @@ class CustomMetadataType < ApplicationRecord
     valid = true
     begin
       clz = supported_type.constantize
-      # TODO: in the future to check it is a support active record type
+      # TODO: in the future to check it is a supported active record type
       valid = clz.ancestors.include?(ActiveRecord::Base)
     rescue NameError
       valid = false

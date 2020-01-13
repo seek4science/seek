@@ -11,13 +11,17 @@ class CustomMetadata < ApplicationRecord
   def get_attribute_value(attr)
     attr = attr.accessor_name if attr.is_a?(CustomMetadataAttribute)
 
-    data[attr]
+    data[attr.to_s]
   end
 
   def set_attribute_value(attr, value)
     attr = attr.accessor_name if attr.is_a?(CustomMetadataAttribute)
 
     data[attr] = value
+  end
+
+  def data=(hash)
+    @data = HashWithIndifferentAccess.new(hash)
   end
 
   def data
@@ -34,7 +38,7 @@ class CustomMetadata < ApplicationRecord
     if json_metadata
       JSON.parse(json_metadata)
     else
-      Hash[custom_metadata_attributes.map { |attr| [attr.title, nil] }]
+      HashWithIndifferentAccess[custom_metadata_attributes.map { |attr| [attr.title, nil] }]
     end
   end
 
