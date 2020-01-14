@@ -184,6 +184,7 @@
   $j(document).ready(function () {
     hide_all_containers()
     $j("#projectDetailContainer").show()
+    get_project()
   })
 
   function hide_all_containers() {
@@ -347,6 +348,24 @@
       success: s => {
         $j('#investigationTitleC').text(s.data.attributes.title)
         $j('#investigationDesC').text(s.data.attributes.description)
+      },
+      error: (e) => {
+        console.log('error gettign investigation!')
+      }
+    })
+  }
+
+  function get_project() {
+    $j.ajax({
+      method: 'GET',
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      url: `/projects/${<%=params[:id]%>}`,
+      success: s => {
+        $j('#projectTitleC').text(s.data.attributes.title)
+        $j('#projectDesC').text(s.data.attributes.description)
       },
       error: (e) => {
         console.log('error gettign investigation!')
