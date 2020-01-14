@@ -11,6 +11,9 @@ class Investigation < ApplicationRecord
 
   validates :projects, presence: true, projects: { self: true }
 
+  has_one :custom_metadata, as: :item
+  accepts_nested_attributes_for :custom_metadata
+
   def state_allows_delete?(*args)
     studies.empty? && super
   end

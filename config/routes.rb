@@ -292,6 +292,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :items_for_result
+      get :custom_metadata_fields
     end
     resources :people,:projects,:assays,:studies,:models,:sops,:workflows, :nodes,:data_files,:publications, :documents, :only=>[:index]
     resources :snapshots, :only => [:show, :new, :create, :destroy] do

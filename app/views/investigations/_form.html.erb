@@ -12,10 +12,49 @@
 
 <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? -%>
 
-<%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales?%>
+<%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales? %>
 
 <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
+<!-- custom metadata experimental -->
+<%= folding_panel('Custom metadata', false) do %>
+
+  <%= f.fields_for(:custom_metadata_attributes) do |f| %>
+    Metadata fields: <%= f.collection_select(:custom_metadata_type_id,CustomMetadataType.where(supported_type:'Investigation'), :id, :title, {prompt:'Select'},{class:"form-control"}) %>
+
+    <div id="custom_attributes">
+
+    </div>
+
+  <% end %>
+
+<% end %>
+
+<script>
+
+    $j(document).ready(function () {
+        $j('#investigation_custom_metadata_attributes_custom_metadata_type_id').change(function() {
+            $j.ajax({
+                url: "<%= custom_metadata_fields_investigations_path %>",
+                type: "get",
+                data: {'custom_metadata_type_id':this.value},
+                dataType: 'html',
+                beforeSend: function() {
+                    $j('#custom_attributes').html('<div class="spinner"></div>');
+                }
+            })
+            .done(function(data){
+                $j('#custom_attributes').html(data);
+            })
+            .error(function() {
+                $j('#custom_attributes').text("Something went wrong!");
+            });
+        });
+    });
+
+</script>
+
+<!-- custom metadata experiment end -->
 <%= form_submit_buttons(@investigation) %>

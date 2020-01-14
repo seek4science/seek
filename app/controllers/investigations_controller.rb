@@ -108,11 +108,29 @@ class InvestigationsController < ApplicationController
     end
   end
 
+  def custom_metadata_fields
+    id = params[:custom_metadata_type_id]
+    respond_to do |format|
+      unless id.blank?
+        cm = CustomMetadataType.find(id)
+        format.html { render partial: 'custom_metadata/custom_metadata_fields',locals:{custom_metadata_type:cm} }
+      else
+        format.html { render html: ''}
+      end
+    end
+  end
+
   private
 
   def investigation_params
+    custom_metadata_keys = []
+    if params[:investigation][:custom_metadata_attributes] && params[:investigation][:custom_metadata_attributes][:custom_metadata_type_id]
+      metadata_type = CustomMetadataType.find(params[:investigation][:custom_metadata_attributes][:custom_metadata_type_id])
+      custom_metadata_keys = [:custom_metadata_type_id] + metadata_type.custom_metadata_attributes.collect(&:method_name)
+    end
+
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, :other_creators,
-                                          { creator_ids: [] },{ scales: [] }, { publication_ids: [] })
+                                          { creator_ids: [] },{ scales: [] }, { publication_ids: [] }, { custom_metadata_attributes: custom_metadata_keys })
   end
 
 end
