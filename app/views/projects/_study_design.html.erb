@@ -131,13 +131,6 @@
     var respTable //saving this for resetting table cols
     $j(document).ready(function () {
         respTable = $j('.resptable').html() 
-        $j(".table").on('click', 'td', function () {
-            if ($j(this).attr("contentEditable") == true) {
-                $j(this).attr("contentEditable", "false");
-            } else {
-                $j(this).attr("contentEditable", "true");
-            }
-        });
     });
 
     function add_level(_tr = '', level = '', add_single=false) {
@@ -148,22 +141,23 @@
         $j(firstCol).attr('rowspan', rowspan + 1);
         $j(tr).find('td:eq(1)').attr('rowspan', rowspan + 1);
         if (add_single) $j(tr).find('td:last').attr('rowspan', rowspan + 1);
-        $j(tr).after(`<tr><td>${level}</td></tr>`)
+        $j(tr).after(`<tr><td contentEditable='true'>${level}</td></tr>`)
     }
 
     function add_var(table, variable = '', level = '', add_single=false) {
-        let action =  "<td><a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a></td>"
+        let action = "<td><a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a></td>"
         let tag =
-            ` <tr><td rowspan='1'>${variable}</td><td rowspan='1'><a class='btn btn-secondary btn-xs' onClick='add_level(undefined,undefined,true)'> <i class='glyphicon glyphicon-plus'></i> Add Level</a></td><td>${level}</td>${add_single?action:''}</tr>`
+            ` <tr><td contentEditable='true' rowspan='1'>${variable}</td><td rowspan='1'><a class='btn btn-secondary btn-xs' onClick='add_level(undefined,undefined,true)'> <i class='glyphicon glyphicon-plus'></i> Add Level</a></td><td contentEditable='true'>${level}</td>${add_single?action:''}</tr>`
         $j(`${table} tbody`).append(tag)
     }
 
     function add_dep_col(value = '', add_single=false) {
-        let bias = add_single?3:2
-        let colCount = $j('.resptable th td').length + 1;
-        $j('.resptable').find('thead').find('th').eq(colCount - bias).after('<th>sub-sample of</th>');
+        let bias = add_single?2:1
+        let action = "<a href='' onclick='remove_col(event)'> <span style='color:white' class='glyphicon glyphicon-trash'></span></a>"
+        let colCount = $j('.resptable thead tr th').length ;
+        $j('.resptable').find('thead').find('th').eq(colCount - bias).after(`<th>sub-sample of${action}</th>`);
         $j('.resptable').find('tr').each(function () {
-            $j(this).find('td').eq(colCount - bias).after(`<td>${value}</td>`);
+            $j(this).find('td').eq(colCount - bias).after(`<td contentEditable='true'>${value}</td>`);
         });
     }
 
@@ -172,10 +166,14 @@
         let newRow;
         let tdCount = $j(`${table} thead tr`).find('th').length
         $j(`${table} thead tr`).find('th').each(function (i, a) {
-            newRow += Object.keys(items).length > 0 ? `<td>${Object.values(items)[i]}</td>` : '<td></td>'
+            newRow += Object.keys(items).length > 0 ? `<td contentEditable='true'>${Object.values(items)[i]}</td>` : '<td contentEditable="true"></td>'
         });
-        if (add_single) newRow = newRow.slice(0,newRow.length-5) + action + newRow.slice(newRow.length-5)
        $j(`${table} tbody`).append('<tr>' + newRow + '</tr>')
+       if (add_single){
+           let td = $j(`${table} tbody tr:last td:last`)
+           td.append(action)
+           td.attr('contentEditable', false)
+       }
     }
 
     function save_design() {
@@ -210,7 +208,7 @@
         }
         let thCount = $j('.resptable thead tr th').length;//Avoid remove cell
         $j('.resptable thead tr th').each(function (i, a) {
-            if (i > 2 && i<thCount-1 ) item_structure[`sub_sample${i-2}`] = ""
+            if (i > 2 && i<thCount-2 ) item_structure[`sub_sample${i-2}`] = ""
         })
         data.response_variables = get_table_JSON(".resptable", item_structure, [])
         item_structure = {
@@ -393,6 +391,15 @@
         $j(tr_list).each((i,t)=>{
             $j(t).remove()
         })
+    }
+
+    function remove_col(e){
+        event.preventDefault();
+        let th = $j(e.target).closest('th')      
+        $j(e.target).closest('table').find('tbody tr').each(function(i,tr) {
+            $j(tr).find(`td:eq(${th.index()})`).remove();
+        });
+        th.remove()
     }
 </script>
 
