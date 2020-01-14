@@ -1,0 +1,12 @@
+<% custom_metadata_type.custom_metadata_attributes.each do |attribute| %>
+  <div class="form-group">
+    <label><%= attribute.title %></label><%= required_span if attribute.required? %>
+    <%= fields_for :investigation do |ff| %>
+      <%= ff.fields_for :custom_metadata_attributes do |fff| %>
+        <%= custom_metadata_form_field_for_attribute(attribute,fff) %>
+      <% end %>
+    <% end %>
+
+  </div>
+
+<% end %>

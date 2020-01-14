@@ -357,8 +357,22 @@ SEEK::Application.routes.draw do
 
   ### ISA ###
 
-  resources :investigations, concerns: [:publishable, :has_snapshots, :isa] do
-    resources :people, :projects, :assays, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
+  resources :investigations do
+    collection do
+      get :preview
+      post :items_for_result
+      get :custom_metadata_fields
+    end
+    resources :people,:projects,:assays,:studies,:models,:sops,:workflows, :nodes,:data_files,:publications, :documents, :only=>[:index]
+    resources :snapshots, :only => [:show, :new, :create, :destroy] do
+      member do
+        get :mint_doi_confirm
+        post :mint_doi
+        get :download
+        get :export, action: :export_preview
+        post :export, action: :export_submit
+      end
+    end
     member do
       get :export_isatab_json
     end
