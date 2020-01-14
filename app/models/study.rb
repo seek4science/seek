@@ -3,6 +3,10 @@ class Study < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
+  after_destroy { |record|
+    StudyDesign.where(study_id: record.id).destroy_all
+  }
+  
   searchable(:auto_index => false) do
     text :experimentalists
     text :person_responsible do
