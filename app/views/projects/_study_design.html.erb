@@ -5,7 +5,7 @@
         <div id="study_design_tableContainer">
             <h2>Experimental factors</h2>
 
-            <a class="btn btn-secondary pull-left" onClick="add_var('.exptable')"> <i
+            <a class="btn btn-secondary pull-left" onClick="add_var('.exptable','','',true)"> <i
                     class="glyphicon glyphicon-plus"></i> Add
                 Variable</a>
             <table class="table tableXs exptable">
@@ -19,10 +19,10 @@
             </table>
             <h2>Response variables</h2>
 
-            <a class="btn btn-secondary pull-left" onClick="add_rep('.resptable')"> <i class="glyphicon glyphicon-plus"></i> Add
+            <a class="btn btn-secondary pull-left" onClick="add_rep('.resptable','',true)"> <i class="glyphicon glyphicon-plus"></i> Add
                 Variable</a>
             &nbsp;
-            <a class="btn btn-secondary pull-left" onClick="add_dep_col()">
+            <a class="btn btn-secondary pull-left" onClick="add_dep_col('',true)">
                 <i class="glyphicon glyphicon-plus"></i> Add sub-sample</a>
 
             <table class="table tableXs resptable">
@@ -37,7 +37,7 @@
 
             <h2>Blocking variables</h2>
 
-            <a class="btn btn-secondary pull-left" onClick="add_var('.blocktable')"> <i class="glyphicon glyphicon-plus"></i>
+            <a class="btn btn-secondary pull-left" onClick="add_var('.blocktable','','',true)"> <i class="glyphicon glyphicon-plus"></i>
                 Add Variable</a>
 
             <table class="table tableXs blocktable">
@@ -52,7 +52,7 @@
 
             <h2>Covariates</h2>
 
-            <a class="btn btn-secondary pull-left" onClick="add_var('.covtable')"> <i class="glyphicon glyphicon-plus"></i> Add
+            <a class="btn btn-secondary pull-left" onClick="add_var('.covtable','','',true)"> <i class="glyphicon glyphicon-plus"></i> Add
                 Variable</a>
 
             <table class="table tableXs covtable">
@@ -67,7 +67,7 @@
 
             <h2>Confounding variables</h2>
 
-            <a class="btn btn-secondary pull-left" onClick="add_var('.conftable')"> <i class="glyphicon glyphicon-plus"></i>
+            <a class="btn btn-secondary pull-left" onClick="add_var('.conftable','','',true)"> <i class="glyphicon glyphicon-plus"></i>
                 Add Variable</a>
 
             <table class="table tableXs conftable">
@@ -83,7 +83,7 @@
 
             <h2>Control variables</h2>
 
-            <a class="btn btn-secondary pull-left" onClick="add_rep('.controltable')"> <i class="glyphicon glyphicon-plus"></i>
+            <a class="btn btn-secondary pull-left" onClick="add_rep('.controltable','',true)"> <i class="glyphicon glyphicon-plus"></i>
                 Add Variable</a>
 
             <table class="table tableXs controltable">
@@ -97,7 +97,7 @@
 
             <h2>Replicates</h2>
 
-            <a class="btn btn-secondary pull-left" onClick="add_rep('.reptable')"> <i class="glyphicon glyphicon-plus"></i> Add
+            <a class="btn btn-secondary pull-left" onClick="add_rep('.reptable','',true)"> <i class="glyphicon glyphicon-plus"></i> Add
                 Variable</a>
 
             <table class="table tableXs reptable">
@@ -128,7 +128,9 @@
 </div>
 
 <script>
+    var respTable //saving this for resetting table cols
     $j(document).ready(function () {
+        respTable = $j('.resptable').html() 
         $j(".table").on('click', 'td', function () {
             if ($j(this).attr("contentEditable") == true) {
                 $j(this).attr("contentEditable", "false");
@@ -138,35 +140,41 @@
         });
     });
 
-    function add_level(_tr = "", level = "Level name") {
+    function add_level(_tr = '', level = '', add_single=false) {
+        let action =  "<td><a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a></td>"
         var tr = _tr.length > 0 ? _tr : event.target.closest('tr')
         var firstCol = $j(tr).find('td:eq(0)');
         var rowspan = parseInt($j(firstCol).attr('rowspan'));
         $j(firstCol).attr('rowspan', rowspan + 1);
         $j(tr).find('td:eq(1)').attr('rowspan', rowspan + 1);
-        $j(tr).after(`<tr><td>${level}</td> </tr>`)
+        if (add_single) $j(tr).find('td:last').attr('rowspan', rowspan + 1);
+        $j(tr).after(`<tr><td>${level}</td></tr>`)
     }
 
-    function add_var(table, variable = "variable name", level = "level name") {
+    function add_var(table, variable = '', level = '', add_single=false) {
+        let action =  "<td><a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a></td>"
         let tag =
-            ` <tr><td rowspan='1'>${variable}</td><td rowspan='1'><a class='btn btn-secondary btn-xs' onClick='add_level()'> <i class='glyphicon glyphicon-plus'></i> Add Level</a></td><td>${level}</td></tr>`
+            ` <tr><td rowspan='1'>${variable}</td><td rowspan='1'><a class='btn btn-secondary btn-xs' onClick='add_level(undefined,undefined,true)'> <i class='glyphicon glyphicon-plus'></i> Add Level</a></td><td>${level}</td>${add_single?action:''}</tr>`
         $j(`${table} tbody`).append(tag)
     }
 
-    function add_dep_col(value = "") {
+    function add_dep_col(value = '', add_single=false) {
+        let bias = add_single?3:2
         let colCount = $j('.resptable th td').length + 1;
-        $j('.resptable').find('thead').find('th').eq(colCount - 2).after('<th>sub-sample of</th>');
+        $j('.resptable').find('thead').find('th').eq(colCount - bias).after('<th>sub-sample of</th>');
         $j('.resptable').find('tr').each(function () {
-            $j(this).find('td').eq(colCount - 2).after(`<td>${value}</td>`);
+            $j(this).find('td').eq(colCount - bias).after(`<td>${value}</td>`);
         });
     }
 
-    function add_rep(table, items = "") {
+    function add_rep(table, items = '', add_single=false) {
+        let action =  "<a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a>"
         let newRow;
+        let tdCount = $j(`${table} thead tr`).find('th').length
         $j(`${table} thead tr`).find('th').each(function (i, a) {
-            newRow += Object.keys(items).length > 0 ? `<td>${Object.values(items)[i]}</td>` : '<td>TBD</td>'
+            newRow += Object.keys(items).length > 0 ? `<td>${Object.values(items)[i]}</td>` : '<td></td>'
         });
-       // $j('.reptable tbody').append('<tr>' + newRow + '</tr>')
+        if (add_single) newRow = newRow.slice(0,newRow.length-5) + action + newRow.slice(newRow.length-5)
        $j(`${table} tbody`).append('<tr>' + newRow + '</tr>')
     }
 
@@ -200,8 +208,9 @@
             "material": "",
             "sub_sample": ""
         }
+        let thCount = $j('.resptable thead tr th').length;//Avoid remove cell
         $j('.resptable thead tr th').each(function (i, a) {
-            if (i > 2) item_structure[`sub_sample${i-2}`] = ""
+            if (i > 2 && i<thCount-1 ) item_structure[`sub_sample${i-2}`] = ""
         })
         data.response_variables = get_table_JSON(".resptable", item_structure, [])
         item_structure = {
@@ -238,6 +247,7 @@
     }
 
     function load_design() {
+        $j(".rem").each((i,t)=>{t.remove()})
         let pid = <%=params[:id]%>
             let design_data = "";
         //Load data from DB
@@ -250,6 +260,7 @@
             success: data => {
                 design_data = JSON.parse(data.data)
                 load_tables(design_data);
+                add_remove_action()
             },
             error: e => {
                 alert('error!')
@@ -259,7 +270,7 @@
 
     function load_tables(data) {
         $j('.exptable tbody').empty()
-        $j('.resptable tbody').empty()
+        $j('.resptable').html(respTable)
         $j('.blocktable tbody').empty()
         $j('.covtable tbody').empty()
         $j('.conftable tbody').empty()
@@ -321,6 +332,7 @@
 
     function get_table_JSON(table_class, item_structure, ignore_col_list) {
         let trs = $j(table_class + " tbody tr");
+        let headerTdCount = $j(table_class + " thead tr th").length;
         let counter = 0
         let root = []
         let currentItem = copy(item_structure)
@@ -331,15 +343,18 @@
             } else {
                 currentItem = copy(item_structure)
                 $j(tr).find('td').each(function (j, td) {
-                    if ($j(td).attr("rowspan")) {
-                        counter = $j(td).attr("rowspan") - 1;
-                    }
-                    if (j == 0) {
-                        currentItem[Object.keys(item_structure)[0]] = $j(td).html()
-                    } else if (ignore_col_list.indexOf(j) == -1) {
-                        if (Object.keys(item_structure)[1] == "levels")
-                            currentItem.levels.push($j(td).html())
-                        else currentItem[Object.keys(item_structure)[j]] = $j(td).html()
+                    if (j!=headerTdCount-1)
+                    {
+                        if ($j(td).attr("rowspan")) {
+                            counter = $j(td).attr("rowspan") - 1;
+                        }
+                        if (j == 0) {
+                            currentItem[Object.keys(item_structure)[0]] = $j(td).html()
+                        } else if (ignore_col_list.indexOf(j) == -1) {
+                            if (Object.keys(item_structure)[1] == "levels")
+                                currentItem.levels.push($j(td).html())
+                            else currentItem[Object.keys(item_structure)[j]] = $j(td).html()
+                        }
                     }
                 })
                 root.push(currentItem)
@@ -350,6 +365,34 @@
 
     function copy(x) {
         return JSON.parse(JSON.stringify(x));
+    }
+
+    function add_remove_action(){
+        let action =  "<a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a>"
+        $j(".tableXs").each(function(i,t){
+            $j(t).children('thead').children('tr').each(function(i,t){$j(t).append("<th class='rem' style='width:50px;'></th>")})
+            $j(t).children('tbody').children('tr').each(function(i,g){
+            if ($j(g).children('td').length >1)
+                $j(g).append(`<td class='rem' rowspan=${$j(g).children('td:first').attr("rowspan")}>${action}</td>`)
+            })
+        })
+    }
+    function remove_tr(e){
+        event.preventDefault();
+        let count = $j(e.target).closest('td').attr("rowspan")
+
+        let first_item = $j(e.target).closest('tr')
+        let tr_list =[]
+        tr_list.push(first_item)
+         let item = first_item
+        for (i=0;i<count-1;i++)
+        {
+             item = item.next('tr')
+            tr_list.push(item)
+        }
+        $j(tr_list).each((i,t)=>{
+            $j(t).remove()
+        })
     }
 </script>
 
