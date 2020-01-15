@@ -4,7 +4,6 @@ class OauthApplicationsController < Doorkeeper::ApplicationsController
   include Seek::BreadCrumbs
 
   layout Seek::Config.main_layout
-
   def index
     @applications = current_user.oauth_applications.ordered_by(:created_at)
 
@@ -54,5 +53,10 @@ class OauthApplicationsController < Doorkeeper::ApplicationsController
     add_breadcrumb 'New' if action_name == 'new'
     add_breadcrumb @application.name, oauth_application_path(@application) if defined? @application
     add_breadcrumb 'Edit' if action_name == 'edit'
+  end
+
+  def application_params
+    params.require(:doorkeeper_application)
+        .permit(:name, :redirect_uri, :scopes, :confidential, scopes: [])
   end
 end

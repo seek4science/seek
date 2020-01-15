@@ -14,7 +14,11 @@
 <p><code class="bg-light" id="secret"><%= flash[:application_secret].presence || @application.plaintext_secret %></code></p>
 
 <h4><%= t('.scopes') %>:</h4>
-<p><code class="bg-light" id="scopes"><%= @application.scopes.presence || raw('&nbsp;') %></code></p>
+<ul id="scopes">
+  <% @application.scopes.each do |scope| %>
+    <li><code><%= scope %></code> - <%= t scope, scope: [:doorkeeper, :scopes] %></li>
+  <% end %>
+</ul>
 
 <h4><%= t('.confidential') %>:</h4>
 <p><code class="bg-light" id="confidential"><%= @application.confidential? %></code></p>
@@ -28,7 +32,13 @@
         <code class="bg-light"><%= uri %></code>
       </td>
       <td>
-        <%= link_to t('doorkeeper.applications.buttons.authorize'), oauth_authorization_path(client_id: @application.uid, redirect_uri: uri, response_type: 'code', scope: @application.scopes), class: 'btn btn-xs btn-success', target: '_blank' %>
+        <%= button_link_to t('doorkeeper.applications.buttons.authorize'), 'next',
+                           oauth_authorization_path(client_id: @application.uid,
+                                                    redirect_uri: uri,
+                                                    response_type: 'code',
+                                                    scope: @application.scopes),
+                           class: 'btn btn-xs btn-default',
+                           target: '_blank' %>
       </td>
     </tr>
   <% end %>

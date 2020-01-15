@@ -28,7 +28,7 @@
     <div class="checkbox">
       <label>
         <%= f.check_box :confidential, class: "checkbox #{ 'is-invalid' if application.errors[:confidential].present? }" %>
-        Confidential?
+        <strong>Confidential?</strong>
       </label>
     </div>
     <%= doorkeeper_errors_for application, :confidential %>
@@ -39,7 +39,15 @@
 
   <div class="form-group">
     <%= f.label :scopes %>
-    <%= f.text_field :scopes, class: "form-control #{ 'has-error' if application.errors[:scopes].present? }" %>
+    <%= hidden_field_tag 'doorkeeper_application[scopes][]', '' %>
+    <% Doorkeeper.configuration.scopes.each do |scope| %>
+      <div class="checkbox">
+        <label>
+          <%= check_box_tag 'doorkeeper_application[scopes][]', scope, application.scopes.include?(scope), class: "checkbox" %>
+          <code><%= scope.titleize %></code> - <%= t scope, scope: [:doorkeeper, :scopes] %>
+        </label>
+      </div>
+    <% end %>
     <%= doorkeeper_errors_for application, :scopes %>
     <p class="help-block">
       <%= t('doorkeeper.applications.help.scopes') %>
