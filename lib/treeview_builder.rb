@@ -1,6 +1,5 @@
 class TreeviewBuilder
-  def initialize(project_files, project)
-    @p_files = project_files
+  def initialize(project)
     @project = project
   end
 
@@ -23,7 +22,7 @@ class TreeviewBuilder
     end
     # Documents folder
     chld = [create_node('Presentations', 'fld', f_count('Presentations')), create_node('Slideshows', 'fld', f_count('Slideshows')),
-            create_node('Articles', 'fld', f_count('Articles')), create_node('Posters', 'fld', f_count('Articles'))]
+            create_node('Articles', 'fld', f_count('Articles')), create_node('Posters', 'fld', f_count('Posters'))]
     inv.unshift(create_node('Documents', nil, nil, nil, nil, true, nil, nil, chld))
     prj.push(create_node(@project.title, 'prj', nil, @project.id, bold, true, 'Investigations', '#', inv))
     JSON[prj]
@@ -46,6 +45,6 @@ class TreeviewBuilder
 
   def f_count(folder_name)
     folder_id = DefaultProjectFolder.where(title: folder_name).first.id
-    (@p_files.select { |file| file.default_project_folders_id == folder_id }).length.to_s
+    (@project.other_project_files.select { |file| file.default_project_folders_id == folder_id }).length.to_s
   end
 end

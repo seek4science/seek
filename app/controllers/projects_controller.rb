@@ -86,7 +86,7 @@ class ProjectsController < ApplicationController
   # GET /projects/1.xml
   def show
     # Create JStree core data
-    tree_builder = TreeviewBuilder.new @project.other_project_files, @project
+    tree_builder = TreeviewBuilder.new @project
     @tree_data = tree_builder.build_tree_data
     # For creating new investigation and study in Project view page
     @investigation = Investigation.new({})

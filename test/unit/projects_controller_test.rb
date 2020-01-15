@@ -14,8 +14,7 @@ class ProjectsControllerTest < ActionController::TestCase
   test 'files count of project default folders' do
     p = Factory(:project)
     post :upload_project_file, params: { id: p.id, description: 'test description', pid: p.id, folder: 'presentations', file: uploadable_file }
-    # @controller.instance_variable_set(:@PFiles, p.other_project_files)
-    controller = TreeviewBuilder.new p.other_project_files, p
+    controller = TreeviewBuilder.new p
     assert_equal controller.send(:f_count, 'presentations').to_i, 1
   end
 
