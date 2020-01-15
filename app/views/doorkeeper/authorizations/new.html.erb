@@ -18,7 +18,9 @@
       <% end %>
 
       <p class="help-block">
-        This application's permissions can be revoked at any time by visiting <%= link_to('the authorized applications page', oauth_authorized_applications_path, target: :_blank) -%>.
+        This application's permissions can be revoked at any time by visiting the
+        <%= link_to('authorized applications page', oauth_authorized_applications_path, target: :_blank) -%> from your
+        profile.
       </p>
 
       <div class="actions">
@@ -42,6 +44,13 @@
           <%= hidden_field_tag :code_challenge_method, @pre_auth.code_challenge_method %>
           <%= submit_tag t('doorkeeper.authorizations.buttons.deny'), class: "btn btn-danger btn-lg btn-block" %>
         <% end %>
+      </div>
+
+      <hr/>
+
+      <div id="application-owner">
+        <p>This application is managed by:</p>
+        <%= render partial: 'assets/resource_list_item', object: @pre_auth.client.application.owner.person %>
       </div>
     <% end %>
   </div>
