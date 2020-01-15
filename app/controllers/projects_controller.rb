@@ -147,12 +147,16 @@ class ProjectsController < ApplicationController
 
   # DELETE
   def delete_project_file
-    uid = params[:uid]
-    aaa = OtherProjectFile.where(uuid: uid)
-    puts aaa
-    return render json: { message: 'done' } if aaa.destroy_all
+    return render json: { message: 'done' } if OtherProjectFile.where(uuid: params[:uid]).destroy_all
 
     render json: { message: 'error deleting file', status: :unprocessable_entity }
+  end
+
+  # GET
+  def download_file
+    doc = OtherProjectFile.where(uuid: params[:uid]).first
+    path = File.join(Seek::Config.other_project_files_path, doc.uuid)
+    send_file(path, filename: doc.title, type: 'application/pdf')
   end
 
   # GET

@@ -78,11 +78,8 @@
              $j(".fileManager li:first").remove();
 
          $j(".fileManager").prepend(
-             '<li class="file" data-id=' + id + '><img src="/assets/' +
-             ext +
-             '.png"> <br><a data-filetype="txt" class="file">' +
-             name +
-             '</a><span onClick="delete_file(event)" class="del_file"><i class="glyphicon glyphicon-remove"></i></span></li>'
+             `<li class="file" data-id=${id}><img src="/assets/${ext}.png"> <br><a href="/projects/${pid}/download_file?uid=${id}" data-filetype="txt" class="file">` +
+             `${name}</a><span onClick="delete_file(event)" class="del_file"><i class="glyphicon glyphicon-remove"></i></span></li>`
          )
      }
 
@@ -153,4 +150,5 @@
              })
          }
      }
+
  </script>

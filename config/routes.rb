@@ -216,6 +216,7 @@ SEEK::Application.routes.draw do
       get :study_shared_with
       post :upload_project_file
       delete :delete_project_file
+      get :download_file
       get :get_file_list
       patch :update_study_design
       get :get_study_design
