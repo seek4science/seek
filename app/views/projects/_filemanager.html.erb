@@ -38,10 +38,10 @@
              success: s => {
                  console.log('Uploaded')
                  let ext = $j('#file').val().split('.').pop();
-                 addFile(s.id, file_icon(ext), file.name)
+                 addFile(s.id, file_icon(ext), minify(file.name))
                  let origin = $j("#" + $j("#selected_tree_item_id").val() + " a span")
                  bounce(origin, parseInt(origin.text()) + 1)
-                 $j('#file').val(''); 
+                 $j('#file').val('');
              }
          })
      })
@@ -64,7 +64,7 @@
                  }
                  if (result.length > 0) {
                      result.forEach(function (file) {
-                         addFile(file.id, file_icon(file.extension), file.name)
+                         addFile(file.id, file_icon(file.extension), minify(file.name))
                      })
                  } else {
                      base.prepend('<li>empty</li>')
@@ -84,6 +84,10 @@
              name +
              '</a><span onClick="delete_file(event)" class="del_file"><i class="glyphicon glyphicon-remove"></i></span></li>'
          )
+     }
+
+     function minify(f) {
+         return f.length > 20 ? f.substr(0, 20) + '...' : f
      }
 
      function file_icon(extension) {
@@ -133,7 +137,9 @@
 
      function delete_file(e) {
          if (confirm('Are you sure?')) {
-             let data = {'uid': $j(e.target).closest('li').attr('data-id')}
+             let data = {
+                 'uid': $j(e.target).closest('li').attr('data-id')
+             }
              $j.ajax({
                  type: 'DELETE',
                  url: pid + '/delete_project_file',
