@@ -125,54 +125,60 @@ class ProjectsController < ApplicationController
       user_ids.push(perm.contributor.id)
     end
     shared_with = Person.where(id: user_ids).select("id, CONCAT(first_name,' ',  last_name) as nam")
-    render :json => { people: shared_with }
+    render json: { people: shared_with }
   end
 
-  # /POST /projects/upload_file
+  # /POST
   def upload_project_file
     unique_id = SecureRandom.uuid
-    new_file = OtherProjectFile.new(uuid: unique_id, title:params[:file].original_filename, description: params[:description]);
-    new_file.projects.push(Project.find(params[:pid]))
-    folder_id = DefaultProjectFolder.where(title: params[:folder]).first().id
+    new_file = OtherProjectFile.new(uuid: unique_id, title: params[:file].original_filename, description: params[:description]);
+    new_file.projects.push(Project.find(params[:id]))
+    folder_id = DefaultProjectFolder.where(title: params[:folder]).first.id
     unless params[:file].nil? && folder_id.nil?
       new_file.default_project_folders_id = folder_id
       path = File.join(Seek::Config.other_project_files_path, unique_id)
       File.open(path, 'wb') { |f| f.write(params[:file].read) }
-      if new_file.save
-        return render :json => { message: 'file uploaded!', id: new_file.id }
-      else
-        return render :json => { message: 'file NOT uploaded!' }
-      end
+      return render json: { message: 'file uploaded!', id: unique_id } if new_file.save
+
+      return render json: { message: 'file NOT uploaded!' }
     end
-    render :json => {message: 'Error saving the uploaded file!' }
+    render json: { message: 'Error saving the uploaded file!' }
+  end
+
+  # DELETE
+  def delete_project_file
+    uid = params[:uid]
+    aaa = OtherProjectFile.where(uuid: uid)
+    puts aaa
+    return render json: { message: 'done' } if aaa.destroy_all
+
+    render json: { message: 'error deleting file', status: :unprocessable_entity }
   end
 
   # GET
   def get_file_list
-    folder_id = DefaultProjectFolder.where(title: params[:folder]).first().id
+    folder_id = DefaultProjectFolder.where(title: params[:folder]).first.id
     file_list_return =[]
-    file_list = Project.find(params[:id]).other_project_files.select{|file| file.default_project_folders_id == folder_id}
+    file_list = Project.find(params[:id]).other_project_files.select{ |file| file.default_project_folders_id == folder_id}
     file_list.each do |file|
-      file_list_return.push({ name:file.title, id: file.id, extension: File.extname(file.title)})
+      file_list_return.push({ name:file.title, id: file.uuid, extension: File.extname(file.title)})
     end
-    render :json => file_list_return
+    render json: file_list_return
   end
 
   # PATCH
   def update_study_design
     study_design = StudyDesign.find(params[:std_id])
     study_design.data = params[:data]
-    if study_design.save
-      return render :json => { message: 'Study design was updated!' }
-    else
-      return render :json => { message: 'Error updating study design' }
-    end
+    return render json: { message: 'Study design was updated!' } if study_design.save
+
+    return render json: { message: 'Error updating study design' }
   end
 
   # Get
   def get_study_design
     study_design = StudyDesign.find(params[:std_id])
-    return render :json => { data: study_design.data }
+    return render json: { data: study_design.data }
   end
 
   # GET /projects/new
@@ -513,4 +519,5 @@ class ProjectsController < ApplicationController
       false
     end
   end
+
 end

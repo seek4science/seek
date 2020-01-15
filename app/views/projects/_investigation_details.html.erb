@@ -20,7 +20,7 @@
        // Add a person permission to the table
        $j('#submit_btn').on('click', e => {
            let people = $j('#investigation-permission-people-ids').tagsinput('items');
-           let pid = <%= params[:id] %>
+        //    let pid = <%= params[:id] %>
            let inv_id = $j("#selected_item_id").val()
            if (!inv_id) return
            let url = `/investigations/${inv_id}`;

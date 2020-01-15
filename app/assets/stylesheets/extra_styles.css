@@ -131,3 +131,24 @@
     background-color: aliceblue;
     color: white
 }
+
+.del_file {
+    position: absolute;
+    visibility: hidden;
+    top: 10px;
+    left: 5px;
+    color: #dedfe0;
+    cursor: pointer;
+}
+
+.del_file:hover {
+    color: red;
+}
+
+.file {
+    position: relative
+}
+
+.file:hover .del_file {
+    visibility: visible;
+}

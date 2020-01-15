@@ -41,8 +41,6 @@
         // Add a person permission to the table
         $j('#study_permission_submit_btn').on('click', e => {
             let people = $j('#study-permission-people-ids').tagsinput('items');
-            let pid = <%= params[:id] %>
-            // let url = pid + '/update_study_permission';
             let std_id = $j("#selected_item_id").val()
             if (!std_id) return
             let url = `/studies/${std_id}`;

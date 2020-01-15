@@ -18,9 +18,7 @@
  </div>
 
  <script>
-     let pid
      let folderName
-
      $j("#upload_btn").on('click', () => {
          $j('#file').click();
      })
@@ -31,7 +29,6 @@
          formData.append('file', file);
          formData.append('folder', folderName)
          formData.append('description', 'description...')
-         formData.append('pid', pid)
          $j.ajax({
              type: 'POST',
              url: pid + '/upload_project_file',
@@ -39,19 +36,19 @@
              processData: false,
              contentType: false,
              success: s => {
-                console.log('Uploaded')
-                let ext = $j('#file').val().split('.').pop();
-                addFile(s.id, file_icon(ext), file.name)
-                let origin = $j( "#" + $j("#selected_tree_item_id").val() + " a span")
-                bounce(origin,parseInt(origin.text())+1)
+                 console.log('Uploaded')
+                 let ext = $j('#file').val().split('.').pop();
+                 addFile(s.id, file_icon(ext), file.name)
+                 let origin = $j("#" + $j("#selected_tree_item_id").val() + " a span")
+                 bounce(origin, parseInt(origin.text()) + 1)
+                 $j('#file').val(''); 
              }
          })
      })
 
 
      function load_files() {
-         pid = <%= params[:id] %>
-             folderName = $j('#selected_folder').val()
+         folderName = $j('#selected_folder').val()
          let base = $j(".fileManager");
          $j('.fileManager li:not(:last-child)').remove();
 
@@ -78,36 +75,33 @@
 
      function addFile(id, ext, name) {
          if ($j(".fileManager li:first").text() == "empty")
-            $j(".fileManager li:first").remove();
+             $j(".fileManager li:first").remove();
 
          $j(".fileManager").prepend(
              '<li class="file" data-id=' + id + '><img src="/assets/' +
              ext +
              '.png"> <br><a data-filetype="txt" class="file">' +
-             name + '</a></li>')
+             name +
+             '</a><span onClick="delete_file(event)" class="del_file"><i class="glyphicon glyphicon-remove"></i></span></li>'
+         )
      }
 
      function file_icon(extension) {
          switch (extension.toLowerCase().replace('.', '')) {
              case 'txt':
                  return 'txt'
-
              case 'doc', 'docx':
                  return 'doc'
-
              case 'jpg':
                  return 'jpg'
              case 'png':
                  return 'png'
              case 'ppt', 'pptx':
                  return 'ppt'
-
              case 'svg':
                  return 'svg'
-
              case 'xls', 'xlsx':
                  return 'xls'
-
              case 'csv':
                  return 'csv'
              case 'pdf':
@@ -115,7 +109,6 @@
              default:
                  return 'general'
          }
-
      }
 
      $j(".fileManager").on("click", ".file", function (event) {
@@ -136,5 +129,22 @@
              item.css('opacity', '1')
              item.text(text)
          }, 300);
+     }
+
+     function delete_file(e) {
+         if (confirm('Are you sure?')) {
+             let data = {'uid': $j(e.target).closest('li').attr('data-id')}
+             $j.ajax({
+                 type: 'DELETE',
+                 url: pid + '/delete_project_file',
+                 data,
+                 success: result => {
+                     $j(e.target).closest('li').remove()
+                     let origin = $j("#" + $j("#selected_tree_item_id").val() + " a span")
+                     bounce(origin, parseInt(origin.text()) - 1)
+                     console.log('the file was deleted!')
+                 }
+             })
+         }
      }
  </script>

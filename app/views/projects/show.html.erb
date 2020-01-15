@@ -180,11 +180,47 @@
       };
     }
   })(jQuery);
-
+  let pid
   $j(document).ready(function () {
+    pid = <%= params[:id] %>
+    let uid = <%= current_user.id if current_user %>
+
     hide_all_containers()
     $j("#projectDetailContainer").show()
     get_project()
+
+    $j("a:contains('Cancel')").click(function (e) {
+      e.preventDefault();
+      $j('#data-file-modal-inv').modal('hide');
+      $j('#data-file-modal-std').modal('hide');
+    })
+    $j("#submit_investigation").click(function () {
+      let f = $j('#new_investigation')
+      append_Form("investigation[project_ids][]", pid, f)
+      append_Form("policy_attributes[access_type]", "0", f)
+      append_Form("investigation[creator_ids][]", uid, f)
+      append_Form("policy_attributes[permissions_attributes][0][contributor_type]", "Project", f)
+      append_Form("policy_attributes[permissions_attributes][0][contributor_id]", pid, f)
+      //TO_DO: set current Project access type:
+      append_Form("policy_attributes[permissions_attributes][0][access_type]", "2", f)
+      append_Form("redirect", "false", f)
+      f.submit()
+    })
+
+    $j("#submit_study").click(function () {
+      let f = $j('#new_study')
+      let inv_id = $j("#selected_item_id").val()
+      append_Form("study[investigation_id]", inv_id, f)
+      append_Form("study[person_responsible_id]", uid, f)
+      append_Form("study[creator_ids][]", uid, f)
+      append_Form("policy_attributes[access_type]", "0", f)
+      append_Form("policy_attributes[permissions_attributes][0][contributor_type]", "Project", f)
+      append_Form("policy_attributes[permissions_attributes][0][contributor_id]", pid, f)
+      //TO_DO: set current Project access type:
+      append_Form("policy_attributes[permissions_attributes][0][access_type]", "2", f)
+      append_Form("redirect", "false", f)
+      f.submit()
+    })
   })
 
   function hide_all_containers() {
@@ -226,7 +262,7 @@
     })
     .jstree({
       'core': {
-        'data': <%=@tree_data.html_safe%>
+        'data': <%= @tree_data.html_safe %>
       },
       plugins: ["separate"]
     });
@@ -247,44 +283,6 @@
     });
   }
 
-  $j(document).ready(function () {
-    let pid = <%= params[:id] %>
-      let uid = <%= current_user.id if current_user %>
-      $j("a:contains('Cancel')").click(function (e) {
-        e.preventDefault();
-        $j('#data-file-modal-inv').modal('hide');
-        $j('#data-file-modal-std').modal('hide');
-      })
-    $j("#submit_investigation").click(function () {
-      let f = $j('#new_investigation')
-      append_Form("investigation[project_ids][]", pid, f)
-      append_Form("policy_attributes[access_type]", "0", f)
-      append_Form("investigation[creator_ids][]", uid, f)
-      append_Form("policy_attributes[permissions_attributes][0][contributor_type]", "Project", f)
-      append_Form("policy_attributes[permissions_attributes][0][contributor_id]", pid, f)
-      //TO_DO: set current Project access type:
-      append_Form("policy_attributes[permissions_attributes][0][access_type]", "2", f)
-      append_Form("redirect", "false", f)
-      f.submit()
-    })
-
-    $j("#submit_study").click(function () {
-      let f = $j('#new_study')
-      let inv_id = $j("#selected_item_id").val()
-      append_Form("study[investigation_id]", inv_id, f)
-      append_Form("study[person_responsible_id]", uid, f)
-      append_Form("study[creator_ids][]", uid, f)
-      append_Form("policy_attributes[access_type]", "0", f)
-      append_Form("policy_attributes[permissions_attributes][0][contributor_type]", "Project", f)
-      append_Form("policy_attributes[permissions_attributes][0][contributor_id]", pid, f)
-      //TO_DO: set current Project access type:
-      append_Form("policy_attributes[permissions_attributes][0][access_type]", "2", f)
-      append_Form("redirect", "false", f)
-      f.submit()
-    })
-
-  })
-
   function append_Form(name, val, form) {
     let input = $j("<input>")
       .attr("type", "hidden")
@@ -294,8 +292,7 @@
 
   function populate_tags(item_id, item_type) {
     //Populate the tags input with list of 'Shared with people'
-    let pid = <%=params[:id]%>
-      let geturl = item_type == 'inv' ? '/investigation_shared_with?inv_id=' : '/study_shared_with?std_id='
+    let geturl = item_type == 'inv' ? '/investigation_shared_with?inv_id=' : '/study_shared_with?std_id='
     let tag_input = item_type == 'inv' ? '#investigation-permission-people-ids' : '#study-permission-people-ids'
     $j.ajax({
       type: 'GET',
@@ -362,7 +359,7 @@
         "Content-Type": "application/json",
         "Accept": "application/json"
       },
-      url: `/projects/${<%=params[:id]%>}`,
+      url: `/projects/${pid}`,
       success: s => {
         $j('#projectTitleC').text(s.data.attributes.title)
         $j('#projectDesC').text(s.data.attributes.description)
