@@ -14,7 +14,7 @@ The **create{0}** operation returns a JSON object representing the newly created
 
 readTemplate = "A **read{0}** operation will return information about the\
  [{0}](#tag/{1}) identified, provided the authenticated user has access to it.\n\
-\n\
+\n\2010', 'json', 'rest
 The **read{0}** operation returns a JSON object representing the [**{0}**](#tag/{1})."
 
 updateTemplate = "An **update{0}** operation will modify the information held about the specified [**{0}**](#tag/{1}). This operation is only available if the authenticated user has access to the [**{0}**](#tag/{1}).\n\

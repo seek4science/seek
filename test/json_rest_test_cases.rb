@@ -9,7 +9,7 @@ module JsonRestTestCases
   JSONAPI_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', 'api', 'jsonapi-schema-v1')
 
   def definitions_path
-    File.join(Rails.root, 'public', 'api', 'definitions.json')
+    File.join(Rails.root, 'public', 'api', 'definitions', 'definitions.json')
   end
 
   def validate_json(path)
