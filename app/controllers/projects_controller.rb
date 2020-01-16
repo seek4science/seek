@@ -173,7 +173,10 @@ class ProjectsController < ApplicationController
   # PATCH
   def update_study_design
     study_design = StudyDesign.find(params[:std_id])
-    study_design.data = params[:data]
+    study_design.data = params[:data] if params.has_key?(:data)
+    study_design.flowchart = params[:flowchart_data] if params.has_key?(:flowchart_data)
+    study_design.tables = params[:flowchart_tables] if params.has_key?(:flowchart_tables)
+    study_design.methods = params[:flowchart_methods] if params.has_key?(:flowchart_methods)
     return render json: { message: 'Study design was updated!' } if study_design.save
 
     return render json: { message: 'Error updating study design' }
@@ -182,7 +185,7 @@ class ProjectsController < ApplicationController
   # Get
   def get_study_design
     study_design = StudyDesign.find(params[:std_id])
-    return render json: { data: study_design.data }
+    return render json: { data: study_design.data, flowchart: study_design.flowchart }
   end
 
   # GET /projects/new
