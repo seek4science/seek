@@ -83,11 +83,7 @@ class StudiesController < ApplicationController
       study_design.save
       respond_to do |format|
         flash[:notice] = "The #{t('study')} was successfully created.<br/>".html_safe
-        if params[:redirect]
-          format.html { redirect_to request.referrer }
-        else
-          format.html { redirect_to study_path(@study) }
-        end
+        format.html { redirect_to study_path(@study) }
         format.json { render json: @study }
       end
     else

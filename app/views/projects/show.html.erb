@@ -180,48 +180,180 @@
       };
     }
   })(jQuery);
+
+
   let pid
   $j(document).ready(function () {
-    pid = <%= params[:id] %>
+  pid = <%= params[:id] %>
     let uid = <%= current_user.id if current_user %>
-
     hide_all_containers()
-    $j("#projectDetailContainer").show()
-    get_project()
-
-    $j("a:contains('Cancel')").click(function (e) {
-      e.preventDefault();
-      $j('#data-file-modal-inv').modal('hide');
-      $j('#data-file-modal-std').modal('hide');
-    })
-    $j("#submit_investigation").click(function () {
-      let f = $j('#new_investigation')
-      append_Form("investigation[project_ids][]", pid, f)
-      append_Form("policy_attributes[access_type]", "0", f)
-      append_Form("investigation[creator_ids][]", uid, f)
-      append_Form("policy_attributes[permissions_attributes][0][contributor_type]", "Project", f)
-      append_Form("policy_attributes[permissions_attributes][0][contributor_id]", pid, f)
-      //TO_DO: set current Project access type:
-      append_Form("policy_attributes[permissions_attributes][0][access_type]", "2", f)
-      append_Form("redirect", "false", f)
-      f.submit()
-    })
-
-    $j("#submit_study").click(function () {
-      let f = $j('#new_study')
-      let inv_id = $j("#selected_item_id").val()
-      append_Form("study[investigation_id]", inv_id, f)
-      append_Form("study[person_responsible_id]", uid, f)
-      append_Form("study[creator_ids][]", uid, f)
-      append_Form("policy_attributes[access_type]", "0", f)
-      append_Form("policy_attributes[permissions_attributes][0][contributor_type]", "Project", f)
-      append_Form("policy_attributes[permissions_attributes][0][contributor_id]", pid, f)
-      //TO_DO: set current Project access type:
-      append_Form("policy_attributes[permissions_attributes][0][access_type]", "2", f)
-      append_Form("redirect", "false", f)
-      f.submit()
+  $j("#projectDetailContainer").show()
+  get_project()
+  init_workflow()
+  $j("a:contains('Cancel')").click(function (e) {
+    e.preventDefault();
+    $j('#data-file-modal-inv').modal('hide');
+    $j('#data-file-modal-std').modal('hide');
+  })
+  $j("#submit_investigation").click(function () {
+    data = {
+      "data": {
+        "type": "investigations",
+        "attributes": {
+          "title": $j("#investigation_title").val(),
+          "policy": {
+            "access": "download",
+            "permissions": [{
+              "resource": {
+                "id": "1",
+                "type": "projects"
+              },
+              "access": "manage"
+            }]
+          },
+          "description": $j("#investigation_description").val()
+        },
+        "relationships": {
+          "projects": {
+            "data": [{
+              "id": pid,
+              "type": "projects"
+            }]
+          },
+          "publications": {
+            "data": []
+          },
+          "creators": {
+            "data": [{
+              "id": uid,
+              "type": "people"
+            }]
+          }
+        }
+      }
+    }
+    $j.ajax({
+      method: 'POST',
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      url: '/investigations',
+      data: JSON.stringify(data),
+      success: s => {
+        location.reload(true);
+      },
+      error: (e) => {
+        console.log('error creating investigation!')
+      }
     })
   })
+
+  $j("#submit_study").click(function () {
+    let data = {
+        "data": {
+          "type": "studies",
+          "attributes": {
+            "title": $j("#study_title").val(),
+            "description": $j("#study_description").val(),
+            "policy": {
+              "access": "download",
+              "permissions": [{
+                "resource": {
+                  "id": pid,
+                  "type": "projects"
+                },
+                "access": "manage"
+              }]
+            }
+          },
+          "relationships": {
+            "investigation": {
+              "data": {
+                "id": $j("#selected_item_id").val(),
+                "type": "investigations"
+              }
+            },
+            "publications": {
+              "data": []
+            },
+            "creators": {
+              "data": [{
+                "id": uid,
+                "type": "people"
+              }]
+            }
+          }
+        }
+      }
+    $j.ajax({
+      method: 'POST',
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      url: '/studies',
+      data: JSON.stringify(data),
+      success: s => {
+        // Create Assay
+        let data = {
+            "data": {
+              "type": "assays",
+              "attributes": {
+                "title": "Assay",
+                "assay_class": {
+                  "key": "EXP"
+                },
+                "policy": {
+                  "access": "download",
+                  "permissions": [{
+                    "resource": {
+                      "id": pid,
+                      "type": "projects"
+                    },
+                    "access": "manage"
+                  }]
+                }
+              },
+              "relationships": {
+                "study": {
+                  "data": {
+                    "id": s.data.id,
+                    "type": "studies"
+                  }
+                },
+                "creators": {
+                  "data": [{
+                    "id": uid,
+                    "type": "people"
+                  }]
+                }
+              }
+            }
+          }
+        $j.ajax({
+          method: 'POST',
+          "headers": {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          url: '/assays',
+          data: JSON.stringify(data),
+          success: s => {
+            location.reload(true);
+          },
+          error: (e) => {
+            console.log('error create assay!')
+          }
+        })
+      },
+      error: (e) => {
+        console.log('error create study!')
+      }
+    })
+  })
+  })
+  
 
   function hide_all_containers() {
     $j("#projectDetailContainer").hide()
