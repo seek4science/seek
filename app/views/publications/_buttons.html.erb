@@ -18,8 +18,10 @@
 
 <%= item_actions_dropdown do %>
   <% if item.can_edit? -%>
+<!--   if the publication is registered manually or imported from bibtex file, it can be edit-->
     <%if item.registered_mode == 3 || item.registered_mode == 4 || !item.doi.nil?%>
       <li><%= image_tag_for_key('edit', edit_publication_path(item), nil, nil, 'Edit Publication') -%></li>
+<!--  instance admin can always edit it -->
     <% elsif current_user.person.is_admin? %>
       <li><%= image_tag_for_key('edit', edit_publication_path(item), nil, nil, 'Admin Edit Publication') -%></li>
     <% end %>

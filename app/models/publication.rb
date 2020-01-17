@@ -368,7 +368,7 @@ class Publication < ApplicationRecord
       self.citation += howpublished.blank? ? '': ''+ howpublished
 
       Rails.logger.info("Citation: Misc"+ self.citation)
-    elsif publication_type.is_phd_thesis? || publication_type.is_masters_thesis?
+    elsif publication_type.is_phd_thesis? || publication_type.is_masters_thesis? || publication_type.is_bachelor_thesis?
       #PhD/Master Thesis
       self.citation = ''
       self.citation += school.nil? ? '' : (' '+ school)

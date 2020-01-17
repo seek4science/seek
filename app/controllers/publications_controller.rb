@@ -8,8 +8,8 @@ class PublicationsController < ApplicationController
   before_action :publications_enabled?
 
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[show edit update destroy]
-  before_action :suggest_authors, only: :mange
+  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy]
+  before_action :suggest_authors, only: [:manage]
 
   include Seek::BreadCrumbs
 
@@ -71,9 +71,8 @@ class PublicationsController < ApplicationController
   def edit; end
 
   # GET /publications/1/manage
-  def manage
-    @publication = Publication.find(params[:id])
-  end
+  def manage; end
+
 
   # POST /publications
   # POST /publications.xml
