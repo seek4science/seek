@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_19_134954) do
+ActiveRecord::Schema.define(version: 2020_01_13_152404) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -98,6 +98,16 @@ ActiveRecord::Schema.define(version: 2019_12_19_134954) do
     t.index ["attribute_id"], name: "index_annotations_on_attribute_id"
     t.index ["source_type", "source_id"], name: "index_annotations_on_source_type_and_source_id", length: { source_type: 191 }
     t.index ["value_type", "value_id"], name: "index_annotations_on_value_type_and_value_id"
+  end
+
+  create_table "api_tokens",  force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "title"
+    t.string "encrypted_token"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["encrypted_token"], name: "index_api_tokens_on_encrypted_token"
+    t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
   create_table "assay_assets", id: :integer,  force: :cascade do |t|
@@ -914,6 +924,53 @@ ActiveRecord::Schema.define(version: 2019_12_19_134954) do
     t.integer "number", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "oauth_access_grants",  force: :cascade do |t|
+    t.bigint "resource_owner_id", null: false
+    t.bigint "application_id", null: false
+    t.string "token", null: false
+    t.integer "expires_in", null: false
+    t.text "redirect_uri", null: false
+    t.datetime "created_at", null: false
+    t.datetime "revoked_at"
+    t.string "scopes", default: "", null: false
+    t.string "code_challenge"
+    t.string "code_challenge_method"
+    t.index ["application_id"], name: "index_oauth_access_grants_on_application_id"
+    t.index ["resource_owner_id"], name: "index_oauth_access_grants_on_resource_owner_id"
+    t.index ["token"], name: "index_oauth_access_grants_on_token", unique: true
+  end
+
+  create_table "oauth_access_tokens",  force: :cascade do |t|
+    t.bigint "resource_owner_id"
+    t.bigint "application_id", null: false
+    t.string "token", null: false
+    t.string "refresh_token"
+    t.integer "expires_in"
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.string "scopes"
+    t.string "previous_refresh_token", default: "", null: false
+    t.index ["application_id"], name: "index_oauth_access_tokens_on_application_id"
+    t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
+    t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
+    t.index ["token"], name: "index_oauth_access_tokens_on_token", unique: true
+  end
+
+  create_table "oauth_applications",  force: :cascade do |t|
+    t.string "name", null: false
+    t.string "uid", null: false
+    t.string "secret", null: false
+    t.text "redirect_uri", null: false
+    t.string "scopes", default: "", null: false
+    t.boolean "confidential", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "owner_id"
+    t.string "owner_type"
+    t.index ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type"
+    t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
   create_table "oauth_sessions", id: :integer,  force: :cascade do |t|
@@ -1765,4 +1822,6 @@ ActiveRecord::Schema.define(version: 2019_12_19_134954) do
     t.integer "sheet_number"
   end
 
+  add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
+  add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
 end

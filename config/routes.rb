@@ -1,4 +1,9 @@
 SEEK::Application.routes.draw do
+  use_doorkeeper do
+    controllers applications: 'oauth_applications'
+    controllers authorized_applications: 'authorized_oauth_applications'
+    controllers authorizations: 'oauth_authorizations'
+  end
   mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)
   #mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
 
@@ -148,6 +153,7 @@ SEEK::Application.routes.draw do
     end
     resources :oauth_sessions, only: [:index, :destroy]
     resources :identities, only: [:index, :destroy]
+    resources :api_tokens, only: [:index, :create, :destroy]
   end
 
   resource :session do

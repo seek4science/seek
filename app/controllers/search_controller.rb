@@ -4,6 +4,8 @@ class SearchController < ApplicationController
 
   class InvalidSearchException < RuntimeError; end
 
+  api_actions :index
+
   def index
     @results = []
     if Seek::Config.solr_enabled

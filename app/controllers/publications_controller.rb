@@ -16,6 +16,8 @@ class PublicationsController < ApplicationController
   include Seek::IsaGraphExtensions
   include PublicationsHelper
 
+  api_actions :index, :show
+
   def export
     @query = Publication.ransack(params[:query])
     @publications = @query.result(distinct: true)
