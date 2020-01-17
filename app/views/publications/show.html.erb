@@ -7,13 +7,13 @@
     <div class="row">
       <div class="col-md-6">
         <%= persistent_resource_id(@publication) %>
-        <% unless @publication.pubmed_id.nil? %>
+        <% unless @publication.pubmed_id.nil? || @publication.pubmed_id.empty? %>
           <p>
             <strong>PubMed ID:</strong>
             <%= link_to @publication.pubmed_id, @publication.pubmed_uri, { :target => "_blank" } %>
           </p>
         <% end %>
-        <% unless @publication.doi.nil? %>
+        <% unless @publication.doi.nil? || @publication.doi.empty? %>
           <p>
             <strong>DOI:</strong>
             <%= doi_link(@publication.doi, { :target => "_blank" }) %>
@@ -62,12 +62,21 @@
       </div>
       <div class="col-md-6">
         <p>
-          <strong><%= "Citation:" -%></strong>
+          <strong>Citation:</strong>
           <%=h @publication.citation -%>
         </p>
         <p>
           <strong for="date_published">Date Published:</strong>
             <span><%= date_as_string(@publication.published_date,false,true) -%></span>
+        </p>
+
+        <p>
+          <% unless @publication.url.nil?  %>
+          <p>
+            <strong>URL:</strong>
+            <%= link_to @publication.url, @publication.url, { target: '_blank' }%>
+          </p>
+        <% end %>
         </p>
 
         <p>
@@ -78,6 +87,8 @@
             <%= text_or_not_specified(nil) %>
           <% end -%>
         </p>
+
+
 
       </div>
     </div>
