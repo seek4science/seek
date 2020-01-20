@@ -628,8 +628,6 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_equal cmt, cm.custom_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal '22',cm.get_attribute_value('age')
-
-
   end
 
   def edit_max_object(investigation)
