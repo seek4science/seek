@@ -540,7 +540,7 @@ SEEK::Application.routes.draw do
         post :create_from_existing
       end
     end
-    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:workflows,:only=>[:index]
   end
 
   resources :workflows, concerns: [:has_content_blobs] do
@@ -569,7 +569,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:sops,:only=>[:index]
   end
 
   resources :nodes, concerns: [:has_content_blobs] do
@@ -655,7 +655,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people,:projects,:data_files,:publications,:presentations,:only=>[:index]
+    resources :people,:projects,:data_files,:publications,:documents,:presentations,:only=>[:index]
   end
 
   resource :policies do
@@ -720,7 +720,8 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples, only:[:index]
+    resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
+              :strains, :organisms, only:[:index]
   end
 
   ### SAMPLE TYPES ###
@@ -774,7 +775,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:only=>[:index]
+    resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
   ### ASSAY AND TECHNOLOGY TYPES ###
