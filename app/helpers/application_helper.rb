@@ -288,7 +288,11 @@ module ApplicationHelper
       if @parent_resource
         title << "#{h(@parent_resource.title)} - "
       end
-      title << PAGE_TITLES[controller_name]
+      t = PAGE_TITLES[controller_name]
+      if t.is_a?(Hash)
+        t = t[action_name] || t['*']
+      end
+      title << t
       title
     else
       "The #{Seek::Config.application_name}"
@@ -458,7 +462,8 @@ module ApplicationHelper
     !(action_name == 'edit' || action_name == 'update')
   end
 
-  PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => 'Institutions', 'people' => 'People', 'sessions' => 'Login', 'users' => 'Signup', 'search' => 'Search',
+  PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => 'Institutions',
+                  'people' => 'People', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' }, 'search' => 'Search',
                   'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize,
                   'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
                   'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'biosamples' => 'Biosamples',

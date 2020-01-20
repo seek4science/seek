@@ -21,6 +21,8 @@ class ProgrammesController < ApplicationController
 
   respond_to :html, :json
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def create
     @programme = Programme.new(programme_params)
 
@@ -38,7 +40,7 @@ class ProgrammesController < ApplicationController
           end
         end
         format.html {respond_with(@programme)}
-        format.json {render json: @programme}
+        format.json {render json: @programme, include: [params[:include]]}
       else
         format.html { render action: 'new' }
         format.json { render json: json_api_errors(@programme), status: :unprocessable_entity }
@@ -52,7 +54,7 @@ class ProgrammesController < ApplicationController
         flash[:notice] = "The #{t('programme').capitalize} was successfully updated"
         format.html { redirect_to(@programme) }
         format.xml { head :ok }
-        format.json { render json: @programme }
+        format.json { render json: @programme, include: [params[:include]] }
       else
         format.html { render action: 'edit' }
         format.xml { render xml: @programme.errors, status: :unprocessable_entity }
@@ -93,8 +95,8 @@ class ProgrammesController < ApplicationController
   def show
     respond_with do |format|
       format.html
-      format.json {render json: @programme}
-      format.rdf { render template: 'rdf/show' }	
+      format.json {render json: @programme, include: [params[:include]]}
+      format.rdf { render template: 'rdf/show' }
     end
   end
 

@@ -103,6 +103,8 @@ gem 'bibtex-ruby', '~> 4.4.2'
 
 gem 'omniauth', '~> 1.3.1'
 gem 'omniauth-ldap', '~> 1.0.5'
+gem 'omniauth_openid_connect'
+gem 'omniauth-rails_csrf_protection', '~> 0.1'
 
 gem 'ransack'
 
@@ -126,6 +128,8 @@ gem 'bootsnap', '>= 1.1.0', require: false
 gem 'activerecord-import'
 
 gem 'puma' # Used for docker, and also teaspoon tests
+
+gem 'doorkeeper'
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'

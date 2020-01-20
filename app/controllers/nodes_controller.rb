@@ -46,7 +46,7 @@ class NodesController < ApplicationController
       if @node.update_attributes(node_params)
         flash[:notice] = "#{t('Node')} metadata was successfully updated."
         format.html { redirect_to node_path(@node) }
-        format.json { render json: @node }
+        format.json { render json: @node, include: [params[:include]] }
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@node), status: :unprocessable_entity }

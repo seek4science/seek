@@ -47,7 +47,7 @@ class WorkflowsController < ApplicationController
       if @workflow.update_attributes(workflow_params)
         flash[:notice] = "#{t('Workflow')} metadata was successfully updated."
         format.html { redirect_to workflow_path(@workflow) }
-        format.json { render json: @workflow }
+        format.json { render json: @workflow, include: [params[:include]] }
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@workflow), status: :unprocessable_entity }

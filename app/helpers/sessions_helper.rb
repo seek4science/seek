@@ -31,4 +31,16 @@ module SessionsHelper
   def logged_in_and_member?
     User.logged_in_and_member?
   end
+
+  def show_omniauth_login?
+    Seek::Config.omniauth_enabled && Seek::Config.omniauth_providers.any?
+  end
+
+  def show_elixir_login?
+    Seek::Config.omniauth_elixir_aai_enabled
+  end
+
+  def show_ldap_login?
+    Seek::Config.omniauth_ldap_enabled
+  end
 end

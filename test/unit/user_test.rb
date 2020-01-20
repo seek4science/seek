@@ -340,6 +340,17 @@ class UserTest < ActiveSupport::TestCase
     assert_equal eve.user, User.get_user('eve@example.com')
   end
 
+  test 'generate unique login' do
+    Factory(:user, login: 'alice')
+
+    3.times do
+      assert_match /alice[0-9]{4}/, User.unique_login('alice')
+    end
+
+    assert_nil User.find_by_login('this_login_is_already_unique')
+    assert_equal 'this_login_is_already_unique', User.unique_login('this_login_is_already_unique')
+  end
+
   protected
 
   def create_user(options = {})

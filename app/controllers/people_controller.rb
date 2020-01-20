@@ -25,6 +25,8 @@ class PeopleController < ApplicationController
 
   protect_from_forgery only: []
 
+  api_actions :index, :show, :create, :update, :destroy, :current
+
   # GET /people/1
   # GET /people/1.xml
   def show
@@ -32,13 +34,25 @@ class PeopleController < ApplicationController
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
-      format.json {render json: @person}
+      format.json {render json: @person, include: [params[:include]]}
     end
   end
 
   def items
     respond_to do |format|
       format.html
+    end
+  end
+
+  def current
+    respond_to do |format|
+      format.json do
+        if logged_in?
+          render json: current_user.person
+        else
+          render json: { errors: [{ title: 'No user logged in'}] }, status: :not_found
+        end
+      end
     end
   end
 
@@ -89,7 +103,10 @@ class PeopleController < ApplicationController
     if email && Person.not_registered_with_matching_email(email).any?
       render :is_this_you, locals: { email: email }
     else
-      @person = Person.new(email: email)
+      p = { email: email }
+      p[:first_name] = params[:first_name] if params[:first_name]
+      p[:last_name] = params[:last_name] if params[:last_name]
+      @person = Person.new(p)
     end
   end
 
@@ -119,13 +136,13 @@ class PeopleController < ApplicationController
             format.html { redirect_to(@person) }
           end
           format.xml { render xml: @person, status: :created, location: @person }
-          format.json {render json: @person, status: :created, location: @person }
+          format.json {render json: @person, status: :created, location: @person, include: [params[:include]] }
         else
           Mailer.signup(current_user).deliver_later
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to controller: 'users', action: 'activation_required' }
-          format.json { render json: @person, status: :created} # There must be more to be done
+          format.json { render json: @person, status: :created, include: [params[:include]]} # There must be more to be done
         end
       else
         format.html { render redirect_action }
@@ -162,7 +179,7 @@ class PeopleController < ApplicationController
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
-        format.json {render json: @person}
+        format.json {render json: @person, include: [params[:include]]}
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @person.errors, status: :unprocessable_entity }

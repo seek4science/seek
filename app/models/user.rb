@@ -1,7 +1,7 @@
 require 'digest/sha1'
 
 class User < ApplicationRecord
-  MIN_PASSWORD_LENGTH=10
+  MIN_PASSWORD_LENGTH = 10
 
   acts_as_annotation_source
 
@@ -9,7 +9,21 @@ class User < ApplicationRecord
 
   belongs_to :person
 
+  has_many :identities, dependent: :destroy
   has_many :oauth_sessions, dependent: :destroy
+  has_many :api_tokens, dependent: :destroy
+  # Doorkeeper-related
+  has_many :access_grants,
+           class_name: "Doorkeeper::AccessGrant",
+           foreign_key: :resource_owner_id,
+           dependent: :destroy
+  has_many :access_tokens,
+           class_name: "Doorkeeper::AccessToken",
+           foreign_key: :resource_owner_id,
+           dependent: :destroy
+  has_many :oauth_applications,
+           class_name: "Doorkeeper::Application",
+           as: :owner
 
   # restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
@@ -287,6 +301,18 @@ class User < ApplicationRecord
     self.reset_password_code_until = nil
   end
 
+  def self.from_omniauth(auth)
+    User.new.tap do |user|
+      user.login = unique_login(auth['info']['nickname'] || 'user')
+      user.password = random_password
+      user.password_confirmation = user.password
+    end
+  end
+
+  def self.from_api_token(token)
+    joins(:api_tokens).where(api_tokens: { encrypted_token: ApiToken.encrypt_token(token) }).first
+  end
+
   protected
 
   # before filter
@@ -320,5 +346,18 @@ class User < ApplicationRecord
     Seek::Util.authorized_types.each do |type|
       type.lookup_class.where(user: id).delete_all
     end
+  end
+
+  def self.unique_login(original_login)
+    login = original_login
+    while User.where(login: login).exists? do
+      login = "#{original_login}#{rand(9999).to_s.rjust(4, '0')}"
+    end
+
+    login
+  end
+
+  def self.random_password
+    SecureRandom.urlsafe_base64(MIN_PASSWORD_LENGTH).first(MIN_PASSWORD_LENGTH)
   end
 end

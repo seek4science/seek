@@ -16,6 +16,8 @@ class PublicationsController < ApplicationController
   include Seek::IsaGraphExtensions
   include PublicationsHelper
 
+  api_actions :index, :show
+
   def export
     @query = Publication.ransack(params[:query])
     @publications = @query.result(distinct: true)
@@ -42,7 +44,7 @@ class PublicationsController < ApplicationController
       format.html # show.html.erb
       format.xml
       format.rdf { render template: 'rdf/show' }
-      format.json {render json: @publication}
+      format.json {render json: @publication, include: [params[:include]]}
       format.any( *Publication::EXPORT_TYPES.keys ) do
         begin
           send_data @publication.export(request.format.to_sym), type: request.format.to_sym, filename: "#{@publication.title}.#{request.format.to_sym}"
@@ -111,7 +113,7 @@ class PublicationsController < ApplicationController
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
         format.xml  { head :ok }
-        format.json { render json: @publication, status: :ok}
+        format.json { render json: @publication, status: :ok, include: [params[:include]]}
       end
     else
       respond_to do |format|
@@ -363,7 +365,7 @@ class PublicationsController < ApplicationController
           flash[:notice] = 'Publication was successfully created.'
           format.html { redirect_to(manage_publication_url(@publication)) }
           format.xml  { render xml: @publication, status: :created, location: @publication }
-          format.json  { render json: @publication, status: :created, location: @publication }
+          format.json  { render json: @publication, status: :created, location: @publication, include: [params[:include]] }
         end
       end
     else # Publication save not successful
@@ -400,7 +402,7 @@ class PublicationsController < ApplicationController
           flash[:notice] = 'Publication was successfully created.'
           format.html { redirect_to(manage_publication_url(@publication)) }
           format.xml  { render xml: @publication, status: :created, location: @publication }
-          format.json { render json: @publication, status: :created, location: @publication }
+          format.json { render json: @publication, status: :created, location: @publication, include: [params[:include]] }
         end
       end
     else # Publication save not successful
@@ -447,7 +449,7 @@ class PublicationsController < ApplicationController
         @subaction = 'Create'
         respond_to do |format|
           format.html { render action: 'new' }
-          format.json { render json: @publication, status: :ok }
+          format.json { render json: @publication, status: :ok, include: [params[:include]] }
         end
     end
   end

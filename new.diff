@@ -1,0 +1,64 @@
+diff --git a/app/models/publication_type.rb b/app/models/publication_type.rb
+index ae1126532..c5e3e416a 100644
+--- a/app/models/publication_type.rb
++++ b/app/models/publication_type.rb
+@@ -18,6 +18,7 @@ class PublicationType  < ActiveRecord::Base
+              "Masters_Thesis"=>"masters_thesis",
+              "Misc"=>"misc",
+              "Phd_Thesis"=>"phd_thesis",
++             "Bachelor_Thesis"=>"bachelor_thesis",
+              "Proceedings"=>"proceedings",
+              "Tech_Report"=>"tech_report",
+              "Unpublished"=>"unpublished" }
+@@ -63,9 +64,15 @@ class PublicationType  < ActiveRecord::Base
+   def self.Misc
+     self.for_type('Misc')
+   end
++  def self.Phd_Thesis
++    self.for_type('Bachelor_Thesis')
++  end
++
+   def self.Phd_Thesis
+     self.for_type('Phd_Thesis')
+   end
++
++
+   def self.Proceedings
+     self.for_type('Proceedings')
+   end
+diff --git a/db/seeds/publication_types.seeds.rb b/db/seeds/publication_types.seeds.rb
+index 91c35c4bc..505faeb60 100644
+--- a/db/seeds/publication_types.seeds.rb
++++ b/db/seeds/publication_types.seeds.rb
+@@ -5,9 +5,10 @@ PUBLICATION_TYPE = [{ title: 'Journal', key: 'article' },
+                     { title: 'InCollection', key: 'incollection' },
+                     { title: 'InProceedings', key: 'inproceedings' },
+                     { title: 'Manual', key: 'manual' },
+-                    { title: 'Masters Thesis', key: 'mastersthesis' },
+                     { title: 'Misc', key: 'misc' },
+                     { title: 'Phd Thesis', key: 'phdthesis' },
++                    { title: 'Masters Thesis', key: 'mastersthesis' },
++                    { title: 'Bachelors Thesis', key: 'bachelorsthesis' },
+                     { title: 'Proceedings', key: 'proceedings' },
+                     { title: 'Tech report', key: 'techreport' },
+                     { title: 'Unpublished', key: 'unpublished' }
+diff --git a/test/functional/publications_controller_test.rb b/test/functional/publications_controller_test.rb
+index 1d43f5c78..a6a50e89a 100644
+--- a/test/functional/publications_controller_test.rb
++++ b/test/functional/publications_controller_test.rb
+@@ -183,6 +183,15 @@ class PublicationsControllerTest < ActionController::TestCase
+     assert_equal  publication[:publication_type].title, p.publication_type.title
+   end
+ 
++
++  test 'should import multiple from bibtex file temp' do
++
++    assert_difference('Publication.count', 3) do
++      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/mcm_error.bib'), project_ids: [projects(:one).id] } }
++    end
++
++  end
++
+   test 'should import multiple from bibtex file' do
+ 
+     publications = [

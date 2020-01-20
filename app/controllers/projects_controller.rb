@@ -26,6 +26,8 @@ class ProjectsController < ApplicationController
 
   respond_to :html, :json
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def asset_report
     @no_sidebar = true
     project_assets = @project.assets | @project.assays | @project.studies | @project.investigations
@@ -87,7 +89,7 @@ class ProjectsController < ApplicationController
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
-      format.json { render json: @project }
+      format.json { render json: @project, include: [params[:include]] }
     end
   end
 
@@ -184,7 +186,7 @@ class ProjectsController < ApplicationController
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
         # format.json {render json: @project, adapter: :json, status: 200 }
-        format.json { render json: @project }
+        format.json { render json: @project, include: [params[:include]] }
       else
         format.html { render action: 'new' }
         format.json { render json: json_api_errors(@project), status: :unprocessable_entity }
@@ -210,7 +212,7 @@ class ProjectsController < ApplicationController
           flash[:notice] = "#{t('project')} was successfully updated."
           format.html { redirect_to(@project) }
           format.xml  { head :ok }
-          format.json { render json: @project }
+          format.json { render json: @project, include: [params[:include]] }
         #            format.json {render json: @project, adapter: :json, status: 200 }
         else
           format.html { render action: 'edit' }

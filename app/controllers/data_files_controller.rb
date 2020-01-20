@@ -34,6 +34,8 @@ class DataFilesController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def plot
     sheet = params[:sheet] || 2
     @csv_data = spreadsheet_to_csv(open(@data_file.content_blob.filepath), sheet, true)
@@ -79,7 +81,7 @@ class DataFilesController < ApplicationController
           flash[:error] = 'Unable to save newflash[:error] version'
         end
         format.html { redirect_to @data_file }
-        format.json { render json: @data_file}
+        format.json { render json: @data_file, include: [params[:include]]}
       end
     else
       flash[:error] = flash.now[:error]
@@ -146,7 +148,7 @@ class DataFilesController < ApplicationController
           respond_to do |format|
             flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
             format.html { redirect_to data_file_path(@data_file) }
-            format.json { render json: @data_file }
+            format.json { render json: @data_file, include: [params[:include]] }
           end
         end
       else
@@ -169,7 +171,7 @@ class DataFilesController < ApplicationController
       if @data_file.update_attributes(data_file_params)
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
-        format.json {render json: @data_file}
+        format.json {render json: @data_file, include: [params[:include]]}
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@data_file), status: :unprocessable_entity }
@@ -429,7 +431,7 @@ class DataFilesController < ApplicationController
         # the assay_id param can also contain the relationship type
         @data_file.assays << @assay if @create_new_assay
         format.html { redirect_to data_file_path(@data_file) }
-        format.json { render json: @data_file }
+        format.json { render json: @data_file, include: [params[:include]] }
       end
 
     else

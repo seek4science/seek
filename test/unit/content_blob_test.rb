@@ -524,7 +524,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'is_content_viewable?' do
-    Seek::Config.stub(:soffice_available?, true) do
+    Seek::Config.stub(:pdf_conversion_enabled, true) do
       viewable_formats = %w[application/pdf]
       viewable_formats << 'application/msword'
       viewable_formats << 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
@@ -543,39 +543,16 @@ class ContentBlobTest < ActiveSupport::TestCase
       end
       cb_with_no_viewable_format = Factory(:content_blob, content_type: 'application/excel', asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet.xls", 'rb').read)
       User.with_current_user cb_with_no_viewable_format.asset.contributor do
-        assert !cb_with_no_viewable_format.is_viewable_format?
-        assert !cb_with_no_viewable_format.is_content_viewable?
+        refute cb_with_no_viewable_format.is_viewable_format?
+        refute cb_with_no_viewable_format.is_content_viewable?
       end
-    end
-  end
 
-  test 'is_content_viewable? without soffice' do
-    Seek::Config.stub(:soffice_available?, false) do
-      viewable_formats = %w[pdf_content_blob] # Can still view PDFs
+      #correct format but file doesn't exist
+      blob = Factory(:content_blob, content_type: 'application/msword', asset: Factory(:sop))
+      FileUtils.rm blob.filepath
 
-      unviewable_formats = []
-      unviewable_formats << 'doc_content_blob'
-      unviewable_formats << 'docx_content_blob'
-      unviewable_formats << 'ppt_content_blob'
-      unviewable_formats << 'pptx_content_blob'
-      unviewable_formats << 'odt_content_blob'
-      unviewable_formats << 'odp_content_blob'
-      unviewable_formats << 'rtf_content_blob'
-
-      viewable_formats.each do |viewable_format|
-        cb_with_content_viewable_format = Factory(viewable_format.to_s, asset:Factory(:sop))
-        User.with_current_user cb_with_content_viewable_format.asset.contributor do
-          assert cb_with_content_viewable_format.is_viewable_format?
-          assert cb_with_content_viewable_format.is_content_viewable?
-        end
-      end
-      unviewable_formats.each do |unviewable_format|
-        cb_with_content_unviewable_format = Factory(unviewable_format.to_s, asset:Factory(:sop))
-        User.with_current_user cb_with_content_unviewable_format.asset.contributor do
-          refute cb_with_content_unviewable_format.is_viewable_format?
-          refute cb_with_content_unviewable_format.is_content_viewable?
-        end
-      end
+      assert blob.is_viewable_format?
+      refute blob.is_content_viewable?
     end
   end
 

@@ -11,6 +11,9 @@
           <div class="col-sm-2">
             <%= link_to "New sample", new_sample_path(:sample_type_id => sample_type.id), class: "btn btn-primary" %>
           </div>
+          <div class="col-sm-2">
+            <%= link_to "New batch submission", batch_upload_sample_type_path(sample_type), class: "btn btn-primary" %>
+          </div>
         <% end %>
       </div>
   <% end %>
