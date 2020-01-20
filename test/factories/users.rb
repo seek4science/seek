@@ -43,3 +43,9 @@ Factory.define(:identity) do |f|
   f.provider 'ldap'
   f.sequence(:uid) { |n| "ldap-user-#{n}" }
 end
+
+# ApiToken
+Factory.define(:api_token) do |f|
+  f.title 'Test API token'
+  f.association :user, factory: :user
+end

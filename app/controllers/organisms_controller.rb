@@ -10,13 +10,15 @@ class OrganismsController < ApplicationController
   before_action :find_assets, only: [:index]
 
   skip_before_action :project_membership_required
-  
+
   cache_sweeper :organisms_sweeper,:only=>[:update,:create,:destroy]
 
   include BioPortal::RestAPI
   include Seek::ExternalServiceWrapper
   include Seek::IndexPager
   include Seek::BreadCrumbs
+
+  api_actions :index, :show
 
   def show
     respond_to do |format|
@@ -72,7 +74,7 @@ class OrganismsController < ApplicationController
       end
     end
   end
-  
+
   def update
 
     respond_to do |format|
@@ -109,5 +111,5 @@ class OrganismsController < ApplicationController
     end
     true
   end
-  
+
 end

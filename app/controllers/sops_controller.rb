@@ -1,5 +1,5 @@
 class SopsController < ApplicationController
-  
+
   include Seek::IndexPager
 
   include Seek::AssetsCommon
@@ -14,6 +14,8 @@ class SopsController < ApplicationController
   include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
+
+  api_actions :index, :show, :create, :update, :destroy
 
   def new_version
     if handle_upload_data(true)
@@ -32,12 +34,12 @@ class SopsController < ApplicationController
           end
           flash[:notice]="New version uploaded - now on version #{@sop.version}"
         else
-          flash[:error]="Unable to save new version"          
+          flash[:error]="Unable to save new version"
         end
         format.html {redirect_to @sop }
       end
     else
-      flash[:error]=flash.now[:error] 
+      flash[:error]=flash.now[:error]
       redirect_to @sop
     end
 

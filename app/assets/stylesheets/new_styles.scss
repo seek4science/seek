@@ -987,3 +987,18 @@ img.github-logo {
   border-radius: 4px;
   display: inline-block;
 }
+
+#application-owner .list_item {
+  .hidden-xs {
+    display: none;
+  }
+  .col-sm-6 {
+    width: 100%;
+  }
+  .list_item_avatar {
+    width: 25%;
+  }
+  .list_item_content {
+    width: 70%;
+  }
+}

@@ -8,6 +8,8 @@ class ContentBlobsController < ApplicationController
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
 
+  api_actions :show, :update, :download
+
   def update
     if @content_blob.no_content?
       @content_blob.tmp_io_object = get_request_payload

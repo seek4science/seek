@@ -219,6 +219,8 @@ GEM
     docsplit (0.7.6)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
+    doorkeeper (5.2.3)
+      railties (>= 5)
     dynamic_form (1.1.4)
     ebnf (1.1.3)
       rdf (~> 3.0)
@@ -891,6 +893,7 @@ DEPENDENCIES
   delayed_job_active_record
   docsplit
   doi_query_tool!
+  doorkeeper
   dynamic_form
   equivalent-xml
   exception_notification

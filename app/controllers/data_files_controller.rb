@@ -34,6 +34,8 @@ class DataFilesController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def plot
     sheet = params[:sheet] || 2
     @csv_data = spreadsheet_to_csv(open(@data_file.content_blob.filepath), sheet, true)
