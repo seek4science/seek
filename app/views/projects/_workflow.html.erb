@@ -1,5 +1,3 @@
-<%# <script src="assets/js/jquery.js"></script> %>
-
 <%=javascript_include_tag('jquery-ui.min.js')%>
 <%=javascript_include_tag('panzoom.js')%>
 <%=javascript_include_tag('wheel.js')%>
@@ -7,14 +5,10 @@
 
 <%= stylesheet_link_tag 'application', 'jquery.flowchart.css' %>
 <%# <link rel="stylesheet" href=" https://fonts.googleapis.com/css?family=Archivo+Narrow&display=swap"> %>
-
 <div id="content-wrapper">
     <div class="inner">
         <section id="main-content">
-
-
             <div class="flowchart-example" style="overflow-x:scroll">
-
                 <div class="flowchart-example-container" id="chart_canvas">
                     <div id="operator_properties" style="display: none;">
                         <label for="operator_title">Operator's title: </label><input type="text" id="operator_title"
@@ -23,8 +17,6 @@
                             style="right:2px;top:2px;;position:absolute;border:none;border-radius:5px">
                     </div>
                 </div>
-
-
                 <style>
                     #operator_properties {
                         position: absolute;
@@ -39,340 +31,234 @@
                         transition: all 200ms ease-in-out;
                     }
                 </style>
-                <script type="text/javascript">
-                    $j(document).ready(function () {
-                        init_workflow();
-                    });
-
-                    function init_workflow() {
-                        var $flowchart = $j('#chart_canvas');
-                        var $container = $flowchart.parent();
-
-                        var cx = $flowchart.width() / 2;
-                        var cy = $flowchart.height() / 2;
-
-
-                        // Panzoom initialization...
-                        //$flowchart.panzoom();
-
-                        // Centering panzoom
-                        //$flowchart.panzoom('pan', -cx + $container.width() / 2, -cy + $container.height() / 2);
-
-                        // Panzoom zoom handling...
-                        // var possibleZooms = [0.5, 0.75, 1, 2, 3];
-                        var currentZoom = 0.5;
-                        // $container.on('mousewheel.focal', function(e) {
-                        //     e.preventDefault();
-                        //     var delta = (e.delta || e.originalEvent.wheelDelta) || e.originalEvent.detail;
-                        //     var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
-                        //     currentZoom = Math.max(0, Math.min(possibleZooms.length - 1, (currentZoom + (zoomOut * 2 - 1))));
-                        //     $flowchart.flowchart('setPositionRatio', possibleZooms[currentZoom]);
-                        //     $flowchart.panzoom('zoom', possibleZooms[currentZoom], {
-                        //         animate: false,
-                        //         focal: e
-                        //     });
-                        // });
-
-                        // Apply the plugin on a standard, empty div...
-                        var $operatorProperties = $j('#operator_properties');
-                        var $linkProperties = $j('#link_properties');
-                        var $operatorTitle = $j('#operator_title');
-                        var $linkColor = $j('#link_color');
-
-                        $flowchart.flowchart({
-                            //data: data
-                            onOperatorSelect: function (operatorId) {
-                                $operatorProperties.show();
-                                $operatorTitle.val($flowchart.flowchart('getOperatorTitle', operatorId));
-                                $operatorProperties.css('position', 'absolute');
-                                $operatorProperties.css("left", this.data.operators[operatorId].left + 120);
-                                $operatorProperties.css("top", this.data.operators[operatorId].top - 20);
-
-                                return true;
-                            },
-                            onOperatorUnselect: function () {
-                                // $operatorProperties.hide();
-                                //return true;
-                            },
-                            onLinkSelect: function (linkId) {
-                                $linkProperties.show();
-                                $linkColor.val($flowchart.flowchart('getLinkMainColor', linkId));
-                                return true;
-                            },
-                            onLinkUnselect: function () {
-                                $linkProperties.hide();
-                                return true;
-                            }
-                        });
-
-                        $operatorTitle.keyup(function () {
-                            var selectedOperatorId = $flowchart.flowchart('getSelectedOperatorId');
-                            if (selectedOperatorId != null) {
-                                $flowchart.flowchart('setOperatorTitle', selectedOperatorId, $operatorTitle
-                                    .val());
-                            }
-                        });
-
-
-                        $flowchart.parent().siblings('.delete_selected_button').click(function () {
-                            $flowchart.flowchart('deleteSelected');
-                        });
-
-
-                        var $draggableOperators = $j('.draggable_operator');
-
-                        function getOperatorData($element) {
-
-                            const nbInputs = parseInt($element.data('nb-inputs'));
-                            const nbOutputs = parseInt($element.data('nb-outputs'));
-
-                            console.log(nbInputs)
-
-                            var data = {
-                                properties: {
-                                    title: $element.text(),
-                                    inputs: {},
-                                    outputs: {},
-                                    shape: $element.data('shape')
-                                },
-
-                            };
-
-                            var i = 0;
-                            for (i = 0; i < nbInputs; i++) {
-                                data.properties.inputs['input_' + i] = {
-                                    label: 'Input ' + (i + 1)
-                                };
-                            }
-                            for (i = 0; i < nbOutputs; i++) {
-                                data.properties.outputs['output_' + i] = {
-                                    label: 'Output ' + (i + 1)
-                                };
-                            }
-
-                            return data;
-                        }
-
-                        var operatorId = 0;
-
-                        $draggableOperators.draggable({
-                            cursor: "move",
-                            opacity: 0.7,
-
-                            helper: 'clone',
-                            appendTo: 'body',
-                            zIndex: 1000,
-
-                            helper: function (e) {
-                                var $this = $j(this);
-                                var data = getOperatorData($this);
-                                return $flowchart.flowchart('getOperatorElement', data);
-
-                            },
-                            stop: function (e, ui) {
-                                var $this = $j(this);
-                                var elOffset = ui.offset;
-                                var containerOffset = $container.offset();
-                                if (elOffset.left > containerOffset.left &&
-                                    elOffset.top > containerOffset.top &&
-                                    elOffset.left < containerOffset.left + $container.width() &&
-                                    elOffset.top < containerOffset.top + $container.height()) {
-
-                                    var flowchartOffset = $flowchart.offset();
-
-                                    var relativeLeft = elOffset.left - flowchartOffset.left;
-                                    var relativeTop = elOffset.top - flowchartOffset.top;
-
-                                    var positionRatio = $flowchart.flowchart('getPositionRatio');
-                                    relativeLeft /= positionRatio;
-                                    relativeTop /= positionRatio;
-
-                                    var data = getOperatorData($this);
-                                    data.left = relativeLeft;
-                                    data.top = relativeTop;
-
-                                    $flowchart.flowchart('addOperator', data);
-                                }
-                            }
-                        });
-                    }
-
-                    $j('html').keyup(function (e) {
-                        if (e.keyCode == 46) {
-                            Delete()
-                        }
-                    });
-
-                    function Delete() {
-
-                        var $flowchart = $j('#chart_canvas');
-                        $flowchart.flowchart('deleteSelected');
-
-                    }
-
-                    function saveWorkflow(cookieName) {
-
-                        if (!cookieName) return;
-                        var $flowchart = $j('#chart_canvas');
-                        var data = $flowchart.flowchart('getData');
-                        setCookie(cookieName, JSON.stringify(data), 1000000)
-                        updateMethods(data);
-                        updateTBLs(data);
-                        // console.log(data)
-                    }
-
-                    function loadWorkflow(cookieName) {
-
-                        var $flowchart = $j('#chart_canvas');
-                        let data =  ""//getCookie(cookieName);
-                        if (!data) {
-                            $flowchart.flowchart('setData', "");
-                            return;
-                        }
-
-                        console.log(JSON.parse(data));
-
-                        //
-                        if (data.length > 20) {
-                            $flowchart.flowchart('setData', JSON.parse(data));
-                        }
-
-                    }
-
-                    function updateMethods(data) {
-                        let methods = [];
-                        // if the workflow has method box
-                        $j.map(data.operators, (operator) => {
-                            if (operator.properties.shape === "rectangle") {
-                                methods.push(operator.properties.title)
-                            }
-
-                        })
-                        let currentStudy = ""// getCookie("whichWorkflow");
-                        setCookie(currentStudy + "_Methods", methods, 1000000);
-                        if (currentStudy === "wf") {
-                            let origin = $j("#j1_13_anchor span")
-                            bounce(origin, methods.length)
-                        } else if (currentStudy === "wf2") {
-
-                            let origin = $j("#j1_16_anchor span")
-                            bounce(origin, methods.length)
-                        } else if (currentStudy === "wf3") {
-
-                            let origin = $j("#j1_24_anchor span")
-                            bounce(origin, methods.length)
-                        }
-
-                    }
-
-                    function updateTBLs(data) {
-                        let TableNames = [];
-                        let TableopIndexes = [];
-                        // if the workflow has TBL box
-                        $j.map(data.operators, (operator, index) => {
-                            if (operator.properties.shape === "parallelogram") {
-                                TableopIndexes.push(index);
-                            }
-                        })
-
-                        let FirstBox = findFirstBox(TableopIndexes, data.links);
-                        let arrenged = arrangeBoxes(data.operators, FirstBox, data.links)
-                        $j.map(arrenged, (operator, index) => {
-                            if (operator.properties.shape === "parallelogram") {
-                                TableNames.push(operator.properties.title);
-                            }
-                        })
-
-                        let currentStudy =""// getCookie("whichWorkflow");
-                        setCookie(currentStudy + "_TBLs", TableNames, 1000000);
-
-                    }
-
-                    function findFirstBox(operatorsIndexes, links) {
-                        let temp, result;
-                        $j.each(operatorsIndexes, (op_key, op_val) => {
-                            temp = false;
-                            $j.each(links, (link_key, link_val) => {
-                                if (link_val.toOperator.toString() == op_val)
-                                    temp = true;
-                            })
-                            if (!temp) {
-                                result = op_val;
-                                return result
-                            }
-                        })
-                        return result
-                    }
-
-                    function arrangeBoxes(OpList, firstBoxId, links) {
-                        let arranged = [],
-                            current = firstBoxId;
-                        arranged.push(OpList[current])
-                        for (let i = 0; i < Object.keys(links).length; i++) {
-                            $j.each(links, (key, link) => {
-
-                                if (link.fromOperator == current) {
-                                    arranged.push(OpList[link.toOperator])
-                                    current = link.toOperator
-                                }
-                            })
-
-                        }
-                        return arranged
-                    }
-
-
-                    function bounce(item, text) {
-
-                        item.addClass('animate')
-                        setTimeout(() => {
-                            item.css('transform', 'scale(2)')
-                            item.css('opacity', '0')
-
-
-
-                        }, 1);
-                        setTimeout(() => {
-                            item.css('transform', 'scale(1)')
-                            item.css('opacity', '1')
-                            item.text(text)
-                        }, 300);
-                    }
-                </script>
             </div>
 
             <div class="draggable_operators">
-
                 <div class="draggable_operators_divs">
-                    <%# <div id="fgg" class="draggable_operator ui-draggable ui-draggable-handle wf_btn oval_button" data-nb-inputs="1" data-nb-outputs="1" data-shape='oval'>Source material</div> &nbsp; %>
                     <div class="draggable_operator ui-draggable ui-draggable-handle wf_btn rectangle_button"
-                        data-nb-inputs="1" data-nb-outputs="1" data-shape='rectangle'>Method</div>&nbsp;&nbsp;&nbsp;
+                        data-nb-inputs="1" data-nb-outputs="1" data-shape='rectangle'>Method</div>
                     <div class="draggable_operator ui-draggable ui-draggable-handle wf_btn parallelogram_button"
-                        data-nb-inputs="1" data-nb-outputs="1" data-shape='parallelogram'>Input/Output</div>&nbsp;
-                    <%# <div class="draggable_operator ui-draggable ui-draggable-handle wf_btn parallelogram_button" data-nb-inputs="1" data-nb-outputs="1" data-shape='parallelogram'>Output</div>&nbsp; %>
-                    <%# <div class="draggable_operator ui-draggable ui-draggable-handle wf_btn oval_button" data-nb-inputs="1" data-nb-outputs="1" data-shape='oval'>Data analysis</div>&nbsp; %>
+                        data-nb-inputs="1" data-nb-outputs="1" data-shape='parallelogram'>Input/Output</div>
                     <div class="form-inline" style="margin-top:10px">
                         Inputs:<input id="inputs_num" type="number" class="form-control" style="width:50px" value="1"
                             min="0" max="3">
-                        &nbsp;Outputs:<input id="outputs_num" type="number" class="form-control" style="width:50px"
-                            value="1" min="0" max="3">
+                        Outputs:<input id="outputs_num" type="number" class="form-control" style="width:50px" value="1"
+                            min="0" max="3">
                     </div>
-                    <%# <input type="button" value="Delete" class="btn btn-primary" onclick="Delete();" /> %>
-                    &emsp;
-                    &emsp;
-                    <input type="button" class="btn btn-primary" value="Save"
-                        onclick="saveWorkflow(getCookie('whichWorkflow'));" style="float:right">
+                    <input type="button" class="btn btn-primary" value="Save" id="btn_save_workflow"
+                        style="float:right">
+                    <br />
                 </div>
             </div>
-
-
-
     </div>
 </div>
 
+<script type="text/javascript">
+    function init_workflow() {
+        var $flowchart = $j('#chart_canvas');
+        var $container = $flowchart.parent();
+        var cx = $flowchart.width() / 2;
+        var cy = $flowchart.height() / 2;
+        var currentZoom = 0.5;
+        // Apply the plugin on a standard, empty div...
+        var $operatorProperties = $j('#operator_properties');
+        var $linkProperties = $j('#link_properties');
+        var $operatorTitle = $j('#operator_title');
+        var $linkColor = $j('#link_color');
+        $flowchart.flowchart({
+            onOperatorSelect: function (operatorId) {
+                $operatorProperties.show();
+                $operatorTitle.val($flowchart.flowchart('getOperatorTitle', operatorId));
+                $operatorProperties.css('position', 'absolute');
+                $operatorProperties.css("left", this.data.operators[operatorId].left + 120);
+                $operatorProperties.css("top", this.data.operators[operatorId].top - 20);
+                return true;
+            },
+            onOperatorUnselect: function () {
+                // $operatorProperties.hide();
+                // return true;
+            },
+            onLinkSelect: function (linkId) {
+                $linkProperties.show();
+                $linkColor.val($flowchart.flowchart('getLinkMainColor', linkId));
+                return true;
+            },
+            onLinkUnselect: function () {
+                $linkProperties.hide();
+                return true;
+            }
+        });
 
+        $operatorTitle.keyup(function () {
+            var selectedOperatorId = $flowchart.flowchart('getSelectedOperatorId');
+            if (selectedOperatorId != null) {
+                $flowchart.flowchart('setOperatorTitle', selectedOperatorId, $operatorTitle
+                    .val());
+            }
+        });
+        $flowchart.parent().siblings('.delete_selected_button').click(function () {
+            $flowchart.flowchart('deleteSelected');
+        });
+        var $draggableOperators = $j('.draggable_operator');
 
-<script>
+        function getOperatorData($element) {
+            const nbInputs = parseInt($element.data('nb-inputs'));
+            const nbOutputs = parseInt($element.data('nb-outputs'));
+            console.log(nbInputs)
+            var data = {
+                properties: {
+                    title: $element.text(),
+                    inputs: {},
+                    outputs: {},
+                    shape: $element.data('shape')
+                },
+            };
+            var i = 0;
+            for (i = 0; i < nbInputs; i++) {
+                data.properties.inputs['input_' + i] = {
+                    label: 'Input ' + (i + 1)
+                };
+            }
+            for (i = 0; i < nbOutputs; i++) {
+                data.properties.outputs['output_' + i] = {
+                    label: 'Output ' + (i + 1)
+                };
+            }
+            return data;
+        }
+        var operatorId = 0;
+        $draggableOperators.draggable({
+            cursor: "move",
+            opacity: 0.7,
+            helper: 'clone',
+            appendTo: 'body',
+            zIndex: 1000,
+            helper: function (e) {
+                var $this = $j(this);
+                var data = getOperatorData($this);
+                return $flowchart.flowchart('getOperatorElement', data);
+
+            },
+            stop: function (e, ui) {
+                var $this = $j(this);
+                var elOffset = ui.offset;
+                var containerOffset = $container.offset();
+                if (elOffset.left > containerOffset.left &&
+                    elOffset.top > containerOffset.top &&
+                    elOffset.left < containerOffset.left + $container.width() &&
+                    elOffset.top < containerOffset.top + $container.height()) {
+                    var flowchartOffset = $flowchart.offset();
+                    var relativeLeft = elOffset.left - flowchartOffset.left;
+                    var relativeTop = elOffset.top - flowchartOffset.top;
+                    var positionRatio = $flowchart.flowchart('getPositionRatio');
+                    relativeLeft /= positionRatio;
+                    relativeTop /= positionRatio;
+                    var data = getOperatorData($this);
+                    data.left = relativeLeft;
+                    data.top = relativeTop;
+                    $flowchart.flowchart('addOperator', data);
+                }
+            }
+        });
+    }
+
+    $j('html').keyup(function (e) {
+        if (e.keyCode == 46) {
+            Delete()
+        }
+    });
+
+    function Delete() {
+        $j('#chart_canvas').flowchart('deleteSelected');
+    }
+
+    function saveWorkflow() {
+        var data = $j('#chart_canvas').flowchart('getData');
+        console.log("saveWorkflow")
+        save_flowchart(data, updateMethods(data), updateTBLs(data))
+    }
+
+    function loadWorkflow(data) {
+        var $flowchart = $j('#chart_canvas');
+        if (!data) {
+            $flowchart.flowchart('setData', "");
+        } else {
+            $flowchart.flowchart('setData', data);
+            console.log('flowchart set!')
+        }
+    }
+
+    function updateMethods(data) {
+        let methods = [];
+        // if the workflow has method box
+        $j.map(data.operators, (operator) => {
+            if (operator.properties.shape === "rectangle") {
+                methods.push({
+                    'id': 'method' + uniqId(),
+                    'title': operator.properties.title,
+                    'content': ''
+                })
+            }
+        })
+        return methods
+    }
+
+    function updateTBLs(data) {
+        if (Object.keys(data.operators) == 0)
+            return []
+        let TableNames = [];
+        let TableopIndexes = [];
+        // if the workflow has TBL box
+        console.log(data)
+        $j.map(data.operators, (operator, index) => {
+            if (operator.properties.shape === "parallelogram") {
+                TableopIndexes.push(index);
+            }
+        })
+        let FirstBox = findFirstBox(TableopIndexes, data.links);
+        let arrenged = arrangeBoxes(data.operators, FirstBox, data.links)
+        $j.map(arrenged, (operator, index) => {
+            if (operator.properties.shape === "parallelogram") {
+                TableNames.push({
+                    'id': 'table' + uniqId(),
+                    'title': operator.properties.title,
+                    'content': ''
+                });
+            }
+        })
+        return TableNames
+    }
+
+    function findFirstBox(operatorsIndexes, links) {
+        let temp, result;
+        $j.each(operatorsIndexes, (op_key, op_val) => {
+            temp = false;
+            $j.each(links, (link_key, link_val) => {
+                if (link_val.toOperator.toString() == op_val)
+                    temp = true;
+            })
+            if (!temp) {
+                result = op_val;
+                return result
+            }
+        })
+        return result
+    }
+
+    function arrangeBoxes(OpList, firstBoxId, links) {
+        let arranged = [],
+            current = firstBoxId;
+        arranged.push(OpList[current])
+        for (let i = 0; i < Object.keys(links).length; i++) {
+            $j.each(links, (key, link) => {
+                if (link.fromOperator == current) {
+                    arranged.push(OpList[link.toOperator])
+                    current = link.toOperator
+                }
+            })
+        }
+        return arranged
+    }
     $j('#inputs_num').on('input', function (e) {
         let num = $j(this).val();
         if (num >= 0 && num < 4)
@@ -383,7 +269,69 @@
         let num = $j(this).val();
         if (num >= 0 && num < 4)
             $j('.wf_btn').data('nb-outputs', num);
-
-
     });
+
+    function load_methods(std_id) {
+        let base = $j(".fileManager");
+        $j('.fileManager li:not(:last-child)').remove();
+        base.not(':last').remove()
+        $j.ajax({
+            type: 'GET',
+            url: pid + '/methods',
+            data: {
+                std_id
+            },
+            success: result => {
+                if (!result) {
+                    base.empty()
+                    base.append("<li>Error!</li>")
+                    return
+                }
+                result = JSON.parse(result.data)
+                if (result.length > 0) {
+                    result.forEach(function (method) {
+                        addFile(`${std_id}_${method.id}`, file_icon('.txt'), minify(
+                            method.title))
+                    })
+                } else {
+                    base.prepend('<li>empty</li>')
+                }
+            }
+        })
+    }
+
+    function load_iotables(std_id) {
+        let base = $j(".fileManager");
+        $j('.fileManager li:not(:last-child)').remove();
+        base.not(':last').remove()
+        $j.ajax({
+            type: 'GET',
+            url: pid + '/iotables',
+            data: {
+                std_id
+            },
+            success: result => {
+                if (!result) {
+                    base.empty()
+                    base.append("<li>Error!</li>")
+                    return
+                }
+                result = JSON.parse(result.data)
+                if (result.length > 0) {
+                    result.forEach(function (iotable) {
+                        addFile(`${std_id}_${iotable.id}`, file_icon('.tbl'),
+                            minify(iotable.title))
+                    })
+                } else {
+                    base.prepend('<li>empty</li>')
+                }
+            }
+        })
+    }
+
+    function refreshWorkflow() {
+        setTimeout(() => {
+            $j('#chart_canvas').flowchart('redrawLinksLayer')
+        }, 250);
+    }
 </script>

@@ -181,76 +181,75 @@
     }
   })(jQuery);
 
-
   let pid
   $j(document).ready(function () {
-  pid = <%= params[:id] %>
-    let uid = <%= current_user.id if current_user %>
-    hide_all_containers()
-  $j("#projectDetailContainer").show()
-  get_project()
-  init_workflow()
-  $j("a:contains('Cancel')").click(function (e) {
-    e.preventDefault();
-    $j('#data-file-modal-inv').modal('hide');
-    $j('#data-file-modal-std').modal('hide');
-  })
-  $j("#submit_investigation").click(function () {
-    data = {
-      "data": {
-        "type": "investigations",
-        "attributes": {
-          "title": $j("#investigation_title").val(),
-          "policy": {
-            "access": "download",
-            "permissions": [{
-              "resource": {
-                "id": "1",
+    pid = <%= params[:id] %>
+      let uid = <%= current_user.id if current_user %>
+      hide_all_containers()
+    $j("#projectDetailContainer").show()
+    get_project()
+    init_workflow()
+    $j("a:contains('Cancel')").click(function (e) {
+      e.preventDefault();
+      $j('#data-file-modal-inv').modal('hide');
+      $j('#data-file-modal-std').modal('hide');
+    })
+    $j("#submit_investigation").click(function () {
+      data = {
+        "data": {
+          "type": "investigations",
+          "attributes": {
+            "title": $j("#investigation_title").val(),
+            "policy": {
+              "access": "download",
+              "permissions": [{
+                "resource": {
+                  "id": "1",
+                  "type": "projects"
+                },
+                "access": "manage"
+              }]
+            },
+            "description": $j("#investigation_description").val()
+          },
+          "relationships": {
+            "projects": {
+              "data": [{
+                "id": pid,
                 "type": "projects"
-              },
-              "access": "manage"
-            }]
-          },
-          "description": $j("#investigation_description").val()
-        },
-        "relationships": {
-          "projects": {
-            "data": [{
-              "id": pid,
-              "type": "projects"
-            }]
-          },
-          "publications": {
-            "data": []
-          },
-          "creators": {
-            "data": [{
-              "id": uid,
-              "type": "people"
-            }]
+              }]
+            },
+            "publications": {
+              "data": []
+            },
+            "creators": {
+              "data": [{
+                "id": uid,
+                "type": "people"
+              }]
+            }
           }
         }
       }
-    }
-    $j.ajax({
-      method: 'POST',
-      "headers": {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      url: '/investigations',
-      data: JSON.stringify(data),
-      success: s => {
-        location.reload(true);
-      },
-      error: (e) => {
-        console.log('error creating investigation!')
-      }
+      $j.ajax({
+        method: 'POST',
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        url: '/investigations',
+        data: JSON.stringify(data),
+        success: s => {
+          location.reload(true);
+        },
+        error: (e) => {
+          console.log('error creating investigation!')
+        }
+      })
     })
-  })
 
-  $j("#submit_study").click(function () {
-    let data = {
+    $j("#submit_study").click(function () {
+      let data = {
         "data": {
           "type": "studies",
           "attributes": {
@@ -286,17 +285,17 @@
           }
         }
       }
-    $j.ajax({
-      method: 'POST',
-      "headers": {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      url: '/studies',
-      data: JSON.stringify(data),
-      success: s => {
-        // Create Assay
-        let data = {
+      $j.ajax({
+        method: 'POST',
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        url: '/studies',
+        data: JSON.stringify(data),
+        success: s => {
+          // Create Assay
+          let data = {
             "data": {
               "type": "assays",
               "attributes": {
@@ -331,35 +330,40 @@
               }
             }
           }
-        $j.ajax({
-          method: 'POST',
-          "headers": {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          url: '/assays',
-          data: JSON.stringify(data),
-          success: s => {
-            location.reload(true);
-          },
-          error: (e) => {
-            console.log('error create assay!')
-          }
-        })
-      },
-      error: (e) => {
-        console.log('error create study!')
-      }
+          $j.ajax({
+            method: 'POST',
+            "headers": {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            url: '/assays',
+            data: JSON.stringify(data),
+            success: s => {
+              location.reload(true);
+            },
+            error: (e) => {
+              console.log('error create assay!')
+            }
+          })
+        },
+        error: (e) => {
+          console.log('error create study!')
+        }
+      })
     })
+    $j("#btn_save_workflow").on("click", function () {
+      saveWorkflow()
+    });
   })
-  })
-  
+
 
   function hide_all_containers() {
     $j("#projectDetailContainer").hide()
     $j("#fileManagerContainer").hide()
     $j("#investigationContainer").hide()
     $j("#studyContainer").hide()
+    $j("#text_content").hide()
+    $j("#tbl_file_content").hide()
   }
 
   $j('#html').on('changed.jstree', function (e, data) {
@@ -384,11 +388,17 @@
           break;
         case "asy":
           $j("#fileManagerContainer").show()
+          load_iotables($j(`#${item.parent}`).children('a[_type="std"]').attr("_id"));
           break;
         case "fld":
           $j("#fileManagerContainer").show()
           $j("#selected_folder").val(item.text)
           load_files()
+          break;
+        case "methods":
+          $j("#fileManagerContainer").show()
+          $j("#selected_folder").val(item.text)
+          load_methods($j(`#${item.parent}`).parent().siblings('a[_type="std"]').attr("_id"));
           break;
       }
     })
@@ -500,5 +510,9 @@
         console.log('error gettign investigation!')
       }
     })
+  }
+
+  function uniqId() {
+    return Math.round((Math.random() * 36 ** 12)).toString(36);
   }
 </script>

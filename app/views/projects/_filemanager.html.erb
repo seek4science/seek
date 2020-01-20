@@ -1,7 +1,5 @@
  <div class="col-lg-12">
      <input type="file" id="file" style="display:none">
-
-
      <div class="row">
          <div id=files class="simpleForm" style="overflow-x:scroll">
              <ul class="fileManager">
@@ -12,9 +10,34 @@
              </ul>
          </div>
      </div>
-     <div class="row" style="display:none">
-         <textarea placeholder="Insert content here!" id="txt_file_content" class="form-control"></textarea>
+     <div class="row" id="text_content">
+         <textarea placeholder="Insert content here!" id="txt_file_content" class="form-control">
+         </textarea>
+         <input id="btn_save_content" class="btn btn-primary pull-right" style="margin-top:5px" type="button"
+             value="Save">
      </div>
+ </div>
+ <div id="tbl_file_content" style="display:none">
+     <a class="btn btn-primary btn-sm" onClick="AddRow('.tableInpOut')"> <i class="glyphicon glyphicon-plus"></i>Add
+         Row</a>
+     <a class="btn btn-primary btn-sm" onClick="showPreDefinedCols(event)">
+         <i class="glyphicon glyphicon-plus"></i>Add Column</a>
+     <a id="btn_update_tables" class="btn btn-primary btn-sm pull-right">Save</a>
+     <div class="arrow_box" style="padding:5px; display:none">
+         <ul id="preDefinedList" style="list-style-type: none;padding:0;">
+             <li><input placeholder="custom column name..." class="form-control customCol" /></li>
+             <li><input type="button" class="btn btn-primary col-md-12 predef" value="Species"></li>
+         </ul>
+     </div>
+     <table>
+         <table class="table tableXs tableInpOut">
+             <thead class="thead-dark">
+                 <tr></tr>
+             </thead>
+             <tbody>
+             </tbody>
+         </table>
+     </table>
  </div>
 
  <script>
@@ -77,10 +100,11 @@
          if ($j(".fileManager li:first").text() == "empty")
              $j(".fileManager li:first").remove();
 
-         $j(".fileManager").prepend(
+         let item = id.includes('method') || id.includes('table') ?
+             `<li class="file" data-id=${id}><img src="/assets/${ext}.png"> <br><a onClick="load_text_content('${id}')" data-filetype="txt" class="file">${name}</a></li>` :
              `<li class="file" data-id=${id}><img src="/assets/${ext}.png"> <br><a href="/projects/${pid}/download_file?uid=${id}" data-filetype="txt" class="file">` +
              `${name}</a><span onClick="delete_file(event)" class="del_file"><i class="glyphicon glyphicon-remove"></i></span></li>`
-         )
+         $j(".fileManager").prepend(item)
      }
 
      function minify(f) {
@@ -107,11 +131,50 @@
                  return 'csv'
              case 'pdf':
                  return 'pdf'
+             case 'tbl':
+                 return 'tbl'
              default:
                  return 'general'
          }
      }
 
+     function load_text_content(id) {
+         let std_id = id.split('_')[0]
+         let item_id = id.split('_')[1]
+         $j("#text_content").attr('data-selected', id)
+         if (item_id.startsWith("method"))
+             $j("#text_content").show()
+         else
+             $j("#tbl_file_content").show()
+         $j.ajax({
+             type: 'GET',
+             url: pid + '/text_content',
+             data: {
+                 std_id,
+                 item_id
+             },
+             success: result => {
+
+                 if (!result) {
+                     alert('Error retrieving content!')
+                     return
+                 }
+                 if (item_id.startsWith("method"))
+                     $j('#txt_file_content').val(result.data)
+                 else {
+
+                     if (result.data.length > 10) {
+                         console.log(result.data)
+                         $j('.tableInpOut').html(result.data);
+                     } else {
+                         $j('.tableInpOut').html('<table class="table tableXs tableInpOut"><thead class="thead-dark"><tr></tr></thead><tbody></tbody></table>');
+                     }
+
+                 }
+
+             }
+         })
+     }
      $j(".fileManager").on("click", ".file", function (event) {
          $j('.file').each(function () {
              $j(this).removeClass("file_selected")
@@ -151,4 +214,106 @@
          }
      }
 
+     function update_method(std_id, method_id, content) {
+         $j.ajax({
+             type: 'PATCH',
+             url: pid + '/update_method',
+             data: {
+                 std_id,
+                 method_id,
+                 content
+             },
+             success: result => {
+                 console.log('Content saved successfully!')
+             }
+         })
+     }
+
+     $j('#btn_save_content').on('click', () => {
+         let std_id = $j("#text_content").attr('data-selected').split('_')[0]
+         let method_id = $j("#text_content").attr('data-selected').split('_')[1]
+         let content = $j("#txt_file_content").val()
+         console.log(content)
+         update_method(std_id, method_id, content)
+     })
+
+     function showPreDefinedCols(e) {
+         $j(".arrow_box").css({
+             display: "block",
+             left: $j(e.target).position().left + 120,
+             top: $j(e.target).position().top - 10
+         });
+     }
+     $j('body').on('click', '.predef', function () {
+         AddCell('.tableInpOut', $j(this).val())
+         $j(".arrow_box").css({
+             display: "none"
+         });
+     });
+
+     $j('.customCol').keypress(function (event) {
+         var keycode = (event.keyCode ? event.keyCode : event.which);
+         if (keycode == '13') {
+             AddCell('.tableInpOut', $j(this).val())
+             $j(".arrow_box").css({
+                 display: "none",
+                 left: 200,
+                 top: 4
+             });
+         }
+     });
+
+     function AddRow(table) {
+         let rowCount = $j(table).rowcount() + 1;
+         let newRow;
+         $j(table + ' thead tr').find('th').each(function () {
+             newRow += '<td contenteditable></td>'
+         });
+         $j(table + ' tbody').append('<tr>' + newRow + '</tr>')
+     }
+
+     $j.fn.columnCount = function () {
+         return $j('th', $j(this).find('thead')).length;
+     };
+
+     $j.fn.rowcount = function () {
+         return $j('tr', $j(this).find('tbody')).length;
+     };
+
+     function AddCell(table, newColName) {
+         let colCount = $j(table).columnCount() + 1;
+         if (newColName.length < 3) {
+             alert("Please enter a valid column name!");
+             return;
+         }
+         if ($j(table).find('thead tr').find('th').length == 0)
+             $j(table).find('thead tr').append('<th>' + newColName + '</th>')
+         else
+             $j(table).find('thead tr').find('th').eq(colCount - 2).after('<th>' + newColName + '</th>');
+         $j(table).find('tr').each(function () {
+             $j(this).find('td').eq(colCount - 2).after('<td contenteditable></td>');
+         });
+     }
+
+     function update_iotable(std_id, table_id, content) {
+         $j.ajax({
+             type: 'PATCH',
+             url: pid + '/update_iotable',
+             data: {
+                 std_id,
+                 table_id,
+                 content
+             },
+             success: result => {
+                 alert('Content saved successfully!')
+             }
+         })
+     }
+
+     $j("#btn_update_tables").on("click", () => {
+         let std_id = $j("#text_content").attr('data-selected').split('_')[0]
+         let table_id = $j("#text_content").attr('data-selected').split('_')[1]
+         let content = $j('.tableInpOut').prop('outerHTML')
+         update_iotable(std_id, table_id, content)
+     })
  </script>

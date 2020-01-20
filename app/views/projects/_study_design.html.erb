@@ -19,7 +19,8 @@
             </table>
             <h2>Response variables</h2>
 
-            <a class="btn btn-secondary pull-left" onClick="add_rep('.resptable','',true)"> <i class="glyphicon glyphicon-plus"></i> Add
+            <a class="btn btn-secondary pull-left" onClick="add_rep('.resptable','',true)"> <i
+                    class="glyphicon glyphicon-plus"></i> Add
                 Variable</a>
             &nbsp;
             <a class="btn btn-secondary pull-left" onClick="add_dep_col('',true)">
@@ -37,7 +38,8 @@
 
             <h2>Blocking variables</h2>
 
-            <a class="btn btn-secondary pull-left" onClick="add_var('.blocktable','','',true)"> <i class="glyphicon glyphicon-plus"></i>
+            <a class="btn btn-secondary pull-left" onClick="add_var('.blocktable','','',true)"> <i
+                    class="glyphicon glyphicon-plus"></i>
                 Add Variable</a>
 
             <table class="table tableXs blocktable">
@@ -52,7 +54,8 @@
 
             <h2>Covariates</h2>
 
-            <a class="btn btn-secondary pull-left" onClick="add_var('.covtable','','',true)"> <i class="glyphicon glyphicon-plus"></i> Add
+            <a class="btn btn-secondary pull-left" onClick="add_var('.covtable','','',true)"> <i
+                    class="glyphicon glyphicon-plus"></i> Add
                 Variable</a>
 
             <table class="table tableXs covtable">
@@ -67,7 +70,8 @@
 
             <h2>Confounding variables</h2>
 
-            <a class="btn btn-secondary pull-left" onClick="add_var('.conftable','','',true)"> <i class="glyphicon glyphicon-plus"></i>
+            <a class="btn btn-secondary pull-left" onClick="add_var('.conftable','','',true)"> <i
+                    class="glyphicon glyphicon-plus"></i>
                 Add Variable</a>
 
             <table class="table tableXs conftable">
@@ -83,7 +87,8 @@
 
             <h2>Control variables</h2>
 
-            <a class="btn btn-secondary pull-left" onClick="add_rep('.controltable','',true)"> <i class="glyphicon glyphicon-plus"></i>
+            <a class="btn btn-secondary pull-left" onClick="add_rep('.controltable','',true)"> <i
+                    class="glyphicon glyphicon-plus"></i>
                 Add Variable</a>
 
             <table class="table tableXs controltable">
@@ -97,7 +102,8 @@
 
             <h2>Replicates</h2>
 
-            <a class="btn btn-secondary pull-left" onClick="add_rep('.reptable','',true)"> <i class="glyphicon glyphicon-plus"></i> Add
+            <a class="btn btn-secondary pull-left" onClick="add_rep('.reptable','',true)"> <i
+                    class="glyphicon glyphicon-plus"></i> Add
                 Variable</a>
 
             <table class="table tableXs reptable">
@@ -130,11 +136,12 @@
 <script>
     var respTable //saving this for resetting table cols
     $j(document).ready(function () {
-        respTable = $j('.resptable').html() 
+        respTable = $j('.resptable').html()
     });
 
-    function add_level(_tr = '', level = '', add_single=false) {
-        let action =  "<td><a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a></td>"
+    function add_level(_tr = '', level = '', add_single = false) {
+        let action =
+            "<td><a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a></td>"
         var tr = _tr.length > 0 ? _tr : event.target.closest('tr')
         var firstCol = $j(tr).find('td:eq(0)');
         var rowspan = parseInt($j(firstCol).attr('rowspan'));
@@ -144,54 +151,80 @@
         $j(tr).after(`<tr><td contentEditable='true'>${level}</td></tr>`)
     }
 
-    function add_var(table, variable = '', level = '', add_single=false) {
-        let action = "<td><a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a></td>"
+    function add_var(table, variable = '', level = '', add_single = false) {
+        let action =
+            "<td><a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a></td>"
         let tag =
             ` <tr><td contentEditable='true' rowspan='1'>${variable}</td><td rowspan='1'><a class='btn btn-secondary btn-xs' onClick='add_level(undefined,undefined,true)'> <i class='glyphicon glyphicon-plus'></i> Add Level</a></td><td contentEditable='true'>${level}</td>${add_single?action:''}</tr>`
         $j(`${table} tbody`).append(tag)
     }
 
-    function add_dep_col(value = '', add_single=false) {
-        let bias = add_single?2:1
-        let action = "<a href='' onclick='remove_col(event)'> <span style='color:white' class='glyphicon glyphicon-trash'></span></a>"
-        let colCount = $j('.resptable thead tr th').length ;
+    function add_dep_col(value = '', add_single = false) {
+        let bias = add_single ? 2 : 1
+        let action =
+            "<a href='' onclick='remove_col(event)'> <span style='color:white' class='glyphicon glyphicon-trash'></span></a>"
+        let colCount = $j('.resptable thead tr th').length;
         $j('.resptable').find('thead').find('th').eq(colCount - bias).after(`<th>sub-sample of${action}</th>`);
         $j('.resptable').find('tr').each(function () {
             $j(this).find('td').eq(colCount - bias).after(`<td contentEditable='true'>${value}</td>`);
         });
     }
 
-    function add_rep(table, items = '', add_single=false) {
-        let action =  "<a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a>"
+    function add_rep(table, items = '', add_single = false) {
+        let action =
+            "<a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a>"
         let newRow;
         let tdCount = $j(`${table} thead tr`).find('th').length
         $j(`${table} thead tr`).find('th').each(function (i, a) {
-            newRow += Object.keys(items).length > 0 ? `<td contentEditable='true'>${Object.values(items)[i]}</td>` : '<td contentEditable="true"></td>'
+            newRow += Object.keys(items).length > 0 ?
+                `<td contentEditable='true'>${Object.values(items)[i]}</td>` :
+                '<td contentEditable="true"></td>'
         });
-       $j(`${table} tbody`).append('<tr>' + newRow + '</tr>')
-       if (add_single){
-           let td = $j(`${table} tbody tr:last td:last`)
-           td.append(action)
-           td.attr('contentEditable', false)
-       }
+        $j(`${table} tbody`).append('<tr>' + newRow + '</tr>')
+        if (add_single) {
+            let td = $j(`${table} tbody tr:last td:last`)
+            td.append(action)
+            td.attr('contentEditable', false)
+        }
     }
 
     function save_design() {
-        let pid = <%=params[:id]%>
-            $j.ajax({
-                method: 'PATCH',
-                url: `${pid}/update_study_design`,
-                data: {
-                    "data": JSON.stringify(create_data()),
-                    "std_id": $j("#selected_item_id").val()
-                },
-                success: s => {
-                    alert('Study design was updated successfully!')
-                },
-                error: e => {
-                    alert('error!')
-                }
-            })
+        $j.ajax({
+            method: 'PATCH',
+            url: `${pid}/update_study_design`,
+            data: {
+                "data" : JSON.stringify(create_data()),
+                "std_id": $j("#selected_item_id").val()
+            },
+            success: s => {
+                alert('All changes were saved successfully!')
+            },
+            error: e => {
+                alert('error!')
+            }
+        })
+    }
+
+    function save_flowchart(data, methods, tables) {
+        $j.ajax({
+            method: 'PATCH',
+            url: `${pid}/update_study_design`,
+            data: {
+                "flowchart_data" : JSON.stringify(data),
+                "flowchart_methods" : JSON.stringify(methods),
+                "flowchart_tables" : JSON.stringify(tables),
+                "std_id": $j("#selected_item_id").val()
+            },
+            success: s => {
+                alert('All changes were saved successfully!')
+                let origin = $j(
+                    `#${$j("#selected_tree_item_id").val()} > ul > li:first > ul > li:first > a > span`)
+                bounce(origin, methods.length)
+            },
+            error: e => {
+                alert('error!')
+            }
+        })
     }
 
     function create_data() {
@@ -206,9 +239,9 @@
             "material": "",
             "sub_sample": ""
         }
-        let thCount = $j('.resptable thead tr th').length;//Avoid remove cell
+        let thCount = $j('.resptable thead tr th').length; //Avoid remove cell
         $j('.resptable thead tr th').each(function (i, a) {
-            if (i > 2 && i<thCount-2 ) item_structure[`sub_sample${i-2}`] = ""
+            if (i > 2 && i < thCount - 2) item_structure[`sub_sample${i-2}`] = ""
         })
         data.response_variables = get_table_JSON(".resptable", item_structure, [])
         item_structure = {
@@ -245,9 +278,10 @@
     }
 
     function load_design() {
-        $j(".rem").each((i,t)=>{t.remove()})
-        let pid = <%=params[:id]%>
-            let design_data = "";
+        $j(".rem").each((i, t) => {
+            t.remove()
+        })
+        let design_data = "";
         //Load data from DB
         $j.ajax({
             method: 'GET',
@@ -256,9 +290,9 @@
                 "std_id": $j("#selected_item_id").val()
             },
             success: data => {
-                design_data = JSON.parse(data.data)
-                load_tables(design_data);
+                load_tables(JSON.parse(data.data))
                 add_remove_action()
+                loadWorkflow(JSON.parse(data.flowchart))
             },
             error: e => {
                 alert('error!')
@@ -341,8 +375,7 @@
             } else {
                 currentItem = copy(item_structure)
                 $j(tr).find('td').each(function (j, td) {
-                    if (j!=headerTdCount-1)
-                    {
+                    if (j != headerTdCount - 1) {
                         if ($j(td).attr("rowspan")) {
                             counter = $j(td).attr("rowspan") - 1;
                         }
@@ -365,38 +398,43 @@
         return JSON.parse(JSON.stringify(x));
     }
 
-    function add_remove_action(){
-        let action =  "<a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a>"
-        $j(".tableXs").each(function(i,t){
-            $j(t).children('thead').children('tr').each(function(i,t){$j(t).append("<th class='rem' style='width:50px;'></th>")})
-            $j(t).children('tbody').children('tr').each(function(i,g){
-            if ($j(g).children('td').length >1)
-                $j(g).append(`<td class='rem' rowspan=${$j(g).children('td:first').attr("rowspan")}>${action}</td>`)
+    function add_remove_action() {
+        let action =
+            "<a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a>"
+        $j(".tableXs").each(function (i, t) {
+            $j(t).children('thead').children('tr').each(function (i, t) {
+                $j(t).append("<th class='rem' style='width:50px;'></th>")
+            })
+            $j(t).children('tbody').children('tr').each(function (i, g) {
+                if ($j(g).children('td').length > 1)
+                    $j(g).append(
+                        `<td class='rem' rowspan=${$j(g).children('td:first').attr("rowspan")}>${action}</td>`
+                        )
             })
         })
     }
-    function remove_tr(e){
+
+    function remove_tr(e) {
         event.preventDefault();
         let count = $j(e.target).closest('td').attr("rowspan")
 
         let first_item = $j(e.target).closest('tr')
-        let tr_list =[]
+        let tr_list = []
         tr_list.push(first_item)
-         let item = first_item
-        for (i=0;i<count-1;i++)
-        {
-             item = item.next('tr')
+        let item = first_item
+        for (i = 0; i < count - 1; i++) {
+            item = item.next('tr')
             tr_list.push(item)
         }
-        $j(tr_list).each((i,t)=>{
+        $j(tr_list).each((i, t) => {
             $j(t).remove()
         })
     }
 
-    function remove_col(e){
+    function remove_col(e) {
         event.preventDefault();
-        let th = $j(e.target).closest('th')      
-        $j(e.target).closest('table').find('tbody tr').each(function(i,tr) {
+        let th = $j(e.target).closest('th')
+        $j(e.target).closest('table').find('tbody tr').each(function (i, tr) {
             $j(tr).find(`td:eq(${th.index()})`).remove();
         });
         th.remove()

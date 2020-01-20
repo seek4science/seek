@@ -170,22 +170,82 @@ class ProjectsController < ApplicationController
     render json: file_list_return
   end
 
+  # GET
+  def methods
+    render json: { data: StudyDesign.where(study_id: params[:std_id]).first.methods }
+  end
+
+  # GET
+  def iotables
+    render json: { data: StudyDesign.where(study_id: params[:std_id]).first.tables }
+  end
+
   # PATCH
   def update_study_design
-    study_design = StudyDesign.find(params[:std_id])
-    study_design.data = params[:data] if params.has_key?(:data)
-    study_design.flowchart = params[:flowchart_data] if params.has_key?(:flowchart_data)
-    study_design.tables = params[:flowchart_tables] if params.has_key?(:flowchart_tables)
-    study_design.methods = params[:flowchart_methods] if params.has_key?(:flowchart_methods)
+    study_design = StudyDesign.where(study_id: params[:std_id]).first
+    study_design.data = params[:data] if params.key?(:data)
+
+    if params.key?(:flowchart_methods)
+      study_design.flowchart = params[:flowchart_data]
+      study_design.tables = params[:flowchart_tables]
+      study_design.methods = params[:flowchart_methods]
+    end
+
     return render json: { message: 'Study design was updated!' } if study_design.save
 
     return render json: { message: 'Error updating study design' }
   end
 
+  # PATCH
+  def update_iotable
+    study_design = StudyDesign.where(study_id: params[:std_id]).first
+    data = JSON.parse(study_design.tables)
+    table_id = params[:table_id]
+    data.each do |x|
+      if x['id'] == table_id
+        x['content'] = params[:content]
+        study_design.tables = data.to_json
+        if study_design.save
+          return render json: { data: 'Table updated successfully!' }
+        else
+          return render json: { data: 'Error updating method', status: :unprocessable_entity }
+        end
+      end
+    end
+  end
+
   # Get
   def get_study_design
-    study_design = StudyDesign.find(params[:std_id])
+    study_design = StudyDesign.where(study_id: params[:std_id]).first
     return render json: { data: study_design.data, flowchart: study_design.flowchart }
+  end
+
+  # Get
+  def text_content
+    study_design = StudyDesign.where(study_id: params[:std_id]).first
+    item_id = params[:item_id]
+    data = item_id.start_with?('method') ? JSON.parse(study_design.methods) : JSON.parse(study_design.tables)
+    data.each do |x|
+      return render json: { data: x['content'] } if x['id'] == item_id
+    end
+  end
+
+  # Patch
+  def update_method
+    study_design = StudyDesign.where(study_id: params[:std_id]).first
+    data = JSON.parse(study_design.methods)
+    method_id = params[:method_id]
+    data.each do |x|
+      if x['id'] == method_id
+        x['content'] = params[:content]
+        study_design.methods = data.to_json
+        if study_design.save
+          return render json: { data: 'Method updated successfully!' }
+        else
+          return render json: { data: 'Error updating method', status: :unprocessable_entity }
+        end
+      end
+    end
   end
 
   # GET /projects/new

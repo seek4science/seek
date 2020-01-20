@@ -12,7 +12,7 @@ class TreeviewBuilder
 
         study.assays.each_with_index do |assay, i|
           asy.push(create_node(assay.title, 'asy', nil, assay.id, bold, true, i == 0 ? 'Assay' : nil, nil,
-                               [create_node('Methods', 'fld', '0')]))
+                               [create_node('Methods', 'methods', method_count(study.id))]))
         end
         std.push(create_node(study.title, 'std', nil, study.id, bold, true, nil, nil, asy))
         asy = []
@@ -46,5 +46,9 @@ class TreeviewBuilder
   def f_count(folder_name)
     folder_id = DefaultProjectFolder.where(title: folder_name).first.id
     (@project.other_project_files.select { |file| file.default_project_folders_id == folder_id }).length.to_s
+  end
+
+  def method_count(study_id)
+    JSON.parse(StudyDesign.where(study_id: study_id).first.methods).count
   end
 end

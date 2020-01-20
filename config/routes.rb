@@ -217,9 +217,14 @@ SEEK::Application.routes.draw do
       post :upload_project_file
       delete :delete_project_file
       get :download_file
+      get :methods
+      get :iotables
       get :get_file_list
       patch :update_study_design
       get :get_study_design
+      get :text_content
+      patch :update_method
+      patch :update_iotable
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:search,:organisms,:documents, :only=>[:index]
