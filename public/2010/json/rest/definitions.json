@@ -4676,6 +4676,9 @@
                 "publisher": {
                   "$ref": "#/definitions/nullableNonEmptyString"
                 },
+                "url": {
+                  "$ref": "#/definitions/nullableNonEmptyString"
+                },
                 "link_to_pub": {
                   "$ref": "#/definitions/nullableUriString"
                 },
