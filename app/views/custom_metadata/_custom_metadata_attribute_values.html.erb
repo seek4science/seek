@@ -1,0 +1,21 @@
+<% if resource.respond_to?(:custom_metadata) && resource.custom_metadata %>
+
+  <% type =  %>
+
+  <div id="custom-metadata" class="panel panel-default">
+    <div class="panel-heading">Additional metadata (<%= resource.custom_metadata.custom_metadata_type.title %>)</div>
+    <div class="panel-body">
+
+      <% resource.custom_metadata.custom_metadata_attributes.each do |attribute| %>
+        <p>
+          <label><%= attribute.title %>:</label>
+          <%= display_attribute(resource.custom_metadata, attribute, link: true) %>
+        </p>
+      <% end %>
+
+    </div>
+  </div>
+
+  <% else %>
+
+<% end %>
