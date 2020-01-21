@@ -159,6 +159,8 @@ group :development do
   gem 'guard-rubycritic', require: false
   gem 'rails_best_practices'
   gem 'gem-licenses'
+  gem "better_errors"
+  gem "binding_of_caller"
 end
 
 group :test do
