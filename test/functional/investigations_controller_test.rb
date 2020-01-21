@@ -624,6 +624,35 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_nil cm.get_attribute_value('date')
   end
 
+  test 'create an investigation with custom metadata validated' do
+    cmt = Factory(:simple_investigation_custom_metadata_type)
+
+    login_as(Factory(:person))
+
+    # invalid age - needs to be a number
+    assert_no_difference('Investigation.count') do
+      inv_attributes = Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':'fred','_custom_metadata_age':'not a number'}}
+
+      put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert inv=assigns(:investigation)
+    refute inv.valid?
+
+    # name is required
+    assert_no_difference('Investigation.count') do
+      inv_attributes = Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':nil,'_custom_metadata_age':22}}
+
+      put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert inv=assigns(:investigation)
+    refute inv.valid?
+
+  end
+
   def edit_max_object(investigation)
     investigation.creators = [Factory(:person)]
     disable_authorization_checks { investigation.save! }
