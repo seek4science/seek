@@ -13,6 +13,18 @@ class CustomMetadataAttribute < ApplicationRecord
     title.parameterize.underscore
   end
 
+  def resolve(value)
+    resolution = if sample_attribute_type.resolution.present? && sample_attribute_type.regexp.present?
+                   value.sub(Regexp.new(sample_attribute_type.regexp), sample_attribute_type.resolution)
+                 end
+    resolution
+  end
+
+  # to behave like a sample attribute, but is never a title
+  def is_title
+    false
+  end
+
   # The method name used to get this attribute via a method call
   def method_name
     METHOD_PREFIX + hash_key

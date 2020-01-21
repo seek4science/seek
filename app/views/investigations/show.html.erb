@@ -10,6 +10,7 @@
         <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @investigation}  %>
       </div>
     </div>
+    <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @investigation} %>
     <%= render partial: 'general/isa_graph', locals: { root_item: @investigation, options: { depth: 4 } } %>
   </div>
   <div class="col-md-3 col-sm-4">
