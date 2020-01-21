@@ -27,16 +27,19 @@ module Seek
           metadata[:description] = cwl['doc']
         end
 
-        metadata[:internals] = {
-            inputs: [
-                { name: 'in1', description: '', type: '', format: '', default_value: '123' },
-                { name: 'in2', description: '', type: '', format: '', default_value: '456' }
-            ],
-            outputs: [
-                { name: 'in1', description: '', type: '' },
-                { name: 'in2', description: '', type: '' }
-            ]
-        }
+        metadata[:internals] = {}
+
+        metadata[:internals][:inputs] = (cwl['inputs'] || []).map do |input|
+          { name: input['label'], id: input['id'], description: input['doc'], type: input['type'], default_value: input['default'] }
+        end
+
+        metadata[:internals][:outputs] = (cwl['outputs'] || []).map do |output|
+          { name: output['label'], id: output['id'], description: output['doc'], type: output['type'] }
+        end
+
+        metadata[:internals][:steps] = (cwl['steps'] || {}).map do |key, step|
+          { name: step['label'], id: step['id'] || key, description: step['doc'] }
+        end
 
         metadata
       end
