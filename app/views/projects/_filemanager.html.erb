@@ -4,17 +4,17 @@
          <div id=files class="simpleForm" style="overflow-x:scroll">
              <ul class="fileManager">
                  <li>empty</li>
-                 <li style="border-left: 2px dotted #aaa; border-radius:0">
+                 <li id="separator_item" style="border-left: 2px dotted #aaa; border-radius:0">
                      <span id="upload_btn" title="Upload a file" class="big_plus glyphicon glyphicon-plus"></span>
                  </li>
              </ul>
          </div>
      </div>
      <div class="row" id="text_content">
+       <input id="btn_save_content" class="btn btn-sm btn-primary pull-right" type="button"
+             value="Save">
          <textarea placeholder="Insert content here!" id="txt_file_content" class="form-control">
          </textarea>
-         <input id="btn_save_content" class="btn btn-primary pull-right" style="margin-top:5px" type="button"
-             value="Save">
      </div>
  </div>
  <div id="tbl_file_content" style="display:none">
@@ -167,7 +167,9 @@
                          console.log(result.data)
                          $j('.tableInpOut').html(result.data);
                      } else {
-                         $j('.tableInpOut').html('<table class="table tableXs tableInpOut"><thead class="thead-dark"><tr></tr></thead><tbody></tbody></table>');
+                         $j('.tableInpOut').html(
+                             '<table class="table tableXs tableInpOut"><thead class="thead-dark"><tr></tr></thead><tbody></tbody></table>'
+                             );
                      }
 
                  }
@@ -238,6 +240,10 @@
      })
 
      function showPreDefinedCols(e) {
+         if ($j('.arrow_box').css('display') == "block") {
+             $j('.arrow_box').hide();
+             return
+         }
          $j(".arrow_box").css({
              display: "block",
              left: $j(e.target).position().left + 120,

@@ -52,7 +52,7 @@
     height: 0px;
     border-top: 10px solid transparent;
     border-bottom: 10px solid transparent;
-    border-left: 10px solid #116383;
+    border-left: 10px solid #b4a16f;
     position: absolute;
     top: 0px;
 }
@@ -107,19 +107,24 @@
 .flowchart-operator {
     position: absolute;
     width: 120px;
-    border: 1px solid #273d9b;
-    background: #4085bd;
+    border: 1px solid #b4a16f;
+    background: rgb(252, 248, 238);
+    background: linear-gradient(180deg, rgba(252, 248, 238, 1) 0%, rgba(221, 200, 148, 1) 100%);
     pointer-events: initial;
     vertical-align: middle;
     /* transform: skew(20deg); */
 }
 
 .flowchart-operator.hover {
-    border: 1px solid black
+    -webkit-box-shadow: 0px 0px 32px -5px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 32px -5px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 32px -5px rgba(0, 0, 0, 0.75);
 }
 
 .flowchart-operator.selected {
-    border: 1px solid black
+    -webkit-box-shadow: 0px 0px 32px -5px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 32px -5px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 32px -5px rgba(0, 0, 0, 0.75);
 }
 
 .flowchart-operator .flowchart-operator-inputs-outputs {
@@ -177,7 +182,7 @@
 .flowchart-example-event {
     margin-top: 10px;
     margin-bottom: 10px;
-    color: #3366FF;
+    color: #b4a16f;
 }
 
 #last_event_example_6 {
@@ -208,7 +213,7 @@ h4 {
 #chart_canvas {
     width: 2000px;
     height: 300px;
-    background: repeating-linear-gradient( 45deg, #eee, #eee 10px, #e5e5e5 10px, #e5e5e5 20px);
+    background: repeating-linear-gradient(45deg, #eee, #eee 10px, #e5e5e5 10px, #e5e5e5 20px);
     /* top: 150px;
     left: 50px */
 }
@@ -235,17 +240,14 @@ h4 {
 .flowchart-operator-title {
     text-align: center;
     line-height: 58px;
-    font-family: 'Archivo Narrow';
-    font-weight: 500;
-    color: white;
+    font-size: 12px;
+    color: black;
     height: 20px;
     cursor: grab;
     border-radius: 5px;
 }
 
-.flowchart-operator-title:hover {
-    background-color: #1100ff
-}
+.flowchart-operator-title:hover {}
 
 .oval_button {
     border-radius: 10px;
@@ -261,15 +263,19 @@ h4 {
 }
 
 .wf_btn {
-    height: 50px;
-    width: 120px;
-    border: 1px solid #a1a1a1;
-    background: #c7c7c7;
-    color: white;
+    height: 35px;
+    width: 100px;
+    border: 1px solid #b4a16f;
+    background: rgb(252, 248, 238);
+    background: linear-gradient(180deg, rgba(252, 248, 238, 1) 0%, rgba(221, 200, 148, 1) 100%);
     display: inline-block;
     text-align: center;
-    line-height: 45px;
+    line-height: 35px;
     cursor: grab;
-    font-family: 'Archivo Narrow';
-    color: black;
+    font-size: 12px;
+    margin-right: 15px;
+    font-weight:bold;
+}
+.wf_btn:hover{
+    opacity:0.8
 }

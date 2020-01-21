@@ -364,6 +364,7 @@
     $j("#studyContainer").hide()
     $j("#text_content").hide()
     $j("#tbl_file_content").hide()
+    $j("#separator_item").hide()
   }
 
   $j('#html').on('changed.jstree', function (e, data) {
@@ -393,6 +394,7 @@
         case "fld":
           $j("#fileManagerContainer").show()
           $j("#selected_folder").val(item.text)
+          $j("#separator_item").show()
           load_files()
           break;
         case "methods":
@@ -516,3 +518,5 @@
     return Math.round((Math.random() * 36 ** 12)).toString(36);
   }
 </script>
+
+

@@ -11,10 +11,13 @@
             <div class="flowchart-example" style="overflow-x:scroll">
                 <div class="flowchart-example-container" id="chart_canvas">
                     <div id="operator_properties" style="display: none;">
-                        <label for="operator_title">Operator's title: </label><input type="text" id="operator_title"
+                        <label for="operator_title">Change title: </label><input style="margin-bottom:10px" type="text" id="operator_title"
                             class="form-control">
-                        <input type="button" value="x" onclick="$j('#operator_properties').hide()"
-                            style="right:2px;top:2px;;position:absolute;border:none;border-radius:5px">
+                        <a href="javascript:void(0);" class="delete_selected_button"><i class="glyphicon glyphicon-minus-sign"></i> Delete item</a>
+
+                        <a style="position:absolute;top:5px;right:5px" href="javascript:void(0);"
+                            onclick="$j('#operator_properties').hide()"><i class="glyphicon glyphicon-remove"></i></a>
+
                     </div>
                 </div>
                 <style>
@@ -23,8 +26,16 @@
                         background-color: white;
                         opacity: 0.9;
                         border-radius: 5px;
-                        border: 1px dashed #ddd;
+                        border: 2px solid #bbb;
                         z-Index: 999;
+                        font-size: 12px;
+                        -webkit-box-shadow: 0px 0px 32px -5px rgba(0, 0, 0, 0.75);
+                        -moz-box-shadow: 0px 0px 32px -5px rgba(0, 0, 0, 0.75);
+                        box-shadow: 0px 0px 32px -5px rgba(0, 0, 0, 0.75);
+                    }
+
+                    #operator_properties input {
+                        font-size: 12px
                     }
 
                     .badge {
@@ -33,24 +44,32 @@
                 </style>
             </div>
 
-            <div class="draggable_operators">
-                <div class="draggable_operators_divs">
-                    <div class="draggable_operator ui-draggable ui-draggable-handle wf_btn rectangle_button"
-                        data-nb-inputs="1" data-nb-outputs="1" data-shape='rectangle'>Method</div>
-                    <div class="draggable_operator ui-draggable ui-draggable-handle wf_btn parallelogram_button"
-                        data-nb-inputs="1" data-nb-outputs="1" data-shape='parallelogram'>Input/Output</div>
-                    <div class="form-inline" style="margin-top:10px">
-                        Inputs:<input id="inputs_num" type="number" class="form-control" style="width:50px" value="1"
-                            min="0" max="3">
-                        Outputs:<input id="outputs_num" type="number" class="form-control" style="width:50px" value="1"
-                            min="0" max="3">
+            <div class="draggable_operators" style="font-size:12px">
+                <div style="float:left;margin-right:20px">
+                    <span style="color:#888"><i class="glyphicon glyphicon-info-sign"></i> Set input and output count of
+                        items:</span><br />
+                    <div class="form-inline">
+                        Inputs: <input id="inputs_num" type="number" class="form-control"
+                            style="width:50px;font-size:12px" value="1" min="0" max="3"> &nbsp;
+                        Outputs: <input id="outputs_num" type="number" class="form-control"
+                            style="width:50px;font-size:12px" value="1" min="0" max="3">
                     </div>
-                    <input type="button" class="btn btn-primary" value="Save" id="btn_save_workflow"
-                        style="float:right">
-                    <br />
                 </div>
+                <div class="draggable_operators_divs">
+                    <span style="color:#888"><i class="glyphicon glyphicon-info-sign"></i> Drag & drop these items to
+                        the canvas:</span><br />
+                    <div class="draggable_operator ui-draggable ui-draggable-handle wf_btn" data-nb-inputs="1"
+                        data-nb-outputs="1" data-shape='rectangle'><i class="glyphicon glyphicon-move"></i>Method</div>
+                    <div class="draggable_operator ui-draggable ui-draggable-handle wf_btn" data-nb-inputs="1"
+                        data-nb-outputs="1" data-shape='parallelogram'><i
+                            class="glyphicon glyphicon-move"></i>Input/Output</div>
+
+                </div>
+                <input type="button" class="btn btn-primary btn-sm pull-right" value="Save" id="btn_save_workflow">
+                <br />
             </div>
     </div>
+</div>
 </div>
 
 <script type="text/javascript">
@@ -70,8 +89,8 @@
                 $operatorProperties.show();
                 $operatorTitle.val($flowchart.flowchart('getOperatorTitle', operatorId));
                 $operatorProperties.css('position', 'absolute');
-                $operatorProperties.css("left", this.data.operators[operatorId].left + 120);
-                $operatorProperties.css("top", this.data.operators[operatorId].top - 20);
+                $operatorProperties.css("left", this.data.operators[operatorId].left-28);
+                $operatorProperties.css("top", this.data.operators[operatorId].top-42);
                 return true;
             },
             onOperatorUnselect: function () {
@@ -96,8 +115,9 @@
                     .val());
             }
         });
-        $flowchart.parent().siblings('.delete_selected_button').click(function () {
+        $j('.delete_selected_button').click(function () {
             $flowchart.flowchart('deleteSelected');
+            $j('#operator_properties').hide()
         });
         var $draggableOperators = $j('.draggable_operator');
 

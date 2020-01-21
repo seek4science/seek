@@ -11,7 +11,7 @@ class TreeviewBuilder
         next unless study.assays
 
         study.assays.each_with_index do |assay, i|
-          asy.push(create_node(assay.title, 'asy', nil, assay.id, bold, true, i == 0 ? 'Assay' : nil, nil,
+          asy.push(create_node(assay.title, 'asy', nil, assay.id, bold, true, i.zero? ? 'Assay' : nil, nil,
                                [create_node('Methods', 'methods', method_count(study.id))]))
         end
         std.push(create_node(study.title, 'std', nil, study.id, bold, true, nil, nil, asy))
@@ -49,6 +49,6 @@ class TreeviewBuilder
   end
 
   def method_count(study_id)
-    JSON.parse(StudyDesign.where(study_id: study_id).first.methods).count
+    JSON.parse(StudyDesign.where(study_id: study_id).first.methods).count.to_s
   end
 end
