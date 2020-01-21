@@ -590,11 +590,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'get custom metadata fields' do
-    cmt = CustomMetadataType.new(title: 'test metadata', supported_type:'Investigation')
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: Factory(:integer_sample_attribute_type))
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: Factory(:string_sample_attribute_type))
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: Factory(:datetime_sample_attribute_type))
-    cmt.save!
+    cmt = Factory(:simple_investigation_custom_metadata_type)
 
     login_as(Factory(:person))
 
@@ -607,10 +603,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'create an investigation with custom metadata' do
-    cmt = CustomMetadataType.new(title: 'test metadata', supported_type:'Investigation')
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: Factory(:integer_sample_attribute_type))
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: Factory(:string_sample_attribute_type))
-    cmt.save!
+    cmt = Factory(:simple_investigation_custom_metadata_type)
 
     login_as(Factory(:person))
 
@@ -628,6 +621,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_equal cmt, cm.custom_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal '22',cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
   end
 
   def edit_max_object(investigation)
