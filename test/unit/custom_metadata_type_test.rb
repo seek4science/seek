@@ -6,7 +6,7 @@ class CustomMetadataTypeTest < ActiveSupport::TestCase
 
     cmt = CustomMetadataType.new(title: 'test metadata', supported_type:'Investigation')
     refute cmt.valid?
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: Factory(:integer_sample_attribute_type))
+    cmt.custom_metadata_attributes << Factory(:age_custom_metadata_attribute)
     assert cmt.valid?
 
     cmt.title=''
