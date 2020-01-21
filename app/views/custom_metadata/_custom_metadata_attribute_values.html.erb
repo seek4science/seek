@@ -1,7 +1,5 @@
 <% if resource.respond_to?(:custom_metadata) && resource.custom_metadata %>
 
-  <% type =  %>
-
   <div id="custom-metadata" class="panel panel-default">
     <div class="panel-heading">Additional metadata (<%= resource.custom_metadata.custom_metadata_type.title %>)</div>
     <div class="panel-body">
