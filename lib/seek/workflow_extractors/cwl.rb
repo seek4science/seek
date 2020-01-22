@@ -29,19 +29,37 @@ module Seek
 
         metadata[:internals] = {}
 
-        metadata[:internals][:inputs] = (cwl['inputs'] || []).map do |input|
-          { name: input['label'], id: input['id'], description: input['doc'], type: input['type'], default_value: input['default'] }
+        metadata[:internals][:inputs] = iterate(cwl['inputs']).map do |id, input|
+          { id: id, name: input['label'], description: input['doc'], type: input['type'], default_value: input['default'] }
         end
 
-        metadata[:internals][:outputs] = (cwl['outputs'] || []).map do |output|
-          { name: output['label'], id: output['id'], description: output['doc'], type: output['type'] }
+        metadata[:internals][:outputs] = iterate(cwl['outputs']).map do |id, output|
+          { id: id, name: output['label'], description: output['doc'], type: output['type'] }
         end
 
-        metadata[:internals][:steps] = (cwl['steps'] || {}).map do |key, step|
-          { name: step['label'], id: step['id'] || key, description: step['doc'] }
+        metadata[:internals][:steps] = iterate(cwl['steps']).map do |id, step|
+          { id: id, name: step['label'], description: step['doc'] }
         end
 
         metadata
+      end
+
+      private
+
+      # Iterate array or map-style lists of things
+      def iterate(array_or_hash)
+        return if array_or_hash.nil?
+        return to_enum(__method__, array_or_hash) unless block_given?
+
+        if array_or_hash.is_a?(Hash)
+          array_or_hash.each do |key, item|
+            yield(key, item)
+          end
+        else
+          array_or_hash.each do |item|
+            yield(item['id'], item)
+          end
+        end
       end
     end
   end
