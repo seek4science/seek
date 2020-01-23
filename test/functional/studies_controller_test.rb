@@ -697,4 +697,58 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal Policy::EDITING,study.policy.permissions.first.access_type
 
   end
+
+  test 'create an study with custom metadata' do
+    cmt = Factory(:simple_study_custom_metadata_type)
+
+    login_as(Factory(:person))
+
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':'fred','_custom_metadata_age':22}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal '22',cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+  end
+
+  test 'create an investigation with custom metadata validated' do
+    cmt = Factory(:simple_study_custom_metadata_type)
+
+    login_as(Factory(:person))
+
+    # invalid age - needs to be a number
+    assert_no_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':'fred','_custom_metadata_age':'not a number'}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+    refute study.valid?
+
+    # name is required
+    assert_no_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':nil,'_custom_metadata_age':22}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+    refute study.valid?
+
+  end
 end

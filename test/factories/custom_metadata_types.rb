@@ -22,3 +22,8 @@ Factory.define(:simple_investigation_custom_metadata_type,class: CustomMetadataT
     a.custom_metadata_attributes << Factory(:datetime_custom_metadata_attribute)
   end
 end
+
+Factory.define(:simple_study_custom_metadata_type, parent: :simple_investigation_custom_metadata_type) do |f|
+  f.title 'simple study custom metadata type'
+  f.supported_type 'Study'
+end
