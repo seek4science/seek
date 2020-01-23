@@ -1,0 +1,40 @@
+<!-- custom metadata experimental -->
+<%= folding_panel('Custom metadata', false) do %>
+
+  <%= f.fields_for(:custom_metadata_attributes) do |f| %>
+    Metadata fields: <%= f.collection_select(:custom_metadata_type_id,CustomMetadataType.where(supported_type:resource.class.name),
+                                             :id, :title,
+                                             {prompt:'Select'},
+                                             {class:"form-control", id:'custom_metadata_attributes_custom_metadata_type_id'}) %>
+
+    <div id="custom_attributes">
+
+    </div>
+
+  <% end %>
+
+<% end %>
+
+<script>
+
+    $j(document).ready(function () {
+        $j('#custom_metadata_attributes_custom_metadata_type_id').change(function() {
+            $j.ajax({
+                url: "<%= form_fields_custom_metadata_types_path %>",
+                type: "get",
+                data: {'id':this.value},
+                dataType: 'html',
+                beforeSend: function() {
+                    $j('#custom_attributes').html('<div class="spinner"></div>');
+                }
+            })
+                .done(function(data){
+                    $j('#custom_attributes').html(data);
+                })
+                .error(function() {
+                    $j('#custom_attributes').text("Something went wrong!");
+                });
+        });
+    });
+
+</script>
