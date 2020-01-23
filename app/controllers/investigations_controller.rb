@@ -108,17 +108,7 @@ class InvestigationsController < ApplicationController
     end
   end
 
-  def custom_metadata_fields
-    id = params[:custom_metadata_type_id]
-    respond_to do |format|
-      unless id.blank?
-        cm = CustomMetadataType.find(id)
-        format.html { render partial: 'custom_metadata/custom_metadata_fields',locals:{custom_metadata_type:cm} }
-      else
-        format.html { render html: ''}
-      end
-    end
-  end
+
 
   private
 
