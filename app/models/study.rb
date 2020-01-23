@@ -22,6 +22,9 @@ class Study < ApplicationRecord
   has_many :assay_publications, through: :assays, source: :publications
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
+  has_one :custom_metadata, as: :item
+  accepts_nested_attributes_for :custom_metadata
+
   belongs_to :person_responsible, :class_name => "Person"
 
   validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true

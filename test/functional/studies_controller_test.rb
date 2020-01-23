@@ -698,40 +698,57 @@ class StudiesControllerTest < ActionController::TestCase
 
   end
 
-  test 'experimentalists only shown if set' do
-    person = Factory(:person)
-    login_as(person)
-    study = Factory(:study,experimentalists:'some experimentalists',contributor:person)
-    refute study.experimentalists.blank?
+  test 'create an study with custom metadata' do
+    cmt = Factory(:simple_study_custom_metadata_type)
 
-    get :edit, params:{id:study}
-    assert_response :success
+    login_as(Factory(:person))
 
-    assert_select 'input#study_experimentalists', count:1
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':'fred','_custom_metadata_age':22}}
 
-    get :show, params:{id:study}
-    assert_response :success
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
 
-    assert_select 'p',text:/Experimentalists:/,count:1
+    assert study=assigns(:study)
 
-    study = Factory(:study,contributor:person)
-    assert study.experimentalists.blank?
+    assert cm = study.custom_metadata
 
-    get :edit, params:{id:study}
-    assert_response :success
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal '22',cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+  end
 
-    assert_select 'input#study_experimentalists', count:0
+  test 'create an investigation with custom metadata validated' do
+    cmt = Factory(:simple_study_custom_metadata_type)
 
-    get :show, params:{id:study}
-    assert_response :success
+    login_as(Factory(:person))
 
-    assert_select 'p',text:/Experimentalists:/, count:0
+    # invalid age - needs to be a number
+    assert_no_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':'fred','_custom_metadata_age':'not a number'}}
 
-    get :new
-    assert_response :success
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
 
-    assert_select 'input#study_experimentalists', count:0
+    assert study=assigns(:study)
+    refute study.valid?
 
+    # name is required
+    assert_no_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':nil,'_custom_metadata_age':22}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+    refute study.valid?
 
   end
 end
