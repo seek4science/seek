@@ -1,8 +1,8 @@
 <% custom_metadata_type.custom_metadata_attributes.each do |attribute| %>
   <div class="form-group">
     <label><%= attribute.title %></label><%= required_span if attribute.required? %>
-    <%= fields_for custom_metadata_type.supported_type.underscore.to_sym do |ff| %>
-      <%= ff.fields_for :custom_metadata_attributes do |fff| %>
+    <%= fields_for resource do |ff| %>
+      <%= ff.fields_for :custom_metadata do |fff| %>
         <%= custom_metadata_form_field_for_attribute(attribute,fff) %>
       <% end %>
     <% end %>
