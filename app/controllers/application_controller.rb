@@ -564,25 +564,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # Dynamically get parent resource from URL.
-  # i.e. /data_files/123/some_sub_resource/456
-  # would fetch DataFile with ID 123
-  #
-  def get_parent_resource
-    parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
-    if parent_id_param
-      parent_type = parent_id_param.to_s.chomp('_id')
-      parent_class = parent_type.camelize.constantize
-      if parent_class
-        @parent_resource = parent_class.find(params[parent_id_param])
+  def determine_custom_metadata_keys
+    keys = []
+    root_key = controller_name.singularize.to_sym
+    attribute_params = params[root_key][:custom_metadata_attributes]
+    if attribute_params && attribute_params[:custom_metadata_type_id].present?
+      metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
+      if metadata_type
+        keys = [:custom_metadata_type_id] + metadata_type.custom_metadata_attributes.collect(&:method_name)
       end
     end
-  end
-
-  def managed_programme_configured?
-    unless Programme.managed_programme
-      error("No managed #{t('programme')} is configured","No managed #{t('programme')} is configured")
-      return false
-    end
+    keys
   end
 end

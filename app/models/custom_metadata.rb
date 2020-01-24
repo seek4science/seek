@@ -38,7 +38,11 @@ class CustomMetadata < ApplicationRecord
     if json_metadata
       JSON.parse(json_metadata)
     else
-      HashWithIndifferentAccess[custom_metadata_attributes.map { |attr| [attr.title, nil] }]
+      if custom_metadata_type
+        HashWithIndifferentAccess[custom_metadata_attributes.map { |attr| [attr.title, nil] }]
+      else
+        {}
+      end
     end
   end
 
