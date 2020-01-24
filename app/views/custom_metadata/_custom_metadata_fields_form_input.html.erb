@@ -1,5 +1,4 @@
-<!-- custom metadata experimental -->
-<% resource.custom_metadata ||= CustomMetadata.new %>
+<% resource.custom_metadata ||= CustomMetadata.new if resource.new_record? %>
 <%= folding_panel('Custom metadata', false) do %>
 
   <%= f.fields_for(:custom_metadata) do |ff| %>
@@ -10,7 +9,7 @@
   <% end %>
 
   <div id="custom_attributes">
-    <% if resource.custom_metadata.custom_metadata_type %>
+    <% if resource.custom_metadata.try(:custom_metadata_type) %>
       <%= render partial: 'custom_metadata/custom_metadata_fields', locals: { custom_metadata_type: resource.custom_metadata.custom_metadata_type, resource: resource } %>
     <% end %>
   </div>

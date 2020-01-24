@@ -113,14 +113,9 @@ class InvestigationsController < ApplicationController
   private
 
   def investigation_params
-    custom_metadata_keys = []
-    if params[:investigation][:custom_metadata_attributes] && params[:investigation][:custom_metadata_attributes][:custom_metadata_type_id]
-      metadata_type = CustomMetadataType.find(params[:investigation][:custom_metadata_attributes][:custom_metadata_type_id])
-      custom_metadata_keys = [:custom_metadata_type_id] + metadata_type.custom_metadata_attributes.collect(&:method_name)
-    end
-
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, :other_creators,
-                                          { creator_ids: [] },{ scales: [] }, { publication_ids: [] }, { custom_metadata_attributes: custom_metadata_keys })
+                                          { creator_ids: [] },{ scales: [] }, { publication_ids: [] },
+                                          { custom_metadata_attributes: determine_custom_metadata_keys })
   end
 
 end

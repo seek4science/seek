@@ -128,13 +128,8 @@ class StudiesController < ApplicationController
   end
 
   def study_params
-    custom_metadata_keys = []
-    if params[:study][:custom_metadata_attributes] && params[:study][:custom_metadata_attributes][:custom_metadata_type_id]
-      metadata_type = CustomMetadataType.find(params[:study][:custom_metadata_attributes][:custom_metadata_type_id])
-      custom_metadata_keys = [:custom_metadata_type_id] + metadata_type.custom_metadata_attributes.collect(&:method_name)
-    end
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
                                   :other_creators, { creator_ids: [] }, { scales: [] }, { publication_ids: [] },
-                                  { custom_metadata_attributes: custom_metadata_keys })
+                                  { custom_metadata_attributes: determine_custom_metadata_keys })
   end
 end
