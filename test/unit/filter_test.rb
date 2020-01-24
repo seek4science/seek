@@ -591,6 +591,37 @@ class FilterTest < ActiveSupport::TestCase
     assert_nil hot_opt
   end
 
+  test 'get active filter options even if they are invalid' do
+    contributor_filter = Seek::Filterer::FILTERS[:contributor]
+
+    contributor = Factory(:person)
+    Factory(:document, contributor: contributor)
+
+    options = contributor_filter.options(Document.all, [contributor.id.to_s])
+    assert_equal 1, options.length
+    opt = get_option(options, contributor.id.to_s)
+    assert_equal 1, opt.count
+    assert_equal contributor.name, opt.label
+    assert opt.active?
+
+    # Apply some invalid options
+    fake_id = Person.maximum(:id) + 100
+    options = contributor_filter.options(Document.all, [fake_id, 'banana'])
+    assert_equal 3, options.length
+    fake_id_opt = get_option(options, fake_id.to_s)
+    assert_equal 0, fake_id_opt.count
+    assert_equal fake_id.to_s, fake_id_opt.label, "The label should just be the ID, since there is no real person with that ID, we can't get their name."
+    assert fake_id_opt.active?
+    banana_opt = get_option(options, 'banana')
+    assert_equal 0, banana_opt.count
+    assert_equal 'banana', banana_opt.label
+    assert banana_opt.active?
+    real_opt = get_option(options, contributor.id.to_s)
+    assert_equal 1, real_opt.count
+    assert_equal contributor.name, real_opt.label
+    refute real_opt.active?
+  end
+
   private
 
   def assert_includes_all(collection, things)

@@ -55,12 +55,11 @@ module Seek
                          .where(value_field => active_options)
                          .pluck(label_field)
                    else
-                     # use the value itself as the label
-                     active_options
+                     []
                    end
           # Pair up values and labels create remaining options
-          active_options.zip(labels).each do |value, label|
-            options << Seek::Filtering::Option.new(label, value.to_s, 0, true)
+          active_options.each_with_index do |value, i|
+            options << Seek::Filtering::Option.new(labels[i] || value.to_s, value.to_s, 0, true)
           end
         end
 
