@@ -545,6 +545,52 @@ class FilterTest < ActiveSupport::TestCase
     assert_equal 2, nz_opt.count
   end
 
+  test 'get active filter options even if they matched 0 records' do
+    tag_filter = Seek::Filterer::FILTERS[:tag]
+
+    cool_contributor = Factory(:person)
+    cool_blue_doc = Factory(:document, contributor: cool_contributor)
+    cool_blue_doc.annotate_with(['cool', 'blue'], 'tag', cool_contributor)
+    disable_authorization_checks { cool_blue_doc.save! }
+
+    hot_contributor = Factory(:person)
+    hot_red_doc = Factory(:document, contributor: hot_contributor)
+    hot_red_doc.annotate_with(['hot', 'red'], 'tag', hot_contributor)
+    disable_authorization_checks { hot_red_doc.save! }
+
+    # "hot" tag filter is active with no results, but should be included as an option anyway, so the user can see it.
+    filtered = Document.where(contributor: cool_contributor)
+    options = tag_filter.options(filtered, ['cool', 'hot'])
+    assert_equal 3, options.length
+    cool_opt = get_option(options, 'cool')
+    assert_equal 1, cool_opt.count
+    assert_equal 'cool', cool_opt.label
+    assert cool_opt.active?
+    blue_opt = get_option(options, 'blue')
+    assert_equal 1, blue_opt.count
+    assert_equal 'blue', blue_opt.label
+    refute blue_opt.active?
+    hot_opt = get_option(options, 'hot')
+    assert_equal 0, hot_opt.count
+    assert_equal 'hot', hot_opt.label
+    assert hot_opt.active?
+
+    # "hot" tag filter is not active and has no results, so we don't need to show it.
+    filtered = Document.where(contributor: cool_contributor)
+    options = tag_filter.options(filtered, ['cool'])
+    assert_equal 2, options.length
+    cool_opt = get_option(options, 'cool')
+    assert_equal 1, cool_opt.count
+    assert_equal 'cool', cool_opt.label
+    assert cool_opt.active?
+    blue_opt = get_option(options, 'blue')
+    assert_equal 1, blue_opt.count
+    assert_equal 'blue', blue_opt.label
+    refute blue_opt.active?
+    hot_opt = get_option(options, 'hot')
+    assert_nil hot_opt
+  end
+
   private
 
   def assert_includes_all(collection, things)
