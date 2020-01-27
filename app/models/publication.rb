@@ -300,6 +300,9 @@ class Publication < ApplicationRecord
     institution = bibtex_record[:institution].try(:to_s)
     type = bibtex_record[:type].try(:to_s)
     note = bibtex_record[:note].try(:to_s)
+    archivePrefix = bibtex_record[:archiveprefix].try(:to_s)
+    primaryClass = bibtex_record[:primaryclass].try(:to_s)
+    eprint= bibtex_record[:eprint].try(:to_s)
     url = parse_bibtex_url(bibtex_record).try(:to_s)
     publication_type = PublicationType.find(self.publication_type_id)
 
@@ -383,8 +386,13 @@ class Publication < ApplicationRecord
       self.citation += type.blank? ? ' ' : (', '+type)
     elsif publication_type.is_unpublished?
       self.citation += note.blank? ? ' ': note
-    else
-      return nil
+    end
+
+    if self.doi.blank? && self.citation.blank?
+      self.citation += archivePrefix unless archivePrefix.nil?
+      self.citation += (self.citation.blank? ? primaryClass : (','+primaryClass)) unless primaryClass.nil?
+      self.citation += (self.citation.blank? ? eprint : (','+eprint)) unless eprint.nil?
+      self.journal = self.citation if self.journal.blank?
     end
 
     if self.doi.blank? && self.citation.blank?
