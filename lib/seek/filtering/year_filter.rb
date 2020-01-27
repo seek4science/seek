@@ -27,8 +27,7 @@ module Seek
         years.each do |year|
           count = apply(collection, [year]).count
           next if count.zero?
-          active = active_options.include?(year.to_s)
-          active_options.delete(year.to_s) if active
+          active = active_options.delete(year.to_s)
           options << Seek::Filtering::Option.new(year, year, count, active)
         end
 

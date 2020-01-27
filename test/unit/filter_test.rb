@@ -508,7 +508,12 @@ class FilterTest < ActiveSupport::TestCase
     assert_equal 1, y1970_opt.count
 
     options = year_filter.options(Publication.all, ['1996'])
-    assert_equal 2, options.length
+    assert_equal 3, options.length
+    # Active value should have an option, even if it returned no results.
+    y1996_opt = get_option(options, '1996')
+    assert y1996_opt.active?
+    assert_equal '1996', y1996_opt.label
+    assert_equal 0, y1996_opt.count
     y2019_opt = get_option(options, '2019')
     refute y2019_opt.active?
     assert_equal '2019', y2019_opt.label

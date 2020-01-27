@@ -38,8 +38,7 @@ module Seek
           results.each do |value, count, label|
             next if value.nil?
             value = value.to_s
-            active = active_options.include?(value)
-            active_options.delete(value) if active
+            active = active_options.delete(value)
             options << Seek::Filtering::Option.new(label || value, value, count, active)
           end
         end
@@ -52,8 +51,8 @@ module Seek
                    elsif label_field
                      # Remove any existing conditions that may have excluded the selected options and just query the label
                      apply_joins(collection.unscoped.select(label_field))
-                         .where(value_field => active_options)
-                         .pluck(label_field)
+                       .where(value_field => active_options)
+                       .pluck(label_field)
                    else
                      []
                    end
