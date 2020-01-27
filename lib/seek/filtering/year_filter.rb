@@ -22,12 +22,22 @@ module Seek
 
       def options(collection, active_values)
         years = collection.pluck(field).compact.map { |d| d.year }.uniq
-        apply(collection, years)
-        years.map do |year|
+        active_options = active_values.dup
+        options = []
+        years.each do |year|
           count = apply(collection, [year]).count
           next if count.zero?
-          Seek::Filtering::Option.new(year, year, count, active_values.include?(year.to_s))
-        end.compact.sort_by { |o| (o.active? ? -10000 : 0) - o.value.to_i }
+          active = active_options.include?(year.to_s)
+          active_options.delete(year.to_s) if active
+          options << Seek::Filtering::Option.new(year, year, count, active)
+        end
+
+        # Add any options that were selected by the user but did not appear in the results.
+        active_options.each do |year|
+          options << Seek::Filtering::Option.new(year, year, 0, true)
+        end
+
+        options.compact.sort_by { |o| (o.active? ? -10000 : 0) - o.value.to_i } # Sort by year, descending
       end
     end
   end
