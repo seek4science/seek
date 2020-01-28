@@ -1,1 +1,0 @@
-<a name="download"></a>**Download** operations are used to retrieve the content of resources such as <a href="#dataFiles">**DataFile**</a>, <a href="#documents">**Document**</a>, <a href="#models">**Model**</a>, <a href="#sops">**SOP**</a> or <a href="#presentations">**Presentation**</a>. See <a href="#ContentBlob">**ContentBlob**</a> for more details.

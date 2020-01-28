@@ -1,1 +1,0 @@
-<a name="updateSearch"></a>This is a updateSearch description

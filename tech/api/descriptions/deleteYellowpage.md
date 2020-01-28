@@ -1,1 +1,0 @@
-<a name="deleteYellowpage"></a>This is a deleteYellowpage description

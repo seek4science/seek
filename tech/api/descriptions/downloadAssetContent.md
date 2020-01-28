@@ -1,1 +1,0 @@
-<a name="downloadAssetContent"></a>Return the identified content of the identified asset

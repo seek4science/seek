@@ -1,1 +1,0 @@
-<a name="uploadAssetContent"></a>Upload the message body into the blob of the identified asset

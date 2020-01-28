@@ -1,1 +1,0 @@
-<a name="deleteSearch"></a>This is a deleteSearch description
