@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_22_160626) do
+ActiveRecord::Schema.define(version: 2019_12_19_134954) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -163,7 +163,6 @@ ActiveRecord::Schema.define(version: 2020_01_22_160626) do
     t.integer "suggested_technology_type_id"
     t.text "other_creators", limit: 16777215
     t.string "deleted_contributor"
-    t.integer "position"
   end
 
   create_table "asset_doi_logs", id: :integer,  force: :cascade do |t|
