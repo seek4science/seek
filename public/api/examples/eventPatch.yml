@@ -1,6 +1,0 @@
----
-data:
-  type: events
-  id: '14'
-  attributes:
-    description: A thing that will happen
