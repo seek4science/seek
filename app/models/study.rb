@@ -69,4 +69,9 @@ class Study < ApplicationRecord
   def self.user_creatable?
     Seek::Config.studies_enabled
   end
+  
+  def positioned_assays
+    assays.order(position: :asc)
+  end
+
 end
