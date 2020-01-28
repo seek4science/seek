@@ -65,4 +65,8 @@ class Study < ApplicationRecord
     ids << person_responsible_id if person_responsible_id
     ids.uniq
   end
+
+  def positioned_assays
+    assays.order(position: :asc)
+  end
 end

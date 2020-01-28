@@ -4,6 +4,8 @@
   creators_enable = creators_enable && f.object.respond_to?(:creators)
   other_creators ||= nil
 
+  assays_enable = f.object.respond_to?(:positioned_assays)
+
   sharing_enable = true if sharing_enable.nil?
   sharing_enable = sharing_enable && f.object.can_manage?
 
@@ -15,6 +17,28 @@
 
   other_creators ||= f.object.try(:other_creators)
 %>
+
+<% if assays_enable %>
+  <p class="help-block">Re-arrange assays by clicking and dragging the button on the left-hand side of each row.</p>
+  <table class="table" id="attribute-table">
+    <thead>
+    <tr>
+      <th width="5em">Order</th>
+      <th>Name</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% f.object.positioned_assays.each do |assay| %>
+      <tr>
+        <td><%= assay.position -%></td>
+        <td><%= assay.title -%></td>
+      </tr>
+    <% end %>
+
+    </tbody>
+  </table>
+
+<% end -%>
 
 <% if sharing_enable %>
   <%= render :partial => "sharing/form" -%>
