@@ -32,14 +32,41 @@
         "application/json"
     ],
     "securityDefinitions": {
+        "OAuth2": {
+            "type": "oauth2",
+            "flow": "accessCode",
+            "authorizationUrl": "/oauth/authorize",
+            "tokenUrl": "/oauth/token",
+            "scopes": {
+                "read": "Read or list resources",
+                "write": "Create, modify, delete resources"
+            },
+            "description": {
+                "$ref": "../descriptions/authOAuth2.md"
+            }
+        },
+        "apiToken": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization",
+            "description": {
+                "$ref": "../descriptions/authToken.md"
+            }
+        },
         "basicAuth": {
             "type": "basic",
             "description": {
-                "$ref": "../descriptions/authentication.md"
+                "$ref": "../descriptions/authBasic.md"
             }
         }
     },
     "security": [
+        {
+            "OAuth2": ["read", "write"]
+        },
+        {
+            "apiToken": []
+        },
         {
             "basicAuth": []
         }
