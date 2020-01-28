@@ -182,6 +182,7 @@ ActiveRecord::Schema.define(version: 2020_07_17_140928) do
     t.integer "suggested_technology_type_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "position"
   end
 
   create_table "asset_doi_logs", id: :integer,  force: :cascade do |t|
