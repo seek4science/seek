@@ -38,8 +38,8 @@
             "authorizationUrl": "/oauth/authorize",
             "tokenUrl": "/oauth/token",
             "scopes": {
-                "read": "Read or list resources",
-                "write": "Create, modify, delete resources"
+                "read": "Read, download and list resources",
+                "write": "Create, upload, update and delete resources"
             },
             "description": {
                 "$ref": "../descriptions/authOAuth2.md"
