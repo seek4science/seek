@@ -4,8 +4,6 @@ The API is defined in the [OpenAPI specification](https://swagger.io/specificati
 
 Example IPython notebooks showing use of the API are available on [GitHub](https://github.com/seek4science/seekAPIexamples)
 
-===
-
 ## Policy
 <a name="Policy"></a>
 A Policy specifies the visibility of an object to people using SEEK. A <a href="#projects">**Project**</a> may specify the default policy for objects belonging to that <a href="#projects">**Project**</a>
@@ -21,8 +19,6 @@ The access may be one of (in order of increasing "power"):
 * manage
 
 In addition a **Policy** may give special access to specific <a href="#people">**People**</a>, People working at an <a href="#institutions">**Institution**</a> or working on a <a href="#projects">**Project**</a>.
-
-===
 
 ## License
 <a name="License"></a>
@@ -62,8 +58,6 @@ The license can currently be:
 * ukcrown-withrights - UK Crown Copyright with data.gov.uk rights
 * [ukpsi](http://www.opendefinition.org/licenses/ukpsi) - UK PSI Public Sector Information
 
-===
-
 ## ContentBlob
 <a name="ContentBlob"></a>
 <a name="contentBlobs"></a>
@@ -96,5 +90,3 @@ A placeholder can then be satisfied by uploading a file to the location URI. For
 may be satisfied by uploading a file to http://fairdomhub.org/data_files/57/content_blobs/313 using the <a href="#uploadDataFileContent">uploadDataFileContent</a> operation
 
 The content of a resource may be downloaded by first *reading* the resource and then *downloading* the ContentBlobs from their URI.
-
-===
