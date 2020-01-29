@@ -26,37 +26,37 @@ The license specifies the license that will apply to any <a href="#dataFiles">**
 
 The license can currently be:
 
-* [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/) - CC0 1.0
-* [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/) - Creative Commons Attribution 4.0
-* [CC-BY-SA-4.0](https://creativecommons.org/licenses/by-sa/4.0/) - Creative Commons Attribution Share-Alike 4.0
-* [ODC-BY-1.0](http://www.opendefinition.org/licenses/odc-by) - Open Data Commons Attribution License 1.0
-* [ODbL-1.0](http://www.opendefinition.org/licenses/odc-odbl) - Open Data Commons Open Database License 1.0
-* [ODC-PDDL-1.0](http://www.opendefinition.org/licenses/odc-pddl) - Open Data Commons Public Domain Dedication and Licence 1.0
-* notspecified - License Not Specified
-* other-at - Other (Attribution)
-* other-open - Other (Open)
-* other-pd - Other (Public Domain)
-* [AFL-3.0](http://www.opensource.org/licenses/AFL-3.0) - Academic Free License 3.0
-* [Against-DRM](http://www.opendefinition.org/licenses/against-drm) - Against DRM
-* [CC-BY-NC-4.0](https://creativecommons.org/licenses/by-nc/4.0/) - Creative Commons Attribution-NonCommercial 4.0
-* [DSL](http://www.opendefinition.org/licenses/dsl) - Design Science License
-* [FAL-1.3](http://www.opendefinition.org/licenses/fal) - Free Art License 1.3
-* [GFDL-1.3-no-cover-texts-no-invariant-sections](http://www.opendefinition.org/licenses/gfdl) - GNU Free Documentation License 1.3 with no cover texts and no invariant sections
-* [geogratis](http://geogratis.gc.ca/geogratis/licenceGG) - Geogratis
-* [hesa-withrights](http://www.hesa.ac.uk/index.php?option=com_content&amp;task=view&amp;id=2619&amp;Itemid=209) - Higher Education Statistics Agency Copyright with data.gov.uk rights
-* localauth-withrights - Local Authority Copyright with data.gov.uk rights
-* [MirOS](http://www.opensource.org/licenses/MirOS) - MirOS Licence
-* [NPOSL-3.0](http://www.opensource.org/licenses/NPOSL-3.0) - Non-Profit Open Software License 3.0
-* [OGL-UK-1.0](http://reference.data.gov.uk/id/open-government-licence) - Open Government Licence 1.0 (United Kingdom)
-* [OGL-UK-2.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/) - Open Government Licence 2.0 (United Kingdom)
-* [OGL-UK-3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/) - Open Government Licence 3.0 (United Kingdom)
-* [OGL-Canada-2.0](http://data.gc.ca/eng/open-government-licence-canada) - Open Government License 2.0 (Canada)
-* [OSL-3.0](http://www.opensource.org/licenses/OSL-3.0) - Open Software License 3.0
-* [dli-model-use](http://data.library.ubc.ca/datalib/geographic/DMTI/license.html) - Statistics Canada: Data Liberation Initiative (DLI) - Model Data Use Licence
-* [Talis](http://www.opendefinition.org/licenses/tcl) - Talis Community License
-* ukclickusepsi - UK Click Use PSI
-* ukcrown-withrights - UK Crown Copyright with data.gov.uk rights
-* [ukpsi](http://www.opendefinition.org/licenses/ukpsi) - UK PSI Public Sector Information
+* `CC0-1.0` - [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)
+* `CC-BY-4.0` - [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/)
+* `CC-BY-SA-4.0` - [Creative Commons Attribution Share-Alike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+* `ODC-BY-1.0` - [Open Data Commons Attribution License 1.0](http://www.opendefinition.org/licenses/odc-by)
+* `ODbL-1.0` - [Open Data Commons Open Database License 1.0](http://www.opendefinition.org/licenses/odc-odbl)
+* `ODC-PDDL-1.0` - [Open Data Commons Public Domain Dedication and Licence 1.0](http://www.opendefinition.org/licenses/odc-pddl)
+* `notspecified` - License Not Specified
+* `other-at` - Other (Attribution)
+* `other-open` - Other (Open)
+* `other-pd` - Other (Public Domain)
+* `AFL-3.0` - [Academic Free License 3.0](http://www.opensource.org/licenses/AFL-3.0)
+* `Against-DRM` - [Against DRM](http://www.opendefinition.org/licenses/against-drm)
+* `CC-BY-NC-4.0` - [Creative Commons Attribution-NonCommercial 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
+* `DSL` - [Design Science License](http://www.opendefinition.org/licenses/dsl)
+* `FAL-1.3` - [Free Art License 1.3](http://www.opendefinition.org/licenses/fal)
+* `GFDL-1.3-no-cover-texts-no-invariant-sections` - [GNU Free Documentation License 1.3 with no cover texts and no invariant sections](http://www.opendefinition.org/licenses/gfdl)
+* `geogratis` - [Geogratis](http://geogratis.gc.ca/geogratis/licenceGG)
+* `hesa-withrights` - [Higher Education Statistics Agency Copyright with data.gov.uk rights](http://www.hesa.ac.uk/index.php?option=com_content&amp;task=view&amp;id=2619&amp;Itemid=209)
+* `localauth-withrights` - Local Authority Copyright with data.gov.uk rights
+* `MirOS` - [MirOS Licence](http://www.opensource.org/licenses/MirOS)
+* `NPOSL-3.0` - [Non-Profit Open Software License 3.0](http://www.opensource.org/licenses/NPOSL-3.0)
+* `OGL-UK-1.0` - [Open Government Licence 1.0 (United Kingdom)](http://reference.data.gov.uk/id/open-government-licence)
+* `OGL-UK-2.0` - [Open Government Licence 2.0 (United Kingdom)](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/)
+* `OGL-UK-3.0` - [Open Government Licence 3.0 (United Kingdom)](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)
+* `OGL-Canada-2.0` - [Open Government License 2.0 (Canada)](http://data.gc.ca/eng/open-government-licence-canada)
+* `OSL-3.0` - [Open Software License 3.0](http://www.opensource.org/licenses/OSL-3.0)
+* `dli-model-use` - [Statistics Canada: Data Liberation Initiative (DLI) - Model Data Use Licence](http://data.library.ubc.ca/datalib/geographic/DMTI/license.html)
+* `Talis` - [Talis Community License](http://www.opendefinition.org/licenses/tcl)
+* `ukclickusepsi` - UK Click Use PSI
+* `ukcrown-withrights` - UK Crown Copyright with data.gov.uk rights
+* `ukpsi` - [UK PSI Public Sector Information](http://www.opendefinition.org/licenses/ukpsi)
 
 ## ContentBlob
 <a name="ContentBlob"></a>

@@ -3737,7 +3737,14 @@
         },
         "license": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "enum": [
+                "CC0-1.0", "CC-BY-4.0", "CC-BY-SA-4.0", "ODC-BY-1.0", "ODbL-1.0", "ODC-PDDL-1.0", "notspecified",
+                "other-at", "other-open", "other-pd", "AFL-3.0", "Against-DRM", "CC-BY-NC-4.0", "DSL", "FAL-1.3",
+                "GFDL-1.3-no-cover-texts-no-invariant-sections", "geogratis", "hesa-withrights", "localauth-withrights",
+                "MirOS", "NPOSL-3.0", "OGL-UK-1.0", "OGL-UK-2.0", "OGL-UK-3.0", "OGL-Canada-2.0", "OSL-3.0",
+                "dli-model-use", "Talis", "ukclickusepsi", "ukcrown-withrights", "ukpsi", null
+            ]
         },
         "nullableLicense": {
             "allOf": [
