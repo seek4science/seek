@@ -455,6 +455,7 @@
             },
             "post": {
                 "operationId": "createAssay",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/createAssay.md"
                 },
@@ -518,6 +519,7 @@
             ],
             "patch": {
                 "operationId": "updateAssay",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/updateAssay.md"
                 },
@@ -604,6 +606,7 @@
             },
             "delete": {
                 "operationId": "deleteAssay",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/deleteAssay.md"
                 },
@@ -662,6 +665,7 @@
             },
             "post": {
                 "operationId": "createDataFile",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/createDataFile.md"
                 },
@@ -770,6 +774,7 @@
             },
             "patch": {
                 "operationId": "updateDataFile",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/updateDataFile.md"
                 },
@@ -821,6 +826,7 @@
             },
             "delete": {
                 "operationId": "deleteDataFile",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/deleteDataFile.md"
                 },
@@ -879,6 +885,7 @@
             ],
             "put": {
                 "operationId": "uploadAssetContent",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/uploadAssetContent.md"
                 },
@@ -1031,6 +1038,7 @@
             },
             "post": {
                 "operationId": "createDocument",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/createDocument.md"
                 },
@@ -1129,6 +1137,7 @@
             },
             "patch": {
                 "operationId": "updateDocument",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/updateDocument.md"
                 },
@@ -1180,6 +1189,7 @@
             },
             "delete": {
                 "operationId": "deleteDocument",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/deleteDocument.md"
                 },
@@ -1238,6 +1248,7 @@
             },
             "post": {
                 "operationId": "createEvent",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/createEvent.md"
                 },
@@ -1336,6 +1347,7 @@
             },
             "patch": {
                 "operationId": "updateEvent",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/updateEvent.md"
                 },
@@ -1387,6 +1399,7 @@
             },
             "delete": {
                 "operationId": "deleteEvent",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/deleteEvent.md"
                 },
@@ -1445,6 +1458,7 @@
             },
             "post": {
                 "operationId": "createInstitution",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/createInstitution.md"
                 },
@@ -1543,6 +1557,7 @@
             },
             "patch": {
                 "operationId": "updateInstitution",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/updateInstitution.md"
                 },
@@ -1594,6 +1609,7 @@
             },
             "delete": {
                 "operationId": "deleteInstitution",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/deleteInstitution.md"
                 },
@@ -1652,6 +1668,7 @@
             },
             "post": {
                 "operationId": "createInvestigation",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/createInvestigation.md"
                 },
@@ -1750,6 +1767,7 @@
             },
             "patch": {
                 "operationId": "updateInvestigation",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/updateInvestigation.md"
                 },
@@ -1801,6 +1819,7 @@
             },
             "delete": {
                 "operationId": "deleteInvestigation",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/deleteInvestigation.md"
                 },
@@ -1859,6 +1878,7 @@
             },
             "post": {
                 "operationId": "createModel",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/createModel.md"
                 },
@@ -1967,6 +1987,7 @@
             },
             "patch": {
                 "operationId": "updateModel",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/updateModel.md"
                 },
@@ -2018,6 +2039,7 @@
             },
             "delete": {
                 "operationId": "deleteModel",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/deleteModel.md"
                 },
@@ -2151,6 +2173,7 @@
             },
             "post": {
                 "operationId": "createPerson",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/createPerson.md"
                 },
@@ -2249,6 +2272,7 @@
             },
             "patch": {
                 "operationId": "updatePerson",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/updatePerson.md"
                 },
@@ -2300,6 +2324,7 @@
             },
             "delete": {
                 "operationId": "deletePerson",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/deletePerson.md"
                 },
@@ -2358,6 +2383,7 @@
             },
             "post": {
                 "operationId": "createPresentation",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/createPresentation.md"
                 },
@@ -2466,6 +2492,7 @@
             },
             "patch": {
                 "operationId": "updatePresentation",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/updatePresentation.md"
                 },
@@ -2517,6 +2544,7 @@
             },
             "delete": {
                 "operationId": "deletePresentation",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/deletePresentation.md"
                 },
@@ -2575,6 +2603,7 @@
             },
             "post": {
                 "operationId": "createProgramme",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/createProgramme.md"
                 },
@@ -2673,6 +2702,7 @@
             },
             "patch": {
                 "operationId": "updateProgramme",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/updateProgramme.md"
                 },
@@ -2724,6 +2754,7 @@
             },
             "delete": {
                 "operationId": "deleteProgramme",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/deleteProgramme.md"
                 },
@@ -2782,6 +2813,7 @@
             },
             "post": {
                 "operationId": "createProject",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/createProject.md"
                 },
@@ -2880,6 +2912,7 @@
             },
             "patch": {
                 "operationId": "updateProject",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/updateProject.md"
                 },
@@ -2931,6 +2964,7 @@
             },
             "delete": {
                 "operationId": "deleteProject",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/deleteProject.md"
                 },
@@ -3092,6 +3126,7 @@
             },
             "post": {
                 "operationId": "createSop",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/createSop.md"
                 },
@@ -3200,6 +3235,7 @@
             },
             "patch": {
                 "operationId": "updateSop",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/updateSop.md"
                 },
@@ -3251,6 +3287,7 @@
             },
             "delete": {
                 "operationId": "deleteSop",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/deleteSop.md"
                 },
@@ -3309,6 +3346,7 @@
             },
             "post": {
                 "operationId": "createStudy",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/createStudy.md"
                 },
@@ -3407,6 +3445,7 @@
             },
             "patch": {
                 "operationId": "updateStudy",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/updateStudy.md"
                 },
@@ -3458,6 +3497,7 @@
             },
             "delete": {
                 "operationId": "deleteStudy",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
                 "description": {
                     "$ref": "../descriptions/deleteStudy.md"
                 },
