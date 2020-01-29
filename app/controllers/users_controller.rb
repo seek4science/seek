@@ -105,12 +105,10 @@ class UsersController < ApplicationController
   end
 
   def edit
-    @user = User.find(params[:id])
     render action: :edit
   end
 
   def update
-    @user = User.find(params[:id])
     if @user == current_user && !@user.registration_complete? && (params[:user][:person_id]) && (params[:user][:email])
       person_id = params[:user][:person_id]
       email = params[:user][:email]

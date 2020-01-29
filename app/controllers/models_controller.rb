@@ -19,6 +19,8 @@ class ModelsController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def find_other_version
     version = params[:other_version]
     @other_version = @model.find_version(version)

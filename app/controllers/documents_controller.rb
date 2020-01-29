@@ -15,6 +15,8 @@ class DocumentsController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def new_version
     if handle_upload_data(true)
       comments = params[:revision_comment]

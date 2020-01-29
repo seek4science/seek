@@ -14,6 +14,8 @@ class EventsController < ApplicationController
 
   include Seek::BreadCrumbs
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def show
     respond_to do |format|
       format.html # show.html.erb

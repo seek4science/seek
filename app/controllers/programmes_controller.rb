@@ -21,6 +21,8 @@ class ProgrammesController < ApplicationController
 
   respond_to :html, :json
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def create
     @programme = Programme.new(programme_params)
 
@@ -94,7 +96,7 @@ class ProgrammesController < ApplicationController
     respond_with do |format|
       format.html
       format.json {render json: @programme, include: [params[:include]]}
-      format.rdf { render template: 'rdf/show' }	
+      format.rdf { render template: 'rdf/show' }
     end
   end
 

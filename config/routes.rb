@@ -1,4 +1,9 @@
 SEEK::Application.routes.draw do
+  use_doorkeeper do
+    controllers applications: 'oauth_applications'
+    controllers authorized_applications: 'authorized_oauth_applications'
+    controllers authorizations: 'oauth_authorizations'
+  end
   mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)
   #mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
 
@@ -148,6 +153,7 @@ SEEK::Application.routes.draw do
     end
     resources :oauth_sessions, only: [:index, :destroy]
     resources :identities, only: [:index, :destroy]
+    resources :api_tokens, only: [:index, :create, :destroy]
   end
 
   resource :session do
@@ -542,7 +548,7 @@ SEEK::Application.routes.draw do
         post :create_from_existing
       end
     end
-    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:workflows,:only=>[:index]
   end
 
   resources :workflows, concerns: [:has_content_blobs] do
@@ -571,7 +577,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:sops,:only=>[:index]
   end
 
   resources :nodes, concerns: [:has_content_blobs] do
@@ -660,7 +666,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people,:projects,:data_files,:publications,:presentations,:only=>[:index]
+    resources :people,:projects,:data_files,:publications,:documents,:presentations,:only=>[:index]
   end
 
   resource :policies do
@@ -725,7 +731,8 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples, only:[:index]
+    resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
+              :strains, :organisms, only:[:index]
   end
 
   ### SAMPLE TYPES ###
@@ -780,7 +787,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:only=>[:index]
+    resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
   ### ASSAY AND TECHNOLOGY TYPES ###

@@ -8,6 +8,8 @@ class ContentBlobsController < ApplicationController
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
 
+  api_actions :show, :update, :download
+
   def update
     if @content_blob.no_content?
       @content_blob.tmp_io_object = get_request_payload
@@ -56,7 +58,7 @@ class ContentBlobsController < ApplicationController
         render plain: 'Unable to view contents of this data file,', content_type: 'text/csv', status: :not_acceptable
     end
   end
-  
+
   def show
     respond_to do |format|
       format.json { render json: @content_blob, include: [params[:include]] }

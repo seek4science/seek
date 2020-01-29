@@ -63,6 +63,19 @@ class PublicationsControllerTest < ActionController::TestCase
     assert p.assays.include? assay
   end
 
+  test 'should create doi publication and suggest the associated person' do
+    person = people(:johan_person)
+    mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1371/journal.pone.0004803', content_file: 'cross_ref3.xml')
+    assert_difference('Publication.count') do
+      post :create, params: { publication: { doi: '10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } }
+    end
+    get :manage, params: { id: assigns(:publication) }
+    assert_response :success
+    p = assigns(:publication)
+    assert_equal p.publication_authors[0].suggested_person.name, person.name
+  end
+
+
   test 'should create doi publication' do
     mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1371/journal.pone.0004803', content_file: 'cross_ref3.xml')
     assert_difference('Publication.count') do
@@ -513,10 +526,6 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'should get manage' do
-    get :manage, params: { id: publications(:one) }
-    assert_response :success
-  end
 
   test 'associates assay' do
     login_as(:model_owner) # can edit assay

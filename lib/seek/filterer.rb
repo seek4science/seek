@@ -12,7 +12,7 @@ module Seek
         # Map a list of person IDs to peoples' names.
         person_name: ->(ids) do
           people = Person.select(:id, :first_name, :last_name).where(id: ids).to_a
-          ids.map { |v| (people.detect { |p| p.id == v })&.name }
+          ids.map { |v| (people.detect { |p| p.id == v.to_i })&.name }
         end,
         assay_type_label:->(uris) {
           uris.map do |uri|

@@ -129,6 +129,8 @@ gem 'activerecord-import'
 
 gem 'puma' # Used for docker, and also teaspoon tests
 
+gem 'doorkeeper'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do

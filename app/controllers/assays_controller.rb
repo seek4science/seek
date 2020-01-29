@@ -18,6 +18,8 @@ class AssaysController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])
     @assay = @existing_assay.clone_with_associations

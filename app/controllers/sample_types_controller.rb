@@ -12,6 +12,8 @@ class SampleTypesController < ApplicationController
 
   before_action :authorize_requested_sample_type, except: [:index, :new, :create]
 
+  api_actions :index
+
   # GET /sample_types/1  ,'sample_attributes','linked_sample_attributes'
   # GET /sample_types/1.json
   def show
@@ -56,7 +58,7 @@ class SampleTypesController < ApplicationController
 
   # POST /sample_types
   # POST /sample_types.json
-  def create    
+  def create
     @sample_type = SampleType.new(sample_type_params)
     @sample_type.contributor = User.current_user.person
 

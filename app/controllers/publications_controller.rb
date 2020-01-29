@@ -8,13 +8,15 @@ class PublicationsController < ApplicationController
   before_action :publications_enabled?
 
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[show edit update destroy]
-  before_action :suggest_authors, only: :mange
+  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy]
+  before_action :suggest_authors, only: [:manage]
 
   include Seek::BreadCrumbs
 
   include Seek::IsaGraphExtensions
   include PublicationsHelper
+
+  api_actions :index, :show
 
   def export
     @query = Publication.ransack(params[:query])
@@ -71,9 +73,8 @@ class PublicationsController < ApplicationController
   def edit; end
 
   # GET /publications/1/manage
-  def manage
-    @publication = Publication.find(params[:id])
-  end
+  def manage; end
+
 
   # POST /publications
   # POST /publications.xml
@@ -321,7 +322,7 @@ class PublicationsController < ApplicationController
   end
 
   def publication_params
-    params.require(:publication).permit(:publication_type_id, :pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,:editor,
+    params.require(:publication).permit(:publication_type_id, :pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,:url,:editor,
                                         :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
                                         { data_file_ids: [] }, { scales: [] },
@@ -424,6 +425,7 @@ class PublicationsController < ApplicationController
       flash[:error] = 'Please upload a bibtex file!'
     else
       bibtex_file = params[:publication].delete(:bibtex_file)
+      #TODO:hu check the encoding problem here, when exception due to encoding, add an error message
       data = bibtex_file.read.force_encoding('UTF-8')
       bibtex = BibTeX.parse(data,:filter => :latex)
       if bibtex[0].nil?
