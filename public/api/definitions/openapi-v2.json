@@ -16,7 +16,7 @@
             "$ref": "../descriptions/api.md"
         },
         "x-logo": {
-            "url": "./definitions/seek.png",
+            "url": "api/definitions/seek.png",
             "backgroundColor": "#FFFFFF"
         }
     },
