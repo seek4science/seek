@@ -228,6 +228,12 @@
             "description": {
                 "$ref": "../descriptions/sampleTypes.md"
             }
+        },
+        {
+            "name": "workflows",
+            "description": {
+                "$ref": "../descriptions/workflows.md"
+            }
         }
     ],
     "x-tagGroups": [
@@ -274,6 +280,7 @@
                 "models",
                 "publications",
                 "sops",
+                "workflows",
                 "contentBlobs"
             ]
         },
@@ -398,7 +405,8 @@
                         "publications",
                         "sample_types",
                         "sops",
-                        "studies"
+                        "studies",
+                        "workflows"
                     ],
                     "default": "data_files"
                 }
@@ -3526,6 +3534,216 @@
                     }
                 }
             }
+        },
+        "/workflows": {
+            "get": {
+                "operationId": "listWorkflows",
+                "description": {
+                    "$ref": "../descriptions/listWorkflows.md"
+                },
+                "tags": [
+                    "list",
+                    "workflows"
+                ],
+                "responses": {
+                    "501": {
+                        "description": "Not implemented"
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/workflowsResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/workflowsResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "createWorkflow",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/createWorkflow.md"
+                },
+                "tags": [
+                    "create",
+                    "workflows"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "workflow",
+                        "description": "The workflow to create.",
+                        "schema": {
+                            "$ref": "#/definitions/workflowPost"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/bad_request"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "schema": {
+                            "$ref": "#/definitions/unprocessable_entity"
+                        }
+                    },
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/workflowResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/workflowPostResponse.json"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/workflows/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "description": "The workflow to fetch, patch or delete",
+                    "type": "integer",
+                    "default": 138
+                }
+            ],
+            "get": {
+                "operationId": "readWorkflow",
+                "description": {
+                    "$ref": "../descriptions/readWorkflow.md"
+                },
+                "tags": [
+                    "read",
+                    "workflows"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/workflowResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/workflowResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "updateWorkflow",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/updateWorkflow.md"
+                },
+                "tags": [
+                    "update",
+                    "workflows"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "workflow",
+                        "description": "The workflow to update.",
+                        "schema": {
+                            "$ref": "#/definitions/workflowPatch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "schema": {
+                            "$ref": "#/definitions/unprocessable_entity"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/workflowResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/workflowPatchResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "deleteWorkflow",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/deleteWorkflow.md"
+                },
+                "tags": [
+                    "delete",
+                    "workflows"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ok"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -3858,6 +4076,9 @@
             ],
             "additionalProperties": false
         },
+        "indexLinks": {
+            "$ref": "#/definitions/linksType"
+        },
         "linksType": {
             "type": "object",
             "properties": {
@@ -3993,7 +4214,8 @@
                 "publications",
                 "sample_types",
                 "sops",
-                "studies"
+                "studies",
+                "workflows"
             ]
         },
         "permissionResource": {
@@ -4681,6 +4903,88 @@
                 "data"
             ],
             "additionalProperties": false
+        },
+        "workflowType": {
+            "type": "string",
+            "minLength": 1,
+            "enum": [
+                "workflows"
+            ]
+        },
+        "workflowReferencesList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/workflowReferences"
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false
+        },
+        "workflowReferences": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/workflowReference"
+            }
+        },
+        "workflowReference": {
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/workflowType"
+                }
+            },
+            "required": [
+                "id",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "workflowSkeleton": {
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/workflowType"
+                },
+                "attributes": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        }
+                    },
+                    "required": [
+                        "title"
+                    ],
+                    "additionalProperties": false
+                },
+                "links": {
+                    "$ref": "#/definitions/linksType"
+                }
+            },
+            "required": [
+                "id",
+                "type",
+                "attributes",
+                "links"
+            ],
+            "additionalProperties": false
+        },
+        "workflowSkeletons": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/workflowSkeleton"
+            }
         },
         "tagsType": {
             "$ref": "#/definitions/nullableNonEmptyStringList"
@@ -8686,6 +8990,374 @@
                 "$ref": "../examples/studyPatch.json"
             }
         },
+        "workflowResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "type": {
+                            "$ref": "#/definitions/workflowType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "tags": {
+                                    "$ref": "#/definitions/tagsType"
+                                },
+                                "title": {
+                                    "$ref": "#/definitions/nonEmptyString"
+                                },
+                                "description": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "workflow_class": {
+                                    "type": "object",
+                                    "properties": {
+                                        "title": {
+                                            "$ref": "#/definitions/nonEmptyString"
+                                        },
+                                        "key": {
+                                            "$ref": "#/definitions/nonEmptyString"
+                                        },
+                                        "description": {
+                                            "$ref": "#/definitions/nullableNonEmptyString"
+                                        }
+                                    },
+                                    "required": [
+                                        "title",
+                                        "key"
+                                    ],
+                                    "additionalProperties": false
+                                },
+                                "license": {
+                                    "$ref": "#/definitions/nullableLicense"
+                                },
+                                "latest_version": {
+                                    "type": "number"
+                                },
+                                "versions": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "properties": {
+                                            "version": {
+                                                "type": "number"
+                                            },
+                                            "revision_comments": {
+                                                "$ref": "#/definitions/nullableNonEmptyString"
+                                            },
+                                            "url": {
+                                                "$ref": "#/definitions/uriString"
+                                            }
+                                        },
+                                        "required": [
+                                            "version",
+                                            "revision_comments",
+                                            "url"
+                                        ],
+                                        "additionalProperties": false
+                                    }
+                                },
+                                "version": {
+                                    "type": "number"
+                                },
+                                "revision_comments": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "created_at": {
+                                    "$ref": "#/definitions/dateTimeString"
+                                },
+                                "updated_at": {
+                                    "$ref": "#/definitions/dateTimeString"
+                                },
+                                "content_blobs": {
+                                    "$ref": "#/definitions/contentBlobsList"
+                                },
+                                "policy": {
+                                    "$ref": "#/definitions/policy"
+                                },
+                                "other_creators": {
+                                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                                }
+                            },
+                            "required": [
+                                "title",
+                                "workflow_class",
+                                "license",
+                                "latest_version",
+                                "versions",
+                                "version",
+                                "created_at",
+                                "updated_at",
+                                "content_blobs"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "creators": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "submitter": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "people": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                },
+                                "investigations": {
+                                    "$ref": "#/definitions/investigationReferencesList"
+                                },
+                                "studies": {
+                                    "$ref": "#/definitions/studyReferencesList"
+                                },
+                                "assays": {
+                                    "$ref": "#/definitions/assayReferencesList"
+                                },
+                                "publications": {
+                                    "$ref": "#/definitions/publicationReferencesList"
+                                },
+                                "sops": {
+                                    "$ref": "#/definitions/sopReferencesList"
+                                }
+                            },
+                            "required": [
+                                "creators",
+                                "submitter",
+                                "people",
+                                "projects",
+                                "investigations",
+                                "studies",
+                                "assays",
+                                "publications",
+                                "sops"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "links": {
+                            "type": "object",
+                            "properties": {
+                                "self": {
+                                    "$ref": "#/definitions/uriString"
+                                },
+                                "diagram": {
+                                    "$ref": "#/definitions/uriString"
+                                }
+                            },
+                            "required": [
+                                "self"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "meta": {
+                            "$ref": "#/definitions/metaType"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "type",
+                        "attributes",
+                        "relationships",
+                        "links",
+                        "meta"
+                    ],
+                    "additionalProperties": false
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi"
+            ],
+            "additionalProperties": false
+        },
+        "workflowPost": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "$ref": "#/definitions/workflowType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "tags": {
+                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                },
+                                "title": {
+                                    "$ref": "#/definitions/nonEmptyString"
+                                },
+                                "description": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "workflow_class": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {
+                                            "$ref": "#/definitions/nonEmptyString"
+                                        }
+                                    },
+                                    "required": [
+                                        "key"
+                                    ]
+                                },
+                                "license": {
+                                    "$ref": "#/definitions/nullableLicense"
+                                },
+                                "policy": {
+                                    "$ref": "#/definitions/policy"
+                                },
+                                "content_blobs": {
+                                    "$ref": "#/definitions/contentBlobSlotsList"
+                                },
+                                "other_creators": {
+                                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                                }
+                            },
+                            "required": [
+                                "title",
+                                "workflow_class",
+                                "content_blobs"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "creators": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                },
+                                "assays": {
+                                    "$ref": "#/definitions/assayReferencesList"
+                                },
+                                "publications": {
+                                    "$ref": "#/definitions/publicationReferencesList"
+                                },
+                                "sops": {
+                                    "$ref": "#/definitions/sopReferencesList"
+                                }
+                            },
+                            "required": [
+                                "projects"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "attributes",
+                        "relationships"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "$ref": "../examples/workflowPost.json"
+            }
+        },
+        "workflowPatch": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "type": {
+                            "$ref": "#/definitions/workflowType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "tags": {
+                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                },
+                                "title": {
+                                    "$ref": "#/definitions/nonEmptyString"
+                                },
+                                "description": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "workflow_class": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {
+                                            "$ref": "#/definitions/nonEmptyString"
+                                        }
+                                    },
+                                    "required": [
+                                        "key"
+                                    ]
+                                },
+                                "license": {
+                                    "$ref": "#/definitions/nullableLicense"
+                                },
+                                "policy": {
+                                    "$ref": "#/definitions/policy"
+                                },
+                                "other_creators": {
+                                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "creators": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                },
+                                "assays": {
+                                    "$ref": "#/definitions/assayReferencesList"
+                                },
+                                "publications": {
+                                    "$ref": "#/definitions/publicationReferencesList"
+                                },
+                                "sops": {
+                                    "$ref": "#/definitions/sopReferencesList"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "type"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "$ref": "../examples/workflowPatch.json"
+            }
+        },
         "assaysResponse": {
             "type": "object",
             "properties": {
@@ -8697,6 +9369,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -8717,6 +9392,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -8777,6 +9455,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -8837,6 +9518,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -8897,6 +9581,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -8957,6 +9644,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -9017,6 +9707,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -9077,6 +9770,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -9197,6 +9893,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -9257,6 +9956,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -9317,6 +10019,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -9377,6 +10082,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -9437,6 +10145,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -9497,6 +10208,9 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
@@ -9557,6 +10271,32 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi",
+                "meta"
+            ],
+            "additionalProperties": false
+        },
+        "workflowsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/workflowSkeletons"
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                },
+                "meta": {
+                    "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [

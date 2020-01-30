@@ -1,0 +1,67 @@
+{ "todo" : "FIXME",
+    "data": {
+        "type": "workflows",
+        "attributes": {
+            "title": "A Maximal Workflow",
+            "description": "This is the description",
+            "workflow_class": {
+                "key": "CWL"
+            },
+            "tags": ["tag1", "tag2"],
+            "license": "CC-BY-4.0",
+            "other_creators": "John Smith, Jane Smith",
+            "content_blobs": [
+                {
+                    "original_filename": "workflow.cwl",
+                    "content_type": "application/x-yaml"
+                }
+            ],
+            "policy": {
+                "access": "download",
+                "permissions": [
+                    {
+                        "resource": {
+                            "id" : "234",
+                            "type": "projects"
+                        },
+                        "access": "edit"
+                    }
+                ]
+            }
+        },
+        "relationships": {
+            "creators": {
+                "data": [
+                    {
+                        "id": "34",
+                        "type": "people"
+                    }
+                ]
+            },
+            "projects": {
+                "data": [
+                    {
+                        "id": "234",
+                        "type": "projects"
+                    }
+                ]
+            },
+            "assays": {
+                "data": [
+                    {
+                        "id": "13",
+                        "type": "assays"
+                    }
+                ]
+            },
+            "publications": {
+                "data": [
+                    {
+                        "id": "71",
+                        "type": "publications"
+                    }
+                ]
+            }
+        }
+    }
+}
