@@ -6,6 +6,10 @@ quentin_person:
   email: "quentin@email.com"
   roles_mask: 1
 
+johan_person:
+  first_name: "Johan"
+  last_name: "Bollen"
+  email: "Bollen@email.com"
 
 aaron_person:
   first_name: "Aaron"
