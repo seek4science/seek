@@ -12,6 +12,8 @@ class WorkflowsController < ApplicationController
   include Seek::Doi::Minting
   include Seek::IsaGraphExtensions
 
+  api_actions :index, :show, :create, :update, :destroy
+
   rescue_from WorkflowDiagram::UnsupportedFormat do
     head :not_acceptable
   end
