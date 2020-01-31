@@ -9083,6 +9083,29 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "internals": {
+                                    "type": "object",
+                                    "properties": {
+                                        "inputs" : {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/workflowInput"
+                                            }
+                                        },
+                                        "steps" : {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/workflowStep"
+                                            }
+                                        },
+                                        "outputs" : {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/workflowOutput"
+                                            }
+                                        }
+                                    }
                                 }
                             },
                             "required": [
@@ -10490,6 +10513,57 @@
                 "jsonapi"
             ],
             "additionalProperties": false
+        },
+        "workflowInput": {
+            "type": "object",
+            "properties": {
+                "id" : {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "name" : {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "description" :  {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "type" : {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "default_value" : {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                }
+            }
+        },
+        "workflowStep": {
+            "type": "object",
+            "properties": {
+                "id" : {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "name" : {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "description" :  {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                }
+            }
+        },
+        "workflowOutput": {
+            "type": "object",
+            "properties": {
+                "id" : {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "name" : {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "description" :  {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "type" : {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                }
+            }
         }
     }
 }
