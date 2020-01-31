@@ -1,16 +1,39 @@
-{ "todo" : "FIXME",
+{
     "data": {
+        "id": "23",
         "type": "workflows",
-        "id": "123",
         "attributes": {
-            "title": "A Maximal Workflow",
-            "description": "This is the description",
-            "workflow_class": {
-                "key": "CWL"
+            "policy": {
+                "access": "download",
+                "permissions": [
+                    {
+                        "resource": {
+                            "id": "12",
+                            "type": "projects"
+                        },
+                        "access": "edit"
+                    }
+                ]
             },
-            "tags": ["tag1", "tag2"],
+            "title": "An Example Workflow",
+            "description": "This is the description",
             "license": "CC-BY-4.0",
-            "other_creators": "John Smith, Jane Smith",
+            "latest_version": 1,
+            "tags": [
+                "tag1",
+                "tag2"
+            ],
+            "versions": [
+                {
+                    "version": 1,
+                    "revision_comments": null,
+                    "url": "http://localhost:3000/workflows/23?version=1"
+                }
+            ],
+            "version": 1,
+            "revision_comments": null,
+            "created_at": "2020-01-31T14:07:10.000Z",
+            "updated_at": "2020-01-31T14:07:10.000Z",
             "content_blobs": [
                 {
                     "original_filename": "workflow.cwl",
@@ -18,28 +41,39 @@
                     "md5sum": null,
                     "sha1sum": null,
                     "content_type": "application/x-yaml",
-                    "link": "http://localhost:3000/data_files/57/content_blobs/313",
+                    "link": "http://localhost:3000/workflows/23/content_blobs/1466",
                     "size": null
                 }
             ],
-            "policy": {
-                "access": "download",
-                "permissions": [
-                    {
-                        "resource": {
-                            "id" : "234",
-                            "type": "projects"
-                        },
-                        "access": "edit"
-                    }
-                ]
-            }
+            "other_creators": "John Smith, Jane Smith",
+            "workflow_class": {
+                "title": "Common Workflow Language",
+                "key": "CWL",
+                "description": null
+            },
+            "internals": null
         },
         "relationships": {
             "creators": {
                 "data": [
                     {
-                        "id": "34",
+                        "id": "321",
+                        "type": "people"
+                    }
+                ]
+            },
+            "submitter": {
+                "data": [
+                    {
+                        "id": "321",
+                        "type": "people"
+                    }
+                ]
+            },
+            "people": {
+                "data": [
+                    {
+                        "id": "321",
                         "type": "people"
                     }
                 ]
@@ -47,36 +81,35 @@
             "projects": {
                 "data": [
                     {
-                        "id": "234",
+                        "id": "12",
                         "type": "projects"
                     }
                 ]
             },
+            "investigations": {
+                "data": []
+            },
+            "studies": {
+                "data": []
+            },
             "assays": {
-                "data": [
-                    {
-                        "id": "13",
-                        "type": "assays"
-                    }
-                ]
+                "data": []
             },
             "publications": {
-                "data": [
-                    {
-                        "id": "71",
-                        "type": "publications"
-                    }
-                ]
+                "data": []
+            },
+            "sops": {
+                "data": []
             }
         },
         "links": {
-            "self": "/workflows/123"
+            "self": "/workflows/23?version=1"
         },
         "meta": {
-            "created": "2020-01-30T16:18:23.987Z",
-            "modified": "2020-01-30T16:18:23.987Z",
-            "api_version": "0.1",
-            "uuid": "ea7918d0-1e72-0138-1a0e-0800278a9619",
+            "created": "2020-01-31T14:07:09.000Z",
+            "modified": "2020-01-31T14:07:10.000Z",
+            "api_version": "0.2",
+            "uuid": "e5180ff0-2660-0138-94a4-74939ff51fe0",
             "base_url": "http://localhost:3000"
         }
     },

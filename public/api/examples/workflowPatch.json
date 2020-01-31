@@ -1,62 +1,41 @@
-{ "todo" : "FIXME",
+{
     "data": {
+        "id": "23",
         "type": "workflows",
-        "id": "123",
         "attributes": {
-            "title": "A Maximally Patched Workflow",
-            "description": "A workflow to do very important stuff",
-            "workflow_class": {
-                "key": "CWL"
-            },
-            "tags": ["tag1", "tag2", "tag3"],
-            "license": "CC-BY-4.0",
-            "other_creators": "John Smith, Jane Smith",
-            "policy": {
-                "access": "no_access",
-                "permissions": [
-                    {
-                        "resource": {
-                            "id" : "234",
-                            "type": "projects"
-                        },
-                        "access": "edit"
-                    }
-                ]
-            }
+            "description": "This is a very important workflow!",
+            "tags": [
+                "tag1",
+                "tag2",
+                "tag3"
+            ]
         },
         "relationships": {
             "creators": {
                 "data": [
                     {
-                        "id": "34",
+                        "id": "321",
+                        "type": "people"
+                    },
+                    {
+                        "id": "372",
                         "type": "people"
                     }
                 ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "234",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "assays": {
-                "data": [
-                    {
-                        "id": "13",
-                        "type": "assays"
-                    }
-                ]
-            },
-            "publications": {
-                "data": [
-                    {
-                        "id": "71",
-                        "type": "publications"
-                    }
-                ]
             }
+        },
+        "links": {
+            "self": "/workflows/23?version=1"
+        },
+        "meta": {
+            "created": "2020-01-31T14:07:09.000Z",
+            "modified": "2020-01-31T14:07:10.000Z",
+            "api_version": "0.2",
+            "uuid": "e5180ff0-2660-0138-94a4-74939ff51fe0",
+            "base_url": "http://localhost:3000"
         }
+    },
+    "jsonapi": {
+        "version": "1.0"
     }
 }

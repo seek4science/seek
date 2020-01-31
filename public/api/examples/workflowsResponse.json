@@ -1,41 +1,44 @@
-{ "todo" : "FIXME",
+{
     "data": [
         {
-            "id": "1",
-            "type": "studies",
+            "id": "23",
+            "type": "workflows",
             "attributes": {
-                "title": "Creating template for metabolomics data"
+                "title": "An Example Workflow"
             },
             "links": {
-                "self": "/studies/1"
+                "self": "/workflows/23"
             }
         },
         {
-            "id": "2",
-            "type": "studies",
+            "id": "20",
+            "type": "workflows",
             "attributes": {
-                "title": "Biphase Batch Fermentation(2009/02/04)"
+                "title": "Functional analysis of sequences that match the 16S SSU"
             },
             "links": {
-                "self": "/studies/2"
+                "self": "/workflows/20"
             }
         },
         {
-            "id": "3",
-            "type": "studies",
+            "id": "21",
+            "type": "workflows",
             "attributes": {
-                "title": "Investigation of different pH values for metabolic shift"
+                "title": "A CWL Worfklow"
             },
             "links": {
-                "self": "/studies/3"
+                "self": "/workflows/21"
             }
         }
     ],
     "jsonapi": {
         "version": "1.0"
     },
+    "links": {
+        "self": "/workflows"
+    },
     "meta": {
-        "base_url": "https://fairdomhub.org",
-        "api_version": "0.1"
+        "base_url": "http://localhost:3000",
+        "api_version": "0.2"
     }
 }

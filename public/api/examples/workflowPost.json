@@ -1,8 +1,8 @@
-{ "todo" : "FIXME",
+{
     "data": {
         "type": "workflows",
         "attributes": {
-            "title": "A Maximal Workflow",
+            "title": "An Example Workflow",
             "description": "This is the description",
             "workflow_class": {
                 "key": "CWL"
@@ -21,7 +21,7 @@
                 "permissions": [
                     {
                         "resource": {
-                            "id" : "234",
+                            "id" : "12",
                             "type": "projects"
                         },
                         "access": "edit"
@@ -33,7 +33,7 @@
             "creators": {
                 "data": [
                     {
-                        "id": "34",
+                        "id": "321",
                         "type": "people"
                     }
                 ]
@@ -41,24 +41,8 @@
             "projects": {
                 "data": [
                     {
-                        "id": "234",
+                        "id": "12",
                         "type": "projects"
-                    }
-                ]
-            },
-            "assays": {
-                "data": [
-                    {
-                        "id": "13",
-                        "type": "assays"
-                    }
-                ]
-            },
-            "publications": {
-                "data": [
-                    {
-                        "id": "71",
-                        "type": "publications"
                     }
                 ]
             }
