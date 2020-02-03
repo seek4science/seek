@@ -9,8 +9,10 @@ class PublicationSerializer < BaseSerializer
       'https://www.ncbi.nlm.nih.gov/pubmed/' + object.pubmed_id.to_s
     elsif !object.doi.nil?
       'https://doi.org/' + object.doi.to_s
+    elsif !object.url.nil?
+      object.url.to_s
     else
-      ''
+      " "
     end
   end
 
