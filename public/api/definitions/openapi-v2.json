@@ -8120,7 +8120,7 @@
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
                                 "link_to_pub": {
-                                    "$ref": "#/definitions/nullableUriString"
+                                    "$ref": "#/definitions/nullableNonEmptyString"
                                 },
                                 "publication_type": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -8138,6 +8138,7 @@
                                 "published_date",
                                 "pubmed_id",
                                 "citation",
+                                "publication_type",
                                 "link_to_pub"
                             ],
                             "additionalProperties": false
