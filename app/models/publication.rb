@@ -300,6 +300,9 @@ class Publication < ApplicationRecord
     institution = bibtex_record[:institution].try(:to_s)
     type = bibtex_record[:type].try(:to_s)
     note = bibtex_record[:note].try(:to_s)
+    archivePrefix = bibtex_record[:archiveprefix].try(:to_s)
+    primaryClass = bibtex_record[:primaryclass].try(:to_s)
+    eprint= bibtex_record[:eprint].try(:to_s)
     url = parse_bibtex_url(bibtex_record).try(:to_s)
     publication_type = PublicationType.find(self.publication_type_id)
 
@@ -308,15 +311,19 @@ class Publication < ApplicationRecord
       self.citation += volume.blank? ? '': ' '+volume
       self.citation += number.nil? ? '' : '('+ number+')'
       self.citation += pages.blank? ? '' : (':'+pages)
+=begin
       unless year.nil?
         self.citation += year.nil? ? '' : (' '+year)
       end
+=end
     elsif publication_type.is_booklet?
       self.citation += howpublished.blank? ? '': ''+ howpublished
       self.citation += address.nil? ? '' : (', '+ address)
+=begin
       unless year.nil?
         self.citation += year.nil? ? '' : (' '+year)
       end
+=end
     elsif publication_type.is_inbook?
       self.citation += self.booktitle.nil? ? '' : ('In '+ self.booktitle)
       self.citation += volume.blank? ? '' : (', volume '+ volume)
@@ -327,11 +334,13 @@ class Publication < ApplicationRecord
       unless address.nil? || (self.booktitle.try(:include?, address))
         self.citation += address.nil? ? '' : (', '+ address)
       end
+=begin
       unless self.booktitle.try(:include?, year)
         unless year.nil?
           self.citation += year.nil? ? '' : (' '+year)
         end
       end
+=end
     elsif publication_type.is_inproceedings? || publication_type.is_incollection? || publication_type.is_book?
       # InProceedings / InCollection
       self.citation += self.booktitle.nil? ? '' : ('In '+ self.booktitle)
@@ -343,11 +352,13 @@ class Publication < ApplicationRecord
       unless address.nil? || (self.booktitle.try(:include?, address))
         self.citation += address.nil? ? '' : (', '+ address)
       end
+=begin
       unless self.booktitle.try(:include?, year)
         unless year.nil?
           self.citation += year.nil? ? '' : (', '+year)
         end
       end
+=end
     elsif publication_type.is_phd_thesis? || publication_type.is_masters_thesis? || publication_type.is_bachelor_thesis?
       #PhD/Master Thesis
       self.citation += school.nil? ? '' : (' '+ school)
@@ -363,18 +374,25 @@ class Publication < ApplicationRecord
       self.citation += volume.blank? ? '' : ('vol. '+ volume)
       self.citation += series.blank? ? '' : (' of '+series)
       self.citation += self.publisher.blank? ? '' : (', '+ self.publisher)
-      # unless month.nil? && year.nil?
-      #   self.citation += self.citation.blank? ? '' : ','
-      #   self.citation += month.nil? ? '' : (' '+ month.capitalize)
-      #   self.citation += year.nil? ? '' : (' '+year)
-      # end
+=begin
+      unless month.nil? && year.nil?
+        self.citation += self.citation.blank? ? '' : ','
+        self.citation += month.nil? ? '' : (' '+ month.capitalize)
+        self.citation += year.nil? ? '' : (' '+year)
+      end
+=end
     elsif publication_type.is_tech_report?
       self.citation += institution.blank? ? ' ': institution
       self.citation += type.blank? ? ' ' : (', '+type)
     elsif publication_type.is_unpublished?
       self.citation += note.blank? ? ' ': note
-    else
-      return nil
+    end
+
+    if self.doi.blank? && self.citation.blank?
+      self.citation += archivePrefix unless archivePrefix.nil?
+      self.citation += (self.citation.blank? ? primaryClass : (','+primaryClass)) unless primaryClass.nil?
+      self.citation += (self.citation.blank? ? eprint : (','+eprint)) unless eprint.nil?
+      self.journal = self.citation if self.journal.blank?
     end
 
     if self.doi.blank? && self.citation.blank?
@@ -404,7 +422,7 @@ class Publication < ApplicationRecord
         query = DOI::Query.new(Seek::Config.crossref_api_email)
         result = query.fetch(doi)
 
-        Rails.logger.debug("fetch_pubmed_or_doi_result:#{result}")
+        Rails.logger.debug("fetch_pubmed_or_doi_result:#{result.citation}")
 
         @error = 'Unable to get result' if result.blank?
         @error = 'Unable to get DOI' if result.title.blank?
