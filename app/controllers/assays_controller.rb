@@ -18,6 +18,8 @@ class AssaysController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])
     @assay = @existing_assay.clone_with_associations
@@ -117,7 +119,7 @@ class AssaysController < ApplicationController
       respond_to do |format|
         flash[:notice] = "#{t('assays.assay')} was successfully created."
         format.html { redirect_to(@assay) }
-        format.json {render json: @assay}
+        format.json {render json: @assay, include: [params[:include]]}
       end
     else
       respond_to do |format|
@@ -137,7 +139,7 @@ class AssaysController < ApplicationController
       if @assay.update_attributes(assay_params)
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
         format.html { redirect_to(@assay) }
-        format.json {render json: @assay}
+        format.json {render json: @assay, include: [params[:include]]}
       else
         format.html { render :action => "edit", status: :unprocessable_entity }
         format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
@@ -161,7 +163,7 @@ class AssaysController < ApplicationController
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show'}
-      format.json {render json: @assay}
+      format.json {render json: @assay, include: [params[:include]]}
 
     end
   end

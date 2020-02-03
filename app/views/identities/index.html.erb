@@ -1,0 +1,59 @@
+<%= button_link_to('Return to profile', 'back', person_path(@user.person)) -%>
+<div class="pull-right">
+  <%= dropdown_button('Add identity', 'add') do %>
+    <% if Seek::Config.omniauth_elixir_aai_enabled %>
+      <li><%= link_to(t("login.elixir_aai"), omniauth_authorize_path(:elixir_aai), method: :post) -%></li>
+    <% end %>
+    <% if Seek::Config.omniauth_ldap_enabled %>
+      <li><%= link_to(t("login.ldap"), '#', 'data-toggle' => 'modal', 'data-target' => "#ldap-form") -%></li>
+    <% end %>
+  <% end %>
+</div>
+
+<h1>Identities</h1>
+
+<%= modal(id: 'ldap-form', size: 'm') do %>
+  <%= modal_header("LDAP Authentication") %>
+  <%= modal_body do %>
+    <%= render partial: 'identities/ldap_form' %>
+  <% end %>
+<% end %>
+
+<div class="row">
+  <div class="col-sm-12">
+    <div class="alert alert-warning" role="alert">
+      To avoid being locked out of your account, please ensure you either:
+      <ul>
+        <li>Keep at least 1 identity</li>
+        <li>Know your <%= Seek::Config.application_name -%> password</li>
+        <li>Have access to your registered email address: <%= link_to @user.person.email, edit_person_path(@user.person, anchor: 'person_email') -%></li>
+      </ul>
+    </div>
+
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Provider</th>
+        <th>UID</th>
+        <th>Created At</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @identities.each do |identity| %>
+        <tr>
+          <td><%= t("login.#{identity.provider}") %></td>
+          <td><%= content_tag(:pre, identity.uid) %></td>
+          <td><%= identity.created_at %></td>
+          <td>
+            <%= link_to 'Unlink', user_identity_path(current_user, identity),
+                        method: :delete,
+                        data: { confirm: 'Are you sure you want to unlink this identity from your account?' },
+                        class: 'btn btn-xs btn-danger' %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

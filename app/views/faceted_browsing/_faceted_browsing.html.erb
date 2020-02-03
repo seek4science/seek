@@ -23,8 +23,7 @@
             <div class="yui-u" style="float:right; width: 15%;">
               <div data-ex-role="facet" data-ex-facet-class="TextSearch" id="facet_search_box"></div>
               <br/>
-              <span class="filter_text">Filter <%= internationalized_resource_name(object_type, true)%> by: <hr/>
-              </span>
+              <span class="filter_text">Filter <%= internationalized_resource_name(object_type, true)%> by: </span><br/>
               <% count = 0 %>
               <% facets_for_object.each do |key, value| %>
                   <%
@@ -32,12 +31,11 @@
                      collapsed = count > expand_facet_count ? true : false
                   %>
                   <%= render :partial => 'faceted_browsing/facet_element', :locals => {:key => key, :value => value, :collapsed => collapsed} %>
-                  <br/>
               <% end %>
-              <ul class="sectionIcons reset_button">
-                    <li><%= link_to 'Reset All Filters', '#', { onclick: 'resetAllFilters(); return false;', class: 'reset_all_filters' }%> </li>
-              </ul>
+              <br/>
+              <%= link_to 'Reset All Filters', '#', { onclick: 'resetAllFilters(); return false;', class: 'reset_all_filters btn btn-default' }%>
             </div>
+
         </div>
     </div>
 

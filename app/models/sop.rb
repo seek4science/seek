@@ -20,8 +20,19 @@ class Sop < ApplicationRecord
 
   has_and_belongs_to_many :workflows
 
+  has_filter assay_type: Seek::Filtering::Filter.new(
+      value_field: 'assays.assay_type_uri',
+      label_mapping: Seek::Filterer::MAPPINGS[:assay_type_label],
+      joins: [:assays]
+  )
+  has_filter technology_type: Seek::Filtering::Filter.new(
+      value_field: 'assays.technology_type_uri',
+      label_mapping: Seek::Filterer::MAPPINGS[:technology_type_label],
+      joins: [:assays]
+  )
+
   explicit_versioning(:version_column => "version") do
-    acts_as_doi_mintable(proxy: :parent)
+    acts_as_doi_mintable(proxy: :parent, general_type: 'Text')
     acts_as_versioned_resource
     acts_as_favouritable
 
@@ -29,7 +40,7 @@ class Sop < ApplicationRecord
             :primary_key => :sop_id, :foreign_key => :asset_id
     has_many :experimental_conditions, -> (r) { where('experimental_conditions.sop_version =?', r.version) },
         :primary_key => "sop_id", :foreign_key => "sop_id"
-    
+
   end
 
   def organism_title
@@ -44,5 +55,4 @@ class Sop < ApplicationRecord
   def self.user_creatable?
     true
   end
-    
 end

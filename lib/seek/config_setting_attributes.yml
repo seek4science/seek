@@ -12,7 +12,6 @@ registration_disabled_description:
 activation_required_enabled:
 smtp:
   encrypt: true
-default_pages:
 project_type:
 project_link:
 type_managers_enabled:
@@ -130,8 +129,6 @@ hard_max_cachable_size:
   convert: :to_i
 tag_threshold:
   convert: :to_i
-limit_latest:
-  convert: :to_i
 max_visible_tags:
   convert: :to_i
 piwik_analytics_id_site:
@@ -165,10 +162,6 @@ auth_lookup_update_batch_size:
   convert: :to_i
 samples_enabled:
 project_admin_sample_type_restriction:
-omniauth_enabled:
-omniauth_user_create:
-omniauth_user_activate:
-omniauth_providers:
 openbis_enabled:
 openbis_download_limit:
 openbis_debug:
@@ -190,3 +183,19 @@ nels_permalink_base:
 nels_use_dummy_client:
 allow_private_address_access:
 session_store_timeout:
+filtering_enabled:
+sorting:
+results_per_page_default:
+  convert: :to_i
+results_per_page:
+# Omniauth
+omniauth_enabled:
+omniauth_user_create:
+omniauth_user_activate:
+omniauth_elixir_aai_enabled:
+omniauth_elixir_aai_client_id:
+omniauth_elixir_aai_secret:
+  encrypt: true
+omniauth_ldap_enabled:
+omniauth_ldap_config:
+  encrypt: true

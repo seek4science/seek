@@ -5,6 +5,8 @@
   <%= admin_checkbox_setting(:solr_enabled, 1, Seek::Config.solr_enabled,
                              "Search enabled", "Whether the search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Background service, after changing this setting.") %>
 
+  <%= admin_checkbox_setting(:filtering_enabled, 1, Seek::Config.filtering_enabled, "Filtering enabled", "Whether filtering system is enabled on index pages.") %>
+
   <%= render :partial => 'admin/email' %>
 
   <%= render :partial => 'admin/omniauth' %>

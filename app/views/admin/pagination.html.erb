@@ -1,34 +1,54 @@
 <h1>Index page behaviour</h1>
 
-<%= form_tag :action=>"update_pagination" do -%>
-    <p>
-      In each index page in the "Browse" section, either all items are listed, or only the top <em>n</em> items.
-      On this page you can select the default for each tab.
-    </p>
+<%= form_tag action: 'update_pagination' do %>
+  <p class="help-block">
+    On this page you can configure the default sorting that is applied for each index page in the "Browse" section,
+    and how many items should appear per page by default.
+  </p>
 
-    <% [['People','people'], [t('project').pluralize,'projects'], [t('programme').pluralize,'programmes'], ['Institutions','institutions'],
-        [t('investigation').pluralize,'investigations'], [t('study').pluralize,'studies'], [t('assays.assay').pluralize.capitalize, 'assays'],
-        [t('data_file').pluralize,'data_files'], [t('model').pluralize, 'models'], [t('sop').pluralize,'sops'],
-        ['Publications','publications'], [t('presentation').pluralize, 'presentations'], [t('event').pluralize,'events'],
-        [t('document').pluralize,'documents']
-       ].each do |type| %>
-        <div class="form-group index-page-setting">
-          <label><%= type[0] -%></label>
-          <div class="btn-group" data-toggle="buttons">
-            <% ['top', 'all'].each do |option| %>
-                <% checked = Seek::Config.default_page(type[1]) == option %>
-                <label class="btn btn-default <%= 'active'.html_safe if checked -%>">
-                  <%= radio_button_tag(type[1], option, checked) %> <%= option.capitalize -%>
-                </label>
-            <% end %>
-          </div>
-        </div>
+  <div class="row">
+    <div class="col-sm-4">
+      <%= admin_text_setting(:results_per_page_default, Seek::Config.results_per_page_default,
+                             'Default items per page', "The number of items shown per page by default.",
+                             onkeypress: "javascript: return onlyNumbers(event);") %>
+    </div>
+  </div>
+
+  <table class="table table-condensed" style="width: auto">
+    <thead>
+    <tr>
+      <th style="width: 10em">Type</th>
+      <th style="width: 30em">Default Sorting</th>
+      <th style="width: 15em">
+        Items per page<br/>
+        <span class="subtle">(leave blank to use default)</span>
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+      ['programmes', 'projects', 'people', 'institutions',
+       'investigations', 'studies', 'assays',
+       'data_files', 'models', 'sops', 'publications', 'documents', 'presentations', 'events'].each do |controller| %>
+      <% options = Seek::ListSorter.options_for_select(controller.classify) %>
+      <% selected = Seek::Config.sorting_for(controller) || Seek::ListSorter.key_for_view(controller.classify, :index) %>
+      <tr>
+        <th scope="row"><%= t(controller.singularize).pluralize -%></th>
+        <td>
+          <%= select_tag("sorting[#{controller}]", options_for_select(options, selected),
+                         autocomplete: 'off',
+                         class: 'form-control') %>
+        </td>
+        <td class="form-inline">
+          <%= text_field_tag("results_per_page[#{controller}]", Seek::Config.results_per_page_for(controller),
+                             size: 5, class: 'form-control', placeholder: 'Default',
+                             onkeypress: "javascript: return onlyNumbers(event);") %>
+        </td>
+      </tr>
     <% end %>
+    </tbody>
+  </table>
 
-    <%= admin_text_setting(:limit_latest, Seek::Config.limit_latest,
-                           'Top list length', "This is the maximum number of items that are listed when viewing the 'top' page.",
-                           :onkeypress => "javascript: return onlyNumbers(event);") %>
-
-    <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
-    <%= cancel_button admin_path %>
+  <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
+  <%= cancel_button admin_path %>
 <% end -%>

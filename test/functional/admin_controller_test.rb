@@ -298,7 +298,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'clear failed jobs' do
-    
+
     Delayed::Job.destroy_all
     ContentBlobCleanerJob.new.queue_job
     job = Delayed::Job.last
@@ -363,6 +363,29 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 'terms page', Seek::Config.terms_page
     assert_equal 'privacy page', Seek::Config.privacy_page
     assert_equal 'about page', Seek::Config.about_page
+  end
+
+  test 'update pagination' do
+    post :update_pagination, params: {
+        results_per_page_default: 9,
+        results_per_page: { people: 6, 'models' => '300', publications: '', sops: nil },
+        sorting: { people: 'created_at_asc', models: :created_at_desc,
+                   data_files: 'published_at_desc', sops: 'bananabread' } }
+
+    assert_redirected_to admin_path
+
+    assert_equal 9, Seek::Config.results_per_page_default
+    assert_equal 6, Seek::Config.results_per_page_for('people')
+    assert_equal 300, Seek::Config.results_per_page_for('models')
+    assert_nil Seek::Config.results_per_page_for('publications')
+    assert_nil Seek::Config.results_per_page_for('sops')
+    assert_nil Seek::Config.results_per_page_for('data_files')
+
+    assert_equal :created_at_asc, Seek::Config.sorting_for('people')
+    assert_equal :created_at_desc, Seek::Config.sorting_for('models')
+    assert_nil Seek::Config.results_per_page_for('publications')
+    assert_nil Seek::Config.results_per_page_for('sops')
+    assert_nil Seek::Config.results_per_page_for('data_files'), "Shouldn't set to a value that is not a valid sorting option."
   end
 
 end

@@ -1,6 +1,4 @@
 <% if !@other_tagging_assets.blank? %>
   <% resource_hash = classify_for_tabs @other_tagging_assets -%>
-  <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :resource_hash => resource_hash,
-    :narrow_view => true,
-    :authorization_already_done => true } -%>
+  <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :resource_hash => resource_hash } -%>
 <% end %>

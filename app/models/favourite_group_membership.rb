@@ -11,7 +11,7 @@ class FavouriteGroupMembership < ApplicationRecord
 
     people << Person.find_by_id(person_id_before_last_save) unless person_id_before_last_save.blank?
 
-    AuthLookupUpdateJob.new.add_items_to_queue people.compact
+    AuthLookupUpdateQueue.enqueue(people.compact)
   end
 
   def allows_action?(action)

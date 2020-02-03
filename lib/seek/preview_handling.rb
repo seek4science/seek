@@ -2,7 +2,7 @@ module Seek
   module PreviewHandling
     def preview
       @element = params[:element]
-      @item = controller_name.classify.constantize.find_by_id(params[:id])
+      @item = controller_model.find_by_id(params[:id])
       @partial = preview_partial
 
       respond_to do |format|

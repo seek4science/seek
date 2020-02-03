@@ -39,7 +39,25 @@ class Person < ApplicationRecord
   has_many :current_work_groups, class_name: 'WorkGroup', through: :current_group_memberships,
                                  source: :work_group
 
+  has_many :group_memberships_project_positions, -> { distinct }, through: :group_memberships
+  has_many :project_positions, -> { distinct }, through: :group_memberships_project_positions
+  has_filter project_position: Seek::Filtering::Filter.new(
+      value_field: 'project_positions.id',
+      label_field: 'project_positions.name',
+      joins: [:project_positions]
+  )
+
+  has_many :projects, -> { distinct }, through: :work_groups
+  has_many :current_projects,  -> { distinct }, through: :current_work_groups, source: :project
+  has_many :former_projects,  -> { distinct }, through: :former_work_groups, source: :project
+
+  has_many :programmes, -> { distinct }, through: :projects
   has_many :institutions, -> { distinct }, through: :work_groups
+  has_filter location: Seek::Filtering::Filter.new(
+      value_field: 'institutions.country',
+      label_mapping: Seek::Filterer::MAPPINGS[:country_name],
+      joins: [:institutions]
+  )
 
   has_many :favourite_group_memberships, dependent: :destroy
   has_many :favourite_groups, through: :favourite_group_memberships
@@ -47,21 +65,40 @@ class Person < ApplicationRecord
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
 
   RELATED_RESOURCE_TYPES = %w[DataFile Sop Model Document Publication Presentation
-                              Sample Event Investigation Study Assay Strain Workflow].freeze
+                              Sample Event Investigation Study Assay Strain Workflow Node].freeze
 
   RELATED_RESOURCE_TYPES.each do |type|
-    has_many :"contributed_#{type.tableize}", foreign_key: :contributor_id, class_name: type
-    has_many :"created_#{type.tableize}", through: :assets_creators, source: :asset, source_type: type
-  end
+    plural = type.tableize
+    singular = plural.singularize
+    klass = type.constantize
 
-  RELATED_RESOURCE_TYPES.collect(&:tableize).each do |type|
-    define_method "related_#{type}" do
-      send("created_#{type}") | send("contributed_#{type}")
+    has_many :"contributed_#{plural}", foreign_key: :contributor_id, class_name: type
+    has_many :"created_#{plural}", through: :assets_creators, source: :asset, source_type: type
+
+    define_method "related_#{plural}" do
+      klass.where(id: send("related_#{singular}_ids"))
+    end
+
+    define_method "related_#{singular}_ids" do
+      send("contributed_#{singular}_ids") | send("created_#{singular}_ids")
     end
   end
 
   has_annotation_type :expertise, method_name: :expertise
+  has_many :expertise_as_text, through: :expertise_annotations, source: :value, source_type: 'TextValue'
+  has_filter expertise: Seek::Filtering::Filter.new(
+      value_field: 'text_values.id',
+      label_field: 'text_values.text',
+      joins: [:expertise_as_text]
+  )
+
   has_annotation_type :tool
+  has_many :tools_as_text, through: :tool_annotations, source: :value, source_type: 'TextValue'
+  has_filter tool: Seek::Filtering::Filter.new(
+      value_field: 'text_values.id',
+      label_field: 'text_values.text',
+      joins: [:tools_as_text]
+  )
 
   has_many :publication_authors
 
@@ -103,7 +140,7 @@ class Person < ApplicationRecord
 
   def queue_update_auth_table
     if saved_changes.keys.include?('roles_mask')
-      AuthLookupUpdateJob.new.add_items_to_queue self
+      AuthLookupUpdateQueue.enqueue(self)
     end
   end
 
@@ -143,10 +180,6 @@ class Person < ApplicationRecord
     else
       obfuscated_email
     end
-  end
-
-  def programmes
-    projects.collect(&:programme).uniq
   end
 
   # whether this person belongs to a programme in common with the other item - generally a person or project
@@ -197,22 +230,6 @@ class Person < ApplicationRecord
     end.to_json
   end
 
-  def projects # ALL projects, former and current
-    # updating workgroups doesn't change groupmemberships until you save. And vice versa.
-    work_groups.collect(&:project).uniq | group_memberships.collect { |gm| gm.work_group.project }
-  end
-
-  def current_projects
-    (current_work_groups.collect(&:project).uniq | current_group_memberships.collect { |gm| gm.work_group.project })
-  end
-
-  # Projects that the person has let completely (i.e. not still involved with through a different institution)
-  def former_projects
-    old_projects = (former_work_groups.collect(&:project).uniq | former_group_memberships.collect { |gm| gm.work_group.project })
-
-    old_projects - current_projects
-  end
-
   def member?
     projects.any?
   end
@@ -233,22 +250,12 @@ class Person < ApplicationRecord
   def name
     firstname = first_name || ''
     lastname = last_name || ''
-    # capitalize, including double barrelled names
-    # TODO: why not just store them like this rather than processing each time? Will need to reprocess exiting entries if we do this.
-    (firstname.gsub(/\b\w/, &:upcase) + ' ' + lastname.gsub(/\b\w/, &:upcase)).strip
+    "#{firstname} #{lastname}".strip
   end
 
   # returns true this is an admin person, and they are the only one defined - indicating they are person creating during setting up SEEK
   def only_first_admin_person?
     Person.count == 1 && [self] == Person.all && Person.first.is_admin?
-  end
-
-  def project_positions
-    project_positions = []
-    group_memberships.each do |gm|
-      project_positions |= gm.project_positions
-    end
-    project_positions
   end
 
   def update_first_letter
@@ -260,10 +267,7 @@ class Person < ApplicationRecord
   end
 
   def project_positions_of_project(projects_or_project)
-    # Get intersection of all project memberships + person's memberships to find project membership
-    projects_or_project = Array(projects_or_project)
-    memberships = group_memberships.select { |g| projects_or_project.include? g.work_group.project }
-    memberships.collect(&:project_positions).flatten
+    project_positions.joins(group_memberships: :work_group).where(work_groups: { project_id: projects_or_project }).distinct.to_a
   end
 
   # all items, assets, ISA and samples that are linked to this person as a creator

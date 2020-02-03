@@ -128,7 +128,7 @@ jQuery(document).ready(function($j) {
             valCheck();
         }
 
-        scales_arr.each(function( scale ){
+        scales_arr.forEach(function( scale ){
             $j('#' + scale).click(function(e) {
                 moveSlider(e, scales_arr.indexOf(scale));
             });

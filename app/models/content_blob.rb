@@ -129,8 +129,8 @@ class ContentBlob < ApplicationRecord
     nil
   end
 
-  def file_exists?
-    File.exist?(filepath)
+  def file_exists?(format = 'dat')
+    File.exist?(filepath(format))
   end
 
   def storage_filename(format = 'dat', uuid_to_use = nil)

@@ -13,7 +13,7 @@ module Seek
         end
 
         def model_class
-          controller_name.classify.constantize
+          controller_model
         end
 
         def new

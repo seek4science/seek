@@ -90,7 +90,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, params: { page: 'all' }
     assert_response :success
-    assert_equal assigns(:sops).sort_by(&:id), Sop.authorize_asset_collection(assigns(:sops), 'view', users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
+    assert_equal assigns(:sops).sort_by(&:id), assigns(:sops).authorized_for('view', users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
   end
 
   test 'should not show private sop to logged out user' do
@@ -476,7 +476,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:owner_of_my_first_sop)
     person = people(:person_for_owner_of_my_first_sop)
     p = projects(:sysmo_project)
-    get :index, params: { filter: { person: person.id }, page: 'all' }
+    get :index, params: { filter: { contributor: person.id }, page: 'all' }
     assert_response :success
     sop  = sops(:downloadable_sop)
     sop2 = sops(:sop_with_fully_public_policy)
@@ -933,13 +933,13 @@ class SopsControllerTest < ActionController::TestCase
 
     get :show, params: { id: sop }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+    assert_select '#citation', text: /Bacall, F/, count:0
 
     sop.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
     get :show, params: { id: sop }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+    assert_select '#citation', text: /Bacall, F/, count:1
   end
 
   def edit_max_object(sop)
@@ -1394,26 +1394,26 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
-  test 'default sorting on top page' do
+  test 'sort by update by default on index' do
     s1 = Factory(:sop, title: 'AAABSop', updated_at: 10.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     s2 = Factory(:sop, title: 'AAAASop', updated_at: 9.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
 
     get :index
 
-    assert_equal 'top', assigns(:sops).page
-    assert_equal [:updated_at_desc], assigns(:sops).order
+    assert_equal '1', assigns(:page)
+    assert_equal [:updated_at_desc], assigns(:order)
     assert_equal s1.id, assigns(:sops)[0].id
     assert_equal s2.id, assigns(:sops)[1].id
   end
 
-  test 'default sorting on A page' do
+  test 'sort by title by default on A page' do
     s1 = Factory(:sop, title: 'AAABSop', updated_at: 10.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     s2 = Factory(:sop, title: 'AAAASop', updated_at: 9.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
 
     get :index, params: { page: 'A' }
 
-    assert_equal 'A', assigns(:sops).page
-    assert_equal [:title_asc], assigns(:sops).order
+    assert_equal 'A', assigns(:page)
+    assert_equal [:title_asc], assigns(:order)
     assert_equal s2.id, assigns(:sops)[0].id
     assert_equal s1.id, assigns(:sops)[1].id
   end
@@ -1425,8 +1425,8 @@ class SopsControllerTest < ActionController::TestCase
 
     get :index, params: { order: 'title_desc' }
 
-    assert_equal 'top', assigns(:sops).page
-    assert_equal [:title_desc], assigns(:sops).order
+    assert_equal '1', assigns(:page)
+    assert_equal [:title_desc], assigns(:order)
     assert_equal s1.id, assigns(:sops)[0].id
     assert_equal s3.id, assigns(:sops)[1].id
     assert_equal s2.id, assigns(:sops)[2].id
@@ -1439,11 +1439,60 @@ class SopsControllerTest < ActionController::TestCase
 
     get :index, params: { page: 'G', order: 'created_at_asc' }
 
-    assert_equal 'G', assigns(:sops).page
-    assert_equal [:created_at_asc], assigns(:sops).order
+    assert_equal 'G', assigns(:page)
+    assert_equal [:created_at_asc], assigns(:order)
     assert_equal s3.id, assigns(:sops)[0].id
     assert_equal s1.id, assigns(:sops)[1].id
     assert_equal s2.id, assigns(:sops)[2].id
+  end
+
+  test 'sorting on numeric paging' do
+    Sop.delete_all
+
+    s1 = Factory(:sop, title: 'GZSop', created_at: 2.years.ago, updated_at: 1.week.ago,
+                 policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s2 = Factory(:sop, title: 'GXSop', created_at: 1.years.ago, updated_at: 2.weeks.ago,
+                 policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s3 = Factory(:sop, title: 'GYSop', created_at: 10.years.ago, updated_at: 3.weeks.ago,
+                 policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+
+    with_config_value(:results_per_page_default, 2) do
+      get :index, params: { page: 1, order: 'created_at_desc' }
+      assert_equal [:created_at_desc], assigns(:order)
+      assert_equal 2, assigns(:sops).length
+      assert_equal [s2, s1], assigns(:sops).to_a
+      assert_equal '1', assigns(:page)
+
+      get :index, params: { page: 2, order: 'created_at_desc' }
+      assert_equal [:created_at_desc], assigns(:order)
+      assert_equal 1, assigns(:sops).length
+      assert_includes assigns(:sops), s3
+      assert_equal '2', assigns(:page)
+
+      get :index, params: { page: 1, order: 'title_asc' }
+      assert_equal [:title_asc], assigns(:order)
+      assert_equal 2, assigns(:sops).length
+      assert_equal [s2, s3], assigns(:sops).to_a
+      assert_equal '1', assigns(:page)
+
+      get :index, params: { page: 2, order: 'title_asc' }
+      assert_equal [:title_asc], assigns(:order)
+      assert_equal 1, assigns(:sops).length
+      assert_includes assigns(:sops), s1
+      assert_equal '2', assigns(:page)
+
+      get :index, params: { order: 'fish' }
+      assert_equal [:updated_at_desc], assigns(:order)
+      assert_equal 2, assigns(:sops).length
+      assert_equal [s1, s2], assigns(:sops).to_a
+      assert_equal '1', assigns(:page)
+
+      get :index, params: { page: 2, order: 'fish' }
+      assert_equal [:updated_at_desc], assigns(:order)
+      assert_equal 1, assigns(:sops).length
+      assert_includes assigns(:sops), s3
+      assert_equal '2', assigns(:page)
+    end
   end
 
   test 'JSON-API multiple sorting' do
@@ -1454,8 +1503,8 @@ class SopsControllerTest < ActionController::TestCase
 
     get :index, params: { page: 'Z', sort: 'title,-created_at' }
 
-    assert_equal 'Z', assigns(:sops).page
-    assert_equal [:title_asc, :created_at_desc], assigns(:sops).order
+    assert_equal 'Z', assigns(:page)
+    assert_equal [:title_asc, :created_at_desc], assigns(:order)
     assert_equal s2.id, assigns(:sops)[0].id
     assert_equal s3.id, assigns(:sops)[1].id
     assert_equal s4.id, assigns(:sops)[2].id

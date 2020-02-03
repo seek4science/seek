@@ -43,7 +43,7 @@ module Seek
       model_name = controller_name.classify
       model_class = class_for_controller_name
 
-      results = model_class.authorize_asset_collection(model_class.where('title LIKE ?', "#{params[:query]}%"), 'view')
+      results = model_class.where('title LIKE ?', "#{params[:query]}%").authorized_for('view')
       items = results.first(params[:limit] || 10).map do |item|
         contributor_name = item.contributor.try(:person).try(:name)
         { id: item.id, name: item.title, hint: contributor_name, type: model_name, contributor: contributor_name }

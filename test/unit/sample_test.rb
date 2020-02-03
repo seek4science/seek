@@ -411,12 +411,12 @@ class SampleTest < ActiveSupport::TestCase
     refute private_sample.can_download?(nil)
     refute private_sample.can_download?(other_person.user)
 
-    assert_equal [public_sample, private_sample].sort, Sample.all_authorized_for(:view, person.user).sort
-    assert_equal [public_sample], Sample.all_authorized_for(:view, other_person.user)
-    assert_equal [public_sample], Sample.all_authorized_for(:view, nil)
-    assert_equal [public_sample, private_sample].sort, Sample.all_authorized_for(:download, person.user).sort
-    assert_equal [public_sample], Sample.all_authorized_for(:download, other_person.user)
-    assert_equal [public_sample], Sample.all_authorized_for(:download, nil)
+    assert_equal [public_sample, private_sample].sort, Sample.authorized_for('view', person.user).sort
+    assert_equal [public_sample], Sample.authorized_for('view', other_person.user)
+    assert_equal [public_sample], Sample.authorized_for('view', nil)
+    assert_equal [public_sample, private_sample].sort, Sample.authorized_for('download', person.user).sort
+    assert_equal [public_sample], Sample.authorized_for('download', other_person.user)
+    assert_equal [public_sample], Sample.authorized_for('download', nil)
   end
 
   test 'assays studies and investigation' do

@@ -14,6 +14,8 @@ class InstitutionsController < ApplicationController
   cache_sweeper :institutions_sweeper, only: [:update, :create, :destroy]
   include Seek::BreadCrumbs
 
+  api_actions :index, :show, :create, :update, :destroy
+
   # GET /institutions/1
   # GET /institutions/1.xml
   def show
@@ -22,7 +24,7 @@ class InstitutionsController < ApplicationController
       format.xml
       # format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@institution).target!) }
       #format.json { render json: @institution } #normal json
-      format.json {render json: @institution}
+      format.json {render json: @institution, include: [params[:include]]}
     end
   end
 
@@ -62,7 +64,7 @@ class InstitutionsController < ApplicationController
         flash[:notice] = 'Institution was successfully created.'
         format.html { redirect_to(@institution) }
         format.xml  { render xml: @institution, status: :created, location: @institution }
-        format.json {render json: @institution, status: :created, location: @institution}
+        format.json {render json: @institution, status: :created, location: @institution, include: [params[:include]]}
       else
         format.html { render action: 'new' }
         format.xml  { render xml: @institution.errors, status: :unprocessable_entity }
@@ -80,7 +82,7 @@ class InstitutionsController < ApplicationController
         flash[:notice] = 'Institution was successfully updated.'
         format.html { redirect_to(@institution) }
         format.xml  { head :ok }
-        format.json {render json: @institution}
+        format.json {render json: @institution, include: [params[:include]]}
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @institution.errors, status: :unprocessable_entity }

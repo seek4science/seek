@@ -42,19 +42,6 @@ module PeopleHelper
     end
   end
 
-  def discipline_list(disciplines)
-    if disciplines.any?
-      text = ''
-      disciplines.each do |discipline|
-        text += link_to(h(discipline.title), people_path(discipline_id: discipline.id))
-        text += ', ' unless disciplines.last == discipline
-      end
-    else
-      text = content_tag(:span, class: 'none_text') { 'Not specified' }
-    end
-    text.html_safe
-  end
-
   def admin_defined_project_roles_hash
     roles = Seek::Roles::ProjectRelatedRoles.role_names.map do |role|
       [role, t(role)]

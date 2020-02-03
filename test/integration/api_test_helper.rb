@@ -12,7 +12,7 @@ module ApiTestHelper
   end
 
   def definitions_path
-    File.join(Rails.root, 'public', '2010', 'json', 'rest',
+    File.join(Rails.root, 'public', 'api', 'definitions',
               'definitions.json')
   end
 
