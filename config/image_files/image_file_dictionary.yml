@@ -195,6 +195,7 @@ cwl_workflow: 'avatars/workflow_types/avatar-cwl.svg'
 galaxy_workflow: 'avatars/workflow_types/avatar-galaxy.png'
 knime_workflow: 'avatars/workflow_types/avatar-knime.svg'
 ro_workflow: 'avatars/workflow_types/avatar-ro.png'
+nextflow_workflow: 'avatars/workflow_types/avatar-nextflow.png'
 ro_crate_avatar: 'file_icons/ro-crate.svg'
 
 # roles
