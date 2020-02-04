@@ -164,11 +164,12 @@ class PublicationsController < ApplicationController
     @publication = Publication.new(publication_params)
     publication_type_id= params[:publication][:publication_type_id]
     doi= params[:publication][:doi]
+    pubmed_id = params[:publication][:pubmed_id]
     id= params[:publication][:id]
     if publication_type_id.blank?
       @error = "Please choose a publication type."
     else
-      result = get_data(@publication, nil, doi)
+      result = get_data(@publication, pubmed_id, doi)
     end
     @error =  @publication.errors.full_messages.join('<br>') if @publication.errors.any?
     if !@error.nil?
