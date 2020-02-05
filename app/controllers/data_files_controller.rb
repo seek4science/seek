@@ -391,6 +391,7 @@ class DataFilesController < ApplicationController
     @create_new_assay = assay_params.delete(:create_assay)
 
     update_sharing_policies(@data_file)
+    update_annotations(params[:tag_list], @data_file)
 
     @assay = Assay.new(assay_params)
     if sop_id
@@ -415,7 +416,6 @@ class DataFilesController < ApplicationController
     all_valid = all_valid && @data_file.save && blob.save
 
     if all_valid
-      update_annotations(params[:tag_list], @data_file)
 
       update_relationships(@data_file, params)
 
