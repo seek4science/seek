@@ -407,7 +407,7 @@ class Publication < ApplicationRecord
   def fetch_pubmed_or_doi_result(pubmed_id, doi)
     result = nil
     @error = nil
-    if pubmed_id
+    if !pubmed_id.blank?
       begin
         result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
         @error = result.error
@@ -417,7 +417,7 @@ class Publication < ApplicationRecord
         @error = 'There was a problem contacting the PubMed query service. Please try again later'
         Seek::Errors::ExceptionForwarder.send_notification(exception, data: {message: "Problem accessing ncbi using pubmed id #{pubmed_id}"})
       end
-    elsif doi
+    elsif !doi.blank?
       begin
         query = DOI::Query.new(Seek::Config.crossref_api_email)
         result = query.fetch(doi)
