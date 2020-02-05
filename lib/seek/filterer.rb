@@ -101,7 +101,7 @@ module Seek
         ),
         published_year: Seek::Filtering::YearFilter.new(field: 'published_date'),
         publication_type: Seek::Filtering::Filter.new(
-            value_field: 'publication_types.id',
+            value_field: 'publication_types.key',
             label_field: 'publication_types.title',
             joins: [:publication_type]
         ),
