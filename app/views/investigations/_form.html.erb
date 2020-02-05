@@ -12,6 +12,11 @@
 
 <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? -%>
 
+<div class="form-group">
+  <%= f.label "Investigation position" -%><br/>
+  <%= f.number_field :position, :rows => 5, :class=>"form-control"  -%>
+</div>
+
 <%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales?%>
 
 <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>

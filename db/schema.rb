@@ -782,6 +782,7 @@ ActiveRecord::Schema.define(version: 2020_07_17_140928) do
     t.integer "contributor_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "position"
   end
 
   create_table "investigations_projects", id: false,  force: :cascade do |t|
@@ -1752,6 +1753,7 @@ ActiveRecord::Schema.define(version: 2020_07_17_140928) do
     t.integer "contributor_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "position"
   end
 
   create_table "study_auth_lookup", id: false,  force: :cascade do |t|

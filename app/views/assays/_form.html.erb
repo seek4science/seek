@@ -29,6 +29,11 @@
   <%= assay_study_selection('assay[study_id]',@assay.study) %>
 </div>
 
+<div class="form-group">
+  <%= f.label "Assay position" -%><br/>
+  <%= f.number_field :position, :rows => 5, :class=>"form-control"  -%>
+</div>
+
 
 <%= f.hidden_field :assay_class_id -%>
 
