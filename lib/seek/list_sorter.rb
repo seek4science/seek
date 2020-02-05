@@ -47,7 +47,10 @@ module Seek
     def self.sort_by_order(items, order = nil)
       order ||= order_for_view(items.first.class.name, :index)
       if items.is_a?(ActiveRecord::Relation)
-        items.order(strategy_for_relation(order, items))
+        orderings = strategy_for_relation(order, items)
+        # Postgres requires any columns being ORDERed to be explicitly SELECTed (only when using DISTINCT?).
+        columns = [items.arel_table[Arel.star]] + orderings.reject { |n| n.is_a?(Arel::Nodes::Ordering) }
+        items.select(columns).order(orderings)
       else
         items.sort(&strategy_for_enum(order))
       end

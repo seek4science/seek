@@ -388,4 +388,39 @@ class AdminControllerTest < ActionController::TestCase
     assert_nil Seek::Config.results_per_page_for('data_files'), "Shouldn't set to a value that is not a valid sorting option."
   end
 
+  test 'update LDAP settings' do
+    with_config_value(:omniauth_ldap_enabled, false) do
+      with_config_value(:omniauth_ldap_config, { }) do
+        assert_equal 'Hash', Seek::Config.omniauth_ldap_config.class.name
+
+        post :update_features_enabled, params: {
+            omniauth_ldap_enabled: '1',
+            omniauth_ldap_host: '127.0.0.1',
+            omniauth_ldap_port: '999',
+            omniauth_ldap_base: 'DC=cool,DC=com',
+            omniauth_ldap_method: 'tls',
+            omniauth_ldap_uid: 'uzername',
+            omniauth_ldap_bind_dn: 'DC=secret,DC=com',
+            omniauth_ldap_password: '123456'
+        }
+
+        assert_equal 'ActiveSupport::HashWithIndifferentAccess', Seek::Config.omniauth_ldap_config.class.name
+        assert Seek::Config.omniauth_ldap_enabled
+        assert_equal '127.0.0.1', Seek::Config.omniauth_ldap_config['host']
+        assert_equal '127.0.0.1', Seek::Config.omniauth_ldap_settings('host')
+        assert_equal 999, Seek::Config.omniauth_ldap_config['port']
+        assert_equal 999, Seek::Config.omniauth_ldap_settings('port')
+        assert_equal 'DC=cool,DC=com', Seek::Config.omniauth_ldap_config['base']
+        assert_equal 'DC=cool,DC=com', Seek::Config.omniauth_ldap_settings('base')
+        assert_equal :tls, Seek::Config.omniauth_ldap_config['method']
+        assert_equal :tls, Seek::Config.omniauth_ldap_settings('method')
+        assert_equal 'uzername', Seek::Config.omniauth_ldap_config['uid']
+        assert_equal 'uzername', Seek::Config.omniauth_ldap_settings('uid')
+        assert_equal 'DC=secret,DC=com', Seek::Config.omniauth_ldap_config['bind_dn']
+        assert_equal 'DC=secret,DC=com', Seek::Config.omniauth_ldap_settings('bind_dn')
+        assert_equal '123456', Seek::Config.omniauth_ldap_config['password']
+        assert_equal '123456', Seek::Config.omniauth_ldap_settings('password')
+      end
+    end
+  end
 end
