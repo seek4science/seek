@@ -178,12 +178,12 @@ module Seek
         }
       when Project
         {
-          children: [:investigations],
+          children: [:positioned_investigations],
           parents: [:programme]
         }
       when Investigation
         {
-          children: [:studies],
+          children: [:positioned_studies],
           related: [:publications]
         }
       when Study

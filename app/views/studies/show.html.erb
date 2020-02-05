@@ -16,6 +16,10 @@
 
         <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>
 
+        <p id="position">
+          <b><%= "Study position" %>: </b>
+          <%= @study.position %>
+        </p>
         <p>
           <label><%= t('person_responsible').capitalize %>:</label>
           <% if @study.person_responsible.try :can_view? -%>

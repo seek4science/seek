@@ -18,28 +18,6 @@
   other_creators ||= f.object.try(:other_creators)
 %>
 
-<% if assays_enable %>
-  <p class="help-block">Re-arrange assays by clicking and dragging the button on the left-hand side of each row.</p>
-  <table class="table" id="attribute-table">
-    <thead>
-    <tr>
-      <th width="5em">Order</th>
-      <th>Name</th>
-    </tr>
-    </thead>
-    <tbody>
-    <% f.object.positioned_assays.each do |assay| %>
-      <tr>
-        <td><%= assay.position -%></td>
-        <td><%= assay.title -%></td>
-      </tr>
-    <% end %>
-
-    </tbody>
-  </table>
-
-<% end -%>
-
 <% if sharing_enable %>
   <%= render :partial => "sharing/form" -%>
 <% end -%>
