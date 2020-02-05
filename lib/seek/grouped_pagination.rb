@@ -56,7 +56,8 @@ module Seek
           end
 
           # GROUP BY and COUNT to get page totals quickly
-          groups = relation.reorder('').select(@field).group(@field).count
+          # Need to remove ORDER and SELECT from the query, which may have been added through the filtering system
+          groups = relation.unscope(:order).unscope(:select).select(@field).group(@field).count
           @pages.each do |p|
             page_totals[p] = groups[p] || 0
           end
