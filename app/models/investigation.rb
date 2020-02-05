@@ -39,4 +39,8 @@ class Investigation < ApplicationRecord
   def self.user_creatable?
     Seek::Config.investigations_enabled
   end
+  
+  def positioned_studies
+    studies.order(position: :asc)
+  end
 end
