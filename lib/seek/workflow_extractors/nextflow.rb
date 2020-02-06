@@ -24,6 +24,7 @@ module Seek
         hash = {}
         lines = config.split("\n")
         open_line = lines.index { |a| a.match?(/\s*manifest\s*\{/) }
+        return {} unless open_line
         line_index = open_line
         line = lines[line_index]
         until line.match?(/\s*\}\s*/) do
