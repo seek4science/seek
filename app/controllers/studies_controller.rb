@@ -43,20 +43,42 @@ class StudiesController < ApplicationController
     end
   end
 
+  def order_assays
+    @study = Study.find(params[:id])
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def update
     @study = Study.find(params[:id])
-    @study.attributes = study_params
-    update_sharing_policies @study
-    update_relationships(@study, params)
+    if params[:study][:ordered_assay_ids]
+      a1 = params[:study][:ordered_assay_ids]
+      a1.permit!
+      pos = 0
+      a1.each_pair do |key, value |
+        assay = Assay.find (value)
+        assay.position = pos
+        pos += 1
+        assay.save!
+      end
+      respond_to do |format|
+         format.html { redirect_to(@study) }
+       end
+    else
+      @study.attributes = study_params
+      update_sharing_policies @study
+      update_relationships(@study, params)
 
-    respond_to do |format|
-      if @study.save
-        flash[:notice] = "#{t('study')} was successfully updated."
-        format.html { redirect_to(@study) }
-        format.json {render json: @study, include: [params[:include]]}
-      else
-        format.html { render action: 'edit', status: :unprocessable_entity }
-        format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
+      respond_to do |format|
+        if @study.save
+          flash[:notice] = "#{t('study')} was successfully updated."
+          format.html { redirect_to(@study) }
+          format.json {render json: @study, include: [params[:include]]}
+        else
+          format.html { render action: 'edit', status: :unprocessable_entity }
+          format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
+        end
       end
     end
   end
@@ -103,6 +125,9 @@ class StudiesController < ApplicationController
   end
 
   def check_assays_are_not_already_associated_with_another_study
+    if params[:study][:ordered_assay_ids]
+      return true
+    end
     assay_ids = params[:study][:assay_ids]
     study_id = params[:id]
     if assay_ids
