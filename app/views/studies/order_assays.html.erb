@@ -1,0 +1,42 @@
+<%= form_for(@study, html: { multipart: true }) do |f| %>
+  <%= f.error_messages %>
+
+      <h3>Assays</h3>
+      <p class="help-block">Re-arrange assays by clicking and dragging the button on the left-hand side.</p>
+      <table class="table" id="assay-table">
+        <thead>
+        <tr>
+          <th width="5em"></th>
+          <th>Assay name</th>
+        </tr>
+        </thead>
+        <tbody class="ui-sortable">
+        <% @study.positioned_assays.each_with_index do |assay, index| %>
+          <tr class="study-assay ui-sortable-handle" data-index="<%= index-%>">
+            <th scope="row" class="assay-position">
+              <div class="btn btn-info attribute-handle">
+                <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>
+              </div>
+              <%= hidden_field_tag "study[ordered_assay_ids][#{index}]", assay.id, {readonly: true} %>
+            </th>
+            <td>
+              <%= text_field_tag "assay_name", assay.title, class: 'form-control',disabled: true %>
+            </td>
+          </tr>
+         <% end %>
+
+        </tbody>
+      </table>
+
+  <script type="text/javascript">
+        jQuery(function() {
+  $j( "tbody" ).sortable();
+});
+</script>
+
+  <p class="actions">
+    <%= f.submit ('Order'), :class => 'btn btn-primary' %>
+    or
+    <%= cancel_button(study_path(@study)) %>
+  </p>
+<% end %>

@@ -336,6 +336,7 @@ SEEK::Application.routes.draw do
       post :publish
       get :published
       get :manage
+      get :order_assays
       patch :manage_update
     end
     resources :people,:projects,:assays,:investigations,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:only=>[:index]
