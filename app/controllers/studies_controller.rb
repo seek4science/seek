@@ -125,11 +125,22 @@ class StudiesController < ApplicationController
   end
 
   def check_assays_are_not_already_associated_with_another_study
+    study_id = params[:id]
     if params[:study][:ordered_assay_ids]
+      a1 = params[:study][:ordered_assay_ids]
+      a1.permit!
+      valid = true
+      a1.each_pair do |key, value |
+        a = Assay.find (value)
+        valid = valid && !a.study.nil? && a.study_id.to_s == study_id
+      end
+      unless valid
+        error("Each ordered #{t('assays.assay')} must be associated with the Study", "is invalid (invalid #{t('assays.assay')})")
+        return false
+      end
       return true
     end
     assay_ids = params[:study][:assay_ids]
-    study_id = params[:id]
     if assay_ids
       valid = !assay_ids.detect do |a_id|
         a = Assay.find(a_id)
