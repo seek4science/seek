@@ -1,5 +1,5 @@
 class StudySerializer < SnapshottableSerializer
-  attributes :title, :description, :experimentalists, :other_creators
+  attributes :title, :description, :experimentalists, :other_creators, :position
   attribute :person_responsible_id do
     object.person_responsible_id.to_s
   end

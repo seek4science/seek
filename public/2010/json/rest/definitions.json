@@ -1704,6 +1704,9 @@
                 "other_creators": {
                   "$ref": "#/definitions/nullableOtherCreatorsString"
                 },
+                "position": {
+                  "$ref": "#/definitions/nullableInteger"
+                },
                 "assay_class": {
                   "type": "object",
                   "properties": {
@@ -1755,7 +1758,11 @@
                 },
                 "policy": {
                   "$ref": "#/definitions/policy"
+                },
+                "position": {
+                  "$ref": "#/definitions/nullableInteger"
                 }
+
               },
               "required": [
                 "title",
@@ -3007,8 +3014,10 @@
                 },
                 "policy": {
                   "$ref": "#/definitions/policy"
-                }
-              },
+                },
+                "position": {
+                  "$ref": "#/definitions/nullableInteger"
+                }              },
               "required": [
                 "title"
               ],
@@ -4341,7 +4350,6 @@
                 "use_default_policy":  {
                   "type": "boolean"
                 }
-
               },
               "required": [
                 "title",
@@ -5027,6 +5035,9 @@
                 },
                 "policy": {
                   "$ref": "#/definitions/policy"
+                },
+                "position": {
+                  "$ref": "#/definitions/nullableInteger"
                 }
               },
               "required": [
