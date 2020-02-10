@@ -510,7 +510,7 @@ class Publication < ApplicationRecord
   end
 
   def publication_author_names
-    publication_authors.map(&:name)
+    publication_authors.map(&:full_name)
   end
 
   def has_doi?

@@ -40,7 +40,7 @@ Factory.define(:max_publication, class: Publication) do |f|
   f.doi 'https://doi.org/10.5072/abcd'
   f.pubmed_id '873864488'
   f.citation 'JMB Oct 2017, 12:234-245'
-  f.publication_authors {[Factory(:publication_author), Factory(:publication_author)]}
+  f.publication_authors {[Factory(:publication_author), Factory(:registered_publication_author)]}
   f.abstract 'Amazing insights into the mechanism of TF2'
   f.editor 'Richling, S. and Baumann, M. and Heuveline, V.'
   f.booktitle 'Proceedings of the 3rd bwHPC-Symposium: Heidelberg 2016'

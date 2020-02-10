@@ -17,6 +17,10 @@ class PublicationsControllerTest < ActionController::TestCase
     @object = Factory(:publication, published_date: Date.new(2013, 1, 1), publication_type: Factory(:journal))
   end
 
+  def test_json_content
+    super
+  end
+
   def test_title
     get :index
     assert_select 'title', text: 'Publications', count: 1
