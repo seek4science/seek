@@ -1194,6 +1194,23 @@ class PublicationsControllerTest < ActionController::TestCase
     assert response.body.include?('FAIRDOMHub: a repository')
   end
 
+  test 'show original author name for associated person' do
+    #show the original name and formatting, but with link to associated person
+    registered_author = Factory(:registered_publication_author)
+    person = registered_author.person
+    original_full_name = registered_author.full_name
+    refute_nil person
+
+    publication = Factory(:publication, publication_authors:[registered_author, Factory(:publication_author)])
+    get :show, params: { id: publication }
+    assert_response :success
+
+    assert_select "p#authors" do
+      assert_select "a[href=?]", person_path(person), text: person.name, count:0
+      assert_select "a[href=?]", person_path(person), text: original_full_name
+    end
+  end
+
   private
 
   def publication_for_export_tests

@@ -23,14 +23,14 @@ Factory.define(:publication) do |f|
   f.sequence(:pubmed_id) { |n| n }
   f.projects { [Factory.build(:project)] }
   f.association :contributor, factory: :person
-  f.publication_type_id  Factory(:journal).id
+  f.association :publication_type, factory: :journal
 end
 
 Factory.define(:min_publication, class: Publication) do |f|
   f.title 'A Minimal Publication'
   f.doi 'https://doi.org/10.5072/abcd'
   f.projects { [Factory.build(:min_project)] }
-  f.publication_type_id  Factory(:journal).id
+  f.association :publication_type, factory: :journal
 end
 
 Factory.define(:max_publication, class: Publication) do |f|
@@ -49,10 +49,15 @@ Factory.define(:max_publication, class: Publication) do |f|
   f.projects { [Factory.build(:max_project)] }
   f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
+  f.association :publication_type, factory: :journal
 end
 
 # PublicationAuthor
 Factory.define :publication_author do |f|
-  f.sequence(:first_name) { |n| "Person#{n}" }
+  f.sequence(:first_name) { |n| "Author#{n}" }
   f.last_name 'Last'
+end
+
+Factory.define :registered_publication_author, parent: :publication_author do |f|
+  f.association :person
 end

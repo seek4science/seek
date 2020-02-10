@@ -95,14 +95,14 @@
     <div class="row">
       <div class="col-md-12 col-sm-10">
         <% unless @publication.publication_authors.size == 0 %>
-        <p>
-          <strong>Author<%= @publication.publication_authors.size > 1 ? "s" : "" -%>:</strong>
+        <p id="authors">
+          <strong><%= 'Author'.pluralize(@publication.publication_authors.size) %>:</strong>
           <% if @publication.publication_authors.empty? %>
               <%= text_or_not_specified(nil) %>
           <% else %>
               <%= @publication.publication_authors.map do |author|
                 if author.person && author.person.can_view?
-                  link_to get_object_title(author.person), show_resource_path(author.person)
+                  link_to author.full_name, show_resource_path(author.person)
                 else
                   author.full_name
                 end
