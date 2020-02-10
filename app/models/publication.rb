@@ -43,7 +43,7 @@ class Publication < ApplicationRecord
 
   validates :doi, format: { with: VALID_DOI_REGEX, message: 'is invalid' }, allow_blank: true
   validates :pubmed_id, numericality: { greater_than: 0, message: 'is invalid' }, allow_blank: true
-  validates :publication_type_id,:presence => true
+  validates :publication_type_id, presence: true
 
   # validation differences between OpenSEEK and the VLN SEEK
   validates_uniqueness_of :pubmed_id, allow_nil: true, allow_blank: true, if: -> { Seek::Config.is_virtualliver }
@@ -407,7 +407,7 @@ class Publication < ApplicationRecord
   def fetch_pubmed_or_doi_result(pubmed_id, doi)
     result = nil
     @error = nil
-    if pubmed_id
+    if !pubmed_id.blank?
       begin
         result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
         @error = result.error
@@ -417,7 +417,7 @@ class Publication < ApplicationRecord
         @error = 'There was a problem contacting the PubMed query service. Please try again later'
         Seek::Errors::ExceptionForwarder.send_notification(exception, data: {message: "Problem accessing ncbi using pubmed id #{pubmed_id}"})
       end
-    elsif doi
+    elsif !doi.blank?
       begin
         query = DOI::Query.new(Seek::Config.crossref_api_email)
         result = query.fetch(doi)
@@ -510,7 +510,7 @@ class Publication < ApplicationRecord
   end
 
   def publication_author_names
-    publication_authors.map(&:name)
+    publication_authors.map(&:full_name)
   end
 
   def has_doi?
