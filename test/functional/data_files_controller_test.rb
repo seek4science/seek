@@ -2814,7 +2814,8 @@ class DataFilesControllerTest < ActionController::TestCase
     params = { data_file: {
       title: 'Small File',
       project_ids: [project.id]
-    }, policy_attributes: valid_sharing,
+    }, tag_list:'fish, soup',
+               policy_attributes: valid_sharing,
                content_blob_id: blob.id.to_s,
                assay_ids: [] }
 
@@ -2837,6 +2838,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'Small File', df.title
     assert_equal person, df.contributor
     assert_empty df.assays
+    assert_equal ['fish','soup'].sort,df.tags.sort
 
     al = ActivityLog.last
     assert_equal 'create', al.action
