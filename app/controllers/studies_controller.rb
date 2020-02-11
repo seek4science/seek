@@ -12,6 +12,8 @@ class StudiesController < ApplicationController
 
   before_action :check_assays_are_not_already_associated_with_another_study, only: %i[create update]
 
+  before_action :check_assays_are_for_this_study, only: %i[update]
+
   include Seek::Publishing::PublishingCommon
   include Seek::AnnotationCommon
   include Seek::BreadCrumbs
@@ -124,7 +126,7 @@ class StudiesController < ApplicationController
     render partial: 'studies/person_responsible_list', locals: { people: people }
   end
 
-  def check_assays_are_not_already_associated_with_another_study
+  def check_assays_are_for_this_study
     study_id = params[:id]
     if params[:study][:ordered_assay_ids]
       a1 = params[:study][:ordered_assay_ids]
@@ -138,8 +140,12 @@ class StudiesController < ApplicationController
         error("Each ordered #{t('assays.assay')} must be associated with the Study", "is invalid (invalid #{t('assays.assay')})")
         return false
       end
-      return true
     end
+    return true
+  end
+
+  def check_assays_are_not_already_associated_with_another_study
+    study_id = params[:id]
     assay_ids = params[:study][:assay_ids]
     if assay_ids
       valid = !assay_ids.detect do |a_id|
