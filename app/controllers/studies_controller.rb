@@ -14,12 +14,11 @@ class StudiesController < ApplicationController
   before_action :check_assays_are_for_this_study, only: %i[update]
 
   include Seek::Publishing::PublishingCommon
-
   include Seek::AnnotationCommon
-
   include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
+
+  api_actions :index, :show, :create, :update, :destroy
 
   def new_object_based_on_existing_one
     @existing_study = Study.find(params[:id])

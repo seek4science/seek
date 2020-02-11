@@ -69,18 +69,23 @@ module Seek
       resource = instance_variable_get("@#{controller_name.singularize}")
 
       add_show_breadcrumb resource if resource && resource.respond_to?(:new_record?) && !resource.new_record?
-
       unless action_name == 'index' || action_name == 'show'
         case action_name
         when 'new_object_based_on_existing_one'
           breadcrumb_name = "New #{controller_name.humanize.singularize.downcase} based on this one"
         when 'create_content_blob'
           breadcrumb_name = "New #{controller_name.humanize.singularize.downcase} details"
+        when 'create'
+          breadcrumb_name = "New"
         else
           breadcrumb_name = action_name.capitalize.humanize
         end
         url = if resource.nil?
-                url_for(controller: controller_name, action: action_name)
+                if action_name == 'create'
+                  nil
+                else
+                  url_for(controller: controller_name, action: action_name)
+                end
               else
                 url_for(controller: controller_name, action: action_name, id: resource.try(:id))
               end

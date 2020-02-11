@@ -236,7 +236,7 @@ module Seek
       hash[controller.to_s]&.to_sym
     end
 
-    def set_sorting_for(controller, value)      
+    def set_sorting_for(controller, value)
       # Store value as a string, unless nil, or not a valid sorting option for that controller.
       if value.blank? || !Seek::ListSorter.options(controller.to_s.classify).include?(value.to_sym)
         value = nil
@@ -321,6 +321,15 @@ module Seek
               jwks_uri: '/oidc/jwk',
           }
       }
+    end
+
+    def omniauth_ldap_settings(field)
+      omniauth_ldap_config.with_indifferent_access[field.to_s]
+    end
+
+    def set_omniauth_ldap_settings(field, value)
+      merge! :omniauth_ldap_config, field => (value.blank? ? nil : value)
+      value
     end
 
     def omniauth_providers

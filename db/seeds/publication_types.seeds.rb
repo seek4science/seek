@@ -5,18 +5,21 @@ PUBLICATION_TYPE = [{ title: 'Journal', key: 'article' },
                     { title: 'InCollection', key: 'incollection' },
                     { title: 'InProceedings', key: 'inproceedings' },
                     { title: 'Manual', key: 'manual' },
-                    { title: 'Masters Thesis', key: 'mastersthesis' },
                     { title: 'Misc', key: 'misc' },
                     { title: 'Phd Thesis', key: 'phdthesis' },
+                    { title: 'Masters Thesis', key: 'mastersthesis' },
+                    { title: 'Bachelors Thesis', key: 'bachelorsthesis' },
                     { title: 'Proceedings', key: 'proceedings' },
                     { title: 'Tech report', key: 'techreport' },
                     { title: 'Unpublished', key: 'unpublished' }
 
 ]
-
+before_n = PublicationType.count
 PUBLICATION_TYPE.each do |type|
-  publication_tpye= PublicationType.find_or_initialize_by(key: type[:key])
-  publication_tpye.update_attributes(title: type[:title])
+  publication_type= PublicationType.find_or_initialize_by(key: type[:key])
+  publication_type.update_attributes(title: type[:title])
 end
 
-puts "Seeded #{PUBLICATION_TYPE.count} publication types"
+seeded_n = PublicationType.count - before_n
+
+puts "Seeded #{seeded_n} publication types" if seeded_n > 0

@@ -13,7 +13,7 @@
             <%= link_to @publication.pubmed_id, @publication.pubmed_uri, { :target => "_blank" } %>
           </p>
         <% end %>
-        <% unless @publication.doi.nil? %>
+        <% unless @publication.doi.nil? || @publication.doi.empty? %>
           <p>
             <strong>DOI:</strong>
             <%= doi_link(@publication.doi, { :target => "_blank" }) %>
@@ -62,12 +62,21 @@
       </div>
       <div class="col-md-6">
         <p>
-          <strong><%= "Citation:" -%></strong>
+          <strong>Citation:</strong>
           <%=h @publication.citation -%>
         </p>
         <p>
           <strong for="date_published">Date Published:</strong>
             <span><%= date_as_string(@publication.published_date,false,true) -%></span>
+        </p>
+
+        <p>
+          <% unless @publication.url.nil?  %>
+          <p>
+            <strong>URL:</strong>
+            <%= link_to @publication.url, @publication.url, { target: '_blank' }%>
+          </p>
+        <% end %>
         </p>
 
         <p>
@@ -79,19 +88,21 @@
           <% end -%>
         </p>
 
+
+
       </div>
     </div>
     <div class="row">
       <div class="col-md-12 col-sm-10">
         <% unless @publication.publication_authors.size == 0 %>
-        <p>
-          <strong>Author<%= @publication.publication_authors.size > 1 ? "s" : "" -%>:</strong>
+        <p id="authors">
+          <strong><%= 'Author'.pluralize(@publication.publication_authors.size) %>:</strong>
           <% if @publication.publication_authors.empty? %>
               <%= text_or_not_specified(nil) %>
           <% else %>
               <%= @publication.publication_authors.map do |author|
                 if author.person && author.person.can_view?
-                  link_to get_object_title(author.person), show_resource_path(author.person)
+                  link_to author.full_name, show_resource_path(author.person)
                 else
                   author.full_name
                 end

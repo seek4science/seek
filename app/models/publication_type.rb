@@ -18,6 +18,7 @@ class PublicationType  < ActiveRecord::Base
              "Masters_Thesis"=>"masters_thesis",
              "Misc"=>"misc",
              "Phd_Thesis"=>"phd_thesis",
+             "Bachelor_Thesis"=>"bachelorsthesis",
              "Proceedings"=>"proceedings",
              "Tech_Report"=>"tech_report",
              "Unpublished"=>"unpublished" }
@@ -30,7 +31,11 @@ class PublicationType  < ActiveRecord::Base
     str_begin = "@"
     str_end = "{"
     publication_key = bibtex_record.try(:to_s)[/#{str_begin}(.*?)#{str_end}/m, 1]
-    return PublicationType.find_by(key: publication_key).id
+    unless PublicationType.find_by(key: publication_key).nil?
+       return PublicationType.find_by(key: publication_key).id
+    else
+      return PublicationType.find_by(key: "misc").id
+    end
   end
 
 
@@ -62,6 +67,9 @@ class PublicationType  < ActiveRecord::Base
   end
   def self.Misc
     self.for_type('Misc')
+  end
+  def self.Bachelor_Thesis
+    self.for_type('Bachelor_Thesis')
   end
   def self.Phd_Thesis
     self.for_type('Phd_Thesis')
@@ -114,6 +122,10 @@ class PublicationType  < ActiveRecord::Base
 
   def is_phd_thesis?
     key == 'phdthesis'
+  end
+
+  def is_bachelor_thesis?
+    key == 'bachelorsthesis'
   end
 
   def is_proceedings?

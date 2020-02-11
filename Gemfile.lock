@@ -42,7 +42,7 @@ GIT
 
 GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
-  revision: 93869b90b2dd4fbff2cdd51417fbfa08479ab446
+  revision: ef354df2e6b1dd86b734dc7613571cb3536aef75
   specs:
     doi_query_tool (1.0.0)
       libxml-ruby (>= 2.6.0)
@@ -191,7 +191,7 @@ GEM
       sort_alphabetical (~> 1.0)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
-    crass (1.0.4)
+    crass (1.0.6)
     csl (1.4.5)
       namae (~> 0.7)
     csl-styles (1.0.1.7)
@@ -211,6 +211,8 @@ GEM
     docsplit (0.7.6)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
+    doorkeeper (5.2.3)
+      railties (>= 5)
     dynamic_form (1.1.4)
     ebnf (1.1.3)
       rdf (~> 3.0)
@@ -374,7 +376,7 @@ GEM
       activesupport (>= 4)
       railties (>= 4)
       request_store (~> 1.0)
-    loofah (2.2.3)
+    loofah (2.3.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     lumberjack (1.0.11)
@@ -883,6 +885,7 @@ DEPENDENCIES
   delayed_job_active_record
   docsplit
   doi_query_tool!
+  doorkeeper
   dynamic_form
   equivalent-xml
   exception_notification

@@ -28,8 +28,20 @@
           <li>
             <%= image_tag_for_key "oauth", user_oauth_sessions_path(@person.user), "OAuth Sessions", nil, "OAuth Sessions" -%>
           </li>
+          <%# API %>
+          <li class="divider"></li>
+          <li>
+            <%= image_tag_for_key "oauth_authorized_applications", oauth_authorized_applications_path, "Authorized Applications", nil, "Authorized Applications" -%>
+          </li>
+          <li>
+            <%= image_tag_for_key "oauth_applications", oauth_applications_path, "API Applications", nil,  "API Applications" -%>
+          </li>
+          <li>
+            <%= image_tag_for_key "key", user_api_tokens_path(@person.user), "API Tokens", nil, "API Tokens" -%>
+          </li>
       <% end -%>
       <% if admin_logged_in? -%>
+          <li class="divider"></li>
           <li>
             <%= image_tag_for_key "destroy", person_path(@person), "Delete Person", { data: { confirm: 'Are you sure?' }, :method => :delete}, "Delete Person" -%>
           </li>

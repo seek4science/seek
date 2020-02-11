@@ -37,13 +37,13 @@ class Publication < ApplicationRecord
 
   belongs_to :publication_type
 
-  VALID_DOI_REGEX = /\A(10[.][0-9]{4,}(?:[.][0-9]+)*\/(?:(?!["&\'<>])\S)+)\z/
+  VALID_DOI_REGEX = /\A10.\d{4,9}\/[<>\-._;()\/:A-Za-z0-9]+\z/
   VALID_PUBMED_REGEX = /\A(([1-9])([0-9]{0,7}))\z/
   # Note that the PubMed regex deliberately does not allow versions
 
   validates :doi, format: { with: VALID_DOI_REGEX, message: 'is invalid' }, allow_blank: true
   validates :pubmed_id, numericality: { greater_than: 0, message: 'is invalid' }, allow_blank: true
-  validates :publication_type_id,:presence => true
+  validates :publication_type_id, presence: true
 
   # validation differences between OpenSEEK and the VLN SEEK
   validates_uniqueness_of :pubmed_id, allow_nil: true, allow_blank: true, if: -> { Seek::Config.is_virtualliver }
@@ -216,6 +216,7 @@ class Publication < ApplicationRecord
       self.booktitle = bibtex_record[:booktitle].try(:to_s)
       self.publisher = bibtex_record[:publisher].try(:to_s)
       self.editor = bibtex_record[:editors].try(:to_s)
+      self.url = parse_bibtex_url(bibtex_record).try(:to_s)
 
       unless bibtex_record[:author].nil?
         plain_authors = bibtex_record[:author].split(' and ') # by bibtex definition
@@ -284,6 +285,7 @@ class Publication < ApplicationRecord
 
   # generating the citations for different types of publications by using the data from Bibtex file when no doi/pubmed_id
   def generate_citation(bibtex_record)
+    self.citation = ''
     month = bibtex_record[:month].try(:to_s)
     year = bibtex_record[:year].try(:to_s)
     page_or_pages = (bibtex_record[:pages].try(:to_s).match?(/[^0-9]/) ? "pp." : "p." ) unless bibtex_record[:pages].nil?
@@ -291,40 +293,38 @@ class Publication < ApplicationRecord
     volume = bibtex_record[:volume].try(:to_s)
     series = bibtex_record[:series].try(:to_s)
     number = bibtex_record[:number].try(:to_s)
-    url =    bibtex_record[:url].try(:to_s) || bibtex_record[:biburl].try(:to_s)
     address = bibtex_record[:address].try(:to_s)
     school = bibtex_record[:school].try(:to_s)
     tutor = bibtex_record[:tutor].try(:to_s)
     tutorhits = bibtex_record[:tutorhits].try(:to_s)
-    note = bibtex_record[:note].try(:to_s)
     institution = bibtex_record[:institution].try(:to_s)
     type = bibtex_record[:type].try(:to_s)
-    howpublished = bibtex_record[:howpublished].try(:to_s)
-
+    note = bibtex_record[:note].try(:to_s)
+    archivePrefix = bibtex_record[:archiveprefix].try(:to_s)
+    primaryClass = bibtex_record[:primaryclass].try(:to_s)
+    eprint= bibtex_record[:eprint].try(:to_s)
+    url = parse_bibtex_url(bibtex_record).try(:to_s)
     publication_type = PublicationType.find(self.publication_type_id)
+
     if publication_type.is_journal?
-      self.citation = ''
       self.citation += self.journal.nil? ? '':self.journal
       self.citation += volume.blank? ? '': ' '+volume
       self.citation += number.nil? ? '' : '('+ number+')'
       self.citation += pages.blank? ? '' : (':'+pages)
-      unless month.nil? && year.nil?
-        self.citation += month.nil? ? ',' : (', '+ month.capitalize)
+=begin
+      unless year.nil?
         self.citation += year.nil? ? '' : (' '+year)
       end
-      Rails.logger.info("Citation:Journal:"+ self.citation)
+=end
     elsif publication_type.is_booklet?
-      self.citation = ''
       self.citation += howpublished.blank? ? '': ''+ howpublished
       self.citation += address.nil? ? '' : (', '+ address)
-      unless month.nil? && year.nil?
-        self.citation += month.nil? ? ',' : (', '+ month.capitalize)
+=begin
+      unless year.nil?
         self.citation += year.nil? ? '' : (' '+year)
       end
-      self.citation += note.nil? ? '' : (', '+ note)
-      Rails.logger.info("Citation: Booklet"+self.citation)
+=end
     elsif publication_type.is_inbook?
-      self.citation = ''
       self.citation += self.booktitle.nil? ? '' : ('In '+ self.booktitle)
       self.citation += volume.blank? ? '' : (', volume '+ volume)
       self.citation += series.blank? ? '' : (' of '+series)
@@ -334,17 +334,15 @@ class Publication < ApplicationRecord
       unless address.nil? || (self.booktitle.try(:include?, address))
         self.citation += address.nil? ? '' : (', '+ address)
       end
+=begin
       unless self.booktitle.try(:include?, year)
-        unless month.nil? && year.nil?
-          self.citation += month.nil? ? ',' : (', '+ month.capitalize)
+        unless year.nil?
           self.citation += year.nil? ? '' : (' '+year)
         end
       end
-      Rails.logger.info("Citation:"+publication_type.title+":" + self.citation)
-      Rails.logger.info("Citation: InBook")
+=end
     elsif publication_type.is_inproceedings? || publication_type.is_incollection? || publication_type.is_book?
       # InProceedings / InCollection
-      self.citation = ''
       self.citation += self.booktitle.nil? ? '' : ('In '+ self.booktitle)
       self.citation += volume.blank? ? '' : (', vol. '+ volume)
       self.citation += series.blank? ? '' : (' of '+series)
@@ -354,64 +352,62 @@ class Publication < ApplicationRecord
       unless address.nil? || (self.booktitle.try(:include?, address))
         self.citation += address.nil? ? '' : (', '+ address)
       end
+=begin
       unless self.booktitle.try(:include?, year)
-        unless month.nil? && year.nil?
-          self.citation += month.nil? ? ',' : (', '+ month.capitalize)
-          self.citation += year.nil? ? '' : (' '+year)
+        unless year.nil?
+          self.citation += year.nil? ? '' : (', '+year)
         end
       end
-      Rails.logger.info("Citation:"+publication_type.title+":" + self.citation)
-    elsif publication_type.is_manual?
-      Rails.logger.info("Citation: Manual")
-    elsif publication_type.is_misc?
-      self.citation = ''
-      self.citation += howpublished.blank? ? '': ''+ howpublished
-
-      Rails.logger.info("Citation: Misc"+ self.citation)
-    elsif publication_type.is_phd_thesis? || publication_type.is_masters_thesis?
+=end
+    elsif publication_type.is_phd_thesis? || publication_type.is_masters_thesis? || publication_type.is_bachelor_thesis?
       #PhD/Master Thesis
-      self.citation = ''
       self.citation += school.nil? ? '' : (' '+ school)
       self.errors.add(:base,'A thesis need to have a school') if school.nil?
       self.citation += year.nil? ? '' : (', '+ year)
       self.citation += tutor.nil? ? '' : (', '+ tutor+'(Tutor)')
       self.citation += tutorhits.nil? ? '' : (', '+ tutorhits+'(HITS Tutor)')
-      self.citation += note.nil? ? '' : (', '+ note)
-      Rails.logger.info("Citation: Thesis:"+ self.citation)
+      self.citation += url.nil? ? '' : (', '+ url)
     elsif publication_type.is_proceedings?
       # Proceedings are conference proceedings, it has no authors but editors
       # Book
       self.journal = self.title
-      self.citation = ''
       self.citation += volume.blank? ? '' : ('vol. '+ volume)
       self.citation += series.blank? ? '' : (' of '+series)
       self.citation += self.publisher.blank? ? '' : (', '+ self.publisher)
+=begin
       unless month.nil? && year.nil?
         self.citation += self.citation.blank? ? '' : ','
         self.citation += month.nil? ? '' : (' '+ month.capitalize)
         self.citation += year.nil? ? '' : (' '+year)
       end
-      self.citation += url.nil? ? '' : (', '+ url)
-      Rails.logger.info("Citation: Proceedings"+self.citation)
+=end
     elsif publication_type.is_tech_report?
-      self.citation = ''
       self.citation += institution.blank? ? ' ': institution
       self.citation += type.blank? ? ' ' : (', '+type)
-      Rails.logger.info("Citation: Tech report")
     elsif publication_type.is_unpublished?
-      self.citation = ''
       self.citation += note.blank? ? ' ': note
-      Rails.logger.info("Citation: Unpublished" +self.citation)
-    else
-      return nil
     end
-    self.citation =  self.citation.strip.gsub(/^,/,'').strip
+
+    if self.doi.blank? && self.citation.blank?
+      self.citation += archivePrefix unless archivePrefix.nil?
+      self.citation += (self.citation.blank? ? primaryClass : (','+primaryClass)) unless primaryClass.nil?
+      self.citation += (self.citation.blank? ? eprint : (','+eprint)) unless eprint.nil?
+      self.journal = self.citation if self.journal.blank?
+    end
+
+    if self.doi.blank? && self.citation.blank?
+     self.citation += url.blank? ? '': url
+    end
+    self.citation =  self.citation.try(:to_s).strip.gsub(/^,/,'').strip
+
+    Rails.logger.info("Citation:"+publication_type.title+":" + self.citation)
+
   end
 
   def fetch_pubmed_or_doi_result(pubmed_id, doi)
     result = nil
     @error = nil
-    if pubmed_id
+    if !pubmed_id.blank?
       begin
         result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
         @error = result.error
@@ -421,12 +417,12 @@ class Publication < ApplicationRecord
         @error = 'There was a problem contacting the PubMed query service. Please try again later'
         Seek::Errors::ExceptionForwarder.send_notification(exception, data: {message: "Problem accessing ncbi using pubmed id #{pubmed_id}"})
       end
-    elsif doi
+    elsif !doi.blank?
       begin
         query = DOI::Query.new(Seek::Config.crossref_api_email)
         result = query.fetch(doi)
 
-        Rails.logger.debug("fetch_pubmed_or_doi_result:#{result}")
+        Rails.logger.debug("fetch_pubmed_or_doi_result:#{result.citation}")
 
         @error = 'Unable to get result' if result.blank?
         @error = 'Unable to get DOI' if result.title.blank?
@@ -514,7 +510,7 @@ class Publication < ApplicationRecord
   end
 
   def publication_author_names
-    publication_authors.map(&:name)
+    publication_authors.map(&:full_name)
   end
 
   def has_doi?
@@ -594,13 +590,31 @@ class Publication < ApplicationRecord
       end
     end
 
-    if self.publication_type.is_phd_thesis? || self.publication_type.is_masters_thesis?
+    if self.publication_type.is_phd_thesis? || self.publication_type.is_masters_thesis? || self.publication_type.is_bachelor_thesis?
       if bibtex_record[:school].try(:to_s).nil?
         self.errors.add(:base,"A #{self.publication_type.title} needs to have a school.")
         return false
       end
     end
     return true
+  end
+
+  def parse_bibtex_url(bibtex_record)
+    pub_url=nil
+    howpublished = bibtex_record[:howpublished].try(:to_s)
+    note = bibtex_record[:note].try(:to_s)
+    url = bibtex_record[:url].try(:to_s)
+    biburl = bibtex_record[:biburl].try(:to_s)
+
+    pub_url = url if url.try(:include?,'http')
+    pub_url ||= howpublished if howpublished.try(:include?,'http')
+    pub_url ||= note if note.try(:include?,'http')
+    pub_url ||= biburl if biburl.try(:include?,'http')
+
+    if (pub_url.try(:start_with?,'\url'))
+      pub_url = pub_url.gsub('\url', '')
+    end
+    pub_url
   end
 
   # defines that this is a user_creatable object type, and appears in the "New Object" gadget

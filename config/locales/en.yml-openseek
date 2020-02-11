@@ -108,3 +108,4 @@ en:
 
   oauth_session: 'OAuth Session'
   identity: 'Identity'
+  api_token: 'API token'

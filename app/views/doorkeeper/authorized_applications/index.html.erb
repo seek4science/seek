@@ -1,0 +1,33 @@
+<%= render partial: 'general/page_title', locals: { title: t('.title') } %>
+
+<div class="alert alert-info" role="alert">
+  These are the applications that you have authorized to access your <%= Seek::Config.application_name %>
+  account via the API.
+</div>
+
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th><%= t('doorkeeper.authorized_applications.index.application') %></th>
+    <th>Owner</th>
+    <th><%= t('doorkeeper.authorized_applications.index.created_at') %></th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @applications.each do |application| %>
+    <tr>
+      <td><%= application.name %></td>
+      <td><%= link_to(application.owner.person.name, application.owner, target: :_blank) %></td>
+      <td><%= application.created_at.strftime(t('doorkeeper.authorized_applications.index.date_format')) %></td>
+      <td>
+        <%= link_to t('doorkeeper.authorized_applications.buttons.revoke'),
+                    oauth_authorized_application_path(application),
+                    method: :delete,
+                    data: { confirm: "Are you sure you wish to revoke this application's access?" },
+                    class: 'btn btn-xs btn-danger' %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

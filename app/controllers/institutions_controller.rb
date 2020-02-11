@@ -14,6 +14,8 @@ class InstitutionsController < ApplicationController
   cache_sweeper :institutions_sweeper, only: [:update, :create, :destroy]
   include Seek::BreadCrumbs
 
+  api_actions :index, :show, :create, :update, :destroy
+
   # GET /institutions/1
   # GET /institutions/1.xml
   def show

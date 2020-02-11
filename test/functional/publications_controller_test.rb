@@ -17,6 +17,10 @@ class PublicationsControllerTest < ActionController::TestCase
     @object = Factory(:publication, published_date: Date.new(2013, 1, 1), publication_type: Factory(:journal))
   end
 
+  def test_json_content
+    super
+  end
+
   def test_title
     get :index
     assert_select 'title', text: 'Publications', count: 1
@@ -62,6 +66,19 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 1, p.assays.count
     assert p.assays.include? assay
   end
+
+  test 'should create doi publication and suggest the associated person' do
+    person = people(:johan_person)
+    mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1371/journal.pone.0004803', content_file: 'cross_ref3.xml')
+    assert_difference('Publication.count') do
+      post :create, params: { publication: { doi: '10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } }
+    end
+    get :manage, params: { id: assigns(:publication) }
+    assert_response :success
+    p = assigns(:publication)
+    assert_equal p.publication_authors[0].suggested_person.name, person.name
+  end
+
 
   test 'should create doi publication' do
     mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1371/journal.pone.0004803', content_file: 'cross_ref3.xml')
@@ -513,10 +530,6 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'should get manage' do
-    get :manage, params: { id: publications(:one) }
-    assert_response :success
-  end
 
   test 'associates assay' do
     login_as(:model_owner) # can edit assay
@@ -1183,6 +1196,23 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert response.body.include?('FAIRDOMHub: a repository')
+  end
+
+  test 'show original author name for associated person' do
+    #show the original name and formatting, but with link to associated person
+    registered_author = Factory(:registered_publication_author)
+    person = registered_author.person
+    original_full_name = registered_author.full_name
+    refute_nil person
+
+    publication = Factory(:publication, publication_authors:[registered_author, Factory(:publication_author)])
+    get :show, params: { id: publication }
+    assert_response :success
+
+    assert_select "p#authors" do
+      assert_select "a[href=?]", person_path(person), text: person.name, count:0
+      assert_select "a[href=?]", person_path(person), text: original_full_name
+    end
   end
 
   private

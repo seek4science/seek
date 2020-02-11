@@ -12,7 +12,7 @@ module AuthenticatedSystem
     if defined? @current_user
       @current_user
     else
-      @current_user = (login_from_session || login_from_basic_auth || login_from_cookie || User.guest)
+      self.current_user = (user_from_session || user_from_doorkeeper  || user_from_basic_auth || user_from_cookie || user_from_api_token || User.guest)
     end
   end
 
@@ -108,26 +108,44 @@ module AuthenticatedSystem
   end
 
   # Called from #current_user.  First attempt to login by the user id stored in the session.
-  def login_from_session
-    self.current_user = User.find_by_id(session[:user_id]) if session[:user_id]
+  def user_from_session
+    User.find_by_id(session[:user_id]) if session[:user_id]
   end
 
   # Called from #current_user.  Now, attempt to login by basic authentication information.
-  def login_from_basic_auth
+  def user_from_basic_auth
     authenticate_with_http_basic do |username, password|
-      self.current_user = User.authenticate(username, password)
-      sleep 2 if Rails.env.production? && (username.present? && !self.current_user) # Throttle incorrect login
-      self.current_user
+      user = User.authenticate(username, password)
+      sleep 2 if Rails.env.production? && (username.present? && !user) # Throttle incorrect login
+      user
     end
   end
 
   # Called from #current_user.  Finaly, attempt to login by an expiring token in the cookie.
-  def login_from_cookie
-    user = cookies[:auth_token] && User.find_by_remember_token(cookies[:auth_token])
-    if user && user.remember_token?
-      cookies[:auth_token] = { :value => user.remember_token, :expires => user.remember_token_expires_at }
-      self.current_user = user
+  def user_from_cookie
+    return unless cookies[:auth_token]
+
+    user = User.find_by_remember_token(cookies[:auth_token])
+    if user&.remember_token?
+      cookies[:auth_token] = { value: user.remember_token, expires: user.remember_token_expires_at }
+      user
     end
   end
 
+  def user_from_api_token
+    authenticate_with_http_token do |api_token, _options|
+      return unless api_token.length > 1
+
+      user = User.from_api_token(api_token)
+      sleep 2 if Rails.env.production? && !user # Throttle incorrect login
+      user
+    end
+  end
+
+  # Is the user authenticated through an OAuth application?
+  def user_from_doorkeeper
+    if doorkeeper_token&.accessible?
+      User.find(doorkeeper_token.resource_owner_id)
+    end
+  end
 end

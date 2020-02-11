@@ -1,0 +1,1 @@
+<a name="listInvestigations"></a>The **listInvestigations** operation returns a JSON object containing a list of all the <a href="#investigations">**Investigations**</a> to which the authenticated user has accesss.

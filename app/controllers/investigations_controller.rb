@@ -24,6 +24,8 @@ class InvestigationsController < ApplicationController
   require "isatab_converter"
   include IsaTabConverter
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def new_object_based_on_existing_one
     @existing_investigation =  Investigation.find(params[:id])
     if @existing_investigation.can_view?

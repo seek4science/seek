@@ -26,7 +26,7 @@ module Seek
       @total_count = assets.count
       log_with_time("  - Authorized") { assets = authorize_assets(assets) }
       log_with_time("  - Relation-ified") { assets = relationify_collection(assets) } if assets.is_a?(Array)
-      log_with_time("  - Filtered") { assets = filter_assets(assets) } if Seek::Config.filtering_enabled
+      assets = filter_assets(assets) if Seek::Config.filtering_enabled
       @visible_count = assets.count
       log_with_time("  - Sorted") { assets = sort_assets(assets) }
       log_with_time("  - Paged") { assets = paginate_assets(assets) }
@@ -50,8 +50,9 @@ module Seek
       filterer = Seek::Filterer.new(controller_model)
       active_filter_values = filterer.active_filter_values(@filters)
       # We need the un-filtered, but authorized, collection to work out which filters are available.
-      @available_filters = filterer.available_filters(assets, active_filter_values)
-      assets = filterer.filter(assets, active_filter_values) if active_filter_values.any?
+      @available_filters = nil
+      log_with_time("  - Calculated available filters") { @available_filters = filterer.available_filters(assets, active_filter_values) }
+      log_with_time("  - Filtered") { assets = filterer.filter(assets, active_filter_values) if active_filter_values.any? }
 
       active_filter_values.each_key do |key|
         active = @available_filters[key].select(&:active?)

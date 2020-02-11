@@ -18,9 +18,10 @@
       "editor":	"Richling, S. and Baumann, M. and Heuveline, V.",
       "booktitle":	"Proceedings of the 3rd bwHPC-Symposium: Heidelberg 2016",
       "publisher":	"Heidelberg University Library, heiBOOKS",
+      "url": null,
       "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/873864488",
       "publication_type":"Journal",
-      "authors": ["Person1 Last", "Person2 Last"]
+      "authors": ["Author1 Last", "Author2 Last"]
     },
     "relationships": {
       "people": {

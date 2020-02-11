@@ -29,8 +29,4 @@ class PublicationAuthor < ApplicationRecord
     return first_name, last_name
   end
 
-  def name
-    person ? person.name : [first_name, last_name].join(' ')
-  end
-
 end
