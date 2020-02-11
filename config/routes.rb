@@ -284,6 +284,7 @@ SEEK::Application.routes.draw do
       get :overview
       get :administer_join_request
       post :respond_join_request
+      get :order_investigations
     end
     resources :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations,
               :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :collections, only: [:index]
@@ -358,6 +359,9 @@ SEEK::Application.routes.draw do
     resources :people, :projects, :assays, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
+      get :manage
+      get :order_studies
+      patch :manage_update
     end
   end
 

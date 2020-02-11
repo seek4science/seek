@@ -38,6 +38,7 @@
     <% else %>
       <li><%= image_tag_for_key('edit', edit_project_path(item), "Edit #{t('project')} Details", nil, "Edit #{t('project')} Details") -%></li>
     <% end -%>
+      <li><%= image_tag_for_key('order', order_investigations_project_path(item), "Order investigations", nil, "Order investigations") -%></li>
     <% if admin_logged_in? -%>
       <%= delete_icon(item,current_user) %>
     <% end -%>
