@@ -211,6 +211,7 @@ SEEK::Application.routes.draw do
       post :request_membership
       get :isa_children
       get :overview
+      get :order_investigations
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:search,:organisms,:documents, :only=>[:index]
@@ -307,6 +308,7 @@ SEEK::Application.routes.draw do
       get :isa_children
       get :export_isatab_json
       get :manage
+      get :order_studies
       patch :manage_update
     end
   end
