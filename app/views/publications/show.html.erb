@@ -101,7 +101,7 @@
               <%= text_or_not_specified(nil) %>
           <% else %>
               <%= @publication.publication_authors.map do |author|
-                if author.person && author.person.can_view?
+                if author.person
                   link_to author.full_name, show_resource_path(author.person)
                 else
                   author.full_name
