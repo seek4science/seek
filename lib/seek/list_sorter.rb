@@ -109,7 +109,7 @@ module Seek
         arel_field = relation.arel_table[field.to_sym]
         arel_field = arel_field.eq(nil) if order == 'IS NULL'
         arel_field = arel_field.lower if m
-        arel_field = arel_field.desc if order&.match?(/desc/i)
+        arel_field = order&.match?(/desc/i) ? arel_field.desc : arel_field.asc
         arel_field
       end
 
