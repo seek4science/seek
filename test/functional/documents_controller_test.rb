@@ -861,6 +861,27 @@ class DocumentsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'filter and sort' do
+    programme = Factory(:programme)
+    project = Factory(:project, programme: programme)
+    other_project = Factory(:project, programme: programme)
+    project_doc = Factory(:public_document, created_at: 3.days.ago, projects: [project])
+    old_project_doc = Factory(:public_document, created_at: 10.years.ago, projects: [project])
+    other_project_doc = Factory(:public_document, created_at: 2.days.ago, projects: [other_project])
+
+    get :index, params: { filter: { programme: programme.id }, order: 'created_at_asc' }
+    assert_equal [old_project_doc, project_doc, other_project_doc], assigns(:documents).to_a
+
+    get :index, params: { filter: { programme: programme.id }, order: 'created_at_desc' }
+    assert_equal [other_project_doc, project_doc, old_project_doc], assigns(:documents).to_a
+
+    get :index, params: { filter: { programme: programme.id, project: project.id }, order: 'created_at_asc' }
+    assert_equal [old_project_doc, project_doc], assigns(:documents).to_a
+
+    get :index, params: { filter: { programme: programme.id, project: project.id }, order: 'created_at_desc' }
+    assert_equal [project_doc, old_project_doc], assigns(:documents).to_a
+  end
+
   private
 
   def valid_document
