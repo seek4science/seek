@@ -248,11 +248,11 @@ module ResourceListItemHelper
     html = ''
     other_html = ''
     content_tag(:p, class: 'list_item_attribute') do
-      html << content_tag(:b, "#{contributor_count == 1 ? key : key.pluralize}: ")
+      html << content_tag(:b, "#{key.pluralize(contributor_count)}: ")
       if (key == 'Author')
         html << contributors.map do |author|
-          if author.person && author.person.can_view?
-            link_to get_object_title(author.person), show_resource_path(author.person)
+          if author.person
+            link_to author.full_name, show_resource_path(author.person)
           else
             author.full_name
           end
