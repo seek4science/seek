@@ -145,7 +145,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     bcp47 (0.3.3)
       i18n
-    bibtex-ruby (4.4.3)
+    bibtex-ruby (5.1.0)
       latex-decode (~> 0.0)
     bindata (2.4.4)
     bio (1.5.1)
@@ -330,8 +330,7 @@ GEM
       addressable (>= 2.4)
     jsonapi-renderer (0.1.3)
     kgio (2.11.0)
-    latex-decode (0.2.2)
-      unicode (~> 0.4)
+    latex-decode (0.3.1)
     launchy (2.4.3)
       addressable (~> 2.3)
     ld-patch (0.3.3)
@@ -808,7 +807,6 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.5)
-    unicode (0.4.4.4)
     unicode-display_width (1.5.0)
     unicode_utils (1.4.0)
     unicorn (5.3.0)
@@ -866,7 +864,7 @@ DEPENDENCIES
   acts_as_tree
   attr_encrypted (~> 3.0.0)
   auto_strip_attributes
-  bibtex-ruby (~> 4.4.2)
+  bibtex-ruby (~> 5.1.0)
   bio (~> 1.5.1)
   bioportal (>= 3.0)!
   bives (~> 2.0)
