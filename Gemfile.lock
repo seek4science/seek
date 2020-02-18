@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/fbacall/ro-crate-ruby.git
-  revision: 41b6287e46fed26012a35bcf259172acb7d4d18c
+  revision: 7b22c0b55784fac68621c8a9db6530dfbe91ed2e
   specs:
     ro-crate-ruby (0.0.2)
       addressable
@@ -266,6 +266,8 @@ GEM
     formatador (0.2.5)
     fssm (0.2.10)
     gem-licenses (0.2.2)
+    git (1.6.0)
+      rchardet (~> 1.8)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
     google-analytics-rails (1.1.0)
@@ -596,6 +598,7 @@ GEM
     rb-fsevent (0.9.8)
     rb-inotify (0.9.8)
       ffi (>= 0.5.0)
+    rchardet (1.8.0)
     rdf (3.0.10)
       hamster (~> 3.0)
       link_header (~> 0.0, >= 0.0.8)
@@ -902,6 +905,7 @@ DEPENDENCIES
   fleximage!
   fssm
   gem-licenses
+  git
   google-analytics-rails
   guard-rubycritic
   handlebars_assets
@@ -1001,4 +1005,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.17.3
+   2.0.2
