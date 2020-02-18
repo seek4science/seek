@@ -1,4 +1,5 @@
 class PeopleController < ApplicationController
+  include Seek::IndexPager
   include Seek::AnnotationCommon
   include Seek::Publishing::PublishingCommon
   include Seek::Publishing::GatekeeperPublish
@@ -7,6 +8,7 @@ class PeopleController < ApplicationController
   include Seek::AdminBulkAction
   include RelatedItemsHelper
 
+  before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[show edit update destroy items]
   before_action :current_user_exists, only: %i[register create new]
   before_action :is_during_registration, only: [:register]
@@ -23,54 +25,7 @@ class PeopleController < ApplicationController
 
   protect_from_forgery only: []
 
-  # GET /people
-  # GET /people.xml
-  def index
-    if params[:discipline_id]
-      @discipline = Discipline.find_by_id(params[:discipline_id])
-      @people = @discipline.try(:people) || []
-    elsif params[:project_position_id]
-      @project_position = ProjectPosition.find(params[:project_position_id])
-      @people = Person.includes(:group_memberships)
-      # FIXME: this needs double checking, (a) not sure its right, (b) can be paged when using find.
-      @people = @people.reject { |p| (p.group_memberships & @project_position.group_memberships).empty? }
-    end
-
-    if (request.format == 'json' && params[:page].nil?)
-      params[:page] = 'all'
-    end
-
-    if @people
-      @people = @people.select(&:can_view?)
-    else
-      @people = Person.all
-
-      @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
-
-      unless view_context.index_with_facets?('people') && params[:user_enable_facet] == 'true'
-        @people = Person.paginate_after_fetch(@people,
-                                              page: (params[:page] || Seek::Config.default_page('people')),
-                                              latest_limit: Seek::Config.limit_latest)
-      end
-    end
-    if params[:page]=='latest' || params[:page].blank?
-      @people.sort_by!(&:updated_at).reverse!
-    else
-      Seek::ListSorter.index_items(@people,params[:page])
-    end
-
-
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml
-      format.json  { render json: @people,
-                            each_serializer: SkeletonSerializer,
-                            meta: {:base_url =>   Seek::Config.site_base_host,
-                                   :api_version => ActiveModel::Serializer.config.api_version
-                            } }
-    end
-  end
+  api_actions :index, :show, :create, :update, :destroy, :current
 
   # GET /people/1
   # GET /people/1.xml
@@ -79,13 +34,25 @@ class PeopleController < ApplicationController
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
-      format.json {render json: @person}
+      format.json {render json: @person, include: [params[:include]]}
     end
   end
 
   def items
     respond_to do |format|
       format.html
+    end
+  end
+
+  def current
+    respond_to do |format|
+      format.json do
+        if logged_in?
+          render json: current_user.person
+        else
+          render json: { errors: [{ title: 'No user logged in'}] }, status: :not_found
+        end
+      end
     end
   end
 
@@ -136,7 +103,10 @@ class PeopleController < ApplicationController
     if email && Person.not_registered_with_matching_email(email).any?
       render :is_this_you, locals: { email: email }
     else
-      @person = Person.new(email: email)
+      p = { email: email }
+      p[:first_name] = params[:first_name] if params[:first_name]
+      p[:last_name] = params[:last_name] if params[:last_name]
+      @person = Person.new(p)
     end
   end
 
@@ -166,13 +136,13 @@ class PeopleController < ApplicationController
             format.html { redirect_to(@person) }
           end
           format.xml { render xml: @person, status: :created, location: @person }
-          format.json {render json: @person, status: :created, location: @person }
+          format.json {render json: @person, status: :created, location: @person, include: [params[:include]] }
         else
           Mailer.signup(current_user).deliver_later
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to controller: 'users', action: 'activation_required' }
-          format.json { render json: @person, status: :created} # There must be more to be done
+          format.json { render json: @person, status: :created, include: [params[:include]]} # There must be more to be done
         end
       else
         format.html { render redirect_action }
@@ -195,7 +165,7 @@ class PeopleController < ApplicationController
   # PUT /people/1
   # PUT /people/1.xml
   def update
-    @person.disciplines.clear if params[:discipline_ids].nil?
+    @person.disciplines.clear if params[:discipline_ids].nil? #????
 
     set_tools_and_expertise(@person, params)
 
@@ -209,7 +179,7 @@ class PeopleController < ApplicationController
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
-        format.json {render json: @person}
+        format.json {render json: @person, include: [params[:include]]}
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @person.errors, status: :unprocessable_entity }

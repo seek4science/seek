@@ -19,7 +19,7 @@ module Seek
 
         title_trimmer
 
-        scope :default_order, -> { order('updated_at DESC') }
+        
 
         validates :title, presence: true
         validates :title, length: { maximum: 255 }

@@ -59,8 +59,21 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
     Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
+    Seek::Config.omniauth_ldap_enabled = string_to_boolean params[:omniauth_ldap_enabled]
+    Seek::Config.set_omniauth_ldap_settings 'host', params[:omniauth_ldap_host]
+    Seek::Config.set_omniauth_ldap_settings 'port', params[:omniauth_ldap_port]&.to_i
+    Seek::Config.set_omniauth_ldap_settings 'method', params[:omniauth_ldap_method]&.to_sym
+    Seek::Config.set_omniauth_ldap_settings 'base', params[:omniauth_ldap_base]
+    Seek::Config.set_omniauth_ldap_settings 'uid', params[:omniauth_ldap_uid]
+    Seek::Config.set_omniauth_ldap_settings 'bind_dn', params[:omniauth_ldap_bind_dn]
+    Seek::Config.set_omniauth_ldap_settings 'password', params[:omniauth_ldap_password]
+
+    Seek::Config.omniauth_elixir_aai_enabled = string_to_boolean params[:omniauth_elixir_aai_enabled]
+    Seek::Config.omniauth_elixir_aai_client_id = params[:omniauth_elixir_aai_client_id]
+    Seek::Config.omniauth_elixir_aai_secret = params[:omniauth_elixir_aai_secret]
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
+    Seek::Config.filtering_enabled = string_to_boolean params[:filtering_enabled]
     Seek::Config.jws_enabled = string_to_boolean params[:jws_enabled]
     Seek::Config.jws_online_root = params[:jws_online_root]
 
@@ -185,14 +198,15 @@ class AdminController < ApplicationController
   end
 
   def update_pagination
-    update_flag = true
     %w[people projects projects programmes institutions investigations
         studies assays data_files models sops publications presentations events documents].each do |type|
-      Seek::Config.set_default_page type, params[type.to_sym]
+      Seek::Config.set_sorting_for(type, params[:sorting][type])
+      Seek::Config.set_results_per_page_for(type, params[:results_per_page][type])
     end
 
-    Seek::Config.limit_latest = params[:limit_latest] if only_positive_integer params[:limit_latest], 'latest limit'
-    update_redirect_to (only_positive_integer params[:limit_latest], 'latest limit'), 'pagination'
+    valid = only_positive_integer(params[:results_per_page_default], 'default items per page')
+    Seek::Config.results_per_page_default = params[:results_per_page_default] if valid
+    update_redirect_to(valid, 'pagination')
   end
 
   def update_settings

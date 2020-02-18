@@ -1,5 +1,4 @@
 class OauthSession < ApplicationRecord
-
   belongs_to :user
   # attr_accessible :access_token, :expires_in, :refresh_token, :provider, :user_id
   validates_uniqueness_of :user_id, scope: :provider
@@ -17,5 +16,4 @@ class OauthSession < ApplicationRecord
   def expired?
     Time.now > expires_at
   end
-
 end

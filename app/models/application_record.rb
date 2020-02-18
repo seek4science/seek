@@ -1,6 +1,7 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
+  include HasFilters
   include Seek::AnnotatableExtensions
   include Seek::VersionedResource
   include Seek::ExplicitVersioning
@@ -20,6 +21,7 @@ class ApplicationRecord < ActiveRecord::Base
   include SiteAnnouncements
   include Seek::Permissions::AuthorizationEnforcement
   include Seek::Permissions::ActsAsAuthorized
+  include Seek::RelatedItems
 
   include Annotations::Acts::Annotatable
   include Annotations::Acts::AnnotationSource
@@ -28,7 +30,7 @@ class ApplicationRecord < ActiveRecord::Base
   def self.is_taggable?
     false # defaults to false, unless it includes Taggable which will override this and check the configuration
   end
-  
+
   # takes and ignores arguments for use in :after_add => :update_timestamp, etc.
   def update_timestamp(*_args)
     current_time = current_time_from_proper_timezone
@@ -88,4 +90,21 @@ class ApplicationRecord < ActiveRecord::Base
   def supports_doi?
     self.class.supports_doi?
   end
+
+  def self.with_search_query(q)
+    if searchable? && Seek::Config.solr_enabled
+      search = search do |query|
+        query.keywords(q)
+        query.paginate(page: 1, per_page: count)
+      end
+
+      where(id: search.hits.map(&:primary_key))
+    else
+      where('1=1')
+    end
+  end
+
+  has_filter query: Seek::Filtering::SearchFilter.new
+  has_filter created_at: Seek::Filtering::DateFilter.new(field: :created_at,
+                                                         presets: [24.hours, 1.week, 1.month, 1.year, 5.years])
 end

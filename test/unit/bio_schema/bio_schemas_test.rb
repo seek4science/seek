@@ -65,7 +65,7 @@ class BioSchemaTest < ActiveSupport::TestCase
     json = Seek::BioSchema::Serializer.new(p).json_ld
     json = JSON.parse(json)
     assert_equal "http://localhost:3000/people/#{p.id}", json['@id']
-    assert_equal "Mr Bob Monk'House", json['name']
+    assert_equal "Mr bob Monk'house", json['name']
     assert_equal 'Person', json['@type']
     assert_equal 'I am a person', json['description']
     assert_equal 'Mr bob', json['givenName']

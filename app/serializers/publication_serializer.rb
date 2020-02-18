@@ -1,16 +1,23 @@
 class PublicationSerializer < BaseSerializer
+  include PublicationsHelper
   attributes :title, #:publication_authors,
              :journal, :published_date,
              :doi, :pubmed_id,
-             :abstract, :citation 
+             :abstract, :citation,:editor, :booktitle, :publisher, :url
   attribute :link_to_pub do
-    if :pubmed_id
+    if !object.pubmed_id.nil?
       'https://www.ncbi.nlm.nih.gov/pubmed/' + object.pubmed_id.to_s
-    elsif :doi
+    elsif !object.doi.nil?
       'https://doi.org/' + object.doi.to_s
+    elsif !object.url.nil?
+      object.url.to_s
     else
-      ''
+      " "
     end
+  end
+
+  attribute :publication_type do
+    PublicationType.find(object.publication_type_id).title
   end
 
   attribute :authors do

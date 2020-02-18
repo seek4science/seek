@@ -4,13 +4,15 @@ class SampleTypesController < ApplicationController
   include Seek::IndexPager
 
   before_action :samples_enabled?
-  before_action :find_sample_type, only: [:show, :edit, :update, :destroy, :template_details]
+  before_action :find_sample_type, only: [:show, :edit, :update, :destroy, :template_details, :batch_upload]
   before_action :check_no_created_samples, only: [:destroy]
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: [:new, :create]
   before_action :project_membership_required, only: [:create, :new, :select, :filter_for_select]
 
   before_action :authorize_requested_sample_type, except: [:index, :new, :create]
+
+  api_actions :index
 
   # GET /sample_types/1  ,'sample_attributes','linked_sample_attributes'
   # GET /sample_types/1.json
@@ -56,7 +58,7 @@ class SampleTypesController < ApplicationController
 
   # POST /sample_types
   # POST /sample_types.json
-  def create    
+  def create
     @sample_type = SampleType.new(sample_type_params)
     @sample_type.contributor = User.current_user.person
 
@@ -67,7 +69,7 @@ class SampleTypesController < ApplicationController
     respond_to do |format|
       if @sample_type.save
         format.html { redirect_to @sample_type, notice: 'Sample type was successfully created.' }
-        format.json { render json: @sample_type, status: :created, location: @sample_type}
+        format.json { render json: @sample_type, status: :created, location: @sample_type, include: [params[:include]]}
       else
         format.html { render action: 'new' }
         format.json { render json: @sample_type.errors, status: :unprocessable_entity}
@@ -83,7 +85,7 @@ class SampleTypesController < ApplicationController
     flash[:notice] = 'Sample type was successfully updated.' if @sample_type.save
     respond_to do |format|
       format.html { respond_with(@sample_type) }
-      format.json {render json: @sample_type}
+      format.json {render json: @sample_type, include: [params[:include]]}
     end
 
   end
@@ -122,6 +124,10 @@ class SampleTypesController < ApplicationController
       end
     end
     render partial: 'sample_types/select/filtered_sample_types'
+  end
+
+  def batch_upload
+
   end
 
   private

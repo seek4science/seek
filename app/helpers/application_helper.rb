@@ -53,7 +53,10 @@ module ApplicationHelper
 
   def date_as_string(date, show_time_of_day = false, year_only_1st_jan = false)
     # for publications, if it is the first of jan, then it can be assumed it is just the year (unlikely have a publication on New Years Day)
-    if year_only_1st_jan && !date.blank? && date.month == 1 && date.day == 1
+
+    if date.to_s == nil
+      str = "<span class='none_text'>No date defined</span>"
+    elsif year_only_1st_jan && !date.blank? && date.month == 1 && date.day == 1
       str = date.year.to_s
     else
       date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
@@ -177,8 +180,13 @@ module ApplicationHelper
 
     result_collection.each do |res|
       tab = res.respond_to?(:tab) ? res.tab : res.class.name
-      results[tab] = { items: [], hidden_count: 0, is_external: (res.respond_to?(:is_external_search_result?) && res.is_external_search_result?) } unless results[tab]
+      results[tab] ||= { items: [],
+                         items_count: 0,
+                         hidden_count: 0,
+                         is_external: (res.respond_to?(:is_external_search_result?) && res.is_external_search_result?) }
+
       results[tab][:items] << res
+      results[tab][:items_count] += 1
     end
 
     results
@@ -280,7 +288,11 @@ module ApplicationHelper
       if @parent_resource
         title << "#{h(@parent_resource.title)} - "
       end
-      title << PAGE_TITLES[controller_name]
+      t = PAGE_TITLES[controller_name]
+      if t.is_a?(Hash)
+        t = t[action_name] || t['*']
+      end
+      title << t
       title
     else
       "The #{Seek::Config.application_name}"
@@ -415,21 +427,6 @@ module ApplicationHelper
     eval "@#{c.singularize}"
   end
 
-  # returns the count of the total visible items, and also the count of the all items, according to controller_name
-  # primarily used for the metrics on the item index page
-  def resource_count_stats
-    klass = klass_from_controller(controller_name)
-    full_total = klass.count
-    visible_total = if klass.authorization_supported?
-                      klass.all_authorized_for('view').count
-                    elsif klass.is_a?(Person) && Seek::Config.is_virtualliver && User.current_user.nil?
-                      0
-                    else
-                      klass.count
-                    end
-    [visible_total, full_total]
-  end
-
   def cancel_button(path, html_options = {})
     html_options[:class] ||= ''
     html_options[:class] << ' btn btn-default'
@@ -465,7 +462,8 @@ module ApplicationHelper
     !(action_name == 'edit' || action_name == 'update')
   end
 
-  PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => 'Institutions', 'people' => 'People', 'sessions' => 'Login', 'users' => 'Signup', 'search' => 'Search',
+  PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => 'Institutions',
+                  'people' => 'People', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' }, 'search' => 'Search',
                   'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize,
                   'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
                   'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'biosamples' => 'Biosamples',

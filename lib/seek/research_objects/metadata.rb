@@ -15,7 +15,6 @@ module Seek
         targetpath = folder_path + metadata_filename
 
         bundle.add(targetpath, tmpfile, aggregate: true)
-        bundle.commit
 
         an = ROBundle::Annotation.new('/' + item.research_object_package_path(parents), '/' + targetpath)
         an.created_on = Time.now

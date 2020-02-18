@@ -1,12 +1,7 @@
 #keys that create the Seek::Config settings.
 #e.g. Seek::Config.home_description
 home_description:
-home_feeds_cache_timeout:
-events_enabled:
 bioportal_api_key:
-jerm_enabled:
-email_enabled:
-jws_enabled:
 jws_online_root:
 internal_help_enabled:
 external_help_url:
@@ -17,7 +12,6 @@ registration_disabled_description:
 activation_required_enabled:
 smtp:
   encrypt: true
-default_pages:
 project_type:
 project_link:
 type_managers_enabled:
@@ -73,8 +67,6 @@ delete_asset_version_enabled:
 recaptcha_enabled:
 project_hierarchy_enabled:
 tabs_lazy_load_enabled:
-admin_impersonation_enabled:
-auth_lookup_enabled:
 publish_button_enabled:
 project_browser_enabled:
 experimental_features_enabled:
@@ -117,7 +109,6 @@ datacite_password:
 datacite_url:
 doi_prefix:
 doi_suffix:
-time_lock_doi_for:
 max_extractable_spreadsheet_size:
 jvm_memory_allocation:
 max_indexable_text_size:
@@ -137,8 +128,6 @@ max_cachable_size:
 hard_max_cachable_size:
   convert: :to_i
 tag_threshold:
-  convert: :to_i
-limit_latest:
   convert: :to_i
 max_visible_tags:
   convert: :to_i
@@ -173,10 +162,6 @@ auth_lookup_update_batch_size:
   convert: :to_i
 samples_enabled:
 project_admin_sample_type_restriction:
-omniauth_enabled:
-omniauth_user_create:
-omniauth_user_activate:
-omniauth_providers:
 openbis_enabled:
 openbis_download_limit:
 openbis_debug:
@@ -198,3 +183,19 @@ nels_permalink_base:
 nels_use_dummy_client:
 allow_private_address_access:
 session_store_timeout:
+filtering_enabled:
+sorting:
+results_per_page_default:
+  convert: :to_i
+results_per_page:
+# Omniauth
+omniauth_enabled:
+omniauth_user_create:
+omniauth_user_activate:
+omniauth_elixir_aai_enabled:
+omniauth_elixir_aai_client_id:
+omniauth_elixir_aai_secret:
+  encrypt: true
+omniauth_ldap_enabled:
+omniauth_ldap_config:
+  encrypt: true

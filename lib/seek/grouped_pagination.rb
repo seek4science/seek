@@ -10,104 +10,112 @@ module Seek
       # this is the array of possible pages, defaults to A-Z. Can be set with the options[:pages] in grouped_pagination definition in model
       attr_reader :pages
 
-      # this is limit to the list when showing 'latest', 7. Can be set with the options[:latest_limit] in grouped_pagination definition in model
-      attr_reader :latest_limit
-
-      # this is the default page to use if :page is not provided when paginating.
-      attr_reader :default_page
-
       def grouped_pagination(options = {})
         @pages = options[:pages] || ('A'..'Z').to_a + ['?']
         @field = options[:field] || 'first_letter'
-        @latest_limit = options[:latest_limit] || Seek::Config.limit_latest
-        @default_page = options[:default_page] || Seek::Config.default_page(name.underscore.pluralize) || 'all'
+        # this is limit to the list when showing the 'top' page of results, defaults to 7.
+        # Can be set with the options[:page_limit] in grouped_pagination definition in model
+        @page_limit = options[:limit]
 
         before_save :update_first_letter
 
         include Seek::GroupedPagination::InstanceMethods
-        extend Seek::GroupedPagination::SingletonMethods
       end
 
+      def page_limit
+        @page_limit || Seek::Config.results_per_page_for(name.underscore.pluralize) || Seek::Config.results_per_page_default
+      end
+
+      # Paginate a given collection/relation
       def paginate_after_fetch(collection, *args)
-        options = args.pop unless args.nil?
-        options ||= {}
-
-        @latest_limit = options[:latest_limit] || @latest_limit
-        @default_page = options[:default_page] || @default_page
-
-        default_page = @default_page
-        default_page = @pages.first if default_page == 'first'
-
-        page = options[:page] || default_page
-
-        records = collection.to_a
-        Seek::ListSorter.index_items(records, page)
-        if page == 'latest'
-          records = records.sort{ |x, y| y.updated_at <=> x.updated_at }[0...@latest_limit]
-        elsif @pages.include?(page)
-          records = records.select { |i| i.first_letter == page }
+        if collection.is_a?(ActiveRecord::Relation)
+          paginate_relation(collection, *args)
+        else
+          paginate_enumerable(collection, *args)
         end
-
-        page_totals = {}
-        @pages.each do |p|
-          page_totals[p] = collection.count { |i| i.first_letter == p }
-        end
-
-        result = Collection.new(records, page, @pages, page_totals)
-
-        # jump to the first page with content if no page is specified and their is no content in the first page.
-        if result.empty? && options[:page].nil?
-          first_page_with_content = result.pages.find { |p| result.page_totals[p] > 0 }
-          unless first_page_with_content.nil?
-            options[:page] = first_page_with_content
-            result = paginate_after_fetch(collection, options)
-          end
-        end
-
-        result
       end
-    end
 
-    module SingletonMethods
-      def paginate(*args)
+      # Fetch from the database and paginate
+      def grouped_paginate(*args)
+        paginate_relation(self, *args)
+      end
+
+      # Paginate an ActiveRecord::Relation
+      def paginate_relation(relation, *args)
+        as_paginated_collection(*args) do |page_totals, page, limit, options|
+          relation = relation.where(options[:conditions]) if options.key?(:conditions)
+
+          if page == 'top'
+            records = relation.limit(limit)
+          elsif page == 'all'
+            records = relation.all
+          elsif @pages.include?(page)
+            records = relation.where(@field.to_s => page)
+          else
+            records = []
+          end
+
+          # GROUP BY and COUNT to get page totals quickly
+          # Need to remove ORDER and SELECT from the query, which may have been added through the filtering system
+          groups = relation.unscope(:order).unscope(:select).select(@field).group(@field).count
+          @pages.each do |p|
+            page_totals[p] = groups[p] || 0
+          end
+
+          records.to_a
+        end
+      end
+
+      # Paginate an Enumerable
+      def paginate_enumerable(collection, *args)
+        as_paginated_collection(*args) do |page_totals, page, limit|
+          @pages.each do |p|
+            page_totals[p] = collection.count { |i| i.first_letter == p }
+          end
+
+          records = collection
+          if page == 'top'
+            records = records[0...limit]
+          elsif page == 'all'
+            records = records
+          elsif @pages.include?(page)
+            records = records.select { |i| i.first_letter == page }
+          else
+            records = []
+          end
+
+          records
+        end
+      end
+
+      # Set-up pagination options, then yield to the given block to return the expected current page of items as an array, and also calculate page totals.
+      def as_paginated_collection(*args, &block)
         options = args.pop unless args.nil?
         options ||= {}
 
-        default_page = options[:default_page] || @default_page
-        default_page = @pages.first if default_page == 'first'
+        limit = options[:limit] || page_limit
 
-        page = options[:page] || default_page
+        def_page = options[:default_page]
+        def_page = @pages.first if def_page == 'first'
+        def_page = 'top' if def_page == 'latest'
 
-        records = []
-        if page == 'all'
-          records = default_order
-        elsif page == 'latest'
-          records = unscoped.order('updated_at DESC').limit(@latest_limit)
-        elsif @pages.include?(page)
-          query_options = { conditions: options[:conditions] }
-          query_options.merge!(options.except(:conditions, :page, :default_page))
-          records = unscoped.where(@field.to_s => page).where(query_options[:conditions]).order(query_options[:order])
-        end
+        page = options[:page] || def_page
 
         page_totals = {}
-        @pages.each do |p|
-          query_options = [conditions: options[:conditions]]
-          query_options[0].merge!(options.except(:conditions, :page, :default_page))
-          page_totals[p] = where(@field.to_s => p).where(query_options[0][:conditions]).count
-        end
 
-        result = Collection.new(records, page, @pages, page_totals)
+        records = yield(page_totals, page, limit, options)
 
-        # jump to the first page with content if no page is specified and their is no content in the first page.
-        if result.empty? && options[:page].nil?
-          first_page_with_content = result.pages.find { |p| result.page_totals[p] > 0 }
+        # If there isn't anything on this page, go to the first page that has something (if there is one).
+        if records.empty? && options[:page].nil?
+          first_page_with_content = page_totals.detect { |_page, count| count != 0 }
           unless first_page_with_content.nil?
-            options[:page] = first_page_with_content
-            result = paginate(options)
+            page = first_page_with_content.first
+            options[:page] = page
+            records = block.call(page_totals, page, limit, options)
           end
         end
 
-        result
+        Collection.new(records, page, @pages, page_totals)
       end
     end
 

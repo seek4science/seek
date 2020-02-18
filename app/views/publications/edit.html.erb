@@ -1,44 +1,11 @@
 <h1>Edit publication: <%= link_to(h(@publication.title), publication_path(@publication)) -%></h1>
 <%= error_messages_for('publication', :message => nil) %>
 
-<%= form_for @publication do |f| %>
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => Seek::Config.is_virtualliver } %>
-
-    <% if @publication.pubmed_id.nil? && @publication.doi %>
-        <div class="form-group">
-          <label>Abstract</label>
-          <p class="help-block">
-            When adding a publication through a DOI, it is not possible to fetch the original abstract automatically.
-            <br/>Please paste the abstract below
-          </p>
-          <%= text_area(:publication, :abstract, :cols => 90, :rows => 8, :class => 'form-control') %>
-        </div>
-    <% end %>
-
-    <%= render partial: 'associate_authors_form', locals: { publication: @publication, f: f } %>
-
-    <%= render partial: 'scales/scales_selector', locals: { object: @publication } if show_scales?%>
-
-    <%= render partial: 'assets/select_tags' -%>
-
-    <% if Seek::Config.events_enabled -%>
-      <%= f.fancy_multiselect :events, other_projects_checkbox: true, sort_by: :start_date %>
-    <% end -%>
-
-    <%= f.fancy_multiselect :investigations, other_projects_checkbox: true %>
-
-    <%= f.fancy_multiselect :studies, { other_projects_checkbox: true,
-                                                    group_options_by: ->(s) { s.investigation.try(:title) }  } %>
-
-    <%= f.fancy_multiselect :assays, { other_projects_checkbox: true,
-                                                   group_options_by: ->(a) { a.study.try(:title) }  } %>
-
-    <%= f.fancy_multiselect :data_files, other_projects_checkbox: true %>
-
-    <%= f.fancy_multiselect :models, other_projects_checkbox: true %>
-
-    <%= f.fancy_multiselect :presentations, other_projects_checkbox: true %>
-
-    <%= f.submit  'Update',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
-    or <%= cancel_button(publication_path(@publication)) %>
-<% end %>
+<!--  when registered manually or from bibtex file -->
+<%if @publication.registered_mode == 3 || @publication.registered_mode == 4 %>
+  <%= form_for @publication do |f| %>
+    <%= render :partial => 'publicaiton_editor', :locals => { :publication_form => f }%>
+  <% end %>
+<% elsif !@publication.doi.blank? || !@publication.pubmed_id.blank? %>
+  <%= render :partial => 'publication_doi_refetch_metadata', :locals => { :publication => @publication } %>
+<%end %>

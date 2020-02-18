@@ -1,0 +1,6 @@
+<h1>Manage publication: <%= link_to(h(@publication.title), publication_path(@publication)) -%></h1>
+<%= error_messages_for('publication', :message => nil) %>
+
+<%= form_for @publication do |f| %>
+  <%= render :partial => 'associated_publication_data', :locals => {:publication_form => f} %>
+<% end %>

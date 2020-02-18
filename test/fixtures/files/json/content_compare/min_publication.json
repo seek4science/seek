@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "927855014",
+    "id": "980191248",
     "type": "publications",
     "attributes": {
       "policy":
@@ -11,11 +11,16 @@
       "title": "A Minimal Publication",
       "journal": null,
       "published_date": null,
-      "doi": null,
+      "doi": "10.5072/abcd",
       "pubmed_id": null,
       "abstract": null,
       "citation": null,
-      "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/",
+      "editor":	null,
+      "booktitle":	null,
+      "publisher":	null,
+      "link_to_pub": "https://doi.org/10.5072/abcd",
+      "url": null,
+      "publication_type":"Journal",
       "authors": null
     },
     "relationships": {

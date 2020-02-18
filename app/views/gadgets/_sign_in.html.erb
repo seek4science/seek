@@ -1,3 +1,5 @@
+<% original_path ||= request.original_fullpath %>
+
 <% unless logged_in_and_registered? -%>
     <div class="panel panel-default" id="login-panel">
       <div class="panel-heading">
@@ -8,25 +10,27 @@
 
       <div class="panel-body">
         <%# tabs if omniauth authentication with providers is enabled %>
-        <% if Seek::Config.omniauth_enabled && !Seek::Config.omniauth_providers.empty? %>
+        <% if show_omniauth_login? %>
           <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
               <a href="#password_login" aria-controls="password_login" role="tab" data-toggle="tab">SEEK login</a>
             </li>
-            <% Seek::Config.omniauth_providers.each do |provider, options| %>
+            <% if show_elixir_login? %>
               <li role="presentation">
-                <a href="#<%= provider.to_s %>_login" aria-controls="<%= provider.to_s %>_login" role="tab" data-toggle="tab"><%= options[:title] || provider.to_s %> login</a>
+                <a href="#elixir_aai_login" aria-controls="elixir_aai_login" role="tab" data-toggle="tab"><%= t('login.elixir_aai') %> login</a>
               </li>
-            <% end #each provider %>
+            <% end %>
+            <% if show_ldap_login? %>
+              <li role="presentation">
+                <a href="#ldap_login" aria-controls="ldap_login" role="tab" data-toggle="tab"><%= t('login.ldap') %> login</a>
+              </li>
+            <% end %>
           </ul>
         <% end #omniauth enabled and providers available %>
-
-
 
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="password_login">
             <%= form_tag main_app.session_path do %>
-              <% original_path ||= request.original_fullpath %>
               <%= hidden_field_tag "called_from[path]", original_path -%>
               <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
               <%= hidden_field_tag "called_from[action]", controller.action_name -%>
@@ -53,34 +57,20 @@
             <% end #form %>
           </div>
 
-          <% if Seek::Config.omniauth_enabled && !Seek::Config.omniauth_providers.empty? %>
-            <% Seek::Config.omniauth_providers.each do |provider, options| %>
-              <div role="tabpanel" class="tab-pane" id="<%= provider.to_s %>_login">
-                <% if provider.to_s == "ldap" %>
-                  <%= form_tag '/auth/ldap/callback' do %>
-                    <% original_path ||= request.original_fullpath %>
-                    <%= hidden_field_tag "called_from[path]", original_path -%>
-                    <div class="form-group">
-                      <label>Username</label>
-                      <%= text_field_tag 'username', nil, :class => 'form-control' -%>
-                    </div>
-      
-                    <div class="form-group">
-                      <label>Password</label>
-                      <%= password_field_tag 'password', nil, :class => 'form-control', :id => "login_#{provider}_password" -%>
-                    </div>
-      
-                    <div class="form-group">
-                      <%= submit_tag "Log in", :class => 'btn btn-default', :id => "login_#{provider}_button" %>
-                    </div>
-                  <% end #form %>
-                <% else # provider == :ldap %>
-                  <div class="alert alert-danger">No link for that omniauth provider yet</div>
-                <% end #provider != :ldap %>
+          <% if show_omniauth_login? %>
+            <% if show_elixir_login? %>
+              <div role="tabpanel" class="tab-pane" id="elixir_aai_login">
+                <div class='text-center'>
+                  <%= link_to image('elixir_aai_login'), omniauth_authorize_path(:elixir_aai), method: :post %>
+                </div>
               </div>
-            <% end #each provider %>
+            <% end %>
+            <% if show_ldap_login? %>
+              <div role="tabpanel" class="tab-pane" id="ldap_login">
+                <%= render partial: 'identities/ldap_form', locals: { original_path: original_path } %>
+              </div>
+            <% end %>
           <% end #omniauth enabled and providers available %>
-
         </div>
       </div>
 

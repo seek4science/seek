@@ -1,0 +1,106 @@
+.faceted_browsing {
+  .exhibit-facet-value {
+    padding-left: 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  div.exhibit-facet-value-count {
+    float:          right;
+    width:          2em;
+    text-align:     right;
+    color:          #aaa;
+    padding-right:  5px;
+  }
+
+  div.exhibit-facet-value-checkbox {
+    float:          left;
+    padding-right:   2px;
+  }
+
+  div.exhibit-facet-header {
+    padding:        0;
+  }
+
+  div.exhibit-facet-header-filterControl {
+    float:          left;
+    width:          2em;
+    display:        none;
+    cursor:         pointer;
+    padding: 5px 0
+  }
+
+  .exhibit-facet-value-link {
+    display: block;
+    margin-left: 20px;
+  }
+
+  div.exhibit-facet-value-inner {
+    padding: 0;
+  }
+
+  a.exhibit-flowingFacet-value-link {
+    text-decoration: none;
+    float:           left;
+    padding-left:    5px;
+  }
+
+  div.exhibit-flowingFacet-value-checkbox {
+    position:       absolute;
+    left:           -15px;
+    padding:        0;
+    margin:         0;
+  }
+
+  img.exhibit-facet-header-collapse {
+    border: 1px;
+    cursor: pointer;
+    float: right;
+    padding-left: 3px;
+  }
+
+  img.exhibit-facet-header-expand {
+    border: 1px;
+    cursor: pointer;
+    float: right;
+    padding-left: 3px;
+  }
+
+  img.exhibit-bookmarkWidget-button {
+    margin-right: 2.3em;
+  }
+
+  div.exhibit-collectionView-header{
+    text-align: center;
+    margin-top: 1em;
+  }
+
+  .exhibit-busyIndicator {
+    position:   absolute;
+    left:       35%;
+    width:      29.5%;
+    z-index:    1000;
+  }
+
+  span.filter_text {
+    display: none;
+    font-weight: bold;
+  }
+
+  a.reset_all_filters {
+    display: none;
+  }
+
+  .exhibit-facet-header-title {
+    display: block;
+    cursor: pointer;
+    padding: 5px;
+  }
+
+  .exhibit-facet-header-title:hover {
+    background: #eee;
+  }
+
+  .exhibit-facet-header-collapse {
+    padding: 10px;
+  }
+}

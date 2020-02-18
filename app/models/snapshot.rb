@@ -17,7 +17,7 @@ class Snapshot < ApplicationRecord
 
   validates :snapshot_number, uniqueness: { scope: %i[resource_type resource_id] }
 
-  acts_as_doi_mintable(proxy: :resource)
+  acts_as_doi_mintable(proxy: :resource, general_type: 'Collection')
   acts_as_zenodo_depositable(&:content_blob)
 
   include Seek::ActsAsAsset::ContentBlobs::InstanceMethods

@@ -42,7 +42,7 @@ GIT
 
 GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
-  revision: a389b760db2a1d00cc79319ad0bd48fd86b9d960
+  revision: ef354df2e6b1dd86b734dc7613571cb3536aef75
   specs:
     doi_query_tool (1.0.0)
       libxml-ruby (>= 2.6.0)
@@ -97,6 +97,8 @@ GEM
       activemodel (= 5.2.3)
       activesupport (= 5.2.3)
       arel (>= 9.0)
+    activerecord-import (1.0.2)
+      activerecord (>= 3.2)
     activerecord-session_store (1.1.1)
       actionpack (>= 4.0)
       activerecord (>= 4.0)
@@ -120,6 +122,7 @@ GEM
       activerecord (>= 3.0.0)
     addressable (2.6.0)
       public_suffix (>= 2.0.2, < 4.0)
+    aes_key_wrap (1.0.1)
     akami (1.2.2)
       gyoku (>= 0.4.0)
       nokogiri
@@ -131,6 +134,7 @@ GEM
     ast (2.4.0)
     attr_encrypted (3.0.3)
       encryptor (~> 3.0.0)
+    attr_required (1.0.1)
     auto_strip_attributes (2.1.0)
       activerecord (>= 3.0)
     autoprefixer-rails (9.4.9)
@@ -143,9 +147,10 @@ GEM
       i18n
     bibtex-ruby (4.4.3)
       latex-decode (~> 0.0)
+    bindata (2.4.4)
     bio (1.5.1)
-    bives (1.0)
-      open4 (~> 1.3.0)
+    bives (2.0)
+      terrapin
     bootsnap (1.3.1)
       msgpack (~> 1.0)
     bootstrap-sass (3.4.1)
@@ -186,14 +191,14 @@ GEM
       sort_alphabetical (~> 1.0)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
-    crass (1.0.4)
+    crass (1.0.6)
     csl (1.4.5)
       namae (~> 0.7)
     csl-styles (1.0.1.7)
       csl (~> 1.0)
     curb (0.9.3)
     daemons (1.1.9)
-    database_cleaner (1.5.3)
+    database_cleaner (1.7.0)
     delayed_job (4.1.5)
       activesupport (>= 3.0, < 5.3)
     delayed_job_active_record (4.1.3)
@@ -206,6 +211,8 @@ GEM
     docsplit (0.7.6)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
+    doorkeeper (5.2.3)
+      railties (>= 5)
     dynamic_form (1.1.4)
     ebnf (1.1.3)
       rdf (~> 3.0)
@@ -288,9 +295,10 @@ GEM
     httparty (0.12.0)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
+    httpclient (2.8.3)
     httpi (1.1.1)
       rack
-    i18n (1.6.0)
+    i18n (1.7.0)
       concurrent-ruby (~> 1.0)
     i18n_data (0.8.0)
     ice_nine (0.11.2)
@@ -307,6 +315,10 @@ GEM
       railties (>= 3.2.16)
     json (1.8.6)
     json-diff (0.4.1)
+    json-jwt (1.11.0)
+      activesupport (>= 4.2)
+      aes_key_wrap
+      bindata
     json-ld (3.0.2)
       multi_json (~> 1.12)
       rdf (>= 2.2.8, < 4.0)
@@ -364,12 +376,12 @@ GEM
       activesupport (>= 4)
       railties (>= 4)
       request_store (~> 1.0)
-    loofah (2.2.3)
+    loofah (2.3.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     lumberjack (1.0.11)
-    macaddr (1.7.1)
-      systemu (~> 2.6.2)
+    macaddr (1.7.2)
+      systemu (~> 2.6.5)
     magic_lamp (1.8.1)
       method_source
       rails (>= 4.0.0)
@@ -442,7 +454,24 @@ GEM
       omniauth (~> 1.0)
       pyu-ruby-sasl (~> 0.0.3.2)
       rubyntlm (~> 0.3.4)
+    omniauth-rails_csrf_protection (0.1.2)
+      actionpack (>= 4.2)
+      omniauth (>= 1.3.1)
+    omniauth_openid_connect (0.2.4)
+      addressable (~> 2.5)
+      omniauth (~> 1.3)
+      openid_connect (~> 1.1)
     open4 (1.3.0)
+    openid_connect (1.1.6)
+      activemodel
+      attr_required (>= 1.0.0)
+      json-jwt (>= 1.5.0)
+      rack-oauth2 (>= 1.6.1)
+      swd (>= 1.0.0)
+      tzinfo
+      validate_email
+      validate_url
+      webfinger (>= 1.0.1)
     openseek-api (0.17.3)
       terrapin
     options (2.3.2)
@@ -472,10 +501,16 @@ GEM
       slop (~> 3.0)
     psych (2.2.4)
     public_suffix (3.0.3)
-    puma (3.8.2)
+    puma (3.12.2)
     pyu-ruby-sasl (0.0.3.3)
-    rack (2.0.6)
+    rack (2.0.8)
     rack-attack (5.0.1)
+      rack
+    rack-oauth2 (1.9.3)
+      activesupport
+      attr_required
+      httpclient
+      json-jwt (>= 1.9.0)
       rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -626,9 +661,9 @@ GEM
       netrc (~> 0.8)
     rfc-822 (0.4.1)
     rmagick (2.15.2)
-    ro-bundle (0.2.3)
+    ro-bundle (0.2.4)
       json (~> 1.8)
-      ucf (~> 2.0.1)
+      ucf (~> 2.0.2)
       uuid (~> 2.3)
     rsolr (2.2.1)
       builder (>= 2.1.2)
@@ -672,7 +707,7 @@ GEM
       ruby_parser (~> 3.8)
       virtus (~> 1.0)
     rubyntlm (0.3.4)
-    rubyzip (1.2.2)
+    rubyzip (1.3.0)
     safe_yaml (1.0.4)
     sample-template-generator (0.5.1)
       rdoc (~> 6.0)
@@ -746,6 +781,10 @@ GEM
       rails (>= 3)
       sunspot (= 2.2.8)
     sunspot_solr (2.2.7)
+    swd (1.1.2)
+      activesupport (>= 3)
+      attr_required (>= 0.0.5)
+      httpclient (>= 2.4)
     sxp (1.0.2)
       rdf (~> 3.0)
     systemu (2.6.5)
@@ -760,10 +799,10 @@ GEM
     thor (0.20.3)
     thread_safe (0.3.6)
     tilt (2.0.9)
-    tzinfo (1.2.5)
+    tzinfo (1.2.6)
       thread_safe (~> 0.1)
-    ucf (2.0.1)
-      zip-container (~> 3.0.2)
+    ucf (2.0.2)
+      zip-container (~> 4.0.1)
     uglifier (3.2.0)
       execjs (>= 0.3.0, < 3)
     unf (0.1.4)
@@ -778,8 +817,11 @@ GEM
     unicorn-rails (2.2.1)
       rack
       unicorn
-    uuid (2.3.8)
+    uuid (2.3.9)
       macaddr (~> 1.0)
+    validate_email (0.1.6)
+      activemodel (>= 3.0)
+      mail (>= 2.2.5)
     validate_url (1.0.2)
       activemodel (>= 3.0.0)
       addressable
@@ -792,6 +834,9 @@ GEM
     wasabi (2.5.1)
       httpi (~> 1.0)
       nokogiri (>= 1.4.0)
+    webfinger (1.1.0)
+      activesupport
+      httpclient (>= 2.4)
     webmock (3.0.1)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -800,13 +845,13 @@ GEM
     websocket-driver (0.7.0)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.3)
-    will_paginate (3.1.6)
+    will_paginate (3.1.8)
     yaml_db (0.7.0)
       rails (>= 3.0)
       rake (>= 0.8.7)
     yard (0.9.20)
-    zip-container (3.0.2)
-      rubyzip (~> 1.2.1)
+    zip-container (4.0.1)
+      rubyzip (~> 1.3.0)
 
 PLATFORMS
   ruby
@@ -814,6 +859,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth (>= 4.3.0)
   active_model_serializers (~> 0.10.2)
+  activerecord-import
   activerecord-session_store
   acts-as-taggable-on
   acts_as_list
@@ -823,7 +869,7 @@ DEPENDENCIES
   bibtex-ruby (~> 4.4.2)
   bio (~> 1.5.1)
   bioportal (>= 3.0)!
-  bives
+  bives (~> 2.0)
   bootsnap (>= 1.1.0)
   bootstrap-sass (>= 3.4.1)
   breadcrumbs_on_rails
@@ -835,10 +881,11 @@ DEPENDENCIES
   country_select
   csl-styles (~> 1.0.1.7)
   daemons
-  database_cleaner
+  database_cleaner (~> 1.7.0)
   delayed_job_active_record
   docsplit
   doi_query_tool!
+  doorkeeper
   dynamic_form
   equivalent-xml
   exception_notification
@@ -872,6 +919,8 @@ DEPENDENCIES
   nokogiri (>= 1.10.4)
   omniauth (~> 1.3.1)
   omniauth-ldap (~> 1.0.5)
+  omniauth-rails_csrf_protection (~> 0.1)
+  omniauth_openid_connect
   openseek-api
   passenger
   pg
@@ -910,12 +959,12 @@ DEPENDENCIES
   rest-client (~> 2.0)
   rfc-822
   rmagick (= 2.15.2)
-  ro-bundle
+  ro-bundle (~> 0.2.4)
   rspec-rails
   rubocop
   ruby-prof (= 0.15.9)
   rubycritic
-  rubyzip (~> 1.2.2)
+  rubyzip
   sample-template-generator (~> 0.5)
   sass-rails (~> 5.0)
   savon (= 1.1.0)

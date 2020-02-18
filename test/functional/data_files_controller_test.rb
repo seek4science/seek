@@ -171,7 +171,8 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, params: { page: 'all' }
     assert_response :success
-    assert_equal assigns(:data_files).sort_by(&:id), DataFile.authorize_asset_collection(assigns(:data_files), 'view', users(:aaron)).sort_by(&:id), "data files haven't been authorized properly"
+    assert_equal assigns(:data_files).sort_by(&:id),
+                 assigns(:data_files).authorized_for('view', users(:aaron)).sort_by(&:id), "data files haven't been authorized properly"
   end
 
   test 'should get new' do
@@ -996,13 +997,15 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'filtering by person' do
     person = people(:person_for_datafile_owner)
-    get :index, params: { filter: { person: person.id }, page: 'all' }
+    get :index, params: { filter: { contributor: person.id }, page: 'all' }
     assert_response :success
-    df = data_files(:downloadable_data_file)
-    df2 = data_files(:sysmo_data_file)
+    non_owned_df = data_files(:sysmo_data_file)
+
     assert_select 'div.list_items_container' do
-      assert_select 'a', text: df.title, count: 2
-      assert_select 'a', text: df2.title, count: 0
+      person.contributed_data_files.each do |df|
+        assert_select 'a', text: df.title, count: 1
+      end
+      assert_select 'a', text: non_owned_df.title, count: 0
     end
   end
 
@@ -1519,7 +1522,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file = data_files(:picture)
     data_file.other_creators = 'another creator'
     data_file.save
-    get :index
+    get :index, params: { page: 'P' }
 
     assert_select 'p.list_item_attribute', text: /another creator/, count: 1
   end
@@ -1583,15 +1586,6 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', data_file_path(df), text: df.title
       assert_select 'a[href=?]', data_file_path(df2), text: df2.title, count: 0
     end
-  end
-
-  test 'dont show resource count for nested route' do
-    df = Factory(:data_file, policy: Factory(:public_policy))
-    project = df.projects.first
-    df2 = Factory(:data_file, policy: Factory(:public_policy))
-    get :index, params: { project_id: project.id }
-    assert_response :success
-    assert_select '#resource-count-stats', count: 0
   end
 
   test 'filtered data files for non existent study' do
@@ -2449,26 +2443,27 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, params: { id: data_file }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+    assert_select '#citation', text: /Bacall, F/, count:0
 
     data_file.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
     get :show, params: { id: data_file }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+    assert_select '#citation', text: /Bacall, F/, count:1
   end
 
   test 'resource count stats' do
     Factory(:data_file, policy: Factory(:public_policy))
     Factory(:data_file, policy: Factory(:private_policy))
     total = DataFile.count
-    visible = DataFile.all_authorized_for(:view).count
+    visible = DataFile.authorized_for('view').count
     assert_not_equal total, visible
     assert_not_equal 0, total
     assert_not_equal 0, visible
     get :index
     assert_response :success
-    assert_select '#resource-count-stats', text: /#{visible} Data files visible.*#{total}/
+    assert_equal total, assigns(:total_count)
+    assert_equal visible, assigns(:visible_count)
   end
 
   test 'delete with data file with extracted samples' do
@@ -2568,7 +2563,7 @@ class DataFilesControllerTest < ActionController::TestCase
       end
     end
 
-    assert assigns(:data_file).errors.any?    
+    assert assigns(:data_file).errors.any?
     assert_template :new
   end
 
@@ -2819,7 +2814,8 @@ class DataFilesControllerTest < ActionController::TestCase
     params = { data_file: {
       title: 'Small File',
       project_ids: [project.id]
-    }, policy_attributes: valid_sharing,
+    }, tag_list:'fish, soup',
+               policy_attributes: valid_sharing,
                content_blob_id: blob.id.to_s,
                assay_ids: [] }
 
@@ -2842,6 +2838,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'Small File', df.title
     assert_equal person, df.contributor
     assert_empty df.assays
+    assert_equal ['fish','soup'].sort,df.tags.sort
 
     al = ActivityLog.last
     assert_equal 'create', al.action

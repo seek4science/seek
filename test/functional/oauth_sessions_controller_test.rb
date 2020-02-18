@@ -52,10 +52,9 @@ class OauthSessionsControllerTest < ActionController::TestCase
     login_as(other_user)
 
     assert_no_difference('OauthSession.count') do
-      delete :destroy, params: { user_id: oauth_session.user.id, id: oauth_session.id }
+      delete :destroy, params: { user_id: other_user.id, id: oauth_session.id }
     end
 
-    assert_redirected_to root_path
-    assert_not_empty flash[:error]
+    assert_response :not_found
   end
 end

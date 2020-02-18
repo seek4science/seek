@@ -18,7 +18,7 @@ class AdminDefinedRoleProject < ApplicationRecord
   private
 
   def queue_update_auth_table
-    AuthLookupUpdateJob.new.add_items_to_queue person
+    AuthLookupUpdateQueue.enqueue(person)
   end
 
   def project_belongs_to_person_or_subprojects

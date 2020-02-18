@@ -1,6 +1,4 @@
 class Sample < ApplicationRecord
-
-
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
 
@@ -29,8 +27,6 @@ class Sample < ApplicationRecord
 
   has_many :linked_samples, through: :sample_resource_links, source: :resource, source_type: 'Sample'
   has_many :linking_samples, through: :reverse_sample_resource_links, source: :sample
-
-  scope :default_order, -> { order('title') }
 
   validates :title, :sample_type, presence: true
   include ActiveModel::Validations
@@ -67,7 +63,11 @@ class Sample < ApplicationRecord
   end
 
   def related_samples
-    linked_samples + linking_samples
+    Sample.where(id: related_sample_ids)
+  end
+
+  def related_sample_ids
+    linked_sample_ids | linking_sample_ids
   end
 
   # Mass assignment of attributes
@@ -153,7 +153,11 @@ class Sample < ApplicationRecord
   end
 
   def related_organisms
-    organisms | ncbi_linked_organisms
+    Organism.where(id: related_organism_ids)
+  end
+
+  def related_organism_ids
+    organism_ids | ncbi_linked_organisms.map(&:id)
   end
 
   private

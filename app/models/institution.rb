@@ -4,14 +4,13 @@ class Institution < ApplicationRecord
   title_trimmer
 
   validates :title, uniqueness: true
-  scope :default_order, -> { order('title') }
-
   validates :web_page, url: {allow_nil: true, allow_blank: true}
   validates :country, country:true, :presence => true
 
   has_many :work_groups, dependent: :destroy, inverse_of: :institution
   has_many :projects, through: :work_groups,  inverse_of: :institutions
   has_many :programmes, -> { distinct }, through: :projects, inverse_of: :institutions
+  has_filter :programme, :project, :country
   has_many :group_memberships, through: :work_groups, inverse_of: :institutions
   has_many :people, -> { order('last_name ASC').distinct }, through: :group_memberships, inverse_of: :institutions
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy

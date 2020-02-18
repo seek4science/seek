@@ -4,6 +4,10 @@ en:
   search_prompt: "Search here..."
   seek_id: "SEEK ID"
 
+  login:
+    elixir_aai: 'ELIXIR AAI'
+    ldap: 'LDAP'
+
   investigation: "Investigation"
   study: "Study"
   assay: "Assay"
@@ -101,3 +105,7 @@ en:
       attributes:
         person:
           title: "Full name"
+
+  oauth_session: 'OAuth Session'
+  identity: 'Identity'
+  api_token: 'API token'

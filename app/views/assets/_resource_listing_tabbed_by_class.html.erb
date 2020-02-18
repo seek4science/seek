@@ -4,36 +4,26 @@
 <%# - resource_hash: a hash of all resource instances, where keys are resource class names and values are arrays of resource instances of that class -%>
 <%# - narrow_view: type of the partial to use for asset listings: 'false' to use the same partial with much info as on SOPs listing page -%>
 <%#                                                               'true' to use a partial with fewer information; suitable for 'show' pages for people/projects -%>
-<%# - authorization_already_done: boolean value indicating whether all items in the collection have already been authorized for the current user to view or not -%>
 <%
-   tabs_id ||= "resource_list_by_class"
-   narrow_view ||= false
-   authorization_already_done ||= false
    actions_partial_disable ||= false
-   show_empty_tabs ||= false
    item ||= nil
-   limit ||= nil
    hide_view_all ||= false
    display_immediately ||= false
 
-   ordered_resource_types = prepare_resource_hash(resource_hash, authorization_already_done, limit, show_empty_tabs)
+   ordered_resource_types = prepare_resource_hash(resource_hash)
 
-   total_count = 0
-   resource_hash.each_value do |res|
-     total_count += (res[:items].size + res[:hidden_count])
-   end
+   any = resource_hash.any? { |key, res| res[:items_count] > 0 || res[:hidden_count] > 0 }
 %>
 
-<% if total_count > 0 %>
+<% if any %>
     <div class="tabpanel related-items">
-      <%= render :partial => 'assets/resource_listing_tab_nav', :locals => { :types => ordered_resource_types, :show_empty_tabs => show_empty_tabs } %>
+      <%= render :partial => 'assets/resource_listing_tab_nav', :locals => { :types => ordered_resource_types } %>
       <div class="tab-content">
         <% ordered_resource_types.each_with_index do |type, i| -%>
-            <% unless type[:items].empty? && (type[:hidden_count] == 0) && !show_empty_tabs %>
+            <% unless type[:items].empty? && (type[:hidden_count] == 0) %>
                 <div id="<%= type[:tab_id] -%>" role="tabpanel" class="tab-pane <%= 'active' if i == 0-%>">
                   <% unless type[:items].empty? %>
                       <%= render :partial => "assets/resource_list", :locals => { :collection => type[:items],
-                                                                                  :narrow_view => narrow_view,
                                                                                   :authorization_for_showing_already_done => true,
                                                                                   :actions_partial_disable => actions_partial_disable} -%>
                       <div id="<%= type[:type] %>_view_all"></div>
