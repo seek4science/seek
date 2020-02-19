@@ -43,6 +43,7 @@ namespace :seek do
       Rake::Task['seek:upgrade_version_tasks'].invoke
 
       Seek::Config.solr_enabled = solr
+      puts "... queuing search reindexing jobs ..."
       Rake::Task['seek:reindex_all'].invoke if solr
 
       puts 'Upgrade completed successfully'
@@ -52,6 +53,7 @@ namespace :seek do
   end
 
   task(convert_old_pagination_settings: :environment) do
+    puts "..... converting old pagination settings ..."
     limit_latest = Settings.where(var: 'limit_latest').first
     if limit_latest&.value
       puts "Setting 'results_per_page_default' to #{limit_latest.value}"
@@ -72,6 +74,7 @@ namespace :seek do
   end
 
   task(set_assay_and_technology_type_uris: :environment) do
+    puts "..... updating assay and technology type uris ..."
     assays = Assay.where('suggested_assay_type_id IS NOT NULL OR suggested_technology_type_id IS NOT NULL')
     count = 0
 
@@ -89,6 +92,7 @@ namespace :seek do
   end
 
   task(convert_old_ldap_settings: :environment) do
+    puts "..... converting ldap settings ..."
     providers_setting = Settings.where(var: 'omniauth_providers').first
     if providers_setting
       unless providers_setting.value.blank?
@@ -109,6 +113,7 @@ namespace :seek do
   end
 
   task(convert_old_elixir_aai_settings: :environment) do
+    puts "..... converting elixir aai settings ..."
     client_id_setting = Settings.where(var: 'elixir_aai_client_id').first
     client_id = nil
 
