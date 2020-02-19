@@ -26,11 +26,19 @@ namespace :seek do
   ]
 
   desc('upgrades SEEK from the last released version to the latest released version')
-  task(upgrade: [:environment, 'db:sessions:trim', 'db:migrate', 'tmp:clear']) do
+  task(upgrade: [:environment]) do
+    puts "Starting upgrade ..."
+    puts "... trimming old session data ..."
+    Rake::Task['db:sessions:trim'].invoke
+    puts "... migrating database ..."
+    Rake::Task['db:migrate'].invoke
+    Rake::Task['tmp:clear'].invoke
+
     solr = Seek::Config.solr_enabled
     Seek::Config.solr_enabled = false
 
     begin
+      puts "... performing upgrade tasks ..."
       Rake::Task['seek:standard_upgrade_tasks'].invoke
       Rake::Task['seek:upgrade_version_tasks'].invoke
 

@@ -17,6 +17,10 @@ class PublicationsControllerTest < ActionController::TestCase
     @object = Factory(:publication, published_date: Date.new(2013, 1, 1), publication_type: Factory(:journal))
   end
 
+  def test_json_content
+    super
+  end
+
   def test_title
     get :index
     assert_select 'title', text: 'Publications', count: 1
@@ -1192,6 +1196,23 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert response.body.include?('FAIRDOMHub: a repository')
+  end
+
+  test 'show original author name for associated person' do
+    #show the original name and formatting, but with link to associated person
+    registered_author = Factory(:registered_publication_author)
+    person = registered_author.person
+    original_full_name = registered_author.full_name
+    refute_nil person
+
+    publication = Factory(:publication, publication_authors:[registered_author, Factory(:publication_author)])
+    get :show, params: { id: publication }
+    assert_response :success
+
+    assert_select "p#authors" do
+      assert_select "a[href=?]", person_path(person), text: person.name, count:0
+      assert_select "a[href=?]", person_path(person), text: original_full_name
+    end
   end
 
   private

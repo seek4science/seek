@@ -43,7 +43,7 @@ class Publication < ApplicationRecord
 
   validates :doi, format: { with: VALID_DOI_REGEX, message: 'is invalid' }, allow_blank: true
   validates :pubmed_id, numericality: { greater_than: 0, message: 'is invalid' }, allow_blank: true
-  validates :publication_type_id,:presence => true
+  validates :publication_type_id, presence: true
 
   # validation differences between OpenSEEK and the VLN SEEK
   validates_uniqueness_of :pubmed_id, allow_nil: true, allow_blank: true, if: -> { Seek::Config.is_virtualliver }
@@ -510,7 +510,7 @@ class Publication < ApplicationRecord
   end
 
   def publication_author_names
-    publication_authors.map(&:name)
+    publication_authors.map(&:full_name)
   end
 
   def has_doi?
