@@ -4,7 +4,7 @@ module WorkflowExtraction
   extend ActiveSupport::Concern
 
   def extractor_class
-    if content_blob.original_filename.end_with?('.crate.zip')
+    if is_ro_crate?
       Seek::WorkflowExtractors::ROCrate
     else
       workflow_class.extractor_class
@@ -16,7 +16,7 @@ module WorkflowExtraction
   end
 
   def default_diagram_format
-    extractor_class.default_diagram_format
+    extractor.default_diagram_format
   end
 
   def diagram(format = default_diagram_format)
@@ -26,14 +26,20 @@ module WorkflowExtraction
 
     unless File.exist?(path)
       diagram = extractor.diagram(format)
-      File.binwrite(path, diagram) unless diagram.blank?
+      File.binwrite(path, diagram) unless diagram.nil? || diagram.length <= 1
     end
 
     workflow = is_a_version? ? self.parent : self
     WorkflowDiagram.new(workflow, version, path, format, content_type)
   end
 
+  def is_ro_crate?
+    content_blob.original_filename.end_with?('.crate.zip')
+  end
+
   def ro_crate
+    return extractor_class.new(content_blob).crate if is_ro_crate?
+
     ROCrate::WorkflowCrate.new.tap do |crate|
       c = content_blob
       wf = ROCrate::Workflow.new(crate, c.filepath, c.original_filename)

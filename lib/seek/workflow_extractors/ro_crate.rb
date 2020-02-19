@@ -5,7 +5,7 @@ module Seek
     class ROCrate < Base
       available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', jpg: 'image/jpeg', default: :svg)
 
-      def diagram(format = self.class.default_digram_format)
+      def diagram(format = default_digram_format)
         if crate&.main_workflow&.diagram
           crate&.main_workflow&.diagram&.source&.source&.read
         end
@@ -33,10 +33,17 @@ module Seek
         end
       end
 
-      private
-
       def crate
         @crate ||= ::ROCrate::WorkflowCrateReader.read_zip(@io)
+      end
+
+      def default_diagram_format
+        if crate&.main_workflow&.diagram
+          ext = crate&.main_workflow&.diagram.id.split('.').last
+          return ext if self.class.diagram_formats.key?(ext)
+        end
+
+        super
       end
     end
   end

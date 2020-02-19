@@ -25,8 +25,12 @@ module Seek
         { warnings: [], errors: [] }
       end
 
-      def diagram(format = self.class.default_diagram_format)
+      def diagram(format = default_diagram_format)
         nil
+      end
+
+      def default_diagram_format
+        self.class.default_diagram_format
       end
     end
   end

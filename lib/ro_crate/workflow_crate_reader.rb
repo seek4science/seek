@@ -26,9 +26,14 @@ module ROCrate
           part = entities.delete(ref['@id'])
           next unless part
           if Array(part['@type']).include?('Dataset')
-            thing = ROCrate::Directory.new(crate, nil, nil, part)
+            contents = yield(part['@id'], true)
+            if contents
+              thing = ROCrate::Directory.new(crate, contents, part['@id'], part)
+            else
+              warn "Could not find: #{part['@id']}"
+            end
           else
-            file = yield(part['@id'])
+            file = yield(part['@id'], false)
             if file
               thing = ROCrate::File.new(crate, file, part['@id'], part)
             else
