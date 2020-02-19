@@ -4,7 +4,11 @@ module WorkflowExtraction
   extend ActiveSupport::Concern
 
   def extractor_class
-    workflow_class.extractor_class
+    if content_blob.original_filename.end_with?('.crate.zip')
+      Seek::WorkflowExtractors::ROCrate
+    else
+      workflow_class.extractor_class
+    end
   end
 
   def extractor
@@ -30,18 +34,18 @@ module WorkflowExtraction
   end
 
   def ro_crate
-    ROCrate::Crate.new.tap do |crate|
+    ROCrate::WorkflowCrate.new.tap do |crate|
       c = content_blob
-      wf = crate.add_file(c.filepath, path: c.original_filename)
+      wf = ROCrate::Workflow.new(crate, c.filepath, c.original_filename)
       wf.identifier = ro_crate_identifier
       wf.content_size = c.file_size
-      wf.type = ["File", "SoftwareSourceCode", "Workflow"]
+      crate.main_workflow = wf
 
       d = diagram
-      wdf = crate.add_file(d.path, path: d.filename)
+      wdf = ROCrate::WorkflowDiagram.new(crate, d.path, d.filename)
       wdf.content_size = d.size
-      wdf.type = ["File", "ImageObject", "WorkflowSketch"]
-      wdf.properties['about'] = wf.reference
+      crate.main_workflow.diagram = wdf
+
       crate.date_published = Time.now
       crate.author = related_people.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
       crate.publisher = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata) }
