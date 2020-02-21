@@ -7,24 +7,25 @@
   <div class="col-md-9 col-sm-8 box_about_actor">
     <%= item_description @display_workflow.description -%>
 
-    <% if @display_workflow.diagram.exists? %>
-      <div class="row">
-        <div class="col-md-12">
-          <div class="workflow-diagram">
-            <%= image_tag(diagram_workflow_path(@workflow, version: @display_workflow.version)) %>
+    <% begin %>
+      <% if @display_workflow.diagram.exists? %>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="workflow-diagram">
+              <%= image_tag(diagram_workflow_path(@workflow, version: @display_workflow.version)) %>
+            </div>
           </div>
         </div>
-      </div>
+      <% end %>
+    <% rescue StandardError %>
+      <div class="alert alert-danger">An error occurred whilst trying to fetch the diagram</div>
     <% end %>
 
     <div class="row">
       <div class="col-md-6">
         <%= persistent_resource_id(@display_workflow) %>
 
-        <%= render :partial => 'assets/fileinfo',:object=>@display_workflow.content_blob -%>
-
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @workflow} %>
-
         <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_workflow} %>
       </div>
     </div>

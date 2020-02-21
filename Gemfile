@@ -138,6 +138,8 @@ gem 'ro-crate-ruby', git: 'https://github.com/fbacall/ro-crate-ruby.git'
 
 gem 'git'
 
+gem 'redcarpet'
+
 source 'https://rails-assets.org' do
   gem 'rails-assets-bootstrap-multiselect', '~> 0.9.13'
   gem 'rails-assets-bootstrap-tagsinput', '~> 0.8.0'

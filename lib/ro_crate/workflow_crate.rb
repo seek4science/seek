@@ -35,5 +35,9 @@ module ROCrate
 
       main_workflow.cwl_description = entity
     end
+
+    def readme
+      dereference('README.md')
+    end
   end
 end
