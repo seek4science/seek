@@ -1,5 +1,5 @@
 module ROCrate
-  class WorkflowDescription < Workflow
+  class WorkflowDescription < ::ROCrate::Workflow
     CWL_LANGUAGE =  {
         "@id" => "#cwl",
         "@type" => "ComputerLanguage",

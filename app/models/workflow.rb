@@ -40,18 +40,4 @@ class Workflow < ApplicationRecord
   def self.user_creatable?
     Seek::Config.workflows_enabled
   end
-
-  def is_github_cwl?
-    return (!content_blob.url.nil?) && (content_blob.url.include? 'github.com')
-  end
-
-  def is_myexperiment?
-    unless (!content_blob.url.nil?) && (is_myexperiment_url? content_blob.url) && (@is_workflow)
-      errors.add(:url, "The URL does not reference a workflow on myExperiment")
-    end
-  end
-
-  def cwl_viewer_url
-    return content_blob.url.sub('https://', 'https://view.commonwl.org/workflows/')
-  end
 end

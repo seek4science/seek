@@ -176,13 +176,12 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def download
+    ro_crate
+  end
+
   def ro_crate
-    crate = @display_workflow.ro_crate
-    path = nil
-    Tempfile.open('crate') do |f|
-      path = f.path
-      ROCrate::Writer.new(crate).write_zip(path)
-    end
+    path = @display_workflow.ro_crate_zip
     respond_to do |format|
       format.html do
         send_file(path,

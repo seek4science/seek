@@ -2,6 +2,10 @@ require 'ro_crate_ruby'
 
 module ROCrate
   class WorkflowCrate < ::ROCrate::Crate
+    include ActiveModel::Model
+
+    validates :main_workflow, presence: true
+
     properties(%w[mainEntity])
 
     def main_workflow
@@ -9,13 +13,11 @@ module ROCrate
     end
 
     def main_workflow=(entity)
-      add_data_entity(entity).tap do |entity|
-        self.main_entity = entity
-      end
+      add_data_entity(entity).tap { |entity| self.main_entity = entity }
     end
 
     def main_workflow_diagram
-      main_workflow&.properties&.[]('image')&.dereference
+      main_workflow&.image
     end
 
     def main_workflow_diagram=(entity)
@@ -25,7 +27,7 @@ module ROCrate
     end
 
     def main_workflow_cwl
-      main_workflow&.properties&.[]('subjectOf')&.dereference
+      main_workflow&.subject_of
     end
 
     def main_workflow_cwl=(entity)

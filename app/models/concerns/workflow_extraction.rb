@@ -4,7 +4,7 @@ module WorkflowExtraction
   extend ActiveSupport::Concern
 
   def extractor_class
-    if is_ro_crate?
+    if is_already_ro_crate?
       Seek::WorkflowExtractors::ROCrate
     else
       workflow_class.extractor_class
@@ -33,12 +33,25 @@ module WorkflowExtraction
     WorkflowDiagram.new(workflow, version, path, format, content_type)
   end
 
-  def is_ro_crate?
+  def ro_crate_zip
+    unless File.exist?(ro_crate_path)
+      if is_already_ro_crate?
+        FileUtils.cp(content_blob.filepath, ro_crate_path)
+      else
+        crate = ro_crate
+        ROCrate::Writer.new(crate).write_zip(ro_crate_path)
+      end
+    end
+
+    ro_crate_path
+  end
+
+  def is_already_ro_crate?
     content_blob.original_filename.end_with?('.crate.zip')
   end
 
   def ro_crate
-    return extractor_class.new(content_blob).crate if is_ro_crate?
+    return extractor_class.new(content_blob).crate if is_already_ro_crate?
 
     ROCrate::WorkflowCrate.new.tap do |crate|
       c = content_blob
@@ -104,5 +117,9 @@ module WorkflowExtraction
 
   def diagram_path(format)
     content_blob.filepath("diagram.#{format}") # generates a path like "<uuid>.diagram.png"
+  end
+
+  def ro_crate_path
+    content_blob.filepath('crate.zip')
   end
 end
