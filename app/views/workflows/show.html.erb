@@ -1,7 +1,8 @@
-<%= render :partial => "general/item_title",:locals => {:item => @workflow, :version => @display_workflow.version,
-                                                        :buttons_partial => 'assets/asset_buttons'} -%>
+<%= render partial: 'general/item_title', locals: { item: @workflow,
+                                                   version: @display_workflow.version,
+                                                   buttons_partial: 'assets/asset_buttons' } -%>
 
-<%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@workflow} -%>
+<%= render partial: 'assets/upload_new_version_form', locals: { resource: @workflow } -%>
 
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
@@ -25,8 +26,8 @@
       <div class="col-md-6">
         <%= persistent_resource_id(@display_workflow) %>
 
-        <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @workflow} %>
-        <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_workflow} %>
+        <%= render partial: 'assets/special_auth_code_display', locals: { resource: @workflow } %>
+        <%= render partial: 'assets/asset_doi', locals: { displayed_resource: @display_workflow } %>
       </div>
     </div>
 
@@ -40,15 +41,15 @@
 
     <%= rendered_asset_view(@display_workflow) %>
 
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @workflow, :deep => true, :include_parents => true} %>
+    <%= render partial: 'general/isa_graph', locals: { root_item: @workflow, deep: true, include_parents: true } %>
   </div>
 
   <div class="col-md-3 col-sm-4">
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @workflow, :versioned_resource=>@display_workflow } %>
+    <%= render partial: 'assets/resource_main_content_right', locals: { resource: @workflow, versioned_resource: @display_workflow } %>
   </div>
 </div>
 
-<%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_workflow, :resource=>@workflow} -%>
+<%= render partial: 'assets/resource_version_details', locals: { displayed_resource: @display_workflow, resource: @workflow } -%>
 
 <%# get, classify and authorize all assets for this project -%>
-<%= render :partial=>"general/items_related_to",:object => @workflow %>
+<%= render partial: 'general/items_related_to', object: @workflow %>
