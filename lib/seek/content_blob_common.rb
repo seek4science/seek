@@ -2,8 +2,8 @@ module Seek
   module ContentBlobCommon
     def download
       name = controller_name.singularize
-      asset = eval("@#{name}")
-      asset_version = eval("@display_#{name}")
+      asset = instance_variable_get("@#{name}")
+      asset_version = instance_variable_get("@display_#{name}")
       @asset_version = asset_version
 
       asset.just_used
