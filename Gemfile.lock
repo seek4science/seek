@@ -437,7 +437,7 @@ GEM
     net-ldap (0.16.0)
     netrc (0.11.0)
     nio4r (2.3.1)
-    nokogiri (1.10.4)
+    nokogiri (1.10.8)
       mini_portile2 (~> 2.4.0)
     nokogumbo (1.5.0)
       nokogiri
