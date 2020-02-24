@@ -48,6 +48,14 @@ module Seek
           m[:description] ||= markdown.render(crate.readme&.source&.source&.read)
         end
 
+        if crate['keywords'] && m[:tags].blank?
+          m[:tags] = crate['keywords'].is_a?(Array) ? crate['keywords'] : crate['keywords'].split(',').map(&:strip)
+        end
+
+        m[:title] ||= crate['name']
+        m[:description] ||= crate['description']
+        m[:license] ||= crate['license']
+
         m
       end
 

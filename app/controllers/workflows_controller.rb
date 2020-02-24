@@ -141,9 +141,9 @@ class WorkflowsController < ApplicationController
     #associate the content blob with the workflow
     blob = ContentBlob.find(params[:content_blob_id])
     @workflow.content_blob = blob
+    update_annotations(params[:tag_list], @workflow) if params.key?(:tag_list)
 
     if uploaded_blob_matches && @workflow.save && blob.save
-      update_annotations(params[:tag_list], @workflow)
       update_relationships(@workflow, params)
 
       clear_session_info
