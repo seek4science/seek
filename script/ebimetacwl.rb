@@ -7,10 +7,12 @@ require 'rails/all'
 require 'pathname'
 Dir[File.join(File.dirname(__FILE__), '..', 'lib', 'ro_crate', '*')].each {|file| require File.expand_path(file) }
 
-github = RestClient::Resource.new('http://api.github.com')
+github = RestClient::Resource.new('https://api.github.com')
 seek = RestClient::Resource.new('http://localhost:3000')
 GIT_REPO = 'https://github.com/EBI-Metagenomics/workflow-is-cwl'
 GIT_DESTINATION = '/tmp/ebi-metagenomics-cwl/'
+CRATE_DESTINATION = File.expand_path(File.join(File.dirname(__FILE__), '..', 'crates', 'ebimeta'))
+FileUtils.mkdir_p(CRATE_DESTINATION)
 CWL_LANGUAGE_META =  {
     "@id" => "#cwl",
     "@type" => "ComputerLanguage",
@@ -104,10 +106,11 @@ Dir.chdir(workflow_dir) do
 
     crate.preview.template = PREVIEW_TEMPLATE
 
-    f = File.new("ro-crate-#{item.gsub('/', '-').gsub('.', '-')}.crate.zip", 'w')
-    puts "  Written to: #{File.expand_path(f)}"
+    crate_path = File.join(CRATE_DESTINATION, "ro-crate-#{item.gsub('/', '-').gsub('.', '-')}.crate.zip")
+    f = File.new(crate_path, 'w')
+    puts "  Written to: #{crate_path}"
     ROCrate::Writer.new(crate).write_zip(f)
-    crates << File.expand_path(f.path)
+    crates << File.expand_path(crate_path)
   end
 end
 

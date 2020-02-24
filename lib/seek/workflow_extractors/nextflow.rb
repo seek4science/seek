@@ -3,21 +3,26 @@ module Seek
     class Nextflow < Base
       def metadata
         metadata = super
-        config_string = @io.read
-        manifest = manifest_block(config_string)
-        manifest = manifest.merge(manifest_values(config_string))
+        mani = manifest
 
-        if manifest.has_key?('name')
-          metadata[:title] = manifest['name']
+        if mani.has_key?('name')
+          metadata[:title] = mani['name']
         else
           metadata[:warnings] << 'Unable to determine title of workflow'
         end
 
-        metadata[:description] = manifest['description'] if manifest.has_key?('description')
-        metadata[:other_creators] = manifest['author'] if manifest.has_key?('author')
+        metadata[:description] = mani['description'] if mani.has_key?('description')
+        metadata[:other_creators] = mani['author'] if mani.has_key?('author')
         #metadata[:url] = manifest['homePage'] if manifest.has_key?('homePage')
 
         metadata
+      end
+
+      def manifest
+        config_string = @io.read
+
+        manifest = manifest_block(config_string)
+        manifest.merge(manifest_values(config_string))
       end
 
       def manifest_block(config)
