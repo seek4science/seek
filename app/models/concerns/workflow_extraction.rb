@@ -4,15 +4,16 @@ module WorkflowExtraction
   extend ActiveSupport::Concern
 
   def extractor_class
-    if is_already_ro_crate?
-      Seek::WorkflowExtractors::ROCrate
-    else
-      workflow_class.extractor_class
-    end
+    workflow_class.extractor_class
   end
 
   def extractor
     extractor_class.new(content_blob)
+    if is_already_ro_crate?
+      Seek::WorkflowExtractors::ROCrate.new(content_blob, inner_extractor_class: extractor_class)
+    else
+      extractor_class.new(content_blob)
+    end
   end
 
   def default_diagram_format

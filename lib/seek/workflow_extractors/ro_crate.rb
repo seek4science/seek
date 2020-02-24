@@ -7,6 +7,11 @@ module Seek
     class ROCrate < Base
       available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', jpg: 'image/jpeg', default: :svg)
 
+      def initialize(io, inner_extractor_class: nil)
+        @io = io
+        @inner_extractor_class = inner_extractor_class
+      end
+
       def diagram(format = default_digram_format)
         if crate.main_workflow_diagram
           crate.main_workflow_diagram&.source&.source&.read
@@ -30,7 +35,11 @@ module Seek
               when '#galaxy'
                 Seek::WorkflowExtractors::Galaxy.new(wf).metadata
               else
-                super
+                if @inner_extractor_class
+                  @inner_extractor_class.new(wf).metadata
+                else
+                  super
+                end
               end
         end
 

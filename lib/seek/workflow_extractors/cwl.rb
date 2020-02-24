@@ -26,6 +26,9 @@ module Seek
         if cwl.key?('doc')
           metadata[:description] = cwl['doc']
         end
+        if cwl.key?('s:license')
+          metadata[:license] = cwl['s:license']
+        end
 
         metadata[:internals] = {}
 
