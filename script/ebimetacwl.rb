@@ -84,7 +84,7 @@ Dir.chdir(workflow_dir) do
     crate.license = cwl['s:license'] if cwl['s:license']
     crate.author = cwl['s:author'] if cwl['s:author']
     crate.publisher = cwl['s:copyrightHolder'] if cwl['s:copyrightHolder']
-    crate.url = GIT_REPO + "/blob/masterworkflows/#{item}"
+    crate.url = GIT_REPO + "/blob/master/workflows/#{item}"
     crate.main_workflow = wf
     # Add the diagram
     cwl_viewer_path = "https://view.commonwl.org/graph/svg/github.com/EBI-Metagenomics/workflow-is-cwl/blob/master/workflows/#{item}"
