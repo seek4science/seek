@@ -6,7 +6,9 @@
 
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
-    <%= item_description @display_workflow.description -%>
+    <div id="description" class="well well-sm">
+      <%= text_or_not_specified(@display_workflow.description, description: false, auto_link: true) %>
+    </div>
 
     <% begin %>
       <% if @display_workflow.diagram.exists? %>
