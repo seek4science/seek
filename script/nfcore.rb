@@ -89,6 +89,7 @@ to_register.each do |repo|
   crate = ROCrate::WorkflowCrate.new
   Dir.chdir(dir) do
     manifest = {}
+    main = 'main.nf'
     if File.exist?('nextflow.config')
       extractor = Seek::WorkflowExtractors::Nextflow.new(File.open('nextflow.config'))
       manifest = extractor.manifest
@@ -97,10 +98,12 @@ to_register.each do |repo|
       crate.author = manifest['author'] if manifest['author']
       crate.url = manifest['homePage'] ? manifest['homePage'] : "https://github.com/#{repo}"
       crate['keywords'] = topics.join(', ') if topics.any?
+      main = manifest['mainScript'] if manifest['mainScript']
     end
+
     Dir.glob('*').each do |item|
-      if item == 'main.nf'
-        wf = crate.add_file('main.nf', 'main.nf', entity_class: ROCrate::Workflow)
+      if item == main
+        wf = crate.add_file(main, main, entity_class: ROCrate::Workflow)
         nf = NF_LANGUAGE_META
         nf.merge('softwareVersion' => manifest['nextflowVersion']) if manifest['nextflowVersion']
         wf.programming_language = ROCrate::ContextualEntity.new(crate, 'nextflow', nf)
