@@ -29,13 +29,13 @@ module Seek
         else
           # Or try and parse main workflow
           wf = crate&.main_workflow&.source&.source
-          extractor = self.class.extractor_from_programming_language(crate&.main_workflow&.programming_language)
-          if extractor
-            extractor
+          extractor_class = self.class.extractor_from_programming_language(crate&.main_workflow&.programming_language)
+          if extractor_class
+            m = extractor_class.new(wf).metadata
           elsif @inner_extractor_class
-            @inner_extractor_class.new(wf).metadata
+            m = @inner_extractor_class.new(wf).metadata
           else
-            super
+            m = super.metadata
           end
         end
 
@@ -79,10 +79,10 @@ module Seek
 
         matchable.each do |key|
           extractor = @extractor_matcher.detect do |hash, extractor|
-            extractor if (!language[key].nil? && !hash[key].nil? && language[key] == hash[key])
+            !language[key].nil? && !hash[key].nil? && language[key] == hash[key]
           end
 
-          return extractor if extractor
+          return extractor[1] if extractor
         end
 
         nil
