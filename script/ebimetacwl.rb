@@ -6,21 +6,14 @@ require 'ro_crate_ruby'
 require 'rails/all'
 require 'pathname'
 Dir[File.join(File.dirname(__FILE__), '..', 'lib', 'ro_crate', '*')].each {|file| require File.expand_path(file) }
-
+Dir[File.join(File.dirname(__FILE__), '..', 'lib', 'seek', 'workflow_extractors', '*')].each {|file| require File.expand_path(file) }
 github = RestClient::Resource.new('https://api.github.com')
 seek = RestClient::Resource.new('http://localhost:3000')
 GIT_REPO = 'https://github.com/EBI-Metagenomics/workflow-is-cwl'
 GIT_DESTINATION = '/tmp/ebi-metagenomics-cwl/'
 CRATE_DESTINATION = File.expand_path(File.join(File.dirname(__FILE__), '..', 'crates', 'ebimeta'))
 FileUtils.mkdir_p(CRATE_DESTINATION)
-CWL_LANGUAGE_META =  {
-    "@id" => "#cwl",
-    "@type" => "ComputerLanguage",
-    "name" => "Common Workflow Language",
-    "alternateName" => "CWL",
-    "identifier" => { "@id" => "https://w3id.org/cwl/v1.0/" },
-    "url" => { "@id" => "https://www.commonwl.org/" }
-}
+CWL_LANGUAGE_META = Seek::WorkflowExtractors::CWL.ro_crate_metadata
 PREVIEW_TEMPLATE = File.read(File.join(File.dirname(__FILE__), 'preview.html.erb'))
 
 def get_local_dependencies(hash)

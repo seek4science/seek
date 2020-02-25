@@ -1,6 +1,8 @@
 require 'ro_crate_ruby'
 
 module WorkflowExtraction
+  PREVIEW_TEMPLATE = File.read(File.join(Rails.root, 'script', 'preview.html.erb'))
+
   extend ActiveSupport::Concern
 
   def extractor_class
@@ -8,7 +10,6 @@ module WorkflowExtraction
   end
 
   def extractor
-    extractor_class.new(content_blob)
     if is_already_ro_crate?
       Seek::WorkflowExtractors::ROCrate.new(content_blob, inner_extractor_class: extractor_class)
     else
@@ -18,6 +19,10 @@ module WorkflowExtraction
 
   def default_diagram_format
     extractor.default_diagram_format
+  end
+
+  def can_render_diagram?
+    extractor.can_render_diagram?
   end
 
   def diagram(format = default_diagram_format)
@@ -60,6 +65,7 @@ module WorkflowExtraction
       wf.identifier = ro_crate_identifier
       wf.content_size = c.file_size
       crate.main_workflow = wf
+      crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, extractor_class.ro_crate_metadata)
 
       d = diagram
       wdf = ROCrate::WorkflowDiagram.new(crate, d.path, d.filename)
@@ -71,6 +77,8 @@ module WorkflowExtraction
       crate.publisher = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata) }
       crate.license = license
       crate.url = ro_crate_url('ro_crate')
+
+      crate.preview.template = PREVIEW_TEMPLATE
     end
   end
 

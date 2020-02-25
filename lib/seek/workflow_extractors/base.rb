@@ -1,6 +1,14 @@
 module Seek
   module WorkflowExtractors
     class Base
+      def self.ro_crate_metadata
+        {
+            "@id" => "#workflow_type",
+            "@type" => "ComputerLanguage",
+            "name" => "Unrecognized Workflow Type"
+        }
+      end
+
       def self.available_diagram_formats(formats)
         formats = formats.with_indifferent_access
         @default_diagram_format = formats.delete(:default) || formats.keys.first.to_sym
@@ -23,6 +31,10 @@ module Seek
 
       def metadata
         { warnings: [], errors: [] }
+      end
+
+      def can_render_diagram?
+        false
       end
 
       def diagram(format = default_diagram_format)

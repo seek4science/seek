@@ -56,18 +56,33 @@
 <p>
   <%= description %>
 </p>
+  <%
+    def render_entity(entity)
+      if entity.is_a?(Array)
+        entity.map { |e| render_entity(e) }.join(", ")
+      elsif entity.is_a?(ROCrate::Entity)
+        if entity['identifier']
+          "<a href=\"#{entity['identifier']}\" target=\"_blank\">#{entity.name || entity.id}</a>"
+        else
+          (entity.name || entity.id).to_s
+        end
+      else
+        entity.to_s
+      end
+    end
+  %>
 <dl>
   <% if author %>
     <dt>Author</dt>
-    <dd><%= author %></dd>
+    <dd><%= render_entity author %></dd>
   <% end %>
   <% if contact_point %>
     <dt>Contact</dt>
-    <dd><%= contact_point %></dd>
+    <dd><%= render_entity contact_point %></dd>
   <% end %>
   <% if publisher %>
     <dt>Publisher</dt>
-    <dd><%= publisher %></dd>
+    <dd><%= render_entity publisher %></dd>
   <% end %>
   <% if license %>
     <dt>License</dt>

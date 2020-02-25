@@ -12,6 +12,10 @@ module Seek
         @inner_extractor_class = inner_extractor_class
       end
 
+      def can_render_diagram?
+        !crate.main_workflow_diagram.nil?
+      end
+
       def diagram(format = default_digram_format)
         if crate.main_workflow_diagram
           crate.main_workflow_diagram&.source&.source&.read
@@ -25,22 +29,14 @@ module Seek
         else
           # Or try and parse main workflow
           wf = crate&.main_workflow&.source&.source
-          m = case crate&.main_workflow&.programming_language&.id
-              when '#cwl'
-                Seek::WorkflowExtractors::CWL.new(wf).metadata
-              when '#knime'
-                Seek::WorkflowExtractors::KNIME.new(wf).metadata
-              when '#nextflow'
-                Seek::WorkflowExtractors::Nextflow.new(wf).metadata
-              when '#galaxy'
-                Seek::WorkflowExtractors::Galaxy.new(wf).metadata
-              else
-                if @inner_extractor_class
-                  @inner_extractor_class.new(wf).metadata
-                else
-                  super
-                end
-              end
+          extractor = self.class.extractor_from_programming_language(crate&.main_workflow&.programming_language)
+          if extractor
+            extractor
+          elsif @inner_extractor_class
+            @inner_extractor_class.new(wf).metadata
+          else
+            super
+          end
         end
 
         if crate.readme && m[:description].blank?
@@ -70,6 +66,26 @@ module Seek
         end
 
         super
+      end
+
+      def self.extractor_from_programming_language(language)
+        matchable = ['identifier', 'name', 'alternateName', '@id', 'url']
+        @extractor_matcher ||= [Seek::WorkflowExtractors::CWL,
+                                Seek::WorkflowExtractors::KNIME,
+                                Seek::WorkflowExtractors::Nextflow,
+                                Seek::WorkflowExtractors::Galaxy].map do |extractor|
+          [extractor.ro_crate_metadata.slice(*matchable), extractor]
+        end
+
+        matchable.each do |key|
+          extractor = @extractor_matcher.detect do |hash, extractor|
+            extractor if (!language[key].nil? && !hash[key].nil? && language[key] == hash[key])
+          end
+
+          return extractor if extractor
+        end
+
+        nil
       end
     end
   end

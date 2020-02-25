@@ -1,6 +1,16 @@
 module Seek
   module WorkflowExtractors
     class Nextflow < Base
+      def self.ro_crate_metadata
+        {
+            "@id" => "#nextflow",
+            "@type" => "ComputerLanguage",
+            "name" => "Nextflow",
+            "identifier" => { "@id" => "https://www.nextflow.io/" },
+            "url" => { "@id" => "https://www.nextflow.io/" }
+        }
+      end
+
       def metadata
         metadata = super
 

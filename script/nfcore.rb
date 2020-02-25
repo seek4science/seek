@@ -18,13 +18,7 @@ NF_CORE_USER = 'nf-core'
 GIT_DESTINATION = '/tmp/nfcore/'
 CRATE_DESTINATION = File.expand_path(File.join(File.dirname(__FILE__), '..', 'crates', 'nfcore'))
 FileUtils.mkdir_p(CRATE_DESTINATION)
-NF_LANGUAGE_META =  {
-    "@id" => "#nextflow",
-    "@type" => "ComputerLanguage",
-    "name" => "Nextflow",
-    "identifier" => { "@id" => "https://www.nextflow.io/" },
-    "url" => { "@id" => "https://www.nextflow.io/" }
-}
+NF_LANGUAGE_META = Seek::WorkflowExtractors::Nextflow.ro_crate_metadata
 PREVIEW_TEMPLATE = File.read(File.join(File.dirname(__FILE__), 'preview.html.erb'))
 
 def cached(name)

@@ -11,7 +11,7 @@
     </div>
 
     <% begin %>
-      <% if @display_workflow.diagram.exists? %>
+      <% if @display_workflow.can_render_diagram? && @display_workflow.diagram.exists? %>
         <div class="row">
           <div class="col-md-12">
             <div class="workflow-diagram">
@@ -20,8 +20,10 @@
           </div>
         </div>
       <% end %>
-    <% rescue StandardError %>
-      <div class="alert alert-danger">An error occurred whilst trying to fetch the diagram</div>
+    <% rescue StandardError => e %>
+      <% Rails.logger.error(e.inspect) %>
+      <% Rails.logger.error(e.backtrace.inspect) %>
+      <div class="alert alert-warning">Could not render the workflow diagram.</div>
     <% end %>
 
     <div class="row">

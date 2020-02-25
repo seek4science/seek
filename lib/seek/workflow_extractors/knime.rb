@@ -1,6 +1,17 @@
 module Seek
   module WorkflowExtractors
     class KNIME < Base
+      def self.ro_crate_metadata
+        {
+            "@id" => "#knime",
+            "@type" => "ComputerLanguage",
+            "name" => "KNIME",
+            "alternateName" => "Knime",
+            "identifier" => { "@id" => "https://galaxyproject.org/" },
+            "url" => { "@id" => "https://galaxyproject.org/" }
+        }
+      end
+
       def metadata
         metadata = super
         knime_string = @io.read

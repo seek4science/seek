@@ -4,8 +4,22 @@ module Seek
   module WorkflowExtractors
     class CWL < Base
       DIAGRAM_PATH = '/graph/%{format}'
+      def self.ro_crate_metadata
+        {
+            "@id" => "#cwl",
+            "@type" => "ComputerLanguage",
+            "name" => "Common Workflow Language",
+            "alternateName" => "CWL",
+            "identifier" => { "@id" => "https://w3id.org/cwl/v1.0/" },
+            "url" => { "@id" => "https://www.commonwl.org/" }
+        }
+      end
 
       available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', default: :svg)
+
+      def can_render_diagram?
+        Seek::Config.cwl_viewer_url.present?
+      end
 
       def diagram(format = self.class.default_digram_format)
         return nil unless Seek::Config.cwl_viewer_url.present?
