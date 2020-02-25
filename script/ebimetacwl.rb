@@ -73,9 +73,10 @@ Dir.chdir(workflow_dir) do
     # Add the workflow
     wf = crate.add_file(item, "workflows/#{item}", entity_class: ROCrate::Workflow)
     wf.programming_language = ROCrate::ContextualEntity.new(crate, 'cwl', CWL_LANGUAGE_META)
-    wf.name = cwl['label'] if cwl['label']
+    wf.name = item.chomp('.cwl')
     wf.content_size = File.size(item)
-    crate.name = cwl['label'] if cwl['label']
+    crate.name = wf.name
+    crate.description = cwl['label'] if cwl['label']
     crate.license = cwl['s:license'] if cwl['s:license']
     crate.author = cwl['s:author'] if cwl['s:author']
     crate.publisher = cwl['s:copyrightHolder'] if cwl['s:copyrightHolder']
