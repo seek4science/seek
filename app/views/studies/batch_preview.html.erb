@@ -1,1 +1,36 @@
-<%= @studies.inspect %>
+<%= form_for :studies, url: batch_create_studies_path do |f| %>
+  <table class="table">
+    <thead>
+    <tr>
+      <th scope="col">Study ID</th>
+      <th scope="col" class="required">Study Title</th>
+      <th scope="col">Study Description</th>
+      <th scope="col">Data File/Path</th>
+      <th scope="col">Start date</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @studies.each do |study| %>
+      <tr>
+        <th scope="row">
+          <%= f.text_field :id, name: "studies[id][]", :class=>"form-control", value: study[0].value %>
+        </th>
+        <td>
+          <%= f.text_area :title, name: "studies[title][]",:class=>"form-control", value: study[1].value %>
+        </td>
+        <td>
+          <%= f.text_area :description, name: "studies[description][]",:class=>"form-control", value: study[2].value %>
+        </td>
+        <td>
+          <%= f.text_area :description,:class=>"form-control", disabled: true, value: @studies_data[0] %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+
+  <%= f.submit "Create", :class => 'btn btn-primary' -%>
+  or <%= cancel_button(studies_path) -%>
+<% end %>
+
+<!-- button_link_to("View samples", 'view_samples', sample_type_samples_path(sample_type)) -->
