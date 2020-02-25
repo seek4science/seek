@@ -189,12 +189,18 @@ module HomesHelper
     link_to(text, session_path(login: 'guest', password: 'guest'), method: :post)
   end
 
-  def frontpage_button(link, image_path)
+  def frontpage_button(link, image_path = nil)
     link_to link, class: 'seek-homepage-button', target: :_blank do
-      image_tag(image_path) +
+      if image_path
+        image_tag(image_path) +
+            content_tag(:span) do
+              yield
+            end
+      else
         content_tag(:span) do
           yield
         end
+      end
     end
   end
 end

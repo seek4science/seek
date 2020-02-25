@@ -8,9 +8,7 @@
   <div class="col-md-9">
     <%= render :partial=>"home_description_box" -%>
 
-    <% if Seek::Config.front_page_buttons_enabled %>
-        <%= render :partial=>"home_buttons" -%>
-    <% end %>
+    <%= render :partial=>"home_buttons" -%>
 
     <% if logged_in_and_registered? %>
         <%= render :partial=>"user_activity" -%>

@@ -341,10 +341,12 @@ a.seek-homepage-button {
   }
 }
 
-.seek-homepage-button img {
-  width: 120px;
-  height: 120px;
-
+.seek-homepage-button img, .seek-homepage-button span.glyphicon  {
+  display: block;
+  font-size: 80px;
+  margin: auto;
+  line-height: 120px;
+  color: #666;
 }
 
 @media (min-width: $screen-sm-min) {
