@@ -6,7 +6,7 @@
   <% end %>
   </div>
   <div class="col-sm-6">
-    <%= frontpage_button(new_workflow_path) do %>
+    <%= frontpage_button(current_user ? new_workflow_path : login_path(return_to: new_workflow_path)) do %>
       <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
       Contribute
   <% end %>
