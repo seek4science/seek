@@ -40,7 +40,7 @@
     </div>
 
     <%= render partial: "projects/project_selector", locals: { resource: @workflow, allow_nil: Seek::Config.is_virtualliver } -%>
-    <%= render partial: 'assets/license_selector', locals: { resource: @workflow } %>
+    <%= render partial: 'assets/license_selector', locals: { resource: @workflow, license_group: :software } %>
     <%= render partial: 'sharing/form' -%>
     <%= folding_panel('Tags', @workflow.tags.none?,
                       help_text: "Here you can provide some tags to help describe, and allow other people to find, your #{text_for_resource(@workflow)}.") do %>

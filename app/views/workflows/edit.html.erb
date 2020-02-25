@@ -14,7 +14,7 @@
       <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
     </div>
 
-    <%= render :partial => 'assets/license_selector', :locals => { :resource => @workflow } %>
+    <%= render partial: 'assets/license_selector', locals: { resource: @workflow, license_group: :software } %>
     <%= render :partial => 'sharing/form' -%>
     <%= render :partial => 'assets/asset_form_bottom', :locals=> {:show_publications=>false, :f => f}-%>
     <%= render :partial => "assays/associate_assays", :locals=>{:resource => @workflow} -%>
