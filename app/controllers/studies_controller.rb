@@ -118,27 +118,42 @@ class StudiesController < ApplicationController
     end
   end
 
-  def batch_uploader
-
-  end
+  def batch_uploader; end
 
   def preview_content
     tempzip_path = params[:content_blobs][0][:data].tempfile.path
     data_files, studies = Study.unzip_batch tempzip_path
-
     study_filename = studies.first.name
     studies_file = ContentBlob.new
     studies_file.tmp_io_object=File.open("#{Rails.root}/tmp/#{study_filename}")
     studies_file.original_filename="#{study_filename}"
     studies_file.save!
     @studies = Study.extract_studies_from_file(studies_file)
-    render "studies/batch_preview"
+    @studies_data = Study.extract_study_data_from_file(data_files)
+    render 'studies/batch_preview'
   end
+
+  def batch_create
+    #create methode will be called for each study
+    # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: Factory(:private_policy))
+    # study.policy = Policy.create(name: 'default policy', access_type: 1)
+    studies_obj = []
+    @studies_array = params[:studies]
+    @studies_array[:id].length.times do |index, data|
+      studies_obj << Study.new(
+        title: @studies_array[:id][index],
+        description: @studies_array[:description][index],
+        investigation_id: 0
+      )
+    end
+    render plain: params[:studies].inspect
+  end
+
 
   private
   def validate_person_responsible(p)
     if (!p[:person_responsible_id].nil?) && (!Person.exists?(p[:person_responsible_id]))
-      render json: {error: "Person responsible does not exist", status: :unprocessable_entity}, status: :unprocessable_entity
+      render json: {error: 'Person responsible does not exist', status: :unprocessable_entity}, status: :unprocessable_entity
       return false
     end
     true

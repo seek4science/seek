@@ -36,12 +36,20 @@ class Study < ApplicationRecord
     has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :assays, source: type.pluralize.to_sym
   end
 
+
+  def self.extract_study_data_from_file(data_files)
+    tmp_dir = "#{Rails.root}/tmp/"
+    data_files
+  end
+
   def self.extract_studies_from_file(studies_file)
     studies = []
+    studies_obj = []
     parsed_sheet = Seek::Templates::StudiesReader.new(studies_file)
-    column_details =  parsed_sheet.column_details
+    column_details = parsed_sheet.column_details
 
-    parsed_sheet.each_record([2,3,4]) do |index, data|
+    #FIXME: Take into account empty columns
+    parsed_sheet.each_record([2, 3, 4, 5]) do |index, data|
       if index > 4
         studies << data
       end
@@ -49,23 +57,22 @@ class Study < ApplicationRecord
     studies
   end
 
-
-  def self.unzip_batch file_path
-      unzipped_files = Zip::File.open(file_path) 
-      tmp_dir = "#{Rails.root}/tmp/"
-      data_files = []
-      studies = []
-      unzipped_files.entries.each do |file|
-        if file.name.starts_with?('data') && file.ftype != :directory
-          data_files << file
-          Dir.mkdir "#{tmp_dir}/data" unless File.exists? "#{tmp_dir}/data"
-          file.extract("#{tmp_dir}#{file.name}") unless File.exists? "#{tmp_dir}#{file.name}"     
-        elsif file.ftype == :file
-          studies << file
-          file.extract("#{Rails.root}/tmp/#{file.name}") unless File.exists? "#{tmp_dir}#{file.name}"
-        end
+  def self.unzip_batch(file_path)
+    unzipped_files = Zip::File.open(file_path)
+    tmp_dir = "#{Rails.root}/tmp/"
+    data_files = []
+    studies = []
+    unzipped_files.entries.each do |file|
+      if file.name.starts_with?('data') && file.ftype != :directory
+        data_files << file
+        Dir.mkdir "#{tmp_dir}/data" unless File.exists? "#{tmp_dir}/data"
+        file.extract("#{tmp_dir}#{file.name}") unless File.exists? "#{tmp_dir}#{file.name}"
+      elsif file.ftype == :file
+        studies << file
+        file.extract("#{Rails.root}/tmp/#{file.name}") unless File.exists? "#{tmp_dir}#{file.name}"
       end
-      [data_files, studies]
+    end
+    [data_files, studies]
   end
 
   def assets
