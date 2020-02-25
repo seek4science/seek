@@ -57,7 +57,7 @@ module WorkflowExtraction
   end
 
   def ro_crate
-    return extractor_class.new(content_blob).crate if is_already_ro_crate?
+    return extractor.crate if is_already_ro_crate?
 
     ROCrate::WorkflowCrate.new.tap do |crate|
       c = content_blob
