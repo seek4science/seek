@@ -1,6 +1,10 @@
-$navbar-default-bg: #474747;
+$eosc-green: #1f8787;
+$eosc-yellow: #f9b233;
+
+$link-color: $eosc-green;
+$navbar-default-bg: #fafafa;
 $navbar-default-border: darken($navbar-default-bg, 6.5%);
 $navbar-default-link-active-bg: darken($navbar-default-bg, 6.5%);
-$navbar-default-link-color: #eeeeee;
-$navbar-default-link-active-color: lighten($navbar-default-link-color, 30%);
-$navbar-default-link-hover-color: lighten($navbar-default-link-color, 40%);
+$navbar-default-link-color: $eosc-green;
+$navbar-default-link-active-color: lighten($navbar-default-link-color, 10%);
+$navbar-default-link-hover-color: lighten($navbar-default-link-color, 15%);
