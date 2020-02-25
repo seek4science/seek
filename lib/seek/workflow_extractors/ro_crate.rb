@@ -39,18 +39,19 @@ module Seek
           end
         end
 
-        if crate.readme && m[:description].blank?
-          markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
-          m[:description] ||= markdown.render(crate.readme&.source&.source&.read)
-        end
-
+        # Metadata from crate
         if crate['keywords'] && m[:tags].blank?
           m[:tags] = crate['keywords'].is_a?(Array) ? crate['keywords'] : crate['keywords'].split(',').map(&:strip)
         end
 
-        m[:title] ||= crate['name'] if crate['name']
-        m[:description] ||= crate['description'] if crate['description']
-        m[:license] ||= crate['license'] if crate['license']
+        m[:title] = crate['name'] if crate['name']
+        m[:description] = crate['description'] if crate['description']
+        m[:license] = crate['license'] if crate['license']
+
+        if crate.readme && m[:description].blank?
+          markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
+          m[:description] ||= markdown.render(crate.readme&.source&.source&.read)
+        end
 
         m
       end
