@@ -3,14 +3,9 @@ module Seek
     class Nextflow < Base
       def metadata
         metadata = super
+
         mani = manifest
-
-        if mani.has_key?('name')
-          metadata[:title] = mani['name']
-        else
-          metadata[:warnings] << 'Unable to determine title of workflow'
-        end
-
+        metadata[:title] = mani['name'] if mani.has_key?('name')
         metadata[:description] = mani['description'] if mani.has_key?('description')
         metadata[:other_creators] = mani['author'] if mani.has_key?('author')
         #metadata[:url] = manifest['homePage'] if manifest.has_key?('homePage')
