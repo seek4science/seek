@@ -40,16 +40,13 @@ module WorkflowExtraction
   end
 
   def ro_crate_zip
-    unless File.exist?(ro_crate_path)
-      if is_already_ro_crate?
-        FileUtils.cp(content_blob.filepath, ro_crate_path)
-      else
-        crate = ro_crate
-        ROCrate::Writer.new(crate).write_zip(ro_crate_path)
-      end
+    if is_already_ro_crate?
+      content_blob.filepath
+    else
+      crate = ro_crate
+      ROCrate::Writer.new(crate).write_zip(ro_crate_path)
+      ro_crate_path
     end
-
-    ro_crate_path
   end
 
   def is_already_ro_crate?
