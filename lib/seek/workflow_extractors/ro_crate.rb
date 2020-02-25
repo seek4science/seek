@@ -1,6 +1,7 @@
 require 'rest-client'
 require 'redcarpet'
 require 'redcarpet/render_strip'
+require 'ro_crate_ruby'
 
 module Seek
   module WorkflowExtractors
@@ -44,9 +45,21 @@ module Seek
           m[:tags] = crate['keywords'].is_a?(Array) ? crate['keywords'] : crate['keywords'].split(',').map(&:strip)
         end
 
-        m[:title] = crate['name'] if crate['name']
-        m[:description] = crate['description'] if crate['description']
-        m[:license] = crate['license'] if crate['license']
+        m[:title] = crate['name'] if crate['name'].present?
+        m[:description] = crate['description'] if crate['description'].present?
+        m[:license] = crate['license'] if crate['license'].present?
+        if m[:other_creators].blank? && crate.author.present?
+          a = crate.author
+          a = a.is_a?(Array) ? a : [a]
+          a = a.map do |author|
+            if author.is_a?(::ROCrate::Entity)
+              author.name || author.id
+            else
+              author
+            end
+          end
+          m[:other_creators] = a.join(', ')
+        end
 
         if crate.readme && m[:description].blank?
           markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
