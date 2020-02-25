@@ -3,7 +3,7 @@
 <% display_asset = version ? asset.find_version(version) : nil %>
 
 <% show_explore_btn = display_asset && (asset.is_a?(DataFile) && display_asset.supported_spreadsheet_format?) %>
-<% show_view_content_btn = display_asset && (asset.is_a?(Workflow) || (display_asset.single_content_blob && !display_asset.single_content_blob.show_as_external_link?)) %>
+<% show_view_content_btn = display_asset && (!asset.is_a?(Workflow) && (display_asset.single_content_blob && !display_asset.single_content_blob.show_as_external_link?)) %>
 <% show_doi_button = display_asset && (asset.supports_doi? && asset.is_published? && asset.can_manage? && display_asset.can_mint_doi?) %>
 <% show_publish_button = asset.is_in_isa_publishable? && asset.can_publish? %>
 
