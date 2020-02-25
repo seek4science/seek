@@ -47,6 +47,7 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
     html_blob_attrs = { data: nil, url: 'http://www.abc.com' }
 
     Seek::Util.inline_viewable_content_types.each do |klass|
+      next if klass == Workflow
       underscored_type_name = klass.name.underscore
 
       with_config_value :show_as_external_link_enabled, true do
