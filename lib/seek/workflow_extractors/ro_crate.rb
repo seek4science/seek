@@ -48,9 +48,9 @@ module Seek
           m[:tags] = crate['keywords'].is_a?(Array) ? crate['keywords'] : crate['keywords'].split(',').map(&:strip)
         end
 
-        m[:title] ||= crate['name']
-        m[:description] ||= crate['description']
-        m[:license] ||= crate['license']
+        m[:title] ||= crate['name'] if crate['name']
+        m[:description] ||= crate['description'] if crate['description']
+        m[:license] ||= crate['license'] if crate['license']
 
         m
       end
