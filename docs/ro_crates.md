@@ -85,12 +85,11 @@ To ensure compatibility, please include one of the following in the RO Crate met
   "@id": "#knime",
   "@type": "ComputerLanguage",
   "name": "KNIME",
-  "alternateName": "Knime",
   "identifier": {
-    "@id": "https://galaxyproject.org/"
+    "@id": "https://www.knime.com/"
   },
   "url": {
-    "@id": "https://galaxyproject.org/"
+    "@id": "https://www.knime.com/"
   }
 }
 ```

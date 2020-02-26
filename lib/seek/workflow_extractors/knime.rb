@@ -6,9 +6,8 @@ module Seek
             "@id" => "#knime",
             "@type" => "ComputerLanguage",
             "name" => "KNIME",
-            "alternateName" => "Knime",
-            "identifier" => { "@id" => "https://galaxyproject.org/" },
-            "url" => { "@id" => "https://galaxyproject.org/" }
+            "identifier" => { "@id" => "https://www.knime.com/" },
+            "url" => { "@id" => "https://www.knime.com/" }
         }
       end
 
