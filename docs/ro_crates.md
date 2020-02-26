@@ -41,13 +41,28 @@ The _Crate_ COULD contain a Dataset (directory) data entity of type `["Dataset"]
 
 The _Crate_ COULD contain a Dataset (directory) data entity of type `["Dataset"]` named "examples" to hold examples.
 
-## Workflow Hub-specific Requirements
+## Workflow Hub-specific Features/Requirements
+
+### Extracted Metadata
+
+The Workflow Hub will extract and expose the following properties from the Crate entity (`./`) in `ro-crate-metadata.jsonld`:
+
+* `name` - This will be shown as the title of the workflow.
+* `description` - This will be shown as the description of the workflow. 
+If it is not present, but a `README.md` file is available in the root of the crate, that will be rendered instead.
+* `author` - These will be shown as "creators" of the workflow.
+* `license` - See below.
+* `keywords` - These will be shown as "tags", and can be filtered over.
+
+If the _Main Workflow CWL Description_ is present it will be parsed and the inputs, outputs and steps will be listed on the workflow's page in the Hub.
+
+If the _Main Workflow Diagram_ is present, it will also be rendered on the page.
+
+### Supported Workflow Types
 
 The Workflow Hub currently supports CWL, Galaxy, KNIME and Nextflow workflow types.
 
 To ensure compatibility, please include one of the following in the RO Crate metadata, and refer to it from the _Main Workflow_'s `programmingLanguage`.
-
-### Supported Workflow Types
 
 #### CWL
 ```json
