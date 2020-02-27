@@ -1349,6 +1349,8 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal other_person,sop.policy.permissions.first.contributor
     assert_equal Policy::MANAGING,sop.policy.permissions.first.access_type
 
+    assert_equal 'SOP was successfully updated.',flash[:notice]
+
   end
 
   test 'manage_update fails without manage rights' do
