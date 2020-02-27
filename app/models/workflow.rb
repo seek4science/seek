@@ -40,4 +40,8 @@ class Workflow < ApplicationRecord
   def self.user_creatable?
     Seek::Config.workflows_enabled
   end
+
+  def contributor_credited?
+    false
+  end
 end
