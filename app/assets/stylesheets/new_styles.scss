@@ -1,29 +1,19 @@
 @import 'variables';
 @import 'mixins';
 
-html {
+html, body {
   height: 100%;
-  position: relative;
 }
 
 body {
   border: none;
-  min-height: 100%;
-  position: relative;
   margin: 0;
-  padding-bottom: $seek-footer-height + 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 #header {
   padding: 0 1em;
-}
-
-#myexp_sidebar {
-  background: none;
-}
-
-#bd {
-  background: none;
 }
 
 #content > .container-fluid,
@@ -89,13 +79,14 @@ ul.feed .file-type-icon img {
   border-radius: 4px;
 }
 
+#content {
+  flex: 1 0 auto;
+}
+
 #ft {
   background-color: $panel-default-heading-bg;
-  position: absolute;
+  flex-shrink: 0;
   text-align: center;
-  right: 0;
-  bottom: 0;
-  left: 0;
   margin-top: 2em;
   padding: 1em 0.5em;
   font-size: small;

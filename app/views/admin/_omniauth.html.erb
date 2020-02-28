@@ -8,7 +8,31 @@
                              "Omniauth user activation on login", "The user created through login by omniauth is automatically activated and does not require email confirmation.") %>
 
   <%= admin_checkbox_setting(:omniauth_ldap_enabled, 1, Seek::Config.omniauth_ldap_enabled,
-                             "LDAP authentication", "Enables use of LDAP for authentication.") %>
+                             "LDAP authentication", "Enables use of LDAP for authentication.",
+                             onchange: toggle_appear_javascript('omniauth_ldap_settings')) %>
+
+  <div id="omniauth_ldap_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_ldap_enabled) -%>;">
+    <div class="row">
+      <div class="col-sm-7">
+        <%= admin_text_setting(:omniauth_ldap_host, Seek::Config.omniauth_ldap_settings('host'), 'Host') %>
+        <%= admin_text_setting(:omniauth_ldap_port, Seek::Config.omniauth_ldap_settings('port'), 'Port') %>
+        <%= admin_dropdown_setting(:omniauth_ldap_method,
+                                   options_for_select(
+                                       [['Plain', :plain], ['SSL', :ssl], ['TLS', :tls]],
+                                       Seek::Config.omniauth_ldap_settings('method')
+                                   ),
+                                   'Encryption method') %>
+        <%= admin_text_setting(:omniauth_ldap_base, Seek::Config.omniauth_ldap_settings('base'),
+                               'Base DN', 'The DN where users will be searched for.') %>
+        <%= admin_text_setting(:omniauth_ldap_uid, Seek::Config.omniauth_ldap_settings('uid'),
+                               'Username attribute', "The LDAP attribute to use as the username. In Active Directory: 'sAMAccountName' or 'UserPrincipalName'. In OpenLDAP: 'uid'") %>
+        <%= admin_text_setting(:omniauth_ldap_bind_dn, Seek::Config.omniauth_ldap_settings('bind_dn'),
+                               'Bind DN (Optional)', 'Bind DN for performing user-lookup.') %>
+        <%= admin_password_setting(:omniauth_ldap_password, Seek::Config.omniauth_ldap_settings('password'),
+                                   'Password (Optional)', 'Password for performing user lookup.') %>
+      </div>
+    </div>
+  </div>
 
   <%= admin_checkbox_setting(:omniauth_elixir_aai_enabled, 1, Seek::Config.omniauth_elixir_aai_enabled,
                              "ELIXIR AAI authentication", "Enables use of ELIXIR AAI for authentication.",

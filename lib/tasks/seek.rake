@@ -9,6 +9,7 @@ require 'csv'
 namespace :seek do
   desc 'Creates background jobs to rebuild all authorization lookup table for all items.'
   task(repopulate_auth_lookup_tables: :environment) do
+    puts "..... repopulating auth lookup tables ..."
     Seek::Util.authorized_types.each do |type|
       type.remove_invalid_auth_lookup_entries
       type.find_each do |item|
@@ -73,6 +74,7 @@ namespace :seek do
 
   desc('clears temporary files from filestore/tmp')
   task(clear_filestore_tmp: :environment) do
+    puts "..... clearing the filestore tmp directory ..."
     FileUtils.rm_r(Dir["#{Seek::Config.temporary_filestore_path}/*"])
   end
 

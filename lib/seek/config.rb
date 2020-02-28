@@ -335,6 +335,15 @@ module Seek
       }
     end
 
+    def omniauth_ldap_settings(field)
+      omniauth_ldap_config.with_indifferent_access[field.to_s]
+    end
+
+    def set_omniauth_ldap_settings(field, value)
+      merge! :omniauth_ldap_config, field => (value.blank? ? nil : value)
+      value
+    end
+
     def omniauth_providers
       providers = {}
       providers[:ldap] = omniauth_ldap_config.merge(name: :ldap, form: SessionsController.action(:new)) if omniauth_ldap_enabled

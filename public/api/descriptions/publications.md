@@ -3,13 +3,18 @@
 The response to a read of a **Publication** includes the following information:
 
 * **The title of the Publication**
+* **The Publication type**
 * **The journal in which the Publication is published**
 * **A string containing the date of publication**
-* **The PubMed ID**
 * **The preferred string for citing the Publication**
 * **A link to the Publication**
-* The DOI of the **Publication**
+* **The DOI of the Publication**
+* **The PubMed of the Publication**
 * A list of strings for the authors
+* A list of strings for the editors (optional)
+* Publisher (optional)
+* Booktitle (optional)
+* An extra URL for publications without DOI or PubMed ID (optional)
 * The sharing <a href="#Policy">**Policy**</a> for the **Publication**
 * References to the <a href="#people">**People**</a> who wrote the **Publication**
 * References to the <a href="#projects">**Projects**</a> described in the **Publication**

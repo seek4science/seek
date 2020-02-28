@@ -863,11 +863,14 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should update data file' do
+    df = Factory(:data_file, contributor:User.current_user.person)
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: data_files(:picture).id, data_file: { title: 'diff title' } }
+      put :update, params: { id: df.id, data_file: { title: 'diff title' } }
     end
 
-    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal 'Data file metadata was successfully updated.', flash[:notice]
+    assert assigns(:data_file)
+    assert_redirected_to data_file_path(df)
   end
 
   test 'should destroy DataFile' do
@@ -2814,7 +2817,8 @@ class DataFilesControllerTest < ActionController::TestCase
     params = { data_file: {
       title: 'Small File',
       project_ids: [project.id]
-    }, policy_attributes: valid_sharing,
+    }, tag_list:'fish, soup',
+               policy_attributes: valid_sharing,
                content_blob_id: blob.id.to_s,
                assay_ids: [] }
 
@@ -2837,6 +2841,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'Small File', df.title
     assert_equal person, df.contributor
     assert_empty df.assays
+    assert_equal ['fish','soup'].sort,df.tags.sort
 
     al = ActivityLog.last
     assert_equal 'create', al.action
@@ -3586,6 +3591,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 1,data_file.policy.permissions.count
     assert_equal other_person,data_file.policy.permissions.first.contributor
     assert_equal Policy::MANAGING,data_file.policy.permissions.first.access_type
+
+    assert_equal 'Data file was successfully updated.',flash[:notice]
 
   end
 

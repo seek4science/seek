@@ -57,6 +57,14 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
     Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
     Seek::Config.omniauth_ldap_enabled = string_to_boolean params[:omniauth_ldap_enabled]
+    Seek::Config.set_omniauth_ldap_settings 'host', params[:omniauth_ldap_host]
+    Seek::Config.set_omniauth_ldap_settings 'port', params[:omniauth_ldap_port]&.to_i
+    Seek::Config.set_omniauth_ldap_settings 'method', params[:omniauth_ldap_method]&.to_sym
+    Seek::Config.set_omniauth_ldap_settings 'base', params[:omniauth_ldap_base]
+    Seek::Config.set_omniauth_ldap_settings 'uid', params[:omniauth_ldap_uid]
+    Seek::Config.set_omniauth_ldap_settings 'bind_dn', params[:omniauth_ldap_bind_dn]
+    Seek::Config.set_omniauth_ldap_settings 'password', params[:omniauth_ldap_password]
+
     Seek::Config.omniauth_elixir_aai_enabled = string_to_boolean params[:omniauth_elixir_aai_enabled]
     Seek::Config.omniauth_elixir_aai_client_id = params[:omniauth_elixir_aai_client_id]
     Seek::Config.omniauth_elixir_aai_secret = params[:omniauth_elixir_aai_secret]

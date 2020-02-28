@@ -2,7 +2,7 @@ module Seek
   class Filterer
     # Hard-coded list of available filters for types. Overrides the automatically discovered filters (via `has_filter`).
     AVAILABLE_FILTERS = {
-        Publication: [:query, :programme, :project, :published_year, :author, :organism, :tag],
+        Publication: [:query, :programme, :project, :published_year, :publication_type, :author, :organism, :tag],
         Event: [:query, :created_at, :country],
         Person: [:query, :programme, :project, :institution, :location, :project_position, :expertise, :tool]
     }.freeze
@@ -99,7 +99,12 @@ module Seek
             label_mapping: MAPPINGS[:person_name],
             joins: [:people]
         ),
-        published_year: Seek::Filtering::YearFilter.new(field: 'published_date')
+        published_year: Seek::Filtering::YearFilter.new(field: 'published_date'),
+        publication_type: Seek::Filtering::Filter.new(
+            value_field: 'publication_types.key',
+            label_field: 'publication_types.title',
+            joins: [:publication_type]
+        ),
     }.freeze
 
     def initialize(klass)

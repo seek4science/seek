@@ -56,8 +56,8 @@ module Seek
         elsif content_is_webpage?(@info[:content_type])
           @type = 'webpage'
           page = summarize_webpage(handler.url)
-          @info[:title] = page.title
-          @info[:description] = page.description
+          @info[:title] = page.title&.strip
+          @info[:description] = page.description&.strip
           @info[:image] = page.images.best
         end
       end

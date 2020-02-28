@@ -8411,8 +8411,23 @@
                                 "citation": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
+                                "editor": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "booktitle": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "publisher": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "url": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
                                 "link_to_pub": {
-                                    "$ref": "#/definitions/nullableUriString"
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "publication_type": {
+                                    "$ref": "#/definitions/nonEmptyString"
                                 },
                                 "authors": {
                                     "$ref": "#/definitions/nullableNonEmptyStringList"
@@ -8427,6 +8442,7 @@
                                 "published_date",
                                 "pubmed_id",
                                 "citation",
+                                "publication_type",
                                 "link_to_pub"
                             ],
                             "additionalProperties": false
