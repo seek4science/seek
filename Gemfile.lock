@@ -578,7 +578,7 @@ GEM
     rainbow (2.2.2)
       rake
     raindrops (0.18.0)
-    rake (12.3.2)
+    rake (13.0.1)
     ransack (2.1.1)
       actionpack (>= 5.0)
       activerecord (>= 5.0)
