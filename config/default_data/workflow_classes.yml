@@ -13,11 +13,6 @@ knime_workflow_class:
   title: KNIME
   key: KNIME
 
-ro_workflow_class:
-  id: 4
-  title: Research Object
-  key: RO
-
 nextflow_class:
   id: 5
   title: Nextflow
