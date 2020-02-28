@@ -23,7 +23,7 @@
             url: '<%= metadata_extraction_ajax_workflows_path -%>',
             data: {
                 content_blob_id: <%= @workflow.content_blob.id -%>,
-                workflow_class_id: <%= @workflow.workflow_class_id -%>
+                workflow_class_id: <%= @workflow.workflow_class_id || 'null' -%>
             },
             error: function (jqXHR, textStatus,errorThrown) {
               $j('#in-progress').hide();

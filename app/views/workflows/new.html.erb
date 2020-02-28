@@ -1,26 +1,34 @@
 <h1>New <%= t('workflow') %></h1>
 
-<%= form_tag({:action => :create_content_blob}, :multipart => true) do -%>
+<%= form_tag({ action: :create_content_blob }, multipart: true) do -%>
   <%= hidden_field_tag 'workflow[parent_name]', @workflow.parent_name%>
-    <div class="asset_form">
-      <%= error_messages_for :workflow -%>
+  <div class="asset_form">
+    <%= error_messages_for :workflow -%>
 
-      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@workflow} -%>
+    <%= alert_box('info', hide_button: true) do %>
+      A workflow can be uploaded as a <a href="https://github.com/seek4science/seek/blob/workflow/docs/ro_crates.md" target="_blank">Workfow RO Crate</a> (recommended),
+      or as a separate workflow file.
+      <br/><br/>
+      Currently supported workflow types are: <%= WorkflowClass.order(:title).pluck(:title).join(', ') %>.
+    <% end %>
 
-      <div class="form-group">
-        <label class="required">Workflow type</label>
-        <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), "id", "title"),
-                       :include_blank => false,
-                       :class => 'form-control' %>
-      </div>
+    <%= render partial: 'assets/upload_box', locals: { resource: @workflow } -%>
 
-      <div>
-        <%= create_button :id => "workflow_submit_btn",
-                       :onclick => "return validateResourceFields('workflow')",
-                       :class => 'btn btn-primary',
-                          button_text:'Upload',
-                          'workflow-upload-file-text' => 'Upload'-%>
-        or <%= cancel_button(workflows_path) -%>
-      </div>
+    <div class="form-group">
+      <label class="required">Workflow type</label>
+      <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title'),
+                     include_blank: '(Determine from Workflow RO Crate)',
+                     class: 'form-control' %>
+      <p class="help-block">Unless uploading an Workflow RO Crate, please specify the workflow type.</p>
     </div>
+
+    <div>
+      <%= create_button id: 'workflow_submit_btn',
+                        onclick: "return validateResourceFields('workflow')",
+                        class: 'btn btn-primary',
+                        button_text:'Upload',
+                        'workflow-upload-file-text' => 'Upload'-%>
+      or <%= cancel_button(workflows_path) -%>
+    </div>
+  </div>
 <% end -%>

@@ -2,7 +2,6 @@
 
 <%= form_tag({action: :create_metadata}, multipart: true) do -%>
   <%= hidden_field_tag 'content_blob_id', session[:uploaded_content_blob_id] %>
-  <%= hidden_field_tag 'workflow[workflow_class_id]', @workflow.workflow_class_id %>
 
   <div class="asset_form">
     <% if @errors && @errors.any? %>
@@ -28,6 +27,12 @@
     <% end %>
 
     <%= error_messages_for :workflow -%>
+
+    <div class="form-group">
+      <label>Type</label>
+      <p class="form-control-static"><%= @workflow.workflow_class.title -%></p>
+      <%= hidden_field_tag 'workflow[workflow_class_id]', @workflow.workflow_class_id %>
+    </div>
 
     <div class="form-group">
       <label class="required">Title</label>

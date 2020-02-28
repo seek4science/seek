@@ -30,9 +30,10 @@ module Seek
         else
           # Or try and parse main workflow
           wf = crate&.main_workflow&.source&.source
-          extractor_class = self.class.extractor_from_programming_language(crate&.main_workflow&.programming_language)
+          extractor_class = self.class.determine_extractor_class(crate&.main_workflow&.programming_language)
           if extractor_class
             m = extractor_class.new(wf).metadata
+            m[:workflow_class_id] = extractor_class.workflow_class&.id
           elsif @inner_extractor_class
             m = @inner_extractor_class.new(wf).metadata
           else
@@ -82,7 +83,7 @@ module Seek
         super
       end
 
-      def self.extractor_from_programming_language(language)
+      def self.determine_extractor_class(language)
         matchable = ['identifier', 'name', 'alternateName', '@id', 'url']
         @extractor_matcher ||= [Seek::WorkflowExtractors::CWL,
                                 Seek::WorkflowExtractors::KNIME,

@@ -119,7 +119,7 @@ class WorkflowsController < ApplicationController
 
   # Displays the form Wizard for providing the metadata for the workflow
   def provide_metadata
-    @workflow ||= Workflow.new(session[:metadata].merge(workflow_class_id: params[:workflow_class_id]))
+    @workflow ||= Workflow.new(session[:metadata].reverse_merge(workflow_class_id: params[:workflow_class_id]))
     @warnings ||= session[:processing_warnings] || []
     @errors ||= session[:processing_errors] || []
 

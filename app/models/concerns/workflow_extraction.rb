@@ -6,12 +6,12 @@ module WorkflowExtraction
   extend ActiveSupport::Concern
 
   def extractor_class
-    workflow_class.extractor_class
+    workflow_class&.extractor_class
   end
 
   def extractor
     if is_already_ro_crate?
-      Seek::WorkflowExtractors::ROCrate.new(content_blob, inner_extractor_class: extractor_class)
+      Seek::WorkflowExtractors::ROCrate.new(content_blob, inner_extractor_class: workflow_class ? extractor_class : nil)
     else
       extractor_class.new(content_blob)
     end

@@ -44,6 +44,10 @@ module Seek
       def default_diagram_format
         self.class.default_diagram_format
       end
+
+      def self.workflow_class
+        WorkflowClass.find_by_key(name.demodulize)
+      end
     end
   end
 end
