@@ -11,8 +11,8 @@ module Seek
           if (is_myexperiment_url? url)
           else
             page = summarize_webpage(url)
-            @title = page.title
-            @description = page.description
+            @title = page.title.strip
+            @description = page.description.strip
             @image = page.images.best
           end
         else
