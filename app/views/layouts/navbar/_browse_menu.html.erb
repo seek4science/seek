@@ -45,12 +45,14 @@
     <% if Seek::Config.events_enabled %>
         <li><%= link_to t("event").pluralize, events_path %></li>
     <% end %>
-    <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
-    <% if Seek::Config.samples_enabled %>
-      <li><%= link_to(t("sample_type").pluralize, sample_types_path) %></li>
-    <% end %>
-    <% if Seek::Config.organisms_enabled %>
-        <li><%= link_to t("organism").pluralize, organisms_path %></li>
+    <% if Seek::Config.samples_enabled || Seek::Config.organisms_enabled %>
+      <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
+      <% if Seek::Config.samples_enabled %>
+        <li><%= link_to(t("sample_type").pluralize, sample_types_path) %></li>
+      <% end %>
+      <% if Seek::Config.organisms_enabled %>
+          <li><%= link_to t("organism").pluralize, organisms_path %></li>
+      <% end %>
     <% end %>
   </ul>
 </li>

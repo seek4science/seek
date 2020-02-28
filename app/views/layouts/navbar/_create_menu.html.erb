@@ -54,6 +54,7 @@
             <li><%= link_to t("event"), new_event_path %></li>
         <% end %>
 
+      <% if Seek::Config.samples_enabled || Seek::Config.organisms_enabled %>
         <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
         <% if Sample.can_create? %>
             <li><%= link_to(t("sample"), select_sample_types_path) %></li>
@@ -61,18 +62,13 @@
         <% if SampleType.can_create? %>
             <li><%= link_to(t("sample_type"), new_sample_type_path) %></li>
         <% end %>
-        <li><%= link_to(t("strain"), new_strain_path) %></li>
-        <% if can_create_organisms? %>
-            <li><%= link_to t("organism"), new_organism_path %></li>
+        <% if Seek::Config.organisms_enabled && can_create_organisms? %>
+          <li><%= link_to(t("strain"), new_strain_path) %></li>
+          <li><%= link_to t("organism"), new_organism_path %></li>
         <% end %>
-
+      <% end %>
     <% else %>
         <li role="presentation" class="dropdown-header"><span style="color:red">You cannot add assets or other items until you are a member of a <%= t('project') %>.</span></li>
     <% end %>
-
-
-
-
   </ul>
-
 </li>
