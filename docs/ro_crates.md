@@ -43,6 +43,10 @@ The _Crate_ COULD contain a Dataset (directory) data entity of type `["Dataset"]
 
 ## Workflow Hub-specific Features/Requirements
 
+### File Extension
+
+The Workflow RO Crate must have the file extension `.crate.zip` to be recognized by the Workflow Hub.
+
 ### Extracted Metadata
 
 The Workflow Hub will extract and expose the following properties from the Crate entity (`./`) in `ro-crate-metadata.jsonld`:
