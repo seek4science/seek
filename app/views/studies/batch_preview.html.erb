@@ -1,36 +1,60 @@
+<h1>Studies Batch Upload</h1>
+
 <%= form_for :studies, url: batch_create_studies_path do |f| %>
   <table class="table">
     <thead>
     <tr>
-      <th scope="col">Study ID</th>
-      <th scope="col" class="required">Study Title</th>
+      <th scope="col">Study ID *</th>
+      <th scope="col" class="required">Study Title *</th>
       <th scope="col">Study Description</th>
+      <th scope="col">Start date *</th>
       <th scope="col">Data File/Path</th>
-      <th scope="col">Start date</th>
     </tr>
     </thead>
     <tbody>
-    <% @studies.each do |study| %>
+    <% @studies_obj.each do |study| %>
       <tr>
         <th scope="row">
-          <%= f.text_field :id, name: "studies[id][]", :class=>"form-control", value: study[0].value %>
+          <%= f.text_field :id, disabled: true, name: "studies[id][]", :class=>"form-control", value: study.id %> <!-- study[0].value -->
         </th>
         <td>
-          <%= f.text_area :title, name: "studies[title][]",:class=>"form-control", value: study[1].value %>
+          <%= f.text_area :title, required: true, name: "studies[title][]",:class=>"form-control", value: study.title %> <!-- study[1].value -->
         </td>
         <td>
-          <%= f.text_area :description, name: "studies[description][]",:class=>"form-control", value: study[2].value %>
+          <%= f.text_area :description, name: "studies[description][]",:class=>"form-control", value: study.description %> <!-- study[2].value -->
         </td>
         <td>
-          <%= f.text_area :description,:class=>"form-control", disabled: true, value: @studies_data[0] %>
+          <%= f.text_field :startDate, required: true, name: "studies[startDate][]",:class=>"form-control", value: study.description.scan(/'([^']*)'/)[0] %> <!-- study[3].value -->
+        </td>
+        <td>
+          <%= f.text_area :dataFile,:class=>"form-control", disabled: true, value: @studies_data[0] %>
         </td>
       </tr>
     <% end %>
     </tbody>
   </table>
 
+  <div class="form-group">
+    <%= f.label "Experimentalist(s)" %>
+    <%= f.text_field :experimentalists, :class=>"form-control" %>
+  </div>
+
+  <%= folding_panel("#{t('investigation')} details") do %>
+    <label class="required"><%= t('investigation') %></label>
+    <div id="investigation_collection">
+      <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
+    </div>
+
+    <%= f.label t('person_responsible').capitalize %>
+    <div id="person_responsible_collection">
+      <% people = @study.investigation ? @study.investigation.projects.collect(&:people).flatten : [] -%>
+      <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
+    </div>
+  <% end %>
+
   <%= f.submit "Create", :class => 'btn btn-primary' -%>
   or <%= cancel_button(studies_path) -%>
+
 <% end %>
 
 <!-- button_link_to("View samples", 'view_samples', sample_type_samples_path(sample_type)) -->

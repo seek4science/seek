@@ -43,18 +43,24 @@ class Study < ApplicationRecord
   end
 
   def self.extract_studies_from_file(studies_file)
-    studies = []
+    studies_array = []
     studies_obj = []
     parsed_sheet = Seek::Templates::StudiesReader.new(studies_file)
     column_details = parsed_sheet.column_details
 
     #FIXME: Take into account empty columns
-    parsed_sheet.each_record([2, 3, 4, 5]) do |index, data|
+    parsed_sheet.each_record([2, 3, 4, 5, 6]) do |index, data|
       if index > 4
-        studies << data
+        studies_array << data
+        studies_obj << Study.new(
+          id: index, title: data[1].value,
+          description: data[2].value +
+              ". Study ID: " + data[0].value +
+              ". Start date: '" + data[3].value + "'" # discuss study ID and startDate
+        )
       end
     end
-    studies
+    [studies_array, studies_obj] # remove array when start date is added to studies_obj
   end
 
   def self.unzip_batch(file_path)
