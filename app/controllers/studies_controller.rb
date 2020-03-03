@@ -128,25 +128,41 @@ class StudiesController < ApplicationController
     studies_file.tmp_io_object=File.open("#{Rails.root}/tmp/#{study_filename}")
     studies_file.original_filename="#{study_filename}"
     studies_file.save!
-    @studies = Study.extract_studies_from_file(studies_file)
+    @studies_array, @studies_obj = Study.extract_studies_from_file(studies_file)
+    @study = @studies_obj[0]
     @studies_data = Study.extract_study_data_from_file(data_files)
     render 'studies/batch_preview'
   end
 
   def batch_create
-    #create methode will be called for each study
+    # create method will be called for each study
     # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: Factory(:private_policy))
     # study.policy = Policy.create(name: 'default policy', access_type: 1)
-    studies_obj = []
-    @studies_array = params[:studies]
-    @studies_array[:id].length.times do |index, data|
-      studies_obj << Study.new(
-        title: @studies_array[:id][index],
-        description: @studies_array[:description][index],
-        investigation_id: 0
-      )
+    studies_length = params[:studies][:title].length
+    batch_uploaded = false
+    studies_length.times do |index|
+      study_params = {
+        title: params[:studies][:title][index],
+        description: params[:studies][:description][index],
+        investigation_id: params[:study][:investigation_id],
+        person_responsible_id: params[:study][:person_responsible_id]
+      }
+      @study = Study.new(study_params)
+      update_sharing_policies @study
+      update_relationships(@study, params)
+      batch_uploaded = true if @study.save
     end
-    render plain: params[:studies].inspect
+
+    if batch_uploaded
+      respond_to do |format|
+        flash[:notice] = "The #{t('studies')} were successfully created.<br/>".html_safe
+        format.html { redirect_to studies_path }
+      end
+    else
+      respond_to do |format|
+        format.html { render action: 'batch_preview', status: :unprocessable_entity }
+      end
+    end
   end
 
 
