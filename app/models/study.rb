@@ -37,30 +37,35 @@ class Study < ApplicationRecord
   end
 
 
-  def self.extract_study_data_from_file(data_files)
-    tmp_dir = "#{Rails.root}/tmp/"
-    data_files
+  def self.extract_study_data_from_file(studies_file)
+    studies_data_files = {}
+    parsed_sheet = Seek::Templates::StudiesReader.new(studies_file)
+
+    # FIXME: Take into account empty columns
+    parsed_sheet.each_record(5, [2, 3]) do |index, data|
+      if index > 4
+        study_code = data[0].value
+        data_file = data[1].value
+        studies_data_files[study_code] = data_file
+      end
+    end
+    studies_data_files
   end
 
   def self.extract_studies_from_file(studies_file)
-    studies_array = []
-    studies_obj = []
+    studies = []
     parsed_sheet = Seek::Templates::StudiesReader.new(studies_file)
-    column_details = parsed_sheet.column_details
 
-    #FIXME: Take into account empty columns
-    parsed_sheet.each_record([2, 3, 4, 5, 6]) do |index, data|
+    # FIXME: Take into account empty columns
+    parsed_sheet.each_record(3, [2, 3, 4, 5, 6]) do |index, data|
       if index > 4
-        studies_array << data
-        studies_obj << Study.new(
+        studies << Study.new(
           id: index, title: data[1].value,
-          description: data[2].value +
-              ". Study ID: " + data[0].value +
-              ". Start date: '" + data[3].value + "'" # discuss study ID and startDate
+          description: data[2].value # discuss study ID and startDate
         )
       end
     end
-    [studies_array, studies_obj] # remove array when start date is added to studies_obj
+    studies
   end
 
   def self.unzip_batch(file_path)

@@ -122,15 +122,15 @@ class StudiesController < ApplicationController
 
   def preview_content
     tempzip_path = params[:content_blobs][0][:data].tempfile.path
-    data_files, studies = Study.unzip_batch tempzip_path
+    data_files, studies = Study.unzip_batch(tempzip_path)
     study_filename = studies.first.name
     studies_file = ContentBlob.new
     studies_file.tmp_io_object=File.open("#{Rails.root}/tmp/#{study_filename}")
     studies_file.original_filename="#{study_filename}"
     studies_file.save!
-    @studies_array, @studies_obj = Study.extract_studies_from_file(studies_file)
-    @study = @studies_obj[0]
-    @studies_data = Study.extract_study_data_from_file(data_files)
+    @studies = Study.extract_studies_from_file(studies_file)
+    @study = @studies[0]
+    @studies_datafiles = Study.extract_study_data_from_file(studies_file)
     render 'studies/batch_preview'
   end
 
@@ -138,6 +138,7 @@ class StudiesController < ApplicationController
     # create method will be called for each study
     # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: Factory(:private_policy))
     # study.policy = Policy.create(name: 'default policy', access_type: 1)
+    # render plain: params[:studies].inspect
     studies_length = params[:studies][:title].length
     batch_uploaded = false
     studies_length.times do |index|
@@ -148,8 +149,6 @@ class StudiesController < ApplicationController
         person_responsible_id: params[:study][:person_responsible_id]
       }
       @study = Study.new(study_params)
-      update_sharing_policies @study
-      update_relationships(@study, params)
       batch_uploaded = true if @study.save
     end
 
