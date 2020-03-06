@@ -12,9 +12,9 @@ module Seek
         @template_content_blob = template_content_blob
       end
 
-      def column_details
+      def column_details sheet_id
         return nil unless compatible?
-        cells = template_xml_document.find("//ss:sheet[@index='#{sheet_index}']/ss:rows/ss:row[@index=1]/ss:cell")
+        cells = template_xml_document.find("//ss:sheet[@index='#{sheet_id}']/ss:rows/ss:row[@index=1]/ss:cell")
         cells.collect do |cell|
           unless (heading = cell.content).blank?
             ColumnDetails.new(heading, cell.attributes['column'].to_i)
@@ -22,8 +22,8 @@ module Seek
         end.compact
       end
 
-      def each_record(columns = nil)
-        rows = template_xml_document.find("//ss:sheet[@index='#{sheet_index}']/ss:rows/ss:row")
+      def each_record(sheet_id, columns = nil)
+        rows = template_xml_document.find("//ss:sheet[@index='#{sheet_id}']/ss:rows/ss:row")
         rows.each do |row|
           next if (row_index = row.attributes['index'].to_i) <= 1
           data = row.children.collect do |cell|
