@@ -24,7 +24,6 @@ class SearchController < ApplicationController
     @results_scaled = Scale.all.collect {|scale| [scale.key, @results.select {|item| !item.respond_to?(:scale_ids) or item.scale_ids.include? scale.id}]}
     @results_scaled << ['all', @results]
     @results_scaled = Hash[*@results_scaled.flatten(1)]
-    logger.info @results_scaled.inspect
     if search_params[:scale]
       # when user does not login, search_params[:scale] is nil
       @results = @results_scaled[search_params[:scale]]
@@ -33,7 +32,6 @@ class SearchController < ApplicationController
        @results = @results_scaled['all']
        @scale_key = 'all'
     end
-
 
     if @results.empty?
       flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'.".html_safe
