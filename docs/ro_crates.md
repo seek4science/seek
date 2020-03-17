@@ -31,7 +31,7 @@ If present the _Main Workflow_ MUST refer to the _Main Workflow CWL Description_
 
 The _Crate_ COULD contain a data entity of type `["File", "ImageObject", "WorkflowSketch"]` as the _Main Workflow Diagram_.
 
-If present the _Main Workflow_ MUST refer to the _Main Workflow CWL Diagram_ via `image`.
+If present the _Main Workflow_ MUST refer to the _Main Workflow Diagram_ via `image`.
 
 ### Crate
 
