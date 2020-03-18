@@ -1,4 +1,4 @@
-<% avatar_for_object = @avatar_for.find(@avatar_for_id) -%>
+<% avatar_for_object = @avatar_for.constantize.find(@avatar_for_id) -%>
 <% return_path = params[:return_to] || polymorphic_path([avatar_for_object, :avatars]) %>
 <h1>Upload <%= @avatar_for.humanize -%>
   Picture: <%= link_to avatar_for_object.title, url_for(avatar_for_object) -%></h1>
