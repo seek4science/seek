@@ -93,7 +93,7 @@ module Seek
 
         param.keys.each do |asset_class|
           param[asset_class].keys.each do |id|
-            asset = eval("#{asset_class}.find_by_id(#{id})")
+            asset = asset_class.find_by_id(id)
             decision = param[asset_class][id]['decision']
             case decision.to_i
             when 1

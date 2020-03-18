@@ -424,7 +424,7 @@ module ApplicationHelper
 
   # returns the instance for the resource for the controller, e.g @data_file for data_files
   def resource_for_controller(c = controller_name)
-    eval "@#{c.singularize}"
+    instance_variable_get("@#{c.singularize}")
   end
 
   def cancel_button(path, html_options = {})

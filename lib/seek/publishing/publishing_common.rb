@@ -201,7 +201,7 @@ module Seek
           assets = []
           param.keys.each do |asset_class|
             param[asset_class].keys.each do |id|
-              assets << eval("#{asset_class}.find_by_id(#{id})")
+              assets << asset_class.find_by_id(id)
             end
           end
           assets.compact.uniq

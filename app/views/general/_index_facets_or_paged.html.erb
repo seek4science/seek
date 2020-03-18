@@ -1,4 +1,4 @@
-<% items ||= eval("@#{controller_name}") %>
+<% items ||= instance_variable_get("@#{controller_name}") %>
 
 <% if items.any? %>
   <% if items.is_a?(Seek::GroupedPagination::Collection) %>

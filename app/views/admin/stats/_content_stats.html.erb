@@ -8,40 +8,10 @@
   na_tag = content_tag(:span,"--",class:'none_text')
   #So we don't have to run lengthy authorization a second time when calculating total stats
 
-  total_visible_models = []
-  total_accessible_models = []
-  total_publicly_visible_models = []
-  total_publicly_accessible_models = []
-
-  total_accessible_sops = []
-  total_visible_sops = []
-  total_publicly_accessible_sops = []
-  total_publicly_visible_sops = []
-
-  total_accessible_data_files = []
-  total_visible_data_files = []
-  total_publicly_visible_data_files = []
-  total_publicly_accessible_data_files = []
-
-  total_accessible_assays = []
-  total_visible_assays = []
-  total_publicly_visible_assays = []
-  total_publicly_accessible_assays = []
-
-  total_accessible_studies = []
-  total_visible_studies = []
-  total_publicly_visible_studies = []
-  total_publicly_accessible_studies = []
-
-  total_accessible_investigations = []
-  total_visible_investigations = []
-  total_publicly_visible_investigations = []
-  total_publicly_accessible_investigations = []
-
-  total_accessible_presentations = []
-  total_visible_presentations = []
-  total_publicly_visible_presentations = []
-  total_publicly_accessible_presentations = []
+  total_visible = { models: [], sops: [], data_files: [], assays: [], studies: [], investigations: [], presentations: [] }
+  total_accessible = { models: [], sops: [], data_files: [], assays: [], studies: [], investigations: [], presentations: [] }
+  total_publicly_visible = { models: [], sops: [], data_files: [], assays: [], studies: [], investigations: [], presentations: [] }
+  total_publicly_accessible = { models: [], sops: [], data_files: [], assays: [], studies: [], investigations: [], presentations: [] }
 %>
 
 <h3>Content statistics</h3>
@@ -70,12 +40,12 @@
               <td><%= stat.people.count -%></td>
               <% authorised_types.each do |type| %>
                   <% if stat.project.children.empty? %>
-                      <% type_str = type.name.underscore.pluralize
-                         pub_vis = stat.send("publicly_visible_#{type_str}")
-                         pub_acc = stat.send("publicly_accessible_#{type_str}")
-                         total = stat.send("#{type_str}").count
-                         eval("total_publicly_visible_#{type_str} |= pub_vis")
-                         eval("total_publicly_accessible_#{type_str} |= pub_acc")
+                      <% type_sym = type.name.underscore.pluralize.to_sym
+                         pub_vis = stat.send("publicly_visible_#{type_sym}")
+                         pub_acc = stat.send("publicly_accessible_#{type_sym}")
+                         total = stat.send(type_sym).count
+                         total_publicly_visible[type_sym] |= pub_vis
+                         total_publicly_accessible[type_sym] |= pub_acc
                          display_total_pub_accessible_count = non_downloadable.include?(type) ? na_tag : pub_acc.count
 
                       -%>
@@ -95,10 +65,10 @@
           <td><b>Overall</b></td>
           <td><b><%= Person.count -%></b></td>
           <% authorised_types.each do |type| %>
-              <% type_str = type.name.underscore.pluralize
+              <% type_sym = type.name.underscore.pluralize.to_sym
                  total=type.count
-                 total_pub_vis = eval("total_publicly_visible_#{type_str}").count
-                 total_pub_acc = eval("total_publicly_accessible_#{type_str}").count
+                 total_pub_vis = total_publicly_visible[type_sym].count
+                 total_pub_acc = total_publicly_accessible[type_sym].count
                  display_total_pub_accessible_count = non_downloadable.include?(type) ? na_tag : total_pub_acc
 
               %>
@@ -135,16 +105,16 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
     <% registered_people = stat.registered_people.count %>
     <td><%= stat.people.count -%> (<%= registered_people -%>)</td>
     <% authorised_types.each do |type| %>
-        <% type_str = type.name.underscore.pluralize
-            vis = stat.send("visible_#{type_str}")
-            acc = stat.send("accessible_#{type_str}")
-            pub_vis = stat.send("publicly_visible_#{type_str}")
-            pub_acc = stat.send("publicly_accessible_#{type_str}")
-            total = stat.send("#{type_str}").count
-            eval("total_visible_#{type_str} |= vis")
-            eval("total_accessible_#{type_str} |= acc")
-            eval("total_publicly_visible_#{type_str} |= pub_vis")
-            eval("total_publicly_accessible_#{type_str} |= pub_acc")
+        <% type_sym = type.name.underscore.pluralize.to_sym
+            vis = stat.send("visible_#{type_sym}")
+            acc = stat.send("accessible_#{type_sym}")
+            pub_vis = stat.send("publicly_visible_#{type_sym}")
+            pub_acc = stat.send("publicly_accessible_#{type_sym}")
+            total = stat.send("#{type_sym}").count
+            total_visible[type_sym] |= vis
+            total_accessible[type_sym] |= acc
+            total_publicly_visible[type_sym] |= pub_vis
+            total_publicly_accessible[type_sym] |= pub_acc
             display_accessible_count = non_downloadable.include?(type) ? na_tag : acc.count
             display_pub_accessible_count = non_downloadable.include?(type) ? na_tag : pub_acc.count
         -%>
@@ -158,12 +128,12 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
     <td><b>Overall</b></td>
     <td><%= Person.count -%> (<%= User.where('person_id IS NOT NULL').count -%>)<em>*</em></td>
     <% authorised_types.each do |type| %>
-        <%  type_str = type.name.underscore.pluralize
+        <%  type_sym = type.name.underscore.pluralize.to_sym
             total=type.count
-            total_vis = eval("total_visible_#{type_str}").count
-            total_acc = eval("total_accessible_#{type_str}").count
-            total_pub_vis = eval("total_publicly_visible_#{type_str}").count
-            total_pub_acc = eval("total_publicly_accessible_#{type_str}").count
+            total_vis = total_visible[type_sym].count
+            total_acc = total_accessible[type_sym].count
+            total_pub_vis = total_publicly_visible[type_sym].count
+            total_pub_acc = total_publicly_accessible[type_sym].count
             display_total_accessible_count = non_downloadable.include?(type) ? na_tag : total_acc
             display_total_pub_accessible_count = non_downloadable.include?(type) ? na_tag : total_pub_acc
         %>

@@ -39,26 +39,24 @@ module Seek
       #
       # by default state_allows_#{action} always returns true, but can be overridden in the particular model type to tune its behaviour
       Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.each do |action|
-        eval <<-END_EVAL
-            def can_#{action}? user = User.current_user
-              authorized_for_#{action}?(user) && state_allows_#{action}?(user)
-            end
+        define_method "can_#{action}?" do |user = User.current_user|
+          send("authorized_for_#{action}?", user) && send("state_allows_#{action}?", user)
+        end
 
-            def authorized_for_#{action}? user = User.current_user
-                return true if new_record?
-                user_id = user.nil? ? 0 : user.id
-                if Seek::Config.auth_lookup_enabled
-                  lookup = self.lookup_for("#{action}", user_id)
-                else
-                  lookup=nil
-                end
-                if lookup.nil?
-                  authorized_for_action(user,"#{action}")
-                else
-                  lookup
-                end
-            end
-        END_EVAL
+        define_method "authorized_for_#{action}?" do |user = User.current_user|
+          return true if new_record?
+          user_id = user.nil? ? 0 : user.id
+          if Seek::Config.auth_lookup_enabled
+            lookup = self.lookup_for(action, user_id)
+          else
+            lookup=nil
+          end
+          if lookup.nil?
+            authorized_for_action(user, action)
+          else
+            lookup
+          end
+        end
       end
 
       module AuthLookupArrayExtensions
