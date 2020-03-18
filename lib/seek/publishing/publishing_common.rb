@@ -200,8 +200,9 @@ module Seek
         else
           assets = []
           param.keys.each do |asset_class|
+            klass = asset_class.constantize
             param[asset_class].keys.each do |id|
-              assets << asset_class.constantize.find_by_id(id)
+              assets << klass.find_by_id(id)
             end
           end
           assets.compact.uniq
