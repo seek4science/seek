@@ -38,7 +38,9 @@ module Seek
       # - state_allows_#{action} - to chekc that the state of the object allows that action to proceed
       #
       # by default state_allows_#{action} always returns true, but can be overridden in the particular model type to tune its behaviour
-      Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.each do |action|
+      Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.each do |action_sym|
+        action = action_sym.to_s
+
         define_method "can_#{action}?" do |user = User.current_user|
           send("authorized_for_#{action}?", user) && send("state_allows_#{action}?", user)
         end
@@ -49,7 +51,7 @@ module Seek
           if Seek::Config.auth_lookup_enabled
             lookup = self.lookup_for(action, user_id)
           else
-            lookup=nil
+            lookup = nil
           end
           if lookup.nil?
             authorized_for_action(user, action)
