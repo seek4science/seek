@@ -19,7 +19,7 @@
             <% if logged_in_and_registered? %>
                 <%= link_to 'Provide feedback', feedback_home_path -%> |
             <% end %>
-            <%= link_to 'Funding and Programmes', funding_home_path, :target => '_blank' -%> |
+            <%= link_to 'Funding and Programmes', funding_home_path -%> |
             <%= link_to 'Credits', Seek::Help::HelpDictionary.instance.help_link(:credits), :target => '_blank' -%>
             <% if Seek::Config.terms_enabled %>
                 | <%= link_to("Terms & Conditions", terms_home_path) %>
