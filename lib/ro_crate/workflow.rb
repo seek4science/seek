@@ -25,10 +25,7 @@ module ROCrate
     end
 
     def default_properties
-      super.merge(
-          '@id' => "./#{SecureRandom.uuid}",
-          '@type' => ['File', 'SoftwareSourceCode', 'Workflow']
-      )
+      super.merge('@type' => ['File', 'SoftwareSourceCode', 'Workflow'])
     end
   end
 end
