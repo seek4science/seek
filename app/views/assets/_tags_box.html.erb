@@ -1,6 +1,6 @@
 <%
    entity=controller_name.singularize
-   object=eval("@"+entity)
+   object=instance_variable_get("@#{entity}")
    title||="Tags"
    all_tags,all_item_tags = fetch_tags_for_item object
    owner_item_tags = object.annotations.with_attribute_name("tag").by_source("User",User.current_user.id).collect{|a| a.value}.uniq
