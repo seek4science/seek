@@ -194,6 +194,8 @@ class PublicationsController < ApplicationController
         format.json { render json: { error: error }, status: 422 }
         format.xml  { render xml: { error: error }, status: 422 }
       end
+
+      return
     end
 
     authors = []
