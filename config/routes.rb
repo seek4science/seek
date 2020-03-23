@@ -274,7 +274,6 @@ SEEK::Application.routes.draw do
 
   resources :institutions do
     collection do
-      get :request_all
       post :items_for_result
     end
     resources :people,:projects,:specimens,:only=>[:index]
