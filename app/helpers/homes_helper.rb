@@ -189,8 +189,8 @@ module HomesHelper
     link_to(text, session_path(login: 'guest', password: 'guest'), method: :post)
   end
 
-  def frontpage_button(link, image_path = nil)
-    link_to link, class: 'seek-homepage-button' do
+  def frontpage_button(link, image_path = nil, opts = {})
+    link_to link, opts.reverse_merge(class: 'seek-homepage-button') do
       if image_path
         image_tag(image_path) +
             content_tag(:span) do

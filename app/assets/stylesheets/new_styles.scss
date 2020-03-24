@@ -326,8 +326,9 @@ a.seek-homepage-button {
   border-radius: 4px;
   padding: 20px;
   margin: 5px;
+  text-decoration: none;
+
   &:hover {
-    text-decoration: none;
     background-color: #f0f0f0;
   }
 }
