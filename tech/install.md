@@ -64,7 +64,7 @@ The remaining packages are:
 
     sudo apt install build-essential git imagemagick libcurl4-gnutls-dev libgmp-dev \
         libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
-        libxml++2.6-dev libxslt1-dev nodejs openjdk-8-jdk openssh-server poppler-utils
+        libxml++2.6-dev libxslt1-dev nodejs openjdk-8-jdk openssh-server poppler-utils zip
 
 Installing these packages now will make installing Ruby easier later on:
 
