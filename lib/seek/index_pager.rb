@@ -67,13 +67,17 @@ module Seek
     end
 
     def paginate_assets(assets)
-      if @page.match?(/[0-9]+/) # Standard pagination
+      if @page.match?(/^[0-9]+$/) # Standard pagination
         assets.paginate(page: @page,
                         per_page: @per_page)
       elsif @page == 'all' # No pagination
         assets.paginate(page: 1, per_page: 1_000_000)
-      else # Alphabetical pagination
+      elsif @page.match?(/^[A-Z]$/) || @page=='?' || @page=='top' # Alphabetical pagination
         controller_model.paginate_after_fetch(assets, page_and_sort_params)
+      else #default to 1 if invalid page
+        @page=1
+        assets.paginate(page: @page,
+                        per_page: @per_page)
       end
     end
 
