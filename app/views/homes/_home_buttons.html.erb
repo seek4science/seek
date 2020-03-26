@@ -1,20 +1,20 @@
 <div class="row seek-homepage-button-container">
   <div class="col-sm-4">
-    <%= frontpage_button(workflows_path) do %>
-      <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-      Discover
-  <% end %>
+    <%= frontpage_button(help_link(:get_started,url_only:true),
+                         '/assets/front_page/home-get-started-3.svg') do %>
+        Get started
+    <% end %>
   </div>
   <div class="col-sm-4">
-    <%= frontpage_button(current_user ? new_workflow_path : login_path(return_to: new_workflow_path)) do %>
-      <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
-      Contribute
-  <% end %>
+    <%= frontpage_button(Seek::Config.programmes_enabled ? programmes_path : projects_path,
+                         '/assets/front_page/home-who-2.svg') do %>
+      Who is using it?
+    <% end %>
   </div>
   <div class="col-sm-4">
-    <%= frontpage_button('https://about.workflowhub.eu', nil, target: :_blank) do %>
-      <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-      About
-  <% end %>
+    <%= frontpage_button(help_link(:get_involved,url_only:true),
+                         '/assets/front_page/home-participate-3.svg') do %>
+        Get involved
+    <% end %>
   </div>
 </div>
