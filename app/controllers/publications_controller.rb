@@ -274,7 +274,7 @@ class PublicationsController < ApplicationController
   # Try and relate non_seek_authors to people in SEEK based on name and project
   def suggest_authors
     @publication.publication_authors.each do |author|
-      author.suggested_person = find_person_for_author(author, @publication.projects)
+      author.suggested_person = find_person_for_author(author, @publication.projects,false)
     end
   end
 
@@ -534,7 +534,7 @@ class PublicationsController < ApplicationController
 
   def associsate_authors_with_users(current_publication)
     current_publication.publication_authors.each do |author|
-      author.suggested_person = find_person_for_author(author, current_publication.projects)
+      author.suggested_person = find_person_for_author(author, current_publication.projects, true)
       unless author.suggested_person.nil?
         author.person_id = author.suggested_person.id
         author.save
@@ -573,8 +573,10 @@ class PublicationsController < ApplicationController
   # if there are still too many matches, they will be narrowed down by the first name initials
   # @param author [PublicationAuthor] the author to find a matching person for
   # @param projects [Array<Project>] projects to narrow matches is necessary
+  # @param  exact [Boolean] if the match should be exact match or not
   # @return [Person] the first match is returned or nil
-  def find_person_for_author(author, projects)
+  def find_person_for_author(author, projects, exact)
+
     matches = []
     # Get author by last name
     last_name_matches = Person.where(last_name: author.last_name)
@@ -606,6 +608,21 @@ class PublicationsController < ApplicationController
       last_name_matches = Person.where(last_name: ascii)
       matches = last_name_matches
     end
+    # when importing multiple bibtex file, the name matching need to be exact
+    if exact
+      unless  matches.empty?
+
+        first_and_last_name_matches = matches.select { |p| p.first_name.at(0).casecmp(author.first_name.at(0).upcase).zero? }
+
+        if first_and_last_name_matches.size >= 1
+          return first_and_last_name_matches.first
+          else
+          return nil
+          end
+      else
+        return nil
+      end
+  end
 
     # If more than one result, filter by project
     if matches.size > 1
@@ -635,7 +652,7 @@ class PublicationsController < ApplicationController
   end
 
   def replace_to_non_umlaut (str)
-    str.gsub!(/[äöüß]/) do |match|
+    replace_str = str.gsub(/[äöüß]/) do |match|
       case match
       when "ä" then 'ae'
       when "ö" then 'oe'
@@ -643,11 +660,11 @@ class PublicationsController < ApplicationController
       when "ß" then 'ss'
       end
     end
-    str
+    replace_str
   end
 
   def replace_to_umlaut (str)
-    str.gsub!(/(ae|oe|ue|ss)/) do |match|
+    replace_str = str.gsub(/(ae|oe|ue|ss)/) do |match|
       case match
       when "ae" then 'ä'
       when "oe" then 'ö'
@@ -655,6 +672,6 @@ class PublicationsController < ApplicationController
       when "ss" then 'ß'
       end
     end
-    str
+    replace_str
   end
 end
