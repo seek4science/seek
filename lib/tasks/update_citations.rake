@@ -71,21 +71,50 @@ namespace :seek do
   #run this task => bundle exec rake seek:refetch_metadata_with_doi
 
   task :refetch_metadata_with_doi => :environment do
-    puts "Publications:" + Publication.count.to_s
-    puts "Publications have DOI:" + Publication.where("doi IS NOT NULL").count.to_s
-    Publication.where("doi IS NOT NULL").each do |t|
-      unless (t.doi == "")
-        before = t.citation
-        t.extract_metadata(nil, t.doi)
-        after = t.citation
-        if (before != after)
-          puts "ID:" + t.id.to_s
-          puts "DOI:" + t.doi
-          puts "before:" + before
-          puts ("after:" + after+"\n")
-          t.update_column(:citation, after)
+  puts "Publications:" + Publication.count.to_s
+  puts "Publications have DOI:" + Publication.where("doi IS NOT NULL").count.to_s
+  Publication.where("doi IS NOT NULL").each do |t|
+    unless (t.doi == "")
+      before = t.citation
+      t.extract_metadata(nil, t.doi)
+      after = t.citation
+      if (before != after)
+        puts "ID:" + t.id.to_s
+        puts "DOI:" + t.doi
+        puts "before:" + before
+        puts ("after:" + after+"\n")
+        t.update_column(:citation, after)
+      end
+    end
+  end
+  end
+
+  task :update_publications_authors_with_doi => :environment do
+    log = Logger.new('./log/update_publication_authors_with_doi.log')
+    log.level = Logger::INFO
+    log.info "Publications:" + Publication.count.to_s
+    log.info "Publications have DOI:" + Publication.where("doi IS NOT NULL").count.to_s
+    Publication.where("doi IS NOT NULL").each_with_index  do |p, p_index|
+      unless (p.doi == "")
+        log.info (p_index+1).to_s+". ID:" +p.id.to_s+" DOI:"+p.doi+" authors_size("+p.publication_authors.size.to_s+")"+"\n"
+        publication_authors_in_DB = p.publication_authors
+        refected_publication_authors = p.fetch_pubmed_or_doi_result(nil, p.doi).authors
+        if publication_authors_in_DB.size == refected_publication_authors.size
+        publication_authors_in_DB.each_with_index  do |author, index|
+            unless author.first_name == refected_publication_authors[index].first_name
+              log.info(author.first_name+" "+author.last_name)
+              author.update_column(:first_name, refected_publication_authors[index].first_name)
+              log.info(author.first_name+" "+author.last_name)
+            end
+            unless author.last_name == refected_publication_authors[index].last_name
+              log.info author.first_name+" "+author.last_name
+              author.update_column(:last_name, refected_publication_authors[index].last_name)
+              log.info author.first_name+" "+author.last_name+"\n"
+            end
+        end
         end
       end
     end
   end
+
 end
