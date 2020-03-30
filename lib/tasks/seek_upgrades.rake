@@ -16,6 +16,7 @@ namespace :seek do
     db:seed:publication_types
     convert_old_ldap_settings
     convert_old_elixir_aai_settings
+    refix_country_codes
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -144,6 +145,17 @@ namespace :seek do
         puts "Setting 'omniauth_elixir_aai_enabled' to: true"
         Seek::Config.omniauth_elixir_aai_enabled = true
       end
+    end
+  end
+
+  task(refix_country_codes: :environment) do
+    [Institution, Event].each do |type|
+      count = 0
+      type.where('length(country) > 2').each do |item|
+        item.update_column(:country, CountryCodes.code(item.country))
+        count += 1
+      end
+      puts "Fixed #{count} #{type.name}s' country codes" if count > 0
     end
   end
 end
