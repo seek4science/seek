@@ -226,12 +226,6 @@ class ActiveSupport::TestCase
     path
   end
 
-  def assert_enqueued_emails(n)
-    assert_difference 'ActionMailer::Base.deliveries.size', n do
-      yield
-    end
-  end
-
   def assert_no_emails
     assert_no_difference 'ActionMailer::Base.deliveries.size' do
       yield
