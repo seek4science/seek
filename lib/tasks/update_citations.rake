@@ -98,18 +98,17 @@ namespace :seek do
       unless (p.doi == "")
         log.info (p_index+1).to_s+". ID:" +p.id.to_s+" DOI:"+p.doi+" authors_size("+p.publication_authors.size.to_s+")"+"\n"
         publication_authors_in_DB = p.publication_authors
-        refected_publication_authors = p.fetch_pubmed_or_doi_result(nil, p.doi).nil? ?  nil : p.fetch_pubmed_or_doi_result(nil, p.doi).authors
-        log.info refected_publication_authors.inspect
-        if !refected_publication_authors.nil? && publication_authors_in_DB.size == refected_publication_authors.size
+        refetched_publication_authors = p.fetch_pubmed_or_doi_result(nil, p.doi).nil? ?  nil : p.fetch_pubmed_or_doi_result(nil, p.doi).authors
+        if !refetched_publication_authors.nil? && publication_authors_in_DB.size == refetched_publication_authors.size
         publication_authors_in_DB.each_with_index  do |author, index|
-            unless author.first_name == refected_publication_authors[index].first_name
+            unless author.first_name == refetched_publication_authors[index].first_name
               log.info(author.first_name+" "+author.last_name)
-              author.update_column(:first_name, refected_publication_authors[index].first_name)
+              author.update_column(:first_name, refetched_publication_authors[index].first_name)
               log.info(author.first_name+" "+author.last_name)
             end
-            unless author.last_name == refected_publication_authors[index].last_name
+            unless author.last_name == refetched_publication_authors[index].last_name
               log.info author.first_name+" "+author.last_name
-              author.update_column(:last_name, refected_publication_authors[index].last_name)
+              author.update_column(:last_name, refetched_publication_authors[index].last_name)
               log.info author.first_name+" "+author.last_name+"\n"
             end
         end
