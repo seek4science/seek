@@ -452,7 +452,7 @@ class HomesControllerTest < ActionController::TestCase
     with_config_value :front_page_buttons_enabled, true do
       get :index
       assert_response :success
-      assert_select 'a.seek-homepage-button', count: 2
+      assert_select 'a.seek-homepage-button', count: 3
     end
     with_config_value :front_page_buttons_enabled, false do
       get :index

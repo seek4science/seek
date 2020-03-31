@@ -295,7 +295,7 @@ class PeopleController < ApplicationController
   end
 
   def notification_params
-    params.permit(:projects, :institutions, :other_projects, :other_institutions)
+    params.permit({ projects: [] }, { institutions: [] }, :other_projects, :other_institutions)
   end
 
   def set_tools_and_expertise(person, params)
