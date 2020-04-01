@@ -30,7 +30,7 @@
 
     <div class="form-group">
       <label>Type</label>
-      <p class="form-control-static"><%= @workflow.workflow_class.title -%></p>
+      <p class="form-control-static"><%= @workflow.workflow_class_title-%></p>
       <%= hidden_field_tag 'workflow[workflow_class_id]', @workflow.workflow_class_id %>
     </div>
 

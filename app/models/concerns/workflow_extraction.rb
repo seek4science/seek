@@ -5,8 +5,12 @@ module WorkflowExtraction
 
   extend ActiveSupport::Concern
 
+  def workflow_class_title
+    workflow_class ? workflow_class.title : 'Unrecognized workflow type'
+  end
+
   def extractor_class
-    workflow_class&.extractor_class
+    workflow_class&.extractor_class || Seek::WorkflowExtractors::Base
   end
 
   def extractor
@@ -65,9 +69,11 @@ module WorkflowExtraction
       crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, extractor_class.ro_crate_metadata)
 
       d = diagram
-      wdf = ROCrate::WorkflowDiagram.new(crate, d.path, d.filename)
-      wdf.content_size = d.size
-      crate.main_workflow.diagram = wdf
+      if d.exists?
+        wdf = ROCrate::WorkflowDiagram.new(crate, d.path, d.filename)
+        wdf.content_size = d.size
+        crate.main_workflow.diagram = wdf
+      end
 
       crate.date_published = Time.now
       crate.author = related_people.map { |person| crate.add_person(nil, person.ro_crate_metadata) }

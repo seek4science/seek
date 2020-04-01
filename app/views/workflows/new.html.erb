@@ -17,7 +17,7 @@
     <div class="form-group">
       <label class="required">Workflow type</label>
       <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title'),
-                     include_blank: '(Determine from Workflow RO Crate)',
+                     include_blank: 'Other/Auto-detect type',
                      class: 'form-control' %>
       <p class="help-block">Unless uploading an Workflow RO Crate, please specify the workflow type.</p>
     </div>
