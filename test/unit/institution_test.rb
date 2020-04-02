@@ -184,7 +184,7 @@ class InstitutionTest < ActiveSupport::TestCase
 
   test 'country conversion and validation' do
     institution = Factory.build(:institution, country:nil)
-    assert institution.valid?
+    refute institution.valid?
     assert institution.country.nil?
 
     institution.country = ''
@@ -222,5 +222,7 @@ class InstitutionTest < ActiveSupport::TestCase
     }
     institution.reload
     assert_equal 'DE',institution.country
+
+
   end
 end
