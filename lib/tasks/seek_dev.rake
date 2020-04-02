@@ -261,21 +261,57 @@ namespace :seek_dev do
     end
   end
 
+  task build_test_custom_metadata: :environment do
+    unless CustomMetadataType.where(supported_type: 'Investigation').any?
+      cmt = CustomMetadataType.new(title: 'test Investigation metadata', supported_type:'Investigation')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
+      cmt.save!
+      puts "Created test CMT for Investigation"
+    else
+      puts "CMT for Investigation already exists"
+    end
+
+    unless CustomMetadataType.where(supported_type: 'Study').any?
+      cmt = CustomMetadataType.new(title: 'test Study metadata', supported_type:'Study')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
+      cmt.save!
+      puts "Created test CMT for Study"
+    else
+      puts "CMT for Study already exists"
+    end
+
+    unless CustomMetadataType.where(supported_type: 'Assay').any?
+      cmt = CustomMetadataType.new(title: 'test Assay metadata', supported_type:'Assay')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
+      cmt.save!
+      puts "Created test CMT for Assay"
+    else
+      puts "CMT for Assay already exists"
+    end
+
+  end
+
   task find_duplicate_users_by_name_match: :environment do
     File.delete("./log/duplicate_users.log") if File.exist?("./log/duplicate_users.log")
     output = File.open( "./log/duplicate_users.log","w" )
     duplicated_users = Person.select(:first_name,:last_name).group(:first_name,:last_name).having("count(*)>1")
     #pp duplicated_users
-      duplicated_users.each do |duplicated_user|
-        matches = Person.where(first_name: duplicated_user.first_name, last_name: duplicated_user.last_name)
-        puts duplicated_user.first_name+" "+duplicated_user.last_name+"("+matches.size.to_s+")"
-        output << duplicated_user.first_name+" "+duplicated_user.last_name+"("+matches.size.to_s+")"+"\n"
-        matches.each do |match|
-          puts "ID "+ match.id.to_s+":"+ match.email
-          output << "ID "+ match.id.to_s+":"+ match.email+"\n"
-        end
-        output << "\n"
+    duplicated_users.each do |duplicated_user|
+      matches = Person.where(first_name: duplicated_user.first_name, last_name: duplicated_user.last_name)
+      puts duplicated_user.first_name+" "+duplicated_user.last_name+"("+matches.size.to_s+")"
+      output << duplicated_user.first_name+" "+duplicated_user.last_name+"("+matches.size.to_s+")"+"\n"
+      matches.each do |match|
+        puts "ID "+ match.id.to_s+":"+ match.email
+        output << "ID "+ match.id.to_s+":"+ match.email+"\n"
       end
+      output << "\n"
+    end
     output.close
   end
 
