@@ -6,10 +6,9 @@ class PublicationsController < ApplicationController
   include Seek::PreviewHandling
 
   before_action :publications_enabled?
-
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[show edit update destroy]
-  before_action :suggest_authors, only: :mange
+  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy]
+  before_action :suggest_authors, only: [:manage]
 
   include Seek::BreadCrumbs
 
@@ -73,9 +72,8 @@ class PublicationsController < ApplicationController
   def edit; end
 
   # GET /publications/1/manage
-  def manage
-    @publication = Publication.find(params[:id])
-  end
+  def manage; end
+
 
   # POST /publications
   # POST /publications.xml
@@ -165,11 +163,12 @@ class PublicationsController < ApplicationController
     @publication = Publication.new(publication_params)
     publication_type_id= params[:publication][:publication_type_id]
     doi= params[:publication][:doi]
+    pubmed_id = params[:publication][:pubmed_id]
     id= params[:publication][:id]
     if publication_type_id.blank?
       @error = "Please choose a publication type."
     else
-      result = get_data(@publication, nil, doi)
+      result = get_data(@publication, pubmed_id, doi)
     end
     @error =  @publication.errors.full_messages.join('<br>') if @publication.errors.any?
     if !@error.nil?
@@ -194,6 +193,8 @@ class PublicationsController < ApplicationController
         format.json { render json: { error: error }, status: 422 }
         format.xml  { render xml: { error: error }, status: 422 }
       end
+
+      return
     end
 
     authors = []
@@ -245,6 +246,8 @@ class PublicationsController < ApplicationController
         format.json { render json: { error: error }, status: 422 }
         format.xml  { render xml: { error: error }, status: 422 }
       end
+
+      return
     end
 
     first_name, last_name = PublicationAuthor.split_full_name full_name
@@ -274,7 +277,7 @@ class PublicationsController < ApplicationController
   # Try and relate non_seek_authors to people in SEEK based on name and project
   def suggest_authors
     @publication.publication_authors.each do |author|
-      author.suggested_person = find_person_for_author(author, @publication.projects)
+      author.suggested_person = find_person_for_author(author, @publication.projects,false)
     end
   end
 
@@ -323,7 +326,7 @@ class PublicationsController < ApplicationController
   end
 
   def publication_params
-    params.require(:publication).permit(:publication_type_id, :pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,:editor,
+    params.require(:publication).permit(:publication_type_id, :pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,:url,:editor,
                                         :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
                                         { data_file_ids: [] }, { scales: [] },
@@ -426,6 +429,7 @@ class PublicationsController < ApplicationController
       flash[:error] = 'Please upload a bibtex file!'
     else
       bibtex_file = params[:publication].delete(:bibtex_file)
+      #TODO:hu check the encoding problem here, when exception due to encoding, add an error message
       data = bibtex_file.read.force_encoding('UTF-8')
       bibtex = BibTeX.parse(data,:filter => :latex)
       if bibtex[0].nil?
@@ -533,7 +537,7 @@ class PublicationsController < ApplicationController
 
   def associsate_authors_with_users(current_publication)
     current_publication.publication_authors.each do |author|
-      author.suggested_person = find_person_for_author(author, current_publication.projects)
+      author.suggested_person = find_person_for_author(author, current_publication.projects, true)
       unless author.suggested_person.nil?
         author.person_id = author.suggested_person.id
         author.save
@@ -572,8 +576,10 @@ class PublicationsController < ApplicationController
   # if there are still too many matches, they will be narrowed down by the first name initials
   # @param author [PublicationAuthor] the author to find a matching person for
   # @param projects [Array<Project>] projects to narrow matches is necessary
+  # @param  exact [Boolean] if the match should be exact match or not
   # @return [Person] the first match is returned or nil
-  def find_person_for_author(author, projects)
+  def find_person_for_author(author, projects, exact)
+
     matches = []
     # Get author by last name
     last_name_matches = Person.where(last_name: author.last_name)
@@ -605,6 +611,21 @@ class PublicationsController < ApplicationController
       last_name_matches = Person.where(last_name: ascii)
       matches = last_name_matches
     end
+    # when importing multiple bibtex file, the name matching need to be exact
+    if exact
+      unless  matches.empty?
+
+        first_and_last_name_matches = matches.select { |p| p.first_name.at(0).casecmp(author.first_name.at(0).upcase).zero? }
+
+        if first_and_last_name_matches.size >= 1
+          return first_and_last_name_matches.first
+          else
+          return nil
+          end
+      else
+        return nil
+      end
+  end
 
     # If more than one result, filter by project
     if matches.size > 1
@@ -634,7 +655,7 @@ class PublicationsController < ApplicationController
   end
 
   def replace_to_non_umlaut (str)
-    str.gsub!(/[äöüß]/) do |match|
+    replace_str = str.gsub(/[äöüß]/) do |match|
       case match
       when "ä" then 'ae'
       when "ö" then 'oe'
@@ -642,11 +663,11 @@ class PublicationsController < ApplicationController
       when "ß" then 'ss'
       end
     end
-    str
+    replace_str
   end
 
   def replace_to_umlaut (str)
-    str.gsub!(/(ae|oe|ue|ss)/) do |match|
+    replace_str = str.gsub(/(ae|oe|ue|ss)/) do |match|
       case match
       when "ae" then 'ä'
       when "oe" then 'ö'
@@ -654,6 +675,6 @@ class PublicationsController < ApplicationController
       when "ss" then 'ß'
       end
     end
-    str
+    replace_str
   end
 end

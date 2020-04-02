@@ -140,7 +140,7 @@ class ApplicationController < ActionController::Base
   # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
   def determine_asset_from_controller
     name = controller_name.singularize
-    eval("@#{name}")
+    instance_variable_get("@#{name}")
   end
 
   def restrict_guest_user
@@ -161,7 +161,7 @@ class ApplicationController < ActionController::Base
           else
             path = nil
             begin
-              path = eval("main_app.#{controller_name}_path")
+              path = main_app.polymorphic_path(controller_name)
             rescue NoMethodError => e
               logger.error("No path found for controller - #{controller_name}")
               path = main_app.root_path
@@ -224,10 +224,10 @@ class ApplicationController < ActionController::Base
         format.json { render json: { errors: [{ title: 'Not found',
                                                 detail: "Couldn't find #{name.camelize} with 'id'=[#{params[:id]}]" }] },
                              status: :not_found }
-        format.html { redirect_to eval "#{controller_name}_path" }
+        format.html { redirect_to polymorphic_path(controller_name) }
       end
     else
-      eval "@#{name} = object"
+      instance_variable_set("@#{name}", object)
     end
   end
 
@@ -241,7 +241,7 @@ class ApplicationController < ActionController::Base
     object = controller_model.find(params[:id])
 
     if is_auth?(object, privilege)
-      eval "@#{name} = object"
+      instance_variable_set("@#{name}", object)
       params.delete :policy_attributes unless object.can_manage?(current_user)
     else
       respond_to do |format|
@@ -253,7 +253,7 @@ class ApplicationController < ActionController::Base
             else
               flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}."
             end
-            redirect_to(eval("#{controller_name.singularize}_path(#{object.id})"))
+            redirect_to(object)
           else
             render template: 'general/landing_page_for_hidden_item', locals: { item: object }, status: :forbidden
           end
@@ -411,9 +411,7 @@ class ApplicationController < ActionController::Base
 
   # determines and returns the object related to controller, e.g. @data_file
   def object_for_request
-    c = controller_name.downcase
-
-    eval('@' + c.singularize)
+    instance_variable_get("@#{controller_name.singularize}")
   end
 
   def expire_activity_fragment_cache(controller, action)

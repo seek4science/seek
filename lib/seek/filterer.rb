@@ -2,7 +2,7 @@ module Seek
   class Filterer
     # Hard-coded list of available filters for types. Overrides the automatically discovered filters (via `has_filter`).
     AVAILABLE_FILTERS = {
-        Publication: [:query, :programme, :project, :published_year, :author, :organism, :tag],
+        Publication: [:query, :programme, :project, :published_year, :publication_type, :author, :organism, :tag],
         Event: [:query, :created_at, :country],
         Person: [:query, :programme, :project, :institution, :location, :project_position, :expertise, :tool]
     }.freeze
@@ -12,7 +12,7 @@ module Seek
         # Map a list of person IDs to peoples' names.
         person_name: ->(ids) do
           people = Person.select(:id, :first_name, :last_name).where(id: ids).to_a
-          ids.map { |v| (people.detect { |p| p.id == v })&.name }
+          ids.map { |v| (people.detect { |p| p.id == v.to_i })&.name }
         end,
         assay_type_label:->(uris) {
           uris.map do |uri|
@@ -99,7 +99,12 @@ module Seek
             label_mapping: MAPPINGS[:person_name],
             joins: [:people]
         ),
-        published_year: Seek::Filtering::YearFilter.new(field: 'published_date')
+        published_year: Seek::Filtering::YearFilter.new(field: 'published_date'),
+        publication_type: Seek::Filtering::Filter.new(
+            value_field: 'publication_types.key',
+            label_field: 'publication_types.title',
+            joins: [:publication_type]
+        ),
     }.freeze
 
     def initialize(klass)

@@ -55,7 +55,7 @@ module Seek
           format.html # new.html.erb
         else
           flash[:error] = "You are not authorized to upload a new #{t(controller_name.singularize)}. Only members of known projects, institutions or work groups are allowed to create new content."
-          format.html { redirect_to eval("#{controller_name}_path") }
+          format.html { redirect_to polymorphic_path(controller_name) }
         end
       end
     end
@@ -68,7 +68,7 @@ module Seek
       update_sharing_policies item
       respond_to do |format|
         if item.save
-          flash[:notice] = "#{t('investigation')} was successfully updated."
+          flash[:notice] = "#{t(item.class.name.underscore)} was successfully updated."
           format.html { redirect_to(item) }
           format.json { render json: item, include: [params[:include]] }
         else

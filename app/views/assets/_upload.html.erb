@@ -74,15 +74,9 @@ end
         </div>
       </div>
 
-      <div id="test_url_result"></div>
-      <div class="checkbox" id="copy_option" style="display:none;">
-        <label>
-          <%= check_box_tag "content_blobs[][make_local_copy]", "1", false, :id => "make_local_copy" %>
-          <strong>Upload a copy</strong>
-        </label>
+      <div id="test_url_result">
+        <%= hidden_field_tag "content_blobs[][original_filename]", original_filename_from_params, :id => :original_filename %>
       </div>
-
-      <%= hidden_field_tag "content_blobs[][original_filename]", original_filename_from_params, :id => :original_filename %>
       <%= hidden_field_tag "url_checked", false %>
 
       <% if batch %>

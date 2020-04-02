@@ -1175,6 +1175,26 @@ class PeopleControllerTest < ActionController::TestCase
     assert_nil body['data']
   end
 
+  test 'notification params' do
+    wg1 = Factory(:work_group)
+    wg2 = Factory(:work_group)
+    user = Factory(:activated_user)
+    assert_nil user.person
+    login_as(user)
+
+    post :create, params: { person: { first_name: 'Fred', last_name: 'BBB', email: 'fred.bbb@email.com' },
+                            projects: [wg1.project_id, wg2.project_id],
+                            institutions: [wg1.institution_id, wg2.institution_id],
+                            other_projects: 'Testy',
+                            other_institutions: 'Testo' }
+
+    notif_params = @controller.send(:notification_params)
+    assert_equal [wg1.project_id, wg2.project_id].sort, notif_params[:projects].map(&:to_i).sort
+    assert_equal [wg1.institution_id, wg2.institution_id].sort, notif_params[:institutions].map(&:to_i).sort
+    assert_equal 'Testy', notif_params[:other_projects]
+    assert_equal 'Testo' ,notif_params[:other_institutions]
+  end
+
   def edit_max_object(person)
     Factory :expertise, value: 'golf', annotatable: person
     Factory :expertise, value: 'fishing', annotatable: person

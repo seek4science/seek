@@ -508,7 +508,12 @@ class FilterTest < ActiveSupport::TestCase
     assert_equal 1, y1970_opt.count
 
     options = year_filter.options(Publication.all, ['1996'])
-    assert_equal 2, options.length
+    assert_equal 3, options.length
+    # Active value should have an option, even if it returned no results.
+    y1996_opt = get_option(options, '1996')
+    assert y1996_opt.active?
+    assert_equal '1996', y1996_opt.label
+    assert_equal 0, y1996_opt.count
     y2019_opt = get_option(options, '2019')
     refute y2019_opt.active?
     assert_equal '2019', y2019_opt.label
@@ -543,6 +548,83 @@ class FilterTest < ActiveSupport::TestCase
     refute nz_opt.active?
     assert_equal 'New Zealand', nz_opt.label
     assert_equal 2, nz_opt.count
+  end
+
+  test 'get active filter options even if they matched 0 records' do
+    tag_filter = Seek::Filterer::FILTERS[:tag]
+
+    cool_contributor = Factory(:person)
+    cool_blue_doc = Factory(:document, contributor: cool_contributor)
+    cool_blue_doc.annotate_with(['cool', 'blue'], 'tag', cool_contributor)
+    disable_authorization_checks { cool_blue_doc.save! }
+
+    hot_contributor = Factory(:person)
+    hot_red_doc = Factory(:document, contributor: hot_contributor)
+    hot_red_doc.annotate_with(['hot', 'red'], 'tag', hot_contributor)
+    disable_authorization_checks { hot_red_doc.save! }
+
+    # "hot" tag filter is active with no results, but should be included as an option anyway, so the user can see it.
+    filtered = Document.where(contributor: cool_contributor)
+    options = tag_filter.options(filtered, ['cool', 'hot'])
+    assert_equal 3, options.length
+    cool_opt = get_option(options, 'cool')
+    assert_equal 1, cool_opt.count
+    assert_equal 'cool', cool_opt.label
+    assert cool_opt.active?
+    blue_opt = get_option(options, 'blue')
+    assert_equal 1, blue_opt.count
+    assert_equal 'blue', blue_opt.label
+    refute blue_opt.active?
+    hot_opt = get_option(options, 'hot')
+    assert_equal 0, hot_opt.count
+    assert_equal 'hot', hot_opt.label
+    assert hot_opt.active?
+
+    # "hot" tag filter is not active and has no results, so we don't need to show it.
+    filtered = Document.where(contributor: cool_contributor)
+    options = tag_filter.options(filtered, ['cool'])
+    assert_equal 2, options.length
+    cool_opt = get_option(options, 'cool')
+    assert_equal 1, cool_opt.count
+    assert_equal 'cool', cool_opt.label
+    assert cool_opt.active?
+    blue_opt = get_option(options, 'blue')
+    assert_equal 1, blue_opt.count
+    assert_equal 'blue', blue_opt.label
+    refute blue_opt.active?
+    hot_opt = get_option(options, 'hot')
+    assert_nil hot_opt
+  end
+
+  test 'get active filter options even if they are invalid' do
+    contributor_filter = Seek::Filterer::FILTERS[:contributor]
+
+    contributor = Factory(:person)
+    Factory(:document, contributor: contributor)
+
+    options = contributor_filter.options(Document.all, [contributor.id.to_s])
+    assert_equal 1, options.length
+    opt = get_option(options, contributor.id.to_s)
+    assert_equal 1, opt.count
+    assert_equal contributor.name, opt.label
+    assert opt.active?
+
+    # Apply some invalid options
+    fake_id = Person.maximum(:id) + 100
+    options = contributor_filter.options(Document.all, [fake_id, 'banana'])
+    assert_equal 3, options.length
+    fake_id_opt = get_option(options, fake_id.to_s)
+    assert_equal 0, fake_id_opt.count
+    assert_equal fake_id.to_s, fake_id_opt.label, "The label should just be the ID, since there is no real person with that ID, we can't get their name."
+    assert fake_id_opt.active?
+    banana_opt = get_option(options, 'banana')
+    assert_equal 0, banana_opt.count
+    assert_equal 'banana', banana_opt.label
+    assert banana_opt.active?
+    real_opt = get_option(options, contributor.id.to_s)
+    assert_equal 1, real_opt.count
+    assert_equal contributor.name, real_opt.label
+    refute real_opt.active?
   end
 
   private

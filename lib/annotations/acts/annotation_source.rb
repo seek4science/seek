@@ -76,7 +76,7 @@ module Annotations
 
         def annotation_source_name
           %w[preferred_name display_name title name].each do |w|
-            return eval("self.#{w}") if respond_to?(w)
+            return self.send(w) if respond_to?(w)
           end
           "#{self.class.name}_#{id}"
         end

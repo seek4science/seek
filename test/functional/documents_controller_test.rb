@@ -613,7 +613,10 @@ class DocumentsControllerTest < ActionController::TestCase
     get :index, params: { filter: { programme: programme.id, tag: ['awkward&id=1unsafe[]tag !'] } }
 
     assert_empty assigns(:documents)
-    assert assigns(:available_filters).values.all?(&:empty?)
+    assert_equal 1, assigns(:available_filters)[:programme].length
+    assert_equal 1, assigns(:active_filters)[:programme].length
+    assert_equal 1, assigns(:available_filters)[:tag].length
+    assert_equal 1, assigns(:active_filters)[:tag].length
 
     login_as(private_document.contributor)
 
@@ -647,11 +650,12 @@ class DocumentsControllerTest < ActionController::TestCase
     get :index, params: { filter: { programme: programme.id, query: 'hello' } }
 
     assert_empty assigns(:documents)
-    assert assigns(:available_filters).except(:query).values.all?(&:empty?)
+    assert_equal 1, assigns(:available_filters)[:programme].length
+    assert_equal 1, assigns(:active_filters)[:programme].length
     assert_equal 1, assigns(:available_filters)[:query].count
     assert_equal 1, assigns(:active_filters)[:query].count
 
-    assert_select '.filter-category', count: 1
+    assert_select '.filter-category', count: 2
 
     assert_select '.filter-category[data-filter-category="query"]' do
       assert_select '.filter-category-title', text: 'Query'
@@ -663,6 +667,10 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_select ".filter-option[title='hello'].filter-option-active" do
         assert_select '[href=?]', documents_path(filter: { programme: programme.id })
         assert_select '.filter-option-label', text: 'hello'
+      end
+      assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
+        assert_select '[href=?]', documents_path(filter: { query: 'hello' })
+        assert_select '.filter-option-label', text: programme.title
       end
     end
   end
@@ -851,6 +859,27 @@ class DocumentsControllerTest < ActionController::TestCase
         assert_select '.filter-option-label', text: "between #{start_date} and #{end_date}"
       end
     end
+  end
+
+  test 'filter and sort' do
+    programme = Factory(:programme)
+    project = Factory(:project, programme: programme)
+    other_project = Factory(:project, programme: programme)
+    project_doc = Factory(:public_document, created_at: 3.days.ago, projects: [project])
+    old_project_doc = Factory(:public_document, created_at: 10.years.ago, projects: [project])
+    other_project_doc = Factory(:public_document, created_at: 2.days.ago, projects: [other_project])
+
+    get :index, params: { filter: { programme: programme.id }, order: 'created_at_asc' }
+    assert_equal [old_project_doc, project_doc, other_project_doc], assigns(:documents).to_a
+
+    get :index, params: { filter: { programme: programme.id }, order: 'created_at_desc' }
+    assert_equal [other_project_doc, project_doc, old_project_doc], assigns(:documents).to_a
+
+    get :index, params: { filter: { programme: programme.id, project: project.id }, order: 'created_at_asc' }
+    assert_equal [old_project_doc, project_doc], assigns(:documents).to_a
+
+    get :index, params: { filter: { programme: programme.id, project: project.id }, order: 'created_at_desc' }
+    assert_equal [project_doc, old_project_doc], assigns(:documents).to_a
   end
 
   private

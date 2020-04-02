@@ -34,7 +34,7 @@
                           <% if item %>
                               <%= link_to "View all #{pluralize(type[:total_visible], 'item')}", [item, type[:type].tableize] -%>
                           <% elsif !hide_view_all %>
-                              <%= link_to "View all items", eval("#{type[:type].pluralize.underscore}_path") %>
+                              <%= link_to "View all items", polymorphic_path(type[:type].pluralize.underscore) %>
                           <% end-%>
                         </div>
                       </div>

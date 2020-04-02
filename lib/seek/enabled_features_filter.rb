@@ -1,7 +1,8 @@
 module Seek
   module EnabledFeaturesFilter
     FEATURES = %i[assays biosamples documentation events models
-                  nels openbis organisms programmes publications samples].freeze
+                  nels openbis organisms programmes publications samples
+                  studies investigations documents workflows].freeze
 
     def feature_enabled?(feature)
       feature = feature.to_s

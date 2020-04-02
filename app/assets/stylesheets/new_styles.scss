@@ -1,29 +1,19 @@
 @import 'variables';
 @import 'mixins';
 
-html {
+html, body {
   height: 100%;
-  position: relative;
 }
 
 body {
   border: none;
-  min-height: 100%;
-  position: relative;
   margin: 0;
-  padding-bottom: $seek-footer-height + 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 #header {
   padding: 0 1em;
-}
-
-#myexp_sidebar {
-  background: none;
-}
-
-#bd {
-  background: none;
 }
 
 #content > .container-fluid,
@@ -68,8 +58,8 @@ ul.feed .file-type-icon {
 }
 
 ul.feed .file-type-icon img {
-  width: 32px;
-  height: 32px;
+  max-width: 32px;
+  max-height: 32px;
 }
 
 .subtle {
@@ -89,13 +79,14 @@ ul.feed .file-type-icon img {
   border-radius: 4px;
 }
 
+#content {
+  flex: 1 0 auto;
+}
+
 #ft {
   background-color: $panel-default-heading-bg;
-  position: absolute;
+  flex-shrink: 0;
   text-align: center;
-  right: 0;
-  bottom: 0;
-  left: 0;
   margin-top: 2em;
   padding: 1em 0.5em;
   font-size: small;
@@ -335,16 +326,19 @@ a.seek-homepage-button {
   border-radius: 4px;
   padding: 20px;
   margin: 5px;
+  text-decoration: none;
+
   &:hover {
-    text-decoration: none;
     background-color: #f0f0f0;
   }
 }
 
-.seek-homepage-button img {
-  width: 120px;
-  height: 120px;
-
+.seek-homepage-button img, .seek-homepage-button span.glyphicon  {
+  display: block;
+  font-size: 80px;
+  margin: auto;
+  line-height: 120px;
+  color: #666;
 }
 
 @media (min-width: $screen-sm-min) {
@@ -976,6 +970,18 @@ div.index-filters {
   clear: both;
 }
 
+img.github-logo {
+  width: 16px;
+  height: 16px;
+}
+
+.github-path {
+  padding: 8px 15px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  display: inline-block;
+}
+
 #application-owner .list_item {
   .hidden-xs {
     display: none;
@@ -989,4 +995,8 @@ div.index-filters {
   .list_item_content {
     width: 70%;
   }
+}
+
+.workflow-diagram img {
+  max-width: 100%;
 }

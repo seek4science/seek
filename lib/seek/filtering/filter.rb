@@ -14,8 +14,7 @@ module Seek
 
       def apply(collection, values)
         values = value_mapping.call(values) if value_mapping
-        collection = collection.joins(joins) if joins
-        collection = collection.includes(includes) if includes
+        collection = apply_joins(collection)
         collection.where(value_field => values).distinct
       end
 
@@ -24,18 +23,54 @@ module Seek
         select_fields = [value_field, count_exp, label_field].compact
         group_fields = [value_field, label_field].compact
         collection = collection.select(*select_fields)
-        collection = collection.joins(joins) if joins
-        collection = collection.includes(includes) if includes
-        opts = collection.group(group_fields).having(count_exp.gt(0)).pluck(*select_fields).reject { |g| g[0].nil? }
-        if label_mapping
-          label_mapping.call(opts.map(&:first)).each.with_index do |label, index|
-            opts[index][2] = label
+        collection = apply_joins(collection)
+        results = collection.group(group_fields).having(count_exp.gt(0)).pluck(*select_fields)
+        active_options = active_values.dup
+
+        options = []
+        if results.any?
+          if label_mapping
+            label_mapping.call(results.map(&:first)).each.with_index do |label, index|
+              results[index][2] = label
+            end
+          end
+
+          results.each do |value, count, label|
+            next if value.blank?
+            value = value.to_s
+            active = active_options.delete(value)
+            options << Seek::Filtering::Option.new(label || value, value, count, active)
           end
         end
 
-        opts.map do |value, count, label|
-          Seek::Filtering::Option.new(label || value.to_s, value.to_s, count, active_values.include?(value.to_s))
-        end.sort
+        # Need to add options that were selected by the user, but did not appear in the results
+        # (probably due to being excluded by another filter, or if a user was trying random IDs).
+        if active_options.any?
+          labels = if label_mapping
+                     label_mapping.call(active_options)
+                   elsif label_field
+                     # Remove any existing conditions that may have excluded the selected options and just query the label
+                     apply_joins(collection.unscoped.select(label_field))
+                       .where(value_field => active_options)
+                       .pluck(label_field)
+                   else
+                     []
+                   end
+          # Pair up values and labels create remaining options
+          active_options.each_with_index do |value, i|
+            options << Seek::Filtering::Option.new(labels[i] || value.to_s, value.to_s, 0, true)
+          end
+        end
+
+        options.sort # Need to sort everything so active options appear at the top, then options are ordered by count.
+      end
+
+      private
+
+      def apply_joins(collection)
+        collection = collection.joins(joins) if joins
+        collection = collection.includes(includes) if includes
+        collection
       end
     end
   end

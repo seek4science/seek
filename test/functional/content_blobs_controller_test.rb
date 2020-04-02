@@ -73,12 +73,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
     stub_request(:head, 'http://mockedlocation.com/a-piccy.png').to_return(status: 200, headers: { 'Content-Type' => 'image/png' })
     get :examine_url, xhr: true, params: { data_url: 'http://mockedlocation.com/a-piccy.png' }
     assert_response :success
+    assert_equal 200, assigns(:info)[:code]
     assert !@response.body.include?('This is a webpage')
-    refute @response.body.include?('disallow_copy_option();')
-    refute assigns(:error)
-    refute assigns(:error_msg)
-    refute assigns(:unauthorized)
-    refute assigns(:is_webpage)
+    assert_equal 'file', assigns(:type)
   end
 
   test 'examine url to webpage' do
@@ -86,24 +83,41 @@ class ContentBlobsControllerTest < ActionController::TestCase
     stub_request(:any, 'http://somewhere.com').to_return(body: '', status: 200, headers: { 'Content-Type' => 'text/html' })
     get :examine_url, xhr: true, params: { data_url: 'http://somewhere.com' }
     assert_response :success
-    assert @response.body.include?('This is a webpage')
-    assert @response.body.include?('disallow_copy_option();')
-    refute assigns(:error)
-    refute assigns(:error_msg)
-    refute assigns(:unauthorized)
-    assert assigns(:is_webpage)
+    assert_equal 200, assigns(:info)[:code]
+    assert @response.body.include?('Webpage Link')
+    assert_equal 'webpage', assigns(:type)
+  end
+
+  test 'examine url to github' do
+    stub_request(:any, 'https://github.com/bob/workflows/blob/master/dir/the_workflow.cwl').to_return(status: 200)
+    stub_request(:any, 'https://raw.githubusercontent.com/bob/workflows/master/dir/the_workflow.cwl').to_return(
+        body: File.new("#{Rails.root}/test/fixtures/files/rp2-to-rp2path.cwl"),
+        status: 200,
+        headers: { 'Content-Length' => 1118,
+                   'Content-Type' => 'text/plain' })
+
+    get :examine_url, xhr: true, params: { data_url: 'https://github.com/bob/workflows/blob/master/dir/the_workflow.cwl' }
+    assert_response :success
+    assert @response.body.include?('GitHub')
+    assert_equal 200, assigns(:info)[:code]
+    assert_equal 'github', assigns(:type)
+    assert_equal 'bob', assigns(:info)[:github_user]
+    assert_equal 'workflows', assigns(:info)[:github_repo]
+    assert_equal 'master', assigns(:info)[:github_branch]
+    assert_equal 'dir/the_workflow.cwl', assigns(:info)[:github_path]
+    assert_equal 1118, assigns(:info)[:file_size]
+    assert_equal 'the_workflow.cwl', assigns(:info)[:file_name]
   end
 
   test 'examine url forbidden' do
     # forbidden
     stub_request(:head, 'http://unauth.com/file.pdf').to_return(status: 403, headers: { 'Content-Type' => 'application/pdf' })
     get :examine_url, xhr: true, params: { data_url: 'http://unauth.com/file.pdf' }
-    assert_response :success
+    assert_response 200
+    assert_equal 403, assigns(:info)[:code]
     assert @response.body.include?('Access to this link is unauthorized')
-    assert @response.body.include?('disallow_copy_option();')
-    refute assigns(:error)
-    refute assigns(:error_msg)
-    assert assigns(:unauthorized)
+    assert_equal 'warning', assigns(:type)
+    assert assigns(:warning_msg)
   end
 
   test 'examine url unauthorized' do
@@ -112,56 +126,47 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :examine_url, xhr: true, params: { data_url: 'http://unauth.com/file.pdf' }
     assert_response :success
     assert @response.body.include?('Access to this link is unauthorized')
-    assert @response.body.include?('disallow_copy_option();')
-    refute assigns(:error)
-    refute assigns(:error_msg)
-    assert assigns(:unauthorized)
+    assert_equal 'warning', assigns(:type)
+    assert assigns(:warning_msg)
   end
 
   test 'examine url 404' do
     # 404
     stub_request(:head, 'http://missing.com').to_return(status: 404, headers: { 'Content-Type' => 'text/html' })
     get :examine_url, xhr: true, params: { data_url: 'http://missing.com' }
-    assert_response :success
+    assert_response 400
+    assert_equal 404, assigns(:info)[:code]
     assert @response.body.include?('Nothing can be found at that URL')
-    assert @response.body.include?('disallow_copy_option();')
-    assert assigns(:error)
+    assert_equal 'error', assigns(:type)
     assert assigns(:error_msg)
-    refute assigns(:unauthorized)
   end
 
   test 'examine url host not found' do
     # doesn't exist
     stub_request(:head, 'http://nohost.com').to_raise(SocketError)
     get :examine_url, xhr: true, params: { data_url: 'http://nohost.com' }
-    assert_response :success
+    assert_response 400
+    assert_equal 404, assigns(:info)[:code]
     assert @response.body.include?('Nothing can be found at that URL')
-    assert @response.body.include?('disallow_copy_option();')
-    assert assigns(:error)
+    assert_equal 'error', assigns(:type)
     assert assigns(:error_msg)
-    refute assigns(:unauthorized)
   end
 
   test 'examine url bad uri' do
     # bad uri
     get :examine_url, xhr: true, params: { data_url: 'this is not a uri' }
-    assert_response :success
+    assert_response 400
     assert @response.body.include?('The URL appears to be invalid')
-    assert @response.body.include?('disallow_copy_option();')
-    assert assigns(:error)
+    assert_equal 'error', assigns(:type)
     assert assigns(:error_msg)
-    refute assigns(:unauthorized)
   end
 
   test 'examine url unrecognized scheme' do
     get :examine_url, xhr: true, params: { data_url: 'fish://tuna:1525125151' }
     assert_response :success
     assert @response.body.include?('Unhandled URL scheme')
-    assert @response.body.include?('disallow_copy_option();')
-    assert assigns(:warning)
+    assert_equal 'warning', assigns(:type)
     assert assigns(:warning_msg)
-    refute assigns(:error)
-    refute assigns(:error_msg)
   end
 
   test 'examine url localhost' do
@@ -170,12 +175,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
       WebMock.allow_net_connect!
       VCR.turned_off do
         get :examine_url, xhr: true, params: { data_url: 'http://localhost/secrets' }
-        assert_response :success
+        assert_response 400
+        assert_equal 490, assigns(:info)[:code]
         assert @response.body.include?('URL is inaccessible')
-        assert @response.body.include?('disallow_copy_option();')
-        assert assigns(:error)
+        assert_equal 'error', assigns(:type)
         assert assigns(:error_msg)
-        refute assigns(:unauthorized)
       end
     ensure
       WebMock.disable_net_connect!(allow_localhost: true)
@@ -189,12 +193,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
       assert PrivateAddressCheck.resolves_to_private_address?('192.168.0.1')
       VCR.turned_off do
         get :examine_url, xhr: true, params: { data_url: 'http://192.168.0.1/config' }
-        assert_response :success
+        assert_response 400
+        assert_equal 490, assigns(:info)[:code]
         assert @response.body.include?('URL is inaccessible')
-        assert @response.body.include?('disallow_copy_option();')
-        assert assigns(:error)
+        assert_equal 'error', assigns(:type)
         assert assigns(:error_msg)
-        refute assigns(:unauthorized)
       end
     ensure
       WebMock.disable_net_connect!(allow_localhost: true)

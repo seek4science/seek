@@ -47,7 +47,10 @@ module Seek
     def self.sort_by_order(items, order = nil)
       order ||= order_for_view(items.first.class.name, :index)
       if items.is_a?(ActiveRecord::Relation)
-        items.order(strategy_for_relation(order, items))
+        orderings = strategy_for_relation(order, items)
+        # Postgres requires any columns being ORDERed to be explicitly SELECTed (only when using DISTINCT?).
+        columns = [items.arel_table[Arel.star]] + orderings.reject { |n| n.is_a?(Arel::Nodes::Ordering) }
+        items.select(columns).order(orderings)
       else
         items.sort(&strategy_for_enum(order))
       end
@@ -98,6 +101,7 @@ module Seek
       self.order_from_keys(self.key_for_view(type_name, view))
     end
 
+    # Returns an Array of Arel "orderings", which can be passed into `SomeModel#order` to sort a relation.
     def self.strategy_for_relation(order, relation)
       fields_and_directions = order.split(',').map do |f|
         field, order = f.strip.split(' ', 2)
@@ -106,7 +110,9 @@ module Seek
         arel_field = relation.arel_table[field.to_sym]
         arel_field = arel_field.eq(nil) if order == 'IS NULL'
         arel_field = arel_field.lower if m
-        arel_field = arel_field.desc if order&.match?(/desc/i)
+        unless arel_field.is_a?(Arel::Nodes::Equality)
+          arel_field = order&.match?(/desc/i) ? arel_field.desc : arel_field.asc
+        end
         arel_field
       end
 
@@ -119,6 +125,8 @@ module Seek
       fields_and_directions
     end
 
+    # Creates a proc from the given order string, which can be used to sort an Array e.g.
+    #   `array.sort(&strategy_for_enum(order))`
     def self.strategy_for_enum(order)
       # Create an array of pairs: [<field>, <sort direction>]
       # Direction 1 is ascending (default), -1 is descending

@@ -68,4 +68,8 @@ class Study < ApplicationRecord
     ids << person_responsible_id if person_responsible_id
     ids.uniq
   end
+
+  def self.user_creatable?
+    Seek::Config.studies_enabled
+  end
 end

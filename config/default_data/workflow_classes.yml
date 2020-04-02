@@ -1,0 +1,19 @@
+cwl_workflow_class:
+  id: 1
+  title: Common Workflow Language
+  key: CWL
+
+galaxy_workflow_class:
+  id: 2
+  title: Galaxy
+  key: Galaxy
+
+knime_workflow_class:
+  id: 3
+  title: KNIME
+  key: KNIME
+
+nextflow_class:
+  id: 5
+  title: Nextflow
+  key: Nextflow

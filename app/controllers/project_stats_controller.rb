@@ -1,7 +1,6 @@
 class ProjectStatsController < StatsController
-  before_action :find_project
-  before_action :member_of_this_project
   skip_before_action :is_user_admin_auth
+  prepend_before_action :find_and_authorize_project
 
   private
 
@@ -9,7 +8,7 @@ class ProjectStatsController < StatsController
     Seek::Stats::DashboardStats.new(@project)
   end
 
-  def find_project
+  def find_and_authorize_project
     name = t('project')
     @project = Project.find_by_id(params[:project_id])
     if @project.nil?
@@ -17,14 +16,15 @@ class ProjectStatsController < StatsController
         flash[:error] = "The #{name.humanize} does not exist!"
         format.html { redirect_to project_path(@project) }
       end
+      return false
     end
-  end
 
-  def member_of_this_project
     unless @project.has_member?(current_user)
-      flash[:error] = "You are not a member of this #{t('project')}, so cannot access this page."
+      flash[:error] = "You are not a member of this #{name}, so cannot access this page."
       redirect_to project_path(@project)
-      false
+      return false
     end
+
+    true
   end
 end

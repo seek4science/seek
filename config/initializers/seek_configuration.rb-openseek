@@ -6,7 +6,6 @@ require 'seek/config'
 def load_seek_config_defaults!
   #Main settings
   Seek::Config.default :sycamore_enabled,false
-  Seek::Config.default :events_enabled,true
   Seek::Config.default :jerm_enabled,false
   Seek::Config.default :email_enabled,false
   Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => '', :enable_starttls_auto=>false}
@@ -18,7 +17,6 @@ def load_seek_config_defaults!
   Seek::Config.default :jws_online_root,"https://jws2.sysmo-db.org/"
   Seek::Config.default :internal_help_enabled, false
   Seek::Config.default :external_help_url,"https://docs.seek4science.org/help"
-  Seek::Config.default :workflows_enabled, false
   Seek::Config.default :sabiork_ws_base_url, "http://sabiork.h-its.org/sabioRestWebServices/"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
@@ -49,14 +47,10 @@ def load_seek_config_defaults!
   Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :filestore_path,"filestore"
   Seek::Config.default :modelling_analysis_enabled,true
-  Seek::Config.default :organisms_enabled,true
-  Seek::Config.default :models_enabled,true
   Seek::Config.default :guide_box_enabled,true
   Seek::Config.default :factors_studied_enabled,false
   Seek::Config.default :experimental_conditions_enabled,false
   Seek::Config.default :tagging_enabled, true
-  Seek::Config.default :assays_enabled,true
-  Seek::Config.default :publications_enabled,true
   Seek::Config.default :authorization_checks_enabled, true
   Seek::Config.default :documentation_enabled,true
   Seek::Config.default :assay_type_ontology_file, "JERM.rdf"
@@ -66,12 +60,21 @@ def load_seek_config_defaults!
   Seek::Config.default :technology_type_base_uri,"http://jermontology.org/ontology/JERMOntology#Technology_type"
   Seek::Config.default :modelling_analysis_type_base_uri,"http://jermontology.org/ontology/JERMOntology#Model_analysis_type"
   Seek::Config.default :profile_select_by_default,true
-  Seek::Config.default :programmes_enabled, false
   Seek::Config.default :project_hierarchy_enabled, false
   Seek::Config.default :show_announcements, true
   Seek::Config.default :programme_user_creation_enabled, false
-  Seek::Config.default :samples_enabled, true
   Seek::Config.default :project_admin_sample_type_restriction, false #only project admins can create and edit sample types and controlled vocabs
+
+  # Types
+  Seek::Config.default :documents_enabled,true
+  Seek::Config.default :events_enabled,true
+  Seek::Config.default :isa_enabled, true
+  Seek::Config.default :models_enabled,true
+  Seek::Config.default :organisms_enabled,true
+  Seek::Config.default :programmes_enabled, false
+  Seek::Config.default :publications_enabled,true
+  Seek::Config.default :samples_enabled, true
+  Seek::Config.default :workflows_enabled, false
 
   Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0

@@ -1,4 +1,4 @@
-<% path = eval("bulk_destroy_#{collection.first.class.name.underscore.pluralize}_path") %>
+<% path = polymorphic_path([:bulk_destroy, collection.first.class]) %>
 <%= form_tag path do %>
     <% collection.each do |item| %>
         <%= hidden_field_tag "ids[]", item.id %>

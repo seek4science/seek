@@ -37,12 +37,9 @@ class AdminController < ApplicationController
   end
 
   def update_features_enabled
-    Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
     Seek::Config.email_enabled = string_to_boolean params[:email_enabled]
     Seek::Config.pdf_conversion_enabled = string_to_boolean params[:pdf_conversion_enabled]
     # Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
-    Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
-    Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
     Seek::Config.project_admin_sample_type_restriction = string_to_boolean params[:project_admin_sample_type_restriction]
     Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
 
@@ -60,6 +57,14 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
     Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
     Seek::Config.omniauth_ldap_enabled = string_to_boolean params[:omniauth_ldap_enabled]
+    Seek::Config.set_omniauth_ldap_settings 'host', params[:omniauth_ldap_host]
+    Seek::Config.set_omniauth_ldap_settings 'port', params[:omniauth_ldap_port]&.to_i
+    Seek::Config.set_omniauth_ldap_settings 'method', params[:omniauth_ldap_method]&.to_sym
+    Seek::Config.set_omniauth_ldap_settings 'base', params[:omniauth_ldap_base]
+    Seek::Config.set_omniauth_ldap_settings 'uid', params[:omniauth_ldap_uid]
+    Seek::Config.set_omniauth_ldap_settings 'bind_dn', params[:omniauth_ldap_bind_dn]
+    Seek::Config.set_omniauth_ldap_settings 'password', params[:omniauth_ldap_password]
+
     Seek::Config.omniauth_elixir_aai_enabled = string_to_boolean params[:omniauth_elixir_aai_enabled]
     Seek::Config.omniauth_elixir_aai_client_id = params[:omniauth_elixir_aai_client_id]
     Seek::Config.omniauth_elixir_aai_secret = params[:omniauth_elixir_aai_secret]
@@ -72,6 +77,16 @@ class AdminController < ApplicationController
     Seek::Config.internal_help_enabled = string_to_boolean params[:internal_help_enabled]
     Seek::Config.external_help_url = params[:external_help_url]
 
+    Seek::Config.cwl_viewer_url = params[:cwl_viewer_url]
+    # Types enabled
+    Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
+    Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
+    Seek::Config.isa_enabled = string_to_boolean params[:isa_enabled]
+    Seek::Config.models_enabled = string_to_boolean params[:models_enabled]
+    Seek::Config.organisms_enabled = string_to_boolean params[:organisms_enabled]
+    Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
+    Seek::Config.publications_enabled = string_to_boolean params[:publications_enabled]
+    Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
     Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
 
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]

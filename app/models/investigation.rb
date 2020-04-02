@@ -38,4 +38,8 @@ class Investigation < ApplicationRecord
   def related_publication_ids
     publication_ids | study_publication_ids | assay_publication_ids
   end
+
+  def self.user_creatable?
+    Seek::Config.investigations_enabled
+  end
 end
