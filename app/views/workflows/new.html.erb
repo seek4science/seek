@@ -6,7 +6,7 @@
     <%= error_messages_for :workflow -%>
 
     <%= alert_box('info', hide_button: true) do %>
-      A workflow can be uploaded as a <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">Workfow RO Crate</a> (recommended),
+      A workflow can be registered as a <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">Workfow RO Crate</a> (recommended),
       or as a separate workflow file.
       <br/><br/>
       Currently supported workflow types are: <%= WorkflowClass.order(:title).pluck(:title).join(', ') %>.
@@ -17,7 +17,7 @@
     <div class="form-group">
       <label class="required">Workflow type</label>
       <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title'),
-                     include_blank: '(Determine from Workflow RO Crate)',
+                     include_blank: 'Other/Auto-detect type',
                      class: 'form-control' %>
       <p class="help-block">Unless uploading an Workflow RO Crate, please specify the workflow type.</p>
     </div>

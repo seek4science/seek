@@ -3,7 +3,7 @@ class Workflow < ApplicationRecord
   include Seek::UploadHandling::ExamineUrl
   include WorkflowExtraction
 
-  belongs_to :workflow_class
+  belongs_to :workflow_class, optional: true
   has_filter workflow_type: Seek::Filtering::Filter.new(value_field: 'workflow_classes.key',
                                                label_field: 'workflow_classes.title',
                                                joins: [:workflow_class])
@@ -29,12 +29,12 @@ class Workflow < ApplicationRecord
 
     serialize :metadata
 
-    belongs_to :workflow_class
+    belongs_to :workflow_class, optional: true
     include WorkflowExtraction
   end
 
   def avatar_key
-    "#{workflow_class.key.downcase}_workflow"
+    workflow_class ? "#{workflow_class.key.downcase}_workflow" : 'workflow'
   end
 
   def self.user_creatable?

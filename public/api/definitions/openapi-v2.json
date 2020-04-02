@@ -9037,7 +9037,7 @@
                                             "$ref": "#/definitions/nonEmptyString"
                                         },
                                         "key": {
-                                            "$ref": "#/definitions/nonEmptyString"
+                                            "$ref": "#/definitions/nullableNonEmptyString"
                                         },
                                         "description": {
                                             "$ref": "#/definitions/nullableNonEmptyString"
@@ -9267,7 +9267,6 @@
                             },
                             "required": [
                                 "title",
-                                "workflow_class",
                                 "content_blobs"
                             ],
                             "additionalProperties": false
