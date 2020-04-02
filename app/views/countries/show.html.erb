@@ -41,7 +41,7 @@
     </div>
 
     <div class="col-md-3 col-sm-4">
-      <%= panel("#{t('institution').pluralize} (#{@institutions.length})", :help_text => "#{t('institution')} that are situated in this country.") do %>
+      <%= panel("#{t('institution').pluralize} (#{@institutions.length})", :help_text => "#{t('institution').pluralize} that are situated in this country.") do %>
         <ul class="mini-resource-list">
           <% @institutions.each do |i| %>
             <li>
