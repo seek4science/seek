@@ -885,7 +885,7 @@ DEPENDENCIES
   attr_encrypted (~> 3.0.0)
   auto_strip_attributes
   better_errors
-  bibtex-ruby (~> 4.4.2)
+  bibtex-ruby (~> 5.1.0)
   binding_of_caller
   bio (~> 1.5.1)
   bioportal (>= 3.0)!
