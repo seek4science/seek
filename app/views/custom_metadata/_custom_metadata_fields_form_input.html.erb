@@ -1,7 +1,7 @@
-<% resource.custom_metadata ||= CustomMetadata.new if resource.new_record? %>
+
 <%= folding_panel('Custom metadata', false) do %>
 
-  <%= f.fields_for(:custom_metadata) do |ff| %>
+  <%= f.fields_for(:custom_metadata,resource.custom_metadata || CustomMetadata.new) do |ff| %>
     Metadata fields: <%= ff.collection_select(:custom_metadata_type_id,CustomMetadataType.where(supported_type:resource.class.name),
                                              :id, :title,
                                              {prompt:'Select'},
