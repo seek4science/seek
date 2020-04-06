@@ -304,11 +304,18 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'workflow' do
     workflow = travel_to(@current_time) do
-      workflow = Factory(:cwl_workflow, title: 'This workflow', contributor: @person)
+      workflow = Factory(:cwl_workflow,
+                         title: 'This workflow',
+                         description: 'This is a test workflow for bioschema generation',
+                         creators: [@person, Factory(:person)],
+                         contributor: @person,
+                         license: 'APSL-2.0')
+
       workflow.add_annotations('wibble', 'tag', User.first)
       disable_authorization_checks { workflow.save! }
       workflow
     end
+
 
     json = JSON.parse(workflow.to_schema_ld)
     pp json
