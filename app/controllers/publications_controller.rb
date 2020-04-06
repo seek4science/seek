@@ -485,6 +485,7 @@ class PublicationsController < ApplicationController
             publications_with_errors << current_publication
           else
             if current_publication.save
+              Rails.logger.info(current_publication.id.inspect+":"+current_publication.citation)
               publications << current_publication
               associsate_authors_with_users(current_publication)
               current_publication.creators = current_publication.seek_authors.map(&:person)
