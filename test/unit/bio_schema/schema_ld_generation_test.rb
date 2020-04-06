@@ -301,4 +301,16 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     json = JSON.parse(presentation.to_schema_ld)
     assert_equal expected, json
   end
+
+  test 'workflow' do
+    workflow = travel_to(@current_time) do
+      workflow = Factory(:cwl_workflow, title: 'This workflow', contributor: @person)
+      workflow.add_annotations('wibble', 'tag', User.first)
+      disable_authorization_checks { workflow.save! }
+      workflow
+    end
+
+    json = JSON.parse(workflow.to_schema_ld)
+    pp json
+  end
 end

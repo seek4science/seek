@@ -4,8 +4,7 @@ module Seek
       # Decorator that provides extensions for a Event
       class CreativeWork < Thing
         associated_items provider: :projects,
-                         creator: :creators,
-                         subject_of: :events
+                         creator: :creators
 
         schema_mappings license: :license,
                         creator: :creator,
