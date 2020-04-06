@@ -19,7 +19,7 @@ RUN apt-get update -qq && \
     locale-gen en_US.UTF-8
 
 RUN mkdir -p $APP_DIR
-RUN chown www-data $APP_DIR
+RUN chown -R www-data $APP_DIR /var/www
 
 USER www-data
 
