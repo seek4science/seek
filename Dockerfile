@@ -1,4 +1,4 @@
-FROM ruby:2.4-stretch
+FROM ruby:2.6-stretch
 
 MAINTAINER Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall
 
