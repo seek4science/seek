@@ -83,6 +83,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
+      'creator' => ["Blogs","Joe"],
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'provider' => [{
         '@type' => ['Project','Organization'],
@@ -131,6 +132,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         'name' => df.title,
         'description' => df.description,
         'keywords' => 'keyword',
+        'creator' => ["Blogs","Joe"],
         'url' => "http://www.abc.com",
         'provider' => [{
                            '@type' => ['Project','Organization'],
@@ -308,6 +310,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                          title: 'This workflow',
                          description: 'This is a test workflow for bioschema generation',
                          creators: [@person, Factory(:person)],
+                         other_creators: 'Fred Bloggs, Steve Smith',
                          contributor: @person,
                          license: 'APSL-2.0')
 
