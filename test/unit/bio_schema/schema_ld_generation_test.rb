@@ -311,6 +311,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                          contributor: @person,
                          license: 'APSL-2.0')
 
+      workflow.internals = workflow.extractor.metadata[:internals]
+
       workflow.add_annotations('wibble', 'tag', User.first)
       disable_authorization_checks { workflow.save! }
       workflow

@@ -8,7 +8,9 @@ module Seek
         schema_mappings sd_publisher: :sdPublisher,
                         version: :version,
                         image: :image,
-                        programming_language: :programmingLanguage
+                        programming_language: :programmingLanguage,
+                        inputs: :inputs,
+                        outputs: :oututs
 
         def contributors
           [contributor]
@@ -25,6 +27,14 @@ module Seek
 
         def programming_language
           resource.workflow_class&.title
+        end
+
+        def inputs
+          resource.inputs.collect{|inp| "#{inp.id} : #{inp.type}"}
+        end
+
+        def outputs
+          resource.outputs.collect{|out| "#{out.id} : #{out.type}"}
         end
 
       end
