@@ -114,6 +114,35 @@ namespace :seek_dev do
     end
   end
 
+  task :add_covid_map_people, [:path] => :environment do |_t, args|
+    path = args.path
+    file = open(path)
+    csv = spreadsheet_to_csv(file)
+    CSV.parse(csv) do |row|
+      name = row[0].strip
+      email = row[1].strip
+      institution_id = row[2].strip
+      expertise = row[3].strip
+      first, last = name.split(' ',2)
+
+
+      if email_valid && first
+        person = add_or_find_person
+        unless person.in_project
+          institution = Institution.find(institution_id)
+          if institution
+            add_to_project
+          else
+            reject_row
+          end
+        end
+      else
+        reject_row
+      end
+      print rejected_rows
+    end
+  end
+
   task :add_people_from_spreadsheet, [:path] => :environment do |_t, args|
     path = args.path
     file = open(path)
