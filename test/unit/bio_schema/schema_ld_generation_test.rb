@@ -83,7 +83,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
-      'creator' => ["Blogs","Joe"],
+      'creator' => [{"@type"=>"Person","name"=>"Blogs"},{"@type"=>"Person","name"=>"Joe"}],
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'provider' => [{
         '@type' => ['Project','Organization'],
@@ -132,7 +132,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         'name' => df.title,
         'description' => df.description,
         'keywords' => 'keyword',
-        'creator' => ["Blogs","Joe"],
+        'creator' => [{"@type"=>"Person","name"=>"Blogs"},{"@type"=>"Person","name"=>"Joe"}],
         'url' => "http://www.abc.com",
         'provider' => [{
                            '@type' => ['Project','Organization'],
@@ -337,8 +337,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                      {"@type"=>"Person",
                       "@id"=>"http://localhost:3000/people/#{creator2.id}",
                       "name"=>creator2.name},
-                     "Fred Bloggs",
-                     "Steve Smith"],
+                     {"@type"=>"Person",
+                      "name"=>"Fred Bloggs"},
+                     {"@type"=>"Person",
+                      "name"=>"Steve Smith"}],
                 "provider"=>
                     [{"@type"=>["Project", "Organization"],
                       "@id"=>"http://localhost:3000/projects/#{@project.id}",
