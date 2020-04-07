@@ -33,7 +33,7 @@ class DecoratorTest < ActiveSupport::TestCase
     person = document.creators.first
     assert_equal [{ :@type => 'Event', :@id => "http://localhost:3000/events/#{event.id}", :name => event.title }], decorator.subject_of
     assert_equal [{ :@type => ['Project','Organization'], :@id => "http://localhost:3000/projects/#{project.id}", :name => project.title }], decorator.provider
-    assert_equal [{ :@type => 'Person', :@id => "http://localhost:3000/people/#{person.id}", :name => person.title }], decorator.creator
+    assert_equal [{ :@type => 'Person', :@id => "http://localhost:3000/people/#{person.id}", :name => person.title }], decorator.all_creators
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
     assert_equal ['@id', 'creator', 'dateCreated', 'dateModified', 'description', 'encodingFormat', 'keywords', 'license', 'name', 'provider', 'subjectOf', 'url'], properties
