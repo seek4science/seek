@@ -22,7 +22,7 @@ module Seek
         end
 
         def schema_type
-          "Workflow"
+          'Workflow'
         end
 
         def programming_language
@@ -30,13 +30,12 @@ module Seek
         end
 
         def inputs
-          resource.inputs.collect{|inp| "#{inp.id} : #{inp.type}"}
+          resource.inputs.collect { |inp| "#{inp.id} : #{inp.type}" }
         end
 
         def outputs
-          resource.outputs.collect{|out| "#{out.id} : #{out.type}"}
+          resource.outputs.collect { |out| "#{out.id} : #{out.type}" }
         end
-
       end
     end
   end

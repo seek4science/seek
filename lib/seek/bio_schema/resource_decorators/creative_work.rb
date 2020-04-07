@@ -25,11 +25,10 @@ module Seek
 
         def all_creators
           others = other_creators&.split(',')&.collect(&:strip)&.compact || []
-          others = others.collect{|name| {"@type":"Person","name":name}}
-          all  = (mini_definitions(creators) || []) + others
+          others = others.collect { |name| { "@type": 'Person', "name": name } }
+          all = (mini_definitions(creators) || []) + others
           return if all.empty?
           all
-
         end
       end
     end
