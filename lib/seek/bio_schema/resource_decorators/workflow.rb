@@ -10,7 +10,7 @@ module Seek
                         image: :image,
                         programming_language: :programmingLanguage,
                         inputs: :inputs,
-                        outputs: :oututs
+                        outputs: :outputs
 
         def contributors
           [contributor]

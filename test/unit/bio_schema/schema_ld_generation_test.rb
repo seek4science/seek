@@ -305,11 +305,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   end
 
   test 'workflow' do
+    creator2=Factory(:person)
     workflow = travel_to(@current_time) do
       workflow = Factory(:cwl_workflow,
                          title: 'This workflow',
                          description: 'This is a test workflow for bioschema generation',
-                         creators: [@person, Factory(:person)],
+                         creators: [@person, creator2],
                          other_creators: 'Fred Bloggs, Steve Smith',
                          contributor: @person,
                          license: 'APSL-2.0')
@@ -321,8 +322,45 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       workflow
     end
 
+    expected = {"@context"=>"http://schema.org",
+                "@type"=>"Workflow",
+                "@id"=>"http://localhost:3000/workflows/#{workflow.id}",
+                "description"=>"This is a test workflow for bioschema generation",
+                "name"=>"This workflow",
+                "url"=>"http://localhost:3000/workflows/#{workflow.id}",
+                "keywords"=>"wibble",
+                "license"=>"https://opensource.org/licenses/APSL-2.0",
+                "creator"=>
+                    [{"@type"=>"Person",
+                      "@id"=>"http://localhost:3000/people/#{@person.id}",
+                      "name"=>@person.name},
+                     {"@type"=>"Person",
+                      "@id"=>"http://localhost:3000/people/#{creator2.id}",
+                      "name"=>creator2.name},
+                     "Fred Bloggs",
+                     "Steve Smith"],
+                "provider"=>
+                    [{"@type"=>["Project", "Organization"],
+                      "@id"=>"http://localhost:3000/projects/#{@project.id}",
+                      "name"=>@project.title}],
+                "dateCreated"=>@current_time.to_s,
+                "dateModified"=>@current_time.to_s,
+                "encodingFormat"=>"application/x-yaml",
+                "sdPublisher"=>
+                    [{"@type"=>"Person",
+                      "@id"=>"http://localhost:3000/people/#{@person.id}",
+                      "name"=>@person.name}],
+                "version"=>1,
+                "programmingLanguage"=>"CWL workflow",
+                "inputs"=>
+                    ["rulesfile : ",
+                     "sourcefile : ",
+                     "sinkfile : ",
+                     "reverse : ",
+                     "max-steps : "],
+                "outputs"=>["compounds : File", "reactions : File", "sinks : File"]}
 
     json = JSON.parse(workflow.to_schema_ld)
-    pp json
+    assert_equal expected, json
   end
 end
