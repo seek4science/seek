@@ -114,6 +114,72 @@ namespace :seek_dev do
     end
   end
 
+  task :add_covid_map_people, [:path, :project_id, :admin_user_id] => :environment do |_t, args|
+    path = args.path
+    project_id = args.project_id
+    admin_user = args.admin_user_id
+    user = User.find(admin_user)
+    project = Project.find(project_id)
+    raise "Wrong project" unless project.title == "COVID-19 Disease Map" #sanity check
+
+    puts "Using CSV at #{path}"
+    errors = []
+    added = 0
+    associated = 0
+    CSV.foreach(path) do |row|
+      name = row[0]&.strip
+      email = row[1]&.strip
+      institution_id = row[2].strip
+      expertise = row[3]
+      first, last = name.split(' ',2)
+
+      puts "Processing #{name}"
+
+      User.with_current_user(user) do
+        if (RFC822::EMAIL =~ email) && first
+          person = Person.where(email:email).first
+          unless person
+            puts "creating profile for #{name}"
+            person = Person.new(first_name: first,last_name: last,email: email)
+            person.expertise = expertise if expertise
+            if person.valid?
+              person.save!
+              added +=1
+            else
+              person = nil
+              errors << ["person invalid", row]
+            end
+          end
+          unless person.nil? || person.member_of?(project)
+            institution = Institution.find_by_id(institution_id)
+            if institution
+              puts "adding #{name} to #{institution.title}"
+              person.add_to_project_and_institution(project, institution)
+              person.save!
+              associated+=1
+            else
+              errors << ["institution not found",row]
+            end
+          else
+            if person
+              puts "#{name} already in project"
+            end
+          end
+        else
+          errors << ["bad email or no first name",row]
+        end
+      end
+    end
+    puts "Errors:" unless errors.empty?
+    errors.each do |error|
+      puts error[0]
+      puts error[1].inspect
+      puts "---------------"
+    end
+    puts "#{added} people added"
+    puts "#{associated} linked to project"
+  end
+
   task :add_people_from_spreadsheet, [:path] => :environment do |_t, args|
     path = args.path
     file = open(path)
