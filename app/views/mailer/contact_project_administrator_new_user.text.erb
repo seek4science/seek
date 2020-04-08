@@ -1,25 +1,25 @@
 Hi,
 
-The new user <%= @person.name %> just signed up and indicated that they are a member of the following projects and/or institutions:
+The new user <%= @person.name %> just signed up and indicated that they are a member of the following <%= t('project').pluralize.downcase -%> and/or <%= t('institution').pluralize.downcase -%>:
 
 <%= @details %>
 
-If you know this person is a genuine member of a <%= t('project').downcase %> you administer, you can add them by:
-    - following the link to the <%= t('project').downcase %> shown below
+If you know this person is a genuine member of a <%= t('project').downcase -%> you administer, you can add them by:
+    - following the link to the <%= t('project').downcase -%> shown below
     - select the Administration menu
-    - select the Administer <%= t('project') %> members button
+    - select the Administer <%= t('project') -%> members button
 
-Links to these <%= t('project').pluralize.downcase %> are:
+Links to these <%= t('project').pluralize.downcase -%> are:
 
 <% @projects.each do |project| %>
     <%= project.title %> - <%= project_url(project) %>
 <% end %>
 
 <% unless @other_institutions.blank? %>
-New institutions have been suggested - <%=@other_institutions%>. First double check if they exist, and if not you can create them.
-You can do this by selecting to create a new institution from the Create menu at the top.
+New <%= t('institution').pluralize.downcase -%> have been suggested - <%=@other_institutions%>. First double check if they exist, and if not you can create them.
+You can do this by selecting to create a new <%= t('institution').downcase -%> from the Create menu at the top.
 
-After the institution has been created successfully, you need to assign it to the <%= t('project').downcase %> following the steps described above.
+After the <%= t('institution').downcase -%> has been created successfully, you need to assign it to the <%= t('project').downcase %> following the steps described above.
 
 <% end %>
 More details about adding people to projects can be found at <%= Seek::Help::HelpDictionary.instance.help_link(:admin_project_members) %>

@@ -199,6 +199,7 @@ knime_workflow: 'avatars/workflow_types/avatar-knime.svg'
 ro_workflow: 'avatars/workflow_types/avatar-ro.png'
 nextflow_workflow: 'avatars/workflow_types/avatar-nextflow.png'
 ro_crate_avatar: 'file_icons/ro-crate.svg'
+snakemake_workflow: 'avatars/workflow_types/avatar-snakemake.png'
 
 # roles
 project_administrator: 'roles/role-project-admin.png'
