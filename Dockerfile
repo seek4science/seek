@@ -26,11 +26,8 @@ USER www-data
 
 WORKDIR $APP_DIR
 
-# CWL dependencies
-RUN pip3 install cwltool html5lib
-# To convert Galaxy to CWL
-#RUN pip3 install --index-url https://test.pypi.org/simple/ galaxy2cwl # --extra-index-url https://pypi.org/simple
-RUN pip3 install -i https://test.pypi.org/simple/ galaxy2cwl==0.1.1
+# CWL dependencies, galaxy2cwl
+RUN pip3 install cwltool==3.0.20200324120055 html5lib==1.0.1 galaxy2cwl==0.1.4
 
 
 # Bundle install throw errors if Gemfile has been modified since Gemfile.lock
