@@ -37,7 +37,7 @@ module Seek
           elsif @inner_extractor_class
             m = @inner_extractor_class.new(wf).metadata
           else
-            m = super.metadata
+            m = super
           end
         end
 
@@ -73,7 +73,7 @@ module Seek
       end
 
       def crate
-        @crate ||= ::ROCrate::WorkflowCrateReader.read_zip(@io)
+        @crate ||= ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.path : @io)
       end
 
       def default_diagram_format

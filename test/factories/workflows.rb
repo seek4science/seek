@@ -51,6 +51,10 @@ Factory.define(:cwl_workflow, parent: :workflow) do |f|
   f.association :content_blob, factory: :cwl_content_blob
 end
 
+Factory.define(:cwl_packed_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :cwl_packed_content_blob
+end
+
 # A Workflow that has been registered as a URI
 Factory.define(:cwl_url_workflow, parent: :workflow) do |f|
   f.association :content_blob, factory: :url_cwl_content_blob

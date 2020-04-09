@@ -44,12 +44,12 @@ module WorkflowExtraction
   end
 
   def ro_crate_zip
-    if is_already_ro_crate?
-      content_blob.filepath
-    else
+    if should_generate_crate?
       crate = ro_crate
       ROCrate::Writer.new(crate).write_zip(ro_crate_path)
       ro_crate_path
+    else
+      content_blob.filepath
     end
   end
 
@@ -57,32 +57,45 @@ module WorkflowExtraction
     content_blob.original_filename.end_with?('.crate.zip')
   end
 
+  def is_basic_ro_crate?
+    content_blob.original_filename.end_with?('.basic.crate.zip')
+  end
+
+  def should_generate_crate?
+    is_basic_ro_crate? || !is_already_ro_crate?
+  end
+
   def ro_crate
-    return extractor.crate if is_already_ro_crate?
+    return extractor.crate unless should_generate_crate?
 
-    ROCrate::WorkflowCrate.new.tap do |crate|
-      c = content_blob
-      wf = ROCrate::Workflow.new(crate, c.filepath, c.original_filename)
-      wf.identifier = ro_crate_identifier
-      wf.content_size = c.file_size
-      crate.main_workflow = wf
-      crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, extractor_class.ro_crate_metadata)
+    crate = is_basic_ro_crate? ? extractor.crate : ROCrate::WorkflowCrate.new
 
+    c = content_blob
+    wf = crate.main_workflow || ROCrate::Workflow.new(crate, c.filepath, c.original_filename)
+    wf.identifier = ro_crate_identifier
+    wf.content_size = c.file_size
+    crate.main_workflow = wf
+    crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, extractor_class.ro_crate_metadata)
+
+    begin
       d = diagram
       if d.exists?
-        wdf = ROCrate::WorkflowDiagram.new(crate, d.path, d.filename)
+        wdf = crate.main_workflow_diagram || ROCrate::WorkflowDiagram.new(crate, d.path, d.filename)
         wdf.content_size = d.size
         crate.main_workflow.diagram = wdf
       end
-
-      crate.date_published = Time.now
-      crate.author = related_people.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
-      crate.publisher = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata) }
-      crate.license = license
-      crate.url = ro_crate_url('ro_crate')
-
-      crate.preview.template = PREVIEW_TEMPLATE
+    rescue WorkflowDiagram::UnsupportedFormat
     end
+
+    crate.date_published = Time.now
+    crate.author = creators.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
+    crate.publisher = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata) }
+    crate.license = license
+    crate.url = ro_crate_url('ro_crate')
+
+    crate.preview.template = PREVIEW_TEMPLATE
+
+    crate
   end
 
   def ro_crate_identifier
