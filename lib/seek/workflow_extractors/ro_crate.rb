@@ -37,7 +37,7 @@ module Seek
           elsif @inner_extractor_class
             m = @inner_extractor_class.new(wf).metadata
           else
-            m = super.metadata
+            m = super
           end
         end
 
