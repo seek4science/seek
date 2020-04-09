@@ -83,14 +83,14 @@ class WorkflowsController < ApplicationController
 
     Rails.logger.info("Making new RO Crate")
     crate = ROCrate::WorkflowCrate.new
-    crate.main_workflow = ROCrate::Workflow.new(crate, workflow_upload, workflow_upload.original_filename)
+    crate.main_workflow = ROCrate::Workflow.new(crate, workflow_upload, get_unique_filename(crate, workflow_upload.original_filename))
     crate.main_workflow.programming_language = crate.add_contextual_entity(ROCrate::ContextualEntity.new(crate, nil, @workflow.extractor_class.ro_crate_metadata))
     if diagram_upload.present?
-      crate.main_workflow.diagram = ROCrate::WorkflowDiagram.new(crate, diagram_upload, diagram_upload.original_filename)
+      crate.main_workflow.diagram = ROCrate::WorkflowDiagram.new(crate, diagram_upload, get_unique_filename(crate, diagram_upload.original_filename))
     end
 
     if cwl_upload.present?
-      crate.main_workflow.cwl_description = ROCrate::WorkflowDescription.new(crate, cwl_upload, cwl_upload.original_filename)
+      crate.main_workflow.cwl_description = ROCrate::WorkflowDescription.new(crate, cwl_upload, get_unique_filename(crate, cwl_upload.original_filename))
     end
     crate.preview.template = WorkflowExtraction::PREVIEW_TEMPLATE
 
@@ -238,6 +238,14 @@ class WorkflowsController < ApplicationController
   end
 
   private
+
+  def get_unique_filename(crate, original_filename)
+    filename = original_filename
+    n = 0
+    filename = "#{n += 1}_#{original_filename}" while crate.dereference(filename)
+
+    filename
+  end
 
   def workflow_params
     params.require(:workflow).permit(:title, :description, :workflow_class_id, # :metadata,
