@@ -550,6 +550,7 @@ SEEK::Application.routes.draw do
       post :items_for_result
       post :resource_in_tab
       post :create_content_blob
+      post :create_ro_crate
       get :provide_metadata
       post :metadata_extraction_ajax
       post :create_metadata

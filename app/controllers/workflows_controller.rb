@@ -73,6 +73,51 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def create_ro_crate
+    clear_session_info
+    @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
+
+    workflow_upload = params[:ro_crate][:workflow]
+    cwl_upload = params[:ro_crate][:abstract_cwl]
+    diagram_upload = params[:ro_crate][:diagram]
+
+    Rails.logger.info("Making new RO Crate")
+    crate = ROCrate::WorkflowCrate.new
+    crate.main_workflow = ROCrate::Workflow.new(crate, workflow_upload, workflow_upload.original_filename)
+    crate.main_workflow.programming_language = crate.add_contextual_entity(ROCrate::ContextualEntity.new(crate, nil, @workflow.extractor_class.ro_crate_metadata))
+    if diagram_upload.present?
+      crate.main_workflow.diagram = ROCrate::WorkflowDiagram.new(crate, diagram_upload, diagram_upload.original_filename)
+    end
+
+    if cwl_upload.present?
+      crate.main_workflow.cwl_description = ROCrate::WorkflowDescription.new(crate, cwl_upload, cwl_upload.original_filename)
+    end
+    crate.preview.template = WorkflowExtraction::PREVIEW_TEMPLATE
+
+    f = Tempfile.new('crate.zip')
+    f.binmode
+
+    Rails.logger.info("Writing crate to #{f.path}")
+    ROCrate::Writer.new(crate).write_zip(f)
+    f.rewind
+
+    @workflow.build_content_blob({ tmp_io_object: f,
+                                   original_filename: 'new-workflow.basic.crate.zip',
+                                   content_type: 'application/zip',
+                                   make_local_copy: true,
+                                   file_size: File.size(f),
+                                   asset_version: 1 })
+
+    respond_to do |format|
+      if @workflow.content_blob.save
+        session[:uploaded_content_blob_id] = @workflow.content_blob.id
+        format.html { render action: :create_content_blob }
+      else
+        format.html { render action: :new }
+      end
+    end
+  end
+
   def retrieve_content(blob)
     if !blob.file_exists?
       if (caching_job = blob.caching_job).exists?
