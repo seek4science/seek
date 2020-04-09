@@ -34,6 +34,7 @@
               <div class="form-group">
                 <label class="required">Workflow type</label>
                 <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title'),
+                               include_blank: 'Other',
                                class: 'form-control' %>
                 <p class="help-block">The type of the above workflow.</p>
               </div>
@@ -94,7 +95,7 @@
           <div class="form-group">
             <label class="required">Workflow type</label>
             <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title'),
-                           include_blank: 'Other/Auto-detect type',
+                           include_blank: 'Other',
                            class: 'form-control' %>
             <p class="help-block">The type of the above workflow.</p>
           </div>
