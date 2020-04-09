@@ -5,6 +5,13 @@ cache: bundler
 jdk:
   - openjdk8
 
+python: 3
+
+addons:
+  apt:
+    packages:
+      - python3-pip
+
 services:
   - docker
   - mysql
