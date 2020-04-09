@@ -306,7 +306,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   test 'workflow' do
     creator2 = Factory(:person)
     workflow = travel_to(@current_time) do
-      workflow = Factory(:cwl_workflow,
+      workflow = Factory(:cwl_packed_workflow,
                          title: 'This workflow',
                          description: 'This is a test workflow for bioschema generation',
                          creators: [@person, creator2],
@@ -354,12 +354,19 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  'version' => 1,
                  'programmingLanguage' => 'CWL workflow',
                  'inputs' =>
-                    ['rulesfile : ',
-                     'sourcefile : ',
-                     'sinkfile : ',
-                     'reverse : ',
-                     'max-steps : '],
-                 'outputs' => ['compounds : File', 'reactions : File', 'sinks : File'] }
+                     ['#main/input.cofsfile : ["File"]',
+                      '#main/input.dmax : ["int"]',
+                      '#main/input.dmin : ["int"]',
+                      '#main/input.max-steps : ["int"]',
+                      '#main/input.mwmax-cof : ["int"]',
+                      '#main/input.mwmax-source : ["int"]',
+                      '#main/input.rulesfile : File',
+                      '#main/input.sinkfile : ["File"]',
+                      '#main/input.sourcefile : File',
+                      '#main/input.std_mode : ["string"]',
+                      '#main/input.stereo_mode : ["string"]',
+                      '#main/input.topx : ["int"]'],
+                 'outputs' => ['#main/solutionfile : File', '#main/sourceinsinkfile : ["File"]', '#main/stdout : File'] }
 
     json = JSON.parse(workflow.to_schema_ld)
     assert_equal expected, json
