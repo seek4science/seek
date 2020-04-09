@@ -1,6 +1,7 @@
 class Workflow < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::UploadHandling::ExamineUrl
+  include Seek::BioSchema::Support
   include WorkflowExtraction
 
   belongs_to :workflow_class, optional: true
