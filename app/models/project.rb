@@ -298,7 +298,9 @@ class Project < ApplicationRecord
         '@id' => "#project-#{id}",
         name: title,
         identifier: rdf_seek_id
-    }
+    }.tap do |m|
+      m.merge!(url: web_page) unless web_page.blank?
+    end
   end
 
   # should put below at the bottom in order to override methods for hierarchies,
