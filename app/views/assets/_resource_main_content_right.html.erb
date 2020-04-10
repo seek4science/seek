@@ -34,7 +34,7 @@
 
 <%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
 
-<% if resource.class.is_taggable? && current_user-%>
+<% if resource.class.is_taggable? %>
     <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
 <% end -%>
 
