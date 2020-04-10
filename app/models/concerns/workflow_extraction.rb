@@ -87,11 +87,15 @@ module WorkflowExtraction
     rescue WorkflowDiagram::UnsupportedFormat
     end
 
-    crate.date_published = Time.now
-    crate.author = creators.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
-    crate.publisher = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata) }
+    authors = creators.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
+    others = other_creators&.split(',')&.collect(&:strip)&.compact || []
+    authors += others.map.with_index { |name, i| crate.add_person("creator-#{i + 1}", name: name) }
+    crate.author = authors
+    crate['provider'] = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata).reference }
     crate.license = license
     crate.url = ro_crate_url('ro_crate')
+    crate['sdPublisher'] = crate.add_person(nil, contributor.ro_crate_metadata).reference
+    crate['sdDatePublished'] = Time.now
 
     crate.preview.template = PREVIEW_TEMPLATE
 
