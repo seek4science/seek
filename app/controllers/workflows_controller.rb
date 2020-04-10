@@ -6,6 +6,7 @@ class WorkflowsController < ApplicationController
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
   before_action :find_display_asset, only: [:show, :download, :diagram, :ro_crate]
+  before_action :login_required, only: [:create, :create_content_blob, :create_ro_crate, :create_metadata, :metadata_extraction_ajax, :provide_metadata]
 
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
@@ -115,15 +116,6 @@ class WorkflowsController < ApplicationController
       else
         format.html { render action: :new }
       end
-    end
-  end
-
-  def retrieve_content(blob)
-    if !blob.file_exists?
-      if (caching_job = blob.caching_job).exists?
-        caching_job.first.destroy
-      end
-      blob.retrieve
     end
   end
 
@@ -238,6 +230,15 @@ class WorkflowsController < ApplicationController
   end
 
   private
+
+  def retrieve_content(blob)
+    if !blob.file_exists?
+      if (caching_job = blob.caching_job).exists?
+        caching_job.first.destroy
+      end
+      blob.retrieve
+    end
+  end
 
   def get_unique_filename(crate, original_filename)
     filename = original_filename
