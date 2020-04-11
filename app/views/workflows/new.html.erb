@@ -64,27 +64,6 @@
       <% end -%>
     </div>
 
-    <div id="existing-ro-crate" role="tabpanel" class="tab-pane">
-      <%= form_tag({ action: :create_content_blob }, multipart: true) do -%>
-        <div class="asset_form">
-          <%= error_messages_for :workflow -%>
-
-          <%= render partial: 'assets/upload_box', locals: { resource: @workflow } -%>
-
-          <%= hidden_field_tag :workflow_class_id, '' %>
-
-          <div>
-            <%= create_button id: 'workflow_submit_btn',
-                              onclick: "return validateResourceFields('workflow')",
-                              class: 'btn btn-primary',
-                              button_text:'Upload',
-                              'workflow-upload-file-text' => 'Upload'-%>
-            or <%= cancel_button(workflows_path) -%>
-          </div>
-        </div>
-      <% end -%>
-    </div>
-
     <div id="individual-workflow" role="tabpanel" class="tab-pane">
       <%= form_tag({ action: :create_content_blob }, multipart: true) do -%>
         <div class="asset_form">
@@ -111,5 +90,27 @@
         </div>
       <% end -%>
     </div>
+
+    <div id="existing-ro-crate" role="tabpanel" class="tab-pane">
+      <%= form_tag({ action: :create_content_blob }, multipart: true) do -%>
+        <div class="asset_form">
+          <%= error_messages_for :workflow -%>
+
+          <%= render partial: 'assets/upload_box', locals: { resource: @workflow } -%>
+
+          <%= hidden_field_tag :workflow_class_id, '' %>
+
+          <div>
+            <%= create_button id: 'workflow_submit_btn',
+                              onclick: "return validateResourceFields('workflow')",
+                              class: 'btn btn-primary',
+                              button_text:'Upload',
+                              'workflow-upload-file-text' => 'Upload'-%>
+            or <%= cancel_button(workflows_path) -%>
+          </div>
+        </div>
+      <% end -%>
+    </div>
+
   </div>
 </div>
