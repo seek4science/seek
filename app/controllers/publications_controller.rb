@@ -615,14 +615,12 @@ class PublicationsController < ApplicationController
     # when importing multiple bibtex file, the name matching need to be exact
     if exact
       unless  matches.empty?
-
-        first_and_last_name_matches = matches.select { |p| p.first_name.at(0).casecmp(author.first_name.at(0).upcase).zero? }
-
-        if first_and_last_name_matches.size >= 1
+        first_and_last_name_matches = matches.select { |p| p.first_name.casecmp(author.first_name.upcase).zero? }
+        unless first_and_last_name_matches.empty?
           return first_and_last_name_matches.first
-          else
+        else
           return nil
-          end
+        end
       else
         return nil
       end
