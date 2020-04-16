@@ -15,7 +15,7 @@ class Workflow < ApplicationRecord
 
   has_and_belongs_to_many :sops
 
-  explicit_versioning(:version_column => "version") do
+  explicit_versioning(version_column: 'version', sync_ignore_columns: [:doi]) do
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
     acts_as_versioned_resource
     acts_as_favouritable
