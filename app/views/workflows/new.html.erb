@@ -1,3 +1,5 @@
+<% mode = params[:mode] %>
+
 <h1>New <%= t('workflow') %></h1>
 
 <%= alert_box('info', hide_button: true) do %>
@@ -10,107 +12,116 @@
 <div>
   <strong>I want to...</strong>
   <ul class="nav nav-pills nav-stacked" role="tablist">
-    <li role="presentation"><a href="#existing-ro-crate" aria-controls="existing-ro-crate" role="tab" data-toggle="tab">Register an existing Workflow RO Crate</a></li>
-    <li role="presentation"><a href="#new-ro-crate" aria-controls="new-ro-crate" role="tab" data-toggle="tab">Register a workflow, along with a diagram and abstract CWL</a></li>
-    <li role="presentation"><a href="#individual-workflow" aria-controls="individual-workflow" role="tab" data-toggle="tab">Register just a workflow</a></li>
+    <%= content_tag(:li, { role: 'presentation', class: mode =='existing-ro-crate' ? 'active' : nil }) do %>
+      <%= link_to 'Register an existing Workflow RO Crate', new_workflow_path(mode: 'existing-ro-crate'), { role: 'tab' } %>
+    <% end %>
+    <%= content_tag(:li, { role: 'presentation', class: mode =='new-ro-crate' ? 'active' : nil }) do %>
+      <%= link_to 'Register a workflow, along with a diagram and abstract CWL', new_workflow_path(mode: 'new-ro-crate'), { role: 'tab' } %>
+    <% end %>
+    <%= content_tag(:li, { role: 'presentation', class: mode =='individual-workflow' ? 'active' : nil }) do %>
+      <%= link_to 'Register just a workflow', new_workflow_path(mode: 'individual-workflow'), { role: 'tab' } %>
+    <% end %>
   </ul>
 
   <br/>
-
   <div class="tab-content">
-    <div id="new-ro-crate" role="tabpanel" class="tab-pane">
-      <%= form_tag({ action: :create_ro_crate }, multipart: true) do -%>
-        <div class="asset_form">
-          <div class="panel panel-default">
-            <%= error_messages_for :workflow -%>
+    <% if mode == 'new-ro-crate' %>
+      <div id="new-ro-crate" role="tabpanel" class="tab-pane active">
+        <%= form_tag({ action: :create_ro_crate }, multipart: true) do -%>
+          <div class="asset_form">
+            <div class="panel panel-default">
+              <%= error_messages_for :workflow -%>
+              <%= hidden_field_tag(:mode, mode) %>
 
-            <div class="panel-body">
-              <div class="form-group">
-                <label class="required">Workflow</label>
-                <%= file_field_tag "ro_crate[workflow]" -%>
-                <p class="help-block">The main executable workflow.</p>
-              </div>
+              <div class="panel-body">
+                <div class="form-group">
+                  <label class="required">Workflow</label>
+                  <%= file_field_tag "ro_crate[workflow]" -%>
+                  <p class="help-block">The main executable workflow.</p>
+                </div>
 
-              <div class="form-group">
-                <label class="required">Workflow type</label>
-                <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title'),
-                               include_blank: 'Other',
-                               class: 'form-control' %>
-                <p class="help-block">The type of the above workflow.</p>
-              </div>
+                <div class="form-group">
+                  <label class="required">Workflow type</label>
+                  <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title'),
+                                 include_blank: 'Other',
+                                 class: 'form-control' %>
+                  <p class="help-block">The type of the above workflow.</p>
+                </div>
 
-              <div class="form-group">
-                <label>Abstract CWL</label>
-                <%= file_field_tag "ro_crate[abstract_cwl]" -%>
-                <p class="help-block">(Optional) The abstract CWL that describes the workflow above.</p>
-              </div>
+                <div class="form-group">
+                  <label>Abstract CWL</label>
+                  <%= file_field_tag "ro_crate[abstract_cwl]" -%>
+                  <p class="help-block">(Optional) The abstract CWL that describes the workflow above.</p>
+                </div>
 
-              <div class="form-group">
-                <label>Diagram</label>
-                <%= file_field_tag "ro_crate[diagram]" -%>
-                <p class="help-block">(Optional) A diagram that illustrates the main workflow.</p>
+                <div class="form-group">
+                  <label>Diagram</label>
+                  <%= file_field_tag "ro_crate[diagram]" -%>
+                  <p class="help-block">(Optional) A diagram that illustrates the main workflow.</p>
+                </div>
               </div>
             </div>
+
+            <div>
+              <%= create_button id: 'workflow_submit_btn',
+                                class: 'btn btn-primary',
+                                button_text:'Upload',
+                                'workflow-upload-file-text' => 'Upload'-%>
+              or <%= cancel_button(workflows_path) -%>
+            </div>
           </div>
+        <% end -%>
+      </div>
+    <% elsif mode == 'individual-workflow' %>
+      <div id="individual-workflow" role="tabpanel" class="tab-pane active">
+        <%= form_tag({ action: :create_content_blob }, multipart: true) do -%>
+          <div class="asset_form">
+            <%= error_messages_for :workflow -%>
+            <%= hidden_field_tag(:mode, mode) %>
 
-          <div>
-            <%= create_button id: 'workflow_submit_btn',
-                              class: 'btn btn-primary',
-                              button_text:'Upload',
-                              'workflow-upload-file-text' => 'Upload'-%>
-            or <%= cancel_button(workflows_path) -%>
+            <%= render partial: 'assets/upload_box', locals: { resource: @workflow } -%>
+
+            <div class="form-group">
+              <label class="required">Workflow type</label>
+              <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title'),
+                             include_blank: 'Other',
+                             class: 'form-control' %>
+              <p class="help-block">The type of the above workflow.</p>
+            </div>
+
+            <div>
+              <%= create_button id: 'workflow_submit_btn',
+                                onclick: "return validateResourceFields('workflow')",
+                                class: 'btn btn-primary',
+                                button_text:'Upload',
+                                'workflow-upload-file-text' => 'Upload'-%>
+              or <%= cancel_button(workflows_path) -%>
+            </div>
           </div>
-        </div>
-      <% end -%>
-    </div>
+        <% end -%>
+      </div>
+    <% elsif mode == 'existing-ro-crate' %>
+      <div id="existing-ro-crate" role="tabpanel" class="tab-pane active">
+        <%= form_tag({ action: :create_content_blob }, multipart: true) do -%>
+          <div class="asset_form">
+            <%= error_messages_for :workflow -%>
+            <%= hidden_field_tag(:mode, mode) %>
 
-    <div id="individual-workflow" role="tabpanel" class="tab-pane">
-      <%= form_tag({ action: :create_content_blob }, multipart: true) do -%>
-        <div class="asset_form">
-          <%= error_messages_for :workflow -%>
+            <%= render partial: 'assets/upload_box', locals: { resource: @workflow } -%>
 
-          <%= render partial: 'assets/upload_box', locals: { resource: @workflow } -%>
+            <%= hidden_field_tag :workflow_class_id, '' %>
 
-          <div class="form-group">
-            <label class="required">Workflow type</label>
-            <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title'),
-                           include_blank: 'Other',
-                           class: 'form-control' %>
-            <p class="help-block">The type of the above workflow.</p>
+            <div>
+              <%= create_button id: 'workflow_submit_btn',
+                                onclick: "return validateResourceFields('workflow')",
+                                class: 'btn btn-primary',
+                                button_text:'Upload',
+                                'workflow-upload-file-text' => 'Upload'-%>
+              or <%= cancel_button(workflows_path) -%>
+            </div>
           </div>
-
-          <div>
-            <%= create_button id: 'workflow_submit_btn',
-                              onclick: "return validateResourceFields('workflow')",
-                              class: 'btn btn-primary',
-                              button_text:'Upload',
-                              'workflow-upload-file-text' => 'Upload'-%>
-            or <%= cancel_button(workflows_path) -%>
-          </div>
-        </div>
-      <% end -%>
-    </div>
-
-    <div id="existing-ro-crate" role="tabpanel" class="tab-pane">
-      <%= form_tag({ action: :create_content_blob }, multipart: true) do -%>
-        <div class="asset_form">
-          <%= error_messages_for :workflow -%>
-
-          <%= render partial: 'assets/upload_box', locals: { resource: @workflow } -%>
-
-          <%= hidden_field_tag :workflow_class_id, '' %>
-
-          <div>
-            <%= create_button id: 'workflow_submit_btn',
-                              onclick: "return validateResourceFields('workflow')",
-                              class: 'btn btn-primary',
-                              button_text:'Upload',
-                              'workflow-upload-file-text' => 'Upload'-%>
-            or <%= cancel_button(workflows_path) -%>
-          </div>
-        </div>
-      <% end -%>
-    </div>
-
+        <% end -%>
+      </div>
+    <% end %>
   </div>
 </div>
