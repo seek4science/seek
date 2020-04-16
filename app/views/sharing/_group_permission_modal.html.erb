@@ -65,7 +65,7 @@
         permission.contributor_id = institutionId;
         permission.title = institutionTitle;
       } else {
-        alert('Please select either a project or institution.');
+        alert('Please select either a <%= t('project') -%> or <%= t('institution') -%>.');
         return false;
       }
     }
@@ -94,7 +94,7 @@
           data: { 'id': projectId },
           success: function (data) {
             institutionSelect.html('');
-            institutionSelect.html('<option value="">any institution</option>');
+            institutionSelect.html('<option value="">any <%= t('institution').downcase -%></option>');
             data.institution_list.forEach(function (i) {
                 var opt = $j('<option>');
                 opt.attr('value', i[idIndex]);
