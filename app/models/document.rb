@@ -30,7 +30,7 @@ class Document < ApplicationRecord
     end
   end
 
-  explicit_versioning(version_column: 'version', sync_ignore_columns: [:doi]) do
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     acts_as_doi_mintable(proxy: :parent, general_type: 'Text')
     acts_as_versioned_resource
     acts_as_favouritable

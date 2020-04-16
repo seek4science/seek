@@ -54,7 +54,7 @@ class Model < ApplicationRecord
       joins: [:assays]
   )
 
-  explicit_versioning(version_column: 'version', sync_ignore_columns: [:doi]) do
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     include Seek::Models::ModelExtraction
     acts_as_doi_mintable(proxy: :parent, general_type: 'Model')
     acts_as_versioned_resource
