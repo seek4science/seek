@@ -188,14 +188,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select 'p#technology_type', text: /Binding/, count: 1
   end
 
-  test 'should not show tagging when not logged in' do
-    logout
-    public_assay = Factory(:experimental_assay, policy: Factory(:public_policy))
-    get :show, params: { id: public_assay }
-    assert_response :success
-    assert_select 'div#tags_box', count: 0
-  end
-
   test 'should show modelling assay' do
     assert_difference('ActivityLog.count') do
       get :show, params: { id: assays(:modelling_assay_with_data_and_relationship) }
