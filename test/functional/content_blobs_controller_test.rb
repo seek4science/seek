@@ -189,8 +189,10 @@ class ContentBlobsControllerTest < ActionController::TestCase
     begin
       # Need to allow the request through so that `private_address_check` can catch it.
       WebMock.allow_net_connect!
-      assert PrivateAddressCheck.resolves_to_private_address?('192.168.0.1')
       VCR.turned_off do
+        assert PrivateAddressCheck.resolves_to_private_address?('192.168.0.1')
+        PrivateAddressCheck.only_public_connections { RestClient.head('192.168.0.1') }
+        PrivateAddressCheck.only_public_connections { TCPSocket.new('192.168.0.1', 80) }
         get :examine_url, xhr: true, params: { data_url: 'http://192.168.0.1/config' }
         assert_response 400
         assert_equal 490, assigns(:info)[:code]
