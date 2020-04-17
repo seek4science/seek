@@ -24,6 +24,7 @@ module Seek
         p = proc do
           begin
             response = RestClient.head(url, accept: '*/*')
+            pp response
             content_type = if is_slideshare_url?
                              'text/html'
                            else
@@ -33,6 +34,8 @@ module Seek
             file_name = determine_filename_from_disposition(response.headers[:content_disposition])
             code = response.code
           rescue RestClient::MethodNotAllowed => e # Try a GET if HEAD isn't allowed, but don't download anything
+            puts "RestClient::MethodNotAllowed"
+            pp e
             if @fallback_to_get
               begin
                 uri = URI.parse(url)
@@ -45,12 +48,16 @@ module Seek
                   end
                 end
               rescue Seek::DownloadHandling::BadResponseCodeException => e2
+                puts "Seek::DownloadHandling::BadResponseCodeException"
+                pp e2
                 code = e2.code
               end
             else
               code = e.http_code
             end
           rescue RestClient::Exception => e
+            puts "RestClient::Exception"
+            pp e
             code = e.http_code
           rescue SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
             code = 404
@@ -58,6 +65,7 @@ module Seek
         end
 
         begin
+          puts "Seek::Config.allow_private_address_access = #{Seek::Config.allow_private_address_access}"
           if Seek::Config.allow_private_address_access
             p.call
           else
