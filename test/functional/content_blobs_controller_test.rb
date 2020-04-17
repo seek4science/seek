@@ -192,8 +192,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
       WebMock.allow_net_connect!
       assert PrivateAddressCheck.resolves_to_private_address?('192.168.0.1')
       VCR.turned_off do
+        puts Thread.current[:private_address_check]
+        puts PrivateAddressCheck.resolves_to_private_address?('192.168.0.1')
         get :examine_url, xhr: true, params: { data_url: 'http://192.168.0.1/config' }
-        assert PrivateAddressCheck.resolves_to_private_address?('192.168.0.1')
         puts @response.body
         pp assigns(:info)
         assert_response 400

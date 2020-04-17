@@ -13,6 +13,7 @@ TCPSocket.class_eval do
     begin
       initialize_without_private_address_check2(remote_host, remote_port, local_host, local_port)
     rescue Errno::ECONNREFUSED, SocketError, Net::OpenTimeout
+      puts "monkey-patched"
       private_address_check! remote_host
       raise
     end
