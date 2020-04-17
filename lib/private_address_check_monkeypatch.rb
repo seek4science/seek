@@ -23,6 +23,7 @@ TCPSocket.class_eval do
   private
 
   def private_address_check!(address)
+    puts "checking #{address} - #{Thread.current[:private_address_check]} #{PrivateAddressCheck.resolves_to_private_address?(address)}"
     return unless Thread.current[:private_address_check]
     return unless PrivateAddressCheck.resolves_to_private_address?(address)
 

@@ -2,7 +2,6 @@ require 'test_helper'
 require 'docsplit'
 require 'seek/download_handling/http_streamer' # Needed to load exceptions that are tested later
 require 'minitest/mock'
-require 'private_address_check'
 
 class ContentBlobTest < ActiveSupport::TestCase
 

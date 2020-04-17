@@ -26,6 +26,8 @@ require 'seek/permissions/publishing_permissions'
 require 'seek/search/common_fields'
 require 'seek/project_hierarchies/project_extension'
 require 'mimemagic'
+require 'private_address_check'
+require 'private_address_check/tcpsocket_ext'
 require 'private_address_check_monkeypatch'
 
 SEEK::Application.configure do

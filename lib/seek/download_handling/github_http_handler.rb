@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require 'rest-client'
-require 'private_address_check'
-require 'private_address_check/tcpsocket_ext'
 require_relative './http_handler'
 
 module Seek
