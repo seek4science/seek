@@ -14,10 +14,12 @@ module Seek
           handler = @content_blob.remote_content_handler
           if handler
             @info = handler.info
-            if @info[:code] && @info[:code] == 200
-              handle_good_http_response(handler)
-            else
-              handle_bad_http_response(@info[:code])
+            if @info[:code]
+              if @info[:code] == 200
+                handle_good_http_response(handler)
+              else
+                handle_bad_http_response(@info[:code])
+              end
             end
           else
             @type = 'warning'
