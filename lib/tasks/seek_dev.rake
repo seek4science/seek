@@ -260,4 +260,22 @@ namespace :seek_dev do
       end
     end
   end
+
+  task find_duplicate_users_by_name_match: :environment do
+    File.delete("./log/duplicate_users.log") if File.exist?("./log/duplicate_users.log")
+    output = File.open( "./log/duplicate_users.log","w" )
+    duplicated_users = Person.select(:first_name,:last_name).group(:first_name,:last_name).having("count(*)>1")
+    #pp duplicated_users
+      duplicated_users.each do |duplicated_user|
+        matches = Person.where(first_name: duplicated_user.first_name, last_name: duplicated_user.last_name)
+        puts duplicated_user.first_name+" "+duplicated_user.last_name+"("+matches.size.to_s+")"
+        output << duplicated_user.first_name+" "+duplicated_user.last_name+"("+matches.size.to_s+")"+"\n"
+        matches.each do |match|
+          puts "ID "+ match.id.to_s+":"+ match.email
+          output << "ID "+ match.id.to_s+":"+ match.email+"\n"
+        end
+        output << "\n"
+      end
+    output.close
+  end
 end
