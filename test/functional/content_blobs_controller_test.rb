@@ -1,6 +1,8 @@
-  require 'test_helper'
+require 'test_helper'
 require 'minitest/mock'
 require 'private_address_check'
+require 'socket'
+require 'ipaddr'
 
 class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
@@ -194,6 +196,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
       VCR.turned_off do
         puts Thread.current[:private_address_check]
         puts PrivateAddressCheck.resolves_to_private_address?('192.168.0.1')
+        ips = Socket.getaddrinfo('192.168.0.1', nil).map { |info| IPAddr.new(info[3]) }
+        pp ips
         get :examine_url, xhr: true, params: { data_url: 'http://192.168.0.1/config' }
         puts @response.body
         pp assigns(:info)
