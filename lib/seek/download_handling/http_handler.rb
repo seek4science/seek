@@ -69,7 +69,12 @@ module Seek
           if Seek::Config.allow_private_address_access
             p.call
           else
-            PrivateAddressCheck.only_public_connections { p.call }
+            PrivateAddressCheck.only_public_connections do
+              puts "Private address check block"
+              puts Thread.current[:private_address_check]
+              puts PrivateAddressCheck.resolves_to_private_address?('192.168.0.1')
+              p.call
+            end
           end
         rescue PrivateAddressCheck::PrivateConnectionAttemptedError
           code = 490 # A made up error code to be handled internally by SEEK
