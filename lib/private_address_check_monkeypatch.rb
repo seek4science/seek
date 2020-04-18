@@ -32,6 +32,9 @@ TCPSocket.class_eval do
       STDOUT.puts "Exception: #{e.class.name}"
       private_address_check! remote_host
       raise
+    rescue Exception => e
+      STDOUT.puts "Unhandled Exception: #{e.class.name}"
+      raise e
     end
 
     STDOUT.puts  "priv add check"
