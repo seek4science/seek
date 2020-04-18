@@ -28,7 +28,7 @@ TCPSocket.class_eval do
 
       initialize_without_private_address_check(remote_host, remote_port, local_host, local_port)
       STDOUT.puts  "begin 2"
-    rescue Errno::ECONNREFUSED, SocketError, Net::OpenTimeout => e
+    rescue SystemCallError, SocketError, Net::OpenTimeout => e
       STDOUT.puts "Exception: #{e.class.name}"
       private_address_check! remote_host
       raise
