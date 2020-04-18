@@ -11,15 +11,26 @@ require 'private_address_check/tcpsocket_ext'
 TCPSocket.class_eval do
   def initialize(remote_host, remote_port, local_host = nil, local_port = nil)
     STDOUT.puts "Patched TCPSocket init - #{remote_host} #{remote_port} #{local_host} #{local_port}"
+    STDOUT.puts "enabled: #{Thread.current[:private_address_check]}, is private: #{PrivateAddressCheck.resolves_to_private_address?(remote_host)}"
+    STDOUT.puts "----ips:"
+    ips = Socket.getaddrinfo(remote_host, nil).map { |info| IPAddr.new(info[3]) }
+    pp ips
+    STDOUT.puts '----'
+    STDOUT.puts "----private address list:"
+    pp PrivateAddressCheck::CIDR_LIST
+    STDOUT.puts '----'
 
     begin
+      STDOUT.puts  "begin 1"
       initialize_without_private_address_check(remote_host, remote_port, local_host, local_port)
+      STDOUT.puts  "begin 2"
     rescue Errno::ECONNREFUSED, SocketError, Net::OpenTimeout => e
       STDOUT.puts "Exception: #{e.class.name}"
       private_address_check! remote_host
       raise
     end
 
+    STDOUT.puts  "priv add check"
     private_address_check! remote_address.ip_address
   end
 
