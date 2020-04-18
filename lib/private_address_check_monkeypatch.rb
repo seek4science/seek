@@ -10,9 +10,11 @@ TCPSocket.class_eval do
   alias_method :initialize_without_private_address_check2, :initialize
 
   def initialize(remote_host, remote_port, local_host = nil, local_port = nil)
+    STDOUT.puts 'Patched TCPSocket init'
     begin
       initialize_without_private_address_check2(remote_host, remote_port, local_host, local_port)
-    rescue Errno::ECONNREFUSED, SocketError, Net::OpenTimeout
+    rescue Errno::ECONNREFUSED, SocketError, Net::OpenTimeout => e
+      STDOUT.puts "Exception: #{e.class.name}"
       private_address_check! remote_host
       raise
     end
@@ -23,7 +25,7 @@ TCPSocket.class_eval do
   private
 
   def private_address_check!(address)
-    puts "checking #{address} - #{Thread.current[:private_address_check]} #{PrivateAddressCheck.resolves_to_private_address?(address)}"
+    STDOUT.puts "checking #{address} - #{Thread.current[:private_address_check]} #{PrivateAddressCheck.resolves_to_private_address?(address)}"
     return unless Thread.current[:private_address_check]
     return unless PrivateAddressCheck.resolves_to_private_address?(address)
 
