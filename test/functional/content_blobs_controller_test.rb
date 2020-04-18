@@ -1,6 +1,26 @@
 require 'test_helper'
 require 'minitest/mock'
 
+module RestClient
+  class Request
+    def net_http_object(hostname, port)
+      p_uri = proxy_uri
+
+      if p_uri.nil?
+        # no proxy set
+        Net::HTTP.new(hostname, port)
+      elsif !p_uri
+        # proxy explicitly set to none
+        Net::HTTP.new(hostname, port, nil, nil, nil, nil)
+      else
+        Net::HTTP.new(hostname, port,
+                      p_uri.hostname, p_uri.port, p_uri.user, p_uri.password)
+
+      end.tap { |n| n.set_debug_output(STDOUT) }
+    end
+  end
+end
+
 class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
 
@@ -186,6 +206,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'examine url local network' do
+    puts "------- broken test --------"
     begin
       # Need to allow the request through so that `private_address_check` can catch it.
       WebMock.allow_net_connect!
@@ -204,6 +225,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     ensure
       WebMock.disable_net_connect!(allow_localhost: true)
     end
+    puts "------- end broken test --------"
   end
 
   test 'should find_and_auth_asset for download' do

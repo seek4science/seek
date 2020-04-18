@@ -5,14 +5,15 @@
 #
 #  # The problem was caused by attempting to connect before checking if the address is private, resulting in a different exception, that could also potentially be used to determine what services are running on the server
 #  FIXME: review this in the future to see if a new version of PrivateAddressCheck has been updated (I've set myself a reminder)
+require 'private_address_check'
+require 'private_address_check/tcpsocket_ext'
 
 TCPSocket.class_eval do
-  alias_method :initialize_without_private_address_check2, :initialize
-
   def initialize(remote_host, remote_port, local_host = nil, local_port = nil)
-    STDOUT.puts 'Patched TCPSocket init'
+    STDOUT.puts "Patched TCPSocket init - #{remote_host} #{remote_port} #{local_host} #{local_port}"
+
     begin
-      initialize_without_private_address_check2(remote_host, remote_port, local_host, local_port)
+      initialize_without_private_address_check(remote_host, remote_port, local_host, local_port)
     rescue Errno::ECONNREFUSED, SocketError, Net::OpenTimeout => e
       STDOUT.puts "Exception: #{e.class.name}"
       private_address_check! remote_host
