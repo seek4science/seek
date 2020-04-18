@@ -1,110 +1,6 @@
 require 'test_helper'
 require 'minitest/mock'
-
-module RestClient
-  class Request
-    def net_http_object(hostname, port)
-      p_uri = proxy_uri
-
-      if p_uri.nil?
-        # no proxy set
-        Net::HTTP.new(hostname, port)
-      elsif !p_uri
-        # proxy explicitly set to none
-        Net::HTTP.new(hostname, port, nil, nil, nil, nil)
-      else
-        Net::HTTP.new(hostname, port,
-                      p_uri.hostname, p_uri.port, p_uri.user, p_uri.password)
-
-      end.tap do |n|
-        STDOUT.puts "net open timeout: #{n.open_timeout}"
-        STDOUT.puts "net read timeout: #{n.read_timeout}"
-        n.set_debug_output(STDOUT)
-      end
-    end
-  end
-end
-
-module Net
-  class HTTP
-    def connect
-      if proxy? then
-        conn_address = proxy_address
-        conn_port    = proxy_port
-      else
-        conn_address = address
-        conn_port    = port
-      end
-
-      D "opening connection to #{conn_address}:#{conn_port}..."
-      s = Timeout.timeout(@open_timeout, Net::OpenTimeout) {
-        begin
-          STDOUT.puts "befor"
-          TCPSocket.open(conn_address, conn_port, @local_host, @local_port)
-          STDOUT.puts "after"
-        rescue => e
-          raise e, "Failed to open TCP connection to " +
-              "#{conn_address}:#{conn_port} (#{e.message})"
-        end
-      }
-      s.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
-      D "opened"
-      if use_ssl?
-        if proxy?
-          plain_sock = BufferedIO.new(s, read_timeout: @read_timeout,
-                                      continue_timeout: @continue_timeout,
-                                      debug_output: @debug_output)
-          buf = "CONNECT #{@address}:#{@port} HTTP/#{HTTPVersion}\r\n"
-          buf << "Host: #{@address}:#{@port}\r\n"
-          if proxy_user
-            credential = ["#{proxy_user}:#{proxy_pass}"].pack('m0')
-            buf << "Proxy-Authorization: Basic #{credential}\r\n"
-          end
-          buf << "\r\n"
-          plain_sock.write(buf)
-          HTTPResponse.read_new(plain_sock).value
-          # assuming nothing left in buffers after successful CONNECT response
-        end
-
-        ssl_parameters = Hash.new
-        iv_list = instance_variables
-        SSL_IVNAMES.each_with_index do |ivname, i|
-          if iv_list.include?(ivname) and
-              value = instance_variable_get(ivname)
-            ssl_parameters[SSL_ATTRIBUTES[i]] = value if value
-          end
-        end
-        @ssl_context = OpenSSL::SSL::SSLContext.new
-        @ssl_context.set_params(ssl_parameters)
-        D "starting SSL for #{conn_address}:#{conn_port}..."
-        s = OpenSSL::SSL::SSLSocket.new(s, @ssl_context)
-        s.sync_close = true
-        # Server Name Indication (SNI) RFC 3546
-        s.hostname = @address if s.respond_to? :hostname=
-        if @ssl_session and
-            Process.clock_gettime(Process::CLOCK_REALTIME) < @ssl_session.time.to_f + @ssl_session.timeout
-          s.session = @ssl_session if @ssl_session
-        end
-        ssl_socket_connect(s, @open_timeout)
-        if @ssl_context.verify_mode != OpenSSL::SSL::VERIFY_NONE
-          s.post_connection_check(@address)
-        end
-        @ssl_session = s.session
-        D "SSL established"
-      end
-      @socket = BufferedIO.new(s, read_timeout: @read_timeout,
-                               continue_timeout: @continue_timeout,
-                               debug_output: @debug_output)
-      on_connect
-    rescue => exception
-      if s
-        D "Conn close because of connect error #{exception}"
-        s.close
-      end
-      raise
-    end
-  end
-end
+require 'private_address_check'
 
 class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
@@ -291,15 +187,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'examine url local network' do
-    puts "------- broken test --------"
     begin
       # Need to allow the request through so that `private_address_check` can catch it.
       WebMock.allow_net_connect!
+      assert PrivateAddressCheck.resolves_to_private_address?('192.168.0.1')
       VCR.turned_off do
-        assert PrivateAddressCheck.resolves_to_private_address?('192.168.0.1')
-        RestClient.log = 'stdout'
-        PrivateAddressCheck.only_public_connections { RestClient.head('192.168.0.1') }
-        PrivateAddressCheck.only_public_connections { TCPSocket.new('192.168.0.1', 80) }
         get :examine_url, xhr: true, params: { data_url: 'http://192.168.0.1/config' }
         assert_response 400
         assert_equal 490, assigns(:info)[:code]
@@ -310,7 +202,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
     ensure
       WebMock.disable_net_connect!(allow_localhost: true)
     end
-    puts "------- end broken test --------"
   end
 
   test 'should find_and_auth_asset for download' do

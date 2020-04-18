@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'rest-client'
+require 'private_address_check'
+require 'private_address_check/tcpsocket_ext'
 
 module Seek
   module DownloadHandling
