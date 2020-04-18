@@ -7,6 +7,7 @@
 #  FIXME: review this in the future to see if a new version of PrivateAddressCheck has been updated (I've set myself a reminder)
 require 'private_address_check'
 require 'private_address_check/tcpsocket_ext'
+require 'resolv'
 
 TCPSocket.class_eval do
   def initialize(remote_host, remote_port, local_host = nil, local_port = nil)
@@ -22,6 +23,9 @@ TCPSocket.class_eval do
 
     begin
       STDOUT.puts  "begin 1"
+      STDOUT.puts  "mapped host: #{IPSocket.getaddress(remote_host).to_s}"
+      STDOUT.puts  "mapped host private?: #{PrivateAddressCheck.resolves_to_private_address?(IPSocket.getaddress(remote_host))}"
+
       initialize_without_private_address_check(remote_host, remote_port, local_host, local_port)
       STDOUT.puts  "begin 2"
     rescue Errno::ECONNREFUSED, SocketError, Net::OpenTimeout => e
