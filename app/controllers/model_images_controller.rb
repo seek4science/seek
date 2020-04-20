@@ -40,18 +40,18 @@ class ModelImagesController < ApplicationController
   end
 
   def show
-    params[:size] ||= ModelImage::DEFAULT_SIZE
-    size = if params[:size] == 'large'
-             ModelImage::LARGE_SIZE
-           else
-             params[:size]
-           end
-
-    @model_image.resize_image(size)
+    if params[:size]
+      size = if params[:size] == 'large'
+               ModelImage::LARGE_SIZE
+             else
+               params[:size]
+             end
+      @model_image.resize_image(size)
+    end
 
     respond_to do |format|
       format.html do
-        path = @model_image.full_cache_path(size)
+        path = size ? @model_image.full_cache_path(size) : @model_image.file_path
         send_file(path, type: 'image/jpeg', disposition: 'inline')
         headers['Content-Length'] = File.size(path).to_s
       end
