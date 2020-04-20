@@ -52,12 +52,12 @@ class ModelImagesController < ApplicationController
     respond_to do |format|
       format.html do
         path = size ? @model_image.full_cache_path(size) : @model_image.file_path
-        send_file(path, type: 'image/jpeg', disposition: 'inline')
+        send_file(path, type: 'image/png', disposition: 'inline')
         headers['Content-Length'] = File.size(path).to_s
       end
       format.xml do
         @cache_file = @model_image.full_cache_path(size)
-        @type = 'image/jpeg'
+        @type = 'image/png'
       end
     end
   end
