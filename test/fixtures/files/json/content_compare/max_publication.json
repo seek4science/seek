@@ -24,10 +24,30 @@
       "authors": ["Author1 Last", "Author2 Last"]
     },
     "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "1039986841",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "522086294",
+            "type": "people"
+          }
+        ]
+      },
       "people": {
         "data": [
           {
             "id": "1039986644",
+            "type": "people"
+          },
+          {
+            "id": "1039986841",
             "type": "people"
           }
         ]
