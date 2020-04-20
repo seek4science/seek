@@ -25,12 +25,7 @@
     },
     "relationships": {
       "creators": {
-        "data": [
-          {
-            "id": "1039986841",
-            "type": "people"
-          }
-        ]
+        "data": []
       },
       "submitter": {
         "data": [
@@ -44,10 +39,6 @@
         "data": [
           {
             "id": "1039986644",
-            "type": "people"
-          },
-          {
-            "id": "1039986841",
             "type": "people"
           }
         ]
