@@ -14,5 +14,5 @@
 </ul>
 
 <%= content_tag :script,
-                @info.merge(allow_copy: @info[:file_size] <= Seek::Config.hard_max_cachable_size).to_json.html_safe,
+                @info.merge(allow_copy: (@info[:file_size].blank? || (@info[:file_size] <= Seek::Config.hard_max_cachable_size))).to_json.html_safe,
                 type: 'application/json' %>

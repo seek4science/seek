@@ -1,10 +1,4 @@
 $j(document).ready(function () {
-    // Have to bind this event to the pending_files div because the .remove-file links are added dynamically
-    //  after page load
-    // $j('#pending-files').on('click', '.remove-file', removeFile);
-    //
-    // $j('#local-file').on('change', 'input[type=file][data-batch-upload=true]', addLocalFile);
-
     $j('[data-seek-upload-field]').each(function () {
         var field = $j(this);
         var pending = $j('[data-seek-upload-field-pending]', field);
@@ -20,20 +14,13 @@ $j(document).ready(function () {
 
         // Tabs
         $j('[data-seek-upload-field-tab]', field).click(function () {
-            console.log($j(this).data('seekUploadFieldTab'));
-            console.log('[data-seek-upload-field-tab-pane="' + $j(this).data('seekUploadFieldTab') + '"]');
-            console.log($j('[data-seek-upload-field-tab-pane="' + $j(this).data('seekUploadFieldTab') + '"]', field));
             $j('[data-seek-upload-field-tab]', field).removeClass('active');
             $j('[data-seek-upload-field-tab-pane]', field).removeClass('active');
             $j('[data-seek-upload-field-tab-pane="' + $j(this).data('seekUploadFieldTab') + '"]', field).addClass('active');
             $j(this).addClass('active');
         });
 
-        pending.on('click', '.remove-file', function () {
-            $j(this).parent('li').remove();
-            return false;
-        });
-
+        // Local file
         var addLocalFile = function () {
             var newField = HandlebarsTemplates['upload/file_field']();
             $j(this).parent().append(newField);
@@ -45,6 +32,7 @@ $j(document).ready(function () {
 
         field.on('change', 'input[type=file][data-batch-upload=true]', addLocalFile);
 
+        // Remote file
         var addRemoteFile = function () {
             var urlInput = $j('[data-seek-url-checker] input', field);
             var filenameInput = $j('[data-seek-upload-field-filename]', field);
@@ -67,23 +55,20 @@ $j(document).ready(function () {
                 filenameInput.val('');
                 $j('[data-seek-url-checker-copy-dialog]', field).hide();
                 $j('[data-seek-url-checker-too-big]', field).hide();
-                $j('#pending-files').append(HandlebarsTemplates['upload/remote_file'](remoteFile));
+                pending.append(HandlebarsTemplates['upload/remote_file'](remoteFile));
             }
         };
 
         addRemoteBtn.click(addRemoteFile);
 
-        if ($j('#local-file').length) {
-            $j('#local-file').on('change', 'input[type=file]', function () { changeUploadButtonText(true); });
-
-            // If the URL field was pre-filled through params, make sure the button text is updated.
-            if ($j('#data_url_field').val().length) {
-                changeUploadButtonText(false);
-            }
-        }
-
+        // Remove file
+        pending.on('click', '.remove-file', function () {
+            $j(this).parent('li').remove();
+            return false;
+        });
     });
 
+    // Code for checking URL and showing preview
     $j('[data-seek-url-checker]').each(function () {
         var checker = $j(this);
         var field = checker.parents('[data-seek-upload-field]');
@@ -109,7 +94,6 @@ $j(document).ready(function () {
                 var json = $j('script', result);
                 if (json.length) {
                     var info = JSON.parse($j('script', result).html());
-                    console.log(info);
                     if (info.allow_copy) {
                         copyDialog.show();
                     } else {
@@ -120,7 +104,6 @@ $j(document).ready(function () {
                 checker.data('urlValid', false);
                 result.html(jqXHR.responseText);
             }).always(function () {
-                changeUploadButtonText(false);
                 result.spinner('remove');
             });
         };
