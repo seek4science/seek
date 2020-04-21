@@ -253,4 +253,31 @@ class AdminAnnotationsTest < ActionController::TestCase
     assert_equal [], person.tools
     assert_equal [], person.expertise
   end
+
+  test 'edit tag to different case' do
+    login_as(Factory(:admin))
+    person = Factory :person
+    person.tools = ['network analysis']
+    person.save!
+    person.expertise = ['network analysis']
+    person.save!
+
+    assert_equal ['network analysis'], person.tools
+    assert_equal ['network analysis'], person.expertise
+
+    tag = person.annotations_with_attribute('expertise').find{ |a| a.value.text == 'network analysis' }
+    post :edit_tag, params: { id: tag.value.id, tag_list: 'Network Analysis' }
+    assert_redirected_to action: :tags
+    assert_nil flash[:error]
+
+    person = Person.find(person.id)
+    expected_tools = ['Network Analysis']
+    expected_expertise = ['Network Analysis']
+
+    person.reload
+    assert_equal expected_tools, person.tools.uniq.sort
+    assert_equal expected_expertise, person.expertise.uniq.sort
+
+    assert person.annotations_with_attribute('expertise').select { |a| a.value.text == 'network analysis' }.blank?
+  end
 end
