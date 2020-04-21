@@ -24,6 +24,17 @@
       "authors": ["Author1 Last", "Author2 Last"]
     },
     "relationships": {
+      "creators": {
+        "data": []
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "522086294",
+            "type": "people"
+          }
+        ]
+      },
       "people": {
         "data": [
           {

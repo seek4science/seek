@@ -24,6 +24,17 @@
       "authors": null
     },
     "relationships": {
+      "creators": {
+        "data": []
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "522086294",
+            "type": "people"
+          }
+        ]
+      },
       "people": {
         "data": [
           {

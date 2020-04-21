@@ -290,7 +290,9 @@ class AdminController < ApplicationController
       params[:tag_list].split(',').each do |item|
         item.strip!
         tag = TextValue.find_by_text(item)
-        tag = TextValue.create(text: item) if tag.nil?
+        if tag.nil? || tag.text != item #case sensitivity check
+          tag = TextValue.create(text: item)
+        end
         replacement_tags << tag
       end
 

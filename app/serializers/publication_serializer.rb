@@ -1,4 +1,4 @@
-class PublicationSerializer < BaseSerializer
+class PublicationSerializer < PCSSerializer
   include PublicationsHelper
   attributes :title, #:publication_authors,
              :journal, :published_date,
