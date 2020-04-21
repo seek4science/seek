@@ -26,6 +26,27 @@ module Seek
       Relationship.set_attributions(asset, params[:attributions])
     end
 
+    def update_asset_link(asset, params)
+
+      Rails.logger.info("\n")
+      Rails.logger.info(__method__)
+
+      asset_id =  params[:asset_id]
+      Rails.logger.info("asset_id:"+asset_id)
+      resource_type = asset.class.name.underscore
+      asset_type_text =  params[:asset_type]
+      Rails.logger.info("asset_type_text:"+asset_type_text)
+      url =  params[:url]
+      Rails.logger.info("url:"+url)
+      link_type =  params[:link_type]
+      Rails.logger.info("link_type:"+link_type)
+
+      asset_link = AssetsLink.new(asset_id: asset_id, asset_type: asset_type_text,link_type: link_type,url: url)
+      asset.assets_links << asset_link
+      Rails.logger.info("asset_link:"+asset_link.inspect)
+      asset
+    end
+
     def request_resource
       resource = class_for_controller_name.find(params[:id])
       details = params[:details]

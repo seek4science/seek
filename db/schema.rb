@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_17_112757) do
+ActiveRecord::Schema.define(version: 2020_04_21_195733) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -204,6 +204,16 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["asset_id", "asset_type"], name: "index_assets_creators_on_asset_id_and_asset_type", length: { asset_type: 191 }
+  end
+
+  create_table "assets_links",  force: :cascade do |t|
+    t.integer "asset_id"
+    t.string "asset_type"
+    t.string "url"
+    t.string "link_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["asset_id", "asset_type"], name: "index_assets_links_on_asset_id_and_asset_type"
   end
 
   create_table "auth_lookup_update_queues", id: :integer,  force: :cascade do |t|
@@ -1802,6 +1812,14 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.index ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view"
   end
 
+  create_table "workflow_classes",  force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.string "key"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "workflow_versions", id: :integer,  force: :cascade do |t|
     t.integer "workflow_id"
     t.integer "version"
@@ -1819,6 +1837,8 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
+    t.text "metadata"
+    t.integer "workflow_class_id"
     t.index ["contributor_id"], name: "index_workflow_versions_on_contributor"
     t.index ["workflow_id"], name: "index_workflow_versions_on_workflow_id"
   end
@@ -1838,6 +1858,8 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
+    t.text "metadata"
+    t.integer "workflow_class_id"
     t.index ["contributor_id"], name: "index_workflows_on_contributor"
   end
 

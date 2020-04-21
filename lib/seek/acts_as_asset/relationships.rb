@@ -48,6 +48,7 @@ module Seek
                    inverse_of: :other_object
 
           has_many :assets_creators, dependent: :destroy, as: :asset, foreign_key: :asset_id
+          has_many :assets_links, dependent: :destroy, as: :asset, foreign_key: :asset_id
           has_many :creators, class_name: 'Person', through: :assets_creators, after_remove: %i[update_timestamp record_creators_changed], after_add: %i[update_timestamp record_creators_changed]
           has_filter :creator
 

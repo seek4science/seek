@@ -1,0 +1,34 @@
+
+<!-- discussion_channel_form -->
+<%
+
+  resource_type = resource.class.name.underscore
+  resource_type_text = text_for_resource(resource)
+  link_type_text = "DiscussionChannel"
+  collapsed = false
+  asset_link = resource.assets_links.where(asset_id: resource.id, asset_type: resource_type_text).empty? ? nil : resource.assets_links.where(asset_id: resource.id, asset_type: resource_type_text).empty
+  Rails.logger.info (__FILE__ )
+  Rails.logger.info ("resource.id:"+resource.id.inspect)
+
+  Rails.logger.info ("asset_link.inspect:"+asset_link.inspect)
+  Rails.logger.info "resource_type:"+resource_type
+  Rails.logger.info "resource_type_text:"+resource_type_text
+-%>
+
+<%= folding_panel('Discussion Channel', collapsed, :body_options => {:id => 'discussion_channel_url'},
+                  :help_text => "Here you attribute this #{resource_type_text} to other #{resource_type_text.pluralize}.") do %>
+    <p>
+      You can add a remote URL to your favorite discussion channels for this <%= resource_type_text %>:
+    </p>
+
+    <div class="box_editing">
+      <%# asset_link_value = (params[resource_type.to_sym].blank? || params[resource_type.to_sym][:discussion_channel].blank?) ? nil : params[resource_type.to_sym][:discussion_channel] -%>
+      <%# asset_link_value = resource.assets_links.find() -%>
+      <%= text_field_tag "#{resource_type}[assets_links_attributes][url]", asset_link, :class => 'form-control' %>
+  <%= hidden_field_tag("#{resource_type}[assets_links_attributes][asset_id]", resource.id, :id => "#{resource_type}[assets_links_attributes][asset_id]" ) %>
+
+  <%= hidden_field_tag("#{resource_type}[assets_links_attributes][asset_type]", resource_type_text, :id => "#{resource_type}[assets_links_attributes][asset_type]" ) %>
+      <%= hidden_field_tag("#{resource_type}[assets_links_attributes][link_type]", link_type_text, :id => "#{resource_type}[assets_links_attributes][link_type]" ) %>
+      </div>
+<% end %>
+

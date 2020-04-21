@@ -131,6 +131,12 @@ module Seek
     end
 
     def initialize_asset
+      Rails.logger.info("\n")
+
+      Rails.logger.info(__method__)
+      Rails.logger.info("asset_params:"+asset_params.inspect)
+      Rails.logger.info("assets_links_params:"+assets_links_params.inspect)
+
       item = class_for_controller_name.new(asset_params)
       set_shared_item_variable(item)
 
@@ -138,9 +144,12 @@ module Seek
     end
 
     def create_asset(item)
+      Rails.logger.info(__method__)
+
       update_sharing_policies item
       update_annotations(params[:tag_list], item)
       update_relationships(item, params)
+      update_asset_link(item, assets_links_params)
       build_model_image item, model_image_params if item.is_a?(Model) && model_image_present?
       item
     end
