@@ -307,6 +307,7 @@ class AdminController < ApplicationController
             new_annotation.save!
           end
         end
+        expire_resource_list_item_content(annotatable) if annotatable
       end
 
       @tag.reload
