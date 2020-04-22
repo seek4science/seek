@@ -21,42 +21,45 @@
     <div id="new-ro-crate" role="tabpanel" class="tab-pane">
       <%= form_tag({ action: :create_ro_crate }, multipart: true) do -%>
         <div class="asset_form">
-          <div class="panel panel-default">
-            <%= error_messages_for :workflow -%>
+          <%= error_messages_for :workflow -%>
 
-            <div class="panel-body">
-              <div class="form-group">
-                <label class="required">Workflow</label>
-                <%= file_field_tag "ro_crate[workflow]" -%>
-                <p class="help-block">The main executable workflow.</p>
-              </div>
-
-              <div class="form-group">
-                <label class="required">Workflow type</label>
-                <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title'),
-                               include_blank: 'Other',
-                               class: 'form-control' %>
-                <p class="help-block">The type of the above workflow.</p>
-              </div>
-
-              <div class="form-group">
-                <label>Abstract CWL</label>
-                <%= file_field_tag "ro_crate[abstract_cwl]" -%>
-                <p class="help-block">(Optional) The abstract CWL that describes the workflow above.</p>
-              </div>
-
-              <div class="form-group">
-                <label>Diagram</label>
-                <%= file_field_tag "ro_crate[diagram]" -%>
-                <p class="help-block">(Optional) A diagram that illustrates the main workflow.</p>
-              </div>
+          <%= panel do %>
+            <div class="form-group">
+              <label class="required">Workflow</label>
+              <p class="help-block">The main executable workflow.</p>
+              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[workflow]' } -%>
             </div>
-          </div>
 
-          <div>
-            <%= create_button class: 'btn btn-primary'-%>
-            or <%= cancel_button(workflows_path) -%>
-          </div>
+            <div class="form-group">
+              <label class="required">Workflow type</label>
+              <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title'),
+                             include_blank: 'Other',
+                             class: 'form-control' %>
+              <p class="help-block">The type of the above workflow.</p>
+            </div>
+          <% end %>
+
+          <%= panel do %>
+            <div class="form-group">
+              <label>Abstract CWL</label>
+              <p class="help-block">(Optional) The abstract CWL that describes the workflow above.</p>
+              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[abstract_cwl]' } -%>
+            </div>
+          <% end %>
+
+          <%= panel do %>
+            <div class="form-group">
+              <label>Diagram</label>
+              <p class="help-block">(Optional) A diagram that illustrates the main workflow.</p>
+              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[diagram]' } -%>
+            </div>
+          <% end %>
+
+        </div>
+
+        <div>
+          <%= create_button class: 'btn btn-primary'-%>
+          or <%= cancel_button(workflows_path) -%>
         </div>
       <% end -%>
     </div>

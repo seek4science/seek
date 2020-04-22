@@ -78,9 +78,9 @@ class WorkflowsController < ApplicationController
     clear_session_info
     @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
 
-    workflow_upload = params[:ro_crate][:workflow]
-    cwl_upload = params[:ro_crate][:abstract_cwl]
-    diagram_upload = params[:ro_crate][:diagram]
+    workflow_upload = params[:ro_crate][:workflow][:data]
+    cwl_upload = params[:ro_crate][:abstract_cwl][:data]
+    diagram_upload = params[:ro_crate][:diagram][:data]
 
     Rails.logger.info("Making new RO Crate")
     crate = ROCrate::WorkflowCrate.new
