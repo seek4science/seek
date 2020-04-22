@@ -1,11 +1,11 @@
 <%
-  new_version ||= false
   resource ||= nil
   title ||= 'Content'
-  asset_name = text_for_resource(asset_field_prefix)
+  id ||= 'upload-panel'
+  asset_name ||= text_for_resource(asset_field_prefix)
   extra_content ||= nil
 %>
-<%= panel(title, id: 'upload-panel') do %>
+<%= panel(title, id: id) do %>
   <div>
     <p>
       You can register a <%= asset_name -%> by either directly uploading a file,
@@ -14,9 +14,9 @@
   </div>
 
   <% if !resource.nil? && Seek::Util.is_multi_file_asset_type?(resource.class) %>
-    <%= render partial: 'assets/upload', locals: { resource: resource, new_version: new_version, batch: true } -%>
+    <%= render partial: 'assets/upload', locals: { existing_objects: resource.content_blobs, batch: true } -%>
   <% else %>
-    <%= render partial: 'assets/upload', locals: { resource: resource, new_version: new_version } -%>
+    <%= render partial: 'assets/upload' -%>
   <% end %>
 
   <%= extra_content if extra_content %>
