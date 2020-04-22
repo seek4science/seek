@@ -17,7 +17,7 @@ class PublicationSerializer < PCSSerializer
   end
 
   attribute :publication_type do
-    PublicationType.find(object.publication_type_id).title
+    object.publication_type.try(:title) || 'Not specified'
   end
 
   attribute :authors do
