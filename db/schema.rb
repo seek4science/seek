@@ -1802,14 +1802,6 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.index ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "workflow_classes",  force: :cascade do |t|
-    t.string "title"
-    t.text "description"
-    t.string "key"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "workflow_versions", id: :integer,  force: :cascade do |t|
     t.integer "workflow_id"
     t.integer "version"
@@ -1827,8 +1819,6 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
-    t.text "metadata"
-    t.integer "workflow_class_id"
     t.index ["contributor_id"], name: "index_workflow_versions_on_contributor"
     t.index ["workflow_id"], name: "index_workflow_versions_on_workflow_id"
   end
@@ -1848,8 +1838,6 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
-    t.text "metadata"
-    t.integer "workflow_class_id"
     t.index ["contributor_id"], name: "index_workflows_on_contributor"
   end
 
