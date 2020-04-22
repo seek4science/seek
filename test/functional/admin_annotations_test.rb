@@ -179,16 +179,16 @@ class AdminAnnotationsTest < ActionController::TestCase
     assert_not_nil fishing
 
     post :edit_tag, params: { id: fishing.value.id, tag_list: '' }
-    assert_redirected_to action: :tags
-    assert_nil flash[:error]
+    assert_response :not_acceptable
+    refute_nil flash[:error]
 
     person = Person.find(person.id)
-    expected_tools = %w(linux ruby)
-    expected_expertise = []
+    expected_tools = %w(fishing linux ruby)
+    expected_expertise = ['fishing']
 
     person.reload
-    assert_equal expected_tools, person.tools.uniq.sort
-    assert_equal expected_expertise, person.expertise.collect(&:text)
+    assert_equal expected_tools, person.tools.sort
+    assert_equal expected_expertise, person.expertise
   end
 
   test 'edit tag to existing tag' do
