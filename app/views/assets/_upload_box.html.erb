@@ -1,15 +1,15 @@
 <%
   new_version ||= false
   resource ||= nil
-  action ||= 'Upload'
+  title ||= 'Content'
   asset_name = text_for_resource(asset_field_prefix)
   extra_content ||= nil
 %>
-<%= panel(action, id: 'upload-panel') do %>
+<%= panel(title, id: 'upload-panel') do %>
   <div>
     <p>
       You can register a <%= asset_name -%> by either directly uploading a file,
-      or registering a URL to either another page or remote file. Please test the URL before submitting.
+      or registering a URL to a remote file or web page.
     </p>
   </div>
 

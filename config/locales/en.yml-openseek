@@ -74,7 +74,7 @@ en:
 
   actions_button: "Actions"
   submit_button:
-    upload: 'Upload and Save'
+    upload: 'Register'
     create: 'Create'
     update: 'Update'
 
