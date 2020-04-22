@@ -1,11 +1,11 @@
 $j(document).ready(function () {
-    $j('[data-seek-upload-field]').each(function () {
+    $j('[data-role="seek-upload-field"]').each(function () {
         var field = $j(this);
-        var pending = $j('[data-seek-upload-field-pending]', field);
-        var addRemoteBtn = $j('[data-seek-upload-field-add-remote]', field);
+        var pending = $j('[data-role="seek-upload-field-pending-files"]', field);
+        var addRemoteBtn = $j('[data-role="seek-upload-field-add-remote"]', field);
 
         // Populate list of existing content blobs from the embedded JSON
-        var existing = $j('[data-seek-upload-field-existing]', field);
+        var existing = $j('[data-role="seek-upload-field-existing"]', field);
         if (existing.length) {
             JSON.parse(existing.html()).forEach(function (blob) {
                 pending.append(HandlebarsTemplates['upload/existing_file'](blob));
@@ -13,12 +13,21 @@ $j(document).ready(function () {
         }
 
         // Tabs
-        $j('[data-seek-upload-field-tab]', field).click(function () {
-            $j('[data-seek-upload-field-tab]', field).removeClass('active');
-            $j('[data-seek-upload-field-tab-pane]', field).removeClass('active');
-            $j('[data-seek-upload-field-tab-pane="' + $j(this).data('seekUploadFieldTab') + '"]', field).addClass('active');
-            $j(this).addClass('active');
+        var activateTab = function (id) {
+            $j('[data-role="seek-upload-field-tab"]', field).closest('li').removeClass('active');
+            $j('[data-role="seek-upload-field-tab"][data-tab-target="' + id + '"]', field).closest('li').addClass('active');
+            $j('[data-role="seek-upload-field-tab-pane"]', field).removeClass('active');
+            $j('[data-role="seek-upload-field-tab-pane"][data-tab-id="' + id + '"]', field).addClass('active');
+        };
+        $j('[data-role="seek-upload-field-tab"]', field).click(function () {
+            activateTab($j(this).data('tabTarget'));
         });
+        // Activate Remote URL tab if URL pre-filled
+        if ($j('[data-role="seek-url-checker"] input', field).val()) {
+            activateTab('remote-url');
+        } else {
+            activateTab('local-file');
+        }
 
         // Local file
         var addLocalFile = function () {
@@ -34,9 +43,9 @@ $j(document).ready(function () {
 
         // Remote file
         var addRemoteFile = function () {
-            var urlInput = $j('[data-seek-url-checker] input', field);
-            var filenameInput = $j('[data-seek-upload-field-filename]', field);
-            var makeLocalCopyCheckbox = $j('[data-seek-upload-field-make-copy]', field)[0];
+            var urlInput = $j('[data-role="seek-url-checker"] input', field);
+            var filenameInput = $j('[data-role="seek-upload-field-filename"]', field);
+            var makeLocalCopyCheckbox = $j('[data-role="seek-upload-field-make-copy"]', field)[0];
 
             var remoteFile = {
                 dataURL: urlInput.val(),
@@ -50,11 +59,11 @@ $j(document).ready(function () {
                 alert("An invalid URL was provided");
             }
             else {
-                $j('[data-seek-url-checker-result]', field).html('');
+                $j('[data-role="seek-url-checker-result"]', field).html('');
                 urlInput.val('');
                 filenameInput.val('');
-                $j('[data-seek-url-checker-copy-dialog]', field).hide();
-                $j('[data-seek-url-checker-too-big]', field).hide();
+                $j('[data-role="seek-url-checker-msg-success"]', field).hide();
+                $j('[data-role="seek-url-checker-msg-too-big"]', field).hide();
                 pending.append(HandlebarsTemplates['upload/remote_file'](remoteFile));
             }
         };
@@ -69,15 +78,15 @@ $j(document).ready(function () {
     });
 
     // Code for checking URL and showing preview
-    $j('[data-seek-url-checker]').each(function () {
+    $j('[data-role="seek-url-checker"]').each(function () {
         var checker = $j(this);
-        var field = checker.parents('[data-seek-upload-field]');
+        var field = checker.parents('[data-role="seek-upload-field"]');
         var input = $j('input', checker);
         var btn = $j('a.btn', checker);
-        var url = checker.data('seekUrlChecker');
-        var result = field.find('[data-seek-url-checker-result]');
-        var copyDialog = $j('[data-seek-url-checker-copy-dialog]', field);
-        var tooBig = $j('[data-seek-url-checker-too-big]', field);
+        var url = checker.data('path');
+        var result = field.find('[data-role="seek-url-checker-result"]');
+        var copyDialog = $j('[data-role="seek-url-checker-msg-success"]', field);
+        var tooBig = $j('[data-role="seek-url-checker-msg-too-big"]', field);
 
         var submitUrl = function () {
             result.html('').spinner('add');
