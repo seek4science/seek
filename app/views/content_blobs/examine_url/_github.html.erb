@@ -1,11 +1,13 @@
-<h4>GitHub</h4>
+<div class="remote-content-preview-result">
+  <h4>GitHub</h4>
 
-<div class="github-path">
-  <%= image_tag('logos/GitHub-Mark-32px.png', class: 'github-logo') %>
-  <%= link_to(@info[:github_user], "https://github.com/#{@info[:github_user]}", target: :_blank) %> /
-  <%= link_to(@info[:github_repo], "https://github.com/#{@info[:github_user]}/#{@info[:github_repo]}", target: :_blank) %> /
-  <%= link_to(@info[:github_branch], "https://github.com/#{@info[:github_user]}/#{@info[:github_repo]}/tree/#{@info[:github_branch]}", target: :_blank) %> /
-  <%= link_to(@info[:github_path], "https://github.com/#{@info[:github_user]}/#{@info[:github_repo]}/blob/#{@info[:github_branch]}/#{@info[:github_path]}", target: :_blank) %>
+  <div class="github-path">
+    <%= image_tag('logos/GitHub-Mark-32px.png', class: 'github-logo') %>
+    <%= link_to(@info[:github_user], "https://github.com/#{@info[:github_user]}", target: :_blank) %> /
+    <%= link_to(@info[:github_repo], "https://github.com/#{@info[:github_user]}/#{@info[:github_repo]}", target: :_blank) %> /
+    <%= link_to(@info[:github_branch], "https://github.com/#{@info[:github_user]}/#{@info[:github_repo]}/tree/#{@info[:github_branch]}", target: :_blank) %> /
+    <%= link_to(@info[:github_path], "https://github.com/#{@info[:github_user]}/#{@info[:github_repo]}/blob/#{@info[:github_branch]}/#{@info[:github_path]}", target: :_blank) %>
+  </div>
+
+  <%= render partial: 'content_blobs/examine_url/file_metadata' %>
 </div>
-
-<%= render partial: 'content_blobs/examine_url/file_metadata' %>

@@ -78,39 +78,12 @@ class WorkflowsController < ApplicationController
     clear_session_info
     @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
 
-    workflow_upload = params[:ro_crate][:workflow]
-    cwl_upload = params[:ro_crate][:abstract_cwl]
-    diagram_upload = params[:ro_crate][:diagram]
-
-    Rails.logger.info("Making new RO Crate")
-    crate = ROCrate::WorkflowCrate.new
-    crate.main_workflow = ROCrate::Workflow.new(crate, workflow_upload, get_unique_filename(crate, workflow_upload.original_filename))
-    crate.main_workflow.programming_language = crate.add_contextual_entity(ROCrate::ContextualEntity.new(crate, nil, @workflow.extractor_class.ro_crate_metadata))
-    if diagram_upload.present?
-      crate.main_workflow.diagram = ROCrate::WorkflowDiagram.new(crate, diagram_upload, get_unique_filename(crate, diagram_upload.original_filename))
-    end
-
-    if cwl_upload.present?
-      crate.main_workflow.cwl_description = ROCrate::WorkflowDescription.new(crate, cwl_upload, get_unique_filename(crate, cwl_upload.original_filename))
-    end
-    crate.preview.template = WorkflowExtraction::PREVIEW_TEMPLATE
-
-    f = Tempfile.new('crate.zip')
-    f.binmode
-
-    Rails.logger.info("Writing crate to #{f.path}")
-    ROCrate::Writer.new(crate).write_zip(f)
-    f.rewind
-
-    @workflow.build_content_blob({ tmp_io_object: f,
-                                   original_filename: 'new-workflow.basic.crate.zip',
-                                   content_type: 'application/zip',
-                                   make_local_copy: true,
-                                   file_size: File.size(f),
-                                   asset_version: 1 })
+    @crate_builder = WorkflowCrateBuilder.new(ro_crate_params)
+    @crate_builder.workflow_extractor = @workflow.extractor_class
+    blob_params = @crate_builder.build
 
     respond_to do |format|
-      if @workflow.content_blob.save
+      if blob_params && @workflow.build_content_blob(blob_params).save
         session[:uploaded_content_blob_id] = @workflow.content_blob.id
         format.html { render action: :create_content_blob }
       else
@@ -240,14 +213,6 @@ class WorkflowsController < ApplicationController
     end
   end
 
-  def get_unique_filename(crate, original_filename)
-    filename = original_filename
-    n = 0
-    filename = "#{n += 1}_#{original_filename}" while crate.dereference(filename)
-
-    filename
-  end
-
   def workflow_params
     params.require(:workflow).permit(:title, :description, :workflow_class_id, # :metadata,
                                      { project_ids: [] }, :license, :other_creators,
@@ -257,4 +222,10 @@ class WorkflowsController < ApplicationController
   end
 
   alias_method :asset_params, :workflow_params
+
+  def ro_crate_params
+    params.require(:ro_crate).permit({ workflow: [:data, :data_url, :make_local_copy] },
+                                     { abstract_cwl: [:data, :data_url, :make_local_copy] },
+                                     { diagram: [:data, :data_url, :make_local_copy] })
+  end
 end

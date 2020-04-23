@@ -33,7 +33,7 @@ module Seek
               elsif response.code == '301' || response.code == '302'
                 follow_redirect(uri, response, redirect_count, block)
               else
-                raise BadResponseCodeException, response
+                raise BadResponseCodeException.new(code: response.code), response.message
               end
             end
           end
@@ -72,6 +72,13 @@ module Seek
 
     class RedirectLimitExceededException < RuntimeError; end
     class SizeLimitExceededException < RuntimeError; end
-    class BadResponseCodeException < RuntimeError; end
+    class BadResponseCodeException < RuntimeError
+      attr_reader :code
+
+      def initialize(message = nil, code: nil)
+        super(message)
+        @code = code
+      end
+    end
   end
 end

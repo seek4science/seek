@@ -1,4 +1,6 @@
-<h4>Webpage Link</h4>
-<%= image_tag(@info[:image], class: 'preview', alt: 'Preview image') if @info[:image] %>
-<p><b>Title: </b><%= text_or_not_specified(@info[:title]) %></p>
-<p><b>Description: </b><%= text_or_not_specified(@info[:description]) %></p>
+<div class="remote-content-preview-result">
+  <h4>Webpage Link</h4>
+  <%= image_tag(@info[:image], class: 'preview', alt: 'Preview image') if @info[:image] %>
+  <p><b>Title: </b><%= text_or_not_specified(@info[:title]) %></p>
+  <p><b>Description: </b><%= text_or_not_specified(@info[:description]) %></p>
+</div>

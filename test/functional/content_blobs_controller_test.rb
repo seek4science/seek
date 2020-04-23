@@ -1,4 +1,4 @@
-  require 'test_helper'
+require 'test_helper'
 require 'minitest/mock'
 require 'private_address_check'
 

@@ -1326,7 +1326,16 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 1,model.policy.permissions.count
     assert_equal person,model.policy.permissions.first.contributor
     assert_equal Policy::EDITING,model.policy.permissions.first.access_type
+  end
 
+  test 'preserves DOI on update' do
+    model = Factory(:teusink_model)
+    model.latest_version.update_column(:doi, '10.1000/doi/1')
+    login_as(model.contributor)
+
+    put :update, params: { id: model.id, model: { title: 'testy' } }
+
+    assert_equal '10.1000/doi/1', model.latest_version.reload.doi
   end
 
   private
