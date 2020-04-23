@@ -248,7 +248,7 @@ class ContentBlob < ApplicationRecord
     end
   end
 
-  def valid_url(url)
+  def valid_url?(url)
     self.class.valid_url?(url)
   end
 
