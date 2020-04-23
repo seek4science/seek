@@ -8,7 +8,7 @@ require 'rest-client'
 class ContentBlob < ApplicationRecord
   include Seek::ContentTypeDetection
   include Seek::ContentExtraction
-  include Seek::UrlValidation
+  extend Seek::UrlValidation
   prepend Seek::Openbis::Blob
   prepend Nels::Blob
 
@@ -69,7 +69,7 @@ class ContentBlob < ApplicationRecord
     if original_filename.blank?
       if url.blank?
         errors.add(:base, 'Need to specify either original_filename or url')
-      elsif !valid_url?(url)
+      elsif !self.class.valid_url?(url)
         errors.add(:url, 'is invalid')
       end
     end
@@ -230,6 +230,10 @@ class ContentBlob < ApplicationRecord
   end
 
   def remote_content_handler
+    self.class.remote_content_handler_for(url)
+  end
+
+  def self.remote_content_handler_for(url)
     return nil unless valid_url?(url)
     uri = URI(url)
     case uri.scheme

@@ -1,15 +1,15 @@
 <%
   batch ||= false
   field_name ||= 'content_blobs[]'
-  param_name ||= field_name.chomp('[]')
+  param ||= params[field_name.chomp('[]').to_sym]
   path_for_examine_url ||= examine_url_content_blobs_path
   existing_objects ||= []
 
   url_from_params = nil
   original_filename_from_params = nil
 
-  blob_params = params[param_name.to_sym]
-  if blob_params && blob_params.any?
+  blob_params = param
+  if blob_params && !blob_params.blank?
     blob = blob_params.is_a?(Array) ? blob_params.first : blob_params
     url_from_params = blob[:data_url] if blob[:data_url].present?
     original_filename_from_params = blob[:original_filename] if blob[:original_filename].present?
