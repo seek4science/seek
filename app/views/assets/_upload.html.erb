@@ -4,6 +4,7 @@
   param ||= params[field_name.chomp('[]').to_sym]
   path_for_examine_url ||= examine_url_content_blobs_path
   existing_objects ||= []
+  file_field_opts ||= {}
 
   url_from_params = nil
   original_filename_from_params = nil
@@ -31,7 +32,7 @@
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" data-role="seek-upload-field-tab-pane" data-tab-id="local-file">
       <div class="form-group">
-        <%= file_field_tag "#{field_name}[data]", { "data-batch-upload" => batch, autocomplete: batch ? 'off' : 'on' } -%>
+        <%= file_field_tag "#{field_name}[data]", file_field_opts.merge({ "data-batch-upload" => batch, autocomplete: batch ? 'off' : 'on' }) -%>
       </div>
     </div>
 
@@ -47,8 +48,8 @@
               <div class="input-group" data-role="seek-url-checker" data-path="<%= path_for_examine_url -%>">
                 <%= text_field_tag "#{field_name}[data_url]", url_from_params, class: 'form-control' -%>
                 <span class="input-group-btn">
-                    <%= button_link_to 'Test', 'test', '#' %>
-                  </span>
+                  <%= button_link_to 'Test', 'test', '#' %>
+                </span>
               </div>
             <% end %>
           </div>
@@ -91,7 +92,9 @@
       </div>
 
       <% if batch %>
-        <%= button_link_to 'Add', 'new', '#', 'data-role' => 'seek-upload-field-add-remote' %>
+        <div class="form-group">
+          <%= button_link_to 'Add', 'new', '#', 'data-role' => 'seek-upload-field-add-remote' %>
+        </div>
         <%= content_tag :script,
                         existing_objects.map { |o| { text: "#{o.url.blank? ? o.original_filename : o.url} (original)", id: o.id } }.to_json.html_safe,
                         type: 'application/json',
