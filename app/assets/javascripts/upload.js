@@ -109,6 +109,7 @@ $j(document).ready(function () {
                         tooBig.show();
                     }
                 }
+                lastTestedUrl = input.val();
             }).fail(function (jqXHR) {
                 checker.data('urlValid', false);
                 result.html(jqXHR.responseText);
@@ -117,20 +118,33 @@ $j(document).ready(function () {
             });
         };
 
+        var debounceTimeout;
+        var lastTestedUrl = null;
+
         btn.on('click', function () {
             submitUrl();
             return false;
         });
 
         input.on('change', function () {
-            setTimeout(function() {
-                submitUrl();
-            }, 0);
+            if (debounceTimeout) {
+                clearTimeout(debounceTimeout)
+            }
+            debounceTimeout = setTimeout(function() {
+                if (lastTestedUrl !== input.val()) { // Prevent double query, 1 from keypress and 1 from text box losing focus.
+                    submitUrl();
+                }
+            }, 100);
             return true;
         });
 
         input.on('keypress',function () {
-            submitUrl(false);
+            if (debounceTimeout) {
+                clearTimeout(debounceTimeout)
+            }
+            debounceTimeout = setTimeout(function() {
+                submitUrl();
+            }, 700);
         });
     });
 });
