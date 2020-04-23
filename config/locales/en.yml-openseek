@@ -74,7 +74,7 @@ en:
 
   actions_button: "Actions"
   submit_button:
-    upload: 'Upload and Save'
+    upload: 'Register'
     create: 'Create'
     update: 'Update'
 
@@ -106,9 +106,14 @@ en:
   null_license: 'No license - no permission to use unless the owner grants a licence'
 
   activerecord:
-      attributes:
-        person:
-          title: "Full name"
+    attributes:
+      person:
+        title: "Full name"
+
+  activemodel:
+    attributes:
+      workflow_crate_builder:
+        abstract_cwl: "Abstract CWL"
 
   oauth_session: 'OAuth Session'
   identity: 'Identity'
