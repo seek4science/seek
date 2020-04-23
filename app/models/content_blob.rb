@@ -69,7 +69,7 @@ class ContentBlob < ApplicationRecord
     if original_filename.blank?
       if url.blank?
         errors.add(:base, 'Need to specify either original_filename or url')
-      elsif !self.class.valid_url?(url)
+      elsif !valid_url?(url)
         errors.add(:url, 'is invalid')
       end
     end
@@ -246,6 +246,10 @@ class ContentBlob < ApplicationRecord
         Seek::DownloadHandling::HTTPHandler.new(url)
       end
     end
+  end
+
+  def valid_url(url)
+    self.class.valid_url?(url)
   end
 
   private
