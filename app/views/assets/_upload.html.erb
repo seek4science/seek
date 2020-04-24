@@ -15,8 +15,6 @@
     url_from_params = blob[:data_url] if blob[:data_url].present?
     original_filename_from_params = blob[:original_filename] if blob[:original_filename].present?
   end
-
-  locked_url_field ||= (Seek::Config.nels_enabled && url_from_params && url_from_params.start_with?(Seek::Config.nels_permalink_base))
 %>
 
 <div role="tabpanel" data-role="seek-upload-field">
@@ -40,18 +38,12 @@
       <div class="form-group">
         <div class="row">
           <div class="col-sm-8">
-            <% if locked_url_field %>
-              <div class="form-group">
-                <%= text_field_tag "#{field_name}[data_url]", url_from_params, class: 'form-control', readonly: :readonly -%>
-              </div>
-            <% else %>
-              <div class="input-group" data-role="seek-url-checker" data-path="<%= path_for_examine_url -%>">
-                <%= text_field_tag "#{field_name}[data_url]", url_from_params, class: 'form-control' -%>
-                <span class="input-group-btn">
-                  <%= button_link_to 'Test', 'test', '#' %>
-                </span>
-              </div>
-            <% end %>
+            <div class="input-group" data-role="seek-url-checker" data-path="<%= path_for_examine_url -%>">
+              <%= text_field_tag "#{field_name}[data_url]", url_from_params, class: 'form-control' -%>
+              <span class="input-group-btn">
+                <%= button_link_to 'Test', 'test', '#' %>
+              </span>
+            </div>
           </div>
         </div>
       </div>
