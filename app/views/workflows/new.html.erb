@@ -2,7 +2,7 @@
 
 <%= alert_box('info', hide_button: true) do %>
   A workflow can be registered as a <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">Workfow RO Crate</a> (recommended),
-  or as a separate workflow file.
+  or as a separate workflow file (with the option of also providing a diagram and abstract CWL description).
   <br/><br/>
   Currently supported workflow types are: <%= WorkflowClass.order(:title).pluck(:title).join(', ') %>.
 <% end %>
@@ -10,8 +10,8 @@
 <div>
   <strong>I want to...</strong>
   <ul class="nav nav-pills nav-stacked" role="tablist">
-    <li role="presentation"><a href="#existing-ro-crate" aria-controls="existing-ro-crate" role="tab" data-toggle="tab">Register an existing Workflow RO Crate</a></li>
-    <li role="presentation"><a href="#new-ro-crate" aria-controls="new-ro-crate" role="tab" data-toggle="tab">Register a workflow, along with a diagram and abstract CWL</a></li>
+    <li role="presentation"><a href="#new-ro-crate" aria-controls="new-ro-crate" role="tab" data-toggle="tab">Register a workflow, with an optional diagram and CWL description.</a></li>
+    <li role="presentation"><a href="#existing-ro-crate" aria-controls="existing-ro-crate" role="tab" data-toggle="tab">Register a <em>Workflow RO Crate</em></a></li>
   </ul>
 
   <br/>
@@ -69,7 +69,13 @@
         <div class="asset_form">
           <%= error_messages_for :workflow -%>
 
-          <%= render partial: 'assets/upload_box', locals: { resource: @workflow } -%>
+          <%= panel do %>
+            <div class="form-group">
+              <label class="required">Workflow RO Crate</label>
+              <p class="help-block">The zipped <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">Workfow RO Crate</a>.</p>
+              <%= render partial: 'assets/upload', locals: { file_field_opts: { accept: '.zip' } } -%>
+            </div>
+          <% end %>
 
           <%= hidden_field_tag :workflow_class_id, '' %>
 
