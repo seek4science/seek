@@ -36,10 +36,9 @@ module Seek
 
       asset_links = asset.assets_links.where(asset_id: asset_id, asset_type: resource_type).nil? ? nil : asset.assets_links.where(asset_id: asset_id, asset_type: resource_type)
       if asset_links.empty?
-        asset_link = AssetsLink.new(asset_id: asset_id, asset_type:resource_type,link_type: link_type,url: url)
-        asset.assets_links << asset_link
+        asset.discussion_links.build(url: url)
       else
-        asset_links.first.update_attribute(:url, url)
+        asset.discussion_links.first.update_attribute(:url, url)
       end
       asset
     end
