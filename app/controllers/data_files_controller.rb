@@ -166,6 +166,7 @@ class DataFilesController < ApplicationController
     update_annotations(params[:tag_list], @data_file) if params.key?(:tag_list)
     update_sharing_policies @data_file
     update_relationships(@data_file, params)
+    update_asset_link(@data_file, assets_links_params)
 
     respond_to do |format|
       if @data_file.update_attributes(data_file_params)
@@ -387,6 +388,7 @@ class DataFilesController < ApplicationController
   def create_metadata
     @data_file = DataFile.new(data_file_params)
     assay_params = data_file_assay_params
+    update_asset_link(@data_file, assets_links_params)
     sop_id = assay_params.delete(:sop_id)
     @create_new_assay = assay_params.delete(:create_assay)
 

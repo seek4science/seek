@@ -43,6 +43,7 @@ class PresentationsController < ApplicationController
     update_annotations(params[:tag_list], @presentation) if params.key?(:tag_list)
     update_sharing_policies @presentation
     update_relationships(@presentation,params)
+    update_asset_link(@presentation, assets_links_params)
 
     respond_to do |format|
       if @presentation.save

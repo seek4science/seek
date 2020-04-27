@@ -14,6 +14,7 @@
         <label>Description</label>
         <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
       </div>
+      <%= render :partial=>"assets/asset_link_form",:locals=>{:resource => @node} -%>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @node } %>
 

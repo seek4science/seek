@@ -124,6 +124,7 @@ class ModelsController < ApplicationController
     update_annotations(params[:tag_list], @model)
     update_sharing_policies @model
     update_relationships(@model, params)
+    update_asset_link(@model, assets_links_params)
 
     respond_to do |format|
       if @model.update_attributes(model_params)

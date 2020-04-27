@@ -28,22 +28,19 @@ module Seek
 
     def update_asset_link(asset, params)
 
-      Rails.logger.info("\n")
-      Rails.logger.info(__method__)
-
       asset_id =  params[:asset_id]
-      Rails.logger.info("asset_id:"+asset_id)
-      resource_type = asset.class.name.underscore
-      asset_type_text =  params[:asset_type]
-      Rails.logger.info("asset_type_text:"+asset_type_text)
+      resource_type = asset.class.name
       url =  params[:url]
-      Rails.logger.info("url:"+url)
       link_type =  params[:link_type]
-      Rails.logger.info("link_type:"+link_type)
 
-      asset_link = AssetsLink.new(asset_id: asset_id, asset_type: asset_type_text,link_type: link_type,url: url)
-      asset.assets_links << asset_link
-      Rails.logger.info("asset_link:"+asset_link.inspect)
+
+      asset_links = asset.assets_links.where(asset_id: asset_id, asset_type: resource_type).nil? ? nil : asset.assets_links.where(asset_id: asset_id, asset_type: resource_type)
+      if asset_links.empty?
+        asset_link = AssetsLink.new(asset_id: asset_id, asset_type:resource_type,link_type: link_type,url: url)
+        asset.assets_links << asset_link
+      else
+        asset_links.first.update_attribute(:url, url)
+      end
       asset
     end
 

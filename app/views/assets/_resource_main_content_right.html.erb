@@ -2,12 +2,22 @@
 <% versioned_resource ||= resource -%>
 <% creators ||= nil %>
 <% authors_title||=nil %>
+<% assets_links = resource.assets_links
+   Rails.logger.info(__FILE__)
+   Rails.logger.info("assets_links:"+ assets_links.inspect)
+   Rails.logger.info("assets_links.size:"+ assets_links.size.inspect)
+
+%>
 
 <% if creators || resource.respond_to?("creators") %>
     <%= render partial: 'assets/resource_authors_box', locals: { resource: versioned_resource,
                                                                  truncate_to: truncate_length_for_boxes,
                                                                  creators: creators,
                                                                  title: authors_title } -%>
+<% end -%>
+
+<% if assets_links.size > 0  %>
+  <%= render partial: 'assets/asset_links_box', locals: { resource: resource } -%>
 <% end -%>
 
 <% if resource.respond_to?(:snapshots)  %>

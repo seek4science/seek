@@ -1,0 +1,7 @@
+<% assets_links = resource.assets_links %>
+<% assets_links.size > 1 ? pannel_title = "Discussion Channels" : pannel_title ="Discussion Channel"%>
+<%= panel(pannel_title, :body_options => {:class => 'text-center'}) do %>
+  <% assets_links.each do |link| %>
+  <div> <%= link_to link.url, link.url, target: :_blank %></div>
+  <% end %>
+<% end %>
