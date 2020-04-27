@@ -475,13 +475,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 'image/png', model.content_blobs.first.content_type
   end
 
-
-  test 'should create model with discussion channel' do
-    m = Factory(:discussion_channel_model, contributor: User.current_user.person)
-
-
-  end
-
   test 'should add webpage with a 301 redirect' do
     # you need to stub out both the redirecting url and the forwarded location url
     stub_request(:head, 'http://news.bbc.co.uk').to_return(status: 301, headers: { 'Location' => 'http://bbc.co.uk/news' })

@@ -110,9 +110,9 @@ Factory.define(:typeless_model, parent: :model) do |f|
   end
 end
 
-Factory.define(:discussion_channel_model, parent: :model) do |f|
+Factory.define(:doc_model, parent: :model) do |f|
   f.after_create do |model|
-    model.assets_links = [Factory.create(:asset_link, asset: model)]
+    model.content_blobs = [Factory.create(:doc_content_blob, asset: model, asset_version: model.version)]
   end
 end
 
