@@ -386,7 +386,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     login_as(person)
     assert_difference('ContentBlob.count') do
       post :create_content_blob, params: {
-          content_blobs: [{ data: fixture_file_upload('files/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
+          content_blobs: [{ data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
           workflow_class_id: cwl.id }
     end
     assert_response :success
@@ -402,8 +402,8 @@ class WorkflowsControllerTest < ActionController::TestCase
     logout
     assert_no_difference('ContentBlob.count') do
       post :create_content_blob, params: {
-          content_blobs: [{ data: fixture_file_upload('files/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
-          workflow_class_id: wf_class.id }
+          content_blobs: [{ data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
+          workflow_class_id: cwl.id }
     end
     assert_response :redirect
   end
@@ -417,7 +417,7 @@ class WorkflowsControllerTest < ActionController::TestCase
           ro_crate: {
               workflow: { data: fixture_file_upload('files/checksums.txt') },
               diagram: { data: fixture_file_upload('files/file_picture.png') },
-              abstract_cwl: { data: fixture_file_upload('files/rp2-to-rp2path-packed.cwl') }
+              abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
       }
@@ -442,11 +442,5 @@ class WorkflowsControllerTest < ActionController::TestCase
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)
-  end
-
-  private
-
-  def rp2_packed_local
-    fixture_file_upload('files/rp2-to-rp2path-packed.cwl', 'application/x-yaml')
   end
 end
