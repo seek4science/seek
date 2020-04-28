@@ -2,56 +2,53 @@
 <% versioned_resource ||= resource -%>
 <% creators ||= nil %>
 <% authors_title||=nil %>
-<% assets_links = resource.assets_links
-   Rails.logger.info(__FILE__)
-   Rails.logger.info("assets_links:"+ assets_links.inspect)
-   Rails.logger.info("assets_links.size:"+ assets_links.size.inspect)
-
-%>
 
 <% if creators || resource.respond_to?("creators") %>
-    <%= render partial: 'assets/resource_authors_box', locals: { resource: versioned_resource,
-                                                                 truncate_to: truncate_length_for_boxes,
-                                                                 creators: creators,
-                                                                 title: authors_title } -%>
+  <%= render partial: 'assets/resource_authors_box', locals: { resource: versioned_resource,
+                                                               truncate_to: truncate_length_for_boxes,
+                                                               creators: creators,
+                                                               title: authors_title } -%>
 <% end -%>
 
-<% if assets_links.size > 0 && !assets_links.first.url.empty?  %>
-  <%= render partial: 'assets/asset_links_box', locals: { resource: resource } -%>
+<% if resource.respond_to?(:assets_links) -%>
+  <% assets_links = resource.assets_links %>
+  <% if assets_links.size > 0 && !assets_links.first.url.empty?  %>
+    <%= render partial: 'assets/asset_links_box', locals: { resource: resource } -%>
+  <% end -%>
 <% end -%>
 
 <% if resource.respond_to?(:snapshots)  %>
-    <% if resource.latest_citable_resource %>
-        <%= render :partial => "assets/citation_box", locals: { doi: resource.latest_citable_resource.doi,
-                                                                snapshot: resource.latest_citable_resource }  %>
-    <% elsif resource.can_manage? && Seek::Config.doi_minting_enabled %>
-        <%= render :partial => "assets/isa_citation_instructions", locals: { resource: resource } %>
-    <% end %>
-    <% if resource.snapshots.any? %>
-      <%= render :partial => "snapshots/snapshots", locals: { snapshots: resource.snapshots, resource: resource } %>
-    <% end %>
+  <% if resource.latest_citable_resource %>
+    <%= render :partial => "assets/citation_box", locals: { doi: resource.latest_citable_resource.doi,
+                                                            snapshot: resource.latest_citable_resource }  %>
+  <% elsif resource.can_manage? && Seek::Config.doi_minting_enabled %>
+    <%= render :partial => "assets/isa_citation_instructions", locals: { resource: resource } %>
+  <% end %>
+  <% if resource.snapshots.any? %>
+    <%= render :partial => "snapshots/snapshots", locals: { snapshots: resource.snapshots, resource: resource } %>
+  <% end %>
 <% elsif versioned_resource.respond_to?(:doi) %>
-    <% if versioned_resource.doi.present? %>
-        <%= render :partial => "assets/citation_box", locals: { doi: versioned_resource.doi } %>
-    <% elsif resource.can_manage? && Seek::Config.doi_minting_enabled && resource.supports_doi? %>
-        <%= render :partial => "assets/citation_instructions", locals: { resource: resource, versioned_resource: versioned_resource } %>
-    <% end %>
+  <% if versioned_resource.doi.present? %>
+    <%= render :partial => "assets/citation_box", locals: { doi: versioned_resource.doi } %>
+  <% elsif resource.can_manage? && Seek::Config.doi_minting_enabled && resource.supports_doi? %>
+    <%= render :partial => "assets/citation_instructions", locals: { resource: resource, versioned_resource: versioned_resource } %>
+  <% end %>
 <% end %>
 
 <% if resource.respond_to?(:license) %>
-    <%= render :partial => "assets/license_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
+  <%= render :partial => "assets/license_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
 <% end %>
 
 <%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
 
 <% if resource.class.is_taggable? && current_user-%>
-    <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
+  <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
 <% end -%>
 
 <% if resource.respond_to? :attributions_objects -%>
-    <%= render :partial => "assets/resource_attributions_box",
-               :locals => { :resource => resource, :attributed_to => resource.attributions_objects,
-                            :truncate_to => truncate_length_for_boxes } -%>
+  <%= render :partial => "assets/resource_attributions_box",
+             :locals => { :resource => resource, :attributed_to => resource.attributions_objects,
+                          :truncate_to => truncate_length_for_boxes } -%>
 <% end -%>
 
 <%= render :partial => "assets/resource_scales_box", :locals => { :resource => resource} if resource.respond_to?(:scales) && show_scales?-%>
