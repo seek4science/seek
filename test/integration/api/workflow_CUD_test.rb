@@ -42,7 +42,7 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     original_md5 = wf.content_blob.md5sum
     put workflow_content_blob_path(wf, wf.content_blob),
         headers: { 'Accept' => 'application/json',
-                   'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'rp2-to-rp2path.cwl')) }
+                   'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'workflows', 'rp2-to-rp2path.cwl')) }
 
     assert_response :success
     blob = wf.content_blob.reload
