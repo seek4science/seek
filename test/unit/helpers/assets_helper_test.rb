@@ -40,7 +40,7 @@ class AssetsHelperTest < ActionView::TestCase
     investigation = Factory(:investigation)
 
     assert_equal 'Create', submit_button_text(new_assay)
-    assert_equal 'Upload and Save', submit_button_text(new_model)
+    assert_equal 'Register', submit_button_text(new_model)
     assert_equal 'Update', submit_button_text(data_file)
     assert_equal 'Update', submit_button_text(investigation)
 

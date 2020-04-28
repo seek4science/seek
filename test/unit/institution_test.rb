@@ -183,12 +183,12 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   test 'country conversion and validation' do
-    institution = Factory.build(:institution, country:nil)
-    refute institution.valid?
+    institution = Factory.build(:institution, country: nil)
+    assert institution.valid?
     assert institution.country.nil?
 
     institution.country = ''
-    refute institution.valid?
+    assert institution.valid?
 
     institution.country = 'GB'
     assert institution.valid?

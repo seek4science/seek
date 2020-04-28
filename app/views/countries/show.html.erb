@@ -28,20 +28,20 @@
                   <% end -%>
                 </ul>
               <% else -%>
-                <p class="none_text" style="margin-left: 2em;">There are no known members in this institution</p>
+                <p class="none_text" style="margin-left: 2em;">There are no known members in this <%= t('institution') -%></p>
               <% end -%>
             </li>
           <% end %>
         </ul>
       <% else -%>
         <p class="none_text">
-          Couldn't find any institutions for this country
+          Couldn't find any <%= t('institution').pluralize -%> for this country
         </p>
       <% end -%>
     </div>
 
     <div class="col-md-3 col-sm-4">
-      <%= panel("Institutions (#{@institutions.length})", :help_text => "Institutions that are situated in this country.") do %>
+      <%= panel("#{t('institution').pluralize} (#{@institutions.length})", :help_text => "#{t('institution').pluralize} that are situated in this country.") do %>
         <ul class="mini-resource-list">
           <% @institutions.each do |i| %>
             <li>
