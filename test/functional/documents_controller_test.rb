@@ -882,6 +882,42 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal [project_doc, old_project_doc], assigns(:documents).to_a
   end
 
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    document =  {title: 'Document', project_ids: [person.projects.first.id], assets_links_attributes:{url: "http://www.slack.com/",link_type: "discussion"}}
+    assert_difference('Document.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, params: {document: document, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+      end
+    end
+    document = assigns(:document)
+    assert_equal 'http://www.slack.com/', document.discussion_links.first.url
+    assert_equal 'discussion', document.assets_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    asset_link = Factory(:asset_link)
+    document = Factory(:document, assets_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: document }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update document with discussion link' do
+    person = Factory(:person)
+    document = Factory(:document, contributor: person)
+    login_as(person)
+    assert_nil document.assets_links.first
+    assert_difference('ActivityLog.count') do
+      put :update, params: { id: document.id, document: { assets_links_attributes:{url: "http://www.slack.com/",link_type: "discussion"} } }
+    end
+    assert_redirected_to document_path(assigns(:document))
+    assert_equal 'http://www.slack.com/', document.assets_links.first.url
+  end
+
+
+
   private
 
   def valid_document

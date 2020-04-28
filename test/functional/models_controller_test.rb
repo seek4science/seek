@@ -1338,6 +1338,40 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal '10.1000/doi/1', model.latest_version.reload.doi
   end
 
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    model =  {title: 'Model', project_ids: [person.projects.first.id], assets_links_attributes:{url: "http://www.slack.com/",link_type: "discussion"}}
+    assert_difference('Model.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, params: {model: model, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+      end
+    end
+    model = assigns(:model)
+    assert_equal 'http://www.slack.com/', model.discussion_links.first.url
+    assert_equal 'discussion', model.assets_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    asset_link = Factory(:asset_link)
+    model = Factory(:model, assets_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: model }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update model with discussion link' do
+    person = Factory(:person)
+    model = Factory(:model, contributor: person)
+    login_as(person)
+    assert_nil model.assets_links.first
+    assert_difference('ActivityLog.count') do
+      put :update, params: { id: model.id, model: { assets_links_attributes:{url: "http://www.slack.com/",link_type: "discussion"} }  }
+    end
+    assert_redirected_to model_path(assigns(:model))
+    assert_equal 'http://www.slack.com/', model.assets_links.first.url
+  end
+
   private
 
   def valid_model

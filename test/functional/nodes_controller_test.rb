@@ -381,6 +381,40 @@ class NodesControllerTest < ActionController::TestCase
 
   end
 
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    node =  {title: 'Node', project_ids: [person.projects.first.id], assets_links_attributes:{url: "http://www.slack.com/",link_type: "discussion"}}
+    assert_difference('Node.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, params: {node: node, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+      end
+    end
+    node = assigns(:node)
+    assert_equal 'http://www.slack.com/', node.discussion_links.first.url
+    assert_equal 'discussion', node.assets_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    asset_link = Factory(:asset_link)
+    node = Factory(:node, assets_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: node }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update node with discussion link' do
+    person = Factory(:person)
+    node = Factory(:node, contributor: person)
+    login_as(person)
+    assert_nil node.assets_links.first
+    assert_difference('ActivityLog.count') do
+      put :update, params: { id: node.id, node: { assets_links_attributes:{url: "http://www.slack.com/",link_type: "discussion"} } }
+    end
+    assert_redirected_to node_path(assigns(:node))
+    assert_equal 'http://www.slack.com/', node.assets_links.first.url
+  end
+
   def edit_max_object(node)
     add_tags_to_test_object(node)
     add_creator_to_test_object(node)

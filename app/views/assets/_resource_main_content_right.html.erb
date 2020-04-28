@@ -16,7 +16,7 @@
                                                                  title: authors_title } -%>
 <% end -%>
 
-<% if assets_links.size > 0  %>
+<% if assets_links.size > 0 && !assets_links.first.url.empty?  %>
   <%= render partial: 'assets/asset_links_box', locals: { resource: resource } -%>
 <% end -%>
 

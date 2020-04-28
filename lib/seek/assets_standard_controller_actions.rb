@@ -142,7 +142,7 @@ module Seek
       update_sharing_policies item
       update_annotations(params[:tag_list], item)
       update_relationships(item, params)
-      update_asset_link(item, assets_links_params)
+      update_asset_link(item, assets_links_params) unless assets_links_params.nil?
       build_model_image item, model_image_params if item.is_a?(Model) && model_image_present?
       item
     end

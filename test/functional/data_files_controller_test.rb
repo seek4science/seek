@@ -3638,4 +3638,40 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal Policy::EDITING,data_file.policy.permissions.first.access_type
 
   end
+
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    data_file =  {title: 'DataFile', project_ids: [person.projects.first.id], assets_links_attributes:{url: "http://www.slack.com/",link_type: "discussion"}}
+    assert_difference('DataFile.count') do
+        post :create_metadata, params: {data_file: data_file, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
+    end
+    data_file = assigns(:data_file)
+    assert_redirected_to data_file_path(data_file)
+    assert_equal 'http://www.slack.com/', data_file.discussion_links.first.url
+    assert_equal 'discussion', data_file.discussion_links.first.link_type
+  end
+
+
+  test 'should show discussion link' do
+    asset_link = Factory(:asset_link)
+    data_file = Factory(:data_file, assets_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: data_file }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update data_file with discussion link' do
+    person = Factory(:person)
+    data_file = Factory(:data_file, contributor: person)
+    login_as(person)
+    assert_nil data_file.assets_links.first
+    assert_difference('ActivityLog.count') do
+      put :update, params: { id: data_file.id, data_file: { assets_links_attributes:{url: "http://www.slack.com/",link_type: "discussion"} } }
+    end
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal 'http://www.slack.com/', data_file.assets_links.first.url
+  end
 end

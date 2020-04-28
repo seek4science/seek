@@ -41,7 +41,7 @@ class SamplesController < ApplicationController
   def create
     @sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
     update_sample_with_params
-    update_asset_link(@sample, assets_links_params)
+    update_asset_link(@sample, assets_links_params) unless assets_links_params.nil?
     flash[:notice] = 'The sample was successfully created.' if @sample.save
     respond_with(@sample)
   end
@@ -62,7 +62,7 @@ class SamplesController < ApplicationController
   def update
     @sample = Sample.find(params[:id])
     update_sample_with_params
-    update_asset_link(@sample, assets_links_params)
+    update_asset_link(@sample, assets_links_params) unless assets_links_params.nil?
     flash[:notice] = 'The sample was successfully updated.' if @sample.save
     respond_with(@sample)
   end
