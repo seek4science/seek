@@ -326,13 +326,13 @@ end
 Factory.define(:cwl_content_blob, parent: :content_blob) do |f|
   f.original_filename 'rp2-to-rp2path.cwl'
   f.content_type 'application/x-yaml'
-  f.data { File.new("#{Rails.root}/test/fixtures/files/rp2-to-rp2path.cwl", 'rb').read }
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path.cwl", 'rb').read }
 end
 
 Factory.define(:cwl_packed_content_blob, parent: :content_blob) do |f|
   f.original_filename 'rp2-to-rp2path-packed.cwl'
   f.content_type 'application/x-yaml'
-  f.data { File.new("#{Rails.root}/test/fixtures/files/rp2-to-rp2path-packed.cwl", 'rb').read }
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'rb').read }
 end
 
 Factory.define(:url_cwl_content_blob, parent: :content_blob) do |f|

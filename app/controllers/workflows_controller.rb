@@ -57,8 +57,6 @@ class WorkflowsController < ApplicationController
   def clear_session_info
     session.delete(:uploaded_content_blob_id)
     session.delete(:metadata)
-    session.delete(:processing_errors)
-    session.delete(:processing_warnings)
   end
 
   def create_content_blob
@@ -95,27 +93,22 @@ class WorkflowsController < ApplicationController
   # AJAX call to trigger metadata extraction, and pre-populate the associated @workflow
   def metadata_extraction_ajax
     @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
-    session[:metadata] = {}
+    session[:metadata] = { workflow_class_id: params[:workflow_class_id] }
     critical_error_msg = nil
 
     begin
       if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
         @workflow.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
-        retrieve_content @workflow.content_blob
-        metadata = @workflow.extractor.metadata
-        errors = metadata.delete(:errors)
-        warnings = metadata.delete(:warnings)
-        session[:processing_errors] = errors if errors.any?
-        session[:processing_warnings] = warnings if warnings.any?
-        session[:metadata] = metadata
+        retrieve_content @workflow.content_blob # Hack
+        session[:metadata] = session[:metadata].merge(@workflow.extractor.metadata)
       else
-        critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
+        critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded."
       end
     rescue StandardError => e
       raise e unless Rails.env.production?
       Seek::Errors::ExceptionForwarder.send_notification(e, data: {
           message: "Problem attempting to extract metadata for content blob #{params[:content_blob_id]}" })
-      session[:processing_errors] = [e.message]
+      critical_error_msg = 'An unexpected error occurred whilst extracting workflow metadata.'
     end
 
     respond_to do |format|
@@ -129,9 +122,10 @@ class WorkflowsController < ApplicationController
 
   # Displays the form Wizard for providing the metadata for the workflow
   def provide_metadata
-    @workflow ||= Workflow.new(session[:metadata].reverse_merge(workflow_class_id: params[:workflow_class_id]))
-    @warnings ||= session[:processing_warnings] || []
-    @errors ||= session[:processing_errors] || []
+    metadata = session[:metadata]
+    @warnings ||= metadata.delete(:warnings) || []
+    @errors ||= metadata.delete(:errors) || []
+    @workflow ||= Workflow.new(metadata)
 
     respond_to do |format|
       format.html

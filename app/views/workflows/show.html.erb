@@ -11,7 +11,7 @@
     </div>
 
     <% begin %>
-      <% if @display_workflow.can_render_diagram? && @display_workflow.diagram.exists? %>
+      <% if @display_workflow.diagram_exists? || @display_workflow.can_render_diagram? %>
         <div class="row">
           <div class="col-md-12">
             <div class="workflow-diagram">
