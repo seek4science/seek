@@ -164,7 +164,7 @@ namespace :seek do
     puts "Looking for broken DOIs..."
     AssetDoiLog.where(action: AssetDoiLog::MINT).each do |log|
       asset = log.asset
-      if asset
+      if asset && asset.respond_to?(:find_version)
         version = asset.find_version(log.asset_version)
         if version
           if version.doi.nil? && log.doi.present?

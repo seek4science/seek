@@ -170,6 +170,7 @@ class WorkflowsController < ApplicationController
   def diagram
     diagram_format = params.key?(:diagram_format) ? params[:diagram_format] : @workflow.default_diagram_format
     @diagram = @display_workflow.diagram(diagram_format)
+    response.set_header('Content-Security-Policy', "default-src 'self'")
     respond_to do |format|
       format.html do
         send_file(@diagram.path,

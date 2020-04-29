@@ -1,4 +1,4 @@
-class PublicationSerializer < BaseSerializer
+class PublicationSerializer < PCSSerializer
   include PublicationsHelper
   attributes :title, #:publication_authors,
              :journal, :published_date,
@@ -17,7 +17,7 @@ class PublicationSerializer < BaseSerializer
   end
 
   attribute :publication_type do
-    PublicationType.find(object.publication_type_id).title
+    object.publication_type.try(:title) || 'Not specified'
   end
 
   attribute :authors do
