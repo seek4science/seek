@@ -1,26 +1,24 @@
 <% image = @display_model.model_image -%>
 <p>
-  <b><%= t('model') %> image: </b> <%= "<span class='none_text'>No image specified</span>".html_safe if image.nil? -%>
+  <b>
+    <%= t('model') %> image: </b>
 
-      <% if  image
-           image_width = @display_model.model_image.image_width.nil??  "600" : @display_model.model_image.image_width
+      <% if image
 
-           #zoom to larger image
-           #STANDARD_SIZE=900
-           #MAX_SIZE=1500
-           zoom_width=image_width < Seek::ActsAsFleximageExtension::STANDARD_SIZE ? Seek::ActsAsFleximageExtension::STANDARD_SIZE : image_width
-           zoom_width=zoom_width > Seek::ActsAsFleximageExtension::MAX_SIZE ? Seek::ActsAsFleximageExtension::MAX_SIZE : zoom_width
-
-           #show smaller image in view
+           image_width = @display_model.model_image.image_width.nil??  600 : @display_model.model_image.image_width
            image_width=600 if image_width>600
-
+           zoom_width = Seek::ActsAsFleximageExtension::MAX_SIZE
       %>
-    <span class="none_text">(Click on the image to zoom)</span>
-    <div id="thumbnail" >
-          <a href='<%= model_model_image_path(@model,@display_model.model_image, :code=>params[:code],:size=>zoom_width) %>' data-lightbox="model-image-<%= image.id -%>">
-            <img src="<%= model_model_image_path(@model,@display_model.model_image,:code=>params[:code],:size=>image_width)  %>" style="max-width: 100%;"/>
-          </a>
-    </div>
-    <% end -%>
+
+        <span class="none_text">(Click on the image to zoom)</span>
+        <span> (<%= link_to('Original',model_model_image_path(@model,@display_model.model_image, :code=>params[:code]), target: :_blank) %>)</span>
+        <div id="thumbnail" >
+              <a href='<%= model_model_image_path(@model,@display_model.model_image, :code=>params[:code],:size=>zoom_width) %>' data-lightbox="model-image-<%= image.id -%>">
+                <img src="<%= model_model_image_path(@model,@display_model.model_image,:code=>params[:code],:size=>image_width)  %>" style="max-width: 100%;"/>
+              </a>
+        </div>
+      <% else %>
+        <span class='none_text'>No image specified</span>
+      <% end %>
 
 </p>
