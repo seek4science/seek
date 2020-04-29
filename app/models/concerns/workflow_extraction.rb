@@ -22,7 +22,9 @@ module WorkflowExtraction
   end
 
   def default_diagram_format
-    extractor.default_diagram_format
+    Rails.cache.fetch("#{cache_key_with_version}/default_diagram_format", expires_in: 3.days) do
+      extractor.default_diagram_format
+    end
   end
 
   def can_render_diagram?
