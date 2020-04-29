@@ -378,12 +378,69 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 1,workflow.policy.permissions.count
     assert_equal person,workflow.policy.permissions.first.contributor
     assert_equal Policy::EDITING,workflow.policy.permissions.first.access_type
+  end
 
+  test 'create content blob' do
+    cwl = Factory(:cwl_workflow_class)
+    person = Factory(:person)
+    login_as(person)
+    assert_difference('ContentBlob.count') do
+      post :create_content_blob, params: {
+          content_blobs: [{ data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
+          workflow_class_id: cwl.id }
+    end
+    assert_response :success
+    assert wf = assigns(:workflow)
+    refute_nil wf.content_blob
+    assert_equal wf.content_blob.id, session[:uploaded_content_blob_id]
+    assert_equal cwl, wf.workflow_class
+  end
+
+  test 'create content blob requires login' do
+    cwl = Factory(:cwl_workflow_class)
+
+    logout
+    assert_no_difference('ContentBlob.count') do
+      post :create_content_blob, params: {
+          content_blobs: [{ data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
+          workflow_class_id: cwl.id }
+    end
+    assert_response :redirect
+  end
+
+  test 'create ro crate with local content' do
+    cwl = Factory(:cwl_workflow_class)
+    person = Factory(:person)
+    login_as(person)
+    assert_difference('ContentBlob.count') do
+      post :create_ro_crate, params: {
+          ro_crate: {
+              workflow: { data: fixture_file_upload('files/checksums.txt') },
+              diagram: { data: fixture_file_upload('files/file_picture.png') },
+              abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
+          },
+          workflow_class_id: cwl.id
+      }
+    end
+    assert_response :success
+    assert wf = assigns(:workflow)
+    refute_nil wf.content_blob
+    assert_equal wf.content_blob.id, session[:uploaded_content_blob_id]
+    assert_equal cwl, wf.workflow_class
+    assert_equal 'new-workflow.basic.crate.zip', wf.content_blob.original_filename
+  end
+
+  test 'extract metadata' do
+    cwl = Factory(:cwl_workflow_class)
+    blob = Factory(:cwl_packed_content_blob)
+    session[:uploaded_content_blob_id] = blob.id.to_s
+    post :metadata_extraction_ajax, params: { content_blob_id: blob.id.to_s, format: 'js', workflow_class_id: cwl.id }
+    assert_response :success
+    assert_equal 12, session[:metadata][:internals][:inputs].length
   end
 
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)
   end
-
 end

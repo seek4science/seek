@@ -76,15 +76,6 @@ module Seek
         @crate ||= ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.path : @io)
       end
 
-      def default_diagram_format
-        if crate&.main_workflow&.diagram
-          ext = crate&.main_workflow&.diagram.id.split('.').last
-          return ext if self.class.diagram_formats.key?(ext)
-        end
-
-        super
-      end
-
       def self.determine_extractor_class(language)
         matchable = ['identifier', 'name', 'alternateName', '@id', 'url']
         @extractor_matcher ||= [Seek::WorkflowExtractors::CWL,

@@ -33,13 +33,15 @@ class WorkflowCrateBuilder
 
       Rails.logger.info("Writing crate to #{f.path}")
       ROCrate::Writer.new(crate).write_zip(f)
+      f.flush
+      File.size(f.path)
       f.rewind
 
       return { tmp_io_object: f,
         original_filename: 'new-workflow.basic.crate.zip',
         content_type: 'application/zip',
         make_local_copy: true,
-        file_size: File.size(f) }
+        file_size: File.size(f.path) }
     end
 
     nil
@@ -50,6 +52,7 @@ class WorkflowCrateBuilder
   def resolve_remotes
     [:workflow, :abstract_cwl, :diagram].each do |attr|
       val = send(attr)
+      next if val.nil?
       if val[:data].blank? && val[:data_url].present?
         begin
           handler = ContentBlob.remote_content_handler_for(val[:data_url])
@@ -73,7 +76,7 @@ class WorkflowCrateBuilder
   end
 
   def workflow_data_present
-    if workflow[:data].blank?
+    if workflow && workflow[:data].blank?
       errors.add(:workflow, 'should be provided as a file or remote URL')
     end
   end

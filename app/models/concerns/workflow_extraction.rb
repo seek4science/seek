@@ -29,6 +29,11 @@ module WorkflowExtraction
     extractor.can_render_diagram?
   end
 
+  def diagram_exists?(format = default_diagram_format)
+    path = diagram_path(format)
+    File.exist?(path)
+  end
+
   def diagram(format = default_diagram_format)
     path = diagram_path(format)
     content_type = extractor_class.diagram_formats[format]

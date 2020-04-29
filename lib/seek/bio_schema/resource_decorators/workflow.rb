@@ -17,7 +17,7 @@ module Seek
         end
 
         def image
-          return unless resource.can_render_diagram? && resource.diagram.exists?
+          return unless resource.diagram_exists?
           diagram_workflow_url(resource, version: resource.version, host: Seek::Config.site_base_host)
         end
 

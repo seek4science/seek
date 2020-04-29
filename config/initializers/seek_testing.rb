@@ -91,7 +91,7 @@ def load_seek_testing_defaults!
 
       Settings.defaults[:cache_remote_files] = true
       Settings.defaults[:max_cachable_size] = 2000
-      Settings.defaults[:hard_max_cachable_size] = 5000
+      Settings.defaults[:hard_max_cachable_size] = 50000
 
       Settings.defaults[:orcid_required] = false
       Settings.defaults[:site_base_host] = "http://localhost:3000"
