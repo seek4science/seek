@@ -1341,7 +1341,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
-    model =  {title: 'Model', project_ids: [person.projects.first.id], assets_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
+    model =  {title: 'Model', project_ids: [person.projects.first.id], asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, params: {model: model, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
@@ -1366,7 +1366,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(person)
     assert_nil model.asset_links.first
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: model.id, model: { assets_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} }  }
+      put :update, params: { id: model.id, model: { asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} }  }
     end
     assert_redirected_to model_path(assigns(:model))
     assert_equal 'http://www.slack.com/', model.asset_links.first.url

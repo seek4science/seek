@@ -41,7 +41,7 @@ class DocumentsController < ApplicationController
     update_annotations(params[:tag_list], @document) if params.key?(:tag_list)
     update_sharing_policies @document
     update_relationships(@document,params)
-    update_asset_link(@document, assets_links_params)  unless assets_links_params.nil?
+    update_asset_link(@document, asset_links_params)  unless asset_links_params.nil?
 
     respond_to do |format|
       if @document.update_attributes(document_params)

@@ -1516,7 +1516,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
-    sop =  {title: 'SOP', project_ids: [person.projects.first.id], assets_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
+    sop =  {title: 'SOP', project_ids: [person.projects.first.id], asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
         post :create, params: {sop: sop, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
@@ -1543,7 +1543,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(person)
     assert_nil sop.asset_links.first
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: sop.id, sop: { assets_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} } }
+      put :update, params: { id: sop.id, sop: { asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} } }
     end
     assert_redirected_to sop_path(assigns(:sop))
     assert_equal 'http://www.slack.com/', sop.asset_links.first.url

@@ -384,7 +384,7 @@ class NodesControllerTest < ActionController::TestCase
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
-    node =  {title: 'Node', project_ids: [person.projects.first.id], assets_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
+    node =  {title: 'Node', project_ids: [person.projects.first.id], asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
     assert_difference('Node.count') do
       assert_difference('ContentBlob.count') do
         post :create, params: {node: node, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
@@ -409,7 +409,7 @@ class NodesControllerTest < ActionController::TestCase
     login_as(person)
     assert_nil node.asset_links.first
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: node.id, node: { assets_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} } }
+      put :update, params: { id: node.id, node: { asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} } }
     end
     assert_redirected_to node_path(assigns(:node))
     assert_equal 'http://www.slack.com/', node.asset_links.first.url

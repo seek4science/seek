@@ -124,7 +124,7 @@ class ModelsController < ApplicationController
     update_annotations(params[:tag_list], @model)
     update_sharing_policies @model
     update_relationships(@model, params)
-    update_asset_link(@model, assets_links_params) unless assets_links_params.nil?
+    update_asset_link(@model, asset_links_params) unless asset_links_params.nil?
     respond_to do |format|
       if @model.update_attributes(model_params)
         flash[:notice] = "#{t('model')} metadata was successfully updated."

@@ -3644,7 +3644,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
     blob = Factory(:content_blob)
     session[:uploaded_content_blob_id] = blob.id
-    data_file =  {title: 'DataFile', project_ids: [person.projects.first.id], assets_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
+    data_file =  {title: 'DataFile', project_ids: [person.projects.first.id], asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
     assert_difference('DataFile.count') do
         post :create_metadata, params: {data_file: data_file, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
     end
@@ -3669,7 +3669,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
     assert_nil data_file.asset_links.first
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: data_file.id, data_file: { assets_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} } }
+      put :update, params: { id: data_file.id, data_file: { asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} } }
     end
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal 'http://www.slack.com/', data_file.asset_links.first.url
