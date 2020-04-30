@@ -5,7 +5,7 @@
   resource_type_text = text_for_resource(resource)
   link_type_text = "discussion"
   collapsed = false
-  asset_link = resource.assets_links.where(asset_id: resource.id, asset_type: resource.class.name).nil? ? nil : resource.assets_links.where(asset_id: resource.id, asset_type: resource.class.name)
+  asset_link = resource.asset_links.where(asset_id: resource.id, asset_type: resource.class.name).nil? ? nil : resource.asset_links.where(asset_id: resource.id, asset_type: resource.class.name)
   asset_link_url = asset_link.empty? ? nil : asset_link.first.url
   help_text = "You can add a remote URL of your favorite discussion channels for this #{resource_type_text}, e.g. slack, google doc, twitter ..."
 -%>

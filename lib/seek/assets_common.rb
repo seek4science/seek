@@ -35,7 +35,7 @@ module Seek
       if asset_id.nil? || asset_id.empty?
         asset.discussion_links.build(url: url) unless url.empty?
       else
-        asset_links = asset.assets_links.where(asset_id: asset_id, asset_type: resource_type)
+        asset_links = asset.discussion_links.where(asset_id: asset_id, asset_type: resource_type)
         if asset_links.empty?
           asset.discussion_links.build(url: url) unless url.empty?
         else

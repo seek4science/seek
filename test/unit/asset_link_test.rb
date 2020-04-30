@@ -4,7 +4,7 @@ class AssetLinkTest < ActiveSupport::TestCase
 
   test 'validation' do
     asset = Factory(:sop)
-    link = AssetsLink.new(url:'http://fish.com',asset:asset)
+    link = AssetLink.new(url:'http://fish.com', asset:asset)
     assert link.valid?
 
     link.url = nil
@@ -28,12 +28,12 @@ class AssetLinkTest < ActiveSupport::TestCase
 
   test 'link_type' do
     # if this changes, then the database entries need updating
-    assert_equal 'discussion', AssetsLink::DISCUSSION
+    assert_equal 'discussion', AssetLink::DISCUSSION
 
     link1 = Factory(:asset_link)
     link2 = Factory(:asset_link, url:'http://google.com',link_type:'another')
 
-    assert_equal [link1],AssetsLink.discussion
+    assert_equal [link1], AssetLink.discussion
   end
 
 

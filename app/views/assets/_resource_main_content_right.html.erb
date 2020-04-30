@@ -10,9 +10,9 @@
                                                                title: authors_title } -%>
 <% end -%>
 
-<% if resource.respond_to?(:assets_links) -%>
-  <% assets_links = resource.assets_links %>
-  <% if assets_links.size > 0 && !assets_links.first.url.empty?  %>
+<% if resource.respond_to?(:asset_links) -%>
+  <% asset_links = resource.asset_links %>
+  <% if asset_links.size > 0 && !asset_links.first.url.empty?  %>
     <%= render partial: 'assets/asset_links_box', locals: { resource: resource } -%>
   <% end -%>
 <% end -%>

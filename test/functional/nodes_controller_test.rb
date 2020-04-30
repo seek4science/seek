@@ -384,7 +384,7 @@ class NodesControllerTest < ActionController::TestCase
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
-    node =  {title: 'Node', project_ids: [person.projects.first.id], assets_links_attributes:{url: "http://www.slack.com/",link_type: "discussion"}}
+    node =  {title: 'Node', project_ids: [person.projects.first.id], assets_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
     assert_difference('Node.count') do
       assert_difference('ContentBlob.count') do
         post :create, params: {node: node, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
@@ -392,12 +392,12 @@ class NodesControllerTest < ActionController::TestCase
     end
     node = assigns(:node)
     assert_equal 'http://www.slack.com/', node.discussion_links.first.url
-    assert_equal AssetsLink::DISCUSSION, node.assets_links.first.link_type
+    assert_equal AssetLink::DISCUSSION, node.asset_links.first.link_type
   end
 
   test 'should show discussion link' do
     asset_link = Factory(:asset_link)
-    node = Factory(:node, assets_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    node = Factory(:node, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     get :show, params: { id: node }
     assert_response :success
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
@@ -407,12 +407,12 @@ class NodesControllerTest < ActionController::TestCase
     person = Factory(:person)
     node = Factory(:node, contributor: person)
     login_as(person)
-    assert_nil node.assets_links.first
+    assert_nil node.asset_links.first
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: node.id, node: { assets_links_attributes:{url: "http://www.slack.com/",link_type: "discussion"} } }
+      put :update, params: { id: node.id, node: { assets_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} } }
     end
     assert_redirected_to node_path(assigns(:node))
-    assert_equal 'http://www.slack.com/', node.assets_links.first.url
+    assert_equal 'http://www.slack.com/', node.asset_links.first.url
   end
 
   def edit_max_object(node)
