@@ -1,4 +1,5 @@
 class AssetsLink < ApplicationRecord
-  belongs_to :asset, :polymorphic => true
-    validates :url, format: URI::regexp(%w[http https])
+  belongs_to :asset, polymorphic: true
+  validates :url, url: { allow_nil: false }
+  validates :asset, presence: true
 end
