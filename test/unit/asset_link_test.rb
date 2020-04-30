@@ -26,4 +26,15 @@ class AssetLinkTest < ActiveSupport::TestCase
     refute link.valid?
   end
 
+  test 'link_type' do
+    # if this changes, then the database entries need updating
+    assert_equal 'discussion', AssetsLink::DISCUSSION
+
+    link1 = Factory(:asset_link)
+    link2 = Factory(:asset_link, url:'http://google.com',link_type:'another')
+
+    assert_equal [link1],AssetsLink.discussion
+  end
+
+
 end

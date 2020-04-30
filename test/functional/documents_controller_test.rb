@@ -893,7 +893,7 @@ class DocumentsControllerTest < ActionController::TestCase
     end
     document = assigns(:document)
     assert_equal 'http://www.slack.com/', document.discussion_links.first.url
-    assert_equal 'discussion', document.assets_links.first.link_type
+    assert_equal AssetsLink::DISCUSSION, document.assets_links.first.link_type
   end
 
   test 'should show discussion link' do

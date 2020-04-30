@@ -392,7 +392,7 @@ class NodesControllerTest < ActionController::TestCase
     end
     node = assigns(:node)
     assert_equal 'http://www.slack.com/', node.discussion_links.first.url
-    assert_equal 'discussion', node.assets_links.first.link_type
+    assert_equal AssetsLink::DISCUSSION, node.assets_links.first.link_type
   end
 
   test 'should show discussion link' do

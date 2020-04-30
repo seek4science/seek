@@ -3651,7 +3651,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file = assigns(:data_file)
     assert_redirected_to data_file_path(data_file)
     assert_equal 'http://www.slack.com/', data_file.discussion_links.first.url
-    assert_equal 'discussion', data_file.discussion_links.first.link_type
+    assert_equal AssetsLink::DISCUSSION, data_file.discussion_links.first.link_type
   end
 
 

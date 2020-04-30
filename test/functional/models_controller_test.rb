@@ -1349,7 +1349,7 @@ class ModelsControllerTest < ActionController::TestCase
     end
     model = assigns(:model)
     assert_equal 'http://www.slack.com/', model.discussion_links.first.url
-    assert_equal 'discussion', model.assets_links.first.link_type
+    assert_equal AssetsLink::DISCUSSION, model.assets_links.first.link_type
   end
 
   test 'should show discussion link' do

@@ -1524,7 +1524,7 @@ class SopsControllerTest < ActionController::TestCase
     end
     sop = assigns(:sop)
     assert_equal 'http://www.slack.com/', sop.discussion_links.first.url
-    assert_equal 'discussion', sop.assets_links.first.link_type
+    assert_equal AssetsLink::DISCUSSION, sop.assets_links.first.link_type
   end
 
 
