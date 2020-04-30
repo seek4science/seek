@@ -27,21 +27,14 @@ module Seek
     end
 
     def update_asset_link(asset, params)
-      asset_id =  params[:asset_id]
-      resource_type = asset.class.name
       url =  params[:url]
-
-
-      if asset_id.nil? || asset_id.empty?
+       
+      if asset.discussion_links.empty?
         asset.discussion_links.build(url: url) unless url.empty?
       else
-        asset_links = asset.discussion_links.where(asset_id: asset_id, asset_type: resource_type)
-        if asset_links.empty?
-          asset.discussion_links.build(url: url) unless url.empty?
-        else
-          asset.discussion_links.first.update_attribute(:url, url)
-        end
+        asset.discussion_links.first.update_attribute(:url, url)
       end
+
     end
 
     def request_resource

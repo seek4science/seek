@@ -17,7 +17,6 @@
 
     <div class="box_editing">
       <%= text_field_tag "#{resource_type}[asset_links_attributes][url]", discussion_link_url, :class => 'form-control' %>
-      <%= hidden_field_tag("#{resource_type}[asset_links_attributes][asset_id]", resource.id, :id => "#{resource_type}[asset_links_attributes][asset_id]" ) %>
       <%= hidden_field_tag("#{resource_type}[asset_links_attributes][asset_type]", resource_type_text, :id => "#{resource_type}[asset_links_attributes][asset_type]" ) %>
       <%= hidden_field_tag("#{resource_type}[asset_links_attributes][link_type]", link_type_text, :id => "#{resource_type}[asset_links_attributes][link_type]" ) %>
       </div>
