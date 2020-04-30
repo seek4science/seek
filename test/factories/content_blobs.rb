@@ -354,7 +354,7 @@ end
 Factory.define(:generated_galaxy_ro_crate, parent: :content_blob) do |f|
   f.original_filename 'new-workflow.basic.crate.zip'
   f.content_type 'application/zip'
-  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/1-PreProcessing.crate.zip", 'rb').read }
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/workflow-4-1.crate.zip", 'rb').read }
 end
 
 Factory.define(:nf_core_ro_crate, parent: :content_blob) do |f|

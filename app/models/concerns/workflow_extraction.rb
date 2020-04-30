@@ -87,7 +87,7 @@ module WorkflowExtraction
 
     begin
       d = diagram
-      if d
+      if d&.exists?
         wdf = crate.main_workflow_diagram || ROCrate::WorkflowDiagram.new(crate, d.path, d.filename)
         wdf.content_size = d.size
         crate.main_workflow.diagram = wdf
