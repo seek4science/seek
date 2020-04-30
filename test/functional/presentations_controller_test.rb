@@ -519,9 +519,11 @@ class PresentationsControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person)
     presentation =  {title: 'Presentation', project_ids: [person.projects.first.id], asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
-    assert_difference('Presentation.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, params: {presentation: presentation, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Presentation.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params: {presentation: presentation, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+        end
       end
     end
     presentation = assigns(:presentation)
@@ -541,12 +543,14 @@ class PresentationsControllerTest < ActionController::TestCase
     person = Factory(:person)
     presentation = Factory(:presentation, contributor: person)
     login_as(person)
-    assert_nil presentation.asset_links.first
-    assert_difference('ActivityLog.count') do
-      put :update, params: { id: presentation.id, presentation: { asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} }  }
+    assert_nil presentation.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: presentation.id, presentation: { asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} }  }
+      end
     end
     assert_redirected_to presentation_path(assigns(:presentation))
-    assert_equal 'http://www.slack.com/', presentation.asset_links.first.url
+    assert_equal 'http://www.slack.com/', presentation.discussion_links.first.url
   end
 
   def edit_max_object(presentation)

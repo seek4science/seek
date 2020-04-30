@@ -886,9 +886,11 @@ class DocumentsControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person)
     document =  {title: 'Document', project_ids: [person.projects.first.id], asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
-    assert_difference('Document.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, params: {document: document, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Document.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params: {document: document, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+        end
       end
     end
     document = assigns(:document)
@@ -909,9 +911,11 @@ class DocumentsControllerTest < ActionController::TestCase
     person = Factory(:person)
     document = Factory(:document, contributor: person)
     login_as(person)
-    assert_nil document.asset_links.first
-    assert_difference('ActivityLog.count') do
-      put :update, params: { id: document.id, document: { asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} } }
+    assert_nil document.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: document.id, document: { asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} } }
+      end
     end
     assert_redirected_to document_path(assigns(:document))
     assert_equal 'http://www.slack.com/', document.discussion_links.first.url

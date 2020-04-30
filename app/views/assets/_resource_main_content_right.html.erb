@@ -10,10 +10,9 @@
                                                                title: authors_title } -%>
 <% end -%>
 
-<% if resource.respond_to?(:asset_links) -%>
-  <% asset_links = resource.asset_links %>
-  <% if asset_links.size > 0 && !asset_links.first.url.empty?  %>
-    <%= render partial: 'assets/asset_links_box', locals: { resource: resource } -%>
+<% if resource.respond_to?(:discussion_links) -%>
+  <% if resource.discussion_links.select{|link| link.url.present?}.any?  %>
+    <%= render partial: 'assets/discussion_links_box', locals: {resource: resource } -%>
   <% end -%>
 <% end -%>
 
