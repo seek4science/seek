@@ -173,10 +173,14 @@ class WorkflowsController < ApplicationController
     response.set_header('Content-Security-Policy', "default-src 'self'")
     respond_to do |format|
       format.html do
-        send_file(@diagram.path,
-                  filename: @diagram.filename,
-                  type: @diagram.content_type,
-                  disposition: 'inline')
+        if @diagram
+          send_file(@diagram.path,
+                    filename: @diagram.filename,
+                    type: @diagram.content_type,
+                    disposition: 'inline')
+        else
+          head :not_found
+        end
       end
     end
   end
