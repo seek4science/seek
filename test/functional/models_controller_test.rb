@@ -1355,7 +1355,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should show discussion link' do
-    asset_link = Factory(:asset_link)
+    asset_link = Factory(:discussion_link)
     model = Factory(:model, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     get :show, params: { id: model }
     assert_response :success

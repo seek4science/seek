@@ -28,7 +28,7 @@ module Seek
 
     def update_asset_link(asset, params)
       url =  params[:url]
-       
+
       if asset.discussion_links.empty?
         asset.discussion_links.build(url: url) unless url.empty?
       else

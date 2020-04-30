@@ -3658,7 +3658,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
 
   test 'should show discussion link' do
-    asset_link = Factory(:asset_link)
+    asset_link = Factory(:discussion_link)
     data_file = Factory(:data_file, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     get :show, params: { id: data_file }
     assert_response :success

@@ -398,7 +398,7 @@ class NodesControllerTest < ActionController::TestCase
   end
 
   test 'should show discussion link' do
-    asset_link = Factory(:asset_link)
+    asset_link = Factory(:discussion_link)
     node = Factory(:node, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     get :show, params: { id: node }
     assert_response :success

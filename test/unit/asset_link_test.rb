@@ -30,7 +30,7 @@ class AssetLinkTest < ActiveSupport::TestCase
     # if this changes, then the database entries need updating
     assert_equal 'discussion', AssetLink::DISCUSSION
 
-    link1 = Factory(:asset_link)
+    link1 = Factory(:discussion_link)
     link2 = Factory(:asset_link, url:'http://google.com',link_type:'another')
 
     assert_equal [link1], AssetLink.discussion

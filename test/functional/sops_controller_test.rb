@@ -1531,7 +1531,7 @@ class SopsControllerTest < ActionController::TestCase
 
 
   test 'should show discussion link' do
-    asset_link = Factory(:asset_link)
+    asset_link = Factory(:discussion_link)
     sop = Factory(:sop, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     get :show, params: { id: sop }
     assert_response :success

@@ -899,7 +899,7 @@ class DocumentsControllerTest < ActionController::TestCase
   end
 
   test 'should show discussion link' do
-    asset_link = Factory(:asset_link)
+    asset_link = Factory(:discussion_link)
     document = Factory(:document, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     assert_equal [asset_link],document.discussion_links
     get :show, params: { id: document }
