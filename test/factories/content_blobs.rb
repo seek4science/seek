@@ -362,3 +362,9 @@ Factory.define(:nf_core_ro_crate, parent: :content_blob) do |f|
   f.content_type 'application/zip'
   f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/ro-crate-nf-core-ampliseq.crate.zip", 'rb').read }
 end
+
+Factory.define(:just_cwl_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'just-cwl-workflow.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/just-cwl-workflow.crate.zip", 'rb').read }
+end

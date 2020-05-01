@@ -14,12 +14,30 @@ module Seek
       end
 
       def can_render_diagram?
-        !crate.main_workflow_diagram.nil?
+        crate.main_workflow_diagram.present? || inner_extractor&.can_render_diagram?
       end
 
       def diagram(format = default_digram_format)
         if crate.main_workflow_diagram
           crate.main_workflow_diagram&.source&.source&.read
+        else
+          inner_extractor.diagram(format)
+        end
+      end
+
+      def inner_extractor
+        if @inner_extractor
+          @inner_extractor
+        else
+          wf = crate&.main_workflow&.source&.source
+          @inner_extractor = if @inner_extractor_class
+            @inner_extractor_class.new(wf)
+          else
+            extractor_class = self.class.determine_extractor_class(crate&.main_workflow&.programming_language) ||
+                Seek::WorkflowExtractors::Base
+
+            extractor_class.new(wf)
+          end
         end
       end
 
@@ -28,17 +46,7 @@ module Seek
         if crate.main_workflow_cwl
           m = Seek::WorkflowExtractors::CWL.new(crate.main_workflow_cwl&.source&.source).metadata
         else
-          # Or try and parse main workflow
-          wf = crate&.main_workflow&.source&.source
-          extractor_class = self.class.determine_extractor_class(crate&.main_workflow&.programming_language)
-          if extractor_class
-            m = extractor_class.new(wf).metadata
-            m[:workflow_class_id] = extractor_class.workflow_class&.id
-          elsif @inner_extractor_class
-            m = @inner_extractor_class.new(wf).metadata
-          else
-            m = super
-          end
+          inner_extractor.metadata.merge(workflow_class_id: inner_extractor.class.workflow_class&.id)
         end
 
         # Metadata from crate

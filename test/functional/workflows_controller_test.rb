@@ -490,6 +490,24 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert wf.diagram_exists?
   end
 
+  test 'generates diagram from CWL in RO crate' do
+    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
+      wf = Factory(:just_cwl_ro_crate_workflow)
+      login_as(wf.contributor)
+      refute wf.diagram_exists?
+      assert_nil wf.ro_crate.main_workflow_diagram
+      assert wf.can_render_diagram?
+
+      VCR.use_cassette('workflows/cwl_viewer_cwl_workflow_from_crate_diagram') do
+        get :diagram, params: { id: wf.id }
+      end
+
+      assert_response :success
+      assert_equal 'image/svg+xml', response.headers['Content-Type']
+      assert wf.diagram_exists?
+    end
+  end
+
   test 'does not render diagram if not in RO crate' do
     wf = Factory(:nf_core_ro_crate_workflow)
     login_as(wf.contributor)

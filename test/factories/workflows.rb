@@ -119,3 +119,7 @@ Factory.define(:nf_core_ro_crate_workflow, parent: :workflow) do |f|
   f.association :content_blob, factory: :nf_core_ro_crate
   f.workflow_class { WorkflowClass.find_by_key('Nextflow') || Factory(:nextflow_workflow_class) }
 end
+
+Factory.define(:just_cwl_ro_crate_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :just_cwl_ro_crate
+end
