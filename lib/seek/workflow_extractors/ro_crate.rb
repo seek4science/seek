@@ -43,8 +43,8 @@ module Seek
 
       def metadata
         # Use CWL description
-        if crate.main_workflow_cwl
-          m = Seek::WorkflowExtractors::CWL.new(crate.main_workflow_cwl&.source&.source).metadata
+        m = if crate.main_workflow_cwl
+          Seek::WorkflowExtractors::CWL.new(crate.main_workflow_cwl&.source&.source).metadata
         else
           inner_extractor.metadata.merge(workflow_class_id: inner_extractor.class.workflow_class&.id)
         end
