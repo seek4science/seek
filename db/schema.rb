@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_17_112757) do
+ActiveRecord::Schema.define(version: 2020_04_30_144615) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -185,6 +185,16 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.string "doi"
+  end
+
+  create_table "asset_links",  force: :cascade do |t|
+    t.integer "asset_id"
+    t.string "asset_type"
+    t.text "url"
+    t.string "link_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["asset_id", "asset_type"], name: "index_asset_links_on_asset_id_and_asset_type"
   end
 
   create_table "assets", id: :integer,  force: :cascade do |t|
