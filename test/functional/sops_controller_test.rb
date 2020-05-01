@@ -1553,6 +1553,16 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 'http://www.slack.com/', sop.discussion_links.first.url
   end
 
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    sop = Factory(:sop, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: sop.id, sop: { asset_links_attributes:{url: "",link_type: AssetLink::DISCUSSION} } }
+    end
+    assert_redirected_to sop_path(assigns(:sop))
+  end
 
   private
 

@@ -32,9 +32,12 @@ module Seek
       if asset.discussion_links.empty?
         asset.discussion_links.build(url: url) unless url.empty?
       else
-        asset.discussion_links.first.update_attribute(:url, url)
+        if url.empty?
+          asset.discussion_links.first.destroy
+        else
+          asset.discussion_links.first.update_attribute(:url, url)
+        end
       end
-
     end
 
     def request_resource

@@ -419,6 +419,17 @@ class NodesControllerTest < ActionController::TestCase
     assert_equal 'http://www.slack.com/', node.discussion_links.first.url
   end
 
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    node = Factory(:node, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+     assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: node.id, node: { asset_links_attributes:{url: "",link_type: AssetLink::DISCUSSION} } }
+    end
+    assert_redirected_to node_path(assigns(:node))
+  end
+
   def edit_max_object(node)
     add_tags_to_test_object(node)
     add_creator_to_test_object(node)

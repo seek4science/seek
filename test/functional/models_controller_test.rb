@@ -1376,6 +1376,17 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 'http://www.slack.com/', model.discussion_links.first.url
   end
 
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    model = Factory(:model, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: model.id, model: { asset_links_attributes:{url: "",link_type: AssetLink::DISCUSSION} } }
+    end
+    assert_redirected_to model_path(assigns(:model))
+  end
+
   private
 
   def valid_model
