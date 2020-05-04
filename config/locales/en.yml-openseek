@@ -32,6 +32,7 @@ en:
   strain: "Strain"
   scale: "Scale"
   organism: "Organism"
+  human_disease: "Human Disease"
 
   person: "Person"
   project: "Project"
@@ -57,6 +58,7 @@ en:
     jerm_templates: "JERM templates"
     feedback: "Provide feedback"
     isa_best_practice: "ISA best practice"
+    vocabularies: "Vocabularies"
 
   favourite_group: "favourite groups"
 

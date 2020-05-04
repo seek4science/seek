@@ -35,6 +35,13 @@
               <%= organisms_link_list @project.organisms -%>
             </p>
         <% end %>
+        <% if Seek::Config.human_diseases_enabled %>
+            <p>
+              <strong>Human Diseases:</strong>
+              <%= human_diseases_link_list @project.human_diseases -%>
+            </p>
+        <% end %>
+
       </div>
 
       <div class="col-md-6">

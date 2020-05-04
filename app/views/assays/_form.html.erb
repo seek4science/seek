@@ -62,6 +62,12 @@
         </div>
     <% end %>
 
+    <% if Seek::Config.human_diseases_enabled %>
+        <div id="add_human_disease_form">
+          <%= render :partial=>"assays/select_human_diseases" -%>
+        </div>
+    <% end %>
+
     <% if show_scales? %>
         <%= render :partial => "scales/scales_selector",:locals=>{:object=>@assay} %>
     <% end %>

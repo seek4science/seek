@@ -24,6 +24,14 @@ core_xlink(assay).merge(is_root ? xml_root_attributes : {}) do
       end      
     end
     
+    parent_xml.tag! "assay_human_diseases" do
+      assay.assay_human_diseases.each do |ao|
+        parent_xml.tag! "assay_human_disease" do
+          api_partial parent_xml,ao.human_disease
+        end
+      end
+    end
+
     if assay.is_modelling? 
       assay_data_relationships_xml parent_xml,assay
     end

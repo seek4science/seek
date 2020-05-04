@@ -8,6 +8,9 @@
   <div class="col-sm-6">
     <%= list_item_attribute "Date Published", date_as_string(resource.published_date,false,true) %>
     <%= list_item_optional_attribute publication_type_text(resource.publication_type), h(resource.journal) %>
+    <% if Seek::Config.human_diseases_enabled %>
+      <%= list_item_simple_list resource.human_diseases, "Human Diseases" %>
+    <% end %>
   </div>
 
   <div class="col-sm-6 hidden-xs">

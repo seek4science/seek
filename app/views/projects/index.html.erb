@@ -2,5 +2,8 @@
 <% if @organisms -%>
   <h2><%= "#{t('project').pluralize} involved with the organism '"+h(@organisms)+"' ... " -%></h2>
 <% end %>
+<% if @human_diseases -%>
+  <h2><%= "#{t('project').pluralize} involved with the human diseases '"+h(@human_diseases)+"' ... " -%></h2>
+<% end %>
 
 <%= render :partial => "general/index_facets_or_paged" %>

@@ -28,6 +28,8 @@
 
       <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
 
+      <%= render :partial => "human_diseases/select_human_disease",:locals=>{:model_class=>Model} -%>
+
       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@model} if show_scales?%>
 
       <%= fields_for(@model) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>

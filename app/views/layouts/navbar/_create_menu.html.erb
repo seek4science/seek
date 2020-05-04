@@ -58,6 +58,10 @@
             <li><%= link_to t("organism"), new_organism_path %></li>
         <% end %>
 
+        <% if can_create_human_diseases? %>
+            <li role="presentation" class="dropdown-header"><%= t("menu.vocabularies") -%></li>
+            <li><%= link_to t("human_disease"), new_human_disease_path %></li>
+        <% end %>
     <% else %>
         <li role="presentation" class="dropdown-header"><span style="color:red">You cannot add assets or other items until you are a member of a <%= t('project') %>.</span></li>
     <% end %>
