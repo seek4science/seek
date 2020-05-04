@@ -8,7 +8,7 @@ class Publication < ApplicationRecord
   # searchable must come before acts_as_asset is called
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
-      text :journal, :pubmed_id, :doi, :published_date
+      text :journal, :pubmed_id, :doi, :published_date, :human_disease_terms
       text :publication_authors do
         seek_authors.map(&:person).collect(&:name)
       end
@@ -27,6 +27,8 @@ class Publication < ApplicationRecord
   has_many :studies, through: :related_relationships, source: :subject, source_type: 'Study'
   has_many :investigations, through: :related_relationships, source: :subject, source_type: 'Investigation'
   has_many :presentations, through: :related_relationships, source: :subject, source_type: 'Presentation'
+
+  has_and_belongs_to_many :human_diseases
 
   acts_as_asset
   validates :title, length: { maximum: 65_535 }
@@ -117,6 +119,10 @@ class Publication < ApplicationRecord
   def doi=(doi)
     doi = doi.gsub(/(https?:\/\/)?(dx\.)?doi\.org\//,'') if doi
     super(doi)
+  end
+
+  def human_disease_terms
+    human_diseases.collect(&:searchable_terms).flatten
   end
 
   def default_policy
@@ -229,6 +235,11 @@ class Publication < ApplicationRecord
   # returns a list of related organisms, related through either the assay or the model
   def related_organisms
     (assays.collect(&:organisms).flatten | models.collect(&:organism).flatten).uniq
+  end
+
+  # returns a list of related human diseases, related through either the assay or the model
+  def related_human_diseases
+    (assays.collect(&:human_diseases).flatten | models.collect(&:human_disease).flatten).uniq
   end
 
   def self.subscribers_are_notified_of?(action)

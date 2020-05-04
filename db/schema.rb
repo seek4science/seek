@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_10_122522) do
+ActiveRecord::Schema.define(version: 2019_05_03_081002) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -131,6 +131,15 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "key", limit: 10
+  end
+
+  create_table "assay_human_diseases", id: :integer,  force: :cascade do |t|
+    t.integer "assay_id"
+    t.integer "human_disease_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["assay_id"], name: "index_assay_diseases_on_assay_id"
+    t.index ["human_disease_id"], name: "index_assay_diseases_on_disease_id"
   end
 
   create_table "assay_organisms", id: :integer,  force: :cascade do |t|
@@ -624,6 +633,36 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.datetime "updated_at"
   end
 
+  create_table "human_disease_parents", id: false,  force: :cascade do |t|
+    t.integer "human_disease_id"
+    t.integer "parent_id"
+    t.index ["human_disease_id", "parent_id"], name: "index_disease_parents_on_disease_id_and_parent_id"
+    t.index ["parent_id"], name: "index_disease_parents_on_parent_id"
+  end
+
+  create_table "human_diseases", id: :integer,  force: :cascade do |t|
+    t.string "title"
+    t.string "doid_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string "first_letter"
+    t.string "uuid"
+  end
+
+  create_table "human_diseases_projects", id: false,  force: :cascade do |t|
+    t.integer "human_disease_id"
+    t.integer "project_id"
+    t.index ["human_disease_id", "project_id"], name: "index_diseases_projects_on_disease_id_and_project_id"
+    t.index ["project_id"], name: "index_diseases_projects_on_project_id"
+  end
+
+  create_table "human_diseases_publications", id: false,  force: :cascade do |t|
+    t.integer "human_disease_id"
+    t.integer "publication_id"
+    t.index ["human_disease_id", "publication_id"], name: "index_diseases_publications_on_disease_id_and_publication_id"
+    t.index ["publication_id"], name: "index_diseases_publications_on_publication_id"
+  end
+
   create_table "institutions", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.text "address", limit: 16777215
@@ -762,6 +801,7 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
+    t.integer "human_disease_id"
     t.index ["contributor_id"], name: "index_model_versions_on_contributor"
     t.index ["model_id"], name: "index_model_versions_on_model_id"
   end
@@ -793,6 +833,7 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
+    t.integer "human_disease_id"
     t.index ["contributor_id"], name: "index_models_on_contributor"
   end
 

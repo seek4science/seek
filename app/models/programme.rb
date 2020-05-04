@@ -64,6 +64,10 @@ class Programme < ApplicationRecord
     projects.collect(&:organisms).flatten.uniq
   end
 
+  def human_diseases
+    projects.collect(&:human_diseases).flatten.uniq
+  end
+
   def assets
     (data_files + models + sops + presentations + events + publications + documents).uniq.compact
   end

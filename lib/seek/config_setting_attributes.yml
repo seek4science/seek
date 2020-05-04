@@ -59,6 +59,7 @@ tagline_prefix:
 events_enabled:
 modelling_analysis_enabled:
 organisms_enabled:
+human_diseases_enabled:
 models_enabled:
 assays_enabled:
 publications_enabled:
