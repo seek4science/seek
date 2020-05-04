@@ -212,7 +212,7 @@ SEEK::Application.routes.draw do
       get :overview
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,
-              :publications,:events,:samples,:specimens,:strains,:search,:organisms,:documents, :only=>[:index]
+              :publications,:events,:samples,:specimens,:strains,:search,:organisms,:human_diseases,:documents, :only=>[:index]
 
     resources :openbis_endpoints do
       collection do
@@ -374,7 +374,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:strains,:organisms, :only=>[:index]
+    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:strains,:organisms,:human_diseases, :only=>[:index]
   end
 
   # to be removed as STI does not work in too many places
@@ -625,7 +625,7 @@ SEEK::Application.routes.draw do
       get :isa_children
     end
     resources :people,:projects, :institutions, :investigations, :studies, :assays,
-              :data_files, :models, :sops, :workflows, :nodes, :presentations, :documents, :events, :publications, :organisms
+              :data_files, :models, :sops, :workflows, :nodes, :presentations, :documents, :events, :publications, :organisms, :human_diseases
   end
 
   resources :publications do
@@ -642,7 +642,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :disassociate_authors
     end
-    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :human_diseases, :events,:only=>[:index]
   end
 
   resources :events do
@@ -688,6 +688,18 @@ SEEK::Application.routes.draw do
     resources :projects, :assays, :studies, :models, :strains, :specimens, :samples, :publications, :only=>[:index]
     member do
       get :visualise
+    end
+  end
+
+  resources :human_diseases do
+    collection do
+      post :search_ajax
+      post :resource_in_tab
+    end
+    resources :projects, :assays, :studies, :models, :publications, :only=>[:index]
+    member do
+      get :visualise
+      get :tree
     end
   end
 

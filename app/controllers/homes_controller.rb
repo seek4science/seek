@@ -6,6 +6,7 @@ class HomesController < ApplicationController
 
   def index
     respond_with do |format|
+      @dataframe = get_human_diseases_plot_data()
       format.html
     end
   end
@@ -82,5 +83,21 @@ class HomesController < ApplicationController
     end
 
     results
+  end
+
+  def get_human_diseases_plot_data()
+    Rails.cache.fetch('human_diseases_plot_data', expires_in: 12.hours) do
+      HumanDisease.all.order(:id).map do |c|
+        {
+          id:           c.id.to_s,
+          title:        c.title,
+          parent:       c.parents.first ? c.parents.first.id.to_s : '',
+          projects:     c.projects.count,
+          assays:       c.assays.count,
+          publications: c.publications.count,
+          models:       c.models.count,
+        }
+      end
+    end
   end
 end

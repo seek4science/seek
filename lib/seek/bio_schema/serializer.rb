@@ -43,7 +43,7 @@ module Seek
 
       private
 
-      SUPPORTED_TYPES = [Person, Project, Event, DataFile, Organism,
+      SUPPORTED_TYPES = [Person, Project, Event, DataFile, Organism, HumanDisease,
                          Seek::BioSchema::DataCatalogueMockModel, Sample,
                          Document, Presentation].freeze
 

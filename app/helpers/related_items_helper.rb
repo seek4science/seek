@@ -100,7 +100,7 @@ module RelatedItemsHelper
   def relatable_types
     { 'Person' => {}, 'Project' => {}, 'Institution' => {}, 'Investigation' => {},
       'Study' => {}, 'Assay' => {}, 'DataFile' => {}, 'Document' => {},
-      'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {}, 'Organism' => {},
+      'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {}, 'Organism' => {}, 'HumanDisease' => {},
       'Strain' => {}, 'Sample' => {}, 'Workflow' => {}, 'Node' => {} }
   end
 
@@ -149,7 +149,7 @@ module RelatedItemsHelper
       total_count = res[:items].size
       if key == 'Project' || key == 'Institution' || key == 'SampleType'
         res[:hidden_count] = 0
-      elsif (key == 'Workflow' || key == 'Node') && !Seek::Config.workflows_enabled
+      elsif (key == 'Workflow' || key == 'Node') # && !Seek::Config.workflows_enabled
         res[:items] = []
         res[:hidden_count] = 0
       elsif key == 'Person'
