@@ -783,6 +783,31 @@ SEEK::Application.routes.draw do
     resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
+
+  ### DOCUMENTS
+  resources :collections do
+    collection do
+      get :typeahead
+      get :preview
+      post :items_for_result
+    end
+    member do
+      post :check_related_items
+      post :check_gatekeeper_required
+      get :published
+      post :publish_related_items
+      post :publish
+      post :request_resource
+      post :update_annotations_ajax
+      post :mint_doi
+      get :mint_doi_confirm
+      get :manage
+      patch :manage_update
+    end
+    resources :collection_items, as: :items
+    resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
+  end
+
   ### ASSAY AND TECHNOLOGY TYPES ###
 
   get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"

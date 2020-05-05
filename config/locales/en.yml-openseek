@@ -34,6 +34,7 @@ en:
   publication: "Publication"
   presentation: "Presentation"
   event: "Event"
+  collection: "Collection"
 
   sample: "Sample"
   sample_type: "Sample type"

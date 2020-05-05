@@ -1,0 +1,23 @@
+<h1>Editing <%= t('collection') %>: <%= link_to(h(@collection.title), collection_path(@collection)) -%></h1>
+
+<%= form_for(@collection) do |f| %>
+    <div class="asset_form">
+      <%= f.error_messages %>
+
+      <div class="form-group">
+        <label class="required">Title</label>
+        <%= f.text_field :title, :class=>"form-control" -%>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
+      </div>
+
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @collection } %>
+
+      <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
+
+      <%= form_submit_buttons(@collection) %>
+    </div>
+<% end %>

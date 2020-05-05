@@ -1,0 +1,62 @@
+<%# This partial expects 3 parameters to be defined: -%>
+<%# - resource - instance of resource for which the attributions are displayed -%>
+
+<% main_list_section_length = 3 -%>
+<% collections ||= resource.collections -%>
+<% truncate_to ||= 22 -%>
+
+<%= panel('Collections', help_text: "Which collections does this resource appear in?") do %>
+  <% unless collections.blank? -%>
+    <ul class="list">
+      <% collections.first(main_list_section_length).each do |item| -%>
+        <% if item -%>
+          <% item_type = item.class.name -%>
+          <% by_text = item.contributor.nil? ? "" : " by #{h(item.contributor.name)}" %>
+          <% tooltip_txt = "<b>#{item_type.humanize}:</b> \"#{h(item.title)}\"#{by_text}" -%>
+          <%= list_item_with_icon(item_type.underscore, item, item.title, truncate_to, tooltip_txt, 34) -%>
+        <% else -%>
+          <li><span class="none_text">Private collection</span></li>
+        <% end -%>
+      <% end  %>
+    </ul>
+
+    <%# if a collection has more than "main_list_section_length" items an "expand" link is provided which opens up the rest of the items -%>
+    <% if collections.length > main_list_section_length -%>
+      <%= link_to(("More " + image('expand')).html_safe, '#', id: 'more_link_collections', class: 'pull-right')-%>
+
+      <div style="display: none;" id="more_items_collections">
+        <ul class="list">
+          <% collections[main_list_section_length..(collections.length-1)].each do |item| -%>
+            <% if item -%>
+              <%= list_item_with_icon(item.class.name.underscore, item, item.title, truncate_to, nil, 34) -%>
+            <% else -%>
+              <li><span class="none_text">Private collection</span></li>
+            <% end -%>
+          <% end -%>
+        </ul>
+
+        <%= link_to(("Less " + image('collapse')).html_safe, '#', id: 'less_link_collections', style: 'display: none', class: 'pull-right')-%>
+      </div>
+    <% end -%>
+  <% else -%>
+    <p class="none_text">None</p>
+  <% end %>
+<% end %>
+
+<script>
+    $j('#more_link_collections').click(function () {
+        $j('#more_items_collections').show();
+        $j('#more_link_collections').hide();
+        $j('#less_link_collections').show();
+
+        return false;
+    });
+
+    $j('#less_link_collections').click(function () {
+        $j('#more_items_collections').hide();
+        $j('#more_link_collections').show();
+        $j('#less_link_collections').hide();
+
+        return false;
+    });
+</script>

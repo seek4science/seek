@@ -94,3 +94,38 @@
     <li><%= image_tag_for_key('doi', polymorphic_path(asset, action: 'mint_doi_confirm', version: display_asset.version), nil, {}, "Generate a DOI") -%></li>
   <% end %>
 <% end %>
+
+<% if current_user&& current_user.person.collections.any? %>
+  <%= dropdown_button('Add to collection', 'add', menu_options: { 'data-role' => 'add-to-collection-list' }) do %>
+    <% current_user.person.collections.each do |collection| %>
+      <li><%= link_to collection.title, '#', 'data-role' => 'add-to-collection-link', 'data-url' => collection_items_path(collection.id) -%></li>
+    <% end %>
+  <% end %>
+  <script>
+      $j(document).ready(function () {
+          $j('[data-role="add-to-collection-list"]').on('click', '[data-role="add-to-collection-link"]', function () {
+              var btn = $j(this);
+              btn.spinner('add');
+              $j.ajax({
+                  url: btn.data('url'),
+                  type: 'POST',
+                  data: {
+                      item: {
+                          asset_id: '<%= asset.id %>',
+                          asset_type: '<%= asset.class.name %>'
+                      }
+                  },
+                  success: function (resp) {
+                      alert("Success!");
+                  },
+                  error: function () {
+                      alert("Error!");
+                  },
+                  complete: function () {
+                      btn.spinner('remove');
+                  }
+              });
+          });
+      });
+  </script>
+<% end %>
