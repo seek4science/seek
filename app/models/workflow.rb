@@ -38,7 +38,7 @@ class Workflow < ApplicationRecord
     end
 
     def maturity_level= level
-      super(Workflow::MATURITY_LEVELS_INV[level.to_sym])
+      super(Workflow::MATURITY_LEVELS_INV[level&.to_sym])
     end
   end
 
@@ -65,7 +65,7 @@ class Workflow < ApplicationRecord
   end
 
   def maturity_level= level
-    super(Workflow::MATURITY_LEVELS_INV[level.to_sym])
+    super(Workflow::MATURITY_LEVELS_INV[level&.to_sym])
   end
 
   has_filter maturity: Seek::Filtering::Filter.new(
