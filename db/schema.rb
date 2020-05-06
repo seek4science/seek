@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_17_112757) do
+ActiveRecord::Schema.define(version: 2020_05_06_123855) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1850,6 +1850,7 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.string "deleted_contributor"
     t.text "metadata"
     t.integer "workflow_class_id"
+    t.integer "maturity_level"
     t.index ["contributor_id"], name: "index_workflows_on_contributor"
   end
 
