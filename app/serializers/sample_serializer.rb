@@ -1,5 +1,7 @@
 class SampleSerializer < PCSSerializer
 
+  attribute :title
+  
   attribute :data, key: :attribute_map
   
   attribute :tags do
