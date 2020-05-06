@@ -24,10 +24,8 @@
                 <%= link_to(avatar(item.asset, 60, true, nil, nil, true, 'home_asset_icon'), item.asset, class: 'file-type-icon') %>
                 <%= link_to(item.asset.title, item.asset, 'data-tooltip' => item.asset.description, target: '_blank') %>
                 <br/>
-                <span class='subtle'>
-            <%= item.comment -%>
-                  - Added <%= time_ago_in_words(item.created_at) -%> ago
-            </span>
+                <%= item.comment -%>
+                <span class='subtle'>- Added <%= time_ago_in_words(item.created_at) -%> ago</span>
               </li>
             <% end %>
           </ul>
