@@ -1,6 +1,6 @@
 class SampleSerializer < PCSSerializer
 
-  attribute :json_metadata
+  attribute :data, key: :attribute_map
   
   attribute :tags do
     serialize_annotations(object)
