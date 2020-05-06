@@ -44,7 +44,7 @@ class WorkflowsController < ApplicationController
 
     respond_to do |format|
       if @workflow.update_attributes(workflow_params)
-        flash[:notice] = "#{t('Workflow')} metadata was successfully updated."
+        flash[:notice] = "#{t('workflow')} metadata was successfully updated."
         format.html { redirect_to workflow_path(@workflow) }
         format.json { render json: @workflow, include: [params[:include]] }
       else
@@ -217,7 +217,7 @@ class WorkflowsController < ApplicationController
                                      { project_ids: [] }, :license, :other_creators,
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                     { publication_ids: [] }, :internals)
+                                     { publication_ids: [] }, :internals, :maturity_level)
   end
 
   alias_method :asset_params, :workflow_params

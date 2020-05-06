@@ -10,34 +10,41 @@ module Seek
 
       def initialize(io, inner_extractor_class: nil)
         @io = io
-        @inner_extractor_class = inner_extractor_class
+        @main_workflow_extractor_class = inner_extractor_class
       end
 
       def can_render_diagram?
-        crate.main_workflow_diagram.present? || inner_extractor&.can_render_diagram?
+        crate.main_workflow_diagram.present? || main_workflow_extractor&.can_render_diagram? || abstract_cwl_extractor&.can_render_diagram?
       end
 
       def diagram(format = default_digram_format)
         if crate.main_workflow_diagram
           crate.main_workflow_diagram&.source&.source&.read
-        else
-          inner_extractor.diagram(format)
+        elsif main_workflow_extractor&.can_render_diagram?
+          main_workflow_extractor.diagram(format)
+        elsif abstract_cwl_extractor&.can_render_diagram?
+          abstract_cwl_extractor.diagram(format)
         end
       end
 
-      def inner_extractor
-        if @inner_extractor
-          @inner_extractor
+      def main_workflow_extractor
+        if @main_workflow_extractor
+          @main_workflow_extractor
         else
-          wf = crate&.main_workflow&.source&.source
-          @inner_extractor = if @inner_extractor_class
-            @inner_extractor_class.new(wf)
-          else
-            extractor_class = self.class.determine_extractor_class(crate&.main_workflow&.programming_language) ||
-                Seek::WorkflowExtractors::Base
+          extractor_class = @main_workflow_extractor_class ||
+              self.class.determine_extractor_class(crate&.main_workflow&.programming_language) ||
+              Seek::WorkflowExtractors::Base
 
-            extractor_class.new(wf)
-          end
+          extractor_class.new(crate&.main_workflow&.source&.source)
+        end
+      end
+
+      def abstract_cwl_extractor
+        if @abstract_cwl_extractor
+          @abstract_cwl_extractor
+        else
+          abstract_cwl = crate&.main_workflow_cwl&.source&.source
+          @abstract_cwl_extractor = abstract_cwl ? Seek::WorkflowExtractors::CWL.new(abstract_cwl) : nil
         end
       end
 
@@ -46,7 +53,7 @@ module Seek
         m = if crate.main_workflow_cwl
           Seek::WorkflowExtractors::CWL.new(crate.main_workflow_cwl&.source&.source).metadata
         else
-          inner_extractor.metadata.merge(workflow_class_id: inner_extractor.class.workflow_class&.id)
+          main_workflow_extractor.metadata.merge(workflow_class_id: main_workflow_extractor.class.workflow_class&.id)
         end
 
         # Metadata from crate
@@ -96,9 +103,10 @@ module Seek
       def self.determine_extractor_class(language)
         matchable = ['identifier', 'name', 'alternateName', '@id', 'url']
         @extractor_matcher ||= [Seek::WorkflowExtractors::CWL,
-                                Seek::WorkflowExtractors::KNIME,
+                                Seek::WorkflowExtractors::Galaxy,
                                 Seek::WorkflowExtractors::Nextflow,
-                                Seek::WorkflowExtractors::Galaxy].map do |extractor|
+                                Seek::WorkflowExtractors::Snakemake,
+                                Seek::WorkflowExtractors::KNIME].map do |extractor|
           [extractor.ro_crate_metadata.slice(*matchable), extractor]
         end
 

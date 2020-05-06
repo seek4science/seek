@@ -1,11 +1,17 @@
 <%= render partial: 'general/item_title', locals: { item: @workflow,
-                                                   version: @display_workflow.version,
-                                                   buttons_partial: 'assets/asset_buttons' } -%>
+                                                    version: @display_workflow.version,
+                                                    buttons_partial: 'assets/asset_buttons' } -%>
 
 <%= render partial: 'assets/upload_new_version_form', locals: { resource: @workflow } -%>
 
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
+    <% if @display_workflow.maturity_level %>
+      <p>
+        <%= maturity_badge(@display_workflow.maturity_level) %>
+      </p>
+    <% end %>
+
     <div id="description" class="well well-sm">
       <%= text_or_not_specified(@display_workflow.description, description: false, auto_link: true) %>
     </div>

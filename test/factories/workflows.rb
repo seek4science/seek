@@ -115,6 +115,11 @@ Factory.define(:generated_galaxy_ro_crate_workflow, parent: :workflow) do |f|
   f.workflow_class { WorkflowClass.find_by_key('Galaxy') || Factory(:galaxy_workflow_class) }
 end
 
+Factory.define(:generated_galaxy_no_diagram_ro_crate_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :generated_galaxy_no_diagram_ro_crate
+  f.workflow_class { WorkflowClass.find_by_key('Galaxy') || Factory(:galaxy_workflow_class) }
+end
+
 Factory.define(:nf_core_ro_crate_workflow, parent: :workflow) do |f|
   f.association :content_blob, factory: :nf_core_ro_crate
   f.workflow_class { WorkflowClass.find_by_key('Nextflow') || Factory(:nextflow_workflow_class) }
