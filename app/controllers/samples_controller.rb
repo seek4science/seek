@@ -49,7 +49,7 @@ class SamplesController < ApplicationController
     @sample = Sample.find(params[:id])
     respond_to do |format|
       format.html
-      format.json {render json: :not_implemented, status: :not_implemented }
+      format.json {render json: @sample, include: [params[:include]]}
     end
   end
 
