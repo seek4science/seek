@@ -783,8 +783,6 @@ SEEK::Application.routes.draw do
     resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
-
-  ### DOCUMENTS
   resources :collections do
     collection do
       get :typeahead
