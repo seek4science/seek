@@ -43,7 +43,8 @@ module WorkflowExtraction
 
     unless File.exist?(path)
       diagram = extractor.diagram(format)
-      File.binwrite(path, diagram) unless diagram.nil? || diagram.length <= 1
+      return nil if diagram.nil? || diagram.length <= 1
+      File.binwrite(path, diagram)
     end
 
     workflow = is_a_version? ? self.parent : self
@@ -86,7 +87,7 @@ module WorkflowExtraction
 
     begin
       d = diagram
-      if d.exists?
+      if d&.exists?
         wdf = crate.main_workflow_diagram || ROCrate::WorkflowDiagram.new(crate, d.path, d.filename)
         wdf.content_size = d.size
         crate.main_workflow.diagram = wdf

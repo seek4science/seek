@@ -20,4 +20,9 @@ module WorkflowsHelper
     end
   end
 
+  def maturity_badge(level)
+    content_tag(:span,
+                t("maturity_level.#{level}"),
+                class: "maturity-level label #{level == :released ? 'label-success' : 'label-warning'}")
+  end
 end

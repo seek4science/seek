@@ -32,6 +32,14 @@ class Workflow < ApplicationRecord
 
     belongs_to :workflow_class, optional: true
     include WorkflowExtraction
+
+    def maturity_level
+      Workflow::MATURITY_LEVELS[super]
+    end
+
+    def maturity_level= level
+      super(Workflow::MATURITY_LEVELS_INV[level&.to_sym])
+    end
   end
 
   def avatar_key
@@ -45,4 +53,27 @@ class Workflow < ApplicationRecord
   def contributor_credited?
     false
   end
+
+  MATURITY_LEVELS = {
+      0 => :work_in_progress,
+      1 => :released
+  }
+  MATURITY_LEVELS_INV = MATURITY_LEVELS.invert
+
+  def maturity_level
+    Workflow::MATURITY_LEVELS[super]
+  end
+
+  def maturity_level= level
+    super(Workflow::MATURITY_LEVELS_INV[level&.to_sym])
+  end
+
+  has_filter maturity: Seek::Filtering::Filter.new(
+      value_field: 'maturity_level',
+      label_mapping: ->(values) {
+        values.map do |value|
+          I18n.translate("maturity_level.#{MATURITY_LEVELS[value]}")
+        end
+      }
+  )
 end

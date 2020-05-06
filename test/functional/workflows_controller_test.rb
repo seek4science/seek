@@ -352,7 +352,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     other_creator.save!
 
     workflow = Factory(:workflow, projects:[proj1], policy:Factory(:private_policy,
-                                                                           permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+                                                                   permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute workflow.can_manage?
@@ -437,6 +437,104 @@ class WorkflowsControllerTest < ActionController::TestCase
     post :metadata_extraction_ajax, params: { content_blob_id: blob.id.to_s, format: 'js', workflow_class_id: cwl.id }
     assert_response :success
     assert_equal 12, session[:metadata][:internals][:inputs].length
+  end
+
+  test 'missing diagram and no CWL viewer available returns 404' do
+    wf = Factory(:cwl_workflow)
+    login_as(wf.contributor)
+    refute wf.diagram_exists?
+    refute wf.can_render_diagram?
+
+    get :diagram, params: { id: wf.id }
+
+    assert_response :not_found
+  end
+
+  test 'cannot see diagram of private workflow' do
+    wf = Factory(:cwl_workflow)
+    refute wf.can_view?
+
+    get :diagram, params: { id: wf.id }
+
+    assert_response :redirect
+    assert flash[:error].include?('You are not authorized')
+  end
+
+  test 'generates diagram if CWL viewer available' do
+    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
+      wf = Factory(:cwl_workflow)
+      login_as(wf.contributor)
+      refute wf.diagram_exists?
+      assert wf.can_render_diagram?
+
+      VCR.use_cassette('workflows/cwl_viewer_cwl_workflow_diagram') do
+        get :diagram, params: { id: wf.id }
+      end
+
+      assert_response :success
+      assert_equal 'image/svg+xml', response.headers['Content-Type']
+      assert wf.diagram_exists?
+    end
+  end
+
+  test 'picks diagram from RO crate' do
+    wf = Factory(:existing_galaxy_ro_crate_workflow)
+    login_as(wf.contributor)
+    refute wf.diagram_exists?
+    assert wf.can_render_diagram?
+
+    get :diagram, params: { id: wf.id }
+
+    assert_response :success
+    assert_equal 'image/png', response.headers['Content-Type']
+    assert wf.diagram_exists?
+  end
+
+  test 'generates diagram from CWL workflow in RO crate' do
+    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
+      wf = Factory(:just_cwl_ro_crate_workflow)
+      login_as(wf.contributor)
+      refute wf.diagram_exists?
+      assert_nil wf.ro_crate.main_workflow_diagram
+      assert wf.can_render_diagram?
+
+      VCR.use_cassette('workflows/cwl_viewer_cwl_workflow_from_crate_diagram') do
+        get :diagram, params: { id: wf.id }
+      end
+
+      assert_response :success
+      assert_equal 'image/svg+xml', response.headers['Content-Type']
+      assert wf.diagram_exists?
+    end
+  end
+
+  test 'generates diagram from abstract CWL in RO crate' do
+    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
+      wf = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
+      login_as(wf.contributor)
+      refute wf.diagram_exists?
+      assert wf.can_render_diagram?
+
+      VCR.use_cassette('workflows/cwl_viewer_galaxy_workflow_abstract_cwl_diagram') do
+        get :diagram, params: { id: wf.id }
+      end
+
+      assert_response :success
+      assert_equal 'image/svg+xml', response.headers['Content-Type']
+      assert wf.diagram_exists?
+    end
+  end
+
+  test 'does not render diagram if not in RO crate' do
+    wf = Factory(:nf_core_ro_crate_workflow)
+    login_as(wf.contributor)
+    refute wf.diagram_exists?
+    refute wf.can_render_diagram?
+
+    get :diagram, params: { id: wf.id }
+
+    assert_response :not_found
+    refute wf.diagram_exists?
   end
 
   def edit_max_object(workflow)

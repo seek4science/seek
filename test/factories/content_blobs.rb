@@ -344,3 +344,33 @@ Factory.define(:blank_cwl_content_blob, parent: :blank_content_blob) do |f|
   f.original_filename 'rp2-to-rp2path.cwl'
   f.content_type 'application/x-yaml'
 end
+
+Factory.define(:existing_galaxy_ro_crate, parent: :content_blob) do |f|
+  f.original_filename '1-PreProcessing.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/1-PreProcessing.crate.zip", 'rb').read }
+end
+
+Factory.define(:generated_galaxy_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'new-workflow.basic.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/workflow-4-1.crate.zip", 'rb').read }
+end
+
+Factory.define(:generated_galaxy_no_diagram_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'new-workflow.basic.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/workflow-4-1-no-diagram.crate.zip", 'rb').read }
+end
+
+Factory.define(:nf_core_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'ro-crate-nf-core-ampliseq.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/ro-crate-nf-core-ampliseq.crate.zip", 'rb').read }
+end
+
+Factory.define(:just_cwl_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'just-cwl-workflow.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/just-cwl-workflow.crate.zip", 'rb').read }
+end
