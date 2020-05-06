@@ -11,4 +11,8 @@ class Collection < ApplicationRecord
   def self.user_creatable?
     Seek::Config.collections_enabled
   end
+
+  def assets
+    items.map(&:asset)
+  end
 end
