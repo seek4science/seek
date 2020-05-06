@@ -1,4 +1,6 @@
 class HomesController < ApplicationController
+  helper HumanDiseasesHelper
+
   before_action :redirect_to_sign_up_when_no_user
   before_action :login_required, only: %i[feedback send_feedback]
 
@@ -6,7 +8,6 @@ class HomesController < ApplicationController
 
   def index
     respond_with do |format|
-      @dataframe = get_human_diseases_plot_data()
       format.html
     end
   end
@@ -66,38 +67,6 @@ class HomesController < ApplicationController
   def seek_intro_demo
     respond_to do |format|
       format.html
-    end
-  end
-
-  private
-
-  RECENT_SIZE = 3
-
-  def classify_for_tabs(result_collection)
-    # FIXME: this is duplicated in application_helper - but of course you can't call that from within controller
-    results = {}
-
-    result_collection.each do |res|
-      results[res.class.name] = [] unless results[res.class.name]
-      results[res.class.name] << res
-    end
-
-    results
-  end
-
-  def get_human_diseases_plot_data()
-    Rails.cache.fetch('human_diseases_plot_data', expires_in: 12.hours) do
-      HumanDisease.all.order(:id).map do |c|
-        {
-          id:           c.id.to_s,
-          title:        c.title,
-          parent:       c.parents.first ? c.parents.first.id.to_s : '',
-          projects:     c.projects.count,
-          assays:       c.assays.count,
-          publications: c.publications.count,
-          models:       c.models.count,
-        }
-      end
     end
   end
 end

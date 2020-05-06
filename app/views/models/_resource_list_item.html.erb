@@ -16,9 +16,11 @@
     <% if Seek::Config.human_diseases_enabled %>
       <%= list_item_optional_attribute "Human Disease", resource.human_disease.try(:title), resource.human_disease %>
     <% end %>
-    <%= list_item_authorized_list resource.investigations, t('investigation').pluralize, true, 50, true %>
-    <%= list_item_authorized_list resource.studies, t('study').pluralize, true, 50, true %>
-    <%= list_item_authorized_list resource.assays, t('assays.modelling_analysis').pluralize, true, 50, true %>
+    <% if Seek::Config.isa_enabled %>
+      <%= list_item_authorized_list resource.investigations, t('investigation').pluralize, true, 50, true %>
+      <%= list_item_authorized_list resource.studies, t('study').pluralize, true, 50, true %>
+      <%= list_item_authorized_list resource.assays, t('assay').pluralize, true, 50, true %>
+    <% end %>
   </div>
 </div>
 

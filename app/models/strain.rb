@@ -15,6 +15,11 @@ class Strain < ApplicationRecord
   grouped_pagination
 
   belongs_to :organism
+  has_filter organism: Seek::Filtering::Filter.new(
+      value_field: 'organisms.id',
+      label_field: 'organisms.title',
+      includes: [:organism]
+  )
 
   has_many :assay_organisms
   has_many :assays,:through=>:assay_organisms
@@ -29,8 +34,6 @@ class Strain < ApplicationRecord
 
   validates_presence_of :title, :organism
   validates_presence_of :projects, :unless => Proc.new{|strain| strain.is_dummy? || Seek::Config.is_virtualliver}
-
-  scope :default_order, -> { order("title") }
 
   alias_attribute :description, :comment
 
@@ -101,7 +104,10 @@ class Strain < ApplicationRecord
   end
 
   def related_people
-    [contributor]
+    Person.where(id: related_person_ids)
   end
 
+  def related_person_ids
+    contributor_id
+  end
 end

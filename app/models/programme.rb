@@ -22,6 +22,13 @@ class Programme < ApplicationRecord
   has_many :institutions, -> { distinct }, through: :work_groups
   has_many :admin_defined_role_programmes, dependent: :destroy
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
+  has_many :organisms, -> { distinct }, through: :projects
+  has_many :investigations, -> { distinct }, through: :projects
+  has_many :studies, -> { distinct }, through: :investigations
+  has_many :assays, -> { distinct }, through: :studies
+  %i[data_files documents models sops presentations events publications workflows nodes].each do |type|
+    has_many type, -> { distinct }, through: :projects
+  end
   accepts_nested_attributes_for :projects
 
   # validations
@@ -35,34 +42,17 @@ class Programme < ApplicationRecord
   before_create :activate_on_create
 
   # scopes
-  scope :default_order, -> { order('title') }
   scope :activated, -> { where(is_activated: true) }
   scope :not_activated, -> { where(is_activated: false) }
   scope :rejected, -> { where('is_activated = ? AND activation_rejection_reason IS NOT NULL', false) }
 
   has_annotation_type :funding_code
-
-  def investigations(include_clause = :investigations)
-    projects.includes(include_clause).collect(&:investigations).flatten.uniq
-  end
-
-  def studies(include_clause = { investigations: :studies })
-    investigations(include_clause).collect(&:studies).flatten.uniq
-  end
-
-  def assays(include_clause = { investigations: { studies: :assays } })
-    studies(include_clause).collect(&:assays).flatten.uniq
-  end
-
-  %i[data_files documents models sops presentations events publications].each do |type|
-    define_method(type) do
-      projects.includes(type).collect(&type).flatten.uniq
-    end
-  end
-
-  def organisms
-    projects.collect(&:organisms).flatten.uniq
-  end
+  has_many :funding_codes_as_text, through: :funding_code_annotations, source: :value, source_type: 'TextValue'
+  has_filter funding_code: Seek::Filtering::Filter.new(
+      value_field: 'text_values.id',
+      label_field: 'text_values.text',
+      joins: [:funding_codes_as_text]
+  )
 
   def human_diseases
     projects.collect(&:human_diseases).flatten.uniq

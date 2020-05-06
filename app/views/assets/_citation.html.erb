@@ -1,1 +1,3 @@
-<%= render_citation(doi, style) %>
+<%= content_tag(:div, data: { 'citation-style' => style }) do %>
+  <%= render_citation(doi, style) %>
+<% end %>

@@ -4,10 +4,10 @@ class ProgrammesController < ApplicationController
   include ApiHelper
 
   before_action :programmes_enabled?
-  before_action :login_required, except: [:show, :index, :isa_children]
+  before_action :login_required, except: [:show, :index]
   before_action :find_and_authorize_requested_item, only: [:edit, :update, :destroy, :storage_report]
   before_action :find_requested_item, only: [:show, :admin,:activation_review,:accept_activation,:reject_activation,:reject_activation_confirmation]
-  before_action :find_activated_programmes, only: [:index]
+  before_action :find_assets, only: [:index]
   before_action :is_user_admin_auth, only: [:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation,:awaiting_activation]
   before_action :can_activate?, only: [:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation]
   before_action :inactive_view_allowed?, only: [:show]
@@ -20,6 +20,8 @@ class ProgrammesController < ApplicationController
   include Seek::IsaGraphExtensions
 
   respond_to :html, :json
+
+  api_actions :index, :show, :create, :update, :destroy
 
   def create
     @programme = Programme.new(programme_params)
@@ -38,7 +40,7 @@ class ProgrammesController < ApplicationController
           end
         end
         format.html {respond_with(@programme)}
-        format.json {render json: @programme}
+        format.json {render json: @programme, include: [params[:include]]}
       else
         format.html { render action: 'new' }
         format.json { render json: json_api_errors(@programme), status: :unprocessable_entity }
@@ -52,7 +54,7 @@ class ProgrammesController < ApplicationController
         flash[:notice] = "The #{t('programme').capitalize} was successfully updated"
         format.html { redirect_to(@programme) }
         format.xml { head :ok }
-        format.json { render json: @programme }
+        format.json { render json: @programme, include: [params[:include]] }
       else
         format.html { render action: 'edit' }
         format.xml { render xml: @programme.errors, status: :unprocessable_entity }
@@ -93,8 +95,8 @@ class ProgrammesController < ApplicationController
   def show
     respond_with do |format|
       format.html
-      format.json {render json: @programme}
-      format.rdf { render template: 'rdf/show' }	
+      format.json {render json: @programme, include: [params[:include]]}
+      format.rdf { render template: 'rdf/show' }
     end
   end
 
@@ -138,7 +140,9 @@ class ProgrammesController < ApplicationController
     result
   end
 
-  def find_activated_programmes
+  private
+
+  def fetch_assets
     if User.admin_logged_in?
       @programmes = Programme.all
     elsif User.programme_administrator_logged_in?
@@ -147,8 +151,6 @@ class ProgrammesController < ApplicationController
       @programmes = Programme.activated
     end
   end
-
-  private
 
   def programme_params
     handle_administrators if params[:programme][:administrator_ids] && !(params[:programme][:administrator_ids].is_a? Array)

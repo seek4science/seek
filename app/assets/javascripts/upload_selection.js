@@ -6,6 +6,7 @@ function setup_url_field(examine_url_path,examine_button_id) {
     examine_url_href = examine_url_path;
     $j('#'+examine_button_id).on('click', function(event){
         submit_url_for_examination();
+        return false;
     });
     upload_url_field.on('change', function(event) {
         setTimeout(function(e){
@@ -17,24 +18,24 @@ function setup_url_field(examine_url_path,examine_button_id) {
         update_url_checked_status(false);
     });
 }
+
 function submit_url_for_examination() {
-    disallow_copy_option();
-    $j('#test_url_result')[0].innerHTML="<p class='large_spinner'/>";
-    var data_url = upload_url_field.val();
-    $j.post(examine_url_href, { data_url: data_url }, function(data){} );
-}
-
-function allow_copy_option() {
-    $j("#copy_option").show();
-}
-
-function disallow_copy_option() {
-    $j("#copy_option").hide();
-    $j("#copy_option input").prop("checked",false);
-}
-
-function set_original_filename_for_upload(filename) {
-    $j("#original_filename")[0].value=filename;
+    var el = $j('#test_url_result');
+    el.html('').spinner('add');
+    $j.ajax({
+        url: examine_url_href,
+        method: 'POST',
+        data: { data_url: upload_url_field.val() },
+        dataType: 'html'
+    }).done(function (data) {
+        update_url_checked_status(true);
+        el.html(data);
+    }).fail(function (jqXHR) {
+        update_url_checked_status(false);
+        el.html(jqXHR.responseText);
+    }).always(function () {
+        el.spinner('remove');
+    });
 }
 
 function update_url_checked_status(url_ok) {

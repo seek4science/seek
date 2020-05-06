@@ -17,7 +17,7 @@
 
 <% if Seek::Config.is_virtualliver -%>
     <div class="form-group">
-      <%= f.label "Institution" %>
+      <%= f.label t('institution') %>
       <%= collection_select(:assay, :institution_id, Institution.all, :id, :title, {:include_blank =>"Please Select ..."},{:class=>"form-control"}) %>
     </div>
 <% end -%>
@@ -102,4 +102,4 @@
 
 <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                     select_id: '#assay_study_id',
-                                                                    parents: Study.all_authorized_for(:edit) } %>
+                                                                    parents: Study.authorized_for('edit') } %>

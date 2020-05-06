@@ -9,7 +9,7 @@ function addRemoteFile() {
 
     var remoteFile = {
         dataURL: url_element.value,
-        makeALocalCopy: make_local_copy_element.checked ? "1" : "0",
+        makeALocalCopy: (make_local_copy_element && make_local_copy_element.checked) ? "1" : "0",
         originalFilename:  original_filename_element.value
     };
     remoteFile.text = remoteFile.originalFilename.trim() ? remoteFile.originalFilename : remoteFile.dataURL;

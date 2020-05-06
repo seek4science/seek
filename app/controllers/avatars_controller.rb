@@ -109,7 +109,7 @@ class AvatarsController < ApplicationController
     @avatar.destroy
 
     respond_to do |format|
-      format.html { redirect_to eval("#{owner.class.name.downcase}_avatars_url(#{owner.id})") }
+      format.html { redirect_to polymorphic_path([owner, :avatars]) }
     end
   end
 
@@ -131,7 +131,7 @@ class AvatarsController < ApplicationController
       end
       respond_to do |format|
         flash[:notice] = 'Profile avatar was successfully updated.'
-        format.html { redirect_to eval("#{@avatar_owner_instance.class.name.downcase}_avatars_url(#{@avatar_owner_instance.id})") }
+        format.html { redirect_to polymorphic_path([owner, :avatars]) }
       end
     else
       respond_to do |format|

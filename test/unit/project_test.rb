@@ -149,10 +149,6 @@ class ProjectTest < ActiveSupport::TestCase
     assert !project.has_member?(nil)
   end
 
-  def test_ordered_by_name
-    assert Project.all.sort_by { |p| p.title.downcase } == Project.default_order || Project.all.sort_by(&:title) == Project.default_order
-  end
-
   def test_title_trimmed
     p = Project.new(title: ' test project')
     disable_authorization_checks { p.save! }
@@ -185,7 +181,7 @@ class ProjectTest < ActiveSupport::TestCase
   def test_publications_association
     project = projects(:sysmo_project)
 
-    assert_equal 3, project.publications.count
+    assert_equal 5, project.publications.count
 
     assert project.publications.include?(publications(:one))
     assert project.publications.include?(publications(:pubmed_2))
@@ -486,14 +482,6 @@ class ProjectTest < ActiveSupport::TestCase
     uuid = x.attributes['uuid']
     x.save
     assert_equal x.uuid, uuid
-  end
-
-  test 'Should order Latest list of projects by updated_at' do
-    project1 = Factory(:project, title: 'C', updated_at: 2.days.ago)
-    project2 = Factory(:project, title: 'B', updated_at: 1.days.ago)
-
-    latest_projects = Project.paginate_after_fetch([project1, project2], page: 'latest')
-    assert_equal project2, latest_projects.first
   end
 
   test 'can_delete?' do

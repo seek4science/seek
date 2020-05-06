@@ -1,3 +1,7 @@
+<%
+  dataframe = get_human_diseases_plot_data()
+%>
+
 <div class="row hidden-xs hidden-sm">
   <div class="col-md-12">
     <div class="panel panel-default">
@@ -27,11 +31,11 @@
     <% plots.each do |plot| %>
       {
         type: 'sunburst',
-        ids:       [ <%== @dataframe.map{ |c| '"' + c[:id]     + '"' }.join(', ') %> ],
-        labels:    [ <%== @dataframe.map{ |c| '"' +            + '"' }.join(', ') %> ],
-        parents:   [ <%== @dataframe.map{ |c| '"' + c[:parent] + '"' }.join(', ') %> ],
-        values:    [ <%== @dataframe.map{ |c|       c[plot[:key]]    }.join(', ') %> ],
-        hovertext: [ <%== @dataframe.map{ |c| '"' + c[:title]  + '"' }.join(', ') %> ],
+        ids:       [ <%== dataframe.map{ |c| '"' + c[:id]     + '"' }.join(', ') %> ],
+        labels:    [ <%== dataframe.map{ |c| '"' +            + '"' }.join(', ') %> ],
+        parents:   [ <%== dataframe.map{ |c| '"' + c[:parent] + '"' }.join(', ') %> ],
+        values:    [ <%== dataframe.map{ |c|       c[plot[:key]]    }.join(', ') %> ],
+        hovertext: [ <%== dataframe.map{ |c| '"' + c[:title]  + '"' }.join(', ') %> ],
         outsidetextfont: { size: 20, color: '#377eb8' },
         leaf: { opacity: 1 },
         marker: { line: { width: 2 } },

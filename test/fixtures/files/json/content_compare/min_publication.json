@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "927855014",
+    "id": "980191248",
     "type": "publications",
     "attributes": {
       "policy":
@@ -11,14 +11,30 @@
       "title": "A Minimal Publication",
       "journal": null,
       "published_date": null,
-      "doi": null,
+      "doi": "10.5072/abcd",
       "pubmed_id": null,
       "abstract": null,
       "citation": null,
-      "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/",
+      "editor":	null,
+      "booktitle":	null,
+      "publisher":	null,
+      "link_to_pub": "https://doi.org/10.5072/abcd",
+      "url": null,
+      "publication_type":"Journal",
       "authors": null
     },
     "relationships": {
+      "creators": {
+        "data": []
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "522086294",
+            "type": "people"
+          }
+        ]
+      },
       "people": {
         "data": [
           {
@@ -68,7 +84,7 @@
       "modified": "2017-10-06T09:53:31.000Z",
       "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
       "base_url": "http://localhost:3000",
-      "api_version": "0.2"
+      "api_version": "0.3"
     }
   },
   "jsonapi": {

@@ -2,6 +2,7 @@ class StudiesController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
 
+  before_action :studies_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[edit update destroy manage manage_update show new_object_based_on_existing_one]
 
@@ -12,12 +13,11 @@ class StudiesController < ApplicationController
   before_action :check_assays_are_not_already_associated_with_another_study, only: %i[create update]
 
   include Seek::Publishing::PublishingCommon
-
   include Seek::AnnotationCommon
-
   include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
+
+  api_actions :index, :show, :create, :update, :destroy
 
   def new_object_based_on_existing_one
     @existing_study = Study.find(params[:id])
@@ -53,7 +53,7 @@ class StudiesController < ApplicationController
       if @study.save
         flash[:notice] = "#{t('study')} was successfully updated."
         format.html { redirect_to(@study) }
-        format.json {render json: @study}
+        format.json {render json: @study, include: [params[:include]]}
       else
         format.html { render action: 'edit', status: :unprocessable_entity }
         format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
@@ -68,7 +68,7 @@ class StudiesController < ApplicationController
       format.html
       format.xml
       format.rdf { render template: 'rdf/show' }
-      format.json {render json: @study}
+      format.json {render json: @study, include: [params[:include]]}
     end
   end
 
@@ -81,7 +81,7 @@ class StudiesController < ApplicationController
       respond_to do |format|
         flash[:notice] = "The #{t('study')} was successfully created.<br/>".html_safe
         format.html { redirect_to study_path(@study) }
-        format.json { render json: @study }
+        format.json { render json: @study, include: [params[:include]] }
       end
     else
       respond_to do |format|

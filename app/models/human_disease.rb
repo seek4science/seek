@@ -11,7 +11,9 @@ class HumanDisease < ApplicationRecord
 
   has_many :assay_human_diseases, inverse_of: :human_disease
   has_many :models
+  has_many :model_publications, through: :models, source: :publications
   has_many :assays, through: :assay_human_diseases, inverse_of: :human_diseases
+  has_many :assay_publications, through: :assays, source: :publications
 
   has_and_belongs_to_many :projects
   has_and_belongs_to_many :publications
@@ -108,7 +110,7 @@ class HumanDisease < ApplicationRecord
     end
   end
 
-  def node(selected = nil, ignore_count = false)
+  def to_node(selected = nil, ignore_count = false)
     ids = projects.pluck(:id).map { |x| 'proj_' + x.to_s } +
       assays.pluck(:id).map { |x| 'ass_' + x.to_s } +
       models.pluck(:id).map { |x| 'mod_' + x.to_s } +
@@ -116,7 +118,7 @@ class HumanDisease < ApplicationRecord
     child_nodes = []
 
     children.each do |child|
-      if node = child.node(selected, ignore_count)
+      if node = child.to_node(selected, ignore_count)
         child_nodes.push node
         ids.concat node[:a_attr][:ids]
       end
@@ -133,6 +135,14 @@ class HumanDisease < ApplicationRecord
         state: { selected: selected == self, opened: selected == self }
       }
     end
+  end
+
+  def get_transitive_related(type)
+    related = get_related(type)
+    children.each do |child|
+      related += child.get_transitive_related(type)
+    end
+    related.uniq
   end
 
   private

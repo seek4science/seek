@@ -22,8 +22,6 @@ class Model < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
-  scope :default_order, -> { order("title") }
-
   include Seek::Models::ModelExtraction
 
   before_save :check_for_sbml_format
@@ -40,9 +38,26 @@ class Model < ApplicationRecord
   belongs_to :model_type
   belongs_to :model_format
 
-  explicit_versioning(:version_column => "version") do
+  has_filter organism: Seek::Filtering::Filter.new(
+      value_field: 'organisms.id',
+      label_field: 'organisms.title',
+      includes: [:organism]
+  )
+
+  has_filter  :model_type, :model_format, :recommended_environment
+  has_filter modelling_analysis_type: Seek::Filtering::Filter.new(
+      value_field: 'assays.assay_type_uri',
+      label_mapping: ->(values) {
+        values.map do |value|
+          Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[value]&.label
+        end
+      },
+      joins: [:assays]
+  )
+
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     include Seek::Models::ModelExtraction
-    acts_as_doi_mintable(proxy: :parent)
+    acts_as_doi_mintable(proxy: :parent, general_type: 'Model')
     acts_as_versioned_resource
     acts_as_favouritable
 
@@ -99,5 +114,5 @@ class Model < ApplicationRecord
   def check_for_sbml_format
     self.model_format = self.model_format
   end
-  
+
 end

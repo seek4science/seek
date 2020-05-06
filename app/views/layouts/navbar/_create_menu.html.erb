@@ -22,10 +22,12 @@
     <% end %>
 
     <% if can_create_new_items? %>
-        <li role="presentation" class="dropdown-header"><%= t("menu.isa") -%></li>
-        <li><%= link_to t("investigation"), new_investigation_path %></li>
-        <li><%= link_to t("study"), new_study_path %></li>
-        <li><%= link_to t("assays.assay"), new_assay_path %></li>
+        <% if Seek::Config.isa_enabled %>
+          <li role="presentation" class="dropdown-header"><%= t("menu.isa") -%></li>
+          <li><%= link_to t("investigation"), new_investigation_path %></li>
+          <li><%= link_to t("study"), new_study_path %></li>
+          <li><%= link_to t("assays.assay"), new_assay_path %></li>
+        <% end %>
 
         <li role="presentation" class="dropdown-header"><%= t("menu.assets") -%></li>
         <li><%= link_to t("data_file"), new_data_file_path %></li>
@@ -35,17 +37,24 @@
         <li><%= link_to t("sop"), new_sop_path %></li>
         <% if Seek::Config.workflows_enabled %>
           <li><%= link_to t("workflow"), new_workflow_path %></li>
-          <li><%= link_to t("node"), new_node_path %></li>
+          <% if false %>
+            <li><%= link_to t("node"), new_node_path %></li>
+          <% end %>
         <% end %>
-        <li><%= link_to t("publication"), new_publication_path %></li>
-        <li><%= link_to t("document"), new_document_path %></li>
+        <% if Seek::Config.publications_enabled %>
+          <li><%= link_to t("publication"), new_publication_path %></li>
+        <% end %>
+        <% if Seek::Config.documents_enabled %>
+          <li><%= link_to t("document"), new_document_path %></li>
+        <% end %>
 
-        <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
+      <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
         <li><%= link_to t("presentation"), new_presentation_path %></li>
         <% if Seek::Config.events_enabled %>
             <li><%= link_to t("event"), new_event_path %></li>
         <% end %>
 
+      <% if Seek::Config.samples_enabled || Seek::Config.organisms_enabled %>
         <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
         <% if Sample.can_create? %>
             <li><%= link_to(t("sample"), select_sample_types_path) %></li>
@@ -53,22 +62,18 @@
         <% if SampleType.can_create? %>
             <li><%= link_to(t("sample_type"), new_sample_type_path) %></li>
         <% end %>
-        <li><%= link_to(t("strain"), new_strain_path) %></li>
-        <% if can_create_organisms? %>
-            <li><%= link_to t("organism"), new_organism_path %></li>
+        <% if Seek::Config.organisms_enabled && can_create_organisms? %>
+          <li><%= link_to(t("strain"), new_strain_path) %></li>
+          <li><%= link_to t("organism"), new_organism_path %></li>
         <% end %>
+      <% end %>
 
-        <% if can_create_human_diseases? %>
-            <li role="presentation" class="dropdown-header"><%= t("menu.vocabularies") -%></li>
-            <li><%= link_to t("human_disease"), new_human_disease_path %></li>
-        <% end %>
+      <% if can_create_human_diseases? %>
+        <li role="presentation" class="dropdown-header"><%= t("menu.vocabularies") -%></li>
+        <li><%= link_to t("human_disease"), new_human_disease_path %></li>
+      <% end %>
     <% else %>
         <li role="presentation" class="dropdown-header"><span style="color:red">You cannot add assets or other items until you are a member of a <%= t('project') %>.</span></li>
     <% end %>
-
-
-
-
   </ul>
-
 </li>

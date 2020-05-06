@@ -9,15 +9,37 @@ require 'csv'
 namespace :seek do
   desc 'Creates background jobs to rebuild all authorization lookup table for all items.'
   task(repopulate_auth_lookup_tables: :environment) do
+    puts "..... repopulating auth lookup tables ..."
     Seek::Util.authorized_types.each do |type|
       type.remove_invalid_auth_lookup_entries
       type.find_each do |item|
-        AuthLookupUpdateQueue.create(item: item, priority: 1) unless AuthLookupUpdateQueue.exists?(item)
+        AuthLookupUpdateQueue.create(item: item, priority: 1) # Duplicates will be caught by uniqueness check
       end
     end
     # 5 is an arbitrary number to take advantage of there being more than 1 worker dedicated to auth refresh
     5.times { AuthLookupUpdateJob.new.queue_job(1, 5.seconds.from_now) }
   end
+
+  desc 'Rebuild all authorization lookup table for all items.'
+  task(repopulate_auth_lookup_tables_sync: :environment) do
+    item_count = 0
+    start_time = Time.now
+    puts "Users: #{User.count}"
+    Seek::Util.authorized_types.each do |type|
+      puts "#{type.name} (#{type.count}):"
+      ActiveRecord::Base.connection.execute("delete from #{type.lookup_table_name}")
+      type.find_each do |item|
+        item.update_lookup_table_for_all_users
+        print '.'
+        item_count += 1
+      end
+      puts
+    end
+    seconds = Time.now - start_time
+    items_per_second = item_count.to_f / seconds.to_f
+    puts "Done - #{seconds}s elapsed (#{items_per_second} items per second)"
+  end
+
 
   desc 'Rebuilds all authorization tables for a given user - you are prompted for a user id'
   task(repopulate_auth_lookup_for_user: :environment) do
@@ -52,6 +74,7 @@ namespace :seek do
 
   desc('clears temporary files from filestore/tmp')
   task(clear_filestore_tmp: :environment) do
+    puts "..... clearing the filestore tmp directory ..."
     FileUtils.rm_r(Dir["#{Seek::Config.temporary_filestore_path}/*"])
   end
 

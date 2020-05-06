@@ -4,6 +4,10 @@ en:
   search_prompt: "Search here..."
   seek_id: "SEEK ID"
 
+  login:
+    elixir_aai: 'ELIXIR AAI'
+    ldap: 'LDAP'
+
   investigation: "Investigation"
   study: "Study"
   assay: "Assay"
@@ -20,6 +24,10 @@ en:
   workflow: "Workflow"
   workflows:
     workflow: "Workflow"
+    cwl_workflow: "CWL workflow"
+    galaxy_workflow: "Galaxy workflow"
+    knime_workflow: "KNIME workflow"
+    ro_workflow: "Research Object workflow"
   node: "Workflow Node"
   nodes:
     node: "Workflow Node"
@@ -68,7 +76,7 @@ en:
 
   actions_button: "Actions"
   submit_button:
-    upload: 'Upload and Save'
+    upload: 'Register'
     create: 'Create'
     update: 'Update'
 
@@ -103,3 +111,7 @@ en:
       attributes:
         person:
           title: "Full name"
+
+  oauth_session: 'OAuth Session'
+  identity: 'Identity'
+  api_token: 'API token'

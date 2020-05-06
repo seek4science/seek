@@ -28,6 +28,7 @@ class ApplicationController < ActionController::Base
 
   before_action :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
 
+  before_action :check_doorkeeper_scopes, if: :doorkeeper_token
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
   before_action :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
 
@@ -82,20 +83,14 @@ class ApplicationController < ActionController::Base
       end
     end
     @version ||= @default
-    puts "api version: ", @version
   end
 
   def is_current_user_auth
-    begin
-      @user = User.where(['id = ?', current_user.try(:id)]).find(params[:id])
-    rescue ActiveRecord::RecordNotFound
-      error('User not found (id not authorized)', 'is invalid (not owner)')
-      return false
-    end
-
-    unless @user
+    if current_user.nil? || params[:id].to_s != current_user.id.to_s
       error('User not found (or not authorized)', 'is invalid (not owner)')
-      return false
+      false
+    else
+      @user = current_user
     end
   end
 
@@ -121,12 +116,31 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
+
+  def page_and_sort_params
+    permitted = Seek::Filterer.new(controller_model).available_filter_keys.flat_map { |p| [p, { p => [] }] }
+    permitted_filter_params = { filter: permitted }
+    params.permit(:page, :sort, :order, permitted_filter_params)
+  end
+
+  helper_method :page_and_sort_params
+
+  def controller_model
+    @controller_model ||= controller_name.classify.constantize
+  end
+
+  helper_method :controller_model
+
+  def self.api_actions(*actions)
+    @api_actions ||= (superclass.respond_to?(:api_actions) ? superclass.api_actions.dup : []) + actions.map(&:to_sym)
+  end
+
   private
 
   # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
   def determine_asset_from_controller
     name = controller_name.singularize
-    eval("@#{name}")
+    instance_variable_get("@#{name}")
   end
 
   def restrict_guest_user
@@ -135,8 +149,6 @@ class ApplicationController < ActionController::Base
       redirect_back fallback_location: main_app.root_path
     end
   end
-
-  private
 
   def project_membership_required
     unless User.logged_in_and_member? || admin_logged_in?
@@ -149,7 +161,7 @@ class ApplicationController < ActionController::Base
           else
             path = nil
             begin
-              path = eval("main_app.#{controller_name}_path")
+              path = main_app.polymorphic_path(controller_name)
             rescue NoMethodError => e
               logger.error("No path found for controller - #{controller_name}")
               path = main_app.root_path
@@ -212,10 +224,10 @@ class ApplicationController < ActionController::Base
         format.json { render json: { errors: [{ title: 'Not found',
                                                 detail: "Couldn't find #{name.camelize} with 'id'=[#{params[:id]}]" }] },
                              status: :not_found }
-        format.html { redirect_to eval "#{controller_name}_path" }
+        format.html { redirect_to polymorphic_path(controller_name) }
       end
     else
-      eval "@#{name} = object"
+      instance_variable_set("@#{name}", object)
     end
   end
 
@@ -226,10 +238,10 @@ class ApplicationController < ActionController::Base
 
     return if privilege.nil?
 
-    object = controller_name.classify.constantize.find(params[:id])
+    object = controller_model.find(params[:id])
 
     if is_auth?(object, privilege)
-      eval "@#{name} = object"
+      instance_variable_set("@#{name}", object)
       params.delete :policy_attributes unless object.can_manage?(current_user)
     else
       respond_to do |format|
@@ -241,7 +253,7 @@ class ApplicationController < ActionController::Base
             else
               flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}."
             end
-            redirect_to(eval("#{controller_name.singularize}_path(#{object.id})"))
+            redirect_to(object)
           else
             render template: 'general/landing_page_for_hidden_item', locals: { item: object }, status: :forbidden
           end
@@ -257,7 +269,7 @@ class ApplicationController < ActionController::Base
   end
 
   def auth_to_create
-    unless controller_name.classify.constantize.can_create?
+    unless controller_model.can_create?
       error('You do not have permission', 'No permission')
       return false
     end
@@ -399,9 +411,7 @@ class ApplicationController < ActionController::Base
 
   # determines and returns the object related to controller, e.g. @data_file
   def object_for_request
-    c = controller_name.downcase
-
-    eval('@' + c.singularize)
+    instance_variable_get("@#{controller_name.singularize}")
   end
 
   def expire_activity_fragment_cache(controller, action)
@@ -434,54 +444,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # Strips any unexpected filter, which protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
-  def permitted_filters(filters)
-    # placed this in a separate method so that other controllers could override it if necessary
-    permitted = Seek::Util.persistent_classes.select { |c| c.respond_to? :find_by_id }.map { |c| c.name.underscore }
-    filters.permit(*permitted)
-  end
-
-  def apply_filters(resources)
-    filters = params[:filter] || ActionController::Parameters.new
-
-    # translate params that are send as an _id, like project_id=12 - which will usually be a consequence of nested routing
-    params.keys.each do |key|
-      filters[key.gsub('_id', '')] = params[key] if key.end_with?('_id')
-    end
-
-    filters = permitted_filters(filters).to_unsafe_h
-    @filters = filters
-
-    if filters.size > 0
-      params[:page] ||= 'all'
-      params[:filtered] = true
-      resources.select do |res|
-        filters.all? do |filter, value|
-          filter = filter.to_s
-          klass = filter.camelize.constantize
-          value = klass.find value.to_i
-
-          detect_for_filter(filter, res, value)
-        end
-      end
-    else
-      resources
-    end
-  end
-
-  def detect_for_filter(filter, resource, value)
-    case
-      when resource.respond_to?(filter.pluralize)
-        resource.send(filter.pluralize).include? value
-      when resource.respond_to?("related_#{filter.pluralize}")
-        resource.send("related_#{filter.pluralize}").include?(value)
-      when resource.respond_to?(filter)
-        resource.send(filter) == value
-      else
-        false
-    end
-  end
-
   # checks if a captcha has been filled out correctly, if enabled, and returns false if not
   def check_captcha
     if Seek::Config.recaptcha_setup?
@@ -495,8 +457,6 @@ class ApplicationController < ActionController::Base
     super
     payload[:user_agent] = request.user_agent
   end
-
-
 
   def redirect_to_sign_up_when_no_user
     redirect_to signup_path if User.count == 0
@@ -558,7 +518,7 @@ class ApplicationController < ActionController::Base
   # filter that responds with :not_acceptable if request rdf for non rdf capable resource
   def rdf_enabled?
     return unless request.format.rdf?
-    unless Seek::Util.rdf_capable_types.include?(controller_name.classify.constantize)
+    unless Seek::Util.rdf_capable_types.include?(controller_model)
       respond_to do |format|
         format.rdf { render plain: 'This resource does not support RDF', status: :not_acceptable, content_type: 'text/plain' }
       end
@@ -587,5 +547,20 @@ class ApplicationController < ActionController::Base
 
   def param_converter_options
     {}
+  end
+
+  def check_doorkeeper_scopes
+    if self.class.api_actions.include?(action_name.to_sym)
+      privilege = Seek::Permissions::Translator.translate(action_name)
+      scopes = [:view, :download].include?(privilege) ? [:read, :write] : [:write]
+      doorkeeper_authorize!(*scopes)
+    else
+      respond_to do |format|
+        format.html { render plain: 'This action is not permitted for API clients using OAuth.', status: :forbidden }
+        format.json { render json: {
+            errors: [{ title: 'Forbidden',
+                       details: 'This action is not permitted for API clients using OAuth.' }] }, status: :forbidden }
+      end
+    end
   end
 end

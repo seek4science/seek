@@ -40,7 +40,7 @@ class StrainsController < ApplicationController
         flash[:notice] = 'Strain was successfully created.'
         format.html { redirect_to(@strain) }
         format.xml { render xml: @strain, status: :created, location: @strain }
-        format.json {render json: @strain, status: :created, location: @strain}
+        format.json {render json: @strain, status: :created, location: @strain, include: [params[:include]]}
 
       end
 
@@ -85,7 +85,7 @@ class StrainsController < ApplicationController
         flash[:notice] = 'Strain was successfully updated.'
         format.html { redirect_to(@strain) }
         format.xml { render xml: @strain, status: :created, location: @strain }
-        format.json {render json: @strain}
+        format.json {render json: @strain, include: [params[:include]]}
       end
 
     else

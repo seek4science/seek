@@ -56,4 +56,3 @@
 //= require chartjs
 //= require lightbox2
 //= require_tree ./templates
-//= require select2

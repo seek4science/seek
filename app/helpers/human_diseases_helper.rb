@@ -43,54 +43,26 @@ module HumanDiseasesHelper
   end
 
   # Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
-  def get_related_transitive_resources(resource, limit = nil)
+  def get_transitive_related_resources(resource, limit = nil)
     return resource_hash_lazy_transitive_load(resource) if Seek::Config.tabs_lazy_load_enabled
 
-    related = collect_related_transitive_items(resource)
+    items_hash = {}
+    resource.class.related_type_methods.each_key do |type|
+      puts type.inspect
+      next if type == 'Organism' && !resource.is_a?(Sample)
+      enabled_method = "#{type.pluralize.underscore}_enabled"
+      next if Seek::Config.respond_to?(enabled_method) && !Seek::Config.send(enabled_method)
 
-    # Authorize
-    authorize_related_items(related)
-
-    Seek::ListSorter.related_items(related)
-
-    # Limit items viewable, and put the excess count in extra_count
-    related.each_key do |key|
-      if limit && related[key][:items].size > limit && %w[Project Investigation Study Assay Person Publication Specimen Sample Snapshot].include?(resource.class.name)
-        related[key][:extra_count] = related[key][:items].size - limit
-        related[key][:items] = related[key][:items][0...limit]
-      end
+      items_hash[type] = resource.get_transitive_related(type)
+      items_hash[type] = items_hash[type].uniq
     end
 
-    related
+    related_items_hash(items_hash, limit)
   end
 
-  def collect_related_transitive_items(resource)
-    related = relatable_types
-    related.delete('HumanDisease')
-
-    answerable = {}
-    related.each_key do |type|
-      related[type][:items] = related_transitive_items_method(resource, type)
-      related[type][:hidden_items] = []
-      related[type][:hidden_count] = 0
-      related[type][:extra_count] = 0
-      answerable[type] = !related[type][:items].nil?
-    end
-    related
-  end
-
-  def related_transitive_items_method(resource, item_type)
-    related = related_items_method(resource, item_type)
-
-    resource.children.each do |child|
-      related = related + related_transitive_items_method(child, item_type)
-    end
-    related.uniq
-  end
-
-  def resource_hash_lazy_transitive_load(resource)
+  def resource_hash_lazy_transitive_load(resource, limit = nil)
     resource_hash = {}
-    all_related_items_hash = collect_related_transitive_items(resource)
+    all_related_items_hash = get_transitive_related_resources(resource)
     all_related_items_hash.each_key do |resource_type|
       all_related_items_hash[resource_type][:items] = all_related_items_hash[resource_type][:items].uniq.compact
       unless all_related_items_hash[resource_type][:items].empty?
@@ -98,5 +70,21 @@ module HumanDiseasesHelper
       end
     end
     resource_hash
+  end
+
+  def get_human_diseases_plot_data()
+    Rails.cache.fetch('human_diseases_plot_data', expires_in: 12.hours) do
+      HumanDisease.all.order(:id).map do |c|
+        {
+          id:           c.id.to_s,
+          title:        c.title,
+          parent:       c.parents.first ? c.parents.first.id.to_s : '',
+          projects:     c.projects.count,
+          assays:       c.assays.count,
+          publications: c.publications.count,
+          models:       c.models.count,
+        }
+      end
+    end
   end
 end

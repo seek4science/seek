@@ -153,7 +153,9 @@ module AssetsHelper
   # if projects is provided, only authorizes the assets for that project
   # assets are sorted by title except if they are projects and scales (because of hierarchies)
   def authorised_assets(asset_class, projects = nil, action = 'view')
-    assets = asset_class.all_authorized_for action, User.current_user, projects
+    assets = asset_class
+    assets = assets.filter_by_projects(projects) if projects
+    assets = assets.authorized_for(action, User.current_user).to_a
     assets = assets.sort_by(&:title) if !assets.blank? && !%w[Project Scale].include?(assets.first.class.name)
     assets
   end
@@ -251,5 +253,15 @@ module AssetsHelper
       elements << yield(text,path)
     end
     elements
+  end
+
+  # whether the viewable content is available, or converted to pdf, or capable to be converted to pdf
+  def view_content_available?(content_blob)
+    return true if content_blob.is_text? || content_blob.is_pdf? || content_blob.is_cwl? || content_blob.is_image?
+    if content_blob.is_pdf_viewable?
+      content_blob.file_exists?('pdf') || Seek::Config.soffice_available?
+    else
+      false
+    end
   end
 end

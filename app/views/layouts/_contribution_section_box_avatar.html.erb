@@ -7,7 +7,7 @@
   </div>
 
   <% if object && object.respond_to?(:can_edit?) && object.can_edit?(current_user) -%>
-    <%= image_tag_for_key('avatars', all_avatars_link(object), nil, { class: 'btn btn-default btn-xs' }, 'Change picture') %>
+    <%= image_tag_for_key('avatars', polymorphic_path([object, :avatars]), nil, { class: 'btn btn-default btn-xs' }, 'Change picture') %>
   <% end %>
 
   <% if object.instance_of?(Person) -%>

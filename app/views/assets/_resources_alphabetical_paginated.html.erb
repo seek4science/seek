@@ -1,9 +1,5 @@
 <% objects = resources_alphabetical_paginated %>
 
-<%
-   visible_total,full_total=resource_count_stats
-%>
-
 <% if objects.public_methods.include?(:page_totals) %>
     <!-- only do the page links if the collection supports it -->
     <%= render :partial => "general/paginate_alphabetical", :locals => {:pages => objects.pages, :page_totals => objects.page_totals, :current_page => objects.page} -%>
@@ -14,6 +10,6 @@
 </div>
 
 
-<% if objects.respond_to?(:page) && objects.page == "latest" && visible_total > Seek::Config.limit_latest %>
-    <%= render :partial => "general/paginate_see_all", :locals => {:visible_total => visible_total} %>
+<% if objects.respond_to?(:page) && objects.page == "top" && @visible_count > @per_page %>
+    <%= render :partial => "general/paginate_see_all", :locals => {:visible_total => @visible_count} %>
 <% end %>

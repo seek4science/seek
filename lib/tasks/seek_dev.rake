@@ -9,7 +9,7 @@ include SysMODB::SpreadsheetExtractor
 
 namespace :seek_dev do
   task(check_auth_lookup: :environment) do
-    output = StringIO.new('')
+    output = STDOUT
     Seek::Util.authorized_types.each do |type|
       puts "Checking #{type.name.pluralize}"
       puts
@@ -19,7 +19,7 @@ namespace :seek_dev do
         users.each do |user|
           user_id = user.nil? ? 0 : user.id
           %w[view edit download manage delete].each do |action|
-            lookup = type.lookup_for_asset(action, user_id, item.id)
+            lookup = item.lookup_for(action, user_id)
             actual = item.authorized_for_action(user, action)
             next if lookup == actual
             output.puts "  #{type.name} #{item.id} - User #{user_id}"
@@ -60,6 +60,30 @@ namespace :seek_dev do
     puts 'Done'
   end
 
+  task(benchmark_auth_lookup: :environment) do
+    start_time = Time.now
+    puts "Benchmarking!"
+    puts "Auth lookup enabled: #{Seek::Config.auth_lookup_enabled}"
+    u = User.first
+    u2 = User.last
+    Seek::Util.authorized_types.each do |type|
+      puts "#{type.name} (#{type.count}):"
+      b = Benchmark.measure do
+        puts "\tAnon view: #{Benchmark.measure { 100.times { type.authorized_for('view') } } }"
+        puts "\tAnon edit: #{Benchmark.measure { 100.times { type.authorized_for('edit') } } }"
+        puts "\tUser edit: #{Benchmark.measure { 100.times { type.authorized_for('edit', u) } } }"
+        puts "\tUser view: #{Benchmark.measure { 100.times { type.authorized_for('view', u2) } } }"
+        puts "\tUser manage: #{Benchmark.measure { 100.times { type.authorized_for('manage', u2) } } }"
+        puts "\tUser delete: #{Benchmark.measure { 100.times { type.authorized_for('delete', u) } } }"
+      end
+      puts "Total #{b}"
+      puts
+    end
+
+    seconds = Time.now - start_time
+    puts "Done - #{seconds}s elapsed"
+  end
+
   task(initial_membership: :environment) do
     p = Person.first
     raise Exception, 'Need to register a person first' if p.nil? || p.user.nil?
@@ -88,6 +112,72 @@ namespace :seek_dev do
         puts "#{asset.title} - #{asset.id}" if asset.can_view?
       end
     end
+  end
+
+  task :add_covid_map_people, [:path, :project_id, :admin_user_id] => :environment do |_t, args|
+    path = args.path
+    project_id = args.project_id
+    admin_user = args.admin_user_id
+    user = User.find(admin_user)
+    project = Project.find(project_id)
+    raise "Wrong project" unless project.title == "COVID-19 Disease Map" #sanity check
+
+    puts "Using CSV at #{path}"
+    errors = []
+    added = 0
+    associated = 0
+    CSV.foreach(path) do |row|
+      name = row[0]&.strip
+      email = row[1]&.strip
+      institution_id = row[2].strip
+      expertise = row[3]
+      first, last = name.split(' ',2)
+
+      puts "Processing #{name}"
+
+      User.with_current_user(user) do
+        if (RFC822::EMAIL =~ email) && first
+          person = Person.where(email:email).first
+          unless person
+            puts "creating profile for #{name}"
+            person = Person.new(first_name: first,last_name: last,email: email)
+            person.expertise = expertise if expertise
+            if person.valid?
+              person.save!
+              added +=1
+            else
+              person = nil
+              errors << ["person invalid", row]
+            end
+          end
+          unless person.nil? || person.member_of?(project)
+            institution = Institution.find_by_id(institution_id)
+            if institution
+              puts "adding #{name} to #{institution.title}"
+              person.add_to_project_and_institution(project, institution)
+              person.save!
+              associated+=1
+            else
+              errors << ["institution not found",row]
+            end
+          else
+            if person
+              puts "#{name} already in project"
+            end
+          end
+        else
+          errors << ["bad email or no first name",row]
+        end
+      end
+    end
+    puts "Errors:" unless errors.empty?
+    errors.each do |error|
+      puts error[0]
+      puts error[1].inspect
+      puts "---------------"
+    end
+    puts "#{added} people added"
+    puts "#{associated} linked to project"
   end
 
   task :add_people_from_spreadsheet, [:path] => :environment do |_t, args|
@@ -169,5 +259,23 @@ namespace :seek_dev do
         bar.increment!
       end
     end
+  end
+
+  task find_duplicate_users_by_name_match: :environment do
+    File.delete("./log/duplicate_users.log") if File.exist?("./log/duplicate_users.log")
+    output = File.open( "./log/duplicate_users.log","w" )
+    duplicated_users = Person.select(:first_name,:last_name).group(:first_name,:last_name).having("count(*)>1")
+    #pp duplicated_users
+      duplicated_users.each do |duplicated_user|
+        matches = Person.where(first_name: duplicated_user.first_name, last_name: duplicated_user.last_name)
+        puts duplicated_user.first_name+" "+duplicated_user.last_name+"("+matches.size.to_s+")"
+        output << duplicated_user.first_name+" "+duplicated_user.last_name+"("+matches.size.to_s+")"+"\n"
+        matches.each do |match|
+          puts "ID "+ match.id.to_s+":"+ match.email
+          output << "ID "+ match.id.to_s+":"+ match.email+"\n"
+        end
+        output << "\n"
+      end
+    output.close
   end
 end

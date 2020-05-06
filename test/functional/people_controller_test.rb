@@ -283,7 +283,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'finding by role' do
     p1 = Factory(:pal)
     p2 = Factory(:person)
-    get :index, params: { project_position_id: ProjectPosition.pal_position.id }
+    get :index, params: { filter: { project_position: ProjectPosition.pal_position.id } }
     assert_response :success
     assert assigns(:people)
     assert assigns(:people).include?(p1)
@@ -397,8 +397,10 @@ class PeopleControllerTest < ActionController::TestCase
     6.times do
       Factory(:asset_housekeeper)
     end
-    get :index
-    asset_housekeeper_number = assigns(:people).count(&:is_asset_housekeeper_of_any_project?)
+
+    get :index, params: { page: 'all' }
+
+    asset_housekeeper_number = assigns(:people).select(&:is_asset_housekeeper_of_any_project?).count
     assert_select 'img[src*=?]', role_image(:asset_housekeeper), count: asset_housekeeper_number
   end
 
@@ -413,9 +415,9 @@ class PeopleControllerTest < ActionController::TestCase
       Factory(:project_administrator)
     end
 
-    get :index
+    get :index, params: { page: 'all' }
 
-    project_administrator_count = assigns(:people).count(&:is_project_administrator_of_any_project?)
+    project_administrator_count = assigns(:people).select(&:is_project_administrator_of_any_project?).count
     assert_select 'img[src*=?]', role_image(:project_administrator), count: project_administrator_count
   end
 
@@ -582,8 +584,10 @@ class PeopleControllerTest < ActionController::TestCase
     6.times do
       Factory(:asset_gatekeeper)
     end
-    get :index
-    gatekeeper_number = assigns(:people).count(&:is_asset_gatekeeper_of_any_project?)
+
+    get :index, params: { page: 'all' }
+
+    gatekeeper_number = assigns(:people).select(&:is_asset_gatekeeper_of_any_project?).count
     assert_select 'img[src*=?]', role_image(:asset_gatekeeper), count: gatekeeper_number
   end
 
@@ -671,26 +675,58 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test 'should update page limit_latest when changing the setting from admin' do
-    assert_equal 'latest', Seek::Config.default_pages[:people]
-    assert_not_equal 5, Seek::Config.limit_latest
+  test 'should update pagination when changing the relevant settings' do
+    assert_not_equal 5, Seek::Config.results_per_page_for('people')
+    assert_not_equal :created_at_asc, Seek::Config.sorting_for('people')
 
-    Seek::Config.limit_latest = 5
-    get :index
-    assert_response :success
-    assert_select '.pagination li.active' do
-      assert_select 'a[href=?]', people_path(page: 'latest')
+    with_config_value(:sorting, { 'people' => 'created_at_asc' }) do
+      with_config_value(:results_per_page, { 'people' => 5 }) do
+        assert_equal 5, Seek::Config.results_per_page_for('people')
+        assert_equal :created_at_asc, Seek::Config.sorting_for('people')
+        get :index
+        assert_response :success
+        assert_equal [:created_at_asc], assigns(:order)
+        assert_equal 5, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select 'div.list_item_title', count: 5
+        assert_select '#index_sort_order option[selected=selected][value=created_at_asc]', count: 1
+      end
     end
-    assert_select 'div.list_item_title', count: 5
+  end
+
+  test 'controller-specific results_per_page should override default' do
+    with_config_value(:results_per_page_default, 2) do
+      get :index
+      assert_response :success
+      assert_equal 2, assigns(:per_page)
+      assert_select '.pagination-container li.active', text: '1'
+      assert_select 'div.list_item_title', count: 2
+
+      with_config_value(:results_per_page, { 'people' => 3 }) do
+        get :index
+        assert_response :success
+        assert_equal 3, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select 'div.list_item_title', count: 3
+      end
+
+      with_config_value(:results_per_page, { 'people' => nil }) do
+        get :index
+        assert_response :success
+        assert_equal 2, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select 'div.list_item_title', count: 2
+      end
+    end
   end
 
   test 'people not in projects should be shown in index' do
-    person_not_in_project = Factory(:brand_new_person, first_name: 'Person Not In Project')
-    person_in_project = Factory(:person, first_name: 'Person in Project')
+    person_not_in_project = Factory(:brand_new_person, first_name: 'Person Not In Project', last_name: 'Petersen', updated_at: 1.second.from_now)
+    person_in_project = Factory(:person, first_name: 'Person in Project', last_name: 'Petersen', updated_at: 1.second.from_now)
     assert person_not_in_project.projects.empty?
     refute person_in_project.projects.empty?
 
-    get :index
+    get :index, params: { page: 'P' }
     assert_response :success
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item_title  a[href=?]', person_path(person_in_project), text: /#{person_in_project.name}/, count: 1
@@ -1031,12 +1067,6 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test 'no resource count stats' do
-    get :index
-    assert_response :success
-    assert_select '#resource-count-stats', count: 0
-  end
-
   test 'autocomplete' do
     Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Johnson')
     Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Bohnson')
@@ -1069,33 +1099,6 @@ class PeopleControllerTest < ActionController::TestCase
     res = JSON.parse(response.body)
     assert_equal 2, res.length
     assert_equal res.map { |r| r['name'] }.uniq, ['Jon Bon Jovi']
-  end
-
-  test 'list by discipline' do
-    exp = Factory(:discipline, title: 'experimentalist')
-    mod = Factory(:discipline, title: 'modeller')
-    experimentalist = Factory(:person, disciplines: [exp])
-    modeller = Factory(:person, disciplines: [mod])
-    assert_includes experimentalist.disciplines, exp
-    refute_includes modeller.disciplines, exp
-
-    get :index, params: { discipline_id: exp.id }
-    assert_response :success
-
-    assert_select 'h2', text: /People with the discipline 'experimentalist'/
-
-    assert_select '.list_items_container' do
-      assert_select '.list_item_title' do
-        assert_select 'a', text: experimentalist.name, count: 1
-        assert_select 'a', text: modeller.name, count: 0
-      end
-    end
-
-    # handles an unknown discipline id
-    get :index, params: { discipline_id: Discipline.last.id + 1 }
-    assert_response :success
-
-    assert_select '.list_items_container', count: 0
   end
 
   test 'related samples are checked for authorization' do
@@ -1152,6 +1155,44 @@ class PeopleControllerTest < ActionController::TestCase
     project_administrator.group_memberships.last.project_positions = [pos]
     get :show, params: { id: project_administrator }
     assert_select '#project-positions label', text: /#{pos.name}/, count: 1
+  end
+
+  test 'current should show current person' do
+    get :current, format: :json
+
+    assert_response :success
+    body = JSON.parse(@response.body)
+    assert_equal people(:quentin_person).id.to_s, body['data']['id']
+  end
+
+  test 'current should return not found if no one logged in' do
+    logout
+
+    get :current, format: :json
+
+    assert_response :not_found
+    body = JSON.parse(@response.body)
+    assert_nil body['data']
+  end
+
+  test 'notification params' do
+    wg1 = Factory(:work_group)
+    wg2 = Factory(:work_group)
+    user = Factory(:activated_user)
+    assert_nil user.person
+    login_as(user)
+
+    post :create, params: { person: { first_name: 'Fred', last_name: 'BBB', email: 'fred.bbb@email.com' },
+                            projects: [wg1.project_id, wg2.project_id],
+                            institutions: [wg1.institution_id, wg2.institution_id],
+                            other_projects: 'Testy',
+                            other_institutions: 'Testo' }
+
+    notif_params = @controller.send(:notification_params)
+    assert_equal [wg1.project_id, wg2.project_id].sort, notif_params[:projects].map(&:to_i).sort
+    assert_equal [wg1.institution_id, wg2.institution_id].sort, notif_params[:institutions].map(&:to_i).sort
+    assert_equal 'Testy', notif_params[:other_projects]
+    assert_equal 'Testo' ,notif_params[:other_institutions]
   end
 
   def edit_max_object(person)

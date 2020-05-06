@@ -4,6 +4,7 @@ class DocumentsController < ApplicationController
 
   include Seek::AssetsCommon
 
+  before_action :documents_enabled?
   before_action :find_assets, :only => [ :index ]
   before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
   before_action :find_display_asset, :only=>[:show, :download]
@@ -14,6 +15,8 @@ class DocumentsController < ApplicationController
   include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
+
+  api_actions :index, :show, :create, :update, :destroy
 
   def new_version
     if handle_upload_data(true)
@@ -44,7 +47,7 @@ class DocumentsController < ApplicationController
       if @document.update_attributes(document_params)
         flash[:notice] = "#{t('document')} metadata was successfully updated."
         format.html { redirect_to document_path(@document) }
-        format.json { render json: @document }
+        format.json { render json: @document, include: [params[:include]] }
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@document), status: :unprocessable_entity }

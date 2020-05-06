@@ -18,8 +18,6 @@ class DataFile < ApplicationRecord
 
   validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
 
-  scope :default_order, -> { order('title') }
-
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
@@ -33,9 +31,20 @@ class DataFile < ApplicationRecord
 
   scope :simulation_data, -> { where(simulation_data: true) }
 
-  explicit_versioning(version_column: 'version') do
+  has_filter assay_type: Seek::Filtering::Filter.new(
+      value_field: 'assays.assay_type_uri',
+      label_mapping: Seek::Filterer::MAPPINGS[:assay_type_label],
+      joins: [:assays]
+  )
+  has_filter technology_type: Seek::Filtering::Filter.new(
+      value_field: 'assays.technology_type_uri',
+      label_mapping: Seek::Filterer::MAPPINGS[:technology_type_label],
+      joins: [:assays]
+  )
+
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     include Seek::Data::SpreadsheetExplorerRepresentation
-    acts_as_doi_mintable(proxy: :parent)
+    acts_as_doi_mintable(proxy: :parent, type: 'Dataset', general_type: 'Dataset')
     acts_as_versioned_resource
     acts_as_favouritable
 

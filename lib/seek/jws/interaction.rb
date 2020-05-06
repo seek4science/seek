@@ -20,7 +20,7 @@ module Seek
       end
 
       def model_simulate_url_from_slug(slug)
-        uri = URI.join(Seek::Config.jws_online_root, '/models/', slug + '/', 'simulate')
+        uri = URI.join(Seek::Config.jws_online_root, '/models/', slug + '/', 'simulate/')
         uri.query = 'embedded=1'
         uri.to_s
       end

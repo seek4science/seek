@@ -10,10 +10,14 @@ module Seek
       end
 
       module ClassMethods
-        def acts_as_doi_mintable(proxy: nil)
-          cattr_accessor :doi_proxy_resource
+        # `type` can be free text, or a term from: https://dictionary.casrai.org/Output_Types
+        # `general_type` should be one of the types listed in: lib/datacite/metadata.rb
+        def acts_as_doi_mintable(proxy: nil, type: nil, general_type: 'Dataset')
+          cattr_accessor :doi_proxy_resource, :datacite_resource_type, :datacite_resource_type_general, instance_reader: false, instance_writer: false
 
           self.doi_proxy_resource = proxy
+          self.datacite_resource_type = type
+          self.datacite_resource_type_general = general_type
 
           include Seek::Doi::ActsAsDoiMintable::InstanceMethods
 
@@ -63,8 +67,17 @@ module Seek
               description: description,
               creators: related_people,
               year: Time.now.year.to_s,
-              publisher: Seek::Config.project_name
+              publisher: Seek::Config.project_name,
+              resource_type: [datacite_resource_type, datacite_resource_type_general]
           )
+        end
+
+        def datacite_resource_type
+          self.class.datacite_resource_type || I18n.t(doi_resource.class.name.underscore)
+        end
+
+        def datacite_resource_type_general
+          self.class.datacite_resource_type_general
         end
 
         def suggested_doi

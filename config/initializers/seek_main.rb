@@ -2,6 +2,7 @@
 #TO MODIFY THE DEFAULT SETTINGS, COPY seek_local.rb.pre to seek_local.rb AND EDIT THAT FILE INSTEAD
 
 require 'object_extensions'
+require 'array_extensions'
 require 'seek/acts_as_cached_tree'
 require 'seek/research_objects/acts_as_snapshottable'
 require "attachment_fu_extensions"

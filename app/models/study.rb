@@ -12,12 +12,14 @@ class Study < ApplicationRecord
 
   belongs_to :investigation
   has_many :projects, through: :investigation
+  has_filter :project
 
   #FIXME: needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
   acts_as_isa
   acts_as_snapshottable
 
   has_many :assays
+  has_many :assay_publications, through: :assays, source: :publications
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
   belongs_to :person_responsible, :class_name => "Person"
@@ -26,22 +28,14 @@ class Study < ApplicationRecord
 
   enforce_authorization_on_association :investigation, :view
 
-  ["data_file","sop","model","document"].each do |type|
-    eval <<-END_EVAL
-      def #{type}_versions
-        assays.collect{|a| a.send(:#{type}_versions)}.flatten.uniq
-      end
-
-      def related_#{type}s
-        assays.collect{|a| a.send(:#{type}s)}.flatten.uniq
-      end
-    END_EVAL
+  %w[data_file sop model document].each do |type|
+    has_many "#{type}_versions".to_sym, -> { distinct }, through: :assays
+    has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :assays, source: type.pluralize.to_sym
   end
 
   def assets
     related_data_files + related_sops + related_models + related_publications + related_documents
   end
-
 
   def state_allows_delete? *args
     assays.empty? && super
@@ -58,4 +52,21 @@ class Study < ApplicationRecord
     external_asset ? external_asset.search_terms : []
   end
 
+  def self.filter_by_projects(projects)
+    joins(:projects).where(investigations: { investigations_projects: { project_id: projects } })
+  end
+
+  def related_publication_ids
+    publication_ids | assay_publication_ids
+  end
+
+  def related_person_ids
+    ids = super
+    ids << person_responsible_id if person_responsible_id
+    ids.uniq
+  end
+
+  def self.user_creatable?
+    Seek::Config.studies_enabled
+  end
 end

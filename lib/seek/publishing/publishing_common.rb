@@ -102,7 +102,7 @@ module Seek
 
       def set_asset
         unless controller_name == 'people'
-          @asset = controller_name.classify.constantize.find(params[:id])
+          @asset = controller_model.find(params[:id])
         end
       rescue ActiveRecord::RecordNotFound
         error('This resource is not found', 'not found resource')
@@ -113,7 +113,7 @@ module Seek
         @assets = {}
         publishable_types = Seek::Util.authorized_types.select { |authorized_type| authorized_type.first.try(:is_in_isa_publishable?) }
         publishable_types.each do |klass|
-          can_manage_assets = klass.all_authorized_for 'manage', current_user
+          can_manage_assets = klass.authorized_for 'manage', current_user
           can_manage_assets = can_manage_assets.select(&:can_publish?)
           unless can_manage_assets.empty?
             @assets[klass.name] = can_manage_assets
@@ -200,8 +200,9 @@ module Seek
         else
           assets = []
           param.keys.each do |asset_class|
+            klass = asset_class.constantize
             param[asset_class].keys.each do |id|
-              assets << eval("#{asset_class}.find_by_id(#{id})")
+              assets << klass.find_by_id(id)
             end
           end
           assets.compact.uniq

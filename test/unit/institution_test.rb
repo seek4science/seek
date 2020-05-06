@@ -34,10 +34,6 @@ class InstitutionTest < ActiveSupport::TestCase
     refute_includes proj3.institutions.first.programmes, prog1
   end
 
-  def test_ordered_by_title
-    assert Institution.all.sort_by { |i| i.title.downcase } == Institution.default_order || Institution.all.sort_by(&:title) == Institution.default_order
-  end
-
   def test_avatar_key
     i = institutions(:one)
     assert_nil i.avatar_key
@@ -187,12 +183,12 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   test 'country conversion and validation' do
-    institution = Factory.build(:institution, country:nil)
-    refute institution.valid?
+    institution = Factory.build(:institution, country: nil)
+    assert institution.valid?
     assert institution.country.nil?
 
     institution.country = ''
-    refute institution.valid?
+    assert institution.valid?
 
     institution.country = 'GB'
     assert institution.valid?

@@ -231,18 +231,29 @@ module Seek
       facet_enable_for_pages.with_indifferent_access[controller.to_s]
     end
 
-    def default_page(controller)
-      pages = default_pages.with_indifferent_access
-      if pages.key?(controller.to_s)
-        pages[controller.to_s]
-      else
-        Settings.defaults['default_pages'][controller.to_s] || 'latest'
-      end
+    def sorting_for(controller)
+      hash = sorting.with_indifferent_access
+      hash[controller.to_s]&.to_sym
     end
 
-    # FIXME: change to standard setter=
-    def set_default_page(controller, value)
-      merge! :default_pages, controller => value
+    def set_sorting_for(controller, value)
+      # Store value as a string, unless nil, or not a valid sorting option for that controller.
+      if value.blank? || !Seek::ListSorter.options(controller.to_s.classify).include?(value.to_sym)
+        value = nil
+      else
+        value = value.to_s
+      end
+      merge!(:sorting, controller.to_s => value)
+      value&.to_sym
+    end
+
+    def results_per_page_for(controller)
+      hash = results_per_page.with_indifferent_access
+      hash[controller.to_s]
+    end
+
+    def set_results_per_page_for(controller, value)
+      merge!(:results_per_page, controller.to_s => value.blank? ? nil : value.to_i)
       value
     end
 
@@ -272,9 +283,9 @@ module Seek
       end
     end
 
-    def soffice_available?(cached=true)
+    def soffice_available?(cached=false)
       @@soffice_available = nil unless cached
-      @@soffice_available ||= begin
+      begin
         port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
         soc = TCPSocket.new('localhost', port)
         soc.close
@@ -282,6 +293,62 @@ module Seek
       rescue
         false
       end
+    end
+
+    def studies_enabled
+      isa_enabled
+    end
+
+    def investigations_enabled
+      isa_enabled
+    end
+
+    def assays_enabled
+      isa_enabled
+    end
+
+    def omniauth_elixir_aai_config
+      callback_path = '/identities/auth/elixir_aai/callback'
+
+      {
+          callback_path: callback_path,
+          name: :elixir_aai,
+          scope: [:openid, :email],
+          response_type: 'code',
+          issuer: 'https://login.elixir-czech.org/oidc/',
+          discovery: false,
+          send_nonce: true,
+          client_signing_alg: :RS256,
+          client_jwk_signing_key: '{"keys":[{"kty":"RSA","e":"AQAB","kid":"rsa1","alg":"RS256","n":"uVHPfUHVEzpgOnDNi3e2pVsbK1hsINsTy_1mMT7sxDyP-1eQSjzYsGSUJ3GHq9LhiVndpwV8y7Enjdj0purywtwk_D8z9IIN36RJAh1yhFfbyhLPEZlCDdzxas5Dku9k0GrxQuV6i30Mid8OgRQ2q3pmsks414Afy6xugC6u3inyjLzLPrhR0oRPTGdNMXJbGw4sVTjnh5AzTgX-GrQWBHSjI7rMTcvqbbl7M8OOhE3MQ_gfVLXwmwSIoKHODC0RO-XnVhqd7Qf0teS1JiILKYLl5FS_7Uy2ClVrAYd2T6X9DIr_JlpRkwSD899pq6PR9nhKguipJE0qUXxamdY9nw"}]}',
+          client_options: {
+              identifier: omniauth_elixir_aai_client_id,
+              secret: omniauth_elixir_aai_secret,
+              redirect_uri: "#{site_base_host.chomp('/')}#{callback_path}",
+              scheme: 'https',
+              host: 'login.elixir-czech.org',
+              port: 443,
+              authorization_endpoint: '/oidc/authorize',
+              token_endpoint: '/oidc/token',
+              userinfo_endpoint: '/oidc/userinfo',
+              jwks_uri: '/oidc/jwk',
+          }
+      }
+    end
+
+    def omniauth_ldap_settings(field)
+      omniauth_ldap_config.with_indifferent_access[field.to_s]
+    end
+
+    def set_omniauth_ldap_settings(field, value)
+      merge! :omniauth_ldap_config, field => (value.blank? ? nil : value)
+      value
+    end
+
+    def omniauth_providers
+      providers = {}
+      providers[:ldap] = omniauth_ldap_config.merge(name: :ldap, form: SessionsController.action(:new)) if omniauth_ldap_enabled
+      providers[:openid_connect] = omniauth_elixir_aai_config if omniauth_elixir_aai_enabled
+      providers
     end
   end
 

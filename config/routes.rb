@@ -1,5 +1,9 @@
 SEEK::Application.routes.draw do
-
+  use_doorkeeper do
+    controllers applications: 'oauth_applications'
+    controllers authorized_applications: 'authorized_oauth_applications'
+    controllers authorizations: 'oauth_authorizations'
+  end
   mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)
   #mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
 
@@ -148,6 +152,8 @@ SEEK::Application.routes.draw do
       post :resend_activation_email
     end
     resources :oauth_sessions, only: [:index, :destroy]
+    resources :identities, only: [:index, :destroy]
+    resources :api_tokens, only: [:index, :create, :destroy]
   end
 
   resource :session do
@@ -167,6 +173,7 @@ SEEK::Application.routes.draw do
     collection do
       get :typeahead
       get :register
+      get :current
       get :is_this_you
       get :get_work_group
       post :userless_project_selected_ajax
@@ -208,7 +215,6 @@ SEEK::Application.routes.draw do
       get :storage_report
       post :update_members
       post :request_membership
-      get :isa_children
       get :overview
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,
@@ -268,7 +274,6 @@ SEEK::Application.routes.draw do
 
   resources :institutions do
     collection do
-      get :request_all
       post :items_for_result
     end
     resources :people,:projects,:specimens,:only=>[:index]
@@ -303,7 +308,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       get :published
-      get :isa_children
+      get :export_isatab_json
       get :manage
       patch :manage_update
     end
@@ -331,7 +336,6 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       get :published
-      get :isa_children
       get :manage
       patch :manage_update
     end
@@ -370,7 +374,6 @@ SEEK::Application.routes.draw do
       post :publish
       get :published
       get :new_object_based_on_existing_one
-      get :isa_children
       get :manage
       patch :manage_update
     end
@@ -425,7 +428,6 @@ SEEK::Application.routes.draw do
       get :extraction_status
       post :extract_samples
       delete :cancel_extraction
-      get :isa_children
       get :destroy_samples_confirm
       post :retrieve_nels_sample_metadata
       get :retrieve_nels_sample_metadata
@@ -459,7 +461,6 @@ SEEK::Application.routes.draw do
       post :new_version
       post :edit_version_comment
       delete :destroy_version
-      get :isa_children
       get :manage
       patch :manage_update
     end
@@ -495,7 +496,6 @@ SEEK::Application.routes.draw do
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
-      get :isa_children
       get :manage
       patch :manage_update
     end
@@ -531,7 +531,6 @@ SEEK::Application.routes.draw do
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
-      get :isa_children
       get :manage
       patch :manage_update
     end
@@ -540,7 +539,7 @@ SEEK::Application.routes.draw do
         post :create_from_existing
       end
     end
-    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:workflows,:only=>[:index]
   end
 
   resources :workflows, concerns: [:has_content_blobs] do
@@ -550,6 +549,10 @@ SEEK::Application.routes.draw do
       post :test_asset_url
       post :items_for_result
       post :resource_in_tab
+      post :create_content_blob
+      get :provide_metadata
+      post :metadata_extraction_ajax
+      post :create_metadata
     end
     member do
       post :check_related_items
@@ -565,11 +568,12 @@ SEEK::Application.routes.draw do
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
-      get :isa_children
       get :manage
       patch :manage_update
+      get :diagram
+      get :ro_crate
     end
-    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:sops,:only=>[:index]
   end
 
   resources :nodes, concerns: [:has_content_blobs] do
@@ -594,7 +598,6 @@ SEEK::Application.routes.draw do
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
-      get :isa_children
       get :manage
       patch :manage_update
     end
@@ -622,7 +625,6 @@ SEEK::Application.routes.draw do
       put :reject_activation
       get :reject_activation_confirmation
       get :storage_report
-      get :isa_children
     end
     resources :people,:projects, :institutions, :investigations, :studies, :assays,
               :data_files, :models, :sops, :workflows, :nodes, :presentations, :documents, :events, :publications, :organisms, :human_diseases
@@ -636,11 +638,14 @@ SEEK::Application.routes.draw do
       get :query_authors_typeahead
       get :export
       post :fetch_preview
+      post :update_metadata
       post :items_for_result
     end
     member do
+      get :manage
       post :update_annotations_ajax
       post :disassociate_authors
+      post :update_metadata
     end
     resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :human_diseases, :events,:only=>[:index]
   end
@@ -655,7 +660,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people,:projects,:data_files,:publications,:presentations,:only=>[:index]
+    resources :people,:projects,:data_files,:publications,:documents,:presentations,:only=>[:index]
   end
 
   resource :policies do
@@ -728,15 +733,15 @@ SEEK::Application.routes.draw do
     end
     member do
       post :update_annotations_ajax
-      get :isa_children
       get :manage
       patch :manage_update
     end
-    resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples, only:[:index]
+    resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
+              :strains, :organisms, only:[:index]
   end
 
   ### SAMPLE TYPES ###
-
+  #
   resources :sample_types do
     collection do
       post :create_from_template
@@ -745,6 +750,7 @@ SEEK::Application.routes.draw do
     end
     member do
       get :template_details
+      get :batch_upload
     end
     resources :samples
     resources :content_blobs do
@@ -782,11 +788,10 @@ SEEK::Application.routes.draw do
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
-      get :isa_children
       get :manage
       patch :manage_update
     end
-    resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:only=>[:index]
+    resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
   ### ASSAY AND TECHNOLOGY TYPES ###
@@ -823,7 +828,12 @@ SEEK::Application.routes.draw do
 
   get '/logout' => 'sessions#destroy', :as => :logout
   get '/login' => 'sessions#new', :as => :login
-  get '/auth/:provider/callback' => 'sessions#create'
+  get '/create' => 'sessions#create', :as => :create_session
+  # Omniauth
+  post '/auth/:provider' => 'sessions#create', as: :omniauth_authorize # For security, ONLY POST should be enabled on this route.
+  match '/auth/:provider/callback' => 'sessions#create', as: :omniauth_callback, via: [:get, :post] # Callback routes need both GET and POST enabled.
+  match '/identities/auth/:provider/callback' => 'sessions#create', via: [:get, :post] # Needed for legacy support..
+
   get '/activate(/:activation_code)' => 'users#activate', :as => :activate
   get '/forgot_password' => 'users#forgot_password', :as => :forgot_password
   get '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings

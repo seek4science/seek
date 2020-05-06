@@ -1,33 +1,37 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 quentin_person:
-  first_name: "quentin"
-  last_name: "jones"
+  first_name: "Quentin"
+  last_name: "Jones"
   email: "quentin@email.com"
   roles_mask: 1
 
+johan_person:
+  first_name: "Johan"
+  last_name: "Bollen"
+  email: "Bollen@email.com"
 
 aaron_person:
-  first_name: "aaron"
-  last_name: "spiggle"
+  first_name: "Aaron"
+  last_name: "Spiggle"
   email: "aaron@email.com"
 
 three:
-  first_name: "no_user"
-  last_name: "smith"
+  first_name: "No_user"
+  last_name: "Smith"
   email: "no_user@email.com"
 
 fred:  
-  first_name: "fred"
-  last_name: "blogs"
+  first_name: "Fred"
+  last_name: "Blogs"
   email: "fred@email.com"
 
 no_first_name:
-  last_name: "lastname"
+  last_name: "Lastname"
   email: "lastname@email.com"
 
 no_last_name:
-  first_name: "firstname"
+  first_name: "Firstname"
   email: "firstname@email.com"
 
 double_firstname:
@@ -45,9 +49,15 @@ double_barrelled_lastname:
   last_name: "Smith-Jones"
   email: "Fred2@email.com"
 
+name_with_umlaut:
+  first_name: "Bob"
+  last_name: "Müller"
+  email: "bob@email.com"
 
-
-
+name_with_non_umlaut:
+  first_name: "Alice"
+  last_name: "Graeter"
+  email: "alice@email.com"
 
 
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
@@ -83,20 +93,20 @@ person_for_owner_of_private_policy_using_custom_sharing:
 
 
 random_userless_person:
-  first_name: "random"
-  last_name: "person"
+  first_name: "Random"
+  last_name: "Person"
   email: "random@email.com"
 
 
 person_not_associated_with_any_projects:
-  first_name: "free"
-  last_name: "spirit"
+  first_name: "Free"
+  last_name: "Spirit"
   email: "not@associated.com"
 
 
 person_to_associate_with_sops_owning_users:
-  first_name: "person"
-  last_name: "place_holder"
+  first_name: "Person"
+  last_name: "Place_holder"
   email: "person_place_holder@email.com"
 
 person_for_test_user_only_in_whitelist:
@@ -169,11 +179,10 @@ person_with_links_in_description:
 
 duplicate_1:
   first_name: "I Am a"
-  last_name: "duplicate"
+  last_name: "Duplicate"
   email: "dup1@email.com"
 
 duplicate_2:
   first_name: "I Am a"
-  last_name: "duplicate"
+  last_name: "Duplicate"
   email: "dup2@email.com"
-

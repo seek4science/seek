@@ -109,12 +109,6 @@ class SampleType < ApplicationRecord
     project_membership || public_samples? || check_referring_sample_permission(user,referring_sample)
   end
 
-  # ducktyping to behave like a Policy based authorized item, in particular the index view
-  def self.all_authorized_for action, user = User.current_user
-    action = "can_#{action.to_s}?"
-    SampleType.all.select{|st| st.send(action,user)}
-  end
-
   def editing_constraints
     Seek::Samples::SampleTypeEditingConstraints.new(self)
   end

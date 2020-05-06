@@ -6,11 +6,10 @@ require 'json-diff'
 
 module JsonRestTestCases
 
-  JSONAPI_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'json', 'rest', 'jsonapi-schema-v1')
+  JSONAPI_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', 'api', 'jsonapi-schema-v1')
 
   def definitions_path
-    File.join(Rails.root, 'public', '2010', 'json', 'rest',
-              'definitions.json')
+    File.join(Rails.root, 'public', 'api', 'definitions', 'definitions.json')
   end
 
   def validate_json(path)
@@ -139,13 +138,13 @@ module JsonRestTestCases
   end
   # check if this current controller type doesn't support read
   def check_for_501_read_return
-    clz = @controller.controller_name.classify.constantize.to_s
+    clz = @controller.controller_model.to_s
     %w[Sample SampleType Strain].include?(clz)
   end
 
   # check if this current controller type doesn't support index
   def check_for_501_index_return
-    clz = @controller.controller_name.classify.constantize.to_s
+    clz = @controller.controller_model.to_s
     %w[Sample Strain].include?(clz)
   end
 
@@ -153,12 +152,12 @@ module JsonRestTestCases
   def get_test_object(m)
     type = @controller.controller_name.classify
     opts = type.constantize.method_defined?(:policy) ? { policy: Factory(:publicly_viewable_policy) } : {}
-
+    opts[:publication_type] = Factory(:journal) if type.constantize.method_defined?(:publication_type)
     Factory("#{m}_#{type.downcase}".to_sym, opts)
   end
 
   def response_code_for_not_available(format)
-    clz = @controller.controller_name.classify.constantize
+    clz = @controller.controller_model
     id = 9999
     id += 1 until clz.find_by_id(id).nil?
 
@@ -171,7 +170,7 @@ module JsonRestTestCases
   end
 
   def response_code_for_not_accessible(format)
-    clz = @controller.controller_name.classify.constantize
+    clz = @controller.controller_model
     if clz.respond_to?(:authorization_supported?) && clz.authorization_supported?
       itemname = @controller.controller_name.singularize.underscore
       item = Factory itemname.to_sym, policy: Factory(:private_policy)

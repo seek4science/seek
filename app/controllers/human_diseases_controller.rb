@@ -38,7 +38,7 @@ class HumanDiseasesController < ApplicationController
         format.xml
         format.json {
           render json: HumanDisease.includes(:parents).where('human_disease_parents': { parent_id: nil }).map { |r|
-            node = r.node
+            node = r.to_node
             if node
               node['state'] = { opened: true }
               node
@@ -138,10 +138,10 @@ class HumanDiseasesController < ApplicationController
     return nodes unless human_disease
 
     if human_disease.parents.empty?
-      nodes.push(human_disease.node(human_disease, true))
+      nodes.push(human_disease.to_node(human_disease, true))
     else
       human_disease.parents.each do |parent|
-        nodes.push(parent.node(human_disease, true))
+        nodes.push(parent.to_node(human_disease, true))
       end
     end
 

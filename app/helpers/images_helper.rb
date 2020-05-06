@@ -44,7 +44,9 @@ module ImagesHelper
   end
 
   def image(key, options = {})
-    image_tag(icon_filename_for_key(key), options)
+    filename = icon_filename_for_key(key)
+    raise "Image not found for key: #{key}" if filename.nil? && !Rails.env.production?
+    image_tag(filename, options)
   end
 
   def help_icon(text, _delay = 200, extra_style = '')
@@ -66,7 +68,7 @@ module ImagesHelper
   end
 
   def model_image_url(model_instance, model_image_id, size = nil)
-    basic_url = eval("model_model_image_path(#{model_instance.id}, #{model_image_id})")
+    basic_url = model_model_image_path(model_instance, model_image_id)
 
     basic_url = append_size_parameter(basic_url, size)
 

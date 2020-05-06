@@ -19,6 +19,8 @@ class ModelsController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def find_other_version
     version = params[:other_version]
     @other_version = @model.find_version(version)
@@ -127,7 +129,7 @@ class ModelsController < ApplicationController
       if @model.update_attributes(model_params)
         flash[:notice] = "#{t('model')} metadata was successfully updated."
         format.html { redirect_to model_path(@model) }
-        format.json {render json: @model}
+        format.json {render json: @model, include: [params[:include]]}
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@model), status: :unprocessable_entity }

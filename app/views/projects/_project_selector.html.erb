@@ -101,8 +101,10 @@
 
             // Select the default license
             if (this.selected.length === 1 && Sharing.defaultLicenses[project.id]) {
-              $j('#license-select').val(Sharing.defaultLicenses[project.id]);
-              zenodoExport.setLicenseUrl();
+                if ($j('#license-select option[value="'+Sharing.defaultLicenses[project.id]+'"]').length) {
+                    $j('#license-select').val(Sharing.defaultLicenses[project.id]);
+                    zenodoExport.setLicenseUrl();
+                }
             }
             this.possibilities.splice(i, 1);
           }

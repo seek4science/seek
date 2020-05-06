@@ -1,6 +1,6 @@
 <%= panel("#{t('project').pluralize} and Institutions") do %>
   <p>
-      If you need to be assigned to one or more existing <%= t('project').pluralize %>, please select it below and also indicate the Institution you belong to.
+      If you need to be assigned to one or more existing <%= t('project').pluralize %>, please select them below and also indicate the <%= t('institution') %>(s) you belong to.
       By doing so a <%= t('project') %> Administrator will be notified and will be able to add you. You will be notified by email once added.
     </p>
 
@@ -25,13 +25,13 @@
     </div>
 
     <div class="col-sm-4">
-      <label>Institutions</label>
+      <label><%= t('institution').pluralize %></label>
       <%= select_tag "institutions",
                      options_for_select(Institution.all.sort_by(&:title).collect { |i| [i.title, i.id] }|[['Others', 0]],
                                         selected: params['institutions']),
                      { multiple: true, class: 'form-control'} -%>
       <div style='display: none' class="form-group other">
-        <label>Other institutions</label>
+        <label>Other <%= t('institution').pluralize %></label>
         <%= text_field_tag :other_institutions, params['other_institutions'], class: 'form-control' %>
       </div>
     </div>
@@ -41,27 +41,29 @@
 <script type="text/javascript">
     $j(document).ready(function () {
         function showOther() {
-            if ($j(this).val().indexOf('0') > -1) {
-                $j(this).siblings('.other').show();
+            if ($j(this).val() && $j(this).val().indexOf('0') > -1) {
+                $j(this).siblings('.other').show().children('.form-control').prop('disabled', false);
             } else {
-                $j(this).siblings('.other').hide();
+                $j(this).siblings('.other').hide().children('.form-control').prop('disabled', true);
             }
         }
 
-	// hides the warning if a registered project is selected
-        $j('#projects').change(function() {
-           if ($j('#projects option:selected[value!="0"]').length == 0) {
-               $j('#no-project-warning').show();
-           }
-           else {
-               $j('#no-project-warning').hide();
-           }
+        $j('#projects').multiselect({ maxHeight: 250, buttonWidth: '20em', numberDisplayed: 1 }).change(function() {
+	          // hides the warning if a registered project is selected
+            if ($j(this).val() === null || ($j(this).val().filter(function (v) { return v !== '0' }).length === 0)) {
+                $j('#no-project-warning').show();
+            }
+            else {
+                $j('#no-project-warning').hide();
+            }
+
+            showOther.apply(this);
         });
 
-        $j('#projects').multiselect({maxHeight: 250, buttonWidth: '20em', numberDisplayed: 1});
-        $j('#institutions').multiselect({maxHeight: 250, buttonWidth: '20em', numberDisplayed: 1});
+        $j('#institutions').multiselect({ maxHeight: 250, buttonWidth: '20em', numberDisplayed: 1 }).change(showOther);
+
+        // Show/hide on page load
+        $j('#projects').change();
+        $j('#institutions').change();
     });
 </script>
-
-<%= javascript_tag "others('projects')" -%>
-<%= javascript_tag "others('institutions')" -%>

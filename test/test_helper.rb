@@ -95,7 +95,7 @@ class ActiveSupport::TestCase
   end
 
   def check_for_soffice
-    unless Seek::Config.soffice_available?
+    unless Seek::Config.soffice_available?(true)
       skip("soffice is not available on port #{ConvertOffice::ConvertOfficeConfig.options[:soffice_port]}, skipping test")
     end
   end
@@ -224,12 +224,6 @@ class ActiveSupport::TestCase
     xml = File.open(contents_path, 'r').read
     stub_request(:get, path).to_return(status: 200, body: xml)
     path
-  end
-
-  def assert_enqueued_emails(n)
-    assert_difference 'ActionMailer::Base.deliveries.size', n do
-      yield
-    end
   end
 
   def assert_no_emails

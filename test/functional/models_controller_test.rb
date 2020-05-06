@@ -141,7 +141,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, params: { page: 'all' }
     assert_response :success
-    assert_equal assigns(:models).sort_by(&:id), Model.authorize_asset_collection(assigns(:models), 'view', users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
+    assert_equal assigns(:models).sort_by(&:id), assigns(:models).authorized_for('view', users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
   end
 
   test 'should contain only model assays ' do
@@ -708,7 +708,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'filtering by person' do
     person = people(:person_for_model_owner)
-    get :index, params: { filter: { person: person.id }, page: 'all' }
+    get :index, params: { filter: { contributor: person.id }, page: 'all' }
     assert_response :success
     m = models(:model_with_format_and_type)
     m2 = models(:model_with_different_owner)
@@ -883,7 +883,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = models(:teusink)
     model.other_creators = 'another creator'
     model.save
-    get :index
+    get :index, params: { page: 'T' }
 
     assert_select 'p.list_item_attribute', text: /, another creator/, count: 1
   end
@@ -1164,13 +1164,13 @@ class ModelsControllerTest < ActionController::TestCase
 
     get :show, params: { id: model }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+    assert_select '#citation', text: /Bacall, F/, count:0
 
     model.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
     get :show, params: { id: model }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+    assert_select '#citation', text: /Bacall, F/, count:1
   end
 
   test 'associated with assay_ids params' do
@@ -1326,7 +1326,16 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 1,model.policy.permissions.count
     assert_equal person,model.policy.permissions.first.contributor
     assert_equal Policy::EDITING,model.policy.permissions.first.access_type
+  end
 
+  test 'preserves DOI on update' do
+    model = Factory(:teusink_model)
+    model.latest_version.update_column(:doi, '10.1000/doi/1')
+    login_as(model.contributor)
+
+    put :update, params: { id: model.id, model: { title: 'testy' } }
+
+    assert_equal '10.1000/doi/1', model.latest_version.reload.doi
   end
 
   private

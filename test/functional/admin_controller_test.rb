@@ -298,7 +298,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'clear failed jobs' do
-    
+
     Delayed::Job.destroy_all
     ContentBlobCleanerJob.new.queue_job
     job = Delayed::Job.last
@@ -365,4 +365,62 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 'about page', Seek::Config.about_page
   end
 
+  test 'update pagination' do
+    post :update_pagination, params: {
+        results_per_page_default: 9,
+        results_per_page: { people: 6, 'models' => '300', publications: '', sops: nil },
+        sorting: { people: 'created_at_asc', models: :created_at_desc,
+                   data_files: 'published_at_desc', sops: 'bananabread' } }
+
+    assert_redirected_to admin_path
+
+    assert_equal 9, Seek::Config.results_per_page_default
+    assert_equal 6, Seek::Config.results_per_page_for('people')
+    assert_equal 300, Seek::Config.results_per_page_for('models')
+    assert_nil Seek::Config.results_per_page_for('publications')
+    assert_nil Seek::Config.results_per_page_for('sops')
+    assert_nil Seek::Config.results_per_page_for('data_files')
+
+    assert_equal :created_at_asc, Seek::Config.sorting_for('people')
+    assert_equal :created_at_desc, Seek::Config.sorting_for('models')
+    assert_nil Seek::Config.results_per_page_for('publications')
+    assert_nil Seek::Config.results_per_page_for('sops')
+    assert_nil Seek::Config.results_per_page_for('data_files'), "Shouldn't set to a value that is not a valid sorting option."
+  end
+
+  test 'update LDAP settings' do
+    with_config_value(:omniauth_ldap_enabled, false) do
+      with_config_value(:omniauth_ldap_config, { }) do
+        assert_equal 'Hash', Seek::Config.omniauth_ldap_config.class.name
+
+        post :update_features_enabled, params: {
+            omniauth_ldap_enabled: '1',
+            omniauth_ldap_host: '127.0.0.1',
+            omniauth_ldap_port: '999',
+            omniauth_ldap_base: 'DC=cool,DC=com',
+            omniauth_ldap_method: 'tls',
+            omniauth_ldap_uid: 'uzername',
+            omniauth_ldap_bind_dn: 'DC=secret,DC=com',
+            omniauth_ldap_password: '123456'
+        }
+
+        assert_equal 'ActiveSupport::HashWithIndifferentAccess', Seek::Config.omniauth_ldap_config.class.name
+        assert Seek::Config.omniauth_ldap_enabled
+        assert_equal '127.0.0.1', Seek::Config.omniauth_ldap_config['host']
+        assert_equal '127.0.0.1', Seek::Config.omniauth_ldap_settings('host')
+        assert_equal 999, Seek::Config.omniauth_ldap_config['port']
+        assert_equal 999, Seek::Config.omniauth_ldap_settings('port')
+        assert_equal 'DC=cool,DC=com', Seek::Config.omniauth_ldap_config['base']
+        assert_equal 'DC=cool,DC=com', Seek::Config.omniauth_ldap_settings('base')
+        assert_equal :tls, Seek::Config.omniauth_ldap_config['method']
+        assert_equal :tls, Seek::Config.omniauth_ldap_settings('method')
+        assert_equal 'uzername', Seek::Config.omniauth_ldap_config['uid']
+        assert_equal 'uzername', Seek::Config.omniauth_ldap_settings('uid')
+        assert_equal 'DC=secret,DC=com', Seek::Config.omniauth_ldap_config['bind_dn']
+        assert_equal 'DC=secret,DC=com', Seek::Config.omniauth_ldap_settings('bind_dn')
+        assert_equal '123456', Seek::Config.omniauth_ldap_config['password']
+        assert_equal '123456', Seek::Config.omniauth_ldap_settings('password')
+      end
+    end
+  end
 end
