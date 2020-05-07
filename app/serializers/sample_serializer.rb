@@ -12,6 +12,7 @@ class SampleSerializer < PCSSerializer
     has_many :creators
     has_one :policy
 
+  attribute :title
   attribute :data, key: :attribute_map
   
   attribute :tags do
