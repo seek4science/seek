@@ -41,8 +41,19 @@ class SamplesController < ApplicationController
   def create
     @sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
     update_sample_with_params
-    flash[:notice] = 'The sample was successfully created.' if @sample.save
-    respond_with(@sample)
+    if @sample.save
+      respond_to do |format|
+        flash[:notice] = 'The sample was successfully created.'
+        format.html { redirect_to sample_path(@sample) }
+        format.json { render json: @sample }
+      end
+    else
+      respond_to do |format|
+        format.html { render :action => "new" }
+        format.json { render json: json_api_errors(@sample), status: :unprocessable_entity }
+      end
+    end
+
   end
 
   def show
@@ -106,9 +117,16 @@ class SamplesController < ApplicationController
 
   def sample_params(sample_type=nil)
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:accessor_name).collect(&:to_sym) | sample_type.sample_attributes.map(&:method_name).collect(&:to_sym) : []
-    params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
-                                   { data: sample_type_param_keys }, { creator_ids: [] },
-                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] }, sample_type_param_keys)
+    attribute_map = params[:sample][:attribute_map]
+    if (attribute_map)
+      attribute_map.each do |key,value|
+        params[:sample]["__sample_data_#{key}"] = value
+      end
+    end
+    params.require(:sample).permit(:sample_type_id, :other_creators, :title, { project_ids: [] },
+                                   { data: sample_type_param_keys }, { creator_ids: [] }, 
+                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] }, 
+                                   sample_type_param_keys)
   end
 
   def update_sample_with_params
