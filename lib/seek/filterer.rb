@@ -79,6 +79,11 @@ module Seek
             label_field: 'organisms.title',
             joins: [:organisms]
         ),
+        human_disease: Seek::Filtering::Filter.new(
+            value_field: 'human_diseases.id',
+            label_field: 'human_diseases.title',
+            joins: [:human_diseases]
+        ),
         model_type: Seek::Filtering::Filter.new(
             value_field: 'model_types.id',
             label_field: 'model_types.title',

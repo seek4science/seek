@@ -1,7 +1,7 @@
 class HumanDisease < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::Search::BackgroundReindexing
-  include Seek::BioSchema::Support;
+  include Seek::BioSchema::Support
 
   acts_as_favouritable
   grouped_pagination
