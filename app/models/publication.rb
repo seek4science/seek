@@ -30,6 +30,7 @@ class Publication < ApplicationRecord
   has_many :presentations, through: :related_relationships, source: :subject, source_type: 'Presentation'
 
   has_and_belongs_to_many :human_diseases
+  has_filter :human_disease
 
   acts_as_asset
   validates :title, length: { maximum: 65_535 }
@@ -503,12 +504,6 @@ class Publication < ApplicationRecord
   def related_human_diseases
     (assays.collect(&:human_diseases).flatten | models.collect(&:human_disease).flatten).uniq
   end
-
-  has_filter human_disease: Seek::Filtering::Filter.new(
-    value_field: 'human_disease.id',
-    label_field: 'human_disease.title',
-    joins: [:assays_human_diseases, :models_human_diseases]
-  )
 
   def self.subscribers_are_notified_of?(action)
     action == 'create'
