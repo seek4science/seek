@@ -52,6 +52,28 @@ class CustomMetadataTest < ActiveSupport::TestCase
     assert_equal date,cm.get_attribute_value(:date)
   end
 
+  test 'mass assign attributes with spaces' do
+    cm = CustomMetadata.new(custom_metadata_type: Factory.build(:study_custom_metadata_type_with_spaces), item: Factory(:study))
+
+    cm.update_attributes(data: {
+        "full name"=>"Stuart Little",
+        "full address"=>"On earth"
+    })
+    assert cm.valid?
+    assert_equal 'Stuart Little',cm.get_attribute_value('full name')
+    assert_equal 'On earth',cm.get_attribute_value('full address')
+  end
+
+  test 'accessor methods' do
+    cm = simple_test_object
+    cm._custom_metadata_name = "Stuart Little"
+    assert_equal "Stuart Little", cm._custom_metadata_name
+
+    cm = CustomMetadata.new(custom_metadata_type: Factory.build(:study_custom_metadata_type_with_spaces), item: Factory(:study))
+    cm._custom_metadata_full_name = "Stuart Little"
+    assert_equal "Stuart Little", cm._custom_metadata_full_name
+  end
+
   test 'construct with item with mass assigment' do
     metadata_type = Factory(:simple_study_custom_metadata_type)
     contributor = Factory(:person)

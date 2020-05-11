@@ -6,6 +6,14 @@ class CustomMetadataType < ApplicationRecord
   validates :supported_type, presence: true
   validate :supported_type_must_be_valid_type
 
+  def attribute_by_title(title)
+    custom_metadata_attributes.where(title:title).first
+  end
+
+  def attribute_by_method_name(method_name)
+    custom_metadata_attributes.detect{|attr| attr.method_name == method_name}
+  end
+
   private
 
   def supported_type_must_be_valid_type
@@ -22,4 +30,5 @@ class CustomMetadataType < ApplicationRecord
       errors.add(:supported_type, 'is not a type that can supported custom metadata')
     end
   end
+
 end
