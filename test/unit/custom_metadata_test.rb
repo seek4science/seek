@@ -52,6 +52,48 @@ class CustomMetadataTest < ActiveSupport::TestCase
     assert_equal date,cm.get_attribute_value(:date)
   end
 
+  test 'construct with item with mass assigment' do
+    metadata_type = Factory(:simple_study_custom_metadata_type)
+    contributor = Factory(:person)
+    investigation = Factory(:investigation, contributor:contributor)
+    date = Time.now.to_s
+
+    User.with_current_user(contributor.user) do # User needs to be logged in for permission to save
+      study = Study.new(title:'test study',
+                        investigation:investigation,
+                        contributor:contributor,
+                        custom_metadata:CustomMetadata.new(
+                            custom_metadata_type:metadata_type,
+                            data: { name: 'Fred', age: 25, date:date}
+                        ))
+      assert study.valid?
+      study.save!
+      assert_equal 'test study', study.title
+      assert_equal 'Fred', study.custom_metadata.get_attribute_value(:name)
+      assert_equal 25, study.custom_metadata.get_attribute_value(:age)
+      assert_equal date, study.custom_metadata.get_attribute_value(:date)
+
+      ## constructed in 2 steps
+
+      study2 = Study.new(title: 'test study 2',
+                        investigation: investigation,
+                        contributor: contributor)
+      study2.custom_metadata = CustomMetadata.new(
+          custom_metadata_type: metadata_type,
+          data: {name: 'Fred', age: 25, date: date}
+      )
+      
+      assert study2.valid?
+      study2.save!
+      assert_equal 'test study 2', study2.title
+      assert_equal 'Fred', study2.custom_metadata.get_attribute_value(:name)
+      assert_equal 25, study2.custom_metadata.get_attribute_value(:age)
+      assert_equal date, study2.custom_metadata.get_attribute_value(:date)
+    end
+
+
+  end
+
   private
 
   def simple_test_object
