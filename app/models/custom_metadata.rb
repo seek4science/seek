@@ -9,13 +9,13 @@ class CustomMetadata < ApplicationRecord
   delegate :custom_metadata_attributes, to: :custom_metadata_type
 
   def get_attribute_value(attr)
-    attr = attr.accessor_name if attr.is_a?(CustomMetadataAttribute)
+    attr = attr.title if attr.is_a?(CustomMetadataAttribute)
 
     data[attr.to_s]
   end
 
   def set_attribute_value(attr, value)
-    attr = attr.accessor_name if attr.is_a?(CustomMetadataAttribute)
+    attr = attr.title if attr.is_a?(CustomMetadataAttribute)
 
     data[attr] = value
   end
@@ -29,7 +29,7 @@ class CustomMetadata < ApplicationRecord
   end
 
   def blank_attribute?(attr)
-    attr = attr.accessor_name if attr.is_a?(CustomMetadataAttribute)
+    attr = attr.title if attr.is_a?(CustomMetadataAttribute)
 
     data[attr].blank? || (data[attr].is_a?(Hash) && data[attr]['id'].blank?)
   end
@@ -52,8 +52,7 @@ class CustomMetadata < ApplicationRecord
 
   def respond_to_missing?(method_name, include_private = false)
     name = method_name.to_s
-    if name.start_with?(CustomMetadataAttribute::METHOD_PREFIX) &&
-       data.key?(name.sub(CustomMetadataAttribute::METHOD_PREFIX, '').chomp('='))
+    if custom_metadata_type.try(:attribute_by_method_name,name.chomp('=')).present?
       true
     else
       super
@@ -62,9 +61,9 @@ class CustomMetadata < ApplicationRecord
 
   def method_missing(method_name, *args)
     name = method_name.to_s
-    if name.start_with?(CustomMetadataAttribute::METHOD_PREFIX)
+    if (attribute = custom_metadata_type.attribute_by_method_name(name.chomp('='))).present?
       setter = name.end_with?('=')
-      attribute_name = name.sub(CustomMetadataAttribute::METHOD_PREFIX, '').chomp('=')
+      attribute_name = attribute.title
       if data.key?(attribute_name)
         set_attribute_value(attribute_name, args.first) if setter
         get_attribute_value(attribute_name)
