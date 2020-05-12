@@ -52,6 +52,32 @@ class CustomMetadataTest < ActiveSupport::TestCase
     assert_equal date,cm.get_attribute_value(:date)
   end
 
+  test 'mass assignment mismatch attributes' do
+    cm = simple_test_object
+    date = Time.now.to_s
+    refute cm.valid?
+    exception = assert_raises CustomMetadata::InvalidDataException do
+      cm.update_attributes(data: { name: 'Fred', wrong_age: 25, wrong_date:date })
+    end
+
+    assert_match /culprits -/,exception.message
+    assert_match /wrong_age,wrong_date/,exception.message
+
+    cm = CustomMetadata.new(custom_metadata_type: Factory.build(:study_custom_metadata_type_with_spaces), item: Factory(:study))
+
+    exception = assert_raises CustomMetadata::InvalidDataException do
+      cm.update_attributes(data: {
+          "wrong full name"=>"Stuart Little",
+          "full address"=>"On earth"
+      })
+    end
+
+    assert_match /culprit -/,exception.message
+    assert_match /wrong full name/,exception.message
+
+
+  end
+
   test 'mass assign attributes with spaces' do
     cm = CustomMetadata.new(custom_metadata_type: Factory.build(:study_custom_metadata_type_with_spaces), item: Factory(:study))
 
