@@ -13,7 +13,7 @@ class CollectionTest < ActiveSupport::TestCase
   test 'to_rdf' do
     person = Factory(:person)
     person.add_to_project_and_institution(Factory(:project),person.institutions.first)
-    object = Factory :collection, description: 'An excellent Collection', projects: person.projects, contributor:person
+    object = Factory(:populated_collection, description: 'An excellent Collection', projects: person.projects, contributor: person)
     Factory :assets_creator, asset: object, creator: Factory(:person)
 
     object = Collection.find(object.id)
@@ -99,7 +99,7 @@ class CollectionTest < ActiveSupport::TestCase
   end
 
   test 'collection assets' do
-    collection = Factory(:empty_collection)
+    collection = Factory(:collection)
     sop = Factory(:sop)
     data_file = Factory(:data_file)
     document = Factory(:document)
@@ -118,7 +118,7 @@ class CollectionTest < ActiveSupport::TestCase
   end
 
   test 'collection assets are unique' do
-    collection = Factory(:empty_collection)
+    collection = Factory(:collection)
     sop = Factory(:sop)
     assert collection.items.create(asset: sop)
 

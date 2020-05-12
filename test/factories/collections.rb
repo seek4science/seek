@@ -1,23 +1,19 @@
 # Collection
 Factory.define(:collection) do |f|
-  f.title 'A collection'
+  f.title 'An empty collection'
   f.association :contributor, factory: :person
 
   f.after_build do |collection|
     collection.projects = [collection.contributor.projects.first] if collection.projects.empty?
-  end
-
-  f.after_create do |c|
-    c.items = [Factory(:collection_item, collection: c, asset: Factory(:public_document))]
   end
 end
 
-Factory.define(:empty_collection, class: Collection) do |f|
+Factory.define(:populated_collection, parent: :collection) do |f|
   f.title 'A collection'
-  f.association :contributor, factory: :person
 
   f.after_build do |collection|
     collection.projects = [collection.contributor.projects.first] if collection.projects.empty?
+    collection.items.build(asset: Factory(:public_document))
   end
 end
 
