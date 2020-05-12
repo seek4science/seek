@@ -6,7 +6,7 @@ class Collection < ApplicationRecord
 
   validates :projects, presence: true, projects: { self: true }
 
-  has_many :items, class_name: 'CollectionItem'
+  has_many :items, class_name: 'CollectionItem', inverse_of: :collection
 
   def self.user_creatable?
     Seek::Config.collections_enabled
