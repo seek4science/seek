@@ -1,18 +1,14 @@
 class CollectionsController < ApplicationController
-
   include Seek::IndexPager
-
   include Seek::AssetsCommon
 
   before_action :collections_enabled?
-  before_action :find_assets, :only => [ :index ]
-  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_assets, only: [:index]
+  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :request_resource, :preview, :update_annotations_ajax]
 
   include Seek::Publishing::PublishingCommon
-
   include Seek::BreadCrumbs
   include Seek::Doi::Minting
-
   include Seek::IsaGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
@@ -25,17 +21,15 @@ class CollectionsController < ApplicationController
     end
   end
 
-
   def create
     item = initialize_asset
     create_asset_and_respond(item)
   end
 
-  # PUT /collections/1
   def update
     update_annotations(params[:tag_list], @collection) if params.key?(:tag_list)
     update_sharing_policies @collection
-    update_relationships(@collection,params)
+    update_relationships(@collection, params)
 
     respond_to do |format|
       if @collection.update_attributes(collection_params)
