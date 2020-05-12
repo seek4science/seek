@@ -1,5 +1,5 @@
 class SampleTypeSerializer < BaseSerializer
-  attributes :title, :description
+  attributes :title, :description, :template_link
   attribute :attribute_map
 
   attribute :tags do
