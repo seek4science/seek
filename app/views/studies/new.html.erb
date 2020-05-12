@@ -5,11 +5,13 @@
 <% if investigations.blank? %>
     <%= button_link_to("New #{t('investigation')}", 'arrow_right', new_investigation_path) -%>
 <% else %>
-<h1>New <%= t('study') %></h1>
+	<h1>New <%= t('study') %></h1>
 
-  <%= link_to "Batch Study Upload", batch_uploader_studies_path, class: "btn btn-primary" %>
+	<h4>Upload studies from file:</h4>
+	<%= link_to "Study batch Upload", batch_uploader_studies_path, class: "btn btn-primary" %>
+	<h4>Or create a study through the form:</h4>
 
-<div class="show_basic">
+	<div class="show_basic">
 
 	<%= form_for @study do |f| %>
 	  <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>

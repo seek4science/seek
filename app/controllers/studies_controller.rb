@@ -125,8 +125,8 @@ class StudiesController < ApplicationController
     data_files, studies = Study.unzip_batch(tempzip_path)
     study_filename = studies.first.name
     studies_file = ContentBlob.new
-    studies_file.tmp_io_object=File.open("#{Rails.root}/tmp/#{study_filename}")
-    studies_file.original_filename="#{study_filename}"
+    studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{study_filename}")
+    studies_file.original_filename = "#{study_filename}"
     studies_file.save!
     @studies = Study.extract_studies_from_file(studies_file)
     @study = @studies[0]
@@ -139,6 +139,7 @@ class StudiesController < ApplicationController
     # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: Factory(:private_policy))
     # study.policy = Policy.create(name: 'default policy', access_type: 1)
     # render plain: params[:studies].inspect
+    metadata_type = CustomMetadataType.new(title: 'MIAPPE metadata', supported_type:'Study')
     studies_length = params[:studies][:title].length
     batch_uploaded = false
     studies_length.times do |index|
@@ -146,7 +147,11 @@ class StudiesController < ApplicationController
         title: params[:studies][:title][index],
         description: params[:studies][:description][index],
         investigation_id: params[:study][:investigation_id],
-        person_responsible_id: params[:study][:person_responsible_id]
+        person_responsible_id: params[:study][:person_responsible_id],
+        custom_metadata: CustomMetadata.new(
+          custom_metadata_type: metadata_type,
+          data: generate_metadata(params[:studies], index)
+      )
       }
       @study = Study.new(study_params)
       batch_uploaded = true if @study.save
@@ -162,6 +167,28 @@ class StudiesController < ApplicationController
         format.html { render action: 'batch_preview', status: :unprocessable_entity }
       end
     end
+  end
+
+  def generate_metadata(studies_data, index)
+    metadata = {
+        id: studies_data[:id][index],
+        study_start_date: studies_data[:startDate][index],
+        study_end_date: studies_data[:endDate][index] || "",
+        contact_institution: studies_data[:contactInstitution][index],
+        geographic_location_country: studies_data[:geographicLocationCountry][index],
+        experimental_site_name: studies_data[:experimentalSiteName][index],
+        latitude: studies_data[:latitude][index],
+        longitude: studies_data[:longitude][index],
+        altitude: studies_data[:altitude][index],
+        description_of_the_experimental_design: studies_data[:descriptionOfTheExperimentalDesign][index],
+        type_of_experimental_design: studies_data[:typeOfExperimentalDesign][index],
+        observation_unit_level_hierarchy: studies_data[:observationUnitLevelHierarchy][index],
+        observation_unit_description: studies_data[:observationUnitDescription][index],
+        description_of_growth_facility: studies_data[:descriptionOfGrowthFacility][index],
+        type_of_growth_facility: studies_data[:typeOfGrowthFacility][index],
+        cultural_practices: studies_data[:culturalPractices][index],
+    }
+    metadata
   end
 
 
