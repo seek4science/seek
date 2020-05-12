@@ -25,7 +25,8 @@ class SampleTypeSerializer < BaseSerializer
     {
         "required": attribute.required,
         "title": attribute.is_title,
-        "type": SampleAttributeType.find(attribute.sample_attribute_type_id).title
+        "type": SampleAttributeType.find(attribute.sample_attribute_type_id).title,
+        "unit": attribute.unit_id.nil? ? nil : Unit.find(attribute.unit_id).symbol
     }
   end
 end
