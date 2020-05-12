@@ -1,13 +1,13 @@
 class ContributedResourceSerializer < PCSSerializer
   attributes :title, :description, :license
 
-  attribute :version, key: :latest_version, if: -> (o) { o.respond_to?(:version) }
+  attribute :version, key: :latest_version, if: -> { object.respond_to?(:version) }
 
   attribute :tags do
     serialize_annotations(object)
   end
 
-  attribute :versions, if: -> (o) { o.respond_to?(:versions) } do
+  attribute :versions, if: -> { object.respond_to?(:versions) } do
     versions_data = []
     object.versions.each do |v|
       path = polymorphic_path(object, version: v.version)
@@ -18,11 +18,11 @@ class ContributedResourceSerializer < PCSSerializer
     versions_data
   end
 
-  attribute :version, if: -> (o) { o.respond_to?(:version) } do
+  attribute :version, if: -> { object.respond_to?(:version) } do
     version_number
   end
 
-  attribute :revision_comments, if: -> (o) { o.respond_to?(:version) } do
+  attribute :revision_comments, if: -> { object.respond_to?(:version) } do
     get_version.revision_comments.presence
   end
 
@@ -33,7 +33,7 @@ class ContributedResourceSerializer < PCSSerializer
     get_version.updated_at
   end
 
-  attribute :content_blobs, if: -> (o) { o.respond_to?(:content_blobs) || o.respond_to?(:content_blob) } do
+  attribute :content_blobs, if: -> { object.respond_to?(:content_blobs) || object.respond_to?(:content_blob) } do
     requested_version = get_version
 
     if requested_version.respond_to?(:content_blobs)
