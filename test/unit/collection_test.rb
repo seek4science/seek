@@ -127,4 +127,14 @@ class CollectionTest < ActiveSupport::TestCase
       assert item.errors.added?(:asset_id, :taken, value: sop.id)
     end
   end
+
+  test 'collection items destroyed with collection' do
+    collection = Factory(:populated_collection)
+
+    assert_difference('Collection.count', -1) do
+      assert_difference('CollectionItem.count', -1) do
+        disable_authorization_checks { collection.destroy }
+      end
+    end
+  end
 end

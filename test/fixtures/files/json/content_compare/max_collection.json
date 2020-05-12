@@ -1,0 +1,125 @@
+{
+  "data": {
+    "id": "883654268",
+    "type": "collections",
+    "attributes": {
+      "policy":
+      {
+        "access":"no_access",
+        "permissions":[]
+      },
+      "tags": ["Collection-tag1", "Collection-tag2", "Collection-tag3", "Collection-tag4", "Collection-tag5"],
+      "title": "A Maximal Collection",
+      "description": "A collection of very interesting things",
+      "license": null,
+      "created_at": "2017-10-06T09:53:31.000Z",
+      "updated_at": "2017-10-06T09:53:31.000Z",
+      "other_creators" : "Blogs, Joe"
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "1039986841",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "522086294",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "1039986644",
+            "type": "people"
+          },
+          {
+            "id": "1039986841",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "projects"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "publications"
+          }
+        ]
+      },
+      "items": {
+        "data": [
+          {
+            "type": "documents",
+            "id": "976",
+            "meta": {
+              "comment": "Readme!"
+            }
+          },
+          {
+            "type": "documents",
+            "id": "977",
+            "meta": {
+              "comment": "Secret info"
+            }
+          },
+          {
+            "type": "sops",
+            "id": "1055250454",
+            "meta": {
+              "comment": "The protocol"
+            }
+          },
+          {
+            "type": "data_files",
+            "id": "883654268",
+            "meta": {
+              "comment": "Data 1"
+            }
+          },
+          {
+            "type": "data_files",
+            "id": "883654269",
+            "meta": {
+              "comment": "Data 2"
+            }
+          },
+          {
+            "type": "data_files",
+            "id": "883654270",
+            "meta": {
+              "comment": "Bad data"
+            }
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/collections/883654268"
+    },
+    "meta": {
+      "created": "2017-10-06T09:53:31.000Z",
+      "modified": "2017-10-06T09:53:31.000Z",
+      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

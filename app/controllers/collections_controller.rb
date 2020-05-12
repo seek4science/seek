@@ -8,7 +8,7 @@ class CollectionsController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
-  include Seek::Doi::Minting
+  # include Seek::Doi::Minting
   include Seek::IsaGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
@@ -17,7 +17,7 @@ class CollectionsController < ApplicationController
     respond_to do |format|
       format.html
       format.rdf { render template: 'rdf/show' }
-      format.json { render json: asset, scope: { requested_version: params[:version] }, include: [params[:include]] }
+      format.json { render json: @collection, scope: { requested_version: params[:version] }, include: [params[:include]] }
     end
   end
 

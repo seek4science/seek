@@ -36,6 +36,7 @@ Factory.define(:max_collection, class: Collection) do |f|
   f.title 'A Maximal Collection'
   f.description 'A collection of very interesting things'
   f.policy { Factory(:downloadable_public_policy) }
+  f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |c|
     c.items = [
         Factory(:collection_item, comment: 'Readme!', collection: c, asset: Factory(:public_document)),
