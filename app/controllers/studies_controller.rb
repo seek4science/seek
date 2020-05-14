@@ -140,6 +140,7 @@ class StudiesController < ApplicationController
     # study.policy = Policy.create(name: 'default policy', access_type: 1)
     # render plain: params[:studies].inspect
     metadata_type = CustomMetadataType.new(title: 'MIAPPE metadata', supported_type:'Study')
+    metadata_type = create_metadata_attribute(metadata_type)
     studies_length = params[:studies][:title].length
     batch_uploaded = false
     studies_length.times do |index|
@@ -191,6 +192,28 @@ class StudiesController < ApplicationController
         cultural_practices: studies_data[:culturalPractices][index],
     }
     metadata
+  end
+
+  def create_metadata_attribute(metadata_type)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'id', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'study_start_date', required:true, sample_attribute_type: SampleAttributeType.where(title:'Date').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'study_end_date', sample_attribute_type: SampleAttributeType.where(title:'Date').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'contact_institution', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'geographic_location_country', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'experimental_site_name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'latitude', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'longitude', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'altitude', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'description_of_the_experimental_design', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'type_of_experimental_design', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'type_of_experimental_design', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'observation_unit_description', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'description_of_growth_facility', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'type_of_growth_facility', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    metadata_type.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'cultural_practices', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+
+    # metadata_type.save!
+    metadata_type
   end
 
 
