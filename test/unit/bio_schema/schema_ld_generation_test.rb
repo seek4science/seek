@@ -85,7 +85,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'keywords' => 'keyword',
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
       'url' => "http://localhost:3000/data_files/#{df.id}",
-      'provider' => [{
+      'producer' => [{
         '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
         'name' => @project.title
@@ -134,7 +134,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'keywords' => 'keyword',
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
       'url' => 'http://www.abc.com',
-      'provider' => [{
+      'producer' => [{
         '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
         'name' => @project.title
@@ -268,7 +268,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.to_s,
       'dateModified' => @current_time.to_s,
       'encodingFormat' => 'application/pdf',
-      'provider' => [
+      'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
       ]
     }
@@ -295,7 +295,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.to_s,
       'dateModified' => @current_time.to_s,
       'encodingFormat' => 'application/pdf',
-      'provider' => [
+      'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
       ]
     }
@@ -341,7 +341,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        'name' => 'Fred Bloggs' },
                      { '@type' => 'Person',
                        'name' => 'Steve Smith' }],
-                 'provider' =>
+                 'producer' =>
                     [{ '@type' => %w[Project Organization],
                        '@id' => "http://localhost:3000/projects/#{@project.id}",
                        'name' => @project.title }],
