@@ -7,6 +7,6 @@ class CollectionItem < ApplicationRecord
   private
 
   def set_order
-    self.set_order ||= (collection.items.maximum(:order) || 0) + 1
+    self.order ||= (collection.items.maximum(:order) || 0) + 1
   end
 end
