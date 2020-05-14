@@ -154,7 +154,9 @@ class StudiesController < ApplicationController
       )
       }
       @study = Study.new(study_params)
-      batch_uploaded = true if @study.save
+      if @study.valid? && @study.save! &&  @study.custom_metadata.valid?
+        batch_uploaded = true if @study.save
+      end
     end
 
     if batch_uploaded
