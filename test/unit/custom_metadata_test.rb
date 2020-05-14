@@ -116,6 +116,9 @@ class CustomMetadataTest < ActiveSupport::TestCase
                         ))
       assert study.valid?
       study.save!
+      study.reload
+      refute_nil study.custom_metadata
+      refute_nil study.custom_metadata.custom_metadata_type
       assert_equal 'test study', study.title
       assert_equal 'Fred', study.custom_metadata.get_attribute_value(:name)
       assert_equal 25, study.custom_metadata.get_attribute_value(:age)
@@ -133,6 +136,9 @@ class CustomMetadataTest < ActiveSupport::TestCase
       
       assert study2.valid?
       study2.save!
+      study2.reload
+      refute_nil study2.custom_metadata
+      refute_nil study2.custom_metadata.custom_metadata_type
       assert_equal 'test study 2', study2.title
       assert_equal 'Fred', study2.custom_metadata.get_attribute_value(:name)
       assert_equal 25, study2.custom_metadata.get_attribute_value(:age)
