@@ -9,7 +9,6 @@ class SampleTypeSerializer < BaseSerializer
   def attribute_map
      object.sample_attributes.collect do |attribute|
        get_sample_attribute(attribute)
-         #attribute
     end
   end
 
@@ -28,7 +27,6 @@ class SampleTypeSerializer < BaseSerializer
         "accessor_name": attribute.accessor_name,
         "sample_controlled_vocab_id": attribute.sample_controlled_vocab_id,
         "linked_sample_type_id": attribute.linked_sample_type_id
-
     }
   end
 
