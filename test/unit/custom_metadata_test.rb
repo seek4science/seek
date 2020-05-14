@@ -10,6 +10,14 @@ class CustomMetadataTest < ActiveSupport::TestCase
     cm.save!
   end
 
+  test 'validate associated custom metadata type' do
+    #invalid metadata type
+    type = CustomMetadataType.new(title:'invalid', supported_type:'Study')
+    refute type.valid?
+    cm = CustomMetadata.new(custom_metadata_type:type, item: Factory(:study))
+    refute cm.valid?
+  end
+
   test 'set and get attribute value' do
     cm = simple_test_object
     assert_nil cm.get_attribute_value('name')

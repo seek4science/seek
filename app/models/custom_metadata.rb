@@ -2,7 +2,7 @@ class CustomMetadata < ApplicationRecord
   class InvalidDataException < RuntimeError; end
 
   belongs_to :item, polymorphic: true
-  belongs_to :custom_metadata_type
+  belongs_to :custom_metadata_type, validate: true
 
   before_validation :update_json_metadata
 
