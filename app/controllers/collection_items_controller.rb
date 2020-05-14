@@ -62,7 +62,6 @@ class CollectionItemsController < ApplicationController
                          "detail": "You are not authorized to modify this collection." },
                  status: :forbidden
         end
-        return false
       end
     end
   end

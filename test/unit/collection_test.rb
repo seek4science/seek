@@ -137,4 +137,21 @@ class CollectionTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'collection item asset must exist' do
+    collection = Factory(:collection)
+
+    item = collection.items.build(asset_id: Sop.maximum(:id) + 1, asset_type: 'Sop')
+    refute item.valid?
+    assert item.errors.added?(:asset, :blank)
+  end
+
+  test 'collection item asset must be viewable' do
+    collection = Factory(:collection)
+    sop = Factory(:sop, policy: Factory(:private_policy))
+    refute sop.can_view?
+    item = collection.items.build(asset: sop)
+    refute item.save
+    assert item.errors[:base].join.include?('You do not have permission to view')
+  end
 end

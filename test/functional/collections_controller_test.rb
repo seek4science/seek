@@ -351,6 +351,31 @@ class CollectionsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should update collection items' do
+    person = Factory(:person)
+    collection = Factory(:collection, contributor: person)
+    item1 = collection.items.create(asset: Factory(:public_document), order: 1, comment: 'First doc')
+    item2 = collection.items.create(asset: Factory(:public_document), order: 2, comment: 'Second doc')
+    item3 = collection.items.create(asset: Factory(:public_document), order: 3, comment: 'Third doc')
+    login_as(person)
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('CollectionItem.count', -1) do
+        put :update, params: { id: collection.id, collection: { title: 'Different title', items_attributes: {
+            '1' => { id: item1.id, order: 1, comment: 'First doc'},
+            '2' => { id: item2.id, order: 2, comment: 'First doc', _destroy: '1' },
+            '3' => { id: item3.id, order: 2, comment: 'Second doc'},
+        } } }
+      end
+    end
+
+    assert_redirected_to collection_path(assigns(:collection))
+    assert_equal 'Different title', assigns(:collection).title
+    assert_equal 'Second doc', item3.reload.comment
+    assert_equal 2, item3.order
+    assert item2.destroyed?
+  end
+
   private
 
   def valid_collection
