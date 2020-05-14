@@ -2,16 +2,10 @@
     "data": {
         "type": "samples",
         "attributes": {
-            "title": "sample",
             "attribute_map": {
-                "a_string": "Hello",
-                "a_date_time": "2020-05-06 09:47",
-                "a_date": "2020-05-06",
-                "a_real_number": "3.6",
-                "an_integer": "1",
-                "a_web_link": "http://example.com"
-            },
-            "tags": null
+                "the_title": "Hello",
+                "a_real_number": "2.6"
+            }
         },
         "relationships": {
             "sample_type": {
@@ -19,22 +13,6 @@
                      "id": "<%= sample_type_id %>",
                     "type": "sample_types"
                 }
-            },
-            "submitter": {
-                "data": [
-                    {
-                       "id": "<%= Factory(:person).id %>",
-                        "type": "people"
-                    }
-                ]
-            },
-            "creators": {
-                "data": [
-                    {
-                       "id": "<%= Factory(:person).id %>",
-                        "type": "people"
-                    }
-                ]
             },
             "projects": {
                 "data": [
