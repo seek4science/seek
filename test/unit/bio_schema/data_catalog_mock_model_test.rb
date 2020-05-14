@@ -1,8 +1,8 @@
 require 'test_helper'
 
-class DataCatalogueMockModelTest < ActiveSupport::TestCase
+class DataCatalogMockModelTest < ActiveSupport::TestCase
   def setup
-    @data_catalogue = Seek::BioSchema::DataCatalogueMockModel.new
+    @data_catalogue = Seek::BioSchema::DataCatalogMockModel.new
   end
 
   test 'date created' do

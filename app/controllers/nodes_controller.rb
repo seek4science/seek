@@ -41,6 +41,7 @@ class NodesController < ApplicationController
     update_annotations(params[:tag_list], @node) if params.key?(:tag_list)
     update_sharing_policies @node
     update_relationships(@node,params)
+    update_asset_link(@node, asset_links_params)  unless asset_links_params.nil?
 
     respond_to do |format|
       if @node.update_attributes(node_params)

@@ -50,6 +50,7 @@ class SopsController < ApplicationController
     update_annotations(params[:tag_list], @sop) if params.key?(:tag_list)
     update_sharing_policies @sop
     update_relationships(@sop,params)
+    update_asset_link(@sop, asset_links_params) unless asset_links_params.nil?
 
     respond_to do |format|
       if @sop.update_attributes(sop_params)
