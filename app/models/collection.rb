@@ -6,7 +6,8 @@ class Collection < ApplicationRecord
 
   validates :projects, presence: true, projects: { self: true }
 
-  has_many :items, class_name: 'CollectionItem', inverse_of: :collection, dependent: :destroy
+  has_many :items, -> { order(:order) }, class_name: 'CollectionItem', inverse_of: :collection, dependent: :destroy
+  accepts_nested_attributes_for :items, allow_destroy: true
 
   def self.user_creatable?
     Seek::Config.collections_enabled
