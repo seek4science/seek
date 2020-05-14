@@ -7,6 +7,10 @@ class CollectionItemsController < ApplicationController
 
     respond_to do |format|
       if @item.save
+        format.html do
+          flash[:notice] = "#{@item.asset.title} added to collection"
+          redirect_to @collection
+        end
         format.json { render json: @item.attributes }
       else
         format.json { head :unprocessable_entity }
