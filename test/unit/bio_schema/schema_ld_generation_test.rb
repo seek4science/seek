@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SchemaLdGenerationTest < ActiveSupport::TestCase
+
   def setup
     @person = Factory(:max_person, description: 'a lovely person')
     @project = @person.projects.first
@@ -353,20 +354,40 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        'name' => @person.name }],
                  'version' => 1,
                  'programmingLanguage' => 'CWL workflow',
-                 'inputs' =>
-                     ['#main/input.cofsfile : ["File"]',
-                      '#main/input.dmax : ["int"]',
-                      '#main/input.dmin : ["int"]',
-                      '#main/input.max-steps : ["int"]',
-                      '#main/input.mwmax-cof : ["int"]',
-                      '#main/input.mwmax-source : ["int"]',
-                      '#main/input.rulesfile : File',
-                      '#main/input.sinkfile : ["File"]',
-                      '#main/input.sourcefile : File',
-                      '#main/input.std_mode : ["string"]',
-                      '#main/input.stereo_mode : ["string"]',
-                      '#main/input.topx : ["int"]'],
-                 'outputs' => ['#main/solutionfile : File', '#main/sourceinsinkfile : ["File"]', '#main/stdout : File'] }
+                 'inputs' => [
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.cofsfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.dmax' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.dmin' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.max-steps' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.mwmax-cof' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.mwmax-source' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.rulesfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.sinkfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.sourcefile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.std_mode' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.stereo_mode' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.topx' }
+                 ],
+                 'outputs' => [
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/solutionfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/sourceinsinkfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/stdout' }
+                 ] }
 
     json = JSON.parse(workflow.to_schema_ld)
     assert_equal expected, json
