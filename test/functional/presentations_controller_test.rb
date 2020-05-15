@@ -515,6 +515,55 @@ class PresentationsControllerTest < ActionController::TestCase
 
   end
 
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    presentation =  {title: 'Presentation', project_ids: [person.projects.first.id], asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Presentation.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params: {presentation: presentation, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+        end
+      end
+    end
+    presentation = assigns(:presentation)
+    assert_equal 'http://www.slack.com/', presentation.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, presentation.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    asset_link = Factory(:discussion_link)
+    presentation = Factory(:presentation, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: presentation }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update presentation with discussion link' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, contributor: person)
+    login_as(person)
+    assert_nil presentation.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: presentation.id, presentation: { asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} }  }
+      end
+    end
+    assert_redirected_to presentation_path(assigns(:presentation))
+    assert_equal 'http://www.slack.com/', presentation.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    presentation = Factory(:presentation , asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: presentation.id, presentation: { asset_links_attributes:{url: "",link_type: AssetLink::DISCUSSION} } }
+    end
+    assert_redirected_to presentation_path(assigns(:presentation ))
+  end
+
   def edit_max_object(presentation)
     add_tags_to_test_object(presentation)
     add_creator_to_test_object(presentation)

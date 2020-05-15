@@ -7,6 +7,10 @@ module Seek
         params.require(controller_name.downcase.singularize.to_sym)
       end
 
+      def asset_links_params
+        params[controller_name.downcase.singularize.to_sym][:asset_links_attributes]
+      end
+
       def content_blobs_params
         params.require(:content_blobs)
       end

@@ -349,7 +349,7 @@ GEM
       rdf-xsd (>= 2.2, < 4.0)
       sparql (>= 2.2, < 4.0)
       sxp (~> 1.0)
-    libxml-ruby (2.8.0)
+    libxml-ruby (2.9.0)
     link_header (0.0.8)
     linkeddata (3.0.1)
       equivalent-xml (~> 0.6)
@@ -915,7 +915,7 @@ DEPENDENCIES
   jquery-ui-rails
   json-diff
   json-schema
-  libxml-ruby (= 2.8.0)
+  libxml-ruby (~> 2.9.0)
   linkeddata
   lograge
   loofah

@@ -2,7 +2,7 @@ module Seek
   module BioSchema
     module ResourceDecorators
       # Decorator that provides extensions for a DataCatalogue
-      class DataCatalogue < Thing
+      class DataCatalog < Thing
         schema_mappings date_created: :dateCreated,
                         provider: :provider
 
@@ -11,7 +11,7 @@ module Seek
         end
 
         def schema_type
-          'DataCatalogue'
+          'DataCatalog'
         end
 
         def url

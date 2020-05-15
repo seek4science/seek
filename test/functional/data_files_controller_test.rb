@@ -1039,9 +1039,9 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal Policy::EDITING, df.policy.access_type, 'data file should have an initial policy with access type for editing'
     assert_difference('ActivityLog.count') do
       put :update, params: { id: df, data_file: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS,
-                                        permissions_attributes: { contributor_type: 'Person',
-                                                                  contributor_id: user.person.id,
-                                                                  access_type: Policy::MANAGING } } }
+                                                                                             permissions_attributes: { contributor_type: 'Person',
+                                                                                                                       contributor_id: user.person.id,
+                                                                                                                       access_type: Policy::MANAGING } } }
     end
 
     assert_redirected_to data_file_path(df)
@@ -1773,13 +1773,13 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should create cache job for small file' do
     mock_http
     params = { data_file: {
-      title: 'Small File',
-      project_ids: [projects(:sysmo_project).id]
+        title: 'Small File',
+        project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                 data_url: 'http://mockedlocation.com/small.txt',
-                 make_local_copy: '0'
-               }],
+                                   data_url: 'http://mockedlocation.com/small.txt',
+                                   make_local_copy: '0'
+                               }],
                policy_attributes: valid_sharing }
 
     assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
@@ -1803,13 +1803,13 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should not create cache job if setting disabled' do
     mock_http
     params = { data_file: {
-      title: 'Small File',
-      project_ids: [projects(:sysmo_project).id]
+        title: 'Small File',
+        project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                 data_url: 'http://mockedlocation.com/small.txt',
-                 make_local_copy: '0'
-               }],
+                                   data_url: 'http://mockedlocation.com/small.txt',
+                                   make_local_copy: '0'
+                               }],
                policy_attributes: valid_sharing }
 
     with_config_value(:cache_remote_files, false) do
@@ -1835,14 +1835,14 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should not create cache job if setting disabled even if user requests 'make_local_copy'" do
     mock_http
     params = { data_file: {
-      title: 'Big File',
-      project_ids: [projects(:sysmo_project).id]
+        title: 'Big File',
+        project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                 data_url: 'http://mockedlocation.com/big.txt',
-                 original_filename: '',
-                 make_local_copy: '1'
-               }],
+                                   data_url: 'http://mockedlocation.com/big.txt',
+                                   original_filename: '',
+                                   make_local_copy: '1'
+                               }],
                policy_attributes: valid_sharing }
     with_config_value(:cache_remote_files, false) do
       assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
@@ -1868,13 +1868,13 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should not automatically create cache job for large file' do
     mock_http
     params = { data_file: {
-      title: 'Big File',
-      project_ids: [projects(:sysmo_project).id]
+        title: 'Big File',
+        project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                 data_url: 'http://mockedlocation.com/big.txt',
-                 make_local_copy: '0'
-               }],
+                                   data_url: 'http://mockedlocation.com/big.txt',
+                                   make_local_copy: '0'
+                               }],
                policy_attributes: valid_sharing }
 
     assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
@@ -1899,12 +1899,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should not automatically create cache job for webpage links' do
     mock_http
     params = { data_file: {
-      title: 'My Fav Website',
-      project_ids: [projects(:sysmo_project).id]
+        title: 'My Fav Website',
+        project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                 data_url: 'http://mockedlocation.com'
-               }],
+                                   data_url: 'http://mockedlocation.com'
+                               }],
                policy_attributes: valid_sharing }
 
     assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
@@ -1927,13 +1927,13 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should create cache job for large file if user requests 'make_local_copy'" do
     mock_http
     params = { data_file: {
-      title: 'Big File',
-      project_ids: [projects(:sysmo_project).id]
+        title: 'Big File',
+        project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                 data_url: 'http://mockedlocation.com/big.txt',
-                 make_local_copy: '1'
-               }],
+                                   data_url: 'http://mockedlocation.com/big.txt',
+                                   make_local_copy: '1'
+                               }],
                policy_attributes: valid_sharing
     }
 
@@ -1960,13 +1960,13 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should create data file for remote URL that does not respond to HEAD' do
     mock_http
     params = { data_file: {
-      title: 'No Head File',
-      project_ids: [projects(:sysmo_project).id]
+        title: 'No Head File',
+        project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                 data_url: 'http://mockedlocation.com/nohead.txt',
-                 make_local_copy: '1'
-               }],
+                                   data_url: 'http://mockedlocation.com/nohead.txt',
+                                   make_local_copy: '1'
+                               }],
                policy_attributes: valid_sharing }
 
     assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
@@ -1992,13 +1992,13 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should create data file for remote URL with a space at the end' do
     mock_http
     params = { data_file: {
-      title: 'Remote File',
-      project_ids: [projects(:sysmo_project).id]
+        title: 'Remote File',
+        project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                 data_url: 'http://mockedlocation.com/txt_test.txt ',
-                 make_local_copy: '1'
-               }],
+                                   data_url: 'http://mockedlocation.com/txt_test.txt ',
+                                   make_local_copy: '1'
+                               }],
                policy_attributes: valid_sharing }
 
     assert_difference('DataFile.count') do
@@ -2014,13 +2014,13 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should create data file for remote URL with no scheme' do
     mock_http
     params = { data_file: {
-      title: 'Remote File',
-      project_ids: [projects(:sysmo_project).id]
+        title: 'Remote File',
+        project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                 data_url: 'mockedlocation.com/txt_test.txt',
-                 make_local_copy: '1'
-               }],
+                                   data_url: 'mockedlocation.com/txt_test.txt',
+                                   make_local_copy: '1'
+                               }],
                policy_attributes: valid_sharing }
 
     assert_difference('DataFile.count') do
@@ -2103,7 +2103,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                    policy: Factory(:private_policy), contributor: person
+                        policy: Factory(:private_policy), contributor: person
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2230,7 +2230,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type = Factory(:simple_sample_type)
     3.times do
       Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
-                       originating_data_file: data_file)
+              originating_data_file: data_file)
     end
     login_as(data_file.contributor)
 
@@ -2247,7 +2247,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type = Factory(:simple_sample_type)
     3.times do
       Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
-                       originating_data_file: data_file)
+              originating_data_file: data_file)
     end
 
     get :samples_table, params: { format: :json, id: data_file.id }
@@ -2289,7 +2289,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
 
     data_file = Factory :data_file, content_blob: Factory(:strain_sample_data_content_blob),
-                                    policy: Factory(:private_policy), contributor: person
+                        policy: Factory(:private_policy), contributor: person
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2319,7 +2319,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                    policy: Factory(:private_policy), contributor: person
+                        policy: Factory(:private_policy), contributor: person
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2356,7 +2356,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                    policy: Factory(:private_policy), contributor: person
+                        policy: Factory(:private_policy), contributor: person
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2389,7 +2389,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                    policy: Factory(:private_policy), contributor: person
+                        policy: Factory(:private_policy), contributor: person
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2416,8 +2416,8 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                    policy: Factory(:private_policy),
-                                    contributor: person
+                        policy: Factory(:private_policy),
+                        contributor: person
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2426,12 +2426,12 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.build_attributes_from_template
     sample_type.save!
     extracted_sample = Factory(:sample, data: { full_name: 'John Wayne' },
-                                        sample_type: sample_type,
-                                        originating_data_file: data_file, contributor: person),
+                               sample_type: sample_type,
+                               originating_data_file: data_file, contributor: person),
 
-    assert_no_difference('Sample.count') do
-      post :extract_samples, params: { id: data_file, confirm: 'true' }
-    end
+        assert_no_difference('Sample.count') do
+          post :extract_samples, params: { id: data_file, confirm: 'true' }
+        end
 
     assert_redirected_to data_file_path(data_file)
     assert_not_empty flash[:error]
@@ -2604,7 +2604,7 @@ class DataFilesControllerTest < ActionController::TestCase
     setup_nels
     mock_http
     data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @user.person, assay_ids: [@assay.id],
-                                    content_blob: Factory(:url_content_blob, url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}"))
+                        content_blob: Factory(:url_content_blob, url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}"))
 
     refute data_file.content_blob.is_excel?
     refute data_file.content_blob.file_size
@@ -2627,7 +2627,7 @@ class DataFilesControllerTest < ActionController::TestCase
     setup_nels
     mock_http
     data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @user.person, assay_ids: [@assay.id],
-                                    content_blob: Factory(:url_content_blob, url: 'https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=404'))
+                        content_blob: Factory(:url_content_blob, url: 'https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=404'))
 
     refute data_file.content_blob.is_excel?
     refute data_file.content_blob.file_size
@@ -2650,7 +2650,7 @@ class DataFilesControllerTest < ActionController::TestCase
     setup_nels
     mock_http
     data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @user.person, assay_ids: [@assay.id],
-                                    content_blob: Factory(:url_content_blob, url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}"))
+                        content_blob: Factory(:url_content_blob, url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}"))
 
     @user.oauth_sessions.where(provider: 'NeLS').first.update_column(:expires_at, 1.day.ago)
 
@@ -2675,7 +2675,7 @@ class DataFilesControllerTest < ActionController::TestCase
     mock_http
     nels_url = "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}"
     data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @user.person, assay_ids: [@assay.id],
-                                    content_blob: Factory(:url_content_blob, url: nels_url))
+                        content_blob: Factory(:url_content_blob, url: nels_url))
 
     get :show, params: { id: data_file }
 
@@ -2815,8 +2815,8 @@ class DataFilesControllerTest < ActionController::TestCase
     session[:uploaded_content_blob_id] = blob.id
     project = person.projects.last
     params = { data_file: {
-      title: 'Small File',
-      project_ids: [project.id]
+        title: 'Small File',
+        project_ids: [project.id]
     }, tag_list:'fish, soup',
                policy_attributes: valid_sharing,
                content_blob_id: blob.id.to_s,
@@ -2865,7 +2865,7 @@ class DataFilesControllerTest < ActionController::TestCase
         project_ids: [project.id],
         assay_assets_attributes: [{ assay_id: assay.id }]
     }, policy_attributes: valid_sharing,
-       content_blob_id: blob.id.to_s
+              content_blob_id: blob.id.to_s
     }
 
     assert_difference('ActivityLog.count') do
@@ -2898,7 +2898,7 @@ class DataFilesControllerTest < ActionController::TestCase
         project_ids: [project.id],
         assay_assets_attributes: [{ assay_id: assay.id }]
     }, policy_attributes: valid_sharing,
-       content_blob_id: blob.id.to_s
+              content_blob_id: blob.id.to_s
     }
 
     assert_difference('ActivityLog.count') do
@@ -2923,8 +2923,8 @@ class DataFilesControllerTest < ActionController::TestCase
     session.delete(:uploaded_content_blob_id)
     project = person.projects.last
     params = { data_file: {
-      title: 'Small File',
-      project_ids: [project.id]
+        title: 'Small File',
+        project_ids: [project.id]
     }, policy_attributes: valid_sharing,
                content_blob_id: blob.id.to_s }
 
@@ -2948,8 +2948,8 @@ class DataFilesControllerTest < ActionController::TestCase
     session[:uploaded_content_blob_id] = Factory(:content_blob).id
     project = person.projects.last
     params = { data_file: {
-      title: 'Small File',
-      project_ids: [project.id]
+        title: 'Small File',
+        project_ids: [project.id]
     }, policy_attributes: valid_sharing,
                content_blob_id: blob.id.to_s }
 
@@ -2972,7 +2972,7 @@ class DataFilesControllerTest < ActionController::TestCase
     session[:uploaded_content_blob_id] = blob.id
     project = person.projects.last
     params = { data_file: {
-      project_ids: [project.id]
+        project_ids: [project.id]
     }, policy_attributes: valid_sharing,
                content_blob_id: blob.id }
 
@@ -2997,7 +2997,7 @@ class DataFilesControllerTest < ActionController::TestCase
     session[:uploaded_content_blob_id] = blob.id
     project = Factory(:project)
     params = { data_file: {
-      project_ids: [project.id]
+        project_ids: [project.id]
     }, policy_attributes: valid_sharing,
                content_blob_id: blob.id }
 
@@ -3020,8 +3020,8 @@ class DataFilesControllerTest < ActionController::TestCase
     project = Factory(:project)
     refute_includes person.projects, project
     params = { data_file: {
-      title: 'Small File',
-      project_ids: [project.id]
+        title: 'Small File',
+        project_ids: [project.id]
     }, policy_attributes: valid_sharing,
                content_blob_id: blob.id }
 
@@ -3052,17 +3052,17 @@ class DataFilesControllerTest < ActionController::TestCase
     assert sop.can_view?
 
     params = { data_file: {
-      title: 'Small File',
-      project_ids: [project.id]
+        title: 'Small File',
+        project_ids: [project.id]
     }, assay: {
-      create_assay: true,
-      assay_class_id: assay_class.id,
-      title: 'my wonderful assay',
-      description: 'assay description',
-      study_id: study.id,
-      sop_id: sop.id,
-      assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
-      technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
+        create_assay: true,
+        assay_class_id: assay_class.id,
+        title: 'my wonderful assay',
+        description: 'assay description',
+        study_id: study.id,
+        sop_id: sop.id,
+        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
+        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     },
                policy_attributes: valid_sharing,
                content_blob_id: blob.id.to_s }
@@ -3122,17 +3122,17 @@ class DataFilesControllerTest < ActionController::TestCase
     }
 
     params = { data_file: {
-      title: 'Small File',
-      project_ids: [project.id]
+        title: 'Small File',
+        project_ids: [project.id]
     }, assay: {
-      create_assay: true,
-      assay_class_id: assay_class.id,
-      title: 'my wonderful assay',
-      description: 'assay description',
-      study_id: study.id,
-      sop_id: nil,
-      assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
-      technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
+        create_assay: true,
+        assay_class_id: assay_class.id,
+        title: 'my wonderful assay',
+        description: 'assay description',
+        study_id: study.id,
+        sop_id: nil,
+        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
+        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     },
                policy_attributes: sharing,
                content_blob_id: blob.id.to_s }
@@ -3183,16 +3183,16 @@ class DataFilesControllerTest < ActionController::TestCase
     refute study.can_edit?
 
     params = { data_file: {
-      title: 'Small File',
-      project_ids: [project.id]
+        title: 'Small File',
+        project_ids: [project.id]
     }, assay: {
-      create_assay: true,
-      assay_class_id: assay_class.id,
-      title: 'my wonderful assay',
-      description: 'assay description',
-      study_id: study.id,
-      assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
-      technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
+        create_assay: true,
+        assay_class_id: assay_class.id,
+        title: 'my wonderful assay',
+        description: 'assay description',
+        study_id: study.id,
+        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
+        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     },
                policy_attributes: valid_sharing,
                content_blob_id: blob.id.to_s }
@@ -3364,7 +3364,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   def data_file_with_extracted_samples(contributor = User.current_user.person)
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                    policy: Factory(:private_policy), contributor: contributor
+                        policy: Factory(:private_policy), contributor: contributor
     sample_type = SampleType.new title: 'from template', projects: contributor.projects, contributor:contributor
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     create_sample_attribute_type
@@ -3456,10 +3456,10 @@ class DataFilesControllerTest < ActionController::TestCase
     owner = Factory(:person)
     random_person = Factory(:person)
     private_item = Factory(:data_file,
-                   policy: private_policy,
-                   title: 'some title',
-                   description: 'some description',
-                   contributor: owner)
+                           policy: private_policy,
+                           title: 'some title',
+                           description: 'some description',
+                           contributor: owner)
     visible_item = Factory(:data_file,
                            policy: visible_policy,
                            title: 'some title',
@@ -3610,7 +3610,7 @@ class DataFilesControllerTest < ActionController::TestCase
     other_creator.save!
 
     data_file = Factory(:data_file, projects:[proj1], policy:Factory(:private_policy,
-                                                                             permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+                                                                     permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute data_file.can_manage?
@@ -3638,4 +3638,56 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal Policy::EDITING,data_file.policy.permissions.first.access_type
 
   end
+
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    data_file =  {title: 'DataFile', project_ids: [person.projects.first.id], asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('DataFile.count') do
+        post :create_metadata, params: {data_file: data_file, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
+      end
+    end
+    data_file = assigns(:data_file)
+    assert_redirected_to data_file_path(data_file)
+    assert_equal 'http://www.slack.com/', data_file.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, data_file.discussion_links.first.link_type
+  end
+
+
+  test 'should show discussion link' do
+    asset_link = Factory(:discussion_link)
+    data_file = Factory(:data_file, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: data_file }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update data_file with discussion link' do
+    person = Factory(:person)
+    data_file = Factory(:data_file, contributor: person)
+    login_as(person)
+    assert_nil data_file.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: data_file.id, data_file: { asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} } }
+      end
+    end
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal 'http://www.slack.com/', data_file.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    data_file = Factory(:data_file, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: data_file.id, data_file: { asset_links_attributes:{url: "",link_type: AssetLink::DISCUSSION} } }
+    end
+    assert_redirected_to data_file_path(assigns(:data_file))
+  end
+
 end
