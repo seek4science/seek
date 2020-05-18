@@ -885,7 +885,7 @@ class DocumentsControllerTest < ActionController::TestCase
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
-    document =  {title: 'Document', project_ids: [person.projects.first.id], asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
+    document =  {title: 'Document', project_ids: [person.projects.first.id], asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Document.count') do
         assert_difference('ContentBlob.count') do
@@ -907,29 +907,49 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
   end
 
-  test 'should update document with discussion link' do
+  test 'should update document with new discussion link' do
     person = Factory(:person)
     document = Factory(:document, contributor: person)
     login_as(person)
     assert_nil document.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: document.id, document: { asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} } }
+        put :update, params: { id: document.id, document: { asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}] } }
       end
     end
     assert_redirected_to document_path(assigns(:document))
     assert_equal 'http://www.slack.com/', document.discussion_links.first.url
   end
 
-  test 'should destroy related assetlink when the discussion link is removed ' do
+  test 'should update document with edited discussion link' do
+    person = Factory(:person)
+    document = Factory(:document, contributor: person, discussion_links:[Factory(:discussion_link)])
+    login_as(person)
+    assert_equal 1,document.discussion_links.count
+    assert_no_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: document.id, document: { asset_links_attributes:[{id:document.discussion_links.first.id, url: "http://www.wibble.com/",link_type: AssetLink::DISCUSSION}] } }
+      end
+    end
+    document = assigns(:document)
+    assert_redirected_to document_path(document)
+    assert_equal 1,document.discussion_links.count
+    assert_redirected_to document_path(assigns(:document))
+    assert_equal 'http://www.wibble.com/', document.discussion_links.first.url
+  end
+
+  test 'should destroy related asset link' do
     person = Factory(:person)
     login_as(person)
     asset_link = Factory(:discussion_link)
     document = Factory(:document, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    refute_empty document.discussion_links
     assert_difference('AssetLink.discussion.count', -1) do
-      put :update, params: { id: document.id, document: { asset_links_attributes:{url: "",link_type: AssetLink::DISCUSSION} } }
+      put :update, params: { id: document.id, document: { asset_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
     end
-    assert_redirected_to document_path(assigns(:document))
+    document = assigns(:document)
+    assert_redirected_to document_path(document)
+    assert_empty document.discussion_links
   end
 
   private
