@@ -106,7 +106,7 @@ class PublicationsController < ApplicationController
   # PUT /publications/1
   # PUT /publications/1.xml
   def update
-    update_annotations(params[:tag_list], @publication)
+    update_annotations(params[:tag_list], @publication) if params.key?(:tag_list)
 
     if @publication.update_attributes(publication_params)
       respond_to do |format|
