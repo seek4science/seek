@@ -34,9 +34,7 @@ class SampleType < ApplicationRecord
   validates :title, length: { maximum: 255 }
   validates :description, length: { maximum: 65_535 }
   validates :contributor, presence: true
-
-  validate :validate_one_title_attribute_present, :validate_attribute_title_unique
-
+  validate :validate_one_title_attribute_present, :validate_attribute_title_unique, :validate_attribute_accessor_names_unique
   validates :projects, presence: true, projects: { self: true }
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
@@ -157,6 +155,15 @@ class SampleType < ApplicationRecord
     if dups.any?
       dups_text=dups.join(', ')
       errors.add(:sample_attributes, "Attribute names must be unique, there are duplicates of #{dups_text}")
+    end
+  end
+
+  def validate_attribute_accessor_names_unique
+    groups = sample_attributes.to_a.group_by(&:accessor_name)
+    dups = groups.select { |k, v| v.length > 1 }
+    if dups.any?
+      dups_text = dups.map { |k, v| "(#{v.map(&:title).join(', ')})" }.join(', ')
+      errors.add(:sample_attributes, "Attribute names are too similar: #{dups_text}")
     end
   end
 
