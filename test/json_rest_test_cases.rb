@@ -79,17 +79,10 @@ module JsonRestTestCases
     response_code_for_not_available('json')
   end
 
-  def edit_max_object(object)
-    if object.class == SampleType
-      s1 = Factory(:max_sample, policy: Factory(:public_policy))
-      s2 = Factory(:max_sample, policy: Factory(:public_policy))
-      object.samples << s1
-      object.samples << s2
-    end
-  end
+  def edit_max_object(object); end
 
   def test_json_content
-     ['min', 'max'].each do |m|
+    ['min', 'max'].each do |m|
       object = get_test_object(m)
       json_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'content_compare',
                             "#{m}_#{@controller.controller_name.classify.downcase}.json")
