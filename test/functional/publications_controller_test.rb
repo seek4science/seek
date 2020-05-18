@@ -1136,17 +1136,6 @@ class PublicationsControllerTest < ActionController::TestCase
     assert response.body.include?('FAIRDOMHub: a repository')
   end
 
-
-  test 'should handle blank publication type when refetching doi metadata' do
-    VCR.use_cassette('publications/refetch_by_doi_non_publication_type_error.yml') do
-      with_config_value :crossref_api_email, 'sowen@cs.man.ac.uk' do
-        post :update_metadata, xhr: true, params: { doi: '10.1136/gutjnl-2018-317872', publication: { project_ids: [User.current_user.person.projects.first.id], publication_type_id: nil } }
-      end
-    end
-    assert_response :internal_server_error
-    assert_match /An error has occurred.*Please choose a publication type./,response.body
-  end
-
   test 'should handle blank pubmed' do
     VCR.use_cassette('publications/fairdom_by_doi') do
       with_config_value :pubmed_api_email, 'fred@email.com' do
