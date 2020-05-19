@@ -3,21 +3,19 @@
 
   resource_type = resource.class.name.underscore
   resource_type_text = text_for_resource(resource)
-  link_type_text = AssetLink::DISCUSSION
-  collapsed = false
-  discussion_link_url = resource.discussion_links.empty? ? nil : resource.discussion_links.first.url
+  collapsed = resource.discussion_links.empty?
   help_text = "You can add a remote URL of your favorite discussion channels for this #{resource_type_text}, e.g. slack, google doc, twitter ..."
 %>
 
 <%= folding_panel('Discussion Channels', collapsed, :body_options => {:id => 'discussion_channel_urls'},
                   :help_text => help_text) do %>
     <p class="help-block">
-      You can add URLs pointing to your favorite discussion channels <%= resource_type_text %>:
+      You can add one or more URL's to point to discussion channels related to this <%= resource_type_text %>:
     </p>
 
     <div id='new-link-form' style="display:none;">
       <div class='link-row row'>
-        <div class="col-xs-8">
+        <div class="col-xs-9">
           <%=  text_field_tag("#{resource_type}[asset_links_attributes][INDEX][url]",'',class: 'form-control') %>
         </div>
         <div class="col">
@@ -27,15 +25,15 @@
                               class: 'destroy-link', autocomplete: 'off', style:'display:none;' %>
           </label>
         </div>
-        <%=  hidden_field_tag("#{resource_type}[asset_links_attributes][INDEX][link_type]", 'discussion',class: 'form-control') %>
+        <%=  hidden_field_tag("#{resource_type}[asset_links_attributes][INDEX][link_type]", AssetLink::DISCUSSION,class: 'form-control') %>
       </div>
     </div>
 
-    <div id='discussion-links' class='container'>
+    <div id='discussion-links'>
       <%= fields_for(resource) do |f| %>
         <%= f.fields_for :asset_links do |ff| %>
           <div class='link-row row'>
-            <span class="col-xs-8">
+            <span class="col-xs-9">
               <%= ff.text_field :url, class:'form-control' %>
             </span>
             <span class="col">

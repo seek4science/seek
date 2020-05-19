@@ -1341,7 +1341,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
-    model =  {title: 'Model', project_ids: [person.projects.first.id], asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
+    model =  {title: 'Model', project_ids: [person.projects.first.id], asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Model.count') do
         assert_difference('ContentBlob.count') do
@@ -1362,18 +1362,34 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
   end
 
-  test 'should update model with discussion link' do
+  test 'should update model with new discussion link' do
     person = Factory(:person)
     model = Factory(:model, contributor: person)
     login_as(person)
     assert_nil model.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: model.id, model: { asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} }  }
+        put :update, params: { id: model.id, model: { asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}] }  }
       end
     end
-    assert_redirected_to model_path(assigns(:model))
+    assert_redirected_to model_path(model = assigns(:model))
     assert_equal 'http://www.slack.com/', model.discussion_links.first.url
+  end
+
+  test 'should update model with edited discussion link' do
+    person = Factory(:person)
+    model = Factory(:model, contributor: person, discussion_links:[Factory(:discussion_link)])
+    login_as(person)
+    assert_equal 1,model.discussion_links.count
+    assert_no_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: model.id, model: { asset_links_attributes:[{id:model.discussion_links.first.id, url: "http://www.wibble.com/",link_type: AssetLink::DISCUSSION}] } }
+      end
+    end
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal 1,model.discussion_links.count
+    assert_equal 'http://www.wibble.com/', model.discussion_links.first.url
   end
 
   test 'should destroy related assetlink when the discussion link is removed ' do
@@ -1382,10 +1398,12 @@ class ModelsControllerTest < ActionController::TestCase
     asset_link = Factory(:discussion_link)
     model = Factory(:model, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
     assert_difference('AssetLink.discussion.count', -1) do
-      put :update, params: { id: model.id, model: { asset_links_attributes:{url: "",link_type: AssetLink::DISCUSSION} } }
+      put :update, params: { id: model.id, model: { asset_links_attributes:[{id: asset_link.id, _destroy:'1'}] } }
     end
-    assert_redirected_to model_path(assigns(:model))
+    assert_redirected_to model_path(model = assigns(:model))
+    assert_empty model.discussion_links
   end
+
 
   private
 

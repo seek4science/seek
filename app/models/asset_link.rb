@@ -7,4 +7,5 @@ class AssetLink < ApplicationRecord
   belongs_to :asset, polymorphic: true, inverse_of: :asset_links
   validates :url, url: { allow_nil: false }
   validates :asset, presence: true
+
 end
