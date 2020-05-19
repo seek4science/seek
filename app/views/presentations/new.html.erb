@@ -18,7 +18,7 @@
         <%= text_area_tag "presentation[description]", presentation_description_value,:class=>"form-control" -%>
       </div>
 
-      <%= render :partial=> "assets/discussion_link_form", :locals=>{:resource=>@presentation} -%>
+      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource=>@presentation} -%>
 
       <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => Seek::Config.is_virtualliver } -%>
 

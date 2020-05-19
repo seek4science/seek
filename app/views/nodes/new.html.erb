@@ -20,7 +20,7 @@
 
       <%= render :partial => "projects/project_selector", :locals => { :resource => @node, :allow_nil => Seek::Config.is_virtualliver } %>
 
-      <%= render :partial=> "assets/discussion_link_form", :locals=>{:resource => @node} -%>
+      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @node} -%>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @node } %>
 

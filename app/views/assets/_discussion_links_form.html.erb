@@ -1,0 +1,85 @@
+<!-- discussion_channel_form -->
+<%
+
+  resource_type = resource.class.name.underscore
+  resource_type_text = text_for_resource(resource)
+  link_type_text = AssetLink::DISCUSSION
+  collapsed = false
+  discussion_link_url = resource.discussion_links.empty? ? nil : resource.discussion_links.first.url
+  help_text = "You can add a remote URL of your favorite discussion channels for this #{resource_type_text}, e.g. slack, google doc, twitter ..."
+%>
+
+<%= folding_panel('Discussion Channels', collapsed, :body_options => {:id => 'discussion_channel_urls'},
+                  :help_text => help_text) do %>
+    <p class="help-block">
+      You can add URLs pointing to your favorite discussion channels <%= resource_type_text %>:
+    </p>
+
+    <div id='new-link-form' style="display:none;">
+      <div class='link-row row'>
+        <div class="col-xs-8">
+          <%=  text_field_tag("#{resource_type}[asset_links_attributes][INDEX][url]",'',class: 'form-control') %>
+        </div>
+        <div class="col">
+          <label class="btn btn-danger">
+            Remove
+            <%= check_box_tag "#{resource_type}[asset_links_attributes][INDEX][_destroy]", '1', false,
+                              class: 'destroy-link', autocomplete: 'off', style:'display:none;' %>
+          </label>
+        </div>
+        <%=  hidden_field_tag("#{resource_type}[asset_links_attributes][INDEX][link_type]", 'discussion',class: 'form-control') %>
+      </div>
+    </div>
+
+    <div id='discussion-links' class='container'>
+      <%= fields_for(resource) do |f| %>
+        <%= f.fields_for :asset_links do |ff| %>
+          <div class='link-row row'>
+            <span class="col-xs-8">
+              <%= ff.text_field :url, class:'form-control' %>
+            </span>
+            <span class="col">
+              <label class="btn btn-danger">
+                Remove
+                <%= ff.check_box :_destroy, class: 'destroy-link', autocomplete: 'off',style:'display:none;' %>
+              </label>
+            </span>
+            <%= ff.hidden_field :link_type %>
+          </div>
+        <% end %>
+      <% end %>
+      <div id='new-link-row'></div>
+    </div>
+
+    <%= button_link_to('Add new link', 'add', '#', :id => 'add-discussion-link') %>
+
+<% end %>
+
+<script type="application/javascript">
+
+    $j(document).ready(function () {
+        $j('#add-discussion-link').click(function () {
+            var newRow = $j('#new-link-form').clone().html();
+            var currentRows = $j('.link-row').length - 2;
+            newRow = newRow.replace(/INDEX/g, currentRows+1);
+            $j('#discussion-links #new-link-row').before($j(newRow));
+            return false;
+        });
+
+        $j('form').submit(function () {
+          $j('#new-link-form').remove();
+          return;
+        });
+
+        $j('#discussion-links').on('change', '.destroy-link', function() {
+            $j(this).closest('.link-row').fadeOut(100);
+        });
+
+
+    });
+
+
+
+
+
+</script>

@@ -17,7 +17,7 @@
         <% sop_description_value = (params[:sop].blank? || params[:sop][:description].blank?) ? nil : params[:sop][:description] -%>
         <%= text_area_tag 'sop[description]', sop_description_value, :class=>"form-control" -%>
       </div>
-      <%= render :partial=> "assets/discussion_link_form", :locals=>{:resource => @sop} -%>
+      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @sop} -%>
 
       <%= render :partial => "projects/project_selector", :locals => { :resource => @sop, :allow_nil => Seek::Config.is_virtualliver } %>
 
