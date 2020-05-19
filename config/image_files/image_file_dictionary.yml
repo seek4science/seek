@@ -200,8 +200,8 @@ ro_workflow: 'avatars/workflow_types/avatar-ro.png'
 nextflow_workflow: 'avatars/workflow_types/avatar-nextflow.png'
 ro_crate_avatar: 'file_icons/ro-crate.svg'
 snakemake_workflow: 'avatars/workflow_types/avatar-snakemake.png'
-collection: 'avatars/avatar-programme.png'
-collection_avatar: 'avatars/avatar-programme.png'
+collection: 'avatars/avatar-collection.png'
+collection_avatar: 'avatars/avatar-collection.png'
 
 # roles
 project_administrator: 'roles/role-project-admin.png'
