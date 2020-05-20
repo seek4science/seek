@@ -20,11 +20,11 @@
         <%= text_area_tag 'model[description]', model_description_value, :class=>"form-control" -%>
       </div>
 
-      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @model} -%>
-
       <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :allow_nil => Seek::Config.is_virtualliver } -%>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @model } %>
+
+      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @model} -%>
 
       <%= render :partial => "model_metadata" -%>
 

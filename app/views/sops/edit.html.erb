@@ -19,9 +19,9 @@
           <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} %>
       <% end %>
 
-      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @sop} -%>
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @sop } %>
 
-    <%= render :partial => 'assets/license_selector', :locals => { :resource => @sop } %>
+      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @sop} -%>
 
       <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
 

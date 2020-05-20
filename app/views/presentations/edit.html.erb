@@ -23,9 +23,9 @@
           <%= render :partial => "scales/scales_selector",:locals=>{:object=>@presentation} %>
       <% end %>
 
-      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @presentation} -%>
-
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @presentation } %>
+
+      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @presentation} -%>
 
 
       <%= render :partial=>"assets/asset_form_bottom", :locals=> {:f => f} -%>

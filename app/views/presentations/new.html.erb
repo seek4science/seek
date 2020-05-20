@@ -18,13 +18,13 @@
         <%= text_area_tag "presentation[description]", presentation_description_value,:class=>"form-control" -%>
       </div>
 
-      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource=>@presentation} -%>
-
       <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => Seek::Config.is_virtualliver } -%>
 
       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@presentation} if show_scales?%>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @presentation } %>
+
+      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource=>@presentation} -%>
 
       <%= fields_for(@presentation) {|f|  f.hidden_field :parent_name } -%>
 

@@ -3,12 +3,13 @@
 
   resource_type = resource.class.name.underscore
   resource_type_text = text_for_resource(resource)
-  collapsed = resource.discussion_links.empty?
+  collapsed = resource.asset_links.select{|l| l.link_type==AssetLink::DISCUSSION}.empty?
   help_text = "You can add a remote URL of your favorite discussion channels for this #{resource_type_text}, e.g. slack, google doc, twitter ..."
 %>
 
 <%= folding_panel('Discussion Channels', collapsed, :body_options => {:id => 'discussion_channel_urls'},
                   :help_text => help_text) do %>
+
     <p class="help-block">
       You can add one or more URL's to point to discussion channels related to this <%= resource_type_text %>:
     </p>

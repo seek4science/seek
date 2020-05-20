@@ -16,9 +16,9 @@
         <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
       </div>
 
-      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @model} -%>
-
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @model } %>
+
+      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @model} -%>
 
       <%= render :partial=>"model_metadata" -%>
 
