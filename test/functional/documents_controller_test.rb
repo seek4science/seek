@@ -934,7 +934,6 @@ class DocumentsControllerTest < ActionController::TestCase
     document = assigns(:document)
     assert_redirected_to document_path(document)
     assert_equal 1,document.discussion_links.count
-    assert_redirected_to document_path(assigns(:document))
     assert_equal 'http://www.wibble.com/', document.discussion_links.first.url
   end
 
