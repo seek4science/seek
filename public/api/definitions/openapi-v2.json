@@ -35,8 +35,8 @@
         "OAuth2": {
             "type": "oauth2",
             "flow": "accessCode",
-            "authorizationUrl": "/oauth/authorize",
-            "tokenUrl": "/oauth/token",
+            "authorizationUrl": "https://fairdomhub.org/oauth/authorize",
+            "tokenUrl": "https://fairdomhub.org//oauth/token",
             "scopes": {
                 "read": "Read, download and list resources",
                 "write": "Create, upload, update and delete resources"
@@ -2224,6 +2224,43 @@
                 }
             }
         },
+        "/people/current": {
+            "get": {
+                "operationId": "currentPerson",
+                "description": {
+                    "$ref": "../descriptions/currentPerson.md"
+                },
+                "tags": [
+                    "read",
+                    "people"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/personResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/personResponse.json"
+                            }
+                        }
+                    }
+                }
+            }
+	},
         "/people/{id}": {
             "parameters": [
                 {
@@ -2354,6 +2391,43 @@
                 }
             }
         },
+        "/current_user": {
+            "get": {
+                "operationId": "currentUser",
+                "description": {
+                    "$ref": "../descriptions/currentUser.md"
+                },
+                "tags": [
+                    "read",
+                    "people"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/personResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/personResponse.json"
+                            }
+                        }
+                    }
+                }
+            }
+	}
         "/presentations": {
             "get": {
                 "operationId": "listPresentations",
