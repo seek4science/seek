@@ -1,6 +1,6 @@
 function updateCreatorSettings() {
     var html = '';
-    var creators_arr = [];
+    var creators_arr = [''];
 
     for(var i = 0; i < creators.length; i++) {
         var creator = creators[i];
