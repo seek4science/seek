@@ -106,7 +106,7 @@ class PublicationsController < ApplicationController
   # PUT /publications/1
   # PUT /publications/1.xml
   def update
-    update_annotations(params[:tag_list], @publication)
+    update_annotations(params[:tag_list], @publication) if params.key?(:tag_list)
 
     if @publication.update_attributes(publication_params)
       respond_to do |format|
@@ -161,15 +161,14 @@ class PublicationsController < ApplicationController
 
   def update_metadata
 
-    @publication = Publication.new(publication_params)
+    @publication = Publication.find(params[:publication][:id])
     publication_type_id= params[:publication][:publication_type_id]
     doi= params[:publication][:doi]
     pubmed_id = params[:publication][:pubmed_id]
-    id= params[:publication][:id]
     if publication_type_id.blank?
       @error = "Please choose a publication type."
     else
-      result = get_data(@publication, pubmed_id, doi)
+      get_data(@publication, pubmed_id, doi)
     end
     @error =  @publication.errors.full_messages.join('<br>') if @publication.errors.any?
     if !@error.nil?
