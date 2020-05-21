@@ -317,6 +317,42 @@ class DocumentsControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'create with no creators' do
+    person = Factory(:person)
+    login_as(person)
+    document = {title: 'Document', project_ids: [person.projects.first.id], creator_ids: []}
+    assert_difference('Document.count') do
+      post :create, params: {document: document, content_blobs: [{data: file_for_upload}], policy_attributes: {access_type: Policy::VISIBLE}}
+    end
+
+    document = assigns(:document)
+    assert_empty document.creators
+  end
+
+  test 'update with no creators' do
+    person = Factory(:person)
+    creators = [Factory(:person), Factory(:person)]
+    document = Factory(:document, contributor: person, creators:creators)
+
+    assert_equal creators.sort, document.creators.sort
+    login_as(person)
+
+    assert document.can_manage?
+
+
+    patch :manage_update,
+          params: {id: document,
+                   document: {
+                       title:'changed title',
+                       creator_ids:[""]
+                   }
+          }
+
+    assert_redirected_to document_path(document = assigns(:document))
+    assert_equal 'changed title', document.title
+    assert_empty document.creators
+  end
+
   test 'manage_update' do
     proj1=Factory(:project)
     proj2=Factory(:project)
@@ -917,7 +953,7 @@ class DocumentsControllerTest < ActionController::TestCase
         put :update, params: { id: document.id, document: { asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}] } }
       end
     end
-    assert_redirected_to document_path(assigns(:document))
+    assert_redirected_to document_path(document = assigns(:document))
     assert_equal 'http://www.slack.com/', document.discussion_links.first.url
   end
 
