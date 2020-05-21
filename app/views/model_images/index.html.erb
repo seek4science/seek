@@ -3,7 +3,7 @@
 <ul class="sectionIcons">
 	<li><%= image_tag_for_key('model', url_for(@model_instance), nil, nil, 'Return to Model')%></li>
   <% if image_can_be_edited_by_current_user -%>
-    <li><%= image_tag_for_key('image', new_model_image_link(@model_instance), nil, nil, 'Upload New Image')%></li>
+    <li><%= image_tag_for_key('image', new_model_model_image_path(@model_instance), nil, nil, 'Upload New Image')%></li>
   <% end %>
 </ul>
 

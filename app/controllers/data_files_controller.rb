@@ -504,7 +504,8 @@ class DataFilesController < ApplicationController
                                       :license, :other_creators,{ event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      { scales: [] }, { publication_ids: [] })
+                                      { scales: [] }, { publication_ids: [] },
+                                      asset_links_attributes:[:id, :url, :link_type, :_destroy])
   end
 
   def data_file_assay_params

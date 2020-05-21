@@ -12,7 +12,7 @@ gem 'sqlite3'
 gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
 gem 'hpricot', '~>0.8.2'
-gem 'libxml-ruby', '2.8.0', require: 'libxml'
+gem 'libxml-ruby', '~>2.9.0', require: 'libxml'
 gem 'uuid', '~>2.3'
 gem 'RedCloth', '>=4.3.0'
 gem 'simple-spreadsheet-extractor', '~>0.16.0'
@@ -133,6 +133,13 @@ gem 'doorkeeper'
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
+
+gem 'ro-crate-ruby', git: 'https://github.com/fbacall/ro-crate-ruby.git'
+
+gem 'git'
+
+gem 'redcarpet'
+
 source 'https://rails-assets.org' do
   gem 'rails-assets-bootstrap-multiselect', '~> 0.9.13'
   gem 'rails-assets-bootstrap-tagsinput', '~> 0.8.0'

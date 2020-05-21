@@ -322,3 +322,19 @@ Factory.define(:blank_txt_content_blob, parent: :blank_content_blob) do |f|
   f.original_filename 'a_txt_file.txt'
   f.content_type 'text/plain'
 end
+
+Factory.define(:cwl_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'rp2-to-rp2path.cwl'
+  f.content_type 'application/x-yaml'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/rp2-to-rp2path.cwl", 'rb').read }
+end
+
+Factory.define(:url_cwl_content_blob, parent: :content_blob) do |f|
+  f.url 'https://www.abc.com/workflow.cwl'
+  f.data nil
+end
+
+Factory.define(:blank_cwl_content_blob, parent: :blank_content_blob) do |f|
+  f.original_filename 'rp2-to-rp2path.cwl'
+  f.content_type 'application/x-yaml'
+end

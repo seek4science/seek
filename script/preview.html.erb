@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= name || "New RO Crate" %></title>
+  <script type="application/ld+json"><%= metadata.generate %></script>
+  <meta name="generator" content="https://github.com/fbacall/ro-crate-ruby">
+  <meta name="keywords" content="RO Crate">
+  <style type="text/css">
+    html {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: sans-serif;
+      color: #333;
+      font-size: 14px;
+      background: #eee;
+      margin: 0;
+      padding: 0;
+    }
+
+    #wrapper {
+      max-width: 1200px;
+      margin: auto;
+      background: #fff;
+      padding: 1em;
+    }
+
+    .data-entity {
+      margin: 0.5em 0;
+      background: #fafafa;
+      border-left: 3px solid #ddd;
+      padding: 0.5em;
+    }
+
+    .main-workflow {
+      background: #bddfff;
+      border-color: #a2cdff !important;
+    }
+
+    dt {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+<div id="wrapper">
+<h1><%= name || "New RO Crate" %></h1>
+<% if url %>
+  Original URL: <a href="<%= url %>" target="_blank"><%= url %></a>
+<% end %>
+<% if main_workflow_diagram %>
+  <img src="<%= main_workflow_diagram.filepath %>" style="width: 100%;"/>
+<% end %>
+<p>
+  <%= description %>
+</p>
+  <%
+    def render_entity(entity)
+      if entity.is_a?(Array)
+        entity.map { |e| render_entity(e) }.join(", ")
+      elsif entity.is_a?(ROCrate::Entity)
+        if entity['identifier']
+          "<a href=\"#{entity['identifier']}\" target=\"_blank\">#{entity.name || entity.id}</a>"
+        else
+          (entity.name || entity.id).to_s
+        end
+      else
+        entity.to_s
+      end
+    end
+  %>
+<dl>
+  <% if author %>
+    <dt>Author</dt>
+    <dd><%= render_entity author %></dd>
+  <% end %>
+  <% if contact_point %>
+    <dt>Contact</dt>
+    <dd><%= render_entity contact_point %></dd>
+  <% end %>
+  <% if publisher %>
+    <dt>Publisher</dt>
+    <dd><%= render_entity publisher %></dd>
+  <% end %>
+  <% if license %>
+    <dt>License</dt>
+    <dd><%= license %></dd>
+  <% end %>
+</dl>
+
+<h2>Contents</h2>
+<div id="contents">
+  <% data_entities.each do |data_entity| %>
+    <div class="data-entity<%= main_workflow == data_entity ? ' main-workflow' : ''%>" id="__data_entity_<%= data_entity.id.gsub(/\s/, '-') %>">
+      <% if main_workflow == data_entity %>
+        <strong>Main Workflow: </strong>
+      <% end %>
+      <% if main_workflow_diagram == data_entity %>
+        <strong>Main Workflow Diagram: </strong>
+      <% end %>
+      <% if main_workflow_cwl == data_entity %>
+        <strong>Main Workflow Description: </strong>
+      <% end %>
+      <a class="data-entity-link" href="<%= data_entity.filepath %>"><%= data_entity.name || data_entity.id %></a>
+      <% if data_entity.content_size %>
+        <br/>Size: <%= data_entity.content_size %> bytes
+      <% end %>
+      <% if data_entity.encoding_format %>
+        <br/>Format: <%= data_entity.encoding_format %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+</div>
+</body>
+</html>

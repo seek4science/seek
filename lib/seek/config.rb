@@ -295,6 +295,18 @@ module Seek
       end
     end
 
+    def studies_enabled
+      isa_enabled
+    end
+
+    def investigations_enabled
+      isa_enabled
+    end
+
+    def assays_enabled
+      isa_enabled
+    end
+
     def omniauth_elixir_aai_config
       callback_path = '/identities/auth/elixir_aai/callback'
 

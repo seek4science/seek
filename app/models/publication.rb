@@ -399,9 +399,6 @@ class Publication < ApplicationRecord
      self.citation += url.blank? ? '': url
     end
     self.citation =  self.citation.try(:to_s).strip.gsub(/^,/,'').strip
-
-    Rails.logger.info("Citation:"+publication_type.title+":" + self.citation)
-
   end
 
   def fetch_pubmed_or_doi_result(pubmed_id, doi)
@@ -421,8 +418,6 @@ class Publication < ApplicationRecord
       begin
         query = DOI::Query.new(Seek::Config.crossref_api_email)
         result = query.fetch(doi)
-
-        Rails.logger.debug("fetch_pubmed_or_doi_result:#{result.citation}")
 
         @error = 'Unable to get result' if result.blank?
         @error = 'Unable to get DOI' if result.title.blank?
@@ -571,7 +566,6 @@ class Publication < ApplicationRecord
 
   def check_bibtex_file (bibtex_record)
 
-    Rails.logger.info("publication_type:"+ self.publication_type.title)
 
     if self.title.blank?
       errors.add(:base, "Please check your bibtex files, each publication should contain a title or a chapter name.")

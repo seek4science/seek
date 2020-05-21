@@ -1,0 +1,128 @@
+{
+    "data": {
+        "id": "23",
+        "type": "workflows",
+        "attributes": {
+            "policy": {
+                "access": "download",
+                "permissions": [
+                    {
+                        "resource": {
+                            "id": "12",
+                            "type": "projects"
+                        },
+                        "access": "edit"
+                    }
+                ]
+            },
+            "title": "An Example Workflow",
+            "description": "This is a very important workflow!",
+            "license": "CC-BY-4.0",
+            "latest_version": 1,
+            "tags": [
+                "tag1",
+                "tag2",
+                "tag3"
+            ],
+            "versions": [
+                {
+                    "version": 1,
+                    "revision_comments": null,
+                    "url": "http://localhost:3000/workflows/23?version=1"
+                }
+            ],
+            "version": 1,
+            "revision_comments": null,
+            "created_at": "2020-01-31T14:07:10.000Z",
+            "updated_at": "2020-01-31T14:09:36.000Z",
+            "content_blobs": [
+                {
+                    "original_filename": "workflow.cwl",
+                    "url": null,
+                    "md5sum": "7ba0ca461d61c6971ac0d7e998cb7f12",
+                    "sha1sum": "37c6f1f4c5e4e2b9c290295afe67e28b16876b25",
+                    "content_type": "application/x-yaml",
+                    "link": "http://localhost:3000/workflows/23/content_blobs/1466",
+                    "size": 1200
+                }
+            ],
+            "other_creators": "John Smith, Jane Smith",
+            "workflow_class": {
+                "title": "Common Workflow Language",
+                "key": "CWL",
+                "description": null
+            },
+            "internals": null
+        },
+        "relationships": {
+            "creators": {
+                "data": [
+                    {
+                        "id": "321",
+                        "type": "people"
+                    },
+                    {
+                        "id": "372",
+                        "type": "people"
+                    }
+                ]
+            },
+            "submitter": {
+                "data": [
+                    {
+                        "id": "321",
+                        "type": "people"
+                    }
+                ]
+            },
+            "people": {
+                "data": [
+                    {
+                        "id": "321",
+                        "type": "people"
+                    },
+                    {
+                        "id": "372",
+                        "type": "people"
+                    }
+                ]
+            },
+            "projects": {
+                "data": [
+                    {
+                        "id": "12",
+                        "type": "projects"
+                    }
+                ]
+            },
+            "investigations": {
+                "data": []
+            },
+            "studies": {
+                "data": []
+            },
+            "assays": {
+                "data": []
+            },
+            "publications": {
+                "data": []
+            },
+            "sops": {
+                "data": []
+            }
+        },
+        "links": {
+            "self": "/workflows/23?version=1"
+        },
+        "meta": {
+            "created": "2020-01-31T14:07:09.000Z",
+            "modified": "2020-01-31T14:09:36.000Z",
+            "api_version": "0.2",
+            "uuid": "e5180ff0-2660-0138-94a4-74939ff51fe0",
+            "base_url": "http://localhost:3000"
+        }
+    },
+    "jsonapi": {
+        "version": "1.0"
+    }
+}

@@ -61,6 +61,10 @@ module Seek
           def latest_version?
             parent.latest_version == self
           end
+
+          def is_a_version?
+            true
+          end
         end
 
         versioned_class.table_name = versioned_table_name
@@ -124,7 +128,7 @@ module Seek
 
         if rtn
           # if the latest version has been updated then update the main table as well
-          if version_number_to_update.to_i == eval(self.class.version_column.to_s)
+          if version_number_to_update.to_i == send(self.class.version_column)
             return update_main_to_version(version_number_to_update, true)
           else
             return true
@@ -140,7 +144,7 @@ module Seek
             # For fault tolerance (ie: to prevent data loss through premature deletion), first...
             # Check to see if the current (aka latest) version has to be deleted,
             # and if so update the main table with the data from the version that will become the latest
-            if version_number.to_i == eval(self.class.version_column.to_s)
+            if version_number.to_i == send(self.class.version_column)
               if versions.count > 1
                 to_be_latest_version = versions[versions.count - 2].version
               else
@@ -171,6 +175,10 @@ module Seek
       end
 
       def empty_callback() end #:nodoc:
+
+      def is_a_version?
+        false
+      end
 
       protected
 
@@ -253,7 +261,7 @@ module Seek
               timestamp_columns.include?(key) ||
               sync_ignore_columns.include?(key)
             next unless orig_model.respond_to?(key)
-            new_model.send("#{key}=", eval("orig_model.#{key}"))
+            new_model.send("#{key}=", orig_model.send(key))
           end
         end
 
@@ -262,13 +270,13 @@ module Seek
           begin
             file_columns.each do |key|
               if orig_model.has_attribute?(key)
-                if eval("orig_model.#{key}.nil?")
+                if orig_model.send(key).nil?
                   logger.debug('DEBUG: file column is nil')
                   new_model.send("#{key}=", nil)
                 else
                   logger.debug('DEBUG: file column is not nil')
-                  new_model.send("#{key}=", File.open(eval("orig_model.#{key}")))
-                  FileUtils.cp(eval("orig_model.#{key}"), eval("new_model.#{key}"))
+                  new_model.send("#{key}=", File.open(orig_model.send(key)))
+                  FileUtils.cp(orig_model.send(key), new_model.send(key))
                 end
               end
             end
@@ -282,10 +290,10 @@ module Seek
         begin
           white_list_columns.each do |key|
             if orig_model.has_attribute?(key)
-              if eval("orig_model.#{key}.nil?")
+              if orig_model.send(key).nil?
                 new_model.send("#{key}=", nil)
               else
-                new_model.send("#{key}=", eval("orig_model.#{key}"))
+                new_model.send("#{key}=", orig_model.send(key))
               end
             end
           end

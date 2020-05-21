@@ -1,12 +1,4 @@
 module AvatarsHelper
-  def all_avatars_link(avatars_for_instance)
-    eval("#{avatars_for_instance.class.name.downcase}_avatars_url(#{avatars_for_instance.id})")
-  end
-
-  def new_avatar_link(avatar_for_instance)
-    eval("new_#{avatar_for_instance.class.name.downcase}_avatar_url(#{avatar_for_instance.id})")
-  end
-
   # A generic key to produce avatars for entities of all kinds.
   #
   # Parameters:
@@ -27,7 +19,7 @@ module AvatarsHelper
     if return_image_tag_only
       img
     else
-      url ||= eval("#{object.class.name.downcase}_url(#{object.id})")
+      url ||= polymorphic_url(object)
       link_to(img, url, 'data-tooltip' => tooltip(tooltip_text))
     end
   end
@@ -69,7 +61,7 @@ module AvatarsHelper
         raise 'Avatar does not belong to instance'
       end
     else
-      basic_url = eval("#{avatar_for_instance.class.name.downcase}_avatar_path(#{avatar_for_instance.id}, #{avatar_id})")
+      basic_url = polymorphic_path([avatar_for_instance, avatar])
       append_size_parameter(basic_url, size)
     end
   end

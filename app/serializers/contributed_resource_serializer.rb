@@ -71,7 +71,7 @@ class ContributedResourceSerializer < PCSSerializer
   end
 
   def get_version
-    object.find_version(version_number)
+    @version ||= object.find_version(version_number)
   end
 
   private

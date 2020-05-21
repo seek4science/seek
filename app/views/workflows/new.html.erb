@@ -1,31 +1,34 @@
 <h1>New <%= t('workflow') %></h1>
 
-<%= form_tag({:action => :create}, :multipart => true) do -%>
-    <div class="asset_form">
-      <%= error_messages_for :workflow -%>
+<%= form_tag({ action: :create_content_blob }, multipart: true) do -%>
+  <%= hidden_field_tag 'workflow[parent_name]', @workflow.parent_name%>
+  <div class="asset_form">
+    <%= error_messages_for :workflow -%>
 
-      <%= render :partial=>"assets/reference_box",:locals=>{:resource=>@workflow} -%>
+    <%= alert_box('info', hide_button: true) do %>
+      A workflow can be uploaded as a <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">Workfow RO Crate</a> (recommended),
+      or as a separate workflow file.
+      <br/><br/>
+      Currently supported workflow types are: <%= WorkflowClass.order(:title).pluck(:title).join(', ') %>.
+    <% end %>
 
-      <div class="form-group">
-        <label>Title <span class="required">*</span></label>
-        <% workflow_title_value = (params[:workflow].blank? || params[:workflow][:title].blank?) ? nil : params[:workflow][:title] -%>
-        <%= text_field_tag 'workflow[title]', workflow_title_value, :class=>"form-control" -%>
-      </div>
+    <%= render partial: 'assets/upload_box', locals: { resource: @workflow } -%>
 
-      <div class="form-group">
-        <label>Description</label>
-        <% workflow_description_value = (params[:workflow].blank? || params[:workflow][:description].blank?) ? nil : params[:workflow][:description] -%>
-        <%= text_area_tag 'workflow[description]', workflow_description_value, :class=>"form-control" -%>
-      </div>
-
-      <%= render :partial => "projects/project_selector", :locals => { :resource => @workflow, :allow_nil => Seek::Config.is_virtualliver } %>
-
-      <%= render :partial => 'assets/license_selector', :locals => { :resource => @workflow } %>
-
-      <%= fields_for(@workflow) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
-
-      <%= render :partial => "assays/associate_assays", :locals=>{:resource => @workflow} -%>
-
-      <%= form_submit_buttons(@workflow) %>
+    <div class="form-group">
+      <label class="required">Workflow type</label>
+      <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title'),
+                     include_blank: '(Determine from Workflow RO Crate)',
+                     class: 'form-control' %>
+      <p class="help-block">Unless uploading an Workflow RO Crate, please specify the workflow type.</p>
     </div>
+
+    <div>
+      <%= create_button id: 'workflow_submit_btn',
+                        onclick: "return validateResourceFields('workflow')",
+                        class: 'btn btn-primary',
+                        button_text:'Upload',
+                        'workflow-upload-file-text' => 'Upload'-%>
+      or <%= cancel_button(workflows_path) -%>
+    </div>
+  </div>
 <% end -%>

@@ -31,6 +31,10 @@ module Seek
           l['domain_content'] ||
           l['id'] == NULL_LICENSE
       end
+
+      category[:software] = category[:all].select do |l|
+        (l['domain_software'] || l['id'] == NULL_LICENSE)
+      end
     end
 
     def self.find(id, source = nil)

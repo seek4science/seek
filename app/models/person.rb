@@ -388,6 +388,14 @@ class Person < ApplicationRecord
     group_memberships << membership
   end
 
+  def ro_crate_metadata
+    {
+        '@id' => orcid.present? ? orcid : "#person-#{id}",
+        name: name,
+        identifier: orcid.present? ? orcid : rdf_seek_id
+    }
+  end
+
   private
 
   # a before_save trigger, that checks if the person is the first one created, and if so defines it as admin

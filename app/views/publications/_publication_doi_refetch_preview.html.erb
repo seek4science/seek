@@ -1,6 +1,7 @@
 <%
   help_text_preview =  "Here is re-fetched metadata of the publication."
   id = params[:publication][:id]
+  publication_type_id = params[:publication][:publication_type_id]
 %>
 
 <%= panel("Updated Metadata", :id => 'publication_refetch_preview', :help_text=> help_text_preview,:class => 'list_item') do %>
@@ -32,7 +33,7 @@
   <%= f.hidden_field :parent_name %>
   <%= f.hidden_field :title %>
   <%= f.hidden_field :doi %>
-  <%= f.hidden_field :publication_type_id %>
+  <%= f.hidden_field :publication_type_id,:value => publication_type_id %>
   <%= f.hidden_field :citation %>
   <%= f.hidden_field :publisher %>
   <%= f.hidden_field :journal %>

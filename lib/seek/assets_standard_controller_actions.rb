@@ -55,7 +55,7 @@ module Seek
           format.html # new.html.erb
         else
           flash[:error] = "You are not authorized to upload a new #{t(controller_name.singularize)}. Only members of known projects, institutions or work groups are allowed to create new content."
-          format.html { redirect_to eval("#{controller_name}_path") }
+          format.html { redirect_to polymorphic_path(controller_name) }
         end
       end
     end
