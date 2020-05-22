@@ -373,7 +373,7 @@ class CollectionsControllerTest < ActionController::TestCase
     assert_equal 'Different title', assigns(:collection).title
     assert_equal 'Second doc', item3.reload.comment
     assert_equal 2, item3.order
-    assert item2.destroyed?
+    refute CollectionItem.exists?(item2.id)
   end
 
   private

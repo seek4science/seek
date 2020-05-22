@@ -100,9 +100,9 @@ class CollectionTest < ActiveSupport::TestCase
 
   test 'collection assets' do
     collection = Factory(:collection)
-    sop = Factory(:sop)
-    data_file = Factory(:data_file)
-    document = Factory(:document)
+    sop = Factory(:sop, policy: Factory(:public_policy))
+    data_file = Factory(:data_file, policy: Factory(:public_policy))
+    document = Factory(:document, policy: Factory(:public_policy))
     assert_empty collection.items
     assert_empty collection.assets
 
@@ -119,7 +119,7 @@ class CollectionTest < ActiveSupport::TestCase
 
   test 'collection assets are unique' do
     collection = Factory(:collection)
-    sop = Factory(:sop)
+    sop = Factory(:sop, policy: Factory(:public_policy))
     assert collection.items.create(asset: sop)
 
     assert_no_difference('CollectionItem.count') do
