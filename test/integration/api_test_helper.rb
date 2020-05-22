@@ -78,6 +78,7 @@ module ApiTestHelper
   end
 
   def test_create
+    debug = false # || true # Uncomment to enable
     begin
       create_post_values
     rescue NameError
@@ -87,7 +88,7 @@ module ApiTestHelper
       if defined? @post_values
         @to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values)
       end
-      #puts "create, to_post #{m}", @to_post
+      puts "create, to_post #{m}", @to_post if debug
 
       if @to_post.blank?
         skip
@@ -98,6 +99,11 @@ module ApiTestHelper
       # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
       assert_difference("#{@clz.classify}.count") do
         post "/#{@plural_clz}.json", params: @to_post.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+        if debug
+          puts "==== Response ===="
+          puts response.body
+          puts "=================="
+        end
         assert_response :success
       end
 

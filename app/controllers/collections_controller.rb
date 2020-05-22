@@ -47,7 +47,7 @@ class CollectionsController < ApplicationController
     params.require(:collection).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
                                        { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                        { creator_ids: [] }, { scales: [] }, { publication_ids: [] },
-                                       { items_attributes: [:id, :order, :comment, :_destroy]})
+                                       { items_attributes: [:id, :asset_type, :asset_id, :order, :comment, :_destroy]})
   end
 
   alias_method :asset_params, :collection_params

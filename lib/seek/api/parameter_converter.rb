@@ -10,7 +10,7 @@ module Seek
     class ParameterConverter
       # Custom conversions required on certain parameters to fit how the controller expects.
       CONVERSIONS = {
-          policy: ->(value) {
+          policy: proc { |value|
             value[:access_type] = PolicyHelper::key_access_type(value.delete(:access))
             perms = {}
             (value.delete(:permissions) || []).each_with_index do |permission, index|
@@ -28,32 +28,32 @@ module Seek
             value
           },
 
-          content_blobs: ->(value) {
+          content_blobs: proc { |value|
             (value || []).map do |cb|
               cb[:data_url] = cb.delete(:url)
               cb
             end
           },
 
-          publication_ids: ->(value) {
+          publication_ids: proc { |value|
             value.map { |id| "#{id}," }
           },
 
-          assay_class: ->(value) {
+          assay_class: proc { |value|
             if value && value[:key]
               AssayClass.where(key: value[:key]).pluck(:id).first
             end
           },
 
-          assay_type: ->(value) {
+          assay_type: proc { |value|
             value[:uri]
           },
 
-          technology_type: ->(value) {
+          technology_type: proc { |value|
             value[:uri]
           },
 
-          tags: ->(value) {
+          tags: proc { |value|
             if value
               value.join(', ')
             else
@@ -61,7 +61,7 @@ module Seek
             end
           },
 
-          funding_codes: ->(value) {
+          funding_codes: proc { |value|
             if value
               value.join(', ')
             else
@@ -69,36 +69,54 @@ module Seek
             end
           },
 
-          programme_ids: ->(value) {
+          programme_ids: proc { |value|
             value.try(:first)
           },
 
-          model_type: ->(value) {
+          model_type: proc { |value|
             ModelType.find_by_title(value).try(:id)
           },
 
-          model_format: ->(value) {
+          model_format: proc { |value|
             ModelFormat.find_by_title(value).try(:id)
           },
 
-          environment: ->(value) {
+          environment: proc { |value|
             RecommendedModelEnvironment.find_by_title(value).try(:id)
           },
 
-          data_file_ids: ->(value) {
+          data_file_ids: proc { |value|
             value.map { |i| { 'asset_id' => i }.with_indifferent_access }
           },
 
-          assay_ids: ->(value) {
+          assay_ids: proc { |value|
             value.map { |i| { assay_id: i } }
           },
 
-          workflow_class: ->(value) {
+          workflow_class: proc { |value|
             if value && value[:key]
               WorkflowClass.where(key: value[:key]).pluck(:id).first
             end
           },
 
+          item_ids: proc { |value, raw| # Have to access the raw params because AMS threw away type and meta...
+            # Convert to the format the `accepts_nested_attributes_for` expects:
+            items_attributes = {}
+            i = 1
+
+            items_params = raw.dig(:data, :relationships, :items).to_unsafe_h || { data: [] }
+            items_params[:data].each do |p|
+              items_attributes[(i += 1).to_s] =
+              {
+                  asset_id: p[:id],
+                  asset_type: p[:type].singularize.classify,
+                  comment: p.dig(:meta, :comment),
+                  order: p.dig(:meta, :order),
+              }
+            end
+
+            items_attributes
+          }
       }
       CONVERSIONS[:default_policy] = CONVERSIONS[:policy]
       CONVERSIONS.freeze
@@ -117,7 +135,8 @@ module Seek
           environment: :recommended_environment_id,
           data_file_ids: :data_files_attributes,
           assay_ids: :assay_assets_attributes,
-          workflow_class: :workflow_class_id
+          workflow_class: :workflow_class_id,
+          item_ids: :items_attributes
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.
@@ -153,7 +172,7 @@ module Seek
       def convert_parameters
         attributes.each do |key, value|
           unless (conversion = CONVERSIONS[key.to_sym]).nil? || exclude?(:convert, key)
-            attributes[key] = conversion.call(value)
+            attributes[key] = conversion.call(value, @parameters)
           end
         end
       end
