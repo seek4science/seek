@@ -110,6 +110,8 @@ en:
     attributes:
       person:
         title: "Full name"
+      collection:
+        creators: 'Maintainers'
 
   activemodel:
     attributes:

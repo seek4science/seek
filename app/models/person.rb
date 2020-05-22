@@ -65,7 +65,7 @@ class Person < ApplicationRecord
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
 
   RELATED_RESOURCE_TYPES = %w[DataFile Sop Model Document Publication Presentation
-                              Sample Event Investigation Study Assay Strain Workflow Node].freeze
+                              Sample Event Investigation Study Assay Strain Workflow Node Collection].freeze
 
   RELATED_RESOURCE_TYPES.each do |type|
     plural = type.tableize
@@ -127,7 +127,6 @@ class Person < ApplicationRecord
   before_destroy :reassign_contribution_permissions
   after_destroy :updated_contributed_items_contributor_after_destroy
   after_destroy :update_publication_authors_after_destroy
-  has_many :collections, foreign_key: :contributor_id, inverse_of: :contributor
 
   # to make it look like a User
   def person
