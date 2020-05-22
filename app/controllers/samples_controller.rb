@@ -41,7 +41,6 @@ class SamplesController < ApplicationController
   def create
     @sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
     update_sample_with_params
-    update_asset_link(@sample, asset_links_params) unless asset_links_params.nil?
     flash[:notice] = 'The sample was successfully created.' if @sample.save
     respond_with(@sample)
   end
@@ -62,7 +61,6 @@ class SamplesController < ApplicationController
   def update
     @sample = Sample.find(params[:id])
     update_sample_with_params
-    update_asset_link(@sample, asset_links_params) unless asset_links_params.nil?
     flash[:notice] = 'The sample was successfully updated.' if @sample.save
     respond_with(@sample)
   end
@@ -110,7 +108,8 @@ class SamplesController < ApplicationController
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:accessor_name).collect(&:to_sym) | sample_type.sample_attributes.map(&:method_name).collect(&:to_sym) : []
     params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
                                    { data: sample_type_param_keys }, { creator_ids: [] },
-                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] }, sample_type_param_keys)
+                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] }, sample_type_param_keys,
+                                   asset_links_attributes:[:id, :url, :link_type, :_destroy])
   end
 
   def update_sample_with_params

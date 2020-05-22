@@ -817,6 +817,49 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+
+    type = Factory(:patient_sample_type)
+
+    sample =  {sample_type_id: type.id,
+               data: { full_name: 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
+               project_ids: [person.projects.first.id],
+               asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}]}
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Sample.count') do
+          post :create, params: {sample: sample,  policy_attributes: { access_type: Policy::VISIBLE }}
+      end
+    end
+    sample = assigns(:sample)
+    assert_equal 'http://www.slack.com/', sample.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, sample.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    asset_link = Factory(:discussion_link)
+    sample = Factory(:sample, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    assert_equal [asset_link],sample.discussion_links
+    get :show, params: { id: sample }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update document with new discussion link' do
+    person = Factory(:person)
+    sample = Factory(:sample, contributor: person)
+    login_as(person)
+    assert_nil sample.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: sample.id, sample: { asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}] } }
+      end
+    end
+    assert_redirected_to sample_path(assigns(:sample))
+    assert_equal 'http://www.slack.com/', sample.discussion_links.first.url
+  end
+
 
   private
 

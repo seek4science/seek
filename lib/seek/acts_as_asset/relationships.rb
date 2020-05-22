@@ -49,8 +49,11 @@ module Seek
 
           has_many :assets_creators, dependent: :destroy, as: :asset, foreign_key: :asset_id
           has_many :creators, class_name: 'Person', through: :assets_creators, after_remove: %i[update_timestamp record_creators_changed], after_add: %i[update_timestamp record_creators_changed]
-          has_many :asset_links, dependent: :destroy, as: :asset, foreign_key: :asset_id
+
+          has_many :asset_links, dependent: :destroy, as: :asset, foreign_key: :asset_id, inverse_of: :asset
           has_many :discussion_links, -> { where(AssetLink.discussion.where_values_hash) }, class_name: 'AssetLink', as: :asset, dependent: :destroy, inverse_of: :asset
+          accepts_nested_attributes_for :asset_links, allow_destroy:true
+          validates_associated :asset_links
 
           has_filter :creator
 

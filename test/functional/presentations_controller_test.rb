@@ -518,7 +518,7 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
-    presentation =  {title: 'Presentation', project_ids: [person.projects.first.id], asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}}
+    presentation =  {title: 'Presentation', project_ids: [person.projects.first.id], asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Presentation.count') do
         assert_difference('ContentBlob.count') do
@@ -539,29 +539,46 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
   end
 
-  test 'should update presentation with discussion link' do
+  test 'should update presentation with new discussion link' do
     person = Factory(:person)
     presentation = Factory(:presentation, contributor: person)
     login_as(person)
     assert_nil presentation.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: presentation.id, presentation: { asset_links_attributes:{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION} }  }
+        put :update, params: { id: presentation.id, presentation: { asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}] }  }
       end
     end
-    assert_redirected_to presentation_path(assigns(:presentation))
+    assert_redirected_to presentation_path(presentation = assigns(:presentation))
     assert_equal 'http://www.slack.com/', presentation.discussion_links.first.url
   end
 
-  test 'should destroy related assetlink when the discussion link is removed ' do
+  test 'should update sop with edited discussion link' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, contributor: person, discussion_links:[Factory(:discussion_link)])
+    login_as(person)
+    assert_equal 1,presentation.discussion_links.count
+    assert_no_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: presentation.id, presentation: { asset_links_attributes:[{id:presentation.discussion_links.first.id, url: "http://www.wibble.com/",link_type: AssetLink::DISCUSSION}] } }
+      end
+    end
+    presentation = assigns(:presentation)
+    assert_redirected_to presentation_path(presentation)
+    assert_equal 1,presentation.discussion_links.count
+    assert_equal 'http://www.wibble.com/', presentation.discussion_links.first.url
+  end
+
+  test 'should destroy related asset link when the discussion link is removed ' do
     person = Factory(:person)
     login_as(person)
     asset_link = Factory(:discussion_link)
     presentation = Factory(:presentation , asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
     assert_difference('AssetLink.discussion.count', -1) do
-      put :update, params: { id: presentation.id, presentation: { asset_links_attributes:{url: "",link_type: AssetLink::DISCUSSION} } }
+      put :update, params: { id: presentation.id, presentation: { asset_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
     end
-    assert_redirected_to presentation_path(assigns(:presentation ))
+    assert_redirected_to presentation_path(presentation = assigns(:presentation ))
+    assert_empty presentation.discussion_links
   end
 
   def edit_max_object(presentation)
