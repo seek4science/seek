@@ -128,6 +128,15 @@ class CollectionTest < ActiveSupport::TestCase
     end
   end
 
+  test 'collection cannot include itself' do
+    collection = Factory(:collection)
+
+    assert_no_difference('CollectionItem.count') do
+      item = collection.items.create(asset: collection)
+      assert item.errors[:asset].join.include?('collection itself')
+    end
+  end
+
   test 'collection items destroyed with collection' do
     collection = Factory(:populated_collection)
 
