@@ -42,7 +42,7 @@ module RdfHelper
 
   def determine_resource_for_schema_ld
     if controller_name=='homes' && action_name=='index'
-      Seek::BioSchema::DataCatalogueMockModel.new
+      Seek::BioSchema::DataCatalogMockModel.new
     elsif action_name == 'show'
       resource_for_controller
     end

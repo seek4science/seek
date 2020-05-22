@@ -817,6 +817,7 @@ div.index-container {
 
 div.index-content {
   flex-grow: 1;
+  min-width: 0; /* This seems to prevent content overflowing parent. Not sure why... */
 }
 
 div.index-filters {
@@ -1009,4 +1010,8 @@ img.github-logo {
 
 .workflow-diagram img {
   max-width: 100%;
+}
+
+.list_item_content .maturity-level {
+  font-size: 100%;
 }

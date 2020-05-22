@@ -14,6 +14,12 @@
       <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
     </div>
 
+    <div class="form-group">
+      <label>Maturity</label>
+      <%= f.select :maturity_level, Workflow::MATURITY_LEVELS.values.map { |k| [t("maturity_level.#{k}"), k] }, { include_blank: 'Not specified' }, class: "form-control" -%>
+      <p class="help-block">This field is used to indicate to users what level of stablity they can expect from the workflow.</p>
+    </div>
+
     <%= render partial: 'assets/license_selector', locals: { resource: @workflow, license_group: :software, default_license: 'Apache-2.0' } %>
     <%= render :partial => 'sharing/form' -%>
     <%= render :partial => 'assets/asset_form_bottom', :locals=> {:show_publications=>false, :f => f}-%>

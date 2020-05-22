@@ -1,0 +1,6 @@
+<% discussion_links = resource.discussion_links %>
+<%= panel("Discussion Channel".pluralize(discussion_links.size), :body_options => {:class => 'text-center'}) do %>
+  <% discussion_links.each do |link| %>
+  <div> <%= link_to link.url, link.url, target: :_blank %></div>
+  <% end %>
+<% end %>

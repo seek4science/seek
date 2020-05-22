@@ -174,10 +174,6 @@ module AssetsHelper
     can_view || (code && asset.auth_by_code?(code))
   end
 
-  def asset_link_url(asset)
-    asset.single_content_blob.try(:url)
-  end
-
   def download_or_link_button(asset, download_path, link_url, _human_name = nil, opts = {})
     download_button = icon_link_to('Download', 'download', download_path, opts)
     link_button_or_nil = link_url ? icon_link_to('External Link', 'external_link', link_url, opts.merge(target: 'blank')) : nil
