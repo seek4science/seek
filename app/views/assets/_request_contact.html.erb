@@ -5,13 +5,13 @@
   if resource.has_attribute?(:creators)
     email_recipients = (resource.creators.count > 0) ? resource.creators : [resource.contributor]
   else
-    email_recipients = [resource.contributor]
+    email_recipients = [resource.contributor] unless email_recipients.nil?
   end
 %>
 
 <% if current_user %>
 <% if Seek::Config.email_enabled -%>
-    <% if email_recipients.count > 0 -%>
+    <% if !email_recipients.nil? && email_recipients.count > 0 -%>
   <%= button_link_to("Contact Inquiry", "message", '#', id: 'request_contact_button',
                      'data-toggle' => 'modal', 'data-target' => "#request-contact-modal") -%>
   <%= modal(id: 'request-contact-modal', class: 'text-left') do %>

@@ -75,13 +75,14 @@ class MailerTest < ActionMailer::TestCase
 
 
   test 'request contact' do
-    @expected.subject = 'A Sysmo SEEK member requests to discuss with you regarding A Presentation 2'
     @expected.to = ['Maximilian Maxi-Mum <maximal_person@email.com>']
     @expected.from = 'no-reply@sysmo-db.org'
     @expected.body = read_fixture('request_contact')
     @owner = Factory(:max_person)
 
     presentation = Factory :ppt_presentation, contributor: @owner
+    @expected.subject = 'A Sysmo SEEK member requests to discuss with you regarding '+ presentation.title
+
     requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
     @expected.reply_to = requester.person.email_with_name
 
