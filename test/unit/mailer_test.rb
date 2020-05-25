@@ -89,6 +89,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text = encode_mail(@expected)
     expected_text.gsub!('-person_id-', requester.person.id.to_s)
     expected_text.gsub!('-resource_id-', presentation.id.to_s)
+    expected_text.gsub!('--title--', presentation.title.to_s)
     assert_equal expected_text, encode_mail(Mailer.request_contact(requester, presentation))
   end
 
