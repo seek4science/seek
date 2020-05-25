@@ -2,7 +2,11 @@
   resource = object
 
   #if there are creators, the email will be sent only to them, otherwise sent to the contributor
-  email_recipients = (resource.creators.count > 0) ? resource.creators : [resource.contributor]
+  if resource.has_attribute?(:creators)
+    email_recipients = (resource.creators.count > 0) ? resource.creators : [resource.contributor]
+  else
+    email_recipients = [resource.contributor]
+  end
 %>
 
 <% if current_user %>

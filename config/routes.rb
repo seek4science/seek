@@ -726,6 +726,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       get :manage
       patch :manage_update
+      post :request_contact
     end
     resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
               :strains, :organisms, only:[:index]
