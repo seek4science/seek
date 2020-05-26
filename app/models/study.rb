@@ -38,15 +38,26 @@ class Study < ApplicationRecord
 
 
   def self.extract_study_data_from_file(studies_file)
-    studies_data_files = {}
     parsed_sheet = Seek::Templates::StudiesReader.new(studies_file)
 
-    # FIXME: Take into account empty columns
-    parsed_sheet.each_record(5, [2, 3]) do |index, data|
-      if index > 4
-        study_code = data[0].value
+    studies_data_files = {}
+    columns = [2, 3, 4, 5]
+    data_file_start_row_index = 4
+    parsed_sheet.each_record(5, columns) do |index, data|
+      if index > data_file_start_row_index
+
+        study_id = data[0].value
+        if !studies_data_files.key?(study_id)
+          studies_data_files[study_id] = {data_file:[], data_file_description:[], data_file_version:[]}
+        end
+
+
         data_file = data[1].value
-        studies_data_files[study_code] = data_file
+        data_file_description = data[2].value
+        data_file_version = data[3].value
+        studies_data_files[study_id][:data_file] << data_file
+        studies_data_files[study_id][:data_file_description] << data_file_description
+        studies_data_files[study_id][:data_file_version] << data_file_version
       end
     end
     studies_data_files

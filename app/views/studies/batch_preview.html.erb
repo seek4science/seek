@@ -23,6 +23,7 @@
         <th scope="col" style="min-width:150px;">Description of growth facility</th>
         <th scope="col" style="min-width:150px;">Type of growth facility</th>
         <th scope="col" style="min-width:150px;">Cultural practices</th>
+        <th scope="col" style="min-width:150px;">Data files</th>
 
       </tr>
       </thead>
@@ -82,6 +83,9 @@
           </td>
           <td>
             <%= f.text_area :culturalPractices, required: false, name: "studies[culturalPractices][]", :class => "form-control", value: study.custom_metadata.data[:cultural_practices] %>
+          </td>
+          <td>
+            <%= f.text_area :culturalPractices, required: false, :class => "form-control", value: @studies_datafiles[study.custom_metadata.data[:id]][:data_file].join(", ") %>
           </td>
         </tr>
       <% end %>
