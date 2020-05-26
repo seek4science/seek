@@ -524,6 +524,21 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select 'p.import_details', count: 0
   end
 
+  test 'should show request contact button' do
+    p1 = Factory :person
+    p2 = Factory :person
+    m = Factory(:model, title: 'a model', creators: [p1,p2], contributor:User.current_user.person, policy: Factory(:public_policy))
+
+    assert_difference('ActivityLog.count') do
+      get :show, params: { id: m }
+    end
+
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a', text: /Contact/, count: 1
+    end
+  end
+
   test 'should show model with multiple files' do
     m = Factory :model_2_files, policy: Factory(:public_policy)
 

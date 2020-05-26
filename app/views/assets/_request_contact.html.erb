@@ -2,20 +2,19 @@
   resource = object
 
   #if there are creators, the email will be sent only to them, otherwise sent to the contributor
-  if resource.has_attribute?(:creators)
-    email_recipients = (resource.creators.count > 0) ? resource.creators : [resource.contributor]
+  if resource.creators.present?
+    email_recipients = resource.creators
   else
-    email_recipients = [resource.contributor] unless email_recipients.nil?
+    email_recipients = [resource.contributor] unless resource.contributor.nil?
   end
 %>
 
 <% if current_user %>
-<% if Seek::Config.email_enabled -%>
-    <% if !email_recipients.nil? && email_recipients.count > 0 -%>
-  <%= button_link_to("Contact Inquiry", "message", '#', id: 'request_contact_button',
+<% if Seek::Config.email_enabled && email_recipients.present? -%>
+    <%= button_link_to("Request Contact", "message", '#', id: 'request_contact_button',
                      'data-toggle' => 'modal', 'data-target' => "#request-contact-modal") -%>
   <%= modal(id: 'request-contact-modal', class: 'text-left') do %>
-    <%= modal_header('Contact Inquiry') %>
+    <%= modal_header('Request Contact') %>
     <%= modal_body do %>
       <div id="request_contact_form">
         <%= form_tag_with_callbacks(polymorphic_url(resource, action: :request_contact),
@@ -39,6 +38,5 @@
   <% end %>
 <% else -%>
   <%= button_link_to("Request Contact", "message", '#', :class => 'disabled-button', :onclick => "alert('No contributor or creator for this asset');") -%>
-<% end -%>
 <% end -%>
 <% end -%>
