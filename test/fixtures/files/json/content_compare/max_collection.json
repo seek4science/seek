@@ -3,18 +3,23 @@
     "id": "883654268",
     "type": "collections",
     "attributes": {
-      "policy":
-      {
-        "access":"no_access",
-        "permissions":[]
+      "policy": {
+        "access": "no_access",
+        "permissions": []
       },
-      "tags": ["Collection-tag1", "Collection-tag2", "Collection-tag3", "Collection-tag4", "Collection-tag5"],
+      "tags": [
+        "Collection-tag1",
+        "Collection-tag2",
+        "Collection-tag3",
+        "Collection-tag4",
+        "Collection-tag5"
+      ],
       "title": "A Maximal Collection",
       "description": "A collection of very interesting things",
       "license": null,
       "created_at": "2017-10-06T09:53:31.000Z",
       "updated_at": "2017-10-06T09:53:31.000Z",
-      "other_creators" : "Blogs, Joe"
+      "other_creators": "Blogs, Joe"
     },
     "relationships": {
       "creators": {
@@ -64,52 +69,35 @@
       "items": {
         "data": [
           {
-            "type": "documents",
-            "id": "976",
-            "meta": {
-              "comment": "Readme!"
-            }
+            "id": "51",
+            "type": "collection_items"
           },
           {
-            "type": "documents",
-            "id": "977",
-            "meta": {
-              "comment": "Secret info"
-            }
+            "id": "52",
+            "type": "collection_items"
           },
           {
-            "type": "sops",
-            "id": "1055250454",
-            "meta": {
-              "comment": "The protocol"
-            }
+            "id": "53",
+            "type": "collection_items"
           },
           {
-            "type": "data_files",
-            "id": "883654268",
-            "meta": {
-              "comment": "Data 1"
-            }
+            "id": "54",
+            "type": "collection_items"
           },
           {
-            "type": "data_files",
-            "id": "883654269",
-            "meta": {
-              "comment": "Data 2"
-            }
+            "id": "55",
+            "type": "collection_items"
           },
           {
-            "type": "data_files",
-            "id": "883654270",
-            "meta": {
-              "comment": "Bad data"
-            }
+            "id": "56",
+            "type": "collection_items"
           }
         ]
       }
     },
     "links": {
-      "self": "/collections/883654268"
+      "self": "/collections/883654268",
+      "items": "/collections/883654268/items"
     },
     "meta": {
       "created": "2017-10-06T09:53:31.000Z",
@@ -119,6 +107,104 @@
       "api_version": "0.3"
     }
   },
+  "included": [
+    {
+      "id": "51",
+      "type": "collection_items",
+      "attributes": {
+        "comment": "Readme!",
+        "order": 1
+      },
+      "relationships": {
+        "asset": {
+          "data": {
+            "id": "207",
+            "type": "documents"
+          }
+        }
+      }
+    },
+    {
+      "id": "52",
+      "type": "collection_items",
+      "attributes": {
+        "comment": "Secret info",
+        "order": 2
+      },
+      "relationships": {
+        "asset": {
+          "data": {
+            "id": "208",
+            "type": "documents"
+          }
+        }
+      }
+    },
+    {
+      "id": "53",
+      "type": "collection_items",
+      "attributes": {
+        "comment": "The protocol",
+        "order": 3
+      },
+      "relationships": {
+        "asset": {
+          "data": {
+            "id": "1055250448",
+            "type": "sops"
+          }
+        }
+      }
+    },
+    {
+      "id": "54",
+      "type": "collection_items",
+      "attributes": {
+        "comment": "Data 1",
+        "order": 4
+      },
+      "relationships": {
+        "asset": {
+          "data": {
+            "id": "883654272",
+            "type": "data_files"
+          }
+        }
+      }
+    },
+    {
+      "id": "55",
+      "type": "collection_items",
+      "attributes": {
+        "comment": "Data 2",
+        "order": 5
+      },
+      "relationships": {
+        "asset": {
+          "data": {
+            "id": "883654273",
+            "type": "data_files"
+          }
+        }
+      }
+    },
+    {
+      "id": "56",
+      "type": "collection_items",
+      "attributes": {
+        "comment": "Bad data",
+        "order": 6
+      },
+      "relationships": {
+        "asset": {
+          "data": {
+            "id": "883654274",
+            "type": "data_files"
+          }
+        }
+      }
+    }
+  ],
   "jsonapi": {
     "version": "1.0"
   }

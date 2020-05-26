@@ -17,7 +17,7 @@ class CollectionsController < ApplicationController
     respond_to do |format|
       format.html
       format.rdf { render template: 'rdf/show' }
-      format.json { render json: @collection, scope: { requested_version: params[:version] }, include: [params[:include]] }
+      format.json { render json: @collection, scope: { requested_version: params[:version] }, include: json_api_include_param }
     end
   end
 
@@ -35,7 +35,7 @@ class CollectionsController < ApplicationController
       if @collection.update_attributes(collection_params)
         flash[:notice] = "#{t('collection')} metadata was successfully updated."
         format.html { redirect_to collection_path(@collection) }
-        format.json { render json: @collection, include: [params[:include]] }
+        format.json { render json: @collection, include: json_api_include_param }
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@collection), status: :unprocessable_entity }
@@ -51,4 +51,8 @@ class CollectionsController < ApplicationController
   end
 
   alias_method :asset_params, :collection_params
+
+  def json_api_include_param
+    [params[:include] || 'items']
+  end
 end

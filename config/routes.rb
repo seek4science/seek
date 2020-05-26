@@ -802,7 +802,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :collection_items, as: :items
+    resources :items, controller: :collection_items
     resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:collections,:only=>[:index]
   end
 

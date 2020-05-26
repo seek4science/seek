@@ -10,10 +10,10 @@
     <%= modal_body do %>
       <div class="form-group">
         <label>Comment</label>
-        <%= text_field_tag('item[comment]', nil, placeholder: 'Comment (optional)', id: 'collection-item-comment', class: 'form-control', autocomplete: 'off') -%>
+        <%= text_field_tag('collection_item[comment]', nil, placeholder: 'Comment (optional)', id: 'collection-item-comment', class: 'form-control', autocomplete: 'off') -%>
       </div>
-      <%= hidden_field_tag('item[asset_type]', resource.class.name) %>
-      <%= hidden_field_tag('item[asset_id]', resource.id) %>
+      <%= hidden_field_tag('collection_item[asset_type]', resource.class.name) %>
+      <%= hidden_field_tag('collection_item[asset_id]', resource.id) %>
     <% end %>
     <%= modal_footer do %>
       <%= submit_tag('Add', class: 'btn btn-primary pull-right') %>

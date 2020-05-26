@@ -32,7 +32,7 @@ module Seek
         format.html
         format.xml
         format.rdf { render template: 'rdf/show' }
-        format.json { render json: asset, scope: { requested_version: params[:version] }, include: [params[:include]] }
+        format.json { render json: asset, scope: { requested_version: params[:version] }, include: json_api_include_param }
       end
     end
 
@@ -70,7 +70,7 @@ module Seek
         if item.save
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully updated."
           format.html { redirect_to(item) }
-          format.json { render json: item, include: [params[:include]] }
+          format.json { render json: item, include: json_api_include_param }
         else
           format.html { render action: 'manage' }
           format.json { render json: json_api_errors(item), status: :unprocessable_entity }
@@ -110,7 +110,7 @@ module Seek
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully uploaded and saved."
           respond_to do |format|
             format.html { redirect_to item }
-            format.json { render json: item, include: [params[:include]] }
+            format.json { render json: item, include: json_api_include_param }
           end
         end
       else
@@ -160,6 +160,10 @@ module Seek
       return false unless item.respond_to?(:parent_name) && !item.parent_name.blank?
       render partial: 'assets/back_to_fancy_parent', locals: { child: item, parent_name: item.parent_name }
       true
+    end
+
+    def json_api_include_param
+      [params[:include]]
     end
   end
 end

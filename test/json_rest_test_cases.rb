@@ -60,7 +60,7 @@ module JsonRestTestCases
     className = @controller.class.name.dup
     className[0] = className[0].downcase
     fragment = '#/definitions/' + className.gsub('Controller', 'Response')
-    get :index, format: 'json'
+    get :index, params: rest_index_url_options, format: 'json'
     if check_for_501_index_return
       assert_response :not_implemented
     else
@@ -125,7 +125,7 @@ module JsonRestTestCases
     end
 
     diff.delete_if do |el|
-      el['path'] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|download|md5sum|sha1sum|project_id|position_id|tags|members/
+      el['path'] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|download|md5sum|sha1sum|project_id|position_id|tags|members|links\/items/
     end
 
     assert_equal [], diff
@@ -183,6 +183,10 @@ module JsonRestTestCases
   end
 
   def rest_show_url_options(_object = rest_api_test_object)
+    {}
+  end
+
+  def rest_index_url_options()
     {}
   end
 end

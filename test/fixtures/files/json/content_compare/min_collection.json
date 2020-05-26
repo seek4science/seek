@@ -52,7 +52,8 @@
       }
     },
     "links": {
-      "self": "/collections/883654268"
+      "self": "/collections/883654268",
+      "items": "/collections/883654268/items"
     },
     "meta": {
       "created": "2017-10-06T09:53:31.000Z",

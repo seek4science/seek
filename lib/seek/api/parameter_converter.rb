@@ -8,6 +8,11 @@ module Seek
     # 3. Rename - Keys the above form are renamed according to the `RENAME` mapping below.
     # 4. Elevate - Parameters in the `ELEVATE` list are moved up out of e.g. `params['data_file']` into the top-level `params`
     class ParameterConverter
+      # The JSON-API deserializer needs to know which fields are polymorphic, or the type info gets thrown away.
+      POLYMORPHIC_FIELDS = {
+          collection_items: [:asset]
+      }
+
       # Custom conversions required on certain parameters to fit how the controller expects.
       CONVERSIONS = {
           policy: proc { |value|
@@ -98,30 +103,12 @@ module Seek
               WorkflowClass.where(key: value[:key]).pluck(:id).first
             end
           },
-
-          item_ids: proc { |value, raw| # Have to access the raw params because AMS threw away type and meta...
-            # Convert to the format the `accepts_nested_attributes_for` expects:
-            items_attributes = {}
-            i = 1
-
-            items_params = raw.dig(:data, :relationships, :items).to_unsafe_h || { data: [] }
-            items_params[:data].each do |p|
-              items_attributes[(i += 1).to_s] =
-              {
-                  asset_id: p[:id],
-                  asset_type: p[:type].singularize.classify,
-                  comment: p.dig(:meta, :comment),
-                  order: p.dig(:meta, :order),
-              }
-            end
-
-            items_attributes
-          }
+          asset_type: proc { |value| value.classify }
       }
       CONVERSIONS[:default_policy] = CONVERSIONS[:policy]
       CONVERSIONS.freeze
 
-          # Parameters to rename
+      # Parameters to rename
       RENAME = {
           tags: :tag_list,
           policy: :policy_attributes,
@@ -135,8 +122,7 @@ module Seek
           environment: :recommended_environment_id,
           data_file_ids: :data_files_attributes,
           assay_ids: :assay_assets_attributes,
-          workflow_class: :workflow_class_id,
-          item_ids: :items_attributes
+          workflow_class: :workflow_class_id
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.
@@ -151,8 +137,9 @@ module Seek
         @parameters = parameters
 
         # Step 1 - JSON-API -> Rails format
+        polymorphic_fields = POLYMORPHIC_FIELDS[@controller_name.to_sym] || []
         @parameters[@controller_name.singularize.to_sym] =
-            ActiveModelSerializers::Deserialization.jsonapi_parse(@parameters)
+            ActiveModelSerializers::Deserialization.jsonapi_parse(@parameters, polymorphic: polymorphic_fields)
 
         # Step 2 - Perform any conversions on parameter values
         convert_parameters
@@ -164,7 +151,6 @@ module Seek
         elevate_parameters
 
         @parameters.delete(:data)
-        @parameters
       end
 
       private

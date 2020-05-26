@@ -1,5 +1,9 @@
-class CollectionSerializer < ContributedResourceSerializer
-  has_many :people
-  has_many :projects
-  has_many :publications
+class CollectionItemSerializer < ActiveModel::Serializer
+  has_one :asset, polymorphic: true
+
+  attributes :comment, :order
+
+  def base_url
+    Seek::Config.site_base_host
+  end
 end

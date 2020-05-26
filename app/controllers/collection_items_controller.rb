@@ -1,6 +1,29 @@
 class CollectionItemsController < ApplicationController
   before_action :collections_enabled?
   before_action :find_and_authorize_collection
+  before_action :find_collection_item, except: [:index, :create]
+
+  def index
+    @items = @collection.items
+
+    respond_to do |format|
+      format.json do
+        render json: @items, include: [params[:include]],
+               each_serializer: CollectionItemSerializer,
+               links: { self: collection_items_path(@collection) },
+               meta: {
+                   base_url: Seek::Config.site_base_host,
+                   api_version: ActiveModel::Serializer.config.api_version
+               }
+      end
+    end
+  end
+
+  def show
+    respond_to do |format|
+      format.json { render json: @item, include: [params[:include] || 'collection'] }
+    end
+  end
 
   def create
     @item = @collection.items.build(item_params)
@@ -11,7 +34,7 @@ class CollectionItemsController < ApplicationController
           flash[:notice] = "#{@item.asset.title} added to collection"
           redirect_to @collection
         end
-        format.json { render json: @item.attributes }
+        format.json { render json: @item, include: [params[:include] || 'collection'] }
       else
         format.json { head :unprocessable_entity }
       end
@@ -20,8 +43,6 @@ class CollectionItemsController < ApplicationController
 
   # PUT /collections/1
   def destroy
-    @item = CollectionItem.find_by_id(params[:id])
-
     respond_to do |format|
       if @item.destroy
         format.json { head :ok }
@@ -32,11 +53,11 @@ class CollectionItemsController < ApplicationController
   end
 
   def update
-    @item = CollectionItem.find_by_id(params[:id])
+    @item = @collection.items.find_by_id(params[:id])
 
     respond_to do |format|
       if @item.update_attributes(item_params)
-        format.json { render json: @item.attributes }
+        format.json { render json: @item, include: [params[:include] || 'collection'] }
       else
         format.json { head :unprocessable_entity }
       end
@@ -46,7 +67,7 @@ class CollectionItemsController < ApplicationController
   private
 
   def item_params
-    params.require(:item).permit(:asset_type, :asset_id, :comment, :order)
+    params.require(:collection_item).permit(:asset_type, :asset_id, :comment, :order)
   end
 
   def find_and_authorize_collection
@@ -64,5 +85,9 @@ class CollectionItemsController < ApplicationController
         end
       end
     end
+  end
+
+  def find_collection_item
+    @item = @collection.items.find_by_id(params[:id])
   end
 end
