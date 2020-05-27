@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_06_123855) do
+ActiveRecord::Schema.define(version: 2020_05_13_101632) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -187,6 +187,16 @@ ActiveRecord::Schema.define(version: 2020_05_06_123855) do
     t.string "doi"
   end
 
+  create_table "asset_links",  force: :cascade do |t|
+    t.integer "asset_id"
+    t.string "asset_type"
+    t.text "url"
+    t.string "link_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["asset_id", "asset_type"], name: "index_asset_links_on_asset_id_and_asset_type"
+  end
+
   create_table "assets", id: :integer,  force: :cascade do |t|
     t.integer "project_id"
     t.string "resource_type"
@@ -280,31 +290,6 @@ ActiveRecord::Schema.define(version: 2020_05_06_123855) do
     t.integer "age_at_sampling"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "custom_metadata",  force: :cascade do |t|
-    t.text "json_metadata"
-    t.string "item_type"
-    t.bigint "item_id"
-    t.bigint "custom_metadata_type_id"
-    t.index ["custom_metadata_type_id"], name: "index_custom_metadata_on_custom_metadata_type_id"
-    t.index ["item_type", "item_id"], name: "index_custom_metadata_on_item_type_and_item_id"
-  end
-
-  create_table "custom_metadata_attributes",  force: :cascade do |t|
-    t.bigint "custom_metadata_type_id"
-    t.bigint "sample_attribute_type_id"
-    t.boolean "required", default: false
-    t.integer "pos"
-    t.string "title"
-    t.index ["custom_metadata_type_id"], name: "index_custom_metadata_attributes_on_custom_metadata_type_id"
-    t.index ["sample_attribute_type_id"], name: "index_custom_metadata_attributes_on_sample_attribute_type_id"
-  end
-
-  create_table "custom_metadata_types",  force: :cascade do |t|
-    t.string "title"
-    t.integer "contributor_id"
-    t.text "supported_type"
   end
 
   create_table "data_file_auth_lookup", id: false,  force: :cascade do |t|
@@ -500,7 +485,7 @@ ActiveRecord::Schema.define(version: 2020_05_06_123855) do
     t.text "address", limit: 16777215
     t.string "city"
     t.string "country"
-    t.string "url"
+    t.text "url"
     t.text "description", limit: 16777215
     t.string "title"
     t.integer "policy_id"
@@ -673,7 +658,7 @@ ActiveRecord::Schema.define(version: 2020_05_06_123855) do
     t.string "title"
     t.text "address", limit: 16777215
     t.string "city"
-    t.string "web_page"
+    t.text "web_page"
     t.string "country"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -1048,7 +1033,7 @@ ActiveRecord::Schema.define(version: 2020_05_06_123855) do
     t.string "email"
     t.string "phone"
     t.string "skype_name"
-    t.string "web_page"
+    t.text "web_page"
     t.text "description", limit: 16777215
     t.integer "avatar_id"
     t.integer "status_id", default: 0
@@ -1148,7 +1133,7 @@ ActiveRecord::Schema.define(version: 2020_05_06_123855) do
     t.string "title"
     t.text "description", limit: 16777215
     t.integer "avatar_id"
-    t.string "web_page"
+    t.text "web_page"
     t.string "first_letter", limit: 1
     t.string "uuid"
     t.datetime "created_at", null: false
@@ -1199,8 +1184,8 @@ ActiveRecord::Schema.define(version: 2020_05_06_123855) do
 
   create_table "projects", id: :integer,  force: :cascade do |t|
     t.string "title"
-    t.string "web_page"
-    t.string "wiki_page"
+    t.text "web_page"
+    t.text "wiki_page"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text "description", limit: 16777215
@@ -1314,7 +1299,7 @@ ActiveRecord::Schema.define(version: 2020_05_06_123855) do
     t.string "publisher"
     t.string "editor"
     t.integer "publication_type_id"
-    t.string "url"
+    t.text "url"
     t.index ["contributor_id"], name: "index_publications_on_contributor"
   end
 

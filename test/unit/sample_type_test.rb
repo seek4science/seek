@@ -11,11 +11,13 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'validation' do
     sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: @person
     refute sample_type.valid?
+    sample_type.errors.added?(:sample_attributes, 'must be 1 attribute')
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
 
     assert sample_type.valid?
     sample_type.title = nil
     refute sample_type.valid?
+    sample_type.errors.added?(:title, 'blank')
     sample_type.title = ''
     refute sample_type.valid?
 
@@ -23,6 +25,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type = SampleType.new title: 'fish', contributor: @person
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
     refute sample_type.valid?
+    sample_type.errors.added?(:projects, 'blank')
     sample_type.projects = [@project]
     assert sample_type.valid?
 
@@ -32,6 +35,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert sample_type.valid?
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'a', is_title: false, sample_type: sample_type)
     refute sample_type.valid?
+    sample_type.errors.added?(:sample_attributes, 'must be unique, there are duplicates of a')
 
     # uniqueness check should be case insensitive
     sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: @person
@@ -39,11 +43,13 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert sample_type.valid?
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'aAA', is_title: false, sample_type: sample_type)
     refute sample_type.valid?
+    sample_type.errors.added?(:sample_attributes, 'must be unique, there are duplicates of aaa')
 
     #needs to have a contributor
     sample_type = SampleType.new title: 'fish', project_ids: @project_ids
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
     refute sample_type.valid?
+    sample_type.errors.added?(:contributor, 'blank')
     sample_type.contributor = @person
     assert sample_type.valid?
 
@@ -51,8 +57,21 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: Factory(:person)
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
     refute sample_type.valid?
+    sample_type.errors.added?(:base, 'associate projects that you are an active member of')
     sample_type.contributor = @person
     assert sample_type.valid?
+
+    # accessor names unique
+    sample_type = SampleType.new title: 'fish', project_ids: @project_ids, contributor: @person
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'a+b', is_title: true, sample_type: sample_type)
+    assert sample_type.valid?
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'a-b', is_title: false, sample_type: sample_type)
+    refute sample_type.valid?
+    sample_type.errors.added?(:sample_attributes, 'too similar: (a+b, a-b)')
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'c-d', is_title: false, sample_type: sample_type)
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'c+d', is_title: false, sample_type: sample_type)
+    refute sample_type.valid?
+    sample_type.errors.added?(:sample_attributes, 'too similar: (a+b, a-b), (c-d, c+d)')
   end
 
   test 'can_view?' do

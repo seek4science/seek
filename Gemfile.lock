@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/fbacall/ro-crate-ruby.git
-  revision: 86242d7c31b4c15b324e6b680523d6cac10d509a
+  revision: c0ac740792565de4c543a615310f67029e666d58
   specs:
     ro-crate-ruby (0.1.0)
       addressable
@@ -349,7 +349,7 @@ GEM
       rdf-xsd (>= 2.2, < 4.0)
       sparql (>= 2.2, < 4.0)
       sxp (~> 1.0)
-    libxml-ruby (2.8.0)
+    libxml-ruby (2.9.0)
     link_header (0.0.8)
     linkeddata (3.0.1)
       equivalent-xml (~> 0.6)
@@ -509,7 +509,7 @@ GEM
       pry (~> 0.9)
       slop (~> 3.0)
     psych (2.2.4)
-    public_suffix (4.0.4)
+    public_suffix (4.0.5)
     puma (3.12.4)
     pyu-ruby-sasl (0.0.3.3)
     rack (2.0.8)
@@ -915,7 +915,7 @@ DEPENDENCIES
   jquery-ui-rails
   json-diff
   json-schema
-  libxml-ruby (= 2.8.0)
+  libxml-ruby (~> 2.9.0)
   linkeddata
   lograge
   loofah

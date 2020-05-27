@@ -28,6 +28,8 @@
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @data_file } %>
 
+      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @data_file} -%>
+
       <%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file} -%>

@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SchemaLdGenerationTest < ActiveSupport::TestCase
+
   def setup
     @person = Factory(:max_person, description: 'a lovely person')
     @project = @person.projects.first
@@ -15,7 +16,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected = {
       '@context' => 'http://schema.org',
-      '@type' => 'DataCatalogue',
+      '@type' => 'DataCatalog',
       'name' => 'Sysmo',
       'url' => 'http://fairyhub.org',
       'description' => 'a lovely project',
@@ -30,7 +31,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     with_config_value(:project_description, 'a lovely project') do
       with_config_value(:project_keywords, 'a,  b, ,,c,d') do
         with_config_value(:site_base_host, 'http://fairyhub.org') do
-          json = JSON.parse(Seek::BioSchema::DataCatalogueMockModel.new.to_schema_ld)
+          json = JSON.parse(Seek::BioSchema::DataCatalogMockModel.new.to_schema_ld)
           assert_equal expected, json
         end
       end
@@ -84,7 +85,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'keywords' => 'keyword',
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
       'url' => "http://localhost:3000/data_files/#{df.id}",
-      'provider' => [{
+      'producer' => [{
         '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
         'name' => @project.title
@@ -133,7 +134,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'keywords' => 'keyword',
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
       'url' => 'http://www.abc.com',
-      'provider' => [{
+      'producer' => [{
         '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
         'name' => @project.title
@@ -267,7 +268,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.to_s,
       'dateModified' => @current_time.to_s,
       'encodingFormat' => 'application/pdf',
-      'provider' => [
+      'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
       ]
     }
@@ -294,7 +295,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.to_s,
       'dateModified' => @current_time.to_s,
       'encodingFormat' => 'application/pdf',
-      'provider' => [
+      'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
       ]
     }
@@ -340,7 +341,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        'name' => 'Fred Bloggs' },
                      { '@type' => 'Person',
                        'name' => 'Steve Smith' }],
-                 'provider' =>
+                 'producer' =>
                     [{ '@type' => %w[Project Organization],
                        '@id' => "http://localhost:3000/projects/#{@project.id}",
                        'name' => @project.title }],
@@ -353,20 +354,40 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        'name' => @person.name }],
                  'version' => 1,
                  'programmingLanguage' => 'CWL workflow',
-                 'inputs' =>
-                     ['#main/input.cofsfile : ["File"]',
-                      '#main/input.dmax : ["int"]',
-                      '#main/input.dmin : ["int"]',
-                      '#main/input.max-steps : ["int"]',
-                      '#main/input.mwmax-cof : ["int"]',
-                      '#main/input.mwmax-source : ["int"]',
-                      '#main/input.rulesfile : File',
-                      '#main/input.sinkfile : ["File"]',
-                      '#main/input.sourcefile : File',
-                      '#main/input.std_mode : ["string"]',
-                      '#main/input.stereo_mode : ["string"]',
-                      '#main/input.topx : ["int"]'],
-                 'outputs' => ['#main/solutionfile : File', '#main/sourceinsinkfile : ["File"]', '#main/stdout : File'] }
+                 'inputs' => [
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.cofsfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.dmax' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.dmin' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.max-steps' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.mwmax-cof' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.mwmax-source' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.rulesfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.sinkfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.sourcefile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.std_mode' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.stereo_mode' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.topx' }
+                 ],
+                 'outputs' => [
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/solutionfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/sourceinsinkfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/stdout' }
+                 ] }
 
     json = JSON.parse(workflow.to_schema_ld)
     assert_equal expected, json
