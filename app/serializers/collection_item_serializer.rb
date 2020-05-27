@@ -1,9 +1,12 @@
-class CollectionItemSerializer < ActiveModel::Serializer
+class CollectionItemSerializer < SimpleBaseSerializer
+  include Rails.application.routes.url_helpers
+
+  belongs_to :collection
   has_one :asset, polymorphic: true
 
   attributes :comment, :order
 
-  def base_url
-    Seek::Config.site_base_host
+  def _links
+    { self: collection_item_path(object.collection, object) }
   end
 end

@@ -52,17 +52,17 @@ end
 
 # CollectionItem
 Factory.define(:collection_item) do |f|
-  f.association :collection
+  f.association :collection, factory: :public_collection
   f.association :asset, factory: :public_document
 end
 
 Factory.define(:min_collection_item, class: CollectionItem) do |f|
-  f.association :collection
+  f.association :collection, factory: :public_collection
   f.association :asset, factory: :public_document
 end
 
 Factory.define(:max_collection_item, class: CollectionItem) do |f|
-  f.association :collection
+  f.association :collection, factory: :public_collection
   f.association :asset, factory: :public_document
   f.comment 'A document'
   f.order 1

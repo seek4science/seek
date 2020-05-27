@@ -1,0 +1,35 @@
+{
+  "data": {
+    "id": "11",
+    "type": "collection_items",
+    "attributes": {
+      "comment": null,
+      "order": 1
+    },
+    "relationships": {
+      "collection": {
+        "data": {
+          "id": "1",
+          "type": "collections"
+        }
+      },
+      "asset": {
+        "data": {
+          "id": "3",
+          "type": "documents"
+        }
+      }
+    },
+    "links": {
+      "self": "/collections/1/items/11"
+    },
+    "meta": {
+      "created": "2020-05-26T13:26:25.000Z",
+      "modified": "2020-05-26T13:26:25.000Z",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

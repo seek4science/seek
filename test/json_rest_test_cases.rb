@@ -85,7 +85,7 @@ module JsonRestTestCases
     ['min', 'max'].each do |m|
       object = get_test_object(m)
       json_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'content_compare',
-                            "#{m}_#{@controller.controller_name.classify.downcase}.json")
+                            "#{m}_#{@controller.controller_name.singularize}.json")
       # parse such that backspace is eliminated and null turns to nil
       json_to_compare = JSON.parse(File.read(json_file))
 
@@ -107,7 +107,11 @@ module JsonRestTestCases
     diff.reverse_each do |el|
       # the self link must start with the pluralized controller's name (e.g. /people)
       if el['path'] =~ /self/
-        assert_match /\/#{plural_obj}\/\d+/, el['value']
+        if plural_obj == 'collection_items' # ugh
+          assert_match /\/collections\/\d+\/items\/\d+/, el['value']
+        else
+          assert_match /\/#{plural_obj}\/\d+/, el['value']
+        end
         # url in version, e.g.  base_url/data_files/877365356?version=1
       elsif el['path'] =~ /versions\/\d+\/url/
         assert_match /#{base}\/#{plural_obj}\/\d+\?version=\d+/, el['value']
@@ -153,13 +157,11 @@ module JsonRestTestCases
     type = @controller.controller_name.classify
     opts = type.constantize.method_defined?(:policy) ? { policy: Factory(:publicly_viewable_policy) } : {}
     opts[:publication_type] = Factory(:journal) if type.constantize.method_defined?(:publication_type)
-    Factory("#{m}_#{type.downcase}".to_sym, opts)
+    Factory("#{m}_#{type.underscore}".to_sym, opts)
   end
 
   def response_code_for_not_available(format)
-    clz = @controller.controller_model
-    id = 9999
-    id += 1 until clz.find_by_id(id).nil?
+    id = (@controller.controller_model.maximum(:id) || 0) + 100
 
     url_opts = rest_show_url_options.merge(id: id, format: format)
 

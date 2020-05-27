@@ -13,7 +13,7 @@ class CollectionItemsControllerTest < ActionController::TestCase
     login_as(collection.contributor)
 
     assert_difference('CollectionItem.count', 1) do
-      post :create, params: { collection_id: collection.id, item: { comment: 'Test', asset_type: 'Document', asset_id: doc.id } }
+      post :create, params: { collection_id: collection.id, collection_item: { comment: 'Test', asset_type: 'Document', asset_id: doc.id } }
     end
 
     assert_redirected_to collection_path(collection)
@@ -32,7 +32,7 @@ class CollectionItemsControllerTest < ActionController::TestCase
     refute collection.can_edit?
 
     assert_no_difference('CollectionItem.count') do
-      post :create, params: { collection_id: collection.id, item: { comment: 'Test', asset_type: 'Document', asset_id: doc.id } }
+      post :create, params: { collection_id: collection.id, collection_item: { comment: 'Test', asset_type: 'Document', asset_id: doc.id } }
     end
 
     assert_redirected_to collection_path(collection)
@@ -43,11 +43,11 @@ class CollectionItemsControllerTest < ActionController::TestCase
     @object ||= Factory(:collection_item)
   end
 
-  def rest_index_url_options(collection = Factory(:collection))
+  def rest_index_url_options(collection = rest_api_test_object.collection)
     { collection_id: collection.id }
   end
 
-  def rest_show_url_options(collection_item)
+  def rest_show_url_options(collection_item = rest_api_test_object)
     { collection_id: collection_item.collection_id }
   end
 end

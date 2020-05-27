@@ -21,7 +21,7 @@ class CollectionItemsController < ApplicationController
 
   def show
     respond_to do |format|
-      format.json { render json: @item, include: [params[:include] || 'collection'] }
+      format.json { render json: @item, include: [params[:include]] }
     end
   end
 
@@ -34,7 +34,7 @@ class CollectionItemsController < ApplicationController
           flash[:notice] = "#{@item.asset.title} added to collection"
           redirect_to @collection
         end
-        format.json { render json: @item, include: [params[:include] || 'collection'] }
+        format.json { render json: @item, include: [params[:include]] }
       else
         format.json { head :unprocessable_entity }
       end
@@ -57,7 +57,7 @@ class CollectionItemsController < ApplicationController
 
     respond_to do |format|
       if @item.update_attributes(item_params)
-        format.json { render json: @item, include: [params[:include] || 'collection'] }
+        format.json { render json: @item, include: [params[:include]] }
       else
         format.json { head :unprocessable_entity }
       end
@@ -73,14 +73,17 @@ class CollectionItemsController < ApplicationController
   def find_and_authorize_collection
     @collection = Collection.find(params[:collection_id])
     @parent_resource = @collection
+    privilege = Seek::Permissions::Translator.translate(action_name)
 
-    unless @collection.can_edit?
+    return if privilege.nil?
+
+    unless is_auth?(@collection, privilege)
       respond_to do |format|
         flash[:error] = 'You are not authorized to perform this action'
         format.html { redirect_to @collection }
         format.json do
           render json: { "title": 'Forbidden',
-                         "detail": "You are not authorized to modify this collection." },
+                         "detail": "You are not authorized to perform this action." },
                  status: :forbidden
         end
       end
@@ -88,6 +91,6 @@ class CollectionItemsController < ApplicationController
   end
 
   def find_collection_item
-    @item = @collection.items.find_by_id(params[:id])
+    @item = @collection.items.find(params[:id])
   end
 end
