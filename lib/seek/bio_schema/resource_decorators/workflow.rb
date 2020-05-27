@@ -30,11 +30,22 @@ module Seek
         end
 
         def inputs
-          resource.inputs.collect { |inp| "#{inp.id} : #{inp.type}" }
+          property_value_specs(resource.inputs)
         end
 
         def outputs
-          resource.outputs.collect { |out| "#{out.id} : #{out.type}" }
+          property_value_specs(resource.outputs)
+        end
+
+        private
+
+        def property_value_specs(properties)
+          properties.collect do |property|
+            {
+              "@type": 'PropertyValueSpecification',
+              name: property.id
+            }
+          end
         end
       end
     end

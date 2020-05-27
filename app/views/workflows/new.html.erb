@@ -1,23 +1,25 @@
 <h1>New <%= t('workflow') %></h1>
 
-<%= alert_box('info', hide_button: true) do %>
-  A workflow can be registered as a <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">Workfow RO Crate</a> (recommended),
-  or as a separate workflow file (with the option of also providing a diagram and abstract CWL description).
-  <br/><br/>
+<%= panel do %>
+  Currently there are two ways to register a workflow:
+  <ul>
+    <li><strong>Simple</strong> - as a file with a picture and a CWL description if you have one</li>
+    <li><strong>Advanced</strong> - as a <em>Workflow RO Crate</em> (Note: this format is under development, click <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">here</a> to find out more)</li>
+  </ul>
+  <br/>
   Currently supported workflow types are: <%= WorkflowClass.order(:title).pluck(:title).join(', ') %>.
 <% end %>
 
 <div>
-  <strong>I want to...</strong>
   <ul class="nav nav-pills nav-stacked" role="tablist">
-    <li role="presentation"><a href="#new-ro-crate" aria-controls="new-ro-crate" role="tab" data-toggle="tab">Register a workflow, with an optional diagram and CWL description.</a></li>
-    <li role="presentation"><a href="#existing-ro-crate" aria-controls="existing-ro-crate" role="tab" data-toggle="tab">Register a <em>Workflow RO Crate</em></a></li>
+    <li class="active" role="presentation"><a href="#new-ro-crate" aria-controls="new-ro-crate" role="tab" data-toggle="tab">Simple</a></li>
+    <li role="presentation"><a href="#existing-ro-crate" aria-controls="existing-ro-crate" role="tab" data-toggle="tab">Advanced (<em>Workflow RO Crate</em>)</a></li>
   </ul>
 
   <br/>
 
   <div class="tab-content">
-    <div id="new-ro-crate" role="tabpanel" class="tab-pane">
+    <div id="new-ro-crate" role="tabpanel" class="tab-pane active">
       <%= form_tag({ action: :create_ro_crate, anchor: 'new-ro-crate' }, multipart: true) do -%>
         <div class="asset_form">
           <%= error_messages_for :workflow -%>
