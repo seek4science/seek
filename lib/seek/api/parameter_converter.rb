@@ -151,6 +151,8 @@ module Seek
         elevate_parameters
 
         @parameters.delete(:data)
+
+        @parameters
       end
 
       private
