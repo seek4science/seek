@@ -104,6 +104,7 @@ module WorkflowExtraction
     crate.url = ro_crate_url('ro_crate')
     crate['sdPublisher'] = crate.add_person(nil, contributor.ro_crate_metadata).reference
     crate['sdDatePublished'] = Time.now
+    crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
 
     crate.preview.template = PREVIEW_TEMPLATE
 
