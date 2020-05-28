@@ -2,25 +2,31 @@ module ApiTestHelper
   include AuthenticatedTestHelper
 
   # Override me!
-  def populate_extra_attributes(hash = nil)
+  def populate_extra_attributes(request_hash = {})
     {}.with_indifferent_access
   end
 
-  # Override me!
-  def populate_extra_relationships(hash = nil)
-    extra_relationships = {}.with_indifferent_access
+  # Add relationships that weren't in the original POST/PATCH request, but are in the response (such as submitter)
+  def populate_extra_relationships(request_hash = {})
+    extra_relationships = {}
     klass = @clz.classify.constantize
-    if klass.method_defined?(:contributor)
+    existing = request_hash.dig('data', 'id') # Is it an existing resource, or something being created?
+    add_contributor = klass.method_defined?(:contributor) && !existing
+    if add_contributor
       extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
     end
     if klass.method_defined?(:creators)
-      extra_relationships[:people][:data] ||= []
-      extra_relationships[:people][:data] << { id: @current_person.id.to_s, type: 'people' } if klass.method_defined?(:contributor)
-      creators = hash.dig('data', 'relationships', 'creators', 'data')
-      extra_relationships[:people][:data] += creators if creators
+      people = (request_hash.dig('data', 'relationships', 'creators', 'data') || []).map(&:symbolize_keys)
+      people << { id: @current_person.id.to_s, type: 'people' } if add_contributor
+      if people.any?
+        extra_relationships[:people] ||= {}
+        extra_relationships[:people][:data] ||= []
+        extra_relationships[:people][:data] += people
+        extra_relationships[:people][:data] = extra_relationships[:people][:data].uniq { |d| d[:id] }
+      end
     end
 
-    extra_relationships
+    extra_relationships.with_indifferent_access
   end
 
   def definitions_path

@@ -91,10 +91,10 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     h = JSON.parse(response.body)
 
     hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
-    hash_comparison(populate_extra_attributes, h['data']['attributes'])
+    hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
 
     hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
-    hash_comparison(populate_extra_relationships, h['data']['relationships'])
+    hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
   end
 
   test 'returns sensible error objects' do

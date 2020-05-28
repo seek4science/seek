@@ -21,14 +21,6 @@ class CollectionCUDTest < ActionDispatch::IntegrationTest
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: collection.id})
   end
 
-  def populate_extra_relationships(hash = nil)
-    extra_relationships = {}
-    extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
-    extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' },
-                                            { id: @creator.id.to_s, type: 'people' }] }
-    extra_relationships.with_indifferent_access
-  end
-
   test 'returns sensible error objects' do
     skip 'Errors are a WIP'
     template_file = File.join(ApiTestHelper.template_dir, 'post_bad_collection.json.erb')
