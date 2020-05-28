@@ -52,7 +52,10 @@ end
 
 # CollectionItem
 Factory.define(:collection_item) do |f|
-  f.association :collection, factory: :public_collection
+  f.ignore do
+    contributor { Factory(:person) }
+  end
+  f.collection { Factory(:public_collection, contributor: contributor) }
   f.association :asset, factory: :public_document
 end
 

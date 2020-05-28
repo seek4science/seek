@@ -5060,6 +5060,18 @@
             ],
             "additionalProperties": false
         },
+        "collectionItemReferencesList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/collectionReferences"
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false
+        },
         "dataFileType": {
             "type": "string",
             "minLength": 1,
@@ -5762,66 +5774,92 @@
             ],
             "additionalProperties": false
         },
+        "collectionItemReferences": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/collectionItemReference"
+            }
+        },
+        "collectionItemReference": {
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/collectionItemType"
+                }
+            },
+            "required": [
+                "id",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "collectionItem":  {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/collectionType"
+                },
+                "attributes": {
+                    "type": "object",
+                    "properties": {
+                        "comment": {
+                            "$ref": "#/definitions/nullableNonEmptyString"
+                        },
+                        "order": {
+                            "$ref": "#/definitions/nullableInteger"
+                        }
+                    },
+                    "required": [
+                        "comment",
+                        "order"
+                    ],
+                    "additionalProperties": false
+                },
+                "relationships": {
+                    "type": "object",
+                    "properties": {
+                        "asset": {
+                            "$ref": "#/definitions/assetSingletonReference"
+                        },
+                        "collection": {
+                            "$ref": "#/definitions/collectionSingletonReference"
+                        }
+                    },
+                    "required": [
+                        "asset",
+                        "collection"
+                    ],
+                    "additionalProperties": false
+                },
+                "links": {
+                    "$ref": "#/definitions/linksType"
+                },
+                "meta": {
+                    "$ref": "#/definitions/metaType"
+                }
+            },
+            "required": [
+                "id",
+                "type",
+                "attributes",
+                "relationships",
+                "links",
+                "meta"
+            ],
+            "additionalProperties": false
+        },
         "collectionItemResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "$ref": "#/definitions/nonEmptyString"
-                        },
-                        "type": {
-                            "$ref": "#/definitions/collectionType"
-                        },
-                        "attributes": {
-                            "type": "object",
-                            "properties": {
-                                "comment": {
-                                    "$ref": "#/definitions/nullableNonEmptyString"
-                                },
-                                "order": {
-                                    "$ref": "#/definitions/nullableInteger"
-                                }
-                            },
-                            "required": [
-                                "comment",
-                                "order"
-                            ],
-                            "additionalProperties": false
-                        },
-                        "relationships": {
-                            "type": "object",
-                            "properties": {
-                                "asset": {
-                                    "$ref": "#/definitions/assetSingletonReference"
-                                },
-                                "collection": {
-                                    "$ref": "#/definitions/collectionSingletonReference"
-                                }
-                            },
-                            "required": [
-                                "asset",
-                                "collection"
-                            ],
-                            "additionalProperties": false
-                        },
-                        "links": {
-                            "$ref": "#/definitions/linksType"
-                        },
-                        "meta": {
-                            "$ref": "#/definitions/metaType"
-                        }
-                    },
-                    "required": [
-                        "id",
-                        "type",
-                        "attributes",
-                        "relationships",
-                        "links",
-                        "meta"
-                    ],
-                    "additionalProperties": false
+                    "$ref": "#/definitions/collectionItem"
                 },
                 "jsonapi": {
                     "$ref": "#/definitions/JsonApiVersion"
@@ -5830,41 +5868,6 @@
             "required": [
                 "data",
                 "jsonapi"
-            ],
-            "additionalProperties": false
-        },
-        "collectionItemsList": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "$ref": "#/definitions/nonEmptyString"
-                        },
-                        "type": {
-                            "$ref": "#/definitions/assetType"
-                        },
-                        "meta": {
-                            "type": "object",
-                            "properties": {
-                                "comment": {
-                                    "$ref": "#/definitions/nullableNonEmptyString"
-                                },
-                                "order": {
-                                    "$ref": "#/definitions/nullableInteger"
-                                }
-                            }
-                        }
-                    },
-                    "required": [
-                        "id",
-                        "type"
-                    ]
-                }
-            },
-            "required": [
-                "data"
             ],
             "additionalProperties": false
         },
@@ -6718,7 +6721,7 @@
                                     "$ref": "#/definitions/publicationReferencesList"
                                 },
                                 "items": {
-                                    "$ref": "#/definitions/collectionItemsList"
+                                    "$ref": "#/definitions/collectionItemReferencesList"
                                 }
                             },
                             "required": [
@@ -6748,12 +6751,21 @@
                     ],
                     "additionalProperties": false
                 },
+                "included": {
+                    "type": "array",
+                    "minItems": 0,
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "#/definitions/collectionItem"
+                    }
+                },
                 "jsonapi": {
                     "$ref": "#/definitions/JsonApiVersion"
                 }
             },
             "required": [
                 "data",
+                "included",
                 "jsonapi"
             ],
             "additionalProperties": false
@@ -6806,9 +6818,6 @@
                                 },
                                 "projects": {
                                     "$ref": "#/definitions/projectReferencesList"
-                                },
-                                "items": {
-                                    "$ref": "#/definitions/collectionItemsList"
                                 }
                             },
                             "required": [
@@ -6877,9 +6886,6 @@
                                 },
                                 "projects": {
                                     "$ref": "#/definitions/projectReferencesList"
-                                },
-                                "items": {
-                                    "$ref": "#/definitions/collectionItemsList"
                                 }
                             },
                             "additionalProperties": false
@@ -6898,6 +6904,125 @@
             "additionalProperties": false,
             "example": {
                 "$ref": "../examples/collectionPatch.json"
+            }
+        },
+        "collectionItemResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/collectionItem"
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi"
+            ],
+            "additionalProperties": false
+        },
+        "collectionItemPost": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "$ref": "#/definitions/collectionItemType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "comment": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "order": {
+                                    "$ref": "#/definitions/nullableInteger"
+                                }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "asset": {
+                                    "$ref": "#/definitions/assetSingletonReference"
+                                }
+                            },
+                            "required": [
+                                "asset"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "relationships"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "$ref": "../examples/collectionItemPost.json"
+            }
+        },
+        "collectionItemPatch": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "type": {
+                            "$ref": "#/definitions/collectionType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "comment": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "order": {
+                                    "$ref": "#/definitions/nullableInteger"
+                                }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "asset": {
+                                    "$ref": "#/definitions/assetSingletonReference"
+                                }
+                            },
+                            "required": [
+                                "asset"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "type"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "$ref": "../examples/collectionItemPatch.json"
             }
         },
         "dataFileResponse": {
@@ -10449,6 +10574,137 @@
             "properties": {
                 "data": {
                     "$ref": "#/definitions/dataFileSkeletons"
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                },
+                "meta": {
+                    "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi",
+                "meta"
+            ],
+            "additionalProperties": false
+        },
+        "collectionSkeleton": {
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/collectionType"
+                },
+                "attributes": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        }
+                    },
+                    "required": [
+                        "title"
+                    ],
+                    "additionalProperties": false
+                },
+                "links": {
+                    "$ref": "#/definitions/linksType"
+                }
+            },
+            "required": [
+                "id",
+                "type",
+                "attributes",
+                "links"
+            ],
+            "additionalProperties": false
+        },
+        "collectionSkeletons": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/collectionSkeleton"
+            }
+        },
+        "collectionsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/collectionSkeletons"
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                },
+                "meta": {
+                    "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi",
+                "meta"
+            ],
+            "additionalProperties": false
+        },
+        "collectionItemSkeleton": {
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/collectionItemType"
+                },
+                "attributes": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        }
+                    },
+                    "required": [
+                        "title"
+                    ],
+                    "additionalProperties": false
+                },
+                "links": {
+                    "$ref": "#/definitions/linksType"
+                }
+            },
+            "required": [
+                "id",
+                "type",
+                "attributes",
+                "links"
+            ],
+            "additionalProperties": false
+        },
+        "collectionItemSkeletons": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/collectionItemSkeleton"
+            }
+        },
+        "collectionItemsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "minItems": 0,
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "#/definitions/collectionItem"
+                    }
                 },
                 "jsonapi": {
                     "$ref": "#/definitions/JsonApiVersion"

@@ -1,0 +1,17 @@
+{
+    "data": {
+        "type": "collection_items",
+        "attributes": {
+            "comment": "...then run this workflow",
+            "order": 3
+        },
+        "relationships": {
+            "asset": {
+                "data": {
+                    "id": "60",
+                    "type": "workflows"
+                }
+            }
+        }
+    }
+}

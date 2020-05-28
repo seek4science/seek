@@ -1,12 +1,11 @@
 {
   "data": {
-    "id": "883654268",
+    "id": "1121",
     "type": "collections",
     "attributes": {
-      "policy": {
-        "access": "no_access",
-        "permissions": []
-      },
+      "title": "A Maximal Collection",
+      "description": "A collection of very interesting things",
+      "license": null,
       "tags": [
         "Collection-tag1",
         "Collection-tag2",
@@ -14,18 +13,15 @@
         "Collection-tag4",
         "Collection-tag5"
       ],
-      "title": "A Maximal Collection",
-      "description": "A collection of very interesting things",
-      "license": null,
-      "created_at": "2017-10-06T09:53:31.000Z",
-      "updated_at": "2017-10-06T09:53:31.000Z",
+      "created_at": "2020-05-28T13:03:28.000Z",
+      "updated_at": "2020-05-28T13:03:32.000Z",
       "other_creators": "Blogs, Joe"
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "1039986841",
+            "id": "1039989767",
             "type": "people"
           }
         ]
@@ -33,7 +29,7 @@
       "submitter": {
         "data": [
           {
-            "id": "522086294",
+            "id": "1039989760",
             "type": "people"
           }
         ]
@@ -41,11 +37,11 @@
       "people": {
         "data": [
           {
-            "id": "1039986644",
+            "id": "1039989760",
             "type": "people"
           },
           {
-            "id": "1039986841",
+            "id": "1039989767",
             "type": "people"
           }
         ]
@@ -53,7 +49,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022250817",
+            "id": "1022253998",
             "type": "projects"
           }
         ]
@@ -61,7 +57,7 @@
       "publications": {
         "data": [
           {
-            "id": "1022250817",
+            "id": "980191013",
             "type": "publications"
           }
         ]
@@ -69,139 +65,223 @@
       "items": {
         "data": [
           {
-            "id": "51",
+            "id": "559",
             "type": "collection_items"
           },
           {
-            "id": "52",
+            "id": "560",
             "type": "collection_items"
           },
           {
-            "id": "53",
+            "id": "561",
             "type": "collection_items"
           },
           {
-            "id": "54",
+            "id": "562",
             "type": "collection_items"
           },
           {
-            "id": "55",
+            "id": "563",
             "type": "collection_items"
           },
           {
-            "id": "56",
+            "id": "564",
             "type": "collection_items"
           }
         ]
       }
     },
     "links": {
-      "self": "/collections/883654268",
-      "items": "/collections/883654268/items"
+      "self": "/collections/1121",
+      "items": "/collections/1121/items"
     },
     "meta": {
-      "created": "2017-10-06T09:53:31.000Z",
-      "modified": "2017-10-06T09:53:31.000Z",
-      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
-      "base_url": "http://localhost:3000",
-      "api_version": "0.3"
+      "created": "2020-05-28T13:03:28.000Z",
+      "modified": "2020-05-28T13:03:32.000Z",
+      "api_version": "0.3",
+      "uuid": "8bfca980-8311-0138-b378-0800278a9619",
+      "base_url": "http://localhost:3000"
     }
   },
   "included": [
     {
-      "id": "51",
+      "id": "559",
       "type": "collection_items",
       "attributes": {
         "comment": "Readme!",
         "order": 1
       },
       "relationships": {
+        "collection": {
+          "data": {
+            "id": "1121",
+            "type": "collections"
+          }
+        },
         "asset": {
           "data": {
-            "id": "207",
+            "id": "1196",
             "type": "documents"
           }
         }
+      },
+      "links": {
+        "self": "/collections/1121/items/559"
+      },
+      "meta": {
+        "created": "2020-05-28T13:03:28.000Z",
+        "modified": "2020-05-28T13:03:28.000Z",
+        "api_version": "0.3"
       }
     },
     {
-      "id": "52",
+      "id": "560",
       "type": "collection_items",
       "attributes": {
         "comment": "Secret info",
         "order": 2
       },
       "relationships": {
+        "collection": {
+          "data": {
+            "id": "1121",
+            "type": "collections"
+          }
+        },
         "asset": {
           "data": {
-            "id": "208",
+            "id": "1197",
             "type": "documents"
           }
         }
+      },
+      "links": {
+        "self": "/collections/1121/items/560"
+      },
+      "meta": {
+        "created": "2020-05-28T13:03:29.000Z",
+        "modified": "2020-05-28T13:03:29.000Z",
+        "api_version": "0.3"
       }
     },
     {
-      "id": "53",
+      "id": "561",
       "type": "collection_items",
       "attributes": {
         "comment": "The protocol",
         "order": 3
       },
       "relationships": {
+        "collection": {
+          "data": {
+            "id": "1121",
+            "type": "collections"
+          }
+        },
         "asset": {
           "data": {
-            "id": "1055250448",
+            "id": "1055250677",
             "type": "sops"
           }
         }
+      },
+      "links": {
+        "self": "/collections/1121/items/561"
+      },
+      "meta": {
+        "created": "2020-05-28T13:03:29.000Z",
+        "modified": "2020-05-28T13:03:29.000Z",
+        "api_version": "0.3"
       }
     },
     {
-      "id": "54",
+      "id": "562",
       "type": "collection_items",
       "attributes": {
         "comment": "Data 1",
         "order": 4
       },
       "relationships": {
+        "collection": {
+          "data": {
+            "id": "1121",
+            "type": "collections"
+          }
+        },
         "asset": {
           "data": {
-            "id": "883654272",
+            "id": "883654352",
             "type": "data_files"
           }
         }
+      },
+      "links": {
+        "self": "/collections/1121/items/562"
+      },
+      "meta": {
+        "created": "2020-05-28T13:03:30.000Z",
+        "modified": "2020-05-28T13:03:30.000Z",
+        "api_version": "0.3"
       }
     },
     {
-      "id": "55",
+      "id": "563",
       "type": "collection_items",
       "attributes": {
         "comment": "Data 2",
         "order": 5
       },
       "relationships": {
+        "collection": {
+          "data": {
+            "id": "1121",
+            "type": "collections"
+          }
+        },
         "asset": {
           "data": {
-            "id": "883654273",
+            "id": "883654353",
             "type": "data_files"
           }
         }
+      },
+      "links": {
+        "self": "/collections/1121/items/563"
+      },
+      "meta": {
+        "created": "2020-05-28T13:03:31.000Z",
+        "modified": "2020-05-28T13:03:31.000Z",
+        "api_version": "0.3"
       }
     },
     {
-      "id": "56",
+      "id": "564",
       "type": "collection_items",
       "attributes": {
         "comment": "Bad data",
         "order": 6
       },
       "relationships": {
+        "collection": {
+          "data": {
+            "id": "1121",
+            "type": "collections"
+          }
+        },
         "asset": {
           "data": {
-            "id": "883654274",
+            "id": "883654354",
             "type": "data_files"
           }
         }
+      },
+      "links": {
+        "self": "/collections/1121/items/564"
+      },
+      "meta": {
+        "created": "2020-05-28T13:03:31.000Z",
+        "modified": "2020-05-28T13:03:31.000Z",
+        "api_version": "0.3"
       }
     }
   ],

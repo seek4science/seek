@@ -3,6 +3,8 @@ class CollectionItemsController < ApplicationController
   before_action :find_and_authorize_collection
   before_action :find_collection_item, except: [:index, :create]
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def index
     @items = @collection.items
 
@@ -36,7 +38,7 @@ class CollectionItemsController < ApplicationController
         end
         format.json { render json: @item, include: [params[:include]] }
       else
-        format.json { head :unprocessable_entity }
+        format.json { render json: json_api_errors(@item), status: :unprocessable_entity }
       end
     end
   end
@@ -47,7 +49,7 @@ class CollectionItemsController < ApplicationController
       if @item.destroy
         format.json { head :ok }
       else
-        format.json { head :unprocessable_entity }
+        format.json { render json: json_api_errors(@item), status: :unprocessable_entity }
       end
     end
   end
@@ -59,7 +61,7 @@ class CollectionItemsController < ApplicationController
       if @item.update_attributes(item_params)
         format.json { render json: @item, include: [params[:include]] }
       else
-        format.json { head :unprocessable_entity }
+        format.json { render json: json_api_errors(@item), status: :unprocessable_entity }
       end
     end
   end
