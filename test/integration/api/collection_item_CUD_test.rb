@@ -13,7 +13,7 @@ class CollectionItemCUDTest < ActionDispatch::IntegrationTest
     @document = Factory(:public_document, contributor: @current_person)
     @sop = Factory(:sop, contributor: @current_person, policy: Factory(:publicly_viewable_policy))
 
-    template_file = File.join(WriteApiTest.template_dir, 'post_max_collection_item.json.erb')
+    template_file = File.join(ApiTestHelper.template_dir, 'post_max_collection_item.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
