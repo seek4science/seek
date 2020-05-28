@@ -8,7 +8,19 @@ module ApiTestHelper
 
   # Override me!
   def populate_extra_relationships(hash = nil)
-    {}.with_indifferent_access
+    extra_relationships = {}.with_indifferent_access
+    klass = @clz.classify.constantize
+    if klass.method_defined?(:contributor)
+      extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
+    end
+    if klass.method_defined?(:creators)
+      extra_relationships[:people][:data] ||= []
+      extra_relationships[:people][:data] << { id: @current_person.id.to_s, type: 'people' } if klass.method_defined?(:contributor)
+      creators = hash.dig('data', 'relationships', 'creators', 'data')
+      extra_relationships[:people][:data] += creators if creators
+    end
+
+    extra_relationships
   end
 
   def definitions_path

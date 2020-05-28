@@ -34,15 +34,6 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
                      r: ApiTestHelper.method(:render_erb) }
   end
 
-  def populate_extra_relationships(hash = nil)
-    person_id = @current_user.person.id
-
-    extra_relationships = {}
-    extra_relationships[:submitter] = { data: [{ id: person_id.to_s, type: 'people' }] }
-    extra_relationships[:people] = { data: [{ id: person_id.to_s, type: 'people' }] }
-    extra_relationships.with_indifferent_access
-  end
-
   test 'should not delete a study with assays' do
     study = Factory(:max_study, policy: Factory(:public_policy))
     assert_no_difference('Study.count') do

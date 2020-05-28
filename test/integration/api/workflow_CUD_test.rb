@@ -24,14 +24,6 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     @to_patch = load_template("patch_min_#{@clz}.json.erb", { id: workflow.id })
   end
 
-  def populate_extra_relationships(hash=nil)
-    extra_relationships = {}
-    extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
-    extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' },
-                                            { id: @creator.id.to_s, type: 'people' }] }
-    extra_relationships.with_indifferent_access
-  end
-
   test 'can add content to API-created workflow' do
     wf = Factory(:api_cwl_workflow, contributor: @current_person)
 
