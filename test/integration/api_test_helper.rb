@@ -315,7 +315,7 @@ module ApiTestHelper
   end
 
   def member_url(obj)
-    "/#{@plural_clz}/#{url_base}/#{obj.id}.json"
+    "/#{@plural_clz}/#{obj.id}.json"
   end
 
   ##
