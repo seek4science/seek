@@ -59,7 +59,7 @@ module AvatarsHelper
         raise 'Avatar does not belong to instance'
       end
     else
-      basic_url = polymorphic_path([avatar_for_instance, avatar])
+      basic_url = polymorphic_path([owner, avatar])
       append_size_parameter(basic_url, size)
     end
   end

@@ -2,7 +2,8 @@ class AvatarsController < ApplicationController
   skip_before_action :project_membership_required
 
   before_action :login_required, except: [:show]
-  before_action :authorize_parent_resource
+  before_action :fetch_owner
+  before_action :authorize_owner, except: [:show]
   before_action :find_avatars, only: [:index]
   before_action :find_avatar, only: [:show, :select, :edit, :update, :destroy]
 
@@ -17,14 +18,14 @@ class AvatarsController < ApplicationController
   def new
     store_unsaved_person_proj_inst_data_to_session
 
-    @avatar = @parent_resource.avatars.build
+    @avatar = @avatar_owner_instance.avatars.build
   end
 
   # POST /people/1/avatars
   # POST /people
   def create
     # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
-    @avatar = @parent_resource.avatars.build(avatar_params)
+    @avatar = @avatar_owner_instance.avatars.build(avatar_params)
     @avatar.original_filename = (params[:avatar][:image_file]).original_filename
 
     respond_to do |format|
@@ -102,7 +103,7 @@ class AvatarsController < ApplicationController
       end
       respond_to do |format|
         flash[:notice] = 'Profile avatar was successfully updated.'
-        format.html { redirect_to polymorphic_path([owner, :avatars]) }
+        format.html { redirect_to polymorphic_path([@avatar_owner_instance, :avatars]) }
       end
     else
       respond_to do |format|
@@ -114,13 +115,16 @@ class AvatarsController < ApplicationController
 
   private
 
-  def authorize_parent_resource
+  def fetch_owner
     get_parent_resource
+    raise ActiveRecord::RecordNotFound unless @parent_resource
     @avatar_owner_instance = @parent_resource # legacy
+  end
 
-    unless @parent_resource.can_edit?
+  def authorize_owner
+    unless @avatar_owner_instance.can_edit?
       flash[:error] = "You can only change avatars of an item you have the permission to edit."
-      redirect_to @parent_resource
+      redirect_to @avatar_owner_instance
     end
   end
 
@@ -129,11 +133,11 @@ class AvatarsController < ApplicationController
   end
 
   def find_avatars
-    @avatars = @parent_resource.avatars
+    @avatars = @avatar_owner_instance.avatars
   end
 
   def find_avatar
-    @avatar = @parent_resource.avatars.find(params[:id])
+    @avatar = @avatar_owner_instance.avatars.find(params[:id])
   end
 
   # this helper will store to session full form data of edited Person / Project / Institution
@@ -142,7 +146,7 @@ class AvatarsController < ApplicationController
   def store_unsaved_person_proj_inst_data_to_session
     data_hash = {}
 
-    param = "#{@parent_resource.class.name.downcase}".to_sym
+    param = "#{@avatar_owner_instance.class.name.downcase}".to_sym
 
     return if params[param].nil?
 
@@ -166,7 +170,7 @@ class AvatarsController < ApplicationController
     end
 
     # store all collected data to session
-    session["unsaved_#{@parent_resource.class.name}_#{@parent_resource.id}".to_sym] = data_hash
+    session["unsaved_#{@avatar_owner_instance.class.name}_#{@avatar_owner_instance.id}".to_sym] = data_hash
   end
 end
 

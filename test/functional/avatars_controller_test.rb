@@ -21,23 +21,71 @@ class AvatarsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'can view avatar' do
+    avatar = Factory(:avatar)
+    get :show, params: { person_id: avatar.owner_id, id: avatar.id }
+    assert_response :success
+  end
+
+  test 'can select avatar' do
+    avatar = Factory(:avatar)
+    person = avatar.owner
+    avatar2 = Factory(:avatar, owner: person)
+    login_as(person)
+    assert_equal avatar, person.avatar
+
+    post :select, params: { person_id: person.id, id: avatar2.id }
+
+    assert_redirected_to person_avatars_path(person)
+    assert_equal avatar2, person.reload.avatar
+  end
+
+  test 'cannot select avatar if not authorized' do
+    avatar = Factory(:avatar)
+    person = avatar.owner
+    avatar2 = Factory(:avatar, owner: person)
+    person2 = Factory(:person)
+    login_as(person2)
+    assert_equal avatar, person.avatar
+
+    post :select, params: { person_id: person.id, id: avatar2.id }
+
+    assert_redirected_to person
+    assert_equal avatar, person.reload.avatar
+  end
+
+  test 'can destroy avatar' do
+    avatar = Factory(:avatar)
+    login_as(avatar.owner)
+    assert_difference('Avatar.count', -1) do
+      delete :destroy, params: { person_id: avatar.owner_id, id: avatar.id }
+    end
+    assert_redirected_to person_avatars_path(avatar.owner)
+  end
+
+  test 'cannot destroy avatar if not authorized' do
+    avatar = Factory(:avatar)
+    login_as(Factory(:person))
+    assert_no_difference('Avatar.count') do
+      delete :destroy, params: { person_id: avatar.owner_id, id: avatar.id }
+    end
+    assert_redirected_to avatar.owner
+  end
+
   test 'handles unknown person when logged out' do
     get :show, params: { person_id: 99_999, id: 4 }
-    assert_redirected_to root_path
-    assert_not_nil flash[:error]
+    assert_response :not_found
   end
 
   test 'handles unknown avatar when logged out' do
     p = Factory :person
     get :show, params: { person_id: p, id: 89_878 }
-    assert_redirected_to root_path
-    assert_not_nil flash[:error]
+    assert_response :not_found
   end
 
   test 'handles missing parent in route when logged out' do
     get :show, params: { id: 2 }
-    assert_redirected_to root_path
-    assert_not_nil flash[:error]
+    assert_response :not_found
   end
 
   test 'breadcrumb for avatar index' do
@@ -47,7 +95,7 @@ class AvatarsControllerTest < ActionController::TestCase
     get :index, params: { person_id: person.id }
     assert_response :success
 
-    assert_select 'div.breadcrumbs', text: /Home People Index #{person.title} Edit Avatars Index/, count: 1 do
+    assert_select 'div.breadcrumbs', text: /Home People Index #{person.title} Avatars Index/, count: 1 do
       assert_select 'a[href=?]', root_path, count: 1
       assert_select 'a[href=?]', people_url, count: 1
       assert_select 'a[href=?]', person_url(person), count: 1
@@ -60,7 +108,7 @@ class AvatarsControllerTest < ActionController::TestCase
     Factory(:avatar, owner: person)
     get :new, params: { person_id: person.id }
     assert_response :success
-    assert_select 'div.breadcrumbs', text: /Home People Index #{person.title} Edit Avatars Index New/, count: 1 do
+    assert_select 'div.breadcrumbs', text: /Home People Index #{person.title} Avatars Index New/, count: 1 do
       assert_select 'a[href=?]', root_path, count: 1
       assert_select 'a[href=?]', people_url, count: 1
       assert_select 'a[href=?]', person_url(person), count: 1

@@ -47,6 +47,7 @@ en:
   institution: "Institution"
   programme: "Programme"
   profile: "Profile"
+  avatar: "Avatar"
 
   gadget:
     new_heading: "New or upload"
