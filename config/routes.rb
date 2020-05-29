@@ -231,7 +231,6 @@ SEEK::Application.routes.draw do
       member do
         post :select
       end
-
     end
     resources :folders do
       collection do
@@ -804,6 +803,11 @@ SEEK::Application.routes.draw do
     end
     resources :items, controller: :collection_items
     resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:collections,:only=>[:index]
+    resources :avatars do
+      member do
+        post :select
+      end
+    end
   end
 
   ### ASSAY AND TECHNOLOGY TYPES ###

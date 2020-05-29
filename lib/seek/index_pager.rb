@@ -85,14 +85,7 @@ module Seek
 
     def assign_index_variables
       # Parent resource
-      parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
-      if parent_id_param
-        parent_type = parent_id_param.to_s.chomp('_id')
-        parent_class = parent_type.camelize.constantize
-        if parent_class
-          @parent_resource = parent_class.find(params[parent_id_param])
-        end
-      end
+      get_parent_resource
 
       # Page
       @page = page_and_sort_params[:page]

@@ -8,6 +8,7 @@ class Collection < ApplicationRecord
 
   has_many :items, -> { order(:order) }, class_name: 'CollectionItem', inverse_of: :collection, dependent: :destroy
   accepts_nested_attributes_for :items, allow_destroy: true
+  include HasCustomAvatar
 
   def self.user_creatable?
     Seek::Config.collections_enabled
