@@ -44,9 +44,8 @@ class CollectionTest < ActiveSupport::TestCase
     assert !asset.valid?
   end
 
-  test 'avatar key' do
-    assert Factory(:collection).avatar_key
-    refute Factory(:collection).use_mime_type_for_avatar?
+  test 'avatar' do
+    assert Factory(:collection).defines_own_avatar?
   end
 
   test 'policy defaults to system default' do
