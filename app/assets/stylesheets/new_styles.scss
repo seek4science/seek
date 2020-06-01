@@ -1015,3 +1015,7 @@ img.github-logo {
 .list_item_content .maturity-level {
   font-size: 100%;
 }
+
+ul.list.collapsed li.hidden-item {
+  display: none;
+}

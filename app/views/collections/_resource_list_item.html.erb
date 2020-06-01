@@ -2,8 +2,9 @@
 
 <div class="row">
   <div class="col-sm-6">
-    <%= render partial: 'assets/resource_list_item_contributor_and_creators', object: resource %>
+    <%= list_item_person_list [resource.contributor] | resource.creators, (resource.other_creators if resource.respond_to? 'other_creators'), 'Maintainers' %>
     <%= list_item_attribute('# items', resource.items.count) %>
     <%= list_item_doi(resource) %>
+    <%= list_item_tag_list(resource) %>
   </div>
 </div>
