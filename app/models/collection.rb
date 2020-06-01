@@ -17,4 +17,8 @@ class Collection < ApplicationRecord
   def assets
     items.map(&:asset)
   end
+
+  def show_contributor_avatars?
+    false
+  end
 end
