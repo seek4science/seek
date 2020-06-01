@@ -48,7 +48,7 @@ class CollectionTest < ActiveSupport::TestCase
     assert Factory(:collection).defines_own_avatar?
   end
 
-  test 'policy defaults to system default' do
+  test 'policy defaults to visible' do
     with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
       collection = Factory.build(:collection)
       refute collection.persisted?
@@ -56,7 +56,7 @@ class CollectionTest < ActiveSupport::TestCase
       collection.reload
       assert collection.valid?
       assert collection.policy.valid?
-      assert_equal Policy::NO_ACCESS, collection.policy.access_type
+      assert_equal Policy::ACCESSIBLE, collection.policy.access_type
       assert collection.policy.permissions.blank?
     end
   end
