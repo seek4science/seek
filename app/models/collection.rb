@@ -21,4 +21,8 @@ class Collection < ApplicationRecord
   def show_contributor_avatars?
     false
   end
+
+  def default_policy
+    Policy.public_policy
+  end
 end
