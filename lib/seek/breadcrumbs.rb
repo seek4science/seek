@@ -18,10 +18,6 @@ module Seek
       elsif controller_name == 'folders'
         add_index_breadcrumb 'projects'
         add_show_breadcrumb @project
-      # elsif controller_name == 'avatars'
-      #   add_index_breadcrumb @avatar_for.pluralize.downcase
-      #   add_show_breadcrumb @avatar_owner_instance
-      #   add_edit_breadcrumb @avatar_owner_instance
       elsif controller_name == 'snapshots'
         add_index_breadcrumb @resource.class.name.downcase.pluralize
         add_show_breadcrumb @resource
@@ -93,9 +89,11 @@ module Seek
       end
     end
 
-    def add_index_breadcrumb(controller_name, breadcrumb_name = nil)
+    def add_index_breadcrumb(controller_name, breadcrumb_name = nil, url = nil)
       breadcrumb_name ||= "#{t(controller_name.singularize, default: controller_name.singularize.humanize).pluralize} Index"
-      add_breadcrumb breadcrumb_name, url_for(controller: controller_name, action: 'index')
+      url ||= url_for(controller: controller_name, action: 'index')
+      puts url
+      add_breadcrumb breadcrumb_name, url
     end
 
     def add_show_breadcrumb(resource, breadcrumb_name = nil)
@@ -111,7 +109,7 @@ module Seek
     end
 
     def add_parent_breadcrumb
-      add_index_breadcrumb @parent_resource.class.name.underscore.pluralize
+      add_index_breadcrumb @parent_resource.class.name.underscore.pluralize, nil, polymorphic_url(@parent_resource.class.name.underscore.pluralize)
       add_show_breadcrumb @parent_resource
     end
   end
