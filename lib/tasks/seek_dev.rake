@@ -262,9 +262,19 @@ namespace :seek_dev do
   end
 
   task build_test_custom_metadata: :environment do
-    old_cmt = CustomMetadataType.where(supported_type: 'Investigation')
-    old_cmt.destroy_all
-    unless CustomMetadataType.where(supported_type: 'Investigation').any?
+    cmt_already_exist = CustomMetadataType.where(supported_type: 'Investigation').any?
+    if cmt_already_exist
+      puts "CMT for Investigation already exists do want to overwrite with your modification y/N"
+      answer = STDIN.gets.chomp.to_s.downcase
+      if (!answer == "y" || !answer == "yes")
+        cmt_already_exist = true
+      elsif (answer == "y" || answer == "yes")
+        old_cmt = CustomMetadataType.where(supported_type: 'Investigation')
+        old_cmt.destroy_all
+        cmt_already_exist = false
+      end
+    end
+    unless cmt_already_exist
       cmt = CustomMetadataType.new(title: 'MIAPPE metadata', supported_type:'Investigation')
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'id', required:true, sample_attribute_type: SampleAttributeType.where(title:'string').first)
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'submission_date', sample_attribute_type: SampleAttributeType.where(title:'Date').first)
@@ -276,9 +286,19 @@ namespace :seek_dev do
       puts "CMT for Investigation already exists"
     end
 
-    old_cmt = CustomMetadataType.where(supported_type: 'Study')
-    old_cmt.destroy_all
-    unless CustomMetadataType.where(supported_type: 'Study').any?
+    cmt_already_exist =  CustomMetadataType.where(supported_type: 'Study').any?
+    if cmt_already_exist
+      puts "CMT for Study already exists do want to overwrite with your modification y/N"
+      answer = STDIN.gets.chomp.to_s.downcase
+      if (!answer == "y" || !answer == "yes")
+        cmt_already_exist = true
+      elsif (answer == "y" || answer == "yes")
+        old_cmt =  CustomMetadataType.where(supported_type: 'Study')
+        old_cmt.destroy_all
+        cmt_already_exist = false
+      end
+    end
+    unless cmt_already_exist
       cmt = CustomMetadataType.new(title: 'MIAPPE metadata', supported_type:'Study')
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'id', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'study_start_date', required:true, sample_attribute_type: SampleAttributeType.where(title:'Date').first)
@@ -303,9 +323,19 @@ namespace :seek_dev do
       puts "CMT for Study already exists"
     end
 
-    old_cmt = CustomMetadataType.where(supported_type: 'Assay')
-    old_cmt.destroy_all
-    unless CustomMetadataType.where(supported_type: 'Assay').any?
+    cmt_already_exist =  CustomMetadataType.where(supported_type: 'Assay').any?
+    if cmt_already_exist
+      puts "CMT for Assay already exists do want to overwrite with your modification y/N"
+      answer = STDIN.gets.chomp.to_s.downcase
+      if (!answer == "y" || !answer == "yes")
+        cmt_already_exist = true
+      elsif (answer == "y" || !answer == "yes")
+        old_cmt =  CustomMetadataType.where(supported_type: 'Assay')
+        old_cmt.destroy_all
+        cmt_already_exist = false
+      end
+    end
+    unless cmt_already_exist
       cmt = CustomMetadataType.new(title: 'test Assay metadata', supported_type:'Assay')
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
