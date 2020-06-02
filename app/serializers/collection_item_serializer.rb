@@ -2,7 +2,9 @@ class CollectionItemSerializer < SimpleBaseSerializer
   include Rails.application.routes.url_helpers
 
   belongs_to :collection
-  has_one :asset, polymorphic: true
+  has_one :asset, polymorphic: true, if: -> { object.asset.can_view? } do
+    meta title: object.asset.title
+  end
 
   attributes :comment, :order
 

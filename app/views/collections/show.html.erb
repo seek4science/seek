@@ -21,8 +21,12 @@
             <ul class="feed">
               <% @collection.items.each do |item| %>
                 <li>
-                  <%= link_to(avatar(item.asset, 60, true, nil, nil, true, 'home_asset_icon'), item.asset, class: 'file-type-icon') %>
-                  <%= link_to(item.asset.title, item.asset, 'data-tooltip' => item.asset.description, target: '_blank') %>
+                  <% if item.asset.can_view? %>
+                    <%= link_to(avatar(item.asset, 60, true, nil, nil, true, 'home_asset_icon'), item.asset, class: 'file-type-icon') %>
+                    <%= link_to(item.asset.title, item.asset, 'data-tooltip' => item.asset.description, target: '_blank') %>
+                  <% else %>
+                    <span class="none_text"><%= t('private_asset') -%></span>
+                  <% end %>
                   <br/>
                   <%= item.comment -%>
                   <span class='subtle'>- Added <%= time_ago_in_words(item.created_at) -%> ago</span>

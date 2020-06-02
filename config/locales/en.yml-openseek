@@ -48,6 +48,7 @@ en:
   programme: "Programme"
   profile: "Profile"
   avatar: "Avatar"
+  private_asset: 'Hidden item'
 
   gadget:
     new_heading: "New or upload"

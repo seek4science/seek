@@ -92,7 +92,6 @@ module Seek
     def add_index_breadcrumb(controller_name, breadcrumb_name = nil, url = nil)
       breadcrumb_name ||= "#{t(controller_name.singularize, default: controller_name.singularize.humanize).pluralize} Index"
       url ||= url_for(controller: controller_name, action: 'index')
-      puts url
       add_breadcrumb breadcrumb_name, url
     end
 

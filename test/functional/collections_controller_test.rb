@@ -376,6 +376,40 @@ class CollectionsControllerTest < ActionController::TestCase
     refute CollectionItem.exists?(item2.id)
   end
 
+  test 'should not show items linked to private assets' do
+    person = Factory(:person)
+    collection = Factory(:collection, contributor: person)
+    public = collection.items.create(asset: Factory(:public_document), order: 1, comment: 'This doc is public')
+    private = collection.items.create(asset: Factory(:private_document), order: 2, comment: 'This doc is not')
+    assert collection.can_view?
+    assert public.asset.can_view?
+    refute private.asset.can_view?
+
+    get :show, params: { id: collection.id }
+
+    assert_response :success
+    assert_select 'li a[href=?]', document_path(public.asset)
+    assert_select 'li a[href=?]', document_path(private.asset), count: 0
+  end
+
+  test 'should not show items linked to private assets even in edit form' do
+    person = Factory(:person)
+    collection = Factory(:collection, contributor: person)
+    public = collection.items.create(asset: Factory(:public_document), order: 1, comment: 'This doc is public')
+    private = collection.items.create(asset: Factory(:private_document), order: 2, comment: 'This doc is not')
+    assert collection.can_view?
+    assert public.asset.can_view?
+    refute private.asset.can_view?
+
+    login_as(person)
+
+    get :edit, params: { id: collection.id }
+
+    assert_response :success
+    assert_select '#items-table tr a[href=?]', document_path(public.asset)
+    assert_select '#items-table tr a[href=?]', document_path(private.asset), count: 0
+  end
+
   private
 
   def valid_collection
