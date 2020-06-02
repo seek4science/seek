@@ -39,6 +39,16 @@ class CollectionItemsControllerTest < ActionController::TestCase
     assert flash[:error].include?('authorized')
   end
 
+  test 'should not reveal private asset in JSON' do
+    private_asset = Factory(:private_document)
+    item = Factory(:collection_item, asset: private_asset)
+    get :show, format: 'json', params: { collection_id: item.collection_id, id: item.id }
+
+    assert_response :success
+    res = JSON.parse(response.body)
+    assert_nil res['data']['relationships']['asset']
+  end
+
   def rest_api_test_object
     @object ||= Factory(:collection_item)
   end
