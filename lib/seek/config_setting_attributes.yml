@@ -191,6 +191,7 @@ programmes_enabled:
 publications_enabled:
 samples_enabled:
 workflows_enabled:
+collections_enabled:
 # Omniauth
 omniauth_enabled:
 omniauth_user_create:

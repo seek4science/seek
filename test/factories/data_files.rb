@@ -14,7 +14,7 @@ Factory.define(:data_file) do |f|
   end
 end
 
-Factory.define(:min_datafile, class: DataFile) do |f|
+Factory.define(:min_data_file, class: DataFile) do |f|
   f.with_project_contributor
   f.title 'A Minimal DataFile'
   f.projects { [Factory.build(:min_project)] }
@@ -23,7 +23,7 @@ Factory.define(:min_datafile, class: DataFile) do |f|
   end
 end
 
-Factory.define(:max_datafile, class: DataFile) do |f|
+Factory.define(:max_data_file, class: DataFile) do |f|
   f.with_project_contributor
   f.title 'A Maximal DataFile'
   f.description 'Results - Sampling conformations of ATP-Mg inside the binding pocket'

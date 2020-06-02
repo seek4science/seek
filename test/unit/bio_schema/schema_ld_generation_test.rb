@@ -67,7 +67,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'dataset' do
     df = travel_to(@current_time) do
-      df = Factory(:max_datafile, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df = Factory(:max_data_file, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       disable_authorization_checks { df.save! }
       df
@@ -114,7 +114,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'dataset with weblink' do
     df = travel_to(@current_time) do
-      df = Factory(:max_datafile, content_blob: Factory(:website_content_blob),
+      df = Factory(:max_data_file, content_blob: Factory(:website_content_blob),
                                   contributor: @person, projects: [@project],
                                   policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)

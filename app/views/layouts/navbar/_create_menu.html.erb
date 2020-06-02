@@ -47,6 +47,9 @@
         <% if Seek::Config.documents_enabled %>
           <li><%= link_to t("document"), new_document_path %></li>
         <% end %>
+        <% if Seek::Config.collections_enabled %>
+          <li><%= link_to t("collection"), new_collection_path %></li>
+        <% end %>
 
       <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
         <li><%= link_to t("presentation"), new_presentation_path %></li>

@@ -106,13 +106,13 @@ module ResourceListItemHelper
     if items.empty?
       html << "<span class='none_text'>Not specified</span>"
     else
-      items.each do |i|
+      items.each_with_index do |i, idx|
         value = if block_given?
                   yield(i)
                 else
                   (link_to get_object_title(i), show_resource_path(i))
                 end
-        html << value + (i == items.last ? '' : ', ')
+        html << value + (idx == (items.length - 1) ? '' : ', ')
       end
     end
     html += '</p>'

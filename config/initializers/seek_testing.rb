@@ -34,6 +34,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:tabs_lazy_load_enabled] = false
 
       # Types
+      Settings.defaults[:collections_enabled] = true
       Settings.defaults[:documents_enabled] = true
       Settings.defaults[:events_enabled] = true
       Settings.defaults[:isa_enabled] = true

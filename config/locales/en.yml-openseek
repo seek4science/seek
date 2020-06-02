@@ -34,6 +34,7 @@ en:
   publication: "Publication"
   presentation: "Presentation"
   event: "Event"
+  collection: "Collection"
 
   sample: "Sample"
   sample_type: "Sample type"
@@ -46,6 +47,8 @@ en:
   institution: "Institution"
   programme: "Programme"
   profile: "Profile"
+  avatar: "Avatar"
+  private_asset: 'Hidden item'
 
   gadget:
     new_heading: "New or upload"
@@ -109,6 +112,8 @@ en:
     attributes:
       person:
         title: "Full name"
+      collection:
+        creators: 'Maintainers'
 
   activemodel:
     attributes:

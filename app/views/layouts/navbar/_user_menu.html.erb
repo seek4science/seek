@@ -5,7 +5,7 @@
         <% if current_person.avatar.nil? %>
             <%= image_tag(icon_filename_for_key("person_avatar"), :size => "18x18") %>
         <% else %>
-            <%= image_tag avatar_url(current_person, current_person.avatar_id, 18) %>
+            <%= image_tag avatar_url(current_person, current_person.avatar, 18) %>
         <% end %>
         <span class="truncated-name" style="max-width: 12em"><%= current_person.name %></span>
         <span class="caret"></span>
