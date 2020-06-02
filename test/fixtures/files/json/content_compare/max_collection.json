@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1121",
+    "id": "80",
     "type": "collections",
     "attributes": {
       "title": "A Maximal Collection",
@@ -13,15 +13,15 @@
         "Collection-tag4",
         "Collection-tag5"
       ],
-      "created_at": "2020-05-28T13:03:28.000Z",
-      "updated_at": "2020-05-28T13:03:32.000Z",
+      "created_at": "2020-06-02T16:26:31.000Z",
+      "updated_at": "2020-06-02T16:26:34.000Z",
       "other_creators": "Blogs, Joe"
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "1039989767",
+            "id": "1039986638",
             "type": "people"
           }
         ]
@@ -29,7 +29,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039989760",
+            "id": "1039986631",
             "type": "people"
           }
         ]
@@ -37,11 +37,11 @@
       "people": {
         "data": [
           {
-            "id": "1039989760",
+            "id": "1039986631",
             "type": "people"
           },
           {
-            "id": "1039989767",
+            "id": "1039986638",
             "type": "people"
           }
         ]
@@ -49,7 +49,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022253998",
+            "id": "1022250791",
             "type": "projects"
           }
         ]
@@ -57,7 +57,7 @@
       "publications": {
         "data": [
           {
-            "id": "980191013",
+            "id": "980190964",
             "type": "publications"
           }
         ]
@@ -65,47 +65,47 @@
       "items": {
         "data": [
           {
-            "id": "559",
+            "id": "23",
             "type": "collection_items"
           },
           {
-            "id": "560",
+            "id": "24",
             "type": "collection_items"
           },
           {
-            "id": "561",
+            "id": "25",
             "type": "collection_items"
           },
           {
-            "id": "562",
+            "id": "26",
             "type": "collection_items"
           },
           {
-            "id": "563",
+            "id": "27",
             "type": "collection_items"
           },
           {
-            "id": "564",
+            "id": "28",
             "type": "collection_items"
           }
         ]
       }
     },
     "links": {
-      "self": "/collections/1121",
-      "items": "/collections/1121/items"
+      "self": "/collections/80",
+      "items": "/collections/80/items"
     },
     "meta": {
-      "created": "2020-05-28T13:03:28.000Z",
-      "modified": "2020-05-28T13:03:32.000Z",
+      "created": "2020-06-02T16:26:31.000Z",
+      "modified": "2020-06-02T16:26:34.000Z",
       "api_version": "0.3",
-      "uuid": "8bfca980-8311-0138-b378-0800278a9619",
+      "uuid": "bd93f710-871b-0138-b8d3-0800278a9619",
       "base_url": "http://localhost:3000"
     }
   },
   "included": [
     {
-      "id": "559",
+      "id": "23",
       "type": "collection_items",
       "attributes": {
         "comment": "Readme!",
@@ -114,28 +114,31 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "1121",
+            "id": "80",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "1196",
+            "id": "25",
             "type": "documents"
+          },
+          "meta": {
+            "title": "This Document"
           }
         }
       },
       "links": {
-        "self": "/collections/1121/items/559"
+        "self": "/collections/80/items/23"
       },
       "meta": {
-        "created": "2020-05-28T13:03:28.000Z",
-        "modified": "2020-05-28T13:03:28.000Z",
+        "created": "2020-06-02T16:26:31.000Z",
+        "modified": "2020-06-02T16:26:31.000Z",
         "api_version": "0.3"
       }
     },
     {
-      "id": "560",
+      "id": "24",
       "type": "collection_items",
       "attributes": {
         "comment": "Secret info",
@@ -144,28 +147,22 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "1121",
+            "id": "80",
             "type": "collections"
-          }
-        },
-        "asset": {
-          "data": {
-            "id": "1197",
-            "type": "documents"
           }
         }
       },
       "links": {
-        "self": "/collections/1121/items/560"
+        "self": "/collections/80/items/24"
       },
       "meta": {
-        "created": "2020-05-28T13:03:29.000Z",
-        "modified": "2020-05-28T13:03:29.000Z",
+        "created": "2020-06-02T16:26:32.000Z",
+        "modified": "2020-06-02T16:26:32.000Z",
         "api_version": "0.3"
       }
     },
     {
-      "id": "561",
+      "id": "25",
       "type": "collection_items",
       "attributes": {
         "comment": "The protocol",
@@ -174,28 +171,31 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "1121",
+            "id": "80",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "1055250677",
+            "id": "1055250441",
             "type": "sops"
+          },
+          "meta": {
+            "title": "This Sop"
           }
         }
       },
       "links": {
-        "self": "/collections/1121/items/561"
+        "self": "/collections/80/items/25"
       },
       "meta": {
-        "created": "2020-05-28T13:03:29.000Z",
-        "modified": "2020-05-28T13:03:29.000Z",
+        "created": "2020-06-02T16:26:32.000Z",
+        "modified": "2020-06-02T16:26:32.000Z",
         "api_version": "0.3"
       }
     },
     {
-      "id": "562",
+      "id": "26",
       "type": "collection_items",
       "attributes": {
         "comment": "Data 1",
@@ -204,28 +204,31 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "1121",
+            "id": "80",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "883654352",
+            "id": "883654269",
             "type": "data_files"
+          },
+          "meta": {
+            "title": "A Data File_1"
           }
         }
       },
       "links": {
-        "self": "/collections/1121/items/562"
+        "self": "/collections/80/items/26"
       },
       "meta": {
-        "created": "2020-05-28T13:03:30.000Z",
-        "modified": "2020-05-28T13:03:30.000Z",
+        "created": "2020-06-02T16:26:33.000Z",
+        "modified": "2020-06-02T16:26:33.000Z",
         "api_version": "0.3"
       }
     },
     {
-      "id": "563",
+      "id": "27",
       "type": "collection_items",
       "attributes": {
         "comment": "Data 2",
@@ -234,28 +237,31 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "1121",
+            "id": "80",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "883654353",
+            "id": "883654270",
             "type": "data_files"
+          },
+          "meta": {
+            "title": "A Data File_2"
           }
         }
       },
       "links": {
-        "self": "/collections/1121/items/563"
+        "self": "/collections/80/items/27"
       },
       "meta": {
-        "created": "2020-05-28T13:03:31.000Z",
-        "modified": "2020-05-28T13:03:31.000Z",
+        "created": "2020-06-02T16:26:33.000Z",
+        "modified": "2020-06-02T16:26:33.000Z",
         "api_version": "0.3"
       }
     },
     {
-      "id": "564",
+      "id": "28",
       "type": "collection_items",
       "attributes": {
         "comment": "Bad data",
@@ -264,23 +270,17 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "1121",
+            "id": "80",
             "type": "collections"
-          }
-        },
-        "asset": {
-          "data": {
-            "id": "883654354",
-            "type": "data_files"
           }
         }
       },
       "links": {
-        "self": "/collections/1121/items/564"
+        "self": "/collections/80/items/28"
       },
       "meta": {
-        "created": "2020-05-28T13:03:31.000Z",
-        "modified": "2020-05-28T13:03:31.000Z",
+        "created": "2020-06-02T16:26:34.000Z",
+        "modified": "2020-06-02T16:26:34.000Z",
         "api_version": "0.3"
       }
     }

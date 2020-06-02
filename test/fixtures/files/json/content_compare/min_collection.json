@@ -1,29 +1,26 @@
 {
   "data": {
-    "id": "883654268",
+    "id": "79",
     "type": "collections",
     "attributes": {
-      "policy":
-      {
-        "access":"no_access",
-        "permissions":[]
-      },
-      "tags": null,
       "title": "A Minimal Collection",
       "description": null,
       "license": null,
-      "created_at": "2017-10-06T09:53:31.000Z",
-      "updated_at": "2017-10-06T09:53:31.000Z",
+      "tags": null,
+      "created_at": "2020-06-02T16:26:28.000Z",
+      "updated_at": "2020-06-02T16:26:28.000Z",
       "other_creators": null
     },
     "relationships": {
       "creators": {
-        "data": []
+        "data": [
+
+        ]
       },
       "submitter": {
         "data": [
           {
-            "id": "522086294",
+            "id": "1039986628",
             "type": "people"
           }
         ]
@@ -31,7 +28,7 @@
       "people": {
         "data": [
           {
-            "id": "1039986644",
+            "id": "1039986628",
             "type": "people"
           }
         ]
@@ -39,28 +36,32 @@
       "projects": {
         "data": [
           {
-            "id": "1022250817",
+            "id": "1022250787",
             "type": "projects"
           }
         ]
       },
       "publications": {
-        "data": []
+        "data": [
+
+        ]
       },
       "items": {
-        "data": []
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/collections/883654268",
-      "items": "/collections/883654268/items"
+      "self": "/collections/79",
+      "items": "/collections/79/items"
     },
     "meta": {
-      "created": "2017-10-06T09:53:31.000Z",
-      "modified": "2017-10-06T09:53:31.000Z",
-      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
-      "base_url": "http://localhost:3000",
-      "api_version": "0.3"
+      "created": "2020-06-02T16:26:28.000Z",
+      "modified": "2020-06-02T16:26:28.000Z",
+      "api_version": "0.3",
+      "uuid": "bc3f7600-871b-0138-b8d3-0800278a9619",
+      "base_url": "http://localhost:3000"
     }
   },
   "jsonapi": {

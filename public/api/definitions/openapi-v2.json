@@ -5826,14 +5826,13 @@
                     "type": "object",
                     "properties": {
                         "asset": {
-                            "$ref": "#/definitions/assetSingletonReference"
+                            "$ref": "#/definitions/assetSingletonReferenceWithTitle"
                         },
                         "collection": {
                             "$ref": "#/definitions/collectionSingletonReference"
                         }
                     },
                     "required": [
-                        "asset",
                         "collection"
                     ],
                     "additionalProperties": false
@@ -5928,6 +5927,27 @@
             },
             "required": [
                 "data"
+            ],
+            "additionalProperties": false
+        },
+        "assetSingletonReferenceWithTitle": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/assetReference"
+                },
+                "meta": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/nullableNonEmptyString"
+                        }
+                    }
+                }
+            },
+            "required": [
+                "data",
+                "meta"
             ],
             "additionalProperties": false
         },
