@@ -41,10 +41,10 @@ Factory.define(:max_collection, class: Collection) do |f|
     c.items = [
         Factory(:collection_item, comment: 'Readme!', collection: c, asset: Factory(:public_document, title: 'Readme')),
         Factory(:collection_item, comment: 'Secret info', collection: c, asset: Factory(:private_document, title: 'Secrets')),
-        Factory(:collection_item, comment: 'The protocol', collection: c, asset: Factory(:sop, policy: Factory(:public_policy, title: 'Protocol'))),
-        Factory(:collection_item, comment: 'Data 1', collection: c, asset: Factory(:data_file, policy: Factory(:public_policy, title: 'Data 1'))),
-        Factory(:collection_item, comment: 'Data 2', collection: c, asset: Factory(:data_file, policy: Factory(:public_policy, title: 'Data 2'))),
-        Factory(:collection_item, comment: 'Bad data', collection: c, asset: Factory(:data_file, policy: Factory(:private_policy, title: 'Readme')))
+        Factory(:collection_item, comment: 'The protocol', collection: c, asset: Factory(:sop, policy: Factory(:public_policy), title: 'Protocol')),
+        Factory(:collection_item, comment: 'Data 1', collection: c, asset: Factory(:data_file, policy: Factory(:public_policy), title: 'Data 1')),
+        Factory(:collection_item, comment: 'Data 2', collection: c, asset: Factory(:data_file, policy: Factory(:public_policy), title: 'Data 2')),
+        Factory(:collection_item, comment: 'Bad data', collection: c, asset: Factory(:data_file, policy: Factory(:private_policy), title: 'Readme'))
     ]
   end
   f.other_creators 'Blogs, Joe'
