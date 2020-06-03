@@ -11,7 +11,7 @@ class ModelSerializer < ContributedResourceSerializer
     object.recommended_environment.try(:title)
   end
 
-  attribute :original_model_image_link do
+  attribute :model_image_link do
      if version_number
        unless object.find_version(version_number).model_image.nil?
         base_url+polymorphic_path([object, object.find_version(version_number).model_image])
