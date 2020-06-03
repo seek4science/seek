@@ -410,6 +410,19 @@ class CollectionsControllerTest < ActionController::TestCase
     assert_select '#items-table tr a[href=?]', document_path(private.asset), count: 0
   end
 
+  test 'should cope with an asset in the collection being deleted' do
+    person = Factory(:person)
+    collection = Factory(:collection, contributor: person)
+    document = Factory(:public_document)
+    item = collection.items.create(asset: document)
+    disable_authorization_checks { document.destroy! }
+
+    get :show, params: { id: collection.id }
+
+    assert_response :success
+    assert_select 'li a[href=?]', document_path(document), count: 0
+  end
+
   private
 
   def valid_collection

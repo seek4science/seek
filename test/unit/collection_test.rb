@@ -162,4 +162,17 @@ class CollectionTest < ActiveSupport::TestCase
     refute item.save
     assert item.errors[:base].join.include?('You do not have permission to view')
   end
+
+  test 'deleting the asset also deletes collection items' do
+    document = Factory(:document)
+    collection1 = Factory(:collection)
+    collection2 = Factory(:collection)
+    disable_authorization_checks do
+      collection1.items.create!(asset: document)
+      collection2.items.create!(asset: document)
+    end
+    assert_difference('CollectionItem.count', -2) do
+      disable_authorization_checks { document.destroy }
+    end
+  end
 end
