@@ -3,13 +3,13 @@
 <% if @folder.respond_to?(:assay) -%>
     <%= render :partial=>"assay_folder_details" -%>
 <% else -%>
-    <%= render :partial=>"folder_details",:object=>folder -%>
+    <%= render :partial=>"folders/folder_details",:object=>folder -%>
 <% end -%>
 
 
 <ul class="asset_cards">
 
-    <%= render :partial=>"asset",:collection=>folder.authorized_assets,:locals=>{:folder=>folder} -%>
+    <%= render :partial=>"folders/asset",:collection=>folder.authorized_assets,:locals=>{:folder=>folder} -%>
 </ul>
 
 <script>

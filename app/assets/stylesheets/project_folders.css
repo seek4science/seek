@@ -1,13 +1,17 @@
 div#folder_contents {
     padding: 0em 0em 0em 0em;
     margin: 0em 0em 0em 0em;
-    min-height: 200em;
+    min-height: 50em;
+    border:1px solid #ddd;
+    border-radius:5px;
 }
 
 div#folder_column {
     border-right: 1px #666 solid;
-    min-height: 200em;
+    min-height: 50em;
     background-color: white;
+    border:1px solid #ddd;
+    border-radius:5px
 }
 
 div#tree {
@@ -39,82 +43,114 @@ div#remove_from_assay_drop_area p {
     font-weight: bolder;
 }
 
-.ygtvcontent.ygtvfocus > a {
+.ygtvcontent.ygtvfocus>a {
     background-color: green;
 }
 
 ul.asset_cards {
-    font-size:smaller;
+    font-size: smaller;
 }
 
 ul.asset_cards li.asset_card_item {
     margin: 0.25em 0.25em 0.25em 0.25em;
     padding: 0.25em;
-    border: #999 solid 1px;
-    min-width: 15em;
-    max-width: 15em;
-    min-height: 5em;
-    max-height: 5em;
+    min-width: 88px;
+    max-width: 88px;
+    min-height: 115px;
+    max-height: 115px;
     float: left;
     list-style: none;
+    border-radius: 5px;
+    border: #fff solid 1px;
+    background-color: transparent
 }
 
+ul.asset_cards > li.asset_card_item:hover {
+    border: #ebebeb solid 1px;
+}
+
+
 li.asset_card_item img.asset_card_avatar {
-    width: 22px;
-    height: 22px;
+    width: 80px;
+    height: 80px;
     padding-right: 0.3em;
     vertical-align: middle;
-    float: left;
+    /* float: left; */
 }
 
 li.asset_card_item.data_file {
-    background-color: #eec591;
+    /* background-color: #eec591; */
 }
 
 li.asset_card_item.model {
-    background-color: #cdcd00;
+    /* background-color: #cdcd00; */
 }
 
 li.asset_card_item.publication {
-    background-color: #84b5fd;
+    /* background-color: #84b5fd; */
 }
 
 li.asset_card_item.sop {
-    background-color: #7ac5cd;
+    /* background-color: #7ac5cd; */
 }
 
 li.asset_card_item.presentation {
-    background-color: #8ee5ee;
+    /* background-color: #8ee5ee; */
 }
 
 li.asset_card_item {
-    background-color: red;
+    /* background-color: red; */
 }
 
 ul#folder_details {
     list-style-type: none;
+    padding: 10px;
+    background-color: rgb(245, 245, 245);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom: 1px solid #ddd;
 }
 
 ul#folder_details li {
     float: left;
-
 }
 
 ul#folder_details li.title_and_description {
-    width: 78%;
+   
+    float: left;
 }
 
 ul#folder_details li.actions {
-
+    float:right
 }
 
-.asset_card_item + .tooltip > .tooltip-inner {
+.asset_card_item+.tooltip>.tooltip-inner {
     background-color: white;
     color: #111;
     border: 1px #999 solid;
 }
 
-.asset_card_item + .tooltip.top > .tooltip-arrow {
+.asset_card_item+.tooltip.top>.tooltip-arrow {
     display: none;
 }
 
+.asset_card_filename {
+
+    text-align: center
+}
+
+.asset_card_filename a {
+    color: #333333;
+    font-size: 13px
+}
+
+.asset_card_filename a:hover {
+    text-decoration: none;
+}
+
+.asset_card_title {
+    margin-bottom: 4px;
+}

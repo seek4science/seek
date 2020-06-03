@@ -63,6 +63,7 @@ project_hierarchy_enabled:
 tabs_lazy_load_enabled:
 publish_button_enabled:
 project_browser_enabled:
+project_single_page_enabled:
 experimental_features_enabled:
 pdf_conversion_enabled:
 admin_impersonation_enabled:
