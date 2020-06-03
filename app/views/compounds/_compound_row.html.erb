@@ -35,10 +35,10 @@
           studied_factors = ''
           experimental_conditions = ''
           compound.studied_factors.each do |sf|
-            studied_factors.concat("(item: #{compound.title} #{sf.measured_item.title}, values: #{sf.start_value}-#{sf.end_value}#{sf.unit.title}, SD: #{sf.standard_deviation}); ")
+            studied_factors.concat("(item: #{compound.title} #{sf.measured_item.title}, values: #{sf.start_value}-#{sf.end_value}#{sf.unit.try(:symbol)}, SD: #{sf.standard_deviation}); ")
           end
           compound.experimental_conditions.each do |ec|
-            experimental_conditions.concat("(item: #{compound.title} #{ec.measured_item.title}, value: #{ec.start_value}}#{ec.unit.title}); ")
+            experimental_conditions.concat("(item: #{compound.title} #{ec.measured_item.title}, value: #{ec.start_value}}#{ec.unit.try(:symbol)}); ")
           end
           confirm_string = ''
           unless studied_factors.blank?
@@ -53,10 +53,10 @@
           experimental_conditions = ''
           synonyms.each do |s|
             s.studied_factors.each do |sf|
-                studied_factors.concat("(item: #{compound.title} #{sf.measured_item.title}, values: #{sf.start_value}-#{sf.end_value}#{sf.unit.title}, SD: #{sf.standard_deviation}); ")
+                studied_factors.concat("(item: #{compound.title} #{sf.measured_item.title}, values: #{sf.start_value}-#{sf.end_value}#{sf.unit.try(:symbol)}, SD: #{sf.standard_deviation}); ")
             end
             s.experimental_conditions.each do |ec|
-                experimental_conditions.concat("(item: #{compound.title} #{ec.measured_item.title}, value: #{ec.start_value}}#{ec.unit.title}); ")
+                experimental_conditions.concat("(item: #{compound.title} #{ec.measured_item.title}, value: #{ec.start_value}}#{ec.unit.try(:symbol)}); ")
             end
           end
 
