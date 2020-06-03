@@ -95,6 +95,7 @@ module JsonRestTestCases
 
       assert_response :success
       parsed_response = JSON.parse(@response.body)
+      # puts JSON.pretty_generate(parsed_response)
       check_content_diff(json_to_compare, parsed_response)
     end
   end
