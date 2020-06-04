@@ -10,10 +10,12 @@
   <%= f.text_area :description, :rows=>5, :class=>"form-control" %>
 </div>
 
-<div class="form-group">
-  <%= f.label "Experimentalist(s)" %>
-  <%= f.text_field :experimentalists, :class=>"form-control" %>
-</div>
+<% unless @study.experimentalists.blank? %>
+  <div class="form-group">
+    <%= f.label "Experimentalist(s)" %>
+    <%= f.text_field :experimentalists, :class=>"form-control" %>
+  </div>
+<% end %>
 
 <%= folding_panel("#{t('investigation')} details") do %>
     <label class="required"><%= t('investigation') %></label>
