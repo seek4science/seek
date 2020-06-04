@@ -25,10 +25,12 @@
           <% end -%>
         </p>
 
-        <p>
-          <b>Experimentalists:</b>
-          <%= text_or_not_specified(@study.experimentalists) %>
-        </p>
+        <% unless @study.experimentalists.blank? %>
+          <p>
+            <b>Experimentalists:</b>
+            <%= text_or_not_specified(@study.experimentalists) %>
+          </p>
+        <% end %>
 
       </div>
     </div>
