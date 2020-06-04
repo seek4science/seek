@@ -57,20 +57,19 @@
     </li>
 </ul>
 
-<div style='clear:both;'>&nbsp;</div>
-
 <% if @folder.editable? -%>
-<div id='new_child' style='display:none;'>
-    <div id="error_text" class='error_div alert alert-danger' style="display:none;"></div>
-    <%= form_tag(create_folder_project_folder_path(@project, @folder), { id: :create_child_form, remote: true }) do -%>
-    <div class="input-group">
-        <%= text_field_tag :title, nil, id: 'subfolder-title', placeholder: 'Enter sub-folder name...', class: 'form-control' -%>
-        <div class="input-group-btn">
-            <%= submit_tag "Create", data: { disable_with: 'Creating...' }, class: 'btn btn-primary' %>
+    <div id='new_child' style='display:none;'>
+        <div id="error_text" class='error_div alert alert-danger' style="display:none;"></div>
+        <%= form_tag(create_folder_project_folder_path(@project, @folder), { id: :create_child_form, remote: true }) do -%>
+        <div class="input-group">
+            <%= text_field_tag :title, nil, id: 'subfolder-title', placeholder: 'Enter sub-folder name...', class: 'form-control' -%>
+            <div class="input-group-btn">
+                <%= submit_tag "Create", data: { disable_with: 'Creating...' }, class: 'btn btn-primary' %>
+            </div>
         </div>
+        <% end -%>
     </div>
-    <% end -%>
-</div>
+<% end -%>
 <script>
     $j(document).ready(function() {
        
@@ -116,7 +115,48 @@
                 data: JSON.stringify(data),
                 cache: false,
                 success: function(res) {
+                    // Call method
                     moveFile(res.data.id)
+                     $j.ajax({
+                        url: `/single_pages/${pid}/render_file_upload/${res.data.id}`,
+                        complete:() =>{
+                           
+
+                            var me = document.getElementById('preview-permission-link-script');
+                             var script = document.createElement('script');
+                            script.type = 'text/javascript';
+                            script.text = me.innerHTML;
+                            $j('body').append(script);
+
+                            //   var ss = document.getElementById('project-selector-script');
+                            //  var sc = document.createElement('script');
+                            // sc.type = 'text/javascript';
+                            // sc.text = ss.innerHTML;
+                            // $j('body').append(sc);
+
+                           
+
+                            //   $j(body).trigger('load')
+                            // setTimeout(() => {
+                            //     previewPermissions()
+                            // }, 1000);
+
+                            $j('#data-file-modal').modal({backdrop: 'static', keyboard: false});
+                            Sharing.projectsSelector.add(<%= @project.id %>)
+                           
+                             
+                            // console.log(me)
+                            // var head= document.getElementsByTagName('head')[0];
+                            // head.appendChild(me);
+                            // eval(me.innerHTML);
+                            // $j('body').append(me.innerHTML);
+                        }
+                     });
+                     
+                   
+                    // ...
+                    //After finishing the metadata wizard:
+                    //location.reload();
                 },
                 error: function(e) {
                     console.log(e.responseText)
@@ -126,8 +166,11 @@
             function moveFile(asset_id) {
                 var folder_element_id = "folder_" + displayed_folder_id;
                 var project_id = <%=@project.id%>
-                var origin_folder_id = <%= (ProjectFolder.where(:project_id=>@project.id, :title=>"Unsorted items").first).id %>
-                var path = "/projects/" + project_id + "/folders/" + origin_folder_id + "/move_asset_to";
+                <%
+                    fld = ProjectFolder.where(:project_id=>@project.id, :title=>"Unsorted items").first
+                    folder_id = fld.id unless fld.nil?
+                %>
+                var path = "/projects/" + project_id + "/folders/" + <%= folder_id%> + "/move_asset_to";
                 $j.ajax({
                   url: path,
                   type: "POST",
@@ -140,7 +183,7 @@
                     // asset_element_id: item_element.attr("id"),
                   },
                   success: function(){
-                    location.reload();
+                    // location.reload();
                   }
                 });
             }
@@ -155,4 +198,3 @@
         });
     });
 </script>
-<% end -%>
