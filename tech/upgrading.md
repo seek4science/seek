@@ -40,15 +40,15 @@ When upgrading between patch versions, it should only be necessary to run
     
     bundle install
     bundle exec rake seek:upgrade 
-
-## Steps to upgrade from 1.8.x to 1.9.x
+    
+## Steps to upgrade from 1.9.x to 1.10.x
 
 ### Upgrading Ruby
 
-You will need to upgrade Ruby to Ruby 2.4.9. If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
+You will need to upgrade Ruby to Ruby 2.4.10. If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
 If you are not prompted you can install with the command:
 
-    rvm install ruby-2.4.9
+    rvm install ruby-2.4.10
 
 ### Set RAILS_ENV
               
@@ -68,18 +68,18 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.9.1
+    git checkout v1.10.0
 
 ### Updating using the tarball
 
 
 You can download the file from
-<https://bitbucket.org/fairdom/seek/downloads/seek-1.9.1.tar.gz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.10.0.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.9.1.tar.gz
+    tar zxvf seek-1.10.0.tar.gz
     mv seek seek-previous
-    mv seek-1.9.1 seek
+    mv seek-1.10.0 seek
     cd seek/
 
 and then copy across your existing filestore and database configuration file
@@ -107,8 +107,7 @@ content.
     bundle exec rake sunspot:solr:start
     bundle exec rake seek:workers:start                
     
-    bundle exec rake tmp:clear
-            
+    bundle exec rake tmp:clear                
     
 ---
     

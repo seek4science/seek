@@ -18,6 +18,76 @@ each released minor version in order incrementally (i.e. 0.13.x -> 0.14.x ->
 Each version has a tag, which has the format of *v* prefix
 followed by the version - e.g. v0.11.1, v0.13.2, v0.17.1
 
+## Steps to upgrade from 1.8.x to 1.9.x
+
+### Upgrading Ruby
+
+You will need to upgrade Ruby to Ruby 2.4.9. If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
+If you are not prompted you can install with the command:
+
+    rvm install ruby-2.4.9
+
+### Set RAILS_ENV
+              
+
+**If upgrading a production instance of SEEK, remember to set the RAILS_ENV first**
+
+    export RAILS_ENV=production
+
+### Stopping services before upgrading
+
+    bundle exec rake seek:workers:stop
+    bundle exec rake sunspot:solr:stop
+
+### Updating from GitHub
+
+If you have an existing installation linked to our GitHub, you can fetch the
+files with:
+
+    git pull
+    git checkout v1.9.1
+
+### Updating using the tarball
+
+
+You can download the file from
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.9.1.tar.gz> You can
+unpack this file using:
+
+    tar zxvf seek-1.9.1.tar.gz
+    mv seek seek-previous
+    mv seek-1.9.1 seek
+    cd seek/
+
+and then copy across your existing filestore and database configuration file
+from your previous installation and continue with the upgrade steps. The
+database configuration file you would need to copy is _config/database.yml_,
+and the filestore is simply _filestore/_
+
+If you have a modified _config/sunspot.yml_ you will also need to copy that across.
+
+### Doing the upgrade
+
+After updating the files, the following steps will update the database, gems,
+and other necessary changes. Note that seek:upgrade may take longer than usual if you have data stored that points to remote
+content.
+
+    cd . #this is to allow RVM to pick up the ruby and gemset changes
+    gem install bundler
+    bundle install --deployment
+    bundle exec rake seek:upgrade
+    bundle exec rake assets:precompile # this task will take a while       
+       
+
+### Restarting services
+
+    bundle exec rake sunspot:solr:start
+    bundle exec rake seek:workers:start                
+    
+    bundle exec rake tmp:clear
+
+---    
+
 ## Steps to upgrade from 1.7.x to 1.8.x
 
 ### Upgrading Ruby

@@ -11,6 +11,21 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.10.0
+
+Release date: _June 2020_
+
+Highlights:
+
+  * Filtered search and browsing
+  
+There have also been many other minor bug fixes and improvements.  
+
+_Note_ that with this version, we moved from JIRA to [Github Issues](https://github.com/seek4science/seek/issues), and
+for this and probably future versions have stopped providing links to individual tasks.
+
+---
+
 ## Version 1.9.1
 
 Release date: _17th October 2019_
