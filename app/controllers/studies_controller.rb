@@ -141,7 +141,8 @@ class StudiesController < ApplicationController
     # render plain: params[:studies].inspect
     metadata_types = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type:'Study')
     studies_length = params[:studies][:title].length
-    batch_uploaded = false
+    studies_uploaded = false
+    assays_uploaded = false
     studies_length.times do |index|
       study_params = {
         title: params[:studies][:title][index],
@@ -155,10 +156,28 @@ class StudiesController < ApplicationController
       }
       @study = Study.new(study_params)
       if @study.valid? && @study.save! &&  @study.custom_metadata.valid?
-        batch_uploaded = true if @study.save
+        studies_uploaded = true if @study.save
+      end
+
+
+      params[:studies][:data_files][index].split(", ").length.times do |data_file_index|
+        study_metadata_id = '"id":"' + params[:studies][:id][index] + '"'
+        study_id = CustomMetadata.where("json_metadata LIKE ?", "%#{study_metadata_id}%").last.item_id
+        assay_class_id = AssayClass.where(title: "Experimental assay").first.id
+        assay_params = {
+            title: 'Assay for ' + params[:studies][:id][index] + '-' + (data_file_index+1).to_s,
+            description: "Test creating assay",
+            study_id: study_id,
+            assay_class_id: assay_class_id
+        }
+        @assay = Assay.new(assay_params)
+        if @assay.valid? && @assay.save!
+          assays_uploaded = true if @assay.save
+        end
       end
     end
 
+    batch_uploaded = studies_uploaded && assays_uploaded
     if batch_uploaded
       respond_to do |format|
         flash[:notice] = "The #{t('studies')} were successfully created.<br/>".html_safe
@@ -171,24 +190,24 @@ class StudiesController < ApplicationController
     end
   end
 
-  def generate_metadata(studies_data, index)
+  def generate_metadata(studies_meta_data, index)
     metadata = {
-        id: studies_data[:id][index],
-        study_start_date: studies_data[:startDate][index],
-        study_end_date: studies_data[:endDate][index] || "",
-        contact_institution: studies_data[:contactInstitution][index],
-        geographic_location_country: studies_data[:geographicLocationCountry][index],
-        experimental_site_name: studies_data[:experimentalSiteName][index],
-        latitude: studies_data[:latitude][index],
-        longitude: studies_data[:longitude][index],
-        altitude: studies_data[:altitude][index],
-        description_of_the_experimental_design: studies_data[:descriptionOfTheExperimentalDesign][index],
-        type_of_experimental_design: studies_data[:typeOfExperimentalDesign][index],
-        observation_unit_level_hierarchy: studies_data[:observationUnitLevelHierarchy][index],
-        observation_unit_description: studies_data[:observationUnitDescription][index],
-        description_of_growth_facility: studies_data[:descriptionOfGrowthFacility][index],
-        type_of_growth_facility: studies_data[:typeOfGrowthFacility][index],
-        cultural_practices: studies_data[:culturalPractices][index],
+        id: studies_meta_data[:id][index],
+        study_start_date: studies_meta_data[:startDate][index],
+        study_end_date: studies_meta_data[:endDate][index] || "",
+        contact_institution: studies_meta_data[:contactInstitution][index],
+        geographic_location_country: studies_meta_data[:geographicLocationCountry][index],
+        experimental_site_name: studies_meta_data[:experimentalSiteName][index],
+        latitude: studies_meta_data[:latitude][index],
+        longitude: studies_meta_data[:longitude][index],
+        altitude: studies_meta_data[:altitude][index],
+        description_of_the_experimental_design: studies_meta_data[:descriptionOfTheExperimentalDesign][index],
+        type_of_experimental_design: studies_meta_data[:typeOfExperimentalDesign][index],
+        observation_unit_level_hierarchy: studies_meta_data[:observationUnitLevelHierarchy][index],
+        observation_unit_description: studies_meta_data[:observationUnitDescription][index],
+        description_of_growth_facility: studies_meta_data[:descriptionOfGrowthFacility][index],
+        type_of_growth_facility: studies_meta_data[:typeOfGrowthFacility][index],
+        cultural_practices: studies_meta_data[:culturalPractices][index],
     }
     metadata
   end
