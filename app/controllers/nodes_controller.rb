@@ -60,7 +60,8 @@ class NodesController < ApplicationController
     params.require(:node).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                { publication_ids: [] })
+                                { publication_ids: [] },
+                                 asset_links_attributes:[:id, :url, :link_type, :_destroy])
   end
 
   alias_method :asset_params, :node_params

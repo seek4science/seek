@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_17_112757) do
+ActiveRecord::Schema.define(version: 2020_05_13_101632) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -185,6 +185,16 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.string "doi"
+  end
+
+  create_table "asset_links",  force: :cascade do |t|
+    t.integer "asset_id"
+    t.string "asset_type"
+    t.text "url"
+    t.string "link_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["asset_id", "asset_type"], name: "index_asset_links_on_asset_id_and_asset_type"
   end
 
   create_table "assets", id: :integer,  force: :cascade do |t|
@@ -500,7 +510,7 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.text "address", limit: 16777215
     t.string "city"
     t.string "country"
-    t.string "url"
+    t.text "url"
     t.text "description", limit: 16777215
     t.string "title"
     t.integer "policy_id"
@@ -673,7 +683,7 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.string "title"
     t.text "address", limit: 16777215
     t.string "city"
-    t.string "web_page"
+    t.text "web_page"
     t.string "country"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -1048,7 +1058,7 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.string "email"
     t.string "phone"
     t.string "skype_name"
-    t.string "web_page"
+    t.text "web_page"
     t.text "description", limit: 16777215
     t.integer "avatar_id"
     t.integer "status_id", default: 0
@@ -1148,7 +1158,7 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.string "title"
     t.text "description", limit: 16777215
     t.integer "avatar_id"
-    t.string "web_page"
+    t.text "web_page"
     t.string "first_letter", limit: 1
     t.string "uuid"
     t.datetime "created_at", null: false
@@ -1199,8 +1209,8 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
 
   create_table "projects", id: :integer,  force: :cascade do |t|
     t.string "title"
-    t.string "web_page"
-    t.string "wiki_page"
+    t.text "web_page"
+    t.text "wiki_page"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text "description", limit: 16777215
@@ -1314,7 +1324,7 @@ ActiveRecord::Schema.define(version: 2020_01_17_112757) do
     t.string "publisher"
     t.string "editor"
     t.integer "publication_type_id"
-    t.string "url"
+    t.text "url"
     t.index ["contributor_id"], name: "index_publications_on_contributor"
   end
 

@@ -2232,6 +2232,43 @@
                 }
             }
         },
+        "/people/current": {
+            "get": {
+                "operationId": "currentPerson",
+                "description": {
+                    "$ref": "../descriptions/currentPerson.md"
+                },
+                "tags": [
+                    "read",
+                    "people"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/personResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/personResponse.json"
+                            }
+                        }
+                    }
+                }
+            }
+	    },
         "/people/{id}": {
             "parameters": [
                 {

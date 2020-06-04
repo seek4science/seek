@@ -751,4 +751,41 @@ class StudiesControllerTest < ActionController::TestCase
     refute study.valid?
 
   end
+
+  test 'experimentalists only shown if set' do
+    person = Factory(:person)
+    login_as(person)
+    study = Factory(:study,experimentalists:'some experimentalists',contributor:person)
+    refute study.experimentalists.blank?
+
+    get :edit, params:{id:study}
+    assert_response :success
+
+    assert_select 'input#study_experimentalists', count:1
+
+    get :show, params:{id:study}
+    assert_response :success
+
+    assert_select 'p',text:/Experimentalists:/,count:1
+
+    study = Factory(:study,contributor:person)
+    assert study.experimentalists.blank?
+
+    get :edit, params:{id:study}
+    assert_response :success
+
+    assert_select 'input#study_experimentalists', count:0
+
+    get :show, params:{id:study}
+    assert_response :success
+
+    assert_select 'p',text:/Experimentalists:/, count:0
+
+    get :new
+    assert_response :success
+
+    assert_select 'input#study_experimentalists', count:0
+
+
+  end
 end
