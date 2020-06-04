@@ -18,7 +18,7 @@ Release date: _June 2020_
 Highlights:
 
   * Filtered search and browsing:
-    * When viewing index page lists, it is not possible to change the sort order, and filter by certain attributes
+    * When viewing index page lists, it is now possible to change the sort order, and filter by certain attributes
     * It is also possible to search over the list, and apply filters to the results
     * Filters across categories have AND applied, whereas within a category OR is applied
   * Enhanced support for publications:
