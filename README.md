@@ -4,7 +4,7 @@
 
 ## License
 
-Copyright © 2009-2019, University of Manchester and HITS gGmbH
+Copyright © 2009-2020, University of Manchester and HITS gGmbH
 
 [BSD 3-clause](BSD-LICENSE)
 
