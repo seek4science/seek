@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "115",
+    "id": "192",
     "type": "collections",
     "attributes": {
       "title": "A Maximal Collection",
@@ -13,15 +13,15 @@
         "Collection-tag4",
         "Collection-tag5"
       ],
-      "created_at": "2020-06-03T15:00:33.000Z",
-      "updated_at": "2020-06-03T15:00:37.000Z",
+      "created_at": "2020-06-03T16:10:48.000Z",
+      "updated_at": "2020-06-03T16:10:51.000Z",
       "other_creators": "Blogs, Joe"
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "1039986762",
+            "id": "1039986924",
             "type": "people"
           }
         ]
@@ -29,7 +29,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039986755",
+            "id": "1039986917",
             "type": "people"
           }
         ]
@@ -37,11 +37,11 @@
       "people": {
         "data": [
           {
-            "id": "1039986755",
+            "id": "1039986917",
             "type": "people"
           },
           {
-            "id": "1039986762",
+            "id": "1039986924",
             "type": "people"
           }
         ]
@@ -49,7 +49,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022250918",
+            "id": "1022251083",
             "type": "projects"
           }
         ]
@@ -57,7 +57,7 @@
       "publications": {
         "data": [
           {
-            "id": "980190967",
+            "id": "980190970",
             "type": "publications"
           }
         ]
@@ -65,47 +65,47 @@
       "items": {
         "data": [
           {
-            "id": "65",
+            "id": "92",
             "type": "collection_items"
           },
           {
-            "id": "66",
+            "id": "93",
             "type": "collection_items"
           },
           {
-            "id": "67",
+            "id": "94",
             "type": "collection_items"
           },
           {
-            "id": "68",
+            "id": "95",
             "type": "collection_items"
           },
           {
-            "id": "69",
+            "id": "96",
             "type": "collection_items"
           },
           {
-            "id": "70",
+            "id": "97",
             "type": "collection_items"
           }
         ]
       }
     },
     "links": {
-      "self": "/collections/115",
-      "items": "/collections/115/items"
+      "self": "/collections/192",
+      "items": "/collections/192/items"
     },
     "meta": {
-      "created": "2020-06-03T15:00:33.000Z",
-      "modified": "2020-06-03T15:00:37.000Z",
+      "created": "2020-06-03T16:10:48.000Z",
+      "modified": "2020-06-03T16:10:51.000Z",
       "api_version": "0.3",
-      "uuid": "e5a683f0-87d8-0138-b8df-0800278a9619",
+      "uuid": "b61a1290-87e2-0138-b8e2-0800278a9619",
       "base_url": "http://localhost:3000"
     }
   },
   "included": [
     {
-      "id": "65",
+      "id": "92",
       "type": "collection_items",
       "attributes": {
         "comment": "Readme!",
@@ -114,13 +114,13 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "115",
+            "id": "192",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "57",
+            "id": "74",
             "type": "documents"
           },
           "meta": {
@@ -129,16 +129,16 @@
         }
       },
       "links": {
-        "self": "/collections/115/items/65"
+        "self": "/collections/192/items/92"
       },
       "meta": {
-        "created": "2020-06-03T15:00:33.000Z",
-        "modified": "2020-06-03T15:00:33.000Z",
+        "created": "2020-06-03T16:10:48.000Z",
+        "modified": "2020-06-03T16:10:48.000Z",
         "api_version": "0.3"
       }
     },
     {
-      "id": "66",
+      "id": "93",
       "type": "collection_items",
       "attributes": {
         "comment": "Secret info",
@@ -147,22 +147,22 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "115",
+            "id": "192",
             "type": "collections"
           }
         }
       },
       "links": {
-        "self": "/collections/115/items/66"
+        "self": "/collections/192/items/93"
       },
       "meta": {
-        "created": "2020-06-03T15:00:34.000Z",
-        "modified": "2020-06-03T15:00:34.000Z",
+        "created": "2020-06-03T16:10:49.000Z",
+        "modified": "2020-06-03T16:10:49.000Z",
         "api_version": "0.3"
       }
     },
     {
-      "id": "67",
+      "id": "94",
       "type": "collection_items",
       "attributes": {
         "comment": "The protocol",
@@ -171,31 +171,31 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "115",
+            "id": "192",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "1055250444",
+            "id": "1055250447",
             "type": "sops"
           },
           "meta": {
-            "title": "This Sop"
+            "title": "Protocol"
           }
         }
       },
       "links": {
-        "self": "/collections/115/items/67"
+        "self": "/collections/192/items/94"
       },
       "meta": {
-        "created": "2020-06-03T15:00:35.000Z",
-        "modified": "2020-06-03T15:00:35.000Z",
+        "created": "2020-06-03T16:10:50.000Z",
+        "modified": "2020-06-03T16:10:50.000Z",
         "api_version": "0.3"
       }
     },
     {
-      "id": "68",
+      "id": "95",
       "type": "collection_items",
       "attributes": {
         "comment": "Data 1",
@@ -204,31 +204,31 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "115",
+            "id": "192",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "883654278",
+            "id": "883654287",
             "type": "data_files"
           },
           "meta": {
-            "title": "A Data File_1"
+            "title": "Data 1"
           }
         }
       },
       "links": {
-        "self": "/collections/115/items/68"
+        "self": "/collections/192/items/95"
       },
       "meta": {
-        "created": "2020-06-03T15:00:35.000Z",
-        "modified": "2020-06-03T15:00:35.000Z",
+        "created": "2020-06-03T16:10:50.000Z",
+        "modified": "2020-06-03T16:10:50.000Z",
         "api_version": "0.3"
       }
     },
     {
-      "id": "69",
+      "id": "96",
       "type": "collection_items",
       "attributes": {
         "comment": "Data 2",
@@ -237,31 +237,31 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "115",
+            "id": "192",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "883654279",
+            "id": "883654288",
             "type": "data_files"
           },
           "meta": {
-            "title": "A Data File_2"
+            "title": "Data 2"
           }
         }
       },
       "links": {
-        "self": "/collections/115/items/69"
+        "self": "/collections/192/items/96"
       },
       "meta": {
-        "created": "2020-06-03T15:00:36.000Z",
-        "modified": "2020-06-03T15:00:36.000Z",
+        "created": "2020-06-03T16:10:50.000Z",
+        "modified": "2020-06-03T16:10:50.000Z",
         "api_version": "0.3"
       }
     },
     {
-      "id": "70",
+      "id": "97",
       "type": "collection_items",
       "attributes": {
         "comment": "Bad data",
@@ -270,17 +270,17 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "115",
+            "id": "192",
             "type": "collections"
           }
         }
       },
       "links": {
-        "self": "/collections/115/items/70"
+        "self": "/collections/192/items/97"
       },
       "meta": {
-        "created": "2020-06-03T15:00:36.000Z",
-        "modified": "2020-06-03T15:00:36.000Z",
+        "created": "2020-06-03T16:10:51.000Z",
+        "modified": "2020-06-03T16:10:51.000Z",
         "api_version": "0.3"
       }
     }

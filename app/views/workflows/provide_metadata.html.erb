@@ -45,12 +45,18 @@
     </div>
 
     <div class="form-group">
+      <label>Source</label>
+      <%= text_field_tag 'workflow[source_link_url]', @workflow.source_link_url, placeholder: 'https://...', class: "form-control" -%>
+      <p class="help-block">If this workflow came from an external repository (i.e. GitHub), you can include its original URL here.</p>
+    </div>
+
+    <div class="form-group">
       <label>Maturity</label>
       <%= select_tag 'workflow[maturity_level]',
                      options_for_select(Workflow::MATURITY_LEVELS.values.map { |k| [t("maturity_level.#{k}"), k] }, @workflow.maturity_level),
                      include_blank: 'Not specified',
                      class: "form-control" -%>
-      <p class="help-block">This field is used to indicate to users what level of stablity they can expect from the workflow.</p>
+      <p class="help-block">This field is used to indicate to users what level of stability they can expect from the workflow.</p>
     </div>
 
     <%= render partial: "projects/project_selector", locals: { resource: @workflow, allow_nil: Seek::Config.is_virtualliver } -%>
