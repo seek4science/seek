@@ -23,7 +23,8 @@
                                       remote: true }) do -%>
           <p>
             An email will be sent to <%= join_with_and(email_recipients.collect{|m| h(m.name)}) -%> to show your interest in
-            <b><%= text_for_resource(resource) %> <%= resource.title %> </b>.<br/>
+            <b><%= text_for_resource(resource) %> <%= resource.title %></b>. Please note that your email address will be shared with the <%="recipient".pluralize(email_recipients.size)%>.
+            <br/>
           </p>
 
           <%= submit_tag 'Send', data: { confirm: "An email will be delivered with your request to #{join_with_and(email_recipients.collect{|m| h(m.name)})}. Are you sure?" }, class: 'btn btn-primary' -%>
