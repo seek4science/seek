@@ -56,7 +56,7 @@
                      options_for_select(Workflow::MATURITY_LEVELS.values.map { |k| [t("maturity_level.#{k}"), k] }, @workflow.maturity_level),
                      include_blank: 'Not specified',
                      class: "form-control" -%>
-      <p class="help-block">This field is used to indicate to users what level of stablity they can expect from the workflow.</p>
+      <p class="help-block">This field is used to indicate to users what level of stability they can expect from the workflow.</p>
     </div>
 
     <%= render partial: "projects/project_selector", locals: { resource: @workflow, allow_nil: Seek::Config.is_virtualliver } -%>
