@@ -22,6 +22,18 @@ module Seek
         def creators_changed?
           @creators_changed
         end
+
+        def source_link_url= url
+          (source_link || build_source_link).assign_attributes(url: url)
+
+          source_link.mark_for_destruction if url.blank?
+
+          url
+        end
+
+        def source_link_url
+          source_link&.url
+        end
       end
 
       module Associations
@@ -54,6 +66,7 @@ module Seek
           has_many :discussion_links, -> { where(AssetLink.discussion.where_values_hash) }, class_name: 'AssetLink', as: :asset, dependent: :destroy, inverse_of: :asset
           accepts_nested_attributes_for :asset_links, allow_destroy:true
           validates_associated :asset_links
+          has_one :source_link, -> { where(link_type: AssetLink::SOURCE) }, class_name: 'AssetLink', as: :asset, dependent: :destroy, inverse_of: :asset, autosave: true
 
           has_filter :creator
 

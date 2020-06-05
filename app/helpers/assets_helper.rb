@@ -260,4 +260,18 @@ module AssetsHelper
       false
     end
   end
+
+  def source_link_button(source_link)
+    url = source_link.url
+    uri = URI.parse(url)
+    if uri.hostname.include?('github.com')
+      image = 'github'
+      text = 'View on GitHub'
+    else
+      image = 'external_link'
+      text = 'Visit source'
+    end
+
+    button_link_to(text, image, source_link.url, target: :_blank)
+  end
 end

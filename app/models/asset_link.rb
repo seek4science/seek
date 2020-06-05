@@ -1,5 +1,6 @@
 class AssetLink < ApplicationRecord
   DISCUSSION = 'discussion'.freeze
+  SOURCE = 'source'.freeze
 
   scope :discussion, -> { where(link_type: AssetLink::DISCUSSION) }
 

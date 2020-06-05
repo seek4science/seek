@@ -80,7 +80,6 @@ module WorkflowExtraction
 
     c = content_blob
     wf = crate.main_workflow || ROCrate::Workflow.new(crate, c.filepath, c.original_filename)
-    wf.identifier = ro_crate_identifier
     wf.content_size = c.file_size
     crate.main_workflow = wf
     crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, extractor_class.ro_crate_metadata)
@@ -101,7 +100,9 @@ module WorkflowExtraction
     crate.author = authors
     crate['provider'] = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata).reference }
     crate.license = license
+    crate.identifier = ro_crate_identifier
     crate.url = ro_crate_url('ro_crate')
+    crate['isBasedOn'] = source_link_url if source_link_url
     crate['sdPublisher'] = crate.add_person(nil, contributor.ro_crate_metadata).reference
     crate['sdDatePublished'] = Time.now
     crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
