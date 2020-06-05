@@ -2,16 +2,16 @@ div#folder_contents {
     padding: 0em 0em 0em 0em;
     margin: 0em 0em 0em 0em;
     min-height: 50em;
-    border:1px solid #ddd;
-    border-radius:5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
 
 div#folder_column {
     border-right: 1px #666 solid;
     min-height: 50em;
     background-color: white;
-    border:1px solid #ddd;
-    border-radius:5px
+    border: 1px solid #ddd;
+    border-radius: 5px
 }
 
 div#tree {
@@ -54,10 +54,10 @@ ul.asset_cards {
 ul.asset_cards li.asset_card_item {
     margin: 0.25em 0.25em 0.25em 0.25em;
     padding: 0.25em;
-    min-width: 88px;
-    max-width: 88px;
-    min-height: 115px;
-    max-height: 115px;
+    min-width: 100px;
+    max-width: 100px;
+    min-height: 130px;
+    max-height: 130px;
     float: left;
     list-style: none;
     border-radius: 5px;
@@ -65,7 +65,7 @@ ul.asset_cards li.asset_card_item {
     background-color: transparent
 }
 
-ul.asset_cards > li.asset_card_item:hover {
+ul.asset_cards>li.asset_card_item:hover {
     border: #ebebeb solid 1px;
 }
 
@@ -75,7 +75,6 @@ li.asset_card_item img.asset_card_avatar {
     height: 80px;
     padding-right: 0.3em;
     vertical-align: middle;
-    /* float: left; */
 }
 
 li.asset_card_item.data_file {
@@ -119,12 +118,12 @@ ul#folder_details li {
 }
 
 ul#folder_details li.title_and_description {
-   
+
     float: left;
 }
 
 ul#folder_details li.actions {
-    float:right
+    float: right
 }
 
 .asset_card_item+.tooltip>.tooltip-inner {
@@ -139,7 +138,9 @@ ul#folder_details li.actions {
 
 .asset_card_filename {
 
-    text-align: center
+    text-align: center;
+    overflow:hidden;
+    text-overflow:ellipsis
 }
 
 .asset_card_filename a {
