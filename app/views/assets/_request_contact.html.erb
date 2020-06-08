@@ -1,0 +1,43 @@
+<%
+  resource = object
+
+  #if there are creators, the email will be sent only to them, otherwise sent to the contributor
+  if resource.creators.present?
+    email_recipients = resource.creators
+  else
+    email_recipients = [resource.contributor] unless resource.contributor.nil?
+  end
+%>
+
+<% if logged_in? %>
+  <% if Seek::Config.email_enabled && email_recipients.present? -%>
+      <%= button_link_to("Request Contact", "message", '#', id: 'request_contact_button',
+                       'data-toggle' => 'modal', 'data-target' => "#request-contact-modal") -%>
+    <%= modal(id: 'request-contact-modal', class: 'text-left') do %>
+      <%= modal_header('Request Contact') %>
+      <%= modal_body do %>
+        <div id="request_contact_form">
+          <%= form_tag_with_callbacks(polymorphic_url(resource, action: :request_contact),
+                                      { id: 'request_contact',
+                                        before: "$j('#requesting_contact_status').fadeIn(); $j('#request_contact_form').hide();",
+                                        remote: true }) do -%>
+            <p>
+              An email will be sent to <%= join_with_and(email_recipients.collect{|m| h(m.name)}) -%> to show your interest in
+              <b><%= text_for_resource(resource) %> <%= resource.title %></b>. Please note that your email address will be shared with the <%="recipient".pluralize(email_recipients.size)%>.
+              <br/>
+            </p>
+
+            <%= submit_tag 'Send', data: { confirm: "An email will be delivered with your request to #{join_with_and(email_recipients.collect{|m| h(m.name)})}. Are you sure?" }, class: 'btn btn-primary' -%>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <% end %>
+        </div>
+        <div id="requesting_contact_status" style="display:none;">
+          About to request contact to <%= h(email_recipients.collect{|p| h(p.name)}.join(", ")) %> ...
+          <%= image('spinner') %>
+        </div>
+      <% end %>
+    <% end %>
+  <% else -%>
+    <%= button_link_to("Request Contact", "message", '#', :class => 'disabled-button', :onclick => "alert('No #{t('contributor')} or creator for this asset');") -%>
+  <% end -%>
+<% end -%>

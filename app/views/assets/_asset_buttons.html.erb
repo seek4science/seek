@@ -9,6 +9,7 @@
 
 <%= source_link_button(asset.source_link) if asset.respond_to?(:source_link) && asset.source_link %>
 
+<%= render partial: 'assets/request_contact', locals: { object: asset } if asset.respond_to?(:creators) -%>
 <%= render partial: 'subscriptions/subscribe', locals: { object: asset } -%>
 
 <% if asset.is_a?(DataFile) %>
