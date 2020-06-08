@@ -40,6 +40,10 @@ class Workflow < ApplicationRecord
     def maturity_level= level
       super(Workflow::MATURITY_LEVELS_INV[level&.to_sym])
     end
+
+    def source_link_url
+      parent&.source_link&.url
+    end
   end
 
   def avatar_key
