@@ -26,9 +26,11 @@ function setupFoldersTree(dataJson, container_id, drop_accept_class) {
       plugins: ["separate"],
     })
     .on("activate_node.jstree", function (e, data) {
-      const { folder_id, project_id, id, type } = $j(this)
-        .jstree(true)
-        .get_node(data.node.id).data;
+      var obj = $j(this).jstree(true).get_node(data.node.id).data;
+      var folder_id = obj.folder_id
+      var project_id = obj.project_id
+      var id = obj.id
+      var type = obj.type
       folder_id
         ? folder_clicked(folder_id, project_id)
         : item_clicked(type, id);
@@ -128,8 +130,8 @@ function item_dropped_to_folder(item_element, dest_folder_id) {
         asset_element_id: item_element.attr("id"),
       },
     });
-    let dest = $j(`#${folder_element_id}_anchor span`);
-    let origin = $j(`#folder_${origin_folder_id}_anchor span`);
+    var dest = $j("#" + folder_element_id + "_anchor span");
+    var origin = $j("#folder_" + origin_folder_id + "_anchor span");
     bounce(dest, parseInt(dest.text()) + 1);
     bounce(origin, parseInt(origin.text()) - 1);
   } else {
@@ -140,18 +142,18 @@ function item_dropped_to_folder(item_element, dest_folder_id) {
 
 function folder_clicked(folder_id, project_id) {
   hideAll();
-  $j(`#folder_contents`).show();
+  $j("#folder_contents").show();
   $j("#folder_contents").spinner("add");
   var path =
     "/projects/" + project_id + "/folders/" + folder_id + "/display_contents";
   displayed_folder_id = folder_id;
-  $j.ajax({ url: path, dataType: "script" });
+  $j.ajax({ url: path, cache:false, dataType: "script" });
 }
 
 function item_clicked(type, id) {
   hideAll();
-  if (type == "folder") $j(`#folder_contents`).show();
-  else $j(`#${type}_contents`).show();
+  if (type == "folder") $j("#folder_contents").show();
+  else $j("#" + type + "_contents").show();
   breadcrumb(type);
   selectedItem.id = id;
   selectedItem.type = type;
@@ -160,7 +162,7 @@ function item_clicked(type, id) {
     case "investigation":
     case "study": {
       $j.ajax({
-        url: `/single_pages/${pid}/render_sharing_form/${id}/type/${type}`,
+        url: "/single_pages/" + pid + "/render_sharing_form/" + id + "/type/" + type,
       });
     }
   }
@@ -176,11 +178,11 @@ function hideAll() {
 
 function bounce(item, text) {
   item.addClass("animate");
-  setTimeout(() => {
+  setTimeout(function() {
     item.css("transform", "scale(2)");
     item.css("opacity", "0");
   }, 1);
-  setTimeout(() => {
+  setTimeout(function() {
     item.css("transform", "scale(1)");
     item.css("opacity", "1");
     item.text(text);
@@ -204,14 +206,14 @@ function bounce(item, text) {
         if (n.data.type) $j(obj.childNodes[1]).attr("_type", n.data.type);
         if (n.data.id) $j(obj.childNodes[1]).attr("_id", n.data.id);
         if (n.state.separate) {
-          let p = d.createElement("p");
+          var p = d.createElement("p");
           p.innerHTML = n.state.separate.label;
           p.className = "separator";
           if (n.state.separate.action) {
-            let a = d.createElement("a");
+            var a = d.createElement("a");
             a.href = n.state.separate.action;
             a.className = "treeaction glyphicon glyphicon-plus";
-            $j(a).attr("onclick", `add${n.state.separate.label}(this)`);
+            $j(a).attr("onclick", 'add'+ n.state.separate.label + '(this)');
             obj.prepend(a);
           }
           obj.prepend(p);
