@@ -29,7 +29,7 @@
     <%= render partial: 'dashboard/asset_activity', locals: { title: 'Most downloaded assets',
                                                               url: polymorphic_path([:asset_activity, scope, :stats], activity: 'download'),
                                                               type_options: Seek::Util.asset_types.sort_by { |t| t.name }  } %>
-    <%= render partial: 'dashboard/activity', locals: { title: 'Most active contributors', url: polymorphic_path([:contributors, scope, :stats]) } %>
+    <%= render partial: 'dashboard/activity', locals: { title: "Most active #{t('contributor').pluralize}", url: polymorphic_path([:contributors, scope, :stats]) } %>
     <%= help_link(:dashboard, link_text:'Dashboard guide',include_icon:true) %>
   </div>
   <div class="col-sm-8">
@@ -53,7 +53,7 @@
 
 <script>
     $j(document).ready(function () {
-        <%# Behaviour for the "Most viewed/downloaded" and "Most active contributor" lists %>
+        <%# Behaviour for the "Most viewed/downloaded" and "Most active <% t('contributor) %>" lists %>
         $j('.most-activity').each(function () {
             var container = $j(this);
             var body = $j('.panel-body', container);

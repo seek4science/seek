@@ -415,6 +415,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
+      post :request_contact
       post :update_annotations_ajax
       post :new_version
       post :edit_version_comment
@@ -457,6 +458,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
+      post :request_contact
       post :update_annotations_ajax
       post :new_version
       post :edit_version_comment
@@ -491,6 +493,7 @@ SEEK::Application.routes.draw do
       post :publish
       post :execute
       post :request_resource
+      post :request_contact
       get :simulate
       post :simulate
       delete :destroy_version
@@ -525,6 +528,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
+      post :request_contact
       post :update_annotations_ajax
       post :new_version
       post :edit_version_comment
@@ -558,6 +562,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
+      post :request_contact
       post :update_annotations_ajax
       post :new_version
       post :edit_version_comment
@@ -586,6 +591,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
+      post :request_contact
       post :update_annotations_ajax
       post :new_version
       post :edit_version_comment
@@ -640,6 +646,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :disassociate_authors
       post :update_metadata
+      post :request_contact
     end
     resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :events,:only=>[:index]
   end
@@ -653,6 +660,7 @@ SEEK::Application.routes.draw do
     member do
       get :manage
       patch :manage_update
+      post :request_contact
     end
     resources :people,:projects,:data_files,:publications,:documents,:presentations,:only=>[:index]
   end
@@ -676,6 +684,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       get :manage
       patch :manage_update
+      post :request_contact
     end
     resources :specimens,:assays,:people,:projects,:samples,:only=>[:index]
   end
@@ -717,6 +726,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       get :manage
       patch :manage_update
+      post :request_contact
     end
     resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
               :strains, :organisms, only:[:index]
@@ -764,6 +774,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
+      post :request_contact
       post :update_annotations_ajax
       post :new_version
       post :edit_version_comment

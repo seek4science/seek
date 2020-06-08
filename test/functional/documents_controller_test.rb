@@ -527,7 +527,7 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     assert_select '.filter-category[data-filter-category="contributor"]' do
-      assert_select '.filter-category-title', text: 'Contributor'
+      assert_select '.filter-category-title', text: 'Submitter'
       assert_select '.filter-option', href: /documents\?filter\[contributor\]=\d+/, count: 8
       assert_select '.filter-option.filter-option-active', count: 0
       # Should show 6 options and hide the rest
@@ -588,7 +588,7 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     assert_select '.filter-category[data-filter-category="contributor"]' do
-      assert_select '.filter-category-title', text: 'Contributor'
+      assert_select '.filter-category-title', text: 'Submitter'
       assert_select '.filter-option', count: 1
       assert_select '.filter-option.filter-option-active', count: 0
       assert_select '.filter-option.filter-option-hidden', count: 0
@@ -726,7 +726,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 21, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='other']", text: 'Other', count: 0
         assert_select 'option[value="custom"]', text: 'Custom range'
@@ -744,7 +744,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 6, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select 'option[value="custom"]', text: 'Custom range'
         assert_select 'option[value=""]', text: 'Any time'
@@ -772,7 +772,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 10, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='custom'][selected='selected']", text: 'Custom range'
         assert_select 'option[value=""]', text: 'Any time'
@@ -805,7 +805,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 9, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='custom'][selected='selected']", text: 'Custom range'
         assert_select 'option[value=""]', text: 'Any time'
@@ -838,7 +838,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 3, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='other'][selected='selected']", text: 'Other'
         assert_select "option[value='custom']", text: 'Custom range'
@@ -869,7 +869,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 7, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='other'][selected='selected']", text: 'Other'
         assert_select "option[value='custom']", text: 'Custom range'

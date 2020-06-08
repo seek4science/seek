@@ -10,13 +10,13 @@
         </select>
       </div>
     </div>
-    Contributions
+    <%= "#{t('contribution').pluralize.capitalize}" %>
   </div>
   <div class="panel-body">
     <canvas id="contributions-canvas"></canvas>
 
     <p class="help-block">
-      Mouse over a bar to see the breakdown of contributions for that month.
+      Mouse over a bar to see the breakdown of <%= "#{t('contribution').pluralize}" %> for that month.
       Clicking on a type in the legend will hide it from the chart.
     </p>
   </div>
@@ -54,7 +54,7 @@
             },
             title: {
                 display: false,
-                text: 'Contributions'
+                text: "#{t('contribution').pluralize.capitalize}"
             },
             tooltips: {
                 mode: 'index',
