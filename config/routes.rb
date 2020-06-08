@@ -806,6 +806,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
+      post :request_contact
       post :update_annotations_ajax
       post :mint_doi
       get :mint_doi_confirm
