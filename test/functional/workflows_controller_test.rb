@@ -558,6 +558,16 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 'file%20with%20spaces%20in%20name.txt', crate_workflow.id
   end
 
+  test 'downloads valid RO crate' do
+    workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
+
+    get :ro_crate, params: { id: workflow.id }
+
+    assert_response :success
+    crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path)
+    assert crate.main_workflow
+  end
+
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)
