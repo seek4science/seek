@@ -11,6 +11,18 @@ class ModelSerializer < ContributedResourceSerializer
     object.recommended_environment.try(:title)
   end
 
+  attribute :model_image_link do
+     if version_number
+       unless object.find_version(version_number).model_image.nil?
+        base_url+polymorphic_path([object, object.find_version(version_number).model_image])
+       end
+     else
+       unless object.model_image.nil?
+        base_url+polymorphic_path([object, object.model_image])
+       end
+     end
+  end
+
   has_many :people
   has_many :projects
   has_many :investigations
