@@ -25,8 +25,12 @@
             end
             
             # Documents folder
-            chld = @folders.reverse_each.map do |folder|
-                inv.unshift(folder_node(folder))
+            if @folders.respond_to? :each
+                chld = @folders.reverse_each.map do |folder|
+                    inv.unshift(folder_node(folder))
+                end
+            else
+                chld = @folders
             end
            
             prj.push(create_node( {text: @project.title, _type: 'project', _id: @project.id,
