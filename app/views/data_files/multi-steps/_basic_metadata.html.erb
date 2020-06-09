@@ -1,3 +1,4 @@
+<% is_modal ||= false %>
 <div class='panel panel-default'>
   <div class='panel-heading'>
     General information
@@ -21,7 +22,11 @@
     </div>
     <%= render :partial => 'projects/project_selector', locals: {resource: @data_file, allow_nil: Seek::Config.is_virtualliver} -%>
     <%= render :partial => 'assets/select_tags', locals: {collapsed: true} if DataFile.is_taggable? %>
-    <%= cancel_button(data_files_path) -%>
+    <%if(is_modal)%>
+      <a class=" btn btn-default" onClick="location.reload();">Cancel</a>
+    <%else%>
+      <%= cancel_button(data_files_path) -%>
+    <%end%>
     <div class='multi-step-buttons'>
       <%= multi_step_forward_button %>
       <%= multi_step_end_button %>
