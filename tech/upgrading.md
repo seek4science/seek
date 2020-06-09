@@ -74,7 +74,7 @@ files with:
 
 
 You can download the file from
-<https://bitbucket.org/fairdom/seek/downloads/seek-1.10.0.tar.gz> You can
+<https://github.com/seek4science/seek/archive/v1.10.0.tar.gz> You can
 unpack this file using:
 
     tar zxvf seek-1.10.0.tar.gz

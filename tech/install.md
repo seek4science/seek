@@ -94,9 +94,9 @@ tagged as *(v{{ site.current_seek_version }})*. To fetch this run:
 ### Download to install
 
 Alternatively, you can download SEEK from
-<https://bitbucket.org/fairdom/seek/downloads/seek-{{ site.current_seek_version }}.tar.gz>
+<https://github.com/seek4science/seek/archive/v{{ site.current_seek_version }}.tar.gz>
 
-    wget https://bitbucket.org/fairdom/seek/downloads/seek-{{ site.current_seek_version }}.tar.gz
+    wget -O seek-{{ site.current_seek_version }}.tar.gz https://github.com/seek4science/seek/archive/v{{ site.current_seek_version }}.tar.gz
 
 then unpack the file with:
 
