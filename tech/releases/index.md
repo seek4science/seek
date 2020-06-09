@@ -13,28 +13,29 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 ## Version 1.10.0
 
-Release date: _June 2020_
+Release date: _9th June 2020_
 
 Highlights:
 
   * Filtered search and browsing:
     * When viewing index page lists, it is now possible to change the sort order, and filter by certain attributes
-    * It is also possible to search over the list, and apply filters to the results
-    * Filters across categories have AND applied, whereas within a category OR is applied
+    * It is also possible to perform a text search over the list, and apply filters to the results
+    * Filters across categories have **AND** applied, whereas within a category **OR** is applied
   * Enhanced support for publications:
-    * Ability to support more publication types, including:  Journal article, inproceedings, inbook, etc. Users can update the publication type when editing the publication.
-    * Additional metadata attributes including booktitle, editor, publisher, a remote URL
+    * Support for more publication types, including:  _Journal article_, _inproceedings_, _inbook_, etc. 
+    Users can update the publication type when editing the publication.
+    * Additional metadata attributes including _booktitle_, _editor_, _publisher_, _a remote URL_
     * For publications, which are manually registered or imported from bibtex files, users can edit all fields of publications.
     * For publications registered with DOI, users can refresh the metadata by clicking "edit publication"
     * Improvements to importing publications by a bibtex file
       * Ability to import different types of publications
       * Add more validations to support different types of publications
       * Generate the citation according to the type of publications when there is no DOI or Pubmed ID   
-  * Ability to add one or more Discussion Channel links to all Assets
+  * Adding one or more Discussion Channel links to all Assets
     * If you wish to provide the ability to open a discussion about an item, one or more links can be added to locations
     such as Slack, GitHub issue, a Forum thread
   * A "Request Contact" button for Assets, to allow a registered user to initiate an email discussion with the owner and creators of that item.
-  * Greater zoom on the model images, and ability to view the original in its full resolution
+  * Increased zoom level when previewing model images, and ability to view the original in its full resolution
   * Support for 'include' when using the JSON API
     * Allows you to get full details about related resources in a single call ( see [JSONAPI specification](https://jsonapi.org/format/#fetching-includes))
     * For example <https://fairdomhub.org/projects/19.json?include=people> expands information about the people in an _included[]_ block at the end of the top level JSON. 
