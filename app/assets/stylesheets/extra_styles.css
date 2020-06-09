@@ -206,7 +206,7 @@
 .bcrumb {
     list-style: none;
     overflow: hidden;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     padding: 0;
 }
@@ -215,7 +215,9 @@
 .bcrumb li a {
     color: white;
     text-decoration: none;
-    padding: 10px 30px 10px 70px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
     background: #000634;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
@@ -223,6 +225,8 @@
     position: relative;
     display: block;
     float: left;
+    width:25%;
+    text-align:center
 }
 
 .bcrumb li a::after {
@@ -257,7 +261,7 @@
 }
 
 .breadcrumb li:first-child a {
-    padding-left: 10px;
+  
 }
 
 .bcrumb li:nth-child(2) a {
@@ -280,7 +284,7 @@
     background: #cbe2f7;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
-    width: 170px
+   
 }
 
 .bcrumb li:nth-child(4) a:after {
