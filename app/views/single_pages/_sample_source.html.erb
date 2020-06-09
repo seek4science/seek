@@ -1,0 +1,124 @@
+<div id="content-wrapper">
+    <div class="inner">
+        <div>
+            <h2>
+                <label>Control variables</label>
+            </h2>
+            <div id="control_variables">
+                <a class="btn btn-secondary pull-left" onClick="addTableRow('.tbl_control_variables','',true)"> <i class="glyphicon glyphicon-plus"></i> Add Variable</a>
+                <a class="btn btn-secondary pull-left" onClick="showPreDefinedCols(event, '.tbl_control_variables', 2)">
+                    <i class="glyphicon glyphicon-plus"></i>Add Column</a>
+                <input id="chk_control_variables" type="checkbox" style="display:none" checked="true">
+                <table class="table tableXs designTbl tbl_control_variables">
+                    <thead class="thead-dark">
+                        <th>Organism</th>
+                        <th>Organism part</th>
+                        <th>Developmental stage</th>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function loadSuggestedCols(std_id) {
+        $j.ajax({
+            method: 'GET',
+            cache: false,
+            url: `${pid}/get_study_design`,
+            data: {
+                std_id
+            },
+            success: data => {
+                let parsedDate = JSON.parse(data.data)
+                let cvars = parsedDate.control_variables
+                // Keys are the columns and 
+                var items = [{
+                    'val': 'Organism',
+                    'term': 'material entity.organism'
+                }, {
+                    'val': 'Organism part',
+                    'term': 'material entity.organism part'
+                }, {
+                    'val': 'Developmental stage',
+                    'term': 'process.developmental stage'
+                }, {
+                    'val': 'Age',
+                    'term': 'information entity.measurement.temporal measurement.age'
+                }, {
+                    'val': 'Genotype',
+                    'term': 'information entity.measurement.genomic measurement.genotype'
+                }, {
+                    'val': 'Disease',
+                    'term': 'material property.disposition.disease'
+                }, {
+                    'val': 'Individual',
+                    'term': 'unknown'
+                }, {
+                    'val': 'Sex',
+                    'term': 'material property.quality.sex'
+                }, {
+                    'val': 'Cell line',
+                    'term': 'unknown'
+                }, {
+                    'val': 'Cell type',
+                    'term': 'material entity.cell type'
+                }, {
+                    'val': 'Cultivar',
+                    'term': 'unknown'
+                }, {
+                    'val': 'Strain',
+                    'term': 'unknown'
+                }]
+                // Get only vals of items
+                let vals = $j.map(items, (val, index) => {
+                    return val.val
+                })
+                // reset the acSource
+                acSource = {}
+                // Add custom items that are created by the user in the control variable table
+                if (cvars.length > 0) {
+                    $j.each(Object.keys(cvars[0]), (key, val) => {
+                        // Load acList in global var to be used in the future
+                        extractOptions(cvars, val)
+                        if (vals.indexOf(val) == -1) {
+                            items.push({
+                                'val': val,
+                                'term': `custom-${val}`
+                            })
+                        } else {
+                            //find the item inside items and update
+                            $j.each(items, (k, v) => {
+                                if (v['val'] == val) {
+                                    v['term'] = `custom-${val}`
+                                    return false;
+                                }
+                            })
+                        }
+                    })
+                }
+                $j('#preDefinedList li:not(:first-child)').remove()
+                $j.each(items, (index, val) => {
+                    let selector = ''
+                    if (val.term.startsWith("custom")) {
+                        selector = val.term
+                    } else if (val.term == "unknown") {} else {
+                        selector = `experimental factor.${val.term}`
+                    }
+                    $j('#preDefinedList').append(`<li><input type="button" class="btn btn-primary col-md-12 predef"
+                         value="${val.val}" data-term="${selector}"></li>`)
+                })
+            }
+        })
+    }
+
+    function extractOptions(list, key) {
+        // populate global acSource
+        let options = $j.map(list, (val, index) => {
+            return val[key]
+        })
+        acSource[key] = options
+    }
+</script>

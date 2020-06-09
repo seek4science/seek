@@ -1,0 +1,104 @@
+    <div class="simpleForm">
+        <ul class="nav nav-tabs">
+            <li class="active "><a data-toggle="tab" href="#details"><i class="glyphicon glyphicon-th-list"></i>
+                    Details</a></li>
+            <li><a data-toggle="tab" href="#design"><i class="glyphicon glyphicon-pencil"></i> Design</a></li>
+
+            <li><a data-toggle="tab" href="#sampleSourceTable" style="display:none" class="dpd"><i class="glyphicon glyphicon-edit"></i> Samples Source
+                    Table</a></li>
+            <li><a data-toggle="tab" href="#workflow" onclick="refreshWorkflow()" style="display:none" class="dpd"><i class="glyphicon glyphicon-random"></i> Workflow</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="details" class="tab-pane fade in active" style="padding:10px">
+                <p id="std-title"><strong style="text-align: center;">Title:</strong> <span></span></p>
+                <p id="std-description"> <strong>Description:</strong> <span></span> </p>
+                <p id="experimentalists"><strong>Experimentalists: </strong> <span></span></p>
+                <form id="study-sharing-form">
+                    <input name="utf8" type="hidden" value="✓">
+                    <input type="hidden" name="_method" value="patch">
+                    <div id="study_sharing"></div>
+                    <input type="hidden" name="study[creator_ids][]">
+                    <div id="std-creators"></div>
+                    <input type="button" value="update" id="std_update_btn" class="btn btn-primary">
+                </form>
+            </div>
+            <div id="design" class="tab-pane fade" style="padding:10px">
+                <%=  render partial: 'study_design' %>
+            </div>
+            <div id="workflow" class="tab-pane fade" style="padding:10px">
+                <%=  render partial: 'workflow' %>
+            </div>
+            <div id="sampleSourceTable" class="tab-pane fade" style="padding:10px">
+                <%=  render partial: 'ssTable' %>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        $j("#std_update_btn").on("click", () => {
+            $j("#std_update_btn").attr("disabled","disabled")
+            var form = $j("#study-sharing-form");
+            var url = `/studies/${selectedItem.id}/manage_update`
+            $j.ajax({
+                type: "POST",
+                url,
+                data: form.serialize(),
+                success: () => {
+                    alert("Sharing permissions updated!")
+                },
+                error: e => {
+                     alert("Can not perform the operation.")
+                },
+                complete:()=>{$j("#std_update_btn").removeAttr("disabled")}
+            });
+            
+        })
+
+        // Add a person permission to the table
+        $j('#study_permission_submit_btn').on('click', e => {
+            let people = $j('#study-permission-people-ids').tagsinput('items');
+            let std_id = $j("#selected_item_id").val()
+            if (!std_id) return
+            let url = `/studies/${std_id}`;
+            let data = {
+                "data": {
+                    "type": "studies",
+                    "id": std_id,
+                    "attributes": {
+                        "policy": {
+                            "access": "download",
+                            "permissions": []
+                        }
+                    }
+                }
+            }
+            people.forEach(function(person, index) {
+                data.data.attributes.policy.permissions.push({
+                    'resource': {
+                        'id': person.id,
+                        'type': 'people'
+                    },
+                    'access': get_permission(parseInt($j('#permission-people-access-type')
+                        .val()))
+                })
+            });
+
+            $j.ajax({
+                method: 'PATCH',
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                url,
+                data: JSON.stringify(data),
+                success: s => {
+                    alert('Sharing policy updated successfully!')
+                },
+                error: (e) => {
+                    alert('error!')
+                }
+            })
+        });
+    </script>

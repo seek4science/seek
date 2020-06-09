@@ -1,0 +1,421 @@
+<div id="tbl_file_content">
+    <a class="btn btn-primary btn-sm" onclick="sample_add_row('.tableInpOut')"> <i class="glyphicon glyphicon-plus"></i>Add Row</a>
+    <a id="sample_add_col" class="btn btn-primary btn-sm">
+        <i class="glyphicon glyphicon-plus"></i>Add Column</a>
+    <a class="btn btn-primary btn-sm pull-right" onclick="updateSampleTbl('.tableInpOut')">Save</a>
+    <div class="sampleTblContainer">
+        <table>
+            <table class="table tableXs tableInpOut">
+                <thead class="thead-dark">
+                    <tr></tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </table>
+    </div>
+</div>
+<style>
+    .sampleTblContainer {
+        overflow-x: scroll;
+    }
+
+    select {
+        min-width: 150px
+    }
+
+    /* 
+     .sampleTblContainer::before {
+         background-image: linear-gradient(left,
+                 rgba(255, 255, 255, 0) 75%,
+                 rgba(255, 255, 255, 1) 100%);
+         background-image: -moz-linear-gradient(left,
+                 rgba(255, 255, 255, 0) 75%,
+                 rgba(255, 255, 255, 1) 100%);
+         background-image: -ms-linear-gradient(left,
+                 rgba(255, 255, 255, 0) 75%,
+                 rgba(255, 255, 255, 1) 100%);
+         background-image: -o-linear-gradient(left,
+                 rgba(255, 255, 255, 0) 75%,
+                 rgba(255, 255, 255, 1) 100%);
+         background-image: -webkit-linear-gradient(left,
+                 rgba(255, 255, 255, 0) 75%,
+                 rgba(255, 255, 255, 1) 100%);
+         content: "\00a0";
+         height: 100%;
+         position: absolute;
+         width: 100%;
+     } */
+</style>
+<script>
+    function load_samples(std_id, asy_id) {
+        $j("#selected_std_asy").attr('data-selected', `${std_id}_${asy_id}`)
+        $j.ajax({
+            type: 'GET',
+            cache: false,
+            url: pid + '/samples',
+            data: {
+                std_id,
+                asy_id
+            },
+            success: result => {
+                if (result.data.length > 0) {
+                    // Load the first sample
+                    loadIOTable(result.data, asy_id)
+                    setTableOntology('.tableInpOut')
+                } else {
+                    $j('.tableInpOut').html(
+                        '<table class="table tableXs tableInpOut"><thead class="thead-dark"><tr></tr></thead><tbody></tbody></table>'
+                    );
+                }
+            }
+        })
+    }
+
+    function loadIOTable(dt, asy_id) {
+        let data = '',
+            realCount, tableIndex
+        $j.each(dt, (k, v) => {
+            if (v.id == asy_id) {
+                data = JSON.parse(dt[k].content)
+                tableIndex = k
+                return false
+            }
+        })
+        if (!data) return
+        $j('.tableInpOut tbody').empty()
+        $j('.tableInpOut thead tr').empty()
+        mergeIOTables(dt, tableIndex)
+    }
+
+    function mergeIOTables(dt, index) {
+        let headerAgg = [],
+            baseData = []
+        $j.each(dt, (k, v) => {
+            if (k <= index) {
+                let header = Object.keys(JSON.parse(v.content)[0])
+                headerAgg += [...headerAgg, ...header]
+                $j.each(header, (k, col) => {
+                    let hash = col.split('%')
+                    let options = hash.length > 1 ? {
+                        title: hash[0],
+                        tableClass: ".tableInpOut",
+                        acTerm: hash[1],
+                        ableToRemove: false,
+                        extraInfo: v.id, //sampleId
+                        originalTitle: col
+                    } : {
+                        title: col,
+                        tableClass: ".tableInpOut",
+                        ableToRemove: false,
+                        extraInfo: v.id,
+                        originalTitle: col
+                    }
+                    addColumn(options)
+                })
+            }
+        })
+        // Create the data object
+        let firstTable = TryJsonParse(dt[0].content)
+        if (firstTable) {
+            $j.each(firstTable, (k, v) => {
+                let row = {}, //v,
+                    id = v.id
+                $j.each(dt, (i, table) => {
+                    if (i <= index) {
+                        let currTable = TryJsonParse(table.content)
+                        if (currTable) {
+                            row = {
+                                ...row,
+                                ...currTable[k]
+                            }
+                        }
+                    }
+                })
+                baseData.push({
+                    ...row,
+                    id
+                })
+            })
+        }
+        //  console.log("baseData");
+        //  console.log(baseData);
+        // Populte table + apply ontology
+        if (baseData[0].id)
+            for (let i = 0; i < baseData.length; i++) addTableRow('.tableInpOut', baseData[i])
+        add_remove_action(".tableInpOut")
+    }
+
+    function loadMethod(std_id, asy_id) {
+        $j("#text_content").show()
+        $j.ajax({
+            type: 'GET',
+            cache: false,
+            url: pid + '/text_content',
+            data: {
+                std_id,
+                item_id: asy_id,
+                item_type: "method"
+            },
+            success: result => {
+                if (!result) {
+                    alert('Error retrieving content!')
+                    return
+                }
+                $j('#txt_file_content').val(result.data)
+                $j("#methodTitle").html(result.title)
+            }
+        })
+    }
+    $j('#btn_save_method').on('click', () => {
+        let std_id = $j("#selected_std_asy").attr('data-selected').split('_')[0]
+        let asy_id = $j("#selected_std_asy").attr('data-selected').split('_')[1]
+        let content = $j("#txt_file_content").val()
+        update_method(std_id, asy_id, content)
+    })
+
+    function showPreDefinedCols(e, tblClass, bias) {
+        $j('.arrow_box').toggle();
+        $j('.arrow_box').position({
+            my: "left top",
+            at: "right+12 top-10",
+            of: $j(e.target),
+            collision: "fit"
+        });
+        $j("#btn_custom_col").attr("onclick", `addCustomCol('${tblClass}','${bias}')`);
+        $j("input:button.predef").each((index, val) => {
+            $j(val).attr("onclick",
+                `addCustomCol('${tblClass}','${bias}','${$j(val).val()}', '${$j(val).data("term")}')`);
+        })
+        removeUsedItems(tblClass)
+    }
+
+    function addCustomCol(tblClass, bias, text = '', acTerm = '') {
+        if (text.length == 0) text = $j.trim($j('.customCol').val())
+        $j(".arrow_box").css({
+            display: "none",
+        });
+        let options = {
+            title: text,
+            tableClass: tblClass,
+            bias,
+            acTerm
+        }
+        addColumn(options)
+    }
+
+    function removeUsedItems(tblClass) {
+        var colNames = $j(`${tblClass} thead tr th`).map((i, val) => {
+            let temp = $j.trim($j(val).html().replace(/<a( |>).*?<\/a>/gi, ""))
+            return temp.length > 0 ? temp : undefined
+        }).get()
+        $j("#preDefinedList li input[type='button']").map((i, val) => {
+            if ($j.inArray($j(val).val(), colNames) != -1) {
+                $j(val).parent().hide()
+            } else {
+                $j(val).parent().show()
+            }
+        }).get()
+    }
+
+    function AddRow(table) {
+        let rowCount = $j(table).rowcount() + 1;
+        let newRow;
+        let rowId = uniqId()
+        $j(table + ' thead tr').find('th').each(function(k, v) {
+            newRow += $j.trim($j(v).text().toLowerCase()) == "id" ? `<td contenteditable>${rowId}</td>` :
+                '<td contenteditable></td>'
+        });
+        $j(table + ' tbody').append('<tr>' + newRow + '</tr>')
+        setTableOntology(table)
+    }
+    $j.fn.columnCount = function() {
+        return $j('th', $j(this).find('thead')).length;
+    };
+    $j.fn.rowcount = function() {
+        return $j('tr', $j(this).find('tbody')).length;
+    };
+
+    function AddCell(table, newColName) {
+        let colCount = $j(table).columnCount() + 1;
+        if (newColName.length < 3) {
+            alert("Please enter a valid column name!");
+            return;
+        }
+        if ($j(table).find('thead tr').find('th').length == 0) $j(table).find('thead tr').append('<th>' + newColName +
+            '</th>')
+        else $j(table).find('thead tr').find('th').eq(colCount - 2).after('<th>' + newColName + '</th>');
+        $j(table).find('tr').each(function() {
+            $j(this).find('td').eq(colCount - 2).after('<td contenteditable></td>');
+        });
+    }
+
+    function update_iotable(std_id, sample_id, content) {
+        $j.ajax({
+            type: 'PATCH',
+            cache: false,
+            url: pid + '/update_iotable',
+            data: {
+                std_id,
+                sample_id, // array
+                content // array
+            },
+            success: result => {
+                alert('Content saved successfully!')
+            }
+        })
+    }
+
+    function update_method(std_id, asy_id, content) {
+        $j.ajax({
+            type: 'PATCH',
+            cache: false,
+            url: pid + '/update_method',
+            data: {
+                std_id,
+                asy_id,
+                content
+            },
+            success: result => {
+                alert('Content saved successfully!')
+            }
+        })
+    }
+
+    function updateSampleTbl(tblClass) {
+        // Add data-term to the col name to be extracted later
+        // TO-DO: Search col name in acSource array instead! (if match then apply data-term="generated-xxx")
+        let cols = [],
+            contents = []
+        $j.each($j(`${tblClass} thead tr th`), (key, val) => {
+            cols.push($j(val).html())
+            if ($j(val).attr('data-term')) $j(val).text($j(val).text() + '%' + $j(val).attr('data-term'))
+        })
+        //get list of first table columns
+        let columns = $j(`${tblClass} thead tr th`).map((i, x) => $j(x).data("info")).get()
+        let uniqCols = $j.unique(columns.slice())
+        var $originalSelects = $j(tblClass).find('select');
+        console.log(columns);
+        $j.each(uniqCols, (k, table) => {
+            let clone = $j(tblClass).first().clone().addClass(`clonedTable${k}`)
+            clone.find('select').each(function(index, item) {
+                $j(item).val($originalSelects.eq(index).val());
+            });
+            let thRemove = '',
+                tdRemove = ''
+            $j.each(columns, (k, v) => {
+                if (v != table) {
+                    thRemove += `thead tr th:nth-child(${k + 1}),`
+                }
+            })
+            thRemove = thRemove.slice(0, -1)
+            tdRemove = thRemove.replace(/thead tr th/g, 'td')
+            $j(clone).find(`${thRemove}`).remove()
+            $j(clone).find('tbody tr').each((i, row) => {
+                $j(row).find(`${tdRemove}`).remove()
+            });
+            $j(tblClass).parent().append(clone)
+            let _content = JSON.stringify(get_table_JSON(`.clonedTable${k}`))
+            clone.remove()
+            contents.push(_content)
+        })
+        // Prepare for save
+        $j.each($j(`${tblClass} thead tr th`), (key, val) => {
+            $j(val).html(cols[key])
+        })
+        let std_id = $j("#selected_std_asy").attr('data-selected').split('_')[0]
+        update_iotable(std_id, uniqCols, contents)
+    }
+
+    function applyOntology(tblClass, column, term) {
+
+
+        if (term.match("^custom")) {
+            $j(`${tblClass} tbody tr td:nth-child(${column})`).autocomplete({
+                source: acSource[term.split('-')[1]],
+                mustMatch: true
+            });
+        } else if (term.match("^generated")) {
+            let tds = $j(`${tblClass} tbody tr td:nth-child(${column})`)
+
+            $j.each(tds, (key, val) => {
+                if (!$j(tds[key]).attr("applied")) {
+                    $j(tds[key]).attr("applied", true)
+                    let temp = $j(tds[key]).text()
+                    $j(tds[key]).empty()
+                    $j(tds[key]).append(appendDropDown(GSource[term.split('-')[1]]))
+                    $j(tds[key]).children(':first').val(temp)
+                }
+            })
+        } else if (term.match("^attribute")) {
+            // TO BE IMPLEMENTED
+            let _term = term.split('-')[1]
+            for (let i = 0; i < methodTypes.length; i++) {
+                for (let j = 0; j < methodTypes[i].attributes.length; j++) {
+                    if (methodTypes[i].attributes[j].title == _term) {
+                        $j(`${tblClass} tbody tr td:nth-child(${column})`).autocomplete({
+                            source: methodTypes[i].attributes[j].ontology,
+                            mustMatch: true
+                        });
+                        return
+                    }
+                }
+            }
+
+        } else {
+            $j.ajax({
+                type: 'GET',
+                url: `https://fairdomhub.be/ontology/ontology/${term}`,
+                cache: true,
+                success: s => {
+                    $j(`${tblClass} tbody tr td:nth-child(${column})`).autocomplete({
+                        source: eval(s),
+                        mustMatch: true
+                    });
+                    $j(`${tblClass} thead tr th:nth-child(${column})`).data("term", term);
+                }
+            })
+        }
+    }
+
+    function setTableOntology(tblClass) {
+        let cols = $j(`${tblClass} thead tr th`)
+        for (let i = 0; i < cols.length; i++) {
+            let term = $j(`${tblClass} thead tr th:nth-child(${i + 1})`).data("term") || undefined
+            if (term) applyOntology(tblClass, i + 1, term)
+        }
+    }
+
+    function sample_add_row(tblClass) {
+        AddRow(tblClass)
+        // Add the remove button
+        let action =
+            "<a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a>"
+        $j(tblClass).each(function(i, t) {
+            if ($j(t).find('thead tr th:last').attr("class") != 'rem') $j(t).children('thead').children(
+                'tr').append("<th class='rem' style='width:50px;'></th>")
+            let headerCount = $j(t).find('thead tr th').length
+            $j(t).children('tbody').children('tr').each(function(i, g) {
+                if ($j(g).find('td').length == headerCount) {
+                    $j(g).find('td:last').html(action)
+                    $j(g).find('td:last').attr("contenteditable", "false")
+                } else $j(g).append(
+                    `<td class='rem' rowspan=${$j(g).children('td:first').attr("rowspan")}>${action}</td>`
+                )
+            })
+        })
+    }
+    $j("#sample_add_col").on("click", () => {
+        showPreDefinedCols(event, '.tableInpOut', 2)
+    })
+
+    function appendDropDown(items) {
+        if (!items) return
+        var select = "<select class='form-control'>"
+        $j.each(items, (key, val) => {
+            select += `<option>${val}</option>`
+        })
+        select += "</select>"
+        return select
+    }
+</script>
