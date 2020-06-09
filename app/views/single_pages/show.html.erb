@@ -1,0 +1,295 @@
+<%= javascript_include_tag "project_folders" %>
+<%
+    default_folder = initial_folder(@project)
+%>
+<div class="show_basic">
+ <div class="row">
+      <div class="col-md-7 col-12">
+        <ul class="bcrumb">
+          <li><a href="#">Project</a></li>
+          <li style="display:none"><a href="#">Investigation</a></li>
+          <li style="display:none"><a href="#">Study</a></li>
+          <li style="display:none"><a href="#">Assay</a></li>
+        </ul>
+      </div>
+      <div class="col-md-5" style="text-align:right">
+        <div>
+          <input id="btn_delete_item" type="button" class="btn btn-primary" value="Delete" onclick="deleteItem()" />
+        </div>
+      </div>
+    </div>
+    <div class="row">
+        <div id="folder_column" class="col-md-4">
+            <div id="folders">
+                <div id="demo_tree" class="new-design"></div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div id="container" class="tv">
+                <div id="project_contents" class="row">
+                    <div class="col-lg-8">
+                        <div class="simpleForm">
+                            <%= render :partial => "project_details" -%>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project } -%>
+                        <% if @project.can_manage? %>
+                        <%= render :partial => 'general/storage_usage_box', locals: { programme: @project,
+                            url: storage_report_project_path(@project)} %>
+                        <% end %>
+                    </div>
+                </div>
+                <div id="folder_contents" class="row" style="display:none">
+                     <%= render :partial => "folders/contents", :locals => {:folder => default_folder } -%>
+                </div>
+                <div id="investigation_contents" class="row" style="display:none">
+                    <%= render :partial => "investigation_details" -%>
+                </div>
+                <div id="study_contents" class="row" style="display:none">
+                    <%= render :partial => "study" -%>
+                </div>
+                <div id="assay_contents" class="row" style="display:none">
+                    <%= render :partial => "assay" -%>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="provide-metadata-content">
+     </div>
+
+    <div class="modal" tabindex="-1" role="dialog" id="data-file-modal-inv">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <%= render :partial=>"investigations/new" %>
+                    <div class="row" style="padding:15px">
+                        <a id="submit_investigation" type="button" class="btn btn-primary">Create</a>
+                        &nbsp;
+                        <a type="button" class="btn btn-default">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" role="dialog" id="data-file-modal-std">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <%= render :partial=>"studies/new" %>
+                    <div class="row" style="padding:15px">
+                        <a id="submit_study" type="button" class="btn btn-primary">Create</a>
+                        &nbsp;
+                        <a type="button" class="btn btn-default">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="text/javascript">
+
+        var selectedItem = {type:"",id:""}, pid, uid
+        $j(document).ready(function() {
+            setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'demo_tree', 'draggable_folder_item');
+            $j(`#project_contents`).show();
+             pid = <%= @project.id %>
+             uid = <%= current_user.id if current_user %>
+
+             $j("a:contains('Cancel')").click(function (e) {
+                e.preventDefault();
+                $j('#data-file-modal-inv').modal('hide');
+                $j('#data-file-modal-std').modal('hide');
+            })
+
+            $j("#submit_investigation").click(function () {
+                $j("#submit_investigation").attr("disabled","disabled")
+                data = {
+                    "data": {
+                    "type": "investigations",
+                    "attributes": {
+                        "title": $j("#investigation_title").val(),
+                        "policy": {
+                        "access": "download",
+                        "permissions": [{
+                            "resource": {
+                            "id": pid,
+                            "type": "projects"
+                            },
+                            "access": "manage"
+                        }]
+                        },
+                        "description": $j("#investigation_description").val()
+                    },
+                    "relationships": {
+                        "projects": {
+                        "data": [{
+                            "id": pid,
+                            "type": "projects"
+                        }]
+                        },
+                        "publications": {
+                        "data": []
+                        },
+                        "creators": {
+                        "data": [{
+                            "id": uid,
+                            "type": "people"
+                        }]
+                        }
+                    }
+                }
+                }
+                $j.ajax({
+                    method: 'POST',
+                    "headers": {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                    },
+                    cache: false,
+                    url: '/investigations',
+                    data: JSON.stringify(data),
+                    success: s => {
+                        location.reload(true);
+                    },
+                    error: (e) => {
+                         console.log('error creating investigation!')
+                    }
+                })
+            })
+
+            $j("#submit_study").click(function () {
+                 $j("#submit_study").attr("disabled","disabled")
+                let data = {
+                    "data": {
+                    "type": "studies",
+                    "attributes": {
+                        "title": $j("#study_title").val(),
+                        "description": $j("#study_description").val(),
+                        "policy": {
+                        "access": "download",
+                        "permissions": [{
+                            "resource": {
+                            "id": pid,
+                            "type": "projects"
+                            },
+                            "access": "manage"
+                        }]
+                        }
+                    },
+                    "relationships": {
+                        "investigation": {
+                        "data": {
+                            "id":selectedItem.id,
+                            "type": "investigations"
+                        }
+                        },
+                        "publications": {
+                        "data": []
+                        },
+                        "creators": {
+                        "data": [{
+                            "id": uid,
+                            "type": "people"
+                        }]
+                        }
+                    }
+                    }
+                }
+                console.log(data)
+                $j.ajax({
+                    method: 'POST',
+                    "headers": {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                    },
+                    cache: false,
+                    url: '/studies',
+                    data: JSON.stringify(data),
+                        success: s => {
+                        console.log('study created successfully!')
+                        location.reload(true);
+                    },
+                        error: (e) => {
+                        console.log('error creating study!')
+                    }
+                })
+            })
+        });
+
+        const addInvestigations = (t) => {
+            $j('#data-file-modal-inv').modal({
+                backdrop: 'static',
+                keyboard: true
+            });
+        }
+
+        const addStudies = (t) => {
+            //Change the JStree active item to the associated Investigation id
+            selectedItem.id = $j(t).parent().children('.jstree-anchor').attr('_id')
+            selectedItem.type = "investigation"
+            $j('#data-file-modal-std').modal({
+                backdrop: 'static',
+                keyboard: true
+            });
+        }
+
+        const deleteItem = () => {
+            let {id, type} = selectedItem
+            if (!id || !type) {
+                alert("Please select item.")
+                return;
+            }
+            if (confirm('Are you sure you want to delete the')) {
+                $j("#btn_delete_item").attr('disabled','disabled')
+                  switch (type) {
+                    case "study":
+                        type = "studies"
+                        break;
+                    default:
+                        type+="s";
+                }
+                $j.ajax({
+                    method: 'DELETE',
+                    "headers": {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                    },
+                    cache: false,
+                    url: `/${type}/${id}`,
+                    success: s => {
+                        // alert("Item was deleted successfully!")
+                        location.reload(true);
+                    },
+                    error: e => {
+                        console.error(e)
+                        if (e.responseJSON.errors)
+                            alert(e.responseJSON.errors[0].title + '\n' + e.responseJSON.errors[0].details)
+                        else
+                            alert('Cannot process the request')
+                    }
+                })
+            }
+        }
+
+        function breadcrumb(item) {
+            $j(".bcrumb li").hide()
+            switch (item) {
+                case "project":
+                    $j(".bcrumb li:first-child").show()
+                    break;
+                case "investigation":
+                    $j(".bcrumb li:first-child, li:nth-child(2)").show()
+                    break;
+                case "study":
+                    $j(".bcrumb li:first-child, li:nth-child(2), li:nth-child(3)").show()
+                    break;
+                case "assay":
+                    $j(".bcrumb li:first-child, li:nth-child(2), li:nth-child(3), li:nth-child(4)").show()
+                    break;
+            }
+        } 
+        
+    </script>

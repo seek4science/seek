@@ -1,0 +1,34 @@
+    <div class="simpleForm">
+        <ul class="nav nav-tabs">
+            <li class="active "><a data-toggle="tab" href="#assayDetails"><i class="glyphicon glyphicon-th-list"></i>
+                    Details</a></li>
+            <li><a data-toggle="tab" href="#assayMethod"><i class="glyphicon glyphicon-pencil"></i> Method</a></li>
+            <li><a data-toggle="tab" href="#assaySample"><i class="glyphicon glyphicon-edit"></i> Sample</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="assayDetails" class="tab-pane fade in active" style="padding:10px">
+                <p><strong>Type: </strong> <span id="assayTypeTab"></span></p>
+                <p>
+
+                    <label>Attributes:</label>
+                    <ul id="adetailsAttribs" class="small_list"></ul>
+
+                </p>
+
+                <p id="assayTitle"><strong style="text-align: center;">Title:</strong> <span id="assaytitleContent"></span>
+                </p>
+                <p> <strong>Description:</strong> <span id="assayDescription"></span> </p>
+            </div>
+            <div id="assayMethod" class="tab-pane fade" style="padding:10px">
+
+                <%= render :partial => "method" -%>
+
+            </div>
+            <div id="assaySample" class="tab-pane fade" style="padding:10px">
+
+                <%= render :partial => "samples" -%>
+
+            </div>
+
+        </div>
+    </div>

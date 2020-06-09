@@ -1,0 +1,62 @@
+<div id="content-wrapper">
+    <a class="btn btn-primary btn-sm" onclick="sample_add_row('.tbl_sample_source')"> <i class="glyphicon glyphicon-plus"></i>Add Row</a>
+    <a class="btn btn-primary btn-sm pull-right" onclick="updateSampleTbl('.tbl_sample_source')">Save</a>
+    <div class="inner">
+        <table class="table tableXs tbl_sample_source">
+            <thead class="thead-dark">
+                <tr></tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    function loadSamplesSourceTable(std_id) {
+        $j("#selected_std_asy").attr('data-selected', `${std_id}_`)
+        $j('.tbl_sample_source thead tr').empty()
+        $j('.tbl_sample_source tbody').empty()
+        $j.ajax({
+            type: 'GET',
+            cache: false,
+            url: pid + '/samples',
+            data: {
+                std_id
+            },
+            success: result => {
+                if (result.data.length == undefined) result.data = [result.data]
+                if (result.data.length > 0) {
+                    let data = JSON.parse(result.data[0].content)
+                    if (!data) return
+                    let header = Object.keys(data[0])
+                    $j.each(header, (k, col) => {
+                        let hash = col.split('%')
+                        let options = hash.length > 1 ? {
+                            title: hash[0],
+                            tableClass: ".tbl_sample_source",
+                            acTerm: hash[1],
+                            ableToRemove: false,
+                            extraInfo: 'init', //sampleId
+                            originalTitle: col
+                        } : {
+                            title: col,
+                            tableClass: ".tbl_sample_source",
+                            ableToRemove: false,
+                            extraInfo: 'init', //sampleId
+                            originalTitle: col
+                        }
+                        addColumn(options)
+                    })
+                    if (data[0].id)
+                        for (let i = 0; i < data.length; i++) addTableRow('.tbl_sample_source', data[i])
+                    add_remove_action(".tbl_sample_source")
+                    $j('.dpd').show()
+                    setTableOntology(".tbl_sample_source")
+
+                } else $j('.dpd').hide()
+            }
+
+
+        })
+    }
+</script>

@@ -618,6 +618,12 @@ SEEK::Application.routes.draw do
     end
   end
 
+  resources :single_pages do
+     member do
+        get "/render_sharing_form/:id/type/:type" => "single_pages#render_sharing_form"
+      end
+  end
+
   ### ASSAY AND TECHNOLOGY TYPES ###
 
   get '/assay_types/', to: 'assay_types#show', as: 'assay_types'
