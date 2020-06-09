@@ -40,11 +40,11 @@
         <% if @folder.deletable? -%>
         <% unsorted_folder = ProjectFolder.new_items_folder(@project).try(:title) -%>
         <div>
-            <%= image_tag_for_key "destroy", project_folder_path(@project, @folder),
-                              "Delete this folder",
-                              { data: { confirm: "Deleting this folder will remove all subfolders, and move any files to the #{unsorted_folder}. It is not reversible. Are you sure you want to delete?" },
-                               :method => :delete},
-                              "Delete this folder"
+        <%= image_tag_for_key "destroy", project_folder_path(@project, @folder),
+            "Delete this folder",
+            { data: { confirm: "Deleting this folder will remove all subfolders, and move any files to the #{unsorted_folder}. It is not reversible. Are you sure you want to delete?" },
+            :method => :delete},
+            "Delete this folder"
         -%>
         </div>
         <% end -%>
@@ -62,17 +62,49 @@
         <div id="error_text" class='error_div alert alert-danger' style="display:none;"></div>
         <%= form_tag(create_folder_project_folder_path(@project, @folder), { id: :create_child_form, remote: true }) do -%>
         <div class="input-group">
+
             <%= text_field_tag :title, nil, id: 'subfolder-title', placeholder: 'Enter sub-folder name...', class: 'form-control' -%>
             <div class="input-group-btn">
-                <%= submit_tag "Create", data: { disable_with: 'Creating...' }, class: 'btn btn-primary' %>
+                <%= button_tag "Cancel", type: 'button', class: 'btn btn-default', onclick: '$j("#new_child").hide()' %>
+                <%= submit_tag "Create", id: 'create-subfolder-btn', data: { disable_with: 'Creating...' }, class: 'btn btn-primary' %>
             </div>
         </div>
         <% end -%>
     </div>
 <% end -%>
 <script>
+
+    function moveFile(asset_id) {
+        var folder_element_id = "folder_" + displayed_folder_id;
+        var project_id = <%=@project.id%>
+        <%
+            fld = ProjectFolder.where(:project_id=>@project.id, :title=>"Unsorted items").first
+            folder_id = fld.id unless fld.nil?
+        %>
+    
+        var path = "/projects/" + project_id + "/folders/" + <%= folder_id%> + "/move_asset_to";
+        const data = {
+            asset_id,
+            asset_type: "DataFile",
+            dest_folder_id: displayed_folder_id,
+            dest_folder_element_id: folder_element_id,
+            }
+        $j.ajax({
+            url: path,
+            type: "POST",
+            dataType: "script",
+            data
+        });
+    }
+
     $j(document).ready(function() {
-       
+        $j('#create-subfolder-btn').click(function (e) {
+            if($j('#subfolder-title').val().length<3)
+            {
+                alert('The name is too short, it must be 2 or more characters');
+                e.preventDefault();
+            }
+        })
         $j('#add-subfolder-btn').click(function() {
             $j('#new_child').fadeIn();
             $j('#subfolder-title').focus();
@@ -82,112 +114,25 @@
             $j('#upload-file-input').click();
         })
 
-        $j('#upload-file-input').on('change', () => {
+        $j('#upload-file-input').on('change', (e) => {
             let file = $j('#upload-file-input')[0].files[0]
-            const data = {
-                "data": {
-                    "type": "data_files",
-                    "attributes": {
-                        "title": file.name.split('.')[0],
-                        "content_blobs": [{
-                            "original_filename": file.name,
-                            "content_type": file.type
-                        }]
-                    },
-                    "relationships": {
-                        "projects": {
-                            "data": [{
-                                "id": "<%= @project.id %>",
-                                "type": "projects"
-                            }]
-                        }
-                    }
-                }
-            }
-
+            $j('#upload-file-input').val('');
+            let data = new FormData();
+            data.append("content_blobs[][data]", file);
+            data.append("utf8", "✓");
             $j.ajax({
-                "headers": {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                type: 'POST',
-                url: '/data_files',
-                data: JSON.stringify(data),
+                type: "POST",
+                url: "/data_files/create_content_blob",
+                data,
                 cache: false,
-                success: function(res) {
-                    // Call method
-                    moveFile(res.data.id)
-                     $j.ajax({
-                        url: `/single_pages/${pid}/render_file_upload/${res.data.id}`,
-                        complete:() =>{
-                           
-
-                            var me = document.getElementById('preview-permission-link-script');
-                             var script = document.createElement('script');
-                            script.type = 'text/javascript';
-                            script.text = me.innerHTML;
-                            $j('body').append(script);
-
-                            //   var ss = document.getElementById('project-selector-script');
-                            //  var sc = document.createElement('script');
-                            // sc.type = 'text/javascript';
-                            // sc.text = ss.innerHTML;
-                            // $j('body').append(sc);
-
-                           
-
-                            //   $j(body).trigger('load')
-                            // setTimeout(() => {
-                            //     previewPermissions()
-                            // }, 1000);
-
-                            $j('#data-file-modal').modal({backdrop: 'static', keyboard: false});
-                            Sharing.projectsSelector.add(<%= @project.id %>)
-                           
-                             
-                            // console.log(me)
-                            // var head= document.getElementsByTagName('head')[0];
-                            // head.appendChild(me);
-                            // eval(me.innerHTML);
-                            // $j('body').append(me.innerHTML);
-                        }
-                     });
-                     
-                   
-                    // ...
-                    //After finishing the metadata wizard:
-                    //location.reload();
-                },
-                error: function(e) {
-                    console.log(e.responseText)
+                contentType: false,
+                processData: false,
+                error: e => {
+                    console.log(e)
                 }
-            })
-
-            function moveFile(asset_id) {
-                var folder_element_id = "folder_" + displayed_folder_id;
-                var project_id = <%=@project.id%>
-                <%
-                    fld = ProjectFolder.where(:project_id=>@project.id, :title=>"Unsorted items").first
-                    folder_id = fld.id unless fld.nil?
-                %>
-                var path = "/projects/" + project_id + "/folders/" + <%= folder_id%> + "/move_asset_to";
-                $j.ajax({
-                  url: path,
-                  type: "POST",
-                  dataType: "script",
-                  data: {
-                    asset_id,
-                    asset_type: "DataFile",
-                    dest_folder_id: displayed_folder_id,
-                    dest_folder_element_id: folder_element_id,
-                    // asset_element_id: item_element.attr("id"),
-                  },
-                  success: function(){
-                    // location.reload();
-                  }
-                });
-            }
+            });
         })
+
         $j('#create_child_form').on("ajax:before", function() {
             $j('#new_child').spinner('add');
         }).on("ajax:success", function(_, data) {
