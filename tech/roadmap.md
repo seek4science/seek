@@ -12,12 +12,18 @@ It is an overview of the main priorities, and milestones. SEEK is developed foll
 
 They are expected to be added to SEEK in roughly the order they are presented here.
 
-
 | Feature | Milestone date |
 | --- | --- |
-| Metadata search and querying | Winter 2019  |
+| Generic Custom Metadata fields | 2020  |
+| Extended Studies with extended metadata, supporting MIAPPE | 2020 |
+| Ontology based metadata attributes, including for samples | 2020 |
 
 <br/>
+
+Please also see the [Workflow Hub Roadmap](https://about.workflowhub.eu/roadmap/), 
+which is being built upon and in conjuction with FAIRDOM SEEK.
+
+
 
 ---
 
@@ -30,7 +36,8 @@ You can find more details about each release in our [Change Logs](/tech/releases
 
 
 | Feature | SEEK version |
-| --- | --- | --- |
+| --- | --- | 
+| Metadata search and querying | 1.10.0 |
 | Bioschemas.org support | 1.9.1 |
 | Rails 5.2 upgrade | 1.9 |
 | Project dashboard, showing details and graphs for projects | 1.8  |
