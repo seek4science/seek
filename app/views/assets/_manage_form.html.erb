@@ -11,7 +11,7 @@
   <% if show_projects %>
     <%= render :partial => 'projects/project_selector', :locals => {:resource => resource, :allow_nil => false} %>
   <% end %>
-  <%= render partial: 'assets/manage_specific_attributes', locals: {f: f, sharing_link: sharing_link} %>
+  <%= render partial: 'assets/manage_specific_attributes', locals: {f: f, sharing_link: sharing_link, :object => resource} %>
 
   <%= form_submit_buttons(resource, validate:false) %>
 

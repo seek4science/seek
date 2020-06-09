@@ -1,4 +1,5 @@
 <%
+object ||= nil 
 
   creators_enable = true if creators_enable.nil?
   creators_enable = creators_enable && f.object.respond_to?(:creators)
@@ -18,7 +19,7 @@
 %>
 
 <% if sharing_enable %>
-  <%= render :partial => "sharing/form" -%>
+  <%= render :partial => "sharing/form",  locals: {:object => object} -%>
 <% end -%>
 
 <% if creators_enable %>
