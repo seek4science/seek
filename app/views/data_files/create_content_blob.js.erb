@@ -1,0 +1,37 @@
+<% if @data_file != nil && @data_file.content_blob %>
+    var payload = <%= raw extraction_forward_payload_json(@data_file, :data_file).to_json if @data_file != nil %>;
+    $j.ajax({
+        type: "POST",
+        contentType: "application/json",
+        dataType: "html",
+        timeout: 0,
+        url: '<%= rightfield_extraction_ajax_data_files_path -%>',
+        data: JSON.stringify(payload),
+        complete:()=>{
+            $j.ajax({
+                type: "GET",
+                url: "/data_files/provide_metadata",
+                cache: false,
+                contentType: false,
+                processData: false,
+                complete:()=>{
+                    var scripts = [$j("#fileMetadataModalScript")[0],
+                     $j('#preview-permission-link-script')[0]]
+                    var bodyScripts = $j('body script')
+                    for (var i = 0; i < scripts.length; i++) {
+                        if($j.inArray(scripts[i], bodyScripts)){
+                            scripts[i].remove()
+                        }
+                        var script = document.createElement('script');
+                        script.type = 'text/javascript';
+                        script.text = scripts[i].innerHTML;
+                        $j('body').append(script);
+                    }
+                    loadObjectInputs();
+                }
+            })
+        }
+    });
+<%else%>
+    alert("Error processing file!") 
+<%end%>
