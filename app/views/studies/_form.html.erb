@@ -1,3 +1,7 @@
+<% object ||= nil %>
+<% showDetails ||= 1 %>
+
+
 <%= error_messages_for :study %>
 
 <div class="form-group">
@@ -28,20 +32,22 @@
       <% people = @study.investigation ? @study.investigation.projects.collect(&:people).flatten : [] -%>
       <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
     </div>
-<% end %>
+<% end  %>
+<% end  %>
 
 
 
-<% if show_scales? %>
+
+<% if show_scales? && showDetails==1 %>
     <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
 <% end %>
 
-<%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
+<%= render partial: 'assets/manage_specific_attributes', locals:{f:f, :object => object} if show_form_manage_specific_attributes? && showDetails==1%>
 
-<%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
+<%= f.fancy_multiselect :publications, { other_projects_checkbox: true }  if showDetails==1%>
 
-<%= form_submit_buttons(@study) %>
+<%= form_submit_buttons(@study) if showDetails==1 %>
 
 <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                     select_id: '#study_investigation_id',
-                                                                    parents: Investigation.authorized_for('edit') } %>
+                                                                    parents: Investigation.authorized_for('edit') } if showDetails==1 %>
