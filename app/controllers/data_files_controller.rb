@@ -319,9 +319,11 @@ class DataFilesController < ApplicationController
     respond_to do |format|
       if handle_upload_data && @data_file.content_blob.save
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
+        format.js
         format.html {}
       else
         session.delete(:uploaded_content_blob_id)
+        format.js 
         format.html { render action: :new }
       end
     end
@@ -379,6 +381,7 @@ class DataFilesController < ApplicationController
     @data_file.assay_assets.build(assay_id: @assay.id) if @assay.persisted?
 
     respond_to do |format|
+      format.js
       format.html
     end
   end
