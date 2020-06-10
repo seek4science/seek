@@ -4,7 +4,7 @@
 %>
 <div class="show_basic">
  <div class="row">
-      <div class="col-md-7 col-12">
+      <div class="col-md-6 col-12">
         <ul class="bcrumb">
           <li><a href="#">Project</a></li>
           <li style="display:none"><a href="#">Investigation</a></li>
@@ -12,10 +12,8 @@
           <li style="display:none"><a href="#">Assay</a></li>
         </ul>
       </div>
-      <div class="col-md-5" style="text-align:right">
-        <div>
-          <input id="btn_delete_item" type="button" class="btn btn-primary" value="Delete" onclick="deleteItem()" />
-        </div>
+      <div class="col-md-6" style="text-align:right">
+
       </div>
     </div>
     <div class="row">
@@ -44,7 +42,7 @@
                      <%= render :partial => "folders/contents", :locals => {:folder => default_folder } -%>
                 </div>
                 <div id="investigation_contents" class="row" style="display:none">
-                    <%= render :partial => "investigation_details" -%>
+                    <%= render :partial => "investigation" -%>
                 </div>
                 <div id="study_contents" class="row" style="display:none">
                     <%= render :partial => "study" -%>
@@ -236,14 +234,14 @@
             });
         }
 
-        const deleteItem = () => {
+        const deleteItem = (t) => {
             let {id, type} = selectedItem
             if (!id || !type) {
                 alert("Please select item.")
                 return;
             }
-            if (confirm('Are you sure you want to delete the')) {
-                $j("#btn_delete_item").attr('disabled','disabled')
+            if (confirm('Are you sure you want to delete the item?')) {
+                $j(t).attr('disabled','disabled')
                   switch (type) {
                     case "study":
                         type = "studies"
