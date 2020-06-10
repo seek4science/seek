@@ -103,6 +103,10 @@
             })
 
             $j("#submit_investigation").click(function () {
+                if ($j("#investigation_title").val().length==0){
+                    alert("Please enter a title.")
+                    return;
+                }
                 $j("#submit_investigation").attr("disabled","disabled")
                 data = {
                     "data": {
@@ -159,7 +163,11 @@
             })
 
             $j("#submit_study").click(function () {
-                 $j("#submit_study").attr("disabled","disabled")
+                if ($j("#study_title").val().length==0){
+                    alert("Please enter a title.")
+                    return;
+                }
+                $j("#submit_study").attr("disabled","disabled")
                 let data = {
                     "data": {
                     "type": "studies",
