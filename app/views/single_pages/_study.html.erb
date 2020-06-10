@@ -1,15 +1,22 @@
     <div class="simpleForm">
         <ul class="nav nav-tabs">
-            <li class="active "><a data-toggle="tab" href="#details"><i class="glyphicon glyphicon-th-list"></i>
+            <li class="active "><a data-toggle="tab" href="#study-details"><i class="glyphicon glyphicon-th-list"></i>
                     Details</a></li>
             <li><a data-toggle="tab" href="#design"><i class="glyphicon glyphicon-pencil"></i> Design</a></li>
 
             <li><a data-toggle="tab" href="#sampleSourceTable" style="display:none" class="dpd"><i class="glyphicon glyphicon-edit"></i> Samples Source
                     Table</a></li>
             <li><a data-toggle="tab" href="#workflow" onclick="refreshWorkflow()" style="display:none" class="dpd"><i class="glyphicon glyphicon-random"></i> Workflow</a></li>
+            <li style="float:right">
+                <div>
+                    <a href="" class="btn btn-danger btn-sm" onclick="deleteItem(this)">
+                        <span style='color:white' class='glyphicon glyphicon-trash'></span>
+                    </a>
+                </div>
+            </li>
         </ul>
         <div class="tab-content">
-            <div id="details" class="tab-pane fade in active" style="padding:10px">
+            <div id="study-details" class="tab-pane fade in active" style="padding:10px">
                 <p id="std-title"><strong style="text-align: center;">Title:</strong> <span></span></p>
                 <p id="std-description"> <strong>Description:</strong> <span></span> </p>
                 <p id="experimentalists"><strong>Experimentalists: </strong> <span></span></p>
@@ -38,7 +45,7 @@
 
     <script>
         $j("#std_update_btn").on("click", () => {
-            $j("#std_update_btn").attr("disabled","disabled")
+            $j("#std_update_btn").attr("disabled", "disabled")
             var form = $j("#study-sharing-form");
             var url = `/studies/${selectedItem.id}/manage_update`
             $j.ajax({
@@ -49,11 +56,13 @@
                     alert("Sharing permissions updated!")
                 },
                 error: e => {
-                     alert("Can not perform the operation.")
+                    alert("Can not perform the operation.")
                 },
-                complete:()=>{$j("#std_update_btn").removeAttr("disabled")}
+                complete: () => {
+                    $j("#std_update_btn").removeAttr("disabled")
+                }
             });
-            
+
         })
 
         // Add a person permission to the table
