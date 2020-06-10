@@ -103,4 +103,35 @@ class WorkflowTest < ActiveSupport::TestCase
 
     assert_not_equal crate.canonical_id, workflow.ro_crate.canonical_id
   end
+
+  test 'can get and set source URL' do
+    workflow = Factory(:workflow)
+
+    assert_no_difference('AssetLink.count') do
+      workflow.source_link_url = 'https://github.com/seek4science/cool-workflow'
+    end
+
+    assert_difference('AssetLink.count', 1) do
+      disable_authorization_checks { workflow.save! }
+    end
+
+    assert_equal 'https://github.com/seek4science/cool-workflow', workflow.source_link_url
+    assert_equal 'https://github.com/seek4science/cool-workflow', workflow.source_link.url
+  end
+
+  test 'can clear source URL' do
+    workflow = Factory(:workflow, source_link_url: 'https://github.com/seek4science/cool-workflow')
+    assert workflow.source_link
+    assert workflow.source_link_url
+
+    assert_no_difference('AssetLink.count') do
+      workflow.source_link_url = nil
+    end
+
+    assert_difference('AssetLink.count', -1) do
+      disable_authorization_checks { workflow.save! }
+    end
+
+    assert_nil workflow.reload.source_link
+  end
 end

@@ -563,4 +563,19 @@ class ApplicationController < ActionController::Base
       end
     end
   end
+
+  # Dynamically get parent resource from URL.
+  # i.e. /data_files/123/some_sub_resource/456
+  # would fetch DataFile with ID 123
+  #
+  def get_parent_resource
+    parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
+    if parent_id_param
+      parent_type = parent_id_param.to_s.chomp('_id')
+      parent_class = parent_type.camelize.constantize
+      if parent_class
+        @parent_resource = parent_class.find(params[parent_id_param])
+      end
+    end
+  end
 end

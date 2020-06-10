@@ -1,7 +1,7 @@
 <% filter_limit = 6 %>
 <% if options.any? %>
   <div class="filter-category collapsed" data-filter-category="<%= key.to_s -%>">
-    <div class="filter-category-title"><%= key.to_s.humanize %></div>
+    <div class="filter-category-title"><%= t(key, default: key.to_s).titleize %></div>
     <% options.each_with_index do |filter, i| %>
       <%= filter_link(key, filter, hidden: i >= filter_limit) %>
     <% end %>

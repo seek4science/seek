@@ -1,4 +1,4 @@
-<%= panel('My Recent Contributions', id: 'my-recent-contributions', body_options: { class: 'front-page-panel' }) do %>
+<%= panel("My Recent #{t('contribution').pluralize}", id: 'my-recent-contributions', body_options: { class: 'front-page-panel' }) do %>
     <ul class="feed">
       <% activity = current_user.person.recent_activity(Seek::Config.recent_contributions_number_of_entries).select {|a| a.activity_loggable} %>
       <% items = convert_logs_to_hash(activity) %>

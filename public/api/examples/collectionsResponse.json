@@ -1,0 +1,44 @@
+{
+    "data": [
+        {
+            "id": "1121",
+            "type": "collections",
+            "attributes": {
+                "title": "A Collection"
+            },
+            "links": {
+                "self": "/collections/1121"
+            }
+        },
+        {
+            "id": "2",
+            "type": "collections",
+            "attributes": {
+                "title": "Bob's favourite things"
+            },
+            "links": {
+                "self": "/collections/2"
+            }
+        },
+        {
+            "id": "1",
+            "type": "collections",
+            "attributes": {
+                "title": "Cool workflows"
+            },
+            "links": {
+                "self": "/collections/1"
+            }
+        }
+    ],
+    "jsonapi": {
+        "version": "1.0"
+    },
+    "links": {
+        "self": "/collections"
+    },
+    "meta": {
+        "base_url": "http://localhost:3000",
+        "api_version": "0.3"
+    }
+}

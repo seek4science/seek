@@ -37,14 +37,9 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
   end
 
   def populate_extra_relationships(hash = nil)
-    person_id = @current_user.person.id
-
-    extra_relationships = {}
-    extra_relationships[:submitter] = { data: [{ id: person_id.to_s, type: 'people' }] }
-    extra_relationships[:people] = { data: [{ id: person_id.to_s, type: 'people' }] }
+    extra_relationships = super
     extra_relationships[:investigation] = { data: { id: @study.investigation.id.to_s, type: 'investigations' } }
-
-    extra_relationships.with_indifferent_access
+    extra_relationships
   end
 
   test 'should not delete assay when not project member' do

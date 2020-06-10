@@ -1,0 +1,84 @@
+{
+    "data": {
+        "id": "1121",
+        "type": "collections",
+        "attributes": {
+            "title": "A Collection",
+            "description": "A collection of things!",
+            "license": null,
+            "tags": [
+                "Collection-tag1",
+                "Collection-tag2",
+                "Collection-tag3",
+                "Collection-tag4",
+                "Collection-tag5"
+            ],
+            "created_at": "2020-05-28T13:03:28.000Z",
+            "updated_at": "2020-05-28T13:03:32.000Z",
+            "other_creators": "Blogs, Joe"
+        },
+        "relationships": {
+            "creators": {
+                "data": [
+                    {
+                        "id": "1039989767",
+                        "type": "people"
+                    }
+                ]
+            },
+            "submitter": {
+                "data": [
+                    {
+                        "id": "1039989760",
+                        "type": "people"
+                    }
+                ]
+            },
+            "people": {
+                "data": [
+                    {
+                        "id": "1039989760",
+                        "type": "people"
+                    },
+                    {
+                        "id": "1039989767",
+                        "type": "people"
+                    }
+                ]
+            },
+            "projects": {
+                "data": [
+                    {
+                        "id": "1022253998",
+                        "type": "projects"
+                    }
+                ]
+            },
+            "publications": {
+                "data": [
+                    {
+                        "id": "980191013",
+                        "type": "publications"
+                    }
+                ]
+            },
+            "items": {
+                "data": [ ]
+            }
+        },
+        "links": {
+            "self": "/collections/1121",
+            "items": "/collections/1121/items"
+        },
+        "meta": {
+            "created": "2020-05-28T13:03:28.000Z",
+            "modified": "2020-05-28T13:03:32.000Z",
+            "api_version": "0.3",
+            "uuid": "8bfca980-8311-0138-b378-0800278a9619",
+            "base_url": "http://localhost:3000"
+        }
+    },
+    "jsonapi": {
+        "version": "1.0"
+    }
+}

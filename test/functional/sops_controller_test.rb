@@ -295,6 +295,12 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'a', text: /Edit experimental conditions/, count: 0
   end
 
+  test 'should disable request contact buttons' do
+    get :show, params: { id: sops(:sop_with_no_contributor) }
+    assert_response :success
+    assert_select 'a.disabled-button', text: /Request Contact/, count: 1
+  end
+
   def test_should_show_version
     s = Factory(:sop, contributor: @user.person)
 
@@ -432,6 +438,7 @@ class SopsControllerTest < ActionController::TestCase
     get :show, params: { id: sops(:sop_with_no_contributor) }
     assert_response :success
   end
+
 
   def test_can_show_edit_for_sop_with_no_contributor
     get :edit, params: { id: sops(:sop_with_no_contributor) }

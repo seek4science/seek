@@ -194,7 +194,7 @@ SEEK::Application.routes.draw do
       get :select
       get :items
     end
-    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :only=>[:index]
+    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,:publications,:documents, :events,:samples,:specimens, :strains, :collections, :only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -218,7 +218,7 @@ SEEK::Application.routes.draw do
       get :overview
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:workflows,:nodes, :data_files,:presentations,
-              :publications,:events,:samples,:specimens,:strains,:search,:organisms,:documents, :only=>[:index]
+              :publications,:events,:samples,:specimens,:strains,:search,:organisms,:documents,:collections, :only=>[:index]
 
     resources :openbis_endpoints do
       collection do
@@ -231,7 +231,6 @@ SEEK::Application.routes.draw do
       member do
         post :select
       end
-
     end
     resources :folders do
       collection do
@@ -415,6 +414,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
+      post :request_contact
       post :update_annotations_ajax
       post :new_version
       post :edit_version_comment
@@ -439,7 +439,7 @@ SEEK::Application.routes.draw do
         post :create_from_existing
       end
     end
-    resources :people,:projects,:investigations,:assays, :samples, :studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays, :samples, :studies,:publications,:events, :collections,:only=>[:index]
   end
 
   resources :presentations, concerns: [:has_content_blobs] do
@@ -457,6 +457,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
+      post :request_contact
       post :update_annotations_ajax
       post :new_version
       post :edit_version_comment
@@ -464,7 +465,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people,:projects,:publications,:events,:only=>[:index]
+    resources :people,:projects,:publications,:events, :collections,:only=>[:index]
   end
 
   resources :models, concerns: [:has_content_blobs] do
@@ -491,6 +492,7 @@ SEEK::Application.routes.draw do
       post :publish
       post :execute
       post :request_resource
+      post :request_contact
       get :simulate
       post :simulate
       delete :destroy_version
@@ -507,7 +509,7 @@ SEEK::Application.routes.draw do
         post :select
       end
     end
-    resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:studies,:publications,:events, :collections,:only=>[:index]
   end
 
   resources :sops, concerns: [:has_content_blobs] do
@@ -525,6 +527,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
+      post :request_contact
       post :update_annotations_ajax
       post :new_version
       post :edit_version_comment
@@ -539,7 +542,7 @@ SEEK::Application.routes.draw do
         post :create_from_existing
       end
     end
-    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:workflows,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:workflows, :collections,:only=>[:index]
   end
 
   resources :workflows, concerns: [:has_content_blobs] do
@@ -563,6 +566,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
+      post :request_contact
       post :update_annotations_ajax
       post :new_version
       post :edit_version_comment
@@ -574,7 +578,7 @@ SEEK::Application.routes.draw do
       get :diagram
       get :ro_crate
     end
-    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:sops,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:sops, :collections,:only=>[:index]
   end
 
   resources :nodes, concerns: [:has_content_blobs] do
@@ -593,6 +597,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
+      post :request_contact
       post :update_annotations_ajax
       post :new_version
       post :edit_version_comment
@@ -602,7 +607,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events, :collections,:only=>[:index]
   end
 
   resources :content_blobs, :except => [:show, :index, :update, :create, :destroy] do
@@ -628,7 +633,7 @@ SEEK::Application.routes.draw do
       get :storage_report
     end
     resources :people,:projects, :institutions, :investigations, :studies, :assays,
-              :data_files, :models, :sops, :workflows, :nodes, :presentations, :documents, :events, :publications, :organisms
+              :data_files, :models, :sops, :workflows, :nodes, :presentations, :documents, :events, :publications, :organisms, :collections
   end
 
   resources :publications do
@@ -647,8 +652,9 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :disassociate_authors
       post :update_metadata
+      post :request_contact
     end
-    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :events,:collections, :only=>[:index]
   end
 
   resources :events do
@@ -660,8 +666,9 @@ SEEK::Application.routes.draw do
     member do
       get :manage
       patch :manage_update
+      post :request_contact
     end
-    resources :people,:projects,:data_files,:publications,:documents,:presentations,:only=>[:index]
+    resources :people,:projects,:data_files,:publications,:documents,:presentations,:collections, :only=>[:index]
   end
 
   resource :policies do
@@ -683,6 +690,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       get :manage
       patch :manage_update
+      post :request_contact
     end
     resources :specimens,:assays,:people,:projects,:samples,:only=>[:index]
   end
@@ -724,9 +732,10 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       get :manage
       patch :manage_update
+      post :request_contact
     end
     resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
-              :strains, :organisms, only:[:index]
+              :strains, :organisms, :collections, only:[:index]
   end
 
   ### SAMPLE TYPES ###
@@ -771,6 +780,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
+      post :request_contact
       post :update_annotations_ajax
       post :new_version
       post :edit_version_comment
@@ -780,7 +790,36 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:collections, :only=>[:index]
+  end
+
+  resources :collections do
+    collection do
+      get :typeahead
+      get :preview
+      post :items_for_result
+    end
+    member do
+      post :check_related_items
+      post :check_gatekeeper_required
+      get :published
+      post :publish_related_items
+      post :publish
+      post :request_resource
+      post :request_contact
+      post :update_annotations_ajax
+      post :mint_doi
+      get :mint_doi_confirm
+      get :manage
+      patch :manage_update
+    end
+    resources :items, controller: :collection_items
+    resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:collections,:only=>[:index]
+    resources :avatars do
+      member do
+        post :select
+      end
+    end
   end
 
   ### ASSAY AND TECHNOLOGY TYPES ###

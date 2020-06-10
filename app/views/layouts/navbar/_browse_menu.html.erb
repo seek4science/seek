@@ -39,6 +39,9 @@
     <% if Seek::Config.documents_enabled %>
       <li><%= link_to t("document").pluralize, documents_path %></li>
     <% end %>
+    <% if Seek::Config.collections_enabled %>
+      <li><%= link_to t("collection").pluralize, collections_path %></li>
+    <% end %>
 
     <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
     <li><%= link_to t("presentation").pluralize, presentations_path %></li>

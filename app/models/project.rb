@@ -20,6 +20,7 @@ class Project < ApplicationRecord
   has_and_belongs_to_many :samples
   has_and_belongs_to_many :sample_types
   has_and_belongs_to_many :documents
+  has_and_belongs_to_many :collections
 
   has_many :work_groups, dependent: :destroy, inverse_of: :project
   has_many :institutions, through: :work_groups, inverse_of: :projects
@@ -89,7 +90,7 @@ class Project < ApplicationRecord
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
 
   def assets
-    data_files | sops | models | publications | presentations | documents | workflows | nodes
+    data_files | sops | models | publications | presentations | documents | workflows | nodes | collections
   end
 
   def institutions=(new_institutions)

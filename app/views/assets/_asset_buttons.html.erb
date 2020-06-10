@@ -7,6 +7,9 @@
 <% show_doi_button = display_asset && (asset.supports_doi? && asset.is_published? && asset.can_manage? && display_asset.can_mint_doi?) %>
 <% show_publish_button = asset.is_in_isa_publishable? && asset.can_publish? %>
 
+<%= source_link_button(asset.source_link) if asset.respond_to?(:source_link) && asset.source_link %>
+
+<%= render partial: 'assets/request_contact', locals: { object: asset } if asset.respond_to?(:creators) -%>
 <%= render partial: 'subscriptions/subscribe', locals: { object: asset } -%>
 
 <% if asset.is_a?(DataFile) %>
@@ -60,12 +63,20 @@
   <% end -%>
 <% end -%>
 
+<% if current_user && asset.respond_to?(:collections) %>
+  <% exceptions = asset.collection_ids %>
+  <% exceptions << asset.id if asset.is_a?(Collection) # Can't add to self! %>
+  <% collections = current_user.person.related_collections.where.not(id: exceptions) %>
+  <% if collections.any? %>
+    <%= render partial: 'assets/add_to_collection', locals: { resource: asset, collections: collections } %>
+  <% end %>
+<% end %>
+
 <% if asset.can_edit? %>
   <%= add_to_dropdown(asset) %>
 <% end %>
 
 <%= item_actions_dropdown do %>
-
   <% if asset.can_edit? -%>
     <% if asset.versioned? -%>
       <li>

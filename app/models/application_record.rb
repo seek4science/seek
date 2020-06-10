@@ -40,7 +40,7 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def defines_own_avatar?
-    respond_to?(:avatar)
+    false
   end
 
   def use_mime_type_for_avatar?

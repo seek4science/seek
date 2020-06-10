@@ -79,6 +79,7 @@ class AdminController < ApplicationController
 
     Seek::Config.cwl_viewer_url = params[:cwl_viewer_url]
     # Types enabled
+    Seek::Config.collections_enabled = string_to_boolean params[:collections_enabled]
     Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
     Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
     Seek::Config.isa_enabled = string_to_boolean params[:isa_enabled]
