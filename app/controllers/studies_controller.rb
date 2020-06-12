@@ -142,7 +142,8 @@ class StudiesController < ApplicationController
     metadata_types = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type:'Study')
     studies_length = params[:studies][:title].length
     studies_uploaded = false
-    assays_uploaded = false
+    data_file_uploaded = false
+
     studies_length.times do |index|
       study_params = {
         title: params[:studies][:title][index],
@@ -160,24 +161,52 @@ class StudiesController < ApplicationController
       end
 
 
-      params[:studies][:data_files][index].split(", ").length.times do |data_file_index|
+      data_file_names = params[:studies][:data_files][index].split(", ")
+      data_file_names.length.times do |data_file_index|
         study_metadata_id = '"id":"' + params[:studies][:id][index] + '"'
         study_id = CustomMetadata.where("json_metadata LIKE ?", "%#{study_metadata_id}%").last.item_id
         assay_class_id = AssayClass.where(title: "Experimental assay").first.id
+        data_file_description = params[:studies][:data_file_description][index].split(", ")
         assay_params = {
             title: 'Assay for ' + params[:studies][:id][index] + '-' + (data_file_index+1).to_s,
-            description: "Test creating assay",
+            description: data_file_description[data_file_index],
             study_id: study_id,
             assay_class_id: assay_class_id
         }
-        @assay = Assay.new(assay_params)
-        if @assay.valid? && @assay.save!
-          assays_uploaded = true if @assay.save
+
+        data_file_name = "#{data_file_names[data_file_index]}.csv"
+        data_file_url = "#{Rails.root}/tmp/data/#{data_file_name}"
+        data_file_content_blob = ContentBlob.new
+        data_file_content_blob.tmp_io_object = File.open(data_file_url)
+        data_file_content_blob.original_filename = "#{data_file_name}"
+
+        #TODO Check and use the right license
+
+        data_file_params = {
+            title: data_file_names[data_file_index],
+            description: data_file_description[data_file_index],
+            license: "CC-BY-4.0",
+            projects: Project.where(title: "Default Project"),
+            content_blob: data_file_content_blob
+        }
+
+        assay_asset_params = {
+            assay: Assay.new(assay_params),
+            asset: DataFile.new(data_file_params)
+        }
+        @assay_asset = AssayAsset.new(assay_asset_params)
+
+        if @assay_asset.valid? && @assay_asset.save!
+          data_file_uploaded = true if @assay_asset.save
         end
+
       end
+
+
     end
 
-    batch_uploaded = studies_uploaded && assays_uploaded
+    batch_uploaded = studies_uploaded && data_file_uploaded
+
     if batch_uploaded
       respond_to do |format|
         flash[:notice] = "The #{t('studies')} were successfully created.<br/>".html_safe

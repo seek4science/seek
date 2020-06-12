@@ -88,6 +88,7 @@
             <%= f.text_area :culturalPractices, required: false, name: "studies[data_files][]", :class => "form-control", value: @studies_datafiles[study.custom_metadata.data[:id]][:data_file].join(", ") %>
           </td>
         </tr>
+        <%= hidden_field_tag "studies[data_file_description][]", @studies_datafiles[study.custom_metadata.data[:id]][:data_file_description].join(", ") %>
       <% end %>
       </tbody>
     </table>
