@@ -13,7 +13,7 @@
                     next unless study.assays
                     study.assays.each_with_index do |assay, i|
                         asy.push(create_node({text: assay.title, _type: 'assay', _id: assay.id,
-                             a_attr: bold, label: i.zero? && 'Assay'}))
+                             a_attr: bold, label: i.zero? ? 'Assay' : nil}))
                     end
                     std.push(create_node({text: study.title, _type: 'study', _id: study.id,
                          a_attr: bold, children: asy}))
