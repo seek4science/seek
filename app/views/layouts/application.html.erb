@@ -28,7 +28,6 @@
       <% if !(current_user&.person&.member?) %>
       <%= render partial: 'layouts/need_to_join_project'  %>
         <% else %>
-        <%= render partial: 'layouts/select_a_project'  %>
          <% end %>
        <% else %>
       <%= render partial: 'layouts/register_or_login' %>
