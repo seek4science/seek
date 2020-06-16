@@ -43,6 +43,8 @@ module Seek
       resource = class_for_controller_name.find(params[:id])
       mail = Mailer.request_contact(current_user, resource)
       mail.deliver_later
+      details = params[:details]
+      MessageLog.log_contact_request(current_user.person, resource, details)
       @resource = resource
       respond_to do |format|
         format.js { render template: 'assets/request_contact' }
