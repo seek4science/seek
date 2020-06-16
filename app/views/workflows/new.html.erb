@@ -47,7 +47,7 @@
             <div class="form-group">
               <label>Abstract CWL</label>
               <p class="help-block">(Optional) The abstract CWL that describes the workflow above.</p>
-              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[abstract_cwl]', param: params.dig(:ro_crate, :abstract_cwl) } -%>
+              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[abstract_cwl]', param: params.dig(:ro_crate, :abstract_cwl), file_field_opts: { accept: '.cwl,.yaml,.yml,.json,.jsonld' } } -%>
             </div>
           <% end %>
 
@@ -55,7 +55,7 @@
             <div class="form-group">
               <label>Diagram</label>
               <p class="help-block">(Optional) A diagram that illustrates the main workflow.</p>
-              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[diagram]', param: params.dig(:ro_crate, :diagram) } -%>
+              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[diagram]', param: params.dig(:ro_crate, :diagram), file_field_opts: { accept: 'image/*' } } -%>
             </div>
           <% end %>
 
