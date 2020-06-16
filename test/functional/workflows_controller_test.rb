@@ -568,6 +568,27 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert crate.main_workflow
   end
 
+  test 'create ro crate even with with duplicated filenames' do
+    cwl = Factory(:cwl_workflow_class)
+    person = Factory(:person)
+    login_as(person)
+    assert_difference('ContentBlob.count') do
+      post :create_ro_crate, params: {
+          ro_crate: {
+              workflow: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') },
+              diagram: { data: fixture_file_upload('files/file_picture.png') },
+              abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
+          },
+          workflow_class_id: cwl.id
+      }
+    end
+    assert_response :success
+    assert wf = assigns(:workflow)
+    crate_workflow = wf.ro_crate.main_workflow
+    crate_cwl = wf.ro_crate.main_workflow_cwl
+    assert_not_equal crate_workflow.id, crate_cwl.id
+  end
+
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)
