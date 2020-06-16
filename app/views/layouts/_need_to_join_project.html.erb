@@ -1,0 +1,24 @@
+<%= alert_box('info', hide_button: true) do %>
+  <p>
+    Before you can upload <%= t('workflow').pluralize -%> you will need to join, or be assigned to a <%= t('project') -%>.
+    If you selected a <%= t('project') -%> and <%= t('institution') %> when registering, an administrator will review and confirm your selection.
+  </p>
+
+  <p>
+    If you did not select a <%= t('project') -%> when registering, or have not yet been assigned to a <%= t('project') -%>:
+  </p>
+
+  <ol>
+    <li><%= link_to('Click here', projects_path) %> to browse the list of <%= t('project').pluralize %> and request to join one.</li>
+    <li><%= link_to('Click here', new_programme_path) %> to create a <%= t('programme') %>, a space in which you can create and manage your own <%= t('project').pluralize -%>.</li>
+  </ol>
+
+  <p>
+    <em>
+      For detailed guidance on how to join a <%= t('project') -%>, <%= link_to('click here', 'https://github.com/workflowhub-eu/about/wiki/How-to-join-a-project', target: :_blank) %>.
+    </em>
+  </p>
+
+  <%= render partial: 'layouts/feedback' %>
+
+<% end %>

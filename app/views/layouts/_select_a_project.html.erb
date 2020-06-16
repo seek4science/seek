@@ -1,0 +1,18 @@
+<%= alert_box('info', hide_button: true) do %>
+  <p>
+    <%= t('workflow').pluralize -%>  are registered to one or more <%= t('project').pluralize -%> .
+  </p>
+
+  <ol>
+    <li><%= link_to('Click here', projects_path) %> to browse the list of <%= t('project').pluralize %> and choose, or request to join, one.</li>
+    <li><%= link_to('Click here', new_programme_path) %> to create a <%= t('programme') %>, a space in which you can create and manage your own <%= t('project').pluralize -%>.</li>
+  </ol>
+
+  <p>
+    <em>
+      For detailed guidance on how to join a <%= t('project') -%>, <%= link_to('click here', 'https://github.com/workflowhub-eu/about/wiki/How-to-join-a-project', target: :_blank) %>.
+    </em>
+  </p>
+
+  <%= render partial: 'layouts/feedback' %>
+<% end %>
