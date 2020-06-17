@@ -79,7 +79,7 @@ class MailerTest < ActionMailer::TestCase
     @expected.from = 'no-reply@sysmo-db.org'
     @expected.body = read_fixture('request_contact')
     @owner = Factory(:max_person)
-
+    details = 'here are some more details.'
     presentation = Factory :ppt_presentation, contributor: @owner
     @expected.subject = 'A Sysmo SEEK member requests to discuss with you regarding '+ presentation.title
 
@@ -90,7 +90,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text.gsub!('-person_id-', requester.person.id.to_s)
     expected_text.gsub!('-resource_id-', presentation.id.to_s)
     expected_text.gsub!('--title--', presentation.title.to_s)
-    assert_equal expected_text, encode_mail(Mailer.request_contact(requester, presentation))
+    assert_equal expected_text, encode_mail(Mailer.request_contact(requester, presentation, details))
   end
 
   test 'request resource no details' do
