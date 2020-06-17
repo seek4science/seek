@@ -260,4 +260,28 @@ module AssetsHelper
       false
     end
   end
+
+  #if there are creators, the email will be sent only to them, otherwise sent to the contributor
+  def get_email_recipients(resource)
+    if resource.creators.present?
+      email_recipients = resource.creators
+    else
+      email_recipients = [resource.contributor] unless resource.contributor.nil?
+    end
+    email_recipients
+  end
+
+  # whether the request contact button should be shown
+  def request_contact_button_enabled?(resource)
+    Seek::Config.email_enabled && User.current_user.present? && get_email_recipients(resource).present? && MessageLog.recent_contact_requests(User.current_user.try(:person),resource).empty?
+  end
+
+  # whether the request contact has been made within 12 hours
+  def request_contact_pending?(resource)
+    return nil unless logged_in?
+    return nil unless Seek::Config.email_enabled
+    return nil unless get_email_recipients(resource).present?
+    MessageLog.recent_contact_requests(current_user.try(:person), resource).first
+  end
+
 end

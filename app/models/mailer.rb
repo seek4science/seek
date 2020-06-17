@@ -53,10 +53,11 @@ class Mailer < ActionMailer::Base
          subject: "A #{Seek::Config.application_name} member requested a protected file: #{resource.title}")
   end
 
-  def request_contact(user, resource)
+  def request_contact(user, resource, details)
     @owners = (resource.creators.count > 0) ? resource.creators : [resource.contributor]
     @requester = user.person
     @resource = resource
+    @details = details
     mail(from: Seek::Config.noreply_sender,
          to: @owners.collect(&:email_with_name),
          reply_to: user.person.email_with_name,

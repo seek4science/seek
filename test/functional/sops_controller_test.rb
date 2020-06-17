@@ -295,10 +295,39 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'a', text: /Edit experimental conditions/, count: 0
   end
 
-  test 'should disable request contact buttons' do
+
+  test 'should show request contact button' do
+    s = Factory(:sop, contributor: @user.person)
+    get :show, params: { id: s }
+    assert_response :success
+    assert_select 'a.disabled-button', text: /Request Contact/, count: 0
+    assert_select 'a#request_contact_button', text: /Request Contact/, count: 1
+  end
+
+  test 'should not show request contact button' do
     get :show, params: { id: sops(:sop_with_no_contributor) }
     assert_response :success
-    assert_select 'a.disabled-button', text: /Request Contact/, count: 1
+    assert_select 'a.disabled-button', text: /Request Contact/, count: 0
+    assert_select 'a#request_contact_button', text: /Request Contact/, count: 0
+  end
+
+
+  test 'request contact' do
+    s = Factory(:sop, contributor: @user.person)
+    requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
+
+    login_as(requester)
+    assert_enqueued_emails(1) do
+      assert_difference('MessageLog.count') do
+        post :request_contact, format: :js, params: { id:s, details:'blah blah' }
+      end
+    end
+
+    log = MessageLog.last
+    assert_equal s, log.resource
+    assert_equal requester,log.sender
+    assert_equal MessageLog::CONTACT_REQUEST,log.message_type
+
   end
 
   def test_should_show_version
