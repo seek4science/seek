@@ -273,7 +273,7 @@ module AssetsHelper
 
   # whether the request contact button should be shown
   def request_contact_button_enabled?(resource)
-    Seek::Config.email_enabled && User.current_user.present? && get_email_recipients(resource).present? && MessageLog.recent_contact_requests(User.current_user.try(:person),resource).empty?
+    Seek::Config.email_enabled && logged_in? && get_email_recipients(resource).present? && MessageLog.recent_contact_requests(User.current_user.try(:person),resource).empty?
   end
 
   # whether the request contact has been made within 12 hours
