@@ -118,13 +118,14 @@ class Study < ApplicationRecord
     study_data = []
     studies = []
     unzipped_files.entries.each do |file|
-      if file.name.starts_with?('data') && file.ftype != :directory
+      file_name = File.basename(file.name)
+      if file.name.include?('/data/') && file.ftype != :directory
         study_data << file
         Dir.mkdir "#{tmp_dir}/data" unless File.exists? "#{tmp_dir}/data"
-        file.extract("#{tmp_dir}#{file.name}") unless File.exists? "#{tmp_dir}#{file.name}"
+        file.extract("#{tmp_dir}/data/#{file_name}") unless File.exists? "#{tmp_dir}/data/#{file_name}"
       elsif file.ftype == :file
-        studies << file
-        file.extract("#{tmp_dir}#{file.name}") unless File.exists? "#{tmp_dir}#{file.name}"
+        studies << file_name
+        file.extract("#{tmp_dir}#{file_name}") unless File.exists? "#{tmp_dir}#{file_name}"
       end
     end
     [study_data, studies]
