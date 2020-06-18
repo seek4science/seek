@@ -8,6 +8,12 @@ class HumanDiseasesControllerTest < ActionController::TestCase
 
   def setup
     login_as(:aaron)
+    @old_enabled_status = Seek::Config.human_diseases_enabled
+    Seek::Config.human_diseases_enabled = true
+  end
+
+  def teardown
+    Seek::Config.human_diseases_enabled = @old_enabled_status
   end
 
   def rest_api_test_object
