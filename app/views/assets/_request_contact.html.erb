@@ -1,0 +1,54 @@
+<%
+  resource = object
+  email_recipients = get_email_recipients(resource)
+%>
+
+  <% if request_contact_button_enabled?(resource) %>
+      <span id="request_contact_button">
+        <%= button_link_to("Request Contact", "message", '#', id: 'request_contact_button',
+                           'data-toggle' => 'modal', 'data-target' => "#request-contact-modal") -%>
+    </span>
+
+    <%= modal(id: 'request-contact-modal', class: 'text-left') do %>
+      <%= modal_header('Request Contact') %>
+      <%= modal_body do %>
+        <div id="request_contact_form">
+          <%= form_tag_with_callbacks(polymorphic_url(resource, action: :request_contact),
+                                      { id: 'request_contact',
+                                        before: "$j('#requesting_contact_status').fadeIn(); $j('#request_contact_form').hide();",
+                                        remote: true }) do -%>
+            <p>
+              An email will be sent to <%= join_with_and(email_recipients.collect{|m| h(m.name)}) -%> to show your interest in
+              <b><%= text_for_resource(resource) %> <%= resource.title %></b>. Please note that your email address will be shared with the <%="recipient".pluralize(email_recipients.size)%>.
+              <br/>
+            </p>
+
+            <div class="form-group">
+              <label>Details</label>
+              <%= text_area_tag :details,'',:cols=>80,:rows=>10, class: 'form-control' -%>
+              <p class="help-block">Please provide some extra information you feel may be useful to your request.</p>
+            </div>
+
+            <p>
+              <em>A request can only be made once every <%= (MessageLog::RECENT_PERIOD / 3600).to_i %> hours</em>
+            </p>
+
+            <%= submit_tag 'Send', data: { confirm: "An email will be delivered with your request to #{join_with_and(email_recipients.collect{|m| h(m.name)})}. Are you sure?" }, class: 'btn btn-primary' -%>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <% end %>
+        </div>
+        <div id="requesting_contact_status" style="display:none;">
+          About to request contact to <%= h(email_recipients.collect{|p| h(p.name)}.join(", ")) %> ...
+          <%= image('spinner') %>
+        </div>
+      <% end %>
+    <% end %>
+
+  <% elsif log = request_contact_pending?(resource) %>
+    <%
+      reason = "A recent request was made, and cannot be made again for another #{log.hours_until_next_allowed_str}"
+    %>
+    <span data-tooltip='<%= reason %>'>
+    <%= button_link_to("Request Contact", "message", '#', :class => 'disabled-button', :onclick => "alert('No #{t('contributor')} or creator for this asset');") -%>
+    </span>
+  <% end -%>

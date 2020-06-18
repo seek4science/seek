@@ -518,7 +518,7 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
-    presentation =  {title: 'Presentation', project_ids: [person.projects.first.id], asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}]}
+    presentation =  {title: 'Presentation', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Presentation.count') do
         assert_difference('ContentBlob.count') do
@@ -533,7 +533,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'should show discussion link' do
     asset_link = Factory(:discussion_link)
-    presentation = Factory(:presentation, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    presentation = Factory(:presentation, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     get :show, params: { id: presentation }
     assert_response :success
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
@@ -546,7 +546,7 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_nil presentation.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: presentation.id, presentation: { asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}] }  }
+        put :update, params: { id: presentation.id, presentation: { discussion_links_attributes:[{url: "http://www.slack.com/"}] }  }
       end
     end
     assert_redirected_to presentation_path(presentation = assigns(:presentation))
@@ -560,7 +560,7 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_equal 1,presentation.discussion_links.count
     assert_no_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: presentation.id, presentation: { asset_links_attributes:[{id:presentation.discussion_links.first.id, url: "http://www.wibble.com/",link_type: AssetLink::DISCUSSION}] } }
+        put :update, params: { id: presentation.id, presentation: { discussion_links_attributes:[{id:presentation.discussion_links.first.id, url: "http://www.wibble.com/"}] } }
       end
     end
     presentation = assigns(:presentation)
@@ -573,9 +573,9 @@ class PresentationsControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person)
     asset_link = Factory(:discussion_link)
-    presentation = Factory(:presentation , asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    presentation = Factory(:presentation , discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
     assert_difference('AssetLink.discussion.count', -1) do
-      put :update, params: { id: presentation.id, presentation: { asset_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+      put :update, params: { id: presentation.id, presentation: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
     end
     assert_redirected_to presentation_path(presentation = assigns(:presentation ))
     assert_empty presentation.discussion_links

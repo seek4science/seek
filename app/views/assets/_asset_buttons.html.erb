@@ -7,6 +7,7 @@
 <% show_doi_button = display_asset && (asset.supports_doi? && asset.is_published? && asset.can_manage? && display_asset.can_mint_doi?) %>
 <% show_publish_button = asset.is_in_isa_publishable? && asset.can_publish? %>
 
+<%= render partial: 'assets/request_contact', locals: { object: asset } if asset.respond_to?(:creators) -%>
 <%= render partial: 'subscriptions/subscribe', locals: { object: asset } -%>
 
 <% if asset.is_a?(DataFile) %>

@@ -73,6 +73,26 @@ class MailerTest < ActionMailer::TestCase
     assert_equal expected_text, encode_mail(Mailer.request_resource(user, resource, details))
   end
 
+
+  test 'request contact' do
+    @expected.to = ['Maximilian Maxi-Mum <maximal_person@email.com>']
+    @expected.from = 'no-reply@sysmo-db.org'
+    @expected.body = read_fixture('request_contact')
+    @owner = Factory(:max_person)
+    details = 'here are some more details.'
+    presentation = Factory :ppt_presentation, contributor: @owner
+    @expected.subject = 'A Sysmo SEEK member requests to discuss with you regarding '+ presentation.title
+
+    requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
+    @expected.reply_to = requester.person.email_with_name
+
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!('-person_id-', requester.person.id.to_s)
+    expected_text.gsub!('-resource_id-', presentation.id.to_s)
+    expected_text.gsub!('--title--', presentation.title.to_s)
+    assert_equal expected_text, encode_mail(Mailer.request_contact(requester, presentation, details))
+  end
+
   test 'request resource no details' do
     @expected.subject = 'A Sysmo SEEK member requested a protected file: Picture'
     # TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade

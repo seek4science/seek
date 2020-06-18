@@ -96,12 +96,13 @@ en:
   pal: 'PAL'
   programme_administrator: 'Programme administrator'
 
-  contributor: 'contributor' # A person who submitted the resource to SEEK
+  contributor: 'submitter' # A person who submitted the resource to SEEK
+  contribution: 'submission'
   creator: 'creator' # A person who was involved with the creation of the resource
   person_responsible: 'person responsible'
 
   jerm_harvester_name: 'The JERM Harvester'
-  deleted_contributor_name: 'Deleted contributor'
+  deleted_contributor_name: 'Deleted submitter'
 
   null_license: 'No license - no permission to use unless the owner grants a licence'
 

@@ -1,0 +1,19 @@
+<% controller=@resource.class.name.underscore.pluralize -%>
+Hi <%= @owners.collect{|o| o.name}.join(", ") -%>,
+
+  The <%= Seek::Config.application_name %> user <%= @requester.name -%>, <%= person_url(@requester) -%>, has interest in the file "<%= @resource.title -%>": <%= url_for(:action=>:show,:controller=>controller,:id=>@resource, :only_path => false) -%>.
+
+  He/She would like to initiate a discussion with you.
+
+<% unless @details.blank? -%>
+  <%=@requester.first_name.capitalize -%> also provided some additional details:
+
+  <%= sanitize(@details) -%>
+<% end -%>
+
+
+  You can reply to <%= @requester.first_name.capitalize -%> by replying to this email.
+
+  This is an automated email.
+
+- <%= Seek::Config.dm_project_name %> Team

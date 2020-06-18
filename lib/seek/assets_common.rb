@@ -38,6 +38,19 @@ module Seek
       end
     end
 
+
+    def request_contact
+      resource = class_for_controller_name.find(params[:id])
+      details = params[:details]
+      mail = Mailer.request_contact(current_user, resource, details)
+      mail.deliver_later
+      MessageLog.log_contact_request(current_user.person, resource, details)
+      @resource = resource
+      respond_to do |format|
+        format.js { render template: 'assets/request_contact' }
+      end
+    end
+
     # For use in autocompleters
     def typeahead
       model_name = controller_name.classify
