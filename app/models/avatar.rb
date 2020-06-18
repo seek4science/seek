@@ -79,6 +79,6 @@ class Avatar < ApplicationRecord
   private
 
   def select_avatar
-    select! if owner.avatar_id.nil?
+    select! unless owner.avatar_selected?
   end
 end
