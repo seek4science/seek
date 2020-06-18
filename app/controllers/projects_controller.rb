@@ -118,6 +118,7 @@ class ProjectsController < ApplicationController
         # update those attributes of a project that we want to be updated from the session
         @project.attributes = session[possible_unsaved_data][:project]
         @project.organism_list = session[possible_unsaved_data][:organism][:list] if session[possible_unsaved_data][:organism]
+        @project.human_disease_list = session[possible_unsaved_data][:human_disease][:list] if session[possible_unsaved_data][:human_disease]
       end
 
       # clear the session data anyway
@@ -147,6 +148,7 @@ class ProjectsController < ApplicationController
         # update those attributes of a project that we want to be updated from the session
         @project.attributes = session[possible_unsaved_data][:project]
         @project.organism_list = session[possible_unsaved_data][:organism][:list] if session[possible_unsaved_data][:organism]
+        @project.human_disease_list = session[possible_unsaved_data][:human_disease][:list] if session[possible_unsaved_data][:human_disease]
       end
 
       # clear the session data anyway
@@ -340,7 +342,7 @@ class ProjectsController < ApplicationController
 
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, { organism_ids: [] }, :parent_id, :start_date,
-                        :end_date, :funding_codes]
+                        :end_date, :funding_codes, { human_disease_ids: [] }]
 
     if User.admin_logged_in?
       permitted_params += [:site_root_uri, :site_username, :site_password, :nels_enabled]

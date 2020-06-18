@@ -22,6 +22,17 @@
           <% end -%>
         </p>
 
+        <% if Seek::Config.human_diseases_enabled %>
+          <p>
+            <b>Human Disease:</b>
+            <% if @display_model.human_disease -%>
+                <%= human_disease_link_to @display_model.human_disease -%>
+            <% else -%>
+                <span class="none_text">Not specified</span>
+            <% end -%>
+          </p>
+        <% end %>
+
         <div id="format_info">
           <p id="model_type">
             <b><%= t('model') %> type:</b>

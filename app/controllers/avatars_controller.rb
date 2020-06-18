@@ -261,6 +261,7 @@ class AvatarsController < ApplicationController
 
     when "Project"
       data_hash[:organism] = params[:organism]
+      data_hash[:human_disease] = params[:human_disease]
 
     when "Institution"
       # no specific data to store for institutions so far

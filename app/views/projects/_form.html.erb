@@ -61,6 +61,11 @@
   <%= f.fancy_multiselect :organisms, { possibilities: Organism.order(:title).all, hidden: false } %>
 <% end %>
 
+<% if Seek::Config.human_diseases_enabled %>
+  <%= f.fancy_multiselect :human_diseases, { possibilities: HumanDisease.order(:title).all, with_new_link: true, hidden: false } %>
+<% end %>
+
+
 <% if @project.can_manage? %>
     <%= render :partial => 'assets/license_selector', :locals => { :resource => @project, :label=>"Default License",:accessor=>:default_license } %>
 
