@@ -3,7 +3,7 @@
 
   resource_type = resource.class.name.underscore
   resource_type_text = text_for_resource(resource)
-  collapsed = resource.asset_links.select{|l| l.link_type==AssetLink::DISCUSSION}.empty?
+  collapsed = resource.discussion_links.empty?
   help_text = "You can add a remote URL of your favorite discussion channels for this #{resource_type_text}, e.g. slack, google doc, twitter ..."
 %>
 
@@ -17,22 +17,21 @@
     <div id='new-link-form' style="display:none;">
       <div class='link-row row'>
         <div class="col-xs-9">
-          <%=  text_field_tag("#{resource_type}[asset_links_attributes][INDEX][url]",'',class: 'form-control') %>
+          <%=  text_field_tag("#{resource_type}[discussion_links_attributes][INDEX][url]",'',class: 'form-control') %>
         </div>
         <div class="col">
           <label class="btn btn-danger">
             Remove
-            <%= check_box_tag "#{resource_type}[asset_links_attributes][INDEX][_destroy]", '1', false,
+            <%= check_box_tag "#{resource_type}[discussion_links_attributes][INDEX][_destroy]", '1', false,
                               class: 'destroy-link', autocomplete: 'off', style:'display:none;' %>
           </label>
         </div>
-        <%=  hidden_field_tag("#{resource_type}[asset_links_attributes][INDEX][link_type]", AssetLink::DISCUSSION,class: 'form-control') %>
       </div>
     </div>
 
     <div id='discussion-links'>
       <%= fields_for(resource) do |f| %>
-        <%= f.fields_for :asset_links do |ff| %>
+        <%= f.fields_for :discussion_links do |ff| %>
           <div class='link-row row'>
             <span class="col-xs-9">
               <%= ff.text_field :url, class:'form-control' %>
@@ -43,7 +42,6 @@
                 <%= ff.check_box :_destroy, class: 'destroy-link', autocomplete: 'off',style:'display:none;' %>
               </label>
             </span>
-            <%= ff.hidden_field :link_type %>
           </div>
         <% end %>
       <% end %>

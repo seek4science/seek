@@ -97,7 +97,7 @@ class AssetsHelperTest < ActionView::TestCase
     sop.contributor= nil
 
     with_config_value(:email_enabled,true) do
-      User.with_current_user(requester) do
+      User.with_current_user(requester.user) do
         assert request_contact_button_enabled?(presentation)
         refute request_contact_button_enabled?(sop)
       end
@@ -110,7 +110,7 @@ class AssetsHelperTest < ActionView::TestCase
 
     # no scenario will work without email enabled
     with_config_value(:email_enabled,false) do
-      User.with_current_user(requester) do
+      User.with_current_user(requester.user) do
         refute request_contact_button_enabled?(presentation)
         refute request_contact_button_enabled?(sop)
       end
@@ -123,7 +123,7 @@ class AssetsHelperTest < ActionView::TestCase
 
     # not if recently requested
     with_config_value(:email_enabled,true) do
-      User.with_current_user(requester) do
+      User.with_current_user(requester.user) do
         travel_to 16.hours.ago do
           MessageLog.create(resource:presentation,sender:requester,message_type:MessageLog::CONTACT_REQUEST)
         end

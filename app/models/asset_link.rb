@@ -4,7 +4,7 @@ class AssetLink < ApplicationRecord
 
   scope :discussion, -> { where(link_type: AssetLink::DISCUSSION) }
 
-  belongs_to :asset, polymorphic: true, inverse_of: :asset_links
+  belongs_to :asset, polymorphic: true
   validates :url, url: { allow_nil: false }
   validates :asset, presence: true
 end
