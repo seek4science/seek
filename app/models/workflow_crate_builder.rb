@@ -1,6 +1,9 @@
 require 'ro_crate_ruby'
 require 'seek/download_handling/http_streamer'
 
+# A kind of "form object" to create a simple Workflow RO-Crate from ~three files (Workflow, diagram, abstract CWL),
+# perform validation (and hold appropriate error messages), and provide output as hash of params that can be used to
+# create a ContentBlob.
 class WorkflowCrateBuilder
   include ActiveModel::Model
 
