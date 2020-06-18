@@ -5,22 +5,22 @@
     <table class="table">
       <thead>
       <tr>
-        <th scope="col" style="min-width:150px;">Study ID *</th>
-        <th scope="col" style="min-width:150px;" class="required">Study Title *</th>
+        <th scope="col" style="min-width:150px;">Study ID <span style="color: red">*</span></th>
+        <th scope="col" style="min-width:150px;" class="required">Study Title <span style="color: red">*</span></th>
         <th scope="col" style="min-width:150px;">Study Description</th>
-        <th scope="col" style="min-width:150px;">Start date*</th>
+        <th scope="col" style="min-width:150px;">Start date <span style="color: red">*</span></th>
         <th scope="col" style="min-width:150px;">End date</th>
-        <th scope="col" style="min-width:150px;">Contact institution</th>
-        <th scope="col" style="min-width:150px;">Geographic location country</th>
-        <th scope="col" style="min-width:150px;">Experimental site name</th>
+        <th scope="col" style="min-width:150px;">Contact institution <span style="color: red">*</span></th>
+        <th scope="col" style="min-width:150px;">Geographic location country <span style="color: red">*</span></th>
+        <th scope="col" style="min-width:150px;">Experimental site name <span style="color: red">*</span></th>
         <th scope="col" style="min-width:150px;">Latitude</th>
         <th scope="col" style="min-width:150px;">Longitude</th>
         <th scope="col" style="min-width:150px;">Altitude</th>
-        <th scope="col" style="min-width:150px;">Description of the experimental design</th>
+        <th scope="col" style="min-width:150px;">Description of the experimental design <span style="color: red">*</span></th>
         <th scope="col" style="min-width:150px;">Type of experimental design</th>
         <th scope="col" style="min-width:150px;">Type of experimental design</th>
-        <th scope="col" style="min-width:150px;">Observation unit description</th>
-        <th scope="col" style="min-width:150px;">Description of growth facility</th>
+        <th scope="col" style="min-width:150px;">Observation unit description <span style="color: red">*</span></th>
+        <th scope="col" style="min-width:150px;">Description of growth facility <span style="color: red">*</span></th>
         <th scope="col" style="min-width:150px;">Type of growth facility</th>
         <th scope="col" style="min-width:150px;">Cultural practices</th>
         <th scope="col" style="min-width:150px;">Data files</th>
@@ -37,22 +37,22 @@
             <%= f.text_area :title, required: true, name: "studies[title][]", :class => "form-control", value: study.title %>
           </td>
           <td>
-            <%= f.text_area :description, name: "studies[description][]", :class => "form-control", value: study.description %>
+            <%= f.text_area :description, required: false, name: "studies[description][]", :class => "form-control", value: study.description %>
           </td>
           <td>
-            <%= f.text_field :startDate, required: false, name: "studies[startDate][]", :class => "form-control", value: study.custom_metadata.data[:study_start_date] %>
+            <%= f.text_field :startDate, required: true, name: "studies[startDate][]", :class => "form-control", value: study.custom_metadata.data[:study_start_date] %>
           </td>
           <td>
             <%= f.text_field :endDate, required: false, name: "studies[endDate][]", :class => "form-control", value: study.custom_metadata.data[:study_end_date] %>
           </td>
           <td>
-            <%= f.text_area :contactInstitution, required: false, name: "studies[contactInstitution][]", :class => "form-control", value: study.custom_metadata.data[:contact_institution] %>
+            <%= f.text_area :contactInstitution, required: true, name: "studies[contactInstitution][]", :class => "form-control", value: study.custom_metadata.data[:contact_institution] %>
           </td>
           <td>
-            <%= f.text_field :geographicLocationCountry, required: false, name: "studies[geographicLocationCountry][]", :class => "form-control", value: study.custom_metadata.data[:geographic_location_country] %>
+            <%= f.text_field :geographicLocationCountry, required: true, name: "studies[geographicLocationCountry][]", :class => "form-control", value: study.custom_metadata.data[:geographic_location_country] %>
           </td>
           <td>
-            <%= f.text_field :experimentalSiteName, required: false, name: "studies[experimentalSiteName][]", :class => "form-control", value: study.custom_metadata.data[:experimental_site_name] %>
+            <%= f.text_field :experimentalSiteName, required: true, name: "studies[experimentalSiteName][]", :class => "form-control", value: study.custom_metadata.data[:experimental_site_name] %>
           </td>
           <td>
             <%= f.text_field :latitude, required: false, name: "studies[latitude][]", :class => "form-control", value: study.custom_metadata.data[:latitude] %>
@@ -64,7 +64,7 @@
             <%= f.text_field :altitude, required: false, name: "studies[altitude][]", :class => "form-control", value: study.custom_metadata.data[:altitude] %>
           </td>
           <td>
-            <%= f.text_area :descriptionOfTheExperimentalDesign, required: false, name: "studies[descriptionOfTheExperimentalDesign][]", :class => "form-control", value: study.custom_metadata.data[:description_of_the_experimental_design] %>
+            <%= f.text_area :descriptionOfTheExperimentalDesign, required: true, name: "studies[descriptionOfTheExperimentalDesign][]", :class => "form-control", value: study.custom_metadata.data[:description_of_the_experimental_design] %>
           </td>
           <td>
             <%= f.text_area :typeOfExperimentalDesign, required: false, name: "studies[typeOfExperimentalDesign][]", :class => "form-control", value: study.custom_metadata.data[:type_of_experimental_design] %>
@@ -73,10 +73,10 @@
             <%= f.text_area :observationUnitLevelHierarchy, required: false, name: "studies[observationUnitLevelHierarchy][]", :class => "form-control", value: study.custom_metadata.data[:observation_unit_level_hierarchy] %>
           </td>
           <td>
-            <%= f.text_area :observationUnitDescription, required: false, name: "studies[observationUnitDescription][]", :class => "form-control", value: study.custom_metadata.data[:observation_unit_description] %>
+            <%= f.text_area :observationUnitDescription, required: true, name: "studies[observationUnitDescription][]", :class => "form-control", value: study.custom_metadata.data[:observation_unit_description] %>
           </td>
           <td>
-            <%= f.text_area :descriptionOfGrowthFacility, required: false, name: "studies[descriptionOfGrowthFacility][]", :class => "form-control", value: study.custom_metadata.data[:description_of_growth_facility] %>
+            <%= f.text_area :descriptionOfGrowthFacility, required: true, name: "studies[descriptionOfGrowthFacility][]", :class => "form-control", value: study.custom_metadata.data[:description_of_growth_facility] %>
           </td>
           <td>
             <%= f.text_area :typeOfGrowthFacility, required: false, name: "studies[typeOfGrowthFacility][]", :class => "form-control", value: study.custom_metadata.data[:type_of_growth_facility] %>

@@ -121,11 +121,12 @@ class StudiesController < ApplicationController
   def batch_uploader; end
 
   def preview_content
+    user_uuid = "#{User.current_user.attributes["uuid"]}"
     tempzip_path = params[:content_blobs][0][:data].tempfile.path
     data_files, studies = Study.unzip_batch(tempzip_path)
     study_filename = studies.first.name
     studies_file = ContentBlob.new
-    studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{study_filename}")
+    studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{study_filename}")
     studies_file.original_filename = "#{study_filename}"
     studies_file.save!
     @studies = Study.extract_studies_from_file(studies_file)
@@ -139,12 +140,14 @@ class StudiesController < ApplicationController
     # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: Factory(:private_policy))
     # study.policy = Policy.create(name: 'default policy', access_type: 1)
     # render plain: params[:studies].inspect
+    user_uuid = "#{User.current_user.attributes["uuid"]}"
     metadata_types = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type:'Study')
     studies_length = params[:studies][:title].length
     studies_uploaded = false
     data_file_uploaded = false
 
     studies_length.times do |index|
+      metadata = generate_metadata(params[:studies], index)
       study_params = {
         title: params[:studies][:title][index],
         description: params[:studies][:description][index],
@@ -152,10 +155,11 @@ class StudiesController < ApplicationController
         person_responsible_id: params[:study][:person_responsible_id],
         custom_metadata: CustomMetadata.new(
           custom_metadata_type: metadata_types.first,
-          data: generate_metadata(params[:studies], index)
+          data: metadata
       )
       }
       @study = Study.new(study_params)
+      Study.check_study_is_valid(@study, metadata)
       if @study.valid? && @study.save! &&  @study.custom_metadata.valid?
         studies_uploaded = true if @study.save
       end
@@ -175,7 +179,7 @@ class StudiesController < ApplicationController
         }
 
         data_file_name = "#{data_file_names[data_file_index]}.csv"
-        data_file_url = "#{Rails.root}/tmp/data/#{data_file_name}"
+        data_file_url = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/data/#{data_file_name}"
         data_file_content_blob = ContentBlob.new
         data_file_content_blob.tmp_io_object = File.open(data_file_url)
         data_file_content_blob.original_filename = "#{data_file_name}"
@@ -208,6 +212,8 @@ class StudiesController < ApplicationController
     batch_uploaded = studies_uploaded && data_file_uploaded
 
     if batch_uploaded
+      user_uuid = "#{User.current_user.attributes["uuid"]}"
+      FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
       respond_to do |format|
         flash[:notice] = "The #{t('studies')} were successfully created.<br/>".html_safe
         format.html { redirect_to studies_path }

@@ -72,6 +72,7 @@ class Study < ApplicationRecord
     study_start_row_index = 4
     parsed_sheet.each_record(3, columns) do |index, data|
       if index > study_start_row_index
+        study_id = data[0].value
         studies << Study.new(
           title: data[1].value,
           description: data[2].value,
@@ -80,6 +81,7 @@ class Study < ApplicationRecord
               data: generate_metadata(data)
           )
         )
+        study_exist(study_id)
       end
     end
     studies
@@ -110,7 +112,9 @@ class Study < ApplicationRecord
 
   def self.unzip_batch(file_path)
     unzipped_files = Zip::File.open(file_path)
-    tmp_dir = "#{Rails.root}/tmp/"
+    user_uuid = "#{User.current_user.attributes["uuid"]}"
+    Dir.mkdir("#{Rails.root}/tmp/#{user_uuid}_studies_upload") unless File.exists?("#{Rails.root}/tmp/#{user_uuid}_studies_upload")
+    tmp_dir = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/"
     study_data = []
     studies = []
     unzipped_files.entries.each do |file|
@@ -124,6 +128,30 @@ class Study < ApplicationRecord
       end
     end
     [study_data, studies]
+  end
+
+  def self.study_exist(study_metadata_id)
+    existing_studies = []
+    find_metadata = CustomMetadata.where("json_metadata LIKE ?", "%#{study_metadata_id}%").last
+    if !find_metadata.nil?
+      study_id = find_metadata.item_id
+      study = Study.where(id: study_id)
+      existing_studies << study
+    end
+  end
+
+  def self.check_study_is_valid(study, metadata)
+    mandatory_fields = %w[id title study_start_date contact_institution geographic_location_country experimental_site_name
+                        description_of_the_experimental_design observation_unit_description description_of_growth_facility]
+    missing_fields = []
+
+    mandatory_fields.each { |mandatory_f|
+
+      if study.attributes[mandatory_f].blank? && metadata[mandatory_f.to_sym].blank?
+        missing_fields << mandatory_f
+      end
+    }
+
   end
 
   def assets
