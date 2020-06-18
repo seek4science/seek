@@ -625,7 +625,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#buttons' do
       assert_select 'a[href=?]', download_data_file_path(df, version: df.version), count: 0
       assert_select 'a', text: /Download/, count: 0
-      assert_select 'a', text: /Request Contact/, count: 1
     end
 
     assert_select '#usage_count' do
