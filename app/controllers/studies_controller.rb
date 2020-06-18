@@ -124,7 +124,7 @@ class StudiesController < ApplicationController
     user_uuid = "#{User.current_user.attributes["uuid"]}"
     tempzip_path = params[:content_blobs][0][:data].tempfile.path
     data_files, studies = Study.unzip_batch(tempzip_path)
-    study_filename = studies.first.name
+    study_filename = studies.first
     studies_file = ContentBlob.new
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{study_filename}")
     studies_file.original_filename = "#{study_filename}"
