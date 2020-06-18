@@ -26,6 +26,22 @@ class AssetLinkTest < ActiveSupport::TestCase
     refute link.valid?
   end
 
+  test 'validates through asset' do
+    asset = Factory.build(:sop, discussion_links:[Factory.build(:discussion_link, url:'not a url')])
+    refute_empty asset.discussion_links
+    refute asset.valid?
+    assert_equal ['Discussion links url is not a valid URL'], asset.errors.full_messages
+
+    asset.discussion_links.first.url='http://fish.com'
+    assert asset.valid?
+    assert_difference('Sop.count') do
+      assert_difference('AssetLink.discussion.count') do
+        asset.save!
+      end
+    end
+
+  end
+
   test 'link_type' do
     # if this changes, then the database entries need updating
     assert_equal 'discussion', AssetLink::DISCUSSION
