@@ -11,6 +11,8 @@ module ResourceListItemHelper
                         'assets/resource_actions_td'
                       elsif resource.is_a?(Organism)
                         'organisms/resource_actions_td'
+                      elsif resource.is_a?(HumanDisease)
+                        'human_diseases/resource_actions_td'
                       end
     actions_partial
   end

@@ -54,6 +54,10 @@ module CommonSweepers
     expire_fragment('organisms_gadget')
   end
 
+  def expire_human_disease_gadget
+    expire_fragment('human_diseases_gadget')
+  end
+
   def expire_fragment(frag)
     ActionController::Base.new.expire_fragment(frag)
   end

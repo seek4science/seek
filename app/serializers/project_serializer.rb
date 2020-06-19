@@ -29,6 +29,7 @@ class ProjectSerializer < AvatarObjSerializer
   end
 
   has_many :organisms,  include_data: true
+  has_many :human_diseases, include_data: true
 
   has_many :people
   has_many :institutions

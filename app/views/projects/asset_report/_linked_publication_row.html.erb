@@ -46,6 +46,41 @@
     <% end -%>
   </td>
   <td>
+    <% human_diseases=pub.related_human_diseases -%>
+    <% if human_diseases.empty? -%>
+        <span class='none_text'>None defined</span>
+    <% else %>
+        <table class="inner_linked_assets">
+          <% human_diseases.each do |human_disease| -%>
+              <%
+                 cls = ""
+                 cls << " bordered" unless human_disease==human_diseases.last
+              -%>
+              <tr class='<%= cls -%>'>
+                <td><span class='cell_content'><%= human_disease.title -%></span></td>
+              </tr>
+          <% end -%>
+        </table>
+    <% end -%>
+  </td>
+  <td>
+    <% if human_diseases.empty? -%>
+        <span class='none_text'>None defined</span>
+    <% else %>
+        <table class="inner_linked_assets">
+          <% human_diseases.each do |human_disease| -%>
+              <%
+                 cls = ""
+                 cls << " bordered" unless human_disease==human_diseases.last
+              -%>
+              <tr class='<%= cls -%>'>
+                <td><%= human_disease.doid_id.nil? ? "<span class='none_text'>Unknown</span>".html_safe : human_disease.doid_id -%></span></td>
+              </tr>
+          <% end -%>
+        </table>
+    <% end -%>
+  </td>
+  <td>
     <table class='inner_linked_assets'>
       <% if data.empty? %>
           <span class='none_text'>None defined</span>

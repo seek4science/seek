@@ -37,6 +37,9 @@ Assay:
   organism:
       label: Organism
       value_from: organisms:title
+  human_disease:
+      label: Human Disease
+      value_from: human_diseases:title
   assay_type:
       label: Assay Type
       value_from: assay_type_label
@@ -89,6 +92,9 @@ Model:
   organism:
       label: Organism
       value_from: organism:title
+  human_disease:
+      label: Human Disease
+      value_from: human_disease:title
   model_type:
       label: Model Type
       value_from: model_type:title
@@ -153,6 +159,9 @@ Publication:
   organism:
       label: Organism
       value_from: related_organisms:title
+  human_disease:
+      label: Human Disease
+      value_from: related_human_diseases:title
   tag:
       label: Tag
       value_from: tags_as_text_array
@@ -208,6 +217,9 @@ Project:
   organism:
       label: Organism
       value_from: organisms:title
+  human_disease:
+      label: Human Disease
+      value_from: human_diseases:title
   institution:
       label: Institution
       value_from: institutions:title
@@ -236,6 +248,9 @@ Strain:
   organism:
       label: Organism
       value_from: organism:title
+  human_disease:
+      label: Human Disease
+      value_from: human_disease:title
   project:
       label: Project
       value_from: projects:title
