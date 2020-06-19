@@ -414,7 +414,6 @@ SEEK::Application.routes.draw do
       post :check_related_items
       post :publish_related_items
       post :publish
-      post :request_resource
       post :request_contact
       post :update_annotations_ajax
       post :new_version
@@ -457,7 +456,6 @@ SEEK::Application.routes.draw do
       get :published
       post :publish_related_items
       post :publish
-      post :request_resource
       post :request_contact
       post :update_annotations_ajax
       post :new_version
@@ -492,7 +490,6 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :publish
       post :execute
-      post :request_resource
       post :request_contact
       get :simulate
       post :simulate
@@ -527,7 +524,6 @@ SEEK::Application.routes.draw do
       get :published
       post :publish_related_items
       post :publish
-      post :request_resource
       post :request_contact
       post :update_annotations_ajax
       post :new_version
@@ -561,7 +557,6 @@ SEEK::Application.routes.draw do
       get :published
       post :publish_related_items
       post :publish
-      post :request_resource
       post :request_contact
       post :update_annotations_ajax
       post :new_version
@@ -590,7 +585,6 @@ SEEK::Application.routes.draw do
       get :published
       post :publish_related_items
       post :publish
-      post :request_resource
       post :request_contact
       post :update_annotations_ajax
       post :new_version
@@ -773,7 +767,6 @@ SEEK::Application.routes.draw do
       get :published
       post :publish_related_items
       post :publish
-      post :request_resource
       post :request_contact
       post :update_annotations_ajax
       post :new_version
