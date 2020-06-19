@@ -25,24 +25,13 @@ module Seek
     def update_relationships(asset, params)
       Relationship.set_attributions(asset, params[:attributions])
     end
-
-    def request_resource
-      resource = class_for_controller_name.find(params[:id])
-      details = params[:details]
-      mail = Mailer.request_resource(current_user, resource, details)
-      mail.deliver_later
-
-      @resource = resource
-      respond_to do |format|
-        format.js { render template: 'assets/request_resource' }
-      end
-    end
-
-
+    
     def request_contact
       resource = class_for_controller_name.find(params[:id])
-      mail = Mailer.request_contact(current_user, resource)
+      details = params[:details]
+      mail = Mailer.request_contact(current_user, resource, details)
       mail.deliver_later
+      MessageLog.log_contact_request(current_user.person, resource, details)
       @resource = resource
       respond_to do |format|
         format.js { render template: 'assets/request_contact' }

@@ -127,9 +127,9 @@ gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'activerecord-import'
 
-gem 'puma' # Used for docker, and also teaspoon tests
+gem "puma", ">= 3.12.6"
 
-gem 'doorkeeper'
+gem "doorkeeper", ">= 5.2.5"
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
