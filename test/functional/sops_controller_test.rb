@@ -42,21 +42,6 @@ class SopsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'request file button visibility when logged in and out' do
-    sop = Factory :sop, policy: Factory(:policy, access_type: Policy::VISIBLE)
-
-    assert !sop.can_download?, 'The SOP must not be downloadable for this test to succeed'
-
-    get :show, params: { id: sop }
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 1
-
-    logout
-    get :show, params: { id: sop }
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 0
-  end
-
   test 'fail gracefullly when trying to access a missing sop' do
     get :show, params: { id: 99_999 }
     assert_response :not_found
