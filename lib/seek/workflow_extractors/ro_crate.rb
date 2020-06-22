@@ -77,6 +77,15 @@ module Seek
           m[:other_creators] = a.join(', ')
         end
 
+        source_url = crate['url'] || crate.main_workflow['url']
+        if source_url
+          handler = ContentBlob.remote_content_handler_for(source_url)
+          if handler.respond_to?(:repository_url)
+            source_url = handler.repository_url
+          end
+          m[:source_link_url] = source_url
+        end
+
         if crate.readme && m[:description].blank?
           markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, tables: true)
           string = crate.readme&.source&.source&.read
