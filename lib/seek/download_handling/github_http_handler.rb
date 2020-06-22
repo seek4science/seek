@@ -8,6 +8,8 @@ require_relative './http_handler'
 module Seek
   module DownloadHandling
     class GithubHTTPHandler < Seek::DownloadHandling::HTTPHandler
+      attr_reader :github_info
+
       def initialize(url, fallback_to_get: true)
         uri = URI(url)
         if uri.hostname.include?('github.com')
@@ -21,13 +23,19 @@ module Seek
                          github_branch: branch,
                          github_path: path }
 
-        raw_url = "https://raw.githubusercontent.com/#{user}/#{repo}/#{branch}/#{path}"
-
         super(raw_url, fallback_to_get: fallback_to_get)
       end
 
       def info
         super.merge(@github_info)
+      end
+
+      def raw_url
+        "https://raw.githubusercontent.com/#{@github_info[:github_user]}/#{@github_info[:github_repo]}/#{@github_info[:github_branch]}/#{@github_info[:github_path]}"
+      end
+
+      def repository_url
+        "https://github.com/#{@github_info[:github_user]}/#{@github_info[:github_repo]}"
       end
     end
   end

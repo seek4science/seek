@@ -27,6 +27,7 @@ class GalaxyExtractionTest < ActiveSupport::TestCase
     assert_equal '1 - read pre-processing', metadata[:title]
     assert_equal '<h1>Preprocessing of raw SARS-CoV-2 reads</h1>', metadata[:description].split("\n").first, 'Should have parsed description from README.md'
     assert_equal ['covid-19'], metadata[:tags]
+    assert_equal 'https://github.com/galaxyproject/SARS-CoV-2', metadata[:source_link_url]
     assert_equal 1, internals[:inputs].length
     assert_equal 17, internals[:steps].length
     assert_equal 31, internals[:outputs].length
