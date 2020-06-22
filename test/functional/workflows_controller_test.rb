@@ -658,6 +658,31 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_empty workflow.discussion_links
   end
 
+  test 'should be able to handle remote files when creating RO crate' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file with spaces in name.txt", 'https://raw.githubusercontent.com/bob/workflow/master/workflow.txt'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'https://raw.githubusercontent.com/bob/workflow/master/diagram.png'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
+
+    cwl = Factory(:cwl_workflow_class)
+    person = Factory(:person)
+    login_as(person)
+    assert_difference('ContentBlob.count') do
+      post :create_ro_crate, params: {
+          ro_crate: {
+              workflow: { data_url: 'https://github.com/bob/workflow/blob/master/workflow.txt' },
+              diagram: { data_url: 'https://github.com/bob/workflow/blob/master/diagram.png' },
+              abstract_cwl: { data_url: 'https://github.com/bob/workflow/blob/master/abstract.cwl' }
+          },
+          workflow_class_id: cwl.id
+      }
+    end
+    assert_response :success
+    assert wf = assigns(:workflow)
+    crate_workflow = wf.ro_crate.main_workflow
+    assert crate_workflow
+    assert_equal 'workflow.txt', crate_workflow.id
+  end
+
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)
