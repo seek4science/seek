@@ -211,7 +211,7 @@ module Seek
 
       def project_member?
         return true if @project.has_member?(User.current_user)
-        error('Must be a member of the project', 'No permission')
+        error("Must be a member of the #{t('project').downcase}", 'No permission')
         false
       end
 

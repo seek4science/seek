@@ -284,7 +284,7 @@ class ProjectsController < ApplicationController
     flag_memberships
     update_administrative_roles
 
-    flash[:notice] = "The members and institutions of the #{t('project').downcase} '#{@project.title}' have been updated"
+    flash[:notice] = "The members and #{t('institution').pluralize} of the #{t('project').downcase} '#{@project.title}' have been updated"
 
     respond_with(@project) do |format|
       format.html { redirect_to project_path(@project) }
@@ -429,7 +429,7 @@ class ProjectsController < ApplicationController
 
   def allow_request_membership
     unless Seek::Config.email_enabled && @project.allow_request_membership?
-      error('Cannot request membership of this project', 'is invalid (invalid state)')
+      error("Cannot request membership of this #{t('project').downcase}", 'is invalid (invalid state)')
       false
     end
   end
