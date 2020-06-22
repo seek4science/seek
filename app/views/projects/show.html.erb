@@ -108,7 +108,7 @@
 <% if Seek::Config.project_hierarchy_enabled && logged_in_and_member? -%>
     <div style="clear:both;">
       <b>
-        Project Hierarchies
+        <%= t('project') -%> Hierarchies
         (<%= link_to "hide", '#', id: 'project-hierarchy-toggle' -%>):
       </b><br/><br/>
 

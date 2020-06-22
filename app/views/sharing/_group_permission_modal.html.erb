@@ -1,18 +1,18 @@
-<%= button_link_to('Share with a project/institution', 'add', '#', id: 'add-project-permission-button') %>
+<%= button_link_to("Share with a #{t('project').downcase}/#{t('institution').downcase}", 'add', '#', id: 'add-project-permission-button') %>
 
 <%= modal(id: 'add-project-permission-modal', size: 'm') do %>
-    <%= modal_header('Share with a project and/or institution') %>
+    <%= modal_header("Share with a #{t('project').downcase} and/or #{t('institution').downcase}") %>
     <%= modal_body do %>
         <div class="form-group">
           <label>Members of...</label>
           <%= select_tag('permission-project-id', projects_grouped_by_programme, name: nil,
-                         prompt: 'any project', class: 'form-control', autocomplete: 'off') -%>
+                         prompt: "any #{t('project').downcase}", class: 'form-control', autocomplete: 'off') -%>
         </div>
         <div class="form-group">
           <label>working at...</label>
           <%= select_tag('permission-institution-id',
                          options_for_select(Institution.all.sort_by(&:title).map { |i| [i.title, i.id] }), name: nil,
-                         prompt: 'any institution', class: 'form-control', autocomplete: 'off') -%>
+                         prompt: "any #{t('institution').downcase}", class: 'form-control', autocomplete: 'off') -%>
         </div>
         <div class="form-group">
           <label>can...</label>

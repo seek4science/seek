@@ -21,7 +21,7 @@
         <% end %>
 
         <% unless current_person.projects.empty? %>
-            <li role="presentation" class="dropdown-header"> My projects</li>
+            <li role="presentation" class="dropdown-header"> My <%= t('project').downcase.pluralize -%></li>
             <% current_person.projects.each do |project| %>
                 <li class="project-item"><%= link_to project.title, project_path(project), title: project.title -%></li>
             <% end %>
