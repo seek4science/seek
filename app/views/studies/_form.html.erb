@@ -10,6 +10,8 @@
   <%= f.text_area :description, :rows=>5, :class=>"form-control" %>
 </div>
 
+<%= render partial: 'custom_metadata/custom_metadata_type_selection', locals:{f:f, resource:@study} %>
+
 <% unless @study.experimentalists.blank? %>
   <div class="form-group">
     <%= f.label "Experimentalist(s)" %>
@@ -30,6 +32,7 @@
     </div>
 <% end %>
 
+<%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@study} %>
 
 
 <% if show_scales? %>
@@ -40,7 +43,7 @@
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
-<%= render partial: 'custom_metadata/custom_metadata_fields_form_input', locals:{f:f, resource:@study} %>
+<%#= render partial: 'custom_metadata/custom_metadata_fields_form_input', locals:{f:f, resource:@study} %>
 
 <%= form_submit_buttons(@study) %>
 
