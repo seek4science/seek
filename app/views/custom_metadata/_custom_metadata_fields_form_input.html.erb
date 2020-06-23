@@ -31,6 +31,14 @@
             })
             .done(function(data){
                 $j('#custom_attributes').html(data);
+                // fixme: hack hack, copied from calendar.js - should be converted to a function if it becomes final
+                $j('[data-calendar]').each(function () {
+                    var showTime = $j(this).data('calendar') === 'mixed';
+                    $j(this).datetimepicker({
+                        format: showTime ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD',
+                        sideBySide: showTime
+                    });
+                });
             })
             .error(function() {
                 $j('#custom_attributes').text("Something went wrong!");
