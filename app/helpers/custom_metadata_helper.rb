@@ -11,9 +11,13 @@ module CustomMetadataHelper
     when Seek::Samples::BaseType::TEXT
       form.text_area attribute_method_name, class: "form-control #{clz}"
     when Seek::Samples::BaseType::DATE_TIME
-      form.text_field attribute_method_name, data: { calendar: 'mixed' }, class: "calendar form-control #{clz}", placeholder: placeholder
+      content_tag :div, style:'position:relative' do
+        form.text_field attribute_method_name, data: { calendar: 'mixed' }, class: "calendar form-control #{clz}", placeholder: placeholder
+      end
     when Seek::Samples::BaseType::DATE
-      form.text_field attribute_method_name, data: { calendar: true }, class: "calendar form-control #{clz}", placeholder: placeholder
+      content_tag :div, style:'position:relative' do
+        form.text_field attribute_method_name, data: { calendar: true }, class: "calendar form-control #{clz}", placeholder: placeholder
+      end
     when Seek::Samples::BaseType::BOOLEAN
       form.check_box attribute_method_name, class: clz.to_s
     else
