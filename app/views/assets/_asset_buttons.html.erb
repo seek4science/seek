@@ -58,9 +58,6 @@
     <% end %>
   <% end -%>
 
-  <% if logged_in? && !can_download_asset?(asset, params[:code]) %>
-    <%= render partial: 'assets/request_resource', locals: { resource: asset } %>
-  <% end -%>
 <% end -%>
 
 <% if current_user && asset.respond_to?(:collections) %>
