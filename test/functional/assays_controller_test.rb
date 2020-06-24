@@ -1244,19 +1244,20 @@ class AssaysControllerTest < ActionController::TestCase
 
     get :show, params: { id: assay.id }
     assert_response :success
-    assert_select 'span.author_avatar a[href=?]', "/people/#{creator.id}"
+    assert_select 'li.author-list-item a[href=?]', "/people/#{creator.id}"
   end
 
   test 'should show other creators' do
     assay = Factory(:assay, policy: Factory(:public_policy))
-    other_creators = 'other creators'
+    other_creators = 'john smith, jane smith'
     assay.other_creators = other_creators
     assay.save
     assay.reload
 
     get :show, params: { id: assay.id }
     assert_response :success
-    assert_select 'div.panel-body div', text: other_creators
+    assert_select 'li.author-list-item', text: 'john smith'
+    assert_select 'li.author-list-item', text: 'jane smith'
   end
 
   test 'programme assays through nested routing' do
