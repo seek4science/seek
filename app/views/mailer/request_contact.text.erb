@@ -8,9 +8,8 @@ Hi <%= @owners.collect{|o| o.name}.join(", ") -%>,
 <% unless @details.blank? -%>
   <%=@requester.first_name.capitalize -%> also provided some additional details:
 
-  <%= sanitize(@details) -%>
+      "<%= sanitize(@details) -%>"
 <% end -%>
-
 
   You can reply to <%= @requester.first_name.capitalize -%> by replying to this email.
 

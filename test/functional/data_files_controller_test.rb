@@ -583,7 +583,6 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_select '#buttons' do
-      assert_select 'a', text: /Request/, count: 2
       assert_select 'a', text: /Request Contact/, count: 1
     end
   end
@@ -625,7 +624,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#buttons' do
       assert_select 'a[href=?]', download_data_file_path(df, version: df.version), count: 0
       assert_select 'a', text: /Download/, count: 0
-      assert_select 'a', text: /Request Contact/, count: 1
     end
 
     assert_select '#usage_count' do
@@ -1139,23 +1137,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_raises ActionController::UrlGenerationError do
       get :sdkfjshdfkhsdf, params: { id: df }
     end
-  end
-
-  test 'request file button visibility when logged in and out' do
-    df = Factory :data_file, policy: Factory(:policy, access_type: Policy::VISIBLE)
-
-    assert !df.can_download?, 'The datafile must not be downloadable for this test to succeed'
-    assert_difference('ActivityLog.count') do
-      get :show, params: { id: df }
-    end
-
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('data_file')}/, count: 1
-
-    logout
-    get :show, params: { id: df }
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('data_file')}/, count: 0
   end
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
