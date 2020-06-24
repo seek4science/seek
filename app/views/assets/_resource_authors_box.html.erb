@@ -8,7 +8,7 @@
   title ||= "#{t('creator').capitalize.pluralize} and #{t('contributor').capitalize}"
   contributor = resource.contributor
   creators ||= resource.creators
-  other_creators ||= resource.respond_to?(:other_creators) ? resource.other_creators.split(',').map(&:strip).map { |s| h(s) } : []
+  other_creators ||= resource.respond_to?(:other_creators) ? (resource.other_creators || '').split(',').map(&:strip).map { |s| h(s) } : []
   avatar_size ||= 20
 %>
 
