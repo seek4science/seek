@@ -51,15 +51,15 @@ ul.feed li:first-child {
   padding-top: 0;
 }
 
-ul.feed .file-type-icon {
+.file-type-icon {
   display: block;
   float: left;
   margin: 0 0.5em 0.5em 0;
 }
 
-ul.feed .file-type-icon img {
-  width: 32px;
-  height: 32px;
+.file-type-icon img {
+  max-width: 32px;
+  max-height: 32px;
 }
 
 .subtle {
@@ -325,7 +325,7 @@ a.seek-homepage-button {
   background-color: #f7f7f7;
   border-radius: 4px;
   padding: 20px;
-  margin: 5px;
+  margin: 5px;  
   &:hover {
     text-decoration: none;
     background-color: #f0f0f0;
@@ -980,5 +980,21 @@ div.index-filters {
   }
   .list_item_content {
     width: 70%;
+  }
+}
+
+h5.author-list-title {
+  margin-top: 0;
+  font-weight: bold;
+}
+
+ul.author-list {
+  padding-left: 0;
+}
+
+li.author-list-item {
+  display: inline;
+  &:not(:last-child):after {
+    content: ", ";
   }
 }
