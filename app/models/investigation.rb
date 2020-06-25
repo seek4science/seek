@@ -20,6 +20,12 @@ class Investigation < ApplicationRecord
     has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :studies
   end
 
+  def can_manage_with_children?(user= User.current_user)
+    parent_ok = can_manage?(user)
+    non_managed_child = studies.detect { |s| !s.can_manage?(user) }
+    return parent_ok && (non_managed_child.nil?)
+  end
+  
   def assets
     related_data_files + related_sops + related_models + related_publications + related_documents
   end

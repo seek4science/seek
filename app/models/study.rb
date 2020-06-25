@@ -70,6 +70,12 @@ class Study < ApplicationRecord
     Seek::Config.studies_enabled
   end
   
+  def can_manage_with_children?(user= User.current_user)
+    parent_ok = can_manage?(user)
+    non_managed_child = assays.detect { |a| !a.can_manage?(user) }
+    return parent_ok && (non_managed_child.nil?)
+  end
+  
   def positioned_assays
     assays.order(position: :asc)
   end
