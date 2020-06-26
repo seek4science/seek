@@ -1,143 +1,6 @@
 <div id="content-wrapper">
-
     <div class="inner">
-
-        <div id="study_design_tableContainer">
-            <h2>
-                <label><input class="design_chk" type="checkbox" id="chk_experimental_factors"> Experimental
-                    factors</label>
-            </h2>
-            <div id="div_chk_experimental_factors" style="display:none">
-                <a class="btn btn-secondary pull-left" onClick="add_var('.tbl_experimental_factors','','',true)"> <i class="glyphicon glyphicon-plus"></i> Add
-                    Variable</a>
-                <table class="table tableXs tbl_experimental_factors designTbl">
-                    <thead class="thead-dark">
-                        <th>Experimental factors</th>
-                        <th></th>
-                        <th>Factors levels</th>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-
-            <h2> <label><input class="design_chk" type="checkbox" id="chk_response_variables"> Response
-                    variables</label>
-            </h2>
-
-            <div id="div_chk_response_variables" style="display:none">
-                <a class="btn btn-secondary pull-left" onClick="addTableRow('.tbl_response_variables','',true)"> <i class="glyphicon glyphicon-plus"></i> Add
-                    Variable</a>
-                &nbsp;
-                <a class="btn btn-secondary pull-left" id="addSubSample">
-                    <i class="glyphicon glyphicon-plus"></i> Add sub-sample</a>
-
-                <table class="table tableXs tbl_response_variables designTbl">
-                    <thead class="thead-dark">
-                        <th>Response variables <%= help_icon('what will you quantify?')%> </th>
-                        <th>Material <%= help_icon('quantification on what?')%> </th>
-                        <th>Sub-sample of</th>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-
-            <h2>
-                <label><input class="design_chk" type="checkbox" id="chk_blocking_variables"> Blocking variables</label>
-            </h2>
-            <div id="div_chk_blocking_variables" style="display:none">
-
-                <a class="btn btn-secondary pull-left" onClick="add_var('.tbl_blocking_variables','','',true)"> <i class="glyphicon glyphicon-plus"></i>
-                    Add Variable</a>
-
-                <table class="table tableXs tbl_blocking_variables designTbl">
-                    <thead class="thead-dark">
-                        <th>Blocking variables</th>
-                        <th></th>
-                        <th>Levels</th>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-
-            <h2>
-                <label><input class="design_chk" type="checkbox" id="chk_covariates"> Covariates</label>
-            </h2>
-            <div id="div_chk_covariates" style="display:none">
-
-                <a class="btn btn-secondary pull-left" onClick="add_var('.tbl_covariates','','',true)"> <i class="glyphicon glyphicon-plus"></i> Add
-                    Variable</a>
-
-                <table class="table tableXs tbl_covariates designTbl">
-                    <thead class="thead-dark">
-                        <th>Covariates <%= help_icon('Variables of no interest that might affect response variables') %>
-                        </th>
-                        <th></th>
-                        <th>Levels</th>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-
-            <h2>
-                <label><input class="design_chk" type="checkbox" id="chk_confounding_variables"> Confounding
-                    variables</label>
-            </h2>
-
-            <div id="div_chk_confounding_variables" style="display:none">
-                <a class="btn btn-secondary pull-left" onClick="add_var('.tbl_confounding_variables','','',true)"> <i class="glyphicon glyphicon-plus"></i>
-                    Add Variable</a>
-
-                <table class="table tableXs tbl_confounding_variables designTbl">
-                    <thead class="thead-dark">
-                        <th>Confounding variables <%= help_icon('Variables of no interest that might affect experimental factors and
-                            response variables') %></th>
-                        <th></th>
-                        <th>Levels</th>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-
-
-            <%=  render partial: 'sample_source' %>
-
-
-
-            <h2> <label><input class="design_chk" type="checkbox" id="chk_replicates"> Replicates</label>
-            </h2>
-            <div id="div_chk_replicates" style="display:none">
-
-                <a class="btn btn-secondary pull-left" onClick="addTableRow('.tbl_replicates','',true)"> <i class="glyphicon glyphicon-plus"></i> Add
-                    Variable</a>
-
-                <table class="table tableXs tbl_replicates designTbl">
-                    <thead class="thead-dark">
-                        <th>Replicates</th>
-                        <th>Number</th>
-                        <th>Description</th>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-
-            <h2>Design of experiment</h2>
-            <div class="form-inline" style="text-align:left">
-                <input id="expDesign" class="form-control" placeholder="...">
-                <input id="experiment_design_desc" type="text" class="form-control" style="min-width:400px" placeholder="Description" value="Compare two temperature. Three independent replicates">
-            </div>
-            <div style="text-align:center">
-                <h2></h2>
-                <a class="btn btn-primary" onClick="save_design()">Save Design</a>
-                or
-                <a class="btn btn-default" onClick="genSampleSource()">Generate Sample</a>
-            </div>
-        </div>
+        <input id="btn-save-study-design" value="Save" type="button" class="btn btn-primary">
     </div>
 </div>
 
@@ -266,29 +129,6 @@
         // Constitute the first input source header
     }
 
-    function save_flowchart(data, assays, samples) {
-        $j.ajax({
-            method: 'PATCH',
-            cache: false,
-            url: `${pid}/update_study_design`,
-            data: {
-                "flowchart_data": JSON.stringify(data),
-                "flowchart_assays": JSON.stringify(assays),
-                "flowchart_samples": JSON.stringify(samples),
-                "std_id": $j("#selected_item_id").val()
-            },
-            success: s => {
-                alert('All changes were saved successfully!')
-                let origin = $j(
-                    `#${$j("#selected_tree_item_id").val()} > ul > li:first > ul > li:first > a > span`
-                )
-                bounce(origin, 1)
-            },
-            error: e => {
-                alert('error!')
-            }
-        })
-    }
 
     function create_data() {
         let data = {}
@@ -367,7 +207,7 @@
             success: data => {
                 load_tables(JSON.parse(data.data))
                 add_remove_action('.designTbl')
-                loadWorkflow(JSON.parse(data.flowchart))
+                loadFLowchart(JSON.parse(data.flowchart))
             },
             error: e => {
                 alert('error!')
@@ -543,8 +383,6 @@
         }
     }
 
-
-
     function add_remove_action(tblClass = '.tableXs') {
         let action =
             "<a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a>"
@@ -619,7 +457,7 @@
             url: `${pid}/update_study_design`,
             data: {
                 "flowchart_samples": JSON.stringify(sampleSource),
-                "flowchart_data": initialWorkflow,
+                "flowchart_data": initialFlowchart,
                 std_id
             },
             success: s => {
@@ -644,35 +482,31 @@
         })
         return cols
     }
+
+    $j("#btn-save-study-design").on("click", () => {
+        // alert("save study design")
+        const data = {
+            flowchart: {
+                study_id: selectedItem.id,
+                source_sample_type_id: "999", //Create sample_type and pass the id
+                // assay_sample_type: "",
+                items: '[{"id": "", "left": 40, "top": 100}]'
+            }
+        }
+        $j.ajax({
+            method: 'POST',
+            cache: false,
+            dataType: "json",
+            data,
+            url: `/single_pages/${pid}/update_flowchart`,
+            success: s => {
+                console.log("success", s.data)
+                loadFlowchart()
+            },
+            error: e => {
+                console.error(e)
+                hideFlowchart()
+            }
+        })
+    })
 </script>
-
-<style>
-    h2 {
-        overflow: hidden;
-        text-align: left;
-        font-size: 16px !important;
-        font-weight: bold !important;
-        color: #888 !important;
-    }
-
-    h2:after {
-        background-color: #bbb;
-        content: "";
-        display: inline-block;
-        height: 1px;
-        position: relative;
-        vertical-align: middle;
-        width: 100%;
-    }
-
-    h2:after {
-        left: 0.5em;
-        margin-right: -50%;
-    }
-
-    #study_design_tableContainer {
-        text-align: center;
-        margin-right: auto;
-        margin-left: auto;
-    }
-</style>
