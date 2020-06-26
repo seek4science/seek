@@ -33,10 +33,6 @@
       <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
     </div>
 <% end  %>
-<% end  %>
-
-
-
 
 <% if show_scales? && showDetails==1 %>
     <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
