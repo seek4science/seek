@@ -14,13 +14,13 @@
   <%= f.text_area :description, :rows=>5, :class=>"form-control" %>
 </div>
 
+<% unless @study.experimentalists.blank? %>
+  <div class="form-group">
+    <%= f.label "Experimentalist(s)" %>
+    <%= f.text_field :experimentalists, :class=>"form-control" %>
+  </div>
+<% end %>
 
-
-<% if showDetails==1 %>
-<div class="form-group">
-  <%= f.label "Experimentalist(s)" %>
-  <%= f.text_field :experimentalists, :class=>"form-control" %>
-</div>
 <%= folding_panel("#{t('investigation')} details") do %>
     <label class="required"><%= t('investigation') %></label>
     <div id="investigation_collection">
@@ -33,10 +33,6 @@
       <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
     </div>
 <% end  %>
-<% end  %>
-
-
-
 
 <% if show_scales? && showDetails==1 %>
     <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
