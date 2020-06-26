@@ -4,7 +4,7 @@ class Model < ApplicationRecord
 
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do
-    text :organism_terms,:model_contents_for_search
+    text :organism_terms, :human_disease_terms, :model_contents_for_search
     text :model_format do
       model_format.try(:title)
     end
@@ -33,6 +33,7 @@ class Model < ApplicationRecord
   has_many :content_blobs, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   belongs_to :organism
+  belongs_to :human_disease
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
   belongs_to :model_type
   belongs_to :model_format
@@ -62,6 +63,7 @@ class Model < ApplicationRecord
 
     belongs_to :model_image
     belongs_to :organism
+    belongs_to :human_disease
     belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
     belongs_to :model_type
     belongs_to :model_format
@@ -81,6 +83,14 @@ class Model < ApplicationRecord
   def organism_terms
     if organism
       organism.searchable_terms
+    else
+      []
+    end
+  end
+
+  def human_disease_terms
+    if human_disease
+      human_disease.searchable_terms
     else
       []
     end

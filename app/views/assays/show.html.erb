@@ -59,6 +59,10 @@
         <% if Seek::Config.organisms_enabled %>
             <%= list_assay_organisms("Organisms", @assay.assay_organisms,{:id=>"organism"}) %>
         <% end %>
+
+        <% if Seek::Config.human_diseases_enabled %>
+            <%= list_assay_human_diseases("Human Diseases", @assay.assay_human_diseases,{:id=>"human_disease"}) %>
+        <% end %>
       </div>
     </div>
     <% if @assay.external_asset %>

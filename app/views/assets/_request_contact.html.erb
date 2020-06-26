@@ -1,9 +1,7 @@
-<%
-  resource = object
-  email_recipients = get_email_recipients(resource)
-%>
+<% resource = object %>
 
   <% if request_contact_button_enabled?(resource) %>
+    <% email_recipients = get_email_recipients(resource)  %>
       <span id="request_contact_button">
         <%= button_link_to("Request Contact", "message", '#', id: 'request_contact_button',
                            'data-toggle' => 'modal', 'data-target' => "#request-contact-modal") -%>

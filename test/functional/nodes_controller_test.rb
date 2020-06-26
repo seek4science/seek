@@ -177,7 +177,7 @@ class NodesControllerTest < ActionController::TestCase
   test 'should show the other creators in -uploader and creators- box' do
     node = Factory(:node, policy: Factory(:public_policy), other_creators: 'another creator')
     get :show, params: { id: node }
-    assert_select 'div', text: 'another creator', count: 1
+    assert_select 'li.author-list-item', text: 'another creator', count: 1
   end
 
   test 'filter by people, including creators, using nested routes' do

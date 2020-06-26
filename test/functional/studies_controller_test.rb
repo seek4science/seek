@@ -353,7 +353,7 @@ class StudiesControllerTest < ActionController::TestCase
     study = Factory(:study, policy: Factory(:public_policy))
     get :show, params: { id: study }
     assert_response :success
-    assert_select '.author_avatar' do
+    assert_select 'li.author-list-item' do
       assert_select 'a[href=?]', person_path(study.contributing_user.person) do
         assert_select 'img'
       end
@@ -444,19 +444,19 @@ class StudiesControllerTest < ActionController::TestCase
 
     get :show, params: { id: study.id }
     assert_response :success
-    assert_select 'span.author_avatar a[href=?]', "/people/#{creator.id}"
+    assert_select 'li.author-list-item a[href=?]', "/people/#{creator.id}"
   end
 
   test 'should show other creators' do
     study = Factory(:study, policy: Factory(:public_policy))
-    other_creators = 'other creators'
+    other_creators = 'frodo baggins'
     study.other_creators = other_creators
     study.save
     study.reload
 
     get :show, params: { id: study.id }
     assert_response :success
-    assert_select 'div.panel-body div', text: other_creators
+    assert_select 'li.author-list-item', text: 'frodo baggins'
   end
 
   test 'should not multiply creators after calling show' do

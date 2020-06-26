@@ -21,6 +21,10 @@
     <% else %>
       <%= list_item_attribute "Publication Type", h(PublicationType.find(resource.publication_type_id).title) %>
     <% end %>
+
+    <% if Seek::Config.human_diseases_enabled and !resource.human_diseases.empty? %>
+      <%= list_item_simple_list resource.human_diseases, "Human Diseases" %>
+    <% end %>
   </div>
 
   <div class="col-sm-6 hidden-xs">

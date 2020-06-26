@@ -972,7 +972,7 @@ class ModelsControllerTest < ActionController::TestCase
     model.save
     get :show, params: { id: model }
 
-    assert_select 'div', text: 'another creator', count: 1
+    assert_select 'li.author-list-item', text: 'another creator', count: 1
   end
 
   test 'should create new model version based on content_blobs of previous version' do

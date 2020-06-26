@@ -19,7 +19,7 @@
 
 <div id="semi_public_assets"  class="asset_report_container curved">
   <h1>Items that are available to
-    all projects, but are not available publicly</h1>
+    all <%= t('project').downcase.pluralize -%>, but are not available publicly</h1>
 
   <p class='alert alert-info' style="width:98%;text-align:center;margin-bottom:1em;">
     These are the <%= t('data_file').pluralize %>, <%= t('model').pluralize %>, <%= t('sop').pluralize %>, <%= t('presentation').pluralize %>, <%= t('investigation').pluralize %>,
@@ -38,7 +38,7 @@
   <p class='alert alert-info' style="width:98%;text-align:center;margin-bottom:1em;">
     These are the <%= t('data_file').pluralize %>, <%= t('model').pluralize %>, <%= t('sop').pluralize %>, <%= t('presentation').pluralize %>, <%= t('investigation').pluralize %>,
     <%= t('study').pluralize %> or <%= t('assays.assay').pluralize %> that have a restrictive sharing permissions, and are not available to
-    download publicly, or possibly even by other projects or members of this project.
+    download publicly, or possibly even by other <%= t('project').downcase.pluralize -%> or members of this <%= t('project').downcase -%>.
   </p>
   <% @types.each do |type| -%>
       <%= render :partial=>"projects/asset_report/shared_assets_table",

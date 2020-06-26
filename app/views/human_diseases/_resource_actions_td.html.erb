@@ -1,0 +1,10 @@
+<% cache "rli_actions_#{resource.cache_key}_#{current_user_id}", skip_digest: true do -%>
+    <% if resource.can_manage? -%>
+      <%= button_link_to 'Manage', 'manage', edit_human_disease_path(resource), class: 'btn-xs' -%>
+    <% end -%>
+
+    <% if resource.can_delete? -%>
+        <%= button_link_to 'Delete', 'destroy', human_disease_path(resource), data: { confirm: 'Are you sure?' },
+                           method: :delete, class: 'btn-xs' -%>
+    <% end -%>
+<% end -%>

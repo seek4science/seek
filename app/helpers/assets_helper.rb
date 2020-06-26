@@ -277,16 +277,17 @@ module AssetsHelper
   end
 
   #if there are creators, the email will be sent only to them, otherwise sent to the contributor
+  #if the contact requester is one of the contirbutor/creators, the person is allowed to send request to others, but not to himself.
   def get_email_recipients(resource)
     if resource.creators.present?
       email_recipients = resource.creators
     else
       email_recipients = [resource.contributor] unless resource.contributor.nil?
     end
-    email_recipients
+    email_recipients = email_recipients - [ User.current_user.person ] unless email_recipients.nil?
   end
 
-  # whether the request contact button should be shown
+  # whether the request contact button should be showns
   def request_contact_button_enabled?(resource)
     Seek::Config.email_enabled && logged_in_and_registered? && get_email_recipients(resource).present? && MessageLog.recent_contact_requests(User.current_user.try(:person),resource).empty?
   end

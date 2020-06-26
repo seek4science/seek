@@ -1019,3 +1019,19 @@ img.github-logo {
 ul.list.collapsed li.hidden-item {
   display: none;
 }
+
+h5.author-list-title {
+  margin-top: 0;
+  font-weight: bold;
+}
+
+ul.author-list {
+  padding-left: 0;
+}
+
+li.author-list-item {
+  display: inline;
+  &:not(:last-child):after {
+    content: ", ";
+  }
+}
