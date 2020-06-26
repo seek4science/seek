@@ -10,10 +10,14 @@
   creators ||= resource.creators
   other_creators ||= resource.respond_to?(:other_creators) ? (resource.other_creators || '').split(',').map(&:strip).map { |s| h(s) } : []
   avatar_size ||= 20
+  total_creator_count = creators.length + other_creators.length
 %>
 
 <%= panel(title, :help_text => "These are the people that uploaded the item, along with other people involved in creating it. Sometimes the uploader may have uploaded the item on behalf of its contributors.") do %>
-  <h5 class="author-list-title"><%= t('creator').capitalize.pluralize(creators.length + other_creators.length) -%></h5>
+  <h5 class="author-list-title"><%= t('creator').capitalize.pluralize(total_creator_count) -%></h5>
+  <% if total_creator_count == 0 %>
+    <span class="none_text">Not specified</span>
+  <% end %>
   <ul class="author-list">
     <% creators.each_with_index do |creator| %>
       <% if creator.can_view? %>
