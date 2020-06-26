@@ -314,11 +314,11 @@
     right: 5px
 }
 
-.workflowPopup input {
+.flowchartPopup input {
     font-size: 12px
 }
 
-.workflowPopup {
+.flowchartPopup {
     position: absolute;
     background-color: white;
     opacity: 0.9;
@@ -331,12 +331,12 @@
     box-shadow: 0px 0px 32px -5px rgba(0, 0, 0, 0.75);
 }
 
-.workflowPopup select {
+.flowchartPopup select {
     font-size: 12px;
     max-width: 150px
 }
 
-.workflowPopup table {
+.flowchartPopup table {
     border-spacing: 5px;
     border-collapse: separate;
 }
