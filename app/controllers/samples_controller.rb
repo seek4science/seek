@@ -109,7 +109,7 @@ class SamplesController < ApplicationController
     params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
                                    { data: sample_type_param_keys }, { creator_ids: [] },
                                    { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] }, sample_type_param_keys,
-                                   discussion_links_attributes:[:id, :url, :_destroy])
+                                   discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   def update_sample_with_params

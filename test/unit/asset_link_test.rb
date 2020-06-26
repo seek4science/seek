@@ -22,6 +22,15 @@ class AssetLinkTest < ActiveSupport::TestCase
     link.url = 'https://fish.com'
     assert link.valid?
 
+    link.label='label'
+    assert link.valid?
+
+    link.label='a'*71
+    refute link.valid?
+
+    link.label=''
+    assert link.valid?
+
     link.asset = nil
     refute link.valid?
   end

@@ -1,7 +1,9 @@
 <% discussion_links = resource.discussion_links %>
 <%= panel("Discussion Channel".pluralize(discussion_links.size), :body_options => {:class => 'text-center'}) do %>
   <% discussion_links.collect do |link| %>
-    <%= link_to link.url.truncate(70), link.url, target: :_blank %>
-    <% unless link==discussion_links.last %><hr class="discussion-links-divider"/><% end %>
+    <div class="discussion-link">
+      <%= link_to link.display_label.truncate(70), link.url, target: :_blank %>
+      <% unless link==discussion_links.last %><hr class="discussion-links-divider"/><% end %>
+    </div>
   <% end  %>
 <% end %>

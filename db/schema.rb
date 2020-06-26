@@ -10,7 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 2020_05_29_115828) do
+=======
+ActiveRecord::Schema.define(version: 2020_06_26_144637) do
+>>>>>>> seek-1.10
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -203,6 +207,7 @@ ActiveRecord::Schema.define(version: 2020_05_29_115828) do
     t.string "link_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "label"
     t.index ["asset_id", "asset_type"], name: "index_asset_links_on_asset_id_and_asset_type"
   end
 
