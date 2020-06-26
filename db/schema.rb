@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-ActiveRecord::Schema.define(version: 2020_05_29_115828) do
-=======
 ActiveRecord::Schema.define(version: 2020_06_26_144637) do
->>>>>>> seek-1.10
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
