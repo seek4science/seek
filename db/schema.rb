@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_13_101632) do
+ActiveRecord::Schema.define(version: 2020_06_12_143742) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -577,6 +577,16 @@ ActiveRecord::Schema.define(version: 2020_05_13_101632) do
     t.string "resource_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "flowcharts",  force: :cascade do |t|
+    t.bigint "study_id", null: false
+    t.integer "source_sample_type_id"
+    t.string "assay_sample_type"
+    t.string "items"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["study_id"], name: "index_flowcharts_on_study_id", unique: true
   end
 
   create_table "genes", id: :integer,  force: :cascade do |t|

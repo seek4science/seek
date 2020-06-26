@@ -1,0 +1,706 @@
+<%=javascript_include_tag('jquery.flowchart.js')%>
+<%= stylesheet_link_tag 'application', 'jquery.flowchart.css' %>
+
+<div id="content-wrapper">
+    <div class="inner">
+        <div class="flowchartex" style="overflow-x:scroll">
+            <div class="flowchartex-container" id="chart_canvas">
+                <div id="operator_properties" class="flowchartPopup">
+                    <label for="operator_title">Change title: </label><input style="margin-bottom:10px" type="text" id="operator_title" class="form-control">
+                    <a class="pgclose" href="javascript:void(0);" onclick="$j('#operator_properties').hide()"><i class="glyphicon glyphicon-remove"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="draggable_operators" style="font-size:12px">
+            <div style="float:left;margin-right:20px;display:none">
+                <span style="color:#888"><i class="glyphicon glyphicon-info-sign"></i> Set input and output count of
+                    items:</span><br />
+                <div class="form-inline">
+                    Inputs: <input id="inputs_num" type="number" class="form-control" style="width:50px;font-size:12px" value="1" min="0" max="3"> &nbsp;
+                    Outputs: <input id="outputs_num" type="number" class="form-control" style="width:50px;font-size:12px" value="1" min="0" max="3">
+                </div>
+            </div>
+            <div class="draggable_operators_divs">
+                <span style="color:#888"><i class="glyphicon glyphicon-info-sign"></i> Drag & drop these items to
+                    the canvas:</span><br />
+                <div class="draggable_operator ui-draggable ui-draggable-handle wf_btn" data-nb-inputs="1" data-nb-outputs="1" data-shape='rectangle' data-shape_id='na'>Assay</div>
+            </div>
+            <hr>
+            <a class="btn btn-primary" id="btn_save_flowchart">Update</a>
+            <br />
+        </div>
+    </div>
+
+
+    <div id="assayInfo" class="modal in">
+        <div class="modal-dialog modal-m">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">Assay</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div style="margin-bottom:10px" class="row">
+                            <div class="col-md-6">
+                                <label>Type:</label>
+                                <select class="form-control" id="assayType" onchange="asyTypeChange(this);">
+                                    <input type="hidden" id="method_type">
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Attributes:</label>
+                                <ul id="attribs" class="small_list"></ul>
+                            </div>
+                        </div>
+                        <div>
+                            <label>*Title:</label>
+                            <input style="margin-bottom:10px" type="text" class="form-control" id="assayTitle">
+                        </div>
+                        <div><label>Description: </label>
+                            <textarea id="assayDes" class="form-control" style="max-height:50px"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-header">
+                    <h4 class="modal-title">Method</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div>
+                            <label>*File:</label>
+                            <input style="margin-bottom:10px" type="file" class="form-control" id="modalMethodfile">
+                        </div>
+                        <div>
+                            <label>*Title:</label>
+                            <input style="margin-bottom:10px" type="text" class="form-control" id="modalMethodTitle">
+                        </div>
+                        <div><label>Description: </label>
+                            <textarea id="modalMethodDes" class="form-control" style="max-height:50px"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input id="btnSaveAssay" type="button" value="Save" class="btn btn-primary" data-dismiss="modal" />
+                    <input id="btnCancelAssay" type="button" value="Cancel" class="btn btn-default" data-dismiss="modal" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    let methodTypes = [{
+        title: 'Custom',
+        attributes: []
+    }, {
+        title: 'type 1',
+        attributes: [{
+                title: 'attrib 1',
+                ontology: ['a', 'b']
+            },
+            {
+                title: 'attrib 2',
+                ontology: []
+            },
+        ]
+    }, {
+        title: 'type 2',
+        attributes: [{
+                title: 'attrib 3',
+                ontology: ['a', 'b']
+            },
+            {
+                title: 'attrib 4',
+                ontology: []
+            },
+        ]
+    }]
+
+    let initialflowchart =
+        '{"operators":{"0":{"properties":{"title":"Sample source","inputs":{"input_0":{"label":"Input 1"}},"outputs":{"output_0":{"label":"Output 1"}},"shape":"parallelogram","shape_id":"init"},"left":40,"top":100}},"links":{},"operatorTypes":{}}'
+
+
+    const init_flowchart = () => {
+        var $flowchart = $j('#chart_canvas');
+        var $container = $flowchart.parent();
+        var cx = $flowchart.width() / 2;
+        var cy = $flowchart.height() / 2;
+        var currentZoom = 0.5;
+        // Apply the plugin on a standard, empty div...
+        var $operatorProperties = $j('#operator_properties');
+        var $linkProperties = $j('#link_properties');
+        var $operatorTitle = $j('#operator_title');
+        var $linkColor = $j('#link_color');
+        $flowchart.flowchart({
+            onOperatorSelect: function(operatorId) {
+                $operatorProperties.show();
+                $operatorTitle.val($flowchart.flowchart('getOperatorTitle', operatorId));
+                $operatorProperties.css('position', 'absolute');
+                $operatorProperties.css("left", this.data.operators[operatorId].left - 28);
+                $operatorProperties.css("top", this.data.operators[operatorId].top - 42);
+                return true;
+            },
+            onOperatorUnselect: () => {
+                // $operatorProperties.hide();
+                // return true;
+            },
+            onLinkSelect: (linkId) => {
+                $linkProperties.show();
+                $linkColor.val($flowchart.flowchart('getLinkMainColor', linkId));
+                return true;
+            },
+            onLinkUnselect: () => {
+                $linkProperties.hide();
+                return true;
+            }
+        });
+
+        $operatorTitle.keyup(() => {
+            var selectedOperatorId = $flowchart.flowchart('getSelectedOperatorId');
+            if (selectedOperatorId != null) {
+                $flowchart.flowchart('setOperatorTitle', selectedOperatorId, $operatorTitle
+                    .val());
+            }
+        });
+        $j('.delete_selected_button').click(() => {
+            $flowchart.flowchart('deleteSelected');
+            $j('#operator_properties').hide()
+        });
+        var $draggableOperators = $j('.draggable_operator');
+
+        const getOperatorData = ($element) => {
+            const nbInputs = parseInt($element.data('nb-inputs'));
+            const nbOutputs = parseInt($element.data('nb-outputs'));
+            var data = {
+                properties: {
+                    title: $element.text(),
+                    inputs: {},
+                    outputs: {},
+                    shape: $element.data('shape'),
+                    shape_id: $element.data('shape_id'),
+                },
+            };
+            var i = 0;
+            for (i = 0; i < nbInputs; i++) {
+                data.properties.inputs['input_' + i] = {
+                    label: 'Input ' + (i + 1)
+                };
+            }
+            for (i = 0; i < nbOutputs; i++) {
+                data.properties.outputs['output_' + i] = {
+                    label: 'Output ' + (i + 1)
+                };
+            }
+            return data;
+        }
+        var operatorId = 0;
+        $draggableOperators.draggable({
+            cursor: "move",
+            opacity: 0.7,
+            helper: 'clone',
+            appendTo: 'body',
+            zIndex: 1000,
+            helper: function(e) {
+                var $this = $j(this);
+                var data = getOperatorData($this);
+                return $flowchart.flowchart('getOperatorElement', data);
+
+            },
+            stop: function(e, ui) {
+                var $this = $j(this);
+                var elOffset = ui.offset;
+                var containerOffset = $container.offset();
+                if (elOffset.left > containerOffset.left &&
+                    elOffset.top > containerOffset.top &&
+                    elOffset.left < containerOffset.left + $container.width() &&
+                    elOffset.top < containerOffset.top + $container.height()) {
+                    var flowchartOffset = $flowchart.offset();
+                    var relativeLeft = elOffset.left - flowchartOffset.left;
+                    var relativeTop = elOffset.top - flowchartOffset.top;
+                    var positionRatio = $flowchart.flowchart('getPositionRatio');
+                    relativeLeft /= positionRatio;
+                    relativeTop /= positionRatio;
+                    var data = getOperatorData($this);
+                    data.left = relativeLeft;
+                    data.top = relativeTop;
+                    let opId = $flowchart.flowchart('addOperator', data);
+                    showAssayPopup(relativeLeft, relativeTop)
+                    // console.log(r);
+                    // console.log($j('#chart_canvas').flowchart('getData'));
+
+
+                    $flowchart.flowchart('selectOperator', opId);
+                    $j('#operator_properties').hide()
+                }
+            }
+        });
+    }
+
+
+    const showAssayPopup = () => {
+        $j('#assayInfo').modal('show');
+    }
+
+    const loadFlowchart = () => {
+        const $flowchart = $j('#chart_canvas');
+        const {
+            id,
+            type
+        } = selectedItem
+        if (type != "study") {
+            console.error("Selected item is not a study")
+            return;
+        }
+        $j.ajax({
+            method: 'GET',
+            cache: false,
+            dataType: "json",
+            url: `/single_pages/${pid}/flowchart/${id}`,
+            success: s => {
+                $j("#flowchart-header").show()
+                if (!s.data) {
+                    alert("no flowchart");
+                    return
+                }
+                console.log(s.data)
+                if (!s.data) {
+                    $flowchart.flowchart('setData', "");
+                } else {
+                    $flowchart.flowchart('setData', s.data);
+                }
+                existingAssays = $j.map(s.data.operators, (op, i) => {
+                    if (op.properties.shape_id != "")
+                        return {
+                            id: op.properties.shape_id,
+                            sopTitle: op.properties.title
+                        }
+                })
+                console.log("existingAssays", existingAssays)
+            },
+            error: e => {
+                hideFlowchart()
+                console.error(e)
+            }
+        })
+    }
+
+
+    const hideFlowchart = () => {
+        $j("#flowchart-header").hide()
+        window.location.href = "#study-details"
+    }
+
+    const findFirstBox = (data) => {
+        const res = $j.map(data.operators, (op, i) => {
+            if (op.properties.shape === "parallelogram") {
+                return i
+            }
+        })
+        return res.length > 0 ? res[0] : undefined
+    }
+
+    const arrangeBoxes = (OpList, firstBoxId, links) => {
+        let arranged = [],
+            current = firstBoxId;
+        arranged.push(OpList[current])
+        for (let i = 0; i < Object.keys(links).length; i++) {
+            $j.each(links, (key, link) => {
+                if (link.fromOperator == current) {
+                    arranged.push(OpList[link.toOperator])
+                    current = link.toOperator
+                    return false
+                }
+            })
+        }
+        return arranged
+    }
+
+    const getOperatorName = (operatorId, data) => {
+        let opName = ""
+        $j.each(data.operators, (op_key, op_val) => {
+            if (op_key == operatorId)
+                opName = op_val.properties.title
+        })
+        return opName
+    }
+
+    $j('#inputs_num').on('input', function(e) {
+        let num = $j(this).val();
+        if (num >= 0 && num < 4)
+            $j('.wf_btn').data('nb-inputs', num);
+    });
+
+    $j('#outputs_num').on('input', function(e) {
+        let num = $j(this).val();
+        if (num >= 0 && num < 4)
+            $j('.wf_btn').data('nb-outputs', num);
+    });
+
+    const refreshFlowchart = () => {
+        setTimeout(() => {
+            $j('#chart_canvas').flowchart('redrawLinksLayer')
+        }, 250);
+    }
+
+    const validateFlowchart = (data) => {
+        // Check for name duplication
+        let operatorLength = Object.keys(data.operators).length
+        if (operatorLength == 0) return true
+        if (operatorLength - Object.keys(data.links).length != 1) {
+            alert("The items must be connected.")
+            return false;
+        }
+        // // Always 2 baxes with only 1 link
+        // let ioBoxes = 0,
+        //     connections = 0
+        // $j.each(data.operators, (op_key, op_val) => {
+        //     $j.each(data.links, (link_key, link_val) => {
+        //         if (link_val.toOperator == op_key ||
+        //             link_val.fromOperator == op_key)
+        //             connections++
+        //     })
+        //     if (connections == 1) {
+        //         ioBoxes++;
+        //     }
+        //     connections = 0
+
+        // })
+        // if (ioBoxes != 2) {
+        //     alert("Boxes are not connected correctly!")
+        //     return false;
+        // }
+        // let TableopIndexes = [];
+        // $j.map(data.operators, (operator, index) => {
+        //     // if (operator.properties.shape === "parallelogram") {
+        //     TableopIndexes.push(index);
+        //     // }
+        // })
+
+        let first = findFirstBox(data) //TableopIndexes, data.links)
+        if (data.operators[first].properties.shape != "parallelogram") {
+            alert("First item must be a source sample!")
+            return false;
+        }
+        let names = [],
+            nameValid = true
+        $j.each(data.operators, (op_key, op_val) => {
+            names.push(op_val.properties.title)
+        })
+        $j.each(names, (id, val) => {
+            $j.each(names, (i, v) => {
+                if (i != id && val == v) {
+                    alert("Duplicate names detected!")
+                    nameValid = false;
+                    return false
+                }
+            })
+            if (!nameValid)
+                return false
+        })
+        if (nameValid)
+            return true
+        else
+            return false
+    }
+
+    $j("#btnSaveAssay").on("click", (e) => {
+        if (!$j("#modalMethodfile")[0].files[0]) {
+            e.stopPropagation();
+            alert("Please select method file")
+            return
+        } else if (!$j("#assayTitle").val()) {
+            e.stopPropagation();
+            alert("Please enter assay title.")
+            return
+        } else if (!$j("#modalMethodTitle").val()) {
+            e.stopPropagation();
+            alert("Please enter method title.")
+            return
+        }
+        var Id = $j('#chart_canvas').flowchart('getSelectedOperatorId');
+        AssayDetails.push({
+            opId: Id,
+            title: $j.trim($j("#assayTitle").val()),
+            description: $j.trim($j("#assayDes").val()),
+            method: {
+                type: $j("#method_type").val() || 0,
+                file: $j("#modalMethodfile")[0].files[0],
+                title: $j("#modalMethodTitle").val(),
+                description: $j("#modalMethodDes").val()
+            }
+
+        })
+        console.log(AssayDetails)
+        //Add the method detail:
+        $j('#chart_canvas').flowchart('setOperatorTitle', Id, $j("#modalMethodTitle").val());
+        $j("#assayInfo").hide()
+    })
+
+    $j("#btnCancelAssay").on("click", () => {
+        $j("#assayInfo").hide()
+    })
+
+    const addAssayTypeOptions = () => {
+        $j('#assayType').empty()
+        $j.each(methodTypes, (key, value) => {
+            $j('#assayType')
+                .append($j("<option></option>")
+                    .attr("value", key)
+                    .text(value.title));
+        })
+
+        $j.each(methodTypes[0].attributes, (k, attr) => {
+            $j("#attribs").append(`<li>${attr.title}</li>`)
+        })
+    }
+
+    const asyTypeChange = (i) => {
+        $j("#attribs").empty()
+        $j("#method_type").val(i.value)
+        $j("#assayTitle").val(methodTypes[i.value].title)
+        $j.each(methodTypes[i.value].attributes, (k, attr) => {
+            $j("#attribs").append(`<li>${attr.title}</li>`)
+        })
+    }
+
+
+    function extractAssays(data) {
+        return $j.map(data.operators, (op, i) => {
+            if (op.properties.shape === "rectangle") {
+                return {
+                    id: op.properties.shape_id,
+                    opId: i // for using to identify Assay name associated with the method
+                }
+            }
+        })
+    }
+
+    function getAssayDetail(opId) {
+        for (let i = 0; i < AssayDetails.length; i++) {
+            if (AssayDetails[i].opId == opId) {
+                return AssayDetails[i]
+            }
+        }
+    }
+
+    function createAssay(pid, std_id, uid, title, desc, sopId) {
+        let data = {
+            "data": {
+                "type": "assays",
+                "attributes": {
+                    "title": title,
+                    "description": desc,
+                    "assay_class": {
+                        "key": "EXP"
+                    },
+                    "policy": {
+                        "access": "download",
+                        "permissions": [{
+                            "resource": {
+                                "id": pid,
+                                "type": "projects"
+                            },
+                            "access": "manage"
+                        }]
+                    }
+                },
+                "relationships": {
+                    "study": {
+                        "data": {
+                            "id": std_id,
+                            "type": "studies"
+                        }
+                    },
+                    "sops": {
+                        "data": [{
+                            "id": sopId,
+                            "type": "sops"
+                        }]
+                    },
+                    "creators": {
+                        "data": [{
+                            "id": uid,
+                            "type": "people"
+                        }]
+                    }
+                }
+            }
+        }
+        return $j.ajax({
+            method: 'POST',
+            "headers": {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cache: false,
+            url: '/assays',
+            data: JSON.stringify(data),
+            success: s => {
+                console.log('assay was created successfully! : ' + s.data.id)
+            },
+            error: (e) => {
+                alert('An error occurred when creating assay')
+            }
+        })
+    }
+
+    const createSOP = (title, desc, pid, uid, file) => {
+        let data = {
+            "data": {
+                "type": "sops",
+                "attributes": {
+                    "title": title,
+                    "description": desc,
+                    "content_blobs": [{
+                        "original_filename": file.name,
+                        "content_type": file.type
+                    }],
+                    "policy": {
+                        "access": "download",
+                        "permissions": [{
+                            "resource": {
+                                "id": pid,
+                                "type": "projects"
+                            },
+                            "access": "manage"
+                        }]
+                    }
+                },
+                "relationships": {
+                    "projects": {
+                        "data": [{
+                            "id": pid,
+                            "type": "projects"
+                        }]
+                    },
+                    "creators": {
+                        "data": [{
+                            "id": uid,
+                            "type": "people"
+                        }]
+                    }
+                }
+            }
+        }
+        return $j.ajax({
+            method: 'POST',
+            "headers": {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cache: false,
+            url: '/sops',
+            data: JSON.stringify(data),
+            success: s => {
+                console.log(`SOP was created successfully!: ${s.data.id}`)
+            },
+            error: (e) => {
+                console.log('error create SOP!', e.responseText)
+                alert('An error occurred when creating SOP')
+            }
+        })
+    }
+
+    const createSampleType = () => {}
+
+    const updateFlowchart = (flowchartData) => {
+        const data = {
+            flowchart: {
+                study_id: selectedItem.id,
+                // source_sample_type_id: "??",
+                // assay_sample_type: [{assay_id:"12", sample_type_id:"1"},{...}],
+                items: JSON.stringify(getOrderedSOPs(flowchartData))
+            }
+        }
+        console.log(data)
+        $j.ajax({
+            method: 'POST',
+            cache: false,
+            url: `/single_pages/${pid}/update_flowchart`,
+            data,
+            dataType: "json",
+            success: s => {
+                console.log(`Flowchart was updated successfully!`)
+                location.reload(true);
+            },
+            error: (e) => {
+                console.error('error updating Flowchart!')
+                // alert('An error occurred when updating the Flowchart')
+            }
+        })
+    }
+
+    $j("#btn_save_flowchart").on("click", async () => {
+        if (selectedItem.type != "study") return
+        let flowchartData = $j('#chart_canvas').flowchart('getData');
+        if (validateFlowchart(flowchartData) == false) return
+        let newAssays = extractAssays(flowchartData)
+        if (arrEqualItems(newAssays,existingAssays)) {
+            console.log("Equal...")
+            updateFlowchart(flowchartData);
+            return
+        }
+        $j.each(newAssays, (i, assay) => {
+            if ($j.inArray(assay.id, $j.map(existingAssays, a => a.id)) == -1) {
+                const {
+                    title,
+                    description,
+                    method
+                } = getAssayDetail(assay.opId)
+                $j.when(createSOP(method.title, method.description, pid, uid, method.file))
+                    .then((res) => {
+                        $j.when(createAssay(pid, selectedItem.id, uid, title, description, res.data.id))
+                            .then((res) => {
+                                updateIds(flowchartData, res.data.id, method.title)
+                                if (i == newAssays.length - 1) {
+                                    updateFlowchart(flowchartData)
+                                    // Create New Assays + SOPs + Sample_types
+                                }
+                            })
+                    })
+            }
+        });
+    });
+
+    const updateIds = (data, id, title)=>{
+        $j.each(data.operators, (i, op) => {
+            if (title == op.properties.title) {
+                op.properties.shape_id = id
+            }
+        })
+    }
+
+    const arrEqualItems = (arr1,arr2)=>{
+        arr1 = $j.map(arr1,item=>item.id)
+        arr2 = $j.map(arr2,item=>item.id)
+        for(let i =0;i<arr1.length;i++){
+            if ($j.inArray(arr1[i], arr2)==-1)
+                return false
+        }
+        return true
+    }
+
+    const getOrderedSOPs = (data) => {
+        let arranged = [],
+            current = 0;
+        arranged.push(data.operators[current])
+        for (let i = 0; i < Object.keys(data.links).length; i++) {
+            $j.each(data.links, (key, link) => {
+                if (link.fromOperator == current) {
+                    arranged.push(data.operators[link.toOperator])
+                    current = link.toOperator
+                    return false
+                }
+            })
+        }
+
+        console.log("arranged",arranged)
+
+        return $j.map(arranged, (op, i) => ({
+            id: arranged[i].properties.shape_id,
+            left: arranged[i].left,
+            top: arranged[i].top
+        }))
+    }
+</script>

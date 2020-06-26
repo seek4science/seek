@@ -785,6 +785,8 @@ SEEK::Application.routes.draw do
   resources :single_pages do
      member do
         get "/render_sharing_form/:id/type/:type" => "single_pages#render_sharing_form"
+        get "/flowchart/:study_id" => "single_pages#flowchart"
+        post :update_flowchart
       end
   end
 
