@@ -54,7 +54,7 @@ module Seek
         if User.logged_in_and_member?
           format.html # new.html.erb
         else
-          flash[:error] = "You are not authorized to upload a new #{t(controller_name.singularize)}. Only members of known projects, institutions or work groups are allowed to create new content."
+          flash[:error] = "You are not authorized to upload a new #{t(controller_name.singularize)}. Only members of #{t('project').downcase.pluralize} are allowed to create content."
           format.html { redirect_to polymorphic_path(controller_name) }
         end
       end

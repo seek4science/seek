@@ -42,17 +42,6 @@ class Mailer < ActionMailer::Base
     gatekeeper_response 'rejected', requester, gatekeeper, items_and_comments
   end
 
-  def request_resource(user, resource, details)
-    @owners = resource.managers
-    @requester = user.person
-    @resource = resource
-    @details = details
-    mail(from: Seek::Config.noreply_sender,
-         to: resource.managers.collect(&:email_with_name),
-         reply_to: user.person.email_with_name,
-         subject: "A #{Seek::Config.application_name} member requested a protected file: #{resource.title}")
-  end
-
   def request_contact(user, resource, details)
     @owners = (resource.creators.count > 0) ? resource.creators : [resource.contributor]
     @requester = user.person

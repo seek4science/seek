@@ -1,0 +1,18 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+melanoma:
+  title: Melanoma
+
+gangliocytoma:
+  title: Gangliocytoma
+
+melanoma:
+  title: Melanoma
+
+# this human disease mustn't be associated with anything
+sarcoma:
+  title: Sarcoma
+
+# this human disease must only be linked to a project
+human_disease_linked_project_only:
+  title: Project link

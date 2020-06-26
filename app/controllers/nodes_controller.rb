@@ -5,7 +5,7 @@ class NodesController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :find_assets, :only => [ :index ]
-  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview, :test_asset_url, :update_annotations_ajax]
   before_action :find_display_asset, :only=>[:show, :download]
 
   include Seek::Publishing::PublishingCommon

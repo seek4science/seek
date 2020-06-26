@@ -1,0 +1,41 @@
+
+
+<% if !search_results.empty? -%>
+    <p><%= link_to_with_callbacks image("arrow_left"),
+                                   {:url => url_for(:action => :search_ajax, :controller => :human_diseases, :pagenum => pagenum.to_i-1, :search_term => search_term),
+                                    :before => "show_ajax_loader('search_results');"},
+                                   {:remote => true} unless pagenum.to_i <= 1 -%>
+      <%= "Page #{pagenum.to_s}  of #{pages.to_s}" -%>
+      <%= link_to_with_callbacks image("arrow_right"),
+                                 {:url => url_for(:action => :search_ajax, :controller => :human_diseases, :pagenum => pagenum.to_i+1, :search_term => search_term),
+                                  :before => "show_ajax_loader('search_results');"},
+                                 {:remote => true} unless pagenum.to_i >= pages.to_i -%>
+    </p>
+    <div id="human-disease-search-results">
+      <table class="table">
+        <thead>
+        <tr>
+          <th id="human-disease-name">
+            Human Disease (click to select)
+          </th>
+          <th id="human-disease-synonyms">Synonyms</th>
+          <th id="human-disease-id">Taxonomy id</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% search_results.each do |result| %>
+            <tr>
+              <td>
+                <%= link_to(result[:preferred_label], '#', onclick: "add_concept('#{result[:preferred_label].gsub("'"){"\\'"}}','#{result[:ontology_acronym]}','#{result[:class_id]}'); return false;") -%>
+              </td>
+              <td><%= h(result[:synonyms].join(", ")) %></td>
+              <td><%= result[:class_id] %></td>
+            </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+<% elsif !search_term.blank? %>
+    <br/>
+    <span class="none_text">No matches found for <b><%= h(search_term) -%></b></span>
+<% end -%>

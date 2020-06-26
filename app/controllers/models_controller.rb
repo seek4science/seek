@@ -7,7 +7,7 @@ class ModelsController < ApplicationController
 
   before_action :models_enabled?
   before_action :find_assets, :only => [:index]
-  before_action :find_and_authorize_requested_item, :except => [:build, :index, :new, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_and_authorize_requested_item, :except => [:build, :index, :new, :create, :preview, :test_asset_url, :update_annotations_ajax]
   before_action :find_display_asset, :only => [:show, :download, :execute, :visualise, :export_as_xgmml, :compare_versions]
   before_action :find_other_version, :only => [:compare_versions]
 
@@ -183,7 +183,7 @@ class ModelsController < ApplicationController
 
   def model_params
     params.require(:model).permit(:imported_source, :imported_url, :title, :description, { project_ids: [] }, :license,
-                                  :model_type_id, :model_format_id, :recommended_environment_id, :organism_id,
+                                  :model_type_id, :model_format_id, :recommended_environment_id, :organism_id, :human_disease_id,
                                   :other_creators,
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                   { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },

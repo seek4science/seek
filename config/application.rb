@@ -52,8 +52,8 @@ module SEEK
 
     config.middleware.use Rack::Deflater,
                           include: %w(text/html application/xml application/json text/css application/javascript)
-
     config.middleware.use Rack::Attack
+    config.middleware.use I18n::JS::Middleware
 
     config.exceptions_app = self.routes
 

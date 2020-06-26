@@ -1,0 +1,16 @@
+<%# required because earlier cached concept hash may not include this key -%>
+<% concept[:related_synonyms] ||= [] %>
+
+<b>Synonyms (<%= concept[:synonyms].count -%>) </b>
+<% if concept[:synonyms].empty? -%>
+    <p class="none_text">None defined</p>
+<% else -%>
+    <p><%= concept[:synonyms].join(", ") %></p>
+<% end -%>
+<br/>
+<b>Definitions (<%= concept[:definitions].count -%>) </b>
+<% if concept[:definitions].empty? -%>
+    <p class="none_text">None defined</p>
+<% else -%>
+    <p><%= concept[:definitions].join(", ") %></p>
+<% end -%>
