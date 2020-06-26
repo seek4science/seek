@@ -177,7 +177,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'should show the other creators in -uploader and creators- box' do
     workflow = Factory(:workflow, policy: Factory(:public_policy), other_creators: 'another creator')
     get :show, params: { id: workflow }
-    assert_select 'div', text: 'another creator', count: 1
+    assert_select 'li.author-list-item', text: 'another creator', count: 1
   end
 
   test 'filter by people, including creators, using nested routes' do
@@ -587,6 +587,100 @@ class WorkflowsControllerTest < ActionController::TestCase
     crate_workflow = wf.ro_crate.main_workflow
     crate_cwl = wf.ro_crate.main_workflow_cwl
     assert_not_equal crate_workflow.id, crate_cwl.id
+  end
+
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Workflow.count') do
+          post :create_metadata, params: {workflow: workflow, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
+      end
+    end
+    workflow = assigns(:workflow)
+    assert_equal 'http://www.slack.com/', workflow.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, workflow.discussion_links.first.link_type
+  end
+
+
+  test 'should show discussion link' do
+    asset_link = Factory(:discussion_link)
+    workflow = Factory(:workflow, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: workflow }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+
+  test 'should update workflow with new discussion link' do
+    person = Factory(:person)
+    workflow = Factory(:workflow, contributor: person)
+    login_as(person)
+    assert_nil workflow.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: workflow.id, workflow: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
+      end
+    end
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_equal 'http://www.slack.com/', workflow.discussion_links.first.url
+  end
+
+  test 'should update workflow with edited discussion link' do
+    person = Factory(:person)
+    workflow = Factory(:workflow, contributor: person, discussion_links:[Factory(:discussion_link)])
+    login_as(person)
+    assert_equal 1,workflow.discussion_links.count
+    assert_no_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: workflow.id, workflow: { discussion_links_attributes:[{id:workflow.discussion_links.first.id, url: "http://www.wibble.com/"}] } }
+      end
+    end
+    workflow = assigns(:workflow)
+    assert_redirected_to workflow_path(workflow)
+    assert_equal 1,workflow.discussion_links.count
+    assert_equal 'http://www.wibble.com/', workflow.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    workflow = Factory(:workflow, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    refute_empty workflow.discussion_links
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: workflow.id, workflow: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+    end
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_empty workflow.discussion_links
+  end
+
+  test 'should be able to handle remote files when creating RO crate' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file with spaces in name.txt", 'https://raw.githubusercontent.com/bob/workflow/master/workflow.txt'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'https://raw.githubusercontent.com/bob/workflow/master/diagram.png'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
+
+    cwl = Factory(:cwl_workflow_class)
+    person = Factory(:person)
+    login_as(person)
+    assert_difference('ContentBlob.count') do
+      post :create_ro_crate, params: {
+          ro_crate: {
+              workflow: { data_url: 'https://github.com/bob/workflow/blob/master/workflow.txt' },
+              diagram: { data_url: 'https://github.com/bob/workflow/blob/master/diagram.png' },
+              abstract_cwl: { data_url: 'https://github.com/bob/workflow/blob/master/abstract.cwl' }
+          },
+          workflow_class_id: cwl.id
+      }
+    end
+    assert_response :success
+    assert wf = assigns(:workflow)
+    crate_workflow = wf.ro_crate.main_workflow
+    assert crate_workflow
+    assert_equal 'workflow.txt', crate_workflow.id
   end
 
   def edit_max_object(workflow)

@@ -91,7 +91,7 @@ class NelsController < ApplicationController
     end
 
     unless @assay.projects.any?(&:nels_enabled)
-      flash[:error] = 'This assay is not associated with a NeLS-enabled project.'
+      flash[:error] = "This assay is not associated with a NeLS-enabled #{t('project').downcase}."
       redirect_to @assay
       return false
     end

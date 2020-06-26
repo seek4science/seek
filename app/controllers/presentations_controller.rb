@@ -77,7 +77,7 @@ class PresentationsController < ApplicationController
                                          { event_ids: [] }, { project_ids: [] },
                                          { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                          { creator_ids: [] }, { publication_ids: [] },
-                                         asset_links_attributes:[:id, :url, :link_type, :_destroy])
+                                         discussion_links_attributes:[:id, :url, :_destroy])
   end
 
   alias_method :asset_params, :presentation_params

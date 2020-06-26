@@ -1,5 +1,7 @@
 class WorkflowsController < ApplicationController
+  
   include Seek::IndexPager
+
   include Seek::AssetsCommon
 
   before_action :workflows_enabled?
@@ -9,8 +11,10 @@ class WorkflowsController < ApplicationController
   before_action :login_required, only: [:create, :create_content_blob, :create_ro_crate, :create_metadata, :metadata_extraction_ajax, :provide_metadata]
 
   include Seek::Publishing::PublishingCommon
+
   include Seek::BreadCrumbs
   include Seek::Doi::Minting
+
   include Seek::IsaGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
@@ -24,6 +28,7 @@ class WorkflowsController < ApplicationController
       comments = params[:revision_comments]
       respond_to do |format|
         if @workflow.save_as_new_version(comments)
+
           flash[:notice]="New version uploaded - now on version #{@workflow.version}"
         else
           flash[:error]="Unable to save new version"
@@ -34,6 +39,7 @@ class WorkflowsController < ApplicationController
       flash[:error] = flash.now[:error]
       redirect_to @workflow
     end
+    
   end
 
   # PUT /Workflows/1
@@ -217,7 +223,8 @@ class WorkflowsController < ApplicationController
                                      { project_ids: [] }, :license, :other_creators,
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                     { publication_ids: [] }, :internals, :maturity_level, :source_link_url)
+                                     { publication_ids: [] }, :internals, :maturity_level, :source_link_url,
+                                     discussion_links_attributes:[:id, :url, :_destroy])
   end
 
   alias_method :asset_params, :workflow_params

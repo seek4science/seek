@@ -84,7 +84,9 @@ class Project < ApplicationRecord
   alias_attribute :internal_webpage, :wiki_page
 
   has_and_belongs_to_many :organisms, before_add: :update_rdf_on_associated_change, before_remove: :update_rdf_on_associated_change
+  has_and_belongs_to_many :human_diseases, before_add: :update_rdf_on_associated_change, before_remove: :update_rdf_on_associated_change
   has_filter :organism
+  has_filter :human_disease
   has_many :project_subscriptions, dependent: :destroy
 
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
@@ -169,6 +171,10 @@ class Project < ApplicationRecord
   def has_member?(user_or_person)
     user_or_person = user_or_person.try(:person)
     people.include? user_or_person
+  end
+
+  def human_disease_terms
+    human_diseases.collect(&:searchable_terms).flatten
   end
 
   def members= replacement_members

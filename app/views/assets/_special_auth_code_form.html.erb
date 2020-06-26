@@ -19,7 +19,9 @@
 
               <div class="form-group">
                 <%= sub_form.label :expiration_date %>
-                <%= sub_form.text_field :expiration_date, data: { calendar: true }, class: 'calendar form-control' %>
+                <div style="position: relative">
+                  <%= sub_form.text_field :expiration_date, data: { calendar: true }, class: 'calendar form-control' %>
+                </div>
                 <p class='help-block'>After this date the link will not be accessible.</p>
               </div>
               <div>

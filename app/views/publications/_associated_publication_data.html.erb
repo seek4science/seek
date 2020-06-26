@@ -14,6 +14,10 @@
 
 <%= render partial: 'assets/select_tags' -%>
 
+<% if Seek::Config.human_diseases_enabled %>
+  <%= publication_form.fancy_multiselect :human_diseases, { possibilities: HumanDisease.order(:title).all, with_new_link: true, hidden: false } %>
+<% end %>
+
 <% if Seek::Config.events_enabled -%>
   <%= publication_form.fancy_multiselect :events, other_projects_checkbox: true, sort_by: :start_date %>
 <% end -%>

@@ -826,7 +826,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample =  {sample_type_id: type.id,
                data: { full_name: 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
                project_ids: [person.projects.first.id],
-               asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}]}
+               discussion_links_attributes:[{url: "http://www.slack.com/"}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Sample.count') do
           post :create, params: {sample: sample,  policy_attributes: { access_type: Policy::VISIBLE }}
@@ -839,7 +839,7 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'should show discussion link' do
     asset_link = Factory(:discussion_link)
-    sample = Factory(:sample, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    sample = Factory(:sample, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     assert_equal [asset_link],sample.discussion_links
     get :show, params: { id: sample }
     assert_response :success
@@ -853,7 +853,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_nil sample.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: sample.id, sample: { asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}] } }
+        put :update, params: { id: sample.id, sample: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
       end
     end
     assert_redirected_to sample_path(assigns(:sample))

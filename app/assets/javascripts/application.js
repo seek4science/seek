@@ -54,4 +54,6 @@
 //= require uri
 //= require chartjs
 //= require lightbox2
+//= require i18n
+//= require i18n/translations
 //= require_tree ./templates

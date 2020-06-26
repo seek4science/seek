@@ -5,6 +5,12 @@ Hi <%= @owners.collect{|o| o.name}.join(", ") -%>,
 
   He/She would like to initiate a discussion with you.
 
+<% unless @details.blank? -%>
+  <%=@requester.first_name.capitalize -%> also provided some additional details:
+
+      "<%= sanitize(@details) -%>"
+<% end -%>
+
   You can reply to <%= @requester.first_name.capitalize -%> by replying to this email.
 
   This is an automated email.

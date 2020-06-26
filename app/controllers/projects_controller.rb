@@ -118,6 +118,7 @@ class ProjectsController < ApplicationController
         # update those attributes of a project that we want to be updated from the session
         @project.attributes = session[possible_unsaved_data][:project]
         @project.organism_list = session[possible_unsaved_data][:organism][:list] if session[possible_unsaved_data][:organism]
+        @project.human_disease_list = session[possible_unsaved_data][:human_disease][:list] if session[possible_unsaved_data][:human_disease]
       end
 
       # clear the session data anyway
@@ -147,6 +148,7 @@ class ProjectsController < ApplicationController
         # update those attributes of a project that we want to be updated from the session
         @project.attributes = session[possible_unsaved_data][:project]
         @project.organism_list = session[possible_unsaved_data][:organism][:list] if session[possible_unsaved_data][:organism]
+        @project.human_disease_list = session[possible_unsaved_data][:human_disease][:list] if session[possible_unsaved_data][:human_disease]
       end
 
       # clear the session data anyway
@@ -282,7 +284,7 @@ class ProjectsController < ApplicationController
     flag_memberships
     update_administrative_roles
 
-    flash[:notice] = "The members and institutions of the #{t('project').downcase} '#{@project.title}' have been updated"
+    flash[:notice] = "The members and #{t('institution').pluralize} of the #{t('project').downcase} '#{@project.title}' have been updated"
 
     respond_with(@project) do |format|
       format.html { redirect_to project_path(@project) }
@@ -340,7 +342,7 @@ class ProjectsController < ApplicationController
 
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, { organism_ids: [] }, :parent_id, :start_date,
-                        :end_date, :funding_codes]
+                        :end_date, :funding_codes, { human_disease_ids: [] }]
 
     if User.admin_logged_in?
       permitted_params += [:site_root_uri, :site_username, :site_password, :nels_enabled]
@@ -427,7 +429,7 @@ class ProjectsController < ApplicationController
 
   def allow_request_membership
     unless Seek::Config.email_enabled && @project.allow_request_membership?
-      error('Cannot request membership of this project', 'is invalid (invalid state)')
+      error("Cannot request membership of this #{t('project').downcase}", 'is invalid (invalid state)')
       false
     end
   end

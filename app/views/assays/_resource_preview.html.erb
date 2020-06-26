@@ -26,6 +26,10 @@
     <%= list_item_simple_list(resource.assay_organisms, "Organism") { |ao| assay_organism_list_item(ao) } %>
   <% end %>
 
+  <% if Seek::Config.human_diseases_enabled %>
+    <%= list_item_simple_list(resource.assay_human_diseases, "Human Disease") { |ao| assay_human_disease_list_item(ao) } %>
+  <% end %>
+
   <%= list_item_authorized_list resource.sops, t('sop').pluralize, true, 50, true %>
 
   <%= list_item_authorized_list resource.data_files, t('data_file').pluralize, true, 50, true %>

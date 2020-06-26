@@ -5,7 +5,7 @@
     <option value="<%= 3.months.ago.strftime('%Y-%m-%d') -%>">last 3 months</option>
     <option value="<%= 12.months.ago.strftime('%Y-%m-%d') -%>" selected="selected">last 12 months</option>
     <% if @project %>
-      <option value="<%= @project.created_at.strftime('%Y-%m-%d') -%>">since project began</option>
+      <option value="<%= @project.created_at.strftime('%Y-%m-%d') -%>">since <%= t('project').downcase -%> creation</option>
     <% else %>
       <option value="<%= User.first.created_at -%>">all time</option>
     <% end %>
@@ -16,11 +16,15 @@
 <br/>
 <div class="form-group custom-range-field">
   <label>Start</label>
-  <input data-dashboard-field="period-start" size="8" type="text" class="form-control input-sm" value="<%= 1.month.ago.strftime('%Y-%m-%d')-%>">
+  <div style="position: relative">
+    <input data-dashboard-field="period-start" size="8" type="text" class="form-control input-sm calendar" value="<%= 1.month.ago.strftime('%Y-%m-%d')-%>">
+  </div>
 </div>
 <div class="form-group custom-range-field">
   <label>End</label>
-  <input data-dashboard-field="period-end" size="8" type="text" class="form-control input-sm" value="<%= Date.today.strftime('%Y-%m-%d') -%>">
+  <div style="position: relative">
+    <input data-dashboard-field="period-end" size="8" type="text" class="form-control input-sm calendar" value="<%= Date.today.strftime('%Y-%m-%d') -%>">
+  </div>
 </div>
 
 <a href="#" data-dashboard-period-btn class="btn btn-primary btn-sm custom-range-field" style="display: none; margin-left: 5px;">Update</a>

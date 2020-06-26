@@ -7,13 +7,12 @@ set -e
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
-#/bin/bash -login
 export RAILS_ENV=production
 
 echo "${GREEN}git pull${NC}"
 git pull
 
-cd .. && cd - #this is to allow RVM to pick up the ruby and gemset changes
+cd . - #this is to allow RVM to pick up the ruby and gemset changes
 echo "${GREEN}bundle install${NC}"
 bundle install --deployment
 

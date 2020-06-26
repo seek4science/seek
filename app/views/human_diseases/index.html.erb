@@ -1,0 +1,33 @@
+<%
+  new_item_label ||= "New #{t(controller_name.singularize)}"
+  new_item_path = eval("new_#{controller_name.singularize}_path")
+  items ||= nil
+%>
+
+<div class="pull-right">
+  <% if logged_in_and_member? and HumanDisease.can_create? %>
+    <%= button_link_to(new_item_label, "new", new_item_path) %>
+  <% end %>
+</div>
+
+<%= index_title %>
+<%= render :partial => "assets/resource_counts" unless params[:filtered] %>
+
+<div id="human-diseases-js-tree"></div>
+
+<script type="text/javascript">
+  $j(document).ready(function () {
+
+    $j('#human-diseases-js-tree').jstree({
+      'core': {
+        'check_callback': true,
+        'force_text': true,
+        'multiple': false,
+        'dblclick_toggle': false,
+        'data': { 'url': '<%= url_for(action: 'index', controller: 'human_diseases', format: 'json') %>' },
+      }
+    }).bind('select_node.jstree', function(e, data) {
+      document.location.href = '<%= url_for(action: 'index', controller: 'human_diseases') %>/' + data.node.id
+    })
+  });
+</script>
