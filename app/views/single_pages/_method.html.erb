@@ -1,0 +1,68 @@
+<div id="text_content">
+    <div id="method-details" class="tab-pane fade in active" style="padding:10px">
+        <div class="row">
+            <div class="col-md-1" style="padding:0">
+                <ul style="list-style-type:none;padding:0;float:left" id="method-icon">
+                </ul>
+            </div>
+            <div class="col-md-11">
+                <div class="col-md-12">
+                    <p id="method-title"><strong style="text-align: center;">Title:</strong><input type="text" class="form-control" /></p>
+                    </p>
+                    <p id="method-description"> <strong>Description:</strong><input type="text" class="form-control" /></p>
+                    <input type="hidden" id="method-id">
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <a class="btn btn-primary" id="btn_replace_method">Replace file</a>
+    <input id="method-upload" type="file" style="display:none">
+</div>
+
+
+<script>
+    $j("#btn_replace_method").on("click", () => {
+        $j("#method-upload").click();
+    })
+
+
+    $j('#method-upload').on('change', (e) => {
+        $j("#btn_replace_method").attr("disabled", "disabled")
+        let file = $j('#method-upload')[0].files[0]
+        const methodId = $j("#method-id").val()
+        $j('#method-upload').val('');
+        let data = {
+            "data": {
+                "type": "sops",
+                "id": methodId,
+                "attributes": {
+                    "content_blobs": [{
+                        "original_filename": "aaaa",
+                        // "content_type": file.type
+                    }],
+                }
+            }
+        }
+        // /sops/{methodId}/content_blobs/blob_id
+        $j.ajax({
+            method: 'PATCH',
+            "headers": {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cache: false,
+            url: `/sops/${methodId}`,
+            data: JSON.stringify(data),
+            success: s => {
+                $j("#btn_replace_method").removeAttr("disabled")
+                location.reload(true);
+            },
+            error: (e) => {
+                $j("#btn_replace_method").removeAttr("disabled")
+                alert('An error updating the method')
+            }
+        })
+
+    })
+</script>
