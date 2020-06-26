@@ -90,6 +90,8 @@
     <script type="text/javascript">
 
         var selectedItem = {type:"",id:""}, pid, uid
+        let AssayDetails = []
+        let existingAssays = []
         $j(document).ready(function() {
             setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'demo_tree', 'draggable_folder_item');
             $j(`#project_contents`).show();
@@ -223,6 +225,8 @@
                     }
                 })
             })
+             init_flowchart()
+             addAssayTypeOptions()
         });
 
         const addInvestigations = (t) => {

@@ -1,11 +1,11 @@
     <div class="simpleForm">
         <ul class="nav nav-tabs">
-            <li class="active "><a data-toggle="tab" href="#assayDetails"><i class="glyphicon glyphicon-th-list"></i>
+            <li class="active "><a data-toggle="tab" href="#assay-details"><i class="glyphicon glyphicon-th-list"></i>
                     Details</a></li>
             <li><a data-toggle="tab" href="#assayMethod"><i class="glyphicon glyphicon-pencil"></i> Method</a></li>
             <li><a data-toggle="tab" href="#assaySample"><i class="glyphicon glyphicon-edit"></i> Sample</a></li>
             <li style="float:right">
-                 <div>
+                <div>
                     <a href="" data-tooltip="delete current assay" class="btn btn-danger btn-sm" onclick="deleteItem(this)">
                         <span style='color:white' class='glyphicon glyphicon-trash'></span>
                     </a>
@@ -13,29 +13,29 @@
             </li>
         </ul>
         <div class="tab-content">
-            <div id="assayDetails" class="tab-pane fade in active" style="padding:10px">
+            <div id="assay-details" class="tab-pane fade in active" style="padding:10px">
                 <p><strong>Type: </strong> <span id="assayTypeTab"></span></p>
                 <p>
-
                     <label>Attributes:</label>
                     <ul id="adetailsAttribs" class="small_list"></ul>
-
                 </p>
-
-                <p id="assayTitle"><strong style="text-align: center;">Title:</strong> <span id="assaytitleContent"></span>
+                <p id="assay-title"><strong style="text-align: center;">Title:</strong> <span></span></p>
                 </p>
-                <p> <strong>Description:</strong> <span id="assayDescription"></span> </p>
+                <p id="assay-description"> <strong>Description:</strong> <span></span> </p>
+                <form id="investigation-sharing-form">
+                    <input name="utf8" type="hidden" value="✓">
+                    <input type="hidden" name="_method" value="patch">
+                    <input type="hidden" name="assay[creator_ids][]">
+                    <div id="assay-creators"></div>
+                    <div id="assay_sharing"></div>
+                    <input type="button" value="update" id="assay_update_btn" class="btn btn-primary">
+                </form>
             </div>
             <div id="assayMethod" class="tab-pane fade" style="padding:10px">
-
                 <%= render :partial => "method" -%>
-
             </div>
             <div id="assaySample" class="tab-pane fade" style="padding:10px">
-
                 <%= render :partial => "samples" -%>
-
             </div>
-
         </div>
     </div>
