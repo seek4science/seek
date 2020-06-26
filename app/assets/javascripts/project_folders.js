@@ -159,13 +159,17 @@ function item_clicked(type, id) {
   selectedItem.type = type;
 
   switch (type) {
-    case "investigation":
-    case "study": {
+    case "assay": 
+    case "investigation": 
+    case "study":{
       $j.ajax({
         url: "/single_pages/" + pid + "/render_sharing_form/" + id + "/type/" + type,
       });
+      break;
     }
   }
+  if (type == "study")
+    loadFlowchart()
 }
 
 function hideAll() {

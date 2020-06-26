@@ -47,6 +47,8 @@ Rails.application.config.assets.precompile += [
     "tablesorter/blue/tablesorter_blue.css",
     "yui/index.css",
     "appended/*.css",
-    "publications"
+    "publications",
+    "jquery.flowchart.js",
+    "jquery.flowchart.css"
 ]
 
