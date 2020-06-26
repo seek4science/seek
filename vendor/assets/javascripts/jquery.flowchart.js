@@ -608,8 +608,8 @@ $j(function () {
     _getOperatorFullElement: function (operatorData) {
       var infos = this.getOperatorCompleteData(operatorData);
 
-      let div = '<div class="flowchart-operator"></div>';
-      let op_title = '<div class="flowchart-operator-title"></div>';
+      var div = '<div class="flowchart-operator"></div>';
+      var op_title = '<div class="flowchart-operator-title"></div>';
       if (operatorData.properties.shape == "oval") {
         div = '<div class="flowchart-operator oval"></div>';
       } else if (operatorData.properties.shape == "parallelogram") {
