@@ -1,8 +1,10 @@
+<p><%= maturity_badge(resource.maturity_level) if resource.maturity_level %></p>
+
 <%= list_item_description resource.description %>
 
 <div class="row">
   <div class="col-sm-6">
-    <%= list_item_attribute('Type', resource.workflow_class.title) %>
+    <%= list_item_attribute('Type', resource.workflow_class_title) %>
     <%= render partial:"assets/resource_list_item_contributor_and_creators",object:resource %>
     <%= list_item_doi(resource) %>
   </div>

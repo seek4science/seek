@@ -1,0 +1,1 @@
+<a name="listCollectionItems"></a>The **listCollectionItems** operation returns a JSON object containing a list of all the <a href="#collection_items">**Collection Items**</a> in the specified collection.

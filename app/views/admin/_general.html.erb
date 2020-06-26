@@ -34,7 +34,7 @@
         <li><%= link_to 'Manage technology types', suggested_technology_types_path %></li>
         <li><%= link_to 'Manage tags', tags_admin_path %></li>
         <% if Seek::Config.project_hierarchy_enabled %>
-            <li><%= link_to 'Manage projects', manage_projects_path %></li>
+            <li><%= link_to "Manage #{t('project').pluralize.downcase}", manage_projects_path %></li>
         <% end %>
         <!-- <li><%= link_to 'Manage compounds', compounds_path %></li> -->
       </ul>

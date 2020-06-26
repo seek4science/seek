@@ -34,18 +34,22 @@ en:
   publication: "Publication"
   presentation: "Presentation"
   event: "Event"
+  collection: "Collection"
 
   sample: "Sample"
   sample_type: "Sample type"
   strain: "Strain"
   scale: "Scale"
   organism: "Organism"
+  human_disease: "Human Disease"
 
   person: "Person"
   project: "Project"
   institution: "Institution"
   programme: "Programme"
   profile: "Profile"
+  avatar: "Avatar"
+  private_asset: 'Hidden item'
 
   gadget:
     new_heading: "New or upload"
@@ -65,6 +69,7 @@ en:
     jerm_templates: "JERM templates"
     feedback: "Provide feedback"
     isa_best_practice: "ISA best practice"
+    vocabularies: "Vocabularies"
 
   favourite_group: "favourite groups"
 
@@ -96,20 +101,31 @@ en:
   pal: 'PAL'
   programme_administrator: 'Programme administrator'
 
-  contributor: 'contributor' # A person who submitted the resource to SEEK
+  contributor: 'submitter' # A person who submitted the resource to SEEK
+  contribution: 'submission'
   creator: 'creator' # A person who was involved with the creation of the resource
   person_responsible: 'person responsible'
 
   jerm_harvester_name: 'The JERM Harvester'
-  deleted_contributor_name: 'Deleted contributor'
+  deleted_contributor_name: 'Deleted submitter'
 
   null_license: 'No license - no permission to use unless the owner grants a licence'
 
   activerecord:
-      attributes:
-        person:
-          title: "Full name"
+    attributes:
+      person:
+        title: "Full name"
+      collection:
+        creators: 'Maintainers'
+
+  activemodel:
+    attributes:
+      workflow_crate_builder:
+        abstract_cwl: "Abstract CWL"
 
   oauth_session: 'OAuth Session'
   identity: 'Identity'
   api_token: 'API token'
+  maturity_level:
+    released: 'Stable'
+    work_in_progress: 'Work-in-progress'

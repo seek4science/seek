@@ -53,7 +53,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'image' => "http://localhost:3000/people/#{@person.id}/avatars/#{@person.avatar.id}?size=250",
       'memberOf' => [
         {
-          '@type' => ['Project','Organization'],
+          '@type' => %w[Project Organization],
           '@id' => "http://localhost:3000/projects/#{@project.id}",
           'name' => @project.title
         }
@@ -67,7 +67,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'dataset' do
     df = travel_to(@current_time) do
-      df = Factory(:max_datafile, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df = Factory(:max_data_file, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       disable_authorization_checks { df.save! }
       df
@@ -83,9 +83,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
+      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
       'url' => "http://localhost:3000/data_files/#{df.id}",
-      'provider' => [{
-        '@type' => ['Project','Organization'],
+      'producer' => [{
+        '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
         'name' => @project.title
       }],
@@ -113,9 +114,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'dataset with weblink' do
     df = travel_to(@current_time) do
-      df = Factory(:max_datafile, content_blob:Factory(:website_content_blob),
-                   contributor: @person, projects: [@project],
-                   policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df = Factory(:max_data_file, content_blob: Factory(:website_content_blob),
+                                  contributor: @person, projects: [@project],
+                                  policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       disable_authorization_checks { df.save! }
       df
@@ -125,27 +126,28 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert df.content_blob.show_as_external_link?
 
     expected = {
-        '@context' => 'http://schema.org',
-        '@type' => 'DataSet',
-        '@id' => "http://localhost:3000/data_files/#{df.id}",
-        'name' => df.title,
-        'description' => df.description,
-        'keywords' => 'keyword',
-        'url' => "http://www.abc.com",
-        'provider' => [{
-                           '@type' => ['Project','Organization'],
-                           '@id' => "http://localhost:3000/projects/#{@project.id}",
-                           'name' => @project.title
-                       }],
-        'dateCreated' => @current_time.to_s,
-        'dateModified' => @current_time.to_s,
-        'encodingFormat' => 'text/html',
-        'identifier' => 'https://doi.org/10.10.10.10/test.1',
-        'subjectOf' => [
-            { '@type' => 'Event',
-              '@id' => "http://localhost:3000/events/#{df.events.first.id}",
-              'name' => df.events.first.title }
-        ]
+      '@context' => 'http://schema.org',
+      '@type' => 'DataSet',
+      '@id' => "http://localhost:3000/data_files/#{df.id}",
+      'name' => df.title,
+      'description' => df.description,
+      'keywords' => 'keyword',
+      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'url' => 'http://www.abc.com',
+      'producer' => [{
+        '@type' => %w[Project Organization],
+        '@id' => "http://localhost:3000/projects/#{@project.id}",
+        'name' => @project.title
+      }],
+      'dateCreated' => @current_time.to_s,
+      'dateModified' => @current_time.to_s,
+      'encodingFormat' => 'text/html',
+      'identifier' => 'https://doi.org/10.10.10.10/test.1',
+      'subjectOf' => [
+        { '@type' => 'Event',
+          '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+          'name' => df.events.first.title }
+      ]
     }
 
     json = JSON.parse(df.to_schema_ld)
@@ -176,7 +178,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     disable_authorization_checks { @project.save! }
     expected = {
       '@context' => 'http://schema.org',
-      '@type' => ['Project','Organization'],
+      '@type' => %w[Project Organization],
       '@id' => "http://localhost:3000/projects/#{@project.id}",
       'name' => @project.title,
       'description' => 'a lovely project',
@@ -238,7 +240,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'location' => 'Sofienstr 2, Heidelberg, Germany',
       'hostInstitution' => [
         {
-          '@type' => ['Project','Organization'],
+          '@type' => %w[Project Organization],
           '@id' => "http://localhost:3000/projects/#{event.projects.first.id}",
           'name' => event.projects.first.title
         }
@@ -266,8 +268,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.to_s,
       'dateModified' => @current_time.to_s,
       'encodingFormat' => 'application/pdf',
-      'provider' => [
-        { '@type' => ['Project','Organization'], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
+      'producer' => [
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
       ]
     }
 
@@ -293,12 +295,101 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.to_s,
       'dateModified' => @current_time.to_s,
       'encodingFormat' => 'application/pdf',
-      'provider' => [
-        { '@type' => ['Project','Organization'], '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
+      'producer' => [
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
       ]
     }
 
     json = JSON.parse(presentation.to_schema_ld)
+    assert_equal expected, json
+  end
+
+  test 'workflow' do
+    creator2 = Factory(:person)
+    workflow = travel_to(@current_time) do
+      workflow = Factory(:cwl_packed_workflow,
+                         title: 'This workflow',
+                         description: 'This is a test workflow for bioschema generation',
+                         creators: [@person, creator2],
+                         other_creators: 'Fred Bloggs, Steve Smith',
+                         contributor: @person,
+                         license: 'APSL-2.0')
+
+      workflow.internals = workflow.extractor.metadata[:internals]
+
+      workflow.add_annotations('wibble', 'tag', User.first)
+      disable_authorization_checks { workflow.save! }
+      workflow
+    end
+
+    expected = { '@context' => 'http://schema.org',
+                 '@type' => 'Workflow',
+                 '@id' => "http://localhost:3000/workflows/#{workflow.id}",
+                 'description' => 'This is a test workflow for bioschema generation',
+                 'name' => 'This workflow',
+                 'url' => "http://localhost:3000/workflows/#{workflow.id}",
+                 'keywords' => 'wibble',
+                 'license' => 'https://opensource.org/licenses/APSL-2.0',
+                 'creator' =>
+                    [{ '@type' => 'Person',
+                       '@id' => "http://localhost:3000/people/#{@person.id}",
+                       'name' => @person.name },
+                     { '@type' => 'Person',
+                       '@id' => "http://localhost:3000/people/#{creator2.id}",
+                       'name' => creator2.name },
+                     { '@type' => 'Person',
+                       'name' => 'Fred Bloggs' },
+                     { '@type' => 'Person',
+                       'name' => 'Steve Smith' }],
+                 'producer' =>
+                    [{ '@type' => %w[Project Organization],
+                       '@id' => "http://localhost:3000/projects/#{@project.id}",
+                       'name' => @project.title }],
+                 'dateCreated' => @current_time.to_s,
+                 'dateModified' => @current_time.to_s,
+                 'encodingFormat' => 'application/x-yaml',
+                 'sdPublisher' =>
+                    [{ '@type' => 'Person',
+                       '@id' => "http://localhost:3000/people/#{@person.id}",
+                       'name' => @person.name }],
+                 'version' => 1,
+                 'programmingLanguage' => 'CWL workflow',
+                 'inputs' => [
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.cofsfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.dmax' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.dmin' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.max-steps' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.mwmax-cof' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.mwmax-source' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.rulesfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.sinkfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.sourcefile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.std_mode' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.stereo_mode' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/input.topx' }
+                 ],
+                 'outputs' => [
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/solutionfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/sourceinsinkfile' },
+                   { '@type' => 'PropertyValueSpecification',
+                     'name' => '#main/stdout' }
+                 ] }
+
+    json = JSON.parse(workflow.to_schema_ld)
     assert_equal expected, json
   end
 end

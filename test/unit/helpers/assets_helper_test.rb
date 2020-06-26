@@ -17,7 +17,6 @@ class AssetsHelperTest < ActionView::TestCase
   end
 
   test 'form_submit_buttons' do
-
     new_study = Study.new
 
     @controller.action_name = 'new'
@@ -30,7 +29,6 @@ class AssetsHelperTest < ActionView::TestCase
 
     html = form_submit_buttons(new_study, validate:false, preview_permissions:false)
     assert_match /submit_button_clicked\(false, false, 'study'\);/,html
-
   end
 
   test 'submit button text' do
@@ -39,12 +37,10 @@ class AssetsHelperTest < ActionView::TestCase
     data_file = Factory(:data_file)
     investigation = Factory(:investigation)
 
-    assert_equal 'Create', submit_button_text(new_assay)
-    assert_equal 'Register', submit_button_text(new_model)
-    assert_equal 'Update', submit_button_text(data_file)
-    assert_equal 'Update', submit_button_text(investigation)
-
-
+    assert_equal t('submit_button.create'), submit_button_text(new_assay)
+    assert_equal t('submit_button.upload'), submit_button_text(new_model)
+    assert_equal t('submit_button.update'), submit_button_text(data_file)
+    assert_equal t('submit_button.update'), submit_button_text(investigation)
   end
 
   test 'rendered_asset_view' do
@@ -91,6 +87,56 @@ class AssetsHelperTest < ActionView::TestCase
       check_expected_authorised
     end
   end
+
+
+  test 'request_contact_button_enabled?' do
+    @owner = Factory(:max_person)
+    presentation = Factory :ppt_presentation, contributor: @owner
+    requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
+    sop = Factory(:sop, projects: [@project],contributor: nil)
+    sop.contributor= nil
+
+    with_config_value(:email_enabled,true) do
+      User.with_current_user(requester.user) do
+        assert request_contact_button_enabled?(presentation)
+        refute request_contact_button_enabled?(sop)
+      end
+
+      User.with_current_user(nil) do
+        refute request_contact_button_enabled?(presentation)
+        refute request_contact_button_enabled?(sop)
+      end
+    end
+
+    # no scenario will work without email enabled
+    with_config_value(:email_enabled,false) do
+      User.with_current_user(requester.user) do
+        refute request_contact_button_enabled?(presentation)
+        refute request_contact_button_enabled?(sop)
+      end
+
+      User.with_current_user(nil) do
+        refute request_contact_button_enabled?(presentation)
+        refute request_contact_button_enabled?(sop)
+      end
+    end
+
+    # not if recently requested
+    with_config_value(:email_enabled,true) do
+      User.with_current_user(requester.user) do
+        travel_to 16.hours.ago do
+          MessageLog.create(resource:presentation,sender:requester,message_type:MessageLog::CONTACT_REQUEST)
+        end
+        assert request_contact_button_enabled?(presentation)
+        travel_to 1.hour.ago do
+          MessageLog.create(resource:presentation,sender:requester,message_type:MessageLog::CONTACT_REQUEST)
+        end
+        refute request_contact_button_enabled?(presentation)
+      end
+    end
+  end
+
+
 
   def check_expected_authorised
     User.with_current_user(@user) do
@@ -153,7 +199,6 @@ class AssetsHelperTest < ActionView::TestCase
     assets << Factory(:sop, title: 'C', contributor: other_person, policy: Factory(:private_policy))
     assets << Factory(:sop, title: 'D', contributor: @user.person, policy: Factory(:publicly_viewable_policy))
     assets << Factory(:sop, title: 'E', contributor: other_person, policy: Factory(:publicly_viewable_policy))
-
     assets << Factory(:data_file, title: 'A', contributor: @user.person, policy: Factory(:downloadable_public_policy))
     assets << Factory(:data_file, title: 'B', contributor: other_person, policy: Factory(:downloadable_public_policy))
     assets

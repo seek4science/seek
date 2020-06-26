@@ -1,0 +1,16 @@
+th#human-disease-name {
+    min-width: 20em;
+}
+
+th#human-disease-synonyms {
+    width: auto;
+}
+
+th#human-disease-id {
+    width: 30em;
+}
+
+div#human-disease-search-results {
+    max-height: 30em;
+    overflow: auto;
+}

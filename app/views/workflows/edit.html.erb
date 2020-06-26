@@ -14,7 +14,20 @@
       <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
     </div>
 
+    <div class="form-group">
+      <label>Source</label>
+      <%= f.text_field :source_link_url, placeholder: 'https://...', class: "form-control" -%>
+      <p class="help-block">If this workflow came from an external repository (i.e. GitHub), you can include its original URL here.</p>
+    </div>
+
+    <div class="form-group">
+      <label>Maturity</label>
+      <%= f.select :maturity_level, Workflow::MATURITY_LEVELS.values.map { |k| [t("maturity_level.#{k}"), k] }, { include_blank: 'Not specified' }, class: "form-control" -%>
+      <p class="help-block">This field is used to indicate to users what level of stability they can expect from the workflow.</p>
+    </div>
+
     <%= render partial: 'assets/license_selector', locals: { resource: @workflow, license_group: :software, default_license: 'Apache-2.0' } %>
+    <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @workflow} -%>
     <%= render :partial => 'sharing/form' -%>
     <%= render :partial => 'assets/asset_form_bottom', :locals=> {:show_publications=>false, :f => f}-%>
     <%= render :partial => "assays/associate_assays", :locals=>{:resource => @workflow} -%>

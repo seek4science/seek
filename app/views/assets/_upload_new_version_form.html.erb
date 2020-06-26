@@ -1,15 +1,30 @@
-<% if logged_in_and_member? -%>
-    <%= panel('New version', :id => 'upload_new_version_form', :style => 'display: none') do %>
-        <%= form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
-            <%= render :partial=>"assets/upload_box" , locals: { resource: resource, new_version: true } -%>
+<%
+  asset_name = text_for_resource(resource)
+  extra_content ||= nil
+%>
 
-            <div class="form-group">
-              <label>Revision comments (optional)</label>
-              <%= text_area_tag :revision_comments, nil, :size=>"55x4", :class => 'form-control' -%>
-            </div>
-            <%= submit_tag "Upload", :id => "new_version_submit_btn",
-                           :onclick => "return validateUploadNewVersion();",
-                           :class => 'btn btn-primary'-%>
-        <% end %>
+<% if logged_in_and_member? -%>
+  <%= panel('New version', :id => 'upload_new_version_form', :style => 'display: none') do %>
+    <%= form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
+
+      <p>
+        You are about to upload a new version of this <%= asset_name -%>.
+        You should only upload a new version if you have made minor modifications,
+        such as tidying up or fixing errors, that do not change the original purpose of the file.
+        If you think this new version changes the original purpose or meaning of the <%= asset_name -%>,
+        then you should <%= link_to "upload it as a new item",polymorphic_path(resource,:action=>:new) -%>
+        rather than create a new version.
+      </p>
+
+      <%= render :partial=>"assets/upload_box" , locals: { resource: resource, extra_content: extra_content } -%>
+
+      <div class="form-group">
+        <label>Revision comments (optional)</label>
+        <%= text_area_tag :revision_comments, nil, :size=>"55x4", :class => 'form-control' -%>
+      </div>
+      <%= submit_tag "Upload", :id => "new_version_submit_btn",
+                     :onclick => "return validateUploadNewVersion();",
+                     :class => 'btn btn-primary'-%>
     <% end %>
+  <% end %>
 <% end %>

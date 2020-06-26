@@ -7,27 +7,28 @@
   resource_type = form.object.class.name.underscore
   resource_type_text = text_for_resource(form.object)
   collapsed = existing_creators.blank? if collapsed.nil?
+  assoc_text ||= form.object.class.human_attribute_name('creators', default: t('creator').pluralize).downcase
 %>
 
-<%= folding_panel(t('creator').capitalize.pluralize, collapsed, :id=>'author_form',:body_options => {:id => 'creator_fold_content'},
+<%= folding_panel(assoc_text.capitalize, collapsed, :id=>'author_form',:body_options => {:id => 'creator_fold_content'},
                   :help_text => "Here you attribute this #{resource_type_text} to other people.") do %>
   <p>
     If this <%= resource_type_text %> was created, by or together with, other members, please list their names below.
     <br/>
     <strong>
-      The <%= t('creator').pluralize -%> you specify will have permissions to 'view and edit summary and contents'.
+      The <%= assoc_text -%> you specify will have permissions to 'view and edit summary and contents'.
     </strong>
   </p>
 
   <p style="color: #666666;">
-    So far you have specified the following <%= t('creator').pluralize -%>:
+    So far you have specified the following <%= assoc_text -%>:
   </p>
   <%= hidden_field_tag "#{resource_type}[creator_ids][]" %>
   <ul id="creators_list" class="box_editing_inner">
     <li><span class="none_text" id="creators_text">Loading...</span></li>
   </ul>
   <p>
-    Please type <%= t('creator').pluralize -%> into the box below - suggestions will be displayed as you type.
+    Please type <%= assoc_text -%> into the box below - suggestions will be displayed as you type.
   </p>
   <p>
     <%= objects_input('creator-typeahead', [], :typeahead => {:query_url => typeahead_people_path + '?query=%QUERY'}) -%>

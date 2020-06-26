@@ -527,7 +527,7 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     assert_select '.filter-category[data-filter-category="contributor"]' do
-      assert_select '.filter-category-title', text: 'Contributor'
+      assert_select '.filter-category-title', text: 'Submitter'
       assert_select '.filter-option', href: /documents\?filter\[contributor\]=\d+/, count: 8
       assert_select '.filter-option.filter-option-active', count: 0
       # Should show 6 options and hide the rest
@@ -588,7 +588,7 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     assert_select '.filter-category[data-filter-category="contributor"]' do
-      assert_select '.filter-category-title', text: 'Contributor'
+      assert_select '.filter-category-title', text: 'Submitter'
       assert_select '.filter-option', count: 1
       assert_select '.filter-option.filter-option-active', count: 0
       assert_select '.filter-option.filter-option-hidden', count: 0
@@ -726,7 +726,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 21, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='other']", text: 'Other', count: 0
         assert_select 'option[value="custom"]', text: 'Custom range'
@@ -744,7 +744,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 6, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select 'option[value="custom"]', text: 'Custom range'
         assert_select 'option[value=""]', text: 'Any time'
@@ -772,7 +772,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 10, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='custom'][selected='selected']", text: 'Custom range'
         assert_select 'option[value=""]', text: 'Any time'
@@ -805,7 +805,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 9, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='custom'][selected='selected']", text: 'Custom range'
         assert_select 'option[value=""]', text: 'Any time'
@@ -838,7 +838,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 3, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='other'][selected='selected']", text: 'Other'
         assert_select "option[value='custom']", text: 'Custom range'
@@ -869,7 +869,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 7, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='other'][selected='selected']", text: 'Other'
         assert_select "option[value='custom']", text: 'Custom range'
@@ -921,7 +921,7 @@ class DocumentsControllerTest < ActionController::TestCase
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
-    document =  {title: 'Document', project_ids: [person.projects.first.id], asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}]}
+    document =  {title: 'Document', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Document.count') do
         assert_difference('ContentBlob.count') do
@@ -936,7 +936,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test 'should show discussion link' do
     asset_link = Factory(:discussion_link)
-    document = Factory(:document, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    document = Factory(:document, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     assert_equal [asset_link],document.discussion_links
     get :show, params: { id: document }
     assert_response :success
@@ -950,7 +950,7 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_nil document.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: document.id, document: { asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}] } }
+        put :update, params: { id: document.id, document: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
       end
     end
     assert_redirected_to document_path(document = assigns(:document))
@@ -964,7 +964,7 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal 1,document.discussion_links.count
     assert_no_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: document.id, document: { asset_links_attributes:[{id:document.discussion_links.first.id, url: "http://www.wibble.com/",link_type: AssetLink::DISCUSSION}] } }
+        put :update, params: { id: document.id, document: { discussion_links_attributes:[{id:document.discussion_links.first.id, url: "http://www.wibble.com/"}] } }
       end
     end
     document = assigns(:document)
@@ -977,10 +977,10 @@ class DocumentsControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person)
     asset_link = Factory(:discussion_link)
-    document = Factory(:document, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    document = Factory(:document, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
     refute_empty document.discussion_links
     assert_difference('AssetLink.discussion.count', -1) do
-      put :update, params: { id: document.id, document: { asset_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+      put :update, params: { id: document.id, document: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
     end
     document = assigns(:document)
     assert_redirected_to document_path(document)

@@ -583,7 +583,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_select '#buttons' do
-      assert_select 'a', text: /Request/, count: 1
+      assert_select 'a', text: /Request Contact/, count: 1
     end
   end
 
@@ -624,7 +624,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#buttons' do
       assert_select 'a[href=?]', download_data_file_path(df, version: df.version), count: 0
       assert_select 'a', text: /Download/, count: 0
-      assert_select 'a', text: /Request/, count: 0
     end
 
     assert_select '#usage_count' do
@@ -1140,23 +1139,6 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'request file button visibility when logged in and out' do
-    df = Factory :data_file, policy: Factory(:policy, access_type: Policy::VISIBLE)
-
-    assert !df.can_download?, 'The datafile must not be downloadable for this test to succeed'
-    assert_difference('ActivityLog.count') do
-      get :show, params: { id: df }
-    end
-
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('data_file')}/, count: 1
-
-    logout
-    get :show, params: { id: df }
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('data_file')}/, count: 0
-  end
-
   test "should create sharing permissions 'with your project and with all SysMO members'" do
     mock_http
     data_file, blob = valid_data_file_with_http_url
@@ -1536,7 +1518,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file.save
     get :show, params: { id: data_file }
 
-    assert_select 'div', text: 'another creator', count: 1
+    assert_select 'li.author-list-item', text: 'another creator', count: 1
   end
 
   # TODO: Permission UI testing - Replace this with a Jasmine test
@@ -3644,7 +3626,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person)
     blob = Factory(:content_blob)
     session[:uploaded_content_blob_id] = blob.id
-    data_file =  {title: 'DataFile', project_ids: [person.projects.first.id], asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}]}
+    data_file =  {title: 'DataFile', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('DataFile.count') do
         post :create_metadata, params: {data_file: data_file, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
@@ -3659,7 +3641,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'should show discussion link' do
     asset_link = Factory(:discussion_link)
-    data_file = Factory(:data_file, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    data_file = Factory(:data_file, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     get :show, params: { id: data_file }
     assert_response :success
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
@@ -3672,7 +3654,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_nil data_file.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: data_file.id, data_file: { asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}] } }
+        put :update, params: { id: data_file.id, data_file: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
       end
     end
     assert_redirected_to data_file_path(assigns(:data_file))
@@ -3686,7 +3668,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 1,data_file.discussion_links.count
     assert_no_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: data_file.id, data_file: { asset_links_attributes:[{id:data_file.discussion_links.first.id, url: "http://www.wibble.com/",link_type: AssetLink::DISCUSSION}] } }
+        put :update, params: { id: data_file.id, data_file: { discussion_links_attributes:[{id:data_file.discussion_links.first.id, url: "http://www.wibble.com/"}] } }
       end
     end
     data_file = assigns(:data_file)
@@ -3699,9 +3681,9 @@ class DataFilesControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person)
     asset_link = Factory(:discussion_link)
-    data_file = Factory(:data_file, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    data_file = Factory(:data_file, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
     assert_difference('AssetLink.discussion.count', -1) do
-      put :update, params: { id: data_file.id, data_file: { asset_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+      put :update, params: { id: data_file.id, data_file: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
     end
     assert_redirected_to data_file_path(data_file = assigns(:data_file))
     assert_empty data_file.discussion_links

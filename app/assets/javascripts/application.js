@@ -26,7 +26,7 @@
 //= require handlebars.runtime
 //= require handlebars_helpers
 //= require zenodo_form
-//= require batch_upload
+//= require upload
 //= require bootstrap_tab_memory
 //= require associations
 //= require people
@@ -42,7 +42,6 @@
 //= require samples
 //= require jstree
 //= require clipboard
-//= require upload_selection
 //= require openbis
 //= require calendar
 //= require inplace
@@ -55,4 +54,6 @@
 //= require uri
 //= require chartjs
 //= require lightbox2
+//= require i18n
+//= require i18n/translations
 //= require_tree ./templates

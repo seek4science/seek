@@ -152,7 +152,7 @@ class ApplicationController < ActionController::Base
 
   def project_membership_required
     unless User.logged_in_and_member? || admin_logged_in?
-      flash[:error] = 'Only members of known projects, institutions or work groups are allowed to create new content.'
+      flash[:error] = "Only members of #{t('project').downcase.pluralize} can create content."
       respond_to do |format|
         format.html do
           object = determine_asset_from_controller
@@ -560,6 +560,21 @@ class ApplicationController < ActionController::Base
         format.json { render json: {
             errors: [{ title: 'Forbidden',
                        details: 'This action is not permitted for API clients using OAuth.' }] }, status: :forbidden }
+      end
+    end
+  end
+
+  # Dynamically get parent resource from URL.
+  # i.e. /data_files/123/some_sub_resource/456
+  # would fetch DataFile with ID 123
+  #
+  def get_parent_resource
+    parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
+    if parent_id_param
+      parent_type = parent_id_param.to_s.chomp('_id')
+      parent_class = parent_type.camelize.constantize
+      if parent_class
+        @parent_resource = parent_class.find(params[parent_id_param])
       end
     end
   end

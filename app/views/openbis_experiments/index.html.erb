@@ -6,7 +6,7 @@
     </p>
 
     <%= form_tag({ controller: 'openbis_experiments', action: 'index' }, { method: 'get' }) do %>
-        <div class="form-group"><label>Project:</label> <%= @project.title %></div>
+        <div class="form-group"><label><%= t('project') -%>:</label> <%= @project.title %></div>
         <div class="form-group"><label>Endpoint:</label> <%= @openbis_endpoint.title %></div>
         <div class="form-group"><label>Entities like:</label> STUDY</div>
         <div class="form-group"><label>OpenBIS Type:</label>

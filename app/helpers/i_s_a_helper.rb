@@ -27,6 +27,8 @@ module ISAHelper
       'Sample' => '#FFF2D5',
       'Presentation' => '#FFB2E4',
       'Event' => '#FF918E',
+      'Workflow' => '#ADCDDC',
+      'Collection' => '#ABEACB',
       'HiddenItem' => '#D3D3D3'
   }
 

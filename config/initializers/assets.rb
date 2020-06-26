@@ -48,6 +48,7 @@ Rails.application.config.assets.precompile += [
     "yui/index.css",
     "appended/*.css",
     "jquery.flowchart.js",
-    "jquery.flowchart.css"
+    "jquery.flowchart.css",
+    "publications"
 ]
 

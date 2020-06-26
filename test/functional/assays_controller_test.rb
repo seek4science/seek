@@ -188,14 +188,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select 'p#technology_type', text: /Binding/, count: 1
   end
 
-  test 'should not show tagging when not logged in' do
-    logout
-    public_assay = Factory(:experimental_assay, policy: Factory(:public_policy))
-    get :show, params: { id: public_assay }
-    assert_response :success
-    assert_select 'div#tags_box', count: 0
-  end
-
   test 'should show modelling assay' do
     assert_difference('ActivityLog.count') do
       get :show, params: { id: assays(:modelling_assay_with_data_and_relationship) }
@@ -1244,19 +1236,20 @@ class AssaysControllerTest < ActionController::TestCase
 
     get :show, params: { id: assay.id }
     assert_response :success
-    assert_select 'span.author_avatar a[href=?]', "/people/#{creator.id}"
+    assert_select 'li.author-list-item a[href=?]', "/people/#{creator.id}"
   end
 
   test 'should show other creators' do
     assay = Factory(:assay, policy: Factory(:public_policy))
-    other_creators = 'other creators'
+    other_creators = 'john smith, jane smith'
     assay.other_creators = other_creators
     assay.save
     assay.reload
 
     get :show, params: { id: assay.id }
     assert_response :success
-    assert_select 'div.panel-body div', text: other_creators
+    assert_select 'li.author-list-item', text: 'john smith'
+    assert_select 'li.author-list-item', text: 'jane smith'
   end
 
   test 'programme assays through nested routing' do

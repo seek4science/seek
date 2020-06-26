@@ -24,14 +24,6 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     @to_patch = load_template("patch_min_#{@clz}.json.erb", { id: workflow.id })
   end
 
-  def populate_extra_relationships(hash=nil)
-    extra_relationships = {}
-    extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
-    extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' },
-                                            { id: @creator.id.to_s, type: 'people' }] }
-    extra_relationships.with_indifferent_access
-  end
-
   test 'can add content to API-created workflow' do
     wf = Factory(:api_cwl_workflow, contributor: @current_person)
 
@@ -42,7 +34,7 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     original_md5 = wf.content_blob.md5sum
     put workflow_content_blob_path(wf, wf.content_blob),
         headers: { 'Accept' => 'application/json',
-                   'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'rp2-to-rp2path.cwl')) }
+                   'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'workflows', 'rp2-to-rp2path.cwl')) }
 
     assert_response :success
     blob = wf.content_blob.reload
@@ -52,7 +44,7 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
   end
 
   test 'can create workflow with remote content' do
-    stub_request(:get, 'http://mockedlocation.com/workflow.cwl').to_return(body: File.new("#{Rails.root}/test/fixtures/files/rp2-to-rp2path.cwl"),
+    stub_request(:get, 'http://mockedlocation.com/workflow.cwl').to_return(body: File.new("#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path.cwl"),
                                                                            status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
     stub_request(:head, 'http://mockedlocation.com/workflow.cwl').to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
 
@@ -71,9 +63,9 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     h = JSON.parse(response.body)
 
     hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
-    hash_comparison(populate_extra_attributes, h['data']['attributes'])
+    hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
 
     hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
-    hash_comparison(populate_extra_relationships, h['data']['relationships'])
+    hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
   end
 end
