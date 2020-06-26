@@ -1356,7 +1356,7 @@ class ModelsControllerTest < ActionController::TestCase
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
-    model =  {title: 'Model', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
+    model =  {title: 'Model', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/", label:'the slack about this model'}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Model.count') do
         assert_difference('ContentBlob.count') do
@@ -1366,6 +1366,7 @@ class ModelsControllerTest < ActionController::TestCase
     end
     model = assigns(:model)
     assert_equal 'http://www.slack.com/', model.discussion_links.first.url
+    assert_equal 'the slack about this model', model.discussion_links.first.label
     assert_equal AssetLink::DISCUSSION, model.discussion_links.first.link_type
   end
 

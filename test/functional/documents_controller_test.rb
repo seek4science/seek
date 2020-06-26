@@ -921,7 +921,7 @@ class DocumentsControllerTest < ActionController::TestCase
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
-    document =  {title: 'Document', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
+    document =  {title: 'Document', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/", label:'our slack'}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Document.count') do
         assert_difference('ContentBlob.count') do
@@ -931,16 +931,43 @@ class DocumentsControllerTest < ActionController::TestCase
     end
     document = assigns(:document)
     assert_equal 'http://www.slack.com/', document.discussion_links.first.url
+    assert_equal 'our slack', document.discussion_links.first.label
     assert_equal AssetLink::DISCUSSION, document.discussion_links.first.link_type
   end
 
-  test 'should show discussion link' do
+  test 'should show discussion link with label' do
+    asset_link = Factory(:discussion_link, label:'discuss-label')
+    document = Factory(:document, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    assert_equal [asset_link],document.discussion_links
+    get :show, params: { id: document }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+    assert_select 'div.discussion-link', count:1 do
+      assert_select 'a[href=?]',asset_link.url,text:'discuss-label'
+    end
+  end
+
+  test 'should show discussion link without label' do
     asset_link = Factory(:discussion_link)
     document = Factory(:document, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     assert_equal [asset_link],document.discussion_links
     get :show, params: { id: document }
     assert_response :success
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+    assert_select 'div.discussion-link', count:1 do
+      assert_select 'a[href=?]',asset_link.url,text:asset_link.url
+    end
+
+    #blank rather than nil
+    asset_link.update_column(:label,'')
+    document.reload
+    assert_equal [asset_link],document.discussion_links
+    get :show, params: { id: document }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+    assert_select 'div.discussion-link', count:1 do
+      assert_select 'a[href=?]',asset_link.url,text:asset_link.url
+    end
   end
 
   test 'should update document with new discussion link' do
@@ -950,11 +977,12 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_nil document.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: document.id, document: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
+        put :update, params: { id: document.id, document: { discussion_links_attributes:[{url: "http://www.slack.com/", label:'our slack'}] } }
       end
     end
     assert_redirected_to document_path(document = assigns(:document))
     assert_equal 'http://www.slack.com/', document.discussion_links.first.url
+    assert_equal 'our slack', document.discussion_links.first.label
   end
 
   test 'should update document with edited discussion link' do

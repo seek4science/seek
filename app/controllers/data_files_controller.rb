@@ -505,7 +505,7 @@ class DataFilesController < ApplicationController
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       { scales: [] }, { publication_ids: [] },
-                                      discussion_links_attributes:[:id, :url, :_destroy])
+                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   def data_file_assay_params
