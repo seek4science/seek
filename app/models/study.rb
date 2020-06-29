@@ -110,7 +110,7 @@ class Study < ApplicationRecord
   end
 
 
-  def self.unzip_batch(file_path)
+  def self.unzip_batch(file_path, user_uuid)
     unzipped_files = Zip::File.open(file_path)
     user_uuid = "#{User.current_user.attributes["uuid"]}"
     Dir.mkdir("#{Rails.root}/tmp/#{user_uuid}_studies_upload") unless File.exists?("#{Rails.root}/tmp/#{user_uuid}_studies_upload")
@@ -119,7 +119,7 @@ class Study < ApplicationRecord
     studies = []
     unzipped_files.entries.each do |file|
       file_name = File.basename(file.name)
-      if file.name.include?('/data/') && file.ftype != :directory
+      if file.name.include?('data/') && file.ftype != :directory
         study_data << file
         Dir.mkdir "#{tmp_dir}/data" unless File.exists? "#{tmp_dir}/data"
         file.extract("#{tmp_dir}/data/#{file_name}") unless File.exists? "#{tmp_dir}/data/#{file_name}"
