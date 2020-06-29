@@ -41,3 +41,23 @@ Factory.define(:study_custom_metadata_type_with_spaces, class: CustomMetadataTyp
     a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'full address')
   end
 end
+
+Factory.define(:study_custom_metadata_type_with_clashes, class: CustomMetadataType) do |f|
+  f.title 'study custom metadata type with clashes'
+  f.supported_type 'Study'
+  f.after_build do |a|
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'Full name')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'full name')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'full  name')
+  end
+end
+
+Factory.define(:study_custom_metadata_type_with_symbols, class: CustomMetadataType) do |f|
+  f.title 'study custom metadata type with symbols'
+  f.supported_type 'Study'
+  f.after_build do |a|
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'+name')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'-name')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'&name')
+  end
+end
