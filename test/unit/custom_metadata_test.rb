@@ -156,6 +156,69 @@ class CustomMetadataTest < ActiveSupport::TestCase
 
   end
 
+  test 'associated metadata destroyed with study' do
+    contributor=Factory(:person)
+    User.with_current_user(contributor.user) do
+      study = Factory.build(:study,title:'test study',
+                        contributor:contributor,
+                        custom_metadata:CustomMetadata.new(
+                            custom_metadata_type:Factory(:simple_study_custom_metadata_type),
+                            data: { name: 'Fred', age: 25}
+                        ))
+      assert study.valid?
+      study.save!
+      study.reload
+      assert_difference('Study.count',-1) do
+        assert_difference('CustomMetadata.count',-1) do
+          study.destroy
+        end
+      end
+    end
+
+  end
+
+  test 'associated metadata destroyed with investigation' do
+    contributor=Factory(:person)
+    User.with_current_user(contributor.user) do
+      inv = Factory.build(:investigation, title:'test inv',
+                        contributor:contributor,
+                        custom_metadata:CustomMetadata.new(
+                            custom_metadata_type:Factory(:simple_investigation_custom_metadata_type),
+                            data: { name: 'Fred', age: 25}
+                        ))
+      assert inv.valid?
+      inv.save!
+      inv.reload
+      assert_difference('Investigation.count',-1) do
+        assert_difference('CustomMetadata.count',-1) do
+          inv.destroy
+        end
+      end
+    end
+  end
+
+
+  test 'associated metadata destroyed with assay' do
+    contributor=Factory(:person)
+    User.with_current_user(contributor.user) do
+      assay = Factory.build(:assay,title:'test assay',
+                        contributor:contributor,
+                        custom_metadata:CustomMetadata.new(
+                            custom_metadata_type:Factory(:simple_assay_custom_metadata_type),
+                            data: { name: 'Fred', age: 25}
+                        ))
+      assert assay.valid?
+      assay.save!
+      assay.reload
+      assert_difference('Assay.count',-1) do
+        assert_difference('CustomMetadata.count',-1) do
+          assay.destroy
+        end
+      end
+    end
+
+  end
+
   private
 
   def simple_test_object
