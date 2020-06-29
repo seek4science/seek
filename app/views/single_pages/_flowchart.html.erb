@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="draggable_operators_divs">
-                <span style="color:#888"><i class="glyphicon glyphicon-info-sign"></i> Drag & drop these items to
+                <span style="color:#888"><i class="glyphicon glyphicon-info-sign"></i> Drag & Drop into
                     the canvas:</span><br />
                 <div class="draggable_operator ui-draggable ui-draggable-handle wf_btn" data-nb-inputs="1" data-nb-outputs="1" data-shape='rectangle' data-shape_id='na'>Assay</div>
             </div>
@@ -36,7 +36,7 @@
         <div class="modal-dialog modal-m">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                    <button class="close" data-dismiss="modal"><span aria-hidden="true" onClick="removeBlock()">×</span></button>
                     <h4 class="modal-title">Assay</h4>
                 </div>
                 <div class="modal-body">
@@ -116,10 +116,6 @@
             },
         ]
     }]
-
-    let initialflowchart =
-        '{"operators":{"0":{"properties":{"title":"Sample source","inputs":{"input_0":{"label":"Input 1"}},"outputs":{"output_0":{"label":"Output 1"}},"shape":"parallelogram","shape_id":"init"},"left":40,"top":100}},"links":{},"operatorTypes":{}}'
-
 
     const init_flowchart = () => {
         var $flowchart = $j('#chart_canvas');
@@ -438,8 +434,13 @@
     })
 
     $j("#btnCancelAssay").on("click", () => {
-        $j("#assayInfo").hide()
+        $j("#assayInfo").hide();
+        removeBlock();
     })
+
+    removeBlock = ()=>{
+        $j('#chart_canvas').flowchart('deleteSelected');
+    }
 
     const addAssayTypeOptions = () => {
         $j('#assayType').empty()
