@@ -7,44 +7,33 @@
             </div>
             <div class="col-md-11">
                 <div class="col-md-12">
-                    <p id="method-title"><strong style="text-align: center;">Title:</strong><input type="text" class="form-control" /></p>
+                    <p id="method-title"><strong style="text-align: center;">Title:</strong><input id="method_title" type="text" class="form-control" /></p>
                     </p>
-                    <p id="method-description"> <strong>Description:</strong><input type="text" class="form-control" /></p>
+                    <p id="method-description"> <strong>Description:</strong><input id="method_description" type="text" class="form-control" /></p>
                     <input type="hidden" id="method-id">
                 </div>
             </div>
         </div>
     </div>
     <hr>
-    <a class="btn btn-primary" id="btn_replace_method">Replace file</a>
-    <input id="method-upload" type="file" style="display:none">
+    <a class="btn btn-primary" id="btn_update_method">Update</a>
 </div>
 
 
 <script>
-    $j("#btn_replace_method").on("click", () => {
-        $j("#method-upload").click();
-    })
-
-
-    $j('#method-upload').on('change', (e) => {
-        $j("#btn_replace_method").attr("disabled", "disabled")
-        let file = $j('#method-upload')[0].files[0]
+    $j("#btn_update_method").on("click", () => {
+        $j("#btn_update_method").attr("disabled", "disabled")
         const methodId = $j("#method-id").val()
-        $j('#method-upload').val('');
         let data = {
             "data": {
                 "type": "sops",
                 "id": methodId,
                 "attributes": {
-                    "content_blobs": [{
-                        "original_filename": "aaaa",
-                        // "content_type": file.type
-                    }],
+                    "title": $j("#method_title").val(),
+                    "description": $j("#method_description").val()
                 }
             }
         }
-        // /sops/{methodId}/content_blobs/blob_id
         $j.ajax({
             method: 'PATCH',
             "headers": {
@@ -55,14 +44,13 @@
             url: `/sops/${methodId}`,
             data: JSON.stringify(data),
             success: s => {
-                $j("#btn_replace_method").removeAttr("disabled")
-                location.reload(true);
+                $j(this).removeAttr("disabled")
+                location.reload();
             },
             error: (e) => {
-                $j("#btn_replace_method").removeAttr("disabled")
-                alert('An error updating the method')
+                $j(this).removeAttr("disabled")
+                alert('An error occurred when updating the method')
             }
         })
-
     })
 </script>
