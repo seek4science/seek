@@ -1,0 +1,5 @@
+<%= list_item_attribute "Taxonomy URI",text_or_not_specified(resource.concept_uri) -%>
+<% unless (concept = resource.concept).nil? %>
+  <%= list_item_attribute 'Synonyms', concept[:synonyms].join(', ') if concept[:synonyms].any? -%>
+  <%= list_item_attribute 'Definitions', concept[:definitions].join(', ') if concept[:definitions].any? -%>
+<% end %>

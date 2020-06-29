@@ -1,4 +1,4 @@
-  require 'test_helper'
+require 'test_helper'
 require 'minitest/mock'
 require 'private_address_check'
 
@@ -91,7 +91,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url to github' do
     stub_request(:any, 'https://github.com/bob/workflows/blob/master/dir/the_workflow.cwl').to_return(status: 200)
     stub_request(:any, 'https://raw.githubusercontent.com/bob/workflows/master/dir/the_workflow.cwl').to_return(
-        body: File.new("#{Rails.root}/test/fixtures/files/rp2-to-rp2path.cwl"),
+        body: File.new("#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path.cwl"),
         status: 200,
         headers: { 'Content-Length' => 1118,
                    'Content-Type' => 'text/plain' })

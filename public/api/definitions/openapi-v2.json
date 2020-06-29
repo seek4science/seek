@@ -170,6 +170,12 @@
             }
         },
         {
+            "name": "collections",
+            "description": {
+                "$ref": "../descriptions/collections.md"
+            }
+        },
+        {
             "name": "contentBlobs",
             "description": {
                 "$ref": "../descriptions/contentBlobs.md"
@@ -275,6 +281,7 @@
         {
             "name": "Assets",
             "tags": [
+                "collections",
                 "dataFiles",
                 "documents",
                 "models",
@@ -393,6 +400,7 @@
                     "type": "string",
                     "enum": [
                         "assays",
+                        "collections",
                         "data_files",
                         "events",
                         "institutions",
@@ -621,6 +629,480 @@
                 "tags": [
                     "delete",
                     "assays"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ok"
+                        }
+                    }
+                }
+            }
+        },
+        "/collections": {
+            "get": {
+                "operationId": "listCollections",
+                "description": {
+                    "$ref": "../descriptions/listCollections.md"
+                },
+                "tags": [
+                    "list",
+                    "collections"
+                ],
+                "responses": {
+                    "501": {
+                        "description": "Not implemented"
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/collectionsResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/collectionsResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "createCollection",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/createCollection.md"
+                },
+                "tags": [
+                    "create",
+                    "collections"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "collection",
+                        "description": "The collection to create.",
+                        "schema": {
+                            "$ref": "#/definitions/collectionPost"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/bad_request"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "schema": {
+                            "$ref": "#/definitions/unprocessable_entity"
+                        }
+                    },
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/collectionResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/collectionPostResponse.json"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/collections/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "description": "The collection to fetch",
+                    "type": "integer",
+                    "default": 1152
+                }
+            ],
+            "get": {
+                "operationId": "readCollection",
+                "description": {
+                    "$ref": "../descriptions/readCollection.md"
+                },
+                "tags": [
+                    "read",
+                    "collections"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/collectionResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/collectionResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "updateCollection",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/updateCollection.md"
+                },
+                "tags": [
+                    "update",
+                    "collections"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "collection",
+                        "description": "The collection to patch.",
+                        "schema": {
+                            "$ref": "#/definitions/collectionPatch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "schema": {
+                            "$ref": "#/definitions/unprocessable_entity"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/collectionResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/collectionPatchResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "deleteCollection",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/deleteCollection.md"
+                },
+                "tags": [
+                    "delete",
+                    "collections"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ok"
+                        }
+                    }
+                }
+            }
+        },
+        "/collections/{collection_id}/items": {
+            "parameters": [
+                {
+                    "name": "collection_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "The ID of the collection",
+                    "type": "integer",
+                    "default": 123
+                }
+            ],
+            "get": {
+                "operationId": "listCollectionItems",
+                "description": {
+                    "$ref": "../descriptions/listCollectionItems.md"
+                },
+                "tags": [
+                    "list",
+                    "collections"
+                ],
+                "responses": {
+                    "501": {
+                        "description": "Not implemented"
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/collectionItemsResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/collectionItemsResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "createCollectionItem",
+                "security": [
+                    {
+                        "OAuth2": [
+                            "write"
+                        ]
+                    },
+                    {
+                        "apiToken": []
+                    },
+                    {
+                        "basicAuth": []
+                    }
+                ],
+                "description": {
+                    "$ref": "../descriptions/createCollectionItem.md"
+                },
+                "tags": [
+                    "create",
+                    "collections"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "collection_item",
+                        "description": "The collection item to create.",
+                        "schema": {
+                            "$ref": "#/definitions/collectionItemPost"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/bad_request"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "schema": {
+                            "$ref": "#/definitions/unprocessable_entity"
+                        }
+                    },
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/collectionItemResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/collectionItemPostResponse.json"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/collections/{collection_id}/items/{id}": {
+            "parameters": [
+                {
+                    "name": "collection_id",
+                    "in": "path",
+                    "required": true,
+                    "description": "The ID of the collection",
+                    "type": "integer",
+                    "default": 123
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "description": "The ID of the item in the collection",
+                    "type": "integer",
+                    "default": 1152
+                }
+            ],
+            "get": {
+                "operationId": "readCollectionItem",
+                "description": {
+                    "$ref": "../descriptions/readCollectionItem.md"
+                },
+                "tags": [
+                    "read",
+                    "collections"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/collectionItemResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/collectionItemResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "updateCollectionItem",
+                "security": [
+                    {
+                        "OAuth2": [
+                            "write"
+                        ]
+                    },
+                    {
+                        "apiToken": []
+                    },
+                    {
+                        "basicAuth": []
+                    }
+                ],
+                "description": {
+                    "$ref": "../descriptions/updateCollectionItem.md"
+                },
+                "tags": [
+                    "update",
+                    "collections"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "collection_item",
+                        "description": "The collection item to patch.",
+                        "schema": {
+                            "$ref": "#/definitions/collectionItemPatch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "schema": {
+                            "$ref": "#/definitions/unprocessable_entity"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/collectionItemResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/collectionItemPatchResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "deleteCollectionItem",
+                "security": [
+                    {
+                        "OAuth2": [
+                            "write"
+                        ]
+                    },
+                    {
+                        "apiToken": []
+                    },
+                    {
+                        "basicAuth": []
+                    }
+                ],
+                "description": {
+                    "$ref": "../descriptions/deleteCollectionItem.md"
+                },
+                "tags": [
+                    "delete",
+                    "collections"
                 ],
                 "responses": {
                     "403": {
@@ -4540,6 +5022,56 @@
                 "content_blobs"
             ]
         },
+        "collectionType": {
+            "type": "string",
+            "minLength": 1,
+            "enum": [
+                "collections"
+            ]
+        },
+        "collectionItemType": {
+            "type": "string",
+            "minLength": 1,
+            "enum": [
+                "collection_items"
+            ]
+        },
+        "collectionReferencesList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/collectionReferences"
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false
+        },
+        "collectionSingletonReference": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/collectionReference"
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false
+        },
+        "collectionItemReferencesList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/collectionReferences"
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false
+        },
         "dataFileType": {
             "type": "string",
             "minLength": 1,
@@ -5155,6 +5687,269 @@
             "items": {
                 "$ref": "#/definitions/assaySkeleton"
             }
+        },
+        "collectionReferences": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/collectionReference"
+            }
+        },
+        "collectionReference": {
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/collectionType"
+                }
+            },
+            "required": [
+                "id",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "collectionSkeleton": {
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/collectionType"
+                },
+                "attributes": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        }
+                    },
+                    "required": [
+                        "title"
+                    ],
+                    "additionalProperties": false
+                },
+                "links": {
+                    "$ref": "#/definitions/linksType"
+                }
+            },
+            "required": [
+                "id",
+                "type",
+                "attributes",
+                "links"
+            ],
+            "additionalProperties": false
+        },
+        "collectionSkeletons": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/collectionSkeleton"
+            }
+        },
+        "collectionsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/collectionSkeletons"
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                },
+                "meta": {
+                    "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi",
+                "meta"
+            ],
+            "additionalProperties": false
+        },
+        "collectionItemReferences": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/collectionItemReference"
+            }
+        },
+        "collectionItemReference": {
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/collectionItemType"
+                }
+            },
+            "required": [
+                "id",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "collectionItem":  {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/collectionType"
+                },
+                "attributes": {
+                    "type": "object",
+                    "properties": {
+                        "comment": {
+                            "$ref": "#/definitions/nullableNonEmptyString"
+                        },
+                        "order": {
+                            "$ref": "#/definitions/nullableInteger"
+                        }
+                    },
+                    "required": [
+                        "comment",
+                        "order"
+                    ],
+                    "additionalProperties": false
+                },
+                "relationships": {
+                    "type": "object",
+                    "properties": {
+                        "asset": {
+                            "$ref": "#/definitions/assetSingletonReferenceWithTitle"
+                        },
+                        "collection": {
+                            "$ref": "#/definitions/collectionSingletonReference"
+                        }
+                    },
+                    "required": [
+                        "collection"
+                    ],
+                    "additionalProperties": false
+                },
+                "links": {
+                    "$ref": "#/definitions/linksType"
+                },
+                "meta": {
+                    "$ref": "#/definitions/metaType"
+                }
+            },
+            "required": [
+                "id",
+                "type",
+                "attributes",
+                "relationships",
+                "links",
+                "meta"
+            ],
+            "additionalProperties": false
+        },
+        "collectionItemResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/collectionItem"
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi"
+            ],
+            "additionalProperties": false
+        },
+        "assetType": {
+            "type": "string",
+            "minLength": 1,
+            "enum": [
+                "collections",
+                "data_files",
+                "documents",
+                "models",
+                "publications",
+                "sops",
+                "workflows"
+            ]
+        },
+        "assetReferences": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/assetReference"
+            }
+        },
+        "assetReference": {
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/assetType"
+                }
+            },
+            "required": [
+                "id",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "assetReferencesList": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/assetReferences"
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false
+        },
+        "assetSingletonReference": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/assetReference"
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false
+        },
+        "assetSingletonReferenceWithTitle": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/assetReference"
+                },
+                "meta": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/nullableNonEmptyString"
+                        }
+                    }
+                }
+            },
+            "required": [
+                "data",
+                "meta"
+            ],
+            "additionalProperties": false
         },
         "dataFileReferences": {
             "type": "array",
@@ -5910,6 +6705,344 @@
             "additionalProperties": false,
             "example": {
                 "$ref": "../examples/assayPatch.json"
+            }
+        },
+        "collectionResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "type": {
+                            "$ref": "#/definitions/collectionType"
+                        },
+                        "attributes": {
+                            "$ref": "#/definitions/contributedTypeAttributes"
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "creators": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "submitter": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "people": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                },
+                                "publications": {
+                                    "$ref": "#/definitions/publicationReferencesList"
+                                },
+                                "items": {
+                                    "$ref": "#/definitions/collectionItemReferencesList"
+                                }
+                            },
+                            "required": [
+                                "creators",
+                                "submitter",
+                                "people",
+                                "projects",
+                                "publications",
+                                "items"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "links": {
+                            "$ref": "#/definitions/linksType"
+                        },
+                        "meta": {
+                            "$ref": "#/definitions/metaType"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "type",
+                        "attributes",
+                        "relationships",
+                        "links",
+                        "meta"
+                    ],
+                    "additionalProperties": false
+                },
+                "included": {
+                    "type": "array",
+                    "minItems": 0,
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "#/definitions/collectionItem"
+                    }
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                }
+            },
+            "required": [
+                "data",
+                "included",
+                "jsonapi"
+            ],
+            "additionalProperties": false
+        },
+        "collectionPost": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "$ref": "#/definitions/collectionType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "tags": {
+                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                },
+                                "title": {
+                                    "$ref": "#/definitions/nonEmptyString"
+                                },
+                                "description": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "license": {
+                                    "$ref": "#/definitions/nullableLicense"
+                                },
+                                "policy": {
+                                    "$ref": "#/definitions/policy"
+                                },
+                                "content_blobs": {
+                                    "$ref": "#/definitions/contentBlobSlotsList"
+                                },
+                                "other_creators": {
+                                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                                }
+                            },
+                            "required": [
+                                "title",
+                                "content_blobs"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "creators": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                }
+                            },
+                            "required": [
+                                "projects"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "attributes",
+                        "relationships"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "$ref": "../examples/collectionPost.json"
+            }
+        },
+        "collectionPatch": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "type": {
+                            "$ref": "#/definitions/collectionType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "tags": {
+                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                },
+                                "title": {
+                                    "$ref": "#/definitions/nonEmptyString"
+                                },
+                                "description": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "license": {
+                                    "$ref": "#/definitions/nullableLicense"
+                                },
+                                "policy": {
+                                    "$ref": "#/definitions/policy"
+                                },
+                                "other_creators": {
+                                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "creators": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "type"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "$ref": "../examples/collectionPatch.json"
+            }
+        },
+        "collectionItemResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/collectionItem"
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi"
+            ],
+            "additionalProperties": false
+        },
+        "collectionItemPost": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "$ref": "#/definitions/collectionItemType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "comment": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "order": {
+                                    "$ref": "#/definitions/nullableInteger"
+                                }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "asset": {
+                                    "$ref": "#/definitions/assetSingletonReference"
+                                }
+                            },
+                            "required": [
+                                "asset"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "relationships"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "$ref": "../examples/collectionItemPost.json"
+            }
+        },
+        "collectionItemPatch": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "type": {
+                            "$ref": "#/definitions/collectionType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "comment": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "order": {
+                                    "$ref": "#/definitions/nullableInteger"
+                                }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "asset": {
+                                    "$ref": "#/definitions/assetSingletonReference"
+                                }
+                            },
+                            "required": [
+                                "asset"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "type"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "$ref": "../examples/collectionItemPatch.json"
             }
         },
         "dataFileResponse": {
@@ -9074,7 +10207,7 @@
                                             "$ref": "#/definitions/nonEmptyString"
                                         },
                                         "key": {
-                                            "$ref": "#/definitions/nonEmptyString"
+                                            "$ref": "#/definitions/nullableNonEmptyString"
                                         },
                                         "description": {
                                             "$ref": "#/definitions/nullableNonEmptyString"
@@ -9304,7 +10437,6 @@
                             },
                             "required": [
                                 "title",
-                                "workflow_class",
                                 "content_blobs"
                             ],
                             "additionalProperties": false
@@ -9462,6 +10594,137 @@
             "properties": {
                 "data": {
                     "$ref": "#/definitions/dataFileSkeletons"
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                },
+                "meta": {
+                    "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi",
+                "meta"
+            ],
+            "additionalProperties": false
+        },
+        "collectionSkeleton": {
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/collectionType"
+                },
+                "attributes": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        }
+                    },
+                    "required": [
+                        "title"
+                    ],
+                    "additionalProperties": false
+                },
+                "links": {
+                    "$ref": "#/definitions/linksType"
+                }
+            },
+            "required": [
+                "id",
+                "type",
+                "attributes",
+                "links"
+            ],
+            "additionalProperties": false
+        },
+        "collectionSkeletons": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/collectionSkeleton"
+            }
+        },
+        "collectionsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/collectionSkeletons"
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                },
+                "meta": {
+                    "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi",
+                "meta"
+            ],
+            "additionalProperties": false
+        },
+        "collectionItemSkeleton": {
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/collectionItemType"
+                },
+                "attributes": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        }
+                    },
+                    "required": [
+                        "title"
+                    ],
+                    "additionalProperties": false
+                },
+                "links": {
+                    "$ref": "#/definitions/linksType"
+                }
+            },
+            "required": [
+                "id",
+                "type",
+                "attributes",
+                "links"
+            ],
+            "additionalProperties": false
+        },
+        "collectionItemSkeletons": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/collectionItemSkeleton"
+            }
+        },
+        "collectionItemsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "minItems": 0,
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "#/definitions/collectionItem"
+                    }
                 },
                 "jsonapi": {
                     "$ref": "#/definitions/JsonApiVersion"

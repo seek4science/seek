@@ -1,0 +1,41 @@
+{
+  "data": {
+    "id": "8233983737",
+    "type": "human_diseases",
+    "attributes": {
+      "title": "A Minimal Human Disease",
+      "concept_uri": null,
+      "ontology_id": null
+    },
+    "relationships": {
+      "projects": {
+        "data": []
+      },
+      "assays": {
+        "data": []
+      },
+      "models": {
+        "data": []
+      },
+      "parents": {
+        "data": []
+      },
+      "children": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/human_diseases/8233983737"
+    },
+    "meta": {
+      "created": "2020-05-04T12:59:42.000Z",
+      "modified": "2020-05-04T12:59:42.000Z",
+      "uuid": "60dd04ec-2d4a-48a3-ab27-cbebf4adca89",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.2"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

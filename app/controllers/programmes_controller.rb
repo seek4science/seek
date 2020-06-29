@@ -135,7 +135,7 @@ class ProgrammesController < ApplicationController
   def inactive_view_allowed?
     return true if @programme.is_activated? || User.admin_logged_in?
     unless result=(User.logged_in_and_registered? && @programme.programme_administrators.include?(current_person))
-      error("This programme is not activated and cannot be viewed", "cannot view (not activated)", :forbidden)
+      error("This #{t('programme').downcase} is not activated and cannot be viewed", "cannot view (not activated)", :forbidden)
     end
     result
   end

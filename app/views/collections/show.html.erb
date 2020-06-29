@@ -1,0 +1,57 @@
+<%= render partial: 'general/item_title', locals: { item: @collection, buttons_partial: 'assets/asset_buttons' } -%>
+
+<div class="row">
+  <div class="col-md-9 col-sm-8 box_about_actor">
+    <%= item_description @collection.description -%>
+
+    <div class="row">
+      <div class="col-md-6">
+        <%= persistent_resource_id(@collection) %>
+
+        <%= render partial: 'assets/special_auth_code_display', locals: { resource: @collection } %>
+
+        <%= render partial: 'assets/asset_doi', locals: { displayed_resource: @collection } %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <%= panel('Items') do %>
+          <% if @collection.items.any? %>
+            <ul class="feed">
+              <% @collection.items.each do |item| %>
+                <li>
+                  <% if item.asset.can_view? %>
+                    <%= link_to(avatar(item.asset, 60, true, nil, nil, true, 'home_asset_icon'), item.asset, class: 'file-type-icon') %>
+                    <%= link_to(item.asset.title, item.asset, 'data-tooltip' => item.asset.description, target: '_blank') %>
+                  <% else %>
+                    <span class="none_text"><%= t('private_asset') -%></span>
+                  <% end %>
+                  <br/>
+                  <%= item.comment -%>
+                  <span class='subtle'>- Added <%= time_ago_in_words(item.created_at) -%> ago</span>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <% if @collection.can_edit? %>
+              <%= alert_box('info', hide_button: true) do %>
+                This collection is currently empty. To add an item to it, browse to the item you wish to add and click the
+                "Add to collection" button the top right.
+              <% end %>
+            <% else %>
+              <span class="none_text">None</span>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-sm-4">
+    <%= render partial: 'layouts/contribution_section_box_avatar', locals: { object: @collection } -%>
+    <%= render partial: 'assets/resource_main_content_right', locals: { resource: @collection, authors_title: 'Maintainers' } %>
+  </div>
+</div>
+
+<%= render partial: 'general/items_related_to', object: @collection %>

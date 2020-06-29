@@ -78,7 +78,7 @@
           <div class="checkbox">
             <label>
               <%= check_box_tag(:all_projects, '1', false, 'data-role' => 'seek-association-filter-field') %>
-              <strong>Show data from all projects?</strong>
+              <strong>Show data from all <%= t('project').downcase.pluralize -%>?</strong>
             </label>
           </div>
 

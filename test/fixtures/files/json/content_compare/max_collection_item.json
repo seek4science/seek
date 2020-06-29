@@ -1,0 +1,38 @@
+{
+  "data": {
+    "id": "48",
+    "type": "collection_items",
+    "attributes": {
+      "comment": "A document",
+      "order": 1
+    },
+    "relationships": {
+      "collection": {
+        "data": {
+          "id": "93",
+          "type": "collections"
+        }
+      },
+      "asset": {
+        "data": {
+          "id": "39",
+          "type": "documents"
+        },
+        "meta": {
+          "title": "This Document"
+        }
+      }
+    },
+    "links": {
+      "self": "/collections/93/items/48"
+    },
+    "meta": {
+      "created": "2020-06-02T16:39:51.000Z",
+      "modified": "2020-06-02T16:39:51.000Z",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

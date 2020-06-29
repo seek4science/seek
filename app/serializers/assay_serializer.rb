@@ -21,6 +21,7 @@ class AssaySerializer < SnapshottableSerializer
   end
 
   has_many :organisms
+  has_many :human_diseases
   # has_many :assay_organisms
 
   has_many :people

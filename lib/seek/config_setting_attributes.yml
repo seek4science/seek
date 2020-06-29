@@ -50,6 +50,7 @@ sabiork_ws_base_url:
 filestore_path:
 tagline_prefix:
 modelling_analysis_enabled:
+human_diseases_enabled:
 jerm_enabled:
 email_enabled:
 jws_enabled:
@@ -191,6 +192,7 @@ programmes_enabled:
 publications_enabled:
 samples_enabled:
 workflows_enabled:
+collections_enabled:
 # Omniauth
 omniauth_enabled:
 omniauth_user_create:

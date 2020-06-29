@@ -26,9 +26,9 @@ GIT
 
 GIT
   remote: https://github.com/fbacall/ro-crate-ruby.git
-  revision: 85136fbb371727eba4e43858e3a737a3b3e2a87f
+  revision: c0ac740792565de4c543a615310f67029e666d58
   specs:
-    ro-crate-ruby (0.0.3)
+    ro-crate-ruby (0.1.0)
       addressable
       rubyzip
 
@@ -317,6 +317,8 @@ GEM
       rack
     i18n (1.8.3)
       concurrent-ruby (~> 1.0)
+    i18n-js (3.7.0)
+      i18n (>= 0.6.6)
     i18n_data (0.8.0)
     ice_nine (0.11.2)
     jbuilder (2.8.0)
@@ -516,7 +518,7 @@ GEM
       pry (~> 0.9)
       slop (~> 3.0)
     psych (2.2.4)
-    public_suffix (3.0.3)
+    public_suffix (4.0.5)
     puma (4.3.5)
       nio4r (~> 2.0)
     pyu-ruby-sasl (0.0.3.3)
@@ -919,6 +921,7 @@ DEPENDENCIES
   guard-rubycritic
   handlebars_assets
   hpricot (~> 0.8.2)
+  i18n-js
   jbuilder
   jbuilder-json_api
   jquery-rails (~> 4.2.2)

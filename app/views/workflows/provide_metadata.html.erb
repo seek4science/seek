@@ -30,7 +30,7 @@
 
     <div class="form-group">
       <label>Type</label>
-      <p class="form-control-static"><%= @workflow.workflow_class.title -%></p>
+      <p class="form-control-static"><%= @workflow.workflow_class_title-%></p>
       <%= hidden_field_tag 'workflow[workflow_class_id]', @workflow.workflow_class_id %>
     </div>
 
@@ -44,8 +44,27 @@
       <%= text_area_tag 'workflow[description]', @workflow.description, class: "form-control", readonly: session[:metadata][:description].present? -%>
     </div>
 
+    <div class="form-group">
+      <label>Source</label>
+      <%= text_field_tag 'workflow[source_link_url]', @workflow.source_link_url, placeholder: 'https://...', class: "form-control" -%>
+      <p class="help-block">If this workflow came from an external repository (i.e. GitHub), you can include its original URL here.</p>
+    </div>
+
+    <div class="form-group">
+      <label>Maturity</label>
+      <%= select_tag 'workflow[maturity_level]',
+                     options_for_select(Workflow::MATURITY_LEVELS.values.map { |k| [t("maturity_level.#{k}"), k] }, @workflow.maturity_level),
+                     include_blank: 'Not specified',
+                     class: "form-control" -%>
+      <p class="help-block">This field is used to indicate to users what level of stability they can expect from the workflow.</p>
+    </div>
+
     <%= render partial: "projects/project_selector", locals: { resource: @workflow, allow_nil: Seek::Config.is_virtualliver } -%>
+
     <%= render partial: 'assets/license_selector', locals: { resource: @workflow, license_group: :software, default_license: 'Apache-2.0' } %>
+
+    <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @workflow} -%>
+
     <%= render partial: 'sharing/form' -%>
     <%= folding_panel('Tags', @workflow.tags.none?,
                       help_text: "Here you can provide some tags to help describe, and allow other people to find, your #{text_for_resource(@workflow)}.") do %>
@@ -58,7 +77,7 @@
     <%= fields_for(@workflow) do |f| %>
       <%= render partial: 'assets/author_form',
                  locals: { form: f,
-                           existing_creators: @workflow.creators.any? ? @workflow.creators : [current_user.person],
+                           existing_creators: @workflow.creators.any? ? @workflow.creators : [],
                            other_creators: @workflow.other_creators } %>
     <% end %>
 

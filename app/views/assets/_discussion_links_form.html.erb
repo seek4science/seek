@@ -16,8 +16,11 @@
 
     <div id='new-link-form' style="display:none;">
       <div class='link-row row'>
-        <div class="col-xs-9">
-          <%=  text_field_tag("#{resource_type}[discussion_links_attributes][INDEX][url]",'',class: 'form-control') %>
+        <div class="col-xs-6">
+          <%=  text_field_tag("#{resource_type}[discussion_links_attributes][INDEX][url]",'',class: 'form-control',placeholder:'URL') %>
+        </div>
+        <div class="col-xs-3">
+          <%=  text_field_tag("#{resource_type}[discussion_links_attributes][INDEX][label]",'',class: 'form-control', placeholder:'(Optional) Alternative display label') %>
         </div>
         <div class="col">
           <label class="btn btn-danger">
@@ -33,8 +36,11 @@
       <%= fields_for(resource) do |f| %>
         <%= f.fields_for :discussion_links do |ff| %>
           <div class='link-row row'>
-            <span class="col-xs-9">
-              <%= ff.text_field :url, class:'form-control' %>
+            <span class="col-xs-6">
+              <%= ff.text_field :url, class:'form-control', placeholder:'URL' %>
+            </span>
+            <span class="col-xs-3">
+              <%= ff.text_field :label, class:'form-control', placeholder:'(Optional) Alternative display label' %>
             </span>
             <span class="col">
               <label class="btn btn-danger">

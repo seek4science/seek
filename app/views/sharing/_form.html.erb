@@ -14,7 +14,7 @@
                   help_text: "Here you can specify who can view, access and manage this #{resource_type}.") do %>
     <div class="alert alert-info">
       <% if object.is_a?(Project) %>
-          Here you can configure a default sharing policy that is applied to new resources created as part of this project.
+          Here you can configure a default sharing policy that is applied to new resources created as part of this <%= t('project').downcase -%>.
       <% else %>
           Here you can specify who can <b>view</b> the summary of<% if object.is_downloadable? %>,
               <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= resource_type -%>.

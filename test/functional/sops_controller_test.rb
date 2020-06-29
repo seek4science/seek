@@ -42,21 +42,6 @@ class SopsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'request file button visibility when logged in and out' do
-    sop = Factory :sop, policy: Factory(:policy, access_type: Policy::VISIBLE)
-
-    assert !sop.can_download?, 'The SOP must not be downloadable for this test to succeed'
-
-    get :show, params: { id: sop }
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 1
-
-    logout
-    get :show, params: { id: sop }
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 0
-  end
-
   test 'fail gracefullly when trying to access a missing sop' do
     get :show, params: { id: 99_999 }
     assert_response :not_found
@@ -297,26 +282,30 @@ class SopsControllerTest < ActionController::TestCase
 
 
   test 'should show request contact button' do
-    s = Factory(:sop, contributor: @user.person)
+    s = Factory(:sop, contributor: Factory(:person), policy: Factory(:public_policy))
     get :show, params: { id: s }
     assert_response :success
     assert_select 'a.disabled-button', text: /Request Contact/, count: 0
     assert_select 'a#request_contact_button', text: /Request Contact/, count: 1
   end
 
-  test 'should not show request contact button' do
-    get :show, params: { id: sops(:sop_with_no_contributor) }
+  test 'should not show request contact button when there is no contributor or creator' do
+    get :show, params: { id: sops(:sop_with_no_contributor), policy: Factory(:public_policy)}
     assert_response :success
     assert_select 'a.disabled-button', text: /Request Contact/, count: 0
     assert_select 'a#request_contact_button', text: /Request Contact/, count: 0
   end
 
+  test 'should not show request contact button when the current user is the only contributor or creator' do
+    s = Factory(:sop, contributor: @user.person)
+    get :show, params: { id: s }
+    assert_response :success
+    assert_select 'a.disabled-button', text: /Request Contact/, count: 0
+    assert_select 'a#request_contact_button', text: /Request Contact/, count: 0
+  end
 
   test 'request contact' do
-    s = Factory(:sop, contributor: @user.person)
-    requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
-
-    login_as(requester)
+    s = Factory(:sop, contributor: Factory(:person), policy: Factory(:public_policy))
     assert_enqueued_emails(1) do
       assert_difference('MessageLog.count') do
         post :request_contact, format: :js, params: { id:s, details:'blah blah' }
@@ -325,7 +314,7 @@ class SopsControllerTest < ActionController::TestCase
 
     log = MessageLog.last
     assert_equal s, log.resource
-    assert_equal requester,log.sender
+    assert_equal User.current_user.person,log.sender
     assert_equal MessageLog::CONTACT_REQUEST,log.message_type
 
   end

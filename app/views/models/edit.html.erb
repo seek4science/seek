@@ -24,6 +24,8 @@
 
       <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
 
+      <%= render :partial => "human_diseases/select_human_disease",:locals=>{:model_class=>Model} -%>
+
       <%= render :partial => "scales/scales_selector_with_parameters",:locals=>{:object=>@model} if show_scales?%>
 
 

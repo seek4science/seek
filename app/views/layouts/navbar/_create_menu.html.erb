@@ -47,6 +47,9 @@
         <% if Seek::Config.documents_enabled %>
           <li><%= link_to t("document"), new_document_path %></li>
         <% end %>
+        <% if Seek::Config.collections_enabled %>
+          <li><%= link_to t("collection"), new_collection_path %></li>
+        <% end %>
 
       <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
         <li><%= link_to t("presentation"), new_presentation_path %></li>
@@ -66,6 +69,11 @@
           <li><%= link_to(t("strain"), new_strain_path) %></li>
           <li><%= link_to t("organism"), new_organism_path %></li>
         <% end %>
+      <% end %>
+
+      <% if can_create_human_diseases? %>
+        <li role="presentation" class="dropdown-header"><%= t("menu.vocabularies") -%></li>
+        <li><%= link_to t("human_disease"), new_human_disease_path %></li>
       <% end %>
     <% else %>
         <li role="presentation" class="dropdown-header"><span style="color:red">You cannot add assets or other items until you are a member of a <%= t('project') %>.</span></li>

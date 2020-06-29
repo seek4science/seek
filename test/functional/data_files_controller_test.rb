@@ -583,7 +583,6 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_select '#buttons' do
-      assert_select 'a', text: /Request/, count: 2
       assert_select 'a', text: /Request Contact/, count: 1
     end
   end
@@ -625,7 +624,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#buttons' do
       assert_select 'a[href=?]', download_data_file_path(df, version: df.version), count: 0
       assert_select 'a', text: /Download/, count: 0
-      assert_select 'a', text: /Request Contact/, count: 1
     end
 
     assert_select '#usage_count' do
@@ -1141,23 +1139,6 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'request file button visibility when logged in and out' do
-    df = Factory :data_file, policy: Factory(:policy, access_type: Policy::VISIBLE)
-
-    assert !df.can_download?, 'The datafile must not be downloadable for this test to succeed'
-    assert_difference('ActivityLog.count') do
-      get :show, params: { id: df }
-    end
-
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('data_file')}/, count: 1
-
-    logout
-    get :show, params: { id: df }
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('data_file')}/, count: 0
-  end
-
   test "should create sharing permissions 'with your project and with all SysMO members'" do
     mock_http
     data_file, blob = valid_data_file_with_http_url
@@ -1537,7 +1518,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file.save
     get :show, params: { id: data_file }
 
-    assert_select 'div', text: 'another creator', count: 1
+    assert_select 'li.author-list-item', text: 'another creator', count: 1
   end
 
   # TODO: Permission UI testing - Replace this with a Jasmine test

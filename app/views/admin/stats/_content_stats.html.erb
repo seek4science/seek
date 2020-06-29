@@ -22,7 +22,7 @@
       <table id="content_stats_table" class="tablesorter">
         <thead>
         <tr>
-          <th>Project</th>
+          <th><%= t('project') %></th>
           <th>People *</th>
           <% authorised_types.each do |type| %>
               <th><%= resource_tab_item_name(type.name) -%></th>

@@ -17,7 +17,6 @@ class AssetsHelperTest < ActionView::TestCase
   end
 
   test 'form_submit_buttons' do
-
     new_study = Study.new
 
     @controller.action_name = 'new'
@@ -30,7 +29,6 @@ class AssetsHelperTest < ActionView::TestCase
 
     html = form_submit_buttons(new_study, validate:false, preview_permissions:false)
     assert_match /submit_button_clicked\(false, false, 'study'\);/,html
-
   end
 
   test 'submit button text' do
@@ -39,12 +37,10 @@ class AssetsHelperTest < ActionView::TestCase
     data_file = Factory(:data_file)
     investigation = Factory(:investigation)
 
-    assert_equal 'Create', submit_button_text(new_assay)
-    assert_equal 'Register', submit_button_text(new_model)
-    assert_equal 'Update', submit_button_text(data_file)
-    assert_equal 'Update', submit_button_text(investigation)
-
-
+    assert_equal t('submit_button.create'), submit_button_text(new_assay)
+    assert_equal t('submit_button.upload'), submit_button_text(new_model)
+    assert_equal t('submit_button.update'), submit_button_text(data_file)
+    assert_equal t('submit_button.update'), submit_button_text(investigation)
   end
 
   test 'rendered_asset_view' do

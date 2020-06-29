@@ -2,7 +2,7 @@ module Seek
   class Filterer
     # Hard-coded list of available filters for types. Overrides the automatically discovered filters (via `has_filter`).
     AVAILABLE_FILTERS = {
-        Publication: [:query, :programme, :project, :published_year, :publication_type, :author, :organism, :tag],
+        Publication: [:query, :programme, :project, :published_year, :publication_type, :author, :organism, :human_disease, :tag],
         Event: [:query, :created_at, :country],
         Person: [:query, :programme, :project, :institution, :location, :project_position, :expertise, :tool]
     }.freeze
@@ -78,6 +78,11 @@ module Seek
             value_field: 'organisms.id',
             label_field: 'organisms.title',
             joins: [:organisms]
+        ),
+        human_disease: Seek::Filtering::Filter.new(
+            value_field: 'human_diseases.id',
+            label_field: 'human_diseases.title',
+            joins: [:human_diseases]
         ),
         model_type: Seek::Filtering::Filter.new(
             value_field: 'model_types.id',

@@ -1,9 +1,17 @@
 language: ruby
-
+dist: bionic
 cache: bundler
 
 jdk:
   - openjdk8
+
+python: "3.6"
+
+addons:
+  apt:
+    packages:
+      - python3-pip
+      - python3-setuptools
 
 services:
   - docker
@@ -25,6 +33,7 @@ env:
   - SUITE="rake db:setup RAILS_ENV=production" DB_TYPE=mysql
 
 before_install:
+  - pip3 install -r requirements.txt
   # starts up a virtuoso docker repository and sets up the config to use it, for the rdf repository related integration tests
   - sh -c "if [ '$SUITE' = 'rails test test/integration' ]; then sh -e script/virtuoso-docker-for-travis.sh; fi"
 

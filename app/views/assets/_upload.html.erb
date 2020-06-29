@@ -1,120 +1,99 @@
 <%
-asset_name = text_for_resource(asset_field_prefix)
-new_version ||= false
-batch ||= false
-with_image_file ||= false
+  batch ||= false
+  field_name ||= 'content_blobs[]'
+  param ||= params[field_name.chomp('[]').to_sym]
+  path_for_examine_url ||= examine_url_content_blobs_path
+  existing_objects ||= []
+  file_field_opts ||= {}
 
-url_from_params = nil
-original_filename_from_params = nil
+  url_from_params = nil
+  original_filename_from_params = nil
 
-if params[:content_blobs] && params[:content_blobs].any?
-  blob = params[:content_blobs].first
-  url_from_params = blob[:data_url] if blob[:data_url].present?
-  original_filename_from_params = blob[:original_filename] if blob[:original_filename].present?
-end
-
+  blob_params = param
+  if blob_params && !blob_params.blank?
+    blob = blob_params.is_a?(Array) ? blob_params.first : blob_params
+    url_from_params = blob[:data_url] if blob[:data_url].present?
+    original_filename_from_params = blob[:original_filename] if blob[:original_filename].present?
+  end
 %>
 
-<%# MERGENOTE - need to pluralize text for batch upload %>
-<div>
-    <p>
-      You can register a <%= asset_name -%> by either directly uploading a file,
-       or registering a URL to either another page or remote file. Please test the URL before submitting.
-    </p>
-    <% if new_version -%>
-        <p>
-          You are about to upload a new version of this <%= asset_name -%>.
-          You should only upload a new version if you have made minor modifications,
-          such as tidying up or fixing errors, that do not change the original purpose of the file.
-          If you think this new version changes the original purpose or meaning of the <%= asset_name -%>,
-          then you should <%= link_to "upload it as a new item",polymorphic_path(resource,:action=>:new) -%>
-          rather than create a new version.
-        </p>
-    <% end -%>
-</div>
-
-<div id="upload_type_selection" role="tabpanel">
-
+<div role="tabpanel" data-role="seek-upload-field">
   <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" <%= 'class="active"'.html_safe unless url_from_params -%>>
-      <a href="#local-file" aria-controls="local-file" role="tab" data-toggle="tab">Local file</a>
+    <li role="presentation" class="upload-field-tab active">
+      <a data-role="seek-upload-field-tab" data-tab-target="local-file" role="tab" data-toggle="tab">Local file</a>
     </li>
-    <li role="presentation" <%= 'class="active"'.html_safe if url_from_params -%>>
-      <a href="#remote-url" aria-controls="remote-url" role="tab" data-toggle="tab">Remote URL</a>
+    <li role="presentation" class="upload-field-tab">
+      <a data-role="seek-upload-field-tab" data-tab-target="remote-url" role="tab" data-toggle="tab">Remote URL</a>
     </li>
   </ul>
-  <div class="tab-content">
 
-    <div role="tabpanel" class="tab-pane <%= 'active'.html_safe unless url_from_params -%>" id="local-file">
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" data-role="seek-upload-field-tab-pane" data-tab-id="local-file">
       <div class="form-group">
-        <label class="required">File to upload</label>
-        <%= file_field_tag "content_blobs[][data]", { "data-batch-upload" => batch } -%>
+        <%= file_field_tag "#{field_name}[data]", file_field_opts.merge({ "data-batch-upload" => batch, autocomplete: batch ? 'off' : 'on' }) -%>
       </div>
     </div>
 
-    <div role="tabpanel" class="tab-pane <%= 'active'.html_safe if url_from_params -%>" id="remote-url">
+    <div role="tabpanel" class="tab-pane" data-role="seek-upload-field-tab-pane" data-tab-id="remote-url">
       <div class="form-group">
-        <label class="required">URL</label>
-
         <div class="row">
           <div class="col-sm-8">
-            <% if Seek::Config.nels_enabled && url_from_params && url_from_params.start_with?(Seek::Config.nels_permalink_base) %>
-                <div class="form-group">
-                  <%= text_field_tag 'content_blobs[][data_url]', url_from_params, id: 'data_url_field', class: 'form-control', readonly: :readonly -%>
-                </div>
-            <% else %>
-                <div class="input-group">
-                  <%= text_field_tag 'content_blobs[][data_url]', url_from_params, id: 'data_url_field', class: 'form-control' -%>
-                  <span class="input-group-btn">
-                    <%= button_link_to 'Test', 'test', '#', id: 'examine_url' %>
-                  </span>
-                </div>
-            <% end %>
+            <div class="input-group" data-role="seek-url-checker" data-path="<%= path_for_examine_url -%>">
+              <%= text_field_tag "#{field_name}[data_url]", url_from_params, class: 'form-control' -%>
+              <span class="input-group-btn">
+                <%= button_link_to 'Test', 'test', '#' %>
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div id="test_url_result">
-        <%= hidden_field_tag "content_blobs[][original_filename]", original_filename_from_params, :id => :original_filename %>
+      <div data-role="seek-url-checker-result"></div>
+
+      <%= hidden_field_tag "#{field_name}[original_filename]", original_filename_from_params, 'data-role' => 'seek-upload-field-filename' %>
+
+      <div class="alert alert-info" role="alert" style="display: none;" data-role="seek-url-checker-msg-too-big">
+        This file exceeds <%= Seek::Config.application_name %>'s remote file size limit of
+        <strong><%= number_to_human_size(Seek::Config.hard_max_cachable_size) -%></strong>
+        and so only a link to the file will be stored.
       </div>
-      <%= hidden_field_tag "url_checked", false %>
+
+      <div style="display: none;" data-role="seek-url-checker-msg-success">
+        <p>
+          You can either upload this file to <%= Seek::Config.application_name %> using this URL, or you can register a link to the file.
+        </p>
+
+        <p>
+          By selecting the option below, a copy of the file will be made. This is recommended, and is equivalent to uploading
+          a file from your disk. It also means that should the data behind the URL become unavailable, the data is still
+          available from <%= Seek::Config.application_name %>.
+          However, you should be sure that the copyright on the file allows you to do this.
+        </p>
+
+        <p>
+          If you do not select the option below <%= Seek::Config.application_name %> will store only the URL and a copy will not be stored on <%= Seek::Config.application_name %>. You should do this if the file
+          is large or you always want <%= Seek::Config.application_name %> to deliver the latest version.
+        </p>
+
+        <div class="checkbox">
+          <label>
+            <%= check_box_tag "#{field_name}[make_local_copy]", "1", false, 'data-role' => 'seek-upload-field-make-copy' %>
+            <strong>Upload a copy</strong>
+          </label>
+        </div>
+      </div>
 
       <% if batch %>
-          <%= button_link_to 'Add', 'new', "javascript: addRemoteFile()" %>
+        <div class="form-group">
+          <%= button_link_to 'Add', 'new', '#', 'data-role' => 'seek-upload-field-add-remote' %>
+        </div>
+        <%= content_tag :script,
+                        existing_objects.map { |o| { text: "#{o.url.blank? ? o.original_filename : o.url} (original)", id: o.id } }.to_json.html_safe,
+                        type: 'application/json',
+                        'data-role' => 'seek-upload-field-existing' %>
       <% end %>
     </div>
-
   </div>
+
+  <ul data-role="seek-upload-field-pending-files" class="pending-files"></ul>
 </div>
-
-<ul id='pending-files'></ul>
-
-<% if with_image_file -%>
-    <hr/>
-    <div id="image_file_box">
-      <% resource_name = resource.class.name.underscore %>
-      <%= hidden_field_tag("#{resource_name}_id", resource.id) -%>
-      <div class="form-group">
-        <label>Image file</label>
-        <%= file_field "#{resource_name}_image", :image_file, :onchange => "detectFileFormat('#{resource_name}_image_image_file')" %>
-      </div>
-      <% if new_version && previous_version_image_file = resource.latest_version.model_image.try(:original_filename) -%>
-          <p>
-            The image file of previous version <span style="font-weight: bold;"><%= previous_version_image_file %></span>
-            will be used if you dont specify the image file
-            <%= hidden_field_tag 'previous_version_image', previous_version_image_file %>
-          </p>
-      <% end -%>
-    </div>
-<% end -%>
-
-<script type="text/javascript">
-  setup_url_field("<%= examine_url_content_blobs_path %>","examine_url");
-
-  <% if batch %>
-      <% resource.content_blobs.each do |blob| %>
-          addExistingFile('<%= blob.url.blank? ? blob.original_filename : blob.url %> (original)', <%= blob.id %>);
-      <% end %>
-  <% end %>
-</script>
-

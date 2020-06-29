@@ -8,9 +8,14 @@ module Seek
     # 3. Rename - Keys the above form are renamed according to the `RENAME` mapping below.
     # 4. Elevate - Parameters in the `ELEVATE` list are moved up out of e.g. `params['data_file']` into the top-level `params`
     class ParameterConverter
+      # The JSON-API deserializer needs to know which fields are polymorphic, or the type info gets thrown away.
+      POLYMORPHIC_FIELDS = {
+          collection_items: [:asset]
+      }
+
       # Custom conversions required on certain parameters to fit how the controller expects.
       CONVERSIONS = {
-          policy: ->(value) {
+          policy: proc { |value|
             value[:access_type] = PolicyHelper::key_access_type(value.delete(:access))
             perms = {}
             (value.delete(:permissions) || []).each_with_index do |permission, index|
@@ -28,32 +33,32 @@ module Seek
             value
           },
 
-          content_blobs: ->(value) {
+          content_blobs: proc { |value|
             (value || []).map do |cb|
               cb[:data_url] = cb.delete(:url)
               cb
             end
           },
 
-          publication_ids: ->(value) {
+          publication_ids: proc { |value|
             value.map { |id| "#{id}," }
           },
 
-          assay_class: ->(value) {
+          assay_class: proc { |value|
             if value && value[:key]
               AssayClass.where(key: value[:key]).pluck(:id).first
             end
           },
 
-          assay_type: ->(value) {
+          assay_type: proc { |value|
             value[:uri]
           },
 
-          technology_type: ->(value) {
+          technology_type: proc { |value|
             value[:uri]
           },
 
-          tags: ->(value) {
+          tags: proc { |value|
             if value
               value.join(', ')
             else
@@ -61,7 +66,7 @@ module Seek
             end
           },
 
-          funding_codes: ->(value) {
+          funding_codes: proc { |value|
             if value
               value.join(', ')
             else
@@ -69,41 +74,41 @@ module Seek
             end
           },
 
-          programme_ids: ->(value) {
+          programme_ids: proc { |value|
             value.try(:first)
           },
 
-          model_type: ->(value) {
+          model_type: proc { |value|
             ModelType.find_by_title(value).try(:id)
           },
 
-          model_format: ->(value) {
+          model_format: proc { |value|
             ModelFormat.find_by_title(value).try(:id)
           },
 
-          environment: ->(value) {
+          environment: proc { |value|
             RecommendedModelEnvironment.find_by_title(value).try(:id)
           },
 
-          data_file_ids: ->(value) {
+          data_file_ids: proc { |value|
             value.map { |i| { 'asset_id' => i }.with_indifferent_access }
           },
 
-          assay_ids: ->(value) {
+          assay_ids: proc { |value|
             value.map { |i| { assay_id: i } }
           },
 
-          workflow_class: ->(value) {
+          workflow_class: proc { |value|
             if value && value[:key]
               WorkflowClass.where(key: value[:key]).pluck(:id).first
             end
           },
-
+          asset_type: proc { |value| value.classify }
       }
       CONVERSIONS[:default_policy] = CONVERSIONS[:policy]
       CONVERSIONS.freeze
 
-          # Parameters to rename
+      # Parameters to rename
       RENAME = {
           tags: :tag_list,
           policy: :policy_attributes,
@@ -132,8 +137,9 @@ module Seek
         @parameters = parameters
 
         # Step 1 - JSON-API -> Rails format
+        polymorphic_fields = POLYMORPHIC_FIELDS[@controller_name.to_sym] || []
         @parameters[@controller_name.singularize.to_sym] =
-            ActiveModelSerializers::Deserialization.jsonapi_parse(@parameters)
+            ActiveModelSerializers::Deserialization.jsonapi_parse(@parameters, polymorphic: polymorphic_fields)
 
         # Step 2 - Perform any conversions on parameter values
         convert_parameters
@@ -145,6 +151,7 @@ module Seek
         elevate_parameters
 
         @parameters.delete(:data)
+
         @parameters
       end
 
@@ -153,7 +160,7 @@ module Seek
       def convert_parameters
         attributes.each do |key, value|
           unless (conversion = CONVERSIONS[key.to_sym]).nil? || exclude?(:convert, key)
-            attributes[key] = conversion.call(value)
+            attributes[key] = conversion.call(value, @parameters)
           end
         end
       end
