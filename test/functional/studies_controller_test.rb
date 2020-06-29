@@ -698,7 +698,7 @@ class StudiesControllerTest < ActionController::TestCase
 
   end
 
-  test 'create an study with custom metadata' do
+  test 'create a study with custom metadata' do
     cmt = Factory(:simple_study_custom_metadata_type)
 
     login_as(Factory(:person))
@@ -721,7 +721,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_nil cm.get_attribute_value('date')
   end
 
-  test 'create an investigation with custom metadata validated' do
+  test 'create a study with custom metadata validated' do
     cmt = Factory(:simple_study_custom_metadata_type)
 
     login_as(Factory(:person))
@@ -750,6 +750,81 @@ class StudiesControllerTest < ActionController::TestCase
     assert study=assigns(:study)
     refute study.valid?
 
+  end
+
+  test 'create a study with custom metadata with spaces in attribute names' do
+    cmt = Factory(:study_custom_metadata_type_with_spaces)
+
+    login_as(Factory(:person))
+
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_full name':'Paul Jones','_custom_metadata_full address':'London, UK'}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+
+    assert study.valid?
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'Paul Jones',cm.get_attribute_value('full name')
+    assert_equal 'London, UK',cm.get_attribute_value('full address')
+  end
+
+  test 'create a study with custom metadata with clashing attribute names' do
+    cmt = Factory(:study_custom_metadata_type_with_clashes)
+
+    login_as(Factory(:person))
+
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_full name':'full name',
+                                                   '_custom_metadata_Full name':'Full name',
+                                                   '_custom_metadata_full  name':'full  name'}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+
+    assert study.valid?
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'full name',cm.get_attribute_value('full name')
+    assert_equal 'Full name',cm.get_attribute_value('Full name')
+    assert_equal 'full  name',cm.get_attribute_value('full  name')
+  end
+
+  test 'create a study with custom metadata with attribute names with symbols' do
+    cmt = Factory(:study_custom_metadata_type_with_symbols)
+
+    login_as(Factory(:person))
+
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_+name':'+name',
+                                                   '_custom_metadata_-name':'-name',
+                                                   '_custom_metadata_&name':'&name'}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+
+    assert study.valid?
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal '+name',cm.get_attribute_value('+name')
+    assert_equal '-name',cm.get_attribute_value('-name')
+    assert_equal '&name',cm.get_attribute_value('&name')
   end
 
   test 'experimentalists only shown if set' do
