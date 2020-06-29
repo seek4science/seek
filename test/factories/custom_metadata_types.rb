@@ -28,6 +28,11 @@ Factory.define(:simple_study_custom_metadata_type, parent: :simple_investigation
   f.supported_type 'Study'
 end
 
+Factory.define(:simple_assay_custom_metadata_type, parent: :simple_investigation_custom_metadata_type) do |f|
+  f.title 'simple study custom metadata type'
+  f.supported_type 'Assay'
+end
+
 Factory.define(:study_custom_metadata_type_with_spaces, class: CustomMetadataType) do |f|
   f.title 'study custom metadata type with spaces'
   f.supported_type 'Study'
