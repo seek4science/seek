@@ -10,7 +10,7 @@ class CustomMetadataAttribute < ApplicationRecord
   end
 
   def hash_key
-    title#.parameterize.underscore + '_' + id.to_s
+    title
   end
 
   def resolve(value)
