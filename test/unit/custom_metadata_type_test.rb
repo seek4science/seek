@@ -69,7 +69,7 @@ class CustomMetadataTypeTest < ActiveSupport::TestCase
     assert_nil cmt.attribute_by_method_name('_custom_metadata_sdfsdfsdf')
 
     cmt = Factory(:study_custom_metadata_type_with_spaces)
-    refute_nil (attr = cmt.attribute_by_method_name('_custom_metadata_full_name'))
+    refute_nil (attr = cmt.attribute_by_method_name('_custom_metadata_full name'))
     assert_equal 'full name',attr.title
   end
 
