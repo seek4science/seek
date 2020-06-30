@@ -5,6 +5,7 @@ class CustomMetadataType < ApplicationRecord
   validates :custom_metadata_attributes, presence: true
   validates :supported_type, presence: true
   validate :supported_type_must_be_valid_type
+  validate :unique_titles_for_custom_metadata_attributes
 
   def attribute_by_title(title)
     custom_metadata_attributes.where(title:title).first
@@ -13,8 +14,6 @@ class CustomMetadataType < ApplicationRecord
   def attribute_by_method_name(method_name)
     custom_metadata_attributes.detect{|attr| attr.method_name == method_name}
   end
-
-  private
 
   def supported_type_must_be_valid_type
     return if supported_type.blank? # already convered by presence validation
@@ -28,6 +27,13 @@ class CustomMetadataType < ApplicationRecord
     end
     unless valid
       errors.add(:supported_type, 'is not a type that can supported custom metadata')
+    end
+  end
+
+  def unique_titles_for_custom_metadata_attributes
+    titles = custom_metadata_attributes.collect(&:title)
+    if titles != titles.uniq
+      errors.add(:custom_metadata_attributes, 'must have unique titles')
     end
   end
 
