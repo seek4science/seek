@@ -9,6 +9,9 @@ SEEK::Application.routes.draw do
 
   # Concerns
   concern :has_content_blobs do
+    member do
+      get :download
+    end
     resources :content_blobs do
       member do
         get :view_pdf_content
@@ -64,6 +67,34 @@ SEEK::Application.routes.draw do
     member do
       get :mint_doi_confirm
       post :mint_doi
+    end
+  end
+
+  concern :asset do
+    collection do
+      get :typeahead
+      get :preview
+      post :items_for_result # Faceted browsing
+    end
+    member do
+      post :request_contact
+      post :update_annotations_ajax
+      get :manage
+      patch :manage_update
+    end
+  end
+  
+  concern :isa do
+    collection do
+      get :typeahead
+      get :preview
+      post :items_for_result # Faceted browsing
+    end
+    member do
+      post :update_annotations_ajax
+      get :manage
+      patch :manage_update
+      get :new_object_based_on_existing_one
     end
   end
 
@@ -315,41 +346,18 @@ SEEK::Application.routes.draw do
 
   ### ISA ###
 
-  resources :investigations, concerns: [:publishable, :has_snapshots] do
-    collection do
-      get :preview
-      post :items_for_result
-    end
+  resources :investigations, concerns: [:publishable, :has_snapshots, :isa] do
     resources :people,:projects,:assays,:studies,:models,:sops,:workflows, :nodes,:data_files,:publications, :documents, :only=>[:index]
     member do
-      get :new_object_based_on_existing_one
       get :export_isatab_json
-      get :manage
-      patch :manage_update
     end
   end
 
-  resources :studies, concerns: [:publishable, :has_snapshots] do
-    collection do
-      get :preview
-      post :investigation_selected_ajax
-      post :items_for_result
-    end
-    member do
-      get :new_object_based_on_existing_one
-      get :manage
-      patch :manage_update
-    end
+  resources :studies, concerns: [:publishable, :has_snapshots, :isa] do
     resources :people,:projects,:assays,:investigations,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:only=>[:index]
   end
 
-  resources :assays, concerns: [:publishable, :has_snapshots] do
-    collection do
-      get :typeahead
-      get :preview
-      post :items_for_result
-      #MERGENOTE - these should be gets and are tested as gets, using post to fix later
-    end
+  resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
     resources :nels, only: [:index] do
       collection do
         get :projects
@@ -357,12 +365,6 @@ SEEK::Application.routes.draw do
         get :dataset
         post :register
       end
-    end
-    member do
-      post :update_annotations_ajax
-      get :new_object_based_on_existing_one
-      get :manage
-      patch :manage_update
     end
     resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:strains,:organisms, :human_diseases, :only=>[:index]
   end
@@ -378,15 +380,11 @@ SEEK::Application.routes.draw do
 
   ### ASSETS ###
 
-  resources :data_files, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable] do
+  resources :data_files, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset] do
     collection do
-      get :typeahead
-      get :preview
       get :filter
-      post :test_asset_url
       post :upload_for_tool
       post :upload_from_email
-      post :items_for_result
       get :provide_metadata
       post :create_content_blob
       post :rightfield_extraction_ajax
@@ -395,9 +393,6 @@ SEEK::Application.routes.draw do
     member do
       get :plot
       get :explore
-      get :download
-      post :request_contact
-      post :update_annotations_ajax
       get :samples_table
       get :select_sample_type
       get :confirm_extraction
@@ -407,8 +402,6 @@ SEEK::Application.routes.draw do
       get :destroy_samples_confirm
       post :retrieve_nels_sample_metadata
       get :retrieve_nels_sample_metadata
-      get :manage
-      patch :manage_update
     end
     resources :studied_factors do
       collection do
@@ -418,44 +411,20 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:assays, :samples, :studies,:publications,:events, :collections,:only=>[:index]
   end
 
-  resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions] do
-    collection do
-      get :typeahead
-      get :preview
-      post :test_asset_url
-      post :items_for_result
-    end
-    member do
-      get :download
-      post :request_contact
-      post :update_annotations_ajax
-      get :manage
-      patch :manage_update
-    end
+  resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset] do
     resources :people,:projects,:publications,:events, :collections,:only=>[:index]
   end
 
-  resources :models, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions] do
-    collection do
-      get :typeahead
-      get :preview
-      post :test_asset_url
-      post :items_for_result
-    end
+  resources :models, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     member do
       get :compare_versions
       post :compare_versions
       get :visualise
-      get :download
       post :submit_to_sycamore
       post :export_as_xgmml
-      post :update_annotations_ajax
       post :execute
-      post :request_contact
       get :simulate
       post :simulate
-      get :manage
-      patch :manage_update
     end
     resources :model_images do
       collection do
@@ -468,20 +437,7 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:assays,:studies,:publications,:events, :collections,:only=>[:index]
   end
 
-  resources :sops, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions] do
-    collection do
-      get :typeahead
-      get :preview
-      post :test_asset_url
-      post :items_for_result
-    end
-    member do
-      get :download
-      post :request_contact
-      post :update_annotations_ajax
-      get :manage
-      patch :manage_update
-    end
+  resources :sops, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     resources :experimental_conditions do
       collection do
         post :create_from_existing
@@ -490,13 +446,8 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:workflows, :collections,:only=>[:index]
   end
 
-  resources :workflows, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions] do
+  resources :workflows, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     collection do
-      get :typeahead
-      get :preview
-      post :test_asset_url
-      post :items_for_result
-      post :resource_in_tab
       post :create_content_blob
       post :create_ro_crate
       get :provide_metadata
@@ -504,32 +455,13 @@ SEEK::Application.routes.draw do
       post :create_metadata
     end
     member do
-      get :download
-      post :request_contact
-      post :update_annotations_ajax
-      get :manage
-      patch :manage_update
       get :diagram
       get :ro_crate
     end
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:sops, :collections,:only=>[:index]
   end
 
-  resources :nodes, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions] do
-    collection do
-      get :typeahead
-      get :preview
-      post :test_asset_url
-      post :items_for_result
-      post :resource_in_tab
-    end
-    member do
-      get :download
-      post :request_contact
-      post :update_annotations_ajax
-      get :manage
-      patch :manage_update
-    end
+  resources :nodes, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events, :collections,:only=>[:index]
   end
 
@@ -559,20 +491,15 @@ SEEK::Application.routes.draw do
               :data_files, :models, :sops, :workflows, :nodes, :presentations, :documents, :events, :publications, :organisms, :human_diseases, :collections
   end
 
-  resources :publications do
+  resources :publications, concerns: [:asset] do
     collection do
-      get :typeahead
-      get :preview
       get :query_authors
       get :query_authors_typeahead
       get :export
       post :fetch_preview
       post :update_metadata
-      post :items_for_result
     end
     member do
-      get :manage
-      post :update_annotations_ajax
       post :disassociate_authors
       post :update_metadata
       post :request_contact
@@ -580,17 +507,7 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :events,:collections, :only=>[:index]
   end
 
-  resources :events do
-    collection do
-      get :typeahead
-      get :preview
-      post :items_for_result
-    end
-    member do
-      get :manage
-      patch :manage_update
-      post :request_contact
-    end
+  resources :events, concerns: [:asset] do
     resources :people,:projects,:data_files,:publications,:documents,:presentations,:collections, :only=>[:index]
   end
 
@@ -603,17 +520,10 @@ SEEK::Application.routes.draw do
   resources :spreadsheet_annotations, :only => [:create, :destroy, :update]
 
 
-  resources :strains do
+  resources :strains, concerns: [:asset] do
     collection do
       get :existing_strains_for_assay_organism
       get :strains_of_selected_organism
-      post :items_for_result
-    end
-    member do
-      post :update_annotations_ajax
-      get :manage
-      patch :manage_update
-      post :request_contact
     end
     resources :specimens,:assays,:people,:projects,:samples,:only=>[:index]
   end
@@ -631,7 +541,6 @@ SEEK::Application.routes.draw do
   resources :human_diseases do
     collection do
       post :search_ajax
-      post :resource_in_tab
     end
     resources :projects, :assays, :studies, :models, :publications, :only=>[:index]
     member do
@@ -657,17 +566,10 @@ SEEK::Application.routes.draw do
 
   ### SAMPLES ###
 
-  resources :samples do
+  resources :samples, concerns: [:asset] do
     collection do
       get :attribute_form
-      get :preview
       get :filter
-    end
-    member do
-      post :update_annotations_ajax
-      get :manage
-      patch :manage_update
-      post :request_contact
     end
     resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
               :strains, :organisms, :collections, only:[:index]
@@ -700,35 +602,13 @@ SEEK::Application.routes.draw do
 
   ### DOCUMENTS
 
-  resources :documents, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions] do
-    collection do
-      get :typeahead
-      get :preview
-      post :test_asset_url
-      post :items_for_result
-    end
-    member do
-      get :download
-      post :request_contact
-      post :update_annotations_ajax
-      get :manage
-      patch :manage_update
-    end
+  resources :documents, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:collections, :only=>[:index]
   end
 
-  resources :collections, concerns: [:publishable, :has_doi] do
-    collection do
-      get :typeahead
-      get :preview
-      post :items_for_result
-    end
+  resources :collections, concerns: [:publishable, :has_doi, :asset] do
     member do
       post :request_resource
-      post :request_contact
-      post :update_annotations_ajax
-      get :manage
-      patch :manage_update
     end
     resources :items, controller: :collection_items
     resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:collections,:only=>[:index]
