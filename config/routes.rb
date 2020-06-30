@@ -32,6 +32,41 @@ SEEK::Application.routes.draw do
     end
   end
 
+  concern :publishable do
+    member do
+      post :check_related_items
+      post :check_gatekeeper_required
+      get :published
+      post :publish_related_items
+      post :publish
+    end
+  end
+
+  concern :has_versions do
+    member do
+      post :new_version
+      post :edit_version_comment
+      delete :destroy_version
+    end
+  end
+
+  concern :has_snapshots do
+    resources :snapshots, only: [:show, :new, :create, :destroy], concerns: [:has_doi] do
+      member do
+        get :download
+        get :export, action: :export_preview
+        post :export, action: :export_submit
+      end
+    end
+  end
+
+  concern :has_doi do
+    member do
+      get :mint_doi_confirm
+      post :mint_doi
+    end
+  end
+
   resources :scales do
     collection do
       post :search
@@ -169,7 +204,7 @@ SEEK::Application.routes.draw do
 
   ### YELLOW PAGES ###
 
-  resources :people do
+  resources :people, concerns: [:publishable] do
     collection do
       get :typeahead
       get :register
@@ -181,12 +216,7 @@ SEEK::Application.routes.draw do
       post :bulk_destroy
     end
     member do
-      post :check_related_items
-      post :check_gatekeeper_required
-      get :published
       get :batch_publishing_preview
-      post :publish_related_items
-      post :publish
       get :requested_approval_assets
       post :gatekeeper_decide
       get :gatekeeper_decision_result
@@ -285,77 +315,40 @@ SEEK::Application.routes.draw do
 
   ### ISA ###
 
-  resources :investigations do
+  resources :investigations, concerns: [:publishable, :has_snapshots] do
     collection do
       get :preview
       post :items_for_result
     end
     resources :people,:projects,:assays,:studies,:models,:sops,:workflows, :nodes,:data_files,:publications, :documents, :only=>[:index]
-    resources :snapshots, :only => [:show, :new, :create, :destroy] do
-      member do
-        get :mint_doi_confirm
-        post :mint_doi
-        get :download
-        get :export, action: :export_preview
-        post :export, action: :export_submit
-      end
-    end
     member do
       get :new_object_based_on_existing_one
-      post :check_related_items
-      post :check_gatekeeper_required
-      post :publish_related_items
-      post :publish
-      get :published
       get :export_isatab_json
       get :manage
       patch :manage_update
     end
   end
 
-  resources :studies do
+  resources :studies, concerns: [:publishable, :has_snapshots] do
     collection do
       get :preview
       post :investigation_selected_ajax
       post :items_for_result
     end
-    resources :snapshots, :only => [:show, :new, :create, :destroy] do
-      member do
-        get :mint_doi_confirm
-        post :mint_doi
-        get :download
-        get :export, action: :export_preview
-        post :export, action: :export_submit
-      end
-    end
     member do
       get :new_object_based_on_existing_one
-      post :check_related_items
-      post :check_gatekeeper_required
-      post :publish_related_items
-      post :publish
-      get :published
       get :manage
       patch :manage_update
     end
     resources :people,:projects,:assays,:investigations,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:only=>[:index]
   end
 
-  resources :assays do
+  resources :assays, concerns: [:publishable, :has_snapshots] do
     collection do
       get :typeahead
       get :preview
       post :items_for_result
       #MERGENOTE - these should be gets and are tested as gets, using post to fix later
-    end
-    resources :snapshots, :only => [:show, :new, :create, :destroy] do
-      member do
-        get :mint_doi_confirm
-        post :mint_doi
-        get :download
-        get :export, action: :export_preview
-        post :export, action: :export_submit
-      end
     end
     resources :nels, only: [:index] do
       collection do
@@ -367,11 +360,6 @@ SEEK::Application.routes.draw do
     end
     member do
       post :update_annotations_ajax
-      post :check_related_items
-      post :check_gatekeeper_required
-      post :publish_related_items
-      post :publish
-      get :published
       get :new_object_based_on_existing_one
       get :manage
       patch :manage_update
@@ -390,7 +378,7 @@ SEEK::Application.routes.draw do
 
   ### ASSETS ###
 
-  resources :data_files, concerns: [:has_content_blobs] do
+  resources :data_files, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable] do
     collection do
       get :typeahead
       get :preview
@@ -405,22 +393,11 @@ SEEK::Application.routes.draw do
       post :create_metadata
     end
     member do
-      post :check_gatekeeper_required
       get :plot
       get :explore
       get :download
-      get :published
-      post :check_related_items
-      post :publish_related_items
-      post :publish
       post :request_contact
       post :update_annotations_ajax
-      post :new_version
-      post :edit_version_comment
-      #MERGENOTE - this is a destroy, and should be the destroy method, not post since we are not updating or creating something.
-      post :destroy_version
-      get :mint_doi_confirm
-      post :mint_doi
       get :samples_table
       get :select_sample_type
       get :confirm_extraction
@@ -441,7 +418,7 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:assays, :samples, :studies,:publications,:events, :collections,:only=>[:index]
   end
 
-  resources :presentations, concerns: [:has_content_blobs] do
+  resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions] do
     collection do
       get :typeahead
       get :preview
@@ -449,24 +426,16 @@ SEEK::Application.routes.draw do
       post :items_for_result
     end
     member do
-      post :check_related_items
-      post :check_gatekeeper_required
       get :download
-      get :published
-      post :publish_related_items
-      post :publish
       post :request_contact
       post :update_annotations_ajax
-      post :new_version
-      post :edit_version_comment
-      delete :destroy_version
       get :manage
       patch :manage_update
     end
     resources :people,:projects,:publications,:events, :collections,:only=>[:index]
   end
 
-  resources :models, concerns: [:has_content_blobs] do
+  resources :models, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions] do
     collection do
       get :typeahead
       get :preview
@@ -476,25 +445,15 @@ SEEK::Application.routes.draw do
     member do
       get :compare_versions
       post :compare_versions
-      post :check_related_items
       get :visualise
-      post :check_gatekeeper_required
       get :download
-      get :published
-      post :publish_related_items
-      post :new_version
-      post :edit_version_comment
       post :submit_to_sycamore
       post :export_as_xgmml
       post :update_annotations_ajax
-      post :publish
       post :execute
       post :request_contact
       get :simulate
       post :simulate
-      delete :destroy_version
-      post :mint_doi
-      get :mint_doi_confirm
       get :manage
       patch :manage_update
     end
@@ -509,7 +468,7 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:assays,:studies,:publications,:events, :collections,:only=>[:index]
   end
 
-  resources :sops, concerns: [:has_content_blobs] do
+  resources :sops, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions] do
     collection do
       get :typeahead
       get :preview
@@ -517,19 +476,9 @@ SEEK::Application.routes.draw do
       post :items_for_result
     end
     member do
-      post :check_related_items
-      post :check_gatekeeper_required
       get :download
-      get :published
-      post :publish_related_items
-      post :publish
       post :request_contact
       post :update_annotations_ajax
-      post :new_version
-      post :edit_version_comment
-      delete :destroy_version
-      post :mint_doi
-      get :mint_doi_confirm
       get :manage
       patch :manage_update
     end
@@ -541,7 +490,7 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:workflows, :collections,:only=>[:index]
   end
 
-  resources :workflows, concerns: [:has_content_blobs] do
+  resources :workflows, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions] do
     collection do
       get :typeahead
       get :preview
@@ -555,19 +504,9 @@ SEEK::Application.routes.draw do
       post :create_metadata
     end
     member do
-      post :check_related_items
-      post :check_gatekeeper_required
       get :download
-      get :published
-      post :publish_related_items
-      post :publish
       post :request_contact
       post :update_annotations_ajax
-      post :new_version
-      post :edit_version_comment
-      delete :destroy_version
-      post :mint_doi
-      get :mint_doi_confirm
       get :manage
       patch :manage_update
       get :diagram
@@ -576,7 +515,7 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:sops, :collections,:only=>[:index]
   end
 
-  resources :nodes, concerns: [:has_content_blobs] do
+  resources :nodes, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions] do
     collection do
       get :typeahead
       get :preview
@@ -585,19 +524,9 @@ SEEK::Application.routes.draw do
       post :resource_in_tab
     end
     member do
-      post :check_related_items
-      post :check_gatekeeper_required
       get :download
-      get :published
-      post :publish_related_items
-      post :publish
       post :request_contact
       post :update_annotations_ajax
-      post :new_version
-      post :edit_version_comment
-      delete :destroy_version
-      post :mint_doi
-      get :mint_doi_confirm
       get :manage
       patch :manage_update
     end
@@ -771,7 +700,7 @@ SEEK::Application.routes.draw do
 
   ### DOCUMENTS
 
-  resources :documents, concerns: [:has_content_blobs] do
+  resources :documents, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions] do
     collection do
       get :typeahead
       get :preview
@@ -779,42 +708,25 @@ SEEK::Application.routes.draw do
       post :items_for_result
     end
     member do
-      post :check_related_items
-      post :check_gatekeeper_required
       get :download
-      get :published
-      post :publish_related_items
-      post :publish
       post :request_contact
       post :update_annotations_ajax
-      post :new_version
-      post :edit_version_comment
-      delete :destroy_version
-      post :mint_doi
-      get :mint_doi_confirm
       get :manage
       patch :manage_update
     end
     resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:collections, :only=>[:index]
   end
 
-  resources :collections do
+  resources :collections, concerns: [:publishable, :has_doi] do
     collection do
       get :typeahead
       get :preview
       post :items_for_result
     end
     member do
-      post :check_related_items
-      post :check_gatekeeper_required
-      get :published
-      post :publish_related_items
-      post :publish
       post :request_resource
       post :request_contact
       post :update_annotations_ajax
-      post :mint_doi
-      get :mint_doi_confirm
       get :manage
       patch :manage_update
     end
