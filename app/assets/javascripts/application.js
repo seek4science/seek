@@ -56,3 +56,4 @@
 //= require chartjs
 //= require lightbox2
 //= require_tree ./templates
+//= require simplemde.min
