@@ -28,6 +28,23 @@ class CustomMetadataTypeTest < ActiveSupport::TestCase
     assert cmt.valid?
   end
 
+  test 'validates attribute titles are unique' do
+    cmt = CustomMetadataType.new(title: 'test unique attributes', supported_type:'Investigation')
+    cmt.custom_metadata_attributes << Factory(:name_custom_metadata_attribute,title:'name')
+    assert cmt.valid?
+    cmt.custom_metadata_attributes << Factory(:name_custom_metadata_attribute,title:'name2')
+    assert cmt.valid?
+    cmt.custom_metadata_attributes.last.title='name'
+    refute cmt.valid?
+    cmt.custom_metadata_attributes.last.title='name2'
+
+
+    #check scope
+    cmt2 = CustomMetadataType.new(title: 'test unique attributes', supported_type:'Investigation')
+    cmt2.custom_metadata_attributes << Factory(:name_custom_metadata_attribute,title:'name')
+    assert cmt2.valid?
+  end
+
   test 'attribute by title' do
     cmt = Factory(:simple_investigation_custom_metadata_type)
 
