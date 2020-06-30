@@ -64,16 +64,6 @@ class CustomMetadata < ApplicationRecord
     data[attr].blank? || (data[attr].is_a?(Hash) && data[attr]['id'].blank?)
   end
 
-  def build_json_hash
-    if json_metadata
-      JSON.parse(json_metadata)
-    elsif custom_metadata_type
-      HashWithIndifferentAccess[custom_metadata_attributes.map { |attr| [attr.title, nil] }]
-    else
-      {}
-    end
-  end
-
   def update_json_metadata
     self.json_metadata = data.to_json
   end
