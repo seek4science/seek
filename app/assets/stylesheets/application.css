@@ -29,6 +29,7 @@
 *= require bootstrap-tagsinput
 *= require bootstrap-multiselect
 *= require organisms
+*= require human_diseases
 *= require samples
 *= require DataTables-1.10.11/dataTables.bootstrap
 *= require DataTables-1.10.11/select.bootstrap

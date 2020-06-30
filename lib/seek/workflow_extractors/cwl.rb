@@ -29,43 +29,68 @@ module Seek
       end
 
       def metadata
-        metadata = super
-        cwl_string = @io.read
-        cwl = YAML.load(cwl_string)
-        if cwl.key?('label')
-          metadata[:title] = cwl['label']
+        meta = super
+        if @io.is_a?(Pathname)
+          cwl_string = nil
+          path = @io.to_s
+        elsif @io.respond_to?('path')
+          cwl_string = nil
+          path = @io.path
         else
-          metadata[:warnings] << 'Unable to determine title of workflow'
-        end
-        if cwl.key?('doc')
-          metadata[:description] = cwl['doc']
-        end
-        if cwl.key?('s:license')
-          metadata[:license] = cwl['s:license']
-        end
-
-        metadata[:internals] = {}
-
-        metadata[:internals][:inputs] = iterate(cwl['inputs']).map do |id, input|
-          { id: id, name: input['label'], description: input['doc'], type: input['type'], default_value: input['default'] }
+          cwl_string = @io.read
+          f = Tempfile.new('cwl')
+          f.binmode
+          f.write(cwl_string)
+          f.rewind
+          path = f.path
         end
 
-        metadata[:internals][:outputs] = iterate(cwl['outputs']).map do |id, output|
-          { id: id, name: output['label'], description: output['doc'], type: output['type'] }
+        packed_cwl_string = `cwltool --pack #{path}`
+        if $?.success?
+          cwl_string = packed_cwl_string
+        else
+          cwl_string ||= @io.read
+          Rails.logger.error('CWL packing failed, using given CWL instead.')
         end
 
-        metadata[:internals][:steps] = iterate(cwl['steps']).map do |id, step|
-          { id: id, name: step['label'], description: step['doc'] }
-        end
+        parse_metadata(meta, cwl_string)
 
-        metadata
+        meta
       end
 
       private
 
+      def parse_metadata(existing_metadata, yaml_or_json_string)
+        cwl = YAML.load(yaml_or_json_string)
+        if cwl.key?('label')
+          existing_metadata[:title] = cwl['label']
+        end
+        if cwl.key?('doc')
+          existing_metadata[:description] = cwl['doc']
+        end
+        if cwl.key?('s:license')
+          existing_metadata[:license] = cwl['s:license']
+        end
+
+        existing_metadata[:internals] = {}
+
+        existing_metadata[:internals][:inputs] = iterate(cwl['inputs']).map do |id, input|
+          { id: id, name: input['label'], description: input['doc'], type: input['type'], default_value: input['default'] }
+        end
+
+        existing_metadata[:internals][:outputs] = iterate(cwl['outputs']).map do |id, output|
+          { id: id, name: output['label'], description: output['doc'], type: output['type'] }
+        end
+
+        existing_metadata[:internals][:steps] = iterate(cwl['steps']).map do |id, step|
+          { id: id, name: step['label'], description: step['doc'] }
+        end
+      end
+
       # Iterate array or map-style lists of things
+      # @return [Hash{String => Hash}, Enumerable]
       def iterate(array_or_hash)
-        return if array_or_hash.nil?
+        return {} if array_or_hash.nil?
         return to_enum(__method__, array_or_hash) unless block_given?
 
         if array_or_hash.is_a?(Hash)

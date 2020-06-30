@@ -42,21 +42,6 @@ class SopsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'request file button visibility when logged in and out' do
-    sop = Factory :sop, policy: Factory(:policy, access_type: Policy::VISIBLE)
-
-    assert !sop.can_download?, 'The SOP must not be downloadable for this test to succeed'
-
-    get :show, params: { id: sop }
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 1
-
-    logout
-    get :show, params: { id: sop }
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 0
-  end
-
   test 'fail gracefullly when trying to access a missing sop' do
     get :show, params: { id: 99_999 }
     assert_response :not_found
@@ -295,6 +280,45 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'a', text: /Edit experimental conditions/, count: 0
   end
 
+
+  test 'should show request contact button' do
+    s = Factory(:sop, contributor: Factory(:person), policy: Factory(:public_policy))
+    get :show, params: { id: s }
+    assert_response :success
+    assert_select 'a.disabled-button', text: /Request Contact/, count: 0
+    assert_select 'a#request_contact_button', text: /Request Contact/, count: 1
+  end
+
+  test 'should not show request contact button when there is no contributor or creator' do
+    get :show, params: { id: sops(:sop_with_no_contributor), policy: Factory(:public_policy)}
+    assert_response :success
+    assert_select 'a.disabled-button', text: /Request Contact/, count: 0
+    assert_select 'a#request_contact_button', text: /Request Contact/, count: 0
+  end
+
+  test 'should not show request contact button when the current user is the only contributor or creator' do
+    s = Factory(:sop, contributor: @user.person)
+    get :show, params: { id: s }
+    assert_response :success
+    assert_select 'a.disabled-button', text: /Request Contact/, count: 0
+    assert_select 'a#request_contact_button', text: /Request Contact/, count: 0
+  end
+
+  test 'request contact' do
+    s = Factory(:sop, contributor: Factory(:person), policy: Factory(:public_policy))
+    assert_enqueued_emails(1) do
+      assert_difference('MessageLog.count') do
+        post :request_contact, format: :js, params: { id:s, details:'blah blah' }
+      end
+    end
+
+    log = MessageLog.last
+    assert_equal s, log.resource
+    assert_equal User.current_user.person,log.sender
+    assert_equal MessageLog::CONTACT_REQUEST,log.message_type
+
+  end
+
   def test_should_show_version
     s = Factory(:sop, contributor: @user.person)
 
@@ -432,6 +456,7 @@ class SopsControllerTest < ActionController::TestCase
     get :show, params: { id: sops(:sop_with_no_contributor) }
     assert_response :success
   end
+
 
   def test_can_show_edit_for_sop_with_no_contributor
     get :edit, params: { id: sops(:sop_with_no_contributor) }
@@ -1516,7 +1541,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
-    sop =  {title: 'SOP', project_ids: [person.projects.first.id], asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}]}
+    sop =  {title: 'SOP', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Sop.count') do
         assert_difference('ContentBlob.count') do
@@ -1532,7 +1557,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should show discussion link' do
     asset_link = Factory(:discussion_link)
-    sop = Factory(:sop, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    sop = Factory(:sop, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     get :show, params: { id: sop }
     assert_response :success
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
@@ -1546,7 +1571,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_nil sop.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: sop.id, sop: { asset_links_attributes:[{url: "http://www.slack.com/",link_type: AssetLink::DISCUSSION}] } }
+        put :update, params: { id: sop.id, sop: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -1560,7 +1585,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 1,sop.discussion_links.count
     assert_no_difference('AssetLink.discussion.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: sop.id, sop: { asset_links_attributes:[{id:sop.discussion_links.first.id, url: "http://www.wibble.com/",link_type: AssetLink::DISCUSSION}] } }
+        put :update, params: { id: sop.id, sop: { discussion_links_attributes:[{id:sop.discussion_links.first.id, url: "http://www.wibble.com/",link_type: AssetLink::DISCUSSION}] } }
       end
     end
     sop = assigns(:sop)
@@ -1573,9 +1598,9 @@ class SopsControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person)
     asset_link = Factory(:discussion_link)
-    sop = Factory(:sop, asset_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    sop = Factory(:sop, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
     assert_difference('AssetLink.discussion.count', -1) do
-      put :update, params: { id: sop.id, sop: { asset_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+      put :update, params: { id: sop.id, sop: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
     end
     assert_redirected_to sop_path(sop = assigns(:sop))
     assert_empty sop.discussion_links

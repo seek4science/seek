@@ -61,6 +61,11 @@
   <%= f.fancy_multiselect :organisms, { possibilities: Organism.order(:title).all, hidden: false } %>
 <% end %>
 
+<% if Seek::Config.human_diseases_enabled %>
+  <%= f.fancy_multiselect :human_diseases, { possibilities: HumanDisease.order(:title).all, with_new_link: true, hidden: false } %>
+<% end %>
+
+
 <% if @project.can_manage? %>
     <%= render :partial => 'assets/license_selector', :locals => { :resource => @project, :label=>"Default License",:accessor=>:default_license } %>
 
@@ -68,11 +73,11 @@
                       help_text: "Here you can choose to configure a default sharing policy that is applied to new resources created as part of this #{t('project').downcase}.") do %>
         <% if @project.new_record? %>
             <div class="alert alert-warning">
-              To configure a default sharing policy, please finish creating the project then visit the "Edit Project Details" page.
+              To configure a default sharing policy, please finish creating the <%= t('project').downcase -%> then visit the "Edit <%= t('project') -%> Details" page.
             </div>
         <% else %>
             <div class="alert alert-info">
-              Here you can choose to configure a default sharing policy that is applied to new resources created as part of this project.
+              Here you can choose to configure a default sharing policy that is applied to new resources created as part of this <%= t('project').downcase -%>.
             </div>
             <div class="checkbox">
               <label>
@@ -91,7 +96,7 @@
   <%= folding_panel('NeLS Settings', false, id: 'nels_admin_section') do %>
     <span class="subtle">(Only visible to administrators)</span>
     <div class="alert alert-info">
-      <p>This option allows members of the Project to use the <%=link_to "Norwegian e-Infrastructure for Life Sciences (NeLS)", "https://nels.bioinfo.no/" %>.</p>
+      <p>This option allows members of the <%= t('project') -%> to use the <%=link_to "Norwegian e-Infrastructure for Life Sciences (NeLS)", "https://nels.bioinfo.no/" %>.</p>
       <p>It is only available to members that have an account that gives you access to its services.</p>
     </div>
 

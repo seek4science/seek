@@ -7,5 +7,5 @@
     <% end %>
 
 <% end %>
-<%= list_item_simple_list resource.projects, "Projects" %>
+<%= list_item_simple_list resource.projects, t('project').pluralize %>
 <%= list_item_optional_attribute "Web page", h(resource.web_page), h(resource.web_page) %>

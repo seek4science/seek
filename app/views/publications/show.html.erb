@@ -61,6 +61,13 @@
 
       </div>
       <div class="col-md-6">
+      <% if Seek::Config.human_diseases_enabled %>
+        <p>
+          <strong>Human Diseases:</strong>
+          <%= human_diseases_link_list @publication.human_diseases -%>
+        </p>
+      <% end %>
+
         <p>
           <strong>Citation:</strong>
           <%=h @publication.citation -%>

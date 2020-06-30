@@ -24,14 +24,14 @@
   <div class="col-md-7 col-md-pull-5" id="project-admin-page">
     <%= panel("#{t('project')} members", :id => "admin_members") do %>
         <%= alert_box('info') do %>
-          The current project members are listed below. From here you can:
+          The current <%= t('project').downcase -%> members are listed below. From here you can:
           <dl class="dl-horizontal icon-key">
             <dt>
               <span class="flag_as_left_icon"></span>
             </dt>
             <dd>
               Mark that a user has left, or became inactive in, the <%= t('project').downcase %> on a given date.
-              This will allow the user's contributions to the project to be managed by the project's asset housekeeper. It won't remove them from the <%= t('project').downcase %>.
+              This will allow the user's <%= t('contribution').pluralize %> to the <%= t('project').downcase -%> to be managed by the <%= t('project').downcase -%>'s <%= t('asset_housekeeper') -%>. It won't remove them from the <%= t('project').downcase %>.
             </dd>
             <dt>
               <span class="unflag_as_left_icon"></span>

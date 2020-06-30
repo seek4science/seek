@@ -1,0 +1,14 @@
+<% if @human_disease.children and !@human_disease.children.empty? %>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Children:</h3>
+    </div>
+    <div class="panel-body">
+      <ul>
+        <% @human_disease.children.uniq.each do |child| %>
+          <li><%= link_to child.title, child -%></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% end %>

@@ -161,6 +161,15 @@ module ApiHelper
       end
     end
 
+    if object.respond_to?('human_disease') || object.respond_to?('human_diseases')
+      builder.tag! 'human_diseases' do
+        human_diseases = []
+        human_diseases = object.human_diseases if object.respond_to?('human_diseases')
+        human_diseases << object.human_disease if object.respond_to?('human_disease') && object.human_disease
+        api_partial_collection builder, human_diseases
+      end
+    end
+
     if !object.instance_of?(Publication) && object.respond_to?('creators')
       builder.tag! 'creators' do
         api_partial_collection builder, (object.creators || [])
@@ -307,7 +316,7 @@ module ApiHelper
 
   # types that should be ignored from the related resources. It may be desirable to add items in this list to the schema
   def ignore_associated_types
-    [Strain, Organism]
+    [Strain, Organism, HumanDisease]
   end
 
   def ignore_associated_types_xml

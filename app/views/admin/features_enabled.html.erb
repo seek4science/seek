@@ -42,14 +42,8 @@
                            'Help URL', "This is the URL for the external help e.g #{Seek::Config.default_external_help_url}.") %>
   </div>
 
-  <%= admin_checkbox_setting(:workflows_enabled, 1, Seek::Config.workflows_enabled,
-                             'Workflows enabled', 'Whether the Workflow framework is enabled.',
-                             onchange: toggle_appear_javascript('workflow_cwl_Settings')) %>
-  <div id="workflow_cwl_Settings" class="additional_settings" style="<%= show_or_hide_block Seek::Config.workflows_enabled -%>">
-    <%= admin_text_setting(:cwl_viewer_url, Seek::Config.cwl_viewer_url,
-                           'CWL Viewer URL',
-                           "The URL of a #{link_to('CWL Viewer', 'https://github.com/common-workflow-language/cwlviewer', target: :_blank)} instance to generate diagrams for CWL workflows.") %>
-  </div>
+  <%= admin_checkbox_setting(:collections_enabled, 1, Seek::Config.collections_enabled,
+                             "Collections enabled", "Whether the users can create collections of assets in SEEK.") %>
 
   <%= admin_checkbox_setting(:documents_enabled, 1, Seek::Config.documents_enabled,
                              "Documents enabled", "Whether the users can register documents in SEEK.") %>
@@ -65,6 +59,15 @@
 
   <%= admin_checkbox_setting(:publications_enabled, 1, Seek::Config.publications_enabled,
                              "Publications enabled", "Whether the users can register publications in SEEK.") %>
+
+  <%= admin_checkbox_setting(:workflows_enabled, 1, Seek::Config.workflows_enabled,
+                             'Workflows enabled', 'Whether the Workflow framework is enabled.',
+                             onchange: toggle_appear_javascript('workflow_cwl_Settings')) %>
+  <div id="workflow_cwl_Settings" class="additional_settings" style="<%= show_or_hide_block Seek::Config.workflows_enabled -%>">
+    <%= admin_text_setting(:cwl_viewer_url, Seek::Config.cwl_viewer_url,
+                           'CWL Viewer URL',
+                           "The URL of a #{link_to('CWL Viewer', 'https://github.com/common-workflow-language/cwlviewer', target: :_blank)} instance to generate diagrams for CWL workflows.") %>
+  </div>
 
   <h2>Integrations</h2>
   <%= admin_checkbox_setting(:jws_enabled, 1, Seek::Config.jws_enabled,

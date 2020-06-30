@@ -47,6 +47,7 @@ def load_seek_config_defaults!
   Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :filestore_path,"filestore"
   Seek::Config.default :modelling_analysis_enabled,true
+  Seek::Config.default :human_diseases_enabled, false
   Seek::Config.default :guide_box_enabled,true
   Seek::Config.default :factors_studied_enabled,false
   Seek::Config.default :experimental_conditions_enabled,false

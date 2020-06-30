@@ -1,0 +1,1 @@
+<a name="listCollections"></a>The **listCollections** operation returns a JSON object containing a list of all the <a href="#collections">**Collections**</a> to which the authenticated user has access.

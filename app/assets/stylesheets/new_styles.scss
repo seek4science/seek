@@ -51,13 +51,13 @@ ul.feed li:first-child {
   padding-top: 0;
 }
 
-ul.feed .file-type-icon {
+.file-type-icon {
   display: block;
   float: left;
   margin: 0 0.5em 0.5em 0;
 }
 
-ul.feed .file-type-icon img {
+.file-type-icon img {
   max-width: 32px;
   max-height: 32px;
 }
@@ -971,6 +971,16 @@ div.index-filters {
   clear: both;
 }
 
+.remote-content-preview-result {
+  border-left: 3px solid #ccc;
+  padding: 0.5em 1em;
+  margin: 0.5em 1em;
+}
+
+li.upload-field-tab {
+  cursor: pointer;
+}
+
 img.github-logo {
   width: 16px;
   height: 16px;
@@ -1000,4 +1010,36 @@ img.github-logo {
 
 .workflow-diagram img {
   max-width: 100%;
+}
+
+.list_item_content .maturity-level {
+  font-size: 100%;
+}
+
+ul.list.collapsed li.hidden-item {
+  display: none;
+}
+
+h5.author-list-title {
+  margin-top: 0;
+  font-weight: bold;
+}
+
+ul.author-list {
+  padding-left: 0;
+}
+
+li.author-list-item {
+  display: inline;
+  &:not(:last-child):after {
+    content: ", ";
+  }
+}
+
+hr.discussion-links-divider {
+  margin: 0.5em;
+}
+
+div.discussion-link {
+  word-wrap: break-word;
 }

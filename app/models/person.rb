@@ -65,7 +65,7 @@ class Person < ApplicationRecord
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
 
   RELATED_RESOURCE_TYPES = %w[DataFile Sop Model Document Publication Presentation
-                              Sample Event Investigation Study Assay Strain Workflow Node].freeze
+                              Sample Event Investigation Study Assay Strain Workflow Node Collection].freeze
 
   RELATED_RESOURCE_TYPES.each do |type|
     plural = type.tableize

@@ -1,0 +1,100 @@
+<h1>Editing <%= t('collection') %>: <%= link_to(h(@collection.title), collection_path(@collection)) -%></h1>
+
+<%= form_for(@collection) do |f| %>
+    <div class="asset_form">
+      <%= f.error_messages %>
+
+      <div class="form-group">
+        <label class="required">Title</label>
+        <%= f.text_field :title, :class=>"form-control" -%>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
+      </div>
+
+      <%= panel('Items') do %>
+        <p class="help-block">Items can be re-arranged by clicking and dragging the button on the left-hand side of each row.</p>
+        <table class="table" id="items-table">
+          <thead>
+          <tr>
+            <th width="5em">Order</th>
+            <th>Item</th>
+            <th>Comment</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          <%= f.fields_for(:items) do |i| %>
+            <tr class="item-row">
+              <th scope="row" class="item-order">
+                <div class="btn btn-info item-handle">
+                  <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>
+                  <span class="item-order-label"><%= i.object.order || i.options[:child_index] + 1 %></span>
+                </div>
+                <%= i.hidden_field(:order) %>
+              </th>
+              <td>
+                <% if i.object.asset.can_view? %>
+                  <%= link_to(avatar(i.object.asset, 60, true, nil, nil, true, 'home_asset_icon'), i.object.asset, class: 'file-type-icon') %>
+                  <%= link_to(i.object.asset.title, i.object.asset, 'data-tooltip' => i.object.asset.description, target: '_blank') %>
+                <% else %>
+                  <span class="none_text"><%= t('private_asset') -%></span>
+                <% end %>
+              </td>
+              <td>
+                <%= i.text_field(:comment, class: 'form-control') %>
+              </td>
+              <td>
+                <div class="pull-right">
+                  <div class="checkbox btn btn-danger">
+                    <%= label_tag do %>
+                      <%= i.check_box :_destroy, autocomplete: 'off', data: { role: 'delete-collection-item' } %> Delete?
+                    <% end %>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      <% end %>
+
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @collection } %>
+
+      <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
+
+      <%= form_submit_buttons(@collection) %>
+    </div>
+<% end %>
+
+<script>
+  $j(document).ready(function () {
+      var recalcOrder = function() {
+          $j('#items-table tr.item-row .item-order').each(function (index, item) {
+              $j('.item-order-label', $j(item)).html(index + 1);
+              $j('input', $j(item)).val(index + 1);
+          });
+      };
+
+      $j('#items-table tbody').sortable({
+          items: '.item-row',
+          //helper: SampleTypes.fixHelper,
+          handle: '.item-handle'
+      }).on('sortupdate', recalcOrder);
+
+      $j('[data-role="delete-collection-item"]').click(function () {
+          var row = $j(this).parents('.item-row');
+          if ($j(this).is(':checked')) {
+              row.addClass('danger');
+              // This selects all the fields in the row, except the magic "_destroy" checkbox and the hidden ID field
+              $j(':input:not([data-role="delete-collection-item"]):not([type=hidden])', row).prop('disabled', true);
+          }
+          else {
+              row.removeClass('danger');
+              $j(':input:not([data-role="delete-collection-item"])', row).prop('disabled', false);
+          }
+      })
+  });
+</script>

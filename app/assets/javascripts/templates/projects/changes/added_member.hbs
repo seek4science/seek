@@ -1,5 +1,5 @@
 <li class="institution_member change-item" data-person-id="{{person.id}}" data-institution-id="{{institution.id}}">
-    Add <strong>{{person.name}}</strong> to the project
+    Add <strong>{{person.name}}</strong> to the {{ downcase (I18n 'project') }}
     @ <strong>{{institution.title}}</strong>
 
     {{> projects/_undo_button}}

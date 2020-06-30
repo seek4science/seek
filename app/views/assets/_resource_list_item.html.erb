@@ -32,7 +32,7 @@
 <div class="panel panel-default <%= access_based_css_class%>">
   <div class="panel-heading rli-head">
     <%= list_item_title resource, title_options %>
-    <% if resource.respond_to?(:projects) && ![Event, Person, Project, Institution, Programme].include?(resource.class) %>
+    <% if resource.respond_to?(:projects) && ![Event, Person, Project, Institution, Programme, Collection].include?(resource.class) %>
         <div class="rli-project-list">
           <%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %>
         </div>
@@ -55,7 +55,7 @@
       <% end %>
     </div>
   </div>
-  <% unless [Person, Project, Institution, Programme, Organism].include?(resource.class)  %>
+  <% unless [Person, Project, Institution, Programme, Organism, HumanDisease].include?(resource.class)  %>
       <div class="panel-footer hidden-xs small">
         <%= list_item_timestamp resource %>
       </div>

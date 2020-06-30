@@ -20,6 +20,7 @@ class Project < ApplicationRecord
   has_and_belongs_to_many :samples
   has_and_belongs_to_many :sample_types
   has_and_belongs_to_many :documents
+  has_and_belongs_to_many :collections
 
   has_many :work_groups, dependent: :destroy, inverse_of: :project
   has_many :institutions, through: :work_groups, inverse_of: :projects
@@ -83,13 +84,15 @@ class Project < ApplicationRecord
   alias_attribute :internal_webpage, :wiki_page
 
   has_and_belongs_to_many :organisms, before_add: :update_rdf_on_associated_change, before_remove: :update_rdf_on_associated_change
+  has_and_belongs_to_many :human_diseases, before_add: :update_rdf_on_associated_change, before_remove: :update_rdf_on_associated_change
   has_filter :organism
+  has_filter :human_disease
   has_many :project_subscriptions, dependent: :destroy
 
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
 
   def assets
-    data_files | sops | models | publications | presentations | documents | workflows | nodes
+    data_files | sops | models | publications | presentations | documents | workflows | nodes | collections
   end
 
   def institutions=(new_institutions)
@@ -168,6 +171,10 @@ class Project < ApplicationRecord
   def has_member?(user_or_person)
     user_or_person = user_or_person.try(:person)
     people.include? user_or_person
+  end
+
+  def human_disease_terms
+    human_diseases.collect(&:searchable_terms).flatten
   end
 
   def members= replacement_members
@@ -298,7 +305,9 @@ class Project < ApplicationRecord
         '@id' => "#project-#{id}",
         name: title,
         identifier: rdf_seek_id
-    }
+    }.tap do |m|
+      m.merge!(url: web_page) unless web_page.blank?
+    end
   end
 
   # should put below at the bottom in order to override methods for hierarchies,

@@ -6,7 +6,17 @@
 
       <%= render :partial => "form_import_details" -%>
 
-      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@model} -%>
+      <% model_image_form = capture do %>
+        <hr/>
+        <div id="image_file_box">
+          <%= hidden_field_tag("model_id", @model.id) -%>
+          <div class="form-group">
+            <label>Image file</label>
+            <%= file_field "model_image", :image_file, :onchange => "detectFileFormat('model_image_image_file')" %>
+          </div>
+        </div>
+      <% end -%>
+      <%= render(partial: 'assets/upload_box', locals: { resource: @model, extra_content: model_image_form })%>
 
       <div class="form-group">
         <label class="required">Title</label>
@@ -29,6 +39,8 @@
       <%= render :partial => "model_metadata" -%>
 
       <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
+
+      <%= render :partial => "human_diseases/select_human_disease",:locals=>{:model_class=>Model} -%>
 
       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@model} if show_scales?%>
 

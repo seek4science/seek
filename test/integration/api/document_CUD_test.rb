@@ -22,14 +22,6 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: document.id})
   end
 
-  def populate_extra_relationships(hash = nil)
-    extra_relationships = {}
-    extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
-    extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' },
-                                            { id: @creator.id.to_s, type: 'people' }] }
-    extra_relationships.with_indifferent_access
-  end
-
   test 'can add content to API-created document' do
     doc = Factory(:api_pdf_document, contributor: @current_person)
 
@@ -98,10 +90,10 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     h = JSON.parse(response.body)
 
     hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
-    hash_comparison(populate_extra_attributes, h['data']['attributes'])
+    hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
 
     hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
-    hash_comparison(populate_extra_relationships, h['data']['relationships'])
+    hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
   end
 
 

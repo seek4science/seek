@@ -1,0 +1,17 @@
+<%
+   if @resource.has_attribute?(:creators)
+     email_recipients = (@resource.creators.count > 0) ? @resource.creators : [@resource.contributor]
+   else
+     email_recipients = [@resource.contributor]
+   end
+%>
+
+<div class="alert alert-success">
+  An email has been sent on your behalf to <b><%= join_with_and( email_recipients.collect{|m| h(m.name)}) -%></b> to show your interest in <b><%= h(@resource.title) -%></b>.
+</div>
+
+<hr/>
+
+<div>
+  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+</div>

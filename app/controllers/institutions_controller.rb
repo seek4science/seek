@@ -61,7 +61,7 @@ class InstitutionsController < ApplicationController
     @institution = Institution.new(institution_params)
     respond_to do |format|
       if @institution.save
-        flash[:notice] = 'Institution was successfully created.'
+        flash[:notice] = "#{t('institution')} was successfully created."
         format.html { redirect_to(@institution) }
         format.xml  { render xml: @institution, status: :created, location: @institution }
         format.json {render json: @institution, status: :created, location: @institution, include: [params[:include]]}
@@ -79,7 +79,7 @@ class InstitutionsController < ApplicationController
     respond_to do |format|
       if @institution.update_attributes(institution_params)
         expire_resource_list_item_content
-        flash[:notice] = 'Institution was successfully updated.'
+        flash[:notice] = "#{t('institution')} was successfully updated."
         format.html { redirect_to(@institution) }
         format.xml  { head :ok }
         format.json {render json: @institution, include: [params[:include]]}

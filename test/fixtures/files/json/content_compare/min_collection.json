@@ -1,0 +1,70 @@
+{
+  "data": {
+    "id": "79",
+    "type": "collections",
+    "attributes": {
+      "title": "A Minimal Collection",
+      "description": null,
+      "license": null,
+      "tags": null,
+      "created_at": "2020-06-02T16:26:28.000Z",
+      "updated_at": "2020-06-02T16:26:28.000Z",
+      "other_creators": null
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "1039986628",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "1039986628",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "1022250787",
+            "type": "projects"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+
+        ]
+      },
+      "items": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/collections/79",
+      "items": "/collections/79/items"
+    },
+    "meta": {
+      "created": "2020-06-02T16:26:28.000Z",
+      "modified": "2020-06-02T16:26:28.000Z",
+      "api_version": "0.3",
+      "uuid": "bc3f7600-871b-0138-b8d3-0800278a9619",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

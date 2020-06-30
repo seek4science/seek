@@ -1,0 +1,154 @@
+{
+    "data": {
+        "id": "2",
+        "type": "collections",
+        "attributes": {
+            "policy": {
+                "access": "view",
+                "permissions": [
+                    {
+                        "resource": {
+                            "id": "1",
+                            "type": "projects"
+                        },
+                        "access": "download"
+                    }
+                ]
+            },
+            "title": "Bob's workflows",
+            "description": null,
+            "license": "CC-BY-4.0",
+            "tags": [
+                "covid-19"
+            ],
+            "created_at": "2020-05-15T08:40:25.000Z",
+            "updated_at": "2020-05-15T08:40:25.000Z",
+            "other_creators": null
+        },
+        "relationships": {
+            "creators": {
+                "data": [
+                    {
+                        "id": "1",
+                        "type": "people"
+                    }
+                ]
+            },
+            "submitter": {
+                "data": [
+                    {
+                        "id": "1",
+                        "type": "people"
+                    }
+                ]
+            },
+            "people": {
+                "data": [
+                    {
+                        "id": "1",
+                        "type": "people"
+                    }
+                ]
+            },
+            "projects": {
+                "data": [
+                    {
+                        "id": "1",
+                        "type": "projects"
+                    }
+                ]
+            },
+            "publications": {
+                "data": []
+            },
+            "items": {
+                "data": [
+                    {
+                        "id": "8",
+                        "type": "collection_items"
+                    },
+                    {
+                        "id": "12",
+                        "type": "collection_items"
+                    }
+                ]
+            }
+        },
+        "links": {
+            "self": "/collections/2",
+            "items": "/collections/2/items"
+        },
+        "meta": {
+            "created": "2020-05-15T08:40:25.000Z",
+            "modified": "2020-05-15T08:40:25.000Z",
+            "api_version": "0.3",
+            "uuid": "a5317230-78b5-0138-b2f8-0800278a9619",
+            "base_url": "http://localhost:3000"
+        }
+    },
+    "included": [
+        {
+            "id": "8",
+            "type": "collection_items",
+            "attributes": {
+                "comment": "Run this workflow first",
+                "order": 2
+            },
+            "relationships": {
+                "collection": {
+                    "data": {
+                        "id": "2",
+                        "type": "collections"
+                    }
+                },
+                "asset": {
+                    "data": {
+                        "id": "63",
+                        "type": "workflows"
+                    }
+                }
+            },
+            "links": {
+                "self": "/collections/2/items/8"
+            },
+            "meta": {
+                "created": "2020-05-15T08:41:13.000Z",
+                "modified": "2020-05-15T08:41:47.000Z",
+                "api_version": "0.3"
+            }
+        },
+        {
+            "id": "12",
+            "type": "collection_items",
+            "attributes": {
+                "comment": "...then run this workflow",
+                "order": 3
+            },
+            "relationships": {
+                "collection": {
+                    "data": {
+                        "id": "2",
+                        "type": "collections"
+                    }
+                },
+                "asset": {
+                    "data": {
+                        "id": "60",
+                        "type": "workflows"
+                    }
+                }
+            },
+            "links": {
+                "self": "/collections/2/items/12"
+            },
+            "meta": {
+                "created": "2020-05-28T15:58:38.000Z",
+                "modified": "2020-05-28T15:58:38.000Z",
+                "api_version": "0.3"
+            }
+        }
+    ],
+    "jsonapi": {
+        "version": "1.0"
+    }
+}
