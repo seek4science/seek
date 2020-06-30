@@ -354,6 +354,9 @@ SEEK::Application.routes.draw do
   end
 
   resources :studies, concerns: [:publishable, :has_snapshots, :isa] do
+    collection do
+      post :investigation_selected_ajax
+    end
     resources :people,:projects,:assays,:investigations,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:only=>[:index]
   end
 
