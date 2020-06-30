@@ -30,5 +30,9 @@ class CustomMetadataAttribute < ApplicationRecord
     METHOD_PREFIX + hash_key
   end
 
+  def pre_process_value(value)
+    sample_attribute_type.pre_process_value(value,{})
+  end
+
   alias accessor_name hash_key
 end

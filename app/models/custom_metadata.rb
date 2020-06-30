@@ -1,5 +1,4 @@
 class CustomMetadata < ApplicationRecord
-  class InvalidDataException < RuntimeError; end
 
   belongs_to :item, polymorphic: true
   belongs_to :custom_metadata_type, validate: true
@@ -9,6 +8,15 @@ class CustomMetadata < ApplicationRecord
   validates_with CustomMetadataValidator
 
   delegate :custom_metadata_attributes, to: :custom_metadata_type
+
+  before_validation :update_json_metadata
+
+  def custom_metadata_type=(type)
+    super
+    @data = Seek::Samples::SampleData.new(type)
+    update_json_metadata
+    type
+  end
 
   def get_attribute_value(attr)
     attr = attr.title if attr.is_a?(CustomMetadataAttribute)
@@ -22,21 +30,33 @@ class CustomMetadata < ApplicationRecord
     data[attr] = value
   end
 
+  # Mass assignment of attributes
   def data=(hash)
-    attribute_titles = custom_metadata_attributes.collect(&:title)
-    provided_keys = hash.keys.collect(&:to_s)
-    wrong = provided_keys - attribute_titles
-    if wrong.any?
-      raise InvalidDataException,
-            'invalid attribute keys in data assignment, must match attribute titles ' \
-            "(#{'culprit'.pluralize(wrong.size)} - #{wrong.join(',')}"
-    end
-    @data = HashWithIndifferentAccess.new(hash)
+    data.mass_assign(hash)
   end
 
   def data
-    @data ||= build_json_hash
+    @data ||= Seek::Samples::SampleData.new(custom_metadata_type, json_metadata)
   end
+
+  def update_json_metadata
+    self.json_metadata = data.to_json
+  end
+  # def data=(hash)
+  #   attribute_titles = custom_metadata_attributes.collect(&:title)
+  #   provided_keys = hash.keys.collect(&:to_s)
+  #   wrong = provided_keys - attribute_titles
+  #   if wrong.any?
+  #     raise InvalidDataException,
+  #           'invalid attribute keys in data assignment, must match attribute titles ' \
+  #           "(#{'culprit'.pluralize(wrong.size)} - #{wrong.join(',')}"
+  #   end
+  #   @data = HashWithIndifferentAccess.new(hash)
+  # end
+  #
+  # def data
+  #   @data ||= build_json_hash
+  # end
 
   def blank_attribute?(attr)
     attr = attr.title if attr.is_a?(CustomMetadataAttribute)
