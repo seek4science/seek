@@ -166,8 +166,6 @@ class CustomMetadataTest < ActiveSupport::TestCase
       assert_equal 25, study2.custom_metadata.get_attribute_value(:age)
       assert_equal date, study2.custom_metadata.get_attribute_value(:date)
     end
-
-
   end
 
   test 'associated metadata destroyed with study' do
