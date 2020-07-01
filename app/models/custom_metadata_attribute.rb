@@ -2,8 +2,6 @@ class CustomMetadataAttribute < ApplicationRecord
   belongs_to :sample_attribute_type
   belongs_to :custom_metadata_type
 
-  METHOD_PREFIX = '_custom_metadata_'.freeze
-
   def validate_value?(value)
     return false if required? && value.blank?
     (value.blank? && !required?) || sample_attribute_type.validate_value?(value, required: required?)
@@ -27,7 +25,7 @@ class CustomMetadataAttribute < ApplicationRecord
 
   # The method name used to get this attribute via a method call
   def method_name
-    METHOD_PREFIX + hash_key
+    Seek::JSONMetadata::METHOD_PREFIX + hash_key
   end
 
   def pre_process_value(value)

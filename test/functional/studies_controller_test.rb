@@ -706,7 +706,9 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':'fred','_custom_metadata_age':22}}
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}name":'fred',
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}age":22}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -760,7 +762,9 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_full name':'Paul Jones','_custom_metadata_full address':'London, UK'}}
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}full name":'Paul Jones',
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}full address":'London, UK'}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -783,9 +787,10 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_full name':'full name',
-                                                   '_custom_metadata_Full name':'Full name',
-                                                   '_custom_metadata_full  name':'full  name'}}
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}full name":'full name',
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}Full name":'Full name',
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}full  name":'full  name'}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -809,9 +814,11 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_+name':'+name',
-                                                   '_custom_metadata_-name':'-name',
-                                                   '_custom_metadata_&name':'&name'}}
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}+name":'+name',
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}-name":'-name',
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}&name":'&name'}
+      }
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end

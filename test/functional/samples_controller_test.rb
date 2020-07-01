@@ -58,7 +58,10 @@ class SamplesControllerTest < ActionController::TestCase
     type = Factory(:patient_sample_type)
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id,
-                              __sample_data_full_name: 'Fred Smith', __sample_data_age: '22', __sample_data_weight: '22.1', __sample_data_postcode: 'M13 9PL' ,
+                              "#{Seek::JSONMetadata::METHOD_PREFIX}full_name": 'Fred Smith',
+                              "#{Seek::JSONMetadata::METHOD_PREFIX}age": '22',
+                              "#{Seek::JSONMetadata::METHOD_PREFIX}weight": '22.1',
+                              "#{Seek::JSONMetadata::METHOD_PREFIX}postcode": 'M13 9PL' ,
                               project_ids: [person.projects.first.id], other_creators:'frank, mary', creator_ids: [creator.id] } }
     end
     assert assigns(:sample)
@@ -108,7 +111,9 @@ class SamplesControllerTest < ActionController::TestCase
     type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
     assert_difference('Sample.count') do
-      post :create, params: { sample: { sample_type_id: type.id, __sample_data_the_title: 'ttt', __sample_data_bool: '1' ,
+      post :create, params: { sample: { sample_type_id: type.id,
+                              "#{Seek::JSONMetadata::METHOD_PREFIX}the_title": 'ttt',
+                              "#{Seek::JSONMetadata::METHOD_PREFIX}bool": '1' ,
                               project_ids: [person.projects.first.id] } }
     end
     assert_not_nil sample = assigns(:sample)
@@ -186,7 +191,9 @@ class SamplesControllerTest < ActionController::TestCase
     assert_empty sample.creators
 
     assert_no_difference('Sample.count') do
-      put :update, params: { id: sample.id, sample: { __sample_data_full_name: 'Jesus Jones', __sample_data_age: '47', __sample_data_postcode: 'M13 9QL',
+      put :update, params: { id: sample.id, sample: { "#{Seek::JSONMetadata::METHOD_PREFIX}full_name": 'Jesus Jones',
+                                                      "#{Seek::JSONMetadata::METHOD_PREFIX}age": '47',
+                                                      "#{Seek::JSONMetadata::METHOD_PREFIX}postcode": 'M13 9QL',
           creator_ids: [creator.id] } }
       assert_equal [creator], sample.creators
     end
@@ -242,8 +249,11 @@ class SamplesControllerTest < ActionController::TestCase
     project_ids = person.projects[0..1].collect(&:id)
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, title: 'My Sample',
-                              __sample_data_full_name: 'Fred Smith', __sample_data_age: '22', __sample_data_weight: '22.1', __sample_data_postcode: 'M13 9PL',
-                              project_ids: project_ids } }
+                                        __metadata_attribute_full_name: 'Fred Smith',
+                                        __metadata_attribute_age: '22',
+                                        __metadata_attribute_weight: '22.1',
+                                        __metadata_attribute_postcode: 'M13 9PL',
+                                        project_ids: project_ids } }
     end
     assert sample = assigns(:sample)
     assert_equal person.projects[0..1].sort, sample.projects.sort
@@ -354,7 +364,10 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, title: 'My Sample',
-                              __sample_data_full_name: 'Fred Smith', __sample_data_age: '22', __sample_data_weight: '22.1', __sample_data_postcode: 'M13 9PL' ,
+                                        "#{Seek::JSONMetadata::METHOD_PREFIX}full_name": 'Fred Smith',
+                                        "#{Seek::JSONMetadata::METHOD_PREFIX}age": '22',
+                                        "#{Seek::JSONMetadata::METHOD_PREFIX}weight": '22.1',
+                                        "#{Seek::JSONMetadata::METHOD_PREFIX}postcode": 'M13 9PL' ,
                               project_ids: [person.projects.first.id] }, policy_attributes: valid_sharing }
     end
     assert sample = assigns(:sample)
