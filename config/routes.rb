@@ -610,9 +610,6 @@ SEEK::Application.routes.draw do
   end
 
   resources :collections, concerns: [:publishable, :has_doi, :asset] do
-    member do
-      post :request_resource
-    end
     resources :items, controller: :collection_items
     resources :people,:projects, :programmes,:investigations,:assays,:studies,:publications,:events,:collections,:only=>[:index]
     resources :avatars do
