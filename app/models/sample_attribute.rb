@@ -1,5 +1,5 @@
 class SampleAttribute < ApplicationRecord
-  METHOD_PREFIX = '__sample_data_'
+
 
   # attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos, :sample_type_id,
   #                :_destroy, :sample_type, :unit, :unit_id, :is_title, :template_column_index, :sample_controlled_vocab,
@@ -51,7 +51,7 @@ class SampleAttribute < ApplicationRecord
 
   # The method name used to get this attribute via a method call
   def method_name
-    METHOD_PREFIX + hash_key
+    Seek::JSONMetadata::METHOD_PREFIX + hash_key
   end
 
   # The key used to address this attribute in the sample's JSON blob

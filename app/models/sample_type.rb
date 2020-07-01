@@ -112,6 +112,10 @@ class SampleType < ApplicationRecord
     Seek::Samples::SampleTypeEditingConstraints.new(self)
   end
 
+  def attribute_by_method_name(method_name)
+    sample_attributes.detect{|attr| attr.method_name == method_name}
+  end
+
   private
 
   # whether the referring sample is valid and gives permission to view
