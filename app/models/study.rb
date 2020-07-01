@@ -66,8 +66,7 @@ class Study < ApplicationRecord
   def self.extract_studies_from_file(studies_file)
     studies = []
     parsed_sheet = Seek::Templates::StudiesReader.new(studies_file)
-    metadata_type = CustomMetadataType.new(title: 'MIAPPE metadata', supported_type:'Study')
-
+    metadata_type = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study').last
     columns = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     study_start_row_index = 4
     parsed_sheet.each_record(3, columns) do |index, data|
@@ -89,22 +88,22 @@ class Study < ApplicationRecord
 
   def self.generate_metadata(data)
     metadata = {
-        id: data[0].value,
-        study_start_date: data[3].value,
-        study_end_date: data[4].value,
-        contact_institution: data[5].value,
-        geographic_location_country: data[6].value,
-        experimental_site_name: data[7].value,
-        latitude: data[8].value,
-        longitude: data[9].value,
-        altitude: data[10].value,
-        description_of_the_experimental_design: data[11].value,
-        type_of_experimental_design: data[12].value,
-        observation_unit_level_hierarchy: data[13].value,
-        observation_unit_description: data[14].value,
-        description_of_growth_facility: data[15].value,
-        type_of_growth_facility: data[16].value,
-        cultural_practices: data[17].value,
+      id: data[0].value,
+      study_start_date: data[3].value,
+      study_end_date: data[4].value,
+      contact_institution: data[5].value,
+      geographic_location_country: data[6].value,
+      experimental_site_name: data[7].value,
+      latitude: data[8].value,
+      longitude: data[9].value,
+      altitude: data[10].value,
+      description_of_the_experimental_design: data[11].value,
+      type_of_experimental_design: data[12].value,
+      observation_unit_level_hierarchy: data[13].value,
+      observation_unit_description: data[14].value,
+      description_of_growth_facility: data[15].value,
+      type_of_growth_facility: data[16].value,
+      cultural_practices: data[17].value
     }
     metadata
   end
@@ -124,7 +123,7 @@ class Study < ApplicationRecord
         Dir.mkdir "#{tmp_dir}/data" unless File.exists? "#{tmp_dir}/data"
         file.extract("#{tmp_dir}/data/#{file_name}") unless File.exists? "#{tmp_dir}/data/#{file_name}"
       elsif file.ftype == :file
-        studies << file_name
+        studies << file
         file.extract("#{tmp_dir}#{file_name}") unless File.exists? "#{tmp_dir}#{file_name}"
       end
     end

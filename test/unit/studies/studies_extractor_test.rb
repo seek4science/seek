@@ -20,21 +20,26 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     assert_same 1, studies.count
     assert_same true, File.exists?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{data_files.first.name}")
     assert_same true, File.exists?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{studies.first.name}")
+
+    FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
   end
 
   test 'read study file' do
 
+    Factory(:study_custom_metadata_type_for_MIAPPE)
     user_uuid = 'user_uuid'
     studies_file = ContentBlob.new
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
     studies_file.original_filename = @studies.first.name.to_s
     studies_file.save!
     pp Study.extract_studies_from_file(studies_file)
-  end
 
+    FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
+  end
 
   test 'extract study correctly' do
     user_uuid = 'user_uuid'
+    Factory(:study_custom_metadata_type_for_MIAPPE)
     studies_file = ContentBlob.new
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
     studies_file.original_filename = @studies.first.name.to_s
@@ -52,6 +57,7 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     assert_equal 'Clonal test of mapping pedigree 0504B in nursery', studies[2].title
     assert_equal 'POPYOMICS-POP2-UK', studies[2].custom_metadata.data[:id]
 
+    FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
     #@extractor.extract
   end
 

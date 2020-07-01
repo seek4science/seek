@@ -311,7 +311,7 @@ namespace :seek_dev do
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'altitude', sample_attribute_type: SampleAttributeType.where(title:'String').first)
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'description_of_the_experimental_design', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'type_of_experimental_design', sample_attribute_type: SampleAttributeType.where(title:'String').first)
-      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'type_of_experimental_design', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'observation_unit_level_hierarchy', sample_attribute_type: SampleAttributeType.where(title:'String').first)
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'observation_unit_description', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'description_of_growth_facility', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'type_of_growth_facility', sample_attribute_type: SampleAttributeType.where(title:'String').first)
