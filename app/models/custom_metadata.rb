@@ -1,5 +1,4 @@
 class CustomMetadata < ApplicationRecord
-
   include Seek::JSONMetadata::Serialization
 
   belongs_to :item, polymorphic: true
@@ -8,7 +7,7 @@ class CustomMetadata < ApplicationRecord
   validates_with CustomMetadataValidator
 
   delegate :custom_metadata_attributes, to: :custom_metadata_type
-  alias :metadata_type :custom_metadata_type
+  alias metadata_type custom_metadata_type
 
   def custom_metadata_type=(type)
     super

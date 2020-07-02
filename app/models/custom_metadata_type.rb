@@ -7,14 +7,14 @@ class CustomMetadataType < ApplicationRecord
   validate :supported_type_must_be_valid_type
   validate :unique_titles_for_custom_metadata_attributes
 
-  alias :metadata_attributes :custom_metadata_attributes
+  alias metadata_attributes custom_metadata_attributes
 
   def attribute_by_title(title)
-    custom_metadata_attributes.where(title:title).first
+    custom_metadata_attributes.where(title: title).first
   end
 
   def attribute_by_method_name(method_name)
-    custom_metadata_attributes.detect{|attr| attr.method_name == method_name}
+    custom_metadata_attributes.detect { |attr| attr.method_name == method_name }
   end
 
   def supported_type_must_be_valid_type
@@ -38,5 +38,4 @@ class CustomMetadataType < ApplicationRecord
       errors.add(:custom_metadata_attributes, 'must have unique titles')
     end
   end
-
 end

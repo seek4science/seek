@@ -3,11 +3,10 @@ module Seek
     METHOD_PREFIX = '__metadata_attribute_'.freeze
 
     module Serialization
-
       extend ActiveSupport::Concern
 
       included do
-        self.before_validation :update_json_metadata
+        before_validation :update_json_metadata
       end
 
       # Mass assignment of attributes
@@ -69,8 +68,6 @@ module Seek
       def attribute_class
         raise 'Needs overriding to provide the class of the metadata attribute'
       end
-
     end
-
   end
 end

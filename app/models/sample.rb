@@ -3,22 +3,23 @@ class Sample < ApplicationRecord
   include Seek::BioSchema::Support
   include Seek::JSONMetadata::Serialization
 
-  searchable(auto_index: false) do
-    text :attribute_values do
-      attribute_values_for_search
+  if Seek::Config.solr_enabled
+    searchable(auto_index: false) do
+      text :attribute_values do
+        attribute_values_for_search
+      end
+      text :sample_type do
+        sample_type.title
+      end
     end
-    text :sample_type do
-      sample_type.title
-    end
-  end if Seek::Config.solr_enabled
-
+  end
 
   acts_as_asset
 
   validates :projects, presence: true, projects: { self: true }
 
   belongs_to :sample_type, inverse_of: :samples
-  alias :metadata_type :sample_type
+  alias metadata_type sample_type
   belongs_to :originating_data_file, class_name: 'DataFile'
 
   has_many :sample_resource_links, inverse_of: :sample, dependent: :destroy
@@ -71,7 +72,6 @@ class Sample < ApplicationRecord
     linked_sample_ids | linking_sample_ids
   end
 
-
   def referenced_resources
     sample_type.sample_attributes.select(&:seek_resource?).map do |sa|
       value = get_attribute_value(sa)
@@ -117,8 +117,6 @@ class Sample < ApplicationRecord
       else
         value.to_s
       end
-    else
-      nil
     end
   end
 
@@ -161,7 +159,7 @@ class Sample < ApplicationRecord
   end
 
   def attribute_values_for_search
-    sample_type ? data.values.select { |v| !v.blank? }.uniq : []
+    sample_type ? data.values.reject(&:blank?).uniq : []
   end
 
   # override to insert the extra accessors for mass assignment

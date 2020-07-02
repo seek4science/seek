@@ -58,7 +58,7 @@ class SampleAttributeType < ApplicationRecord
   end
 
   def validate_resolution
-    (!resolution.present?) || (resolution.include? '\\')
+    !resolution.present? || (resolution.include? '\\')
   end
 
   def check_value_against_base_type(value, additional_options)
