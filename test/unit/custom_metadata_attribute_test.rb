@@ -89,11 +89,9 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
   test 'accessor name' do
     attribute = CustomMetadataAttribute.new title: 'fish', sample_attribute_type: Factory(:datetime_sample_attribute_type)
     assert_equal 'fish', attribute.accessor_name
-    assert_equal 'fish', attribute.hash_key
 
     attribute = CustomMetadataAttribute.new title: 'fish pie', sample_attribute_type: Factory(:datetime_sample_attribute_type)
     assert_equal 'fish pie', attribute.accessor_name
-    assert_equal 'fish pie', attribute.hash_key
   end
 
 

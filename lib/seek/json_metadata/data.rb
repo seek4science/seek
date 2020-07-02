@@ -1,6 +1,6 @@
 module Seek
-  module Samples
-    class SampleData < HashWithIndifferentAccess
+  module JSONMetadata
+    class Data < HashWithIndifferentAccess
 
       class InvalidKeyException < RuntimeError; end
 

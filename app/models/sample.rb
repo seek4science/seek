@@ -1,7 +1,7 @@
 class Sample < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
-  include Seek::JSONMetadata
+  include Seek::JSONMetadata::Serialization
 
   searchable(auto_index: false) do
     text :attribute_values do
@@ -42,7 +42,7 @@ class Sample < ApplicationRecord
 
   def sample_type=(type)
     super
-    @data = Seek::Samples::SampleData.new(type)
+    @data = Seek::JSONMetadata::Data.new(type)
     update_json_metadata
     type
   end

@@ -146,21 +146,21 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('')
   end
 
-  test 'hash key' do
+  test 'accessor_name' do
     attribute = SampleAttribute.new title: 'fish pie'
-    assert_equal 'fish_pie', attribute.hash_key
+    assert_equal 'fish_pie', attribute.accessor_name
 
     attribute.title = "provider's cell culture identifier"
-    assert_equal 'provider_s_cell_culture_identifier', attribute.hash_key
+    assert_equal 'provider_s_cell_culture_identifier', attribute.accessor_name
 
     attribute = SampleAttribute.new title: %(fish "' &-[]}^-pie)
-    assert_equal 'fish_pie', attribute.hash_key
+    assert_equal 'fish_pie', attribute.accessor_name
 
     attribute = SampleAttribute.new title: 'Fish Pie'
-    assert_equal 'fish_pie', attribute.hash_key
+    assert_equal 'fish_pie', attribute.accessor_name
 
     attribute = SampleAttribute.new title: 'title'
-    assert_equal 'title', attribute.hash_key
+    assert_equal 'title', attribute.accessor_name
   end
 
   test 'method name' do
@@ -174,22 +174,22 @@ class SampleAttributeTest < ActiveSupport::TestCase
     assert_equal Seek::JSONMetadata::METHOD_PREFIX + 'updated_at', attribute.method_name
   end
 
-  test 'accessor name matches hash key and is updated when title changes' do
+  test 'original accessor name is updated when title changes' do
     attribute = SampleAttribute.new title: 'fish pie'
     assert_equal 'fish_pie', attribute.accessor_name
-    assert_equal attribute.hash_key, attribute.accessor_name
+    assert_equal attribute.accessor_name, attribute.original_accessor_name
 
     attribute.title = 'title'
     assert_equal 'title', attribute.accessor_name
-    assert_equal attribute.hash_key, attribute.accessor_name
+    assert_equal attribute.accessor_name, attribute.original_accessor_name
 
     attribute.title = 'updated_at'
     assert_equal 'updated_at', attribute.accessor_name
-    assert_equal attribute.hash_key, attribute.accessor_name
+    assert_equal attribute.accessor_name, attribute.original_accessor_name
 
     attribute.title = 'HeLlo World!'
     assert_equal 'hello_world', attribute.accessor_name
-    assert_equal attribute.hash_key, attribute.accessor_name
+    assert_equal attribute.accessor_name, attribute.original_accessor_name
   end
 
   test 'title_attributes scope' do

@@ -1,6 +1,6 @@
 class CustomMetadata < ApplicationRecord
 
-  include Seek::JSONMetadata
+  include Seek::JSONMetadata::Serialization
 
   belongs_to :item, polymorphic: true
   belongs_to :custom_metadata_type, validate: true
@@ -12,7 +12,7 @@ class CustomMetadata < ApplicationRecord
 
   def custom_metadata_type=(type)
     super
-    @data = Seek::Samples::SampleData.new(type)
+    @data = Seek::JSONMetadata::Data.new(type)
     update_json_metadata
     type
   end
