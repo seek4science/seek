@@ -32,6 +32,10 @@ class SampleAttribute < ApplicationRecord
     super || is_title?
   end
 
+  def pre_process_value(value)
+    sample_attribute_type.pre_process_value(value, controlled_vocab: sample_controlled_vocab, linked_sample_type: linked_sample_type)
+  end
+
   def controlled_vocab_labels
     if controlled_vocab?
       sample_controlled_vocab.labels
