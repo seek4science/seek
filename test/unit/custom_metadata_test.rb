@@ -64,7 +64,7 @@ class CustomMetadataTest < ActiveSupport::TestCase
     cm = simple_test_object
     date = Time.now.to_s
     refute cm.valid?
-    exception = assert_raises Seek::Samples::SampleData::InvalidKeyException do
+    exception = assert_raises Seek::JSONMetadata::Data::InvalidKeyException do
       cm.update_attributes(data: { name: 'Fred', wrong_age: 25, wrong_date:date })
     end
 
@@ -73,7 +73,7 @@ class CustomMetadataTest < ActiveSupport::TestCase
 
     cm = CustomMetadata.new(custom_metadata_type: Factory.build(:study_custom_metadata_type_with_spaces), item: Factory(:study))
 
-    exception = assert_raises Seek::Samples::SampleData::InvalidKeyException do
+    exception = assert_raises Seek::JSONMetadata::Data::InvalidKeyException do
       cm.update_attributes(data: {
           "wrong full name"=>"Stuart Little",
           "full address"=>"On earth"

@@ -15,7 +15,7 @@ class SampleAttribute < ApplicationRecord
   # validates that the attribute type is SeekSample if linked_sample_type is set, and vice-versa
   validate :linked_sample_type_and_attribute_type_consistency
 
-  before_save :generate_accessor_name
+  before_save :store_accessor_name
   before_save :default_pos, :force_required_when_is_title
 
   scope :title_attributes, -> { where(is_title: true) }
@@ -28,7 +28,7 @@ class SampleAttribute < ApplicationRecord
 
   def title=(title)
     super
-    generate_accessor_name
+    store_accessor_name
     self.title
   end
 
@@ -46,11 +46,11 @@ class SampleAttribute < ApplicationRecord
 
   # The method name used to get this attribute via a method call
   def method_name
-    Seek::JSONMetadata::METHOD_PREFIX + hash_key
+    Seek::JSONMetadata::METHOD_PREFIX + accessor_name
   end
 
   # The key used to address this attribute in the sample's JSON blob
-  def hash_key
+  def accessor_name
     title.parameterize.underscore
   end
 
@@ -86,8 +86,8 @@ class SampleAttribute < ApplicationRecord
 
   private
 
-  def generate_accessor_name
-    self.accessor_name = hash_key
+  def store_accessor_name
+    self.original_accessor_name = accessor_name
   end
 
   # if not set, takes the next value for that sample type

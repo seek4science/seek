@@ -363,7 +363,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   # trying to track down an sqlite3 specific problem
-  test 'sqlite3 setting of accessor problem' do
+  test 'sqlite3 setting of original accessor problem' do
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
     sample.set_attribute_value(:full_name, 'Jimi Hendrix')
@@ -371,13 +371,13 @@ class SampleTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
     id = sample.id
     assert_equal 5, sample.sample_type.sample_attributes.count
-    assert_equal %w(full_name age weight address postcode), sample.sample_type.sample_attributes.collect(&:hash_key)
+    assert_equal %w(full_name age weight address postcode), sample.sample_type.sample_attributes.collect(&:accessor_name)
     assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full_name'
 
     sample2 = Sample.find(id)
     assert_equal id, sample2.id
     assert_equal 5, sample2.sample_type.sample_attributes.count
-    assert_equal %w(full_name age weight address postcode), sample2.sample_type.sample_attributes.collect(&:hash_key)
+    assert_equal %w(full_name age weight address postcode), sample2.sample_type.sample_attributes.collect(&:original_accessor_name)
     assert_respond_to sample2, Seek::JSONMetadata::METHOD_PREFIX + 'full_name'
   end
 

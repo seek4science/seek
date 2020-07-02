@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_13_152404) do
+ActiveRecord::Schema.define(version: 2020_07_02_123255) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -323,7 +323,7 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
 
   create_table "content_blobs", id: :integer,  force: :cascade do |t|
     t.string "md5sum"
-    t.text "url"
+    t.text "url", limit: 16777215
     t.string "uuid"
     t.string "original_filename"
     t.string "content_type"
@@ -395,16 +395,16 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
   create_table "data_file_versions", id: :integer,  force: :cascade do |t|
     t.integer "data_file_id"
     t.integer "version"
-    t.text "revision_comments"
+    t.text "revision_comments", limit: 16777215
     t.integer "contributor_id"
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.integer "template_id"
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "first_letter", limit: 1
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "uuid"
     t.integer "policy_id"
     t.string "doi"
@@ -423,14 +423,14 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
   create_table "data_files", id: :integer,  force: :cascade do |t|
     t.integer "contributor_id"
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.integer "template_id"
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "version", default: 1
     t.string "first_letter", limit: 1
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "uuid"
     t.integer "policy_id"
     t.string "doi"
@@ -459,8 +459,8 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
   create_table "delayed_jobs", id: :integer,  force: :cascade do |t|
     t.integer "priority", default: 0
     t.integer "attempts", default: 0
-    t.text "handler"
-    t.text "last_error"
+    t.text "handler", limit: 16777215
+    t.text "last_error", limit: 16777215
     t.datetime "run_at"
     t.datetime "locked_at"
     t.datetime "failed_at"
@@ -498,9 +498,9 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
   create_table "document_versions", id: :integer,  force: :cascade do |t|
     t.integer "document_id"
     t.integer "version"
-    t.text "revision_comments"
-    t.text "title"
-    t.text "description"
+    t.text "revision_comments", limit: 16777215
+    t.text "title", limit: 16777215
+    t.text "description", limit: 16777215
     t.integer "contributor_id"
     t.string "first_letter", limit: 1
     t.string "uuid"
@@ -510,7 +510,7 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "deleted_contributor"
     t.index ["contributor_id"], name: "index_document_versions_on_contributor"
     t.index ["document_id"], name: "index_document_versions_on_document_id"
@@ -524,8 +524,8 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
   end
 
   create_table "documents", id: :integer,  force: :cascade do |t|
-    t.text "title"
-    t.text "description"
+    t.text "title", limit: 16777215
+    t.text "description", limit: 16777215
     t.integer "contributor_id"
     t.integer "version"
     t.string "first_letter", limit: 1
@@ -536,7 +536,7 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "deleted_contributor"
     t.index ["contributor_id"], name: "index_documents_on_contributor"
   end
@@ -570,11 +570,11 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
   create_table "events", id: :integer,  force: :cascade do |t|
     t.datetime "start_date"
     t.datetime "end_date"
-    t.text "address"
+    t.text "address", limit: 16777215
     t.string "city"
     t.string "country"
     t.text "url"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.string "title"
     t.integer "policy_id"
     t.integer "contributor_id"
@@ -670,7 +670,7 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
   create_table "genes", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.string "symbol"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -679,7 +679,7 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
     t.integer "gene_id"
     t.integer "modification_id"
     t.integer "strain_id"
-    t.text "comment"
+    t.text "comment", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -714,7 +714,7 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
   create_table "help_documents", id: :integer,  force: :cascade do |t|
     t.string "identifier"
     t.string "title"
-    t.text "body"
+    t.text "body", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -774,7 +774,7 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
 
   create_table "institutions", id: :integer,  force: :cascade do |t|
     t.string "title"
-    t.text "address"
+    t.text "address", limit: 16777215
     t.string "city"
     t.text "web_page"
     t.string "country"
@@ -799,14 +799,14 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
 
   create_table "investigations", id: :integer,  force: :cascade do |t|
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "first_letter", limit: 1
     t.string "uuid"
     t.integer "policy_id"
     t.integer "contributor_id"
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "deleted_contributor"
   end
 
@@ -844,12 +844,11 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "message_type"
-    t.text "details"
+    t.text "details", limit: 16777215
     t.integer "resource_id"
     t.string "resource_type"
     t.integer "sender_id"
-    t.text "response"
-    t.index ["resource_type", "resource_id"], name: "index_message_logs_on_resource_type_and_resource_id"
+    t.index ["resource_type", "resource_id"], name: "index_message_logs_on_resource_type_and_resource_id", length: { resource_type: 191 }
     t.index ["sender_id"], name: "index_message_logs_on_sender_id"
   end
 
@@ -890,10 +889,10 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
   create_table "model_versions", id: :integer,  force: :cascade do |t|
     t.integer "model_id"
     t.integer "version"
-    t.text "revision_comments"
+    t.text "revision_comments", limit: 16777215
     t.integer "contributor_id"
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.integer "recommended_environment_id"
     t.datetime "last_used_at"
     t.datetime "created_at"
@@ -902,12 +901,12 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
     t.integer "model_type_id"
     t.integer "model_format_id"
     t.string "first_letter", limit: 1
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "uuid"
     t.integer "policy_id"
+    t.integer "model_image_id"
     t.string "imported_source"
     t.string "imported_url"
-    t.integer "model_image_id"
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
@@ -1154,7 +1153,7 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
     t.string "email"
     t.string "phone"
     t.string "skype_name"
-    t.string "web_page"
+    t.text "web_page"
     t.text "description", limit: 16777215
     t.integer "avatar_id"
     t.integer "status_id", default: 0
@@ -1490,7 +1489,7 @@ ActiveRecord::Schema.define(version: 2020_01_13_152404) do
     t.integer "unit_id"
     t.boolean "is_title", default: false
     t.integer "template_column_index"
-    t.string "accessor_name"
+    t.string "original_accessor_name"
     t.integer "sample_controlled_vocab_id"
     t.integer "linked_sample_type_id"
     t.index ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"
