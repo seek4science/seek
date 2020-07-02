@@ -1,26 +1,19 @@
 class SampleAttribute < ApplicationRecord
 
-  belongs_to :sample_attribute_type, inverse_of: :sample_attributes
+  include Seek::JSONMetadata::Attribute
+
   belongs_to :sample_type, inverse_of: :sample_attributes
   belongs_to :unit
-  belongs_to :sample_controlled_vocab, inverse_of: :sample_attributes
+
   belongs_to :linked_sample_type, class_name: 'SampleType'
 
-  validates :title, :sample_attribute_type, presence: true
+  validates :title, presence: true
   validates :sample_type, presence: true
-
-  # validates that the attribute type is CV if vocab is set, and vice-versa
-  validate :sample_controlled_vocab_and_attribute_type_consistency
-
-  # validates that the attribute type is SeekSample if linked_sample_type is set, and vice-versa
-  validate :linked_sample_type_and_attribute_type_consistency
 
   before_save :store_accessor_name
   before_save :default_pos, :force_required_when_is_title
 
   scope :title_attributes, -> { where(is_title: true) }
-
-  delegate :controlled_vocab?, :seek_sample?, :seek_strain?, :seek_resource?, to: :sample_attribute_type, allow_nil: true
 
   # to store that this attribute should be linked to the sample_type it is being assigned to, but needs to wait until the
   # sample type exists
@@ -37,18 +30,6 @@ class SampleAttribute < ApplicationRecord
     super(id)
   end
 
-  def validate_value?(value)
-    return false if required? && value.blank?
-    (value.blank? && !required?) || sample_attribute_type.validate_value?(value, required: required?,
-                                                                          controlled_vocab: sample_controlled_vocab,
-                                                                          linked_sample_type: linked_sample_type)
-  end
-
-  # The method name used to get this attribute via a method call
-  def method_name
-    Seek::JSONMetadata::METHOD_PREFIX + accessor_name
-  end
-
   # The key used to address this attribute in the sample's JSON blob
   def accessor_name
     title.parameterize.underscore
@@ -56,10 +37,6 @@ class SampleAttribute < ApplicationRecord
 
   def required?
     super || is_title?
-  end
-
-  def pre_process_value(value)
-    sample_attribute_type.pre_process_value(value, controlled_vocab: sample_controlled_vocab, linked_sample_type: linked_sample_type)
   end
 
   def controlled_vocab_labels
@@ -73,15 +50,6 @@ class SampleAttribute < ApplicationRecord
   # provides the hash that defines the column definition for template generation
   def template_column_definition
     { "#{title}" => controlled_vocab_labels }
-  end
-
-  def resolve(value)
-    if sample_attribute_type.resolution.present? && sample_attribute_type.regexp.present?
-      resolution = value.sub(Regexp.new(sample_attribute_type.regexp), sample_attribute_type.resolution)
-    else
-      resolution = nil
-    end
-    resolution
   end
 
   private
@@ -99,24 +67,6 @@ class SampleAttribute < ApplicationRecord
     # forces required to be true if it is a title
     self.required = required? || is_title?
     true
-  end
-
-  def sample_controlled_vocab_and_attribute_type_consistency
-    if sample_attribute_type && sample_controlled_vocab && !controlled_vocab?
-      errors.add(:sample_attribute_type, 'Attribute type must be CV if controlled vocabulary set')
-    end
-    if controlled_vocab? && sample_controlled_vocab.nil?
-      errors.add(:sample_controlled_vocab, 'Controlled vocabulary must be set if attribute type is CV')
-    end
-  end
-
-  def linked_sample_type_and_attribute_type_consistency
-    if sample_attribute_type && linked_sample_type && !seek_sample?
-      errors.add(:sample_attribute_type, 'Attribute type must be SeekSample if linked sample type set')
-    end
-    if seek_sample? && linked_sample_type.nil?
-      errors.add(:sample_controlled_vocab, 'Linked Sample Type must be set if attribute type is SeekSample')
-    end
   end
 
 end

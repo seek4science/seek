@@ -1,6 +1,6 @@
 module Seek
   module JSONMetadata
-    METHOD_PREFIX = '__metadata_attribute_'
+    METHOD_PREFIX = '__metadata_attribute_'.freeze
 
     module Serialization
 
