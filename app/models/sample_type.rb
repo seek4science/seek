@@ -1,10 +1,12 @@
 class SampleType < ApplicationRecord
   # attr_accessible :title, :uuid, :sample_attributes_attributes,
- #                 :description, :uploaded_template, :project_ids, :tags
+  #                 :description, :uploaded_template, :project_ids, :tags
 
-  searchable(auto_index: false) do
-    text :attribute_search_terms
-  end if Seek::Config.solr_enabled
+  if Seek::Config.solr_enabled
+    searchable(auto_index: false) do
+      text :attribute_search_terms
+    end
+  end
 
   include Seek::ActsAsAsset::Searching
   include Seek::Search::BackgroundReindexing
@@ -25,7 +27,7 @@ class SampleType < ApplicationRecord
   has_many :samples, inverse_of: :sample_type
 
   has_many :sample_attributes, -> { order(:pos) }, inverse_of: :sample_type, dependent: :destroy, after_add: :detect_link_back_to_self
-  alias :metadata_attributes :sample_attributes
+  alias metadata_attributes sample_attributes
 
   has_many :linked_sample_attributes, class_name: 'SampleAttribute', foreign_key: 'linked_sample_type_id'
 
@@ -46,7 +48,7 @@ class SampleType < ApplicationRecord
 
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
-    fail UnknownAttributeException.new("Unknown attribute #{attribute_name}") unless attribute
+    raise UnknownAttributeException, "Unknown attribute #{attribute_name}" unless attribute
     attribute.validate_value?(value)
   end
 
@@ -92,12 +94,12 @@ class SampleType < ApplicationRecord
   def can_edit?(user = User.current_user)
     return false if user.nil? || user.person.nil? || !Seek::Config.samples_enabled
     return true if user.is_admin?
-    contributor == user.person || projects.detect { |project| project.can_manage?(user)}.present?
+    contributor == user.person || projects.detect { |project| project.can_manage?(user) }.present?
   end
 
   def can_delete?(user = User.current_user)
     can_edit?(user) && samples.empty? &&
-      linked_sample_attributes.detect do|attr|
+      linked_sample_attributes.detect do |attr|
         attr.sample_type &&
           attr.sample_type != self
       end.nil?
@@ -105,7 +107,7 @@ class SampleType < ApplicationRecord
 
   def can_view?(user = User.current_user, referring_sample = nil)
     project_membership = (user && user.person && (user.person.projects & projects).any?)
-    project_membership || public_samples? || check_referring_sample_permission(user,referring_sample)
+    project_membership || public_samples? || check_referring_sample_permission(user, referring_sample)
   end
 
   def editing_constraints
@@ -113,19 +115,19 @@ class SampleType < ApplicationRecord
   end
 
   def attribute_by_method_name(method_name)
-    sample_attributes.detect{|attr| attr.method_name == method_name}
+    sample_attributes.detect { |attr| attr.method_name == method_name }
   end
 
   private
 
   # whether the referring sample is valid and gives permission to view
-  def check_referring_sample_permission(user,referring_sample)
-    referring_sample.try(:sample_type)==self && referring_sample.can_view?(user)
+  def check_referring_sample_permission(user, referring_sample)
+    referring_sample.try(:sample_type) == self && referring_sample.can_view?(user)
   end
 
-  #whether it is assocaited with any public samples
+  # whether it is assocaited with any public samples
   def public_samples?
-    samples.joins(:policy).where('policies.access_type >= ?',Policy::VISIBLE).any?
+    samples.joins(:policy).where('policies.access_type >= ?', Policy::VISIBLE).any?
   end
 
   # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
@@ -158,16 +160,16 @@ class SampleType < ApplicationRecord
     titles = attribute_titles.collect(&:downcase)
     dups = titles.select { |title| titles.count(title) > 1 }.uniq
     if dups.any?
-      dups_text=dups.join(', ')
+      dups_text = dups.join(', ')
       errors.add(:sample_attributes, "Attribute names must be unique, there are duplicates of #{dups_text}")
     end
   end
 
   def validate_attribute_accessor_names_unique
     groups = sample_attributes.to_a.group_by(&:accessor_name)
-    dups = groups.select { |k, v| v.length > 1 }
+    dups = groups.select { |_k, v| v.length > 1 }
     if dups.any?
-      dups_text = dups.map { |k, v| "(#{v.map(&:title).join(', ')})" }.join(', ')
+      dups_text = dups.map { |_k, v| "(#{v.map(&:title).join(', ')})" }.join(', ')
       errors.add(:sample_attributes, "Attribute names are too similar: #{dups_text}")
     end
   end
@@ -187,5 +189,5 @@ class SampleType < ApplicationRecord
     end
   end
 
-  class UnknownAttributeException < Exception; end
+  class UnknownAttributeException < RuntimeError; end
 end

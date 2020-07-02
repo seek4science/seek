@@ -11,5 +11,4 @@ class CustomMetadataAttribute < ApplicationRecord
   def linked_sample_type
     nil
   end
-
 end

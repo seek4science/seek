@@ -1,7 +1,6 @@
 module Seek
   module JSONMetadata
     class Data < HashWithIndifferentAccess
-
       class InvalidKeyException < RuntimeError; end
 
       attr_accessor :sample_type
@@ -20,7 +19,7 @@ module Seek
       end
 
       # Pre-processes the value before setting
-      alias_method :orig_set_value, :[]=
+      alias orig_set_value []=
 
       def []=(key, value)
         super(key, pre_process_value(key, value))
@@ -31,7 +30,7 @@ module Seek
         method = pre_process ? :[]= : :orig_set_value
         validate_hash(hash)
         hash.each do |key, value|
-          self.send(method, key, value)
+          send(method, key, value)
         end
       end
 
@@ -61,7 +60,7 @@ module Seek
       end
 
       def attribute_for_attribute_name(attribute_name)
-        metadata_attributes.detect{|attr| attr.accessor_name == attribute_name.to_s}
+        metadata_attributes.detect { |attr| attr.accessor_name == attribute_name.to_s }
       end
     end
   end

@@ -1,5 +1,4 @@
 class SampleAttribute < ApplicationRecord
-
   include Seek::JSONMetadata::Attribute
 
   belongs_to :sample_type, inverse_of: :sample_attributes
@@ -49,7 +48,7 @@ class SampleAttribute < ApplicationRecord
 
   # provides the hash that defines the column definition for template generation
   def template_column_definition
-    { "#{title}" => controlled_vocab_labels }
+    { title.to_s => controlled_vocab_labels }
   end
 
   private
@@ -68,5 +67,4 @@ class SampleAttribute < ApplicationRecord
     self.required = required? || is_title?
     true
   end
-
 end

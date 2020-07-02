@@ -34,7 +34,7 @@ class SampleControlledVocab < ApplicationRecord
   end
 
   def self.can_create?
-    #criteria is the same, and likely to always be
+    # criteria is the same, and likely to always be
     SampleType.can_create?
   end
 
