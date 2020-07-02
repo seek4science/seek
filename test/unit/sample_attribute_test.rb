@@ -165,13 +165,13 @@ class SampleAttributeTest < ActiveSupport::TestCase
 
   test 'method name' do
     attribute = SampleAttribute.new title: 'fish pie'
-    assert_equal SampleAttribute::METHOD_PREFIX + 'fish_pie', attribute.method_name
+    assert_equal Seek::JSONMetadata::METHOD_PREFIX + 'fish_pie', attribute.method_name
 
     attribute.title = 'title'
-    assert_equal SampleAttribute::METHOD_PREFIX + 'title', attribute.method_name
+    assert_equal Seek::JSONMetadata::METHOD_PREFIX + 'title', attribute.method_name
 
     attribute.title = 'updated_at'
-    assert_equal SampleAttribute::METHOD_PREFIX + 'updated_at', attribute.method_name
+    assert_equal Seek::JSONMetadata::METHOD_PREFIX + 'updated_at', attribute.method_name
   end
 
   test 'accessor name matches hash key and is updated when title changes' do
