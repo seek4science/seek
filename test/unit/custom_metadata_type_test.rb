@@ -63,13 +63,13 @@ class CustomMetadataTypeTest < ActiveSupport::TestCase
   test 'attribute by method name' do
     cmt = Factory(:simple_investigation_custom_metadata_type)
 
-    refute_nil (attr = cmt.attribute_by_method_name('_custom_metadata_name'))
+    refute_nil (attr = cmt.attribute_by_method_name(Seek::JSONMetadata::METHOD_PREFIX+'name'))
     assert_equal 'name',attr.title
 
-    assert_nil cmt.attribute_by_method_name('_custom_metadata_sdfsdfsdf')
+    assert_nil cmt.attribute_by_method_name(Seek::JSONMetadata::METHOD_PREFIX+'sdfsdfsdf')
 
     cmt = Factory(:study_custom_metadata_type_with_spaces)
-    refute_nil (attr = cmt.attribute_by_method_name('_custom_metadata_full name'))
+    refute_nil (attr = cmt.attribute_by_method_name(Seek::JSONMetadata::METHOD_PREFIX+'full name'))
     assert_equal 'full name',attr.title
   end
 

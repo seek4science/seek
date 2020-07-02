@@ -11,9 +11,9 @@ class CustomMetadataTypesControllerTest < ActionController::TestCase
 
     get :form_fields, params:{id:cmt.id}
 
-    assert_select "input#investigation_custom_metadata_attributes__custom_metadata_age[name=?]",'investigation[custom_metadata_attributes][_custom_metadata_age]'
-    assert_select "input#investigation_custom_metadata_attributes__custom_metadata_name[name=?]",'investigation[custom_metadata_attributes][_custom_metadata_name]'
-    assert_select "input#investigation_custom_metadata_attributes__custom_metadata_date[name=?]",'investigation[custom_metadata_attributes][_custom_metadata_date]'
+    assert_select "input#investigation_custom_metadata_attributes_#{Seek::JSONMetadata::METHOD_PREFIX}age[name=?]","investigation[custom_metadata_attributes][#{Seek::JSONMetadata::METHOD_PREFIX}age]"
+    assert_select "input#investigation_custom_metadata_attributes_#{Seek::JSONMetadata::METHOD_PREFIX}name[name=?]","investigation[custom_metadata_attributes][#{Seek::JSONMetadata::METHOD_PREFIX}name]"
+    assert_select "input#investigation_custom_metadata_attributes_#{Seek::JSONMetadata::METHOD_PREFIX}date[name=?]","investigation[custom_metadata_attributes][#{Seek::JSONMetadata::METHOD_PREFIX}date]"
 
   end
 
