@@ -82,8 +82,6 @@ class CustomMetadataTest < ActiveSupport::TestCase
 
     assert_match /culprit -/,exception.message
     assert_match /wrong full name/,exception.message
-
-
   end
 
   test 'mass assign attributes with spaces' do
@@ -178,7 +176,6 @@ class CustomMetadataTest < ActiveSupport::TestCase
         end
       end
     end
-
   end
 
   test 'associated metadata destroyed with investigation' do

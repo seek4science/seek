@@ -7,7 +7,7 @@ class CustomMetadataType < ApplicationRecord
   validate :supported_type_must_be_valid_type
   validate :unique_titles_for_custom_metadata_attributes
 
-  alias metadata_attributes custom_metadata_attributes
+  alias_method :metadata_attributes, :custom_metadata_attributes
 
   def attribute_by_title(title)
     custom_metadata_attributes.where(title: title).first

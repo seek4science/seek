@@ -6,7 +6,6 @@ class SampleAttribute < ApplicationRecord
 
   belongs_to :linked_sample_type, class_name: 'SampleType'
 
-  validates :title, presence: true
   validates :sample_type, presence: true
 
   before_save :store_accessor_name
@@ -67,4 +66,5 @@ class SampleAttribute < ApplicationRecord
     self.required = required? || is_title?
     true
   end
+
 end
