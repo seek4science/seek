@@ -501,6 +501,7 @@ GEM
     progress_bar (1.1.0)
       highline (~> 1.6)
       options (~> 2.3.0)
+    progressbar (1.10.1)
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
@@ -942,6 +943,7 @@ DEPENDENCIES
   pothoven-attachment_fu
   private_address_check
   progress_bar
+  progressbar
   pry
   pry-doc
   pry-remote

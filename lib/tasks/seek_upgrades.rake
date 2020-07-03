@@ -18,6 +18,7 @@ namespace :seek do
     convert_old_elixir_aai_settings
     refix_country_codes
     fix_missing_dois
+    download_efo
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -176,4 +177,26 @@ namespace :seek do
     end
     puts "Done"
   end
+  
+  task(download_efo: [:environment]) do
+    puts "Downloading EFO..."
+    url = "http://data.bioontology.org/ontologies/EFO/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb&download_format=rdf"
+    pbar = nil
+    open(url, "rb", :content_length_proc => lambda {|t|
+    if t && 0 < t
+    pbar = ProgressBar.create(title: 'EFO', total:t, 
+            progress_mark:'█'.encode('utf-8')) 
+    end
+    }, :progress_proc => lambda {|s|
+    pbar.progress = s if pbar
+    }) do |page|
+        File.open('config/ontologies/EFO.rdf', "wb") do |f|
+                while chunk = page.read(1024)
+                    f.write(chunk)
+                end
+            end
+        end       
+  end
+
+
 end
