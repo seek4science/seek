@@ -142,6 +142,8 @@ gem 'redcarpet'
 
 gem 'i18n-js'
 
+gem 'progressbar'
+
 source 'https://rails-assets.org' do
   gem 'rails-assets-bootstrap-multiselect', '~> 0.9.13'
   gem 'rails-assets-bootstrap-tagsinput', '~> 0.8.0'
