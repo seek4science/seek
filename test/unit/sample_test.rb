@@ -38,8 +38,8 @@ class SampleTest < ActiveSupport::TestCase
     sample = Sample.find(sample.id)
     refute_nil sample.sample_type
 
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full_name'
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full_name='
+    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name'
+    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name='
     assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'age'
     assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'age='
     assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'postcode'
@@ -49,8 +49,8 @@ class SampleTest < ActiveSupport::TestCase
 
     # doesn't affect all sample classes
     sample = Factory(:sample, sample_type: Factory(:simple_sample_type))
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full_name'
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full_name='
+    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name'
+    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name='
     refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'age'
     refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'age='
     refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'postcode'
@@ -63,13 +63,13 @@ class SampleTest < ActiveSupport::TestCase
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
 
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full_name'
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full_name='
+    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name'
+    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name='
 
     sample.sample_type = Factory(:simple_sample_type)
 
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full_name'
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full_name='
+    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name'
+    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name='
     refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'age'
     refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'age='
     refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'postcode'
@@ -81,8 +81,8 @@ class SampleTest < ActiveSupport::TestCase
   test 'mass assignment' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
-    sample.update_attributes(data: { full_name: 'Fred Bloggs', age: 25, postcode: 'M12 9QL', weight: 0.22, address: 'somewhere' })
-    assert_equal 'Fred Bloggs', sample.get_attribute_value(:full_name)
+    sample.update_attributes(data: { 'full name': 'Fred Bloggs', age: 25, postcode: 'M12 9QL', weight: 0.22, address: 'somewhere' })
+    assert_equal 'Fred Bloggs', sample.get_attribute_value('full name')
     assert_equal 25, sample.get_attribute_value(:age)
     assert_equal 0.22, sample.get_attribute_value(:weight)
     assert_equal 'M12 9QL', sample.get_attribute_value(:postcode)
@@ -93,15 +93,15 @@ class SampleTest < ActiveSupport::TestCase
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
     refute sample.valid?
-    sample.set_attribute_value(:full_name, 'Bob Monkhouse')
-    assert_equal 'Bob Monkhouse',sample.get_attribute_value(:full_name)
+    sample.set_attribute_value('full name', 'Bob Monkhouse')
+    assert_equal 'Bob Monkhouse',sample.get_attribute_value('full name')
     sample.set_attribute_value(:age, 22)
     assert sample.valid?
 
-    sample.set_attribute_value(:full_name, 'FRED')
+    sample.set_attribute_value('full name', 'FRED')
     refute sample.valid?
 
-    sample.set_attribute_value(:full_name, 'Bob Monkhouse')
+    sample.set_attribute_value('full name', 'Bob Monkhouse')
     sample.set_attribute_value(:postcode, 'fish')
     refute sample.valid?
     assert_equal 1, sample.errors.count
@@ -123,20 +123,20 @@ class SampleTest < ActiveSupport::TestCase
   test 'store and retrieve' do
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
-    sample.set_attribute_value(:full_name, 'Jimi Hendrix')
+    sample.set_attribute_value('full name', 'Jimi Hendrix')
     sample.set_attribute_value(:age, 27)
     sample.set_attribute_value(:weight, 88.9)
     sample.set_attribute_value(:postcode, 'M13 9PL')
     disable_authorization_checks { sample.save! }
 
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 27, sample.get_attribute_value(:age)
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
 
     sample = Sample.find(sample.id)
 
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 27, sample.get_attribute_value(:age)
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
@@ -146,7 +146,7 @@ class SampleTest < ActiveSupport::TestCase
 
     sample = Sample.find(sample.id)
 
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 28, sample.get_attribute_value(:age)
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
@@ -156,16 +156,16 @@ class SampleTest < ActiveSupport::TestCase
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
     # Mass assignment
-    sample.data = { full_name: 'Jimi Hendrix', age: 27, weight: 88.9, postcode: 'M13 9PL' }
+    sample.data = { 'full name': 'Jimi Hendrix', age: 27, weight: 88.9, postcode: 'M13 9PL' }
     disable_authorization_checks { sample.save! }
 
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 27, sample.get_attribute_value(:age)
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
 
     sample = Sample.find(sample.id)
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 27, sample.get_attribute_value(:age)
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
@@ -175,7 +175,7 @@ class SampleTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
 
     sample = Sample.find(sample.id)
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 28, sample.get_attribute_value(:age)
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
@@ -185,7 +185,7 @@ class SampleTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
 
     sample = Sample.find(sample.id)
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 28, sample.get_attribute_value(:age)
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M14 8PL', sample.get_attribute_value(:postcode)
@@ -195,7 +195,7 @@ class SampleTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
 
     sample = Sample.find(sample.id)
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 28, sample.get_attribute_value(:age)
     assert_equal 90.1, sample.get_attribute_value(:weight)
     assert_equal 'M14 8PL', sample.get_attribute_value(:postcode)
@@ -330,15 +330,15 @@ class SampleTest < ActiveSupport::TestCase
   test 'json_metadata' do
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
-    sample.set_attribute_value(:full_name, 'Jimi Hendrix')
+    sample.set_attribute_value('full name', 'Jimi Hendrix')
     sample.set_attribute_value(:age, 27)
     sample.set_attribute_value(:weight, 88.9)
     sample.set_attribute_value(:postcode, 'M13 9PL')
     sample.set_attribute_value(:address, 'Somewhere on earth')
-    assert_equal %({"full_name":null,"age":null,"weight":null,"address":null,"postcode":null}), sample.json_metadata
+    assert_equal %({"full name":null,"age":null,"weight":null,"address":null,"postcode":null}), sample.json_metadata
     disable_authorization_checks { sample.save! }
     refute_nil sample.json_metadata
-    assert_equal %({"full_name":"Jimi Hendrix","age":27,"weight":88.9,"address":"Somewhere on earth","postcode":"M13 9PL"}), sample.json_metadata
+    assert_equal %({"full name":"Jimi Hendrix","age":27,"weight":88.9,"address":"Somewhere on earth","postcode":"M13 9PL"}), sample.json_metadata
   end
 
   test 'json metadata with awkward attributes' do
@@ -366,19 +366,19 @@ class SampleTest < ActiveSupport::TestCase
   test 'sqlite3 setting of original accessor problem' do
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
-    sample.set_attribute_value(:full_name, 'Jimi Hendrix')
+    sample.set_attribute_value('full name', 'Jimi Hendrix')
     sample.set_attribute_value(:age, 22)
     disable_authorization_checks { sample.save! }
     id = sample.id
     assert_equal 5, sample.sample_type.sample_attributes.count
-    assert_equal %w(full_name age weight address postcode), sample.sample_type.sample_attributes.collect(&:accessor_name)
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full_name'
+    assert_equal ['full name','age', 'weight', 'address', 'postcode'], sample.sample_type.sample_attributes.collect(&:accessor_name)
+    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name'
 
     sample2 = Sample.find(id)
     assert_equal id, sample2.id
     assert_equal 5, sample2.sample_type.sample_attributes.count
-    assert_equal %w(full_name age weight address postcode), sample2.sample_type.sample_attributes.collect(&:original_accessor_name)
-    assert_respond_to sample2, Seek::JSONMetadata::METHOD_PREFIX + 'full_name'
+    assert_equal ['full name','age', 'weight', 'address', 'postcode'], sample2.sample_type.sample_attributes.collect(&:original_accessor_name)
+    assert_respond_to sample2, Seek::JSONMetadata::METHOD_PREFIX + 'full name'
   end
 
   test 'projects' do
@@ -1111,7 +1111,7 @@ class SampleTest < ActiveSupport::TestCase
     User.with_current_user(contributor.user) do
       sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
       sample.set_attribute_value(:the_title, 'testing related orgs')
-      sample.set_attribute_value(:ncbi, '12345')
+      sample.set_attribute_value(:NcBi, '12345')
       sample.save!
 
       assert_equal [org1,org2].sort,sample.related_organisms.sort

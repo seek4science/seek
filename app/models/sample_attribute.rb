@@ -28,11 +28,6 @@ class SampleAttribute < ApplicationRecord
     super(id)
   end
 
-  # The key used to address this attribute in the sample's JSON blob
-  def accessor_name
-    title.parameterize.underscore
-  end
-
   def required?
     super || is_title?
   end

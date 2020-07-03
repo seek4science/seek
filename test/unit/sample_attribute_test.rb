@@ -148,16 +148,16 @@ class SampleAttributeTest < ActiveSupport::TestCase
 
   test 'accessor_name' do
     attribute = SampleAttribute.new title: 'fish pie'
-    assert_equal 'fish_pie', attribute.accessor_name
+    assert_equal 'fish pie', attribute.accessor_name
 
     attribute.title = "provider's cell culture identifier"
-    assert_equal 'provider_s_cell_culture_identifier', attribute.accessor_name
+    assert_equal "provider's cell culture identifier", attribute.accessor_name
 
     attribute = SampleAttribute.new title: %(fish "' &-[]}^-pie)
-    assert_equal 'fish_pie', attribute.accessor_name
+    assert_equal %(fish "' &-[]}^-pie), attribute.accessor_name
 
     attribute = SampleAttribute.new title: 'Fish Pie'
-    assert_equal 'fish_pie', attribute.accessor_name
+    assert_equal 'Fish Pie', attribute.accessor_name
 
     attribute = SampleAttribute.new title: 'title'
     assert_equal 'title', attribute.accessor_name
@@ -165,7 +165,7 @@ class SampleAttributeTest < ActiveSupport::TestCase
 
   test 'method name' do
     attribute = SampleAttribute.new title: 'fish pie'
-    assert_equal Seek::JSONMetadata::METHOD_PREFIX + 'fish_pie', attribute.method_name
+    assert_equal Seek::JSONMetadata::METHOD_PREFIX + 'fish pie', attribute.method_name
 
     attribute.title = 'title'
     assert_equal Seek::JSONMetadata::METHOD_PREFIX + 'title', attribute.method_name
@@ -176,7 +176,7 @@ class SampleAttributeTest < ActiveSupport::TestCase
 
   test 'original accessor name is updated when title changes' do
     attribute = SampleAttribute.new title: 'fish pie'
-    assert_equal 'fish_pie', attribute.accessor_name
+    assert_equal 'fish pie', attribute.accessor_name
     assert_equal attribute.accessor_name, attribute.original_accessor_name
 
     attribute.title = 'title'
@@ -188,7 +188,7 @@ class SampleAttributeTest < ActiveSupport::TestCase
     assert_equal attribute.accessor_name, attribute.original_accessor_name
 
     attribute.title = 'HeLlo World!'
-    assert_equal 'hello_world', attribute.accessor_name
+    assert_equal 'HeLlo World!', attribute.accessor_name
     assert_equal attribute.accessor_name, attribute.original_accessor_name
   end
 
