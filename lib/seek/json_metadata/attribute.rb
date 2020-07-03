@@ -7,6 +7,7 @@ module Seek
         belongs_to :sample_attribute_type, inverse_of: table_name.to_sym
         belongs_to :sample_controlled_vocab, inverse_of: table_name.to_sym
 
+        validates :title, presence: true
         validates :sample_attribute_type, presence: true
 
         # validates that the attribute type is CV if vocab is set, and vice-versa

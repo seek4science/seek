@@ -19,7 +19,8 @@ class Sample < ApplicationRecord
   validates :projects, presence: true, projects: { self: true }
 
   belongs_to :sample_type, inverse_of: :samples
-  alias metadata_type sample_type
+  alias_method :metadata_type, :sample_type
+
   belongs_to :originating_data_file, class_name: 'DataFile'
 
   has_many :sample_resource_links, inverse_of: :sample, dependent: :destroy
