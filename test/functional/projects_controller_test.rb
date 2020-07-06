@@ -1712,6 +1712,28 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 404, res['status']
   end
 
+  test "show New Project button if user can create them" do
+    person = Factory(:admin)
+    login_as(person)
+    assert Project.can_create?
+
+    get :index
+
+    assert_response :success
+    assert_select 'a.btn', text: 'New Project'
+  end
+
+  test "do not show New Project button if user cannot create them" do
+    person = Factory(:person)
+    login_as(person)
+    refute Project.can_create?
+
+    get :index
+
+    assert_response :success
+    assert_select 'a.btn', text: 'New Project', count: 0
+  end
+
   private
 
   def edit_max_object(project)
