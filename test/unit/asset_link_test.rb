@@ -25,7 +25,7 @@ class AssetLinkTest < ActiveSupport::TestCase
     link.label='label'
     assert link.valid?
 
-    link.label='a'*71
+    link.label='a'*101
     refute link.valid?
 
     link.label=''
