@@ -2,3 +2,5 @@ en:
   institution: "Organization"
   project: "Team"
   programme: "Space"
+  project_administrator: "Team Administrator"
+  programme_administrator: "Space Administrator"
