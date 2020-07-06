@@ -2321,7 +2321,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert(samples = assigns(:samples))
     assert_equal 3, samples.count
-    assert_not_includes samples.map { |s| s.get_attribute_value(:full_name) }, 'Bob'
+    assert_not_includes samples.map { |s| s.get_attribute_value('full name') }, 'Bob'
 
     samples.each do |sample|
       assert_equal data_file, sample.originating_data_file
@@ -2407,7 +2407,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     sample_type.save!
-    extracted_sample = Factory(:sample, data: { full_name: 'John Wayne' },
+    extracted_sample = Factory(:sample, data: { 'full name': 'John Wayne' },
                                sample_type: sample_type,
                                originating_data_file: data_file, contributor: person),
 
