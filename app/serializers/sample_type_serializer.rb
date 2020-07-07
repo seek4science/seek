@@ -25,8 +25,8 @@ class SampleTypeSerializer < BaseSerializer
         "unit_id": attribute.unit_id.nil? ? nil : Unit.find(attribute.unit_id).symbol,
         "is_title": attribute.is_title,
         "accessor_name": attribute.accessor_name,
-        "sample_controlled_vocab_id": attribute.sample_controlled_vocab_id.to_s,
-        "linked_sample_type_id": attribute.linked_sample_type_id.to_s
+        "sample_controlled_vocab_id": attribute.sample_controlled_vocab_id.nil? ? nil : attribute.sample_controlled_vocab_id.to_s,
+        "linked_sample_type_id": attribute.linked_sample_type_id.nil? ? nil : attribute.linked_sample_type_id.to_s
     }
   end
 
