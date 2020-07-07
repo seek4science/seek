@@ -1,0 +1,82 @@
+
+<div class="form-group">
+  <%= label_tag :search_label, "#{t('project')} search" -%>
+  <%= text_field_tag 'project-search-terms', '', :class=>"form-control"-%>
+  <%= submit_tag 'Search', id: 'project-search-submit',:class => 'btn btn-primary' %>
+</div>
+<div class="form-group">
+  <div id='project-search-results'></div>
+</div>
+
+<div id='institution-selection' style="display:none">
+  <div class="form-group">
+    <%= label_tag :your_institution, "Your #{t('institution')}" %>
+  </div>
+  <div class="form-group">
+    <%= label_tag :comments, 'Comments' %>
+    <%= text_area_tag :comments, '', rows: 5, :class=>"form-control" %>
+  </div>
+
+</div>
+
+
+
+<script type='application/javascript'>
+
+    $j(document).ready(function () {
+
+        function projectSelected() {
+          if ($j('input.project-selected:checked').length > 0) {
+              $j('#institution-selection').show();
+          }
+          else {
+              $j('#institution-selection').hide();
+          }
+        };
+
+        function handleJsonResults(json) {
+            if (json.data.length == 0) {
+                $j('#project-search-results').html('No results');
+            }
+            else {
+                $j('#project-search-results').html(json.data.length + ' results');
+                $j.each(json.data, function(key,val){
+                    var link = val.links.self;
+                    console.log(link);
+                    $j.getJSON(link, function(data) {
+                        console.log(data.data.attributes);
+                        $j('#project-search-results').append('<table><tbody>');
+                        $j('#project-search-results').append(HandlebarsTemplates['project_search/result_list'](data.data)).on('change','input.project-selected',function() {
+                            projectSelected();
+                        });
+                        $j('#project-search-results').append('</tbody></table>');
+                    })
+                    projectSelected();
+                });
+
+            }
+        }
+
+      $j('#project-search-submit').click(function (e) {
+          $j('#project-search-results').spinner('add');
+          var terms = $j('#project-search-terms').val();
+          var search_type = 'Project';
+          $j.ajax({ url: '<%= search_path %>/?q='+terms+"&search_type=projects",
+              dataType: "json",
+              success: function (resp) {
+                  handleJsonResults((resp))
+              },
+              error: function () {
+                  $j('#project-search-results').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
+              },
+              complete: function () {
+                  $j('#project-search-results').spinner('remove');
+              }
+          })
+         return false;
+      });
+
+    });
+
+
+</script>

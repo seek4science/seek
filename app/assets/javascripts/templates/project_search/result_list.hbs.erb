@@ -1,0 +1,14 @@
+
+<tr>
+    <td>
+      <input type="checkbox" id="project_{{attributes.id}}" data-project-id="{{attributes.id}}" class="project-selected"/>
+    </td>
+    <td>
+      {{#if attributes.avatar}}
+        <img src="{{ attributes.avatar  }}" height='50px'/>
+      {{else}}
+        <%= image_tag(Seek::ImageFileDictionary.instance.image_filename_for_key(:project_avatar),height:'50px') %>
+      {{/if}}
+    </td>
+    <td><a href='{{ links.self }}'>{{ attributes.title }}</a></td>
+</tr>
