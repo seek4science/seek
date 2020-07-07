@@ -17,23 +17,23 @@ class SampleTypeSerializer < BaseSerializer
 
   def get_sample_attribute(attribute)
     {
-        "id": attribute.id,
+        "id": attribute.id.to_s,
         "title": attribute.title,
         "sample_attibute_type": get_sample_attribute_type(attribute),
         "required": attribute.required,
-        "pos": attribute.pos,
+        "pos": attribute.pos.to_s,
         "unit_id": attribute.unit_id.nil? ? nil : Unit.find(attribute.unit_id).symbol,
         "is_title": attribute.is_title,
         "accessor_name": attribute.accessor_name,
-        "sample_controlled_vocab_id": attribute.sample_controlled_vocab_id,
-        "linked_sample_type_id": attribute.linked_sample_type_id
+        "sample_controlled_vocab_id": attribute.sample_controlled_vocab_id.to_s,
+        "linked_sample_type_id": attribute.linked_sample_type_id.to_s
     }
   end
 
   def get_sample_attribute_type(attribute)
     attribute_type= SampleAttributeType.find(attribute.sample_attribute_type_id)
     {
-        "id": attribute_type.id,
+        "id": attribute_type.id.to_s,
         "title": attribute_type.title,
         "base_type": attribute_type.base_type,
         "regular_expression": attribute_type.regexp,
