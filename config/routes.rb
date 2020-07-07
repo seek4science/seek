@@ -47,7 +47,7 @@ SEEK::Application.routes.draw do
 
   concern :has_versions do
     member do
-      post :new_version
+      post :create_version
       post :edit_version_comment
       delete :destroy_version
     end

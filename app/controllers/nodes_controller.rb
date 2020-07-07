@@ -15,7 +15,7 @@ class NodesController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
-  def new_version
+  def create_version
     if handle_upload_data(true)
       comments=params[:revision_comments]
 

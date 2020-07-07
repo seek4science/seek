@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
 
   before_action :check_doorkeeper_scopes, if: :doorkeeper_token
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
-  before_action :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
+  before_action :convert_json_params, only: [:update, :destroy, :create, :create_version], if: :json_api_request?
 
   before_action :rdf_enabled? #only allows through rdf calls to supported types
 
@@ -377,7 +377,7 @@ class ApplicationController < ActionController::Base
         end
       when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
         action = 'create' if action == 'upload_for_tool' || action == 'create_metadata' || action == 'create_from_template'
-        action = 'update' if action == 'new_version'
+        action = 'update' if action == 'create_version'
         action = 'inline_view' if action == 'explore'
         if %w(show create update destroy download inline_view).include?(action)
           check_log_exists(action, controller_name, object)
