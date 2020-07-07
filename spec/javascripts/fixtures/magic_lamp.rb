@@ -64,3 +64,19 @@ MagicLamp.register_fixture(name: 'projects-selector') do
   }
   render partial: 'projects/project_selector', locals: { resource: @sop }
 end
+
+MagicLamp.register_fixture(name: 'project/markdown') do
+  User.current_user = Factory(:user)
+  session[:user_id] = User.current_user.id.to_s
+
+  @project = Project.new(id:"1",title: 'markdown test',
+    description: '# header
+Some text
+
+## second header
+
+_italic **bold** text_
+
+> Another paragraph')
+  render "projects/show"
+end
