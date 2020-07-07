@@ -1,0 +1,23 @@
+
+<div class='row'>
+    <div class="panel panel-warning text-center">
+      <div class="panel-body alert-warning">
+        <%= t('joining_a_project',project:t('project')) %>
+      </div>
+    </div>
+</div>
+
+<div class='row text-center'>
+
+  <%= link_to(guided_join_projects_path) do %>
+    <button type="button" class="btn btn-success btn-vlg ">Join a <%=t('project') %></button>
+  <% end %>
+
+  <%= link_to(guided_create_projects_path) do %>
+    <button type="button" class="btn btn-primary btn-vlg ">Create a <%=t('project') %></button>
+  <% end %>
+
+</div>
+
+
+

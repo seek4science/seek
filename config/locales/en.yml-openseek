@@ -129,3 +129,5 @@ en:
   maturity_level:
     released: 'Stable'
     work_in_progress: 'Work-in-progress'
+
+  joining_a_project: "blah blah blah %{project}"

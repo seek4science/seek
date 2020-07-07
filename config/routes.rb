@@ -147,6 +147,7 @@ SEEK::Application.routes.draw do
       get :terms
       get :privacy
       get :about
+      get :create_or_join_project
     end
   end
 
@@ -268,6 +269,8 @@ SEEK::Application.routes.draw do
       get :request_institutions
       get :manage
       post :items_for_result
+      get :guided_join
+      get :guided_create
     end
     member do
       get :asset_report
