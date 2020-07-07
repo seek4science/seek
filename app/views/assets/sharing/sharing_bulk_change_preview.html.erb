@@ -1,0 +1,42 @@
+<div class="show_basic">
+  <%= show_title "New sharing policy and permissions" -%>
+</div>
+
+<%= form_tag :action => :sharing_permission_changed do %>
+  <% resource = (controller_name == 'people') ? current_user.person : @asset %>
+  <%= folding_panel('Sharing', false, id: 'sharing_form',
+                    help_text: "Here you can specify who can view, access and manage this.") do %>
+    <div class="alert alert-info">
+      Specify the new sharing policies for the following <%= "item".pluralize(@items_for_sharing.size) %>:<br>
+      <% if include_downloadable_item? (@items_for_sharing) %>
+      Please note that the <span class="sharing-colour">Download</span> option is only applied to the items which are downloadable with the icon <span><%= icon_tag("download") %>.</span>
+      <% end %>
+    </div>
+
+
+    <ul class="sharing_options">
+      <% @items_for_sharing.each do |item| %>
+        <%= hidden_field_tag sharing_item_param(item), 1 %>
+        <li class="type_and_title">
+          <%= text_for_resource item -%>: <%= link_to item.title, item -%>
+          <% if  item.try(:is_downloadable?) %>
+          <span><%= icon_tag("download") %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+
+
+    <% if include_downloadable_item? (@items_for_sharing) %>
+        <%= render partial: 'sharing/permissions_table', locals: { object: DataFile.new, policy: Policy.new, projects: [] } %>
+    <% else %>
+       <%= render partial: 'sharing/permissions_table', locals: { object: Study.new, policy: Policy.new, projects: [] } %>
+    <% end %>
+  <% end %>
+
+  <%= submit_tag "Confirm",data: { disable_with: 'Confirm' }, :class => 'btn btn-primary' -%>
+  or
+  <%= cancel_button(resource) %>
+<% end %>
+
+

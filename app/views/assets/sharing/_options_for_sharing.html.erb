@@ -1,0 +1,9 @@
+<%
+   item = options_for_sharing
+-%>
+<div class="isa-tree">
+  <% if item.class.name  != "Publication" %>
+  <h4><strong><%= item.class.name -%>:</strong></h4>
+  <%= render :partial => "assets/sharing/single_item_permissions", :locals => {  :object => item } -%>
+  <% end %>
+</div>

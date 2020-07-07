@@ -31,7 +31,6 @@ gem 'daemons'
 gem 'linkeddata'
 gem 'rdf'
 
-
 gem 'openseek-api'
 # for fancy content escaping in openbis integration
 gem 'loofah'

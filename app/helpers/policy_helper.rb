@@ -180,6 +180,18 @@ module PolicyHelper
     end
   end
 
+  def self.permission_changed_item_class(permission, policy_params)
+     mark = nil
+       unless policy_params[:permissions_attributes].nil?
+        policy_params[:permissions_attributes].values.map do |perm_params|
+            if  permission.contributor_type == perm_params[:contributor_type] && permission.contributor_id == perm_params[:contributor_id].to_i
+            mark = "sharing_permission_changed"
+          end
+        end
+       end
+    mark
+  end
+
   ACCESS_TYPE_MAP = {
       Policy::MANAGING => 'manage',
       Policy::EDITING => 'edit',

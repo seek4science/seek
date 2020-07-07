@@ -1,0 +1,38 @@
+<%
+  object ||= resource_for_controller
+  policy = object.policy unless local_assigns.key?(:policy)
+  policy ||= Policy.default
+  resource_type = text_for_resource(object)
+  if object.respond_to?(:projects)
+    projects = object.projects
+  else
+    projects = []
+  end
+%>
+<% downloadable ||= object.try(:is_downloadable?) %>
+
+<div class="table-responsive">
+  <permissions-table class="table table-bordered" id="permissions-table"
+                     :permissions="permissions" :public-permission="publicPermission" :downloadable="<%= downloadable || 'false' -%>">
+  </permissions-table>
+</div>
+
+<script>
+    var policy = <%= policy_json(policy, projects) -%>;
+
+    <%# A deep copy of the policy that is used in `Sharing.permissionsChanged` to check if it has been modified %>
+    var originalPolicy = $j.extend(true, {}, policy);
+
+    Sharing.permissionsTable = new Vue({
+        el: '#permissions-table',
+        data: {
+            publicPermission: {
+                access_type: policy.access_type, <%# Uses snake case because that's how rails returns the JSON %>
+                title: 'Public',
+                isPublic: true,
+                isMandatory: true
+            },
+            permissions: policy.permissions
+        }
+    });
+</script>

@@ -16,6 +16,7 @@
         <li><%= link_to 'My profile', person_path(current_person) -%></li>
         <li><%= link_to 'Edit profile', edit_person_path(current_person) -%></li>
         <li><%= link_to 'Change password', edit_user_path(current_user) -%></li>
+        <li><%= link_to 'Bulk sharing permission change', batch_sharing_permission_preview_person_path(current_person) -%></li>
         <% if Seek::Config.omniauth_enabled %>
           <li><%= link_to 'Manage identities', user_identities_path(current_user) -%></li>
         <% end %>

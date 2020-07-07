@@ -405,6 +405,16 @@ div.isa_graph {
   display: inline-block;
 }
 
+.sharing_permission_changed{
+  color: #d14;
+  font-weight: bold;
+}
+
+.sharing_policy_changed {
+  color: #d14;
+  font-weight: bold;
+}
+
 .sample-attribute .attribute-handle { }
 
 .sample-attribute .attribute-position .glyphicon {

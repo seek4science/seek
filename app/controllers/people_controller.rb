@@ -2,6 +2,7 @@ class PeopleController < ApplicationController
   include Seek::IndexPager
   include Seek::AnnotationCommon
   include Seek::Publishing::PublishingCommon
+  include Seek::Sharing::SharingCommon
   include Seek::Publishing::GatekeeperPublish
   include Seek::FacetedBrowsing
   include Seek::DestroyHandling
@@ -9,7 +10,7 @@ class PeopleController < ApplicationController
   include RelatedItemsHelper
 
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[show edit update destroy items]
+  before_action :find_and_authorize_requested_item, only: %i[show edit update destroy items batch_sharing_permission_preview]
   before_action :current_user_exists, only: %i[register create new]
   before_action :is_during_registration, only: [:register]
   before_action :is_user_admin_auth, only: [:destroy]
