@@ -1,0 +1,27 @@
+<%
+   item = isa_sharing_preview
+   case item
+     when Investigation
+       children = item.studies
+     when Study
+       children = item.assays
+     when Assay
+       children = item.assets
+     else
+       children = []
+   end
+-%>
+
+<%= render :partial => "assets/sharing/options_for_sharing",
+           :object => item,
+           :locals => {:checked => (item == preselected)} -%>
+
+<% if children.any? %>
+    <div style="margin-left: 3em">
+      <% children.each do |child| %>
+          <%= render :partial => "assets/sharing/isa_sharing_preview",
+                     :object => child,
+                     :locals => { :preselected => preselected } -%>
+      <% end %>
+    </div>
+<% end %>

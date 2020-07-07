@@ -1,0 +1,87 @@
+<%
+  #remove the public items which don't need change sharing permission
+  all_related_items_hash = get_related_resources(current_user.person).except!('Project', 'Institution','Publication')
+  items_not_in_isa = filter_items_not_in_ISA(all_related_items_hash)
+  flash.discard(:notice)
+  title = "Items related to " + link_to(h(current_user.person.name),current_user.person)
+%>
+
+<div class="show_basic">
+  <%= show_title title.html_safe -%>
+</div>
+
+<%= form_tag({:action => :bulk_sharing_permission_change}, :method => :post) do -%>
+
+  <% folding_panel_title = "Items not in ISA:" %>
+  <%= folding_panel(folding_panel_title, false, :id => 'not_isa_item', :body_options => {:id => 'items_fold_content'},
+                    :help_text => nil) do %>
+    <div><label><%= link_to "Select All", "#", id: "select_all_not_isa" -%></label> |
+      <label><%= link_to "Deselect All", "#", id: "deselect_all_not_isa" -%></label></div><br>
+    <% items_not_in_isa.each do |resource_type, resource_items| %>
+        <h4><strong><%= resource_type -%></strong></h4>
+        <% resource_items.each do |item| %>
+          <%= render :partial => "assets/sharing/single_item_permissions", :locals => {:object => item } -%>
+        <% end %>
+
+      <br>
+
+    <% end %>
+  <% end %>
+
+  <% folding_panel_title = "Items in ISA: " %>
+  <%= folding_panel(folding_panel_title, false, :id => 'isa_item', :body_options => {:id => 'items_fold_content'},
+                    :help_text => nil) do %>
+    <label><%= link_to "Select All", "#", id: "select_all_isa" -%></label> |
+    <label><%= link_to "Deselect All", "#", id: "deselect_all_isa" -%></label>
+    <br>
+    <% all_related_items_hash.each do |resource_type, resource_items| %>
+
+      <% if resource_type == "Investigation" %>
+        <% resource_items[:items].each do |item| %>
+          <br>
+          <% if item.is_asset? %>
+            <%= render :partial => "assets/sharing/isa_sharing_preview",
+                       :collection => item.assays.map(&:study).map(&:investigation).flatten.uniq,
+                       :locals => {:preselected => item } %>
+          <% else %>
+
+            <%= render :partial => "assets/sharing/isa_sharing_preview", :object => item,
+                       :locals => {:preselected => item } %>
+          <% end %>
+
+
+        <% end %>
+
+      <% end %>
+
+    <% end %>
+  <% end %>
+
+  <% resource = (controller_name == 'people') ? current_user.person : @asset %>
+
+  <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary' -%>
+  or
+  <%= cancel_button(resource) %>
+<% end -%>
+</div>
+</div>
+<script>
+    $j(document).ready(function () {
+        $j('#select_all_not_isa').click(function (event) {
+            $j('input[name^="share_not_isa"]').prop("checked", true);
+        });
+
+        $j('#deselect_all_not_isa').click(function (event) {
+            $j('input[name^="share_not_isa"]').prop("checked", false);
+        });
+
+        $j('#select_all_isa').click(function (event) {
+            $j('input[name^="share_isa"]').prop("checked", true);
+        });
+
+        $j('#deselect_all_isa').click(function (event) {
+            $j('input[name^="share_isa"]').prop("checked", false);
+        });
+    });
+</script>
+

@@ -1,0 +1,44 @@
+<%
+  item = object
+  downloadable = item.try(:is_downloadable?)
+  checked =false
+  policy_params = params[:policy_attributes]
+  @batch_sharing_permission_changed && (@items_for_sharing.include? item) &&  !policy_params[:access_type].nil?? "sharing_policy_changed" : nil
+%>
+
+<label><%= check_box_tag sharing_item_param(item), 1, checked,
+                        {:class=>"#{item.class.name}_#{item.id}" } -%>
+  <%= link_to item.title, item, :target => "_blank" -%>
+</label>
+
+<span class=<%=((@batch_sharing_permission_changed && (@items_for_sharing.include? item) && !policy_params[:access_type].nil?)? "sharing_policy_changed" : nil)%>>
+  <p><strong><%= Policy.get_access_type_wording(item.policy.access_type, downloadable)-%> </strong>by Public</p></span>
+
+
+<% item.policy.permissions.map do |permission|%>
+  <% case permission.contributor_type %>
+<% when Permission::PROJECT %>
+    <% m = Project.find(permission.contributor_id) %>
+    <span class=<%= (@batch_sharing_permission_changed && (@items_for_sharing.include? item) ? PolicyHelper::permission_changed_item_class(permission, policy_params) : nil) %>>
+      <p><strong><%= Policy.get_access_type_wording(permission.access_type, downloadable)-%></strong> by Project <%= link_to(h(m.title), m) %></p></span>
+  <% when Permission::WORKGROUP %>
+    <% m = WorkGroup.find(permission.contributor_id) %>
+    <% institution = Institution.find(m.institution_id) %>
+    <% project = Project.find(m.project_id) %>
+    <span class=<%= (@batch_sharing_permission_changed && (@items_for_sharing.include? item) ? PolicyHelper::permission_changed_item_class(permission, policy_params) : nil) %>>
+      <p><strong><%= Policy.get_access_type_wording(permission.access_type, downloadable)-%></strong> by <%= link_to(h(project.title), project) %> @ <%= link_to(h(institution.title), institution) %></p></span>
+  <% when Permission::INSTITUTION %>
+    <% m = Institution.find(permission.contributor_id) %>
+    <span class=<%= (@batch_sharing_permission_changed && (@items_for_sharing.include? item) ? PolicyHelper::permission_changed_item_class(permission, policy_params) : nil) %>>
+      <p><strong><%= Policy.get_access_type_wording(permission.access_type, downloadable)-%></strong> by Institution <%= link_to(h(m.title), m) %></p></span>
+  <% when Permission::PERSON %>
+    <% m = Person.find(permission.contributor_id) %>
+    <span class=<%= (@batch_sharing_permission_changed && (@items_for_sharing.include? item) ? PolicyHelper::permission_changed_item_class(permission, policy_params) : nil) %>>
+      <p><strong><%= Policy.get_access_type_wording(permission.access_type, downloadable)-%></strong> by People <%= link_to(h(m.title), m) %></p></span>
+  <% when Permission::PROGRAMME %>
+    <% m = Programme.find(permission.contributor_id) %>
+    <span class=<%= (@batch_sharing_permission_changed && (@items_for_sharing.include? item) ? PolicyHelper::permission_changed_item_class(permission, policy_params) : nil) %>>
+      <p><strong><%= Policy.get_access_type_wording(permission.access_type, downloadable)-%></strong> by Programme <%= link_to(h(m.title), m) %></p></span>
+  <% end %>
+<% end %>
+<br>
