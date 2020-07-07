@@ -5,21 +5,21 @@ describe('upload selection', function(){
     });
 
     it('should select local file tab by default', function() {
-        expect($j('#upload_type_selection ul.nav-tabs li.active a')).to.have.$text('Local file');
-        expect($j('#local-file')).to.have.$class('active');
-        expect($j('#remote-url')).to.not.have.$class('active');
+        expect($j('#upload-panel ul.nav-tabs li.active a')).to.have.$text('Local file');
+        expect($j('#upload-panel ul.nav-tabs li a[data-tab-target="local-file"]').parent()).to.have.$class('active');
+        expect($j('#upload-panel ul.nav-tabs li a[data-tab-target="remote-url"]').parent()).to.not.have.$class('active');
     });
 
     it('should select remote url tab when it is clicked', function() {
-        var remoteUrlTabLink = $j("#upload_type_selection ul.nav-tabs li a[href='#remote-url']");
+        var remoteUrlTabLink = $j('#upload-panel ul.nav-tabs li a[data-tab-target="remote-url"]');
         var remoteUrlTab = remoteUrlTabLink.parent();
 
         expect(remoteUrlTab).to.not.have.$class('active');
 
         remoteUrlTabLink.trigger('click');
-        expect(remoteUrlTab.find("a[href='#remote-url']")).to.have.$text('Remote URL');
-        expect($j('#local-file')).to.not.have.$class('active');
-        expect($j('#remote-url')).to.have.$class('active');
+        expect(remoteUrlTabLink).to.have.$text('Remote URL');
+        expect($j('#upload-panel ul.nav-tabs li a[data-tab-target="local-file"]').parent()).to.not.have.$class('active');
+        expect($j('#upload-panel ul.nav-tabs li a[data-tab-target="remote-url"]').parent()).to.have.$class('active');
     });
 
     it('should rename the upload button when a URL is chosen', function() {
