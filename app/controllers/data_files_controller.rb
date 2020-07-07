@@ -12,7 +12,7 @@ class DataFilesController < ApplicationController
 
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob,
-                                                             :request_resource, :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
+                                                             :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
   before_action :find_display_asset, only: [:show, :explore, :download]
   before_action :xml_login_only, only: [:upload_for_tool, :upload_from_email]
   before_action :get_sample_type, only: :extract_samples
@@ -391,6 +391,7 @@ class DataFilesController < ApplicationController
     @create_new_assay = assay_params.delete(:create_assay)
 
     update_sharing_policies(@data_file)
+    update_annotations(params[:tag_list], @data_file)
 
     @assay = Assay.new(assay_params)
     if sop_id
@@ -415,7 +416,6 @@ class DataFilesController < ApplicationController
     all_valid = all_valid && @data_file.save && blob.save
 
     if all_valid
-      update_annotations(params[:tag_list], @data_file)
 
       update_relationships(@data_file, params)
 
@@ -504,7 +504,8 @@ class DataFilesController < ApplicationController
                                       :license, :other_creators,{ event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      { scales: [] }, { publication_ids: [] })
+                                      { scales: [] }, { publication_ids: [] },
+                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   def data_file_assay_params

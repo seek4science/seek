@@ -244,7 +244,7 @@ class PeopleController < ApplicationController
       people = project.people
     else
       workgroup = WorkGroup.find_by_project_id_and_institution_id(project_id, institution_id)
-      people = workgroup.people
+      people = workgroup ? workgroup.people : []
     end
     people_list = people.collect { |p| [h(p.name), p.email, p.id] }
     respond_to do |format|
@@ -296,7 +296,7 @@ class PeopleController < ApplicationController
   end
 
   def notification_params
-    params.permit(:projects, :institutions, :other_projects, :other_institutions)
+    params.permit({ projects: [] }, { institutions: [] }, :other_projects, :other_institutions)
   end
 
   def set_tools_and_expertise(person, params)

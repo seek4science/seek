@@ -21,9 +21,20 @@
       "url": null,
       "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/873864488",
       "publication_type":"Journal",
-      "authors": ["Person1 Last", "Person2 Last"]
+      "authors": ["Author1 Last", "Author2 Last"]
     },
     "relationships": {
+      "creators": {
+        "data": []
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "522086294",
+            "type": "people"
+          }
+        ]
+      },
       "people": {
         "data": [
           {
@@ -113,7 +124,7 @@
       "modified": "2017-10-06T09:53:31.000Z",
       "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
       "base_url": "http://localhost:3000",
-      "api_version": "0.2"
+      "api_version": "0.3"
     }
   },
   "jsonapi": {

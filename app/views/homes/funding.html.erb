@@ -6,17 +6,30 @@
 <h1>SEEK Funding details</h1>
 
 <p>
-  SEEK is developed as a component of the <%= link_to "FAIRDOM", "http://fair-dom.org", :target => "_blank" %> project,
-  which is funded by the following agencies ...
+  SEEK is developed as a component of the <%= link_to "FAIRDOM", "https://fair-dom.org", target:'_blank' %> ,
+  <%= link_to "EOSC-Life", "https://www.eosc-life.eu/", target:'_blank' %> and
+  <%= link_to 'IBISBA', 'https://www.ibisba.eu/',target:'_blank' %> projects
+  which are funded by the following agencies ...
 </p>
 <br/>
+
+<div class='row funder-row'>
+  <div class='col-md-2'>
+    <%= image 'funder-eu-h2020',:class=>'funder-logo' %>
+  </div>
+  <div>
+    <%= link_to 'European Union Horizon 2020 Programme', 'https://ec.europa.eu/programmes/horizon2020/', target:'_blank' %>
+    is the biggest EU Research and Innovation programme ever with nearly €80 billion of funding available over 7 years (2014 to 2020)
+    – in addition to the private investment that this money will attract.
+  </div>
+</div>
 
 <div class='row funder-row'>
   <div class='col-md-2'>
   <%= image 'funder-bbsrc',:class=>'funder-logo' %>
   </div>
   <div>
-    <%= link_to 'Biotechnology and Biological Sciences Research Council (BBSRC)', 'http://www.bbsrc.ac.uk/', :target => "_blank" %>
+    <%= link_to 'Biotechnology and Biological Sciences Research Council (BBSRC)', 'http://www.bbsrc.ac.uk/', target:'_blank' %>
     is a UK Research Council and non-departmental public
     body. Being the largest UK public funder of non-medical bioscience, the organization funds scientific research
     institutes and university research departments in the UK.
@@ -28,7 +41,7 @@
     <%= image 'funder-bmbf',:class=>'funder-logo' %>
   </div>
   <div>
-    <%= link_to 'The Federal Ministry of Education and Research (Bundesministerium für Bildung und Forschung – BMBF)', 'https://www.bmbf.de/en/', :target => "_blank" %>
+    <%= link_to 'The Federal Ministry of Education and Research (Bundesministerium für Bildung und Forschung – BMBF)', 'https://www.bmbf.de/en/', target:'_blank' %>
     , is a
     cabinet-level ministry of the Federal Republic of Germany. The Ministry provides funding for research projects and
     institutions and sets general educational policy
@@ -40,7 +53,7 @@
     <%= image 'funder-nwo',:class=>'funder-logo' %>
   </div>
   <div>
-    <%= link_to 'The Netherlands Organization for Scientific Research (Nederlandse Organisatie voor Wetenschappelijk Onderzoek)', 'http://www.nwo.nl/en', :target => "_blank" %>
+    <%= link_to 'The Netherlands Organization for Scientific Research (Nederlandse Organisatie voor Wetenschappelijk Onderzoek)', 'http://www.nwo.nl/en', target:'_blank' %>
     is
     the national research council of the Netherlands. Promoting quality and innovation in science, the organization
     funds
@@ -53,7 +66,7 @@
     <%= image 'funder-systemsx',:class=>'funder-logo' %>
   </div>
   <div>
-    <%= link_to 'SystemsX (SystemsX.ch)', 'http://www.systemsx.ch/', :target => "_blank" %> is the largest public
+    <%= link_to 'SystemsX (SystemsX.ch)', 'http://www.systemsx.ch/', target:'_blank' %> is the largest public
     research
     initiative in Switzerland. It focuses on a broad topical area
     of basic research with major specialization in systems biology.
@@ -61,20 +74,18 @@
 </div>
 
 <p>
-  SEEK development is funded until 2019. The <%= link_to 'FAIRDOMHub','https://fairdomhub.org',:target=>'_blank' %> is guaranteed to run until 2027.
+  SEEK development is funded until 2023. The <%= link_to 'FAIRDOMHub','https://fairdomhub.org', target:'_blank' %> is guaranteed to run until 2027.
 </p>
 
 <h1>Programmes</h1>
-<p>
-  FAIRDOM is a joint action of ERA-Net EraSysAPP and European Research Infrastructure ISBE to establish a data and model management service facility for Systems Biology.
-</p>
+
 <br/>
 <div class='row funder-row'>
   <div class='col-md-2'>
     <%= image 'programme-erasysapp',:class=>'funder-logo' %>
   </div>
   <div>
-    <%= link_to 'ERANET proposal Systems Biology Applications (ERASysAPP)', 'https://www.erasysapp.eu', :target => "_blank" %>
+    <%= link_to 'ERANET proposal Systems Biology Applications (ERASysAPP)', 'https://www.erasysapp.eu', target:'_blank' %>
     - The main objective of ERASysAPP is to promote multidimensional and complementary European systems biology projects, programmes and research initiatives on a number of selected research topics.
   </div>
 </div>
@@ -84,7 +95,7 @@
     <%= image 'programme-isbe',:class=>'funder-logo' %>
   </div>
   <div>
-    <%= link_to 'European Research Infrastructure (ISBE)', 'http://project.isbe.eu/', :target => "_blank" %>
+    <%= link_to 'European Research Infrastructure (ISBE)', 'http://project.isbe.eu/', target:'_blank' %>
     - Creating a European research infrastructure that empowers scientists to understand how living organisms function to a level that allows rational and effective intervention in how biological systems operate.
     This allows life science researchers to deliver solutions that address societal grand challenges in health and quality of life, bio-economy and sustainability.
   </div>
@@ -95,7 +106,7 @@
     <%= image 'programme-denbi',:class=>'funder-logo' %>
   </div>
   <div>
-    <%= link_to 'German Network for Bioinformatics Infrastructure – de.NBI', 'https://www.denbi.de/', :target => "_blank" %>
+    <%= link_to 'German Network for Bioinformatics Infrastructure – de.NBI', 'https://www.denbi.de/', target:'_blank' %>
     - A national, academic and non-profit infrastructure supported by the Federal Ministry of Education and Research providing bioinformatics services to users in life sciences research and biomedicine
     in Germany and Europe. The partners organize training events, courses and summer schools on tools, standards and compute services provided by de.NBI to assist researchers to more effectively exploit their data.
 

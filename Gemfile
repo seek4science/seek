@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 5.2.3'
+gem 'rails', '~> 5.2.4'
 gem 'rdoc'
 
 #database adaptors
@@ -12,7 +12,7 @@ gem 'sqlite3'
 gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
 gem 'hpricot', '~>0.8.2'
-gem 'libxml-ruby', '2.8.0', require: 'libxml'
+gem 'libxml-ruby', '~>2.9.0', require: 'libxml'
 gem 'uuid', '~>2.3'
 gem 'RedCloth', '>=4.3.0'
 gem 'simple-spreadsheet-extractor', '~>0.16.0'
@@ -64,7 +64,7 @@ gem 'validate_url'
 gem "attr_encrypted", "~> 3.0.0"
 
 # gem for BiVeS and BudHat
-gem 'bives'
+gem 'bives', "~> 2.0"
 
 # Linked to SysMO Git repositories
 gem 'my_responds_to_parent', git: 'https://github.com/SysMO-DB/my_responds_to_parent.git'
@@ -98,7 +98,7 @@ gem 'rspec-rails'
 gem 'citeproc-ruby', '~> 1.1.4'
 gem 'citeproc', '~> 1.0.4'
 gem 'csl-styles', '~> 1.0.1.7'
-gem 'bibtex-ruby', '~> 4.4.2'
+gem 'bibtex-ruby', '~> 5.1.0'
 
 gem 'omniauth', '~> 1.3.1'
 gem 'omniauth-ldap', '~> 1.0.5'
@@ -126,9 +126,9 @@ gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'activerecord-import'
 
-gem 'puma' # Used for docker, and also teaspoon tests
+gem "puma", ">= 3.12.6"
 
-gem 'doorkeeper'
+gem "doorkeeper", ">= 5.2.5"
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'

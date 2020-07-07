@@ -16,6 +16,8 @@ namespace :seek do
     db:seed:publication_types
     convert_old_ldap_settings
     convert_old_elixir_aai_settings
+    refix_country_codes
+    fix_missing_dois
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -26,15 +28,24 @@ namespace :seek do
   ]
 
   desc('upgrades SEEK from the last released version to the latest released version')
-  task(upgrade: [:environment, 'db:sessions:trim', 'db:migrate', 'tmp:clear']) do
+  task(upgrade: [:environment]) do
+    puts "Starting upgrade ..."
+    puts "... trimming old session data ..."
+    Rake::Task['db:sessions:trim'].invoke
+    puts "... migrating database ..."
+    Rake::Task['db:migrate'].invoke
+    Rake::Task['tmp:clear'].invoke
+
     solr = Seek::Config.solr_enabled
     Seek::Config.solr_enabled = false
 
     begin
+      puts "... performing upgrade tasks ..."
       Rake::Task['seek:standard_upgrade_tasks'].invoke
       Rake::Task['seek:upgrade_version_tasks'].invoke
 
       Seek::Config.solr_enabled = solr
+      puts "... queuing search reindexing jobs ..."
       Rake::Task['seek:reindex_all'].invoke if solr
 
       puts 'Upgrade completed successfully'
@@ -44,6 +55,7 @@ namespace :seek do
   end
 
   task(convert_old_pagination_settings: :environment) do
+    puts "..... converting old pagination settings ..."
     limit_latest = Settings.where(var: 'limit_latest').first
     if limit_latest&.value
       puts "Setting 'results_per_page_default' to #{limit_latest.value}"
@@ -64,6 +76,7 @@ namespace :seek do
   end
 
   task(set_assay_and_technology_type_uris: :environment) do
+    puts "..... updating assay and technology type uris ..."
     assays = Assay.where('suggested_assay_type_id IS NOT NULL OR suggested_technology_type_id IS NOT NULL')
     count = 0
 
@@ -81,6 +94,7 @@ namespace :seek do
   end
 
   task(convert_old_ldap_settings: :environment) do
+    puts "..... converting ldap settings ..."
     providers_setting = Settings.where(var: 'omniauth_providers').first
     if providers_setting
       unless providers_setting.value.blank?
@@ -101,6 +115,7 @@ namespace :seek do
   end
 
   task(convert_old_elixir_aai_settings: :environment) do
+    puts "..... converting elixir aai settings ..."
     client_id_setting = Settings.where(var: 'elixir_aai_client_id').first
     client_id = nil
 
@@ -132,5 +147,33 @@ namespace :seek do
         Seek::Config.omniauth_elixir_aai_enabled = true
       end
     end
+  end
+
+  task(refix_country_codes: :environment) do
+    [Institution, Event].each do |type|
+      count = 0
+      type.where('length(country) > 2').each do |item|
+        item.update_column(:country, CountryCodes.code(item.country))
+        count += 1
+      end
+      puts "Fixed #{count} #{type.name}s' country codes" if count > 0
+    end
+  end
+
+  task(fix_missing_dois: :environment) do
+    puts "Looking for broken DOIs..."
+    AssetDoiLog.where(action: AssetDoiLog::MINT).each do |log|
+      asset = log.asset
+      if asset && asset.respond_to?(:find_version)
+        version = asset.find_version(log.asset_version)
+        if version
+          if version.doi.nil? && log.doi.present?
+            puts "  Restoring DOI: #{log.doi}"
+            version.update_column(:doi, log.doi)
+          end
+        end
+      end
+    end
+    puts "Done"
   end
 end

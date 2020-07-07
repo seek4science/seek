@@ -60,6 +60,14 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
     Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
     Seek::Config.omniauth_ldap_enabled = string_to_boolean params[:omniauth_ldap_enabled]
+    Seek::Config.set_omniauth_ldap_settings 'host', params[:omniauth_ldap_host]
+    Seek::Config.set_omniauth_ldap_settings 'port', params[:omniauth_ldap_port]&.to_i
+    Seek::Config.set_omniauth_ldap_settings 'method', params[:omniauth_ldap_method]&.to_sym
+    Seek::Config.set_omniauth_ldap_settings 'base', params[:omniauth_ldap_base]
+    Seek::Config.set_omniauth_ldap_settings 'uid', params[:omniauth_ldap_uid]
+    Seek::Config.set_omniauth_ldap_settings 'bind_dn', params[:omniauth_ldap_bind_dn]
+    Seek::Config.set_omniauth_ldap_settings 'password', params[:omniauth_ldap_password]
+
     Seek::Config.omniauth_elixir_aai_enabled = string_to_boolean params[:omniauth_elixir_aai_enabled]
     Seek::Config.omniauth_elixir_aai_client_id = params[:omniauth_elixir_aai_client_id]
     Seek::Config.omniauth_elixir_aai_secret = params[:omniauth_elixir_aai_secret]
@@ -279,33 +287,42 @@ class AdminController < ApplicationController
     if request.post?
       replacement_tags = []
 
-      params[:tag_list].split(',').each do |item|
-        item.strip!
-        tag = TextValue.find_by_text(item)
-        tag = TextValue.create(text: item) if tag.nil?
-        replacement_tags << tag
-      end
-
-      @tag.annotations.each do |a|
-        annotatable = a.annotatable
-        source = a.source
-        attribute_name = a.annotation_attribute.name
-        a.destroy unless replacement_tags.include?(@tag)
-        replacement_tags.each do |tag|
-          if annotatable.annotations_with_attribute_and_by_source(attribute_name, source).select { |an| an.value == tag }.blank?
-            new_annotation = Annotation.new attribute_name: attribute_name, value: tag, annotatable: annotatable, source: source
-            new_annotation.save!
-          end
+      if params[:tag_list].blank?
+        flash[:error] = 'Not tags provided, use Delete to delete a tag. Make sure you register the replacement tag by pressing comma'
+        respond_to do |format|
+          format.html { render status: :not_acceptable }
         end
+      else
+        params[:tag_list].split(',').each do |item|
+          item.strip!
+          tag = TextValue.find_by_text(item)
+          tag = TextValue.create(text: item) if tag.nil? || tag.text != item # case sensitivity check
+          replacement_tags << tag
+        end
+
+        @tag.annotations.each do |a|
+          annotatable = a.annotatable
+          source = a.source
+          attribute_name = a.annotation_attribute.name
+          a.destroy unless replacement_tags.include?(@tag)
+          replacement_tags.each do |tag|
+            if annotatable.annotations_with_attribute_and_by_source(attribute_name, source).select { |an| an.value == tag }.blank?
+              new_annotation = Annotation.new attribute_name: attribute_name, value: tag, annotatable: annotatable, source: source
+              new_annotation.save!
+            end
+          end
+          expire_resource_list_item_content(annotatable) if annotatable
+        end
+
+        @tag.reload
+
+        @tag.destroy if @tag.annotations.blank?
+
+        expire_annotation_fragments
+
+        redirect_to action: :tags
       end
 
-      @tag.reload
-
-      @tag.destroy if @tag.annotations.blank?
-
-      expire_annotation_fragments
-
-      redirect_to action: :tags
     else
       @all_tags_as_json = TextValue.all.map { |t| { 'id' => t.id, 'name' => h(t.text) } }.to_json
       respond_to do |format|

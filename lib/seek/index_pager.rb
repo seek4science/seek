@@ -26,7 +26,7 @@ module Seek
       @total_count = assets.count
       log_with_time("  - Authorized") { assets = authorize_assets(assets) }
       log_with_time("  - Relation-ified") { assets = relationify_collection(assets) } if assets.is_a?(Array)
-      log_with_time("  - Filtered") { assets = filter_assets(assets) } if Seek::Config.filtering_enabled
+      assets = filter_assets(assets) if Seek::Config.filtering_enabled
       @visible_count = assets.count
       log_with_time("  - Sorted") { assets = sort_assets(assets) }
       log_with_time("  - Paged") { assets = paginate_assets(assets) }
@@ -50,8 +50,9 @@ module Seek
       filterer = Seek::Filterer.new(controller_model)
       active_filter_values = filterer.active_filter_values(@filters)
       # We need the un-filtered, but authorized, collection to work out which filters are available.
-      @available_filters = filterer.available_filters(assets, active_filter_values)
-      assets = filterer.filter(assets, active_filter_values) if active_filter_values.any?
+      @available_filters = nil
+      log_with_time("  - Calculated available filters") { @available_filters = filterer.available_filters(assets, active_filter_values) }
+      log_with_time("  - Filtered") { assets = filterer.filter(assets, active_filter_values) if active_filter_values.any? }
 
       active_filter_values.each_key do |key|
         active = @available_filters[key].select(&:active?)
@@ -66,13 +67,17 @@ module Seek
     end
 
     def paginate_assets(assets)
-      if @page.match?(/[0-9]+/) # Standard pagination
+      if @page.match?(/^[0-9]+$/) # Standard pagination
         assets.paginate(page: @page,
                         per_page: @per_page)
       elsif @page == 'all' # No pagination
         assets.paginate(page: 1, per_page: 1_000_000)
-      else # Alphabetical pagination
+      elsif @page.match?(/^[A-Z]$/) || @page=='?' || @page=='top' # Alphabetical pagination
         controller_model.paginate_after_fetch(assets, page_and_sort_params)
+      else #default to 1 if invalid page
+        @page=1
+        assets.paginate(page: @page,
+                        per_page: @per_page)
       end
     end
 

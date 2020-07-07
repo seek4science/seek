@@ -16,7 +16,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected = {
       '@context' => 'http://schema.org',
-      '@type' => 'DataCatalogue',
+      '@type' => 'DataCatalog',
       'name' => 'Sysmo',
       'url' => 'http://fairyhub.org',
       'description' => 'a lovely project',
@@ -31,7 +31,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     with_config_value(:project_description, 'a lovely project') do
       with_config_value(:project_keywords, 'a,  b, ,,c,d') do
         with_config_value(:site_base_host, 'http://fairyhub.org') do
-          json = JSON.parse(Seek::BioSchema::DataCatalogueMockModel.new.to_schema_ld)
+          json = JSON.parse(Seek::BioSchema::DataCatalogMockModel.new.to_schema_ld)
           assert_equal expected, json
         end
       end

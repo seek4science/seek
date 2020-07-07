@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.1",
+        "version": "0.3",
         "title": "JSON API to FAIRDOM SEEK",
         "license": {
             "name": "The 3-Clause BSD License",
@@ -2224,6 +2224,43 @@
                 }
             }
         },
+        "/people/current": {
+            "get": {
+                "operationId": "currentPerson",
+                "description": {
+                    "$ref": "../descriptions/currentPerson.md"
+                },
+                "tags": [
+                    "read",
+                    "people"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/personResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/personResponse.json"
+                            }
+                        }
+                    }
+                }
+            }
+	    },
         "/people/{id}": {
             "parameters": [
                 {
