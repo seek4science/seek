@@ -28,6 +28,14 @@ class ProjectsController < ApplicationController
 
   api_actions :index, :show, :create, :update, :destroy
 
+  def guided_join
+
+  end
+
+  def guided_create
+
+  end
+
   def asset_report
     @no_sidebar = true
     project_assets = @project.assets | @project.assays | @project.studies | @project.investigations
