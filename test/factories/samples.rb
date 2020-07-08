@@ -38,7 +38,7 @@ end
 
 
 Factory.define(:min_sample, parent: :sample) do |f|
-  f.association :sample_type, factory: :min_sampletype
+  f.association :sample_type, factory: :min_sample_type
   f.after_build do |sample|
     sample.set_attribute_value(:full_name, 'Fred Bloggs')
   end
