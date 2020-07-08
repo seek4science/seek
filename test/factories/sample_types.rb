@@ -81,7 +81,7 @@ Factory.define(:linked_optional_sample_type, parent: :sample_type) do |f|
 end
 
 
-Factory.define(:min_sampletype, parent: :sample_type) do |f|
+Factory.define(:min_sample_type, parent: :sample_type) do |f|
   f.title 'A Minimal SampleType'
   f.after_build do |type|
     type.sample_attributes << Factory.build(:sample_attribute, title: 'full name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: type)
