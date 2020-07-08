@@ -170,6 +170,24 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal [event],doc.events
   end
 
+  test 'update with no assays' do
+    person = Factory(:person)
+    creators = [Factory(:person), Factory(:person)]
+    assay = Factory(:assay, contributor:person)
+    document = Factory(:document,assays:[assay], contributor: person, creators:creators)
+
+    login_as(person)
+
+    assert document.can_edit?
+    assert_difference('AssayAsset.count', -1) do
+      assert_difference('ActivityLog.count',1) do
+         put :update, params: { id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id], assay_assets_attributes: [""] } }
+      end
+    end
+    assert_empty assigns(:document).assays
+    assert_redirected_to document_path(document)
+  end
+
   test 'should destroy document' do
     person = Factory(:person)
     document = Factory(:document, contributor: person)
