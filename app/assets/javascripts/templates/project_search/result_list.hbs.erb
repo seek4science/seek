@@ -1,7 +1,7 @@
 
 <tr>
     <td>
-      <input type="checkbox" id="project_{{attributes.id}}" data-project-id="{{attributes.id}}" class="project-selected"/>
+      <input type="checkbox" name='requested_project[]' id='requested_project_{{id}}' value='{{ id }}' data-project-id="{{ id }}" class="project-selected"/>
     </td>
     <td>
       {{#if attributes.avatar}}

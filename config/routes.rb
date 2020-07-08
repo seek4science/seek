@@ -338,6 +338,7 @@ SEEK::Application.routes.draw do
   resources :institutions do
     collection do
       post :items_for_result
+      get  :typeahead
     end
     resources :people, :projects, :specimens, only: [:index]
     resources :avatars do

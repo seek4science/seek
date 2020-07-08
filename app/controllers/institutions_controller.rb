@@ -91,6 +91,22 @@ class InstitutionsController < ApplicationController
     end
   end
 
+  # For use in autocompleters
+  def typeahead
+    results = Institution.where("LOWER(title) LIKE :query",
+                           query: "%#{params[:query].downcase}%").limit(params[:limit] || 10)
+    items = results.map do |institution|
+      { id: institution.id, name: institution.title, hint: institution.typeahead_hint }
+    end
+
+    # hack to allow new items
+    items << {id:0, name:params[:query],hint:"NEW"}
+
+    respond_to do |format|
+      format.json { render json: items.to_json }
+    end
+  end
+
   private
 
   def institution_params
