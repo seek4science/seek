@@ -8,7 +8,7 @@ class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
                abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
     }
     builder = WorkflowCrateBuilder.new(params)
-    builder.workflow_extractor = Seek::WorkflowExtractors::Galaxy
+    builder.workflow_extractor_class = Seek::WorkflowExtractors::Galaxy
     cb_params = builder.build
     assert cb_params[:tmp_io_object].respond_to?(:read), 'tmp_io_object missing or not readable?'
     assert cb_params[:file_size] > 100, "Crate file size unexpectedly small: #{cb_params[:file_size]}"
@@ -27,7 +27,7 @@ class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
                abstract_cwl: { data_url: 'http://workflow.com/rp2.cwl' }
     }
     builder = WorkflowCrateBuilder.new(params)
-    builder.workflow_extractor = Seek::WorkflowExtractors::Galaxy
+    builder.workflow_extractor_class = Seek::WorkflowExtractors::Galaxy
     cb_params = builder.build
     assert cb_params[:tmp_io_object].respond_to?(:read), 'tmp_io_object missing or not readable?'
     assert cb_params[:file_size] > 100, "Crate file size unexpectedly small: #{cb_params[:file_size]}"
