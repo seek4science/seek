@@ -1,0 +1,100 @@
+<% cancel_path ||= workflows_path %>
+<% new_version ||= false %>
+
+<div>
+  <ul class="nav nav-pills nav-stacked" role="tablist">
+    <li class="active" role="presentation"><a href="#new-ro-crate" aria-controls="new-ro-crate" role="tab" data-toggle="tab">Simple</a></li>
+    <li role="presentation"><a href="#existing-ro-crate" aria-controls="existing-ro-crate" role="tab" data-toggle="tab">Advanced (<em>Workflow RO Crate</em>)</a></li>
+  </ul>
+
+  <br/>
+
+  <div class="tab-content">
+    <div id="new-ro-crate" role="tabpanel" class="tab-pane active">
+      <%= form_tag({ action: :create_ro_crate, anchor: 'new-ro-crate' }, multipart: true) do -%>
+        <div class="asset_form">
+          <%= error_messages_for :workflow -%>
+          <%= error_messages_for :crate_builder, header_message: "Could not build Workflow RO Crate" -%>
+
+          <%= panel do %>
+            <div class="form-group">
+              <label class="required">Workflow</label>
+              <p class="help-block">The main executable workflow.</p>
+              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[workflow]', param: params.dig(:ro_crate, :workflow) } -%>
+            </div>
+
+            <div class="form-group">
+              <label class="required">Workflow type</label>
+              <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title', @workflow.workflow_class_id),
+                             include_blank: 'Other',
+                             class: 'form-control' %>
+              <p class="help-block">The type of the above workflow.</p>
+            </div>
+          <% end %>
+
+          <%= panel do %>
+            <div class="form-group">
+              <label>Abstract CWL</label>
+              <p class="help-block">(Optional) The abstract CWL that describes the workflow above.</p>
+              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[abstract_cwl]', param: params.dig(:ro_crate, :abstract_cwl), file_field_opts: { accept: '.cwl,.yaml,.yml,.json,.jsonld' } } -%>
+            </div>
+          <% end %>
+
+          <%= panel do %>
+            <div class="form-group">
+              <label>Diagram</label>
+              <p class="help-block">(Optional) A diagram that illustrates the main workflow.</p>
+              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[diagram]', param: params.dig(:ro_crate, :diagram), file_field_opts: { accept: 'image/*' } } -%>
+            </div>
+          <% end %>
+        </div>
+
+        <% if new_version %>
+          <div class="form-group">
+            <label>Revision comments (optional)</label>
+            <%= text_area_tag :revision_comments, nil, size: '55x4', class: 'form-control' -%>
+          </div>
+
+          <%= hidden_field_tag(:workflow_id, @workflow.id) %>
+        <% end %>
+
+        <div>
+          <%= create_button class: 'btn btn-primary'-%>
+          or <%= cancel_button(cancel_path) -%>
+        </div>
+      <% end -%>
+    </div>
+
+    <div id="existing-ro-crate" role="tabpanel" class="tab-pane">
+      <%= form_tag({ action: :create_content_blob, anchor: 'existing-ro-crate' }, multipart: true) do -%>
+        <div class="asset_form">
+          <%= error_messages_for :workflow -%>
+
+          <%= panel do %>
+            <div class="form-group">
+              <label class="required">Workflow RO Crate</label>
+              <p class="help-block">The zipped <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">Workfow RO Crate</a>.</p>
+              <%= render partial: 'assets/upload', locals: { file_field_opts: { accept: '.zip' } } -%>
+            </div>
+          <% end %>
+
+          <% if new_version %>
+            <div class="form-group">
+              <label>Revision comments (optional)</label>
+              <%= text_area_tag :revision_comments, nil, size: '55x4', class: 'form-control' -%>
+            </div>
+
+            <%= hidden_field_tag(:workflow_id, @workflow.id) %>
+          <% end %>
+
+          <%= hidden_field_tag :workflow_class_id, '' %>
+
+          <div>
+            <%= create_button class: 'btn btn-primary'-%>
+            or <%= cancel_button(cancel_path) -%>
+          </div>
+        </div>
+      <% end -%>
+    </div>
+  </div>
+</div>
