@@ -1,0 +1,33 @@
+{
+    "data": {
+        "type": "sample_types",
+        "attributes": {
+            "title": "A Minimal SampleType",
+            "description": null,
+            "attribute_map": [
+                {
+                    "title": "full name",
+                    "sample_attibute_type": {
+                        "id":"<%= sample_attribute_type_id %>"
+                    },
+                    "required": true,
+                    "pos": "1",
+                    "unit_id": null,
+                    "is_title": true,
+                    "accessor_name": "full_name"
+                }
+            ],
+            "tags": null
+        },
+        "relationships": {
+            "projects": {
+                "data": [
+                    {
+                        "id": "<%= project_id %>",
+                        "type": "projects"
+                    }
+                ]
+            }
+        }
+    }
+}

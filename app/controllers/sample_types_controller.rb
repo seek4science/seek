@@ -19,8 +19,7 @@ class SampleTypesController < ApplicationController
   def show
     respond_to do |format|
       format.html
-      # format.json {render json: @sample_type}
-      format.json {render json: :not_implemented, status: :not_implemented }
+      format.json {render json: @sample_type, include: [params[:include]]}
     end
   end
 
@@ -82,24 +81,29 @@ class SampleTypesController < ApplicationController
   def update
     @sample_type.update_attributes(sample_type_params)
     @sample_type.resolve_inconsistencies
-    flash[:notice] = 'Sample type was successfully updated.' if @sample_type.save
     respond_to do |format|
-      format.html { respond_with(@sample_type) }
-      format.json {render json: @sample_type, include: [params[:include]]}
+      if @sample_type.save
+        format.html { redirect_to @sample_type, notice: 'Sample type was successfully updated.' }
+        format.json {render json: @sample_type, include: [params[:include]]}
+      else
+        format.html { render action: 'edit', status: :unprocessable_entity }
+        format.json { render json: @sample_type.errors, status: :unprocessable_entity}
+      end
     end
-
   end
 
   # DELETE /sample_types/1
   # DELETE /sample_types/1.json
   def destroy
+    respond_to do |format|
     if @sample_type.can_delete? && @sample_type.destroy
-      flash[:notice] = 'The sample type was successfully deleted.'
+      format.html { redirect_to @sample_type,location: sample_types_path, notice: 'Sample type was successfully deleted.' }
+      format.json {render json: @sample_type, include: [params[:include]]}
     else
-      flash[:notice] = 'It was not possible to delete the sample type.'
+      format.html { redirect_to @sample_type, location: sample_types_path, notice: 'It was not possible to delete the sample type.' }
+      format.json { render json: @sample_type.errors, status: :unprocessable_entity}
     end
-
-    respond_with(@sample_type, location: sample_types_path)
+    end
   end
 
   def template_details
@@ -133,6 +137,17 @@ class SampleTypesController < ApplicationController
   private
 
   def sample_type_params
+
+    attribute_map = params[:sample_type][:attribute_map]
+    Rails.logger.info("attribute_map:"+attribute_map.inspect)
+    if (attribute_map)
+      params[:sample_type][:sample_attributes_attributes] =[]
+      attribute_map.each do |attribute|
+        attribute[:sample_attribute_type_id] = attribute[:sample_attibute_type][:id]
+        params[:sample_type][:sample_attributes_attributes] << attribute
+      end
+    end
+
     params.require(:sample_type).permit(:title, :description, :tags,
                                         {project_ids: [],
                                          sample_attributes_attributes: [:id, :title, :pos, :required, :is_title,
