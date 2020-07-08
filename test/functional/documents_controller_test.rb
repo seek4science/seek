@@ -317,6 +317,42 @@ class DocumentsControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'create with no creators' do
+    person = Factory(:person)
+    login_as(person)
+    document = {title: 'Document', project_ids: [person.projects.first.id], creator_ids: []}
+    assert_difference('Document.count') do
+      post :create, params: {document: document, content_blobs: [{data: file_for_upload}], policy_attributes: {access_type: Policy::VISIBLE}}
+    end
+
+    document = assigns(:document)
+    assert_empty document.creators
+  end
+
+  test 'update with no creators' do
+    person = Factory(:person)
+    creators = [Factory(:person), Factory(:person)]
+    document = Factory(:document, contributor: person, creators:creators)
+
+    assert_equal creators.sort, document.creators.sort
+    login_as(person)
+
+    assert document.can_manage?
+
+
+    patch :manage_update,
+          params: {id: document,
+                   document: {
+                       title:'changed title',
+                       creator_ids:[""]
+                   }
+          }
+
+    assert_redirected_to document_path(document = assigns(:document))
+    assert_equal 'changed title', document.title
+    assert_empty document.creators
+  end
+
   test 'manage_update' do
     proj1=Factory(:project)
     proj2=Factory(:project)
@@ -491,7 +527,7 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     assert_select '.filter-category[data-filter-category="contributor"]' do
-      assert_select '.filter-category-title', text: 'Contributor'
+      assert_select '.filter-category-title', text: 'Submitter'
       assert_select '.filter-option', href: /documents\?filter\[contributor\]=\d+/, count: 8
       assert_select '.filter-option.filter-option-active', count: 0
       # Should show 6 options and hide the rest
@@ -552,7 +588,7 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     assert_select '.filter-category[data-filter-category="contributor"]' do
-      assert_select '.filter-category-title', text: 'Contributor'
+      assert_select '.filter-category-title', text: 'Submitter'
       assert_select '.filter-option', count: 1
       assert_select '.filter-option.filter-option-active', count: 0
       assert_select '.filter-option.filter-option-hidden', count: 0
@@ -690,7 +726,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 21, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='other']", text: 'Other', count: 0
         assert_select 'option[value="custom"]', text: 'Custom range'
@@ -708,7 +744,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 6, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select 'option[value="custom"]', text: 'Custom range'
         assert_select 'option[value=""]', text: 'Any time'
@@ -736,7 +772,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 10, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='custom'][selected='selected']", text: 'Custom range'
         assert_select 'option[value=""]', text: 'Any time'
@@ -769,7 +805,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 9, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='custom'][selected='selected']", text: 'Custom range'
         assert_select 'option[value=""]', text: 'Any time'
@@ -802,7 +838,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 3, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='other'][selected='selected']", text: 'Other'
         assert_select "option[value='custom']", text: 'Custom range'
@@ -833,7 +869,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_equal 7, assigns(:visible_count)
     assert_select '.filter-category[data-filter-category="created_at"]' do
-      assert_select '.filter-category-title', text: 'Created at'
+      assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='other'][selected='selected']", text: 'Other'
         assert_select "option[value='custom']", text: 'Custom range'
@@ -880,6 +916,103 @@ class DocumentsControllerTest < ActionController::TestCase
 
     get :index, params: { filter: { programme: programme.id, project: project.id }, order: 'created_at_desc' }
     assert_equal [project_doc, old_project_doc], assigns(:documents).to_a
+  end
+
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    document =  {title: 'Document', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/", label:'our slack'}]}
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Document.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params: {document: document, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+        end
+      end
+    end
+    document = assigns(:document)
+    assert_equal 'http://www.slack.com/', document.discussion_links.first.url
+    assert_equal 'our slack', document.discussion_links.first.label
+    assert_equal AssetLink::DISCUSSION, document.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link with label' do
+    asset_link = Factory(:discussion_link, label:'discuss-label')
+    document = Factory(:document, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    assert_equal [asset_link],document.discussion_links
+    get :show, params: { id: document }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+    assert_select 'div.discussion-link', count:1 do
+      assert_select 'a[href=?]',asset_link.url,text:'discuss-label'
+    end
+  end
+
+  test 'should show discussion link without label' do
+    asset_link = Factory(:discussion_link)
+    document = Factory(:document, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    assert_equal [asset_link],document.discussion_links
+    get :show, params: { id: document }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+    assert_select 'div.discussion-link', count:1 do
+      assert_select 'a[href=?]',asset_link.url,text:asset_link.url
+    end
+
+    #blank rather than nil
+    asset_link.update_column(:label,'')
+    document.reload
+    assert_equal [asset_link],document.discussion_links
+    get :show, params: { id: document }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+    assert_select 'div.discussion-link', count:1 do
+      assert_select 'a[href=?]',asset_link.url,text:asset_link.url
+    end
+  end
+
+  test 'should update document with new discussion link' do
+    person = Factory(:person)
+    document = Factory(:document, contributor: person)
+    login_as(person)
+    assert_nil document.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: document.id, document: { discussion_links_attributes:[{url: "http://www.slack.com/", label:'our slack'}] } }
+      end
+    end
+    assert_redirected_to document_path(document = assigns(:document))
+    assert_equal 'http://www.slack.com/', document.discussion_links.first.url
+    assert_equal 'our slack', document.discussion_links.first.label
+  end
+
+  test 'should update document with edited discussion link' do
+    person = Factory(:person)
+    document = Factory(:document, contributor: person, discussion_links:[Factory(:discussion_link)])
+    login_as(person)
+    assert_equal 1,document.discussion_links.count
+    assert_no_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: document.id, document: { discussion_links_attributes:[{id:document.discussion_links.first.id, url: "http://www.wibble.com/"}] } }
+      end
+    end
+    document = assigns(:document)
+    assert_redirected_to document_path(document)
+    assert_equal 1,document.discussion_links.count
+    assert_equal 'http://www.wibble.com/', document.discussion_links.first.url
+  end
+
+  test 'should destroy related asset link' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    document = Factory(:document, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    refute_empty document.discussion_links
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: document.id, document: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+    end
+    document = assigns(:document)
+    assert_redirected_to document_path(document)
+    assert_empty document.discussion_links
   end
 
   private

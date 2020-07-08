@@ -7,7 +7,7 @@ class ModelsController < ApplicationController
 
   before_action :models_enabled?
   before_action :find_assets, :only => [:index]
-  before_action :find_and_authorize_requested_item, :except => [:build, :index, :new, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_and_authorize_requested_item, :except => [:build, :index, :new, :create, :preview, :update_annotations_ajax]
   before_action :find_display_asset, :only => [:show, :download, :execute, :visualise, :export_as_xgmml, :compare_versions]
   before_action :find_other_version, :only => [:compare_versions]
 
@@ -124,7 +124,6 @@ class ModelsController < ApplicationController
     update_annotations(params[:tag_list], @model)
     update_sharing_policies @model
     update_relationships(@model, params)
-
     respond_to do |format|
       if @model.update_attributes(model_params)
         flash[:notice] = "#{t('model')} metadata was successfully updated."
@@ -184,11 +183,12 @@ class ModelsController < ApplicationController
 
   def model_params
     params.require(:model).permit(:imported_source, :imported_url, :title, :description, { project_ids: [] }, :license,
-                                  :model_type_id, :model_format_id, :recommended_environment_id, :organism_id,
+                                  :model_type_id, :model_format_id, :recommended_environment_id, :organism_id, :human_disease_id,
                                   :other_creators,
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                   { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                  { scale_extra_params: [] }, { publication_ids: [] })
+                                  { scale_extra_params: [] }, { publication_ids: [] },
+                                  discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :model_params

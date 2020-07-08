@@ -5,7 +5,7 @@
     </p>
 
     <p class="alert alert-warning" id="no-project-warning">
-      If you register but are not a member of a <%= t('project') %> you will not be able to add new content. You will need to contact a <%= t('project') %> administrator to ask to be assigned to that Project,
+      If you register but are not a member of a <%= t('project') %> you will not be able to add new content. You will need to contact a <%= t('project') %> administrator to ask to be assigned to that <%= t('project') -%>,
       or you can <%= help_link(:join_project,link_text:'Request to join') %> from the <%= t('project') %> page.
       <% if Seek::Config.programme_user_creation_enabled && Seek::Config.programmes_enabled %>
         You can also to create and administer your own <%= t('project').pluralize %>, by <%= help_link(:programme_self_management,link_text:'Creating and managing your own Programme space') %>.

@@ -1,9 +1,9 @@
 class WorkflowSerializer < ContributedResourceSerializer
   attribute :workflow_class do
     {
-        title: object.workflow_class.title,
-        key: object.workflow_class.key,
-        description: object.workflow_class.description
+        title: object.workflow_class_title,
+        key: object.workflow_class&.key,
+        description: object.workflow_class&.description
     }
   end
 
@@ -18,7 +18,7 @@ class WorkflowSerializer < ContributedResourceSerializer
   attribute :internals
 
   def _links
-    if get_version.content_blob.file_exists? && get_version.diagram.exists?
+    if get_version.content_blob.file_exists? && (get_version.diagram_exists? rescue false)
       super.merge(diagram: diagram_workflow_path(object, version: get_version.version))
     else
       super

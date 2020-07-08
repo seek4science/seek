@@ -3,6 +3,9 @@
     Other associated items
   </div>
   <div class='panel-body'>
+
+    <%= render :partial=> "assets/discussion_links_form", locals: {resource: @data_file} -%>
+
     <%= render :partial => 'assets/attribution_form', :locals => {:resource_class => DataFile,
                                                                   :existing_attributions => [], collapsed: @data_file.attributions.empty?} -%>
     <%= f.fancy_multiselect :publications, { hidden:  @data_file.publications.empty?, other_projects_checkbox: true } %>

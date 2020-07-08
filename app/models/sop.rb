@@ -47,6 +47,10 @@ class Sop < ApplicationRecord
     organism.nil? ? "" : organism.title
   end
 
+  def human_disease_title
+    human_disease.nil? ? "" : human_disease.title
+  end
+
   def use_mime_type_for_avatar?
     true
   end

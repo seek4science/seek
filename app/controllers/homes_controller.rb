@@ -1,4 +1,6 @@
 class HomesController < ApplicationController
+  helper HumanDiseasesHelper
+
   before_action :redirect_to_sign_up_when_no_user
   before_action :login_required, only: %i[feedback send_feedback]
 

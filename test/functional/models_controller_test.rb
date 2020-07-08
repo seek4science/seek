@@ -524,6 +524,21 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select 'p.import_details', count: 0
   end
 
+  test 'should show request contact button' do
+    p1 = Factory :person
+    p2 = Factory :person
+    m = Factory(:model, title: 'a model', creators: [p1,p2], contributor:User.current_user.person, policy: Factory(:public_policy))
+
+    assert_difference('ActivityLog.count') do
+      get :show, params: { id: m }
+    end
+
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a', text: /Contact/, count: 1
+    end
+  end
+
   test 'should show model with multiple files' do
     m = Factory :model_2_files, policy: Factory(:public_policy)
 
@@ -957,7 +972,7 @@ class ModelsControllerTest < ActionController::TestCase
     model.save
     get :show, params: { id: model }
 
-    assert_select 'div', text: 'another creator', count: 1
+    assert_select 'li.author-list-item', text: 'another creator', count: 1
   end
 
   test 'should create new model version based on content_blobs of previous version' do
@@ -1337,6 +1352,74 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_equal '10.1000/doi/1', model.latest_version.reload.doi
   end
+
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    model =  {title: 'Model', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/", label:'the slack about this model'}]}
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Model.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params: {model: model, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+        end
+      end
+    end
+    model = assigns(:model)
+    assert_equal 'http://www.slack.com/', model.discussion_links.first.url
+    assert_equal 'the slack about this model', model.discussion_links.first.label
+    assert_equal AssetLink::DISCUSSION, model.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    asset_link = Factory(:discussion_link)
+    model = Factory(:model, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: model }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update model with new discussion link' do
+    person = Factory(:person)
+    model = Factory(:model, contributor: person)
+    login_as(person)
+    assert_nil model.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: model.id, model: { discussion_links_attributes:[{url: "http://www.slack.com/"}] }  }
+      end
+    end
+    assert_redirected_to model_path(model = assigns(:model))
+    assert_equal 'http://www.slack.com/', model.discussion_links.first.url
+  end
+
+  test 'should update model with edited discussion link' do
+    person = Factory(:person)
+    model = Factory(:model, contributor: person, discussion_links:[Factory(:discussion_link)])
+    login_as(person)
+    assert_equal 1,model.discussion_links.count
+    assert_no_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: model.id, model: { discussion_links_attributes:[{id:model.discussion_links.first.id, url: "http://www.wibble.com/"}] } }
+      end
+    end
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal 1,model.discussion_links.count
+    assert_equal 'http://www.wibble.com/', model.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    model = Factory(:model, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: model.id, model: { discussion_links_attributes:[{id: asset_link.id, _destroy:'1'}] } }
+    end
+    assert_redirected_to model_path(model = assigns(:model))
+    assert_empty model.discussion_links
+  end
+
 
   private
 

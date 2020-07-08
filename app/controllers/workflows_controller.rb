@@ -1,15 +1,20 @@
 class WorkflowsController < ApplicationController
+  
   include Seek::IndexPager
+
   include Seek::AssetsCommon
 
   before_action :workflows_enabled?
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview, :update_annotations_ajax]
   before_action :find_display_asset, only: [:show, :download, :diagram, :ro_crate]
+  before_action :login_required, only: [:create, :create_content_blob, :create_ro_crate, :create_metadata, :metadata_extraction_ajax, :provide_metadata]
 
   include Seek::Publishing::PublishingCommon
+
   include Seek::BreadCrumbs
   include Seek::Doi::Minting
+
   include Seek::IsaGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
@@ -23,6 +28,7 @@ class WorkflowsController < ApplicationController
       comments = params[:revision_comments]
       respond_to do |format|
         if @workflow.save_as_new_version(comments)
+
           flash[:notice]="New version uploaded - now on version #{@workflow.version}"
         else
           flash[:error]="Unable to save new version"
@@ -33,6 +39,7 @@ class WorkflowsController < ApplicationController
       flash[:error] = flash.now[:error]
       redirect_to @workflow
     end
+    
   end
 
   # PUT /Workflows/1
@@ -43,7 +50,7 @@ class WorkflowsController < ApplicationController
 
     respond_to do |format|
       if @workflow.update_attributes(workflow_params)
-        flash[:notice] = "#{t('Workflow')} metadata was successfully updated."
+        flash[:notice] = "#{t('workflow')} metadata was successfully updated."
         format.html { redirect_to workflow_path(@workflow) }
         format.json { render json: @workflow, include: [params[:include]] }
       else
@@ -56,8 +63,6 @@ class WorkflowsController < ApplicationController
   def clear_session_info
     session.delete(:uploaded_content_blob_id)
     session.delete(:metadata)
-    session.delete(:processing_errors)
-    session.delete(:processing_warnings)
   end
 
   def create_content_blob
@@ -73,39 +78,43 @@ class WorkflowsController < ApplicationController
     end
   end
 
-  def retrieve_content(blob)
-    if !blob.file_exists?
-      if (caching_job = blob.caching_job).exists?
-        caching_job.first.destroy
+  def create_ro_crate
+    clear_session_info
+    @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
+
+    @crate_builder = WorkflowCrateBuilder.new(ro_crate_params)
+    @crate_builder.workflow_extractor = @workflow.extractor_class
+    blob_params = @crate_builder.build
+
+    respond_to do |format|
+      if blob_params && @workflow.build_content_blob(blob_params).save
+        session[:uploaded_content_blob_id] = @workflow.content_blob.id
+        format.html { render action: :create_content_blob }
+      else
+        format.html { render action: :new }
       end
-      blob.retrieve
     end
   end
 
   # AJAX call to trigger metadata extraction, and pre-populate the associated @workflow
   def metadata_extraction_ajax
     @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
-    session[:metadata] = {}
+    session[:metadata] = { workflow_class_id: params[:workflow_class_id] }
     critical_error_msg = nil
 
     begin
       if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
         @workflow.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
-        retrieve_content @workflow.content_blob
-        metadata = @workflow.extractor.metadata
-        errors = metadata.delete(:errors)
-        warnings = metadata.delete(:warnings)
-        session[:processing_errors] = errors if errors.any?
-        session[:processing_warnings] = warnings if warnings.any?
-        session[:metadata] = metadata
+        retrieve_content @workflow.content_blob # Hack
+        session[:metadata] = session[:metadata].merge(@workflow.extractor.metadata)
       else
-        critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
+        critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded."
       end
     rescue StandardError => e
       raise e unless Rails.env.production?
       Seek::Errors::ExceptionForwarder.send_notification(e, data: {
           message: "Problem attempting to extract metadata for content blob #{params[:content_blob_id]}" })
-      session[:processing_errors] = [e.message]
+      critical_error_msg = 'An unexpected error occurred whilst extracting workflow metadata.'
     end
 
     respond_to do |format|
@@ -119,9 +128,10 @@ class WorkflowsController < ApplicationController
 
   # Displays the form Wizard for providing the metadata for the workflow
   def provide_metadata
-    @workflow ||= Workflow.new(session[:metadata].reverse_merge(workflow_class_id: params[:workflow_class_id]))
-    @warnings ||= session[:processing_warnings] || []
-    @errors ||= session[:processing_errors] || []
+    metadata = session[:metadata]
+    @warnings ||= metadata.delete(:warnings) || []
+    @errors ||= metadata.delete(:errors) || []
+    @workflow ||= Workflow.new(metadata)
 
     respond_to do |format|
       format.html
@@ -166,12 +176,17 @@ class WorkflowsController < ApplicationController
   def diagram
     diagram_format = params.key?(:diagram_format) ? params[:diagram_format] : @workflow.default_diagram_format
     @diagram = @display_workflow.diagram(diagram_format)
+    response.set_header('Content-Security-Policy', "default-src 'self'")
     respond_to do |format|
       format.html do
-        send_file(@diagram.path,
-                  filename: @diagram.filename,
-                  type: @diagram.content_type,
-                  disposition: 'inline')
+        if @diagram
+          send_file(@diagram.path,
+                    filename: @diagram.filename,
+                    type: @diagram.content_type,
+                    disposition: 'inline')
+        else
+          head :not_found
+        end
       end
     end
   end
@@ -194,13 +209,29 @@ class WorkflowsController < ApplicationController
 
   private
 
+  def retrieve_content(blob)
+    if !blob.file_exists?
+      if (caching_job = blob.caching_job).exists?
+        caching_job.first.destroy
+      end
+      blob.retrieve
+    end
+  end
+
   def workflow_params
     params.require(:workflow).permit(:title, :description, :workflow_class_id, # :metadata,
                                      { project_ids: [] }, :license, :other_creators,
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                     { publication_ids: [] }, :internals)
+                                     { publication_ids: [] }, :internals, :maturity_level, :source_link_url,
+                                     discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :workflow_params
+
+  def ro_crate_params
+    params.require(:ro_crate).permit({ workflow: [:data, :data_url, :make_local_copy] },
+                                     { abstract_cwl: [:data, :data_url, :make_local_copy] },
+                                     { diagram: [:data, :data_url, :make_local_copy] })
+  end
 end

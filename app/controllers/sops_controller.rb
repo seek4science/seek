@@ -5,7 +5,7 @@ class SopsController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :find_assets, :only => [ :index ]
-  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview, :update_annotations_ajax]
   before_action :find_display_asset, :only=>[:show, :download]
 
   include Seek::Publishing::PublishingCommon
@@ -69,7 +69,8 @@ class SopsController < ApplicationController
     params.require(:sop).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                { publication_ids: [] }, {workflow_ids: []})
+                                { publication_ids: [] }, {workflow_ids: []},
+                                discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :sop_params

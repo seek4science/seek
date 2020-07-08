@@ -332,13 +332,19 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should show old unspecified publication type' do
     get :index
     assert_response :success
-    assert_select 'span.none_text', { text:'Not specified', :count=> 9 }
+    assert_select '.list_item_attribute' do
+      assert_select 'b', { text: 'Publication Type' }
+      assert_select 'span.none_text', { text: 'Not specified' }
+    end
   end
 
   test 'should show the publication with unspecified publication type as Not specified' do
     get :show, params: { id: publications(:no_publication_type) }
     assert_response :success
-    assert_select 'span.none_text', { text:'Not specified', :count=>3 }
+    assert_select 'p' do
+      assert_select 'strong', { text: 'Publication type:' }
+      assert_select 'span.none_text', { text: 'Not specified' }
+    end
   end
 
   test 'should only show the year for 1st Jan in list view' do
@@ -1130,17 +1136,6 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert response.body.include?('FAIRDOMHub: a repository')
-  end
-
-
-  test 'should handle blank publication type when refetching doi metadata' do
-    VCR.use_cassette('publications/refetch_by_doi_non_publication_type_error.yml') do
-      with_config_value :crossref_api_email, 'sowen@cs.man.ac.uk' do
-        post :update_metadata, xhr: true, params: { doi: '10.1136/gutjnl-2018-317872', publication: { project_ids: [User.current_user.person.projects.first.id], publication_type_id: nil } }
-      end
-    end
-    assert_response :internal_server_error
-    assert_match /An error has occurred.*Please choose a publication type./,response.body
   end
 
   test 'should handle blank pubmed' do

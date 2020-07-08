@@ -26,6 +26,10 @@
         <%= list_assay_organisms("Organisms", resource.assay_organisms,{:class=>"list_item_attribute"}) %>
     <% end %>
 
+    <% if Seek::Config.human_diseases_enabled %>
+        <%= list_assay_human_diseases("Human Diseases", resource.assay_human_diseases,{:class=>"list_item_attribute"}) %>
+    <% end %>
+
     <%= list_item_authorized_list(resource.models, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
     <%= list_item_authorized_list resource.sops, t('sop').pluralize, true, 50, true %>
     <%= list_item_authorized_list resource.data_files, t('data_file').pluralize, true, 50, true %>

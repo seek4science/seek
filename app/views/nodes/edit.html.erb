@@ -17,6 +17,8 @@
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @node } %>
 
+      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @node} -%>
+
       <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @node} -%>

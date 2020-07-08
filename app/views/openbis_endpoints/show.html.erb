@@ -26,7 +26,7 @@
                              id: 'openbis_endpoint', class: 'form-control', :onchange => 'javascript:changeEndpoint(this);' %></div>
         <% end %>
 
-        <div class="form-group"><label>Project:</label> <%= @project.title %></div>
+        <div class="form-group"><label><%= t('project') -%>:</label> <%= @project.title %></div>
         <div class="form-group"><label>Registered Studies:</label> <%= @openbis_endpoint.registered_studies.count %>
         </div>
         <div class="form-group"><label>Registered Assays:</label> <%= @openbis_endpoint.registered_assays.count %></div>

@@ -5,8 +5,6 @@ import sys
 
 # import isatools
 
-subprocess.call([sys.executable, "-m", "pip", "install", "isatools"])
-
 import isatools
 from isatools.model import *
 import io

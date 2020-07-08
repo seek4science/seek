@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 5.2.3'
+gem 'rails', '~> 5.2.4'
 gem 'rdoc'
 
 #database adaptors
@@ -12,7 +12,7 @@ gem 'sqlite3'
 gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
 gem 'hpricot', '~>0.8.2'
-gem 'libxml-ruby', '2.8.0', require: 'libxml'
+gem 'libxml-ruby', '~>2.9.0', require: 'libxml'
 gem 'uuid', '~>2.3'
 gem 'RedCloth', '>=4.3.0'
 gem 'simple-spreadsheet-extractor', '~>0.16.0'
@@ -127,9 +127,9 @@ gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'activerecord-import'
 
-gem 'puma' # Used for docker, and also teaspoon tests
+gem "puma", ">= 3.12.6"
 
-gem 'doorkeeper'
+gem "doorkeeper", ">= 5.2.5"
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
@@ -139,6 +139,8 @@ gem 'ro-crate-ruby', git: 'https://github.com/fbacall/ro-crate-ruby.git'
 gem 'git'
 
 gem 'redcarpet'
+
+gem 'i18n-js'
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-bootstrap-multiselect', '~> 0.9.13'

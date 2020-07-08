@@ -116,7 +116,7 @@ module Seek
         end
 
         def lookup_class
-          const_get("#{name}::AuthLookup")
+          Object.const_get("#{name}::AuthLookup")
         end
 
         # removes all entries from the authorization lookup type for this authorized type

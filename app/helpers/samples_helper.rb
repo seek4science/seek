@@ -9,9 +9,13 @@ module SamplesHelper
     when Seek::Samples::BaseType::TEXT
       text_area :sample, attribute_method_name, class: "form-control #{clz}"
     when Seek::Samples::BaseType::DATE_TIME
-      text_field :sample, attribute_method_name, data: { calendar: 'mixed' }, class: "calendar form-control #{clz}", placeholder: placeholder
+      content_tag :div, style:'position:relative' do
+        text_field :sample, attribute_method_name, data: { calendar: 'mixed' }, class: "calendar form-control #{clz}", placeholder: placeholder
+      end
     when Seek::Samples::BaseType::DATE
-      text_field :sample, attribute_method_name, data: { calendar: true }, class: "calendar form-control #{clz}", placeholder: placeholder
+      content_tag :div, style:'position:relative' do
+        text_field :sample, attribute_method_name, data: { calendar: true }, class: "calendar form-control #{clz}", placeholder: placeholder
+      end
     when Seek::Samples::BaseType::BOOLEAN
       check_box :sample, attribute_method_name, class: "#{clz}"
     when Seek::Samples::BaseType::SEEK_STRAIN
