@@ -146,7 +146,7 @@ module JsonRestTestCases
   # check if this current controller type doesn't support read
   def check_for_501_read_return
     clz = @controller.controller_model.to_s
-    %w[Sample Strain].include?(clz)
+    %w[Sample SampleType Strain].include?(clz)
   end
 
   # check if this current controller type doesn't support index
