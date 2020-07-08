@@ -55,4 +55,8 @@ class Event < ApplicationRecord
   def self.user_creatable?
     Seek::Config.events_enabled
   end
+
+  def self.can_create?
+    Seek::Config.events_enabled && User.logged_in_and_member?
+  end
 end
