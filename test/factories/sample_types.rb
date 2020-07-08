@@ -79,23 +79,3 @@ Factory.define(:linked_optional_sample_type, parent: :sample_type) do |f|
     type.sample_attributes << Factory.build(:sample_sample_attribute, title: 'patient', linked_sample_type: Factory(:patient_sample_type,project_ids:type.projects.collect(&:id)), required: false, sample_type: type)
   end
 end
-
-
-Factory.define(:min_sampletype, parent: :sample_type) do |f|
-  f.title 'A Minimal SampleType'
-  f.after_build do |type|
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'full name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: type)
-  end
-end
-
-Factory.define(:max_sampletype, parent: :sample_type) do |f|
-  f.title 'A Maximal SampleType'
-  f.description 'A very new research'
-  f.tags ["tag1","tag2"]
-  f.after_build do |type|
-    # Not sure why i have to explicitly add the sample_type association
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'full name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: type)
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'address', sample_attribute_type: Factory(:address_sample_attribute_type), required: false, sample_type: type)
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'postcode', sample_attribute_type: Factory(:postcode_sample_attribute_type), required: false, sample_type: type)
-  end
-end

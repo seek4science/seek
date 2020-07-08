@@ -610,11 +610,4 @@ class SampleTypesControllerTest < ActionController::TestCase
   def missing_columns_template_for_upload
     fixture_file_upload('files/samples-data-missing-columns.xls', 'application/excel')
   end
-
-  def edit_max_object(object)
-      s1 = Factory(:max_sample, policy: Factory(:public_policy))
-      s2 = Factory(:max_sample, policy: Factory(:public_policy))
-      object.samples << s1
-      object.samples << s2
-  end
 end

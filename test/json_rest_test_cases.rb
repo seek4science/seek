@@ -144,7 +144,7 @@ module JsonRestTestCases
   # check if this current controller type doesn't support read
   def check_for_501_read_return
     clz = @controller.controller_model.to_s
-    %w[Sample Strain].include?(clz)
+    %w[Sample SampleType Strain].include?(clz)
   end
 
   # check if this current controller type doesn't support index
@@ -158,8 +158,7 @@ module JsonRestTestCases
     type = @controller.controller_name.classify
     opts = type.constantize.method_defined?(:policy) ? { policy: Factory(:publicly_viewable_policy) } : {}
     opts[:publication_type] = Factory(:journal) if type.constantize.method_defined?(:publication_type)
-    opts[:projects] = [@project] if type == "SampleType"
-    Factory("#{m}_#{type.downcase}".to_sym, opts)
+    Factory("#{m}_#{type.underscore}".to_sym, opts)
   end
 
   def response_code_for_not_available(format)
