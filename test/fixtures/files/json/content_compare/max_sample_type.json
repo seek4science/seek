@@ -89,6 +89,14 @@
             "type": "samples"
           }
         ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "1",
+            "type": "people"
+          }
+        ]
       }
     },
     "links": {

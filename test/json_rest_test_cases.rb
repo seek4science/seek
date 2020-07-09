@@ -89,6 +89,7 @@ module JsonRestTestCases
       # parse such that backspace is eliminated and null turns to nil
       json_to_compare = JSON.parse(File.read(json_file))
 
+      edit_min_object(object) if m == 'min'
       edit_max_object(object) if m == 'max'
 
       get :show, params: rest_show_url_options(object).merge(id: object, format: 'json')

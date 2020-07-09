@@ -88,7 +88,7 @@ Factory.define(:min_sample_type, parent: :sample_type) do |f|
   end
 end
 
-Factory.define(:max_sampletype, parent: :sample_type) do |f|
+Factory.define(:max_sample_type, parent: :sample_type) do |f|
   f.title 'A Maximal SampleType'
   f.description 'A very new research'
   f.tags ["tag1","tag2"]

@@ -38,7 +38,20 @@
         ]
       },
       "samples": {
-        "data": []
+        "data": [
+          {
+            "id": "7",
+            "type": "samples"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "1",
+            "type": "people"
+          }
+        ]
       }
     },
     "links": {
