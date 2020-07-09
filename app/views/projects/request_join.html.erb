@@ -1,0 +1,28 @@
+<p>
+  You have requested to join the following <%= t('project').pluralize(@projects.count) %>:
+  <ul>
+      <% @projects.each do |project| %>
+        <li>
+          <%= link_to project.title,project %>
+        </li>
+      <% end %>
+  </ul>
+</p>
+
+<p>
+  <% if @institution.new_record? %>
+
+  <% else %>
+      You have indicated that you are associated with <%= link_to(@institution.title,@institution) %> <%= t('institution') %>
+  <% end %>
+</p>
+
+<p>
+  and provided the following comments:
+  <div class="well"><%= @comments %></div>
+</p>
+
+<p>
+  An email has sent to the <%= t('project_administrator').pluralize %> and you will receive a notification when added
+  to the <%= t('project') %>, or an email about why your request was declined.
+</p>
