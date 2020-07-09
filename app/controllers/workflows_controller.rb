@@ -83,7 +83,7 @@ class WorkflowsController < ApplicationController
         session[:revision_comments] = params[:revision_comments]
         format.html
       else
-        format.html { render action: :new }
+        format.html { render action: :new, status: :unprocessable_entity }
       end
     end
   end
@@ -104,7 +104,7 @@ class WorkflowsController < ApplicationController
         session[:revision_comments] = params[:revision_comments]
         format.html { render action: :create_content_blob }
       else
-        format.html { render action: :new }
+        format.html { render action: :new, status: :unprocessable_entity }
       end
     end
   end
@@ -117,7 +117,9 @@ class WorkflowsController < ApplicationController
     begin
       if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
         content_blob = ContentBlob.find_by_id(params[:content_blob_id])
-        extractor = WorkflowClass.extractor_for(params[:workflow_class_id], content_blob)
+        # This Workflow instance is just to get the extractor. It is not persisted beyond this action.
+        workflow = Workflow.new(workflow_class_id: params[:workflow_class_id], content_blob: content_blob)
+        extractor = workflow.extractor
         retrieve_content content_blob # Hack
         session[:metadata] = session[:metadata].merge(extractor.metadata)
       else
