@@ -36,6 +36,28 @@ class ProjectsController < ApplicationController
 
   end
 
+  def request_join
+    @projects = params[:projects].collect{|id| Project.find(id)}
+    raise 'no projects defined' if @projects.empty?
+    raise 'email is disabled' unless Seek::Config.email_enabled
+    @institution = Institution.find_by_id(params[:institution][:id])
+    if @institution.nil?
+      inst_params = params.require(:institution).permit([:id, :title, :web_page, :country])
+      @institution ||= Institution.new(inst_params)
+    end
+
+    @comments = params[:comments]
+    @projects.each do |project|
+      Mailer.request_join_project(current_user, project, @institution, @comments).deliver_later
+      MessageLog.log_project_membership_request(current_user.person, project, @comments)
+    end
+
+    flash[:notice]="Thank you, your request to join has been sent"
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def asset_report
     @no_sidebar = true
     project_assets = @project.assets | @project.assays | @project.studies | @project.investigations

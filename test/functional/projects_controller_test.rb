@@ -1712,6 +1712,50 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 404, res['status']
   end
 
+  test 'request_join_project with known project and institution' do
+    person = Factory(:person_not_in_project)
+    project = Factory(:project)
+    institution = Factory(:institution)
+    login_as(person)
+    params = {
+        projects: [project.id.to_s],
+        institution:{
+            id:institution.id
+        },
+        comments: 'some comments'
+    }
+    assert_enqueued_emails(1) do
+      assert_difference('MessageLog.count') do
+        post :request_join, params: params
+      end
+    end
+
+    assert_response :success
+    assert flash[:notice]
+
+  end
+
+  test 'request_join_project with known project and new institution' do
+    person = Factory(:person_not_in_project)
+    project = Factory(:project)
+    login_as(person)
+    params = {
+        requested_projects: [project.id.to_s],
+        institution:{
+            id:0,
+            title:'fish',
+            country:'GB',
+            web_page:'http://google.com'
+        },
+        comments: 'some comments'
+    }
+
+
+    post :request_join, params: params
+    assert_response :success
+
+  end
+
   private
 
   def edit_max_object(project)

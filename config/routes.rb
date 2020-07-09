@@ -271,6 +271,7 @@ SEEK::Application.routes.draw do
       post :items_for_result
       get :guided_join
       get :guided_create
+      post :request_join
     end
     member do
       get :asset_report

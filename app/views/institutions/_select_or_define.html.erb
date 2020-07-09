@@ -1,13 +1,13 @@
 <div class="form-group">
   <label class="control-label">Type the name of the <%= t('institution') %> </label>
-  <%= objects_input('institution_id', [], typeahead:  {query_url: typeahead_institutions_path + '?query=%QUERY'}, limit:1) -%>
+  <%= objects_input('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path + '?query=%QUERY'}, limit:1) -%>
 </div>
 
-<%= hidden_field_tag :institution_name %>
+<%= hidden_field_tag 'institution[title]' %>
 
 <div class="form-group" id='additional-institution-details' style='display:none;'>
   <label class="control-label">Website</label>
-  <%= text_field_tag(:institution_website,'',class:'form-control') %>
+  <%= text_field_tag('institution[web_page]','',class:'form-control') %>
 
   <label class="control-label">Country</label>
   <%= country_select('institution','country',
@@ -25,12 +25,12 @@
             else {
                 $j('#additional-institution-details').hide();
             }
-            $j('#institution_name').val(event.item.name);
+            $j('#institution_title').val(event.item.name);
         });
 
         $j('input').on('itemRemoved', function(event) {
             $j('#additional-institution-details').hide();
-            $j('#institution_name').val('');
+            $j('#institution_title').val('');
         });
 
     });
