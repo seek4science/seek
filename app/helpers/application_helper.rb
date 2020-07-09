@@ -221,7 +221,7 @@ module ApplicationHelper
       res = simple_format(res, {}, sanitize: false).html_safe if options[:description] == true || options[:address] == true
 
       res = mail_to(res) if options[:email]
-      res = link_to(res, res, popup: true) if options[:external_link]
+      res = link_to(res, res, popup: true, target: :_blank) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
       res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(CountryCodes.code(text))) if options[:link_as_country]
     end

@@ -10,17 +10,24 @@
 </p>
 
 <p>
-  <% if @institution.new_record? %>
-
+  <% if @institution.new_record? || @institution.id==0 %>
+      You have described a new <%= t('institution') %> with the following details:
+      <ul>
+        <li><strong>Title:</strong><%= text_or_not_specified(@institution.title) %></li>
+        <li><strong>Web page:</strong><%= text_or_not_specified(@institution.web_page, :external_link=>true) -%></li>
+        <li><strong>Country:</strong><%= country_text_or_not_specified @institution.country -%></li>
+      </ul>
   <% else %>
-      You have indicated that you are associated with <%= link_to(@institution.title,@institution) %> <%= t('institution') %>
+      You have indicated that you are associated with <%= link_to(@institution.title,@institution) %>
   <% end %>
 </p>
 
-<p>
-  and provided the following comments:
-  <div class="well"><%= @comments %></div>
-</p>
+<% unless @comments.blank? %>
+  <p>
+    and provided the following comments:
+    <div class="well"><%= @comments %></div>
+  </p>
+<% end %>
 
 <p>
   An email has sent to the <%= t('project_administrator').pluralize %> and you will receive a notification when added
