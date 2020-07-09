@@ -1,3 +1,11 @@
+<style>
+  .label {
+    font-size:100%;
+    background-color: royalblue;
+  }
+</style>
+
+
 <div class="form-group">
   <label class="control-label">Type the name of the <%= t('institution') %> </label>
   <%= objects_input('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path + '?query=%QUERY'}, limit:1) -%>
