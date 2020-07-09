@@ -7,12 +7,4 @@ class WorkflowClass < ApplicationRecord
       Seek::WorkflowExtractors::Base
     end
   end
-
-  def self.extractor_class_for(id)
-    (find_by_id(id)&.extractor_class || Seek::WorkflowExtractors::Base)
-  end
-
-  def self.extractor_for(id, content_blob)
-    extractor_class_for(id).new(content_blob)
-  end
 end
