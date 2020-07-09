@@ -605,7 +605,6 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal AssetLink::DISCUSSION, workflow.discussion_links.first.link_type
   end
 
-
   test 'should show discussion link' do
     asset_link = Factory(:discussion_link)
     workflow = Factory(:workflow, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
@@ -613,7 +612,6 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
   end
-
 
   test 'should update workflow with new discussion link' do
     person = Factory(:person)
@@ -681,6 +679,28 @@ class WorkflowsControllerTest < ActionController::TestCase
     crate_workflow = wf.ro_crate.main_workflow
     assert crate_workflow
     assert_equal 'workflow.txt', crate_workflow.id
+  end
+
+  test 'create new version of a workflow' do
+    person = Factory(:person)
+    login_as(person)
+    workflow = Factory(:workflow, contributor: person)
+    blob = Factory(:nf_core_ro_crate)
+    session[:uploaded_content_blob_id] = blob.id
+    workflow_params =  { title: 'workflow', project_ids: [person.projects.first.id] }
+    assert_equal 1, workflow.version
+    old_blob = workflow.content_blob
+
+    assert_no_difference('ContentBlob.count') do
+      assert_difference('Workflow::Version.count') do
+        post :create_version_metadata, params: { id: workflow.id, workflow: workflow_params, content_blob_id: blob.id.to_s }
+      end
+    end
+
+    workflow = assigns(:workflow)
+    assert_equal 2, workflow.version
+    assert_equal old_blob, workflow.versions.first.content_blob
+    assert_equal blob, workflow.versions.last.content_blob
   end
 
   def edit_max_object(workflow)
