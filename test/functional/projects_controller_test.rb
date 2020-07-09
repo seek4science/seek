@@ -1740,7 +1740,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Factory(:project)
     login_as(person)
     params = {
-        requested_projects: [project.id.to_s],
+        projects: [project.id.to_s],
         institution:{
             id:0,
             title:'fish',

@@ -383,6 +383,28 @@ class MailerTest < ActionMailer::TestCase
     end
   end
 
+  test 'request join project with new institution' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://hub.com') do
+        institution = Institution.new({id:0, title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
+        institution = Institution.new(id:0, title:'', web_page:'', country:'')
+        email = Mailer.request_join_project(Factory(:person).user, Factory(:project), institution,'some comments')
+        refute_nil email
+        refute_nil email.body
+      end
+    end
+  end
+
+  test 'request join project existing institution' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        email = Mailer.request_join_project(Factory(:person).user, Factory(:project), Factory(:institution),'some comments')
+        refute_nil email
+        refute_nil email.body
+      end
+    end
+  end
+
   private
 
   def encode_mail(message)

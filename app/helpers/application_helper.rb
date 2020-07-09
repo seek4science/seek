@@ -228,7 +228,7 @@ module ApplicationHelper
       end
       res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link]
       res = mail_to(res) if options[:email]
-      res = link_to(res, res, popup: true) if options[:external_link]
+      res = link_to(res, res, popup: true, target: :_blank) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
       res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(CountryCodes.code(text))) if options[:link_as_country]
     end
