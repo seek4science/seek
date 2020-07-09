@@ -14,6 +14,7 @@ class SampleTypeSerializer < BaseSerializer
 
   has_many :projects
   has_many :samples
+  has_many :submitter
 
   def get_sample_attribute(attribute)
     {
