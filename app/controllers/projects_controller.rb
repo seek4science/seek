@@ -58,6 +58,30 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def request_create
+    proj_params = params.require(:project).permit([:title])
+    @project = Project.new(proj_params)
+
+    @project.id = 0 #required for serialization for the email
+    @institution = Institution.find_by_id(params[:institution][:id])
+    if @institution.nil?
+      inst_params = params.require(:institution).permit([:id, :title, :web_page, :country])
+      @institution ||= Institution.new(inst_params)
+    end
+
+    @comments = params[:comments]
+    if params[:managed_programme]
+      @programme = Programme.managed_programme
+      Mailer.request_create_project_for_programme(current_user, @programme,@project, @institution, @comments).deliver_later
+      MessageLog.log_project_creation_request(current_person, @programme, @project,@comments)
+    end
+    flash[:notice]="Thank you, your request for a new #{t('project')} has been sent"
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def asset_report
     @no_sidebar = true
     project_assets = @project.assets | @project.assays | @project.studies | @project.investigations

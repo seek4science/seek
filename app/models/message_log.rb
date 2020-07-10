@@ -3,6 +3,7 @@ class MessageLog < ApplicationRecord
   # the different types of messages
   PROJECT_MEMBERSHIP_REQUEST = 1
   CONTACT_REQUEST = 2
+  PROGRAMME_CREATION_REQUEST = 3
 
   # the period concidered recent, which can be used to prevent a repeat message until that period has passed
   RECENT_PERIOD = 12.hours.freeze
@@ -21,6 +22,10 @@ class MessageLog < ApplicationRecord
   # message logs created since the recent period, for that person and project
   def self.recent_project_membership_requests(person, project)
     MessageLog.where("resource_type = 'Project' AND resource_id = ?", project.id).where(sender: person).project_membership_requests.recent
+  end
+
+  def self.log_project_creation_request(sender,programme,project,details)
+    MessageLog.create(resource: programme, sender: sender, details: details, message_type: PROGRAMME_CREATION_REQUEST)
   end
 
   # records a project membership request for a sender and project, along with any details provided

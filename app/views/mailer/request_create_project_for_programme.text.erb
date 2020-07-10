@@ -1,7 +1,12 @@
 
-Hi <%= @owners.collect{|o| o.name}.join(", ") -%>,
+Hi <%= @admins.collect{|o| o.name}.join(", ") -%>,
 
-The <%= Seek::Config.application_name %> user <%= link_to @requester.name, @requester %>, has requested membership of "<%= link_to(@project.title, @project) -%>.
+The <%= Seek::Config.application_name %> user <%= link_to @requester.name, @requester %>, has requested a <%= t('project')  %> is created within your <%= t('programme') %> -%>.
+
+The <%= t('programme') %> is <%= link_to @programme.title,@programme %>
+
+They provided the following details about the <%= t('project') %>
+  <%= t('project') %> title: '<%= @project.title %>'
 
 <% if @institution.new_record? || @institution.id==0 %>
   <%
@@ -19,9 +24,9 @@ They indicated that they are associated with the existing <%= t('institution') %
 <% end %>
 
 <% unless @comments.blank? -%>
-<%=@requester.first_name.capitalize -%> also provided some additional details about why they wish to join:
+<%=@requester.first_name.capitalize -%> also provided some additional details about the request:
 
-    "<%= sanitize(@comments) -%>"
+  "<%= sanitize(@comments) -%>"
 
 <% end -%>
 You can reply to <%= @requester.first_name.capitalize -%> by replying to this email.
