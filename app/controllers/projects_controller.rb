@@ -14,7 +14,7 @@ class ProjectsController < ApplicationController
   before_action :editable_by_user, only: %i[edit update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report]
   before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
-  before_action :login_required, only: [:request_membership]
+  before_action :login_required, only: [:request_membership, :guided_join, :guided_create, :request_join, :request_create]
   before_action :allow_request_membership, only: [:request_membership]
 
   skip_before_action :project_membership_required
@@ -73,7 +73,7 @@ class ProjectsController < ApplicationController
     if params[:managed_programme]
       @programme = Programme.managed_programme
       Mailer.request_create_project_for_programme(current_user, @programme,@project, @institution, @comments).deliver_later
-      MessageLog.log_project_creation_request(current_person, @programme, @project,@institution,@comments)
+      MessageLog.log_project_creation_request(current_person, nil, @project,@institution,@comments)
       flash[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     else
       prog_params = params.require(:programme).permit([:title])
