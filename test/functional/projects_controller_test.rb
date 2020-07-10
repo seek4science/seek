@@ -1784,7 +1784,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, programme.id) do
       params = {
           managed_programme: '1',
-          project: { title: 'The Project'},
+          project: { title: 'The Project',description:'description',web_page:'web_page'},
           institution: {id: institution.id}
       }
       assert_enqueued_emails(1) do
@@ -1804,7 +1804,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     with_config_value(:managed_programme_id, programme.id) do
       params = {
-          project: { title: 'The Project'},
+          project: { title: 'The Project',description:'description',web_page:'web_page'},
           institution: {id: '0', title:'the inst',web_page:'the page',country:'GB'},
           programme: {title:'the prog'}
       }

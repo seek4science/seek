@@ -7,7 +7,15 @@ They provided the following details about the <%= t('programme') %>
   <%= t('programme') %> title: '<%= @programme.title %>'
 
 They provided the following details about the <%= t('project') %>
-  <%= t('project') %> title: '<%= @project.title %>'
+<%
+  title = @project.title.blank? ? 'No title provided' : @project.title
+  web_page = @project.web_page.blank? ? 'No web page provided' : @project.web_page
+  description = @project.description.blank? ? 'No description provided' : @project.description
+
+%>
+  <%= t('project') %> title: '<%= title %>'
+  <%= t('project') %> description: '<%= description %>'
+  <%= t('project') %> web_page: '<%= web_page %>'
 
 <% if @institution.new_record? || @institution.id==0 %>
   <%
