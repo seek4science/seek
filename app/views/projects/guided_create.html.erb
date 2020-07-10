@@ -1,45 +1,47 @@
-<div class="row">
-  <div class="col-md-8 d-flex justify-content-cente">
+<%= form_tag request_create_projects_path do %>
+  <div class="row">
+    <div class="col-md-8 d-flex justify-content-cente">
 
-    <div class="panel panel-default">
-      <div class="panel-heading"><%= t('programme') %></div>
-      <div class="panel-body">
+      <div class="panel panel-default">
+        <div class="panel-heading"><%= t('programme') %></div>
+        <div class="panel-body">
 
-        <label>
-          <%= check_box_tag :managed_programme, '1', true %>
-          <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}?" %>
-        </label>
-
-        <div id='programme-details' style="display:none;">
-          <%= label_tag :programme_title, "Title" %>
-          <%= text_field_tag 'programme[title]', '', class: 'form-control' %>
+          <label>
+            <%= check_box_tag :managed_programme, '1', true %>
+            <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}?" %>
+          </label>
+          <div id='programme-details' style="display:none;">
+            <%= label_tag :programme_title, "Title" %>
+            <%= text_field_tag 'programme[title]', '', class: 'form-control' %>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="panel panel-default">
-      <div class="panel-heading"><%= t('project') %></div>
-      <div class="panel-body">
+      <div class="panel panel-default">
+        <div class="panel-heading"><%= t('project') %></div>
+        <div class="panel-body">
 
-        <%= label_tag :project_title, "Title" %>
-        <%= text_field_tag 'project[title]', '', class: 'form-control' %>
+          <%= label_tag :project_title, "Title" %>
+          <%= text_field_tag 'project[title]', '', class: 'form-control' %>
 
-      </div>
-    </div>
-
-    <div class="panel panel-default">
-      <div class="panel-heading"><%= t('institution') %></div>
-      <div class="panel-body">
-
-        <div class="form-group">
-          <%= render partial: 'institutions/select_or_define' %>
         </div>
-
       </div>
-    </div>
 
+      <div class="panel panel-default">
+        <div class="panel-heading"><%= t('institution') %></div>
+        <div class="panel-body">
+
+          <div class="form-group">
+            <%= render partial: 'institutions/select_or_define' %>
+          </div>
+
+        </div>
+      </div>
+
+      <%= submit_tag('Submit', class: 'btn btn-primary') %>
+    </div>
   </div>
-</div>
+<% end %>
 
 
 <script type=application/javascript>

@@ -204,6 +204,19 @@ class Mailer < ActionMailer::Base
          subject: "#{@requester.email_with_name} requested membership of project: #{@resource.title}")
   end
 
+  def request_create_project_for_programme(user, programme, project, institution, comments)
+    @admins = programme.programme_administrators
+    @programme = programme
+    @requester = user.person
+    @institution = institution
+    @project = project
+    @comments = comments
+    mail(from: Seek::Config.noreply_sender,
+         to: @admins.collect(&:email_with_name),
+         reply_to: user.person.email_with_name,
+         subject: "#{@requester.email_with_name} request for new #{t('project')} for your #{t('programme')}: #{@project.title}")
+  end
+
   private
 
   def admin_emails

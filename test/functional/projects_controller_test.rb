@@ -1712,6 +1712,21 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 404, res['status']
   end
 
+  test 'guided_join' do
+    person = Factory(:person_not_in_project)
+    login_as(person)
+    get :guided_join
+    assert_response :success
+  end
+
+  test 'guided_create' do
+    person = Factory(:person_not_in_project)
+    login_as(person)
+    get :guided_create
+    assert_response :success
+  end
+
+
   test 'request_join_project with known project and institution' do
     person = Factory(:person_not_in_project)
     project = Factory(:project)
@@ -1750,10 +1765,37 @@ class ProjectsControllerTest < ActionController::TestCase
         comments: 'some comments'
     }
 
+    assert_enqueued_emails(1) do
+      assert_difference('MessageLog.count') do
+        post :request_join, params: params
+      end
+    end
 
-    post :request_join, params: params
     assert_response :success
+    assert flash[:notice]
 
+  end
+
+  test 'request create project with managed programme' do
+    person = Factory(:person_not_in_project)
+    programme = Factory(:programme)
+    institution = Factory(:institution)
+    login_as(person)
+    with_config_value(:managed_programme_id, programme.id) do
+      params = {
+          managed_programme: '1',
+          project: { title: 'The Project'},
+          institution: {id: institution.id}
+      }
+      assert_enqueued_emails(1) do
+        assert_difference('MessageLog.count') do
+          post :request_create, params: params
+        end
+      end
+
+      assert_response :success
+      assert flash[:notice]
+    end
   end
 
   private

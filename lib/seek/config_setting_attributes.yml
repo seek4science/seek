@@ -189,6 +189,7 @@ isa_enabled:
 models_enabled:
 organisms_enabled:
 programmes_enabled:
+managed_programme_id:
 publications_enabled:
 samples_enabled:
 workflows_enabled:
