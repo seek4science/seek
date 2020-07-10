@@ -1798,6 +1798,27 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'request create project with new programme and institution' do
+    person = Factory(:person_not_in_project)
+    programme = Factory(:programme)
+    login_as(person)
+    with_config_value(:managed_programme_id, programme.id) do
+      params = {
+          project: { title: 'The Project'},
+          institution: {id: '0', title:'the inst',web_page:'the page',country:'GB'},
+          programme: {title:'the prog'}
+      }
+      assert_enqueued_emails(1) do
+        assert_difference('MessageLog.count') do
+          post :request_create, params: params
+        end
+      end
+
+      assert_response :success
+      assert flash[:notice]
+    end
+  end
+
   private
 
   def edit_max_object(project)
