@@ -1,3 +1,4 @@
+<% is_modal ||= false %>
 <div class='panel panel-default'>
   <div class='panel-heading'>
     Associated <%=t('assay').pluralize %>
@@ -64,7 +65,11 @@
         </div>
       </div>
     </div>
-    <%= cancel_button(data_files_path) -%>
+    <%if(is_modal)%>
+      <a class=" btn btn-default" onClick="location.reload();">Cancel</a>
+    <%else%>
+      <%= cancel_button(data_files_path) -%>
+    <%end%>
     <div class='multi-step-buttons'>
       <%= multi_step_start_button %>
       <%= multi_step_back_button %>

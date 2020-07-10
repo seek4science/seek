@@ -24,6 +24,9 @@ class Study < ApplicationRecord
 
   belongs_to :person_responsible, :class_name => "Person"
 
+  has_one :flowchart, :dependent => :destroy
+
+
   validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true
 
   enforce_authorization_on_association :investigation, :view

@@ -1,0 +1,16 @@
+<script type="text/javascript">
+  var CREATE_INVESTIGATION_PATH='<%= create_investigation_path %>';
+</script>
+<% investigations = Investigation.all.select &:can_view? -%>
+<% if investigations.blank? %>
+    <%= button_link_to("New #{t('investigation')}", 'arrow_right', new_investigation_path) -%>
+<% else %>
+<h1>New <%= t('study') %></h1>
+
+<div class="show_basic">
+
+	<%= form_for @study do |f| %>
+	  <%= render :partial => "studies/form", :locals => { :f => f, :action=>:new, :object => @study, :showDetails => 0 } -%>
+	<% end -%>
+</div>
+<% end -%>

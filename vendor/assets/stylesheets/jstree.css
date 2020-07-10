@@ -62,6 +62,9 @@
 .jstree-anchor > .jstree-themeicon {
   margin-right: 2px;
 }
+.new-design .jstree-anchor > .jstree-themeicon {
+  background-size: 24px !important;
+}
 .jstree-no-icons .jstree-themeicon,
 .jstree-anchor > .jstree-themeicon-hidden {
   display: none;

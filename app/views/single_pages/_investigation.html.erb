@@ -1,0 +1,50 @@
+   <div class="simpleForm">
+       <ul class="nav nav-tabs">
+           <li class="active "><a data-toggle="tab" href="#investigation-details"><i class="glyphicon glyphicon-th-list"></i>
+                   Details</a></li>
+           <li style="float:right">
+               <div>
+                    <a href="" data-tooltip="delete current investigation" class="btn btn-danger btn-sm" onclick="deleteItem(this)">
+                        <span style='color:white' class='glyphicon glyphicon-trash'></span>
+                    </a>
+                </div>
+           </li>
+       </ul>
+       <div class="tab-content">
+           <div id="investigation-details" class="tab-pane fade in active" style="padding:10px">
+               <p id="inv-title"><strong style="text-align: center;">Title:</strong> <span></span></p>
+               <p id="inv-description"> <strong>Description:</strong> <span></span> </p>
+               <form id="investigation-sharing-form">
+                   <input name="utf8" type="hidden" value="✓">
+                   <input type="hidden" name="_method" value="patch">
+                   <input type="hidden" name="investigation[creator_ids][]">
+                   <div id="inv-creators"></div>
+                   <div id="investigation_sharing"></div>
+                   <input type="button" value="update" id="inv_update_btn" class="btn btn-primary">
+               </form>
+           </div>
+       </div>
+
+   </div>
+
+   <script>
+       $j("#inv_update_btn").on("click", () => {
+           $j("#inv_update_btn").attr("disabled", "disabled")
+           var form = $j("#investigation-sharing-form");
+           var url = `/investigations/${selectedItem.id}/manage_update`
+           $j.ajax({
+               type: "POST",
+               url,
+               data: form.serialize(),
+               success: () => {
+                   alert("Sharing permissions updated!")
+               },
+               error: e => {
+                   alert("Can not perform the operation.")
+               },
+               complete: () => {
+                   $j("#inv_update_btn").removeAttr("disabled")
+               }
+           });
+       })
+   </script>
