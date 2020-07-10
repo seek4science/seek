@@ -59,7 +59,7 @@ class ProjectsController < ApplicationController
   end
 
   def request_create
-    proj_params = params.require(:project).permit([:title])
+    proj_params = params.require(:project).permit([:title, :web_page, :description])
     @project = Project.new(proj_params)
 
     @project.id = 0 #required for serialization for the email
@@ -72,6 +72,7 @@ class ProjectsController < ApplicationController
     @comments = params[:comments]
     if params[:managed_programme]
       @programme = Programme.managed_programme
+      raise "no #{t('programme')} can be found" if @programme.nil?
       Mailer.request_create_project_for_programme(current_user, @programme,@project, @institution, @comments).deliver_later
       MessageLog.log_project_creation_request(current_person, nil, @project,@institution,@comments)
       flash[:notice]="Thank you, your request for a new #{t('project')} has been sent"
@@ -80,7 +81,7 @@ class ProjectsController < ApplicationController
       @programme = Programme.new(prog_params)
       @programme.id=0 # required for serialization for the email
       Mailer.request_create_project_and_programme(current_user, @programme,@project, @institution, @comments).deliver_later
-      MessageLog.log_project_creation_request(current_person, @programme, @project,@institution,@comments)
+      MessageLog.log_project_creation_request(current_person, nil, @project,@institution,@comments)
       flash[:notice]="Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
     end
 
