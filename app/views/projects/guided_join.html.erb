@@ -6,10 +6,14 @@
           <%= t('project') %>
         </div>
         <div class="panel-body">
-          <div class="form-group">
-            <%= label_tag :search_label, "#{t('project')} search" -%>
-            <%= text_field_tag 'project-search-terms', '', :class=>"form-control"-%>
-            <%= submit_tag 'Search', id: 'project-search-submit',:class => 'btn btn-primary' %>
+          <%= label_tag :search_label, "#{t('project')} search" -%>
+          <div class="row">
+            <div class="col-md-10">
+              <%= text_field_tag 'project-search-terms', '', :class=>"form-control"-%>
+            </div>
+            <div class="col">
+              <%= submit_tag 'Search', id: 'project-search-submit',:class => 'btn btn-primary' %>
+            </div>
           </div>
           <%= form_tag request_join_projects_path do %>
             <div class="form-group">
