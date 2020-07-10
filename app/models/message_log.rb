@@ -24,7 +24,7 @@ class MessageLog < ApplicationRecord
     MessageLog.where("resource_type = 'Project' AND resource_id = ?", project.id).where(sender: person).project_membership_requests.recent
   end
 
-  def self.log_project_creation_request(sender,programme,project,details)
+  def self.log_project_creation_request(sender,programme,project,institution,details)
     MessageLog.create(resource: programme, sender: sender, details: details, message_type: PROGRAMME_CREATION_REQUEST)
   end
 

@@ -410,15 +410,28 @@ class MailerTest < ActionMailer::TestCase
         programme_admin = Factory(:programme_administrator)
         programme = programme_admin.programmes.first
         refute_empty programme.programme_administrators
-        institution = Institution.new({id:0, title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
         project = Project.new(id:0, title:'My lovely project')
         email = Mailer.request_create_project_for_programme(Factory(:person).user, programme, project, Factory(:institution),'some comments')
+        refute_nil email
+        refute_nil email.body
+      end
+    end
+  end
+
+  test 'request create project and programme' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        institution = Institution.new({id:0, title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
+        project = Project.new(id:0, title:'My lovely project')
+        programme = Programme.new(id:0,title:'My lovely programme')
+        email = Mailer.request_create_project_and_programme(Factory(:person).user, programme, project, institution,'some comments')
         refute_nil email
         refute_nil email.body
         pp email.body
       end
     end
   end
+
 
   private
 

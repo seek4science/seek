@@ -217,13 +217,23 @@ class Mailer < ActionMailer::Base
          subject: "#{@requester.email_with_name} request for new #{t('project')} for your #{t('programme')}: #{@project.title}")
   end
 
+  def request_create_project_and_programme(user, programme, project, institution, comments)
+    @admins = admins
+    @programme = programme
+    @requester = user.person
+    @institution = institution
+    @project = project
+    @comments = comments
+    mail(from: Seek::Config.noreply_sender,
+         to: admin_emails,
+         reply_to: user.person.email_with_name,
+         subject: "#{@requester.email_with_name} request for new #{t('project')} and new #{t('programme')}: #{@project.title}")
+  end
+
   private
 
   def admin_emails
     admins.map(&:email_with_name)
-  rescue
-    Rails.logger.error('Error determining admin email addresses')
-    ['sowen@cs.man.ac.uk']
   end
 
   def project_administrator_email(project_administrator)
