@@ -13,7 +13,8 @@ services:
 
   seek: # The SEEK application
     #build: .
-    image: fairdom/seek:issue-388
+
+    image: fairdom/seek:workflow
 
     container_name: seek
     command: docker/entrypoint.sh
@@ -38,7 +39,8 @@ services:
 
   seek_workers: # The SEEK delayed job workers
       #build: .
-      image: fairdom/seek:issue-388
+
+      image: fairdom/seek:workflow
       container_name: seek-workers
       command: docker/start_workers.sh
       restart: always
