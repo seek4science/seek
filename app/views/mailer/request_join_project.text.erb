@@ -3,7 +3,7 @@ Hi <%= @owners.collect{|o| o.name}.join(", ") -%>,
 
 The <%= Seek::Config.application_name %> user <%= link_to @requester.name, @requester %>, has requested membership of "<%= link_to(@project.title, @project) -%>.
 
-<% if @institution.new_record? || @institution.id==0 %>
+<% if @institution.id==0 %>
   <%
     title = @institution.title.blank? ? 'No title provided' : @institution.title
     web_page = @institution.web_page.blank? ? 'No web page provided' : @institution.web_page

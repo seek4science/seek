@@ -8,7 +8,7 @@ The <%= t('programme') %> is <%= link_to @programme.title,@programme %>
 They provided the following details about the <%= t('project') %>
   <%= t('project') %> title: '<%= @project.title %>'
 
-<% if @institution.new_record? || @institution.id==0 %>
+<% if @institution.id==0 %>
   <%
     title = @institution.title.blank? ? 'No title provided' : @institution.title
     web_page = @institution.web_page.blank? ? 'No web page provided' : @institution.web_page

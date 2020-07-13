@@ -181,18 +181,6 @@ class Mailer < ActionMailer::Base
     )
   end
 
-  def request_join_project(user,project,institution,comments)
-    @owners = project.project_administrators
-    @requester = user.person
-    @institution = institution
-    @project = project
-    @comments = comments
-    mail(from: Seek::Config.noreply_sender,
-         to: @owners.collect(&:email_with_name),
-         reply_to: user.person.email_with_name,
-         subject: "#{@requester.email_with_name} requested membership of #{t('project')}: #{@project.title}")
-  end
-
   def request_membership(user, project, details)
     @owners = project.project_administrators
     @requester = user.person
@@ -204,12 +192,24 @@ class Mailer < ActionMailer::Base
          subject: "#{@requester.email_with_name} requested membership of project: #{@resource.title}")
   end
 
-  def request_create_project_for_programme(user, programme, project, institution, comments)
+  def request_join_project(user,project,institution_json,comments)
+    @owners = project.project_administrators
+    @requester = user.person
+    @institution = Institution.new(JSON.parse(institution_json))
+    @project = project
+    @comments = comments
+    mail(from: Seek::Config.noreply_sender,
+         to: @owners.collect(&:email_with_name),
+         reply_to: user.person.email_with_name,
+         subject: "#{@requester.email_with_name} requested membership of #{t('project')}: #{@project.title}")
+  end
+
+  def request_create_project_for_programme(user, programme, project_json, institution_json, comments)
     @admins = programme.programme_administrators
     @programme = programme
     @requester = user.person
-    @institution = institution
-    @project = project
+    @institution = Institution.new(JSON.parse(institution_json))
+    @project = Project.new(JSON.parse(project_json))
     @comments = comments
     mail(from: Seek::Config.noreply_sender,
          to: @admins.collect(&:email_with_name),
@@ -217,12 +217,12 @@ class Mailer < ActionMailer::Base
          subject: "#{@requester.email_with_name} request for new #{t('project')} for your #{t('programme')}: #{@project.title}")
   end
 
-  def request_create_project_and_programme(user, programme, project, institution, comments)
+  def request_create_project_and_programme(user, programme_json, project_json, institution_json, comments)
     @admins = admins
-    @programme = programme
+    @programme = Programme.new(JSON.parse(programme_json))
     @requester = user.person
-    @institution = institution
-    @project = project
+    @institution = Institution.new(JSON.parse(institution_json))
+    @project = Project.new(JSON.parse(project_json))
     @comments = comments
     mail(from: Seek::Config.noreply_sender,
          to: admin_emails,
