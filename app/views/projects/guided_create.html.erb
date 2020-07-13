@@ -42,13 +42,22 @@
         </div>
       </div>
 
-      <%= submit_tag('Submit', class: 'btn btn-primary') %>
+      <%= submit_tag('Submit', class: 'btn btn-primary',id:'submit-button',disabled:true) %>
     </div>
   </div>
 <% end %>
 
 
 <script type=application/javascript>
+
+    function checkSubmitButtonEnabled() {
+        var enabled = $j('#institution_id').val()
+            && ($j('input#managed_programme:checked').length==1 || $j('input#programme_title').val())
+            && $j('input#project_title').val()
+            && $j('select#institution_country').val();
+        $j('#submit-button').prop('disabled',!enabled);
+    }
+
     $j(document).ready(function () {
        $j('input#managed_programme').on('change', function() {
            if ($j('input#managed_programme:checked').length == 0) {
@@ -56,7 +65,17 @@
            }
            else {
                $j('#programme-details').hide();
+               $j('input#programme_title').val('');
            }
-       })
+           checkSubmitButtonEnabled();
+       });
+
+       $j('input#programme_title').on('input',function() {
+          checkSubmitButtonEnabled();
+       });
+
+        $j('input#project_title').on('input',function() {
+            checkSubmitButtonEnabled();
+        });
     });
 </script>

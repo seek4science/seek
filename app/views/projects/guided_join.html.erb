@@ -51,22 +51,20 @@
         </div>
       </div>
 
-      <%= submit_tag('Submit', class: 'btn btn-primary') %>
+      <%= submit_tag('Submit', class: 'btn btn-primary', id: 'submit-button', disabled:true) %>
     </div>
   </div>
 <% end %>
 
 <script type='application/javascript'>
 
-    function quickLoadDebugging() {
-        $j('#project-search-terms').val('def');
-        $j('#project-search-submit').click();
 
+    function checkSubmitButtonEnabled() {
+      var enabled = $j('#institution_id').val()
+          && $j('input.project-selected:checked').length > 0
+          && $j('select#institution_country').val();
+      $j('#submit-button').prop('disabled',!enabled);
     }
-
-    function projectSelected() {
-
-    };
 
     function handleJsonResults(json) {
         if (json.data.length == 0) {
@@ -81,11 +79,10 @@
                     console.log(data.data.attributes);
                     $j('#project-search-results').append('<table><tbody>');
                     $j('#project-search-results').append(HandlebarsTemplates['project_search/result_list'](data.data)).on('change','input.project-selected',function() {
-                        projectSelected();
+                        checkSubmitButtonEnabled();
                     });
                     $j('#project-search-results').append('</tbody></table>');
                 })
-                projectSelected();
             });
 
         }
@@ -111,8 +108,6 @@
           })
          return false;
       });
-
-      //quickLoadDebugging();
 
     });
 
