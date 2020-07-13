@@ -8,37 +8,51 @@
 
 <div class="form-group">
   <label class="control-label">Type the name of the <%= t('institution') %> </label>
-  <%= objects_input('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path + '?query=%QUERY'}, limit:1) -%>
+  <%= objects_input('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path + '?query=%QUERY&include_new=true'}, limit:1) -%>
 </div>
 
 <%= hidden_field_tag 'institution[title]' %>
 
 <div class="form-group" id='additional-institution-details'>
   <label class="control-label">Website</label>
-  <%= text_field_tag('institution[web_page]','',class:'form-control',disabled:true) %>
+  <%= text_field_tag('institution[web_page]','',class:'form-control institution-user-input') %>
+
+  <label class="control-label">City</label>
+  <%= text_field_tag('institution[city]','',class:'form-control institution-user-input') %>
 
   <label class="control-label">Country</label>
   <%= country_select('institution','country',
                      { include_blank: 'Select a country' },
-                     { class: 'form-control', disabled:true }) %>
+                     { class: 'form-control institution-user-input', disabled:true }) %>
 </div>
 
 <script type='application/javascript'>
+
+    function toggleUserInput(disabled) {
+        $j(".institution-user-input").prop('disabled',disabled);
+    }
     $j(document).ready(function () {
+
+        toggleUserInput(true);
 
         $j('input').on('itemAdded', function(event) {
             if (event.item.id=='0') {
-                $j('#additional-institution-details').show();
+                toggleUserInput(false);
             }
             else {
-                $j('#additional-institution-details').hide();
+                toggleUserInput(true);
             }
             $j('#institution_title').val(event.item.name);
+            $j('#institution_web_page').val(event.item.web_page);
+            $j('#institution_city').val(event.item.city);
+            $j('#institution_country').val(event.item.country);
         });
 
         $j('input').on('itemRemoved', function(event) {
-            $j('#additional-institution-details').hide();
+            toggleUserInput(true);
             $j('#institution_title').val('');
+            $j('#institution_web_page').val('');
+            $j('#institution_country').val('');
         });
 
     });
