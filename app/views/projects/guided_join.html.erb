@@ -1,5 +1,6 @@
- <div class="row">
-    <div class="col-md-8 d-flex justify-content-cente">
+<%= form_tag request_join_projects_path do %>
+  <div class="row">
+    <div style="margin:auto;width:70%;">
 
       <div class="panel panel-default">
         <div class="panel-heading">
@@ -9,47 +10,47 @@
           <%= label_tag :search_label, "#{t('project')} search" -%>
           <div class="row">
             <div class="col-md-10">
-              <%= text_field_tag 'project-search-terms', '', :class=>"form-control"-%>
+              <%= text_field_tag 'project-search-terms', '', :class => "form-control" -%>
             </div>
             <div class="col">
-              <%= submit_tag 'Search', id: 'project-search-submit',:class => 'btn btn-primary' %>
+              <%= submit_tag 'Search', id: 'project-search-submit', :class => 'btn btn-primary' %>
             </div>
           </div>
-          <%= form_tag request_join_projects_path do %>
-            <div class="form-group">
-              <div id='project-search-results'></div>
-            </div>
+
+          <div class="form-group">
+            <div id='project-search-results'></div>
+          </div>
         </div>
       </div>
     </div>
- </div>
+  </div>
 
-   <div class="row">
-     <div class="col-md-8 d-flex justify-content-cente">
+  <div class="row">
+    <div style="margin:auto;width:70%;">
 
 
-       <div class="panel panel-default" id='institution-selection' style="display:none;">
-         <div class="panel-heading"><%= t('institution') %></div>
-         <div class="panel-body">
-           <div class="form-group">
-             <%= render partial: 'institutions/select_or_define' %>
-           </div>
-         </div>
-       </div>
+      <div class="panel panel-default" id='institution-selection' style="display:none;">
+        <div class="panel-heading"><%= t('institution') %></div>
+        <div class="panel-body">
+          <div class="form-group">
+            <%= render partial: 'institutions/select_or_define' %>
+          </div>
+        </div>
+      </div>
 
-       <div class="panel panel-default" id='comments' style="display:none;">
-         <div class="panel-heading">Comments</div>
-         <div class="panel-body">
-           <div class="form-group">
-             <%= text_area_tag :comments, '', rows: 3, :class => "form-control" %>
-           </div>
-         </div>
-       </div>
+      <div class="panel panel-default" id='comments' style="display:none;">
+        <div class="panel-heading">Comments</div>
+        <div class="panel-body">
+          <div class="form-group">
+            <%= text_area_tag :comments, '', rows: 3, :class => "form-control" %>
+          </div>
+        </div>
+      </div>
 
-       <%= submit_tag('Submit', class: 'btn btn-primary') %>
-     </div>
-   </div>
- <% end %>
+      <%= submit_tag('Submit', class: 'btn btn-primary') %>
+    </div>
+  </div>
+<% end %>
 
 <script type='application/javascript'>
 
