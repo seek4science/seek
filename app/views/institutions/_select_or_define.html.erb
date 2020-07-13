@@ -13,14 +13,14 @@
 
 <%= hidden_field_tag 'institution[title]' %>
 
-<div class="form-group" id='additional-institution-details' style='display:none;'>
+<div class="form-group" id='additional-institution-details'>
   <label class="control-label">Website</label>
-  <%= text_field_tag('institution[web_page]','',class:'form-control') %>
+  <%= text_field_tag('institution[web_page]','',class:'form-control',disabled:true) %>
 
   <label class="control-label">Country</label>
   <%= country_select('institution','country',
                      { include_blank: 'Select a country' },
-                     { class: 'form-control' }) %>
+                     { class: 'form-control', disabled:true }) %>
 </div>
 
 <script type='application/javascript'>
