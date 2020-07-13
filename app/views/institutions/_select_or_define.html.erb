@@ -8,7 +8,7 @@
 
 <div class="form-group">
   <label class="control-label">Type the name of the <%= t('institution') %> </label>
-  <%= objects_input('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path + '?query=%QUERY&include_new=true'}, limit:1) -%>
+  <%= objects_input('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path + '?query=%QUERY&include_new=true',handlebars_template:'typeahead/institution'}, limit:1) -%>
 </div>
 
 <%= hidden_field_tag 'institution[title]' %>

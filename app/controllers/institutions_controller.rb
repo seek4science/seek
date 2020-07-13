@@ -98,11 +98,17 @@ class InstitutionsController < ApplicationController
                                   OR LOWER(address) LIKE :query",
                            query: "%#{params[:query].downcase}%").limit(params[:limit] || 10)
     items = results.map do |institution|
-      { id: institution.id, name: institution.title, web_page: institution.web_page, city: institution.city, country:institution.country,hint: institution.typeahead_hint }
+      { id: institution.id,
+        name: institution.title,
+        web_page: institution.web_page,
+        city: institution.city,
+        country:institution.country,
+        country_name: CountryCodes.country(institution.country),
+        hint: institution.typeahead_hint }
     end
 
     if params[:include_new]
-      items.unshift({id:0, name:params[:query],web_page:'',country:'', city:'',hint:"NEW"})
+      items.unshift({id:0, name:params[:query],web_page:'',country:'', country_name:'',city:'',hint:"new item", new:true})
     end
 
     respond_to do |format|
