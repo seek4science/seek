@@ -17,9 +17,13 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <div id='project-search-results'></div>
+
+          <div id='project-search-results'>
+            <div class="alert alert-secondary text-center" role="alert">
+              <em>Search results</em>
+            </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -29,7 +33,7 @@
     <div style="margin:auto;width:70%;">
 
 
-      <div class="panel panel-default" id='institution-selection' style="display:none;">
+      <div class="panel panel-default" id='institution-selection'>
         <div class="panel-heading"><%= t('institution') %></div>
         <div class="panel-body">
           <div class="form-group">
@@ -38,7 +42,7 @@
         </div>
       </div>
 
-      <div class="panel panel-default" id='comments' style="display:none;">
+      <div class="panel panel-default" id='comments'>
         <div class="panel-heading">Comments</div>
         <div class="panel-body">
           <div class="form-group">
@@ -61,14 +65,7 @@
     }
 
     function projectSelected() {
-        if ($j('input.project-selected:checked').length > 0) {
-            $j('#institution-selection').show();
-            $j('#comments').show();
-        }
-        else {
-            $j('#institution-selection').hide();
-            $j('#comments').hide();
-        }
+
     };
 
     function handleJsonResults(json) {
