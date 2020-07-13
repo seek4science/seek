@@ -17,7 +17,7 @@ They provided the following details about the <%= t('project') %>
   <%= t('project') %> description: '<%= description %>'
   <%= t('project') %> web_page: '<%= web_page %>'
 
-<% if @institution.new_record? || @institution.id==0 %>
+<% if @institution.id==0 %>
   <%
     title = @institution.title.blank? ? 'No title provided' : @institution.title
     web_page = @institution.web_page.blank? ? 'No web page provided' : @institution.web_page
