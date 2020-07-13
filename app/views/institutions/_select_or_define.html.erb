@@ -35,6 +35,10 @@
 
         toggleUserInput(true);
 
+        $j('select#institution_country').on('change',function() {
+            checkSubmitButtonEnabled();
+        });
+
         $j('input').on('itemAdded', function(event) {
             if (event.item.id=='0') {
                 toggleUserInput(false);
@@ -46,6 +50,7 @@
             $j('#institution_web_page').val(event.item.web_page);
             $j('#institution_city').val(event.item.city);
             $j('#institution_country').val(event.item.country);
+            checkSubmitButtonEnabled();
         });
 
         $j('input').on('itemRemoved', function(event) {
@@ -53,6 +58,7 @@
             $j('#institution_title').val('');
             $j('#institution_web_page').val('');
             $j('#institution_country').val('');
+            checkSubmitButtonEnabled();
         });
 
     });
