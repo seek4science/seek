@@ -47,6 +47,10 @@ class Institution < ApplicationRecord
   end
 
   def typeahead_hint
-    city
+    unless city.blank?
+      "#{city}, #{CountryCodes.country(country)}"
+    else
+      CountryCodes.country(country)
+    end
   end
 end
