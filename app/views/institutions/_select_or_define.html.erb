@@ -7,7 +7,7 @@
 
 
 <div class="form-group">
-  <label class="control-label">Type the name of the <%= t('institution') %> </label>
+  <label class="control-label">Type the name of the <%= t('institution') %> </label><span class="required">*</span>
   <%= objects_input('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path + '?query=%QUERY&include_new=true',handlebars_template:'typeahead/institution'}, limit:1) -%>
 </div>
 
@@ -20,7 +20,7 @@
   <label class="control-label">City</label>
   <%= text_field_tag('institution[city]','',class:'form-control institution-user-input') %>
 
-  <label class="control-label">Country</label>
+  <label class="control-label">Country</label><span class="required">*</span>
   <%= country_select('institution','country',
                      { include_blank: 'Select a country' },
                      { class: 'form-control institution-user-input', disabled:true }) %>
