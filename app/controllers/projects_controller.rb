@@ -42,7 +42,7 @@ class ProjectsController < ApplicationController
     raise 'email is disabled' unless Seek::Config.email_enabled
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
-      inst_params = params.require(:institution).permit([:id, :title, :web_page, :country])
+      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
       @institution ||= Institution.new(inst_params)
     end
 
@@ -65,7 +65,7 @@ class ProjectsController < ApplicationController
     @project.id = 0 #required for serialization for the email
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
-      inst_params = params.require(:institution).permit([:id, :title, :web_page, :country])
+      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
       @institution ||= Institution.new(inst_params)
     end
 

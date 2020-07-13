@@ -38,6 +38,7 @@
   <ul>
     <li><strong>Title:</strong> <%= text_or_not_specified(@institution.title) %></li>
     <li><strong>Web page:</strong> <%= text_or_not_specified(@institution.web_page, external_link:true) -%></li>
+    <li><strong>City:</strong><%= text_or_not_specified(@institution.city) -%></li>
     <li><strong>Country:</strong> <%= country_text_or_not_specified @institution.country -%></li>
   </ul>
 <% else %>

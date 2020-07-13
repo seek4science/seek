@@ -1759,6 +1759,7 @@ class ProjectsControllerTest < ActionController::TestCase
         institution:{
             id:0,
             title:'fish',
+            city:'Sheffield',
             country:'GB',
             web_page:'http://google.com'
         },
@@ -1805,7 +1806,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, programme.id) do
       params = {
           project: { title: 'The Project',description:'description',web_page:'web_page'},
-          institution: {id: '0', title:'the inst',web_page:'the page',country:'GB'},
+          institution: {id: '0', title:'the inst',web_page:'the page',city:'London',country:'GB'},
           programme: {title:'the prog'}
       }
       assert_enqueued_emails(1) do

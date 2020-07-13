@@ -98,11 +98,12 @@ class InstitutionsController < ApplicationController
                                   OR LOWER(address) LIKE :query",
                            query: "%#{params[:query].downcase}%").limit(params[:limit] || 10)
     items = results.map do |institution|
-      { id: institution.id, name: institution.title, hint: institution.typeahead_hint }
+      { id: institution.id, name: institution.title, web_page: institution.web_page, city: institution.city, country:institution.country,hint: institution.typeahead_hint }
     end
 
-    # hack to allow new items
-    items.unshift({id:0, name:params[:query],hint:"NEW"})
+    if params[:include_new]
+      items.unshift({id:0, name:params[:query],web_page:'',country:'', city:'',hint:"NEW"})
+    end
 
     respond_to do |format|
       format.json { render json: items.to_json }
