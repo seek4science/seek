@@ -44,9 +44,9 @@ en:
   human_disease: "Human Disease"
 
   person: "Person"
-  project: "Project"
-  institution: "Institution"
-  programme: "Programme"
+  project: "Team"
+  institution: "Organization"
+  programme: "Space"
   profile: "Profile"
   avatar: "Avatar"
   private_asset: 'Hidden item'
@@ -97,9 +97,9 @@ en:
 
   asset_housekeeper: 'Asset housekeeper'
   asset_gatekeeper: 'Asset gatekeeper'
-  project_administrator: 'Project administrator'
+  project_administrator: 'Team administrator'
   pal: 'PAL'
-  programme_administrator: 'Programme administrator'
+  programme_administrator: 'Space administrator'
 
   contributor: 'submitter' # A person who submitted the resource to SEEK
   contribution: 'submission'
