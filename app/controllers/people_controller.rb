@@ -133,7 +133,12 @@ class PeopleController < ApplicationController
           if @person.only_first_admin_person?
             format.html { redirect_to registration_form_admin_path(during_setup: 'true') }
           else
-            format.html { redirect_to(@person) }
+            if Seek::Config.programmes_enabled && Programme.managed_programme
+              format.html { redirect_to(create_or_join_project_home_path)}
+            else
+              format.html { redirect_to(@person) }
+            end
+
           end
           format.xml { render xml: @person, status: :created, location: @person }
           format.json {render json: @person, status: :created, location: @person, include: [params[:include]] }
