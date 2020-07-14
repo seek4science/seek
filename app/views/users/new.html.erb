@@ -65,6 +65,24 @@
   </div>
 <% end -%>
 
+<% if show_omniauth_login? && Seek::Config.omniauth_user_create %>
+  <hr/>
+  <h3>Alternatively...</h3>
+  <ul>
+    <% if show_elixir_login? %>
+      <li>
+        <%= link_to(omniauth_authorize_path(:elixir_aai, state: "return_to:/"), method: :post) do %>
+          Log in using <%= t('login.elixir_aai') -%><br/>
+          <%= image('elixir_aai_login') %>
+        <% end %>
+      </li>
+    <% end %>
+    <% if show_ldap_login? %>
+      <li><%= link_to "Log in using #{t('login.ldap')}", login_path(anchor: 'ldap_login') %></li>
+    <% end %>
+  </ul>
+<% end %>
+
 <script type="text/javascript">
 
     $j('input:checkbox').change(
