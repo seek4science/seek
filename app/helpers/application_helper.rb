@@ -216,15 +216,17 @@ module ApplicationHelper
       text.capitalize! if options[:capitalize]
       res = text.html_safe
       res = white_list(res)
-      res = truncate_without_splitting_words(res, options[:length]) if options[:length]
-      res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link]
-      res = simple_format(res, {}, sanitize: false).html_safe if options[:description] == true || options[:address] == true
       if options[:description] == true && options[:markdown] == true
         markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, tables: true)
         # remove <p> and <br> tags, markdown render cannot handle them
-        res = ActionView::Base.full_sanitizer.sanitize(res, tags:['br', 'p'])
+        scrubber = Rails::Html::TargetScrubber.new
+        scrubber.tags = ['br', 'p']
+        res = Loofah.fragment(res).scrub!(scrubber).to_s
         res = markdown.render(res)
       end
+      res = truncate_without_splitting_words(res, options[:length]) if options[:length]
+      res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link]
+      res = simple_format(res, {}, sanitize: false).html_safe if options[:description] == true || options[:address] == true
       res = mail_to(res) if options[:email]
       res = link_to(res, res, popup: true) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
