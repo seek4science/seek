@@ -7,6 +7,12 @@
 
 
 <div class="form-group">
+  <div class="subtle">
+    Type the name of the <%= t('institution') %>, or part of the name or the city it may be associated with. From the list of the results
+    found, select the <%= t('institution') %> you are looking for. If you cannot find it in the list, continue to type the full name and select
+    the top <em>new item</em>; you will then be able to provide the additional details about the new <%= t('institution') %>.
+  </div>
+
   <label class="control-label">Type the name of the <%= t('institution') %> </label><span class="required">*</span>
   <%= objects_input('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path + '?query=%QUERY&include_new=true',handlebars_template:'typeahead/institution'}, limit:1) -%>
 </div>

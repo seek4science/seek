@@ -7,6 +7,14 @@
           <%= t('project') %>
         </div>
         <div class="panel-body">
+          <div class="subtle">
+            Search for the <%=t('project') %>, either by name or details related to it.
+            If you cannot find the <%=t('project') %> here, you could try the
+            <%= link_to "#{t('project')} search and filtering",projects_path,target: :_blank %> first to find the name.
+            <br/>
+            Once found, check the box next to the <%= t('project').pluralize %> you wish to request to join.
+          </div>
+
           <%= label_tag :search_label, "#{t('project')} search" -%>
           <div class="row">
             <div class="col-md-10">
@@ -45,6 +53,9 @@
       <div class="panel panel-default" id='comments'>
         <div class="panel-heading">Comments</div>
         <div class="panel-body">
+          <div class="subtle">
+            Provide any additional details that you think will help with your join request.
+          </div>
           <div class="form-group">
             <%= text_area_tag :comments, '', rows: 3, :class => "form-control" %>
           </div>
