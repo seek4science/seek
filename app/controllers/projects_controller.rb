@@ -7,10 +7,11 @@ class ProjectsController < ApplicationController
   include ApiHelper
 
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
-                                               admin_member_roles update_members storage_report request_membership overview]
+                                               admin_member_roles update_members storage_report
+                                               request_membership overview administer_join_request respond_join_request]
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create]
-  before_action :is_user_admin_auth, only: %i[manage destroy]
+  before_action :is_user_admin_auth, only: %i[manage destroy administer_join_request respond_join_request]
   before_action :editable_by_user, only: %i[edit update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report]
   before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
@@ -29,11 +30,45 @@ class ProjectsController < ApplicationController
   api_actions :index, :show, :create, :update, :destroy
 
   def guided_join
-
+    respond_to do |format|
+      format.html
+    end
   end
 
   def guided_create
+    respond_to do |format|
+      format.html
+    end
+  end
 
+  def administer_join_request
+    @message_log = MessageLog.find_by_id(params[:message_log_id])
+    raise "message log not found" unless @message_log
+    raise "message log doesn't match project" if @message_log.resource != @project
+    raise "incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_MEMBERSHIP_REQUEST
+    details = JSON.parse(@message_log.details)
+    @comments = details['comments']
+    @institution = Institution.new(JSON.parse(details['institution']))
+    @institution = Institution.find(@institution.id) if @institution.id!=0
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def respond_join_request
+    message_log = MessageLog.find_by_id(params[:message_log_id])
+    raise "message log not found" unless message_log
+    raise "message log doesn't match project" if message_log.resource != @project
+    raise "incorrect type of message log" unless message_log.message_type==MessageLog::PROJECT_MEMBERSHIP_REQUEST
+    sender = message_log.sender
+    if params[:accept_request]=='1'
+      flash[:notice]="Request accepted and #{sender.name} added to #{t('project')} and notified"
+    else
+      flash[:notice]="Request rejected and #{sender.name} has been notified"
+    end
+
+    redirect_to(@project)
   end
 
   def request_join
@@ -48,8 +83,9 @@ class ProjectsController < ApplicationController
 
     @comments = params[:comments]
     @projects.each do |project|
-      Mailer.request_join_project(current_user, project, @institution.to_json, @comments).deliver_later
-      MessageLog.log_project_membership_request(current_user.person, project, @comments)
+      log = MessageLog.log_project_membership_request(current_user.person, project, @institution, @comments)
+      Mailer.request_join_project(current_user, project, @institution.to_json, @comments, log).deliver_later
+
     end
 
     flash[:notice]="Thank you, your request to join has been sent"

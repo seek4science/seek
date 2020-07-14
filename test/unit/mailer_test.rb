@@ -386,8 +386,12 @@ class MailerTest < ActionMailer::TestCase
   test 'request join project with new institution' do
     with_config_value(:application_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://hub.com') do
+        project = Factory(:project)
         institution = Institution.new({id:0, title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
-        email = Mailer.request_join_project(Factory(:person).user, Factory(:project), institution.to_json,'some comments')
+        comments = 'some comments'
+        person = Factory(:person)
+        log = MessageLog.log_project_membership_request(person, project, institution, comments)
+        email = Mailer.request_join_project(person.user, project, institution.to_json,comments, log)
         refute_nil email
         refute_nil email.body
       end
@@ -397,7 +401,12 @@ class MailerTest < ActionMailer::TestCase
   test 'request join project existing institution' do
     with_config_value(:application_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
-        email = Mailer.request_join_project(Factory(:person).user, Factory(:project), Factory(:institution).to_json,'some comments')
+        project = Factory(:project)
+        institution = Factory(:institution)
+        comments = 'some comments'
+        person = Factory(:person)
+        log = MessageLog.log_project_membership_request(person, project, institution, comments)
+        email = Mailer.request_join_project(person.user, project, institution.to_json,comments, log)
         refute_nil email
         refute_nil email.body
       end

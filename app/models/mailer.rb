@@ -192,12 +192,13 @@ class Mailer < ActionMailer::Base
          subject: "#{@requester.email_with_name} requested membership of project: #{@resource.title}")
   end
 
-  def request_join_project(user,project,institution_json,comments)
+  def request_join_project(user, project, institution_json, comments, message_log)
     @owners = project.project_administrators
     @requester = user.person
     @institution = Institution.new(JSON.parse(institution_json))
     @project = project
     @comments = comments
+    @message_log = message_log
     mail(from: Seek::Config.noreply_sender,
          to: @owners.collect(&:email_with_name),
          reply_to: user.person.email_with_name,
