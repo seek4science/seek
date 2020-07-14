@@ -1,36 +1,50 @@
-<p>
-  You have requested to join the following <%= t('project').pluralize(@projects.count) %>:
-  <ul>
-      <% @projects.each do |project| %>
-        <li>
-          <%= link_to project.title,project %>
-        </li>
-      <% end %>
-  </ul>
-</p>
+<div class="row">
+  <div style="width:70%;margin:auto">
 
-<p>
-  <% if @institution.new_record? || @institution.id==0 %>
-      You have described a new <%= t('institution') %> with the following details:
-      <ul>
-        <li><strong>Title:</strong><%= text_or_not_specified(@institution.title) %></li>
-        <li><strong>Web page:</strong><%= text_or_not_specified(@institution.web_page, external_link:true) -%></li>
-        <li><strong>City:</strong><%= text_or_not_specified(@institution.city) -%></li>
-        <li><strong>Country:</strong><%= country_text_or_not_specified @institution.country -%></li>
-      </ul>
-  <% else %>
-      You have indicated that you are associated with <%= link_to(@institution.title,@institution) %>
-  <% end %>
-</p>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <p>
+          You have requested to join the following <%= t('project').pluralize(@projects.count) %>:
+        <ul>
+          <% @projects.each do |project| %>
+            <li>
+              <%= link_to project.title,project %>
+            </li>
+          <% end %>
+        </ul>
+        </p>
 
-<% unless @comments.blank? %>
-  <p>
-    and provided the following comments:
-    <div class="well"><%= @comments %></div>
-  </p>
-<% end %>
+        <div style="padding-top: 1em;">
+          <% if @institution.new_record? || @institution.id==0 %>
+              You have described a new <%= t('institution') %> with the following details:
+            <ul>
+              <li><strong>Title:</strong><%= text_or_not_specified(@institution.title) %></li>
+              <li><strong>Web page:</strong><%= text_or_not_specified(@institution.web_page, external_link:true) -%></li>
+              <li><strong>City:</strong><%= text_or_not_specified(@institution.city) -%></li>
+              <li><strong>Country:</strong><%= country_text_or_not_specified @institution.country -%></li>
+            </ul>
+          <% else %>
+            You have indicated that you are associated with <%= link_to(@institution.title,@institution) %>
+          <% end %>
+        </div>
 
-<p>
+        <% unless @comments.blank? %>
+          <p style="padding-top: 1em;">
+            and provided the following comments:
+          <div class="well"><%= @comments %></div>
+          </p>
+        <% end %>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
+<p class="text-center">
+  <strong>
   An email has sent to the <%= t('project_administrator').pluralize %> and you will receive a notification when added
   to the <%= t('project') %>, or an email about why your request was declined.
+  </strong>
 </p>

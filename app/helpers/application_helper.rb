@@ -466,11 +466,12 @@ module ApplicationHelper
   def join_or_create_project_banner?
     return false if !logged_in_and_registered?
     return false if logged_in_and_member?
-    return false if current_page?(controller: :homes, action: :create_or_join_project) ||
-        current_page?(controller: :projects, action: :guided_join) ||
-        current_page?(controller: :projects, action: :guided_create) ||
-        current_page?(controller: :projects, action: :request_join) ||
-        current_page?(controller: :projects, action: :request_join)
+    return false if current_page?(create_or_join_project_home_path) ||
+        current_page?(guided_create_projects_path) ||
+        current_page?(guided_join_projects_path)
+
+    #current_page? doesn't work with POST
+    return false if ['request_join','request_create'].include?(action_name)
 
     return Seek::Config.programmes_enabled && Programme.managed_programme
   end
