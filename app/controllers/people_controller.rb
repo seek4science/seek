@@ -159,12 +159,6 @@ class PeopleController < ApplicationController
 
   def notify_admin_and_project_administrators_of_new_user
     Mailer.contact_admin_new_user(notification_params.to_h, current_user).deliver_later
-
-    # send mail to project managers
-    project_administrators = project_administrators_of_selected_projects params[:projects]
-    project_administrators.each do |project_administrator|
-      Mailer.contact_project_administrator_new_user(project_administrator, notification_params.to_h, current_user).deliver_later
-    end
   end
 
   # PUT /people/1
