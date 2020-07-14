@@ -1820,6 +1820,53 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'administer join request' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    institution = Institution.new(id:0, title:'my institution')
+    log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
+    get :administer_join_request, params:{id:project.id,message_log_id:log.id}
+    assert_response :success
+  end
+
+  test 'respond join request accept existing institution' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    institution = Factory(:institution)
+    log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
+
+    params = {
+        message_log_id: log.id,
+        accept_request: '1',
+        institution:{id:institution.id},
+        id:project.id
+    }
+
+    post :respond_join_request, params:params
+
+    assert_redirected_to(project_path(project))
+    assert_equal "Request accepted and #{log.sender.name} added to project and notified",flash[:notice]
+  end
+
+  test 'respond join request rejected' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    institution = Factory(:institution)
+    log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
+
+    params = {
+        message_log_id: log.id,
+        reject_details: 'bad request',
+        institution:{id:institution.id},
+        id:project.id
+    }
+
+    post :respond_join_request, params:params
+
+    assert_redirected_to(project_path(project))
+    assert_equal "Request rejected and #{log.sender.name} has been notified",flash[:notice]
+  end
+
   private
 
   def edit_max_object(project)
