@@ -889,7 +889,7 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  
+
   test 'redirect after destroy' do
     person1 = Factory(:person)
     person2 = Factory(:person)

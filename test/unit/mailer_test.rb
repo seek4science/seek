@@ -426,7 +426,6 @@ class MailerTest < ActionMailer::TestCase
         programme = Programme.new(id:0,title:'My lovely programme')
         email = Mailer.request_create_project_and_programme(Factory(:person).user, programme.to_json, project.to_json, institution.to_json,'some comments')
         refute_nil email
-        refute_nil email.body
       end
     end
   end

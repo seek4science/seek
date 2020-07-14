@@ -201,7 +201,7 @@ class Mailer < ActionMailer::Base
     mail(from: Seek::Config.noreply_sender,
          to: @owners.collect(&:email_with_name),
          reply_to: user.person.email_with_name,
-         subject: "#{@requester.email_with_name} requested membership of #{t('project')}: #{@project.title}")
+         subject: "JOIN #{t('project')} request to #{@project.title} from #{@requester.name}")
   end
 
   def request_create_project_for_programme(user, programme, project_json, institution_json, comments)
@@ -214,7 +214,7 @@ class Mailer < ActionMailer::Base
     mail(from: Seek::Config.noreply_sender,
          to: @admins.collect(&:email_with_name),
          reply_to: user.person.email_with_name,
-         subject: "#{@requester.email_with_name} request for new #{t('project')} for your #{t('programme')}: #{@project.title}")
+         subject: "NEW #{t('project')} request from #{@requester.name} for your #{t('programme')}: #{@project.title}")
   end
 
   def request_create_project_and_programme(user, programme_json, project_json, institution_json, comments)
@@ -227,7 +227,7 @@ class Mailer < ActionMailer::Base
     mail(from: Seek::Config.noreply_sender,
          to: admin_emails,
          reply_to: user.person.email_with_name,
-         subject: "#{@requester.email_with_name} request for new #{t('project')} and new #{t('programme')}: #{@project.title}")
+         subject: "New #{t('project')} and #{t('programme')} request from #{@requester.name}: #{@project.title}")
   end
 
   private

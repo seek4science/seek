@@ -1,9 +1,9 @@
 
 Hi <%= @admins.collect{|o| o.name}.join(", ") -%>,
 
-The <%= Seek::Config.application_name %> user <%= link_to @requester.name, @requester %>, has requested a <%= t('project')  %> is created within your <%= t('programme') %> -%>.
+The <%= Seek::Config.application_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a <%= t('project')  %> is created within your <%= t('programme') %> -%>.
 
-The <%= t('programme') %> is <%= link_to @programme.title,@programme %>
+The <%= t('programme') %> is <%= "#{@programme.title} (#{programme_url(@programme)})" %>
 
 They provided the following details about the <%= t('project') %>
   <%= t('project') %> title: '<%= @project.title %>'
@@ -20,7 +20,7 @@ They provided the following details about their <%= t('institution') %>:
   <%= t('institution') %> web page: '<%= web_page %>'
   <%= t('institution') %> country: '<%= country %>'
 <% else %>
-They indicated that they are associated with the existing <%= t('institution') %> <%= link_to(@institution.title, @institution) %>
+They indicated that they are associated with the existing <%= "#{@institution.title} (#{institution_url(@institution)})" %>
 <% end %>
 
 <% unless @comments.blank? -%>

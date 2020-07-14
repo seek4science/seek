@@ -1,7 +1,7 @@
 
 Hi <%= @owners.collect{|o| o.name}.join(", ") -%>,
 
-The <%= Seek::Config.application_name %> user <%= link_to @requester.name, @requester %>, has requested membership of "<%= link_to(@project.title, @project) -%>.
+The <%= Seek::Config.application_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested membership of <%= "#{@project.title} (#{project_url(@project)})" %>.
 
 <% if @institution.id==0 %>
   <%
@@ -15,7 +15,7 @@ They provided the following details about their <%= t('institution') %>:
   <%= t('institution') %> web page: '<%= web_page %>'
   <%= t('institution') %> country: '<%= country %>'
 <% else %>
-They indicated that they are associated with the existing <%= t('institution') %> <%= link_to(@institution.title, @institution) %>
+They indicated that they are associated with the existing <%= t('institution') %> <%= "#{@institution.title} (#{institution_url(@institution)}" %>
 <% end %>
 
 <% unless @comments.blank? -%>
