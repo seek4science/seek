@@ -10,7 +10,7 @@
 %>
 
 <div class="pull-right">
-  <% if show_new_button && logged_in_and_member? %>
+  <% if show_new_button && controller_model.can_create? %>
     <%= button_link_to(new_item_label, "new", new_item_path) %>
   <% end %>
 
