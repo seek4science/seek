@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_26_144637) do
+ActiveRecord::Schema.define(version: 2020_07_13_122810) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1678,6 +1678,26 @@ ActiveRecord::Schema.define(version: 2020_06_26_144637) do
     t.index ["sop_id"], name: "index_sops_workflows_on_sop_id"
     t.index ["workflow_id"], name: "index_sops_workflows_on_workflow_id"
   end
+
+  create_table "source_attributes",  force: :cascade do |t|
+    t.bigint "source_type_id", null: false
+    t.string "name"
+    t.text "IRI"
+    t.boolean "required"
+    t.string "short_name"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_type_id"], name: "index_source_attributes_on_source_type_id"
+  end
+  
+  create_table "source_types",  force: :cascade do |t|
+    t.string "name"
+    t.string "group"
+    t.integer "source_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end 
 
   create_table "special_auth_codes", id: :integer,  force: :cascade do |t|
     t.string "code"
