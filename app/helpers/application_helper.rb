@@ -462,6 +462,19 @@ module ApplicationHelper
     !(action_name == 'edit' || action_name == 'update')
   end
 
+  #whether to show a banner encouraging you to join or create a project
+  def join_or_create_project_banner?
+    return false if !logged_in_and_registered?
+    return false if logged_in_and_member?
+    return false if current_page?(controller: :homes, action: :create_or_join_project) ||
+        current_page?(controller: :projects, action: :guided_join) ||
+        current_page?(controller: :projects, action: :guided_create) ||
+        current_page?(controller: :projects, action: :request_join) ||
+        current_page?(controller: :projects, action: :request_join)
+
+    return Seek::Config.programmes_enabled && Programme.managed_programme
+  end
+
   PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => I18n.t('institution').pluralize,
                   'people' => 'People', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' }, 'search' => 'Search',
                   'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize,
