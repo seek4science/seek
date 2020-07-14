@@ -7,7 +7,7 @@
           <%= t('project') %>
         </div>
         <div class="panel-body">
-          <div class="subtle">
+          <div class="help-block">
             Search for the <%=t('project') %>, either by name or details related to it.
             If you cannot find the <%=t('project') %> here, you could try the
             <%= link_to "#{t('project')} search and filtering",projects_path,target: :_blank %> first to find the name.
@@ -53,8 +53,8 @@
       <div class="panel panel-default" id='comments'>
         <div class="panel-heading">Comments</div>
         <div class="panel-body">
-          <div class="subtle">
-            Provide any additional details that you think will help with your join request.
+          <div class="help-block">
+            Provide any additional details that you think will be useful with your request.
           </div>
           <div class="form-group">
             <%= text_area_tag :comments, '', rows: 3, :class => "form-control" %>

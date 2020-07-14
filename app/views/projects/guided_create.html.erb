@@ -6,12 +6,12 @@
         <div class="panel-heading"><%= t('programme') %></div>
         <div class="panel-body">
 
-          <div class="subtle">
+          <div class="help-block">
             You can either choose to have a site managed <%= t('programme') %>, or have one created for you.
             If you have one created, you will then be able to freely create further <%= t('project').pluralize %> within
             it. To have one created, then please provide the name. You will be able to provide additional details once it has been created.
           </div>
-          
+
           <label>
             <%= check_box_tag :managed_programme, '1', true %>
             <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}?" %>
@@ -26,7 +26,7 @@
       <div class="panel panel-default">
         <div class="panel-heading"><%= t('project') %></div>
         <div class="panel-body">
-          <div class="subtle">
+          <div class="help-block">
             Please provide some basic details about the <%= t('project') %> that will be created. You will be able to update and add additional
             information once it has been created.
           </div>
