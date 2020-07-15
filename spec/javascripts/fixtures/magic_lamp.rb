@@ -72,6 +72,7 @@ MagicLamp.register_fixture(name: 'project/markdown') do
 
   @project = Project.create(title: 'markdown test',
     description: '# header
+
 Some text
 
 ## second header
