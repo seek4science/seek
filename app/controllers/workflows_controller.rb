@@ -6,7 +6,7 @@ class WorkflowsController < ApplicationController
 
   before_action :workflows_enabled?
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview, :update_annotations_ajax]
   before_action :find_display_asset, only: [:show, :download, :diagram, :ro_crate]
   before_action :login_required, only: [:create, :create_content_blob, :create_ro_crate, :create_metadata, :metadata_extraction_ajax, :provide_metadata]
 
@@ -224,7 +224,7 @@ class WorkflowsController < ApplicationController
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                      { publication_ids: [] }, :internals, :maturity_level, :source_link_url,
-                                     discussion_links_attributes:[:id, :url, :_destroy])
+                                     discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :workflow_params
