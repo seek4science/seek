@@ -439,6 +439,16 @@ class MailerTest < ActionMailer::TestCase
     end
   end
 
+  test 'join project rejected' do
+    project = Factory(:project,title:'project to join')
+    requester = Factory(:person)
+    comments = "You are evil"
+    email = Mailer.join_project_rejected(requester, project, comments)
+    refute_nil email
+    refute_nil email.body
+    assert_equal "Your request to join the Project, project to join, hasn't been approved",email.subject
+  end
+
 
   private
 
