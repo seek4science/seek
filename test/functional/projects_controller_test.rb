@@ -1833,7 +1833,8 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:project_administrator)
     project = person.projects.first
     institution = Factory(:institution)
-    log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
+    sender = Factory(:person)
+    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
 
     params = {
         message_log_id: log.id,
@@ -1842,17 +1843,65 @@ class ProjectsControllerTest < ActionController::TestCase
         id:project.id
     }
 
-    post :respond_join_request, params:params
+    assert_enqueued_emails(1) do
+      assert_no_difference('Institution.count') do
+        assert_difference('GroupMembership.count') do
+          post :respond_join_request, params:params
+        end
+      end
+    end
 
     assert_redirected_to(project_path(project))
-    assert_equal "Request accepted and #{log.sender.name} added to project and notified",flash[:notice]
+    assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
+    project.reload
+    assert_includes project.people, sender
+    assert_includes project.institutions, institution
+  end
+
+  test 'respond join request accept new institution' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    sender = Factory(:person)
+    institution = Institution.new({id:0,
+                                   title:'institution',
+                                   country:'DE'
+                                  })
+    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
+
+    params = {
+        message_log_id: log.id,
+        accept_request: '1',
+        institution:{id:0,
+                     title:'institution',
+                     country:'FR' # admin may have corrected this from DE
+        },
+        id:project.id
+    }
+
+    assert_enqueued_emails(1) do
+      assert_difference('Institution.count') do
+        assert_difference('GroupMembership.count') do
+          post :respond_join_request, params:params
+        end
+      end
+    end
+
+    assert_redirected_to(project_path(project))
+    assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
+    project.reload
+    institution = Institution.last
+    assert_equal 'institution',institution.title
+    assert_equal 'FR',institution.country
+    assert_includes project.people, sender
+    assert_includes project.institutions, institution
   end
 
   test 'respond join request rejected' do
     person = Factory(:project_administrator)
     project = person.projects.first
     institution = Factory(:institution)
-    log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
+    sender = Factory(:person)
+    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
 
     params = {
         message_log_id: log.id,
@@ -1861,10 +1910,19 @@ class ProjectsControllerTest < ActionController::TestCase
         id:project.id
     }
 
-    post :respond_join_request, params:params
+    assert_enqueued_emails(1) do
+      assert_no_difference('Institution.count') do
+        assert_no_difference('GroupMembership.count') do
+          post :respond_join_request, params:params
+        end
+      end
+    end
 
     assert_redirected_to(project_path(project))
     assert_equal "Request rejected and #{log.sender.name} has been notified",flash[:notice]
+    project.reload
+    refute_includes project.people, sender
+    refute_includes project.institutions, institution
   end
 
   private

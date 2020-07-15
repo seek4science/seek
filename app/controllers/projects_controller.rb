@@ -62,9 +62,24 @@ class ProjectsController < ApplicationController
     raise "message log doesn't match project" if message_log.resource != @project
     raise "incorrect type of message log" unless message_log.message_type==MessageLog::PROJECT_MEMBERSHIP_REQUEST
     sender = message_log.sender
+    details = JSON.parse(message_log.details)
     if params[:accept_request]=='1'
+      institution = Institution.new(JSON.parse(details['institution']))
+
+      if institution.id==0
+        institution.id=nil
+        institution.save!
+      else
+        institution = Institution.find(institution.id)
+      end
+      sender.add_to_project_and_institution(@project,institution)
+      sender.save!
+      Mailer.notify_user_projects_assigned(sender,[@project]).deliver_later
+
       flash[:notice]="Request accepted and #{sender.name} added to #{t('project')} and notified"
     else
+      comments = details['comments']
+      Mailer.join_project_rejected(sender,@project,comments).deliver_later
       flash[:notice]="Request rejected and #{sender.name} has been notified"
     end
 
