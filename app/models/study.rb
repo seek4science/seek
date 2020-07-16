@@ -80,7 +80,6 @@ class Study < ApplicationRecord
               data: generate_metadata(data)
           )
         )
-        study_exist(study_id)
       end
     end
     studies
@@ -130,14 +129,52 @@ class Study < ApplicationRecord
     [study_data, studies]
   end
 
-  def self.study_exist(study_metadata_id)
+  def self.get_existing_studies(studies)
     existing_studies = []
-    find_metadata = CustomMetadata.where("json_metadata LIKE ?", "%#{study_metadata_id}%").last
-    if !find_metadata.nil?
-      study_id = find_metadata.item_id
-      study = Study.where(id: study_id)
-      existing_studies << study
+    studies.each do |study|
+      study_metadata_id = study.custom_metadata.data[:id]
+      find_metadata = CustomMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").all
+      next if find_metadata.nil?
+
+      find_metadata.each do |metadata|
+
+        old_study = {
+            id: metadata.item_id.to_s,
+            metadata_id: metadata.id,
+            study_miappe_id: study_metadata_id
+        }
+        existing_studies << old_study
+      end
+
     end
+    existing_studies.to_json
+  end
+
+  def self.get_license(studies_file)
+
+    default_license = 'test'
+    investigation_license_id = ''
+    license_row_index = 7
+    columns = [2]
+    parsed_sheet = Seek::Templates::StudiesReader.new(studies_file)
+    parsed_sheet.each_record(2, columns) do |index, data|
+      investigation_license_id = data[0].value if index == license_row_index
+    end
+    licenses_ids = JSON.parse(File.read(File.join(Rails.root, 'public', 'od_licenses.json'))).keys
+
+
+    normalize_license_id(default_license)
+
+    licenses_ids.each do |license_id|
+      if normalize_license_id(license_id) == normalize_license_id(investigation_license_id)
+        return license_id
+      end
+    end
+    default_license
+  end
+
+  def self.normalize_license_id(license_id)
+    license_id.remove('-').remove('.').remove(' ').upcase
   end
 
   def self.check_study_is_valid(study, metadata)
@@ -174,7 +211,7 @@ class Study < ApplicationRecord
   end
 
   def self.filter_by_projects(projects)
-    joins(:projects).where(investigations: { investigations_projects: { project_id: projects } })
+    joins(:projects).where(investigations: {investigations_projects: {project_id: projects}})
   end
 
   def related_publication_ids

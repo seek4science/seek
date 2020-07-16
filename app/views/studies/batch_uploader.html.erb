@@ -12,12 +12,12 @@
     <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file} -%>
 
     <div>
-      <%= create_button id:"data_file_submit_btn",
+      <%= create_button id:"study_file_submit_btn",
                         onclick:"return validateResourceFields('data_file');",
                         class:'btn btn-primary',
                         button_text:'Upload',
                         'data-upload-file-text' => 'Upload' %>
-      or <%= cancel_button(data_files_path) -%>
+      or <%= cancel_button(studies_path) -%>
     </div>
   </div>
 <% end -%>
