@@ -136,6 +136,9 @@ class StudiesController < ApplicationController
     @studies = Study.extract_studies_from_file(studies_file)
     @study = @studies[0]
     @studies_datafiles = Study.extract_study_data_from_file(studies_file)
+    @license = Study.get_license(studies_file)
+    @existing_studies = JSON.parse(Study.get_existing_studies(@studies))
+
     render 'studies/batch_preview'
   end
 
@@ -154,6 +157,11 @@ class StudiesController < ApplicationController
     studies_uploaded = false
     data_file_uploaded = false
 
+    unless params[:existing_studies].blank?
+      remove_existing_studies(params[:existing_studies])
+    end
+
+
     studies_length.times do |index|
       metadata = generate_metadata(params[:studies], index)
       study_params = {
@@ -170,51 +178,46 @@ class StudiesController < ApplicationController
       Study.check_study_is_valid(@study, metadata)
       if @study.valid? && @study.save! && @study.custom_metadata.valid?
         studies_uploaded = true if @study.save
-      end
 
+        data_file_names = params[:studies][:data_files][index].split(', ')
+        data_file_names.length.times do |data_file_index|
+          study_metadata_id = params[:studies][:id][index]
+          study_id = CustomMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last.item_id
+          assay_class_id = AssayClass.where(title: 'Experimental assay').first.id
+          data_file_description = params[:studies][:data_file_description][index].split(', ')
+          assay_params = {
+            title: 'Assay for ' + params[:studies][:id][index] + '-' + (data_file_index + 1).to_s,
+            description: data_file_description[data_file_index],
+            study_id: study_id,
+            assay_class_id: assay_class_id
+          }
 
-      data_file_names = params[:studies][:data_files][index].split(', ')
-      data_file_names.length.times do |data_file_index|
-        study_metadata_id = '"id":"' + params[:studies][:id][index] + '"'
-        study_id = CustomMetadata.where('json_metadata LIKE ?', "%#{study_metadata_id}%").last.item_id
-        assay_class_id = AssayClass.where(title: 'Experimental assay').first.id
-        data_file_description = params[:studies][:data_file_description][index].split(', ')
-        assay_params = {
-          title: 'Assay for ' + params[:studies][:id][index] + '-' + (data_file_index + 1).to_s,
-          description: data_file_description[data_file_index],
-          study_id: study_id,
-          assay_class_id: assay_class_id
-        }
+          data_file_name = "#{data_file_names[data_file_index]}.csv"
+          data_file_url = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/data/#{data_file_name}"
+          data_file_content_blob = ContentBlob.new
+          data_file_content_blob.tmp_io_object = File.open(data_file_url)
+          data_file_content_blob.original_filename = "#{data_file_name}"
 
-        data_file_name = "#{data_file_names[data_file_index]}.csv"
-        data_file_url = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/data/#{data_file_name}"
-        data_file_content_blob = ContentBlob.new
-        data_file_content_blob.tmp_io_object = File.open(data_file_url)
-        data_file_content_blob.original_filename = "#{data_file_name}"
+          license = params[:studies][:license]
+          data_file_params = {
+            title: data_file_names[data_file_index],
+            description: data_file_description[data_file_index],
+            license: license,
+            projects: Project.where(title: 'Default Project'),
+            content_blob: data_file_content_blob
+          }
 
-        #TODO Check and use the right license
+          assay_asset_params = {
+            assay: Assay.new(assay_params),
+            asset: DataFile.new(data_file_params)
+          }
+          @assay_asset = AssayAsset.new(assay_asset_params)
 
-        data_file_params = {
-          title: data_file_names[data_file_index],
-          description: data_file_description[data_file_index],
-          license: 'CC-BY-4.0',
-          projects: Project.where(title: 'Default Project'),
-          content_blob: data_file_content_blob
-        }
-
-        assay_asset_params = {
-          assay: Assay.new(assay_params),
-          asset: DataFile.new(data_file_params)
-        }
-        @assay_asset = AssayAsset.new(assay_asset_params)
-
-        if @assay_asset.valid? && @assay_asset.save!
-          data_file_uploaded = true if @assay_asset.save
+          if @assay_asset.valid? && @assay_asset.save!
+            data_file_uploaded = true if @assay_asset.save
+          end
         end
-
       end
-
-
     end
 
     batch_uploaded = studies_uploaded && data_file_uploaded
@@ -257,6 +260,21 @@ class StudiesController < ApplicationController
       cultural_practices: studies_meta_data[:culturalPractices][index]
     }
     metadata
+  end
+
+  def remove_existing_studies(studies)
+
+    existing_studies = JSON.parse(studies.to_json)
+
+    existing_studies.each do |study|
+      study_id = JSON.parse(study.gsub("=>",":"))["id"].to_i
+      metadata_id = JSON.parse(study.gsub("=>",":"))["metadata_id"].to_i
+
+      Study.where(id: study_id).delete_all
+      CustomMetadata.where(id: metadata_id).delete_all
+      Assay.where(study_id: study_id).delete_all
+    end
+
   end
 
   private

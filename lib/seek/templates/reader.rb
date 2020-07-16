@@ -22,8 +22,8 @@ module Seek
         end.compact
       end
 
-      def each_record(sheet_id, columns = nil)
-        rows = template_xml_document.find("//ss:sheet[@index='#{sheet_id}']/ss:rows/ss:row")
+      def each_record(sheet_index, columns = nil)
+        rows = template_xml_document.find("//ss:sheet[@index='#{sheet_index}']/ss:rows/ss:row")
         first_col = columns[0]
         rows.each do |row|
           next if (row_index = row.attributes['index'].to_i) <= 1
@@ -36,7 +36,7 @@ module Seek
             if is_valid_row && !cell.content.strip.blank? && (columns.nil? || columns.include?(column))
               Data.new(column, cell.content)
             elsif is_valid_row && cell.content.strip.blank? && (columns.nil? || columns.include?(column))
-              Data.new(column, "")
+              Data.new(column, '')
             end
           end.compact
           next if data.empty?
