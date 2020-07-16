@@ -261,7 +261,8 @@ class SopTest < ActiveSupport::TestCase
 
     v = sop.reload.latest_version
 
-    assert_equal :registered_users, v.visibility
+    assert_equal :public, v.visibility
+    assert_equal v.class.default_visibility, v.visibility
   end
 
   test 'gets and sets version visibility' do
