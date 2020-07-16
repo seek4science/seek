@@ -126,6 +126,24 @@ class ProgrammesController < ApplicationController
     raise "message log not found" unless @message_log
     raise "incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST
     details = JSON.parse(@message_log.details)
+    @programme = Programme.new(details['programme'])
+    @programme = Programme.find(@programme.id) unless @programme.id==0
+
+    if @programme.new_record?
+      raise 'You do not have rights to create a Programme' unless Programme.can_create?
+    else
+      raise 'You do not have permissions to administer this programme' unless @programme.can_manage?
+    end
+
+    @institution = Institution.new(details['institution'])
+    @institution = Institution.find(@institution.id) unless @institution.id==0
+
+    @project = Project.new(details['project'])
+
+    respond_to do |format|
+      format.html
+    end
+
   end
 
   private
