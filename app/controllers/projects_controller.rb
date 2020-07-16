@@ -41,6 +41,10 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def administer_create_request
+
+  end
+
   def administer_join_request
     @message_log = MessageLog.find_by_id(params[:message_log_id])
     raise "message log not found" unless @message_log
@@ -120,19 +124,18 @@ class ProjectsController < ApplicationController
       @institution ||= Institution.new(inst_params)
     end
 
-    @comments = params[:comments]
     if params[:managed_programme]
       @programme = Programme.managed_programme
       raise "no #{t('programme')} can be found" if @programme.nil?
       Mailer.request_create_project_for_programme(current_user, @programme,JSON(@project.to_json), JSON(@institution.to_json), @comments).deliver_later
-      MessageLog.log_project_creation_request(current_person, @programme, @project,@institution,@comments)
+      MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       flash[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     else
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
       @programme.id=0 # required for serialization for the email
       Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, @comments).deliver_later
-      MessageLog.log_project_creation_request(current_person, Programme.first, @project,@institution,@comments)
+      MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       flash[:notice]="Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
     end
 

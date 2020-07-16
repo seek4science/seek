@@ -188,7 +188,7 @@ class Mailer < ActionMailer::Base
     @details = details
     mail(from: Seek::Config.noreply_sender,
          to: project.project_administrators.collect(&:email_with_name),
-         reply_to: user.person.email_with_name,
+         reply_to: @requester.email_with_name,
          subject: "#{@requester.email_with_name} requested membership of project: #{@resource.title}")
   end
 
@@ -201,33 +201,33 @@ class Mailer < ActionMailer::Base
     @message_log = message_log
     mail(from: Seek::Config.noreply_sender,
          to: @owners.collect(&:email_with_name),
-         reply_to: user.person.email_with_name,
+         reply_to: @requester.email_with_name,
          subject: "JOIN #{t('project')} request to #{@project.title} from #{@requester.name}")
   end
 
-  def request_create_project_for_programme(user, programme, project_json, institution_json, comments)
+  def request_create_project_for_programme(user, programme, project_json, institution_json, message_log)
     @admins = programme.programme_administrators
     @programme = programme
     @requester = user.person
     @institution = Institution.new(JSON.parse(institution_json))
     @project = Project.new(JSON.parse(project_json))
-    @comments = comments
+    @message_log = message_log
     mail(from: Seek::Config.noreply_sender,
          to: @admins.collect(&:email_with_name),
-         reply_to: user.person.email_with_name,
+         reply_to: @requester.email_with_name,
          subject: "NEW #{t('project')} request from #{@requester.name} for your #{t('programme')}: #{@project.title}")
   end
 
-  def request_create_project_and_programme(user, programme_json, project_json, institution_json, comments)
+  def request_create_project_and_programme(user, programme_json, project_json, institution_json, message_log)
     @admins = admins
     @programme = Programme.new(JSON.parse(programme_json))
     @requester = user.person
     @institution = Institution.new(JSON.parse(institution_json))
     @project = Project.new(JSON.parse(project_json))
-    @comments = comments
+    @message_log = message_log
     mail(from: Seek::Config.noreply_sender,
          to: admin_emails,
-         reply_to: user.person.email_with_name,
+         reply_to: @requester.email_with_name,
          subject: "New #{t('project')} and #{t('programme')} request from #{@requester.name}: #{@project.title}")
   end
 
@@ -238,6 +238,7 @@ class Mailer < ActionMailer::Base
     subject = "Your request to join the #{t('project')}, #{project.title}, hasn't been approved"
     mail(from: Seek::Config.noreply_sender,
          to: requester.email_with_name,
+         reply_to: @requester.email_with_name,
          subject: subject)
   end
 
