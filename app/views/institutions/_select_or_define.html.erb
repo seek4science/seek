@@ -46,7 +46,8 @@
         });
 
         $j('input').on('itemAdded', function(event) {
-            if (event.item.id=='0') {
+            console.log(event.item.id)
+            if (event.item.id=='-1') {
                 toggleUserInput(false);
             }
             else {

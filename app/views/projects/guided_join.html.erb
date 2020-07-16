@@ -100,6 +100,13 @@
 
     $j(document).ready(function () {
 
+      $j('form').on('submit',function() {
+         //clear the id if -1 before submitting
+         if ($j('#institution_id').val()=='-1') {
+             $j('#institution_id').val('');
+         }
+      });
+
       $j('#project-search-submit').click(function (e) {
           $j('#project-search-results').spinner('add');
           var terms = $j('#project-search-terms').val();

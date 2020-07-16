@@ -722,9 +722,9 @@ class ProgrammesControllerTest < ActionController::TestCase
   test 'administer create request project with new programme and institution' do
     person = Factory(:admin)
     login_as(person)
-    project = Project.new(id:0, title:'new project')
-    programme = Programme.new(id:0, title:'new programme')
-    institution = Institution.new(id:0, title:'my institution')
+    project = Project.new(title:'new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new(title:'my institution')
     log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
     assert_response :success
@@ -733,23 +733,23 @@ class ProgrammesControllerTest < ActionController::TestCase
   test 'respond create project request - new programme and institution' do
     person = Factory(:admin)
     login_as(person)
-    project = Project.new(id:0, title:'new project',web_page:'my new project')
-    programme = Programme.new(id:0, title:'new programme')
-    institution = Institution.new({id:0, title:'institution', country:'DE'})
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new({title:'institution', country:'DE'})
     requester = Factory(:person)
     log = MessageLog.log_project_creation_request(requester,programme,project,institution)
     params = {
         message_log_id:log.id,
         accept_request: '1',
         project:{
-            title:'new project',
+            title:'new project updated',
             web_page:'http://proj.org'
         },
         programme:{
-            title:'new prog'
+            title:'new programme updated'
         },
         institution:{
-            title:'the institute',
+            title:'new institution updated',
             city:'Paris',
             country:'FR'
         }
@@ -774,6 +774,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_redirected_to(project_path(project))
     assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
 
+    assert_equal 'new project updated', project.title
+    assert_equal 'new programme updated', programme.title
+    assert_equal 'new institution updated', institution.title
+
     assert_includes programme.projects,project
     assert_includes project.people, requester
     assert_includes project.institutions, institution
@@ -787,7 +791,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     programme = person.programmes.first
     institution = Factory(:institution)
     login_as(person)
-    project = Project.new(id:0, title:'new project',web_page:'my new project')
+    project = Project.new(title:'new project',web_page:'my new project')
     requester = Factory(:person)
     log = MessageLog.log_project_creation_request(requester,programme,project,institution)
     params = {
@@ -836,7 +840,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     programme = person.programmes.first
     institution = Factory(:institution)
     login_as(person)
-    project = Project.new(id:0, title:'new project',web_page:'my new project')
+    project = Project.new(title:'new project',web_page:'my new project')
     requester = Factory(:person)
     log = MessageLog.log_project_creation_request(requester,programme,project,institution)
     params = {

@@ -1759,7 +1759,6 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Factory(:project)
     login_as(person)
     institution_params = {
-        id:0,
         title:'fish',
         city:'Sheffield',
         country:'GB',
@@ -1783,7 +1782,7 @@ class ProjectsControllerTest < ActionController::TestCase
     details = JSON.parse(log.details)
     assert_equal 'some comments', details['comments']
     institution_details = details['institution']
-    assert_equal 0, institution_details['id']
+    assert_equal nil, institution_details['id']
     assert_equal 'GB', institution_details['country']
     assert_equal 'Sheffield', institution_details['city']
     assert_equal 'http://google.com', institution_details['web_page']
@@ -1825,8 +1824,8 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, programme.id) do
       params = {
           project: { title: 'The Project',description:'description',web_page:'web_page'},
-          institution: {id: '0', title:'the inst',web_page:'the page',city:'London',country:'GB'},
-          programme: {id:'0',title:'the prog'}
+          institution: {title:'the inst',web_page:'the page',city:'London',country:'GB'},
+          programme: {title:'the prog'}
       }
       assert_enqueued_emails(1) do
         assert_difference('MessageLog.count') do
@@ -1853,21 +1852,21 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_equal 'London',institution_details['city']
       assert_equal 'the page',institution_details['web_page']
       assert_equal 'the inst',institution_details['title']
-      assert_equal 0,institution_details['id']
+      assert_equal nil,institution_details['id']
 
       assert_equal 'description', project_details['description']
       assert_equal 'The Project', project_details['title']
-      assert_equal 0,project_details['id']
+      assert_equal nil,project_details['id']
 
       assert_equal 'the prog',programme_details['title']
-      assert_equal 0,programme_details['id']
+      assert_equal nil,programme_details['id']
     end
   end
 
   test 'administer join request' do
     person = Factory(:project_administrator)
     project = person.projects.first
-    institution = Institution.new(id:0, title:'my institution')
+    institution = Institution.new(title:'my institution')
     log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
     get :administer_join_request, params:{id:project.id,message_log_id:log.id}
     assert_response :success
@@ -1906,8 +1905,8 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:project_administrator)
     project = person.projects.first
     sender = Factory(:person)
-    institution = Institution.new({id:0,
-                                   title:'institution',
+    institution = Institution.new({
+                                      title:'institution',
                                    country:'DE'
                                   })
     log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
@@ -1915,7 +1914,7 @@ class ProjectsControllerTest < ActionController::TestCase
     params = {
         message_log_id: log.id,
         accept_request: '1',
-        institution:{id:0,
+        institution:{
                      title:'institution',
                      country:'FR' # admin may have corrected this from DE
         },
