@@ -1750,7 +1750,7 @@ class ProjectsControllerTest < ActionController::TestCase
     log = MessageLog.last
     details = JSON.parse(log.details)
     assert_equal 'some comments', details['comments']
-    assert_equal institution.to_json, details['institution']
+    assert_equal institution.attributes, details['institution']
 
   end
 
@@ -1782,7 +1782,7 @@ class ProjectsControllerTest < ActionController::TestCase
     log = MessageLog.last
     details = JSON.parse(log.details)
     assert_equal 'some comments', details['comments']
-    institution_details = JSON.parse(details['institution'])
+    institution_details = details['institution']
     assert_equal 0, institution_details['id']
     assert_equal 'GB', institution_details['country']
     assert_equal 'Sheffield', institution_details['city']
@@ -1810,9 +1810,9 @@ class ProjectsControllerTest < ActionController::TestCase
       assert flash[:notice]
       log = MessageLog.last
       details = JSON.parse(log.details)
-      assert_equal institution.to_json, details['institution']
-      assert_equal programme.to_json, details['programme']
-      project_details = JSON.parse(details['project'])
+      assert_equal institution.attributes, details['institution']
+      assert_equal programme.attributes, details['programme']
+      project_details = details['project']
       assert_equal 'description', project_details['description']
       assert_equal 'The Project', project_details['title']
     end
@@ -1830,7 +1830,13 @@ class ProjectsControllerTest < ActionController::TestCase
       }
       assert_enqueued_emails(1) do
         assert_difference('MessageLog.count') do
-          post :request_create, params: params
+          assert_no_difference('Institution.count') do
+            assert_no_difference('Project.count') do
+              assert_no_difference('Programme.count') do
+                post :request_create, params: params
+              end
+            end
+          end
         end
       end
 
@@ -1838,9 +1844,9 @@ class ProjectsControllerTest < ActionController::TestCase
       assert flash[:notice]
       log = MessageLog.last
       details = JSON.parse(log.details)
-      project_details = JSON.parse(details['project'])
-      programme_details = JSON.parse(details['programme'])
-      institution_details = JSON.parse(details['institution'])
+      project_details = details['project']
+      programme_details = details['programme']
+      institution_details = details['institution']
 
 
       assert_equal 'GB',institution_details['country']
@@ -1864,16 +1870,6 @@ class ProjectsControllerTest < ActionController::TestCase
     institution = Institution.new(id:0, title:'my institution')
     log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
     get :administer_join_request, params:{id:project.id,message_log_id:log.id}
-    assert_response :success
-  end
-
-  test 'administer create request new programme and institution' do
-    person = Factory(:project_administrator)
-    project = Project.new(id:0, title:'new project')
-    programme = Programme.new(id:0, title:'new programme')
-    institution = Institution.new(id:0, title:'my institution')
-    log = MessageLog.log_project_creation_request(Factory(:person),project,institution,'some comments')
-    get :administer_create_request, params:{id:project.id,message_log_id:log.id}
     assert_response :success
   end
 

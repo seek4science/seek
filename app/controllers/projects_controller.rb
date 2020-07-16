@@ -41,10 +41,6 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def administer_create_request
-
-  end
-
   def administer_join_request
     @message_log = MessageLog.find_by_id(params[:message_log_id])
     raise "message log not found" unless @message_log
@@ -52,7 +48,7 @@ class ProjectsController < ApplicationController
     raise "incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_MEMBERSHIP_REQUEST
     details = JSON.parse(@message_log.details)
     @comments = details['comments']
-    @institution = Institution.new(JSON.parse(details['institution']))
+    @institution = Institution.new(details['institution'])
     @institution = Institution.find(@institution.id) if @institution.id!=0
 
     respond_to do |format|
@@ -68,7 +64,8 @@ class ProjectsController < ApplicationController
     sender = message_log.sender
     details = JSON.parse(message_log.details)
     if params[:accept_request]=='1'
-      institution = Institution.new(JSON.parse(details['institution']))
+      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
+      institution = Institution.new(inst_params)
 
       if institution.id==0
         institution.id=nil
@@ -127,15 +124,16 @@ class ProjectsController < ApplicationController
     if params[:managed_programme]
       @programme = Programme.managed_programme
       raise "no #{t('programme')} can be found" if @programme.nil?
-      Mailer.request_create_project_for_programme(current_user, @programme,JSON(@project.to_json), JSON(@institution.to_json), @comments).deliver_later
-      MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+      log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+      Mailer.request_create_project_for_programme(current_user, @programme,JSON(@project.to_json), JSON(@institution.to_json), log).deliver_later
+
       flash[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     else
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
       @programme.id=0 # required for serialization for the email
-      Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, @comments).deliver_later
-      MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+      log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+      Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, log).deliver_later
       flash[:notice]="Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
     end
 
