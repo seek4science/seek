@@ -1,47 +1,55 @@
-<% if logged_in_and_member? %>
-    <h2>Version History</h2>
-    <div class="list-group">
-      <% resource.versions.reverse.each do |version| %>
-          <div class="list-group-item <%= 'list-group-item-info' if version.version == displayed_resource.version -%>">
-            <div class="row">
-              <div class="col-sm-8">
-                <h4 class="list-group-item-heading">
-                  <%= link_to "Version #{version.version} #{resource.describe_version(version.version)}", {:version => version.version} %>
-                  <small>
-                    Created <%= date_as_string(version.created_at,true) %>
-                    by <%= contributor version.contributor %>
-                  </small>
-                </h4>
-                <p>
-                  <% if resource.can_manage? %>
-                    <small><%= link_to "Edit comment",'#',onclick:"$j('#edit_version_comment_form_#{version.version}').fadeToggle(); return false;" %></small>
-                  <% end %>
-                </p>
-                <p class="list-group-item-text">
-                  <% if version.revision_comments.blank? %>
-                      <span class="subtle">No revision comments</span>
-                  <% else %>
-                      <%= white_list(version.revision_comments) -%>
-                  <% end %>
-                </p>
-                <% if resource.can_manage? %>
-                  <%= render :partial=>"assets/edit_version_comment_form",:locals => {:version=>version} -%>
-                <% end %>
-              </div>
-              <div class="col-sm-4 text-right">
-                <% if resource.versions.length > 1 && resource.is_a?(Model) %>
-                    <% if allow_model_comparison(displayed_resource, version) %>
-                        <%= button_link_to("Compare", 'show', compare_versions_model_path(resource, version: displayed_resource.version, other_version: version.version).html_safe) -%>
-                    <% end %>
-                <% end %>
-                <% if Seek::Config.delete_asset_version_enabled && resource.can_edit?(User.current_user) && resource.versions.length > 1 %>
-                    <% path = polymorphic_path(resource, :version => version.version, :action => :destroy_version) %>
-                    <%= button_link_to("Delete", 'destroy', path,
-                                       { data: { confirm: "This deletes version #{version.to_s} of the #{text_for_resource resource}. Are you sure?" }, :method => :delete}) -%>
-                <% end -%>
-              </div>
-            </div>
+<h2>Version History</h2>
+<div class="list-group">
+  <% visible_versions = resource.visible_versions %>
+  <% visible_versions.reverse.each do |version| %>
+    <div class="list-group-item <%= 'list-group-item-info' if version.version == displayed_resource.version -%>">
+      <div class="row">
+        <div class="col-sm-8">
+          <h4 class="list-group-item-heading">
+            <%= link_to "Version #{version.version} #{resource.describe_version(version.version)}", {:version => version.version} %>
+            <small>
+              Created <%= date_as_string(version.created_at,true) %>
+              by <%= contributor version.contributor %>
+            </small>
+          </h4>
+          <p>
+            <% if resource.can_manage? %>
+              <small><%= link_to "Edit comment",'#',onclick:"$j('#edit_version_comment_form_#{version.version}').fadeToggle(); return false;" %></small>
+            <% end %>
+          </p>
+          <p class="list-group-item-text">
+            <% if version.revision_comments.blank? %>
+              <span class="subtle">No revision comments</span>
+            <% else %>
+              <%= white_list(version.revision_comments) -%>
+            <% end %>
+          </p>
+          <div class="subtle">
+            <% if version.visibility == :registered_users %>
+              <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+              Only visible to registered users
+            <% elsif version.visibility == :private %>
+              <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+              Hidden
+            <% end %>
+            <% if resource.can_manage? %>
+              <%= render :partial=>"assets/edit_version_comment_form",:locals => {:version=>version} -%>
+            <% end %>
           </div>
-      <% end %>
+        </div>
+        <div class="col-sm-4 text-right">
+          <% if visible_versions.length > 1 && resource.is_a?(Model) %>
+            <% if allow_model_comparison(displayed_resource, version) %>
+              <%= button_link_to("Compare", 'show', compare_versions_model_path(resource, version: displayed_resource.version, other_version: version.version).html_safe) -%>
+            <% end %>
+          <% end %>
+          <% if Seek::Config.delete_asset_version_enabled && resource.can_edit?(User.current_user) && visible_versions.length > 1 %>
+            <% path = polymorphic_path(resource, :version => version.version, :action => :destroy_version) %>
+            <%= button_link_to("Delete", 'destroy', path,
+                               { data: { confirm: "This deletes version #{version.to_s} of the #{text_for_resource resource}. Are you sure?" }, :method => :delete}) -%>
+          <% end -%>
+        </div>
+      </div>
     </div>
-<% end %>
+  <% end %>
+</div>

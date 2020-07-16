@@ -2,6 +2,13 @@ module Seek
   # Based heavily on the acts_as_versioned plugin
   module ExplicitVersioning
     CALLBACKS = [:sync_latest_version].freeze
+    VISIBILITY = {
+        0 => :private,
+        1 => :registered_users,
+        2 => :public
+    }.freeze
+    VISIBILITY_INV = VISIBILITY.invert.freeze
+
     def self.included(mod) # :nodoc:
       mod.extend(ClassMethods)
     end
@@ -65,6 +72,33 @@ module Seek
           def is_a_version?
             true
           end
+
+          def visibility= key
+            super(Seek::ExplicitVersioning::VISIBILITY_INV[key.to_sym] || Seek::ExplicitVersioning::VISIBILITY_INV[self.class.default_visibility])
+          end
+
+          def visibility
+            Seek::ExplicitVersioning::VISIBILITY[super]
+          end
+
+          def visible?(user = User.current_user)
+            case visibility
+            when :public
+              true
+            when :private
+              parent.can_manage?(user)
+            when :registered_users
+              user&.person&.member?
+            end
+          end
+
+          def self.default_visibility
+            :public
+          end
+
+          def set_default_visibility
+            self.visibility ||= self.class.default_visibility
+          end
         end
 
         versioned_class.table_name = versioned_table_name
@@ -76,6 +110,8 @@ module Seek
         versioned_class.belongs_to :parent,
                                    class_name: "::#{self}",
                                    foreign_key: versioned_foreign_key
+
+        versioned_class.before_validation :set_default_visibility
 
         versioned_class.class_eval(&extension) if block_given?
       end
@@ -178,6 +214,14 @@ module Seek
 
       def is_a_version?
         false
+      end
+
+      def visible_versions(user = User.current_user)
+        scopes = [ExplicitVersioning::VISIBILITY_INV[:public]]
+        scopes << ExplicitVersioning::VISIBILITY_INV[:registered_users] if user&.person&.member?
+        scopes << ExplicitVersioning::VISIBILITY_INV[:private] if can_manage?(user)
+
+        versions.where(visibility: scopes)
       end
 
       protected

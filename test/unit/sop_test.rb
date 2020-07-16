@@ -252,4 +252,75 @@ class SopTest < ActiveSupport::TestCase
     assert_includes sop.contributors, sop.contributor
     assert_includes sop.contributors, user.person
   end
+
+  test 'sets default version visibility' do
+    sop = Factory(:sop)
+    disable_authorization_checks do
+      sop.save_as_new_version('Updated sop as part of a test')
+    end
+
+    v = sop.reload.latest_version
+
+    assert_equal :registered_users, v.visibility
+  end
+
+  test 'gets and sets version visibility' do
+    sop = Factory(:sop)
+    disable_authorization_checks do
+      sop.save_as_new_version('Updated sop as part of a test')
+    end
+
+    v = sop.reload.latest_version
+
+    v.visibility = :private
+    assert_equal :private, v.visibility
+    v.visibility = :registered_users
+    assert_equal :registered_users, v.visibility
+    v.visibility = :public
+    assert_equal :public, v.visibility
+    v.visibility = :fish
+    assert_not_equal :fish, v.visibility
+    assert_equal v.class.default_visibility, v.visibility
+  end
+
+  test 'lists visible versions' do
+    sop = Factory(:sop)
+    pub, reg, priv = nil
+
+    disable_authorization_checks do
+      pub = sop.latest_version
+      pub.visibility = :public
+      pub.save!
+
+      sop.save_as_new_version('Registered users')
+      reg = sop.reload.latest_version
+      reg.visibility = :registered_users
+      reg.save!
+
+      sop.save_as_new_version('Private')
+      priv = sop.reload.latest_version
+      priv.visibility = :private
+      priv.save!
+    end
+
+    assert_equal 3, sop.versions.length
+
+    assert pub.visible?(nil)
+    refute reg.visible?(nil)
+    refute priv.visible?(nil)
+    assert_equal [pub].sort, sop.visible_versions(nil).sort
+
+    registered_user = Factory(:person).user
+    assert pub.visible?(registered_user)
+    assert reg.visible?(registered_user)
+    refute priv.visible?(registered_user)
+    assert_equal [pub, reg].sort, sop.visible_versions(registered_user).sort
+
+    manager = sop.contributor.user
+    assert sop.can_manage?(manager)
+    assert pub.visible?(manager)
+    assert reg.visible?(manager)
+    assert priv.visible?(manager)
+    assert_equal [pub, reg, priv].sort, sop.visible_versions(manager).sort
+  end
 end

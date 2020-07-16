@@ -10,16 +10,12 @@ module Seek
     def find_display_asset(asset = instance_variable_get("@#{controller_name.singularize}"))
       requested_version = params[:version] || asset.latest_version.version
       found_version = asset.find_version(requested_version)
-      if !found_version || anonymous_request_for_previous_version?(asset, requested_version)
+      if !found_version || !found_version.visible?
         error('This version is not available', 'invalid route')
         return false
       else
         instance_variable_set("@display_#{asset.class.name.underscore}", asset.find_version(found_version))
       end
-    end
-
-    def anonymous_request_for_previous_version?(asset, requested_version)
-      (!User.logged_in_and_member? && requested_version.to_i != asset.latest_version.version)
     end
 
     def update_relationships(asset, params)

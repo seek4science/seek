@@ -17,13 +17,14 @@ col_width = buttons_partial.nil? && !content_for?(:buttons) ? 12 : 6
     <h1>
       <%= title -%>
       <% if version %>
-          <% if logged_in_and_registered? && item.versions.count > 1 %>
+          <% visible_versions = item.visible_versions %>
+          <% if visible_versions.length > 1 %>
               <div class="version">
                 <a class="dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
                   Version <%= version -%> <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu" role="menu">
-                  <% item.versions.reverse.each do |v| %>
+                  <% visible_versions.reverse.each do |v| %>
                       <li>
                         <%= link_to({:version => v.version}, :method => request.request_method) do -%>
                             Version <%= v.version %> <%= item.describe_version(v.version) -%><br/>
