@@ -730,6 +730,58 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'respond create project request - new programme and institution' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Project.new(id:0, title:'new project',web_page:'my new project')
+    programme = Programme.new(id:0, title:'new programme')
+    institution = Institution.new({id:0, title:'institution', country:'DE'})
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'new project',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            title:'new prog'
+        },
+        institution:{
+            title:'the institute',
+            city:'Paris',
+            country:'FR'
+        }
+    }
+
+    assert_enqueued_emails(1) do
+      assert_difference('Programme.count') do
+        assert_difference('Project.count') do
+          assert_difference('Institution.count') do
+            assert_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    project = Project.last
+    programme = Programme.last
+    institution = Institution.last
+
+    assert_redirected_to(project_path(project))
+    assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
+
+    assert_includes programme.projects,project
+    assert_includes project.people, requester
+    assert_includes project.institutions, institution
+    assert_includes programme.programme_administrators, requester
+    assert_includes project.project_administrators, requester
+
+  end
+
   def edit_max_object(programme)
     for i in 1..5 do
       Factory(:person).add_to_project_and_institution(programme.projects.first, Factory(:institution))
