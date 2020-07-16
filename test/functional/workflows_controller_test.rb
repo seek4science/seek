@@ -526,6 +526,22 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'handles error when generating diagram from CWL' do
+    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
+      wf = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
+      login_as(wf.contributor)
+      refute wf.diagram_exists?
+      assert wf.can_render_diagram?
+
+      VCR.use_cassette('workflows/cwl_viewer_error') do
+        get :diagram, params: { id: wf.id }
+      end
+
+      assert_response :not_found
+      refute wf.diagram_exists?
+    end
+  end
+
   test 'does not render diagram if not in RO crate' do
     wf = Factory(:nf_core_ro_crate_workflow)
     login_as(wf.contributor)

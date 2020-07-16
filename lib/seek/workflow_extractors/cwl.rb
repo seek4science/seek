@@ -25,7 +25,11 @@ module Seek
         return nil unless Seek::Config.cwl_viewer_url.present?
         content_type = self.class.diagram_formats[format]
         url = URI.join(Seek::Config.cwl_viewer_url, DIAGRAM_PATH % { format: format }).to_s
-        RestClient.post(url, @io.read, content_type: 'text/plain', accept: content_type)
+        begin
+          RestClient.post(url, @io.read, content_type: 'text/plain', accept: content_type)
+        rescue RestClient::Exception => e
+          nil
+        end
       end
 
       def metadata
