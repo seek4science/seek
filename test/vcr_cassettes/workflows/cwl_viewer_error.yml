@@ -1,0 +1,67 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://localhost:8080/graph/svg
+    body:
+      encoding: UTF-8
+      string: "class: Workflow\r\ncwlVersion: v1.2.0-dev2\r\ndoc: 'This workflow generates
+        binding scores that correlate well with binding affinities using an additional
+        tool SuCOS Max, developed at Oxford University. More info can be found at
+        https://covid19.galaxyproject.org/cheminformatics/'\r\ninputs:\r\n  0_Input
+        Dataset Collection:\r\n    format: data\r\n    type: File\r\n  1_Input Dataset:\r\n
+        \   format: data\r\n    type: File\r\noutputs: {}\r\nsteps:\r\n  2_Collapse
+        Collection:\r\n    in:\r\n      input_list: 0_Input Dataset Collection\r\n
+        \   out:\r\n    - output\r\n    run:\r\n      class: Operation\r\n      id:
+        toolshed_g2_bx_psu_edu_repos_nml_collapse_collections_collapse_dataset_4_2\r\n
+        \     inputs:\r\n        input_list:\r\n          format: Any\r\n          type:
+        File\r\n      outputs:\r\n        output:\r\n          doc: input\r\n          type:
+        File\r\n  3_SDF sort and filter:\r\n    in:\r\n      input: 2_Collapse Collection/output\r\n
+        \   out:\r\n    - output\r\n    run:\r\n      class: Operation\r\n      id:
+        toolshed_g2_bx_psu_edu_repos_bgruening_rdock_sort_filter_rdock_sort_filter_0_1_0\r\n
+        \     inputs:\r\n        input:\r\n          format: Any\r\n          type:
+        File\r\n      outputs:\r\n        output:\r\n          doc: sdf\r\n          type:
+        File\r\n  4_Split file:\r\n    in:\r\n      split_parms|input: 3_SDF sort
+        and filter/output\r\n    out:\r\n    - list_output_sdf\r\n    run:\r\n      class:
+        Operation\r\n      id: toolshed_g2_bx_psu_edu_repos_bgruening_split_file_to_collection_split_file_to_collection_0_4_0\r\n
+        \     inputs:\r\n        split_parms|input:\r\n          format: Any\r\n          type:
+        File\r\n      outputs:\r\n        list_output_sdf:\r\n          doc: input\r\n
+        \         type: File\r\n  5_Max SuCOS score:\r\n    in:\r\n      clusters:
+        1_Input Dataset\r\n      input: 4_Split file/list_output_sdf\r\n    out:\r\n
+        \   - output\r\n    run:\r\n      class: Operation\r\n      id: toolshed_g2_bx_psu_edu_repos_bgruening_sucos_max_score_sucos_max_score_0_2_0\r\n
+        \     inputs:\r\n        clusters:\r\n          format: Any\r\n          type:
+        File\r\n        input:\r\n          format: Any\r\n          type: File\r\n
+        \     outputs:\r\n        output:\r\n          doc: sdf\r\n          type:
+        File\r\n  6_Collapse Collection:\r\n    in:\r\n      input_list: 5_Max SuCOS
+        score/output\r\n    out:\r\n    - output\r\n    run:\r\n      class: Operation\r\n
+        \     id: toolshed_g2_bx_psu_edu_repos_nml_collapse_collections_collapse_dataset_4_2\r\n
+        \     inputs:\r\n        input_list:\r\n          format: Any\r\n          type:
+        File\r\n      outputs:\r\n        output:\r\n          doc: input\r\n          type:
+        File\r\n\r\n"
+    headers:
+      Accept:
+      - image/svg+xml
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - rest-client/2.0.2 (linux-gnu x86_64) ruby/2.4.9p362
+      Content-Type:
+      - text/plain
+      Content-Length:
+      - '2468'
+      Host:
+      - localhost:8080
+  response:
+    status:
+      code: 500
+      message: 'Oh no!'
+    headers:
+      Content-Type:
+      - text/plain
+      Content-Length:
+      - '7'
+      Date:
+      - Fri, 01 May 2020 16:13:22 GMT
+    http_version:
+  recorded_at: Fri, 01 May 2020 16:13:23 GMT
+recorded_with: VCR 2.9.3
