@@ -152,12 +152,14 @@ class ProgrammesController < ApplicationController
     raise "incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST
     raise 'you have no permission to create a project' unless Project.can_create?
     requester = @message_log.sender
+    make_programme_admin=false
 
     if params['accept_request']=='1'
       if params['programme']['id']
         @programme = Programme.find(params['programme']['id'])
       else
         @programme = Programme.new(params.require(:programme).permit([:title]))
+        make_programme_admin=true
       end
 
       if @programme.new_record?
@@ -167,26 +169,30 @@ class ProgrammesController < ApplicationController
       end
 
       if params['institution']['id']
-        @institution = Programme.find(params['institution']['id'])
+        @institution = Institution.find(params['institution']['id'])
       else
         @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country]))
       end
 
       @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
       @project.programme = @programme
-      @project.save!
-      @institution.save!
+
       requester.add_to_project_and_institution(@project, @institution)
       requester.is_project_administrator = true,@project
-      requester.is_programme_administrator = true, @programme
-      requester.save!
+      requester.is_programme_administrator = true, @programme if make_programme_admin
+      disable_authorization_checks do
+        requester.save!
+      end
 
       flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
       Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
 
       redirect_to(@project)
     else
-
+      comments = params['reject_details']
+      project_name = JSON.parse(@message_log.details)['project']['title']
+      Mailer.create_project_rejected(sender,project_name,comments).deliver_later
+      flash[:notice]="Request rejected and #{sender.name} has been notified"
     end
 
   end

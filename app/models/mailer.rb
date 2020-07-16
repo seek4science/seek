@@ -238,7 +238,16 @@ class Mailer < ActionMailer::Base
     subject = "Your request to join the #{t('project')}, #{project.title}, hasn't been approved"
     mail(from: Seek::Config.noreply_sender,
          to: requester.email_with_name,
-         reply_to: @requester.email_with_name,
+         subject: subject)
+  end
+
+  def create_project_rejected(requester,project_name,comments)
+    @requester = requester
+    @project_name = project_name
+    @comments = comments
+    subject = "Your request to create the #{t('project')}, #{project_name}, hasn't been approved"
+    mail(from: Seek::Config.noreply_sender,
+         to: requester.email_with_name,
          subject: subject)
   end
 

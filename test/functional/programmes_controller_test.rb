@@ -782,6 +782,97 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   end
 
+  test 'respond create project request - existing programme and institution' do
+    person = Factory(:programme_administrator)
+    programme = person.programmes.first
+    institution = Factory(:institution)
+    login_as(person)
+    project = Project.new(id:0, title:'new project',web_page:'my new project')
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'new project',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            id:programme.id
+        },
+        institution:{
+            id:institution.id
+        }
+    }
+
+    assert_enqueued_emails(1) do
+      assert_no_difference('Programme.count') do
+        assert_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    project = Project.last
+    programme.reload
+
+    assert_redirected_to(project_path(project))
+    assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
+
+    assert_includes programme.projects,project
+    assert_includes project.people, requester
+    assert_includes project.institutions, institution
+    refute_includes programme.programme_administrators, requester
+    assert_includes project.project_administrators, requester
+
+  end
+
+  test 'respond create project request - rejected' do
+    person = Factory(:programme_administrator)
+    programme = person.programmes.first
+    institution = Factory(:institution)
+    login_as(person)
+    project = Project.new(id:0, title:'new project',web_page:'my new project')
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        reject_details:'not very good',
+        project:{
+            title:'new project',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            id:programme.id
+        },
+        institution:{
+            id:institution.id
+        }
+    }
+
+    assert_enqueued_emails(1) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to(root_path)
+    assert_equal "Request rejected and #{log.sender.name} has been notified",flash[:notice]
+
+    refute_includes programme.programme_administrators, requester
+
+  end
+
   def edit_max_object(programme)
     for i in 1..5 do
       Factory(:person).add_to_project_and_institution(programme.projects.first, Factory(:institution))
