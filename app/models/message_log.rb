@@ -25,18 +25,19 @@ class MessageLog < ApplicationRecord
     MessageLog.where("resource_type = 'Project' AND resource_id = ?", project.id).where(sender: person).project_membership_requests.recent
   end
 
-  def self.log_project_creation_request(sender,programme, project, institution)
+  def self.log_project_creation_request(sender, programme, project, institution)
     details = {}
-    details[:institution] = institution.to_json
-    details[:project] = project.to_json
-    details[:programme] = programme.to_json
-    MessageLog.create(resource: programme, sender: sender, details: details.to_json, message_type: PROJECT_CREATION_REQUEST)
+    details[:institution] = institution.attributes
+    details[:project] = project.attributes
+    details[:programme] = programme.attributes
+    # FIXME: needs a resource, but can't use programme as it will save it if it is new
+    MessageLog.create(resource: sender, sender: sender, details: details.to_json, message_type: PROJECT_CREATION_REQUEST)
   end
 
   # records a project membership request for a sender and project, along with any details provided
   def self.log_project_membership_request(sender, project, institution, comments)
     details = {comments: comments}
-    details[:institution]=institution.to_json if institution
+    details[:institution]=institution.attributes if institution
     MessageLog.create(resource: project, sender: sender, details: details.to_json, message_type: PROJECT_MEMBERSHIP_REQUEST)
 
   end

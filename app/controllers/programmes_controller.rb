@@ -121,6 +121,13 @@ class ProgrammesController < ApplicationController
     end
   end
 
+  def administer_create_project_request
+    @message_log = MessageLog.find_by_id(params[:message_log_id])
+    raise "message log not found" unless @message_log
+    raise "incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST
+    details = JSON.parse(@message_log.details)
+  end
+
   private
 
   #whether the item needs or can be activated, which affects steps around activation of rejection
@@ -139,8 +146,6 @@ class ProgrammesController < ApplicationController
     end
     result
   end
-
-  private
 
   def fetch_assets
     if User.admin_logged_in?

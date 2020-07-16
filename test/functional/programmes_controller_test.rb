@@ -719,6 +719,17 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_equal 0, assigns(:programme).funding_codes.length
   end
 
+  test 'administer create request project with new programme and institution' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Project.new(id:0, title:'new project')
+    programme = Programme.new(id:0, title:'new programme')
+    institution = Institution.new(id:0, title:'my institution')
+    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+    assert_response :success
+  end
+
   def edit_max_object(programme)
     for i in 1..5 do
       Factory(:person).add_to_project_and_institution(programme.projects.first, Factory(:institution))
