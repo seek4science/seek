@@ -69,6 +69,14 @@
     }
 
     $j(document).ready(function () {
+        $j('form').on('submit',function() {
+            //clear the id if -1 before submitting
+            if ($j('#institution_id').val()=='-1') {
+                $j('#institution_id').val('');
+            }
+            console.log('val = '+$j('#institution_id').val(''));
+        });
+
        $j('input#managed_programme').on('change', function() {
            if ($j('input#managed_programme:checked').length == 0) {
                $j('#programme-details').show();

@@ -49,7 +49,7 @@ class ProjectsController < ApplicationController
     details = JSON.parse(@message_log.details)
     @comments = details['comments']
     @institution = Institution.new(details['institution'])
-    @institution = Institution.find(@institution.id) if @institution.id!=0
+    @institution = Institution.find(@institution.id) unless @institution.id.nil?
 
     respond_to do |format|
       format.html
@@ -67,11 +67,10 @@ class ProjectsController < ApplicationController
       inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
       institution = Institution.new(inst_params)
 
-      if institution.id==0
-        institution.id=nil
-        institution.save!
-      else
+      if institution.id
         institution = Institution.find(institution.id)
+      else
+        institution.save!
       end
       sender.add_to_project_and_institution(@project,institution)
       sender.save!
@@ -94,7 +93,7 @@ class ProjectsController < ApplicationController
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
       inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
-      @institution ||= Institution.new(inst_params)
+      @institution = Institution.new(inst_params)
     end
 
     @comments = params[:comments]
@@ -114,7 +113,6 @@ class ProjectsController < ApplicationController
     proj_params = params.require(:project).permit([:title, :web_page, :description])
     @project = Project.new(proj_params)
 
-    @project.id = 0 #required for serialization for the email
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
       inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
@@ -131,7 +129,6 @@ class ProjectsController < ApplicationController
     else
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
-      @programme.id=0 # required for serialization for the email
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, log).deliver_later
       flash[:notice]="Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"

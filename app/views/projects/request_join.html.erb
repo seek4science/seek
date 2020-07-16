@@ -15,7 +15,7 @@
         </p>
 
         <div style="padding-top: 1em;">
-          <% if @institution.new_record? || @institution.id==0 %>
+          <% if @institution.id.nil? %>
               You have described a new <%= t('institution') %> with the following details:
             <ul>
               <li><strong>Title:</strong><%= text_or_not_specified(@institution.title) %></li>
