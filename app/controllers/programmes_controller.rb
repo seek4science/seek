@@ -146,6 +146,51 @@ class ProgrammesController < ApplicationController
 
   end
 
+  def respond_create_project_request
+    @message_log = MessageLog.find_by_id(params[:message_log_id])
+    raise "message log not found" unless @message_log
+    raise "incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST
+    raise 'you have no permission to create a project' unless Project.can_create?
+    requester = @message_log.sender
+
+    if params['accept_request']=='1'
+      if params['programme']['id']
+        @programme = Programme.find(params['programme']['id'])
+      else
+        @programme = Programme.new(params.require(:programme).permit([:title]))
+      end
+
+      if @programme.new_record?
+        raise 'No permission to create a programme' unless Programme.can_create?
+      else
+        raise 'No permission to create a project for this programme' unless @programme.can_manage?
+      end
+
+      if params['institution']['id']
+        @institution = Programme.find(params['institution']['id'])
+      else
+        @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country]))
+      end
+
+      @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
+      @project.programme = @programme
+      @project.save!
+      @institution.save!
+      requester.add_to_project_and_institution(@project, @institution)
+      requester.is_project_administrator = true,@project
+      requester.is_programme_administrator = true, @programme
+      requester.save!
+
+      flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
+      Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+
+      redirect_to(@project)
+    else
+
+    end
+
+  end
+
   private
 
   #whether the item needs or can be activated, which affects steps around activation of rejection
