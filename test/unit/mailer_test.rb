@@ -409,6 +409,7 @@ class MailerTest < ActionMailer::TestCase
         email = Mailer.request_join_project(person.user, project, institution.to_json,comments, log)
         refute_nil email
         refute_nil email.body
+
       end
     end
   end
@@ -420,7 +421,10 @@ class MailerTest < ActionMailer::TestCase
         programme = programme_admin.programmes.first
         refute_empty programme.programme_administrators
         project = Project.new(id:0, title:'My lovely project')
-        email = Mailer.request_create_project_for_programme(Factory(:person).user, programme, project.to_json, Factory(:institution).to_json,'some comments')
+        institution = Factory(:institution)
+        sender = Factory(:person)
+        log = MessageLog.log_project_creation_request(sender,programme,project,institution)
+        email = Mailer.request_create_project_for_programme(sender.user, programme, project.to_json, institution.to_json,log)
         refute_nil email
         refute_nil email.body
       end
@@ -433,8 +437,11 @@ class MailerTest < ActionMailer::TestCase
         institution = Institution.new({id:0, title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
         project = Project.new(id:0, title:'My lovely project')
         programme = Programme.new(id:0,title:'My lovely programme')
-        email = Mailer.request_create_project_and_programme(Factory(:person).user, programme.to_json, project.to_json, institution.to_json,'some comments')
+        sender = Factory(:person)
+        log = MessageLog.log_project_creation_request(sender,programme,project,institution)
+        email = Mailer.request_create_project_and_programme(sender.user, programme.to_json, project.to_json, institution.to_json,log)
         refute_nil email
+        refute_nil email.body
       end
     end
   end

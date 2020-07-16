@@ -38,6 +38,9 @@ They indicated that they are associated with the existing <%= t('institution') %
   "<%= sanitize(@comments) -%>"
 
 <% end -%>
+
+You can quickly accept or reject this request by going to <%= administer_create_project_request_programmes_url(message_log_id:@message_log.id) %>.
+
 You can reply to <%= @requester.first_name.capitalize -%> by replying to this email.
 
 This is an automated email.
