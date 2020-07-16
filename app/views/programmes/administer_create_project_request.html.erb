@@ -21,6 +21,20 @@
           <%= hidden_field_tag 'institution[id]',@institution.id %>
         <% end %>
 
+        <div>
+          The <%= t('project') %> details provided are as follows:
+          <div class="form-group">
+            <%= label_tag 'Title' %>
+            <%= text_field_tag 'project[title]',@project.title, class:'form-control' %>
+
+            <%= label_tag 'Description' %>
+            <%= text_field_tag 'project[description]',@project.description, class:'form-control' %>
+
+            <%= label_tag 'Website' %>
+            <%= text_field_tag 'project[web_page]',@project.web_page, class:'form-control' %>
+          </div>
+        </div>
+
         <% if @institution.new_record? %>
           <div>
             They have requested a new <%= t('institution') %>, and provided the following details.
@@ -45,20 +59,6 @@
           </div>
           <% hidden_field_tag 'institution[id]',@institution.id %>
         <% end %>
-
-        <div>
-          The <%= t('project') %> details they have provided are as follows
-          <div class="form-group">
-            <%= label_tag 'Title' %>
-            <%= text_field_tag 'project[title]',@project.title, class:'form-control' %>
-
-            <%= label_tag 'Description' %>
-            <%= text_field_tag 'project[description]',@project.description, class:'form-control' %>
-
-            <%= label_tag 'Website' %>
-            <%= text_field_tag 'project[web_page]',@project.web_page, class:'form-control' %>
-          </div>
-        </div>
 
         <div>
           <label>
