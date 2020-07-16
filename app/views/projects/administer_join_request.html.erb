@@ -19,7 +19,7 @@
 
       <% if @institution.new_record? %>
         <div>
-          The have requested a new <%= t('institution') %>, and provided the following details.
+          They have requested a new <%= t('institution') %>, and provided the following details.
           Please edit or complete if and where you feel necessary.
           <div class="form-group">
             <%= label_tag 'Title' %>
@@ -28,10 +28,10 @@
             <%= label_tag 'Website' %>
             <%= text_field_tag 'institution[web_page]',@institution.web_page, class:'form-control' %>
 
-            <%= label_tag 'Title' %>
+            <%= label_tag 'City' %>
             <%= text_field_tag 'institution[city]',@institution.city, class:'form-control' %>
 
-            <%= label_tag 'City' %>
+            <%= label_tag 'Country' %>
             <%= country_select 'institution', 'country', {}, {class:'form-control'} %>
           </div>
         </div>
