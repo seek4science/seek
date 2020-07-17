@@ -130,14 +130,14 @@ class ProjectsController < ApplicationController
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
       inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
-      @institution ||= Institution.new(inst_params)
+      @institution = Institution.new(inst_params)
     end
 
     if params[:managed_programme]
       @programme = Programme.managed_programme
       raise "no #{t('programme')} can be found" if @programme.nil?
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
-      Mailer.request_create_project_for_programme(current_user, @programme,JSON(@project.to_json), JSON(@institution.to_json), log).deliver_later
+      Mailer.request_create_project_for_programme(current_user, @programme,@project.to_json, @institution.to_json, log).deliver_later
 
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     else
