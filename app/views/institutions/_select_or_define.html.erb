@@ -26,7 +26,7 @@
   <label class="control-label">City</label>
   <%= text_field_tag('institution[city]','',class:'form-control institution-user-input') %>
 
-  <label class="control-label">Country</label><span class="required">*</span>
+  <label class="control-label">Country</label>
   <%= country_select('institution','country',
                      { include_blank: 'Select a country' },
                      { class: 'form-control institution-user-input', disabled:true }) %>
