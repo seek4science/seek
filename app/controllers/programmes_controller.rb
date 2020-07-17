@@ -123,101 +123,117 @@ class ProgrammesController < ApplicationController
 
   def administer_create_project_request
     @message_log = MessageLog.find_by_id(params[:message_log_id])
-    raise "message log not found" unless @message_log
-    raise "incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST
-    details = JSON.parse(@message_log.details)
-    @programme = Programme.new(details['programme'])
-    @programme = Programme.find(@programme.id) unless @programme.id.nil?
+    precondition_error ||= "message log not found" unless @message_log
+    precondition_error ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST)
+    precondition_error ||= ("message has already been responded to" if @message_log.responded?)
+    precondition_error ||= ('you have no permission to create a project' unless Project.can_create?)
 
-    if @programme.new_record?
-      raise 'You do not have rights to create a Programme' unless Programme.can_create?
-    else
-      raise 'You do not have permissions to administer this programme' unless @programme.can_manage?
+    unless precondition_error
+      details = JSON.parse(@message_log.details)
+      @programme = Programme.new(details['programme'])
+      @programme = Programme.find(@programme.id) unless @programme.id.nil?
+      if @programme.new_record?
+        precondition_error ||= ('You do not have rights to create a Programme' unless Programme.can_create?)
+      else
+        precondition_error ||= ('You do not have permissions to administer this programme' unless @programme.can_manage?)
+      end
     end
 
-    @institution = Institution.new(details['institution'])
-    @institution = Institution.find(@institution.id) unless @institution.id.nil?
+    if precondition_error
+      flash[:error]=precondition_error
+      redirect_to(:root)
+    else
+      @institution = Institution.new(details['institution'])
+      @institution = Institution.find(@institution.id) unless @institution.id.nil?
 
-    @project = Project.new(details['project'])
+      @project = Project.new(details['project'])
 
-    respond_to do |format|
-      format.html
+      respond_to do |format|
+        format.html
+      end
     end
 
   end
 
   def respond_create_project_request
     @message_log = MessageLog.find_by_id(params[:message_log_id])
-    raise "message log not found" unless @message_log
-    raise "incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST
-    raise 'you have no permission to create a project' unless Project.can_create?
-    requester = @message_log.sender
-    make_programme_admin=false
+    precondition_error ||= "message log not found" unless @message_log
+    precondition_error ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST)
+    precondition_error ||= ("message has already been responded to" if @message_log.responded?)
+    precondition_error ||= ('you have no permission to create a project' unless Project.can_create?)
 
-    if params['accept_request']=='1'
-      if params['programme']['id']
-        @programme = Programme.find(params['programme']['id'])
-      else
-        @programme = Programme.new(params.require(:programme).permit([:title]))
-        make_programme_admin=true
-      end
+    if precondition_error
+      flash[:error]=precondition_error
+      redirect_to(:root)
+    else
+      requester = @message_log.sender
+      make_programme_admin=false
 
-      if @programme.new_record?
-        raise 'No permission to create a programme' unless Programme.can_create?
-      else
-        raise 'No permission to create a project for this programme' unless @programme.can_manage?
-      end
-
-      if params['institution']['id']
-        @institution = Institution.find(params['institution']['id'])
-      else
-        @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country]))
-      end
-
-      @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
-      @project.programme = @programme
-
-      validate_error_msg = []
-
-      unless @project.valid?
-        validate_error_msg << "The #{t('project')} is invalid, #{@project.errors.full_messages.join(', ')}"
-      end
-      unless @programme.valid?
-        validate_error_msg << "The #{t('programme')} is invalid, #{@programme.errors.full_messages.join(', ')}"
-      end
-      unless @institution.valid?
-        validate_error_msg << "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
-      end
-
-      validate_error_msg = validate_error_msg.join('<br/>').html_safe
-
-      if validate_error_msg.blank?
-        requester.add_to_project_and_institution(@project, @institution)
-        requester.is_project_administrator = true,@project
-        requester.is_programme_administrator = true, @programme if make_programme_admin
-
-        disable_authorization_checks do
-          requester.save!
+      if params['accept_request']=='1'
+        if params['programme']['id']
+          @programme = Programme.find(params['programme']['id'])
+        else
+          @programme = Programme.new(params.require(:programme).permit([:title]))
+          make_programme_admin=true
         end
 
-        @message_log.update_column(:response,'Accepted')
-        flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
-        Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+        if @programme.new_record?
+          raise 'No permission to create a programme' unless Programme.can_create?
+        else
+          raise 'No permission to create a project for this programme' unless @programme.can_manage?
+        end
 
-        redirect_to(@project)
+        if params['institution']['id']
+          @institution = Institution.find(params['institution']['id'])
+        else
+          @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country]))
+        end
+
+        @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
+        @project.programme = @programme
+
+        validate_error_msg = []
+
+        unless @project.valid?
+          validate_error_msg << "The #{t('project')} is invalid, #{@project.errors.full_messages.join(', ')}"
+        end
+        unless @programme.valid?
+          validate_error_msg << "The #{t('programme')} is invalid, #{@programme.errors.full_messages.join(', ')}"
+        end
+        unless @institution.valid?
+          validate_error_msg << "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
+        end
+
+        validate_error_msg = validate_error_msg.join('<br/>').html_safe
+
+        if validate_error_msg.blank?
+          requester.add_to_project_and_institution(@project, @institution)
+          requester.is_project_administrator = true,@project
+          requester.is_programme_administrator = true, @programme if make_programme_admin
+
+          disable_authorization_checks do
+            requester.save!
+          end
+
+          @message_log.update_column(:response,'Accepted')
+          flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
+          Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+
+          redirect_to(@project)
+        else
+          flash.now[:error] = validate_error_msg
+          render action: :administer_create_project_request
+        end
+
       else
-        flash.now[:error] = validate_error_msg
-        render action: :administer_create_project_request
+        comments = params['reject_details']
+        @message_log.update_column(:response,comments)
+        project_name = JSON.parse(@message_log.details)['project']['title']
+        Mailer.create_project_rejected(requester,project_name,comments).deliver_later
+        flash[:notice]="Request rejected and #{requester.name} has been notified"
+
+        redirect_to :root
       end
-
-    else
-      comments = params['reject_details']
-      @message_log.update_column(:response,comments)
-      project_name = JSON.parse(@message_log.details)['project']['title']
-      Mailer.create_project_rejected(requester,project_name,comments).deliver_later
-      flash[:notice]="Request rejected and #{requester.name} has been notified"
-
-      redirect_to :root
     end
 
   end
