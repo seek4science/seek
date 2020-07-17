@@ -5,7 +5,7 @@ class SopsController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :find_assets, :only => [ :index ]
-  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview, :update_annotations_ajax]
   before_action :find_display_asset, :only=>[:show, :download]
 
   include Seek::Publishing::PublishingCommon
@@ -17,7 +17,7 @@ class SopsController < ApplicationController
 
   api_actions :index, :show, :create, :update, :destroy
 
-  def new_version
+  def create_version
     if handle_upload_data(true)
       comments=params[:revision_comments]
 

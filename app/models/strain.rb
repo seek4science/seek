@@ -110,4 +110,8 @@ class Strain < ApplicationRecord
   def related_person_ids
     contributor_id
   end
+
+  def self.can_create?
+    User.logged_in_and_member?
+  end
 end

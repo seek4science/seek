@@ -1,9 +1,7 @@
-<%= render partial: 'layouts/select_a_project'  %>
-
-<h1>New <%= t('workflow') %></h1>
+<h1>New Version</h1>
 
 <%= panel do %>
-  Currently there are two ways to register a workflow:
+  Currently there are two ways to add a new version of a workflow:
   <ul>
     <li><strong>Simple</strong> - as a file with a picture and a CWL description if you have one</li>
     <li><strong>Advanced</strong> - as a <em>Workflow RO Crate</em> (Note: this format is under development, click <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">here</a> to find out more)</li>
@@ -12,4 +10,4 @@
   Currently supported workflow types are: <%= WorkflowClass.order(:title).pluck(:title).join(', ') %>.
 <% end %>
 
-<%= render 'upload_form' %>
+<%= render partial: 'upload_form', locals: { new_version: true, cancel_path: workflow_path(@workflow) } %>

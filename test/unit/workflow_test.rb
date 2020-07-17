@@ -134,4 +134,36 @@ class WorkflowTest < ActiveSupport::TestCase
 
     assert_nil workflow.reload.source_link
   end
+
+  test 'generates RO crate and diagram for workflow/abstract workflow' do
+    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
+      workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
+      assert workflow.should_generate_crate?
+      crate = nil
+
+      VCR.use_cassette('workflows/cwl_viewer_galaxy_workflow_abstract_cwl_diagram') do
+        crate = workflow.ro_crate
+      end
+
+      assert crate.main_workflow
+      assert crate.main_workflow_diagram
+      assert crate.main_workflow_cwl
+    end
+  end
+
+  test 'generates RO crate and gracefully handles diagram error for workflow/abstract workflow' do
+    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
+      workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
+      assert workflow.should_generate_crate?
+      crate = nil
+
+      VCR.use_cassette('workflows/cwl_viewer_error') do
+        crate = workflow.ro_crate
+      end
+
+      assert crate.main_workflow
+      refute crate.main_workflow_diagram
+      assert crate.main_workflow_cwl
+    end
+  end
 end

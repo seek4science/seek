@@ -325,7 +325,7 @@ class SopsControllerTest < ActionController::TestCase
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
     # create new version
-    post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: fixture_file_upload('files/little_file_v2.txt', 'text/plain') }] }
+    post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: fixture_file_upload('files/little_file_v2.txt', 'text/plain') }] }
     assert_redirected_to sop_path(assigns(:sop))
 
     s = Sop.find(s.id)
@@ -366,7 +366,7 @@ class SopsControllerTest < ActionController::TestCase
     s = Factory(:sop, contributor: @user.person)
 
     assert_difference('Sop::Version.count', 1) do
-      post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
+      post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to sop_path(s)
@@ -392,7 +392,7 @@ class SopsControllerTest < ActionController::TestCase
     refute s.can_edit?
 
     assert_no_difference('Sop::Version.count') do
-      post :new_version, params: { id: s, data: fixture_file_upload('files/file_picture.png'), revision_comments: 'This is a new revision' }
+      post :create_version, params: { id: s, data: fixture_file_upload('files/file_picture.png'), revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to sop_path(s)
@@ -412,7 +412,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 1, s.experimental_conditions.count
     assert_difference('Sop::Version.count', 1) do
       assert_difference('ExperimentalCondition.count', 1) do
-        post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
+        post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
       end
     end
 
@@ -428,7 +428,7 @@ class SopsControllerTest < ActionController::TestCase
                                               start_value: 1, sop_id: s.id, sop_version: s.version)
     assert_difference('Sop::Version.count', 1) do
       assert_difference('ExperimentalCondition.count', 1) do
-        post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
+        post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
       end
     end
 
@@ -689,7 +689,7 @@ class SopsControllerTest < ActionController::TestCase
     s = assigns(:sop)
     assert_difference('ActivityLog.count', 1) do
       assert_difference('Sop::Version.count', 1) do
-        post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
+        post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
       end
     end
     al2 = ActivityLog.last
@@ -702,7 +702,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should not create duplication sop_versions_projects when uploading new version' do
     sop = Factory(:sop)
     login_as(sop.contributor)
-    post :new_version, params: { id: sop, sop: { title: sop.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
+    post :create_version, params: { id: sop, sop: { title: sop.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
 
     sop.reload
     assert_equal 2, sop.versions.count
@@ -1225,7 +1225,7 @@ class SopsControllerTest < ActionController::TestCase
 
     login_as(person)
     assert_no_difference('Sop::Version.count', 1) do
-      post :new_version, params: { id: sop.id, sop: { title: "haha!" }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' }
+      post :create_version, params: { id: sop.id, sop: { title: "haha!" }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' }
     end
   end
 

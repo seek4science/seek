@@ -65,7 +65,7 @@ class NodesControllerTest < ActionController::TestCase
     node = Factory :node, contributor: User.current_user.person
 
     assert_difference 'node.version' do
-      post :new_version, params: { id: node, node: {}, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png' }] }
+      post :create_version, params: { id: node, node: {}, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png' }] }
 
       node.reload
     end
@@ -81,7 +81,7 @@ class NodesControllerTest < ActionController::TestCase
 
     new_file_path = file_for_upload
     assert_difference 'node.version' do
-      post :new_version, params: { id: node, node: {}, content_blobs: [{ data: new_file_path }] }
+      post :create_version, params: { id: node, node: {}, content_blobs: [{ data: new_file_path }] }
 
       node.reload
     end
@@ -103,7 +103,7 @@ class NodesControllerTest < ActionController::TestCase
     node = Factory :node, contributor: User.current_user.person
     new_data_url = 'http://www.blah.de/images/liver-illustration.png'
     assert_no_difference 'node.version' do
-      post :new_version, params: { id: node, node: {}, content_blobs: [{ data_url: new_data_url }] }
+      post :create_version, params: { id: node, node: {}, content_blobs: [{ data_url: new_data_url }] }
 
       node.reload
     end
