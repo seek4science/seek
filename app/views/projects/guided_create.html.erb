@@ -7,9 +7,11 @@
         <div class="panel-body">
 
           <div class="help-block">
-            You can either choose to have a site managed <%= t('programme') %>, or have one created for you.
-            If you have one created, you will then be able to freely create further <%= t('project').pluralize %> within
-            it. To have one created, then please provide the name. You will be able to provide additional details once it has been created.
+            You can choose either to be linked to a <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}" %>, <%= link_to Programme.managed_programme.title,Programme.managed_programme %>, or have one created for you.
+          </div>
+          <div class="help-block">
+            If you have a <%= t('programme') %> created, then you will then be able to freely create further <%= t('project').pluralize %> within
+            it. To have one created, then please provide the name. You will be able to provide additional details, if you wish, once it has been created.
           </div>
 
           <label>
