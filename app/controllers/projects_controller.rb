@@ -117,7 +117,7 @@ class ProjectsController < ApplicationController
 
     end
 
-    flash[:notice]="Thank you, your request to join has been sent"
+    flash.now[:notice]="Thank you, your request to join has been sent"
     respond_to do |format|
       format.html
     end
@@ -139,13 +139,13 @@ class ProjectsController < ApplicationController
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       Mailer.request_create_project_for_programme(current_user, @programme,JSON(@project.to_json), JSON(@institution.to_json), log).deliver_later
 
-      flash[:notice]="Thank you, your request for a new #{t('project')} has been sent"
+      flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     else
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, log).deliver_later
-      flash[:notice]="Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
+      flash.now[:notice]="Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
     end
 
 
