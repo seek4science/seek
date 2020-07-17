@@ -1939,6 +1939,39 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes project.institutions, institution
   end
 
+  test 'respond join with new invalid institution' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    sender = Factory(:person)
+    institution = Institution.new({
+                                      title:'institution',
+                                      country:'DE'
+                                  })
+    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
+
+    params = {
+        message_log_id: log.id,
+        accept_request: '1',
+        institution:{
+            title:'',
+        },
+        id:project.id
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Institution.count') do
+        assert_no_difference('GroupMembership.count') do
+          post :respond_join_request, params:params
+        end
+      end
+    end
+
+    assert_redirected_to(administer_join_request_project_path(project,message_log_id:log.id))
+    assert_equal "The Institution is invalid, Title can't be blank",flash[:error]
+    project.reload
+    refute_includes project.people, sender
+  end
+
   test 'respond join request rejected' do
     person = Factory(:project_administrator)
     project = person.projects.first

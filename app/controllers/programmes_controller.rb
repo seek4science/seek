@@ -177,17 +177,38 @@ class ProgrammesController < ApplicationController
       @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
       @project.programme = @programme
 
-      requester.add_to_project_and_institution(@project, @institution)
-      requester.is_project_administrator = true,@project
-      requester.is_programme_administrator = true, @programme if make_programme_admin
-      disable_authorization_checks do
-        requester.save!
+      validate_error_msg = []
+
+      unless @project.valid?
+        validate_error_msg << "The #{t('project')} is invalid, #{@project.errors.full_messages.join(', ')}"
+      end
+      unless @programme.valid?
+        validate_error_msg << "The #{t('programme')} is invalid, #{@programme.errors.full_messages.join(', ')}"
+      end
+      unless @institution.valid?
+        validate_error_msg << "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
       end
 
-      flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
-      Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+      validate_error_msg = validate_error_msg.join('<br/>').html_safe
 
-      redirect_to(@project)
+      if validate_error_msg.blank?
+        requester.add_to_project_and_institution(@project, @institution)
+        requester.is_project_administrator = true,@project
+        requester.is_programme_administrator = true, @programme if make_programme_admin
+
+        disable_authorization_checks do
+          requester.save!
+        end
+
+        flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
+        Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+
+        redirect_to(@project)
+      else
+        flash.now[:error] = validate_error_msg
+        render action: :administer_create_project_request
+      end
+
     else
       comments = params['reject_details']
       project_name = JSON.parse(@message_log.details)['project']['title']

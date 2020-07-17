@@ -22,7 +22,7 @@
           They have requested a new <%= t('institution') %>, and provided the following details.
           Please edit or complete if and where you feel necessary.
           <div class="form-group">
-            <%= label_tag 'Title' %>
+            <%= label_tag 'Title' %><span class="required">*</span>
             <%= text_field_tag 'institution[title]',@institution.title, class:'form-control' %>
 
             <%= label_tag 'Website' %>
