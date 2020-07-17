@@ -18,7 +18,7 @@
           </div>
         <% else %>
           It will be associated with the <%= t('programme') %>, <%= link_to @programme.title,@programme %>, which you administer.
-          <%= hidden_field_tag 'institution[id]',@institution.id %>
+          <%= hidden_field_tag 'programme[id]',@programme.id %>
         <% end %>
 
         <div>
@@ -57,7 +57,7 @@
           <div>
             They wish to be associated with <%= link_to(@institution.title, @institution) %>
           </div>
-          <% hidden_field_tag 'institution[id]',@institution.id %>
+          <%= hidden_field_tag 'institution[id]',@institution.id %>
         <% end %>
 
         <div>
