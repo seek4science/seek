@@ -8,7 +8,7 @@ The <%= t('programme') %> is <%= "#{@programme.title} (#{programme_url(@programm
 They provided the following details about the <%= t('project') %>
   <%= t('project') %> title: '<%= @project.title %>'
 
-<% if @institution.id==0 %>
+<% if @institution.id.nil? %>
   <%
     title = @institution.title.blank? ? 'No title provided' : @institution.title
     web_page = @institution.web_page.blank? ? 'No web page provided' : @institution.web_page

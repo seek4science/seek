@@ -387,7 +387,7 @@ class MailerTest < ActionMailer::TestCase
     with_config_value(:application_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://hub.com') do
         project = Factory(:project)
-        institution = Institution.new({id:0, title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
+        institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
         comments = 'some comments'
         person = Factory(:person)
         log = MessageLog.log_project_membership_request(person, project, institution, comments)
@@ -420,7 +420,7 @@ class MailerTest < ActionMailer::TestCase
         programme_admin = Factory(:programme_administrator)
         programme = programme_admin.programmes.first
         refute_empty programme.programme_administrators
-        project = Project.new(id:0, title:'My lovely project')
+        project = Project.new(title:'My lovely project')
         institution = Factory(:institution)
         sender = Factory(:person)
         log = MessageLog.log_project_creation_request(sender,programme,project,institution)
@@ -434,9 +434,9 @@ class MailerTest < ActionMailer::TestCase
   test 'request create project and programme' do
     with_config_value(:application_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
-        institution = Institution.new({id:0, title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
-        project = Project.new(id:0, title:'My lovely project')
-        programme = Programme.new(id:0,title:'My lovely programme')
+        institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
+        project = Project.new(title:'My lovely project')
+        programme = Programme.new(title:'My lovely programme')
         sender = Factory(:person)
         log = MessageLog.log_project_creation_request(sender,programme,project,institution)
         email = Mailer.request_create_project_and_programme(sender.user, programme.to_json, project.to_json, institution.to_json,log)
