@@ -13,7 +13,7 @@
         <% if @programme.new_record? %>
           They have requested a new <%= t('programme') %>, with the following:
           <div class="form-group">
-            <%= label_tag 'Title' %>
+            <%= label_tag 'Title' %><span class="required">*</span>
             <%= text_field_tag 'programme[title]',@programme.title, class:'form-control' %>
           </div>
         <% else %>
@@ -24,7 +24,7 @@
         <div>
           The <%= t('project') %> details provided are as follows:
           <div class="form-group">
-            <%= label_tag 'Title' %>
+            <%= label_tag 'Title' %><span class="required">*</span>
             <%= text_field_tag 'project[title]',@project.title, class:'form-control' %>
 
             <%= label_tag 'Description' %>
@@ -40,7 +40,7 @@
             They have requested a new <%= t('institution') %>, and provided the following details.
             Please edit or complete if and where you feel necessary.
             <div class="form-group">
-              <%= label_tag 'Title' %>
+              <%= label_tag 'Title' %><span class="required">*</span>
               <%= text_field_tag 'institution[title]',@institution.title, class:'form-control' %>
 
               <%= label_tag 'Website' %>

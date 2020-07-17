@@ -786,6 +786,87 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   end
 
+  test 'respond create project request - new programme and institution, project invalid' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new({title:'institution', country:'DE'})
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:''
+        },
+        programme:{
+            title:'new programme updated'
+        },
+        institution:{
+            title:'new institution updated',
+            city:'Paris',
+            country:'FR'
+        }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_equal "The Project is invalid, Title can't be blank",flash[:error]
+
+  end
+
+  test 'respond create project request - new programme and institution, programme and institution invalid' do
+    person = Factory(:admin)
+    duplicate_institution=Factory(:institution)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new({title:'institution', country:'DE'})
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'a valid project'
+        },
+        programme:{
+            title:''
+        },
+        institution:{
+            title:duplicate_institution.title,
+            city:'Paris',
+            country:'FR'
+        }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_equal "The Programme is invalid, Title can't be blank<br/>The Institution is invalid, Title has already been taken",flash[:error]
+
+  end
+
   test 'respond create project request - existing programme and institution' do
     person = Factory(:programme_administrator)
     programme = person.programmes.first
