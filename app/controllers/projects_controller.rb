@@ -82,11 +82,12 @@ class ProjectsController < ApplicationController
         sender.add_to_project_and_institution(@project,institution)
         sender.save!
         Mailer.notify_user_projects_assigned(sender,[@project]).deliver_later
-
         flash[:notice]="Request accepted and #{sender.name} added to #{t('project')} and notified"
+        message_log.update_column(:response,'Accepted')
       end
     else
       comments = params['reject_details']
+      message_log.update_column(:response,comments)
       Mailer.join_project_rejected(sender,@project,comments).deliver_later
       flash[:notice]="Request rejected and #{sender.name} has been notified"
     end
