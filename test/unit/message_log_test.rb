@@ -100,7 +100,9 @@ class MessageLogTest < ActiveSupport::TestCase
     assert_equal MessageLog::PROJECT_MEMBERSHIP_REQUEST, log.message_type
     details = JSON.parse(log.details)
     assert_equal 'some comments',details['comments']
-    assert_equal institution.attributes, details['institution']
+    assert_equal 'new inst', details['institution']['title']
+    assert_nil details['institution']['id']
+    assert_equal 'DE',details['institution']['country']
   end
 
   test 'log project creation request' do
@@ -116,9 +118,13 @@ class MessageLogTest < ActiveSupport::TestCase
     assert_equal requester, log.sender
     assert_equal MessageLog::PROJECT_CREATION_REQUEST, log.message_type
     details = JSON.parse(log.details)
-    assert_equal programme.attributes,details['programme']
-    assert_equal project.attributes,details['project']
-    assert_equal institution.attributes, details['institution']
+    assert_equal programme.title,details['programme']['title']
+    assert_equal programme.id,details['programme']['id']
+    assert_equal 'a project',details['project']['title']
+    assert_nil details['project']['id']
+    assert_equal 'an inst', details['institution']['title']
+    assert_nil details['institution']['id']
+    assert_equal 'FR',details['institution']['country']
   end
 
 

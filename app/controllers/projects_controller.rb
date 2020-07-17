@@ -436,7 +436,7 @@ class ProjectsController < ApplicationController
     details = params[:details]
     mail = Mailer.request_membership(current_user, @project, details)
     mail.deliver_later
-    MessageLog.log_project_membership_request(current_user.person,@project,details)
+    MessageLog.log_project_membership_request(current_user.person,@project,nil, details)
 
     flash[:notice]='Membership request has been sent'
 
