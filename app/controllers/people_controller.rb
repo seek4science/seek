@@ -104,9 +104,9 @@ class PeopleController < ApplicationController
       render :is_this_you, locals: { email: email }
     else
       p = { email: email }
+      p[:first_name], p[:last_name] = params[:name].split(' ') if params[:name].present?
       p[:first_name] = params[:first_name] if params[:first_name]
       p[:last_name] = params[:last_name] if params[:last_name]
-      p[:first_name], p[:last_name] = params[:name].split(' ') if params[:name].present?
       @person = Person.new(p)
     end
   end
