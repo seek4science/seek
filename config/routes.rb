@@ -460,6 +460,8 @@ SEEK::Application.routes.draw do
     member do
       get :diagram
       get :ro_crate
+      get :new_version
+      post :create_version_metadata
     end
     resources :people, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, only: [:index]
   end

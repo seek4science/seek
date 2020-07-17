@@ -7,7 +7,7 @@ require 'seek/download_handling/http_streamer'
 class WorkflowCrateBuilder
   include ActiveModel::Model
 
-  attr_accessor :workflow, :abstract_cwl, :diagram, :workflow_extractor
+  attr_accessor :workflow, :abstract_cwl, :diagram, :workflow_extractor_class
 
   validates :workflow, presence: true
   validate :resolve_remotes
@@ -18,7 +18,7 @@ class WorkflowCrateBuilder
       Rails.logger.info("Making new RO Crate")
       crate = ROCrate::WorkflowCrate.new
       crate.main_workflow = ROCrate::Workflow.new(crate, workflow[:data], get_unique_filename(crate, workflow))
-      crate.main_workflow.programming_language = crate.add_contextual_entity(ROCrate::ContextualEntity.new(crate, nil, workflow_extractor.ro_crate_metadata))
+      crate.main_workflow.programming_language = crate.add_contextual_entity(ROCrate::ContextualEntity.new(crate, nil, workflow_extractor_class.ro_crate_metadata))
       crate.main_workflow['url'] = workflow[:data_url] if workflow[:data_url].present?
       if diagram[:data].present?
         crate.main_workflow.diagram = ROCrate::WorkflowDiagram.new(crate, diagram[:data], get_unique_filename(crate, diagram))
