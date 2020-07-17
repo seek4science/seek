@@ -87,10 +87,9 @@ module Seek
         end
 
         if crate.readme && m[:description].blank?
-          markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, tables: true)
           string = crate.readme&.source&.source&.read
           string = string.gsub(/^(---\s*\n.*?\n?)^(---\s*$\n?)/m,'') # Remove "Front matter"
-          m[:description] ||= markdown.render(string)
+          m[:description] ||= string
         end
 
         m

@@ -12,8 +12,8 @@
       </p>
     <% end %>
 
-    <div id="description" class="well well-sm">
-      <%= text_or_not_specified(@display_workflow.description, description: false, auto_link: true) %>
+    <div id="description">
+      <%= item_description(@display_workflow.description) %>
     </div>
 
     <% begin %>
