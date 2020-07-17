@@ -43,62 +43,78 @@ class ProjectsController < ApplicationController
 
   def administer_join_request
     @message_log = MessageLog.find_by_id(params[:message_log_id])
-    raise "message log not found" unless @message_log
-    raise "message log doesn't match project" if @message_log.resource != @project
-    raise "incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_MEMBERSHIP_REQUEST
-    details = JSON.parse(@message_log.details)
-    @comments = details['comments']
-    @institution = Institution.new(details['institution'])
-    @institution = Institution.find(@institution.id) unless @institution.id.nil?
 
-    respond_to do |format|
-      format.html
+    precondition_error ||= "message log not found" unless @message_log
+    precondition_error ||= ("message log doesn't match project" if @message_log.resource != @project)
+    precondition_error ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+    precondition_error ||= ("message has already been responded to" if @message_log.responded?)
+
+    if precondition_error
+      flash[:error]=precondition_error
+      redirect_to(:root)
+    else
+      details = JSON.parse(@message_log.details)
+      @comments = details['comments']
+      @institution = Institution.new(details['institution'])
+      @institution = Institution.find(@institution.id) unless @institution.id.nil?
+
+      respond_to do |format|
+        format.html
+      end
     end
+
+
   end
 
   def respond_join_request
     @message_log = MessageLog.find_by_id(params[:message_log_id])
-    raise "message log not found" unless @message_log
-    raise "message log doesn't match project" if @message_log.resource != @project
-    raise "incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_MEMBERSHIP_REQUEST
-    sender = @message_log.sender
-    validation_error_msg=nil;
+    precondition_error ||= "message log not found" unless @message_log
+    precondition_error ||= ("message log doesn't match project" if @message_log.resource != @project)
+    precondition_error ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+    precondition_error ||= ("message has already been responded to" if @message_log.responded?)
 
-    if params[:accept_request]=='1'
-      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
-      @institution = Institution.new(inst_params)
+    if precondition_error
+      flash[:error]=precondition_error
+      redirect_to(:root)
+    else
+      sender = @message_log.sender
+      validation_error_msg=nil;
 
-      if @institution.id
-        @institution = Institution.find(@institution.id)
-      else
-        if @institution.valid?
-          @institution.save!
+      if params[:accept_request]=='1'
+        inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
+        @institution = Institution.new(inst_params)
+
+        if @institution.id
+          @institution = Institution.find(@institution.id)
         else
-          validation_error_msg = "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
+          if @institution.valid?
+            @institution.save!
+          else
+            validation_error_msg = "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
+          end
         end
+
+        unless validation_error_msg
+          sender.add_to_project_and_institution(@project,@institution)
+          sender.save!
+          Mailer.notify_user_projects_assigned(sender,[@project]).deliver_later
+          flash[:notice]="Request accepted and #{sender.name} added to #{t('project')} and notified"
+          @message_log.update_column(:response,'Accepted')
+        end
+      else
+        comments = params['reject_details']
+        @message_log.update_column(:response,comments)
+        Mailer.join_project_rejected(sender,@project,comments).deliver_later
+        flash[:notice]="Request rejected and #{sender.name} has been notified"
       end
 
-      unless validation_error_msg
-        sender.add_to_project_and_institution(@project,@institution)
-        sender.save!
-        Mailer.notify_user_projects_assigned(sender,[@project]).deliver_later
-        flash[:notice]="Request accepted and #{sender.name} added to #{t('project')} and notified"
-        @message_log.update_column(:response,'Accepted')
+      if validation_error_msg
+        flash.now[:error]=validation_error_msg
+        render action: :administer_join_request
+      else
+        redirect_to(@project)
       end
-    else
-      comments = params['reject_details']
-      @message_log.update_column(:response,comments)
-      Mailer.join_project_rejected(sender,@project,comments).deliver_later
-      flash[:notice]="Request rejected and #{sender.name} has been notified"
     end
-
-    if validation_error_msg
-      flash.now[:error]=validation_error_msg
-      render action: :administer_join_request
-    else
-      redirect_to(@project)
-    end
-
   end
 
   def request_join
