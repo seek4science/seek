@@ -10,55 +10,78 @@
           The user <%= link_to(@message_log.sender.title, @message_log.sender) %> has requested to create a <%= t('project') %>
         </div>
 
-        <% if @programme.new_record? %>
-          They have requested a new <%= t('programme') %>, with the following:
-          <div class="form-group">
-            <%= label_tag 'Title' %><span class="required">*</span>
-            <%= text_field_tag 'programme[title]',@programme.title, class:'form-control' %>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <%= t('programme') %>
           </div>
-        <% else %>
-          It will be associated with the <%= t('programme') %>, <%= link_to @programme.title,@programme %>, which you administer.
-          <%= hidden_field_tag 'programme[id]',@programme.id %>
-        <% end %>
-
-        <div>
-          The <%= t('project') %> details provided are as follows:
-          <div class="form-group">
-            <%= label_tag 'Title' %><span class="required">*</span>
-            <%= text_field_tag 'project[title]',@project.title, class:'form-control' %>
-
-            <%= label_tag 'Description' %>
-            <%= text_field_tag 'project[description]',@project.description, class:'form-control' %>
-
-            <%= label_tag 'Website' %>
-            <%= text_field_tag 'project[web_page]',@project.web_page, class:'form-control' %>
+          <div class="panel-body">
+            <% if @programme.new_record? %>
+              They have requested a new <%= t('programme') %>, with the following:
+              <div class="form-group">
+                <%= label_tag 'Title' %><span class="required">*</span>
+                <%= text_field_tag 'programme[title]',@programme.title, class:'form-control' %>
+              </div>
+            <% else %>
+              It will be associated with the <%= t('programme') %>, <%= link_to @programme.title,@programme %>, which you administer.
+              <%= hidden_field_tag 'programme[id]',@programme.id %>
+            <% end %>
           </div>
+
         </div>
 
-        <% if @institution.new_record? %>
-          <div>
-            They have requested a new <%= t('institution') %>, and provided the following details.
-            Please edit or complete if and where you feel necessary.
-            <div class="form-group">
-              <%= label_tag 'Title' %><span class="required">*</span>
-              <%= text_field_tag 'institution[title]',@institution.title, class:'form-control' %>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <%= t('project') %>
+          </div>
+          <div class="panel-body">
+            <div>
+              The <%= t('project') %> details provided are as follows:
+              <div class="form-group">
+                <%= label_tag 'Title' %><span class="required">*</span>
+                <%= text_field_tag 'project[title]',@project.title, class:'form-control' %>
 
-              <%= label_tag 'Website' %>
-              <%= text_field_tag 'institution[web_page]',@institution.web_page, class:'form-control' %>
+                <%= label_tag 'Description' %>
+                <%= text_field_tag 'project[description]',@project.description, class:'form-control' %>
 
-              <%= label_tag 'City' %>
-              <%= text_field_tag 'institution[city]',@institution.city, class:'form-control' %>
-
-              <%= label_tag 'Country' %>
-              <%= country_select 'institution', 'country', {}, {class:'form-control'} %>
+                <%= label_tag 'Website' %>
+                <%= text_field_tag 'project[web_page]',@project.web_page, class:'form-control' %>
+              </div>
             </div>
           </div>
-        <% else %>
-          <div>
-            They wish to be associated with <%= link_to(@institution.title, @institution) %>
+
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <%= t('institution') %>
           </div>
-          <%= hidden_field_tag 'institution[id]',@institution.id %>
-        <% end %>
+          <div class="panel-body">
+            <% if @institution.new_record? %>
+              <div>
+                They have requested a new <%= t('institution') %>, and provided the following details.
+                Please edit or complete if and where you feel necessary.
+                <div class="form-group">
+                  <%= label_tag 'Title' %><span class="required">*</span>
+                  <%= text_field_tag 'institution[title]',@institution.title, class:'form-control' %>
+
+                  <%= label_tag 'Website' %>
+                  <%= text_field_tag 'institution[web_page]',@institution.web_page, class:'form-control' %>
+
+                  <%= label_tag 'City' %>
+                  <%= text_field_tag 'institution[city]',@institution.city, class:'form-control' %>
+
+                  <%= label_tag 'Country' %>
+                  <%= country_select 'institution', 'country', {}, {class:'form-control'} %>
+                </div>
+              </div>
+            <% else %>
+              <div>
+                They wish to be associated with <%= link_to(@institution.title, @institution) %>
+              </div>
+              <%= hidden_field_tag 'institution[id]',@institution.id %>
+            <% end %>
+          </div>
+        </div>
 
         <div>
           <label>

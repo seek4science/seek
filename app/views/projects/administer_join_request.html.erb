@@ -10,37 +10,46 @@
         The user <%= link_to(@message_log.sender.title, @message_log.sender) %> has requested to join <%= link_to(@project.title, @project) %>
       </div>
 
-      <div>
+      <div style="padding-top: 1em;">
         They provided the following comments:
         <div class="well">
           <%= text_or_not_specified(@comments, none_text:'no comments provided') %>
         </div>
       </div>
 
-      <% if @institution.new_record? %>
-        <div>
-          They have requested a new <%= t('institution') %>, and provided the following details.
-          Please edit or complete if and where you feel necessary.
-          <div class="form-group">
-            <%= label_tag 'Title' %><span class="required">*</span>
-            <%= text_field_tag 'institution[title]',@institution.title, class:'form-control' %>
-
-            <%= label_tag 'Website' %>
-            <%= text_field_tag 'institution[web_page]',@institution.web_page, class:'form-control' %>
-
-            <%= label_tag 'City' %>
-            <%= text_field_tag 'institution[city]',@institution.city, class:'form-control' %>
-
-            <%= label_tag 'Country' %>
-            <%= country_select 'institution', 'country', {}, {class:'form-control'} %>
-          </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <%= t('institution') %>
         </div>
-      <% else %>
-        <div>
-          They wish to be associated with <%= link_to(@institution.title, @institution) %>
+        <div class="panel-body">
+          <% if @institution.new_record? %>
+            <div>
+              They have requested a new <%= t('institution') %>, and provided the following details.
+              Please edit or complete if and where you feel necessary.
+              <div class="form-group">
+                <%= label_tag 'Title' %><span class="required">*</span>
+                <%= text_field_tag 'institution[title]',@institution.title, class:'form-control' %>
+
+                <%= label_tag 'Website' %>
+                <%= text_field_tag 'institution[web_page]',@institution.web_page, class:'form-control' %>
+
+                <%= label_tag 'City' %>
+                <%= text_field_tag 'institution[city]',@institution.city, class:'form-control' %>
+
+                <%= label_tag 'Country' %>
+                <%= country_select 'institution', 'country', {}, {class:'form-control'} %>
+              </div>
+            </div>
+          <% else %>
+            <div>
+              They wish to be associated with <%= link_to(@institution.title, @institution) %>
+            </div>
+            <%= hidden_field_tag 'institution[id]',@institution.id %>
+          <% end %>
         </div>
-        <%= hidden_field_tag 'institution[id]',@institution.id %>
-      <% end %>
+      </div>
+
+
       <div>
         <label>
           <%= check_box_tag 'accept_request','1',true %>
