@@ -130,6 +130,9 @@ def load_seek_testing_defaults!
           password: '',
           bind_dn: ''
       }
+      Settings.defaults[:omniauth_github_enabled] = true
+      Settings.defaults[:omniauth_github_client_id] = 'abc'
+      Settings.defaults[:omniauth_github_secret] = '456'
     end
 end
 
