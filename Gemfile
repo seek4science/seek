@@ -105,6 +105,7 @@ gem 'omniauth', '~> 1.3.1'
 gem 'omniauth-ldap', '~> 1.0.5'
 gem 'omniauth_openid_connect'
 gem 'omniauth-rails_csrf_protection', '~> 0.1'
+gem 'omniauth-github', '~> 1.2.0'
 
 gem 'ransack'
 
