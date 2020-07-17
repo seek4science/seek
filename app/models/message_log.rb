@@ -63,6 +63,10 @@ class MessageLog < ApplicationRecord
     "#{number_hours} #{'hour'.pluralize(number_hours)}"
   end
 
+  def responded?
+    response.present?
+  end
+
   private
 
   def project_required_for_project_membership_request

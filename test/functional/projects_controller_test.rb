@@ -1750,7 +1750,8 @@ class ProjectsControllerTest < ActionController::TestCase
     log = MessageLog.last
     details = JSON.parse(log.details)
     assert_equal 'some comments', details['comments']
-    assert_equal institution.attributes, details['institution']
+    assert_equal institution.title, details['institution']['title']
+    assert_equal institution.id, details['institution']['id']
 
   end
 
@@ -1809,8 +1810,11 @@ class ProjectsControllerTest < ActionController::TestCase
       assert flash[:notice]
       log = MessageLog.last
       details = JSON.parse(log.details)
-      assert_equal institution.attributes, details['institution']
-      assert_equal programme.attributes, details['programme']
+      assert_equal institution.title, details['institution']['title']
+      assert_equal institution.id, details['institution']['id']
+      assert_equal institution.country, details['institution']['country']
+      assert_equal programme.title, details['programme']['title']
+      assert_equal programme.id, details['programme']['id']
       project_details = details['project']
       assert_equal 'description', project_details['description']
       assert_equal 'The Project', project_details['title']
@@ -1899,6 +1903,10 @@ class ProjectsControllerTest < ActionController::TestCase
     project.reload
     assert_includes project.people, sender
     assert_includes project.institutions, institution
+
+    log.reload
+    assert log.responded?
+    assert_equal 'Accepted',log.response
   end
 
   test 'respond join request accept new institution' do
@@ -1937,6 +1945,10 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 'FR',institution.country
     assert_includes project.people, sender
     assert_includes project.institutions, institution
+
+    log.reload
+    assert log.responded?
+    assert_equal 'Accepted',log.response
   end
 
   test 'respond join with new invalid institution' do
@@ -1970,6 +1982,9 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal "The Institution is invalid, Title can't be blank",flash[:error]
     project.reload
     refute_includes project.people, sender
+
+    log.reload
+    refute log.responded?
   end
 
   test 'respond join request rejected' do
@@ -1999,6 +2014,10 @@ class ProjectsControllerTest < ActionController::TestCase
     project.reload
     refute_includes project.people, sender
     refute_includes project.institutions, institution
+
+    log.reload
+    assert log.responded?
+    assert_equal 'bad request',log.response
   end
 
   private

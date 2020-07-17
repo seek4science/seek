@@ -127,6 +127,18 @@ class MessageLogTest < ActiveSupport::TestCase
     assert_equal 'FR',details['institution']['country']
   end
 
+  test 'responded' do
+    log = MessageLog.new
+    assert_nil log.response
+    refute log.responded?
+
+    log.response=''
+    refute log.responded?
+
+    log.response = 'Accepted'
+    assert log.responded?
+  end
+
 
   private
 

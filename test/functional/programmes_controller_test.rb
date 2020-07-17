@@ -784,6 +784,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_includes programme.programme_administrators, requester
     assert_includes project.project_administrators, requester
 
+    log.reload
+    assert log.responded?
+    assert_equal 'Accepted',log.response
+
   end
 
   test 'respond create project request - new programme and institution, project invalid' do
@@ -823,6 +827,9 @@ class ProgrammesControllerTest < ActionController::TestCase
     end
 
     assert_equal "The Project is invalid, Title can't be blank",flash[:error]
+
+    log.reload
+    refute log.responded?
 
   end
 
@@ -865,6 +872,8 @@ class ProgrammesControllerTest < ActionController::TestCase
 
     assert_equal "The Programme is invalid, Title can't be blank<br/>The Institution is invalid, Title has already been taken",flash[:error]
 
+    log.reload
+    refute log.responded?
   end
 
   test 'respond create project request - existing programme and institution' do
@@ -914,6 +923,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute_includes programme.programme_administrators, requester
     assert_includes project.project_administrators, requester
 
+    log.reload
+    assert log.responded?
+    assert_equal 'Accepted',log.response
+
   end
 
   test 'respond create project request - rejected' do
@@ -955,6 +968,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_equal "Request rejected and #{log.sender.name} has been notified",flash[:notice]
 
     refute_includes programme.programme_administrators, requester
+
+    log.reload
+    assert log.responded?
+    assert_equal 'not very good',log.response
 
   end
 

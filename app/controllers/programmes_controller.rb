@@ -200,6 +200,7 @@ class ProgrammesController < ApplicationController
           requester.save!
         end
 
+        @message_log.update_column(:response,'Accepted')
         flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
         Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
 
@@ -211,6 +212,7 @@ class ProgrammesController < ApplicationController
 
     else
       comments = params['reject_details']
+      @message_log.update_column(:response,comments)
       project_name = JSON.parse(@message_log.details)['project']['title']
       Mailer.create_project_rejected(requester,project_name,comments).deliver_later
       flash[:notice]="Request rejected and #{requester.name} has been notified"
