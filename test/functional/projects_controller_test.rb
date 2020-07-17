@@ -1978,7 +1978,6 @@ class ProjectsControllerTest < ActionController::TestCase
       end
     end
 
-    assert_redirected_to(administer_join_request_project_path(project,message_log_id:log.id))
     assert_equal "The Institution is invalid, Title can't be blank",flash[:error]
     project.reload
     refute_includes project.people, sender
