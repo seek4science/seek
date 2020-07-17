@@ -1782,7 +1782,7 @@ class ProjectsControllerTest < ActionController::TestCase
     details = JSON.parse(log.details)
     assert_equal 'some comments', details['comments']
     institution_details = details['institution']
-    assert_equal nil, institution_details['id']
+    assert_nil institution_details['id']
     assert_equal 'GB', institution_details['country']
     assert_equal 'Sheffield', institution_details['city']
     assert_equal 'http://google.com', institution_details['web_page']
@@ -1852,14 +1852,14 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_equal 'London',institution_details['city']
       assert_equal 'the page',institution_details['web_page']
       assert_equal 'the inst',institution_details['title']
-      assert_equal nil,institution_details['id']
+      assert_nil institution_details['id']
 
       assert_equal 'description', project_details['description']
       assert_equal 'The Project', project_details['title']
-      assert_equal nil,project_details['id']
+      assert_nil  project_details['id']
 
       assert_equal 'the prog',programme_details['title']
-      assert_equal nil,programme_details['id']
+      assert_nil programme_details['id']
     end
   end
 
