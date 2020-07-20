@@ -6,6 +6,9 @@ class ProjectsController < ApplicationController
   include Seek::DestroyHandling
   include ApiHelper
 
+  before_action :programmes_enabled?,only: [:guided_create]
+  before_action :managed_programme_configured?, only: [:guided_create]
+
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
                                                admin_member_roles update_members storage_report
                                                request_membership overview administer_join_request respond_join_request]

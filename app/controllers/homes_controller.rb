@@ -72,7 +72,7 @@ class HomesController < ApplicationController
   end
 
   def redirect_to_create_or_join_if_no_member
-    if User.logged_in? && !User.logged_in_and_member?
+    if User.logged_in? && !User.logged_in_and_member? && Seek::Config.programmes_enabled && Programme.managed_programme.present?
       redirect_to create_or_join_project_home_path
     end
   end
