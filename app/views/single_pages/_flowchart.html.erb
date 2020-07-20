@@ -90,33 +90,6 @@
 </div>
 
 <script type="text/javascript">
-    let methodTypes = [{
-        title: 'Custom',
-        attributes: []
-    }, {
-        title: 'type 1',
-        attributes: [{
-                title: 'attrib 1',
-                ontology: ['a', 'b']
-            },
-            {
-                title: 'attrib 2',
-                ontology: []
-            },
-        ]
-    }, {
-        title: 'type 2',
-        attributes: [{
-                title: 'attrib 3',
-                ontology: ['a', 'b']
-            },
-            {
-                title: 'attrib 4',
-                ontology: []
-            },
-        ]
-    }]
-
     const init_flowchart = () => {
         var $flowchart = $j('#chart_canvas');
         var $container = $flowchart.parent();
@@ -438,29 +411,29 @@
         removeBlock();
     })
 
-    removeBlock = ()=>{
+    removeBlock = () => {
         $j('#chart_canvas').flowchart('deleteSelected');
     }
 
     const addAssayTypeOptions = () => {
         $j('#assayType').empty()
-        $j.each(methodTypes, (key, value) => {
+        $j.each(AssayTypes, (key, value) => {
             $j('#assayType')
                 .append($j("<option></option>")
                     .attr("value", key)
                     .text(value.title));
         })
-
-        $j.each(methodTypes[0].attributes, (k, attr) => {
-            $j("#attribs").append(`<li>${attr.title}</li>`)
-        })
+        if (AssayTypes[0])
+            $j.each(AssayTypes[0].attributes, (k, attr) => {
+                $j("#attribs").append(`<li>${attr.title}</li>`)
+            })
     }
 
     const asyTypeChange = (i) => {
         $j("#attribs").empty()
         $j("#method_type").val(i.value)
-        $j("#assayTitle").val(methodTypes[i.value].title)
-        $j.each(methodTypes[i.value].attributes, (k, attr) => {
+        $j("#assayTitle").val(AssayTypes[i.value].title)
+        $j.each(AssayTypes[i.value].attributes, (k, attr) => {
             $j("#attribs").append(`<li>${attr.title}</li>`)
         })
     }
@@ -603,13 +576,11 @@
         })
     }
 
-    const createSampleType = () => {}
-
     const updateFlowchart = (flowchartData) => {
         const data = {
             flowchart: {
                 study_id: selectedItem.id,
-                // source_sample_type_id: "??",
+                // source_sample_type_id: "??", No need to update!
                 // assay_sample_type: [{assay_id:"12", sample_type_id:"1"},{...}],
                 items: JSON.stringify(getOrderedSOPs(flowchartData))
             }
@@ -637,7 +608,7 @@
         let flowchartData = $j('#chart_canvas').flowchart('getData');
         if (validateFlowchart(flowchartData) == false) return
         let newAssays = extractAssays(flowchartData)
-        if (arrEqualItems(newAssays,existingAssays)) {
+        if (arrEqualItems(newAssays, existingAssays)) {
             console.log("Equal...")
             updateFlowchart(flowchartData);
             return
@@ -654,17 +625,21 @@
                         $j.when(createAssay(pid, selectedItem.id, uid, title, description, res.data.id))
                             .then((res) => {
                                 updateIds(flowchartData, res.data.id, method.title)
-                                if (i == newAssays.length - 1) {
-                                    updateFlowchart(flowchartData)
-                                    // Create New Assays + SOPs + Sample_types
-                                }
+                                const attr = AssayTypes[$j("#assayType").children("option:selected").val()].attributes
+                                const data = sampleTypeData(attr, `sample_type_${res.data.id}`)
+                                $j.when(createSampleType(data, () => {})).then(res => {
+                                    if (i == newAssays.length - 1) {
+                                        updateFlowchart(flowchartData)
+                                    }
+                                })
                             })
                     })
             }
         });
     });
 
-    const updateIds = (data, id, title)=>{
+
+    const updateIds = (data, id, title) => {
         $j.each(data.operators, (i, op) => {
             if (title == op.properties.title) {
                 op.properties.shape_id = id
@@ -672,11 +647,11 @@
         })
     }
 
-    const arrEqualItems = (arr1,arr2)=>{
-        arr1 = $j.map(arr1,item=>item.id)
-        arr2 = $j.map(arr2,item=>item.id)
-        for(let i =0;i<arr1.length;i++){
-            if ($j.inArray(arr1[i], arr2)==-1)
+    const arrEqualItems = (arr1, arr2) => {
+        arr1 = $j.map(arr1, item => item.id)
+        arr2 = $j.map(arr2, item => item.id)
+        for (let i = 0; i < arr1.length; i++) {
+            if ($j.inArray(arr1[i], arr2) == -1)
                 return false
         }
         return true
@@ -696,7 +671,7 @@
             })
         }
 
-        console.log("arranged",arranged)
+        console.log("arranged", arranged)
 
         return $j.map(arranged, (op, i) => ({
             id: arranged[i].properties.shape_id,
