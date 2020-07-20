@@ -174,21 +174,7 @@
         update_method(std_id, asy_id, content)
     })
 
-    function showPreDefinedCols(e, tblClass, bias) {
-        $j('.arrow_box').toggle();
-        $j('.arrow_box').position({
-            my: "left top",
-            at: "right+12 top-10",
-            of: $j(e.target),
-            collision: "fit"
-        });
-        $j("#btn_custom_col").attr("onclick", `addCustomCol('${tblClass}','${bias}')`);
-        $j("input:button.predef").each((index, val) => {
-            $j(val).attr("onclick",
-                `addCustomCol('${tblClass}','${bias}','${$j(val).val()}', '${$j(val).data("term")}')`);
-        })
-        removeUsedItems(tblClass)
-    }
+    
 
     function addCustomCol(tblClass, bias, text = '', acTerm = '') {
         if (text.length == 0) text = $j.trim($j('.customCol').val())
@@ -204,19 +190,6 @@
         addColumn(options)
     }
 
-    function removeUsedItems(tblClass) {
-        var colNames = $j(`${tblClass} thead tr th`).map((i, val) => {
-            let temp = $j.trim($j(val).html().replace(/<a( |>).*?<\/a>/gi, ""))
-            return temp.length > 0 ? temp : undefined
-        }).get()
-        $j("#preDefinedList li input[type='button']").map((i, val) => {
-            if ($j.inArray($j(val).val(), colNames) != -1) {
-                $j(val).parent().hide()
-            } else {
-                $j(val).parent().show()
-            }
-        }).get()
-    }
 
     function AddRow(table) {
         let rowCount = $j(table).rowcount() + 1;

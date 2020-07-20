@@ -1,6 +1,5 @@
 <div id="content-wrapper">
-    <a class="btn btn-primary btn-sm" onclick="sample_add_row('.tbl_sample_source')"> <i class="glyphicon glyphicon-plus"></i>Add Row</a>
-    <a class="btn btn-primary btn-sm pull-right" onclick="updateSampleTbl('.tbl_sample_source')">Save</a>
+    <a id="btn_add_col" class="btn btn-primary btn-sm"> <i class="glyphicon glyphicon-plus"></i>Add column</a>
     <div class="inner">
         <table class="table tableXs tbl_sample_source">
             <thead class="thead-dark">
@@ -12,6 +11,40 @@
     </div>
 </div>
 <script>
+    $j("#btn_add_col").on("click", function() {
+        showPreDefinedCols(event, '.tbl_sample_source', 1)
+    })
+
+    function showPreDefinedCols(e, tblClass, bias) {
+        $j('.arrow_box').toggle();
+        $j('.arrow_box').position({
+            my: "left top",
+            at: "right+12 top-10",
+            of: $j(e.target),
+            collision: "fit"
+        });
+        $j("#btn_custom_col").attr("onclick", `addCustomCol('${tblClass}','${bias}')`);
+        $j("input:button.predef").each((index, val) => {
+            $j(val).attr("onclick",
+                `addCustomCol('${tblClass}','${bias}','${$j(val).val()}', '${$j(val).data("term")}')`);
+        })
+        removeUsedItems(tblClass)
+    }
+
+    function removeUsedItems(tblClass) {
+        var colNames = $j(`${tblClass} thead tr th`).map((i, val) => {
+            let temp = $j.trim($j(val).html().replace(/<a( |>).*?<\/a>/gi, ""))
+            return temp.length > 0 ? temp : undefined
+        }).get()
+        $j("#preDefinedList li input[type='button']").map((i, val) => {
+            if ($j.inArray($j(val).val(), colNames) != -1) {
+                $j(val).parent().hide()
+            } else {
+                $j(val).parent().show()
+            }
+        }).get()
+    }
+
     function loadSamplesSourceTable(std_id) {
         $j("#selected_std_asy").attr('data-selected', `${std_id}_`)
         $j('.tbl_sample_source thead tr').empty()
