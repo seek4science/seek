@@ -23,6 +23,11 @@
   <div id="programme_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.programmes_enabled -%>">
     <%= admin_checkbox_setting(:programme_user_creation_enabled, 1, Seek::Config.programme_user_creation_enabled,
                                "User creation of #{t('programme').pluralize} enabled", "Controls whether standard users can create their own #{t('programme').pluralize}. If disabled only full administrators will be able to create #{t('programme').pluralize}. If enabled a full administrator is still required to allow and activate the #{t('programme')}") %>
+    <% managed_programme_options = options_for_select(Programme.all.map{|p|[p.title, p.id]}, Seek::Config.managed_programme_id) %>
+    <%= admin_dropdown_setting(:managed_programme_id, managed_programme_options,
+                               "Site mananaged #{t('programme')}",
+                               "The #{t('programme')} the users can request to have a #{t('project')} created and associated with, without the need to create and manage their own",
+                               include_blank:'None') %>
   </div>
   <%= admin_checkbox_setting(:samples_enabled, 1, Seek::Config.samples_enabled,
                              "Samples enabled", "Whether the Samples framework is enabled. The framework allows users to create their own custom Sample types to describe their biological samples and other metadata.",:onchange=>toggle_appear_javascript('sample_type_pa_only')) %>

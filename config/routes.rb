@@ -147,6 +147,7 @@ SEEK::Application.routes.draw do
       get :terms
       get :privacy
       get :about
+      get :create_or_join_project
     end
   end
 
@@ -268,6 +269,10 @@ SEEK::Application.routes.draw do
       get :request_institutions
       get :manage
       post :items_for_result
+      get :guided_join
+      get :guided_create
+      post :request_join
+      post :request_create
     end
     member do
       get :asset_report
@@ -277,6 +282,8 @@ SEEK::Application.routes.draw do
       post :update_members
       post :request_membership
       get :overview
+      get :administer_join_request
+      post :respond_join_request
     end
     resources :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations,
               :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :collections, only: [:index]
@@ -335,6 +342,7 @@ SEEK::Application.routes.draw do
   resources :institutions do
     collection do
       post :items_for_result
+      get  :typeahead
     end
     resources :people, :projects, :specimens, only: [:index]
     resources :avatars do
@@ -482,6 +490,8 @@ SEEK::Application.routes.draw do
     collection do
       post :items_for_result
       get :awaiting_activation
+      get :administer_create_project_request
+      post :respond_create_project_request
     end
     member do
       get :activation_review
