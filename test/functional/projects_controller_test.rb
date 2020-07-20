@@ -1873,14 +1873,28 @@ class ProjectsControllerTest < ActionController::TestCase
   test 'administer join request' do
     person = Factory(:project_administrator)
     project = person.projects.first
+    login_as(person)
     institution = Institution.new(title:'my institution')
     log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
     get :administer_join_request, params:{id:project.id,message_log_id:log.id}
     assert_response :success
   end
 
+  test 'admininster join request blocked for different admin' do
+    person = Factory(:project_administrator)
+    another_admin = Factory(:project_administrator)
+    project = person.projects.first
+    login_as(another_admin)
+    institution = Institution.new(title:'my institution')
+    log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
+    get :administer_join_request, params:{id:project.id,message_log_id:log.id}
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
   test 'respond join request accept existing institution' do
     person = Factory(:project_administrator)
+    login_as(person)
     project = person.projects.first
     institution = Factory(:institution)
     sender = Factory(:person)
@@ -1910,6 +1924,37 @@ class ProjectsControllerTest < ActionController::TestCase
     log.reload
     assert log.responded?
     assert_equal 'Accepted',log.response
+  end
+
+  test 'respond join request blocked another admin' do
+    person = Factory(:project_administrator)
+    another_admin = Factory(:programme_administrator)
+    login_as(another_admin)
+    project = person.projects.first
+    institution = Factory(:institution)
+    sender = Factory(:person)
+    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
+
+    params = {
+        message_log_id: log.id,
+        accept_request: '1',
+        institution:{id:institution.id},
+        id:project.id
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Institution.count') do
+        assert_no_difference('GroupMembership.count') do
+          post :respond_join_request, params:params
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    log.reload
+    refute log.responded?
   end
 
   test 'respond join request accept new institution' do

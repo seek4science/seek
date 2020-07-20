@@ -730,6 +730,62 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'admininister create request can be accessed by programme admin' do
+    person = Factory(:programme_administrator)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = person.programmes.first
+    institution = Institution.new(title:'my institution')
+    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+    assert_response :success
+
+    another_person = Factory(:programme_administrator)
+    login_as(another_person)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+  test 'admininister create request cannot be accessed by a different programme admin' do
+    person = Factory(:programme_administrator)
+    another_person = Factory(:programme_administrator)
+    login_as(another_person)
+
+    project = Project.new(title:'new project')
+    programme = person.programmes.first
+    institution = Institution.new(title:'my institution')
+    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+  test 'administer create request can be accessed by site admin for new programme' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new(title:'my institution')
+    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+    assert_response :success
+  end
+
+  test 'administer create request cannot be accessed by none site admin for new programme' do
+    person = Factory(:programme_administrator)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new(title:'my institution')
+    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
   test 'respond create project request - new programme and institution' do
     person = Factory(:admin)
     login_as(person)
@@ -790,6 +846,51 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   end
 
+  test 'respond create project request - new programme requires site admin' do
+    person = Factory(:programme_administrator)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new({title:'institution', country:'DE'})
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'new project updated',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            title:'new programme updated'
+        },
+        institution:{
+            title:'new institution updated',
+            city:'Paris',
+            country:'FR'
+        }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    log.reload
+    refute log.responded?
+
+  end
+
   test 'respond create project request - new programme and institution, project invalid' do
     person = Factory(:admin)
     login_as(person)
@@ -832,6 +933,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute log.responded?
 
   end
+
 
   test 'respond create project request - new programme and institution, programme and institution invalid' do
     person = Factory(:admin)
@@ -926,6 +1028,51 @@ class ProgrammesControllerTest < ActionController::TestCase
     log.reload
     assert log.responded?
     assert_equal 'Accepted',log.response
+
+  end
+
+  test 'respond create project request - existing programme need prog admin rights' do
+    person = Factory(:programme_administrator)
+    another_admin = Factory(:programme_administrator)
+    programme = person.programmes.first
+    institution = Factory(:institution)
+    login_as(another_admin)
+    project = Project.new(title:'new project',web_page:'my new project')
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'new project',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            id:programme.id
+        },
+        institution:{
+            id:institution.id
+        }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    log.reload
+    refute log.responded?
+
 
   end
 

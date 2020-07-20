@@ -11,9 +11,9 @@ class ProjectsController < ApplicationController
                                                request_membership overview administer_join_request respond_join_request]
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create]
-  before_action :is_user_admin_auth, only: %i[manage destroy administer_join_request respond_join_request]
+  before_action :is_user_admin_auth, only: %i[manage destroy]
   before_action :editable_by_user, only: %i[edit update]
-  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report]
+  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request]
   before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
   before_action :login_required, only: [:request_membership, :guided_join, :guided_create, :request_join, :request_create]
   before_action :allow_request_membership, only: [:request_membership]
