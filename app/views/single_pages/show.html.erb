@@ -88,10 +88,15 @@
     </div>
     
     <script type="text/javascript">
-
         var selectedItem = {type:"",id:""}, pid, uid
         let AssayDetails = []
         let existingAssays = []
+        const sourceTypes = <%= @sourceTypes.to_json.html_safe %>
+        const characteristics = $j(sourceTypes).map((i,x)=>{if(x.type==0) return x}).get()
+        const AssayTypes = $j(sourceTypes).map((i,x)=>{if(x.type==1) return x}).get()
+        console.log("characteristics", characteristics)
+        console.log("AssayTypes", AssayTypes)
+
         $j(document).ready(function() {
             setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'demo_tree', 'draggable_folder_item');
             $j(`#project_contents`).show();
@@ -227,6 +232,8 @@
             })
              init_flowchart()
              addAssayTypeOptions()
+             addSourcesOptions()
+             loadDesign()
         });
 
         const addInvestigations = (t) => {

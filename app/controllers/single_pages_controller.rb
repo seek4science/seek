@@ -10,6 +10,7 @@ class SinglePagesController < ApplicationController
     @investigation = Investigation.new({})
     @study = Study.new({})
     @assay = Assay.new({})
+    @sourceTypes = load_source_types
 
     respond_to do |format|
       format.html
@@ -117,6 +118,22 @@ class SinglePagesController < ApplicationController
   def create_link index
     {fromOperator:index, fromConnector:"output_0",
       fromSubConnector: "0",toOperator: index + 1, toConnector:"input_0",toSubConnector: "0"}
+  end
+
+  def load_source_types
+    source_list = []
+    list = SourceType.all()
+    list.each do |item|
+      source_list.push({title: item.name, type: item.source_type, attributes: 
+        item.source_attributes.map do |attribute|
+          {title: attribute.name,
+          shortName: attribute.short_name,
+          des: attribute.description,
+          required: attribute.required}
+        end
+      })
+    end
+    source_list
   end
 
 end

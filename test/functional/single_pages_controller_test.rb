@@ -93,4 +93,28 @@ class SinglePagesControllerTest < ActionController::TestCase
     assert_equal body['data']['operators'].length, 2
   end
 
+  test 'should provide the Source types list' do
+    populate_source_types
+    source_types = @controller.send(:load_source_types)
+
+    assert_equal source_types.kind_of?(Array), true
+    source_type = source_types[0]
+    assert_equal source_type[:title], 'Plant-ArrayExpress'
+    assert_equal source_type[:type], 0
+    assert_equal source_type[:attributes].kind_of?(Array), true
+    assert_equal source_type[:attributes][0][:title], 'Organism'
+    assert_equal source_type[:attributes][0][:required], true
+  end
+
+
+  private
+
+  def populate_source_types
+    source_type = SourceType.new(name: "Plant-ArrayExpress", group: "plant", source_type: 0)
+    source_type.save!
+    source_attribute = SourceAttribute.new(source_type_id: source_type.id, name: "Organism", required: 1)
+    source_attribute.save!
+    source_type
+  end
+
 end

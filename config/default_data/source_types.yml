@@ -1,0 +1,198 @@
+Plant_ArrayExpress:
+    name: Plant-ArrayExpress
+    group:
+        plant
+    source_type:
+        study
+    attributes:
+        - attribute:
+            title: Organism*
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Developmental stage*
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Age*
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Age Measurement Unit*
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Genotype*
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Cultivar*
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Organism part*
+            short_name: ""
+            description: ""
+            IRI: ""
+
+PlantPhenotype_MIAPPE:
+    name: PlantPhenotype-MIAPPE
+    group:
+        plant
+    source_type:
+        study
+    attributes:
+        - attribute:
+            title: Biological material ID*
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Organism*
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Genus
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Species
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Infraspecific name
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Biological material latitude
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Biological material longitude
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Biological material altitude
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Biological material coordinates uncertainty
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Biological material preprocessing
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Material source ID (Holding institute/stock centre, accession)
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Material source DOI
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Material source latitude
+            short_name: ""
+            description: ""
+            IRI: ""
+
+        - attribute:
+            title: Material source longitude
+            short_name: ""
+            description: ""
+            IRI: ""
+
+        - attribute:
+            title: Material source altitude
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Material source coordinates uncertainty
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Material source description
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Block ID
+            short_name: ""
+            description: ""
+            IRI: ""
+
+        - attribute:
+            title: Sub-block ID
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Plot ID
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Sub-plot ID
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Pot ID
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Plant ID
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Block ID Spatial distribution
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Sub-block ID Spatial distribution
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Plot ID Spatial distribution
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Sub-plot ID Spatial distribution
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Pot ID Spatial distribution
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Plant ID Spatial distribution
+            short_name: ""
+            description: ""
+            IRI: ""
