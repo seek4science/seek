@@ -1720,9 +1720,12 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'guided_create' do
+    prog = Factory(:programme)
     person = Factory(:person_not_in_project)
     login_as(person)
-    get :guided_create
+    with_config_value(:managed_programme_id, prog.id) do
+      get :guided_create
+    end
     assert_response :success
   end
 
