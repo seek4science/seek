@@ -272,7 +272,12 @@ class StudiesController < ApplicationController
 
       Study.where(id: study_id).delete_all
       CustomMetadata.where(id: metadata_id).delete_all
-      Assay.where(study_id: study_id).delete_all
+      assays = Assay.where(study_id: study_id)
+      assays.each do |assay|
+        AssayAsset.where(assay_id: assay.id).delete_all
+      end
+      assays.delete_all
+
     end
 
   end
