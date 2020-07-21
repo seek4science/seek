@@ -133,15 +133,17 @@ class Study < ApplicationRecord
     existing_studies = []
     studies.each do |study|
       study_metadata_id = study.custom_metadata.data[:id]
-      find_metadata = CustomMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").all
+      find_metadata = CustomMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%")
       next if find_metadata.nil?
 
       find_metadata.each do |metadata|
 
+        study = Study.where(id: metadata.item_id).last
         old_study = {
-            id: metadata.item_id.to_s,
-            metadata_id: metadata.id,
-            study_miappe_id: study_metadata_id
+          id: study.id,
+          metadata_id: metadata.id,
+          study_miappe_id: study_metadata_id,
+          description: study.description
         }
         existing_studies << old_study
       end
