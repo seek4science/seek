@@ -45,7 +45,7 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   test 'new page not accessible to logged out user' do
     get :new
-    assert_redirected_to :root
+    assert_redirected_to login_path
   end
 
   test 'only admin can destroy' do
@@ -394,7 +394,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_no_difference('Programme.count') do
       post :create, params: { programme: { title: 'A programme' } }
     end
-    assert_redirected_to :root
+    assert_redirected_to login_path
   end
 
   test 'activation review available to admin' do
