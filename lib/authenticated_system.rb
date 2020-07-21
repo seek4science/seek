@@ -58,7 +58,10 @@ module AuthenticatedSystem
   #   skip_before_action :login_required
   #
   def login_required
-    authorized? || access_denied
+    unless authorized?
+      flash[:error]="You need to be logged in"
+      access_denied(main_app.login_path)
+    end
   end
 
   # Redirect as appropriate when an access request fails.
@@ -69,13 +72,13 @@ module AuthenticatedSystem
   # behavior in case the user is not authorized
   # to access the requested action.  For example, a popup window might
   # simply close itself.
-  def access_denied
+  def access_denied(redirect_path = main_app.root_path)
     request.format = :html if request.env['HTTP_USER_AGENT'] =~ /msie/i
 
     respond_to do |format|
       format.html do
         store_return_to_location
-        redirect_to main_app.root_path
+        redirect_to redirect_path
       end
       format.any do
         request_http_basic_authentication 'Web Password'
