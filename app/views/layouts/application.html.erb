@@ -44,6 +44,17 @@
         <% end %>
     <% end %>
 
+    <% if join_or_create_project_banner? %>
+      <div class="alert alert-warning text-center">
+        As a newly registered user, you are not yet a member of a <%= t('project') %>. Please
+        <%=
+          link_to(
+            button_tag("Join or Create a #{t('project')}", class:'btn btn-success'),
+          create_or_join_project_home_path)
+        %>
+      </div>
+    <% end %>
+
     <%# main content part of every page -%>
     <%= yield :layout %>
   </div>

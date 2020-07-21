@@ -1,0 +1,73 @@
+<style>
+  .label {
+    font-size:100%;
+    background-color: royalblue;
+  }
+</style>
+
+
+<div class="form-group">
+  <div class="help-block">
+    Type the name of the <%= t('institution') %>, or part of the name or the city it may be associated with. From the list of the results
+    found, select the <%= t('institution') %> you are looking for. If you cannot find it in the list, continue to type the full name and select
+    the top <em>new item</em>; you will then be able to provide the additional details about the new <%= t('institution') %>.
+  </div>
+
+  <label class="control-label">Type the name of the <%= t('institution') %> </label><span class="required">*</span>
+  <%= objects_input('institution[id]', [], typeahead:  {query_url: typeahead_institutions_path + '?query=%QUERY&include_new=true',handlebars_template:'typeahead/institution'}, limit:1) -%>
+</div>
+
+<%= hidden_field_tag 'institution[title]' %>
+
+<div class="form-group" id='additional-institution-details'>
+  <label class="control-label">Website</label>
+  <%= text_field_tag('institution[web_page]','',class:'form-control institution-user-input') %>
+
+  <label class="control-label">City</label>
+  <%= text_field_tag('institution[city]','',class:'form-control institution-user-input') %>
+
+  <label class="control-label">Country</label>
+  <%= country_select('institution','country',
+                     { include_blank: 'Select a country' },
+                     { class: 'form-control institution-user-input', disabled:true }) %>
+</div>
+
+<script type='application/javascript'>
+
+    function toggleUserInput(disabled) {
+        $j(".institution-user-input").prop('disabled',disabled);
+    }
+    $j(document).ready(function () {
+
+        toggleUserInput(true);
+
+        $j('select#institution_country').on('change',function() {
+            checkSubmitButtonEnabled();
+        });
+
+        $j('input').on('itemAdded', function(event) {
+            console.log(event.item.id)
+            if (event.item.id=='-1') {
+                toggleUserInput(false);
+            }
+            else {
+                toggleUserInput(true);
+            }
+            $j('#institution_title').val(event.item.name);
+            $j('#institution_web_page').val(event.item.web_page);
+            $j('#institution_city').val(event.item.city);
+            $j('#institution_country').val(event.item.country);
+            checkSubmitButtonEnabled();
+        });
+
+        $j('input').on('itemRemoved', function(event) {
+            toggleUserInput(true);
+            $j('#institution_title').val('');
+            $j('#institution_web_page').val('');
+            $j('#institution_country').val('');
+            checkSubmitButtonEnabled();
+        });
+
+    });
+</script>
+

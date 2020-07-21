@@ -45,4 +45,12 @@ class Institution < ApplicationRecord
     User.admin_or_project_administrator_logged_in? ||
       User.activated_programme_administrator_logged_in?
   end
+
+  def typeahead_hint
+    unless city.blank?
+      "#{city}, #{CountryCodes.country(country)}"
+    else
+      CountryCodes.country(country)
+    end
+  end
 end

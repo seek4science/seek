@@ -1,0 +1,141 @@
+<div>
+  <%= form_tag respond_create_project_request_programmes_path do %>
+
+    <%= hidden_field_tag :message_log_id,@message_log.id %>
+
+    <div class="panel panel-default">
+      <div class="panel-body">
+
+        <div>
+          The user <%= link_to(@message_log.sender.title, @message_log.sender) %> has requested to create a <%= t('project') %>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <%= t('programme') %>
+          </div>
+          <div class="panel-body">
+            <% if @programme.new_record? %>
+              They have requested a new <%= t('programme') %>, with the following:
+              <div class="form-group">
+                <%= label_tag 'Title' %><span class="required">*</span>
+                <%= text_field_tag 'programme[title]',@programme.title, class:'form-control' %>
+              </div>
+            <% else %>
+              It will be associated with the <%= t('programme') %>, <%= link_to @programme.title,@programme %>, which you administer.
+              <%= hidden_field_tag 'programme[id]',@programme.id %>
+            <% end %>
+          </div>
+
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <%= t('project') %>
+          </div>
+          <div class="panel-body">
+            <div>
+              The <%= t('project') %> details provided are as follows:
+              <div class="form-group">
+                <%= label_tag 'Title' %><span class="required">*</span>
+                <%= text_field_tag 'project[title]',@project.title, class:'form-control' %>
+
+                <%= label_tag 'Description' %>
+                <%= text_field_tag 'project[description]',@project.description, class:'form-control' %>
+
+                <%= label_tag 'Website' %>
+                <%= text_field_tag 'project[web_page]',@project.web_page, class:'form-control' %>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <%= t('institution') %>
+          </div>
+          <div class="panel-body">
+            <% if @institution.new_record? %>
+              <div>
+                They have requested a new <%= t('institution') %>, and provided the following details.
+                Please edit or complete if and where you feel necessary.
+                <div class="form-group">
+                  <%= label_tag 'Title' %><span class="required">*</span>
+                  <%= text_field_tag 'institution[title]',@institution.title, class:'form-control' %>
+
+                  <%= label_tag 'Website' %>
+                  <%= text_field_tag 'institution[web_page]',@institution.web_page, class:'form-control' %>
+
+                  <%= label_tag 'City' %>
+                  <%= text_field_tag 'institution[city]',@institution.city, class:'form-control' %>
+
+                  <%= label_tag 'Country' %>
+                  <%= country_select 'institution', 'country', {}, {class:'form-control'} %>
+                </div>
+              </div>
+            <% else %>
+              <div>
+                They wish to be associated with <%= link_to(@institution.title, @institution) %>
+              </div>
+              <%= hidden_field_tag 'institution[id]',@institution.id %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <label>
+            <%= check_box_tag 'accept_request','1',true %>
+            Accept this request
+          </label>
+        </div>
+
+        <div id='reject-details-block' style="display:none;">
+
+          <%= label_tag "Reasons for rejection" %>
+          <div class="help-block">
+            Provide details why it was rejected. Note that this will be forwarded onto to the requester.
+          </div>
+          <%= text_area_tag 'reject_details','',class:'form-control' %>
+        </div>
+
+        <%= submit_tag('Accept', class: 'btn btn-success',id:'submit-button') %>
+      </div>
+    </div>
+
+  <% end %>
+</div>
+
+<script type=application/javascript>
+
+
+    function submitButtonStatus() {
+        if ($j('input#accept_request').is(':checked')) {
+            $j('#submit-button').val('Accept');
+            $j('#submit-button').addClass('btn-success').removeClass('btn-danger');
+        }
+        else {
+            $j('#submit-button').val('Reject');
+            $j('#submit-button').addClass('btn-danger').removeClass('btn-success');
+        }
+    }
+
+    function rejectDetailsStatus() {
+        if ($j('input#accept_request').is(':checked')) {
+            $j('#reject-details-block').hide();
+        }
+        else {
+            $j('#reject-details-block').show();
+        }
+    }
+
+    $j(document).ready(function () {
+        $j('input#accept_request').on('change',function() {
+            submitButtonStatus();
+            rejectDetailsStatus();
+        })
+        submitButtonStatus();
+        rejectDetailsStatus();
+    });
+
+</script>
