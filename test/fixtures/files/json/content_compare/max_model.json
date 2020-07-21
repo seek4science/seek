@@ -73,6 +73,14 @@
           }
         ]
       },
+      "organisms": {
+        "data": [
+          {
+            "id": "1",
+            "type": "organisms"
+          }
+        ]
+      },
       "people": {
         "data": [
           {
