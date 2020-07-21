@@ -80,6 +80,13 @@
     <% if show_ldap_login? %>
       <li><%= link_to "Log in using #{t('login.ldap')}", login_path(anchor: 'ldap_login') %></li>
     <% end %>
+    <% if show_github_login? %>
+      <li>
+        <%= link_to(omniauth_authorize_path(:github, state: "return_to:/"), method: :post) do%>
+          Log in using <%= t('login.github') -%> <%= image('github') %>
+      <% end %>
+      </li>
+    <% end %>
   </ul>
 <% end %>
 

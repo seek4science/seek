@@ -90,15 +90,55 @@ class MessageLogTest < ActiveSupport::TestCase
   test 'log project membership request' do
     proj = Factory(:project)
     sender = Factory(:person)
+    institution = Institution.new(title:'new inst',country:'DE')
     assert_difference('MessageLog.count') do
-      MessageLog.log_project_membership_request(sender, proj, 'blah')
+      MessageLog.log_project_membership_request(sender, proj, institution, 'some comments')
     end
     log = MessageLog.last
     assert_equal proj, log.resource
     assert_equal sender, log.sender
-    assert_equal 'blah', log.details
     assert_equal MessageLog::PROJECT_MEMBERSHIP_REQUEST, log.message_type
+    details = JSON.parse(log.details)
+    assert_equal 'some comments',details['comments']
+    assert_equal 'new inst', details['institution']['title']
+    assert_nil details['institution']['id']
+    assert_equal 'DE',details['institution']['country']
   end
+
+  test 'log project creation request' do
+    requester = Factory(:person)
+    programme = Factory(:programme)
+    project = Project.new(title:'a project',web_page:'http://page')
+    institution = Institution.new(title:'an inst',country:'FR')
+    assert_difference('MessageLog.count') do
+      MessageLog.log_project_creation_request(requester, programme, project, institution)
+    end
+    log = MessageLog.last
+    assert_equal requester, log.resource
+    assert_equal requester, log.sender
+    assert_equal MessageLog::PROJECT_CREATION_REQUEST, log.message_type
+    details = JSON.parse(log.details)
+    assert_equal programme.title,details['programme']['title']
+    assert_equal programme.id,details['programme']['id']
+    assert_equal 'a project',details['project']['title']
+    assert_nil details['project']['id']
+    assert_equal 'an inst', details['institution']['title']
+    assert_nil details['institution']['id']
+    assert_equal 'FR',details['institution']['country']
+  end
+
+  test 'responded' do
+    log = MessageLog.new
+    assert_nil log.response
+    refute log.responded?
+
+    log.response=''
+    refute log.responded?
+
+    log.response = 'Accepted'
+    assert log.responded?
+  end
+
 
   private
 

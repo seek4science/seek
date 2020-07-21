@@ -1,0 +1,32 @@
+
+<div class='row'>
+    <div class="panel panel-warning text-center">
+      <div class="panel-body alert-warning">
+        <%= t('joining_a_project',
+              project:t('project'),
+              projects:t('project').pluralize,
+              programme:t('programme')
+            ).html_safe %>
+      </div>
+    </div>
+</div>
+
+
+<div class="row seek-homepage-button-container">
+  <div class="col-md-6">
+    <%= frontpage_button(guided_join_projects_path) do %>
+      <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+      Join a <%=t('project') %>
+    <% end %>
+  </div>
+
+  <div class="col-md-6">
+    <%= frontpage_button(guided_create_projects_path) do %>
+      <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+      Create a <%=t('project') %>
+    <% end %>
+  </div>
+</div>
+
+
+
