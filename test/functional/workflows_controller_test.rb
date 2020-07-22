@@ -582,6 +582,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :success
     crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path)
     assert crate.main_workflow
+    assert_equal '11719', @response.header['Content-Length']
   end
 
   test 'create ro crate even with with duplicated filenames' do
