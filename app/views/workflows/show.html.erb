@@ -5,6 +5,13 @@
 <%= render partial: 'assets/upload_new_version_form', locals: { resource: @workflow } -%>
 
 <div class="row">
+  <% if @display_workflow&.content_blob&.caching_job&.exists? %>
+    <div class="col-sm-12">
+      <%= alert_box('info', hide_button: true) do %>
+        The content of this workflow has not yet been downloaded. Please check back later.
+      <% end %>
+    </div>
+  <% end %>
   <div class="col-md-9 col-sm-8 box_about_actor">
     <% if @display_workflow.maturity_level %>
       <p>

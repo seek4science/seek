@@ -256,6 +256,7 @@ class WorkflowsController < ApplicationController
 
   def ro_crate
     path = @display_workflow.ro_crate_zip
+    response.headers['Content-Length'] = File.size(path).to_s
     respond_to do |format|
       format.html do
         send_file(path,
