@@ -12,6 +12,7 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
     @sample_type = Factory(:simple_sample_type, project_ids: [@project.id], contributor:@current_person)
     @sample_type_attribute = @sample_type.sample_attributes.first
     @to_post = load_template("post_min_#{@clz}.json.erb", {project_id: @project.id, sample_attribute_type_id: @sample_type_attribute.sample_attribute_type_id})
+    @assay = Factory(:assay, contributor:@current_person)
   end
 
   def test_should_delete_object
@@ -82,7 +83,8 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
     @post_values = {
         sample_attribute_type_id: @sample_type_attribute.sample_attribute_type_id,
         creator_id: @current_person.id,
-        project_id: @project.id}
+        project_id: @project.id,
+        assay_id: @assay.id}
   end
 
   def create_patch_values
@@ -92,7 +94,8 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
         attribute_title: "This is a new attribute title",
         project_id: @project.id,
         sample_attribute_type_id: @sample_type_attribute.sample_attribute_type_id,
-        sample_attribute_id: @sample_type_attribute.id
+        sample_attribute_id: @sample_type_attribute.id,
+        assay_id: @assay.id
     }
   end
 
