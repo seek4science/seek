@@ -52,6 +52,9 @@
             "type": "people"
           }
         ]
+      },
+      "assays": {
+        "data": []
       }
     },
     "links": {
