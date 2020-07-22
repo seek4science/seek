@@ -1,0 +1,100 @@
+<%= form_tag request_create_projects_path do %>
+  <div class="row">
+    <div  style="margin:auto;width:70%;">
+
+      <div class="panel panel-default">
+        <div class="panel-heading"><%= t('programme') %></div>
+        <div class="panel-body">
+
+          <div class="help-block">
+            You can choose either to be linked to a <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}" %>, <%= link_to Programme.managed_programme.title,Programme.managed_programme %>, or have one created for you.
+          </div>
+          <div class="help-block">
+            If you have a <%= t('programme') %> created, then you will then be able to freely create further <%= t('project').pluralize %> within
+            it. To have one created, then please provide the name. You will be able to provide additional details, if you wish, once it has been created.
+          </div>
+
+          <label>
+            <%= check_box_tag :managed_programme, '1', true %>
+            <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}?" %>
+          </label>
+          <div id='programme-details' style="display:none;">
+            <%= label_tag :programme_title, "Title" %><span class="required">*</span>
+            <%= text_field_tag 'programme[title]', '', class: 'form-control' %>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading"><%= t('project') %></div>
+        <div class="panel-body">
+          <div class="help-block">
+            Please provide some basic details about the <%= t('project') %> that will be created. You will be able to update and add additional
+            information once it has been created.
+          </div>
+
+          <%= label_tag :project_title, "Title" %><span class="required">*</span>
+          <%= text_field_tag 'project[title]', '', class: 'form-control' %>
+          <%= label_tag :project_title, "Description" %>
+          <%= text_area_tag 'project[description]', '', rows:2, class: 'form-control' %>
+          <%= label_tag :project_title, "Web page" %>
+          <%= text_field_tag 'project[web_page]', '', class: 'form-control' %>
+
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading"><%= t('institution') %></div>
+        <div class="panel-body">
+
+          <div class="form-group">
+            <%= render partial: 'institutions/select_or_define' %>
+          </div>
+
+        </div>
+      </div>
+
+      <%= submit_tag('Submit', class: 'btn btn-primary',id:'submit-button',disabled:true) %>
+    </div>
+  </div>
+<% end %>
+
+
+<script type=application/javascript>
+
+    function checkSubmitButtonEnabled() {
+        var enabled = $j('#institution_id').val()
+            && ($j('input#managed_programme:checked').length==1 || $j('input#programme_title').val())
+            && $j('input#project_title').val()
+            && $j('select#institution_country').val();
+        $j('#submit-button').prop('disabled',!enabled);
+    }
+
+    $j(document).ready(function () {
+        $j('form').on('submit',function() {
+            //clear the id if -1 before submitting
+            if ($j('#institution_id').val()=='-1') {
+                $j('#institution_id').val('');
+            }
+        });
+
+       $j('input#managed_programme').on('change', function() {
+           if ($j('input#managed_programme:checked').length == 0) {
+               $j('#programme-details').show();
+           }
+           else {
+               $j('#programme-details').hide();
+               $j('input#programme_title').val('');
+           }
+           checkSubmitButtonEnabled();
+       });
+
+       $j('input#programme_title').on('input',function() {
+          checkSubmitButtonEnabled();
+       });
+
+        $j('input#project_title').on('input',function() {
+            checkSubmitButtonEnabled();
+        });
+    });
+</script>

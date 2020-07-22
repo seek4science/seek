@@ -104,6 +104,7 @@ class PeopleController < ApplicationController
       render :is_this_you, locals: { email: email }
     else
       p = { email: email }
+      p[:first_name], p[:last_name] = params[:name].split(' ') if params[:name].present?
       p[:first_name] = params[:first_name] if params[:first_name]
       p[:last_name] = params[:last_name] if params[:last_name]
       @person = Person.new(p)
@@ -133,7 +134,12 @@ class PeopleController < ApplicationController
           if @person.only_first_admin_person?
             format.html { redirect_to registration_form_admin_path(during_setup: 'true') }
           else
-            format.html { redirect_to(@person) }
+            if Seek::Config.programmes_enabled && Programme.managed_programme
+              format.html { redirect_to(create_or_join_project_home_path)}
+            else
+              format.html { redirect_to(@person) }
+            end
+
           end
           format.xml { render xml: @person, status: :created, location: @person }
           format.json {render json: @person, status: :created, location: @person, include: [params[:include]] }
@@ -154,12 +160,6 @@ class PeopleController < ApplicationController
 
   def notify_admin_and_project_administrators_of_new_user
     Mailer.contact_admin_new_user(notification_params.to_h, current_user).deliver_later
-
-    # send mail to project managers
-    project_administrators = project_administrators_of_selected_projects params[:projects]
-    project_administrators.each do |project_administrator|
-      Mailer.contact_project_administrator_new_user(project_administrator, notification_params.to_h, current_user).deliver_later
-    end
   end
 
   # PUT /people/1

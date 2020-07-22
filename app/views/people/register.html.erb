@@ -5,10 +5,6 @@
   <%= render :partial=>"name_details_form", :locals=>{:f=>f} %>
   <%= render :partial => 'contact_details_form', :locals => {:f => f} %>
 
-  <% unless Person.count==0 %> <%# not for the first person %>
-    <%= render :partial => 'project_and_institution_selection', :locals => {:f => f} %>
-  <% end %>
-
   <%= f.submit("Create",data: { disable_with: 'Creating...' }, :class => 'btn btn-primary') %>
   <%= render :partial=>"cancel_registration" %>
 <% end -%>

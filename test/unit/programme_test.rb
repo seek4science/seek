@@ -467,7 +467,19 @@ class ProgrammeTest < ActiveSupport::TestCase
       prog.update_attribute(:funding_codes,'a,b')
       assert_equal ['a','b'],prog.funding_codes.sort
     end
+  end
 
-
+  test 'managed programme' do
+    prog1 = Factory(:programme)
+    prog2 = Factory(:programme)
+    with_config_value(:managed_programme_id,prog1.id) do
+      assert_equal prog1,Programme.managed_programme
+    end
+    with_config_value(:managed_programme_id,prog2.id) do
+      assert_equal prog2,Programme.managed_programme
+    end
+    with_config_value(:managed_programme_id,nil) do
+      assert_nil Programme.managed_programme
+    end
   end
 end

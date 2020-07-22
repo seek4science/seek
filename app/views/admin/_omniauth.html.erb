@@ -43,4 +43,14 @@
     <%= admin_password_setting(:omniauth_elixir_aai_secret, Seek::Config.omniauth_elixir_aai_secret,
                                'ELIXIR AAI Secret', 'The secret key provided by ELIXIR AAI for your installation.') %>
   </div>
+
+  <%= admin_checkbox_setting(:omniauth_github_enabled, 1, Seek::Config.omniauth_github_enabled,
+                             "GitHub authentication", "Enables use of GitHub for authentication.",
+                             onchange: toggle_appear_javascript('omniauth_github_settings')) %>
+  <div id="omniauth_github_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_github_enabled) -%>;">
+    <%= admin_text_setting(:omniauth_github_client_id, Seek::Config.omniauth_github_client_id,
+                           'GitHub Client ID', 'The client ID provided by GitHub for your installation.') %>
+    <%= admin_password_setting(:omniauth_github_secret, Seek::Config.omniauth_github_secret,
+                               'GitHub Secret', 'The secret key provided by GitHub for your installation.') %>
+  </div>
 </div>

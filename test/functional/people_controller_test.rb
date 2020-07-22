@@ -889,29 +889,7 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test 'should email admin and project administrators when specifying project' do
-    proj_man1 = Factory :project_administrator
-    proj_man2 = Factory :project_administrator
-    proj1 = proj_man1.projects.first
-    proj2 = proj_man2.projects.first
-    project_without_manager = Factory :project
 
-    # check there are 3 uniq projects
-    assert_equal 3, [proj1, proj2, project_without_manager].uniq.size
-
-    user = Factory :activated_user
-    assert_nil user.person
-    login_as(user)
-
-    # 3 emails - 1 to admin and 2 to project administrators
-    assert_enqueued_emails(3) do
-      post :create, params: { person: { first_name: 'Fred', last_name: 'BBB', email: 'fred.bbb@email.com' }, projects: [proj1.id, proj2.id, project_without_manager.id] }
-    end
-
-    assert assigns(:person)
-    user.reload
-    assert_equal user.person, assigns(:person)
-  end
   test 'redirect after destroy' do
     person1 = Factory(:person)
     person2 = Factory(:person)

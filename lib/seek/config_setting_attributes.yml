@@ -189,6 +189,7 @@ isa_enabled:
 models_enabled:
 organisms_enabled:
 programmes_enabled:
+managed_programme_id:
 publications_enabled:
 samples_enabled:
 workflows_enabled:
@@ -203,4 +204,8 @@ omniauth_elixir_aai_secret:
   encrypt: true
 omniauth_ldap_enabled:
 omniauth_ldap_config:
+  encrypt: true
+omniauth_github_enabled:
+omniauth_github_client_id:
+omniauth_github_secret:
   encrypt: true
