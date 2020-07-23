@@ -345,7 +345,7 @@ module Seek
     end
 
     def omniauth_github_config
-      [omniauth_github_client_id, omniauth_github_secret]
+      [omniauth_github_client_id, omniauth_github_secret, { scope: 'user:email' }]
     end
 
     def omniauth_providers
