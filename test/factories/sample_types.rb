@@ -92,6 +92,7 @@ Factory.define(:max_sample_type, parent: :sample_type) do |f|
   f.title 'A Maximal SampleType'
   f.description 'A very new research'
   f.tags ["tag1","tag2"]
+  f.assays {[Factory.build(:assay, policy: Factory(:public_policy))]}
   f.after_build do |type|
     # Not sure why i have to explicitly add the sample_type association
     type.sample_attributes << Factory.build(:sample_attribute, title: 'full name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: type)

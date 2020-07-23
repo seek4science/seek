@@ -97,6 +97,14 @@
             "type": "people"
           }
         ]
+      },
+      "assays": {
+        "data": [
+            {
+                "id": "1",
+                "type": "assays"
+            }
+        ]
       }
     },
     "links": {

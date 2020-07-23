@@ -182,6 +182,8 @@ ActiveRecord::Schema.define(version: 2020_07_13_122810) do
     t.integer "suggested_technology_type_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "sample_type_id"
+    t.index ["sample_type_id"], name: "index_assays_on_sample_type_id" 
   end
 
   create_table "asset_doi_logs", id: :integer,  force: :cascade do |t|
