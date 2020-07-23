@@ -39,7 +39,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
         info: {
             'nickname' => 'new_github_user',
             'name' => 'New Githubuser',
-            'email' => nil
+            'email' => 'new_github_user@example.com'
         }
     })
   end
@@ -290,7 +290,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
 
     assert_equal 'Githubuser', assigns(:person).last_name
     assert_equal 'New', assigns(:person).first_name
-    assert_equal nil, assigns(:person).email
+    assert_equal 'new_github_user@example.com', assigns(:person).email
     assert session[:user_id]
     user = User.find_by_id(session[:user_id])
     assert user
