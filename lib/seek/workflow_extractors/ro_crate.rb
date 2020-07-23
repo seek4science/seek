@@ -96,7 +96,7 @@ module Seek
       end
 
       def crate
-        @crate ||= ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.path : @io)
+        @crate ||= ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.path : @io, target_dir: Dir.mktmpdir('ro-crate'))
       end
 
       def default_diagram_format
