@@ -395,7 +395,12 @@ SEEK::Application.routes.draw do
   resources :studies, concerns: [:publishable, :has_snapshots, :isa] do
     collection do
       get :preview
+      get :batch_uploader
+      post :preview_content
+      post :batch_create
+      post :create_content_blob
       post :investigation_selected_ajax
+      post :items_for_result
       post :items_for_result
     end
     resources :snapshots, :only => [:show, :new, :create, :destroy] do
