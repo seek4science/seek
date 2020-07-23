@@ -7,7 +7,7 @@ module ROCrate
         crate.properties = entity_hash.delete(ROCrate::Crate::IDENTIFIER)
         crate.metadata.properties = entity_hash.delete(ROCrate::Metadata::IDENTIFIER)
         main_wf = entity_hash.delete(crate.properties.dig('mainEntity', '@id'))
-        if main_wf
+        if main_wf && (['ComputationalWorkflow', 'Workflow'] & Array(main_wf['@type'])).any?
           crate.main_workflow = create_entity(crate, ROCrate::Workflow, source, main_wf)
           diagram = entity_hash.delete(main_wf.dig('image', '@id'))
           if diagram
