@@ -68,18 +68,18 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.10.0
+    git checkout v1.10.1
 
 ### Updating using the tarball
 
 
 You can download the file from
-<https://github.com/seek4science/seek/archive/v1.10.0.tar.gz> You can
+<https://github.com/seek4science/seek/archive/v1.10.1.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.10.0.tar.gz
+    tar zxvf seek-1.10.1.tar.gz
     mv seek seek-previous
-    mv seek-1.10.0 seek
+    mv seek-1.10.1 seek
     cd seek/
 
 and then copy across your existing filestore and database configuration file

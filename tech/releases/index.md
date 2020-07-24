@@ -11,6 +11,24 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.10.1
+
+Release date: _24th June 2020_
+
+This version contains a few bug fixes and security updates, and minor feature additions. 
+In particular:
+
+  * Rails upgrade to the latest Rails 5 release (5.2.4.3), along with some other dependencies
+  * Discussion links now have an optional label, to be displayed instead of the raw URL
+  * Discussion links are now included in the API
+  * Model organism has been included in the API
+  * The Model image link has been included in the API
+  * An improvement to how Submitter and Other creators are displayed, to be less ambiguous
+  * Request resource has now been entirely replaced by the improved ability to request contact
+  * A fix to a bug that prevented Assays and Assets being unlinked, if there was only 1 Assay
+
+[Closed issues for 1.10.1](https://github.com/seek4science/seek/issues?q=is%3Aissue+is%3Aclosed++milestone%3Av1.10.1+)
+
 ## Version 1.10.0
 
 Release date: _9th June 2020_

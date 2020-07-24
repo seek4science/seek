@@ -1,9 +1,9 @@
 #baseurl: /seek
 
-current_seek_version: "1.10.0"
+current_seek_version: "1.10.1"
 current_docker_tag: "1.10"
 
-plugins:
+plugins_dir:
   - jekyll-sitemap
   - jekyll-redirect-from
   - jekyll-feed
