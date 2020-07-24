@@ -9,6 +9,8 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     @clz = 'model'
     @plural_clz = @clz.pluralize
     @project = @current_user.person.projects.first
+    @organism = Factory(:organism)
+    @project.organisms << @organism
     investigation = Factory(:investigation, projects: [@project], contributor: @current_person)
     study = Factory(:study, investigation: investigation, contributor: @current_person)
     @assay = Factory(:assay, study: study, contributor: @current_person)
