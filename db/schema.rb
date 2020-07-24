@@ -27,11 +27,11 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.text "user_agent"
     t.text "data", limit: 16777215
     t.string "controller_name"
-    t.index ["action"], name: "act_logs_action_index"
-    t.index ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index"
-    t.index ["culprit_type", "culprit_id"], name: "act_logs_culprit_index"
-    t.index ["format"], name: "act_logs_format_index"
-    t.index ["referenced_type", "referenced_id"], name: "act_logs_referenced_index"
+    t.index ["action"], name: "act_logs_action_index", length: 191
+    t.index ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index", length: { activity_loggable_type: 191 }
+    t.index ["culprit_type", "culprit_id"], name: "act_logs_culprit_index", length: { culprit_type: 191 }
+    t.index ["format"], name: "act_logs_format_index", length: 191
+    t.index ["referenced_type", "referenced_id"], name: "act_logs_referenced_index", length: { referenced_type: 191 }
   end
 
   create_table "admin_defined_role_programmes", id: :integer,  force: :cascade do |t|
@@ -51,7 +51,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "identifier", null: false
-    t.index ["name"], name: "index_annotation_attributes_on_name"
+    t.index ["name"], name: "index_annotation_attributes_on_name", length: 191
   end
 
   create_table "annotation_value_seeds", id: :integer,  force: :cascade do |t|
@@ -96,7 +96,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "value_id", default: 0, null: false
     t.index ["annotatable_type", "annotatable_id"], name: "index_annotations_on_annotatable_type_and_annotatable_id"
     t.index ["attribute_id"], name: "index_annotations_on_attribute_id"
-    t.index ["source_type", "source_id"], name: "index_annotations_on_source_type_and_source_id"
+    t.index ["source_type", "source_id"], name: "index_annotations_on_source_type_and_source_id", length: { source_type: 191 }
     t.index ["value_type", "value_id"], name: "index_annotations_on_value_type_and_value_id"
   end
 
@@ -120,7 +120,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.string "asset_type"
     t.integer "direction", default: 0
     t.index ["assay_id"], name: "index_assay_assets_on_assay_id"
-    t.index ["asset_id", "asset_type"], name: "index_assay_assets_on_asset_id_and_asset_type"
+    t.index ["asset_id", "asset_type"], name: "index_assay_assets_on_asset_id_and_asset_type", length: { asset_type: 191 }
   end
 
   create_table "assay_auth_lookup", id: false,  force: :cascade do |t|
@@ -137,7 +137,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
 
   create_table "assay_classes", id: :integer,  force: :cascade do |t|
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "key", limit: 10
@@ -166,7 +166,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
 
   create_table "assays", id: :integer,  force: :cascade do |t|
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "study_id"
@@ -180,7 +180,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.string "technology_type_uri"
     t.integer "suggested_assay_type_id"
     t.integer "suggested_technology_type_id"
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "deleted_contributor"
   end
 
@@ -189,7 +189,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "asset_id"
     t.integer "asset_version"
     t.integer "action"
-    t.text "comment"
+    t.text "comment", limit: 16777215
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id"
@@ -223,7 +223,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.string "asset_type"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.index ["asset_id", "asset_type"], name: "index_assets_creators_on_asset_id_and_asset_type"
+    t.index ["asset_id", "asset_type"], name: "index_assets_creators_on_asset_id_and_asset_type", length: { asset_type: 191 }
   end
 
   create_table "auth_lookup_update_queues", id: :integer,  force: :cascade do |t|
@@ -240,13 +240,13 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.string "original_filename"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.index ["owner_type", "owner_id"], name: "index_avatars_on_owner_type_and_owner_id"
+    t.index ["owner_type", "owner_id"], name: "index_avatars_on_owner_type_and_owner_id", length: { owner_type: 191 }
   end
 
   create_table "bioportal_concepts", id: :integer,  force: :cascade do |t|
     t.string "ontology_id"
     t.string "concept_uri"
-    t.text "cached_concept_yaml"
+    t.text "cached_concept_yaml", limit: 16777215
     t.integer "conceptable_id"
     t.string "conceptable_type"
   end
@@ -321,7 +321,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
 
   create_table "content_blobs", id: :integer,  force: :cascade do |t|
     t.string "md5sum"
-    t.text "url"
+    t.text "url", limit: 16777215
     t.string "uuid"
     t.string "original_filename"
     t.string "content_type"
@@ -334,7 +334,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.bigint "file_size"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.index ["asset_id", "asset_type"], name: "index_content_blobs_on_asset_id_and_asset_type"
+    t.index ["asset_id", "asset_type"], name: "index_content_blobs_on_asset_id_and_asset_type", length: { asset_type: 191 }
   end
 
   create_table "culture_growth_types", id: :integer,  force: :cascade do |t|
@@ -395,16 +395,16 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "data_file_versions", id: :integer,  force: :cascade do |t|
     t.integer "data_file_id"
     t.integer "version"
-    t.text "revision_comments"
+    t.text "revision_comments", limit: 16777215
     t.integer "contributor_id"
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.integer "template_id"
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "first_letter", limit: 1
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "uuid"
     t.integer "policy_id"
     t.string "doi"
@@ -423,14 +423,14 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "data_files", id: :integer,  force: :cascade do |t|
     t.integer "contributor_id"
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.integer "template_id"
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "version", default: 1
     t.string "first_letter", limit: 1
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "uuid"
     t.integer "policy_id"
     t.string "doi"
@@ -459,8 +459,8 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "delayed_jobs", id: :integer,  force: :cascade do |t|
     t.integer "priority", default: 0
     t.integer "attempts", default: 0
-    t.text "handler"
-    t.text "last_error"
+    t.text "handler", limit: 16777215
+    t.text "last_error", limit: 16777215
     t.datetime "run_at"
     t.datetime "locked_at"
     t.datetime "failed_at"
@@ -498,9 +498,9 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "document_versions", id: :integer,  force: :cascade do |t|
     t.integer "document_id"
     t.integer "version"
-    t.text "revision_comments"
-    t.text "title"
-    t.text "description"
+    t.text "revision_comments", limit: 16777215
+    t.text "title", limit: 16777215
+    t.text "description", limit: 16777215
     t.integer "contributor_id"
     t.string "first_letter", limit: 1
     t.string "uuid"
@@ -510,7 +510,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "deleted_contributor"
     t.index ["contributor_id"], name: "index_document_versions_on_contributor"
     t.index ["document_id"], name: "index_document_versions_on_document_id"
@@ -524,8 +524,8 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   end
 
   create_table "documents", id: :integer,  force: :cascade do |t|
-    t.text "title"
-    t.text "description"
+    t.text "title", limit: 16777215
+    t.text "description", limit: 16777215
     t.integer "contributor_id"
     t.integer "version"
     t.string "first_letter", limit: 1
@@ -536,7 +536,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "deleted_contributor"
     t.index ["contributor_id"], name: "index_documents_on_contributor"
   end
@@ -570,11 +570,11 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "events", id: :integer,  force: :cascade do |t|
     t.datetime "start_date"
     t.datetime "end_date"
-    t.text "address"
+    t.text "address", limit: 16777215
     t.string "city"
     t.string "country"
     t.text "url"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.string "title"
     t.integer "policy_id"
     t.integer "contributor_id"
@@ -670,7 +670,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "genes", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.string "symbol"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -679,7 +679,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "gene_id"
     t.integer "modification_id"
     t.integer "strain_id"
-    t.text "comment"
+    t.text "comment", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -714,7 +714,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "help_documents", id: :integer,  force: :cascade do |t|
     t.string "identifier"
     t.string "title"
-    t.text "body"
+    t.text "body", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -774,7 +774,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
 
   create_table "institutions", id: :integer,  force: :cascade do |t|
     t.string "title"
-    t.text "address"
+    t.text "address", limit: 16777215
     t.string "city"
     t.text "web_page"
     t.string "country"
@@ -799,14 +799,14 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
 
   create_table "investigations", id: :integer,  force: :cascade do |t|
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "first_letter", limit: 1
     t.string "uuid"
     t.integer "policy_id"
     t.integer "contributor_id"
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "deleted_contributor"
   end
 
@@ -844,12 +844,12 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "message_type"
-    t.text "details"
+    t.text "details", limit: 16777215
     t.integer "resource_id"
     t.string "resource_type"
     t.integer "sender_id"
     t.text "response"
-    t.index ["resource_type", "resource_id"], name: "index_message_logs_on_resource_type_and_resource_id"
+    t.index ["resource_type", "resource_id"], name: "index_message_logs_on_resource_type_and_resource_id", length: { resource_type: 191 }
     t.index ["sender_id"], name: "index_message_logs_on_sender_id"
   end
 
@@ -890,10 +890,10 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "model_versions", id: :integer,  force: :cascade do |t|
     t.integer "model_id"
     t.integer "version"
-    t.text "revision_comments"
+    t.text "revision_comments", limit: 16777215
     t.integer "contributor_id"
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.integer "recommended_environment_id"
     t.datetime "last_used_at"
     t.datetime "created_at"
@@ -902,12 +902,12 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "model_type_id"
     t.integer "model_format_id"
     t.string "first_letter", limit: 1
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "uuid"
     t.integer "policy_id"
+    t.integer "model_image_id"
     t.string "imported_source"
     t.string "imported_url"
-    t.integer "model_image_id"
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
@@ -924,7 +924,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "models", id: :integer,  force: :cascade do |t|
     t.integer "contributor_id"
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.integer "recommended_environment_id"
     t.datetime "last_used_at"
     t.datetime "created_at"
@@ -934,12 +934,12 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "model_format_id"
     t.integer "version", default: 1
     t.string "first_letter", limit: 1
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "uuid"
     t.integer "policy_id"
+    t.integer "model_image_id"
     t.string "imported_source"
     t.string "imported_url"
-    t.integer "model_image_id"
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
@@ -963,7 +963,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "modifications", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.string "symbol"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.string "position"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -1155,7 +1155,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.string "phone"
     t.string "skype_name"
     t.text "web_page"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.integer "avatar_id"
     t.integer "status_id", default: 0
     t.string "first_letter", limit: 10
@@ -1175,8 +1175,8 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   end
 
   create_table "phenotypes", id: :integer,  force: :cascade do |t|
-    t.text "description"
-    t.text "comment"
+    t.text "description", limit: 16777215
+    t.text "comment", limit: 16777215
     t.integer "strain_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -1207,15 +1207,15 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "presentation_versions", id: :integer,  force: :cascade do |t|
     t.integer "presentation_id"
     t.integer "version"
-    t.text "revision_comments"
+    t.text "revision_comments", limit: 16777215
     t.integer "contributor_id"
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
     t.string "first_letter", limit: 1
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "uuid"
     t.integer "policy_id"
     t.string "license"
@@ -1230,13 +1230,13 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "presentations", id: :integer,  force: :cascade do |t|
     t.integer "contributor_id"
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
     t.integer "version", default: 1
     t.string "first_letter", limit: 1
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "uuid"
     t.integer "policy_id"
     t.string "license"
@@ -1252,16 +1252,16 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
 
   create_table "programmes", id: :integer,  force: :cascade do |t|
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.integer "avatar_id"
     t.text "web_page"
     t.string "first_letter", limit: 1
     t.string "uuid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "funding_details"
+    t.text "funding_details", limit: 16777215
     t.boolean "is_activated", default: false
-    t.text "activation_rejection_reason"
+    t.text "activation_rejection_reason", limit: 16777215
   end
 
   create_table "project_descendants", id: false,  force: :cascade do |t|
@@ -1280,7 +1280,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "project_folders", id: :integer,  force: :cascade do |t|
     t.integer "project_id"
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.integer "parent_id"
     t.boolean "editable", default: true
     t.datetime "created_at"
@@ -1309,7 +1309,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.text "wiki_page"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.integer "avatar_id"
     t.integer "default_policy_id"
     t.string "first_letter", limit: 1
@@ -1401,8 +1401,8 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
 
   create_table "publications", id: :integer,  force: :cascade do |t|
     t.integer "pubmed_id"
-    t.text "title"
-    t.text "abstract"
+    t.text "title", limit: 16777215
+    t.text "abstract", limit: 16777215
     t.date "published_date"
     t.string "journal"
     t.string "first_letter", limit: 1
@@ -1439,7 +1439,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
 
   create_table "relationship_types", id: :integer,  force: :cascade do |t|
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "key"
@@ -1462,20 +1462,20 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "publish_state"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text "comment"
+    t.text "comment", limit: 16777215
     t.index ["publish_state"], name: "index_resource_publish_logs_on_publish_state"
-    t.index ["resource_type", "resource_id"], name: "index_resource_publish_logs_on_resource_type_and_resource_id"
+    t.index ["resource_type", "resource_id"], name: "index_resource_publish_logs_on_resource_type_and_resource_id", length: { resource_type: 191 }
     t.index ["user_id"], name: "index_resource_publish_logs_on_user_id"
   end
 
   create_table "sample_attribute_types", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.string "base_type"
-    t.text "regexp"
+    t.text "regexp", limit: 16777215
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "placeholder"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.string "resolution"
   end
 
@@ -1518,7 +1518,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
 
   create_table "sample_controlled_vocabs", id: :integer,  force: :cascade do |t|
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "first_letter", limit: 1
@@ -1528,7 +1528,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "sample_id"
     t.integer "resource_id"
     t.string "resource_type"
-    t.index ["resource_id", "resource_type"], name: "index_sample_resource_links_on_resource_id_and_resource_type"
+    t.index ["resource_id", "resource_type"], name: "index_sample_resource_links_on_resource_id_and_resource_type", length: { resource_type: 191 }
     t.index ["sample_id"], name: "index_sample_resource_links_on_sample_id"
   end
 
@@ -1538,7 +1538,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "first_letter", limit: 1
-    t.text "description"
+    t.text "description", limit: 16777215
     t.boolean "uploaded_template", default: false
     t.integer "contributor_id"
     t.string "deleted_contributor"
@@ -1547,22 +1547,22 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "samples", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.integer "sample_type_id"
-    t.text "json_metadata"
+    t.text "json_metadata", limit: 16777215
     t.string "uuid"
     t.integer "contributor_id"
     t.integer "policy_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "first_letter", limit: 1
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.integer "originating_data_file_id"
     t.string "deleted_contributor"
   end
 
   create_table "saved_searches", id: :integer,  force: :cascade do |t|
     t.integer "user_id"
-    t.text "search_query"
-    t.text "search_type"
+    t.text "search_query", limit: 16777215
+    t.text "search_type", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "include_external_search", default: false
@@ -1591,7 +1591,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.text "data", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.index ["session_id"], name: "index_sessions_on_session_id"
+    t.index ["session_id"], name: "index_sessions_on_session_id", length: 191
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
@@ -1618,7 +1618,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "announcer_id"
     t.string "announcer_type"
     t.string "title"
-    t.text "body"
+    t.text "body", limit: 16777215
     t.integer "site_announcement_category_id"
     t.boolean "is_headline", default: false
     t.datetime "expires_at"
@@ -1654,15 +1654,15 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "sop_versions", id: :integer,  force: :cascade do |t|
     t.integer "sop_id"
     t.integer "version"
-    t.text "revision_comments"
+    t.text "revision_comments", limit: 16777215
     t.integer "contributor_id"
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
     t.string "first_letter", limit: 1
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "uuid"
     t.integer "policy_id"
     t.string "doi"
@@ -1675,13 +1675,13 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
   create_table "sops", id: :integer,  force: :cascade do |t|
     t.integer "contributor_id"
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
     t.integer "version", default: 1
     t.string "first_letter", limit: 1
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "uuid"
     t.integer "policy_id"
     t.string "doi"
@@ -1730,7 +1730,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.datetime "updated_at"
     t.integer "parent_id"
     t.string "synonym"
-    t.text "comment"
+    t.text "comment", limit: 16777215
     t.string "provider_id"
     t.string "provider_name"
     t.boolean "is_dummy", default: false
@@ -1765,9 +1765,9 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
 
   create_table "studies", id: :integer,  force: :cascade do |t|
     t.string "title"
-    t.text "description"
+    t.text "description", limit: 16777215
     t.integer "investigation_id"
-    t.text "experimentalists"
+    t.text "experimentalists", limit: 16777215
     t.datetime "begin_date"
     t.integer "person_responsible_id"
     t.datetime "created_at"
@@ -1776,7 +1776,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.string "uuid"
     t.integer "policy_id"
     t.integer "contributor_id"
-    t.text "other_creators"
+    t.text "other_creators", limit: 16777215
     t.string "deleted_contributor"
   end
 
@@ -1826,7 +1826,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.string "substance_type"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.index ["substance_id", "substance_type"], name: "index_synonyms_on_substance_id_and_substance_type"
+    t.index ["substance_id", "substance_type"], name: "index_synonyms_on_substance_id_and_substance_type", length: { substance_type: 191 }
   end
 
   create_table "taggings", id: :integer,  force: :cascade do |t|
@@ -1838,7 +1838,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.string "context"
     t.datetime "created_at"
     t.index ["tag_id"], name: "index_taggings_on_tag_id"
-    t.index ["taggable_id", "taggable_type", "context"], name: "index_taggings_on_taggable_id_and_taggable_type_and_context"
+    t.index ["taggable_id", "taggable_type", "context"], name: "index_taggings_on_taggable_id_and_taggable_type_and_context", length: { taggable_type: 191, context: 191 }
   end
 
   create_table "tags", id: :integer,  force: :cascade do |t|
