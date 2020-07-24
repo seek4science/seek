@@ -54,7 +54,12 @@
       "model_format": "SBML",
       "environment": "JWS Online",
       "model_image_link": null,
-      "other_creators": "Blogs, Joe"
+      "other_creators": "Blogs, Joe",
+      "discussion_links": [{
+        "id": 55,
+        "url": "http://www.slack.com/",
+        "label": "Slack"
+      }]
     },
     "relationships": {
       "creators": {
@@ -70,6 +75,14 @@
           {
             "id": "522086294",
             "type": "people"
+          }
+        ]
+      },
+      "organisms": {
+        "data": [
+          {
+            "id": "1",
+            "type": "organisms"
           }
         ]
       },

@@ -183,7 +183,7 @@ class ModelsController < ApplicationController
 
   def model_params
     params.require(:model).permit(:imported_source, :imported_url, :title, :description, { project_ids: [] }, :license,
-                                  :model_type_id, :model_format_id, :recommended_environment_id, :organism_id,
+                                  :model_type_id, :model_format_id, :recommended_environment_id, :organism_id, { organism_ids: []},
                                   :other_creators,
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                   { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
