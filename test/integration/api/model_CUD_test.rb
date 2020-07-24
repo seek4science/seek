@@ -25,7 +25,10 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
-    model = Factory(:model, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
+    model = Factory(:model, policy: Factory(:public_policy),
+                    contributor: @current_person, creators: [@creator],
+                    discussion_links:[Factory(:discussion_link)])
+    @discussion_link = model.discussion_links.first
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: model.id})
   end
 
