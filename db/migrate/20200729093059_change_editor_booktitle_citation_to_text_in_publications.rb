@@ -1,5 +1,4 @@
 class ChangeEditorBooktitleCitationToTextInPublications < ActiveRecord::Migration[5.2]
-  def change
     def up
       change_column :publications, :editor, :text
       change_column :publications, :booktitle, :text
@@ -11,5 +10,4 @@ class ChangeEditorBooktitleCitationToTextInPublications < ActiveRecord::Migratio
       change_column :publications, :booktitle, :string
       change_column :publications, :citation, :string
     end
-  end
 end
