@@ -278,4 +278,32 @@ namespace :seek_dev do
       end
     output.close
   end
+
+  task find_publications_without_publication_types: :environment do
+     base_url = "https://fairdomhub.org/"
+     #base_url = "https://0.0.0.0:3002/"
+    File.delete("./log/publications_without_publication_types.log") if File.exist?("./log/publications_without_publication_types.log")
+    output = File.open( "./log/publications_without_publication_types.log","w" )
+     pj_has_pubs = Project.all.select { |p| p.publications.size > 0 }
+     pj_has_pubs_without_type = pj_has_pubs.select{|p| p.publications.map(&:publication_type_id).any?{ |e| e.nil? } }
+      pp pj_has_pubs.map(&:id)
+      pp pj_has_pubs_without_type.map(&:id)
+      pj_has_pubs_without_type.each do |project|
+        pp "====================="
+        pp project.title + '('+base_url+"projects/"+project.id.to_s+ ')'
+        output << "====================="+"\n"
+        output << "Project:"+ project.title+"\n"
+        output << base_url+"projects/"+project.id.to_s+"\n"
+        output << "====================="+"\n"
+        project.publications.each do |publication|
+          if  publication.publication_type_id.blank?
+            pp base_url+"publications/"+publication.id.to_s
+            output << base_url+"publications/"+publication.id.to_s+"\n"
+          end
+        end
+        output << "\n"
+      end
+    output.close
+  end
+
 end
