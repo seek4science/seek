@@ -45,11 +45,7 @@
         <%= button_link_to('Explore', 'spreadsheet', polymorphic_path(asset, version: version, action: :explore, code: params[:code])) %>
       <% else %>
         <% explanation = "This spreadsheet is too big to be explored (larger than #{Seek::Config.max_extractable_spreadsheet_size} MB), or the file does not exist." %>
-        <span data-tooltip='<%= tooltip(explanation) %>'>
-            <span class='disabled_icon disabled-button btn btn-default'>
-              <%= image('spreadsheet', { alt: 'Explore', class: 'disabled' }) %> Explore
-            </span>
-        </span>
+        <%= button_link_to('Explore', 'spreadsheet', nil, disabled_reason: explanation) %>
       <% end %>
     <% elsif show_view_content_btn %>
       <%= render partial: 'assets/view_content',

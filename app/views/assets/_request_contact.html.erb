@@ -43,10 +43,6 @@
     <% end %>
 
   <% elsif log = request_contact_pending?(resource) %>
-    <%
-      reason = "A recent request was made, and cannot be made again for another #{log.hours_until_next_allowed_str}"
-    %>
-    <span data-tooltip='<%= reason %>'>
-    <%= button_link_to("Request Contact", "message", '#', :class => 'disabled-button', :onclick => "alert('No #{t('contributor')} or creator for this asset');") -%>
-    </span>
+    <%= button_link_to("Request Contact", "message", '#',
+                       disabled_reason: "A recent request was made, and cannot be made again for another #{log.hours_until_next_allowed_str}") -%>
   <% end -%>
