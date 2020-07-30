@@ -220,12 +220,14 @@ class PresentationsControllerTest < ActionController::TestCase
       get :show, params: { id: ms_ppt_presentation.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 0
 
       openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
       assert openoffice_ppt_presentation.content_blob.is_content_viewable?
       get :show, params: { id: openoffice_ppt_presentation.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 0
     end
   end
 
@@ -236,14 +238,14 @@ class PresentationsControllerTest < ActionController::TestCase
       refute ms_ppt_presentation.content_blob.file_exists?('pdf')
       get :show, params: { id: ms_ppt_presentation.id }
       assert_response :success
-      assert_select 'span.disabled-button', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 1
 
       openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
       assert openoffice_ppt_presentation.content_blob.file_exists?
       refute openoffice_ppt_presentation.content_blob.file_exists?('pdf')
       get :show, params: { id: openoffice_ppt_presentation.id }
       assert_response :success
-      assert_select 'span.disabled-button', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 1
     end
   end
 
