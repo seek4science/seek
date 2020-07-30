@@ -323,7 +323,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = { '@context' => 'http://schema.org',
-                 '@type' => 'Workflow',
+                 '@type' => 'ComputationalWorkflow',
                  '@id' => "http://localhost:3000/workflows/#{workflow.id}",
                  'description' => 'This is a test workflow for bioschema generation',
                  'name' => 'This workflow',
