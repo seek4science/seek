@@ -289,8 +289,8 @@ class HomesControllerTest < ActionController::TestCase
 
   test 'recently added and download should include snapshot' do
     person = Factory(:person)
-    snapshot1 = Factory(:investigation, title: 'inv with snap', contributor: person).create_snapshot
-    snapshot2 = Factory(:assay, title: 'assay with snap', contributor: person).create_snapshot
+    snapshot1 = Factory(:investigation, policy: Factory(:publicly_viewable_policy), title: 'inv with snap', contributor: person).create_snapshot
+    snapshot2 = Factory(:assay, policy: Factory(:publicly_viewable_policy), title: 'assay with snap', contributor: person).create_snapshot
     assert_difference 'ActivityLog.count', 2 do
       Factory(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
       Factory(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)

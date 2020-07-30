@@ -1,11 +1,7 @@
-<span data-tooltip='<%= tooltip(explanation) %>'>
-  <% if icon_view %>
-    <span class="disabled-button" style="pointer-events: all">
-      <%= image('show', :onclick => "alert('#{explanation}');") %>
-    </span>
-  <% else %>
-    <span class='disabled_icon disabled-button btn btn-default' onclick='alert("<%=explanation%>")'>
-      <%= image('show', {:alt => "View Content", :class => "disabled"}) %> View content
-    </span>
-  <% end %>
-</span>
+<% if icon_view %>
+  <span class="disabled" data-tooltip='<%= tooltip(explanation) %>'>
+    <%= image('show', :onclick => "alert('#{explanation}');") %>
+  </span>
+<% else %>
+  <%= button_link_to('View content', 'show', nil, disabled_reason: explanation) %>
+<% end %>

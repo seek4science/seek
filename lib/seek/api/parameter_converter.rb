@@ -122,7 +122,8 @@ module Seek
           environment: :recommended_environment_id,
           data_file_ids: :data_files_attributes,
           assay_ids: :assay_assets_attributes,
-          workflow_class: :workflow_class_id
+          workflow_class: :workflow_class_id,
+	        discussion_links: :discussion_links_attributes
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.

@@ -285,14 +285,14 @@ class SopsControllerTest < ActionController::TestCase
     s = Factory(:sop, contributor: Factory(:person), policy: Factory(:public_policy))
     get :show, params: { id: s }
     assert_response :success
-    assert_select 'a.disabled-button', text: /Request Contact/, count: 0
+    assert_select 'a.disabled', text: /Request Contact/, count: 0
     assert_select 'a#request_contact_button', text: /Request Contact/, count: 1
   end
 
   test 'should not show request contact button when there is no contributor or creator' do
     get :show, params: { id: sops(:sop_with_no_contributor), policy: Factory(:public_policy)}
     assert_response :success
-    assert_select 'a.disabled-button', text: /Request Contact/, count: 0
+    assert_select 'a.disabled', text: /Request Contact/, count: 0
     assert_select 'a#request_contact_button', text: /Request Contact/, count: 0
   end
 
@@ -300,7 +300,7 @@ class SopsControllerTest < ActionController::TestCase
     s = Factory(:sop, contributor: @user.person)
     get :show, params: { id: s }
     assert_response :success
-    assert_select 'a.disabled-button', text: /Request Contact/, count: 0
+    assert_select 'a.disabled', text: /Request Contact/, count: 0
     assert_select 'a#request_contact_button', text: /Request Contact/, count: 0
   end
 
@@ -641,6 +641,7 @@ class SopsControllerTest < ActionController::TestCase
     get :show, params: { id: sop.id }
     assert_response :success
     assert_select 'a', text: /View content/, count: 1
+    assert_select 'a.disabled', text: /View content/, count: 0
   end
 
   test 'should be able to view ms/open office word content' do
@@ -653,12 +654,14 @@ class SopsControllerTest < ActionController::TestCase
       get :show, params: { id: ms_word_sop.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 0
 
       openoffice_word_sop = Factory(:odt_sop, policy: Factory(:all_sysmo_downloadable_policy))
       assert openoffice_word_sop.content_blob.is_content_viewable?
       get :show, params: { id: openoffice_word_sop.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 0
     end
   end
 
@@ -673,7 +676,7 @@ class SopsControllerTest < ActionController::TestCase
     assert !content_blob.is_content_viewable?
     get :show, params: { id: ms_word_sop.id }
     assert_response :success
-    assert_select 'a', text: /View content/, count: 0
+    assert_select 'a.disabled', text: /View content/, count: 1
 
     Seek::Config.pdf_conversion_enabled = tmp
   end
