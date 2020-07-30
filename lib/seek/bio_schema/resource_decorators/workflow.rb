@@ -22,7 +22,7 @@ module Seek
         end
 
         def schema_type
-          'Workflow'
+          'ComputationalWorkflow'
         end
 
         def programming_language
