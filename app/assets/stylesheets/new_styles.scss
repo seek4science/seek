@@ -1006,3 +1006,11 @@ hr.discussion-links-divider {
 div.discussion-link {
   word-wrap: break-word;
 }
+
+span.disabled {
+  opacity: 0.65;
+}
+
+.btn.disabled img.icon {
+  opacity: 0.4;
+}
