@@ -4,7 +4,13 @@ OmniAuth.config.logger = Rails.logger
 if Seek::Config.omniauth_enabled
   Rails.application.config.middleware.use OmniAuth::Builder do
     # To add more providers, see the `omniauth_providers` definition in: `lib/seek/config.rb`
-    Seek::Config.omniauth_providers.each do |key, options|
+    begin
+      providers = Seek::Config.omniauth_providers
+    rescue Settings::DecryptionError
+      providers = {}
+    end
+
+    providers.each do |key, options|
       provider key, options
     end
   end
