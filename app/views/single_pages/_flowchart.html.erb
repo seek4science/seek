@@ -228,11 +228,11 @@
             url: `/single_pages/${pid}/flowchart/${id}`,
             success: s => {
                 $j("#flowchart-header").show()
-                if (!s.data) {
-                    alert("no flowchart");
-                    return
-                }
-                console.log(s.data)
+                // if (!s.data) {
+                //     // alert("no flowchart");
+                //     return
+                // }
+                // console.log(s.data)
                 if (!s.data) {
                     $flowchart.flowchart('setData', "");
                 } else {
@@ -249,7 +249,7 @@
             },
             error: e => {
                 hideFlowchart()
-                console.error(e)
+                // console.error(e)
             }
         })
     }
@@ -397,8 +397,8 @@
                 file: $j("#modalMethodfile")[0].files[0],
                 title: $j("#modalMethodTitle").val(),
                 description: $j("#modalMethodDes").val()
-            }
-
+            },
+            sampleTypeAttrId: $j("#assayType").children("option:selected").val()
         })
         console.log(AssayDetails)
         //Add the method detail:
@@ -618,15 +618,16 @@
                 const {
                     title,
                     description,
-                    method
+                    method,
+                    sampleTypeAttrId
                 } = getAssayDetail(assay.opId)
                 $j.when(createSOP(method.title, method.description, pid, uid, method.file))
                     .then((res) => {
                         $j.when(createAssay(pid, selectedItem.id, uid, title, description, res.data.id))
                             .then((res) => {
                                 updateIds(flowchartData, res.data.id, method.title)
-                                const attr = AssayTypes[$j("#assayType").children("option:selected").val()].attributes
-                                const data = sampleTypeData(attr, `sample_type_${res.data.id}`)
+                                const attr = AssayTypes[sampleTypeAttrId].attributes
+                                const data = sampleTypeData(attr, `sample_type_${res.data.id}`, res.data.id)
                                 $j.when(createSampleType(data, () => {})).then(res => {
                                     if (i == newAssays.length - 1) {
                                         updateFlowchart(flowchartData)
