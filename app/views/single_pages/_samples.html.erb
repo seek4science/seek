@@ -1,11 +1,11 @@
 <div id="tbl_file_content">
-    <a class="btn btn-primary btn-sm" onclick="sample_add_row('.tableInpOut')"> <i class="glyphicon glyphicon-plus"></i>Add Row</a>
+    <a class="btn btn-primary btn-sm" onclick="sample_add_row('.sampleTable')"> <i class="glyphicon glyphicon-plus"></i>Add Row</a>
     <a id="sample_add_col" class="btn btn-primary btn-sm">
         <i class="glyphicon glyphicon-plus"></i>Add Column</a>
-    <a class="btn btn-primary btn-sm pull-right" onclick="updateSampleTbl('.tableInpOut')">Save</a>
+    <a class="btn btn-primary btn-sm pull-right" onclick="updateSampleTbl('.sampleTable')">Save</a>
     <div class="sampleTblContainer">
         <table>
-            <table class="table tableXs tableInpOut">
+            <table class="table tableXs sampleTable">
                 <thead class="thead-dark">
                     <tr></tr>
                 </thead>
@@ -23,71 +23,38 @@
     select {
         min-width: 150px
     }
-
-    /* 
-     .sampleTblContainer::before {
-         background-image: linear-gradient(left,
-                 rgba(255, 255, 255, 0) 75%,
-                 rgba(255, 255, 255, 1) 100%);
-         background-image: -moz-linear-gradient(left,
-                 rgba(255, 255, 255, 0) 75%,
-                 rgba(255, 255, 255, 1) 100%);
-         background-image: -ms-linear-gradient(left,
-                 rgba(255, 255, 255, 0) 75%,
-                 rgba(255, 255, 255, 1) 100%);
-         background-image: -o-linear-gradient(left,
-                 rgba(255, 255, 255, 0) 75%,
-                 rgba(255, 255, 255, 1) 100%);
-         background-image: -webkit-linear-gradient(left,
-                 rgba(255, 255, 255, 0) 75%,
-                 rgba(255, 255, 255, 1) 100%);
-         content: "\00a0";
-         height: 100%;
-         position: absolute;
-         width: 100%;
-     } */
 </style>
 <script>
-    function load_samples(std_id, asy_id) {
-        $j("#selected_std_asy").attr('data-selected', `${std_id}_${asy_id}`)
+    function load_samples() {
+        console.log("load_sample")
         $j.ajax({
             type: 'GET',
             cache: false,
-            url: pid + '/samples',
-            data: {
-                std_id,
-                asy_id
-            },
-            success: result => {
-                if (result.data.length > 0) {
-                    // Load the first sample
-                    loadIOTable(result.data, asy_id)
-                    setTableOntology('.tableInpOut')
+            url: `/single_pages/${pid}/sample_table/${selectedItem.id}`,
+            success: res => {
+                if (res.data) {
+                    loadSampleTableHeader(res.data.header)
+                    //res.data.data >> The rows of the table
+                    console.log(res)
                 } else {
-                    $j('.tableInpOut').html(
-                        '<table class="table tableXs tableInpOut"><thead class="thead-dark"><tr></tr></thead><tbody></tbody></table>'
+                    $j('.sampleTable').html(
+                        '<table class="table tableXs sampleTable"><thead class="thead-dark"><tr></tr></thead><tbody></tbody></table>'
                     );
                 }
             }
         })
     }
 
-    function loadIOTable(dt, asy_id) {
-        let data = '',
-            realCount, tableIndex
-        $j.each(dt, (k, v) => {
-            if (v.id == asy_id) {
-                data = JSON.parse(dt[k].content)
-                tableIndex = k
-                return false
-            }
+    // loads sample table header
+    function loadSampleTableHeader(data) {
+        $j('.sampleTable thead tr').empty()
+        $j(data).each((i, x) => {
+            const TD = customTD(x.title, x.required)
+            $j('.sampleTable thead tr').append(TD)
         })
-        if (!data) return
-        $j('.tableInpOut tbody').empty()
-        $j('.tableInpOut thead tr').empty()
-        mergeIOTables(dt, tableIndex)
     }
 
+    
     function mergeIOTables(dt, index) {
         let headerAgg = [],
             baseData = []
@@ -99,14 +66,14 @@
                     let hash = col.split('%')
                     let options = hash.length > 1 ? {
                         title: hash[0],
-                        tableClass: ".tableInpOut",
+                        tableClass: ".sampleTable",
                         acTerm: hash[1],
                         ableToRemove: false,
                         extraInfo: v.id, //sampleId
                         originalTitle: col
                     } : {
                         title: col,
-                        tableClass: ".tableInpOut",
+                        tableClass: ".sampleTable",
                         ableToRemove: false,
                         extraInfo: v.id,
                         originalTitle: col
@@ -142,8 +109,8 @@
         //  console.log(baseData);
         // Populte table + apply ontology
         if (baseData[0].id)
-            for (let i = 0; i < baseData.length; i++) addTableRow('.tableInpOut', baseData[i])
-        add_remove_action(".tableInpOut")
+            for (let i = 0; i < baseData.length; i++) addTableRow('.sampleTable', baseData[i])
+        add_remove_action(".sampleTable")
     }
 
     function loadMethod(std_id, asy_id) {
@@ -174,8 +141,6 @@
         update_method(std_id, asy_id, content)
     })
 
-    
-
     function addCustomCol(tblClass, bias, text = '', acTerm = '') {
         if (text.length == 0) text = $j.trim($j('.customCol').val())
         $j(".arrow_box").css({
@@ -190,7 +155,6 @@
         addColumn(options)
     }
 
-
     function AddRow(table) {
         let rowCount = $j(table).rowcount() + 1;
         let newRow;
@@ -202,9 +166,11 @@
         $j(table + ' tbody').append('<tr>' + newRow + '</tr>')
         setTableOntology(table)
     }
+
     $j.fn.columnCount = function() {
         return $j('th', $j(this).find('thead')).length;
     };
+
     $j.fn.rowcount = function() {
         return $j('tr', $j(this).find('tbody')).length;
     };
@@ -379,7 +345,7 @@
         })
     }
     $j("#sample_add_col").on("click", () => {
-        showPreDefinedCols(event, '.tableInpOut', 2)
+        showPreDefinedCols(event, '.sampleTable', 2)
     })
 
     function appendDropDown(items) {

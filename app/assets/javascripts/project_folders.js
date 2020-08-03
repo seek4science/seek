@@ -169,7 +169,12 @@ function item_clicked(type, id) {
     }
   }
   if (type == "study")
+  {
     loadFlowchart()
+    loadDesign()
+  } 
+  else if (type == "assay")
+    load_samples()
 }
 
 function hideAll() {

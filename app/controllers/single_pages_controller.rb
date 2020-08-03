@@ -86,7 +86,7 @@ class SinglePagesController < ApplicationController
     end
   end
 
-  # POST
+  # POST >> TO-DO: PUT flowchart
   def update_flowchart
     is_new = false
     f = Flowchart.find_or_create_by(study_id: params[:flowchart][:study_id]) do |u|
@@ -97,6 +97,37 @@ class SinglePagesController < ApplicationController
     else
       render json: { error: json_api_errors(f) }, status: :unprocessable_entity
     end
+  end
+
+  #GET  study_id
+  def sample_source 
+    flowchart = Flowchart.where(study_id: params[:study_id]).first
+    if (flowchart)
+      source_sample_type = SampleType.find(flowchart.source_sample_type_id).sample_attributes.select(:required, :title)
+      render json: { status: :ok, data: source_sample_type }
+    else
+      render json: { status: :unprocessable_entity, error: "There is no data yet!" }
+    end
+  end
+
+  #GET 
+  def sample_table
+    # begin
+      assay =  Assay.find(params[:assay_id])
+      flowchart = Flowchart.where(study_id: assay.study.id).first
+      if (flowchart)
+        source_sample_type = SampleType.find(flowchart.source_sample_type_id).sample_attributes.select(:required, :title)
+        # Consider all sample types of assay ordered before the intended
+        assay_sample_type = SampleType.find(assay.sample_type_id).sample_attributes.select(:required, :title)
+        # Load all samples sample...
+        data = { header: source_sample_type + assay_sample_type, data: "" }
+        render json: { status: :ok, data: data }
+      else
+        render json: { status: :unprocessable_entity, error: "The flowchart does not exist." }
+      end
+    # rescue Exception => e
+    #    render json: {status: :unprocessable_entity, error: e.message } 
+    # end
   end
 
   private

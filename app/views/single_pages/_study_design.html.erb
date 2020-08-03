@@ -122,8 +122,8 @@
         let newRow, templates
         let headers = $j(`${table} thead tr`).find('th')
         let tdCount = headers.length
-        // Exception for tableInpOut
-        if (table == ".tableInpOut" || !items)
+        // Exception for sampleTable
+        if (table == ".sampleTable" || !items)
             templates = headers;
         else
             templates = items
@@ -214,16 +214,33 @@
         createSampleType(sampleTypeData(attr, title), callBack)
     }
 
+    // loads sample source table header
     function loadDesign() {
-        // // Get the source sample type
-        // // If source sample type exists
-        // const data = ["1", "2", "3"]
-        // $j(data).each((i, x) => {
-        //     $j('.tbl_sample_source thead tr').append(`<th>${x}</th>`)
-        // })
+        $j.ajax({
+            method: 'GET',
+            cache: false,
+            dataType: "json",
+            url: `/single_pages/${pid}/sample_source/${selectedItem.id}`,
+            success: s => {
+                $j('.tbl_sample_source thead tr').empty()
+                $j(s.data).each((i, x) => {
+                    const TD = customTD(x.title, x.required)
+                    $j('.tbl_sample_source thead tr').append(TD)
+                })
+            },
+            error: e => {
+                console.error(e)
+            }
+        })
     }
 
-    function sampleTypeData(attributes, title) {
+    function customTD(title, required = true) {
+        const action = required ? "" :
+            "<a href='' onclick='remove_col(event)'> <span style='color:white' class='glyphicon glyphicon-trash'></span></a>"
+        return `<th>${title} ${action}</th>`
+    }
+
+    function sampleTypeData(attributes, title, assayId = null) {
         // Create the Source Sample Type
         // Add table columns as attribute types
         // const headers = getHeaderText('.tbl_sample_source')
@@ -253,6 +270,12 @@
                             "id": pid.toString(),
                             "type": "projects"
                         }]
+                    },
+                    "assays": {
+                        "data": [{
+                            "id": assayId,
+                            "type": "assays"
+                        }]
                     }
                 }
             }
@@ -268,6 +291,7 @@
     }
 
 
+    // Adds remove button for row
     function add_remove_action(tblClass = '.tableXs') {
         let action =
             "<a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a>"
