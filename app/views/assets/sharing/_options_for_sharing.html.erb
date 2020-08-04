@@ -4,6 +4,6 @@
 <div class="isa-tree">
   <% if item.class.name  != "Publication" %>
   <h4><strong><%= item.class.name -%>:</strong></h4>
-  <%= render :partial => "assets/sharing/single_item_permissions", :locals => {  :object => item } -%>
+  <%= render :partial => "assets/sharing/single_item_permissions", :locals => {  :object => item, :in_isa => true } -%>
   <% end %>
 </div>

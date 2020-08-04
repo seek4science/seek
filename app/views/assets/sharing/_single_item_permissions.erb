@@ -1,5 +1,6 @@
 <%
   item = object
+  is_in_isa = in_isa ? "in_isa": "not_in_isa"
   downloadable = item.try(:is_downloadable?)
   checked =false
   policy_params = params[:policy_attributes]
@@ -7,7 +8,7 @@
 %>
 
 <label><%= check_box_tag sharing_item_param(item), 1, checked,
-                        {:class=>"#{item.class.name}_#{item.id}" } -%>
+                        {:class=>"#{item.class.name}_#{item.id} #{is_in_isa}" } -%>
   <%= link_to item.title, item, :target => "_blank" -%>
 </label>
 

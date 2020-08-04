@@ -10,7 +10,7 @@
   <%= show_title title.html_safe -%>
 </div>
 
-<%= form_tag({:action => :bulk_sharing_permission_change}, :method => :post) do -%>
+<%= form_tag({:action => :batch_change_permssion_for_selected_items}, :method => :post) do -%>
 
   <% folding_panel_title = "Items not in ISA:" %>
   <%= folding_panel(folding_panel_title, false, :id => 'not_isa_item', :body_options => {:id => 'items_fold_content'},
@@ -20,7 +20,7 @@
     <% items_not_in_isa.each do |resource_type, resource_items| %>
         <h4><strong><%= resource_type -%></strong></h4>
         <% resource_items.each do |item| %>
-          <%= render :partial => "assets/sharing/single_item_permissions", :locals => {:object => item } -%>
+          <%= render :partial => "assets/sharing/single_item_permissions", :locals => {:object => item, :in_isa => false } -%>
         <% end %>
 
       <br>
