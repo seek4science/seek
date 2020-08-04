@@ -18,4 +18,6 @@
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
+<%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @investigation} -%>
+
 <%= form_submit_buttons(@investigation) %>

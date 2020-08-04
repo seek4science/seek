@@ -91,6 +91,8 @@
     <%= f.fancy_multiselect :documents, { other_projects_checkbox: true } %>
 <% end -%>
 
+<%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @assay} -%>
+
 <%= form_submit_buttons(@assay) %>
 
 

@@ -91,6 +91,14 @@
 
   <div class="col-md-3 col-sm-4">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project } -%>
+
+    <% if @project.respond_to?(:discussion_links) -%>
+      <% if @project.discussion_links.select{|link| link.url.present?}.any?  %>
+        <%= render partial: 'assets/discussion_links_box', locals: {resource: @project } -%>
+      <% end -%>
+    <% end -%>
+
+
     <% if @project.can_manage? %>
       <%= render :partial => 'general/storage_usage_box', locals: { programme: @project,
                                                                     url: storage_report_project_path(@project)} %>

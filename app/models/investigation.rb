@@ -11,6 +11,8 @@ class Investigation < ApplicationRecord
 
   validates :projects, presence: true, projects: { self: true }
 
+  acts_as_discussable
+
   def state_allows_delete?(*args)
     studies.empty? && super
   end

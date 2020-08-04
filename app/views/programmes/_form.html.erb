@@ -42,6 +42,9 @@
 <% end %>
 
 
+  <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @programme} -%>
+
+
 <% end %>
 
 <%= f.submit(programme ? "Update" : "Create",data: { disable_with: (programme ? "Updating..." : "Creating...") }, :class => 'btn btn-primary') -%>

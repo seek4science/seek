@@ -173,6 +173,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "suggested_technology_type_id"
     t.text "other_creators", limit: 16777215
     t.string "deleted_contributor"
+    t.integer "position"
   end
 
   create_table "asset_doi_logs", id: :integer,  force: :cascade do |t|
@@ -716,6 +717,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "contributor_id"
     t.text "other_creators", limit: 16777215
     t.string "deleted_contributor"
+    t.integer "position"
   end
 
   create_table "investigations_projects", id: false,  force: :cascade do |t|
@@ -756,6 +758,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "resource_id"
     t.string "resource_type"
     t.integer "sender_id"
+    t.text "response"
     t.index ["resource_type", "resource_id"], name: "index_message_logs_on_resource_type_and_resource_id", length: { resource_type: 191 }
     t.index ["sender_id"], name: "index_message_logs_on_sender_id"
   end
@@ -1683,6 +1686,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "contributor_id"
     t.text "other_creators", limit: 16777215
     t.string "deleted_contributor"
+    t.integer "position"
   end
 
   create_table "study_auth_lookup", id: false,  force: :cascade do |t|

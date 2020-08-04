@@ -26,7 +26,7 @@ class Study < ApplicationRecord
 
   validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true
 
-  enforce_authorization_on_association :investigation, :view
+  acts_as_discussable
 
   %w[data_file sop model document].each do |type|
     has_many "#{type}_versions".to_sym, -> { distinct }, through: :assays
