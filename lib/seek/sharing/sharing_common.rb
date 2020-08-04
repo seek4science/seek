@@ -3,10 +3,11 @@ module Seek
     module SharingCommon
 
       def self.included(base)
-        base.before_action :sharing_auth, only: [:batch_sharing_permission_preview, :bulk_sharing_permission_change, :sharing_permission_changed]
+        base.before_action :sharing_auth, only: [:batch_sharing_permission_preview, :batch_change_permssion_for_selected_items, :batch_sharing_permission_changed]
       end
 
-      def bulk_sharing_permission_change
+      def batch_change_permssion_for_selected_items
+
         @items_for_sharing = resolve_sharing_params(params)
         if @items_for_sharing.empty?
           flash[:error] = "Please choose at least one resource!"
@@ -26,7 +27,7 @@ module Seek
         end
       end
 
-      def sharing_permission_changed
+      def batch_sharing_permission_changed
         # policy_params == params[:policy_attributes]
         flash[:notice] = ""
         @items_for_sharing = resolve_sharing_params(params)

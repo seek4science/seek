@@ -2,7 +2,7 @@
   <%= show_title "New sharing policy and permissions" -%>
 </div>
 
-<%= form_tag :action => :sharing_permission_changed do %>
+<%= form_tag :action => :batch_sharing_permission_changed do %>
   <% resource = (controller_name == 'people') ? current_user.person : @asset %>
   <%= folding_panel('Sharing', false, id: 'sharing_form',
                     help_text: "Here you can specify who can view, access and manage this.") do %>
