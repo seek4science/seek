@@ -97,35 +97,25 @@ module WorkflowExtraction
   end
 
   def ro_crate
-    if is_already_ro_crate?
-      extractor.open_crate do |crate|
-        if is_basic_ro_crate?
-          populate_ro_crate(crate)
-          crate
-        else
-          return crate
-        end
+    inner = proc do |crate|
+      populate_ro_crate(crate) if should_generate_crate?
+
+      if block_given?
+        yield crate
+      else
+        return crate
       end
+    end
+
+    if is_already_ro_crate?
+      extractor.open_crate(&inner)
     else
-      crate = ROCrate::WorkflowCrate.new
-      populate_ro_crate(crate)
-      crate
+      ROCrate::WorkflowCrate.new.tap(&inner)
     end
   end
 
   def ro_crate_zip
-    if is_already_ro_crate?
-      if is_basic_ro_crate?
-        extractor.open_crate do |crate|
-          populate_ro_crate(crate)
-          ROCrate::Writer.new(crate).write_zip(ro_crate_path)
-          ro_crate_path
-        end
-      else
-        return content_blob.filepath
-      end
-    else
-      crate = ro_crate
+    ro_crate do |crate|
       ROCrate::Writer.new(crate).write_zip(ro_crate_path)
       ro_crate_path
     end
