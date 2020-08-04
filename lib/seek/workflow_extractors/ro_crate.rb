@@ -84,20 +84,10 @@ module Seek
         end
       end
 
-      def crate
-        raise "deprecated call to #crate"
-        Dir.mktmpdir('ro-crate') do
-          ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.path : @io)
-        end
-      end
-
       def open_crate
-        dir = Dir.mktmpdir('ro-crate')
-        begin
+        Dir.mktmpdir('ro-crate') do |dir|
           crate = ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.path : @io, target_dir: dir)
           yield crate
-        ensure
-          FileUtils.remove_entry(dir)
         end
       end
 
@@ -134,7 +124,6 @@ module Seek
       end
 
       private
-
 
       def main_workflow_extractor_class(crate)
         return @main_workflow_extractor_class if @main_workflow_extractor_class
