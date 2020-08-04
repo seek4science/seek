@@ -117,8 +117,9 @@ module WorkflowExtraction
   def ro_crate_zip
     ro_crate do |crate|
       ROCrate::Writer.new(crate).write_zip(ro_crate_path)
-      ro_crate_path
     end
+
+    ro_crate_path
   end
 
   def ro_crate_identifier
