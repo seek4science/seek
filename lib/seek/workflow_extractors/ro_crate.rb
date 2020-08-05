@@ -19,8 +19,10 @@ module Seek
         end
       end
 
-      def diagram(format = default_digram_format)
+      def diagram(format = nil)
         open_crate do |crate|
+          format ||= default_diagram_format
+
           return crate.main_workflow_diagram&.source&.source&.read if crate.main_workflow_diagram
 
           extractor = main_workflow_extractor(crate)
@@ -85,10 +87,19 @@ module Seek
       end
 
       def open_crate
-        Dir.mktmpdir('ro-crate') do |dir|
-          crate = ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.path : @io, target_dir: dir)
-          yield crate
+        if @opened_crate
+          v = yield @opened_crate
+          return v
         end
+
+        v = Dir.mktmpdir('ro-crate') do |dir|
+          @opened_crate = ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.path : @io, target_dir: dir)
+          yield @opened_crate
+        end
+
+        @opened_crate = nil
+
+        v
       end
 
       def default_diagram_format
@@ -128,26 +139,20 @@ module Seek
       def main_workflow_extractor_class(crate)
         return @main_workflow_extractor_class if @main_workflow_extractor_class
 
-        open_crate do |crate|
-          return self.class.determine_extractor_class(crate&.main_workflow&.programming_language) || Seek::WorkflowExtractors::Base
-        end
+        self.class.determine_extractor_class(crate&.main_workflow&.programming_language) || Seek::WorkflowExtractors::Base
       end
 
       def main_workflow_extractor(crate)
-        if @main_workflow_extractor
-          @main_workflow_extractor
-        else
-          main_workflow_extractor_class(crate).new(crate&.main_workflow&.source&.source)
-        end
+        return @main_workflow_extractor if @main_workflow_extractor
+
+        main_workflow_extractor_class(crate).new(crate&.main_workflow&.source&.source)
       end
 
       def abstract_cwl_extractor(crate)
-        if @abstract_cwl_extractor
-          @abstract_cwl_extractor
-        else
-          abstract_cwl = crate&.main_workflow_cwl&.source&.source
-          @abstract_cwl_extractor = abstract_cwl ? Seek::WorkflowExtractors::CWL.new(abstract_cwl) : nil
-        end
+        return @abstract_cwl_extractor if @abstract_cwl_extractor
+
+        abstract_cwl = crate&.main_workflow_cwl&.source&.source
+        @abstract_cwl_extractor = abstract_cwl ? Seek::WorkflowExtractors::CWL.new(abstract_cwl) : nil
       end
     end
   end
