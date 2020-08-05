@@ -353,8 +353,11 @@ class ProjectsController < ApplicationController
                            { asset_gatekeeper_ids: [] }, { asset_housekeeper_ids: [] }, { pal_ids: [] }]
     end
 
-    if params[:project][:programme_id].present? && Programme.find_by_id(params[:project][:programme_id])&.can_manage?
-      permitted_params += [:programme_id]
+    if params[:project][:programme_id].present?
+      prog = Programme.find_by_id(params[:project][:programme_id])
+      if prog&.can_manage? || prog&.allows_user_projects?
+        permitted_params += [:programme_id]
+      end
     end
 
     params.require(:project).permit(permitted_params)

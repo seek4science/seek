@@ -49,7 +49,9 @@
     </div>
 <% end -%>
 
-<% if Seek::Config.programmes_enabled && admin_or_programme_administrator_logged_in? %>
+<% if Seek::Config.programmes_enabled &&
+    (admin_or_programme_administrator_logged_in? ||
+        (logged_in_and_registered? && Programme.any? { |p| p.allows_user_projects? }))%>
     <%= render :partial=>"projects/programme_selection", :locals=>{:f=>f} -%>
 <% end %>
 
