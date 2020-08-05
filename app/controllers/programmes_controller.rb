@@ -158,6 +158,7 @@ class ProgrammesController < ApplicationController
     params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
                                       { project_ids: [] }, :funding_details, { administrator_ids: [] },
                                       :activation_rejection_reason, :funding_codes,
+                                      :open_for_projects,
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

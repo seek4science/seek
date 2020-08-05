@@ -101,7 +101,7 @@ class Programme < ApplicationRecord
   end
 
   def allows_user_projects?
-    true
+    open_for_projects?
   end
 
   def self.can_create?

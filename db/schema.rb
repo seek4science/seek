@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_29_093059) do
+ActiveRecord::Schema.define(version: 2020_08_05_091606) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1170,6 +1170,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.text "funding_details", limit: 16777215
     t.boolean "is_activated", default: false
     t.text "activation_rejection_reason", limit: 16777215
+    t.boolean "open_for_projects", default: false
   end
 
   create_table "project_descendants", id: false,  force: :cascade do |t|

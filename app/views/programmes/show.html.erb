@@ -28,6 +28,10 @@
     <div class="well well-sm">
       <%= text_or_not_specified(@programme.funding_details, :description=>true,:auto_link=>true, :none_text=>"No funding details specified") %>
     </div>
+
+    <% if @programme.allows_user_projects? %>
+      <strong><%= "Allows #{"Users"} to create #{"Projects"}" %></strong>
+    <% end %>
   </div>
 
   <div class="col-md-3 col-sm-4">
