@@ -364,31 +364,9 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations, concerns: [:publishable, :has_snapshots, :isa] do
-    collection do
-      get :preview
-      post :items_for_result
-    end
-    resources :people,:projects,:assays,:studies,:models,:sops,:workflows, :nodes,:data_files,:publications, :documents, :only=>[:index]
-    resources :snapshots, :only => [:show, :new, :create, :destroy] do
-      member do
-        get :mint_doi_confirm
-        post :mint_doi
-        get :download
-        get :export, action: :export_preview
-        post :export, action: :export_submit
-      end
-    end
+    resources :people, :projects, :assays, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
     member do
-      get :new_object_based_on_existing_one
-      post :check_related_items
-      post :check_gatekeeper_required
-      post :publish_related_items
-      post :publish
-      get :published
-      get :isa_children
       get :export_isatab_json
-      get :manage
-      patch :manage_update
     end
   end
 
@@ -400,7 +378,6 @@ SEEK::Application.routes.draw do
       post :batch_create
       post :create_content_blob
       post :investigation_selected_ajax
-      post :items_for_result
       post :items_for_result
     end
     resources :snapshots, :only => [:show, :new, :create, :destroy] do
@@ -427,21 +404,6 @@ SEEK::Application.routes.draw do
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
-    collection do
-      get :typeahead
-      get :preview
-      post :items_for_result
-      #MERGENOTE - these should be gets and are tested as gets, using post to fix later
-    end
-    resources :snapshots, :only => [:show, :new, :create, :destroy] do
-      member do
-        get :mint_doi_confirm
-        post :mint_doi
-        get :download
-        get :export, action: :export_preview
-        post :export, action: :export_submit
-      end
-    end
     resources :nels, only: [:index] do
       collection do
         get :projects
@@ -450,19 +412,7 @@ SEEK::Application.routes.draw do
         post :register
       end
     end
-    member do
-      post :update_annotations_ajax
-      post :check_related_items
-      post :check_gatekeeper_required
-      post :publish_related_items
-      post :publish
-      get :published
-      get :new_object_based_on_existing_one
-      get :isa_children
-      get :manage
-      patch :manage_update
-    end
-    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:workflows,:nodes,:data_files,:publications, :documents,:strains,:organisms, :human_diseases, only: [:index]
+    resources :people, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, only: [:index]
   end
 
   # to be removed as STI does not work in too many places
@@ -478,47 +428,26 @@ SEEK::Application.routes.draw do
 
   resources :data_files, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset] do
     collection do
-      get :typeahead
-      get :preview
       get :filter
-      post :test_asset_url
       post :upload_for_tool
       post :upload_from_email
-      post :items_for_result
       get :provide_metadata
       post :create_content_blob
       post :rightfield_extraction_ajax
       post :create_metadata
     end
     member do
-      post :check_gatekeeper_required
       get :plot
       get :explore
-      get :download
-      get :published
-      post :check_related_items
-      post :publish_related_items
-      post :publish
-      post :request_resource
-      post :update_annotations_ajax
-      post :new_version
-      post :edit_version_comment
-      #MERGENOTE - this is a destroy, and should be the destroy method, not post since we are not updating or creating something.
-      post :destroy_version
-      get :mint_doi_confirm
-      post :mint_doi
       get :samples_table
       get :select_sample_type
       get :confirm_extraction
       get :extraction_status
       post :extract_samples
       delete :cancel_extraction
-      get :isa_children
       get :destroy_samples_confirm
       post :retrieve_nels_sample_metadata
       get :retrieve_nels_sample_metadata
-      get :manage
-      patch :manage_update
     end
     resources :studied_factors do
       collection do
@@ -529,63 +458,19 @@ SEEK::Application.routes.draw do
   end
 
   resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset] do
-    collection do
-      get :typeahead
-      get :preview
-      post :test_asset_url
-      post :items_for_result
-    end
-    member do
-      post :check_related_items
-      post :check_gatekeeper_required
-      get :download
-      get :published
-      post :publish_related_items
-      post :publish
-      post :request_resource
-      post :update_annotations_ajax
-      post :new_version
-      post :edit_version_comment
-      delete :destroy_version
-      get :isa_children
-      get :manage
-      patch :manage_update
-    end
     resources :people, :projects, :publications, :events, :collections, only: [:index]
   end
 
-  resources :models, concerns: [:has_content_blobs] do
-    collection do
-      get :typeahead
-      get :preview
-      post :test_asset_url
-      post :items_for_result
-    end
+  resources :models, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     member do
       get :compare_versions
       post :compare_versions
-      post :check_related_items
       get :visualise
-      post :check_gatekeeper_required
-      get :download
-      get :published
-      post :publish_related_items
-      post :new_version
-      post :edit_version_comment
       post :submit_to_sycamore
       post :export_as_xgmml
-      post :update_annotations_ajax
-      post :publish
       post :execute
-      post :request_resource
       get :simulate
       post :simulate
-      delete :destroy_version
-      post :mint_doi
-      get :mint_doi_confirm
-      get :isa_children
-      get :manage
-      patch :manage_update
     end
     resources :model_images do
       collection do
