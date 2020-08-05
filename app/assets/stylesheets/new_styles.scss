@@ -1049,6 +1049,10 @@ div.discussion-link {
   font-style: bold;
 }
 
-.appears-disabled {
-  opacity: 0.5;
+span.disabled {
+  opacity: 0.65;
+}
+
+.btn.disabled img.icon {
+  opacity: 0.4;
 }

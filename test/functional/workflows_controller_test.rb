@@ -574,16 +574,46 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 'file%20with%20spaces%20in%20name.txt', crate_workflow.id
   end
 
-  test 'downloads valid RO crate' do
+  test 'downloads valid generated RO crate' do
     workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
 
     get :ro_crate, params: { id: workflow.id }
 
     assert_response :success
-    crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path)
-    assert crate.main_workflow
     assert @response.header['Content-Length'].present?
     assert @response.header['Content-Length'].to_i > 5000 # Length is variable because the crate contains variable data
+    Dir.mktmpdir do |dir|
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      assert crate.main_workflow
+    end
+  end
+
+  test 'downloads valid existing RO crate' do
+    workflow = Factory(:existing_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
+
+    get :ro_crate, params: { id: workflow.id }
+
+    assert_response :success
+    assert @response.header['Content-Length'].present?
+    assert @response.header['Content-Length'].to_i > 5000 # Length is variable because the crate contains variable data
+    Dir.mktmpdir do |dir|
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      assert crate.main_workflow
+    end
+  end
+
+  test 'downloads valid RO crate for single workflow file' do
+    workflow = Factory(:cwl_packed_workflow, policy: Factory(:public_policy))
+
+    get :ro_crate, params: { id: workflow.id }
+
+    assert_response :success
+    assert @response.header['Content-Length'].present?
+    assert @response.header['Content-Length'].to_i > 2000 # Length is variable because the crate contains variable data
+    Dir.mktmpdir do |dir|
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      assert crate.main_workflow
+    end
   end
 
   test 'create ro crate even with with duplicated filenames' do
