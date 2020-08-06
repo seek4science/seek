@@ -8,7 +8,8 @@
       "description": null,
       "web_page": null,
       "funding_details": null,
-      "funding_codes": null
+      "funding_codes": null,
+      "discussion_links" : null
     },
     "relationships": {
       "administrators": {

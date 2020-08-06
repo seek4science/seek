@@ -13,7 +13,8 @@
       "description": null,
       "experimentalists": null,
       "other_creators": null,
-      "person_responsible_id": null
+      "person_responsible_id": null,
+      "discussion_links" : null
     },
     "relationships": {
       "creators": {

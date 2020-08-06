@@ -21,7 +21,8 @@
       "url": null,
       "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/873864488",
       "publication_type":"Journal",
-      "authors": ["Author1 Last", "Author2 Last"]
+      "authors": ["Author1 Last", "Author2 Last"],
+      "discussion_links" : null
     },
     "relationships": {
       "creators": {

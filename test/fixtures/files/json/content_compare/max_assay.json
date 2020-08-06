@@ -24,7 +24,8 @@
       "technology_type": {
         "label": null,
         "uri": null
-      }
+      },
+      "discussion_links" : null
     },
     "relationships": {
       "creators": {

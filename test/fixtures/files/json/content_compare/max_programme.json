@@ -8,7 +8,8 @@
       "description": "A very exciting programme",
       "web_page": "http://www.synbiochem.co.uk",
       "funding_details": "Someone is funding this for me",
-      "funding_codes": ["DFG"]
+      "funding_codes": ["DFG"],
+      "discussion_links" : null
     },
     "relationships": {
       "administrators": {

@@ -13,7 +13,8 @@
       "description": "The Study of many things",
       "experimentalists": "Wet lab people",
       "other_creators": "Marie Curie",
-      "person_responsible_id": "887473922"
+      "person_responsible_id": "887473922",
+      "discussion_links" : null
     },
     "relationships": {
       "creators": {

@@ -11,7 +11,8 @@
       "default_license": "CC-BY-4.0",
       "members": null,
       "start_date": null,
-      "end_date": null
+      "end_date": null,
+      "discussion_links" : null
     },
     "relationships": {
       "organisms": {

@@ -9,7 +9,8 @@
       "country_code": "DE",
       "city": null,
       "address": null,
-      "web_page": null
+      "web_page": null,
+      "discussion_links" : null
     },
     "relationships": {
       "people": {
