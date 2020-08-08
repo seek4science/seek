@@ -55,8 +55,8 @@ class InvestigationsControllerTest < ActionController::TestCase
 
       investigation = Factory(:investigation, policy: Factory(:public_policy),contributor:person)
       study = Factory(:study, policy: Factory(:public_policy),
-                      assays: [assay1, assay2],
-                      investigation: investigation,contributor:person)
+                              assays: [assay1, assay2],
+                              investigation: investigation,contributor:person)
     end
 
 
@@ -151,7 +151,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(user)
     assert_difference('Investigation.count') do
       post :create, params: { investigation: Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id]), policy_attributes: { access_type: Policy::ACCESSIBLE,
-                                permissions_attributes: project_permissions([project, another_project], Policy::EDITING) } }
+                                                                                                                                                                     permissions_attributes: project_permissions([project, another_project], Policy::EDITING) } }
     end
 
     investigation = assigns(:investigation)
@@ -399,7 +399,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     gatekeeper = Factory(:asset_gatekeeper)
     person = Factory(:person,project:gatekeeper.projects.first)
     investigation = Factory(:investigation, projects: gatekeeper.projects, contributor:person,
-                            policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+                                            policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     login_as(person)
 
     assert investigation.is_published?
@@ -444,7 +444,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'shows how to publish investigation to get a citation' do
     study = Factory(:study)
     investigation = Factory(:investigation, policy: Factory(:private_policy),
-                            studies: [study], contributor:study.contributor)
+                                            studies: [study], contributor:study.contributor)
     login_as(investigation.contributor)
 
     refute investigation.permitted_for_research_object?
@@ -458,7 +458,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'shows how to get a citation for a snapshotted investigation' do
     study = Factory(:study)
     investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy),
-                            studies: [study], contributor:study.contributor)
+                                            studies: [study], contributor:study.contributor)
 
     login_as(investigation.contributor)
     investigation.create_snapshot
@@ -478,7 +478,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     another_person = Factory(:person,project:person.projects.first)
     study = Factory(:study,contributor:another_person)
     investigation = Factory(:investigation, projects:another_person.projects, contributor:another_person,
-                            policy: Factory(:publicly_viewable_policy), studies: [study])
+                                            policy: Factory(:publicly_viewable_policy), studies: [study])
 
     login_as(person)
     investigation.create_snapshot
@@ -503,7 +503,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     investigation = Factory(:investigation, contributor:person)
     login_as(person)
     assert investigation.can_manage?
-    get :manage, params: {id: investigation}
+    get :manage, params: { id: investigation }
     assert_response :success
 
     # check the project form exists, studies and assays don't have this
@@ -521,7 +521,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(person)
     assert investigation.can_edit?
     refute investigation.can_manage?
-    get :manage, params: {id:investigation}
+    get :manage, params: { id:investigation }
     assert_redirected_to investigation_path(investigation)
     refute_nil flash[:error]
   end
@@ -542,13 +542,13 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(person)
     assert investigation.can_manage?
 
-    patch :manage_update, params: {id: investigation,
-                                 investigation: {
+    patch :manage_update, params: { id: investigation,
+                                   investigation: {
                                      creator_ids: [other_creator.id],
                                      project_ids: [proj1.id, proj2.id]
                                  },
-                                 policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
-                                 }}
+                                   policy_attributes: { access_type: Policy::VISIBLE, permissions_attributes: { '1' => { contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING } }
+                                 } }
 
     assert_redirected_to investigation
 
@@ -585,13 +585,13 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_equal [proj1],investigation.projects
     assert_empty investigation.creators
 
-    patch :manage_update, params: {id: investigation,
-                                 investigation: {
+    patch :manage_update, params: { id: investigation,
+                                   investigation: {
                                      creator_ids: [other_creator.id],
                                      project_ids: [proj1.id, proj2.id]
                                  },
-                                 policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
-                                 }}
+                                   policy_attributes: { access_type: Policy::VISIBLE, permissions_attributes: { '1' => { contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING } }
+                                 } }
 
     refute_nil flash[:error]
 
@@ -609,4 +609,57 @@ class InvestigationsControllerTest < ActionController::TestCase
     investigation.creators = [Factory(:person)]
     disable_authorization_checks { investigation.save! }
   end
+
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Investigation.count') do
+        post :create, params: { investigation: { title: 'test7',
+                                                 project_ids: [person.projects.first.id],
+                                                 discussion_links_attributes: [{ url: "http://www.slack.com/" }] } }
+      end
+    end
+    investigation = assigns(:investigation)
+    assert_equal 'http://www.slack.com/', investigation.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, investigation.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    disc_link = Factory(:discussion_link)
+    investigation = Factory(:investigation, contributor: User.current_user.person)
+    investigation.discussion_links = [disc_link]
+    get :show, params: { id: investigation }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update node with discussion link' do
+    person = Factory(:person)
+    investigation = Factory(:investigation, contributor: person)
+    login_as(person)
+    assert_nil investigation.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: investigation.id,
+                               investigation: { discussion_links_attributes: [{ url: "http://www.slack.com/" }] } }
+      end
+    end
+    assert_redirected_to investigation_path(assigns(:investigation))
+    assert_equal 'http://www.slack.com/', investigation.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    investigation = Factory(:investigation, contributor: person)
+    investigation.discussion_links = [asset_link]
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: investigation.id, investigation: { discussion_links_attributes:[{ id:asset_link.id, _destroy:'1' }] } }
+    end
+    assert_redirected_to investigation_path(investigation = assigns(:investigation))
+    assert_empty investigation.discussion_links
+  end
+
 end

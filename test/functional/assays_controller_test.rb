@@ -1779,54 +1779,61 @@ class AssaysControllerTest < ActionController::TestCase
 
   end
 
-  # test 'should create with discussion link' do
-  #   person = Factory(:person)
-  #   login_as(person)
-  #   node =  {title: 'Node', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
-  #   assert_difference('AssetLink.discussion.count') do
-  #     assert_difference('Node.count') do
-  #       assert_difference('ContentBlob.count') do
-  #         post :create, params: {node: node, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
-  #       end
-  #     end
-  #   end
-  #   node = assigns(:node)
-  #   assert_equal 'http://www.slack.com/', node.discussion_links.first.url
-  #   assert_equal AssetLink::DISCUSSION, node.discussion_links.first.link_type
-  # end
-  #
-  # test 'should show discussion link' do
-  #   asset_link = Factory(:discussion_link)
-  #   node = Factory(:node, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-  #   get :show, params: { id: node }
-  #   assert_response :success
-  #   assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
-  # end
-  #
-  # test 'should update node with discussion link' do
-  #   person = Factory(:person)
-  #   node = Factory(:node, contributor: person)
-  #   login_as(person)
-  #   assert_nil node.discussion_links.first
-  #   assert_difference('AssetLink.discussion.count') do
-  #     assert_difference('ActivityLog.count') do
-  #       put :update, params: { id: node.id, node: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
-  #     end
-  #   end
-  #   assert_redirected_to node_path(assigns(:node))
-  #   assert_equal 'http://www.slack.com/', node.discussion_links.first.url
-  # end
-  #
-  # test 'should destroy related assetlink when the discussion link is removed ' do
-  #   person = Factory(:person)
-  #   login_as(person)
-  #   asset_link = Factory(:discussion_link)
-  #   node = Factory(:node, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
-  #   assert_difference('AssetLink.discussion.count', -1) do
-  #     put :update, params: { id: node.id, node: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
-  #   end
-  #   assert_redirected_to node_path(node = assigns(:node))
-  #   assert_empty node.discussion_links
-  # end
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    assay_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'fish')
+    tech_type = Factory(:suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', label: 'carrot')
+    assert_difference('AssetLink.discussion.count') do
+    assert_difference('Assay.count') do
+      post :create, params: { assay: { title: 'test',
+                                       technology_type_uri: tech_type.uri,
+                                       assay_type_uri: assay_type.uri,
+                                       study_id: Factory(:study,contributor:User.current_user.person).id,
+                                       assay_class_id: Factory(:experimental_assay_class).id,
+                                       discussion_links_attributes: [{url: "http://www.slack.com/"}]},
+                              policy_attributes: valid_sharing }
+    end
+    end
+    assay = assigns(:assay)
+    assert_equal 'http://www.slack.com/', assay.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, assay.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    disc_link = Factory(:discussion_link)
+    assay = Factory(:assay, contributor: User.current_user.person)
+    assay.discussion_links = [disc_link]
+    get :show, params: { id: assay }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update node with discussion link' do
+    person = Factory(:person)
+    assay = Factory(:assay, contributor: person)
+    login_as(person)
+    assert_nil assay.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: assay.id, assay: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
+      end
+    end
+    assert_redirected_to assay_path(assigns(:assay))
+    assert_equal 'http://www.slack.com/', assay.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    assay = Factory(:assay, contributor: person)
+    assay.discussion_links = [asset_link]
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: assay.id, assay: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+    end
+    assert_redirected_to assay_path(assay = assigns(:assay))
+    assert_empty assay.discussion_links
+  end
 
   end

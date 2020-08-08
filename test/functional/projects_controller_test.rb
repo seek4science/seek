@@ -1748,4 +1748,55 @@ class ProjectsControllerTest < ActionController::TestCase
   def valid_project
     { title: 'a title' }
   end
+
+  test 'should create with discussion link' do
+    person = Factory(:admin)
+    login_as(person)
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Project.count') do
+        post :create, params: { project: { title: 'test',
+                                           discussion_links_attributes: [{url: "http://www.slack.com/"}]}}
+      end
+    end
+    project = assigns(:project)
+    assert_equal 'http://www.slack.com/', project.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, project.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    disc_link = Factory(:discussion_link)
+    project = Factory(:project)
+    project.discussion_links = [disc_link]
+    get :show, params: { id: project }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update node with discussion link' do
+    person = Factory(:admin)
+    project = Factory(:project)
+    login_as(person)
+    assert_nil project.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: project.id, project: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
+      end
+    end
+    assert_redirected_to project_path(assigns(:project))
+    assert_equal 'http://www.slack.com/', project.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:admin)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    project = Factory(:project)
+    project.discussion_links = [asset_link]
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: project.id, project: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+    end
+    assert_redirected_to project_path(project = assigns(:project))
+    assert_empty project.discussion_links
+  end
+
 end
