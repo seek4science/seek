@@ -32,7 +32,7 @@ module Seek
             content_length = response.headers[:content_length]
             file_name = determine_filename_from_disposition(response.headers[:content_disposition])
             code = response.code
-          rescue RestClient::MethodNotAllowed => e # Try a GET if HEAD isn't allowed, but don't download anything
+          rescue RestClient::MethodNotAllowed,RestClient::NotFound => e # Try a GET if HEAD isn't allowed, but don't download anything
             if @fallback_to_get
               begin
                 uri = URI.parse(url)
@@ -51,19 +51,7 @@ module Seek
               code = e.http_code
             end
           rescue RestClient::Exception => e
-            begin
-              response = RestClient.get(url, accept: '*/*')
-              content_type = if is_slideshare_url?
-                               'text/html'
-                             else
-                               response.headers[:content_type]
-                             end
-              content_length = response.headers[:content_length]
-              file_name = determine_filename_from_disposition(response.headers[:content_disposition])
-              code = response.code
-            rescue RestClient::Exception => e1
-              code = e1.http_code
-            end
+            code = e.http_code
           rescue SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
             code = 404
           end

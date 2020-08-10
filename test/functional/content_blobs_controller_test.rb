@@ -121,6 +121,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url 404' do
     # 404
     stub_request(:head, 'http://missing.com').to_return(status: 404, headers: { 'Content-Type' => 'text/html' })
+    stub_request(:get, 'http://missing.com').to_return(status: 404, headers: { 'Content-Type' => 'text/html' })
     get :examine_url, xhr: true, params: { data_url: 'http://missing.com' }
     assert_response :success
     assert @response.body.include?('Nothing can be found at that URL')
