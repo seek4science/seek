@@ -51,7 +51,19 @@ module Seek
               code = e.http_code
             end
           rescue RestClient::Exception => e
-            code = e.http_code
+            begin
+              response = RestClient.get(url, accept: '*/*')
+              content_type = if is_slideshare_url?
+                               'text/html'
+                             else
+                               response.headers[:content_type]
+                             end
+              content_length = response.headers[:content_length]
+              file_name = determine_filename_from_disposition(response.headers[:content_disposition])
+              code = response.code
+            rescue RestClient::Exception => e1
+              code = e1.http_code
+            end
           rescue SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
             code = 404
           end
