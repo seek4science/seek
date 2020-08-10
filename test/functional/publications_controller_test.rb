@@ -1005,7 +1005,7 @@ class PublicationsControllerTest < ActionController::TestCase
     get :query_authors_typeahead, params: { format: :json, full_name: query }
     assert_response :success
     authors = JSON.parse(@response.body)
-    assert_equal 0, authors['data'].length
+    assert_equal 0, authors.length
   end
 
   test 'query authors for initialization' do
