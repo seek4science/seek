@@ -61,4 +61,21 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     #@extractor.extract
   end
 
+
+  test 'validate date format correctly' do
+    valid_date_1 = '2020-08-15'
+    valid_date_2 = '1994-03-30'
+    wrong_date_1 = '20-08-15'
+    wrong_date_2 = '2020-08-32'
+    wrong_date_3 = '2020-15-08'
+    wrong_date_4 = '2020/08/15'
+
+    assert_equal true, Study.validate_date(valid_date_1)
+    assert_equal true, Study.validate_date(valid_date_2)
+    assert_equal false, Study.validate_date(wrong_date_1)
+    assert_equal false, Study.validate_date(wrong_date_2)
+    assert_equal false, Study.validate_date(wrong_date_3)
+    assert_equal false, Study.validate_date(wrong_date_4)
+
+  end
 end
