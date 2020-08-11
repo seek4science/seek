@@ -196,3 +196,104 @@ PlantPhenotype_MIAPPE:
             short_name: ""
             description: ""
             IRI: ""
+
+Nucleic_acid_library_construction_ArrayExpress:
+    name: Nucleic-acid-library-construction-ArrayExpress
+    group:
+        nucleic_acids
+    source_type:
+        assay
+    attributes:
+        - attribute:
+            title: Library layout*
+            short_name: "LibLayout"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Library source*
+            short_name: "LibSource"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Library strategy*
+            short_name: "LibStrategy"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Library selection*
+            short_name: "LibSelection"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Library strand
+            short_name: "LibStrand"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Plant ID
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Orientation
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Size range (bp)
+            short_name: "SizeRange (bp)"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Molarity
+            short_name: "LibMol"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Barcode p5
+            short_name: "p5"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Barcode p7
+            short_name: "p7"
+            description: ""
+            IRI: "" 
+
+Sample_collection_MIAPPE:
+    name: Sample-collection-MIAPPE
+    group:
+        experimental_conditions
+    source_type:
+        assay
+    attributes:
+        - attribute:
+            title: Sample ID*
+            short_name: "SampleID"
+            description: "Unique identifier for the sample."
+            IRI: ""
+        - attribute:
+            title: Plant structure development stage
+            short_name: "DevStage"
+            description: "The stage in the life of a plant structure during which the sample was taken, in the form of an accession number to a suitable controlled vocabulary (Plant Ontology, BBCH scale)"
+            IRI: ""
+        - attribute:
+            title: Plant anatomical entity*
+            short_name: "PlantPart"
+            description: "A description of  the plant part (e.g. leaf) or the plant product (e.g. resin) from which the sample was taken, in the form of an accession number to a suitable controlled vocabulary (Plant Ontology)."
+            IRI: ""
+        - attribute:
+            title: Sample description
+            short_name: "Sample"
+            description: "Any information not captured by the other sample fields, including quantification, sample treatments and processing."
+            IRI: ""
+        - attribute:
+            title: Collection date*
+            short_name: "CollectionDate"
+            description: "The date and time when the sample was collected / harvested"
+            IRI: ""
+        - attribute:
+            title: External ID
+            short_name: "ExtarnalID"
+            description: "An identifier for the sample in a persistent repository, comprising the name of the repository and the accession number of the observation unit therein. Submission to the EBI Biosamples repository is recommended. URI are recommended when possible."
+            IRI: ""
