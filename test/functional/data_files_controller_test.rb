@@ -653,7 +653,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#buttons' do
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 1
-      assert_select 'span.disabled-button', text: 'Explore', count: 0
+      assert_select 'a.disabled', text: 'Explore', count: 0
     end
   end
 
@@ -666,7 +666,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#buttons' do
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
-      assert_select 'span.disabled-button', text: 'Explore', count: 1
+      assert_select 'a.disabled', text: 'Explore', count: 1
     end
   end
 
@@ -1518,7 +1518,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file.save
     get :show, params: { id: data_file }
 
-    assert_select 'div', text: 'another creator', count: 1
+    assert_select 'li.author-list-item', text: 'another creator', count: 1
   end
 
   # TODO: Permission UI testing - Replace this with a Jasmine test

@@ -23,6 +23,7 @@
 
 class Settings < ActiveRecord::Base
   class SettingNotFound < RuntimeError; end
+  class DecryptionError < RuntimeError; end
 
   belongs_to :target, polymorphic: true, required: false
 
@@ -94,7 +95,7 @@ class Settings < ActiveRecord::Base
       begin
         attr_enc_value
       rescue OpenSSL::Cipher::CipherError
-        raise "Unable to decrypt setting '#{var}'. Was the key (filestore/attr_encrypted/key) changed?"
+        raise Settings::DecryptionError, "Unable to decrypt setting '#{var}'. Was the key (filestore/attr_encrypted/key) changed?"
       end
     elsif self[:value].present?
       YAML::load(self[:value])

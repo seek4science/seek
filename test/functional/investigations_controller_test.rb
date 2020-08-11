@@ -128,6 +128,22 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert !assigns(:investigation).new_record?
   end
 
+  test 'should create an investigations and associate it with a publication without publication type' do
+    user = Factory(:user)
+    project = user.person.projects.first
+    p = Factory(:publication)
+    p.publication_type_id = nil
+    disable_authorization_checks { p.save! }
+    login_as(user)
+    assert_difference('Investigation.count',1) do
+      post :create, params: { investigation: { title: 'investigation with publication', project_ids: [project.id.to_s],publication_ids: [p.id.to_s] } }
+    end
+    investigation = assigns(:investigation)
+    assert_nil p.publication_type_id
+    assert p.investigations.include?(investigation)
+    assert investigation.publications.include?(p)
+  end
+
   test 'should create with policy' do
     user = Factory(:user)
     project = user.person.projects.first
@@ -296,7 +312,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     investigation = Factory(:investigation, policy: Factory(:public_policy))
     get :show, params: { id: investigation }
     assert_response :success
-    assert_select '.author_avatar' do
+    assert_select '.author-list-item' do
       assert_select 'a[href=?]', person_path(investigation.contributing_user.person) do
         assert_select 'img'
       end
@@ -332,19 +348,19 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     get :show, params: { id: investigation.id }
     assert_response :success
-    assert_select 'span.author_avatar a[href=?]', "/people/#{creator.id}"
+    assert_select 'li.author-list-item a[href=?]', "/people/#{creator.id}"
   end
 
   test 'should show other creators' do
     investigation = Factory(:investigation, policy: Factory(:public_policy))
-    other_creators = 'other creators'
+    other_creators = 'john smith'
     investigation.other_creators = other_creators
     investigation.save
     investigation.reload
 
     get :show, params: { id: investigation.id }
     assert_response :success
-    assert_select 'div.panel-body div', text: other_creators
+    assert_select 'li.author-list-item', text: 'john smith'
   end
 
   test 'programme investigations through nested routing' do

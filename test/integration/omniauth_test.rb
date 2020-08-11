@@ -249,4 +249,19 @@ class OmniauthTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test 'should authenticate ELIXIR AAI user and redirect to path stored in state' do
+    OmniAuth.config.mock_auth[:elixir_aai] = @elixir_aai_mock_auth
+    existing_user = Factory(:user, login: 'bob')
+    existing_user.identities.create!(uid: 'new_elixir_aai_user', provider: 'elixir_aai')
+
+    with_config_value(:omniauth_enabled, true) do
+      with_config_value(:omniauth_elixir_aai_enabled, true) do
+        post omniauth_authorize_path(:elixir_aai, state: 'return_to:/sops')
+        follow_redirect!
+        assert_redirected_to sops_path
+        assert_equal existing_user.id, session[:user_id]
+      end
+    end
+  end
 end

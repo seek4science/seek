@@ -336,13 +336,19 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should show old unspecified publication type' do
     get :index
     assert_response :success
-    assert_select 'span.none_text', { text:'Not specified', :count=> 9 }
+    assert_select '.list_item_attribute' do
+      assert_select 'b', { text: 'Publication Type' }
+      assert_select 'span.none_text', { text: 'Not specified' }
+    end
   end
 
   test 'should show the publication with unspecified publication type as Not specified' do
     get :show, params: { id: publications(:no_publication_type) }
     assert_response :success
-    assert_select 'span.none_text', { text:'Not specified', :count=>3 }
+    assert_select 'p' do
+      assert_select 'strong', { text: 'Publication type:' }
+      assert_select 'span.none_text', { text: 'Not specified' }
+    end
   end
 
   test 'should only show the year for 1st Jan in list view' do

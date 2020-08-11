@@ -31,7 +31,23 @@ require 'private_address_check_monkeypatch'
 SEEK::Application.configure do
   ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
 
-  Seek::Config.propagate_all
+  begin
+    Seek::Config.propagate_all
+  rescue Settings::DecryptionError
+    puts "\n" * 3
+    puts "#" * 40
+    puts
+    puts "WARNING - Could not decrypt settings!"
+    puts
+    puts "Please check the encryption key (filestore/attr_encrypted/key) is"
+    puts "is present and is the same key used to encrypt the settings originally."
+    puts
+    puts "If you no longer have access to the original key you can clear any encrypted"
+    puts "settings by running: rake seek:clear_encrypted_settings"
+    puts
+    puts "#" * 40
+    puts "\n" * 3
+  end
 
   #Need to load defaut_locale file for internationalization used in Inflector below
   #coz this file is loaded at a later point

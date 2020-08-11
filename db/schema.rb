@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_13_101632) do
+ActiveRecord::Schema.define(version: 2020_07_29_093059) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -194,6 +194,7 @@ ActiveRecord::Schema.define(version: 2020_05_13_101632) do
     t.string "link_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "label"
     t.index ["asset_id", "asset_type"], name: "index_asset_links_on_asset_id_and_asset_type"
   end
 
@@ -1317,12 +1318,12 @@ ActiveRecord::Schema.define(version: 2020_05_13_101632) do
     t.string "doi"
     t.string "uuid"
     t.integer "policy_id"
-    t.string "citation"
+    t.text "citation"
     t.string "deleted_contributor"
     t.integer "registered_mode"
-    t.string "booktitle"
+    t.text "booktitle"
     t.string "publisher"
-    t.string "editor"
+    t.text "editor"
     t.integer "publication_type_id"
     t.text "url"
     t.index ["contributor_id"], name: "index_publications_on_contributor"

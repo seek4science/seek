@@ -1,5 +1,7 @@
 <%
-   return if resource.is_a?(Model) && !Seek::Config.modelling_analysis_enabled
+  resource_type = resource.class.name.underscore
+
+return if resource.is_a?(Model) && !Seek::Config.modelling_analysis_enabled
    return unless Seek::Config.assays_enabled
    return if resource.is_a?(Workflow)
    return if resource.is_a?(Node)
@@ -53,7 +55,7 @@
         </p>
 
         <%= associations_list('assay_asset_list', 'associations/assay', assay_asset_json, empty_text: 'No assays',) %>
-
+        <%= hidden_field_tag "#{resource_type}[assay_assets_attributes][]" %>
         <div class="association_step">
           <hr/>
           <p style="color: #666666;">
