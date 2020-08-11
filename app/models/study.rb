@@ -51,7 +51,6 @@ class Study < ApplicationRecord
           studies_data_files[study_id] = {data_file:[], data_file_description:[], data_file_version:[]}
         end
 
-
         data_file = data[1].value
         data_file_description = data[2].value
         data_file_version = data[3].value
@@ -88,8 +87,8 @@ class Study < ApplicationRecord
   def self.generate_metadata(data)
     metadata = {
       id: data[0].value,
-      study_start_date: data[3].value,
-      study_end_date: data[4].value,
+      study_start_date: validate_date(data[3].value) ? data[3].value : '',
+      study_end_date: validate_date(data[4].value) ? data[4].value : '',
       contact_institution: data[5].value,
       geographic_location_country: data[6].value,
       experimental_site_name: data[7].value,
@@ -105,6 +104,18 @@ class Study < ApplicationRecord
       cultural_practices: data[17].value
     }
     metadata
+  end
+
+
+  def self.validate_date(date)
+    format_ok = date.match(/\d{4}-\d{2}-\d{2}/)
+    parseable = Date.strptime(date, '%Y-%m-%d') rescue false
+
+    if format_ok && parseable
+      return true
+    else
+      return false
+    end
   end
 
 
@@ -163,7 +174,6 @@ class Study < ApplicationRecord
     end
     licenses_ids = JSON.parse(File.read(File.join(Rails.root, 'public', 'od_licenses.json'))).keys
 
-
     normalize_license_id(default_license)
 
     licenses_ids.each do |license_id|
@@ -183,12 +193,12 @@ class Study < ApplicationRecord
                         description_of_the_experimental_design observation_unit_description description_of_growth_facility]
     missing_fields = []
 
-    mandatory_fields.each { |mandatory_f|
+    mandatory_fields.each do |mandatory_f|
 
       if study.attributes[mandatory_f].blank? && metadata[mandatory_f.to_sym].blank?
         missing_fields << mandatory_f
       end
-    }
+    end
 
   end
 
