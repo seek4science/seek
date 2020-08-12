@@ -23,7 +23,7 @@ module Seek
         open_crate do |crate|
           format ||= default_diagram_format
 
-          return crate.main_workflow_diagram&.source&.source&.read if crate.main_workflow_diagram
+          return crate.main_workflow_diagram&.source&.read if crate.main_workflow_diagram
 
           extractor = main_workflow_extractor(crate)
           return extractor.diagram(format) if extractor&.can_render_diagram?
@@ -77,7 +77,7 @@ module Seek
           end
 
           if crate.readme && m[:description].blank?
-            string = crate.readme&.source&.source&.read
+            string = crate.readme&.source&.read
             string = string.gsub(/^(---\s*\n.*?\n?)^(---\s*$\n?)/m,'') # Remove "Front matter"
             m[:description] ||= string
           end
@@ -145,13 +145,13 @@ module Seek
       def main_workflow_extractor(crate)
         return @main_workflow_extractor if @main_workflow_extractor
 
-        main_workflow_extractor_class(crate).new(crate&.main_workflow&.source&.source)
+        main_workflow_extractor_class(crate).new(crate&.main_workflow&.source)
       end
 
       def abstract_cwl_extractor(crate)
         return @abstract_cwl_extractor if @abstract_cwl_extractor
 
-        abstract_cwl = crate&.main_workflow_cwl&.source&.source
+        abstract_cwl = crate&.main_workflow_cwl&.source
         @abstract_cwl_extractor = abstract_cwl ? Seek::WorkflowExtractors::CWL.new(abstract_cwl) : nil
       end
     end
