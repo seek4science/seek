@@ -143,6 +143,15 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.string "key", limit: 10
   end
 
+  create_table "assay_human_diseases", id: :integer,  force: :cascade do |t|
+    t.integer "assay_id"
+    t.integer "human_disease_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["assay_id"], name: "index_assay_diseases_on_assay_id"
+    t.index ["human_disease_id"], name: "index_assay_diseases_on_disease_id"
+  end
+
   create_table "assay_organisms", id: :integer,  force: :cascade do |t|
     t.integer "assay_id"
     t.integer "organism_id"
@@ -252,6 +261,57 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.integer "end_column"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "collection_auth_lookup",  force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_collection_user_id_asset_id_can_view"
+    t.index ["user_id", "can_view"], name: "index_collection_auth_lookup_on_user_id_and_can_view"
+  end
+
+  create_table "collection_items",  force: :cascade do |t|
+    t.bigint "collection_id"
+    t.string "asset_type"
+    t.bigint "asset_id"
+    t.text "comment"
+    t.integer "order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["asset_type", "asset_id"], name: "index_collection_items_on_asset_type_and_asset_id"
+    t.index ["collection_id"], name: "index_collection_items_on_collection_id"
+  end
+
+  create_table "collections",  force: :cascade do |t|
+    t.text "title"
+    t.text "description"
+    t.bigint "contributor_id"
+    t.string "first_letter", limit: 1
+    t.string "uuid"
+    t.bigint "policy_id"
+    t.string "doi"
+    t.string "license"
+    t.datetime "last_used_at"
+    t.text "other_creators"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "avatar_id"
+    t.index ["avatar_id"], name: "index_collections_on_avatar_id"
+    t.index ["contributor_id"], name: "index_collections_on_contributor_id"
+    t.index ["policy_id"], name: "index_collections_on_policy_id"
+  end
+
+  create_table "collections_projects",  force: :cascade do |t|
+    t.bigint "collection_id"
+    t.bigint "project_id"
+    t.index ["collection_id", "project_id"], name: "index_collections_projects_on_collection_id_and_project_id"
+    t.index ["collection_id"], name: "index_collections_projects_on_collection_id"
+    t.index ["project_id"], name: "index_collections_projects_on_project_id"
   end
 
   create_table "compounds", id: :integer,  force: :cascade do |t|
@@ -671,6 +731,36 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.datetime "updated_at"
   end
 
+  create_table "human_disease_parents", id: false,  force: :cascade do |t|
+    t.integer "human_disease_id"
+    t.integer "parent_id"
+    t.index ["human_disease_id", "parent_id"], name: "index_disease_parents_on_disease_id_and_parent_id"
+    t.index ["parent_id"], name: "index_disease_parents_on_parent_id"
+  end
+
+  create_table "human_diseases", id: :integer,  force: :cascade do |t|
+    t.string "title"
+    t.string "doid_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string "first_letter"
+    t.string "uuid"
+  end
+
+  create_table "human_diseases_projects", id: false,  force: :cascade do |t|
+    t.integer "human_disease_id"
+    t.integer "project_id"
+    t.index ["human_disease_id", "project_id"], name: "index_diseases_projects_on_disease_id_and_project_id"
+    t.index ["project_id"], name: "index_diseases_projects_on_project_id"
+  end
+
+  create_table "human_diseases_publications", id: false,  force: :cascade do |t|
+    t.integer "human_disease_id"
+    t.integer "publication_id"
+    t.index ["human_disease_id", "publication_id"], name: "index_diseases_publications_on_disease_id_and_publication_id"
+    t.index ["publication_id"], name: "index_diseases_publications_on_publication_id"
+  end
+
   create_table "identities", id: :integer,  force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -821,6 +911,7 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
+    t.integer "human_disease_id"
     t.index ["contributor_id"], name: "index_model_versions_on_contributor"
     t.index ["model_id"], name: "index_model_versions_on_model_id"
   end
@@ -852,6 +943,7 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
+    t.integer "human_disease_id"
     t.index ["contributor_id"], name: "index_models_on_contributor"
   end
 
@@ -1818,6 +1910,14 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.index ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view"
   end
 
+  create_table "workflow_classes",  force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.string "key"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "workflow_versions", id: :integer,  force: :cascade do |t|
     t.integer "workflow_id"
     t.integer "version"
@@ -1835,6 +1935,9 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
+    t.text "metadata"
+    t.integer "workflow_class_id"
+    t.integer "maturity_level"
     t.index ["contributor_id"], name: "index_workflow_versions_on_contributor"
     t.index ["workflow_id"], name: "index_workflow_versions_on_workflow_id"
   end
@@ -1854,6 +1957,9 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
+    t.text "metadata"
+    t.integer "workflow_class_id"
+    t.integer "maturity_level"
     t.index ["contributor_id"], name: "index_workflows_on_contributor"
   end
 
