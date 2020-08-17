@@ -4,7 +4,7 @@
 <!--  when registered manually or from bibtex file -->
 <%if @publication.registered_mode == 3 || @publication.registered_mode == 4 %>
   <%= form_for @publication do |f| %>
-    <%= render :partial => 'publicaiton_editor', :locals => { :publication_form => f }%>
+    <%= render :partial => 'publication_editor', :locals => {:publication_form => f }%>
   <% end %>
 <% elsif !@publication.doi.blank? || !@publication.pubmed_id.blank? %>
   <%= render :partial => 'publication_doi_refetch_metadata', :locals => { :publication => @publication } %>

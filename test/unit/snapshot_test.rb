@@ -291,6 +291,18 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_equal snapshot.resource_id, reindex_job.item_id
   end
 
+  test 'snapshots destroyed with parent object' do
+    snapshot1 = @study.create_snapshot
+    snapshot2 = @study.create_snapshot
+
+    assert_difference('Snapshot.count', -2) do
+      disable_authorization_checks { @study.destroy }
+    end
+
+    assert snapshot1.destroyed?
+    assert snapshot2.destroyed?
+  end
+
   private
 
   def extract_keys(o, key)

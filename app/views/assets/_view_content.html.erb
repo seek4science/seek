@@ -37,7 +37,7 @@
     <% if content_blob.file_exists? %>
       <% supported_file_formats = ['pdf'] %>
       <% supported_file_formats += Seek::ContentTypeDetection::PDF_VIEWABLE_FORMAT if (Seek::Config.pdf_conversion_enabled && Seek::Config.soffice_available?) %>
-      <% explanation = "Your #{text_for_resource(asset)} is unable to be viewed in browser. " +
+      <% explanation = "This #{text_for_resource(asset).downcase} is unable to be viewed in-browser. " +
           "Supported file formats are: " + supported_file_formats.join(', ') +
           "; Supported image formats are: " + Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.join(', ') %>
     <% else %>

@@ -128,6 +128,22 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert !assigns(:investigation).new_record?
   end
 
+  test 'should create an investigations and associate it with a publication without publication type' do
+    user = Factory(:user)
+    project = user.person.projects.first
+    p = Factory(:publication)
+    p.publication_type_id = nil
+    disable_authorization_checks { p.save! }
+    login_as(user)
+    assert_difference('Investigation.count',1) do
+      post :create, params: { investigation: { title: 'investigation with publication', project_ids: [project.id.to_s],publication_ids: [p.id.to_s] } }
+    end
+    investigation = assigns(:investigation)
+    assert_nil p.publication_type_id
+    assert p.investigations.include?(investigation)
+    assert investigation.publications.include?(p)
+  end
+
   test 'should create with policy' do
     user = Factory(:user)
     project = user.person.projects.first
