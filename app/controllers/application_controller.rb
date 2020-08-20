@@ -24,6 +24,8 @@ class ApplicationController < ActionController::Base
   rescue_from 'ActiveRecord::UnknownAttributeError', with: :render_unknown_attribute_error
   rescue_from NotImplementedError, with: :render_not_implemented_error
 
+  before_action :update_request_log
+
   before_action :project_membership_required, only: [:create, :new]
 
   before_action :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
@@ -38,6 +40,10 @@ class ApplicationController < ActionController::Base
 
   layout Seek::Config.main_layout
 
+  def update_request_log
+    session[:previous_request_url] = session[:current_request_url]
+    session[:current_request_url] = request.env['HTTP_REFERER']
+  end
 
   def with_current_user
     User.with_current_user current_user do
