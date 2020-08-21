@@ -168,7 +168,7 @@ module ResourceListItemHelper
     return '' if hide_if_blank && text.blank?
     text = strip_tags(text) if text && text.length > length
     content_tag :div, class: 'list_item_desc' do
-      text_or_not_specified(text, description: true, auto_link: auto_link, length: length)
+      text_or_not_specified(text, description: true, auto_link: auto_link, length: length, markdown: true)
     end.html_safe
   end
 
