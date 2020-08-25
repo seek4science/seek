@@ -16,9 +16,7 @@ module Ga4gh
         end
 
         def versions
-          super.map { |v| ToolVersion.new(v) }.tap do |x|
-            pp x
-          end
+          super.map { |v| ToolVersion.new(v) }
         end
       end
     end

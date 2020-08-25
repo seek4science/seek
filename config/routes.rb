@@ -11,16 +11,18 @@ SEEK::Application.routes.draw do
   namespace :ga4gh do
     namespace :trs do
       namespace :v2 do
-        get 'tools' => 'tools#index'
-        get 'tools/:id' => 'tools#show'
-        get 'tools/:id/versions' => 'tool_versions#index'
-        get 'tools/:id/versions/:version_id' => 'tool_versions#show'
-        get 'tools/:id/versions/:version_id/containerfile' => 'tool_versions#containerfile'
-        get 'tools/:id/versions/:version_id/:type/descriptor(/:relative_path)' => 'tool_versions#descriptor'
-        get 'tools/:id/versions/:version_id/:type/files' => 'tool_versions#files'
-        get 'tools/:id/versions/:version_id/:type/tests' => 'tool_versions#tests'
-        get 'toolClasses' => 'general#tool_classes'
-        get 'service-info' => 'general#service_info'
+        defaults format: 'json' do
+          get 'tools' => 'tools#index'
+          get 'tools/:id' => 'tools#show'
+          get 'tools/:id/versions' => 'tool_versions#index'
+          get 'tools/:id/versions/:version_id' => 'tool_versions#show'
+          get 'tools/:id/versions/:version_id/containerfile' => 'tool_versions#containerfile'
+          get 'tools/:id/versions/:version_id/:type/descriptor(/:relative_path)' => 'tool_versions#descriptor'
+          get 'tools/:id/versions/:version_id/:type/files' => 'tool_versions#files'
+          get 'tools/:id/versions/:version_id/:type/tests' => 'tool_versions#tests'
+          get 'toolClasses' => 'general#tool_classes'
+          get 'service-info' => 'general#service_info'
+        end
       end
     end
   end
