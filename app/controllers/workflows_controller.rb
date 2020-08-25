@@ -16,6 +16,7 @@ class WorkflowsController < ApplicationController
   include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
+  include RoCrateHandling
 
   api_actions :index, :show, :create, :update, :destroy
 
@@ -255,16 +256,8 @@ class WorkflowsController < ApplicationController
   end
 
   def ro_crate
-    path = @display_workflow.ro_crate_zip
-    response.headers['Content-Length'] = File.size(path).to_s
-    respond_to do |format|
-      format.html do
-        send_file(path,
-                  filename: "workflow-#{@workflow.id}-#{@display_workflow.version}.crate.zip",
-                  type: 'application/zip',
-                  disposition: 'inline')
-      end
-    end
+    send_ro_crate(@display_workflow.ro_crate_zip,
+                  "workflow-#{@workflow.id}-#{@display_workflow.version}.crate.zip")
   end
 
   private

@@ -6,6 +6,7 @@ module Ga4gh
         before_action :get_version, only: [:show, :descriptor, :tests, :files, :containerfile]
         before_action :check_type, only: [:descriptor, :tests, :files]
         respond_to :json
+        include ::RoCrateHandling
 
         def show
           respond_with(@tool_version, adapter: :attributes)
@@ -42,7 +43,26 @@ module Ga4gh
         end
 
         def files
-          raise NotImplementedError
+          if request.query_parameters[:format] == 'zip'
+            send_ro_crate(@tool_version.ro_crate_zip,
+                          "workflow-#{@tool.id}-#{@tool_version.version}.crate.zip")
+          else
+            @tool.ro_crate do |crate|
+              files = crate.data_entities.select do |data_entity|
+                !(data_entity.is_a?(ROCrate::Directory) || data_entity.remote?)
+              end.map do |data_entity|
+                if data_entity == crate.main_workflow
+                  type = 'PRIMARY_DESCRIPTOR'
+                else
+                  type = 'OTHER'
+                end
+
+                { path: data_entity.id, file_type: type }
+              end
+
+              respond_with(files.to_json)
+            end
+          end
         end
 
         def containerfile
