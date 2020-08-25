@@ -1,1 +1,0 @@
-json.array! @workflows, partial: 'tool', as: :workflow
