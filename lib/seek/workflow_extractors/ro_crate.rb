@@ -39,12 +39,11 @@ module Seek
         open_crate do |crate|
           # Use CWL description
           m = if crate.main_workflow_cwl
-                extractor = abstract_cwl_extractor(crate)
-                extractor.metadata
+                abstract_cwl_extractor(crate).metadata
               else
-                extractor = main_workflow_extractor(crate)
-                extractor.metadata.merge(workflow_class_id: extractor.class.workflow_class&.id)
+                main_workflow_extractor(crate).metadata
               end
+          m[:workflow_class_id] ||= main_workflow_extractor(crate).class.workflow_class&.id
 
           # Metadata from crate
           if crate['keywords'] && m[:tags].blank?

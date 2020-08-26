@@ -19,11 +19,13 @@ class GalaxyExtractionTest < ActiveSupport::TestCase
   end
 
   test 'extracts metadata from Galaxy workflow RO crate' do
+    c = Factory(:galaxy_workflow_class)
     wf = open_fixture_file('workflows/1-PreProcessing.crate.zip')
     extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
     metadata = extractor.metadata
     internals = metadata[:internals]
 
+    assert_equal c.id, metadata[:workflow_class_id]
     assert_equal '1 - read pre-processing', metadata[:title]
     assert_equal '# Preprocessing of raw SARS-CoV-2 reads', metadata[:description].split("\n").first, 'Should have parsed description from README.md'
     assert_equal ['covid-19'], metadata[:tags]
