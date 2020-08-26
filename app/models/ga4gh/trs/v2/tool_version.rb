@@ -23,16 +23,17 @@ module Ga4gh
         end
 
         def descriptor_type
-          case workflow_class&.key
-          when 'CWL'
-            'CWL'
-          when 'Nextflow'
-            'NFL'
-          when 'Galaxy'
-            'GALAXY'
-          else
-            nil
-          end
+          t = case workflow_class&.key
+              when 'CWL'
+                'CWL'
+              when 'Nextflow'
+                'NFL'
+              when 'Galaxy'
+                'GALAXY'
+              else
+                nil
+              end
+          [t].compact
         end
       end
     end

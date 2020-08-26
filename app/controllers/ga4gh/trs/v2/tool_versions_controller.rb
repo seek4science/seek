@@ -39,7 +39,15 @@ module Ga4gh
         end
 
         def tests
-          raise NotImplementedError
+          @tool.ro_crate do |crate|
+            file_wrappers = crate.data_entities.select do |data_entity|
+              data_entity.id.match?(/tests?\/.*\.json/)
+            end.map do |data_entity|
+              FileWrapper.new(data_entity)
+            end
+
+            respond_with(file_wrappers, adapter: :attributes)
+          end
         end
 
         def files
@@ -53,6 +61,8 @@ module Ga4gh
               end.map do |data_entity|
                 if data_entity == crate.main_workflow
                   type = 'PRIMARY_DESCRIPTOR'
+                elsif data_entity.id == 'Dockerfile'
+                  type = 'CONTAINERFILE'
                 else
                   type = 'OTHER'
                 end
@@ -66,7 +76,15 @@ module Ga4gh
         end
 
         def containerfile
-          raise NotImplementedError
+          @tool.ro_crate do |crate|
+            dockerfile = crate.get('Dockerfile')
+            if dockerfile
+              @file_wrapper = FileWrapper.new(dockerfile)
+              respond_with([@file_wrapper], adapter: :attributes)
+            else
+              respond_with({}, adapter: :attributes, status: :not_found)
+            end
+          end
         end
 
         private
