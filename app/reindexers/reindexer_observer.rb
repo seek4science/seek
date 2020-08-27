@@ -16,7 +16,7 @@ class ReindexerObserver < ActiveRecord::Observer
 
   def reindex item
     concs = Array(consequences(item))
-    ReindexingJob.new.add_items_to_queue(concs)
+    ReindexingQueue.enqueue(concs)
   end
 
 end

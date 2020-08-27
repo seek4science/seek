@@ -14,9 +14,7 @@ class ReindexingJob < SeekJob
   end
 
   def gather_items
-    ReindexingQueue.order('id ASC').limit(BATCHSIZE).collect do |queued|
-      take_queued_item(queued)
-    end.uniq.compact
+    ReindexingQueue.dequeue(BATCHSIZE)
   end
 
   def default_priority
@@ -24,17 +22,6 @@ class ReindexingJob < SeekJob
   end
 
   def follow_on_job?
-    ReindexingQueue.count > 0 && !exists?
-  end
-
-  def add_items_to_queue(items, time = default_delay.from_now, priority = default_priority)
-    items = Array(items)
-
-    disable_authorization_checks do
-      items.uniq.each do |item|
-        ReindexingQueue.create item: item
-      end
-    end
-    queue_job(priority, time) unless exists?
+    ReindexingQueue.any? && !exists?
   end
 end

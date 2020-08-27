@@ -9,7 +9,7 @@ module Seek
         def queue_background_reindexing
           unless (saved_changes.keys - %w(updated_at last_used_at)).empty?
             Rails.logger.info("About to reindex #{self.class.name} #{id}")
-            ReindexingJob.new.add_items_to_queue self
+            ReindexingQueue.enqueue(self)
           end
         end
       end

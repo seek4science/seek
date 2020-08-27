@@ -101,7 +101,7 @@ class OpenbisEndpoint < ApplicationRecord
   # def reindex_entities
   #  # ugly should reindex only those that have changed
   #  datafiles = registered_datafiles
-  #  ReindexingJob.new.add_items_to_queue datafiles unless datafiles.empty?
+  #  ReindexingQueue.enqueue(datafiles) unless datafiles.empty?
   # end
 
   def registered_datafiles

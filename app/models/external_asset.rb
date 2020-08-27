@@ -109,7 +109,7 @@ class ExternalAsset < ApplicationRecord
   end
 
   def trigger_reindexing
-    ReindexingJob.new.add_items_to_queue seek_entity if seek_entity && needs_reindexing
+    ReindexingQueue.enqueue(seek_entity) if seek_entity && needs_reindexing
   end
 
   def search_terms

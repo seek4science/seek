@@ -26,10 +26,6 @@ class AuthLookupUpdateJob < SeekJob
     expire_auth_related_fragments
   end
 
-  def retry_item(item)
-    add_items_to_queue(item, 15.seconds.from_now, 1)
-  end
-
   def gather_items
     # including item_type in the order, encourages assets to be processed before users (since they are much quicker), due to the happy coincidence
     # that User falls last alphabetically. Its not that important if a new authorized type is added after User in the future.

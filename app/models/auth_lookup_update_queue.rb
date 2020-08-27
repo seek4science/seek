@@ -4,7 +4,7 @@ class AuthLookupUpdateQueue < ApplicationRecord
   belongs_to :item, polymorphic: true, required: false
   validates :item_id, uniqueness: { scope:  [:item_type] }
 
-  def self.prioritized
+  def self.prioritized # Priority is never actually set anywhere outside of tests...
     order(:priority, :item_type, :id)
   end
 
