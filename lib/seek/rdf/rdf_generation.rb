@@ -105,12 +105,12 @@ module Seek
 
       def queue_rdf_generation(force = false, refresh_dependents = true)
         unless !force && (saved_changes.keys - %w[updated_at last_used_at]).empty?
-          x = RdfGenerationQueue.enqueue(self)
-          #pp x
-          queue_dependents_rdf_generation if refresh_dependents
-          true
+          RdfGenerationQueue.enqueue(self)
+          if refresh_dependents
+            reload
+            queue_dependents_rdf_generation
+          end
         end
-        true
       end
 
       def remove_rdf
@@ -138,8 +138,6 @@ module Seek
           deps = deps.collect { |dep| dep.is_a?(User) ? [dep, dep.person] : dep }.flatten.compact
           items |= deps
         end
-
-        items.compact.uniq
 
         items |= related_items_from_sparql if rdf_repository_configured?
 
