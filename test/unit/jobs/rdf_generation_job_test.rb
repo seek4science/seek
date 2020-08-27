@@ -78,7 +78,7 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     Delayed::Job.delete_all
 
     assert_difference('Delayed::Job.count', 1) do
-      RdfGenerationJob.new(item).queue_job
+      RdfGenerationJob.new.queue_job
     end
     job = Delayed::Job.last
     assert_equal 2, job.priority
@@ -88,42 +88,23 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     item = Factory(:event)
     refute item.rdf_supported?
 
-    assert_empty RdfGenerationJob.new(item).gather_items
+    assert_empty RdfGenerationJob.new.gather_items
 
     item = Factory(:sop)
     assert item.rdf_supported?
 
-    assert_equal [item], RdfGenerationJob.new(item).gather_items
-  end
-
-  test 'exists' do
-    project = Factory(:project)
-    project2 = Factory(:project)
-
-    Delayed::Job.delete_all
-
-    refute RdfGenerationJob.new(project, true).exists?
-    refute RdfGenerationJob.new(project, false).exists?
-
-    Delayed::Job.enqueue RdfGenerationJob.new(project, true), priority: 1, run_at: Time.now
-    assert RdfGenerationJob.new(project, true).exists?
-    assert RdfGenerationJob.new(project, false).exists?, 'should say that it exists, because one already exists with refresh_dependents true'
-    refute RdfGenerationJob.new(project2, true).exists?
-    refute RdfGenerationJob.new(project2, false).exists?
-
-    Delayed::Job.enqueue RdfGenerationJob.new(project2, false), priority: 1, run_at: Time.now
-    assert RdfGenerationJob.new(project2, false).exists?
-    refute RdfGenerationJob.new(project2, true).exists?, "shouldn't reports exists, because one already exists with refresh_dependents false, but this is true"
+    assert_equal [item], RdfGenerationJob.new.gather_items
   end
 
   test 'perform' do
     item = Factory(:assay, policy: Factory(:public_policy))
+    RdfGenerationQueue.delete_all
 
     expected_rdf_file = File.join(Rails.root, 'tmp/testing-filestore/rdf/public', "Assay-test-#{item.id}.rdf")
     assert_equal expected_rdf_file, item.rdf_storage_path
     FileUtils.rm expected_rdf_file if File.exist?(expected_rdf_file)
-
-    job = RdfGenerationJob.new(item)
+    RdfGenerationQueue.enqueue(item)
+    job = RdfGenerationJob.new
     job.perform
 
     assert File.exist?(expected_rdf_file)
@@ -138,23 +119,14 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
 
   test 'should not allow duplicates' do
     assay = Factory(:assay)
-    Delayed::Job.delete_all
-    refute RdfGenerationJob.new(assay, false).exists?
-    assert_difference('Delayed::Job.count', 1) do
-      RdfGenerationJob.new(assay, false).queue_job
+    RdfGenerationQueue.delete_all
+    refute RdfGenerationQueue.where(item_type: 'Assay', item_id: assay).exists?
+    assert_difference('RdfGenerationQueue.count', 1) do
+      RdfGenerationQueue.enqueue(assay)
     end
 
-    assert_no_difference('Delayed::Job.count') do
-      RdfGenerationJob.new(assay, false).queue_job
-    end
-
-    refute RdfGenerationJob.new(assay, true).exists?
-    assert_difference('Delayed::Job.count', 1) do
-      RdfGenerationJob.new(assay, true).queue_job
-    end
-
-    assert_no_difference('Delayed::Job.count') do
-      RdfGenerationJob.new(assay, true).queue_job
+    assert_no_difference('RdfGenerationQueue.count') do
+      RdfGenerationQueue.enqueue(assay)
     end
   end
 end

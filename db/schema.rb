@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_29_093059) do
+ActiveRecord::Schema.define(version: 2020_08_27_101623) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -232,6 +232,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "priority", default: 0
+    t.index ["item_id", "item_type"], name: "index_auth_lookup_update_queues_on_item_id_and_item_type"
   end
 
   create_table "avatars", id: :integer,  force: :cascade do |t|
@@ -1397,6 +1398,14 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.index ["contributor_id"], name: "index_publications_on_contributor"
   end
 
+  create_table "rdf_generation_queues",  force: :cascade do |t|
+    t.integer "item_id"
+    t.string "item_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["item_id", "item_type"], name: "index_rdf_generation_queues_on_item_id_and_item_type"
+  end
+
   create_table "recommended_model_environments", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.datetime "created_at"
@@ -1408,6 +1417,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "item_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["item_id", "item_type"], name: "index_reindexing_queues_on_item_id_and_item_type"
   end
 
   create_table "relationship_types", id: :integer,  force: :cascade do |t|

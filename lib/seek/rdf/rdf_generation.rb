@@ -105,7 +105,8 @@ module Seek
 
       def create_rdf_generation_job(force = false, refresh_dependents = true)
         unless !force && (saved_changes.keys - %w[updated_at last_used_at]).empty?
-          RdfGenerationJob.new(self, refresh_dependents).queue_job
+          RdfGenerationQueue.enqueue(self)
+          refresh_dependents_rdf if refresh_dependents
         end
       end
 
@@ -116,9 +117,7 @@ module Seek
       end
 
       def refresh_dependents_rdf
-        dependent_items.each do |item|
-          item.refresh_rdf if item.respond_to?(:refresh_rdf)
-        end
+        RdfGenerationQueue.enqueue(dependent_items)
       end
 
       def dependent_items

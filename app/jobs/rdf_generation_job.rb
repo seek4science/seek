@@ -1,11 +1,5 @@
 class RdfGenerationJob < SeekJob
-  attr_reader :item_type_name, :item_id, :refresh_dependents
-
-  def initialize(item, refresh_dependents = true)
-    @item_type_name = item.class.name
-    @item_id = item.id
-    @refresh_dependents = refresh_dependents
-  end
+  BATCHSIZE = 10
 
   # executes the job - if a triple store is configured it will also update the triple store, otherwise just saves the rdf
   # to a file.
@@ -16,28 +10,9 @@ class RdfGenerationJob < SeekJob
       job_item.delete_rdf_file
       job_item.save_rdf_file
     end
-    job_item.refresh_dependents_rdf if refresh_dependents
   end
 
   def gather_items
-    [item].compact.select(&:rdf_supported?)
-  end
-
-  def item
-    item_type_name.constantize.find_by_id(item_id)
-  end
-
-  def exists?
-    result = super
-
-    # if we don't want to refresh_dependents, but a job exists that does, then we can say it exists
-    unless result || refresh_dependents || item.nil?
-      result = RdfGenerationJob.new(item, true).exists?
-    end
-    result
-  end
-
-  def allow_duplicate_jobs?
-    false
+    RdfGenerationQueue.dequeue(BATCHSIZE)
   end
 end

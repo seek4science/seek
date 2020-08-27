@@ -38,7 +38,7 @@ class Policy < ApplicationRecord
   def queue_rdf_generation_job
     supported_assets = assets.select(&:rdf_supported?)
     unless (saved_changes.keys - ['updated_at']).empty? || supported_assets.empty?
-      supported_assets.each { |asset| RdfGenerationJob.new(asset).queue_job }
+      RdfGenerationQueue.enqueue(supported_assets)
     end
   end
 
