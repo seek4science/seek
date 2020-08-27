@@ -31,7 +31,7 @@ module Seek
 
         def react_to_project_removal(project)
           RemoveSubscriptionsForItemJob.new(self, [project]).queue_job if self.subscribable?
-          create_rdf_generation_job(true) if self.respond_to?(:create_rdf_generation_job)
+          queue_rdf_generation(true) if self.respond_to?(:queue_rdf_generation)
         end
 
         def self.project_join_table

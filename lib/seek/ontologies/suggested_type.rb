@@ -16,7 +16,7 @@ module Seek
 
         after_destroy :join_parents_and_children
         after_destroy :update_ontology_uri_for_children
-        after_save :create_rdf_generation_job
+        after_save :queue_rdf_generation
 
       end
 
@@ -174,7 +174,7 @@ module Seek
       end
 
       # creates a job to update rdf if the suggested ontology uri changes
-      def create_rdf_generation_job
+      def queue_rdf_generation
         return unless saved_changes.include?(:ontology_uri)
         RdfGenerationQueue.enqueue(assays)
       end

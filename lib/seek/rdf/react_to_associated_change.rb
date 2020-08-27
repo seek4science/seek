@@ -28,7 +28,7 @@ module Seek
 
             define_method method do
               i = send(item)
-              i.create_rdf_generation_job(true) if !i.nil? && i.respond_to?(:create_rdf_generation_job)
+              i.queue_rdf_generation(true) if !i.nil? && i.respond_to?(:queue_rdf_generation)
             end
           end
         end
