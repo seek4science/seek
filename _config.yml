@@ -3,7 +3,7 @@
 current_seek_version: "1.10.2"
 current_docker_tag: "1.10"
 
-plugins_dir:
+plugins:
   - jekyll-sitemap
   - jekyll-redirect-from
   - jekyll-feed
