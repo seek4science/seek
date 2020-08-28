@@ -1,0 +1,439 @@
+<style>
+
+  .hide_permission
+  {
+    display:none;
+  }
+
+  .root-node>i.jstree-ocl, .root-node>a.jstree-anchor
+  {
+    display:none;
+  }
+
+  #jstree {
+    width: 100%;
+    border-left:none;
+  }
+
+  #jstree a.no_checkbox>i.jstree-checkbox{
+    visibility: hidden;
+    /*display:none;*/
+  }
+
+  #jstree a.permission-node>i.jstree-checkbox{
+    /*visibility: hidden;*/
+    display:none;
+  }
+  #jstree a.permission-node {
+    margin-left: 35px;
+  }
+
+  #jstree_not_isa a.permission-node>i.jstree-checkbox, li.asset-type-node>a>i.jstree-checkbox, .asset-type-node>a>i.jstree-icon, .asset-node-row>i.jstree-ocl{
+    /*visibility: hidden;*/
+    display:none;
+  }
+  #jstree a.permission-node>i.jstree-icon, #jstree_not_isa a.permission-node>i.jstree-icon{
+    /*visibility: hidden;*/
+    display:none;
+  }
+
+  #jstree .asset-node-row>i.jstree-ocl {
+    visibility: hidden;
+  }
+
+  #hiddencheckboxs input {
+    display:none;
+  }
+
+  #jstree a.sharing_permission_changed, #jstree_not_isa a.sharing_permission_changed {
+    margin-bottom: 5px;
+    padding: 0 10px;
+    font-weight: bold;
+    background-color: #d4fcbc;
+    /*font-weight: normal;*/
+  }
+
+  #jstree a.sharing_permission_changed::before, #jstree_not_isa a.sharing_permission_changed::before{
+    content: "+";
+
+    margin: 0 20px 0 0;
+  }
+  .jstree-default .jstree-clicked {
+    background: #dee9f3;
+    border-radius: 2px;
+  }
+
+  #jstree_not_isa .jstree-themeicon {
+    background-size: 24px !important;
+  }
+</style>
+
+<%
+  #remove the public items which don't need change sharing permission
+  all_related_items_hash = get_related_resources(current_user.person).except!('Project', 'Institution','Publication')
+  items_not_in_isa = filter_items_not_in_ISA(all_related_items_hash)
+  flash.discard(:notice)
+  checked = false
+  title = "Bulk sharing items related to " + link_to(h(current_user.person.name),current_user.person)
+  @policy_params = params[:policy_attributes]
+
+  items_not_in_isa_hash = {
+      "id": "not_isa-tree",
+      "data": {
+          "loadable": false
+      },
+      "li_attr": {
+          class:"root-node"
+      },
+      "a_attr": {
+
+      },
+      "children": [
+      ],
+      "text": "Not in ISA",
+      "state": {
+          "opened": true
+      }
+  }
+
+  all_investigations_hash = {
+      "id": "isa-tree",
+      "data": {
+          "loadable": false
+      },
+      "li_attr": {
+          class:"root-node"
+      },
+      "a_attr": {
+
+      },
+      "children": [
+      ],
+      "text": "ISA",
+      "state": {
+          "opened": true
+      }
+  }
+
+%>
+<div class="show_basic">
+  <%= show_title "Change permissions of items related to #{link_to(h(current_user.person.name),current_user.person.name)} in batch".html_safe -%>
+</div>
+
+<div class="alert alert-info">
+  <ul>
+    <li>Items are grouped to those in and those not in ISA (Investigation-Study-Assay) structure.</li>
+    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore. </li>
+    <li>on ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.</li>
+  </ul>
+</div>
+
+<%= form_tag({:action => :batch_change_permssion_for_selected_items}, :method => :post) do -%>
+
+  <%= folding_panel("Items not in ISA", false, :id => 'not_isa_item', :body_options => {:id => 'items_fold_content'},
+                    :help_text => nil) do %>
+
+    <label><%= link_to "Select All", "#", id: "select_all_not_isa" -%></label> |
+    <label><%= link_to "Deselect All", "#", id: "deselect_all_not_isa" -%></label> |
+    <label><%= link_to "Expand All", "#", id: "expand_all_not_isa" -%></label> |
+    <label><%= link_to "Collapse All", "#", id: "collapse_all_not_isa" -%></label>
+
+    <% items_not_in_isa.each do |resource_type, resource_items| %>
+      <% asset_node= asset_node_json(resource_type, resource_items) %>
+      <% items_not_in_isa_hash [:children].append(asset_node) %>
+    <% end %>
+    <div id="jstree_not_isa"></div>
+  <% end %>
+
+
+  <% all_related_items_hash.each do |resource_type, resource_items| %>
+
+    <% if resource_type == "Investigation" %>
+      <%  resource_items[:items].each do |item| %>
+        <%
+          options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true }
+          hash = Seek::IsaGraphGenerator.new(item).generate(options)
+          tree = JSON.parse(tree_json(hash, item))
+          tree = add_permissions_to_tree_json (tree)
+          # pp "==========================="
+          # pp tree
+          # pp "==========================="
+          investigation_tree =  eval(tree.join)
+          all_investigations_hash[:children].append (investigation_tree)
+        %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%= folding_panel("Items in ISA: ", false, :id => 'isa_item', :body_options => {:id => 'items_fold_content'},
+                    :help_text => nil) do %>
+
+
+    <label><%= link_to "Select All", "#", id: "select_all_isa" -%></label> |
+    <label><%= link_to "Deselect All", "#", id: "deselect_all_isa" -%></label> |
+    <label><%= link_to "Expand All", "#", id: "expand_all_isa" -%></label> |
+    <label><%= link_to "Collapse All", "#", id: "collapse_all_isa" -%></label>
+
+    <div id="jstree"></div>
+  <% end -%>
+
+  <% resource = (controller_name == 'people') ? current_user.person : @asset %>
+
+  <%= submit_tag "Next", data: {disable_with: 'Next'}, :class => 'btn btn-primary' -%>
+  or
+  <%= cancel_button(resource) %>
+
+  <div id="hiddencheckboxs">
+  </div>
+
+
+<% end -%>
+<script type="text/javascript">
+
+    function addCheckboxToAssetNode(asset,asset_id,is_isa){
+        var container = $j('#hiddencheckboxs');
+        var inputs = container.find('input');
+        var id = inputs.length+1;
+        $j('<input />', { type: 'checkbox', name: is_isa+'['+asset+']['+asset_id+']', id: is_isa+'_'+asset+'_'+asset_id, value: 1,class: asset+'_'+asset_id+' '+is_isa, checked: false}).appendTo(container);
+    }
+
+    function addLinkToAssetNode(asset,asset_id,node){
+
+        var asset_link = '/'+asset.split(/(?=[A-Z])/).join('_').toLowerCase()+'s/'+asset_id
+        var asset_link_html = '<%= icon_link_to("", "new_window", 'ASSET_LINK', options = {target:'blank',class:'asset-icon'})%>'
+        var asset_link_html = asset_link_html.replace("ASSET_LINK",asset_link);
+        $j("#"+node.a_attr.id).after(asset_link_html)
+
+    }
+
+
+
+
+
+    $j(document).ready(function () {
+
+        $j('#select_all_not_isa').click(function (event) {
+             event.preventDefault();
+            $j('input[name^="share_not_isa"]').prop("checked", true);
+            $j("#jstree_not_isa").jstree().check_all(true);
+        });
+
+        $j('#deselect_all_not_isa').click(function (event) {
+            event.preventDefault();
+            $j('input[name^="share_not_isa"]').prop("checked", false);
+            $j("#jstree_not_isa").jstree().uncheck_all(true);
+        });
+        $j('#expand_all_not_isa').click(function (event) {
+            event.preventDefault();
+
+            console.log("==============expand_all_not_isa===============")
+
+            $j("#jstree_not_isa").jstree("open_all");
+            $j("#jstree_not_isa").find('[id^="Permission-"]').removeClass('hide_permission')
+
+        });
+        $j('#collapse_all_not_isa').click(function (event) {
+            event.preventDefault();
+
+            console.log("==============collapse_all_not_isa===============")
+            $j("#jstree_not_isa").find('[id^="Permission-"]').addClass('hide_permission')
+
+        });
+
+        $j('#select_all_isa').click(function (event) {
+            $j('input[name^="share_isa"]').prop("checked", true);
+            $j("#jstree").jstree().check_all(true);
+            event.preventDefault();
+
+        });
+
+        $j('#deselect_all_isa').click(function (event) {
+            $j('input[name^="share_isa"]').prop("checked", false);
+            $j("#jstree").jstree().uncheck_all(true);
+            event.preventDefault();
+
+        });
+        $j('#expand_all_isa').click(function (event) {
+            console.log("==============expand_all_isa===============")
+            event.preventDefault();
+            $j("#jstree").jstree("open_all");
+            $j('#jstree').find(('[id^="Permission-"]')).removeClass('hide_permission')
+
+        });
+        $j('#collapse_all_isa').click(function (event) {
+            console.log("==============collapse_all_isa===============")
+            event.preventDefault();
+            $j('#jstree').find(('[id^="Permission-"]')).addClass('hide_permission')
+
+        });
+    });
+
+    $j(document).ready(function () {
+
+        $j('#jstree_not_isa').on('loaded.jstree', function (event, data) {
+// expand all nodes
+            $j("#jstree_not_isa").jstree("open_all");
+
+            if (<%= @batch_sharing_permission_changed %>){
+                $j('#jstree_not_isa').find(('[id^="Permission-"]')).removeClass('hide_permission')
+            }
+
+
+            var $tree = $j(this);
+            $j($tree.jstree().get_json($tree, {
+                flat: true
+            }))
+                .each(function(index, value) {
+
+                    var node = $j("#jstree").jstree().get_node(this.id);
+                    var asset = this.id.split('-')[0]
+                    var asset_id = this.id.split('-')[1]
+
+
+                    if (this.a_attr.class== "asset-node"){
+                        addLinkToAssetNode(asset,asset_id,this)
+                    }
+
+                    if ((index!= 0) && (asset!= "Permission") && (asset_id)!= "not_isa"){
+                        addCheckboxToAssetNode(asset,asset_id,'share_not_isa');
+                    }
+
+                });
+        })
+            .jstree({
+                'core': {
+                    'multiple' : true,
+                    "check_callback": true,
+                    "themes": {
+                        "variant": "large",
+                        "dots": false
+                    },
+
+                    'data':  <%= items_not_in_isa_hash.to_json.html_safe -%>
+
+                },
+                "checkbox" : {
+                    "three_state" : false, // to avoid that fact that checking a node also check others
+                    "whole_node" : false,  // to avoid checking the box just clicking the node
+                    "tie_selection" : false // for checking without selecting and selecting without checking
+                },
+                "plugins" : [ "checkbox" ,"changed","json_data"]
+            }).on("check_node.jstree uncheck_node.jstree", function(e, data) {
+
+            // console.log("checked_node:"+ data.node.id)
+            var asset = data.node.id.split('-')
+
+            var asset_id = 'share_not_isa_'+asset[0]+'_'+asset[1]
+            // console.log( $j('input[id="'+asset_id+'"]').prop('checked'))
+            if  ($j('input[id="'+asset_id+'"]').prop('checked') ){
+                $j('input[id="'+asset_id+'"]').prop("checked", false);
+            } else {
+                $j('input[id="'+asset_id+'"]').prop("checked", true);
+            }
+
+
+        }).on("select_node.jstree", function (e, data) {
+
+            console.log("==============select_node plugin===============")
+            console.log("data:"+ data.node.id)
+
+            var asset = data.node.id.split('-')
+            var Permission_id = 'Permission-'+asset[0]+'-'+asset[1]
+            var selector = $j('[id^='+Permission_id+']')
+            if (selector.hasClass ("hide_permission")){
+                selector.removeClass('hide_permission')
+            }else{
+                selector.addClass('hide_permission')
+            }
+
+        });
+
+    });
+
+    $j(document).ready(function () {
+
+        $j('#jstree').on('loaded.jstree', function (event, data) {
+            // expand all nodes
+            $j("#jstree").jstree("open_all");
+
+            if (<%= @batch_sharing_permission_changed %>){
+                $j('#jstree').find(('[id^="Permission-"]')).removeClass('hide_permission')
+            }
+
+            var $tree = $j(this);
+            $j($tree.jstree().get_json($tree, {
+                flat: true
+            }))
+                .each(function(index, value) {
+                    var node = $j("#jstree").jstree().get_node(this.id);
+                    var asset = this.id.split('-')[0]
+                    var asset_id = this.id.split('-')[1]
+
+                    if (this.a_attr.class== "asset-node"){
+                        addLinkToAssetNode(asset,asset_id,this)
+                    }
+
+                    if ((index!= 0) && (asset!= "Permission")) {
+                        addCheckboxToAssetNode(asset,asset_id,'share_isa');
+                    }
+
+
+                });
+
+        })
+            .jstree({
+                'core': {
+                    'multiple' : true,
+                    "check_callback": true,
+                    "themes": {
+                        "variant": "large",
+                        "dots": false
+                    },
+
+                    'data':  <%= all_investigations_hash.to_json.html_safe -%>
+
+                },
+                "checkbox" : {
+                    "three_state" : false, // to avoid that fact that checking a node also check others
+                    "whole_node" : false,  // to avoid checking the box just clicking the node
+                    "tie_selection" : false // for checking without selecting and selecting without checking
+                },
+                "plugins" : [ "checkbox" ,"changed","json_data"]
+            }).on("check_node.jstree uncheck_node.jstree", function(e, data) {
+
+            console.log("checked_node:"+ data.node.id)
+            var asset = data.node.id.split('-')
+
+            var asset_id = 'share_isa_'+asset[0]+'_'+asset[1]
+            console.log( $j('input[id="'+asset_id+'"]').prop('checked'))
+            if  ($j('input[id="'+asset_id+'"]').prop('checked') ){
+                $j('input[id="'+asset_id+'"]').prop("checked", false);
+            } else {
+                $j('input[id="'+asset_id+'"]').prop("checked", true);
+            }
+
+
+        }).on("select_node.jstree", function (e, data) {
+
+            console.log("data:"+ data.node.id)
+
+            var asset = data.node.id.split('-')
+            var Permission_id = 'Permission-'+asset[0]+'-'+asset[1]
+            var selector = $j('[id^='+Permission_id+']')
+            if (selector.hasClass ("hide_permission")){
+                selector.removeClass('hide_permission')
+            }else{
+                selector.addClass('hide_permission')
+            }
+
+            if(asset[0]=="Permission"){
+                console.log("==============select_Permission_node===============")
+                console.log(data.node.a_attr.text)
+
+            }
+        });
+
+    });
+</script>
+
+
