@@ -11,6 +11,19 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.10.2
+
+Release date: _28th August 2020_
+
+This version includes a few bugfixes:
+
+  * A fix to a validation error when linking to a older publication with no publication type defined. 
+  * A fix to adding via a URL, where the server doesn't respond to HEAD requests correctly.
+  * Better handling of when the attr_encrypted key is missing or wrong, which previously prevented the server starting up.
+  * A fix to activity reporting, where a snapshot pointed to a deleted resource.
+
+[Closed issues for 1.10.2](https://github.com/seek4science/seek/milestone/3?closed=1)  
+
 ## Version 1.10.1
 
 Release date: _24th June 2020_
@@ -27,7 +40,7 @@ In particular:
   * Request resource has now been entirely replaced by the improved ability to request contact
   * A fix to a bug that prevented Assays and Assets being unlinked, if there was only 1 Assay
 
-[Closed issues for 1.10.1](https://github.com/seek4science/seek/issues?q=is%3Aissue+is%3Aclosed++milestone%3Av1.10.1+)
+[Closed issues for 1.10.1](https://github.com/seek4science/seek/milestone/1?closed=1)
 
 ## Version 1.10.0
 
