@@ -18,7 +18,7 @@ Release date: _28th August 2020_
 This version includes a few bugfixes:
 
   * A fix to a validation error when linking to a older publication with no publication type defined. 
-  * A fix to adding via a URL, where the server doesn't respond to HEAD requests correctly.
+  * A fix to adding via a URL, where the remote server doesn't respond to HEAD requests.
   * Better handling of when the attr_encrypted key is missing or wrong, which previously prevented the server starting up.
   * A fix to activity reporting, where a snapshot pointed to a deleted resource.
 
