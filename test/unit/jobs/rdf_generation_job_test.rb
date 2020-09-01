@@ -13,16 +13,22 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     item = nil
 
     assert_difference('Delayed::Job.count', 2) do
-      item = Factory :project
+      assert_difference('RdfGenerationQueue.count', 1) do
+        item = Factory :project
+        assert RdfGenerationQueue.last.refresh_dependents
+      end
     end
     handlers = Delayed::Job.all.collect(&:handler).join(',')
     assert_includes(handlers, 'RdfGenerationJob')
 
     Delayed::Job.delete_all # necessary, otherwise the next assert will fail since it won't create a new job if it already exists as pending
+    RdfGenerationQueue.delete_all
 
     assert_difference('Delayed::Job.count', 2) do
-      item.title = 'sdfhsdfkhsdfklsdf2'
-      disable_authorization_checks { item.save! }
+      assert_difference('RdfGenerationQueue.count', 1) do
+        item.title = 'sdfhsdfkhsdfklsdf2'
+        disable_authorization_checks { item.save! }
+      end
     end
     handlers = Delayed::Job.all.collect(&:handler).join(',')
     assert_includes(handlers, 'RdfGenerationJob')
@@ -32,13 +38,16 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     disable_authorization_checks { item.save! }
     item.last_used_at = Time.now
     assert_no_difference('Delayed::Job.count') do
-      disable_authorization_checks { item.save! }
+      assert_no_difference('RdfGenerationQueue.count') do
+        disable_authorization_checks { item.save! }
+      end
     end
   end
 
   test 'rdf generation job created after policy change' do
     item = Factory(:sop, policy: Factory(:public_policy))
     Delayed::Job.delete_all
+    RdfGenerationQueue.delete_all
 
     handlers = Delayed::Job.all.collect(&:handler).join(',')
     refute_includes(handlers, 'RdfGenerationJob')
@@ -46,7 +55,10 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     item.policy.access_type = Policy::NO_ACCESS
     disable_authorization_checks do
       assert_difference('Delayed::Job.count', 1) do
-        item.policy.save!
+        assert_difference('RdfGenerationQueue.count', 1) do
+          item.policy.save!
+          refute RdfGenerationQueue.last.refresh_dependents
+        end
       end
     end
 
@@ -57,6 +69,7 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
   test 'rdf generation job not created after policy change for non rdf supported entity' do
     item = Factory(:event, policy: Factory(:public_policy))
     Delayed::Job.delete_all
+    RdfGenerationQueue.delete_all
 
     handlers = Delayed::Job.all.collect(&:handler).join(',')
     refute_includes(handlers, 'RdfGenerationJob')
@@ -64,7 +77,9 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     item.policy.access_type = Policy::NO_ACCESS
     disable_authorization_checks do
       assert_no_difference('Delayed::Job.count') do
-        item.policy.save!
+        assert_no_difference('RdfGenerationQueue.count') do
+          item.policy.save!
+        end
       end
     end
 
@@ -87,13 +102,11 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
   test 'skip items that dont support rdf' do
     item = Factory(:event)
     refute item.rdf_supported?
-
-    assert_empty RdfGenerationJob.new.gather_items
+    refute RdfGenerationQueue.where(item_id: item.id, item_type: 'Event').exists?
 
     item = Factory(:sop)
     assert item.rdf_supported?
-
-    assert_equal [item], RdfGenerationJob.new.gather_items
+    assert RdfGenerationQueue.where(item_id: item.id, item_type: 'Sop').exists?
   end
 
   test 'perform' do
@@ -103,9 +116,11 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     expected_rdf_file = File.join(Rails.root, 'tmp/testing-filestore/rdf/public', "Assay-test-#{item.id}.rdf")
     assert_equal expected_rdf_file, item.rdf_storage_path
     FileUtils.rm expected_rdf_file if File.exist?(expected_rdf_file)
-    RdfGenerationQueue.enqueue(item)
+    RdfGenerationQueue.enqueue(item, queue_job: false)
     job = RdfGenerationJob.new
-    job.perform
+    assert_difference('RdfGenerationQueue.count', -1) do
+      job.perform
+    end
 
     assert File.exist?(expected_rdf_file)
     rdf = ''
@@ -128,5 +143,29 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     assert_no_difference('RdfGenerationQueue.count') do
       RdfGenerationQueue.enqueue(assay)
     end
+  end
+
+  test 'should not set `refresh_dependents` to false for existing queue item' do
+    assay = Factory(:assay)
+    RdfGenerationQueue.delete_all
+    RdfGenerationQueue.enqueue(assay, refresh_dependents: true)
+    assert RdfGenerationQueue.where(item_type: 'Assay', item_id: assay, refresh_dependents: true).exists?
+
+    assert_no_difference('RdfGenerationQueue.count') do
+      RdfGenerationQueue.enqueue(assay, refresh_dependents: false)
+    end
+    assert RdfGenerationQueue.where(item_type: 'Assay', item_id: assay).first.refresh_dependents
+  end
+
+  test 'should set `refresh_dependents` to true for existing queue item' do
+    assay = Factory(:assay)
+    RdfGenerationQueue.delete_all
+    RdfGenerationQueue.enqueue(assay, refresh_dependents: false)
+    assert RdfGenerationQueue.where(item_type: 'Assay', item_id: assay, refresh_dependents: false).exists?
+
+    assert_no_difference('RdfGenerationQueue.count') do
+      RdfGenerationQueue.enqueue(assay, refresh_dependents: true)
+    end
+    assert RdfGenerationQueue.where(item_type: 'Assay', item_id: assay).first.refresh_dependents
   end
 end
