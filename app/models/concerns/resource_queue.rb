@@ -33,7 +33,7 @@ module ResourceQueue
       entries
     end
 
-    def dequeue(num)
+    def dequeue(num = 1)
       entries = prioritized.limit(num)
       items = entries.map(&:item)
       entries.destroy_all

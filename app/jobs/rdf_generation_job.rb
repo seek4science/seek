@@ -18,7 +18,7 @@ class RdfGenerationJob < SeekJob
   end
 
   def gather_items
-    entries = RdfGenerationQueue.prioritized.limit(num)
+    entries = RdfGenerationQueue.prioritized.limit(BATCHSIZE)
     entries.destroy_all
     entries
   end

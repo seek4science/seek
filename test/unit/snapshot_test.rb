@@ -280,6 +280,8 @@ class SnapshotTest < ActiveSupport::TestCase
   test 're-indexes parent model when DOI created' do
     snapshot = @assay.create_snapshot
 
+    ReindexingQueue.destroy_all
+
     assert_difference('ReindexingQueue.count', 1) do
       snapshot.doi = '10.5072/test'
       snapshot.save
