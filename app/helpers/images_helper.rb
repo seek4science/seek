@@ -7,10 +7,6 @@ module ImagesHelper
   def image_tag_for_key(key, url = nil, alt = nil, html_options = {}, label = key.humanize, remote = false, size = nil)
     label = 'Delete' if label == 'Destroy'
 
-    puts 'image_tag_for_key:'
-    # html_options.merge(return_to:request.env['HTTP_REFERER'])
-    puts(html_options)
-    
     return nil unless (filename = icon_filename_for_key(key.downcase))
 
     image_options = alt ? { alt: alt } : { alt: key.humanize }
@@ -21,18 +17,12 @@ module ImagesHelper
     inner = "#{img_tag} #{label}".html_safe unless label.blank?
 
     if url
-      puts ("CREATING LINK")
-      puts (inner)
-      puts(url)
-      puts(html_options)
-
       inner = if remote
                 link_to(inner, url, html_options.merge(remote: true))
               else
                 link_to(inner, url, html_options)
               end
     end
-    puts(html_options)
 
     inner.html_safe
   end
