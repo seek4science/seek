@@ -23,6 +23,7 @@ module ResourceQueue
         entry = where(item_id: item&.id, item_type: item ? item.class.name : nil).first_or_initialize
         # Only change priority if its a new entry, or lower than existing. (Lower priority is executed first...)
         entry.priority = priority if entry.new_record? || priority < entry.priority
+        yield entry if block_given?
         entry.save!
         entry
       end

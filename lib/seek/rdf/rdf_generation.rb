@@ -8,7 +8,7 @@ module Seek
       include CSVMappingsHandling
 
       def self.included(base)
-        base.after_commit :generate_rdf_after_commit, on: [:create, :update]
+        base.after_commit :queue_rdf_generation, on: [:create, :update]
         base.before_destroy :remove_rdf
       end
 
@@ -103,15 +103,9 @@ module Seek
         }
       end
 
-      def generate_rdf_after_commit
-        reload # Make sure associations are fresh
-        queue_rdf_generation
-      end
-
       def queue_rdf_generation(force = false, refresh_dependents = true)
         unless !force && (saved_changes.keys - %w[updated_at last_used_at]).empty?
-          RdfGenerationQueue.enqueue(self)
-          queue_dependents_rdf_generation if refresh_dependents
+          RdfGenerationQueue.enqueue(self, refresh_dependents: refresh_dependents)
         end
       end
 
