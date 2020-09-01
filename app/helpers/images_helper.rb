@@ -7,6 +7,10 @@ module ImagesHelper
   def image_tag_for_key(key, url = nil, alt = nil, html_options = {}, label = key.humanize, remote = false, size = nil)
     label = 'Delete' if label == 'Destroy'
 
+    puts 'image_tag_for_key:'
+    # html_options.merge(return_to:request.env['HTTP_REFERER'])
+    puts(html_options)
+    
     return nil unless (filename = icon_filename_for_key(key.downcase))
 
     image_options = alt ? { alt: alt } : { alt: key.humanize }
@@ -17,12 +21,18 @@ module ImagesHelper
     inner = "#{img_tag} #{label}".html_safe unless label.blank?
 
     if url
+      puts ("CREATING LINK")
+      puts (inner)
+      puts(url)
+      puts(html_options)
+
       inner = if remote
                 link_to(inner, url, html_options.merge(remote: true))
               else
                 link_to(inner, url, html_options)
               end
     end
+    puts(html_options)
 
     inner.html_safe
   end
@@ -86,7 +96,14 @@ module ImagesHelper
   def delete_icon(model_item, user)
     item_name = text_for_resource model_item
     if model_item.can_delete?(user)
-      html = content_tag(:li) { image_tag_for_key('destroy', url_for(model_item), "Delete #{item_name}", { data: { confirm: 'Are you sure?' }, method: :delete }, "Delete #{item_name}") }
+      fullURL = url_for(model_item)
+
+      # Check referer's host before setting a return point
+      if (request.referer && URI(request.referer).host==request.host)
+        fullURL = polymorphic_url(model_item,:return_to=>URI(request.referer).path)
+      end
+
+      html = content_tag(:li) { image_tag_for_key('destroy', fullURL, "Delete #{item_name}", { data: { confirm: 'Are you sure?' }, method: :delete}, "Delete #{item_name}") }
       return html.html_safe
     elsif model_item.can_manage?(user)
       explanation = unable_to_delete_text model_item
