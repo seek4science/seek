@@ -5,6 +5,8 @@ class RdfGenerationJob < SeekJob
   # to a file.
   def perform_job(entry)
     job_item = entry.item
+    return unless job_item
+
     if job_item.rdf_repository_configured?
       job_item.update_repository_rdf
     else
