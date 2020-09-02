@@ -133,12 +133,31 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url 404' do
     # 404
     stub_request(:head, 'http://missing.com').to_return(status: 404, headers: { 'Content-Type' => 'text/html' })
+    stub_request(:get, 'http://missing.com').to_return(status: 404, headers: { 'Content-Type' => 'text/html' })
     get :examine_url, xhr: true, params: { data_url: 'http://missing.com' }
     assert_response 400
     assert_equal 404, assigns(:info)[:code]
     assert @response.body.include?('Nothing can be found at that URL')
     assert_equal 'error', assigns(:type)
     assert assigns(:error_msg)
+  end
+
+  test 'examine url head 404 get 200' do
+    begin
+      WebMock.allow_net_connect!
+      VCR.turned_off do
+        get :examine_url, xhr: true, params: { data_url: 'https://onedrive.live.com/' }
+        assert_response :success
+        assert @response.body.include?('This is a webpage')
+        assert @response.body.include?('disallow_copy_option();')
+        refute assigns(:error)
+        refute assigns(:error_msg)
+        refute assigns(:unauthorized)
+        assert assigns(:is_webpage)
+      end
+    ensure
+      WebMock.disable_net_connect!(allow_localhost: true)
+    end
   end
 
   test 'examine url host not found' do

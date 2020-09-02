@@ -780,6 +780,19 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal blob, workflow.versions.last.content_blob
   end
 
+  test 'should be able to handle remote files in existing RO crate' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file with spaces in name.txt", 'https://raw.githubusercontent.com/bob/workflow/master/workflow.txt'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'https://raw.githubusercontent.com/bob/workflow/master/diagram.png'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
+
+    galaxy = Factory(:galaxy_workflow_class)
+    blob = Factory(:fully_remote_ro_crate)
+    session[:uploaded_content_blob_id] = blob.id.to_s
+    post :metadata_extraction_ajax, params: { content_blob_id: blob.id.to_s, format: 'js', workflow_class_id: galaxy.id }
+    assert_response :success
+    assert_equal 12, session[:metadata][:internals][:inputs].length
+  end
+
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)
