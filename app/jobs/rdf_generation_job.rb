@@ -23,4 +23,8 @@ class RdfGenerationJob < SeekJob
     entries = RdfGenerationQueue.prioritized.limit(BATCHSIZE)
     entries.destroy_all
   end
+
+  def follow_on_job?
+    RdfGenerationQueue.any? && !exists?
+  end
 end
