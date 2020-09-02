@@ -372,3 +372,9 @@ Factory.define(:just_cwl_ro_crate, parent: :content_blob) do |f|
   f.content_type 'application/zip'
   f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/just-cwl-workflow.crate.zip", 'rb').read }
 end
+
+Factory.define(:fully_remote_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'all_remote.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/all_remote.crate.zip", 'rb').read }
+end

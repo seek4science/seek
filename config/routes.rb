@@ -47,7 +47,7 @@ SEEK::Application.routes.draw do
 
   concern :has_versions do
     member do
-      post :new_version
+      post :create_version
       post :edit_version_comment
       delete :destroy_version
     end
@@ -468,6 +468,8 @@ SEEK::Application.routes.draw do
     member do
       get :diagram
       get :ro_crate
+      get :new_version
+      post :create_version_metadata
     end
     resources :people, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, only: [:index]
   end

@@ -25,7 +25,7 @@ module ROCrate
     end
 
     def default_properties
-      super.merge('@type' => ['File', 'SoftwareSourceCode', 'Workflow'])
+      super.merge('@type' => ['File', 'SoftwareSourceCode', 'ComputationalWorkflow'])
     end
   end
 end
