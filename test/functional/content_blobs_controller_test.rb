@@ -74,7 +74,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :examine_url, xhr: true, params: { data_url: 'http://mockedlocation.com/a-piccy.png' }
     assert_response :success
     assert_equal 200, assigns(:info)[:code]
-    assert !@response.body.include?('This is a webpage')
+    assert !@response.body.include?('Webpage Link')
     assert_equal 'file', assigns(:type)
   end
 
@@ -143,21 +143,15 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'examine url head 404 get 200' do
-    begin
-      WebMock.allow_net_connect!
-      VCR.turned_off do
-        get :examine_url, xhr: true, params: { data_url: 'https://onedrive.live.com/' }
-        assert_response :success
-        assert @response.body.include?('This is a webpage')
-        assert @response.body.include?('disallow_copy_option();')
-        refute assigns(:error)
-        refute assigns(:error_msg)
-        refute assigns(:unauthorized)
-        assert assigns(:is_webpage)
-      end
-    ensure
-      WebMock.disable_net_connect!(allow_localhost: true)
-    end
+    stub_request(:head, 'https://onedrive.live.com/').to_return(status: 404, headers: { 'Content-Type' => 'text/html' })
+    stub_request(:get, 'https://onedrive.live.com/').to_return(status: 200, headers: { 'Content-Type' => 'text/html' })
+    get :examine_url, xhr: true, params: { data_url: 'https://onedrive.live.com/' }
+    assert_response :success
+    assert_equal 200, assigns(:info)[:code]
+    assert @response.body.include?('Webpage Link')
+    assert_equal 'webpage', assigns(:type)
+    refute assigns(:error_msg)
+    refute assigns(:warning_msg)
   end
 
   test 'examine url host not found' do
