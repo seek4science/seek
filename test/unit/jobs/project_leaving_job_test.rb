@@ -12,7 +12,7 @@ class PersonLeavingJobTest < ActiveSupport::TestCase
 
     with_config_value(:auth_lookup_enabled, true) do
       assert_difference('AuthLookupUpdateQueue.count', 2) do # person + housekeeper
-        ProjectLeavingJob.new(person, project).perform
+        ProjectLeavingJob.new(person, project).perform_now
       end
 
       assert_equal [person, asset_housekeeper].sort, AuthLookupUpdateQueue.last(2).map(&:item).sort

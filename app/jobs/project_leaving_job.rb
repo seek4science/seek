@@ -1,7 +1,5 @@
 class ProjectLeavingJob < SeekJob
-  def perform(person, project = nil)
-    if project
-      AuthLookupUpdateQueue.enqueue(([person] + project.asset_housekeepers).compact.uniq)
-    end
+  def perform(person, project)
+    AuthLookupUpdateQueue.enqueue(([person] + project.asset_housekeepers).compact.uniq) if project
   end
 end

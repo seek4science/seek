@@ -50,8 +50,4 @@ class AuthLookupUpdateJob < SeekJob
   def follow_on_job?
     AuthLookupUpdateQueue.any?
   end
-
-  def follow_on_priority
-    0
-  end
 end

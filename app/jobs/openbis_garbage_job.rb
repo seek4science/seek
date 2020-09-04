@@ -1,14 +1,10 @@
 # job to periodically call GC and prints heap stats
-class OpenbisGarbageJob < SeekJob
+class OpenbisGarbageJob < ApplicationJob
   queue_with_priority 3
   # debug is with puts so it can be easily seen on tests screens
   DEBUG = true
 
-  def initialize(name, delay = 10)
-    super(name, delay)
-  end
-
-  def perform_job(_item)
+  def perform
     Rails.logger.info "Before GC job ObjectSpace\n#{ObjectSpace.count_objects}"
     Rails.logger.info "Before GC stats\n#{GC.stat}"
 
@@ -18,19 +14,11 @@ class OpenbisGarbageJob < SeekJob
     Rails.logger.info "After GC stats\n#{GC.stat}"
   end
 
-  def gather_items
-    [arguments[0]]
-  end
-
-  def follow_on_delay
-    arguments[1].minutes
-  end
-
-  def follow_on_job?
-    true
+  after_perform do |job|
+    job.class.set(wait: 10.minutes).perform_later
   end
 
   def self.create_initial_jobs
-    OpenbisGarbageJob.new('GC1').queue_job
+    OpenbisGarbageJob.new.queue_job
   end
 end

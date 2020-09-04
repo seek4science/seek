@@ -43,7 +43,7 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
     assert_equal 1, endpoint.refreshed
   end
 
-  test 'create_initial_jobs creates jobs for each endpoint' do
+  test 'queue_jobs creates jobs for each endpoint' do
     endpoint1 = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: 'frog',
                                     web_endpoint: 'http://my-openbis.org/doesnotmatter',
                                     as_endpoint: 'http://my-openbis.org/doesnotmatter',
@@ -67,7 +67,7 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
 
     Delayed::Job.destroy_all
     assert_difference('Delayed::Job.count', diff) do
-      OpenbisEndpointCacheRefreshJob.create_initial_jobs
+      OpenbisEndpointCacheRefreshJob.queue_jobs
     end
     assert OpenbisEndpointCacheRefreshJob.new(endpoint1).exists?
     assert OpenbisEndpointCacheRefreshJob.new(endpoint2).exists?
@@ -75,7 +75,7 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
     Seek::Config.openbis_enabled = false
     Delayed::Job.destroy_all
     assert_no_difference('Delayed::Job.count') do
-      OpenbisEndpointCacheRefreshJob.create_initial_jobs
+      OpenbisEndpointCacheRefreshJob.queue_jobs
     end
   end
 

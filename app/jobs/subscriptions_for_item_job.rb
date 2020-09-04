@@ -9,8 +9,4 @@ class SubscriptionsForItemJob < SeekJob
     Seek::Config.smtp_propagate
     Seek::Config.site_base_host_propagate
   end
-
-  def perform(subscribable, projects)
-    # do something
-  end
 end
