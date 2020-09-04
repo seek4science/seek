@@ -1,9 +1,4 @@
 module DefaultJobProperties
-  # whether create_job will create a new job if one already exists with the same properties
-  def allow_duplicate_jobs?
-    true
-  end
-
   # time limit for the whole job to run, after which a timeout exception will be raised
   def timelimit
     15.minutes
@@ -33,10 +28,5 @@ module DefaultJobProperties
   # the delay for the follow on job, which defaults to the default delay but could be different
   def follow_on_delay
     1.second
-  end
-
-  # the name of the queue the job will be places on - so that multiple workers can watch different queues.
-  def queue_name
-    QueueNames::DEFAULT
   end
 end

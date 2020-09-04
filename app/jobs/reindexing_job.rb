@@ -24,6 +24,6 @@ class ReindexingJob < SeekJob
   end
 
   def follow_on_job?
-    ReindexingQueue.any? && !exists?
+    ReindexingQueue.any?
   end
 end

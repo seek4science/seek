@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_01_133959) do
+ActiveRecord::Schema.define(version: 2020_09_04_102556) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1103,6 +1103,8 @@ ActiveRecord::Schema.define(version: 2020_09_01_133959) do
     t.string "encrypted_password"
     t.string "encrypted_password_iv"
     t.text "meta_config_json"
+    t.datetime "last_sync"
+    t.datetime "last_cache_refresh"
   end
 
   create_table "organisms", id: :integer,  force: :cascade do |t|

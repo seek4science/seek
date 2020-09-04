@@ -1,59 +1,16 @@
-class SendPeriodicEmailsJob < SeekEmailJob
-  include PeriodicRegularSeekJob
-
+class SendPeriodicEmailsJob < ApplicationJob
   DELAYS = { 'daily' => 1.day, 'weekly' => 1.week, 'monthly' => 1.month }.freeze
 
-  Subscription::FREQUENCIES.drop(1).each do |frequency|
-    singleton_class.instance_eval do
-      define_method "#{frequency}_exists?" do
-        SendPeriodicEmailsJob.new(frequency).exists?
+  def perform
+    return unless Seek::Config.email_enabled
+    logs = find_relevant_logs
+    subscribed_people(logs).each do |person|
+      begin
+        collect_and_deliver_to_person(logs, person)
+      rescue Exception => e
+        Delayed::Job.logger.error("Error sending subscription emails to person #{person.id} - #{e.message}")
       end
     end
-  end
-
-  attr_reader :frequency
-
-  def initialize(frequency)
-    @frequency = frequency.to_s.downcase
-    raise Exception, "invalid frequency - #{frequency}" unless DELAYS.keys.include?(@frequency)
-  end
-
-  def perform_job(logs)
-    send_subscription_mails logs
-  end
-
-  def gather_items
-    if Seek::Config.email_enabled
-      [find_relevant_logs]
-    else
-      []
-    end
-  end
-
-  def default_priority
-    3
-  end
-
-  def follow_on_delay
-    delay_for_frequency
-  end
-
-  def allow_duplicate_jobs?
-    false
-  end
-
-  def delay_for_frequency
-    DELAYS[frequency]
-  end
-
-  def send_subscription_mails(logs)
-      subscribed_people(logs).each do |person|
-        begin
-          collect_and_deliver_to_person(logs, person)
-        rescue Exception => e
-          Delayed::Job.logger.error("Error sending subscription emails to person #{person.id} - #{e.message}")
-        end
-      end
   end
 
   def collect_and_deliver_to_person(logs, person)
@@ -96,29 +53,5 @@ class SendPeriodicEmailsJob < SeekEmailJob
     activity_logs_since(delay_for_frequency.ago).to_a.select do |log|
       log.activity_loggable.try(:subscribable?)
     end
-  end
-
-  # puts the initial jobs on the queue for each period - daily, weekly, monthly - if they do not exist already
-  # starting at midday
-  def self.create_initial_jobs
-    time = time_for_initial_job
-    %w[daily weekly monthly].each do |freq|
-      SendPeriodicEmailsJob.new(freq).queue_job(default_priority, time)
-      time += 5.minutes
-    end
-  end
-
-  def self.time_for_initial_job
-    # start tomorrow if time now is later than midday
-    time = if Time.now.hour > 12
-             1.day.from_now
-           else
-             Time.now
-    end
-    Time.local(time.year, time.month, time.day, 12, 0o0, 0o0)
-  end
-
-  def self.default_priority
-    SendPeriodicEmailsJob.new('daily').send(:default_priority)
   end
 end

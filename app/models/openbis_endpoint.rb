@@ -128,16 +128,8 @@ class OpenbisEndpoint < ApplicationRecord
     OpenbisEndpointCacheRefreshJob.new(self).queue_job
   end
 
-  def remove_refresh_metadata_job
-    OpenbisEndpointCacheRefreshJob.new(self).delete_jobs
-  end
-
   def create_sync_metadata_job
     OpenbisSyncJob.new(self).queue_job
-  end
-
-  def remove_sync_metadata_job
-    OpenbisSyncJob.new(self).delete_jobs
   end
 
   def default_policy
@@ -217,6 +209,14 @@ class OpenbisEndpoint < ApplicationRecord
 
   def reset_fatal_assets
     external_assets.fatal.update_all(sync_state: ExternalAsset.sync_states[:refresh])
+  end
+
+  def due_sync?
+    last_sync.nil? || last_sync < refresh_period_mins.minutes.ago
+  end
+
+  def due_cache_refresh?
+    last_cache_refresh.nil? || last_cache_refresh < refresh_period_mins.minutes.ago
   end
 
   private

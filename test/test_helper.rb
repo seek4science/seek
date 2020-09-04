@@ -87,6 +87,8 @@ Kernel.class_eval do
 end
 
 class ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   setup :clear_rails_cache, :create_initial_person
   teardown :clear_current_user
 

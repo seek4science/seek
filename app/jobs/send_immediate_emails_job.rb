@@ -20,10 +20,6 @@ class SendImmediateEmailsJob < SeekEmailJob
     3
   end
 
-  def allow_duplicate_jobs?
-    false
-  end
-
   # Add a short delay so that SetSubscriptionsForItemJob has time to finish and the subscriptions are in place.
   def default_delay
     10.seconds

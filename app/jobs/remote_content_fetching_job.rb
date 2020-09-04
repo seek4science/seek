@@ -1,4 +1,6 @@
 class RemoteContentFetchingJob < SeekJob
+  queue_as QueueNames::REMOTE_CONTENT
+
   attr_reader :content_blob_id
 
   def initialize(content_blob)
@@ -11,9 +13,5 @@ class RemoteContentFetchingJob < SeekJob
 
   def gather_items
     [ContentBlob.find_by_id(content_blob_id)].compact
-  end
-
-  def queue_name
-    QueueNames::REMOTE_CONTENT
   end
 end

@@ -1,4 +1,6 @@
 class SampleDataExtractionJob < SeekJob
+  queue_as QueueNames::SAMPLES
+
   attr_reader :data_file_id, :sample_type_id, :persist, :overwrite
 
   def initialize(data_file, sample_type, persist = false, overwrite: false)
@@ -26,10 +28,6 @@ class SampleDataExtractionJob < SeekJob
       extractor.clear
       extractor.extract(overwrite)
     end
-  end
-
-  def queue_name
-    QueueNames::SAMPLES
   end
 
   def self.get_status(data_file)

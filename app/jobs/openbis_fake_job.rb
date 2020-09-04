@@ -24,10 +24,6 @@ class OpenbisFakeJob < SeekJob
     assets_and_assays
   end
 
-  def allow_duplicate_jobs?
-    false
-  end
-
   def default_priority
     3
   end
@@ -39,16 +35,6 @@ class OpenbisFakeJob < SeekJob
   def follow_on_job?
     # Rails.logger.info "After job\n#{ObjectSpace.count_objects}"
     true
-  end
-
-  # overidden to ignore_locked false by default
-  def exists?(ignore_locked = false)
-    super(ignore_locked)
-  end
-
-  # overidden to ignore_locked false by default
-  def count(ignore_locked = false)
-    super(ignore_locked)
   end
 
   def assets_and_assays

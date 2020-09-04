@@ -30,14 +30,6 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
     assert_equal 299.minutes, @job.follow_on_delay
   end
 
-  test 'delete jobs' do
-    @job.queue_job
-    assert_difference('Delayed::Job.count', -1) do
-      @job.delete_jobs
-    end
-    refute @job.exists?
-  end
-
   test 'defaults' do
     assert_equal 3, @job.default_priority
     refute @job.allow_duplicate_jobs?

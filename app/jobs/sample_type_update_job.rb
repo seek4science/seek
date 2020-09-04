@@ -1,6 +1,8 @@
 # Job responsible for reacting to an update to a sample type
 # refreshes the associated samples, and recreates the editing constraints cache
 class SampleTypeUpdateJob < SeekJob
+  queue_as QueueNames::SAMPLES
+
   attr_reader :sample_type_id
 
   # if refresh_samples is false, then the associated samples won't be refreshed, only the constraints cache rebuilt
@@ -19,17 +21,9 @@ class SampleTypeUpdateJob < SeekJob
     [sample_type].compact
   end
 
-  def allow_duplicate_jobs?
-    false
-  end
-
   # overrides the default priority, needs to be run soon
   def default_priority
     0
-  end
-
-  def queue_name
-    QueueNames::SAMPLES
   end
 
   private

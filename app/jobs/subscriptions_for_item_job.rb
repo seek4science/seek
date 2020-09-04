@@ -31,8 +31,4 @@ class SubscriptionsForItemJob < SeekJob
   def subscribable
     subscribable_type.constantize.find_by_id(subscribable_id)
   end
-
-  def allow_duplicate_jobs?
-    false
-  end
 end

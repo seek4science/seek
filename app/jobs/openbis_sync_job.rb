@@ -68,10 +68,6 @@ class OpenbisSyncJob < SeekJob
     need_sync.to_a
   end
 
-  def allow_duplicate_jobs?
-    false
-  end
-
   def default_priority
     3
   end
@@ -89,19 +85,8 @@ class OpenbisSyncJob < SeekJob
   end
 
   def follow_on_job?
-    Rails.logger.info "Follow? count #{count} #{count(true)}" if DEBUG
     return false unless Seek::Config.openbis_enabled && Seek::Config.openbis_autosync
-    (count(true) < 1) && endpoint # don't follow on if the endpoint no longer exists
-  end
-
-  # overidden to ignore_locked false by default
-  def exists?(ignore_locked = false)
-    super(ignore_locked)
-  end
-
-  # overidden to ignore_locked false by default
-  def count(ignore_locked = false)
-    super(ignore_locked)
+    !endpoint.nil? # don't follow on if the endpoint no longer exists
   end
 
   def need_sync
@@ -128,10 +113,11 @@ class OpenbisSyncJob < SeekJob
     t < 3 ? 3 : t
   end
 
-  def self.create_initial_jobs
+  def self.queue_jobs
     return unless Seek::Config.openbis_enabled && Seek::Config.openbis_autosync
-    OpenbisEndpoint.all.each(&:create_sync_metadata_job)
-    # OpenbisEndpoint.all.each { |point| OpenbisSyncJob.new(point).queue_job }
+    OpenbisEndpoint.find_each do |endpoint|
+      endpoint.create_sync_metadata_job if endpoint.due_sync?
+    end
   end
 
   def seek_util

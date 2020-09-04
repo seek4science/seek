@@ -1,5 +1,7 @@
 # Job responsible for generating Excel spreadsheet templates from samples
 class SampleTemplateGeneratorJob < SeekJob
+  queue_as QueueNames::SAMPLES
+
   attr_reader :sample_type_id
 
   def initialize(sample_type)
@@ -12,14 +14,6 @@ class SampleTemplateGeneratorJob < SeekJob
 
   def gather_items
     [sample_type].compact
-  end
-
-  def allow_duplicate_jobs?
-    false
-  end
-
-  def queue_name
-    QueueNames::SAMPLES
   end
 
   private

@@ -1,7 +1,5 @@
-class AuthLookupUpdateJob < SeekJob
-  def queue_name
-    QueueNames::AUTH_LOOKUP
-  end
+class AuthLookupUpdateJob < ApplicationJob
+  queue_as QueueNames::AUTH_LOOKUP
 
   def timelimit
     1.hour
@@ -47,7 +45,7 @@ class AuthLookupUpdateJob < SeekJob
   end
 
   def follow_on_job?
-    AuthLookupUpdateQueue.any? && !exists?
+    AuthLookupUpdateQueue.any?
   end
 
   def default_priority

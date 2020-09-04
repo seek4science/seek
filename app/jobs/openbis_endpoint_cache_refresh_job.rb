@@ -14,10 +14,6 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
     [endpoint].compact
   end
 
-  def allow_duplicate_jobs?
-    false
-  end
-
   def default_priority
     3
   end
@@ -34,19 +30,11 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
     Seek::Config.openbis_enabled && endpoint # don't follow on if the endpoint no longer exists
   end
 
-  # overidden to ignore_locked false by default
-  def exists?(ignore_locked = false)
-    super(ignore_locked)
-  end
-
-  # overidden to ignore_locked false by default
-  def count(ignore_locked = false)
-    super(ignore_locked)
-  end
-
-  def self.create_initial_jobs
+  def self.queue_jobs
     return unless Seek::Config.openbis_enabled
-    OpenbisEndpoint.all.each(&:create_refresh_metadata_job)
+    OpenbisEndpoint.find_each do |endpoint|
+      endpoint.create_refresh_metadata_job if endpoint.due_cache_refresh?
+    end
   end
 
   private

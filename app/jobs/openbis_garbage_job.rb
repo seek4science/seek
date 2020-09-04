@@ -22,10 +22,6 @@ class OpenbisGarbageJob < SeekJob
     [@name]
   end
 
-  def allow_duplicate_jobs?
-    false
-  end
-
   def default_priority
     3
   end

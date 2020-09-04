@@ -19,8 +19,4 @@ class ProjectChangedEmailJob < SeekEmailJob
   def default_delay
     15.minutes
   end
-
-  def allow_duplicate_jobs?
-    false
-  end
 end

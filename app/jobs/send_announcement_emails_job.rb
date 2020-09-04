@@ -39,8 +39,4 @@ class SendAnnouncementEmailsJob < SeekEmailJob
   def default_priority
     3
   end
-
-  def allow_duplicate_jobs?
-    false
-  end
 end

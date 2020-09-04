@@ -25,6 +25,6 @@ class RdfGenerationJob < SeekJob
   end
 
   def follow_on_job?
-    RdfGenerationQueue.any? && !exists?
+    RdfGenerationQueue.any?
   end
 end

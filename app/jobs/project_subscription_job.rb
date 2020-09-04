@@ -25,10 +25,6 @@ class ProjectSubscriptionJob < SeekJob
     15.seconds
   end
 
-  def allow_duplicate_jobs?
-    false
-  end
-
   # all direct assets in the project, but related_#{asset_type} includes also assets from descendants
   def all_in_project(project)
     # assay and study dont have project association table

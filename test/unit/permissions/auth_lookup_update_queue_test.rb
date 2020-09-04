@@ -264,7 +264,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
 
     AuthLookupUpdateQueue.destroy_all
 
-    assert_difference('Delayed::Job.count', 1) do
+    assert_enqueued_with(job: AuthLookupUpdateJob) do
       assert_difference('AuthLookupUpdateQueue.count', 1) do
         AuthLookupUpdateQueue.enqueue(df, priority: 2)
       end
@@ -280,14 +280,14 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
       assert_equal 1, entry.priority, 'should change priority'
     end
 
-    assert_difference('Delayed::Job.count', 0) do
+    assert_no_enqueued_jobs do
       assert_difference('AuthLookupUpdateQueue.count', 1) do
         AuthLookupUpdateQueue.enqueue(df2, priority: 2, queue_job: false)
       end
     end
 
     # Handle flattening
-    assert_difference('Delayed::Job.count', 1) do
+    assert_enqueued_with(job: AuthLookupUpdateJob) do
       assert_difference('AuthLookupUpdateQueue.count', 2) do
         entries = AuthLookupUpdateQueue.enqueue([sop], [[[[sop2]]]], priority: 2).map(&:item)
         assert_includes entries, sop
