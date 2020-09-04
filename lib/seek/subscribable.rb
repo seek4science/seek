@@ -67,11 +67,9 @@ module Seek
     def remove_subscriptions(projects)
       unless projects.empty?
         project_subscription_ids = projects.collect(&:project_subscriptions).flatten.collect(&:id)
-        subscriptions = Subscription.where(['subscribable_type=? AND subscribable_id=? AND project_subscription_id IN (?)', self.class.name, id, project_subscription_ids])
+        subscriptions = self.subscriptions.where(project_subscription_id: project_subscription_ids)
         # remove also subcriptions for studies and assays association with this investigation
         if self.is_a?(Investigation)
-          study_ids = studies.collect(&:id)
-          assay_ids = assays.collect(&:id)
           subscriptions |= Subscription.where(['subscribable_type=? AND subscribable_id IN (?) AND project_subscription_id IN (?)', 'Study', study_ids, project_subscription_ids])
           subscriptions |= Subscription.where(['subscribable_type=? AND subscribable_id IN (?) AND project_subscription_id IN (?)', 'Assay', assay_ids, project_subscription_ids])
         end
@@ -114,8 +112,8 @@ module Seek
     private
 
     def update_subscriptions_for(item, projects_to_add, projects_to_remove)
-      SetSubscriptionsForItemJob.new(item, projects_to_add).queue_job
-      RemoveSubscriptionsForItemJob.new(item, projects_to_remove).queue_job
+      SetSubscriptionsForItemJob.new(item, projects_to_add.to_a).queue_job
+      RemoveSubscriptionsForItemJob.new(item, projects_to_remove.to_a).queue_job
     end
   end
 end

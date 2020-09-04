@@ -19,8 +19,7 @@ class OpenbisEndpoint < ApplicationRecord
   validates :space_perm_id, uniqueness: { scope: %i[dss_endpoint as_endpoint space_perm_id project_id],
                                           message: 'the endpoints and the space must be unique for this project' }
 
-  after_create :create_refresh_metadata_job, :create_sync_metadata_job
-  after_destroy :remove_refresh_metadata_job, :remove_sync_metadata_job, :clear_metadata_store
+  after_destroy :clear_metadata_store
 
   after_initialize :default_policy, autosave: true
   after_initialize :add_meta_config, autosave: true
