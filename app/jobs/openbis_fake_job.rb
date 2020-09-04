@@ -1,5 +1,6 @@
 # job to periodically fetch assets to potentially create mem leak
 class OpenbisFakeJob < SeekJob
+  queue_with_priority 3
   DEBUG = false
 
   def initialize(name, batch_size = 10)
@@ -22,14 +23,6 @@ class OpenbisFakeJob < SeekJob
   def gather_items
     # Rails.logger.info "Before job\n#{ObjectSpace.count_objects}"
     assets_and_assays
-  end
-
-  def default_priority
-    3
-  end
-
-  def follow_on_delay
-    1.seconds
   end
 
   def follow_on_job?

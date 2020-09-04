@@ -1,19 +1,12 @@
 class SendAnnouncementEmailsJob < SeekEmailJob
+  queue_with_priority 3
   BATCHSIZE = 50
 
-  attr_reader :site_announcement_id, :offset
+  def perform(site_announcement_id, offset)
+    announcement = SiteAnnouncement.find_by_id(site_announcement_id)
+    return unless announcement && Seek::Config.email_enabled
 
-  def initialize(site_annoucement_id, offset = 0)
-    @site_announcement_id = site_annoucement_id
-    @offset = offset
-  end
-
-  def perform
-    super if Seek::Config.email_enabled
-  end
-
-  def perform_job(announcement)
-    NotifieeInfo.where(receive_notifications: true).offset(@offset).limit(BATCHSIZE).each do |notifiee_info|
+    NotifieeInfo.where(receive_notifications: true).offset(offset).limit(BATCHSIZE).each do |notifiee_info|
       begin
         unless notifiee_info.notifiee.nil?
           Mailer.announcement_notification(announcement, notifiee_info).deliver_later
@@ -25,18 +18,8 @@ class SendAnnouncementEmailsJob < SeekEmailJob
       end
     end
 
-    @offset += BATCHSIZE
-  end
+    offset += BATCHSIZE
 
-  def follow_on_job?
-    @offset < NotifieeInfo.count
-  end
-
-  def gather_items
-    [SiteAnnouncement.find_by_id(site_announcement_id)].compact
-  end
-
-  def default_priority
-    3
+    self.class.perform_later(site_announcement_id, offset) if offset < NotifieeInfo.count
   end
 end

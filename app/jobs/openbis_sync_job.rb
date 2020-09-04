@@ -2,14 +2,13 @@
 # and refresh their content with the current state in OBIS
 # It can also follow the dependent Objects/DataSets and register them if so configured
 class OpenbisSyncJob < SeekJob
-  attr_accessor :openbis_endpoint_id
+  queue_with_priority 3
 
   # debug is with puts so it can be easily seen on tests screens
   DEBUG = Seek::Config.openbis_debug ? true : false
 
   def initialize(openbis_endpoint, batch_size = 20)
-    @openbis_endpoint_id = openbis_endpoint.id
-    @batch_size = batch_size || 20
+    super(openbis_endpoint, batch_size)
   end
 
   def perform_job(obis_asset)
@@ -68,27 +67,6 @@ class OpenbisSyncJob < SeekJob
     need_sync.to_a
   end
 
-  def default_priority
-    3
-  end
-
-  def follow_on_delay
-    needed = need_sync.count
-    Rails.logger.info "OBis syn will follow with #{needed} items" if DEBUG
-    return 1.seconds if need_sync.count.positive?
-
-    if endpoint
-      endpoint.refresh_period_mins.minutes
-    else
-      120.minutes
-    end
-  end
-
-  def follow_on_job?
-    return false unless Seek::Config.openbis_enabled && Seek::Config.openbis_autosync
-    !endpoint.nil? # don't follow on if the endpoint no longer exists
-  end
-
   def need_sync
     # bussines rule
     # - status refresh or failed
@@ -105,7 +83,7 @@ class OpenbisSyncJob < SeekJob
         .where('synchronized_at < ? AND (sync_state = ? OR (updated_at < ? AND sync_state =?))',
                old, ExternalAsset.sync_states[:refresh], too_fresh, ExternalAsset.sync_states[:failed])
         .order(:sync_state, :updated_at)
-        .limit(@batch_size)
+        .limit(batch_size)
   end
 
   def failure_threshold
@@ -128,9 +106,11 @@ class OpenbisSyncJob < SeekJob
 
   private
 
+  def batch_size
+    arguments[1]
+  end
+
   def endpoint
-    # looks like local variables are wrote to yaml and becomes job parameter
-    # @endpoint ||= OpenbisEndpoint.find_by_id(openbis_endpoint_id)
-    OpenbisEndpoint.find_by_id(openbis_endpoint_id)
+    arguments[0]
   end
 end

@@ -1,10 +1,7 @@
 # top level abstract class for defining jobs
 # that automatically handles performing the job, and and handling and reporting any errors.
 # utility methods for counting and checking if a job exists, and creating a new job.
-class SeekJob
-  queue_as QueueNames::DEFAULT
-
-  include CommonSweepers
+class SeekJob < ApplicationJob
   include DefaultJobProperties # the default properties - these are methods that can be overridden in the job implementation
 
   def perform
@@ -28,8 +25,11 @@ class SeekJob
 
   # adds the job to the Delayed Job queue. Will not create it if it already exists and allow_duplicate is false,
   # or by default allow_duplicate_jobs? returns false.
-  def queue_job(priority = default_priority, time = default_delay.from_now)
-    enqueue(priority: priority, queue: queue_name, run_at: time)
+  def queue_job(priority = nil, time = default_delay.from_now)
+    args = { run_at: time }
+    args[:priority] = priority if priority
+
+    enqueue(args)
   end
 
   private

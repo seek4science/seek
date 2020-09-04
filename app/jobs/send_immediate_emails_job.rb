@@ -1,5 +1,5 @@
 class SendImmediateEmailsJob < SeekEmailJob
-  DEFAULT_PRIORITY = 3
+  queue_with_priority 3
 
   attr_reader :activity_log_id
 
@@ -14,10 +14,6 @@ class SendImmediateEmailsJob < SeekEmailJob
 
   def gather_items
     [ActivityLog.find_by_id(activity_log_id)].compact
-  end
-
-  def default_priority
-    3
   end
 
   # Add a short delay so that SetSubscriptionsForItemJob has time to finish and the subscriptions are in place.

@@ -4,11 +4,6 @@ module DefaultJobProperties
     15.minutes
   end
 
-  # the priority of the job on the queue
-  def default_priority
-    2
-  end
-
   # time before the job is run
   def default_delay
     3.seconds
@@ -23,6 +18,10 @@ module DefaultJobProperties
   # the priority of the follow on job
   def follow_on_priority
     default_priority
+  end
+
+  def default_priority
+    self.class.default_priority
   end
 
   # the delay for the follow on job, which defaults to the default delay but could be different

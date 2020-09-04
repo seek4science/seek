@@ -1,11 +1,11 @@
 # job to periodically call GC and prints heap stats
 class OpenbisGarbageJob < SeekJob
+  queue_with_priority 3
   # debug is with puts so it can be easily seen on tests screens
   DEBUG = true
 
   def initialize(name, delay = 10)
-    @name = name
-    @delay = delay
+    super(name, delay)
   end
 
   def perform_job(_item)
@@ -19,15 +19,11 @@ class OpenbisGarbageJob < SeekJob
   end
 
   def gather_items
-    [@name]
-  end
-
-  def default_priority
-    3
+    [arguments[0]]
   end
 
   def follow_on_delay
-    @delay.minutes
+    arguments[1].minutes
   end
 
   def follow_on_job?

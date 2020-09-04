@@ -1,24 +1,12 @@
 class ProjectSubscriptionJob < SeekJob
-  attr_reader :project_subscription_id
+  queue_with_priority 2
 
-  def initialize(project_subscription_id)
-    @project_subscription_id = project_subscription_id
-  end
-
-  def perform_job(ps)
+  def perform(project_subscription)
     disable_authorization_checks do
-      all_in_project(ps.project).reject { |item| item.subscribed?(ps.person) }.each do |item|
-        item.subscriptions << Subscription.new(person: ps.person, project_subscription_id: project_subscription_id)
+      all_in_project(project_subscription.project).reject { |item| item.subscribed?(project_subscription.person) }.each do |item|
+        item.subscriptions << Subscription.new(person: project_subscription.person, project_subscription_id: project_subscription.id)
       end
     end
-  end
-
-  def gather_items
-    [ProjectSubscription.find_by_id(project_subscription_id)].compact
-  end
-
-  def default_priority
-    2
   end
 
   def default_delay

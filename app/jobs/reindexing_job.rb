@@ -19,10 +19,6 @@ class ReindexingJob < SeekJob
     ReindexingQueue.dequeue(BATCHSIZE)
   end
 
-  def default_priority
-    2
-  end
-
   def follow_on_job?
     ReindexingQueue.any?
   end

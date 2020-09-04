@@ -1,7 +1,7 @@
 class RemoveSubscriptionsForItemJob < SubscriptionsForItemJob
-  def perform_job(item)
+  def perform(subscribable, projects)
     disable_authorization_checks do
-      item.remove_subscriptions projects
+      subscribable.remove_subscriptions(projects)
     end
   end
 end
