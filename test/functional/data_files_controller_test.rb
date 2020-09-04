@@ -889,9 +889,9 @@ class DataFilesControllerTest < ActionController::TestCase
       # upload a data file
       df = Factory :data_file, contributor: User.current_user.person
       # upload new version 1 of the data file
-      post :new_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision 1' }
+      post :create_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision 1' }
       # upload new version 2 of the data file
-      post :new_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision 2' }
+      post :create_version, params: { id: df, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision 2' }
 
       df.reload
       assert_equal 3, df.versions.length
@@ -917,7 +917,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile::Version.count', 1) do
       assert_difference('StudiedFactor.count', 1) do
-        post :new_version, params: { id: d, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
+        post :create_version, params: { id: d, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
       end
     end
 
@@ -2503,7 +2503,7 @@ class DataFilesControllerTest < ActionController::TestCase
     Factory(:sample, originating_data_file: data_file, contributor: User.current_user.person)
 
     assert_no_difference('DataFile::Version.count') do
-      post :new_version, params: { id: data_file.id, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
+      post :create_version, params: { id: data_file.id, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to data_file

@@ -32,7 +32,12 @@
 <% if asset.is_downloadable? -%>
   <% if can_download_asset?(asset, params[:code]) -%>
     <% if asset.is_a?(Workflow) %>
-      <%= button_link_to('Download RO Crate', 'ro_crate_file', ro_crate_workflow_path(asset, version: version, code: params[:code])) %>
+      <% if asset.content_blob.file_exists? %>
+        <%= button_link_to('Download RO Crate', 'ro_crate_file', ro_crate_workflow_path(asset, version: version, code: params[:code])) %>
+      <% else %>
+        <%= button_link_to('Download RO Crate', 'ro_crate_file', nil,
+                           disabled_reason: 'This workflow is still being processed, check back later.') %>
+      <% end %>
     <% else %>
       <%= download_or_link_button display_asset,
                                   polymorphic_path(asset, version: version, action: :download, code: params[:code]),
@@ -74,7 +79,11 @@
     <% if asset.versioned? -%>
       <li>
         <% if asset.new_version_supported? %>
-          <%= link_to (image("new") + ' Upload new version'), '#', onclick: "$j('#upload_new_version_form').fadeToggle(); return false" %>
+          <% if asset.is_a?(Workflow) %>
+            <%= link_to (image("new") + ' Upload new version'), new_version_workflow_path(asset) %>
+          <% else %>
+            <%= link_to (image("new") + ' Upload new version'), '#', onclick: "$j('#upload_new_version_form').fadeToggle(); return false" %>
+          <% end %>
         <% else %>
           <%= link_to (image("new") + ' Upload new version'), '#', disabled: true, class: 'disabled' %>
         <% end %>

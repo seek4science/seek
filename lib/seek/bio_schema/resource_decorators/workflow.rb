@@ -9,8 +9,8 @@ module Seek
                         version: :version,
                         image: :image,
                         programming_language: :programmingLanguage,
-                        inputs: :inputs,
-                        outputs: :outputs
+                        inputs: :input,
+                        outputs: :output
 
         def contributors
           [contributor]
@@ -22,7 +22,7 @@ module Seek
         end
 
         def schema_type
-          'Workflow'
+          'ComputationalWorkflow'
         end
 
         def programming_language
@@ -30,19 +30,19 @@ module Seek
         end
 
         def inputs
-          property_value_specs(resource.inputs)
+          formal_parameters(resource.inputs)
         end
 
         def outputs
-          property_value_specs(resource.outputs)
+          formal_parameters(resource.outputs)
         end
 
         private
 
-        def property_value_specs(properties)
+        def formal_parameters(properties)
           properties.collect do |property|
             {
-              "@type": 'PropertyValueSpecification',
+              "@type": 'FormalParameter',
               name: property.id
             }
           end

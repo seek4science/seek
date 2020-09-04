@@ -74,7 +74,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :examine_url, xhr: true, params: { data_url: 'http://mockedlocation.com/a-piccy.png' }
     assert_response :success
     assert_equal 200, assigns(:info)[:code]
-    assert !@response.body.include?('This is a webpage')
+    assert !@response.body.include?('Webpage Link')
     assert_equal 'file', assigns(:type)
   end
 
@@ -133,12 +133,25 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url 404' do
     # 404
     stub_request(:head, 'http://missing.com').to_return(status: 404, headers: { 'Content-Type' => 'text/html' })
+    stub_request(:get, 'http://missing.com').to_return(status: 404, headers: { 'Content-Type' => 'text/html' })
     get :examine_url, xhr: true, params: { data_url: 'http://missing.com' }
     assert_response 400
     assert_equal 404, assigns(:info)[:code]
     assert @response.body.include?('Nothing can be found at that URL')
     assert_equal 'error', assigns(:type)
     assert assigns(:error_msg)
+  end
+
+  test 'examine url head 404 get 200' do
+    stub_request(:head, 'https://onedrive.live.com/').to_return(status: 404, headers: { 'Content-Type' => 'text/html' })
+    stub_request(:get, 'https://onedrive.live.com/').to_return(status: 200, headers: { 'Content-Type' => 'text/html' })
+    get :examine_url, xhr: true, params: { data_url: 'https://onedrive.live.com/' }
+    assert_response :success
+    assert_equal 200, assigns(:info)[:code]
+    assert @response.body.include?('Webpage Link')
+    assert_equal 'webpage', assigns(:type)
+    refute assigns(:error_msg)
+    refute assigns(:warning_msg)
   end
 
   test 'examine url host not found' do
