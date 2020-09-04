@@ -1,42 +1,28 @@
-require 'search_biomodel'
+
 
 module Seek
   module BiomodelsSearch
     class SearchBiomodelsAdaptor < AbstractSearchAdaptor
+      NUMRESULTS=25
       def perform_search(query)
-        yaml = Rails.cache.fetch("biomodels_search_#{URI.encode(query)}", expires_in: 1.day) do
-          connection = SysMODB::SearchBiomodel.instance
-          biomodels_search_results = connection.models(query).select do |result|
-            !(result.nil? || result[:publication_id].nil?)
+        #yaml = Rails.cache.fetch("biomodels_search_#{CGI.escape(query)}", expires_in: 1.day) do
+          results = RestClient.get("https://www.ebi.ac.uk/biomodels/search?query=#{CGI.escape(query)}&numResults=#{NUMRESULTS}", accept: 'application/json') do |resp|
+            json = JSON.parse(resp.body)
+            json['models'].collect do |result|
+              r = BiomodelsSearchResult.new result['id']
+            end.compact.select do |biomodels_result|
+              !biomodels_result.title.blank?
+            end
           end
-          results = biomodels_search_results.collect do |result|
-            r = BiomodelsSearchResult.new result
-          end.compact.select do |biomodels_result|
-            !biomodels_result.title.blank?
-          end
-          results.to_yaml
-        end
+        yaml = results.to_yaml
+        #end
         YAML.load(yaml)
       end
 
       def fetch_item(item_id)
-        yaml = Rails.cache.fetch("biomodels_search_#{item_id}") do
-          connection = SysMODB::SearchBiomodel.instance
-          biomodel_result = connection.getSimpleModel(item_id)
-          unless biomodel_result.blank?
-            hash_result = Nori.parse(biomodel_result)[:simple_models][:simple_model]
-          end
-
-          unless hash_result[:publication_id].nil?
-            result = BiomodelsSearchResult.new hash_result
-            result = result.title.blank? ? nil : result
-          else
-            result = nil
-          end
-          result.to_yaml
-        end
-
-        YAML.load(yaml)
+        result = BiomodelsSearchResult.new item_id
+        result = result.title.blank? ? nil : result
+        YAML.load(result.to_yaml)
       end
     end
 
@@ -45,66 +31,27 @@ module Seek
 
       alias_attribute :id, :model_id
 
-      def initialize(biomodels_search_result)
+      def initialize(model_id)
         self.authors = []
-        self.model_id = biomodels_search_result[:model_id]
-        self.last_modification_date = biomodels_search_result[:last_modification_date]
-        self.publication_id = biomodels_search_result[:publication_id]
-        self.title = biomodels_search_result[:model_name]
+        self.model_id = model_id
         populate
       end
 
       private
 
       def populate
-        if publication_id_is_doi?
-          populate_from_doi
-        else
-          populate_from_pubmed
+        RestClient.get("https://www.ebi.ac.uk/biomodels/#{self.model_id}",accept:'application/json') do |resp|
+          json = JSON.parse(resp.body)
+          self.title = json['name']
+          self.publication_title=json['publication']['title']
+          self.abstract = json['description']
+          self.authors = json['publication']['authors'].collect{|author| author['name']}
+          self.published_date = Time.at(json['firstPublished']/1000)
+          latest_version = json['history']['revisions'].sort{|rev| rev['version']}.first
+          self.last_modification_date = Time.at(latest_version['submitted']/1000)
         end
       end
 
-      def populate_from_doi
-        query_result = Rails.cache.fetch("biomodels_doi_fetch_#{publication_id}", expires_in: 1.week) do
-          query = DOI::Query.new(Seek::Config.crossref_api_email)
-          result = query.fetch(publication_id)
-          hash = {}
-          hash[:published_date] = result.date_published
-          hash[:title] = result.title
-          hash[:authors] = result.authors.collect(&:name)
-          hash
-        end
-
-        self.published_date = query_result[:published_date]
-        self.title ||= query_result[:title]
-        self.publication_title = query_result[:title]
-        self.authors = query_result[:authors]
-      end
-
-      def populate_from_pubmed
-        query_result = Rails.cache.fetch("biomodels_pubmed_fetch_#{publication_id}", expires_in: 1.week) do
-          begin
-            result = Bio::MEDLINE.new(Bio::PubMed.efetch(publication_id).first).reference
-          rescue Exception => e
-            result = Bio::MEDLINE.new('').reference
-          end
-          hash = {}
-          hash[:abstract] = result.abstract
-          hash[:title] = result.title
-          hash[:published_date] = result.published_date
-          hash[:authors] = result.authors.collect { |a| a.name.to_s }
-          hash
-        end
-        self.abstract = query_result[:abstract]
-        self.published_date = query_result[:published_date]
-        self.title ||= query_result[:title]
-        self.publication_title = query_result[:title]
-        self.authors = query_result[:authors]
-      end
-
-      def publication_id_is_doi?
-        publication_id.include?('.')
-      end
     end
   end
 end
