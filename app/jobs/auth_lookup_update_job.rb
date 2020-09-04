@@ -1,4 +1,4 @@
-class AuthLookupUpdateJob < SeekJob
+class AuthLookupUpdateJob < BatchJob
   include CommonSweepers
 
   queue_as QueueNames::AUTH_LOOKUP

@@ -1,26 +1,13 @@
-class SampleDataExtractionJob < SeekJob
+class SampleDataExtractionJob < ApplicationJob
   queue_as QueueNames::SAMPLES
-
-  attr_reader :data_file_id, :sample_type_id, :persist, :overwrite
-
-  def initialize(data_file, sample_type, persist = false, overwrite: false)
-    @data_file_id = data_file.id
-    @sample_type_id = sample_type.id
-    @persist = persist
-    @overwrite = overwrite
-  end
-
-  def gather_items
-    [data_file].compact
-  end
 
   # either pending or running
   def self.in_progress?(data_file)
     [:pending, :running].include?(get_status(data_file))
   end
 
-  def perform_job(item)
-    extractor = Seek::Samples::Extractor.new(item, sample_type)
+  def perform(data_file, sample_type, persist = false, overwrite: false)
+    extractor = Seek::Samples::Extractor.new(data_file, sample_type)
 
     if persist
       extractor.persist
@@ -46,15 +33,5 @@ class SampleDataExtractionJob < SeekJob
     else
       nil
     end
-  end
-
-  private
-
-  def data_file
-    DataFile.find_by_id(data_file_id)
-  end
-
-  def sample_type
-    SampleType.find_by_id(sample_type_id)
   end
 end

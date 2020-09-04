@@ -1,4 +1,4 @@
-class SendAnnouncementEmailsJob < SeekEmailJob
+class SendAnnouncementEmailsJob < EmailJob
   queue_with_priority 3
   BATCHSIZE = 50
 

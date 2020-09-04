@@ -1,5 +1,5 @@
 # Job responsible for generating Excel spreadsheet templates from samples
-class SampleTemplateGeneratorJob < SeekJob
+class SampleTemplateGeneratorJob < ApplicationJob
   queue_as QueueNames::SAMPLES
 
   def perform(sample_type)

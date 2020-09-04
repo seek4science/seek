@@ -1,4 +1,4 @@
-class RdfGenerationJob < SeekJob
+class RdfGenerationJob < BatchJob
   BATCHSIZE = 10
 
   # executes the job - if a triple store is configured it will also update the triple store, otherwise just saves the rdf

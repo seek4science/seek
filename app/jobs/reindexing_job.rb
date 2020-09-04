@@ -1,4 +1,4 @@
-class ReindexingJob < SeekJob
+class ReindexingJob < BatchJob
   BATCHSIZE = 100
 
   def perform

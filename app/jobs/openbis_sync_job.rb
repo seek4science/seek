@@ -1,7 +1,7 @@
 # job to periodically take OBIS assets that are due to synchronization
 # and refresh their content with the current state in OBIS
 # It can also follow the dependent Objects/DataSets and register them if so configured
-class OpenbisSyncJob < SeekJob
+class OpenbisSyncJob < BatchJob
   queue_with_priority 3
 
   # debug is with puts so it can be easily seen on tests screens

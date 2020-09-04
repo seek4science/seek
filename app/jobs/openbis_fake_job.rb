@@ -1,5 +1,5 @@
 # job to periodically fetch assets to potentially create mem leak
-class OpenbisFakeJob < SeekJob
+class OpenbisFakeJob < BatchJob
   queue_with_priority 3
   DEBUG = false
 

@@ -21,11 +21,6 @@ class ApplicationJob < ActiveJob::Base
     false
   end
 
-  # the priority of the follow on job
-  def follow_on_priority
-    default_priority
-  end
-
   def default_priority
     self.class.default_priority
   end
@@ -35,10 +30,21 @@ class ApplicationJob < ActiveJob::Base
     1.second
   end
 
+  around_perform do |job, block|
+    Timeout.timeout(job.timelimit) do
+      block.call
+    end
+  end
+
   after_perform do |job|
     if job.follow_on_job?
-      job.queue_job(follow_on_priority, follow_on_delay.from_now)
+      job.queue_job(nil, follow_on_delay.from_now)
     end
+  end
+
+  rescue_from(Exception) do |exception|
+    raise exception if Rails.env.test?
+    report_exception(exception)
   end
 
   # adds the job to the Delayed Job queue. Will not create it if it already exists and allow_duplicate is false,
@@ -48,5 +54,12 @@ class ApplicationJob < ActiveJob::Base
     args[:priority] = priority if priority
 
     enqueue(args)
+  end
+
+  def self.report_exception(exception, message = nil, data = {})
+    message ||= "Error executing job for #{self.class.name}"
+    Seek::Errors::ExceptionForwarder.send_notification(exception, data: data)
+    Rails.logger.error(message)
+    Rails.logger.error(exception)
   end
 end

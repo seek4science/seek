@@ -1,4 +1,4 @@
-class ProjectSubscriptionJob < SeekJob
+class ProjectSubscriptionJob < ApplicationJob
   queue_with_priority 2
 
   def perform(project_subscription)

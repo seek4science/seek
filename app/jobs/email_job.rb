@@ -1,4 +1,4 @@
-class SeekEmailJob < SeekJob
+class EmailJob < ApplicationJob
   # makes sure any changes to the smtp and host settings are picked up without having to restart delayed job
   before_perform do
     # make sure the SMTP,site_base_host configuration is in sync with current SEEK settings

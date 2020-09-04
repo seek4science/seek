@@ -1,4 +1,4 @@
-class SendImmediateEmailsJob < SeekEmailJob
+class SendImmediateEmailsJob < EmailJob
   queue_with_priority 3
 
   def perform(activity_log)
