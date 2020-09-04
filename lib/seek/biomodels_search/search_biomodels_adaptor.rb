@@ -3,26 +3,22 @@
 module Seek
   module BiomodelsSearch
     class SearchBiomodelsAdaptor < AbstractSearchAdaptor
-      NUMRESULTS=25
+      NUMRESULTS = 25
       def perform_search(query)
-        #yaml = Rails.cache.fetch("biomodels_search_#{CGI.escape(query)}", expires_in: 1.day) do
-          results = RestClient.get("https://www.ebi.ac.uk/biomodels/search?query=#{CGI.escape(query)}&numResults=#{NUMRESULTS}", accept: 'application/json') do |resp|
-            json = JSON.parse(resp.body)
-            json['models'].collect do |result|
-              r = BiomodelsSearchResult.new result['id']
-            end.compact.select do |biomodels_result|
-              !biomodels_result.title.blank?
-            end
+        results = RestClient.get("https://www.ebi.ac.uk/biomodels/search?query=#{CGI.escape(query)}&numResults=#{NUMRESULTS}", accept: 'application/json') do |resp|
+          json = JSON.parse(resp.body)
+          json['models'].collect do |result|
+            BiomodelsSearchResult.new result['id']
+          end.compact.reject do |biomodels_result|
+            biomodels_result.title.blank?
           end
-        yaml = results.to_yaml
-        #end
-        YAML.load(yaml)
+        end
+        results
       end
 
       def fetch_item(item_id)
         result = BiomodelsSearchResult.new item_id
-        result = result.title.blank? ? nil : result
-        YAML.load(result.to_yaml)
+        result.title.blank? ? nil : result
       end
     end
 
@@ -38,26 +34,24 @@ module Seek
       end
 
       def download_link
-        "https://www.ebi.ac.uk/biomodels/model/download/#{self.model_id}?filename=#{self.main_filename}"
+        "https://www.ebi.ac.uk/biomodels/model/download/#{model_id}?filename=#{main_filename}"
       end
 
       private
 
       def populate
-        RestClient.get("https://www.ebi.ac.uk/biomodels/#{self.model_id}",accept:'application/json') do |resp|
+        RestClient.get("https://www.ebi.ac.uk/biomodels/#{model_id}", accept: 'application/json') do |resp|
           json = JSON.parse(resp.body)
           self.title = json['name']
-          self.publication_title=json['publication']['title']
+          self.publication_title = json['publication']['title']
           self.abstract = json['description']
-          self.authors = json['publication']['authors'].collect{|author| author['name']}
-          self.published_date = Time.at(json['firstPublished']/1000)
-          latest_version = json['history']['revisions'].sort{|rev| rev['version']}.first
-          self.last_modification_date = Time.at(latest_version['submitted']/1000)
+          self.authors = json['publication']['authors'].collect { |author| author['name'] }
+          self.published_date = Time.at(json['firstPublished'] / 1000)
+          latest_version = json['history']['revisions'].sort { |rev| rev['version'] }.first
+          self.last_modification_date = Time.at(latest_version['submitted'] / 1000)
           self.main_filename = json['files']['main'].first['name']
-
         end
       end
-
     end
   end
 end
