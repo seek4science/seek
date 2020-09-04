@@ -64,6 +64,7 @@ public/system/
 
 public/assets/
 public/assets_dev/
+public/javascripts/
 
 .bundle/config
 
