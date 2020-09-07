@@ -33,12 +33,6 @@ GIT
       rubyzip
 
 GIT
-  remote: https://github.com/myGrid/search_biomodel.git
-  revision: e109ac6d8b102f7ecb65140c17d263b85e066870
-  specs:
-    search_biomodel (2.2.1)
-
-GIT
   remote: https://github.com/ruby-rdf/rdf-virtuoso
   revision: 0cf165e1f244e16454362ae09b4a8ff4a8cd4e99
   branch: develop
@@ -999,7 +993,7 @@ DEPENDENCIES
   sample-template-generator (~> 0.5)
   sass-rails (~> 5.0)
   savon (= 1.1.0)
-  search_biomodel (= 2.2.1)!
+ 
   seedbank
   simple-spreadsheet-extractor (~> 0.16.0)
   simplecov

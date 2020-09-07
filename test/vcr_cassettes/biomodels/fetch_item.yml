@@ -1,0 +1,135 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.ebi.ac.uk/biomodels/BIOMD0000000429
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - rest-client/2.0.2 (linux-gnu x86_64) ruby/2.4.10p364
+      Host:
+      - www.ebi.ac.uk
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Apache-Coyote/1.1
+      Content-Type:
+      - application/json;charset=utf-8
+      Strict-Transport-Security:
+      - max-age=0
+      Date:
+      - Fri, 04 Sep 2020 15:49:56 GMT
+      Transfer-Encoding:
+      - chunked
+      Set-Cookie:
+      - SESSION=3498087b-1575-44bb-8791-6cbce34179a2; Path=/biomodels/; HttpOnly
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "name" : "Schaber2012 - Hog pathway in yeast",
+          "description" : "<notes xmlns=\"http://www.sbml.org/sbml/level2/version4\">\r\n      <body xmlns=\"http://www.w3.org/1999/xhtml\">\r\n        <div class=\"dc:title\">Schaber2012 - Hog pathway in yeast</div>\r\n            <div class=\"dc:description\">      <p>The high osmolarity glycerol (HOG) pathway in the yeast Saccharomyces cerevisiae is one of the best-studied mitogen-activated protein kinase (MAPK) pathways and serves as a prototype signalling system for eukaryotes. This pathway is necessary and sufficient to adapt to high external osmolarity. A key component of this pathway is the stress-activated protein kinase (SAPK) Hog1, which is rapidly phosphorylated by the SAPK kinase Pbs2 upon hyper-osmotic shock, and which is the terminal kinase of two parallel signalling pathways, subsequently called the Sho1 branch and the Sln1 branch, respectively. Ensemble modelling (192 models) is used to study the yeast HOG pathway, a prototype for eukaryotic mitogen-activated kinase signalling systems. The best fit model (Model Nr.22: described here) provides new insights into the function of this system, some of which are then experimentally validated.</p>\r\n                </div>\r\n            <div class=\"dc:bibliographicCitation\">      <p>This model is described in the article:</p>\r\n                <div class=\"bibo:title\">        <a href=\"http://identifiers.org/pubmed/23149687\" title=\"Access to this publication\">Modelling reveals novel roles of two parallel signalling pathways and homeostatic feedbacks in yeast.</a>\r\n                    </div>\r\n                <div class=\"bibo:authorList\">Schaber J, Baltanas R, Bush A, Klipp E, Colman-Lerner A.</div>\r\n                <div class=\"bibo:Journal\">Mol Syst Biol. 2012 Nov 13;8:622.</div>\r\n                <p>Abstract:</p>\r\n                <div class=\"bibo:abstract\">        <p>The high osmolarity glycerol (HOG) pathway in yeast serves as a prototype signalling system for eukaryotes. We used an unprecedented amount of data to parameterise 192 models capturing different hypotheses about molecular mechanisms underlying osmo-adaptation and selected a best approximating model. This model implied novel mechanisms regulating osmo-adaptation in yeast. The model suggested that (i) the main mechanism for osmo-adaptation is a fast and transient non-transcriptional Hog1-mediated activation of glycerol production, (ii) the transcriptional response serves to maintain an increased steady-state glycerol production with low steady-state Hog1 activity, and (iii) fast negative feedbacks of activated Hog1 on upstream signalling branches serves to stabilise adaptation response. The best approximating model also indicated that homoeostatic adaptive systems with two parallel redundant signalling branches show a more robust and faster response than single-branch systems. We corroborated this notion to a large extent by dedicated measurements of volume recovery in single cells. Our study also demonstrates that systematically testing a model ensemble against data has the potential to achieve a better and unbiased understanding of molecular mechanisms.</p>\r\n                    </div>\r\n                </div>\r\n            <div class=\"dc:publisher\">      <p>This model is hosted on        <a href=\"http://www.ebi.ac.uk/biomodels/\">BioModels Database</a>\r\n            and identified by:        <a href=\"http://identifiers.org/biomodels.db/MODEL1209110001\">MODEL1209110001</a>\r\n            .        </p>\r\n                <p>To cite BioModels Database, please use:        <a href=\"http://identifiers.org/pubmed/20587024\" title=\"Latest BioModels Database publication\">BioModels Database: An enhanced, curated and annotated resource for published quantitative kinetic models</a>\r\n            .        </p>\r\n                </div>\r\n            <div class=\"dc:license\">      <p>To the extent possible under law, all copyright and related or neighbouring rights to this encoded model have been dedicated to the public domain worldwide. Please refer to        <a href=\"http://creativecommons.org/publicdomain/zero/1.0/\" title=\"Access to: CC0 1.0 Universal (CC0 1.0), Public Domain Dedication\">CC0 Public Domain Dedication</a>\r\n            for more information.        </p>\r\n                </div>\r\n            </body>\r\n      \r\n    </notes>",
+          "format" : {
+            "name" : "SBML",
+            "version" : "L2V4"
+          },
+          "publication" : {
+            "journal" : "Molecular Systems Biology",
+            "title" : "Modelling reveals novel roles of two parallel signalling pathways and homeostatic feedbacks in yeast.",
+            "affiliation" : "Institute for Experimental Internal Medicine, Medical Faculty, Otto von Guericke University, Magdeburg, Germany. schaber@med.ovgu.de",
+            "synopsis" : "The high osmolarity glycerol (HOG) pathway in yeast serves as a prototype signalling system for eukaryotes. We used an unprecedented amount of data to parameterise 192 models capturing different hypotheses about molecular mechanisms underlying osmo-adaptation and selected a best approximating model. This model implied novel mechanisms regulating osmo-adaptation in yeast. The model suggested that (i) the main mechanism for osmo-adaptation is a fast and transient non-transcriptional Hog1-mediated activation of glycerol production, (ii) the transcriptional response serves to maintain an increased steady-state glycerol production with low steady-state Hog1 activity, and (iii) fast negative feedbacks of activated Hog1 on upstream signalling branches serves to stabilise adaptation response. The best approximating model also indicated that homoeostatic adaptive systems with two parallel redundant signalling branches show a more robust and faster response than single-branch systems. We corroborated this notion to a large extent by dedicated measurements of volume recovery in single cells. Our study also demonstrates that systematically testing a model ensemble against data has the potential to achieve a better and unbiased understanding of molecular mechanisms.",
+            "year" : 2012,
+            "month" : "0",
+            "volume" : "8",
+            "pages" : "622",
+            "link" : "http://identifiers.org/pubmed/23149687",
+            "authors" : [ {
+              "name" : "Schaber J",
+              "orcid" : "0000-0001-6971-2530"
+            }, {
+              "name" : "Baltanas R"
+            }, {
+              "name" : "Bush A"
+            }, {
+              "name" : "Klipp E"
+            }, {
+              "name" : "Colman-Lerner A",
+              "orcid" : "0000-0002-2557-8883"
+            } ]
+          },
+          "files" : {
+            "main" : [ {
+              "name" : "BIOMD0000000429_url.xml",
+              "fileSize" : "219752"
+            } ],
+            "additional" : [ {
+              "name" : "BIOMD0000000429.vcml",
+              "fileSize" : "900",
+              "description" : "Auto-generated VCML file"
+            }, {
+              "name" : "BIOMD0000000429.png",
+              "fileSize" : "248611",
+              "description" : "Auto-generated Reaction graph (PNG)"
+            }, {
+              "name" : "BIOMD0000000429.pdf",
+              "fileSize" : "321904",
+              "description" : "Auto-generated PDF file"
+            }, {
+              "name" : "BIOMD0000000429.svg",
+              "fileSize" : "52983",
+              "description" : "Auto-generated Reaction graph (SVG)"
+            }, {
+              "name" : "BIOMD0000000429_urn.xml",
+              "fileSize" : "219616",
+              "description" : "Auto-generated SBML file with URNs"
+            }, {
+              "name" : "BIOMD0000000429-biopax2.owl",
+              "fileSize" : "32137",
+              "description" : "Auto-generated BioPAX (Level 2)"
+            }, {
+              "name" : "BIOMD0000000429.sci",
+              "fileSize" : "1301",
+              "description" : "Auto-generated Scilab file"
+            }, {
+              "name" : "BIOMD0000000429-biopax3.owl",
+              "fileSize" : "46101",
+              "description" : "Auto-generated BioPAX (Level 3)"
+            }, {
+              "name" : "BIOMD0000000429.m",
+              "fileSize" : "20126",
+              "description" : "Auto-generated Octave file"
+            }, {
+              "name" : "BIOMD0000000429.xpp",
+              "fileSize" : "17125",
+              "description" : "Auto-generated XPP file"
+            } ]
+          },
+          "history" : {
+            "revisions" : [ {
+              "version" : 1,
+              "submitted" : 1347364049000,
+              "submitter" : "Joerg Schaber",
+              "comment" : "Original import of HOG wt"
+            }, {
+              "version" : 2,
+              "submitted" : 1355495080000,
+              "submitter" : "Joerg Schaber",
+              "comment" : "Current version of Schaber2012 - Hog pathway in yeast"
+            } ]
+          },
+          "firstPublished" : 1353609089000,
+          "submissionId" : "MODEL1209110001",
+          "publicationId" : "BIOMD0000000429"
+        }
+    http_version: 
+  recorded_at: Fri, 04 Sep 2020 15:49:56 GMT
+recorded_with: VCR 2.9.3
