@@ -993,7 +993,6 @@ DEPENDENCIES
   sample-template-generator (~> 0.5)
   sass-rails (~> 5.0)
   savon (= 1.1.0)
- 
   seedbank
   simple-spreadsheet-extractor (~> 0.16.0)
   simplecov
