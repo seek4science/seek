@@ -222,7 +222,7 @@ module ApplicationHelper
         markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, tables: true)
         # remove <p> and <br> tags, markdown render cannot handle them
         scrubber = Rails::Html::TargetScrubber.new
-        scrubber.tags = ['p']
+        scrubber.tags = ['p','br']
         res = Loofah.fragment(res).scrub!(scrubber).to_s
         res = markdown.render(res)
       end
