@@ -6,9 +6,16 @@ class OpenbisSyncJob < BatchJob
 
   # debug is with puts so it can be easily seen on tests screens
   DEBUG = Seek::Config.openbis_debug ? true : false
+  BATCH_SIZE = 20
 
-  def initialize(openbis_endpoint, batch_size = 20)
+  def initialize(openbis_endpoint, batch_size = BATCH_SIZE)
     super(openbis_endpoint, batch_size)
+  end
+
+  def perform(*args)
+    return unless Seek::Config.openbis_enabled
+    return unless endpoint&.persisted?
+    super.tap { endpoint.touch(:last_sync) }
   end
 
   def perform_job(obis_asset)
@@ -102,6 +109,10 @@ class OpenbisSyncJob < BatchJob
     # looks like local variables are wrote to yaml and becomes job parameter
     # @seek_util ||= Seek::Openbis::SeekUtil.new
     Seek::Openbis::SeekUtil.new
+  end
+
+  def follow_on_job?
+    endpoint&.persisted? && need_sync.any?
   end
 
   private

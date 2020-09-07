@@ -79,6 +79,8 @@ class OpenbisEndpoint < ApplicationRecord
     # syncJob = OpenbisSyncJob.new(self)
     # syncJob.queue_job unless syncJob.exists?
 
+    touch(:last_cache_refresh)
+
     self
   end
 

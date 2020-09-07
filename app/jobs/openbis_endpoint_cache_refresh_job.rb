@@ -3,6 +3,8 @@ class OpenbisEndpointCacheRefreshJob < ApplicationJob
   queue_with_priority 3
 
   def perform(endpoint)
+    return unless Seek::Config.openbis_enabled
+    return unless endpoint&.persisted?
     endpoint.refresh_metadata
   end
 

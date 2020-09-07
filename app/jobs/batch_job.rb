@@ -1,6 +1,6 @@
 # An abstract job for dealing with batches of items.
 class BatchJob < ApplicationJob
-  def perform
+  def perform(*args)
     gather_items.each do |item|
       begin
         perform_job(item)

@@ -296,49 +296,46 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'create_refresh_metadata_job' do
-    endpoint = Factory(:openbis_endpoint)
-    Delayed::Job.destroy_all
-    refute OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
-    assert_difference('Delayed::Job.count', 1) do
+    endpoint = nil
+
+    assert_no_enqueued_jobs(only: OpenbisEndpointCacheRefreshJob) do
+      endpoint = Factory(:openbis_endpoint)
+    end
+
+    assert_enqueued_with(job: OpenbisEndpointCacheRefreshJob) do
       endpoint.create_refresh_metadata_job
     end
-    assert_no_difference('Delayed::Job.count') do
-      endpoint.create_refresh_metadata_job
-    end
-    assert OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
   end
 
   test 'create_sync_metadata_job' do
-    endpoint = Factory(:openbis_endpoint)
-    Delayed::Job.destroy_all
-    refute OpenbisSyncJob.new(endpoint).exists?
-    assert_difference('Delayed::Job.count', 1) do
+    endpoint = nil
+
+    assert_no_enqueued_jobs(only: OpenbisSyncJob) do
+      endpoint = Factory(:openbis_endpoint)
+    end
+
+    assert_enqueued_with(job: OpenbisSyncJob) do
       endpoint.create_sync_metadata_job
     end
-    assert_no_difference('Delayed::Job.count') do
-      endpoint.create_sync_metadata_job
+  end
+
+  test 'does not create jobs on creation' do
+    assert_no_enqueued_jobs(only: [OpenbisSyncJob, OpenbisEndpointCacheRefreshJob]) do
+      Factory(:openbis_endpoint)
     end
-    assert OpenbisSyncJob.new(endpoint).exists?
   end
 
-  test 'create jobs on creation' do
-    Delayed::Job.destroy_all
-    endpoint = Factory(:openbis_endpoint)
-    assert OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
-    assert OpenbisSyncJob.new(endpoint).exists?
-  end
-
-  test 'jobs destroyed on delete' do
-    Delayed::Job.destroy_all
+  test 'jobs do not error for destroyed endpoint' do
     pa = Factory(:project_administrator)
     endpoint = Factory(:openbis_endpoint, project: pa.projects.first)
-    assert_difference('Delayed::Job.count', -2) do
-      User.with_current_user(pa.user) do
-        endpoint.destroy
-      end
+    User.with_current_user(pa.user) do
+      endpoint.destroy
     end
-    refute OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
-    refute OpenbisSyncJob.new(endpoint).exists?
+
+    assert_nothing_raised do
+      OpenbisEndpointCacheRefreshJob.perform_now(endpoint)
+      OpenbisSyncJob.perform_now(endpoint)
+    end
   end
 
   test 'encrypted password' do
@@ -589,11 +586,14 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert_equal 'Tomek', store.fetch(key1)
     assert_equal 'Marek', store.fetch(key2)
 
+    old_timestamp = endpoint.last_cache_refresh
+
     sleep(0.2.seconds)
 
     # Delayed::Job.destroy_all
     # assert_difference('Delayed::Job.count', 1) do
     endpoint.refresh_metadata
+    assert_not_equal old_timestamp, endpoint.last_cache_refresh, 'Should update `last_cache_refresh` timestamp'
     # end
 
     assert endpoint.metadata_store.exist?(key1)
@@ -601,8 +601,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
     asset.reload
     assert asset.refresh?
-
-    assert OpenbisSyncJob.new(endpoint).exists?
   end
 
   test 'force_refresh_metadata clears store, marks all for refresh' do
@@ -633,8 +631,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
     asset.reload
     assert asset.refresh?
-
-    assert OpenbisSyncJob.new(endpoint).exists?
   end
 
   test 'due_to_refresh gives synchronized assets with elapsed synchronization time' do
@@ -933,5 +929,17 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 '
     names = endpoint.parse_code_names(input)
     assert_equal %w[N1 N2 NAME NAME2 AGAIN], names
+  end
+
+  test 'due for sync?' do
+    assert Factory(:openbis_endpoint, refresh_period_mins: 60).due_sync?
+    assert Factory(:openbis_endpoint, refresh_period_mins: 60, last_sync: 2.years.ago).due_sync?
+    refute Factory(:openbis_endpoint, refresh_period_mins: 60, last_sync: 2.seconds.ago).due_sync?
+  end
+
+  test 'due for cache refresh?' do
+    assert Factory(:openbis_endpoint, refresh_period_mins: 60).due_cache_refresh?
+    assert Factory(:openbis_endpoint, refresh_period_mins: 60, last_cache_refresh: 2.hours.ago).due_cache_refresh?
+    refute Factory(:openbis_endpoint, refresh_period_mins: 60, last_cache_refresh: 30.minutes.ago).due_cache_refresh?
   end
 end
