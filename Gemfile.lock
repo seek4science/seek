@@ -26,9 +26,9 @@ GIT
 
 GIT
   remote: https://github.com/fbacall/ro-crate-ruby.git
-  revision: c0ac740792565de4c543a615310f67029e666d58
+  revision: 70804d34264481e70d0fe83ecc6ad76eda164e74
   specs:
-    ro-crate-ruby (0.1.0)
+    ro-crate-ruby (0.3.0)
       addressable
       rubyzip
 

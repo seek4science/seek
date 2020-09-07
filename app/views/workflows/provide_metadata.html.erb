@@ -1,6 +1,6 @@
 <h1>New <%= t('workflow') %></h1>
 
-<%= form_tag({action: :create_metadata}, multipart: true) do -%>
+<%= form_tag(@workflow.new_record? ? create_metadata_workflows_path : create_version_metadata_workflow_path(@workflow), multipart: true) do -%>
   <%= hidden_field_tag 'content_blob_id', session[:uploaded_content_blob_id] %>
 
   <div class="asset_form">
@@ -84,11 +84,7 @@
     <%= hidden_field_tag 'workflow[internals]', raw(@workflow.internals.to_json) -%>
 
     <div>
-      <%= preview_permission_popup_link(@workflow)-%>
-      <%= create_button id: "workflow_submit_btn",
-                        onclick: "return validateResourceFields('workflow')",
-                        class: 'btn btn-primary' -%>
-      or <%= cancel_button(workflows_path) -%>
+      <%= form_submit_buttons(@workflow) %>
     </div>
   </div>
 <% end -%>

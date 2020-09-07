@@ -162,7 +162,7 @@ module JsonRestTestCases
   end
 
   def response_code_for_not_available(format)
-    id = (@controller.controller_model.maximum(:id) || 0) + 100
+    id = (@controller.controller_model.maximum(:id) || 0) + 1357
 
     url_opts = rest_show_url_options.merge(id: id, format: format)
 

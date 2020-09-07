@@ -5,7 +5,7 @@
 
 <% if logged_in_and_member? -%>
   <%= panel('New version', :id => 'upload_new_version_form', :style => 'display: none') do %>
-    <%= form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
+    <%= form_tag({:action=>"create_version", :id=>resource}, :multipart => true) do -%>
 
       <p>
         You are about to upload a new version of this <%= asset_name -%>.
