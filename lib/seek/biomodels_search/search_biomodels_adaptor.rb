@@ -5,6 +5,7 @@ module Seek
     class SearchBiomodelsAdaptor < AbstractSearchAdaptor
       NUMRESULTS = 25
       def perform_search(query)
+        
         json = Rails.cache.fetch("biomodels_search_json_#{CGI.escape(query)}", expires_in: 1.day) do
           RestClient.get("https://www.ebi.ac.uk/biomodels/search?query=#{CGI.escape(query)}&numResults=#{NUMRESULTS}", accept: 'application/json').body
         end
@@ -15,6 +16,9 @@ module Seek
         end.compact.reject do |biomodels_result|
           biomodels_result.title.blank?
         end
+      rescue StandardError => exception
+        Seek::Errors::ExceptionForwarder.send_notification(exception, data: { query: query })
+        []
       end
 
       def fetch_item(item_id)
