@@ -1033,6 +1033,33 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_empty document.discussion_links
   end
 
+  test 'should return to project page after destroy' do
+    person = Factory(:person)
+    project = Factory(:project)
+    document = Factory(:document, contributor: person, project_ids: [project.id])
+    login_as(person)
+    assert_difference('Document.count', -1) do
+      assert_no_difference('ContentBlob.count') do
+        delete :destroy, params: { id: document, return_to: project_path(project)}
+      end
+    end
+    assert_redirected_to project_path(project)
+  end
+
+  
+  test "shouldn't return to unauthorised host" do
+    person = Factory(:person)
+    project = Factory(:project)
+    document = Factory(:document, contributor: person, project_ids: [project.id])
+    login_as(person)
+    assert_difference('Document.count', -1) do
+      assert_no_difference('ContentBlob.count') do
+        delete :destroy, params: { id: document, return_to: "https://www.google.co.uk/"}
+      end
+    end
+    assert_redirected_to documents_path
+  end
+
   private
 
   def valid_document
