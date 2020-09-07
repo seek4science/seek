@@ -88,10 +88,8 @@ module ImagesHelper
     if model_item.can_delete?(user)
       fullURL = url_for(model_item)
 
-      # Check referer's host before setting a return point
-      if (request.referer && URI(request.referer).host==request.host)
-        fullURL = polymorphic_url(model_item,:return_to=>URI(request.referer).path)
-      end
+      ## Add return path if available
+      fullURL = polymorphic_url(model_item,:return_to=>URI(request.referer).path) if request.referer
 
       html = content_tag(:li) { image_tag_for_key('destroy', fullURL, "Delete #{item_name}", { data: { confirm: 'Are you sure?' }, method: :delete}, "Delete #{item_name}") }
       return html.html_safe
