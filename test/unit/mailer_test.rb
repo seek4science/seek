@@ -172,54 +172,24 @@ class MailerTest < ActionMailer::TestCase
     assert_equal encode_mail(@expected), encode_mail(Mailer.forgot_password(users(:aaron)))
   end
 
-  test 'contact_admin_new_user - project has no administrator' do
+  test 'contact_admin_new_user' do
+
+    new_registree = Factory(:person,first_name:'Fred',last_name:'Jones', email:'fredjones@email.com')
+
     @expected.subject = 'Sysmo SEEK member signed up'
     @expected.to = 'Quentin Jones <quentin@email.com>'
     @expected.from = 'no-reply@sysmo-db.org'
-    @expected.reply_to = 'Aaron Spiggle <aaron@email.com>'
+    @expected.reply_to = 'Fred Jones <fredjones@email.com>'
 
-    @expected.body = read_fixture('contact_admin_new_user_no_project_admin')
-
-    params = {}
-    params[:projects] = [Factory(:project, title: 'Project X').id.to_s, Factory(:project, title: 'Project Y').id.to_s]
-    params[:institutions] = [Factory(:institution, title: 'The Institute').id.to_s]
-    params[:other_projects] = 'Another Project'
-    params[:other_institutions] = 'Another Institute'
+    @expected.body = read_fixture('contact_admin_new_user')
 
     expected_text = encode_mail(@expected)
-    expected_text.gsub!('-person_id-', users(:aaron).person.id.to_s)
+    expected_text.gsub!('-person_id-', new_registree.id.to_s)
 
     assert_equal expected_text,
-                 encode_mail(Mailer.contact_admin_new_user(params, users(:aaron)))
+                 encode_mail(Mailer.contact_admin_new_user(new_registree.user))
   end
 
-  test 'contact_admin_new_user - project has administrator' do
-    @expected.subject = 'Sysmo SEEK member signed up'
-    @expected.to = 'Quentin Jones <quentin@email.com>'
-    @expected.from = 'no-reply@sysmo-db.org'
-    @expected.reply_to = 'Aaron Spiggle <aaron@email.com>'
-
-    @expected.body = read_fixture('contact_admin_new_user_has_project_admin')
-
-    params = {}
-
-    project_admin = Factory(:project_administrator)
-    project = project_admin.projects.first
-    project.title = 'Project X'
-    disable_authorization_checks { project.save! }
-
-    params[:projects] = [project.id.to_s, Factory(:project, title: 'Project Y').id.to_s]
-    params[:institutions] = [Factory(:institution, title: 'The Institute').id.to_s]
-    params[:other_projects] = 'Another Project'
-    params[:other_institutions] = 'Another Institute'
-
-    expected_text = encode_mail(@expected)
-    expected_text.gsub!('-person_id-', users(:aaron).person.id.to_s)
-    expected_text.gsub!('-project_path-', "http://localhost:3000/projects/#{project.id}")
-
-    assert_equal expected_text,
-                 encode_mail(Mailer.contact_admin_new_user(params, users(:aaron)))
-  end
 
   test 'welcome' do
     @expected.subject = 'Welcome to Sysmo SEEK'

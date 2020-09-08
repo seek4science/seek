@@ -127,7 +127,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.save && current_user.save
         if Seek::Config.email_enabled && during_registration
-          notify_admin_and_project_administrators_of_new_user
+          Mailer.contact_admin_new_user(current_user).deliver_later
         end
         if current_user.active?
           flash[:notice] = 'Person was successfully created.'
@@ -156,10 +156,6 @@ class PeopleController < ApplicationController
         format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
     end
-  end
-
-  def notify_admin_and_project_administrators_of_new_user
-    Mailer.contact_admin_new_user(notification_params.to_h, current_user).deliver_later
   end
 
   # PUT /people/1

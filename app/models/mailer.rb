@@ -80,13 +80,10 @@ class Mailer < ActionMailer::Base
          subject: "Welcome to #{Seek::Config.application_name}")
   end
 
-  def contact_admin_new_user(params, user)
-    new_member_details = Seek::Mail::NewMemberAffiliationDetails.new(params)
-    @details = new_member_details.message
+  def contact_admin_new_user(user)
+
     @person = user.person
     @user = user
-    @projects = new_member_details.projects
-    @projects_with_admins = @projects.select{|p| p.project_administrators.any?}
 
     mail(from: Seek::Config.noreply_sender,
          to: admin_emails,
