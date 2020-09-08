@@ -4,7 +4,7 @@
 
 Factory.define(:programme) do |f|
   f.sequence(:title) { |n| "A Programme: #{n}" }
-  f.projects { [Factory.build(:project)] }
+  f.projects { [Factory(:project)] }
   f.after_create do |p|
     p.is_activated = true
     p.save
