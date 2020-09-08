@@ -1,5 +1,5 @@
 class TaskJob < ApplicationJob
-  after_enqueue do
+  before_enqueue do
     task.update_attribute(:status, Task::STATUS_QUEUED)
   end
 

@@ -6,14 +6,14 @@ class Task < ApplicationRecord
   STATUS_FAILED = 'failed'.freeze
   belongs_to :resource, polymorphic: true, inverse_of: :tasks
   before_validation :initialize_status
-  validates :status, inclusion: {in: [STATUS_WAITING, STATUS_QUEUED, STATUS_ACTIVE, STATUS_DONE, STATUS_FAILED]}
+  validates :status, inclusion: { in: [STATUS_WAITING, STATUS_QUEUED, STATUS_ACTIVE, STATUS_DONE, STATUS_FAILED] }
 
   def completed?
     status == STATUS_DONE || status == STATUS_FAILED
   end
 
   def pending?
-    !completed?
+    status.nil? || status == STATUS_WAITING || status == STATUS_QUEUED
   end
 
   private
