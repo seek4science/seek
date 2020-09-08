@@ -1,24 +1,24 @@
 class SendPeriodicEmailsJob < ApplicationJob
   DELAYS = { 'daily' => 1.day, 'weekly' => 1.week, 'monthly' => 1.month }.freeze
 
-  def perform
+  def perform(frequency)
     return unless Seek::Config.email_enabled
-    logs = find_relevant_logs
+    logs = find_relevant_logs(frequency)
     subscribed_people(logs).each do |person|
       begin
-        collect_and_deliver_to_person(logs, person)
+        collect_and_deliver_to_person(logs, person, frequency)
       rescue Exception => e
-        Delayed::Job.logger.error("Error sending subscription emails to person #{person.id} - #{e.message}")
+        raise("Error sending subscription emails to person #{person.id} - #{e.message}")
       end
     end
   end
 
-  def collect_and_deliver_to_person(logs, person)
-    activity_logs = collect_relevant_logs_for_person(logs, person)
+  def collect_and_deliver_to_person(logs, person, frequency)
+    activity_logs = collect_relevant_logs_for_person(logs, person, frequency)
     SubMailer.send_digest_subscription(person, activity_logs, frequency).deliver_later if activity_logs.any?
   end
 
-  def collect_relevant_logs_for_person(logs, person)
+  def collect_relevant_logs_for_person(logs, person, frequency)
     # get only the logs for items that are visible to this person
     logs_for_visible_items = logs.select { |log| log.activity_loggable.try(:can_view?, person.user) }
 
@@ -48,9 +48,9 @@ class SendPeriodicEmailsJob < ApplicationJob
     ActivityLog.where(['created_at >= ? and action in (?) and controller_name != ?', time_point, %w[create update], 'sessions'])
   end
 
-  def find_relevant_logs
+  def find_relevant_logs(frequency)
     # strip the logs down to those that are relevant
-    activity_logs_since(delay_for_frequency.ago).to_a.select do |log|
+    activity_logs_since(DELAYS[frequency].ago).to_a.select do |log|
       log.activity_loggable.try(:subscribable?)
     end
   end
