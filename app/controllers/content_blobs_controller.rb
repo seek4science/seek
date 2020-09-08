@@ -72,9 +72,7 @@ class ContentBlobsController < ApplicationController
     if @content_blob.file_exists?
       pdf_or_convert
     elsif @content_blob.cachable?
-      if (caching_job = @content_blob.caching_job).exists?
-        caching_job.first.destroy
-      end
+      @content_blob.caching_task&.destroy
       @content_blob.retrieve
       pdf_or_convert
     else

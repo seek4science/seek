@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_04_102556) do
+ActiveRecord::Schema.define(version: 2020_09_08_093735) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1831,6 +1831,17 @@ ActiveRecord::Schema.define(version: 2020_09_04_102556) do
 
   create_table "tags", id: :integer,  force: :cascade do |t|
     t.string "name"
+  end
+
+  create_table "tasks",  force: :cascade do |t|
+    t.string "resource_type"
+    t.bigint "resource_id"
+    t.string "key"
+    t.string "status"
+    t.integer "attempts", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["resource_type", "resource_id"], name: "index_tasks_on_resource_type_and_resource_id"
   end
 
   create_table "text_values", id: :integer,  force: :cascade do |t|

@@ -40,6 +40,7 @@ class ContentBlob < ApplicationRecord
   after_destroy :delete_converted_files
 
   has_many :worksheets, inverse_of: :content_blob, dependent: :destroy
+  has_one :caching_task, -> { where(key: 'remote_content_fetch') }, class_name: 'Task', as: :resource, dependent: :destroy
 
   validate :original_filename_or_url
 
@@ -180,16 +181,6 @@ class ContentBlob < ApplicationRecord
       file_size < Seek::Config.max_cachable_size
   end
 
-  def caching_job(ignore_locked = true)
-    job_yaml = RemoteContentFetchingJob.new(self).to_yaml
-
-    if ignore_locked
-      Delayed::Job.where(['handler = ? AND locked_at IS NULL AND failed_at IS NULL', job_yaml]) # possibly a better way of doing this...
-    else
-      Delayed::Job.where(['handler = ? AND failed_at IS NULL', job_yaml])
-    end
-  end
-
   def search_terms
     if is_text?
       if is_indexable_text?
@@ -305,7 +296,8 @@ class ContentBlob < ApplicationRecord
 
   def create_retrieval_job
     if Seek::Config.cache_remote_files && !file_exists? && !url.blank? && (make_local_copy || cachable?) && remote_content_handler
-      RemoteContentFetchingJob.new(self).queue_job
+      create_caching_task
+      RemoteContentFetchingJob.perform_later(self)
     end
   end
 
