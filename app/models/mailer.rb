@@ -112,7 +112,6 @@ class Mailer < ActionMailer::Base
   end
 
   def announcement_notification(site_announcement, notifiee_info)
-    # FIXME: this should really be part of the site_announcements plugin
     @site_announcement  = site_announcement
     @notifiee_info = notifiee_info
     mail(from: Seek::Config.noreply_sender,
@@ -211,6 +210,19 @@ class Mailer < ActionMailer::Base
          to: admin_emails,
          reply_to: @requester.email_with_name,
          subject: "New #{t('project')} and #{t('programme')} request from #{@requester.name}: #{@project.title}")
+  end
+
+  def request_create_project(user, project_json, institution_json, message_log)
+    @admins = admins
+    @requester = user.person
+    @institution = Institution.new(JSON.parse(institution_json))
+    @project = Project.new(JSON.parse(project_json))
+    @message_log = message_log
+    mail(from: Seek::Config.noreply_sender,
+         to: admin_emails,
+         reply_to: @requester.email_with_name,
+         subject: "New #{t('project')} request from #{@requester.name}: #{@project.title}",
+         template_name: :request_create_project_for_programme)
   end
 
   def join_project_rejected(requester, project, comments)

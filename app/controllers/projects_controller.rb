@@ -8,7 +8,6 @@ class ProjectsController < ApplicationController
 
   before_action :login_required, only: [:request_membership, :guided_join, :guided_create, :request_join, :request_create, :administer_join_request, :respond_join_request]
 
-  before_action :programmes_enabled?,only: [:guided_create]
   before_action :managed_programme_configured?, only: [:guided_create]
 
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
@@ -139,12 +138,17 @@ class ProjectsController < ApplicationController
       Mailer.request_create_project_for_programme(current_user, @programme,@project.to_json, @institution.to_json, log).deliver_later
 
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
-    else
+    elsif Seek::Config.programmes_enabled
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, log).deliver_later
       flash.now[:notice]="Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
+    else
+      @programme=nil
+      log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+      Mailer.request_create_project(current_user, @project.to_json, @institution.to_json, log).deliver_later
+      flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     end
 
 

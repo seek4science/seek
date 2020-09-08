@@ -347,6 +347,21 @@ class MailerTest < ActionMailer::TestCase
     end
   end
 
+  test 'request create project' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        project = Project.new(title:'My lovely project')
+        institution = Factory(:institution)
+        sender = Factory(:person)
+        log = MessageLog.log_project_creation_request(sender,nil,project,institution)
+        email = Mailer.request_create_project(sender.user, project.to_json, institution.to_json,log)
+        refute_nil email
+        refute_nil email.body
+        pp email.body
+      end
+    end
+  end
+
   test 'request create project and programme' do
     with_config_value(:application_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do

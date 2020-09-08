@@ -29,7 +29,7 @@ class MessageLog < ApplicationRecord
     details = {}
     details[:institution] = institution.attributes
     details[:project] = project.attributes
-    details[:programme] = programme.attributes
+    details[:programme] = programme&.attributes
     # FIXME: needs a resource, but can't use programme as it will save it if it is new
     MessageLog.create(resource: sender, sender: sender, details: details.to_json, message_type: PROJECT_CREATION_REQUEST)
   end
