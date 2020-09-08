@@ -105,21 +105,6 @@ class Mailer < ActionMailer::Base
     )
   end
 
-  def contact_project_administrator_new_user(project_administrator, params, user)
-    new_member_details = Seek::Mail::NewMemberAffiliationDetails.new(params)
-    @details = new_member_details.message
-    @other_institutions = params[:other_institutions]
-    @person = user.person
-    @projects = new_member_details.projects.select{|project| project_administrator.is_project_administrator?(project)}
-    @user = user
-    mail(from: Seek::Config.noreply_sender,
-         to: project_administrator_email(project_administrator),
-         reply_to: user.person.email_with_name,
-         subject: "#{Seek::Config.application_name} member signed up, please assign this person to the #{I18n.t('project').pluralize.downcase} of which you are #{I18n.t('project')} Administrator")
-  end
-
-
-
   def resources_harvested(harvester_responses, user)
     @resources = harvester_resources
     @person = user.person
