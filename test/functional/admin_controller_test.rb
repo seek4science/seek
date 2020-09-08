@@ -298,12 +298,10 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'clear failed jobs' do
-
     Delayed::Job.destroy_all
-    ContentBlobCleanerJob.new.queue_job
-    job = Delayed::Job.last
+    job = Delayed::Job.create!
     job.update_column(:failed_at,Time.now)
-    ContentBlobCleanerJob.new.queue_job
+    Delayed::Job.create!
     assert_equal 2,Delayed::Job.count
     assert_difference('Delayed::Job.count',-1) do
       post :clear_failed_jobs, format: 'json'
@@ -318,10 +316,9 @@ class AdminControllerTest < ActionController::TestCase
     person = Factory(:person)
 
     Delayed::Job.destroy_all
-    ContentBlobCleanerJob.new.queue_job
-    job = Delayed::Job.last
+    job = Delayed::Job.create!
     job.update_column(:failed_at,Time.now)
-    ContentBlobCleanerJob.new.queue_job
+    Delayed::Job.create!
     assert_equal 2,Delayed::Job.count
 
     assert_no_difference('Delayed::Job.count') do

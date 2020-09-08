@@ -56,7 +56,7 @@ class ApplicationJob < ActiveJob::Base
     enqueue(args)
   end
 
-  def self.report_exception(exception, message = nil, data = {})
+  def report_exception(exception, message = nil, data = {})
     message ||= "Error executing job for #{self.class.name}"
     Seek::Errors::ExceptionForwarder.send_notification(exception, data: data)
     Rails.logger.error(message)

@@ -2,7 +2,7 @@ class SendAnnouncementEmailsJob < EmailJob
   queue_with_priority 3
   BATCHSIZE = 50
 
-  def perform(site_announcement_id, offset)
+  def perform(site_announcement_id, offset = 0)
     announcement = SiteAnnouncement.find_by_id(site_announcement_id)
     return unless announcement && Seek::Config.email_enabled
 
