@@ -150,7 +150,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'should update sample_type' do
     sample_type = nil
-    perform_enqueued_jobs do
+    perform_enqueued_jobs(only: [SampleTemplateGeneratorJob, SampleTypeUpdateJob]) do
       sample_type = Factory(:patient_sample_type, project_ids: @project_ids)
     end
     assert_empty sample_type.tags

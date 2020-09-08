@@ -2,9 +2,8 @@ class SendAnnouncementEmailsJob < EmailJob
   queue_with_priority 3
   BATCHSIZE = 50
 
-  def perform(site_announcement_id, offset = 0)
-    announcement = SiteAnnouncement.find_by_id(site_announcement_id)
-    return unless announcement && Seek::Config.email_enabled
+  def perform(announcement, offset = 0)
+    return unless announcement.persisted? && Seek::Config.email_enabled
 
     NotifieeInfo.where(receive_notifications: true).offset(offset).limit(BATCHSIZE).each do |notifiee_info|
       begin
@@ -20,6 +19,6 @@ class SendAnnouncementEmailsJob < EmailJob
 
     offset += BATCHSIZE
 
-    self.class.perform_later(site_announcement_id, offset) if offset < NotifieeInfo.count
+    self.class.perform_later(announcement, offset) if offset < NotifieeInfo.count
   end
 end

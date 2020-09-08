@@ -244,7 +244,7 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     RdfGenerationQueue.destroy_all
 
     # checks that rdf generation jobs have been created, to update the RDF for the assays
-    assert_difference('Delayed::Job.where("handler LIKE ?", "%RdfGenerationJob%").count', 1) do
+    assert_enqueued_jobs(1, only: RdfGenerationJob) do
       assert_difference('RdfGenerationQueue.count', 2) do
         type.ontology_uri = 'http://wibble.com/ontology#fish'
         type.save!
@@ -268,7 +268,7 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     RdfGenerationQueue.destroy_all
 
     # checks that rdf generation jobs have been created, to update the RDF for the assays
-    assert_difference('Delayed::Job.where("handler LIKE ?", "%RdfGenerationJob%").count', 1) do
+    assert_enqueued_jobs(1, only: RdfGenerationJob) do
       assert_difference('RdfGenerationQueue.count', 1) do
         type.destroy
         assay.reload
