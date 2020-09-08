@@ -357,7 +357,6 @@ class MailerTest < ActionMailer::TestCase
         email = Mailer.request_create_project(sender.user, project.to_json, institution.to_json,log)
         refute_nil email
         refute_nil email.body
-        pp email.body
       end
     end
   end

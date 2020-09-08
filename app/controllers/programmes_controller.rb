@@ -3,7 +3,7 @@ class ProgrammesController < ApplicationController
   include Seek::DestroyHandling
   include ApiHelper
 
-  before_action :programmes_enabled?
+  before_action :programmes_enabled?, except: [:administer_create_project_request, :respond_create_project_request]
   before_action :login_required, except: [:show, :index]
   before_action :find_and_authorize_requested_item, only: [:edit, :update, :destroy, :storage_report]
   before_action :find_requested_item, only: [:show, :admin,:activation_review,:accept_activation,:reject_activation,:reject_activation_confirmation]
@@ -15,7 +15,7 @@ class ProgrammesController < ApplicationController
   #specific to the actions that require a MessageLog with a programme definition assigned
   before_action :validate_message_log, only: [:administer_create_project_request, :respond_create_project_request]
   before_action :parse_message_log_details, only: [:administer_create_project_request]
-  before_action :check_message_log_programme_permissions, only: [:administer_create_project_request, :respond_create_project_request]
+  before_action :check_message_log_programme_permissions, only: [:administer_create_project_request, :respond_create_project_request], if: Proc.new{Seek::Config.programmes_enabled}
 
 
   skip_before_action :project_membership_required
@@ -142,7 +142,7 @@ class ProgrammesController < ApplicationController
     if params['accept_request']=='1'
 
       # @programme already populated in before_filter when checking permissions
-      make_programme_admin = @programme.new_record?
+      make_programme_admin = @programme&.new_record?
 
       if params['institution']['id']
         @institution = Institution.find(params['institution']['id'])
@@ -158,7 +158,7 @@ class ProgrammesController < ApplicationController
       unless @project.valid?
         validate_error_msg << "The #{t('project')} is invalid, #{@project.errors.full_messages.join(', ')}"
       end
-      unless @programme.valid?
+      unless @programme.nil? || @programme.valid?
         validate_error_msg << "The #{t('programme')} is invalid, #{@programme.errors.full_messages.join(', ')}"
       end
       unless @institution.valid?
@@ -214,8 +214,10 @@ class ProgrammesController < ApplicationController
 
   def parse_message_log_details
     details = JSON.parse(@message_log.details)
-    @programme = Programme.new(details['programme'])
-    @programme = Programme.find(@programme.id) unless @programme.id.nil?
+    if details['programme']
+      @programme = Programme.new(details['programme'])
+      @programme = Programme.find(@programme.id) unless @programme.id.nil?
+    end
 
     @project = Project.new(details['project'])
     @project = Project.find(@project.id) unless @project.id.nil?
