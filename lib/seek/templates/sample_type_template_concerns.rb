@@ -20,12 +20,14 @@ module Seek
             content_blob.destroy
             update_attribute(:content_blob, nil)
           end
-          SampleTemplateGeneratorJob.new(self).queue_job
+          start_task('template_generation') do
+            SampleTemplateGeneratorJob.new(self).queue_job
+          end
         end
       end
 
       def queue_sample_type_update_job
-        SampleTypeUpdateJob.new(self).queue_job
+        SampleTypeUpdateJob.new(self, true).queue_job
       end
 
       def generate_template
@@ -60,6 +62,10 @@ module Seek
 
       def compatible_template_file?
         template_reader.compatible?
+      end
+
+      def template_generation_task
+        tasks.where(key: 'template_generation').first
       end
 
       # private
