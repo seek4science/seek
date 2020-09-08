@@ -273,6 +273,8 @@ SEEK::Application.routes.draw do
       get :guided_create
       post :request_join
       post :request_create
+      get :administer_create_project_request
+      post :respond_create_project_request
     end
     member do
       get :asset_report
@@ -492,8 +494,6 @@ SEEK::Application.routes.draw do
     collection do
       post :items_for_result
       get :awaiting_activation
-      get :administer_create_project_request
-      post :respond_create_project_request
     end
     member do
       get :activation_review
