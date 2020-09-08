@@ -76,7 +76,7 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def self.subscribable?
-    include? Seek::Subscribable
+    false
   end
 
   def subscribable?

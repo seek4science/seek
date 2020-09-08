@@ -202,17 +202,20 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     refute cv.new_record?
     assert_equal [type], cv.sample_types
 
+    type.template_generation_task.destroy!
     assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [type]) do
       cv.sample_controlled_vocab_terms.create(label: 'fsdfsdsdfsdf')
     end
 
+    type.template_generation_task.destroy!
     assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [type]) do
       term = cv.sample_controlled_vocab_terms.last
       cv.sample_controlled_vocab_terms.destroy(term)
     end
 
+    type.template_generation_task.destroy!
     # changing the title has no effect
-    assert_no_enqueued_jobs do
+    assert_no_enqueued_jobs(only: SampleTemplateGeneratorJob) do
       cv.title = 'new title'
       cv.save
     end

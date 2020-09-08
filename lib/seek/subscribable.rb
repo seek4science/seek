@@ -3,8 +3,8 @@ module Seek
     def self.included(klass)
       klass.class_eval do
         has_many :subscriptions, as: :subscribable, dependent: :destroy, autosave: true, before_add: proc { |item, sub| sub.subscribable = item } # ,:required_access_to_owner => false,
-        after_create :set_subscription_job if self.subscribable?
-        after_update :update_subscription_job_if_study_or_assay if self.subscribable?
+        after_create :set_subscription_job, if: -> { self.subscribable? }
+        after_update :update_subscription_job_if_study_or_assay, if: -> { self.subscribable? }
         extend ClassMethods
       end
     end
@@ -104,6 +104,10 @@ module Seek
     end
 
     module ClassMethods
+      def self.subscribable?
+        true
+      end
+
       def subscribers_are_notified_of?(action)
         action == 'create' || action == 'update'
       end
