@@ -25,12 +25,12 @@ module Seek
 
         def react_to_project_addition(project)
           project_additions << project
-          SetSubscriptionsForItemJob.new(self, [project]).queue_job if !self.new_record? && self.subscribable?
+          SetSubscriptionsForItemJob.new(self, [project]).queue_job if persisted? && subscribable?
           update_rdf_on_associated_change(project) if self.respond_to?(:update_rdf_on_associated_change)
         end
 
         def react_to_project_removal(project)
-          RemoveSubscriptionsForItemJob.new(self, [project]).queue_job if self.subscribable?
+          RemoveSubscriptionsForItemJob.new(self, [project]).queue_job if persisted? && subscribable?
           queue_rdf_generation(true) if self.respond_to?(:queue_rdf_generation)
         end
 
