@@ -4,12 +4,13 @@ module Ga4gh
       class ToolSerializer < ActiveModel::Serializer
         include Rails.application.routes.url_helpers
 
-        attributes :id, :url, :name
+        attributes :id, :url, :name, :toolclass
         has_many :versions
 
         def url
           workflow_url(object.id, host: Seek::Config.site_base_host)
         end
+
       end
     end
   end

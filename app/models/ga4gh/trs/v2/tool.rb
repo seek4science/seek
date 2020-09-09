@@ -18,6 +18,10 @@ module Ga4gh
         def versions
           super.map { |v| ToolVersion.new(v) }
         end
+
+        def toolclass
+          ToolClass::WORKFLOW
+        end
       end
     end
   end
