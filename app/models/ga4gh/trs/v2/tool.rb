@@ -4,7 +4,6 @@ module Ga4gh
       # Decorator for a Workflow to make it appear as a GA4GH TRS Tool.
       class Tool
         include ActiveModel::Serialization
-        include Rails.application.routes.url_helpers
         delegate_missing_to :@workflow
 
         def initialize(workflow)
@@ -19,8 +18,12 @@ module Ga4gh
           title
         end
 
+        def organization
+          projects.map(&:title).sort.join(', ')
+        end
+
         def versions
-          super.map { |v| ToolVersion.new(v) }
+          super.map { |v| ToolVersion.new(self, v) }
         end
 
         def toolclass

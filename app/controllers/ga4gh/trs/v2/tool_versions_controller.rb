@@ -95,7 +95,7 @@ module Ga4gh
         end
 
         def get_version
-          @tool_version = ToolVersion.new(@tool.find_version(params[:version_id]))
+          @tool_version = ToolVersion.new(@tool, @tool.find_version(params[:version_id]))
         end
 
         def check_type

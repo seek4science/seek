@@ -6,12 +6,17 @@ module Ga4gh
         include ActiveModel::Serialization
         delegate_missing_to :@workflow_version
 
-        def initialize(workflow_version)
+        def initialize(tool, workflow_version)
+          @tool = tool
           @workflow_version = workflow_version
         end
 
         def id
           version.to_s
+        end
+
+        def tool_id
+          @tool.id
         end
 
         def name
