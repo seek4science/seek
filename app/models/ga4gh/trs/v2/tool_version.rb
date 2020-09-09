@@ -6,6 +6,12 @@ module Ga4gh
         include ActiveModel::Serialization
         delegate_missing_to :@workflow_version
 
+        DESCRIPTOR_TYPE_MAPPING = {
+            'CWL' => 'CWL',
+            'Nextflow' => 'NFL',
+            'Galaxy' => 'Galaxy'
+        }
+
         def initialize(tool, workflow_version)
           @tool = tool
           @workflow_version = workflow_version
@@ -28,17 +34,7 @@ module Ga4gh
         end
 
         def descriptor_type
-          t = case workflow_class&.key
-              when 'CWL'
-                'CWL'
-              when 'Nextflow'
-                'NFL'
-              when 'Galaxy'
-                'GALAXY'
-              else
-                nil
-              end
-          [t].compact
+          [DESCRIPTOR_TYPE_MAPPING[workflow_class&.key]].compact
         end
       end
     end
