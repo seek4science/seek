@@ -11,7 +11,7 @@ module Ga4gh
         end
 
         def id
-          version
+          version.to_s
         end
 
         def name

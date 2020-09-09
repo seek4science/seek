@@ -10,7 +10,7 @@ module Ga4gh
         end
 
         def id
-          @params[:id]
+          @params[:id].to_s
         end
 
         def name

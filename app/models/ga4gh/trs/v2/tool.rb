@@ -11,6 +11,10 @@ module Ga4gh
           @workflow = workflow
         end
 
+        def id
+          super.to_s
+        end
+
         def name
           title
         end
