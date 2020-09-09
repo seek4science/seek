@@ -1,11 +1,10 @@
 module Ga4gh
   module Trs
     module V2
-      class ToolVersionsController < ActionController::API
+      class ToolVersionsController < TrsBaseController
         before_action :get_tool
         before_action :get_version, only: [:show, :descriptor, :tests, :files, :containerfile]
         before_action :check_type, only: [:descriptor, :tests, :files]
-        respond_to :json
         include ::RoCrateHandling
 
         def show
@@ -91,6 +90,7 @@ module Ga4gh
 
         def get_tool
           workflow = Workflow.find(params[:id])
+          respond_with({}, adapter: :attributes, status: :forbidden) unless workflow.can_view?
           @tool = Tool.new(workflow)
         end
 
@@ -101,7 +101,7 @@ module Ga4gh
         def check_type
           if params[:type]
             descriptor = params[:type].sub(/plain_/i, '').upcase
-            unless @tool_version.descriptor_type == descriptor
+            unless (@tool_version.descriptor_type || []).include?(descriptor)
               respond_with({ code: 404, message: "Type: #{descriptor} not available" }, status: :not_found)
             end
           end

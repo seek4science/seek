@@ -1,16 +1,15 @@
 module Ga4gh
   module Trs
     module V2
-      class ToolsController < ActionController::API
+      class ToolsController < TrsBaseController
         before_action :get_tool, only: [:show]
-        respond_to :json
 
         def show
           respond_with(@tool, adapter: :attributes)
         end
 
         def index
-          @tools = Workflow.all.map { |workflow| Ga4gh::Trs::V2::Tool.new(workflow) }
+          @tools = Workflow.authorized_for('view').all.map { |workflow| Ga4gh::Trs::V2::Tool.new(workflow) }
           respond_with(@tools, adapter: :attributes)
         end
 
@@ -18,6 +17,7 @@ module Ga4gh
 
         def get_tool
           workflow = Workflow.find(params[:id])
+          respond_with({}, adapter: :attributes, status: :forbidden) unless workflow.can_view?
           @tool = Ga4gh::Trs::V2::Tool.new(workflow)
         end
       end

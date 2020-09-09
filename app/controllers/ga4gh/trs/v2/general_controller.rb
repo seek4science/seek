@@ -1,9 +1,7 @@
 module Ga4gh
   module Trs
     module V2
-      class GeneralController < ActionController::API
-        respond_to :json
-
+      class GeneralController < TrsBaseController
         def service_info
           id = URI(Seek::Config.site_base_host).host.split('.').reverse.join('.') rescue nil
           id ||= 'misc-seek-deployment'
