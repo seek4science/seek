@@ -25,7 +25,8 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
                                     refresh_period_mins: 60
 
     not_needing_refresh = Factory(:openbis_endpoint, refresh_period_mins: 60, last_cache_refresh: Time.now)
-    not_needing_refresh_timestamp = not_needing_refresh.last_cache_refresh
+    # Reload before getting timestamp to avoid comparison error later: No visible difference in the ActiveSupport::TimeWithZone#inspect output
+    not_needing_refresh_timestamp = not_needing_refresh.reload.last_cache_refresh
 
     disable_authorization_checks do
       assert endpoint1.save
