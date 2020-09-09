@@ -53,8 +53,10 @@ module Ga4gh
           workflows = workflows.limit(@limit)
 
           offset = @offset || 0
+          last_page_offset = count - @limit
+          last_page_offset = nil if last_page_offset <= 0
           response.headers['next_page'] = ga4gh_trs_v2_tools_url(tools_index_params.merge(offset: offset + @limit)) if count > @limit
-          response.headers['last_page'] = ga4gh_trs_v2_tools_url(tools_index_params.merge(offset: offset - @limit)) if offset - @limit > 0
+          response.headers['last_page'] = ga4gh_trs_v2_tools_url(tools_index_params.merge(offset: last_page_offset))
           response.headers['current_offset'] = @offset if @offset
           response.headers['current_limit'] = @limit
           response.headers['self_link'] = request.url
