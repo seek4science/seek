@@ -6,6 +6,26 @@ location=$1
 
 #do some sanity checks
 
+error() {
+  echo "ERROR:$1"
+  echo "Usage: load-docker.sh path"
+  echo ""
+  echo " .. the path should point to a directory containing the filestore directory, and a seek.sql dump of database"
+  exit 1
+}
+
+if [ -z "$location" ];then
+  error "the path parameter is missing"
+fi
+
+if [ ! -f "$location/seek.sql" ];then
+  error "$location/seek.sql file cannot be found"
+fi
+
+if [ ! -d "$location/filestore" ];then
+  error "$location/filestore directory cannot be found"
+fi
+
 docker-compose down
 docker volume rm seek-filestore 
 docker volume rm seek-solr-data
