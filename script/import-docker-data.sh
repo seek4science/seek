@@ -55,9 +55,12 @@ echo "loading up database ..."
 docker exec seek bash -c 'bundle exec rake db:drop && bundle exec rake db:create'
 docker exec seek bash -c 'mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h$MYSQL_HOST $MYSQL_DATABASE < /seek/filestore/seek.sql'
 
+echo "cleaning up"
 docker exec seek bash -c 'bundle exec rake tmp:clear'
 docker exec seek bash -c 'bundle exec rake seek:reindex_all'
 docker exec seek bash -c 'rm /seek/filestore/seek.sql'
 
 echo "Starting up"
 docker-compose restart
+
+echo "Finished"
