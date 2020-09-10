@@ -8,9 +8,11 @@ location=$1
 
 error() {
   echo "ERROR:$1"
-  echo "Usage: load-docker.sh path"
   echo ""
-  echo " .. the path should point to a directory containing the filestore directory, and a seek.sql dump of database"
+  echo "Usage: import-docker-data.sh path"
+  echo ""
+  echo "the path should point to a directory containing the filestore directory, and a seek.sql dump of database"
+  echo "the script should be run from within the directory containing the docker-compose.yml"
   exit 1
 }
 
