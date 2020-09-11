@@ -1795,7 +1795,7 @@ class DataFilesControllerTest < ActionController::TestCase
                policy_attributes: valid_sharing }
 
     with_config_value(:cache_remote_files, false) do
-      assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
         assert_difference('DataFile.count') do
           assert_difference('ContentBlob.count') do
             post :create, params: params
@@ -1827,7 +1827,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                }],
                policy_attributes: valid_sharing }
     with_config_value(:cache_remote_files, false) do
-      assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
         assert_difference('DataFile.count') do
           assert_difference('ContentBlob.count') do
             post :create, params: params
@@ -1859,7 +1859,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                }],
                policy_attributes: valid_sharing }
 
-    assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+    assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
           post :create, params: params
@@ -1889,7 +1889,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                }],
                policy_attributes: valid_sharing }
 
-    assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+    assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
           post :create, params: params
@@ -2615,7 +2615,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.content_blob.file_size
 
     assert_no_difference('Sample.count') do
-      assert_no_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count") do
+      assert_no_enqueued_jobs(only: SampleDataExtractionJob) do
         VCR.use_cassette('nels/missing_sample_metadata') do
           post :retrieve_nels_sample_metadata, params: { id: data_file }
 
@@ -2642,7 +2642,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                             "data_file_id:#{data_file.id}")
 
     assert_no_difference('Sample.count') do
-      assert_no_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count") do
+      assert_no_enqueued_jobs(only: SampleDataExtractionJob) do
         VCR.use_cassette('nels/get_sample_metadata') do
           post :retrieve_nels_sample_metadata, params: { id: data_file }
 
