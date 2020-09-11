@@ -2,7 +2,6 @@ require 'test_helper'
 
 class ReindexingJobTest < ActiveSupport::TestCase
   test 'add item to queue' do
-    Delayed::Job.delete_all
     p = Factory :person
     ReindexingQueue.delete_all
     assert_enqueued_jobs(1, only: ReindexingJob) do

@@ -80,7 +80,6 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
   end
 
   test 'perform ignores unwanted actions' do
-    Delayed::Job.delete_all
     person1 = Factory(:person)
     person2 = Factory(:person)
     person3 = Factory(:person)
@@ -107,8 +106,6 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
   end
 
   test 'perform2' do
-    Delayed::Job.delete_all
-
     person1 = Factory :person
     person2 = Factory :person
     person3 = Factory :person, group_memberships: [Factory(:group_membership, work_group: person2.work_groups[0])]

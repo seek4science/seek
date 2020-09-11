@@ -9,7 +9,6 @@ class RemoveSubscriptionsForItemJobTest < ActiveSupport::TestCase
 
   test 'perform' do
     # set subscriptions
-    Delayed::Job.destroy_all
     person1 = Factory(:person)
     person2 = Factory(:person)
     subscribable = Factory(:data_file, policy: Factory(:public_policy))

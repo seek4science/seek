@@ -558,9 +558,8 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   #  endpoint = Factory(:openbis_endpoint)
   #  datafile1 = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23').create_seek_datafile
   #  assert datafile1.save
-  #  Delayed::Job.destroy_all
   #  # don't know how to test that it was really reindexing job with correct content
-  #  assert_difference('Delayed::Job.count', 1) do
+  # assert_enqueued_with(job: ReindexingJob) do
   #    endpoint.reindex_entities
   #  end
   #  assert ReindexingQueue.exists?(item: datafile1)
@@ -590,11 +589,8 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
     sleep(0.2.seconds)
 
-    # Delayed::Job.destroy_all
-    # assert_difference('Delayed::Job.count', 1) do
     endpoint.refresh_metadata
     assert_not_equal old_timestamp, endpoint.last_cache_refresh, 'Should update `last_cache_refresh` timestamp'
-    # end
 
     assert endpoint.metadata_store.exist?(key1)
     refute endpoint.metadata_store.exist?(key2)
@@ -621,10 +617,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert_equal 'Tomek', store.fetch(key1)
     assert_equal 'Marek', store.fetch(key2)
 
-    # Delayed::Job.destroy_all
-    # assert_difference('Delayed::Job.count', 1) do
     endpoint.force_refresh_metadata
-    # end
 
     refute endpoint.metadata_store.exist?(key1)
     refute endpoint.metadata_store.exist?(key2)

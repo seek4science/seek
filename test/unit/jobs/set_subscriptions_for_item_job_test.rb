@@ -8,7 +8,6 @@ class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
   end
 
   test 'perform for datafile' do
-    Delayed::Job.destroy_all
     person1 = Factory(:person)
     person2 = Factory(:person)
     subscribable = nil
@@ -31,7 +30,6 @@ class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
   end
 
   test 'perform for assay' do
-    Delayed::Job.destroy_all
     person1 = Factory(:person)
     person2 = Factory(:person)
     subscribable = nil
@@ -54,7 +52,6 @@ class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
   end
 
   test 'perform for study' do
-    Delayed::Job.destroy_all
     person1 = Factory(:person)
     person2 = Factory(:person)
     subscribable = nil

@@ -212,7 +212,6 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
     assert_equal 'http://jermontology.org/ontology/JERMOntology#UPLC', assay.technology_type_uri
     assert_equal 'http://jermontology.org/ontology/JERMOntology#UPLC', assay2.technology_type_uri
 
-    Delayed::Job.destroy_all
     RdfGenerationQueue.destroy_all
 
     # checks that rdf generation jobs have been created, to update the RDF for the assays
@@ -236,7 +235,6 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
     type.reload
     assert_equal 'http://jermontology.org/ontology/JERMOntology#UPLC', assay.technology_type_uri
 
-    Delayed::Job.destroy_all
     RdfGenerationQueue.destroy_all
 
     # checks that rdf generation jobs have been created, to update the RDF for the assays

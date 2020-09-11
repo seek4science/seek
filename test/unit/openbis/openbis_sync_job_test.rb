@@ -11,7 +11,6 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     @endpoint.assay_types = ['TZ_FAIR_ASSAY', 'EXPERIMENTAL_STEP'] #needed for automatic picking up of assays
     assert @endpoint.save
     @job = OpenbisSyncJob.new(@endpoint, @batch_size)
-    Delayed::Job.destroy_all # avoids jobs created from the after_create callback, this is tested for OpenbisEndpoint
     @person = Factory(:person, project: @endpoint.project)
     User.current_user = nil # @person.user
   end

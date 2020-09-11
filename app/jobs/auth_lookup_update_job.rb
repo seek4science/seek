@@ -20,7 +20,7 @@ class AuthLookupUpdateJob < BatchJob
     elsif item.is_a?(Person)
       update_assets_for_user item.user unless item.user.nil?
     else
-      Delayed::Job.logger.error("Unexpected type encountered: #{item.class.name}")
+      Rails.logger.error("Unexpected type encountered: #{item.class.name}")
     end
 
     # required to make sure that cached fragments that contain details related to authorization are regenerated after the job has run

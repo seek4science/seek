@@ -310,7 +310,6 @@ class ExternalAssetTest < ActiveSupport::TestCase
     end
 
     asset1.content = { 'key1': 'value1' }
-    Delayed::Job.destroy_all
     assert_enqueued_jobs(1, only: ReindexingJob) do
       asset1.save
     end
