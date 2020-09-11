@@ -238,7 +238,9 @@ class DataFilesController < ApplicationController
       @data_file.copy_assay_associations(@samples, params[:assay_ids]) if params[:assay_ids]
       flash[:notice] = "#{@samples.count} samples extracted successfully"
     else
-      SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
+      @data_file.start_task('sample_extraction') do
+        SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
+      end
     end
 
     respond_to do |format|
@@ -267,7 +269,7 @@ class DataFilesController < ApplicationController
 
   def extraction_status
     @previous_status = params[:previous_status]
-    @job_status = SampleDataExtractionJob.get_status(@data_file)
+    @job_status = @data_file.sample_extraction_task.status
 
     respond_to do |format|
       format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file } }
@@ -280,7 +282,9 @@ class DataFilesController < ApplicationController
         @sample_type = @data_file.reload.possible_sample_types.last
 
         if @sample_type
-          SampleDataExtractionJob.new(@data_file, @sample_type, false, overwrite: true).queue_job
+          @data_file.start_task('sample_extraction') do
+            SampleDataExtractionJob.new(@data_file, @sample_type, false, overwrite: true).queue_job
+          end
 
           respond_to do |format|
             format.html { redirect_to @data_file }

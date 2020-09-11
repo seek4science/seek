@@ -230,4 +230,8 @@ class DataFile < ApplicationRecord
       return assay, Set.new
     end
   end
+
+  def sample_extraction_task
+    tasks.where(key: 'sample_extraction').last
+  end
 end

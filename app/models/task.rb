@@ -16,6 +16,10 @@ class Task < ApplicationRecord
     status.nil? || status == STATUS_WAITING || status == STATUS_QUEUED
   end
 
+  def in_progress?
+    status == STATUS_QUEUED || status == STATUS_ACTIVE
+  end
+
   private
 
   def initialize_status
