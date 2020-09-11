@@ -1,6 +1,4 @@
 class ApplicationJob < ActiveJob::Base
-  include CommonSweepers
-
   # the name of the queue the job will be places on - so that multiple workers can watch different queues.
   queue_as QueueNames::DEFAULT
   queue_with_priority  2
@@ -12,7 +10,7 @@ class ApplicationJob < ActiveJob::Base
 
   # time before the job is run
   def default_delay
-    3.seconds
+    nil
   end
 
   # whether a new job will be created once this one finishes.
@@ -27,7 +25,7 @@ class ApplicationJob < ActiveJob::Base
 
   # the delay for the follow on job, which defaults to the default delay but could be different
   def follow_on_delay
-    1.second
+    default_delay
   end
 
   around_perform do |job, block|
@@ -38,7 +36,7 @@ class ApplicationJob < ActiveJob::Base
 
   after_perform do |job|
     if job.follow_on_job?
-      job.queue_job(nil, follow_on_delay.from_now)
+      job.queue_job(default_priority, follow_on_delay.from_now)
     end
   end
 
@@ -49,8 +47,9 @@ class ApplicationJob < ActiveJob::Base
 
   # adds the job to the Delayed Job queue. Will not create it if it already exists and allow_duplicate is false,
   # or by default allow_duplicate_jobs? returns false.
-  def queue_job(priority = nil, time = default_delay.from_now)
-    args = { wait_until: time }
+  def queue_job(priority = nil, time = default_delay&.from_now)
+    args = { }
+    args[:wait_until] = time if time
     args[:priority] = priority if priority
 
     enqueue(args)

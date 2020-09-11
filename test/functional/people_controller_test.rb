@@ -613,7 +613,7 @@ class PeopleControllerTest < ActionController::TestCase
       assert_enqueued_emails 1 do
         Factory(:activity_log, activity_loggable: sop, action: 'update')
         Factory(:activity_log, activity_loggable: df, action: 'update')
-        SendPeriodicEmailsJob.perform_now('weekly')
+        PeriodicSubscriptionEmailJob.perform_now('weekly')
       end
 
       # unsubscribe to project
@@ -630,7 +630,7 @@ class PeopleControllerTest < ActionController::TestCase
       assert_no_enqueued_emails do
         Factory(:activity_log, activity_loggable: sop, action: 'update')
         Factory(:activity_log, activity_loggable: df, action: 'update')
-        SendPeriodicEmailsJob.perform_now('weekly')
+        PeriodicSubscriptionEmailJob.perform_now('weekly')
       end
     end
   end

@@ -29,14 +29,14 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     end
     # only create and update actions are filtered
     # creation of session is excluded
-    assert_equal 2 * count, SendPeriodicEmailsJob.new('daily').activity_logs_since(Time.now.yesterday.utc).count
-    assert_equal 2 * count, SendPeriodicEmailsJob.new('weekly').activity_logs_since(7.days.ago).count
-    assert_equal 2 * count, SendPeriodicEmailsJob.new('monthly').activity_logs_since(1.month.ago).count
+    assert_equal 2 * count, PeriodicSubscriptionEmailJob.new('daily').activity_logs_since(Time.now.yesterday.utc).count
+    assert_equal 2 * count, PeriodicSubscriptionEmailJob.new('weekly').activity_logs_since(7.days.ago).count
+    assert_equal 2 * count, PeriodicSubscriptionEmailJob.new('monthly').activity_logs_since(1.month.ago).count
 
     Factory(:activity_log, action: 'create', activity_loggable: activity_loggable, culprit: culprit, created_at: 2.days.ago)
-    assert_equal 2 * count, SendPeriodicEmailsJob.new('daily').activity_logs_since(Time.now.yesterday.utc).count
-    assert_equal 2 * count + 1, SendPeriodicEmailsJob.new('weekly').activity_logs_since(7.days.ago).count
-    assert_equal 2 * count + 1, SendPeriodicEmailsJob.new('monthly').activity_logs_since(1.month.ago).count
+    assert_equal 2 * count, PeriodicSubscriptionEmailJob.new('daily').activity_logs_since(Time.now.yesterday.utc).count
+    assert_equal 2 * count + 1, PeriodicSubscriptionEmailJob.new('weekly').activity_logs_since(7.days.ago).count
+    assert_equal 2 * count + 1, PeriodicSubscriptionEmailJob.new('monthly').activity_logs_since(1.month.ago).count
   end
 
   test 'no follow on job after perform' do
@@ -44,8 +44,8 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
 
     person1 = Factory(:person)
 
-    assert_no_enqueued_jobs(only: SendPeriodicEmailsJob) do
-      SendPeriodicEmailsJob.perform_now('daily')
+    assert_no_enqueued_jobs(only: PeriodicSubscriptionEmailJob) do
+      PeriodicSubscriptionEmailJob.perform_now('daily')
     end
   end
 
@@ -69,13 +69,13 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     Factory :activity_log, activity_loggable: nil, culprit: Factory(:user), action: 'search'
 
     assert_enqueued_emails 1 do
-      SendPeriodicEmailsJob.perform_now('daily')
+      PeriodicSubscriptionEmailJob.perform_now('daily')
     end
     assert_enqueued_emails 1 do
-      SendPeriodicEmailsJob.perform_now('weekly')
+      PeriodicSubscriptionEmailJob.perform_now('weekly')
     end
     assert_enqueued_emails 2 do
-      SendPeriodicEmailsJob.perform_now('monthly')
+      PeriodicSubscriptionEmailJob.perform_now('monthly')
     end
   end
 
@@ -99,9 +99,9 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
       Factory :activity_log, activity_loggable: sop, culprit: user, action: 'download'
       Factory :activity_log, activity_loggable: sop, culprit: user, action: 'destroy'
 
-      SendPeriodicEmailsJob.perform_now('daily')
-      SendPeriodicEmailsJob.perform_now('weekly')
-      SendPeriodicEmailsJob.perform_now('monthly')
+      PeriodicSubscriptionEmailJob.perform_now('daily')
+      PeriodicSubscriptionEmailJob.perform_now('weekly')
+      PeriodicSubscriptionEmailJob.perform_now('monthly')
     end
   end
 
@@ -145,7 +145,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     end
 
     assert_enqueued_emails 1 do
-      SendPeriodicEmailsJob.perform_now('daily')
+      PeriodicSubscriptionEmailJob.perform_now('daily')
     end
   end
 end

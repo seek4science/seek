@@ -21,7 +21,7 @@ class SendImmediateEmailsJobTest < ActiveSupport::TestCase
     assert_enqueued_emails 2 do
       disable_authorization_checks do
         al = ActivityLog.create(activity_loggable: sop, culprit: Factory(:user), action: 'create')
-        SendImmediateEmailsJob.perform_now(al)
+        ImmediateSubscriptionEmailJob.perform_now(al)
       end
     end
   end

@@ -1,4 +1,4 @@
-class SendPeriodicEmailsJob < ApplicationJob
+class PeriodicSubscriptionEmailJob < ApplicationJob
   DELAYS = { 'daily' => 1.day, 'weekly' => 1.week, 'monthly' => 1.month }.freeze
 
   def perform(frequency)

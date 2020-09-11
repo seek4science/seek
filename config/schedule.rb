@@ -19,9 +19,9 @@
 
 # Learn more: http://github.com/javan/whenever
 
-SendPeriodicEmailsJob::DELAYS.each do |_, period|
+PeriodicSubscriptionEmailJob::DELAYS.each do |_, period|
   every period do
-    runner "SendPeriodicEmailsJob.new(#{period}).queue_job"
+    runner "PeriodicSubscriptionEmailJob.new(#{period}).queue_job"
   end
 end
 

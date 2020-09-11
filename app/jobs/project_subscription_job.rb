@@ -1,3 +1,5 @@
+# A job to subscribe someone to all items in a project.
+# Happens when a new "ProjectSubscription" is created.
 class ProjectSubscriptionJob < ApplicationJob
   queue_with_priority 2
 
@@ -7,10 +9,6 @@ class ProjectSubscriptionJob < ApplicationJob
         item.subscriptions << Subscription.new(person: project_subscription.person, project_subscription_id: project_subscription.id)
       end
     end
-  end
-
-  def default_delay
-    15.seconds
   end
 
   # all direct assets in the project, but related_#{asset_type} includes also assets from descendants

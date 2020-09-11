@@ -80,7 +80,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     assert_enqueued_emails(1) do
       al = Factory(:activity_log, activity_loggable: s, action: 'update')
-      SendImmediateEmailsJob.perform_now(al)
+      ImmediateSubscriptionEmailJob.perform_now(al)
     end
 
     other_guy = Factory(:person)
@@ -92,7 +92,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     assert_enqueued_emails(2) do
       al = Factory(:activity_log, activity_loggable: s, action: 'update')
-      SendImmediateEmailsJob.perform_now(al)
+      ImmediateSubscriptionEmailJob.perform_now(al)
     end
   end
 
@@ -117,7 +117,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_no_emails do
       User.with_current_user(person) do
         al = Factory(:activity_log, activity_loggable: s, action: 'update')
-        SendImmediateEmailsJob.perform_now(al)
+        ImmediateSubscriptionEmailJob.perform_now(al)
       end
     end
   end
@@ -138,7 +138,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     assert_no_emails do
       al = Factory(:activity_log, activity_loggable: s, action: 'update')
-      SendImmediateEmailsJob.perform_now(al)
+      ImmediateSubscriptionEmailJob.perform_now(al)
     end
   end
 
@@ -155,7 +155,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     assert_no_emails do
       al = Factory(:activity_log, activity_loggable: s, action: 'update')
-      SendImmediateEmailsJob.perform_now(al)
+      ImmediateSubscriptionEmailJob.perform_now(al)
     end
   end
 
