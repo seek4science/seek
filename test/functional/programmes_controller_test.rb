@@ -361,9 +361,11 @@ class ProgrammesControllerTest < ActionController::TestCase
   test 'user can create programme, and becomes programme administrator' do
     p = Factory(:person)
     login_as(p)
-    assert_difference('Programme.count') do
-      assert_enqueued_emails(1) do # activation email
-        post :create, params: { programme: { title: 'A programme', funding_codes: 'aaa,bbb', web_page: '', description: '', funding_details: '' } }
+    with_config_value(:email_enabled, true) do
+      assert_difference('Programme.count') do
+        assert_enqueued_emails(1) do # activation email
+          post :create, params: { programme: { title: 'A programme', funding_codes: 'aaa,bbb', web_page: '', description: '', funding_details: '' } }
+        end
       end
     end
     prog = assigns(:programme)
@@ -379,9 +381,11 @@ class ProgrammesControllerTest < ActionController::TestCase
   test "admin doesn't become programme administrator by default" do
     p = Factory(:admin)
     login_as(p)
-    assert_difference('Programme.count') do
-      assert_no_enqueued_emails do # no email for admin creation
-        post :create, params: { programme: { title: 'A programme' } }
+    with_config_value(:email_enabled, true) do
+      assert_difference('Programme.count') do
+        assert_no_enqueued_emails do # no email for admin creation
+          post :create, params: { programme: { title: 'A programme' } }
+        end
       end
     end
     prog = assigns(:programme)
@@ -438,8 +442,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_enqueued_emails(1) do
-      put :accept_activation, params: { id: programme }
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_emails(1) do
+        put :accept_activation, params: { id: programme }
+      end
     end
 
     assert_redirected_to programme
@@ -457,8 +463,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(programme_administrator)
 
-    assert_no_enqueued_emails do
-      put :accept_activation, params: { id: programme }
+    with_config_value(:email_enabled, true) do
+      assert_no_enqueued_emails do
+        put :accept_activation, params: { id: programme }
+      end
     end
 
     assert_redirected_to :root
@@ -475,8 +483,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_no_enqueued_emails do
-      put :accept_activation, params: { id: programme }
+    with_config_value(:email_enabled, true) do
+      assert_no_enqueued_emails do
+        put :accept_activation, params: { id: programme }
+      end
     end
 
     assert_redirected_to :root
@@ -534,8 +544,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_enqueued_emails(1) do
-      put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_emails(1) do
+        put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+      end
     end
 
     assert_redirected_to programme
@@ -554,8 +566,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(programme_administrator)
 
-    assert_no_enqueued_emails do
-      put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+    with_config_value(:email_enabled, true) do
+      assert_no_enqueued_emails do
+        put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+      end
     end
 
     assert_redirected_to :root
@@ -573,8 +587,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_no_enqueued_emails do
-      put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+    with_config_value(:email_enabled, true) do
+      assert_no_enqueued_emails do
+        put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+      end
     end
 
     assert_redirected_to :root
@@ -811,12 +827,14 @@ class ProgrammesControllerTest < ActionController::TestCase
         }
     }
 
-    assert_enqueued_emails(1) do
-      assert_difference('Programme.count') do
-        assert_difference('Project.count') do
-          assert_difference('Institution.count') do
-            assert_difference('GroupMembership.count') do
-              post :respond_create_project_request, params:params
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_emails(1) do
+        assert_difference('Programme.count') do
+          assert_difference('Project.count') do
+            assert_difference('Institution.count') do
+              assert_difference('GroupMembership.count') do
+                post :respond_create_project_request, params:params
+              end
             end
           end
         end
@@ -871,12 +889,14 @@ class ProgrammesControllerTest < ActionController::TestCase
         }
     }
 
-    assert_enqueued_emails(0) do
-      assert_no_difference('Programme.count') do
-        assert_no_difference('Project.count') do
-          assert_no_difference('Institution.count') do
-            assert_no_difference('GroupMembership.count') do
-              post :respond_create_project_request, params:params
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_emails(0) do
+        assert_no_difference('Programme.count') do
+          assert_no_difference('Project.count') do
+            assert_no_difference('Institution.count') do
+              assert_no_difference('GroupMembership.count') do
+                post :respond_create_project_request, params:params
+              end
             end
           end
         end
@@ -915,12 +935,14 @@ class ProgrammesControllerTest < ActionController::TestCase
         }
     }
 
-    assert_enqueued_emails(0) do
-      assert_no_difference('Programme.count') do
-        assert_no_difference('Project.count') do
-          assert_no_difference('Institution.count') do
-            assert_no_difference('GroupMembership.count') do
-              post :respond_create_project_request, params:params
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_emails(0) do
+        assert_no_difference('Programme.count') do
+          assert_no_difference('Project.count') do
+            assert_no_difference('Institution.count') do
+              assert_no_difference('GroupMembership.count') do
+                post :respond_create_project_request, params:params
+              end
             end
           end
         end
@@ -960,12 +982,14 @@ class ProgrammesControllerTest < ActionController::TestCase
         }
     }
 
-    assert_enqueued_emails(0) do
-      assert_no_difference('Programme.count') do
-        assert_no_difference('Project.count') do
-          assert_no_difference('Institution.count') do
-            assert_no_difference('GroupMembership.count') do
-              post :respond_create_project_request, params:params
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_emails(0) do
+        assert_no_difference('Programme.count') do
+          assert_no_difference('Project.count') do
+            assert_no_difference('Institution.count') do
+              assert_no_difference('GroupMembership.count') do
+                post :respond_create_project_request, params:params
+              end
             end
           end
         end
@@ -1001,12 +1025,14 @@ class ProgrammesControllerTest < ActionController::TestCase
         }
     }
 
-    assert_enqueued_emails(1) do
-      assert_no_difference('Programme.count') do
-        assert_difference('Project.count') do
-          assert_no_difference('Institution.count') do
-            assert_difference('GroupMembership.count') do
-              post :respond_create_project_request, params:params
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_emails(1) do
+        assert_no_difference('Programme.count') do
+          assert_difference('Project.count') do
+            assert_no_difference('Institution.count') do
+              assert_difference('GroupMembership.count') do
+                post :respond_create_project_request, params:params
+              end
             end
           end
         end
@@ -1055,12 +1081,14 @@ class ProgrammesControllerTest < ActionController::TestCase
         }
     }
 
-    assert_enqueued_emails(0) do
-      assert_no_difference('Programme.count') do
-        assert_no_difference('Project.count') do
-          assert_no_difference('Institution.count') do
-            assert_no_difference('GroupMembership.count') do
-              post :respond_create_project_request, params:params
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_emails(0) do
+        assert_no_difference('Programme.count') do
+          assert_no_difference('Project.count') do
+            assert_no_difference('Institution.count') do
+              assert_no_difference('GroupMembership.count') do
+                post :respond_create_project_request, params:params
+              end
             end
           end
         end
@@ -1099,12 +1127,14 @@ class ProgrammesControllerTest < ActionController::TestCase
         }
     }
 
-    assert_enqueued_emails(1) do
-      assert_no_difference('Programme.count') do
-        assert_no_difference('Project.count') do
-          assert_no_difference('Institution.count') do
-            assert_no_difference('GroupMembership.count') do
-              post :respond_create_project_request, params:params
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_emails(1) do
+        assert_no_difference('Programme.count') do
+          assert_no_difference('Project.count') do
+            assert_no_difference('Institution.count') do
+              assert_no_difference('GroupMembership.count') do
+                post :respond_create_project_request, params:params
+              end
             end
           end
         end
