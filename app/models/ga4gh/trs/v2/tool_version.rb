@@ -9,7 +9,7 @@ module Ga4gh
         DESCRIPTOR_TYPE_MAPPING = {
             'CWL' => 'CWL',
             'Nextflow' => 'NFL',
-            'Galaxy' => 'Galaxy'
+            'Galaxy' => 'GALAXY'
         }
 
         def initialize(tool, workflow_version)
