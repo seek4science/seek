@@ -181,6 +181,7 @@ group :test do
   gem 'vcr', '~> 2.9'
   gem 'rails-controller-testing'
   gem 'simplecov'
+  gem 'whenever-test'
 end
 
 group :test, :development do

@@ -19,9 +19,9 @@
 
 # Learn more: http://github.com/javan/whenever
 
-PeriodicSubscriptionEmailJob::DELAYS.each do |_, period|
+PeriodicSubscriptionEmailJob::DELAYS.each do |frequency, period|
   every period do
-    runner "PeriodicSubscriptionEmailJob.new(#{period}).queue_job"
+    runner "PeriodicSubscriptionEmailJob.new('#{frequency}').queue_job"
   end
 end
 
@@ -29,7 +29,7 @@ every ContentBlobCleanerJob::GRACE_PERIOD do
   runner "ContentBlobCleanerJob.perform_later"
 end
 
-every Seek::Config.home_feeds_cache_timeout.minutes do
+every Seek::Config.home_feeds_cache_timeout.minutes do # Crontab will need to be regenerated if this changes...
   runner "NewsFeedRefreshJob.set(priority: 3).perform_later"
 end
 

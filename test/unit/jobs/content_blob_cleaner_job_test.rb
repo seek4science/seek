@@ -2,7 +2,6 @@ require 'test_helper'
 
 class ContentBlobCleanerJobTest < ActiveSupport::TestCase
   def setup
-    @job = ContentBlobCleanerJob.new
     ContentBlob.destroy_all
   end
 
@@ -20,7 +19,7 @@ class ContentBlobCleanerJobTest < ActiveSupport::TestCase
     end
 
     assert_difference('ContentBlob.count', -1) do
-      @job.perform
+      ContentBlobCleanerJob.perform_now
     end
 
     refute ContentBlob.exists?(to_go.id)

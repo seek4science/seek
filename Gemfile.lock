@@ -874,6 +874,8 @@ GEM
     websocket-extensions (0.1.5)
     whenever (1.0.0)
       chronic (>= 0.6.3)
+    whenever-test (1.0.1)
+      whenever
     will_paginate (3.1.8)
     yaml_db (0.7.0)
       rails (>= 3.0)
@@ -1022,6 +1024,7 @@ DEPENDENCIES
   vcr (~> 2.9)
   webmock
   whenever (~> 1.0.0)
+  whenever-test
   will_paginate (~> 3.1)
   yaml_db
   zenodo-client!
