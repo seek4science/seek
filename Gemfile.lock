@@ -25,10 +25,12 @@ GIT
     my_responds_to_parent (1.0.0)
 
 GIT
-  remote: https://github.com/myGrid/search_biomodel.git
-  revision: e109ac6d8b102f7ecb65140c17d263b85e066870
+  remote: https://github.com/fbacall/ro-crate-ruby.git
+  revision: 70804d34264481e70d0fe83ecc6ad76eda164e74
   specs:
-    search_biomodel (2.2.1)
+    ro-crate-ruby (0.3.0)
+      addressable
+      rubyzip
 
 GIT
   remote: https://github.com/ruby-rdf/rdf-virtuoso
@@ -120,8 +122,8 @@ GEM
       activerecord (>= 3.0)
     acts_as_tree (2.6.1)
       activerecord (>= 3.0.0)
-    addressable (2.6.0)
-      public_suffix (>= 2.0.2, < 4.0)
+    addressable (2.7.0)
+      public_suffix (>= 2.0.2, < 5.0)
     aes_key_wrap (1.0.1)
     akami (1.2.2)
       gyoku (>= 0.4.0)
@@ -258,6 +260,8 @@ GEM
     formatador (0.2.5)
     fssm (0.2.10)
     gem-licenses (0.2.2)
+    git (1.6.0)
+      rchardet (~> 1.8)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
     google-analytics-rails (1.1.0)
@@ -300,6 +304,8 @@ GEM
       rack
     i18n (1.8.3)
       concurrent-ruby (~> 1.0)
+    i18n-js (3.7.0)
+      i18n (>= 0.6.6)
     i18n_data (0.8.0)
     ice_nine (0.11.2)
     jbuilder (2.8.0)
@@ -329,6 +335,7 @@ GEM
     json-schema (2.8.0)
       addressable (>= 2.4)
     jsonapi-renderer (0.1.3)
+    jwt (2.2.1)
     kgio (2.11.0)
     latex-decode (0.3.1)
     launchy (2.4.3)
@@ -445,14 +452,26 @@ GEM
       nenv (~> 0.1)
       shellany (~> 0.0)
     ntlm-http (0.1.1)
+    oauth2 (1.4.4)
+      faraday (>= 0.8, < 2.0)
+      jwt (>= 1.0, < 3.0)
+      multi_json (~> 1.3)
+      multi_xml (~> 0.5)
+      rack (>= 1.2, < 3)
     omniauth (1.3.2)
       hashie (>= 1.2, < 4)
       rack (>= 1.0, < 3)
+    omniauth-github (1.2.0)
+      omniauth (~> 1.3.2)
+      omniauth-oauth2 (>= 1.4.0, < 2.0)
     omniauth-ldap (1.0.5)
       net-ldap (~> 0.12)
       omniauth (~> 1.0)
       pyu-ruby-sasl (~> 0.0.3.2)
       rubyntlm (~> 0.3.4)
+    omniauth-oauth2 (1.5.0)
+      oauth2 (~> 1.1)
+      omniauth (~> 1.2)
     omniauth-rails_csrf_protection (0.1.2)
       actionpack (>= 4.2)
       omniauth (>= 1.3.1)
@@ -499,7 +518,7 @@ GEM
       pry (~> 0.9)
       slop (~> 3.0)
     psych (2.2.4)
-    public_suffix (3.0.3)
+    public_suffix (4.0.5)
     puma (4.3.5)
       nio4r (~> 2.0)
     pyu-ruby-sasl (0.0.3.3)
@@ -588,6 +607,7 @@ GEM
     rb-fsevent (0.9.8)
     rb-inotify (0.9.8)
       ffi (>= 0.5.0)
+    rchardet (1.8.0)
     rdf (3.0.10)
       hamster (~> 3.0)
       link_header (~> 0.0, >= 0.0.8)
@@ -644,6 +664,7 @@ GEM
     rdoc (6.0.3)
     recaptcha (4.1.0)
       json
+    redcarpet (3.5.0)
     reek (4.6.1)
       codeclimate-engine-rb (~> 0.4.0)
       parser (>= 2.3.1.2, < 2.5)
@@ -893,10 +914,12 @@ DEPENDENCIES
   fleximage!
   fssm
   gem-licenses
+  git
   google-analytics-rails
   guard-rubycritic
   handlebars_assets
   hpricot (~> 0.8.2)
+  i18n-js
   jbuilder
   jbuilder-json_api
   jquery-rails (~> 4.2.2)
@@ -917,6 +940,7 @@ DEPENDENCIES
   mysql2
   nokogiri (>= 1.10.4)
   omniauth (~> 1.3.1)
+  omniauth-github (~> 1.2.0)
   omniauth-ldap (~> 1.0.5)
   omniauth-rails_csrf_protection (~> 0.1)
   omniauth_openid_connect
@@ -953,12 +977,14 @@ DEPENDENCIES
   rdf-virtuoso!
   rdoc
   recaptcha (~> 4.1.0)
+  redcarpet
   request-log-analyzer
   responders
   rest-client (~> 2.0)
   rfc-822
   rmagick (= 2.15.2)
   ro-bundle (~> 0.2.4)
+  ro-crate-ruby!
   rspec-rails
   rubocop
   ruby-prof (= 0.15.9)
@@ -967,7 +993,6 @@ DEPENDENCIES
   sample-template-generator (~> 0.5)
   sass-rails (~> 5.0)
   savon (= 1.1.0)
-  search_biomodel (= 2.2.1)!
   seedbank
   simple-spreadsheet-extractor (~> 0.16.0)
   simplecov

@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
 
   before_action :check_doorkeeper_scopes, if: :doorkeeper_token
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
-  before_action :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
+  before_action :convert_json_params, only: [:update, :destroy, :create, :create_version], if: :json_api_request?
 
   before_action :rdf_enabled? #only allows through rdf calls to supported types
 
@@ -140,7 +140,7 @@ class ApplicationController < ActionController::Base
   # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
   def determine_asset_from_controller
     name = controller_name.singularize
-    eval("@#{name}")
+    instance_variable_get("@#{name}")
   end
 
   def restrict_guest_user
@@ -152,7 +152,7 @@ class ApplicationController < ActionController::Base
 
   def project_membership_required
     unless User.logged_in_and_member? || admin_logged_in?
-      flash[:error] = 'Only members of known projects, institutions or work groups are allowed to create new content.'
+      flash[:error] = "Only members of #{t('project').downcase.pluralize} can create content."
       respond_to do |format|
         format.html do
           object = determine_asset_from_controller
@@ -161,7 +161,7 @@ class ApplicationController < ActionController::Base
           else
             path = nil
             begin
-              path = eval("main_app.#{controller_name}_path")
+              path = main_app.polymorphic_path(controller_name)
             rescue NoMethodError => e
               logger.error("No path found for controller - #{controller_name}")
               path = main_app.root_path
@@ -224,10 +224,10 @@ class ApplicationController < ActionController::Base
         format.json { render json: { errors: [{ title: 'Not found',
                                                 detail: "Couldn't find #{name.camelize} with 'id'=[#{params[:id]}]" }] },
                              status: :not_found }
-        format.html { redirect_to eval "#{controller_name}_path" }
+        format.html { redirect_to polymorphic_path(controller_name) }
       end
     else
-      eval "@#{name} = object"
+      instance_variable_set("@#{name}", object)
     end
   end
 
@@ -241,7 +241,7 @@ class ApplicationController < ActionController::Base
     object = controller_model.find(params[:id])
 
     if is_auth?(object, privilege)
-      eval "@#{name} = object"
+      instance_variable_set("@#{name}", object)
       params.delete :policy_attributes unless object.can_manage?(current_user)
     else
       respond_to do |format|
@@ -253,7 +253,7 @@ class ApplicationController < ActionController::Base
             else
               flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}."
             end
-            redirect_to(eval("#{controller_name.singularize}_path(#{object.id})"))
+            redirect_to(object)
           else
             render template: 'general/landing_page_for_hidden_item', locals: { item: object }, status: :forbidden
           end
@@ -377,7 +377,7 @@ class ApplicationController < ActionController::Base
         end
       when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
         action = 'create' if action == 'upload_for_tool' || action == 'create_metadata' || action == 'create_from_template'
-        action = 'update' if action == 'new_version'
+        action = 'update' if action == 'create_version'
         action = 'inline_view' if action == 'explore'
         if %w(show create update destroy download inline_view).include?(action)
           check_log_exists(action, controller_name, object)
@@ -411,9 +411,7 @@ class ApplicationController < ActionController::Base
 
   # determines and returns the object related to controller, e.g. @data_file
   def object_for_request
-    c = controller_name.downcase
-
-    eval('@' + c.singularize)
+    instance_variable_get("@#{controller_name.singularize}")
   end
 
   def expire_activity_fragment_cache(controller, action)
@@ -563,6 +561,28 @@ class ApplicationController < ActionController::Base
             errors: [{ title: 'Forbidden',
                        details: 'This action is not permitted for API clients using OAuth.' }] }, status: :forbidden }
       end
+    end
+  end
+
+  # Dynamically get parent resource from URL.
+  # i.e. /data_files/123/some_sub_resource/456
+  # would fetch DataFile with ID 123
+  #
+  def get_parent_resource
+    parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
+    if parent_id_param
+      parent_type = parent_id_param.to_s.chomp('_id')
+      parent_class = parent_type.camelize.constantize
+      if parent_class
+        @parent_resource = parent_class.find(params[parent_id_param])
+      end
+    end
+  end
+
+  def managed_programme_configured?
+    unless Programme.managed_programme
+      error("No managed #{t('programme')} is configured","No managed #{t('programme')} is configured")
+      return false
     end
   end
 end

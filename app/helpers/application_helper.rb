@@ -217,11 +217,18 @@ module ApplicationHelper
       res = text.html_safe
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length]) if options[:length]
-      res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link]
       res = simple_format(res, {}, sanitize: false).html_safe if options[:description] == true || options[:address] == true
-
+      if options[:description] == true && options[:markdown] == true
+        markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, tables: true)
+        # remove <p> and <br> tags, markdown render cannot handle them
+        scrubber = Rails::Html::TargetScrubber.new
+        scrubber.tags = ['p','br']
+        res = Loofah.fragment(res).scrub!(scrubber).to_s
+        res = markdown.render(res)
+      end
+      res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link]
       res = mail_to(res) if options[:email]
-      res = link_to(res, res, popup: true) if options[:external_link]
+      res = link_to(res, res, popup: true, target: :_blank) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
       res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(CountryCodes.code(text))) if options[:link_as_country]
     end
@@ -395,7 +402,7 @@ module ApplicationHelper
       Investigation => "You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it.",
       Strain => 'You cannot delete this Strain. Samples associated with it or you are not authorized.',
       Project => "You cannot delete this #{I18n.t 'project'}. It may have people or items associated with it.",
-      Institution => 'You cannot delete this Institution. It may have people associated with it.',
+      Institution => "You cannot delete this #{I18n.t 'institution'}. It may have people associated with it.",
       SampleType => 'You cannot delete this Sample Type, it may have Samples associated with it or have another Sample Type linked to it',
       SampleControlledVocab => 'You can delete this Controlled Vocabulary, it may be associated with a Sample Type' }
   end
@@ -424,7 +431,7 @@ module ApplicationHelper
 
   # returns the instance for the resource for the controller, e.g @data_file for data_files
   def resource_for_controller(c = controller_name)
-    eval "@#{c.singularize}"
+    instance_variable_get("@#{c.singularize}")
   end
 
   def cancel_button(path, html_options = {})
@@ -462,11 +469,25 @@ module ApplicationHelper
     !(action_name == 'edit' || action_name == 'update')
   end
 
-  PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => 'Institutions',
+  #whether to show a banner encouraging you to join or create a project
+  def join_or_create_project_banner?
+    return false if !logged_in_and_registered?
+    return false if logged_in_and_member?
+    return false if current_page?(create_or_join_project_home_path) ||
+        current_page?(guided_create_projects_path) ||
+        current_page?(guided_join_projects_path)
+
+    #current_page? doesn't work with POST
+    return false if ['request_join','request_create'].include?(action_name)
+
+    return Seek::Config.programmes_enabled && Programme.managed_programme
+  end
+
+  PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => I18n.t('institution').pluralize,
                   'people' => 'People', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' }, 'search' => 'Search',
                   'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize,
                   'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
-                  'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'biosamples' => 'Biosamples',
+                  'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'human_disease' => 'Human Diseases', 'biosamples' => 'Biosamples',
                   'presentations' => I18n.t('presentation').pluralize, 'programmes' => I18n.t('programme').pluralize, 'events' => I18n.t('event').pluralize, 'help_documents' => 'Help' }.freeze
 end
 

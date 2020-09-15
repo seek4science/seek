@@ -1,0 +1,4 @@
+cwltool==3.0.20200324120055
+html5lib==1.0.1
+galaxy2cwl==0.1.4
+isatools==0.11.0

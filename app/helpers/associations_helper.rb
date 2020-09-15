@@ -134,4 +134,15 @@ module AssociationsHelper
       ao.reverse_merge(extra_data)
     end.flatten.to_json
   end
+
+  def associations_json_from_assay_human_diseases(assay_human_diseases, extra_data = {})
+    assay_human_diseases.map do |d|
+      ad = {
+        human_disease_id:    d.human_disease.id,
+        human_disease_title: escape_javascript(d.human_disease.title)
+      }
+
+      ad.reverse_merge(extra_data)
+    end.flatten.to_json
+  end
 end

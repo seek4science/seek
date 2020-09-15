@@ -9,6 +9,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     OmniAuth.config.test_mode = true
     OmniAuth.config.mock_auth[:ldap] = nil
     OmniAuth.config.mock_auth[:elixir_aai] = nil
+    OmniAuth.config.mock_auth[:github] = nil
 
     @ldap_mock_auth = OmniAuth::AuthHash.new({
         provider: 'ldap',
@@ -29,6 +30,16 @@ class OmniauthTest < ActionDispatch::IntegrationTest
             'first_name' => 'new',
             'last_name' => 'elixir_aai_user',
             'email' => 'new_elixir_aai_user@example.com'
+        }
+    })
+
+    @github_mock_auth = OmniAuth::AuthHash.new({
+        provider: 'github',
+        uid: 'new_github_user',
+        info: {
+            'nickname' => 'new_github_user',
+            'name' => 'New Githubuser',
+            'email' => 'new_github_user@example.com'
         }
     })
   end
@@ -263,5 +274,31 @@ class OmniauthTest < ActionDispatch::IntegrationTest
         assert_equal existing_user.id, session[:user_id]
       end
     end
+  end
+
+  test 'should create and activate new GitHub user' do
+    OmniAuth.config.mock_auth[:github] = @github_mock_auth
+
+    assert_difference('User.count', 1) do
+      assert_difference('Identity.count', 1) do
+        post omniauth_authorize_path(:github)
+        follow_redirect! # OmniAuth callback
+        assert_redirected_to(/#{register_people_path}/)
+        follow_redirect! # New profile
+      end
+    end
+
+    assert_equal 'Githubuser', assigns(:person).last_name
+    assert_equal 'New', assigns(:person).first_name
+    assert_equal 'new_github_user@example.com', assigns(:person).email
+    assert session[:user_id]
+    user = User.find_by_id(session[:user_id])
+    assert user
+    assert user.active?
+    assert_equal 1, user.identities.count
+    identity = user.identities.first
+    assert_equal 'github', identity.provider
+    assert_equal 'new_github_user', identity.uid
+    assert_match(/You have successfully registered your account, but you need to create a profile/, flash[:notice])
   end
 end

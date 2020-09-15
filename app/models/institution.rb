@@ -4,8 +4,8 @@ class Institution < ApplicationRecord
   title_trimmer
 
   validates :title, uniqueness: true
-  validates :web_page, url: {allow_nil: true, allow_blank: true}
-  validates :country, country:true, :presence => true
+  validates :web_page, url: { allow_nil: true, allow_blank: true }
+  validates :country, country: true
 
   has_many :work_groups, dependent: :destroy, inverse_of: :institution
   has_many :projects, through: :work_groups,  inverse_of: :institutions
@@ -44,5 +44,13 @@ class Institution < ApplicationRecord
   def self.can_create?
     User.admin_or_project_administrator_logged_in? ||
       User.activated_programme_administrator_logged_in?
+  end
+
+  def typeahead_hint
+    unless city.blank?
+      "#{city}, #{CountryCodes.country(country)}"
+    else
+      CountryCodes.country(country)
+    end
   end
 end

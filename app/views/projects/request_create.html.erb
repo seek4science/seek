@@ -1,0 +1,68 @@
+<div class="row">
+  <div style="width:70%;margin:auto">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <% if @programme.id.nil? %>
+          <%
+            mail_recipients = "#{Seek::Config.dm_project_name} administrators"
+            to_be_created = "#{t('programme')} and #{t('project')}"
+          %>
+          <p>
+            You have requested for a new <%= t('programme') %>, and a <%= t('project') %> to be created within it.
+          </p>
+          <p>
+            You will become an administrator of both the <%= t('programme') %> and <%= t('project') %>
+          </p>
+          <p>
+            You have described the new <%= t('programme') %> with the following details:
+          <ul>
+            <li><strong>Title:</strong> <%= text_or_not_specified(@programme.title) %></li>
+          </ul>
+          </p>
+        <% else %>
+          <%
+            mail_recipients = t('project_administrator').pluralize
+            to_be_created = "#{t('project')}"
+          %>
+          <p>
+            You have requested for a <%= t('project') %> to be created within a <%= Seek::Config.dm_project_name %>
+            managed <%= t('programme') %>.
+          </p>
+        <% end %>
+
+        <p style="padding-top: 1em;">
+          You have described the new <%= t('project') %> with the following details:
+        <ul>
+          <li><strong>Title:</strong> <%= text_or_not_specified(@project.title) %></li>
+          <li><strong>Description:</strong> <%= text_or_not_specified(@project.description) %></li>
+          <li><strong>Web page:</strong> <%= text_or_not_specified(@project.web_page, external_link: true) %></li>
+        </ul>
+        </p>
+
+        <p style="padding-top: 1em;">
+          <% if @institution.id.nil? %>
+            You have described a new <%= t('institution') %> with the following details:
+          <ul>
+            <li><strong>Title:</strong> <%= text_or_not_specified(@institution.title) %></li>
+            <li><strong>Web page:</strong> <%= text_or_not_specified(@institution.web_page, external_link: true) -%>
+            </li>
+            <li><strong>City:</strong><%= text_or_not_specified(@institution.city) -%></li>
+            <li><strong>Country:</strong> <%= country_text_or_not_specified @institution.country -%></li>
+          </ul>
+        <% else %>
+          You have indicated that you are associated with <%= link_to(@institution.title, @institution) %>
+        <% end %>
+        </p>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<p class="text-center">
+  <strong>
+  An email has been sent to the <%= mail_recipients %> and you will receive an email when the <%= to_be_created %> has been created,
+  or an email about why your request was declined.
+  </strong>
+</p>

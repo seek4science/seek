@@ -684,8 +684,10 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert !blob.file_exists?
     assert_equal 500, blob.file_size
 
-    assert_raise Seek::DownloadHandling::SizeLimitExceededException do
-      blob.retrieve
+    with_config_value(:hard_max_cachable_size, 5000) do
+      assert_raise Seek::DownloadHandling::SizeLimitExceededException do
+        blob.retrieve
+      end
     end
     assert !blob.file_exists?
   end

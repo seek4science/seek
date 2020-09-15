@@ -1,0 +1,56 @@
+{
+  "data": {
+    "id": "8233983738",
+    "type": "human_diseases",
+    "attributes": {
+      "title": "A Maximal Human Disease",
+      "concept_uri": "http://purl.bioontology.org/obo/DOID_1909",
+      "ontology_id": "23"
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "1022251427",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "1022251427",
+            "type": "assays"
+          }
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "1022251427",
+            "type": "models"
+          }
+        ]
+      },
+      "parents": {
+        "data": [ ]
+      },
+      "children": {
+        "data": [ ]
+      }
+    },
+    "links": {
+      "self": "/human_diseases/8233983738"
+    },
+    "meta": {
+      "created": "2020-05-04T12:59:42.000Z",
+      "modified": "2020-05-04T12:59:42.000Z",
+      "uuid": "60dd04ec-2d4a-48a3-ab27-cbebf4adca89",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.2"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

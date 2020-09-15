@@ -11,7 +11,7 @@ var Projects = {
             var toRemove = [];
 
             if(institution_id == '') {
-                errors.push('Please select an institution!');
+                errors.push(I18n.t('institution').toLowerCase() + ' is required!');
                 $j("#institution_ids").parent('.form-group').addClass('has-error');
             } else {
                 $j.each(people, function (index, value) {

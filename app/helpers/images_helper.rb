@@ -68,7 +68,7 @@ module ImagesHelper
   end
 
   def model_image_url(model_instance, model_image_id, size = nil)
-    basic_url = eval("model_model_image_path(#{model_instance.id}, #{model_image_id})")
+    basic_url = model_model_image_path(model_instance, model_image_id)
 
     basic_url = append_size_parameter(basic_url, size)
 

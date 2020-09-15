@@ -40,14 +40,18 @@
 
 <%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
 
-<% if resource.class.is_taggable? && current_user-%>
-  <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
+<% if resource.class.is_taggable? %>
+    <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
 <% end -%>
 
 <% if resource.respond_to? :attributions_objects -%>
   <%= render :partial => "assets/resource_attributions_box",
              :locals => { :resource => resource, :attributed_to => resource.attributions_objects,
                           :truncate_to => truncate_length_for_boxes } -%>
+<% end -%>
+
+<% if resource.respond_to?(:collections) && resource.collections.any? -%>
+    <%= render partial: 'assets/resource_collections_box', locals: { resource: resource } -%>
 <% end -%>
 
 <%= render :partial => "assets/resource_scales_box", :locals => { :resource => resource} if resource.respond_to?(:scales) && show_scales?-%>

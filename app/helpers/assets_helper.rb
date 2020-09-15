@@ -285,6 +285,20 @@ module AssetsHelper
     end
   end
 
+  def source_link_button(source_link)
+    url = source_link.url
+    uri = URI.parse(url)
+    if uri.hostname.include?('github.com')
+      image = 'github'
+      text = 'View on GitHub'
+    else
+      image = 'external_link'
+      text = 'Visit source'
+    end
+
+    button_link_to(text, image, source_link.url, target: :_blank)
+  end
+
   #if there are creators, the email will be sent only to them, otherwise sent to the contributor
   #if the contact requester is one of the contirbutor/creators, the person is allowed to send request to others, but not to himself.
   def get_email_recipients(resource)

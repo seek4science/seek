@@ -4,7 +4,7 @@ module Seek
 
     RELATABLE_TYPES = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Document',
                        'Model', 'Sop', 'Publication', 'Presentation', 'Event', 'Organism', 'Strain', 'Sample',
-                       'Workflow', 'Node'].freeze
+                       'Workflow', 'Node', 'Collection', 'HumanDisease'].freeze
 
     class_methods do
       def related_type_methods

@@ -24,14 +24,6 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: data_file.id})
   end
 
-  def populate_extra_relationships(hash=nil)
-    extra_relationships = {}
-    extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
-    extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' },
-                                            { id: @creator.id.to_s, type: 'people' }] }
-    extra_relationships.with_indifferent_access
-  end
-
   test 'can add content to API-created data file' do
     df = Factory(:api_pdf_data_file, contributor: @current_person)
 
@@ -117,10 +109,10 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     h = JSON.parse(response.body)
 
     hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
-    hash_comparison(populate_extra_attributes, h['data']['attributes'])
+    hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
 
     hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
-    hash_comparison(populate_extra_relationships, h['data']['relationships'])
+    hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
   end
 
   test 'returns sensible error objects' do

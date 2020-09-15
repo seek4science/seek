@@ -37,6 +37,8 @@ class Avatar < ApplicationRecord
            foreign_key: :avatar_id,
            dependent: :nullify
 
+  after_create :select_avatar
+
   def select!
     if selected?
       false
@@ -72,5 +74,11 @@ class Avatar < ApplicationRecord
     end
 
     File.join(public_avatars_path, avatar_filename)
+  end
+
+  private
+
+  def select_avatar
+    select! unless owner.avatar_selected?
   end
 end

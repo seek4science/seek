@@ -184,7 +184,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       assert latest_version.save
       assert latest_version.has_doi?
 
-      post "/#{type.pluralize}/#{asset.id}/new_version", params: { data_file: {}, content_blobs: [{ data: {} }], revision_comments: 'This is a new revision' }
+      post "/#{type.pluralize}/#{asset.id}/create_version", params: { data_file: {}, content_blobs: [{ data: {} }], revision_comments: 'This is a new revision' }
 
       assert_redirected_to :root
       assert_not_nil flash[:error]

@@ -172,7 +172,7 @@ class SessionsController < ApplicationController
             @user.activate if Seek::Config.omniauth_user_activate && !@user.active?
             @identity.user = @user
             @identity.save!
-            check_login(nil, person_params: auth['info'].slice(:first_name, :last_name, :email))
+            check_login(nil, person_params: auth['info'].slice(:first_name, :last_name, :email, :name))
           else # An unexpected error occurred whilst saving the user.
             failed_login "Cannot create a new user: #{@user.errors.full_messages.join(', ')}."
           end

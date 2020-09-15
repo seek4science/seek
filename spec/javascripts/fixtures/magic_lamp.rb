@@ -1,12 +1,13 @@
-MagicLamp.register_fixture(controller: SopsController, name: 'sops/with_associations') do
-  assay = Factory(:assay, :policy => Factory(:public_policy))
-  @sop = Factory(:sop,
-                 :assays => [assay],
-                 :policy => Factory(:public_policy))
-  @sop.valid?
-  @display_sop = @sop.latest_version
-  render :show
-end
+# # Broken fixture
+# MagicLamp.register_fixture(controller: SopsController, name: 'sops/with_associations') do
+#   assay = Factory(:assay, :policy => Factory(:public_policy))
+#   @sop = Factory(:sop,
+#                  :assays => [assay],
+#                  :policy => Factory(:public_policy))
+#   @sop.valid?
+#   @display_sop = @sop.latest_version
+#   render :show
+# end
 
 MagicLamp.register_fixture(controller: SopsController, name: 'sops/new') do
   @controller_name = 'sops'
@@ -63,4 +64,21 @@ MagicLamp.register_fixture(name: 'projects-selector') do
       id: @sop.id
   }
   render partial: 'projects/project_selector', locals: { resource: @sop }
+end
+
+MagicLamp.register_fixture(name: 'project/markdown') do
+  User.current_user = Factory(:user)
+  session[:user_id] = User.current_user.id.to_s
+
+  @project = Project.create(title: 'markdown test',
+    description: '# header
+
+Some text
+
+## second header
+
+_italic **bold** text_
+
+> Another paragraph')
+  render "projects/show"
 end
