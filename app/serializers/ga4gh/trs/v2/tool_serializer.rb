@@ -4,7 +4,7 @@ module Ga4gh
       class ToolSerializer < ActiveModel::Serializer
         include Rails.application.routes.url_helpers
 
-        attributes :id, :url, :name, :organization, :toolclass
+        attributes :id, :url, :name, :description, :organization, :toolclass
         has_many :versions
 
         def url
