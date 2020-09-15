@@ -1,6 +1,8 @@
 <% if mine?(@person) && !current_user.guest? -%>
-    <% tooltip_text = "Publish your owned assets in one click. A preview will be given before publishing" %>
-    <%= button_link_to "Publish your assets", "publish", batch_publishing_preview_person_path(@person), 'data-tooltip' => tooltip(tooltip_text) -%>
+    <% tooltip_text_sharing = "You can change the sharing policy and permissions for your assets in batch. A preview of selected assets will be given before you choose new permissions for them." %>
+    <% tooltip_text_publishing = "Publish your owned assets in one click. A preview will be given before publishing" %>
+    <%= button_link_to "Batch permission changes", "publish", batch_sharing_permission_preview_person_path(@person), 'data-tooltip' => tooltip(tooltip_text_sharing) -%>
+    <%= button_link_to "Publish your assets", "publish", batch_publishing_preview_person_path(@person), 'data-tooltip' => tooltip(tooltip_text_publishing) -%>
   <% if @person.is_in_any_gatekept_projects? %>
     <%= button_link_to "Assets awaiting approval", "waiting", waiting_approval_assets_person_path(@person),
                        'data-tooltip' => tooltip("The assets you have requested to publish, but are awaiting Gatekeeper approval") -%>

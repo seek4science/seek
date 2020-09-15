@@ -9,7 +9,7 @@
     <div class="alert alert-info">
       Specify the new sharing policies for the following <%= "item".pluralize(@items_for_sharing.size) %>:<br>
       <% if include_downloadable_item? (@items_for_sharing) %>
-      Please note that the <span class="sharing-colour">Download</span> option is only applied to the items which are downloadable with the icon <span><%= icon_tag("download") %>.</span>
+      Please note that the <a herf="#" class="highlight-colour">Download</a> option is only applied to the items which are downloadable with the icon <span><%= icon_tag("download") %>.</span>
       <% end %>
     </div>
 
@@ -34,9 +34,29 @@
     <% end %>
   <% end %>
 
-  <%= submit_tag "Confirm",data: { disable_with: 'Confirm' }, :class => 'btn btn-primary' -%>
+  <%= submit_tag "Confirm", data: { disable_with: 'Confirm....' }, :class => 'btn btn-primary confirm-button', disabled: true  -%>
   or
   <%= cancel_button(resource) %>
 <% end %>
 
 
+
+<script>
+
+    $j(document).ready(function () {
+        $j(".permission-column:contains('Download')").addClass('sharing-color');
+
+        $j('#permissions-table').on("DOMSubtreeModified", function(){
+                if  ($j(".confirm-button").prop("disabled") ){
+                    $j(".confirm-button").prop("disabled", false);
+                }
+        });
+
+        $j("#permissions-table").on('click', function() {
+                if  ($j(".confirm-button").prop("disabled") ){
+                    $j(".confirm-button").prop("disabled", false);
+                }
+        });
+    });
+
+</script>
