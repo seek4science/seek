@@ -15,12 +15,6 @@ module Ga4gh
 
         private
 
-        def get_tool
-          workflow = Workflow.find(params[:id])
-          respond_with({}, adapter: :attributes, status: :forbidden) unless workflow.can_view?
-          @tool = Ga4gh::Trs::V2::Tool.new(workflow)
-        end
-
         def paginate_and_filter
           @offset = tools_index_params[:offset]&.to_i
           @limit = tools_index_params[:limit]&.to_i || 1000

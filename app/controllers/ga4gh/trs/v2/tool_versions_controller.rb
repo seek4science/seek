@@ -24,15 +24,13 @@ module Ga4gh
               file = crate.main_workflow
             end
 
-            if file.nil?
-              respond_with({ code: 404, message: 'Not found' }, status: :not_found)
+            return trs_error(404, "No descriptor found#{ " at: #{params[:relative_path]}" if params[:relative_path].present?}") unless file
+
+            if params[:type].downcase.start_with?('plain_')
+              render plain: (file.remote? ? file.id.to_s : file.source.read)
             else
-              if params[:type].downcase.start_with?('plain_')
-                render plain: (file.remote? ? file.id.to_s : file.source.read)
-              else
-                @file_wrapper = FileWrapper.new(file)
-                respond_with(@file_wrapper, adapter: :attributes)
-              end
+              @file_wrapper = FileWrapper.new(file)
+              respond_with(@file_wrapper, adapter: :attributes)
             end
           end
         end
@@ -77,33 +75,24 @@ module Ga4gh
         def containerfile
           @tool.ro_crate do |crate|
             dockerfile = crate.get('Dockerfile')
-            if dockerfile
-              @file_wrapper = FileWrapper.new(dockerfile)
-              respond_with([@file_wrapper], adapter: :attributes)
-            else
-              respond_with({}, adapter: :attributes, status: :not_found)
-            end
+            return trs_error(404, "No container file ('./Dockerfile') found for this tool version") unless dockerfile
+            @file_wrapper = FileWrapper.new(dockerfile)
+            respond_with([@file_wrapper], adapter: :attributes)
           end
         end
 
         private
 
-        def get_tool
-          workflow = Workflow.find(params[:id])
-          respond_with({}, adapter: :attributes, status: :forbidden) unless workflow.can_view?
-          @tool = Tool.new(workflow)
-        end
-
         def get_version
-          @tool_version = ToolVersion.new(@tool, @tool.find_version(params[:version_id]))
+          workflow_version = @tool.find_version(params[:version_id])
+          return trs_error(404, "Couldn't find version with 'id'=#{params[:version_id]} for this tool") unless workflow_version
+          @tool_version = ToolVersion.new(@tool, workflow_version)
         end
 
         def check_type
           if params[:type]
             descriptor = params[:type].sub(/plain_/i, '').upcase
-            unless (@tool_version.descriptor_type || []).include?(descriptor)
-              respond_with({ code: 404, message: "Type: #{descriptor} not available" }, status: :not_found)
-            end
+            return trs_error(404, "Type: #{descriptor} not available") unless (@tool_version.descriptor_type || []).include?(descriptor)
           end
         end
       end
