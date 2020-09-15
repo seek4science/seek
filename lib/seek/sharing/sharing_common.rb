@@ -7,10 +7,10 @@ module Seek
       end
 
       def batch_change_permssion_for_selected_items
-
+        flash[:notice] = nil
         @items_for_sharing = resolve_sharing_params(params)
         if @items_for_sharing.empty?
-          flash[:error] = "Please choose at least one resource!"
+          flash[:error] = "Please choose at least one item!"
           redirect_to batch_sharing_permission_preview_person_url(current_user.person)
         else
           respond_to do |format|
@@ -28,31 +28,23 @@ module Seek
       end
 
       def batch_sharing_permission_changed
-        # policy_params == params[:policy_attributes]
-        flash[:notice] = ""
+
         @items_for_sharing = resolve_sharing_params(params)
-        if params[:policy_attributes].nil?
-              flash[:error] = "Please select at least one policy or permission for your selected #{"item".pluralize(@items_for_sharing.size)}!"
-              redirect_to batch_sharing_permission_preview_person_url(current_user.person)
-        else
-
           @batch_sharing_permission_changed = true
-
+          flash[:notice] = "The sharing policies for your selected #{"item".pluralize(@items_for_sharing.size)} were successfully updated:<ul> "
           @items_for_sharing.each do |item|
             item.policy.update_attributes_with_bulk_sharing_policy(policy_params) if policy_params.present?
-
             if item.save
-              flash[:notice] += "The sharing policy of #{item.title} was successfully updated.<br>"
+              flash[:notice] += "<li>#{item.title}</li>"
             else
-              flash[:error] = "The sharing policy of #{item.title} was not successfully updated, please try it again.<br>"
+              flash[:error] = "The sharing policy of <b>#{item.title}</b> was not successfully updated, please try it again.<br>"
             end
           end
-
-          flash[:notice] = flash[:notice].html_safe
+              flash[:notice] = (flash[:notice]+"</ul>").html_safe
+              flash[:error] =  flash[:error].html_safe unless flash[:error].nil?
           respond_to do |format|
             format.html { render template: 'assets/sharing/batch_sharing_permission_preview' }
           end
-        end
       end
 
       private
@@ -67,17 +59,17 @@ module Seek
         else
           assets = []
           unless param_not_isa.blank?
-           param_not_isa.keys.each do |asset_class|
-            param_not_isa[asset_class].keys.each do |id|
-              assets << eval("#{asset_class}.find_by_id(#{id})")
-            end
+            param_not_isa.keys.each do |asset_class|
+              param_not_isa[asset_class].keys.each do |id|
+                assets << eval("#{asset_class}.find_by_id(#{id})")
+              end
             end
           end
           unless param_isa.blank?
-           param_isa.keys.each do |asset_class|
-            param_isa[asset_class].keys.each do |id|
-              assets << eval("#{asset_class}.find_by_id(#{id})")
-            end
+            param_isa.keys.each do |asset_class|
+              param_isa[asset_class].keys.each do |id|
+                assets << eval("#{asset_class}.find_by_id(#{id})")
+              end
             end
           end
           assets.compact.uniq
@@ -92,8 +84,6 @@ module Seek
           end
         end
       end
-
-
     end
   end
 end

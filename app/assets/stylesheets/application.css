@@ -22,6 +22,7 @@
 *= require faceted_browsing
 *= require project_folders
 *= require publishing
+*= require sharing_peremission_change
 *= require settings
 *= require new_styles
 *= require jquery-ui
