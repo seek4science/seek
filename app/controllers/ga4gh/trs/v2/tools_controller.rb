@@ -24,7 +24,7 @@ module Ga4gh
           workflows = workflows.where(id: tools_index_params[:id]) if tools_index_params[:id].present?
           workflows = workflows.where('workflows.title LIKE ?', "%#{tools_index_params[:name]}%") if tools_index_params[:name].present?
           workflows = workflows.where('workflows.description LIKE ?', "%#{tools_index_params[:description]}%") if tools_index_params[:description].present?
-          workflows = workflows.where('1=0') if tools_index_params[:toolClass].present? && tools_index_params[:toolClass] != ToolClass::WORKFLOW.name
+          workflows = workflows.none if tools_index_params[:toolClass].present? && tools_index_params[:toolClass] != ToolClass::WORKFLOW.name
           if tools_index_params[:descriptorType].present?
             class_title = ToolVersion::DESCRIPTOR_TYPE_MAPPING.invert[tools_index_params[:descriptorType].upcase]
             if class_title
@@ -32,7 +32,7 @@ module Ga4gh
             end
           end
           workflows = workflows.includes(:projects).where(projects: { title: tools_index_params[:organization] }) if tools_index_params[:organization].present?
-          workflows = workflows.where('1=0') if tools_index_params[:checker].present? && tools_index_params[:checker].to_s.downcase != 'false'
+          workflows = workflows.none if tools_index_params[:checker].present? && tools_index_params[:checker].to_s.downcase != 'false'
           if tools_index_params[:author].present?
             people = Person.all.select { |p| p.name == tools_index_params[:author] }.map(&:id)
             workflows = workflows.includes(:creators).where(people: { id: people })
