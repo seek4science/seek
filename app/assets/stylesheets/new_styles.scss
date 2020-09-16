@@ -92,6 +92,25 @@ ul.feed li:first-child {
   font-size: small;
 }
 
+#footer-logos {
+  a {
+    display: inline-block;
+    padding: 8px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+  }
+  a:hover {
+    background-color: lighten($panel-default-heading-bg, 30%);
+    text-decoration: none;
+    transition: background-color 500ms linear;
+  }
+  img {
+    max-width: 256px;
+    max-height: 64px;
+  }
+}
+
 #ft .ft-info {
   padding: 10px;
 }
