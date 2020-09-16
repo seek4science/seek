@@ -7,7 +7,7 @@ module Ga4gh
           id ||= 'misc-seek-deployment'
           respond_with({
               "contactUrl": "mailto:#{Seek::Config.support_email_address}",
-              "createdAt": "2019-06-04T12:58:19Z",
+              #"createdAt": "2019-06-04T12:58:19Z",
               "description": "TRS API endpoint for #{Seek::Config.application_name}",
               "documentationUrl": "https://editor.swagger.io/?url=https://raw.githubusercontent.com/ga4gh/tool-registry-schemas/develop/openapi/ga4gh-tool-discovery.yaml",
               "environment": Rails.env,
@@ -20,10 +20,10 @@ module Ga4gh
               "type": {
                   "artifact": "trs",
                   "group": "org.ga4gh",
-                  "version": "1.0.0"
+                  "version": "2.0.1"
               },
-              "updatedAt": "2019-06-04T12:58:19Z",
-              "version": "1.0.0"
+              #"updatedAt": "2019-06-04T12:58:19Z",
+              "version": Seek::Version::APP_VERSION.to_s
           }.to_json)
         end
 
