@@ -83,6 +83,7 @@ class AdminController < ApplicationController
     Seek::Config.external_help_url = params[:external_help_url]
 
     Seek::Config.cwl_viewer_url = params[:cwl_viewer_url]
+    Seek::Config.ga4gh_trs_api_enabled = string_to_boolean(params[:ga4gh_trs_api_enabled])
     # Types enabled
     Seek::Config.collections_enabled = string_to_boolean params[:collections_enabled]
     Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
