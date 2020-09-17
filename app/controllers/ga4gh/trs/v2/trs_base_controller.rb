@@ -14,13 +14,12 @@ module Ga4gh
         private
 
         def check_trs_enabled
-          trs_error(403, "TRS API is not enabled for this instance") unless Seek::Config.ga4gh_trs_api_enabled
+          trs_error(404, "TRS API is not enabled on this instance") unless Seek::Config.ga4gh_trs_api_enabled
         end
 
         def get_tool
           workflow = Workflow.find_by_id(params[:id])
-          return trs_error(404, "Couldn't find tool with 'id'=#{params[:id]}") unless workflow
-          return trs_error(403, "Access to this tool is restricted") unless workflow.can_view?
+          return trs_error(404, "Couldn't find tool with 'id'=#{params[:id]}") unless workflow&.can_view?
           @tool = Tool.new(workflow)
         end
 

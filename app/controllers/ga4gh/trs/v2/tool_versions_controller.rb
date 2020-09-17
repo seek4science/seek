@@ -24,7 +24,7 @@ module Ga4gh
               file = crate.main_workflow
             end
 
-            return trs_error(404, "No descriptor found#{ " at: #{params[:relative_path]}" if params[:relative_path].present?}") unless file
+            return trs_error(404, "No descriptor found#{ " at: #{params[:relative_path]}" if params[:relative_path].present?}") unless file&.is_a?(ROCrate::File)
 
             if params[:type].downcase.start_with?('plain_')
               render plain: (file.remote? ? file.id.to_s : file.source.read)
