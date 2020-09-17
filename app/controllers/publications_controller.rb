@@ -10,8 +10,6 @@ class PublicationsController < ApplicationController
   before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy]
   before_action :suggest_authors, only: [:manage]
 
-  include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
   include PublicationsHelper
 

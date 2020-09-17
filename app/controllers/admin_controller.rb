@@ -2,7 +2,6 @@ require 'delayed/command'
 
 class AdminController < ApplicationController
   include CommonSweepers
-  include Seek::BreadCrumbs
 
   RESTART_MSG = "Your settings have been updated. If you changed some settings e.g. search, you need to restart some processes.
                  Please see the buttons and explanations below.".freeze

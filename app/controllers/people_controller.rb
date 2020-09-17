@@ -22,7 +22,6 @@ class PeopleController < ApplicationController
   skip_after_action :request_publish_approval, :log_publishing, only: %i[create update]
 
   cache_sweeper :people_sweeper, only: %i[update create destroy]
-  include Seek::BreadCrumbs
 
   protect_from_forgery only: []
 

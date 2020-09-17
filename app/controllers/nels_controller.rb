@@ -12,10 +12,6 @@ class NelsController < ApplicationController
   rescue_from RestClient::Unauthorized, :with => :unauthorized_response
   rescue_from RestClient::InternalServerError, :with => :nels_error_response
 
-  include Seek::BreadCrumbs
-
-  skip_before_action :add_breadcrumbs, only: :callback
-
   def callback
     hash = @oauth_client.get_token(params[:code])
 

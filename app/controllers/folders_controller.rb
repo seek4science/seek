@@ -8,8 +8,6 @@ class FoldersController < ApplicationController
   before_action :get_folders,:only=>[:index,:move_asset_to,:create_folder]
   before_action :get_asset, :only=>[:move_asset_to,:remove_asset]
 
-  include Seek::BreadCrumbs
-
   def show
     respond_to do |format|
       format.html
