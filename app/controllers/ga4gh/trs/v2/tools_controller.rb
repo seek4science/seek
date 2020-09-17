@@ -15,12 +15,16 @@ module Ga4gh
 
         private
 
+        def controller_model
+          Workflow
+        end
+
         def paginate_and_filter
           @offset = tools_index_params[:offset]&.to_i
           @limit = tools_index_params[:limit]&.to_i || 1000
 
           # Filtering
-          workflows = Workflow.authorized_for('view')
+          workflows = relationify_collection(Workflow.authorized_for('view'))
           workflows = workflows.where(id: tools_index_params[:id]) if tools_index_params[:id].present?
           workflows = workflows.where('workflows.title LIKE ?', "%#{tools_index_params[:name]}%") if tools_index_params[:name].present?
           workflows = workflows.where('workflows.description LIKE ?', "%#{tools_index_params[:description]}%") if tools_index_params[:description].present?
