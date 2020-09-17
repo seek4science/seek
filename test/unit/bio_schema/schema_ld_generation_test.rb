@@ -78,7 +78,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected = {
       '@context' => 'http://schema.org',
-      '@type' => 'DataSet',
+      '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
       'description' => df.description,
@@ -126,28 +126,27 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert df.content_blob.show_as_external_link?
 
     expected = {
-      '@context' => 'http://schema.org',
-      '@type' => 'DataSet',
-      '@id' => "http://localhost:3000/data_files/#{df.id}",
-      'name' => df.title,
-      'description' => df.description,
-      'keywords' => 'keyword',
-      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
-      'url' => 'http://www.abc.com',
-      'producer' => [{
-        '@type' => %w[Project Organization],
-        '@id' => "http://localhost:3000/projects/#{@project.id}",
-        'name' => @project.title
-      }],
-      'dateCreated' => @current_time.to_s,
-      'dateModified' => @current_time.to_s,
-      'encodingFormat' => 'text/html',
-      'identifier' => 'https://doi.org/10.10.10.10/test.1',
-      'subjectOf' => [
-        { '@type' => 'Event',
-          '@id' => "http://localhost:3000/events/#{df.events.first.id}",
-          'name' => df.events.first.title }
-      ]
+        '@context' => 'http://schema.org',
+        '@type' => 'Dataset',
+        '@id' => "http://localhost:3000/data_files/#{df.id}",
+        'name' => df.title,
+        'description' => df.description,
+        'keywords' => 'keyword',
+        'url' => "http://www.abc.com",
+        'provider' => [{
+                           '@type' => ['Project','Organization'],
+                           '@id' => "http://localhost:3000/projects/#{@project.id}",
+                           'name' => @project.title
+                       }],
+        'dateCreated' => @current_time.to_s,
+        'dateModified' => @current_time.to_s,
+        'encodingFormat' => 'text/html',
+        'identifier' => 'https://doi.org/10.10.10.10/test.1',
+        'subjectOf' => [
+            { '@type' => 'Event',
+              '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+              'name' => df.events.first.title }
+        ]
     }
 
     json = JSON.parse(df.to_schema_ld)
