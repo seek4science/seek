@@ -78,7 +78,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected = {
       '@context' => 'http://schema.org',
-      '@type' => 'DataSet',
+      '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
       'description' => df.description,
@@ -126,7 +126,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected = {
         '@context' => 'http://schema.org',
-        '@type' => 'DataSet',
+        '@type' => 'Dataset',
         '@id' => "http://localhost:3000/data_files/#{df.id}",
         'name' => df.title,
         'description' => df.description,

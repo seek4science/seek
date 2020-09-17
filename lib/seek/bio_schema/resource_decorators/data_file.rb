@@ -35,7 +35,7 @@ module Seek
         end
 
         def schema_type
-          'DataSet'
+          'Dataset'
         end
       end
     end
