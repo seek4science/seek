@@ -567,45 +567,6 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'p.list_item_attribute', text: /#{I18n.t('creator').pluralize.capitalize}: None/, count: no_other_creator_sops.count
   end
 
-  test 'breadcrumb for sop index' do
-    get :index
-    assert_response :success
-    assert_select 'div.breadcrumbs', text: /Home #{I18n.t('sop').pluralize} Index/, count: 1 do
-      assert_select 'a[href=?]', root_path, count: 1
-    end
-  end
-
-  test 'breadcrumb for showing sop' do
-    sop = sops(:sop_with_fully_public_policy)
-    get :show, params: { id: sop }
-    assert_response :success
-    assert_select 'div.breadcrumbs', text: /Home #{I18n.t('sop').pluralize} Index #{sop.title}/, count: 1 do
-      assert_select 'a[href=?]', root_path, count: 1
-      assert_select 'a[href=?]', sops_url, count: 1
-    end
-  end
-
-  test 'breadcrumb for editing sop' do
-    sop = sops(:sop_with_all_sysmo_users_policy)
-    assert sop.can_edit?
-    get :edit, params: { id: sop }
-    assert_response :success
-    assert_select 'div.breadcrumbs', text: /Home SOPs Index #{sop.title} Edit/, count: 1 do
-      assert_select 'a[href=?]', root_path, count: 1
-      assert_select 'a[href=?]', sops_url, count: 1
-      assert_select 'a[href=?]', sop_url(sop), count: 1
-    end
-  end
-
-  test 'breadcrumb for creating new sop' do
-    get :new
-    assert_response :success
-    assert_select 'div.breadcrumbs', text: /Home #{I18n.t('sop').pluralize} Index New/, count: 1 do
-      assert_select 'a[href=?]', root_path, count: 1
-      assert_select 'a[href=?]', sops_url, count: 1
-    end
-  end
-
   test 'should set the policy to projects_policy if the item is requested to be published, when creating new sop' do
     as_not_virtualliver do
       gatekeeper = Factory(:asset_gatekeeper)

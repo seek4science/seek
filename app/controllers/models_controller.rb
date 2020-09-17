@@ -13,7 +13,7 @@ class ModelsController < ApplicationController
 
   include Seek::Jws::Simulator
   include Seek::Publishing::PublishingCommon
-  include Seek::BreadCrumbs
+
   include Bives
   include Seek::Doi::Minting
 

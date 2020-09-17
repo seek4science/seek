@@ -42,7 +42,6 @@ gem 'json-diff'
 gem 'rubyzip'
 
 gem 'equivalent-xml'
-gem 'breadcrumbs_on_rails'
 gem 'docsplit'
 gem 'pothoven-attachment_fu'
 gem 'exception_notification'
