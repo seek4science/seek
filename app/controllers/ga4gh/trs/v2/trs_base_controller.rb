@@ -31,7 +31,10 @@ module Ga4gh
         end
 
         def trs_error(code, message)
-          respond_with({ code: code, message: message }, adapter: :attributes, status: code)
+          respond_to do |format|
+            format.json { render json: { code: code, message: message }, adapter: :attributes, status: code }
+            format.text { render plain: "Error #{code} - #{message}", status: code }
+          end
         end
       end
     end
