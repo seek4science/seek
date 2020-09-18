@@ -78,12 +78,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected = {
       '@context' => 'http://schema.org',
-      '@type' => 'DataSet',
+      '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
-      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'producer' => [{
         '@type' => %w[Project Organization],
@@ -127,7 +126,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected = {
       '@context' => 'http://schema.org',
-      '@type' => 'DataSet',
+      '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
       'description' => df.description,
