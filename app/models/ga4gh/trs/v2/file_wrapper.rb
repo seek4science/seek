@@ -4,18 +4,18 @@ module Ga4gh
       # Decorator for a ROCrate::File to make it appear as a GA4GH TRS File Wrapper.
       class FileWrapper
         include ActiveModel::Serialization
-        delegate_missing_to :@ro_crate_file
+        delegate_missing_to :@entry
 
-        def initialize(ro_crate_file)
-          @ro_crate_file = ro_crate_file
+        def initialize(entry)
+          @entry = entry
         end
 
         def content
-          remote? ? nil : source.read
+          remote? ? nil : read
         end
 
         def url
-          remote? ? canonical_id : nil
+          remote? ? uri&.to_s : nil
         end
 
         def checksums
