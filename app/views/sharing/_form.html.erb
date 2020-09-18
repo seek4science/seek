@@ -21,6 +21,6 @@
               <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= resource_type -%>.
       <% end %>
     </div>
-  s
+
     <%= render partial: 'sharing/permissions_table', locals: { object: object, policy: policy, projects: projects } %>
 <% end %>
