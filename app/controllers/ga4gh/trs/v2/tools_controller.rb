@@ -30,16 +30,19 @@ module Ga4gh
           workflows = workflows.where('workflows.description LIKE ?', "%#{tools_index_params[:description]}%") if tools_index_params[:description].present?
           workflows = workflows.none if tools_index_params[:toolClass].present? && tools_index_params[:toolClass] != ToolClass::WORKFLOW.name
           if tools_index_params[:descriptorType].present?
-            class_title = ToolVersion::DESCRIPTOR_TYPE_MAPPING.invert[tools_index_params[:descriptorType].upcase]
-            if class_title
-              workflows = workflows.includes(:workflow_class).where(workflow_classes: { title: class_title })
+            class_key = ToolVersion::DESCRIPTOR_TYPE_MAPPING.invert[tools_index_params[:descriptorType].upcase]
+            if class_key
+              workflows = workflows.includes(:workflow_class).where(workflow_classes: { key: class_key })
+            else
+              workflows = workflows.none
             end
           end
           workflows = workflows.includes(:projects).where(projects: { title: tools_index_params[:organization] }) if tools_index_params[:organization].present?
           workflows = workflows.none if tools_index_params[:checker].present? && tools_index_params[:checker].to_s.downcase != 'false'
           if tools_index_params[:author].present?
             people = Person.all.select { |p| p.name == tools_index_params[:author] }.map(&:id)
-            workflows = workflows.includes(:creators).where(people: { id: people })
+            workflows = workflows.includes(:creators)
+            workflows = workflows.where(people: { id: people }).or(workflows.where('workflows.other_creators LIKE ?', "%#{tools_index_params[:author]}%"))
           end
           # Not implemented:
 #          tools_index_params[:alias]

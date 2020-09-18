@@ -63,6 +63,252 @@ module Ga4gh
           assert_equal 404, r['code']
           assert r['message'].include?("Couldn't find")
         end
+
+        # Filtering
+        test 'should filter workflows by name' do
+          w1 = Factory(:workflow, title: 'Cool Workflow', policy: Factory(:public_policy))
+          w2 = Factory(:workflow, title: 'Hot Workflow', policy: Factory(:public_policy))
+          w3 = Factory(:workflow, title: 'Cooler Workflow', policy: Factory(:public_policy))
+
+          get :index, params: { name: 'cool' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 2, ids.length
+          assert ids.include?(w1.id.to_s)
+          assert ids.include?(w3.id.to_s)
+
+          get :index, params: { name: 'flow' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 3, ids.length
+          assert ids.include?(w1.id.to_s)
+          assert ids.include?(w2.id.to_s)
+          assert ids.include?(w3.id.to_s)
+
+          get :index, params: { name: 'fish' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 0, ids.length
+        end
+
+        test 'should filter workflows by description' do
+          w1 = Factory(:workflow, description: 'A very cool Workflow indeed!', policy: Factory(:public_policy))
+          w2 = Factory(:workflow, description: 'A very hot Workflow indeed!', policy: Factory(:public_policy))
+          w3 = Factory(:workflow, description: 'A very cooler Workflow indeed!', policy: Factory(:public_policy))
+
+          get :index, params: { description: 'cool' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 2, ids.length
+          assert ids.include?(w1.id.to_s)
+          assert ids.include?(w3.id.to_s)
+
+          get :index, params: { description: 'hot' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 1, ids.length
+          assert ids.include?(w2.id.to_s)
+
+          get :index, params: { description: 'warm' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 0, ids.length
+        end
+
+        test 'should filter workflows by toolClass' do
+          w1 = Factory(:workflow, policy: Factory(:public_policy))
+          w2 = Factory(:workflow, policy: Factory(:public_policy))
+          w3 = Factory(:workflow, policy: Factory(:public_policy))
+
+          get :index, params: { toolClass: 'Workflow' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 3, ids.length
+          assert ids.include?(w1.id.to_s)
+          assert ids.include?(w2.id.to_s)
+          assert ids.include?(w3.id.to_s)
+
+          get :index, params: { toolClass: 'Hammer' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 0, ids.length
+        end
+
+        test 'should filter workflows by descriptorType' do
+          w1 = Factory(:cwl_workflow, policy: Factory(:public_policy))
+          w2 = Factory(:existing_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
+          w3 = Factory(:nf_core_ro_crate_workflow, policy: Factory(:public_policy))
+
+          get :index, params: { descriptorType: 'CWL' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 1, ids.length
+          assert ids.include?(w1.id.to_s)
+
+          get :index, params: { descriptorType: 'GALAXY' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 1, ids.length
+          assert ids.include?(w2.id.to_s)
+
+          get :index, params: { descriptorType: 'NFL' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 1, ids.length
+          assert ids.include?(w3.id.to_s)
+
+          get :index, params: { descriptorType: 'WDL' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 0, ids.length
+        end
+
+        test 'should filter workflows by organization' do
+          p1 = Factory(:project, title: 'MegaWorkflows')
+          p2 = Factory(:project, title: 'CovidSux')
+          w1 = Factory(:workflow, projects: [p1], policy: Factory(:public_policy))
+          w2 = Factory(:workflow, projects: [p2], policy: Factory(:public_policy))
+          w3 = Factory(:workflow, projects: [p1, p2], policy: Factory(:public_policy))
+
+          get :index, params: { organization: 'CovidSux' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 2, ids.length
+          assert ids.include?(w2.id.to_s)
+          assert ids.include?(w3.id.to_s)
+
+          get :index, params: { organization: 'MegaWorkflows' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 2, ids.length
+          assert ids.include?(w1.id.to_s)
+          assert ids.include?(w3.id.to_s)
+
+          get :index, params: { organization: 'Hello' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 0, ids.length
+        end
+
+        test 'should filter workflows by author' do
+          p1 = Factory(:person, first_name: 'Bob', last_name: 'Lastname')
+          p2 = Factory(:person, first_name: 'Jane', last_name: 'Lastname')
+          w1 = Factory(:workflow, creators: [p1], other_creators: 'Sandra Testington, John Johnson', policy: Factory(:public_policy))
+          w2 = Factory(:workflow, creators: [p2], other_creators: 'Sandra Testington, Ivan Ivanov', policy: Factory(:public_policy))
+          w3 = Factory(:workflow, creators: [p1, p2], other_creators: 'Bob Lastname', policy: Factory(:public_policy))
+          w4 = Factory(:workflow, creators: [], other_creators: 'Bob Lastname', policy: Factory(:public_policy))
+
+          get :index, params: { author: 'Bob Lastname' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 3, ids.length
+          assert ids.include?(w1.id.to_s)
+          assert ids.include?(w3.id.to_s)
+          assert ids.include?(w4.id.to_s)
+
+          get :index, params: { author: 'Jane Lastname' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 2, ids.length
+          assert ids.include?(w2.id.to_s)
+          assert ids.include?(w3.id.to_s)
+
+          get :index, params: { author: 'Ivan Ivanov' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 1, ids.length
+          assert ids.include?(w2.id.to_s)
+
+          get :index, params: { author: 'Sandra Testington' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 2, ids.length
+          assert ids.include?(w1.id.to_s)
+          assert ids.include?(w2.id.to_s)
+
+          get :index, params: { author: 'Sandra Johnson' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 0, ids.length
+        end
+
+        test 'should filter workflows by "checker"' do
+          w1 = Factory(:workflow, policy: Factory(:public_policy))
+          w2 = Factory(:workflow, policy: Factory(:public_policy))
+          w3 = Factory(:workflow, policy: Factory(:public_policy))
+
+          get :index, params: { checker: 'true' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 0, ids.length
+
+          get :index, params: { checker: 'false' }
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 3, ids.length
+          assert ids.include?(w1.id.to_s)
+          assert ids.include?(w2.id.to_s)
+          assert ids.include?(w3.id.to_s)
+        end
+
+        test 'should filter by multiple criterion' do
+          p1 = Factory(:project, title: 'CovidBad')
+          p2 = Factory(:project, title: 'WorkflowsGood')
+          cwl1 = Factory(:cwl_workflow, title: 'Covid fixer', projects: [p1], policy: Factory(:public_policy))
+          cwl2 = Factory(:cwl_workflow, title: 'Thing doer', projects: [p2], policy: Factory(:public_policy))
+          gal1 = Factory(:existing_galaxy_ro_crate_workflow, title: 'Stop covid', projects: [p1],  policy: Factory(:public_policy))
+          gal2 = Factory(:existing_galaxy_ro_crate_workflow, title: 'Concat 2 strings', projects: [p2], policy: Factory(:public_policy))
+          nfl1 = Factory(:nf_core_ro_crate_workflow, title: 'Covid sim', policy: Factory(:public_policy))
+          nfl2 = Factory(:nf_core_ro_crate_workflow, title: 'RNA something', policy: Factory(:public_policy))
+
+          get :index, params: { name: 'covid', descriptorType: 'NFL' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 1, ids.length
+          assert ids.include?(nfl1.id.to_s)
+
+          get :index, params: { descriptorType: 'CWL', organization: 'CovidBad' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 1, ids.length
+          assert ids.include?(cwl1.id.to_s)
+
+          get :index, params: { name: 'covid', organization: 'CovidBad' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 2, ids.length
+          assert ids.include?(cwl1.id.to_s)
+          assert ids.include?(gal1.id.to_s)
+
+          get :index, params: { name: 'covid', organization: 'CovidBad', descriptorType: 'NFL' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 0, ids.length
+        end
       end
     end
   end

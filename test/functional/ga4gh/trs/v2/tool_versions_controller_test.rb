@@ -32,6 +32,15 @@ module Ga4gh
           assert_response :success
         end
 
+        test 'should 404 for non-existent tool version' do
+          workflow = Factory(:workflow, policy: Factory(:public_policy))
+          assert 1, workflow.reload.versions.count
+
+          get :show, params: { id: workflow.id, version_id: 1337 }
+
+          assert_response :not_found
+        end
+
         test 'should list tool version files for correct descriptor' do
           workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
 
