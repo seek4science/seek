@@ -12,6 +12,7 @@
 
 <%= folding_panel('Sharing', false, id: 'sharing_form',
                   help_text: "Here you can specify who can view, access and manage this #{resource_type}.") do %>
+
     <div class="alert alert-info">
       <% if object.is_a?(Project) %>
           Here you can configure a default sharing policy that is applied to new resources created as part of this <%= t('project').downcase -%>.

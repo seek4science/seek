@@ -255,6 +255,9 @@ SEEK::Application.routes.draw do
       get :waiting_approval_assets
       get :select
       get :items
+      get :batch_sharing_permission_preview
+      post :batch_change_permssion_for_selected_items
+      post :batch_sharing_permission_changed
     end
     resources :projects, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :collections, only: [:index]
     resources :avatars do
