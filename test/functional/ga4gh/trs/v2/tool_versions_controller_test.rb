@@ -32,6 +32,15 @@ module Ga4gh
           assert_response :success
         end
 
+        test 'should 404 for private tool version' do
+          workflow = Factory(:workflow, policy: Factory(:private_policy))
+          assert 1, workflow.reload.versions.count
+
+          get :show, params: { id: workflow.id, version_id: 1 }
+
+          assert_response :not_found
+        end
+
         test 'should 404 for non-existent tool version' do
           workflow = Factory(:workflow, policy: Factory(:public_policy))
           assert 1, workflow.reload.versions.count
@@ -83,6 +92,14 @@ module Ga4gh
           assert_response :not_found
         end
 
+        test 'should not list tool version files for private tool' do
+          workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:private_policy))
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :not_found
+        end
+
         test 'should get main workflow as primary descriptor' do
           workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
 
@@ -121,6 +138,16 @@ module Ga4gh
           assert_equal 'text/plain; charset=utf-8', @response.headers['Content-Type']
           assert @response.body.start_with?('<?xml version="1')
         end
+
+        test 'should 404 on descriptor for private tool' do
+          workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:private_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :not_found
+          refute @response.body.include?('a_galaxy_workflow')
+        end
+
 
         test 'should 404 on missing descriptor file via relative path' do
           workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy))

@@ -309,6 +309,68 @@ module Ga4gh
           ids = JSON.parse(@response.body).map { |t| t['id'] }
           assert_equal 0, ids.length
         end
+
+        test 'should paginate tools' do
+          p1 = Factory(:project, title: 'CovidBad')
+          p2 = Factory(:project, title: 'WorkflowsGood')
+          cwl1 = Factory(:cwl_workflow, title: 'Covid fixer', projects: [p1], policy: Factory(:public_policy))
+          cwl2 = Factory(:cwl_workflow, title: 'Thing doer', projects: [p2], policy: Factory(:public_policy))
+          gal1 = Factory(:existing_galaxy_ro_crate_workflow, title: 'Stop covid', projects: [p1],  policy: Factory(:public_policy))
+          gal2 = Factory(:existing_galaxy_ro_crate_workflow, title: 'Concat 2 strings', projects: [p2], policy: Factory(:public_policy))
+          nfl1 = Factory(:nf_core_ro_crate_workflow, title: 'Covid sim', policy: Factory(:public_policy))
+          nfl2 = Factory(:nf_core_ro_crate_workflow, title: 'RNA something', policy: Factory(:public_policy))
+
+          count = Workflow.count
+          assert_equal 6, count
+
+          get :index
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 6, ids.length
+          assert_equal ga4gh_trs_v2_tools_url, @response.headers['self_link']
+          assert_nil @response.headers['next_page']
+          assert_equal ga4gh_trs_v2_tools_url, @response.headers['last_page']
+          assert_equal 1000, @response.headers['current_limit']
+          assert_nil @response.headers['current_offset']
+
+          get :index, params: { limit: 1 }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 1, ids.length
+          assert_equal cwl1.id.to_s, ids.first
+          assert_equal ga4gh_trs_v2_tools_url(limit: 1), @response.headers['self_link']
+          assert_equal ga4gh_trs_v2_tools_url(limit: 1, offset: 1), @response.headers['next_page']
+          assert_equal ga4gh_trs_v2_tools_url(limit: 1, offset: 5), @response.headers['last_page']
+          assert_equal 1, @response.headers['current_limit']
+          assert_nil @response.headers['current_offset']
+
+          get :index, params: { limit: 2, offset: 1 }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 2, ids.length
+          assert_equal cwl2.id.to_s, ids.first
+          assert_equal gal1.id.to_s, ids.last
+          assert_equal ga4gh_trs_v2_tools_url(limit: 2, offset: 1), @response.headers['self_link']
+          assert_equal ga4gh_trs_v2_tools_url(limit: 2, offset: 3), @response.headers['next_page']
+          assert_equal ga4gh_trs_v2_tools_url(limit: 2, offset: 3), @response.headers['last_page']
+          assert_equal 2, @response.headers['current_limit']
+          assert_equal 1, @response.headers['current_offset']
+
+          get :index, params: { offset: 1, descriptorType: 'NFL' }
+
+          assert_response :success
+          ids = JSON.parse(@response.body).map { |t| t['id'] }
+          assert_equal 1, ids.length
+          assert_equal nfl2.id.to_s, ids.first
+          assert_equal ga4gh_trs_v2_tools_url(offset: 1, descriptorType: 'NFL'), @response.headers['self_link']
+          assert_nil @response.headers['next_page']
+          assert_equal ga4gh_trs_v2_tools_url(descriptorType: 'NFL'), @response.headers['last_page']
+          assert_equal 1000, @response.headers['current_limit']
+          assert_equal 1, @response.headers['current_offset']
+        end
       end
     end
   end
