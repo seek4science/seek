@@ -72,6 +72,9 @@
     <%= admin_text_setting(:cwl_viewer_url, Seek::Config.cwl_viewer_url,
                            'CWL Viewer URL',
                            "The URL of a #{link_to('CWL Viewer', 'https://github.com/common-workflow-language/cwlviewer', target: :_blank)} instance to generate diagrams for CWL workflows.") %>
+
+    <%= admin_checkbox_setting(:ga4gh_trs_api_enabled, 1, Seek::Config.ga4gh_trs_api_enabled,
+                               "GA4GH TRS API enabled", "Enable GA4GH Tool Registry Service API endpoints for accessing workflows.") %>
   </div>
 
   <h2>Integrations</h2>

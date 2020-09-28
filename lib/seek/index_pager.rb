@@ -118,15 +118,6 @@ module Seek
       @available_filters = {}
     end
 
-    # This is a silly method to turn an Array of AR objects back into an AR relation so we can do joins etc. on it.
-    def relationify_collection(collection)
-      if collection.is_a?(Array)
-        controller_model.where(id: collection.map(&:id))
-      else
-        collection
-      end
-    end
-
     def json_api_links
       if @parent_resource
         base = [@parent_resource, controller_name.to_sym]

@@ -133,6 +133,8 @@ def load_seek_testing_defaults!
       Settings.defaults[:omniauth_github_enabled] = true
       Settings.defaults[:omniauth_github_client_id] = 'abc'
       Settings.defaults[:omniauth_github_secret] = '456'
+
+      Settings.defaults[:ga4gh_trs_api_enabled] = true
     end
 end
 
