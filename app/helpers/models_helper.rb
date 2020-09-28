@@ -42,4 +42,9 @@ module ModelsHelper
   def jws_online_logo
     image(:jws_online_logo, style: 'background-color:black;padding:1em;', class: 'img-responsive')
   end
+
+#ToDo:hu add in admin area to active or dis active button
+  def show_copasi_button?
+    @model.can_download? && @display_model.is_copasi_supported?
+  end
 end
