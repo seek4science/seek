@@ -77,14 +77,6 @@ module Seek
       end
     end
 
-    def self.breadcrumb_types
-      cache('breadcrumb_types') do
-        persistent_classes.select do |c|
-          c.is_isa? || c.is_asset? || c.is_yellow_pages? || c.name == 'Event'
-        end.sort_by(&:name)
-      end
-    end
-
     def self.asset_types
       cache('asset_types') do
         persistent_classes.select(&:is_asset?).sort_by(&:name)

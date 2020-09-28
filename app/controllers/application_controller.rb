@@ -38,7 +38,6 @@ class ApplicationController < ActionController::Base
 
   layout Seek::Config.main_layout
 
-
   def with_current_user
     User.with_current_user current_user do
       yield
@@ -583,6 +582,15 @@ class ApplicationController < ActionController::Base
     unless Programme.managed_programme
       error("No managed #{t('programme')} is configured","No managed #{t('programme')} is configured")
       return false
+    end
+  end
+
+  # This is a silly method to turn an Array of AR objects back into an AR relation so we can do joins etc. on it.
+  def relationify_collection(collection)
+    if collection.is_a?(Array)
+      controller_model.where(id: collection.map(&:id))
+    else
+      collection
     end
   end
 end

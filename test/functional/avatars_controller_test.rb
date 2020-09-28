@@ -88,34 +88,6 @@ class AvatarsControllerTest < ActionController::TestCase
     assert_response :not_found
   end
 
-  test 'breadcrumb for avatar index' do
-    login_as @admin.user
-    person = Factory(:person)
-    Factory(:avatar, owner: person)
-    get :index, params: { person_id: person.id }
-    assert_response :success
-
-    assert_select 'div.breadcrumbs', text: /Home People Index #{person.title} Avatars Index/, count: 1 do
-      assert_select 'a[href=?]', root_path, count: 1
-      assert_select 'a[href=?]', people_url, count: 1
-      assert_select 'a[href=?]', person_url(person), count: 1
-    end
-  end
-
-  test 'breadcrumb for uploading new avatar' do
-    login_as @admin.user
-    person = Factory(:person)
-    Factory(:avatar, owner: person)
-    get :new, params: { person_id: person.id }
-    assert_response :success
-    assert_select 'div.breadcrumbs', text: /Home People Index #{person.title} Avatars Index New/, count: 1 do
-      assert_select 'a[href=?]', root_path, count: 1
-      assert_select 'a[href=?]', people_url, count: 1
-      assert_select 'a[href=?]', person_url(person), count: 1
-      assert_select 'a[href=?]', person_avatars_url(person), count: 1
-    end
-  end
-
   test 'index for programmes for admin' do
     programme = Factory(:programme, avatar: Factory(:avatar))
     Factory(:avatar, owner: programme)

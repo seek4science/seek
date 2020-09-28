@@ -16,8 +16,6 @@ class InvestigationsController < ApplicationController
 
   include Seek::AnnotationCommon
 
-  include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
 
   require "isatab_converter"

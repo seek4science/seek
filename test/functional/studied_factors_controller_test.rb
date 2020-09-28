@@ -295,18 +295,6 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal 'update value', fs.annotations_with_attribute('description').first.value.text
   end
 
-  test 'breadcrumb for factors studied' do
-    df = data_files(:editable_data_file)
-    assert df.can_edit?
-    get :index, params: { data_file_id: df.id, version: df.version }
-    assert_response :success
-    assert_select 'div.breadcrumbs', text: /Home #{I18n.t('data_file').pluralize} Index #{df.title} Factors studied Index/, count: 1 do
-      assert_select 'a[href=?]', root_path, count: 1
-      assert_select 'a[href=?]', data_files_url, count: 1
-      assert_select 'a[href=?]', data_file_url(df)
-    end
-  end
-
   def mock_sabio_rk
     body = %(<Compound>
   <sabioID>1286</sabioID>

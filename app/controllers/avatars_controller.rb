@@ -11,8 +11,6 @@ class AvatarsController < ApplicationController
 
   protect_from_forgery except: [:new]
 
-  include Seek::BreadCrumbs
-
   # GET /people/1/avatars/new
   # GET /people/new
   def new
