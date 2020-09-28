@@ -1570,6 +1570,21 @@ class SopsControllerTest < ActionController::TestCase
     assert_empty sop.discussion_links
   end
 
+  test 'should immediately update auth for anon user' do
+    with_config_value(:auth_lookup_enabled, true) do
+      login_as(person = Factory(:person))
+      sop = Factory(:sop, contributor: person, policy: Factory(:private_policy))
+      AuthLookupUpdateQueue.destroy_all
+      refute sop.can_view?(nil)
+
+      put :update, params: { id: sop.id, sop: { title: 'Test2' }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
+
+      sop = assigns(:sop)
+      assert_equal Policy::ACCESSIBLE, sop.policy.access_type
+      assert sop.can_view?(nil)
+    end
+  end
+
   private
 
   def doi_citation_mock
