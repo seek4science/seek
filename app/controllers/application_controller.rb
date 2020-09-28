@@ -38,6 +38,16 @@ class ApplicationController < ActionController::Base
 
   layout Seek::Config.main_layout
 
+  def with_current_user
+    User.with_current_user current_user do
+      yield
+    end
+  end
+
+  def current_person
+    current_user.try(:person)
+  end
+
   def partially_registered?
     redirect_to register_people_path if current_user && !current_user.registration_complete?
   end

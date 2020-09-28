@@ -1,5 +1,5 @@
 module Ga4gh
-module Trs
+  module Trs
     module V2
       class ToolVersionSerializer < ActiveModel::Serializer
         include Rails.application.routes.url_helpers

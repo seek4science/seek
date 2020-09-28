@@ -62,7 +62,7 @@ module Ga4gh
           response.headers['current_limit'] = @limit
           response.headers['self_link'] = request.url
 
-          @tools = workflows.map { |workflow| Ga4gh::Trs::V2::Tool.new(workflow) }
+          @tools = workflows.map { |workflow| Tool.new(workflow) }
         end
 
         def tools_index_params
