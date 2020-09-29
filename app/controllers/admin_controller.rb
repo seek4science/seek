@@ -118,6 +118,7 @@ class AdminController < ApplicationController
     Seek::Config.zenodo_client_secret = params[:zenodo_client_secret].try(:strip)
 
     Seek::Config.openbis_enabled = string_to_boolean(params[:openbis_enabled])
+    Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
 
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
     Seek::Config.nels_client_id = params[:nels_client_id].try(:strip)
