@@ -228,7 +228,7 @@ module AssetsHelper
     download_path = polymorphic_path([files.first.asset, files.first], action: :download, code: params[:code])
     copasi_download_path =  "copasi://process?downloadUrl=http://"+request.host_with_port+download_path+"&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
 
-    tooltip_text_copasi_button = "This button opens your local installed Copasi.You can download this model to run a simulation there."
+    tooltip_text_copasi_button = "Simulate the publicly accessible model in your local installed Copasi. "
 
     button= button_link_to('Simulate Model in Copasi', 'copasi', copasi_download_path, class: 'btn btn-default', disabled: asset.download_disabled?, 'data-tooltip' => tooltip(tooltip_text_copasi_button))
 
