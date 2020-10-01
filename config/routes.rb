@@ -359,9 +359,7 @@ SEEK::Application.routes.draw do
     resources :people, :projects, :assays, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
-      get :manage
       get :order_studies
-      patch :manage_update
     end
   end
 
@@ -370,6 +368,9 @@ SEEK::Application.routes.draw do
       post :investigation_selected_ajax
     end
     resources :people, :projects, :assays, :investigations, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
+    member do
+      get :order_assays
+    end
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do

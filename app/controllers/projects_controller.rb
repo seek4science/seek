@@ -20,7 +20,6 @@ class ProjectsController < ApplicationController
   before_action :editable_by_user, only: %i[edit update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request]
   before_action :check_investigations_are_for_this_project, only: %i[update]
-  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report]
   before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
   before_action :allow_request_membership, only: [:request_membership]
 
