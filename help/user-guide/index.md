@@ -9,8 +9,10 @@ layout: page
 
 - [Registering in SEEK](registering.html)
 - [Logging into SEEK](login.html)
+     - [Logging into SEEK via ELIXIR AAI](aai.html)
 - [Editing your profile](editing-profile.html)
 - [Managing your account](managing-account.html)
+     - [Managing your identities/alternative login methods](managing-identities.html)
 - [Requesting to join a Project](request-to-join-project.html)
 - [Adding assets (data, models, SOPs, publications) to SEEK](adding-assets.html)
 - [Creating new asset versions](uploading-new-versions.html)

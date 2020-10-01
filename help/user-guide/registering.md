@@ -17,6 +17,7 @@ When complete click the Register button in the bottom left hand corner.
 
 ![Registration 2](/images/user-guide/register_2.png){:.screenshot}
 
+<a name="new-profile"></a>
 You will then be taken to a screen where you will enter further information. We require the following information:
 
 * First Name
