@@ -9,7 +9,7 @@ layout: page
 and ELIXIR AAI authentication is enabled on the SEEK instance you are using. For more information on ELIXIR AAI, please 
 see their [documentation](https://elixir-europe.org/services/compute/aai-documentation){:target="_blank"}.
 
-Already got a SEEK account? See how to [add ELIXIR AAI to your account](managing-identites.html#add-identity) instead. 
+Already got a SEEK account? See how to [add ELIXIR AAI to your account](managing-identities.html#add-identity) instead. 
 
 If enabled on the SEEK instance you are using, you will see a tab on the login form titled "ELIXIR AAI"
 
