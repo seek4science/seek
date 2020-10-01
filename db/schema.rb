@@ -183,7 +183,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.text "other_creators", limit: 16777215
     t.string "deleted_contributor"
     t.integer "sample_type_id"
-    t.index ["sample_type_id"], name: "index_assays_on_sample_type_id" 
+    t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
   create_table "asset_doi_logs", id: :integer,  force: :cascade do |t|
