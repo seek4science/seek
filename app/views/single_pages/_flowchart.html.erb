@@ -458,13 +458,14 @@
         }
     }
 
-    function createAssay(pid, std_id, uid, title, desc, sopId) {
+    function createAssay(pid, std_id, uid, title, desc, sopId, position) {
         let data = {
             "data": {
                 "type": "assays",
                 "attributes": {
                     "title": title,
                     "description": desc,
+                    "position": position,
                     "assay_class": {
                         "key": "EXP"
                     },
@@ -623,7 +624,7 @@
                 } = getAssayDetail(assay.opId)
                 $j.when(createSOP(method.title, method.description, pid, uid, method.file))
                     .then((res) => {
-                        $j.when(createAssay(pid, selectedItem.id, uid, title, description, res.data.id))
+                        $j.when(createAssay(pid, selectedItem.id, uid, title, description, res.data.id, i))
                             .then((res) => {
                                 updateIds(flowchartData, res.data.id, method.title)
                                 const attr = AssayTypes[sampleTypeAttrId].attributes
