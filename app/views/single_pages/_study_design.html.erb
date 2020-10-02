@@ -37,7 +37,7 @@
         <input id="btn-save-study-design" onClick="saveDesign()" value="Save Design" type="button" class="btn btn-primary">
     </div>
 
-    <%=  render partial: 'attribute_list' %>
+   
 
 </div>
 
@@ -234,10 +234,10 @@
         })
     }
 
-    function customTD(title, required = true) {
+    function customTD(title, required = true, info = null) {
         const action = required ? "" :
             "<a href='' onclick='remove_col(event)'> <span style='color:white' class='glyphicon glyphicon-trash'></span></a>"
-        return `<th>${title} ${action}</th>`
+        return `<th data-sampletypeid=${info}>${title} ${action}</th>`
     }
 
     function sampleTypeData(attributes, title, assayId = null) {
@@ -255,6 +255,18 @@
             "is_title": i == 0 ? true : false,
             "accessor_name": $j.trim(x.title).replace(/ /g, '_')
         })).get()
+        //Add a custom ID attribute to the sample type, in order to link right samples of different sample types
+        attributeMap.push({
+            "title": "link_id",
+            "sample_attibute_type": {
+                "id": "8" //string
+            },
+            "required": true,
+            "pos": (attributeMap.length + 1).toString(),
+            "unit_id": null,
+            "is_title": false,
+            "accessor_name": "link_id"
+        })
         return {
             "data": {
                 "type": "sample_types",
