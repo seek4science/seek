@@ -12,10 +12,13 @@
 
 <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? -%>
 
-<%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales?%>
+<%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales? %>
 
 <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
+<%= render partial: 'custom_metadata/custom_metadata_fields_form_input', locals:{f:f, resource:@investigation} %>
+
+<!-- custom metadata experiment end -->
 <%= form_submit_buttons(@investigation) %>
