@@ -2,7 +2,7 @@
     <a class="btn btn-primary btn-sm" onclick="sample_add_row('.sampleTable')"> <i class="glyphicon glyphicon-plus"></i>Add Row</a>
     <a id="sample_add_col" class="btn btn-primary btn-sm">
         <i class="glyphicon glyphicon-plus"></i>Add Column</a>
-    <a class="btn btn-primary btn-sm pull-right" onclick="updateSampleTbl('.sampleTable')">Save</a>
+    <a class="btn btn-primary btn-sm pull-right" onclick="saveSamples()">Save</a>
     <div class="sampleTblContainer">
         <table>
             <table class="table tableXs sampleTable">
@@ -26,16 +26,19 @@
 </style>
 <script>
     function load_samples() {
-        console.log("load_sample")
+        // console.log("load_sample")
         $j.ajax({
             type: 'GET',
             cache: false,
             url: `/single_pages/${pid}/sample_table/${selectedItem.id}`,
             success: res => {
                 if (res.data) {
-                    loadSampleTableHeader(res.data.header)
-                    //res.data.data >> The rows of the table
-                    console.log(res)
+                    // console.log(res)
+                    // Remove link_id for now --> Is it needed in the future??
+                    const header = $j.grep(res.data.header, (n, i) => n.accessor_name != "link_id")
+                    loadSampleTableHeader(header)
+                    loadSampleData(res.data.samples, header)
+                    requiredValidator()
                 } else {
                     $j('.sampleTable').html(
                         '<table class="table tableXs sampleTable"><thead class="thead-dark"><tr></tr></thead><tbody></tbody></table>'
@@ -49,97 +52,244 @@
     function loadSampleTableHeader(data) {
         $j('.sampleTable thead tr').empty()
         $j(data).each((i, x) => {
-            const TD = customTD(x.title, x.required)
+            const TD = customTD(x.accessor_name, x.required, x.sample_type_id)
+            // $(this).attr("data-id")
             $j('.sampleTable thead tr').append(TD)
         })
     }
 
-    
-    function mergeIOTables(dt, index) {
-        let headerAgg = [],
-            baseData = []
-        $j.each(dt, (k, v) => {
-            if (k <= index) {
-                let header = Object.keys(JSON.parse(v.content)[0])
-                headerAgg += [...headerAgg, ...header]
-                $j.each(header, (k, col) => {
-                    let hash = col.split('%')
-                    let options = hash.length > 1 ? {
-                        title: hash[0],
-                        tableClass: ".sampleTable",
-                        acTerm: hash[1],
-                        ableToRemove: false,
-                        extraInfo: v.id, //sampleId
-                        originalTitle: col
-                    } : {
-                        title: col,
-                        tableClass: ".sampleTable",
-                        ableToRemove: false,
-                        extraInfo: v.id,
-                        originalTitle: col
-                    }
-                    addColumn(options)
-                })
-            }
-        })
-        // Create the data object
-        let firstTable = TryJsonParse(dt[0].content)
-        if (firstTable) {
-            $j.each(firstTable, (k, v) => {
-                let row = {}, //v,
-                    id = v.id
-                $j.each(dt, (i, table) => {
-                    if (i <= index) {
-                        let currTable = TryJsonParse(table.content)
-                        if (currTable) {
-                            row = {
-                                ...row,
-                                ...currTable[k]
-                            }
-                        }
-                    }
-                })
-                baseData.push({
-                    ...row,
-                    id
-                })
+    function loadSampleData(data, headers) {
+        $j('.sampleTable tbody').empty()
+        const header = $j.map(headers, (item, i) => item.accessor_name)
+        const rows = consolidateRows(data)
+        // const headerCount = $j('.sampleTable thead tr').length;
+        $j(rows).each((i, row) => {
+            let newRow
+            $j.each(header, (i, val) => {
+                const sampleVal = findSampleVal(row, val)
+                newRow += createTD(sampleVal)
             })
-        }
-        //  console.log("baseData");
-        //  console.log(baseData);
-        // Populte table + apply ontology
-        if (baseData[0].id)
-            for (let i = 0; i < baseData.length; i++) addTableRow('.sampleTable', baseData[i])
-        add_remove_action(".sampleTable")
+            $j('.sampleTable tbody').append('<tr>' + newRow + '</tr>')
+        })
     }
 
-    function loadMethod(std_id, asy_id) {
-        $j("#text_content").show()
-        $j.ajax({
-            type: 'GET',
-            cache: false,
-            url: pid + '/text_content',
-            data: {
-                std_id,
-                item_id: asy_id,
-                item_type: "method"
-            },
-            success: result => {
-                if (!result) {
-                    alert('Error retrieving content!')
-                    return
+    function findSampleVal(row, key) {
+        let result = {
+            text: undefined,
+            sampleId: undefined
+        }
+        $j.each(row, (n, samplePart) => {
+            if (samplePart.data[key] != undefined)
+                return result = {
+                    text: samplePart.data[key],
+                    sampleId: samplePart.sampleId
                 }
-                $j('#txt_file_content').val(result.data)
-                $j("#methodTitle").html(result.title)
+        })
+        return result
+    }
+
+    function createTD(sampleVal) {
+        text = sampleVal.text
+        sampleId = sampleVal.sampleId
+        if (text == undefined) text = ""
+        if (sampleId == undefined) sampleId = ""
+        return `<td contenteditable data-sampleid=${sampleId}>` + text + "</td>"
+    }
+
+    function consolidateRows(data) {
+        const sourceSamples = data[0]
+        delete data[0]
+        let rows = []
+        $j(sourceSamples).each((i, row) => {
+            let tableRow = [{
+                sampleId: row.id,
+                data: JSON.parse(row.data)
+            }]
+            $j(data).each((i, x) => {
+                // TO_DO: check the following code in case of more sample existance
+                if (x.length > i)
+                    tableRow.push({
+                        sampleId: x.id,
+                        data: JSON.parse(x.data)
+                    })
+                // $j.extend(true, tableRow, {id:x.id, data:JSON.parse(x.data)});
+            })
+            rows.push(tableRow)
+        })
+        // console.log("rows", rows)
+        return rows
+    }
+
+    function requiredValidator() {
+        // Checks which cells are rquired and not yet filled
+        let valid = true
+        const required = $j.map($j('.sampleTable thead tr th').get(), (x, i) => !x.children.length > 0)
+        const rows = $j('.sampleTable tbody tr').get()
+        $j.each(rows, (i, row) => {
+            const tds = $j(row).find('td').get()
+            $j.each(tds, (j, td) => {
+                if (required[j] && $j(td).html() == "") {
+                    $j(td).css('border-bottom', '1px solid red');
+                    valid = false
+                }
+            })
+        })
+        return valid
+    }
+
+    function saveSamples() {
+        // Get the new list of sample types and samples with their attributes
+        const header = $j('.sampleTable thead tr th')
+        const headerValue = $j.map(header, (x, i) => $j(x).html().replace(/<(?:.|\n)*?>/gm, '').trim())
+        const _sampleTypes = $j.map(header, (x, i) => ({
+            sampleTypeId: $j(x).attr("data-sampletypeid"),
+            text: $j(x).html().replace(/<(?:.|\n)*?>/gm, '').trim()
+        }))
+        // Get all the rows of the table
+        const rows = $j('.sampleTable tbody tr').get()
+        let samples = []
+        for (let i = 0; i < rows.length; i++) {
+            samples.push(...splitSamples(rows[i], _sampleTypes))
+        }
+        let sampleTypes = getSampleTypes(_sampleTypes);
+        console.log("sampleTypes", sampleTypes)
+        console.log("samples", samples)
+        // Check the sample API >> create / update
+    }
+
+    function getSampleTypes(a) {
+        let s = []
+        for (let i = 0; i < a.length; i++) {
+            if (s.length == 0 || a[i].sampleTypeId != s[s.length - 1].id) {
+                s.push({
+                    "id": a[i].sampleTypeId,
+                    "attributes": [a[i].text]
+                })
+            } else {
+                s[s.length - 1].attributes.push(a[i].text)
+            }
+        }
+        return s
+    }
+
+    function splitSamples(row, header) {
+        let JSONMetadata = {}
+        let samples = []
+        $j.each($j(row).find('td'), (i, td) => {
+            if (samples.length == 0 || header[i].sampleTypeId != samples[samples.length - 1].sampleTypeId) {
+                samples.push({
+                    sampleId: $j(td).attr("data-sampleid"),
+                    sampleTypeId: header[i].sampleTypeId,
+                    JSONMetadata: {
+                        [`${header[i].text}`]: $j(td).html()
+                    }
+                })
+            } else {
+                $j.extend(true, samples[samples.length - 1].JSONMetadata, {
+                    [`${header[i].text}`]: $j(td).html()
+                });
             }
         })
+        return samples
     }
-    $j('#btn_save_method').on('click', () => {
-        let std_id = $j("#selected_std_asy").attr('data-selected').split('_')[0]
-        let asy_id = $j("#selected_std_asy").attr('data-selected').split('_')[1]
-        let content = $j("#txt_file_content").val()
-        update_method(std_id, asy_id, content)
-    })
+
+    function updateSampleType(){
+
+    }
+
+    function updateSample(){
+        
+    }
+    function createSample(){
+
+    }
+
+    // function mergeIOTables(dt, index) {
+    //     let headerAgg = [],
+    //         baseData = []
+    //     $j.each(dt, (k, v) => {
+    //         if (k <= index) {
+    //             let header = Object.keys(JSON.parse(v.content)[0])
+    //             headerAgg += [...headerAgg, ...header]
+    //             $j.each(header, (k, col) => {
+    //                 let hash = col.split('%')
+    //                 let options = hash.length > 1 ? {
+    //                     title: hash[0],
+    //                     tableClass: ".sampleTable",
+    //                     acTerm: hash[1],
+    //                     ableToRemove: false,
+    //                     extraInfo: v.id, //sampleId
+    //                     originalTitle: col
+    //                 } : {
+    //                     title: col,
+    //                     tableClass: ".sampleTable",
+    //                     ableToRemove: false,
+    //                     extraInfo: v.id,
+    //                     originalTitle: col
+    //                 }
+    //                 addColumn(options)
+    //             })
+    //         }
+    //     })
+    //     // Create the data object
+    //     let firstTable = TryJsonParse(dt[0].content)
+    //     if (firstTable) {
+    //         $j.each(firstTable, (k, v) => {
+    //             let row = {}, //v,
+    //                 id = v.id
+    //             $j.each(dt, (i, table) => {
+    //                 if (i <= index) {
+    //                     let currTable = TryJsonParse(table.content)
+    //                     if (currTable) {
+    //                         row = {
+    //                             ...row,
+    //                             ...currTable[k]
+    //                         }
+    //                     }
+    //                 }
+    //             })
+    //             baseData.push({
+    //                 ...row,
+    //                 id
+    //             })
+    //         })
+    //     }
+    //     //  console.log("baseData");
+    //     //  console.log(baseData);
+    //     // Populte table + apply ontology
+    //     if (baseData[0].id)
+    //         for (let i = 0; i < baseData.length; i++) addTableRow('.sampleTable', baseData[i])
+    //     add_remove_action(".sampleTable")
+    // }
+
+    // function loadMethod(std_id, asy_id) {
+    //     $j("#text_content").show()
+    //     $j.ajax({
+    //         type: 'GET',
+    //         cache: false,
+    //         url: pid + '/text_content',
+    //         data: {
+    //             std_id,
+    //             item_id: asy_id,
+    //             item_type: "method"
+    //         },
+    //         success: result => {
+    //             if (!result) {
+    //                 alert('Error retrieving content!')
+    //                 return
+    //             }
+    //             $j('#txt_file_content').val(result.data)
+    //             $j("#methodTitle").html(result.title)
+    //         }
+    //     })
+    // }
+
+    // $j('#btn_save_method').on('click', () => {
+    //     let std_id = $j("#selected_std_asy").attr('data-selected').split('_')[0]
+    //     let asy_id = $j("#selected_std_asy").attr('data-selected').split('_')[1]
+    //     let content = $j("#txt_file_content").val()
+    //     update_method(std_id, asy_id, content)
+    // })
 
     function addCustomCol(tblClass, bias, text = '', acTerm = '') {
         if (text.length == 0) text = $j.trim($j('.customCol').val())
@@ -160,11 +310,22 @@
         let newRow;
         let rowId = uniqId()
         $j(table + ' thead tr').find('th').each(function(k, v) {
-            newRow += $j.trim($j(v).text().toLowerCase()) == "id" ? `<td contenteditable>${rowId}</td>` :
+            newRow += $j.trim($j(v).text().toLowerCase()) == "link_id" ? `<td>${rowId}</td>` :
                 '<td contenteditable></td>'
         });
-        $j(table + ' tbody').append('<tr>' + newRow + '</tr>')
+        $j(table + ' tbody').append('<tr data-new="true">' + newRow + '</tr>')
         setTableOntology(table)
+    }
+
+    function uniqId() {
+        // return Math.random().toString(36).replace(/[^1-z]+/g, '').substr(0, 5);
+        var result = '';
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for (var i = 0; i < 5; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
     }
 
     $j.fn.columnCount = function() {
@@ -175,35 +336,35 @@
         return $j('tr', $j(this).find('tbody')).length;
     };
 
-    function AddCell(table, newColName) {
-        let colCount = $j(table).columnCount() + 1;
-        if (newColName.length < 3) {
-            alert("Please enter a valid column name!");
-            return;
-        }
-        if ($j(table).find('thead tr').find('th').length == 0) $j(table).find('thead tr').append('<th>' + newColName +
-            '</th>')
-        else $j(table).find('thead tr').find('th').eq(colCount - 2).after('<th>' + newColName + '</th>');
-        $j(table).find('tr').each(function() {
-            $j(this).find('td').eq(colCount - 2).after('<td contenteditable></td>');
-        });
-    }
+    // function AddCell(table, newColName) {
+    //     let colCount = $j(table).columnCount() + 1;
+    //     if (newColName.length < 3) {
+    //         alert("Please enter a valid column name!");
+    //         return;
+    //     }
+    //     if ($j(table).find('thead tr').find('th').length == 0) $j(table).find('thead tr').append('<th>' + newColName +
+    //         '</th>')
+    //     else $j(table).find('thead tr').find('th').eq(colCount - 2).after('<th>' + newColName + '</th>');
+    //     $j(table).find('tr').each(function() {
+    //         $j(this).find('td').eq(colCount - 2).after('<td contenteditable></td>');
+    //     });
+    // }
 
-    function update_iotable(std_id, sample_id, content) {
-        $j.ajax({
-            type: 'PATCH',
-            cache: false,
-            url: pid + '/update_iotable',
-            data: {
-                std_id,
-                sample_id, // array
-                content // array
-            },
-            success: result => {
-                alert('Content saved successfully!')
-            }
-        })
-    }
+    // function update_iotable(std_id, sample_id, content) {
+    //     $j.ajax({
+    //         type: 'PATCH',
+    //         cache: false,
+    //         url: pid + '/update_iotable',
+    //         data: {
+    //             std_id,
+    //             sample_id, // array
+    //             content // array
+    //         },
+    //         success: result => {
+    //             alert('Content saved successfully!')
+    //         }
+    //     })
+    // }
 
     function update_method(std_id, asy_id, content) {
         $j.ajax({
@@ -221,50 +382,6 @@
         })
     }
 
-    function updateSampleTbl(tblClass) {
-        // Add data-term to the col name to be extracted later
-        // TO-DO: Search col name in acSource array instead! (if match then apply data-term="generated-xxx")
-        let cols = [],
-            contents = []
-        $j.each($j(`${tblClass} thead tr th`), (key, val) => {
-            cols.push($j(val).html())
-            if ($j(val).attr('data-term')) $j(val).text($j(val).text() + '%' + $j(val).attr('data-term'))
-        })
-        //get list of first table columns
-        let columns = $j(`${tblClass} thead tr th`).map((i, x) => $j(x).data("info")).get()
-        let uniqCols = $j.unique(columns.slice())
-        var $originalSelects = $j(tblClass).find('select');
-        console.log(columns);
-        $j.each(uniqCols, (k, table) => {
-            let clone = $j(tblClass).first().clone().addClass(`clonedTable${k}`)
-            clone.find('select').each(function(index, item) {
-                $j(item).val($originalSelects.eq(index).val());
-            });
-            let thRemove = '',
-                tdRemove = ''
-            $j.each(columns, (k, v) => {
-                if (v != table) {
-                    thRemove += `thead tr th:nth-child(${k + 1}),`
-                }
-            })
-            thRemove = thRemove.slice(0, -1)
-            tdRemove = thRemove.replace(/thead tr th/g, 'td')
-            $j(clone).find(`${thRemove}`).remove()
-            $j(clone).find('tbody tr').each((i, row) => {
-                $j(row).find(`${tdRemove}`).remove()
-            });
-            $j(tblClass).parent().append(clone)
-            let _content = JSON.stringify(get_table_JSON(`.clonedTable${k}`))
-            clone.remove()
-            contents.push(_content)
-        })
-        // Prepare for save
-        $j.each($j(`${tblClass} thead tr th`), (key, val) => {
-            $j(val).html(cols[key])
-        })
-        let std_id = $j("#selected_std_asy").attr('data-selected').split('_')[0]
-        update_iotable(std_id, uniqCols, contents)
-    }
 
     function applyOntology(tblClass, column, term) {
 

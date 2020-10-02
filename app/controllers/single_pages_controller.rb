@@ -116,11 +116,19 @@ class SinglePagesController < ApplicationController
       assay =  Assay.find(params[:assay_id])
       flowchart = Flowchart.where(study_id: assay.study.id).first
       if (flowchart)
-        source_sample_type = SampleType.find(flowchart.source_sample_type_id).sample_attributes.select(:required, :title)
-        # Consider all sample types of assay ordered before the intended
-        assay_sample_type = SampleType.find(assay.sample_type_id).sample_attributes.select(:required, :title)
+        source_sample_type = SampleType.find(flowchart.source_sample_type_id)
+        source_sample_type_attributes = source_sample_type.sample_attributes.select(:required, :accessor_name, :sample_type_id, :id)
+        
+        assay_sample_type = SampleType.find(assay.sample_type_id)
+        # assay_samples = assay_sample_type.samples.json_metadata 
         # Load all samples sample...
-        data = { header: source_sample_type + assay_sample_type, data: "" }
+        # source_samples = source_sample_type.samples.json_metadata #.where(contributor_id: 1)
+
+        all_samples = load_samples(assay, source_sample_type)
+        rest_headers = load_headers(assay)
+
+        data = { header: source_sample_type_attributes + rest_headers, samples: all_samples }
+          #  data: source_samples + assay_samples }
         render json: { status: :ok, data: data }
       else
         render json: { status: :unprocessable_entity, error: "The flowchart does not exist." }
@@ -165,6 +173,35 @@ class SinglePagesController < ApplicationController
       })
     end
     source_list
+  end
+
+  def load_headers assay
+    final_header = []
+    all_assays = Study.find(assay.study.id).assays.where("position <= #{assay.position}").sort_by{|e| e[:position]}
+    all_assays.each do |m|
+      s = SampleType.find(m.sample_type_id)
+      final_header += s.sample_attributes.select(:required, :accessor_name, :sample_type_id, :id) if !s.nil?
+    end
+    final_header
+  end
+
+
+  def load_samples (assay, source_sample_type)
+    final_samples = {"0" => []}
+    source_sample_type.samples.each_with_index do |s, i|
+      final_samples["0"] << {"id" => s.id, "data" => s.json_metadata}
+    end
+
+    all_assays = Study.find(assay.study.id).assays.where("position <= #{assay.position}").sort_by{|e| e[:position]}
+    all_assays.each_with_index do |m, i|
+      final_samples[i+1] = []
+      s = SampleType.find(m.sample_type_id)
+      s.samples.each do |s|
+        puts s.json_metadata
+        final_samples[i+1] << {"id" => s.id, "data" => s.json_metadata}
+      end
+    end
+    final_samples
   end
 
 end
