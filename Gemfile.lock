@@ -25,6 +25,14 @@ GIT
     my_responds_to_parent (1.0.0)
 
 GIT
+  remote: https://github.com/fbacall/ro-crate-ruby.git
+  revision: 70804d34264481e70d0fe83ecc6ad76eda164e74
+  specs:
+    ro-crate-ruby (0.3.0)
+      addressable
+      rubyzip
+
+GIT
   remote: https://github.com/ruby-rdf/rdf-virtuoso
   revision: 0cf165e1f244e16454362ae09b4a8ff4a8cd4e99
   branch: develop
@@ -143,7 +151,7 @@ GEM
       coderay (>= 1.0.0)
       erubi (>= 1.0.0)
       rack (>= 0.9.0)
-    bibtex-ruby (4.4.3)
+    bibtex-ruby (5.1.4)
       latex-decode (~> 0.0)
     bindata (2.4.4)
     binding_of_caller (0.8.0)
