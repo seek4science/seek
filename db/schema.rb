@@ -850,6 +850,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "resource_id"
     t.string "resource_type"
     t.integer "sender_id"
+    t.text "response"
     t.index ["resource_type", "resource_id"], name: "index_message_logs_on_resource_type_and_resource_id"
     t.index ["sender_id"], name: "index_message_logs_on_sender_id"
   end

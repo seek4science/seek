@@ -13,8 +13,7 @@ class ContributedResourceSerializer < PCSSerializer
     end
   end
 
-
-  attribute :versions do
+  attribute :versions, if: -> { object.respond_to?(:versions) } do
     versions_data = []
     object.versions.each do |v|
       path = polymorphic_path(object, version: v.version)
