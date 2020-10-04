@@ -56,7 +56,6 @@ class StudiesController < ApplicationController
     @study = Study.find(params[:id])
     if params[:study][:ordered_assay_ids]
       a1 = params[:study][:ordered_assay_ids]
-      a1.permit!
       pos = 0
       a1.each_pair do |key, value |
         assay = Assay.find (value)

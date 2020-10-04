@@ -605,6 +605,57 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   end
 
+   test 'order studies permission' do
+    owner = Factory(:project_administrator)
+    
+    investigation = Factory(:investigation, contributor: owner)
+    login_as(owner)
+    study_map = {}
+    5.times do |n|
+      study = Factory(:study, contributor: owner, investigation: investigation)
+      study_map[n] = study.id
+    end
+
+    studies = investigation.studies
+    put :update, params: { id: investigation, investigation: { ordered_study_ids: study_map } }
+    assert_redirected_to(investigation_path(investigation))
+
+    logout
+    put :update, params: { id: investigation, investigation: { ordered_study_ids: study_map } }
+#    assert_redirected_to(investigation_path(investigation))
+  end
+
+  test 'order studies does order' do
+    owner = Factory(:project_administrator)
+
+    login_as(owner)
+
+    investigation = Factory(:investigation, contributor: owner)
+
+    study_map = {}
+    5.times do |n|
+      study = Factory(:study, contributor: owner, investigation: investigation)
+      study.position = n
+      study_map[n] = study.id
+    end
+
+    assert_equal investigation.studies.size, 5
+    studies = investigation.studies
+    put :update, params: { id: investigation, investigation: { ordered_study_ids: study_map } }
+    assert_redirected_to(investigation_path(investigation))
+
+    assert_equal investigation.positioned_studies[0].id, investigation.studies[0].id
+    assert_equal investigation.positioned_studies[4].id, investigation.studies[4].id
+
+    study_map[4] = investigation.studies[0].id
+    study_map[0] = investigation.studies[4].id
+    put :update, params: { id: investigation, investigation: { ordered_study_ids: study_map } }
+
+    assert_equal investigation.positioned_studies[0].id, investigation.studies[4].id
+    assert_equal investigation.positioned_studies[4].id, investigation.studies[0].id
+
+end
+
   def edit_max_object(investigation)
     investigation.creators = [Factory(:person)]
     disable_authorization_checks { investigation.save! }

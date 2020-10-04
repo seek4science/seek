@@ -734,4 +734,56 @@ class StudiesControllerTest < ActionController::TestCase
 
 
   end
+
+  test 'order assays permission' do
+    owner = Factory(:project_administrator)
+    
+    study = Factory(:study, contributor: owner)
+    login_as(owner)
+    assay_map = {}
+    5.times do |n|
+      assay = Factory(:assay, contributor: owner, study: study)
+      assay_map[n] = assay.id
+    end
+
+    assays = study.assays
+    put :update, params: { id: study, study: { ordered_assay_ids: assay_map } }
+    assert_redirected_to(study_path(study))
+
+    logout
+    put :update, params: { id: study, study: { ordered_assay_ids: assay_map } }
+#    assert_redirected_to(study_path(study))
+  end
+
+  test 'order assays does order' do
+    owner = Factory(:project_administrator)
+
+    login_as(owner)
+
+    study = Factory(:study, contributor: owner)
+
+    assay_map = {}
+    5.times do |n|
+      assay = Factory(:assay, contributor: owner, study: study)
+      assay.position = n
+      assay_map[n] = assay.id
+    end
+
+    assert_equal study.assays.size, 5
+    assays = study.assays
+    put :update, params: { id: study, study: { ordered_assay_ids: assay_map } }
+    assert_redirected_to(study_path(study))
+
+    assert_equal study.positioned_assays[0].id, study.assays[0].id
+    assert_equal study.positioned_assays[4].id, study.assays[4].id
+
+    assay_map[4] = study.assays[0].id
+    assay_map[0] = study.assays[4].id
+    put :update, params: { id: study, study: { ordered_assay_ids: assay_map } }
+
+    assert_equal study.positioned_assays[0].id, study.assays[4].id
+    assert_equal study.positioned_assays[4].id, study.assays[0].id
+
+end
+
 end

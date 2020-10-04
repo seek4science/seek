@@ -514,7 +514,6 @@ class ProjectsController < ApplicationController
     project_id = params[:id]
     if params[:project][:ordered_investigation_ids]
       a1 = params[:project][:ordered_investigation_ids]
-      a1.permit!
       valid = true
       a1.each_pair do |key, value |
         a = Investigation.find (value)
