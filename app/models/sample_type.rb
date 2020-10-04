@@ -33,6 +33,8 @@ class SampleType < ApplicationRecord
 
   belongs_to :contributor, class_name: 'Person'
 
+  has_many :assays
+
   validates :title, presence: true
   validates :title, length: { maximum: 255 }
   validates :description, length: { maximum: 65_535 }
@@ -76,6 +78,18 @@ class SampleType < ApplicationRecord
   def resolve_inconsistencies
     resolve_controlled_vocabs_inconsistencies
     resolve_seek_samples_inconsistencies
+  end
+
+  def update_sample_type_attribute(attribute_map)
+    new_sample_attribute_ids = []
+    if (attribute_map)
+      attribute_map.each do |attribute|
+        if  sample_attributes.map(&:id).include? attribute[:id].to_i
+          new_sample_attribute_ids << attribute[:id].to_i
+        end
+      end
+    end
+    self.sample_attributes = self.sample_attributes.select { |sample_attribute| new_sample_attribute_ids.include? sample_attribute.id}
   end
 
   def can_download?(user = User.current_user)

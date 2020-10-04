@@ -89,13 +89,13 @@ module JsonRestTestCases
       # parse such that backspace is eliminated and null turns to nil
       json_to_compare = JSON.parse(File.read(json_file))
 
+      edit_min_object(object) if m == 'min'
       edit_max_object(object) if m == 'max'
 
       get :show, params: rest_show_url_options(object).merge(id: object, format: 'json')
 
       assert_response :success
       parsed_response = JSON.parse(@response.body)
-      # puts JSON.pretty_generate(parsed_response)
       check_content_diff(json_to_compare, parsed_response)
     end
   end
@@ -144,7 +144,7 @@ module JsonRestTestCases
   # check if this current controller type doesn't support read
   def check_for_501_read_return
     clz = @controller.controller_model.to_s
-    %w[Sample SampleType Strain].include?(clz)
+    %w[Sample Strain].include?(clz)
   end
 
   # check if this current controller type doesn't support index
