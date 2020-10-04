@@ -12,7 +12,6 @@ class InstitutionsController < ApplicationController
   skip_before_action :project_membership_required
 
   cache_sweeper :institutions_sweeper, only: [:update, :create, :destroy]
-  include Seek::BreadCrumbs
 
   api_actions :index, :show, :create, :update, :destroy
 

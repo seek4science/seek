@@ -51,16 +51,6 @@ module WorkflowExtraction
     WorkflowDiagram.new(workflow, version, path, format, content_type)
   end
 
-  def ro_crate_zip
-    if should_generate_crate?
-      crate = ro_crate
-      ROCrate::Writer.new(crate).write_zip(ro_crate_path)
-      ro_crate_path
-    else
-      content_blob.filepath
-    end
-  end
-
   def is_already_ro_crate?
     content_blob.original_filename.end_with?('.crate.zip')
   end
@@ -73,11 +63,7 @@ module WorkflowExtraction
     is_basic_ro_crate? || !is_already_ro_crate?
   end
 
-  def ro_crate
-    return extractor.crate unless should_generate_crate?
-
-    crate = is_basic_ro_crate? ? extractor.crate : ROCrate::WorkflowCrate.new
-
+  def populate_ro_crate(crate)
     c = content_blob
     wf = crate.main_workflow || ROCrate::Workflow.new(crate, c.filepath, c.original_filename)
     wf.content_size = c.file_size
@@ -108,8 +94,32 @@ module WorkflowExtraction
     crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
 
     crate.preview.template = PREVIEW_TEMPLATE
+  end
 
-    crate
+  def ro_crate
+    inner = proc do |crate|
+      populate_ro_crate(crate) if should_generate_crate?
+
+      if block_given?
+        yield crate
+      else
+        return crate
+      end
+    end
+
+    if is_already_ro_crate?
+      extractor.open_crate(&inner)
+    else
+      ROCrate::WorkflowCrate.new.tap(&inner)
+    end
+  end
+
+  def ro_crate_zip
+    ro_crate do |crate|
+      ROCrate::Writer.new(crate).write_zip(ro_crate_path)
+    end
+
+    ro_crate_path
   end
 
   def ro_crate_identifier

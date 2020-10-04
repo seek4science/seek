@@ -24,13 +24,6 @@
 
 <div id="content">
   <div class="container-fluid">
-    <% unless breadcrumbs.empty? %>
-        <div class="breadcrumbs">
-          <ol class="breadcrumb">
-            <%= render_breadcrumbs :tag => 'li', :separator => ' ' %>
-          </ol>
-        </div>
-    <% end %>
 
     <%# applying styling to error / notice messages -%>
     <% if flash[:error] %>

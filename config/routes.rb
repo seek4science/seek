@@ -47,7 +47,7 @@ SEEK::Application.routes.draw do
 
   concern :has_versions do
     member do
-      post :new_version
+      post :create_version
       post :edit_version_comment
       delete :destroy_version
     end
@@ -155,6 +155,12 @@ SEEK::Application.routes.draw do
   get 'index.html' => 'homes#index'
   get 'index' => 'homes#index'
 
+  resources :custom_metadata_types do
+    collection do
+      get :form_fields
+    end
+  end
+
   resource :favourites do
     collection do
       post :add
@@ -255,6 +261,9 @@ SEEK::Application.routes.draw do
       get :waiting_approval_assets
       get :select
       get :items
+      get :batch_sharing_permission_preview
+      post :batch_change_permssion_for_selected_items
+      post :batch_sharing_permission_changed
     end
     resources :projects, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :collections, only: [:index]
     resources :avatars do
@@ -468,6 +477,8 @@ SEEK::Application.routes.draw do
     member do
       get :diagram
       get :ro_crate
+      get :new_version
+      post :create_version_metadata
     end
     resources :people, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, only: [:index]
   end

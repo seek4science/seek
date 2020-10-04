@@ -13,7 +13,7 @@ class ModelsController < ApplicationController
 
   include Seek::Jws::Simulator
   include Seek::Publishing::PublishingCommon
-  include Seek::BreadCrumbs
+
   include Bives
   include Seek::Doi::Minting
 
@@ -84,7 +84,7 @@ class ModelsController < ApplicationController
   # GET /models
   # GET /models.xml
 
-  def new_version
+  def create_version
     if handle_upload_data(true)
       comments = params[:revision_comments]
 

@@ -22,7 +22,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_not_nil assigns(:studies)
-    assert !assigns(:studies).empty?
+    refute assigns(:studies).empty?
   end
 
   test 'should show aggregated publications linked to assay' do
@@ -696,6 +696,142 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal person,study.policy.permissions.first.contributor
     assert_equal Policy::EDITING,study.policy.permissions.first.access_type
 
+  end
+
+  test 'create a study with custom metadata' do
+    cmt = Factory(:simple_study_custom_metadata_type)
+
+    login_as(Factory(:person))
+
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}name":'fred',
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}age":22}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal '22',cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+  end
+
+  test 'create a study with custom metadata validated' do
+    cmt = Factory(:simple_study_custom_metadata_type)
+
+    login_as(Factory(:person))
+
+    # invalid age - needs to be a number
+    assert_no_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':'fred','_custom_metadata_age':'not a number'}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+    refute study.valid?
+
+    # name is required
+    assert_no_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':nil,'_custom_metadata_age':22}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+    refute study.valid?
+
+  end
+
+  test 'create a study with custom metadata with spaces in attribute names' do
+    cmt = Factory(:study_custom_metadata_type_with_spaces)
+
+    login_as(Factory(:person))
+
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}full name":'Paul Jones',
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}full address":'London, UK'}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+
+    assert study.valid?
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'Paul Jones',cm.get_attribute_value('full name')
+    assert_equal 'London, UK',cm.get_attribute_value('full address')
+  end
+
+  test 'create a study with custom metadata with clashing attribute names' do
+    cmt = Factory(:study_custom_metadata_type_with_clashes)
+
+    login_as(Factory(:person))
+
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}full name":'full name',
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}Full name":'Full name',
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}full  name":'full  name'}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+
+    assert study.valid?
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'full name',cm.get_attribute_value('full name')
+    assert_equal 'Full name',cm.get_attribute_value('Full name')
+    assert_equal 'full  name',cm.get_attribute_value('full  name')
+  end
+
+  test 'create a study with custom metadata with attribute names with symbols' do
+    cmt = Factory(:study_custom_metadata_type_with_symbols)
+
+    login_as(Factory(:person))
+
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}+name":'+name',
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}-name":'-name',
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}&name":'&name'}
+      }
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+
+    assert study.valid?
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal '+name',cm.get_attribute_value('+name')
+    assert_equal '-name',cm.get_attribute_value('-name')
+    assert_equal '&name',cm.get_attribute_value('&name')
   end
 
   test 'experimentalists only shown if set' do
