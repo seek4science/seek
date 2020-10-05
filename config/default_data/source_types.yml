@@ -297,3 +297,148 @@ Sample_collection_MIAPPE:
             short_name: "ExtarnalID"
             description: "An identifier for the sample in a persistent repository, comprising the name of the repository and the accession number of the observation unit therein. Submission to the EBI Biosamples repository is recommended. URI are recommended when possible."
             IRI: ""
+
+Nucleic_acid_library_construction_ILVO:
+    name: Nucleic-acid-library-construction-ILVO*
+    group:
+        nucleic_acids
+    source_type:
+        assay
+    attributes:
+        - attribute:
+            title: Library layout*
+            short_name: "LibLayout"
+            description: "ENA ontology(single, paired, loci, targeted)"
+            IRI: ""
+        - attribute:
+            title: Library source*
+            short_name: "LibSource"
+            description: "ENA ontology(Genomic, Transcriptomics, Viral RNA)"
+            IRI: ""
+        - attribute:
+            title: Library strategy*
+            short_name: "LibStrategy"
+            description: "ENA ontology(RNA-seq, GBS)"
+            IRI: ""
+        - attribute:
+            title: Library selection*
+            short_name: "LibSelection"
+            description: ""
+            IRI: "ENA ontology(random, RT-PCR, PCR, cDNA_oligo_dT, Restriction digest)"
+        - attribute:
+            title: Library Restriction Enzyme
+            short_name: "LibRE"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Library Kit
+            short_name: "LibKit"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Library Protocol Name and Version
+            short_name: "LibProtocol_v"
+            description: "Name and version of the used protocol"
+            IRI: ""
+        - attribute:
+            title: Library Primers
+            short_name: "Libprimers"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Primers code
+            short_name: "P_code"
+            description: ""
+            IRI: ""
+
+Nucleic_acid_sequencing_ILVO*:
+    name: Nucleic-acid-sequencing-ILVO*
+    group:
+        nucleic_acids
+    source_type:
+        assay
+    attributes:
+        - attribute:
+            title: Instrument platform
+            short_name: "Platform"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Instrument model
+            short_name: "Model"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: # Re-sequencing
+            short_name: "# Re-seq"
+            description: "sequential number indicating the number of times that the same sample (individual) is sequenced with the same  technology (library)"
+            IRI: ""
+        - attribute:
+            title: Re-sequencing_code
+            short_name: "# re-seq_code"
+            description: "sequential number indicating the number of times that the same sample (individual) is sequenced with the same  technology (library)"
+            IRI: ""
+        - attribute:
+            title: Run
+            short_name: "run"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Flowcell_code
+            short_name: "flowcell_code"
+            description: ""
+        - attribute:
+            title: Code
+            short_name: "code"
+            description: ""
+        - attribute:
+            title: Remarks after data analysis
+            short_name: "PostAnalysis_remarks"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Lane
+            short_name: "lane"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Unique sample_code
+            short_name: "sample_id"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Barcode i5
+            short_name: "i5"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Barcode i7
+            short_name: "i7"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: i5_code
+            short_name: "i5_code"
+            description: "adaptor index  i5 code "
+            IRI: ""
+        - attribute:
+            title: i7_code
+            short_name: "i7_code"
+            description: "adaptor index  i7 code "
+            IRI: ""
+        - attribute:
+            title: md5 value PE forward
+            short_name: "md5_PE_F"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: md5 value PE reverse
+            short_name: "md5_PE_R"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: md5 value SE
+            short_name: "md5_SE"
+            description: ""
+            IRI: ""
+            
