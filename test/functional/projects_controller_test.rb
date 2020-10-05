@@ -2128,6 +2128,8 @@ class ProjectsControllerTest < ActionController::TestCase
 
     assert_equal project.positioned_investigations[0].id, project.investigations[0].id
     assert_equal project.positioned_investigations[4].id, project.investigations[4].id
+    assert_equal 1, project.positioned_investigations[0].position
+    assert_equal 5, project.positioned_investigations[4].position
 
     investigation_map[4] = project.investigations[0].id
     investigation_map[0] = project.investigations[4].id
@@ -2135,6 +2137,8 @@ class ProjectsControllerTest < ActionController::TestCase
 
     assert_equal project.positioned_investigations[0].id, project.investigations[4].id
     assert_equal project.positioned_investigations[4].id, project.investigations[0].id
+    assert_equal 1, project.positioned_investigations[0].position
+    assert_equal 5, project.positioned_investigations[4].position
 
 end
 

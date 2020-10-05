@@ -646,6 +646,8 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     assert_equal investigation.positioned_studies[0].id, investigation.studies[0].id
     assert_equal investigation.positioned_studies[4].id, investigation.studies[4].id
+    assert_equal 1, investigation.positioned_studies[0].position
+    assert_equal 5, investigation.positioned_studies[4].position
 
     study_map[4] = investigation.studies[0].id
     study_map[0] = investigation.studies[4].id
@@ -653,6 +655,8 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     assert_equal investigation.positioned_studies[0].id, investigation.studies[4].id
     assert_equal investigation.positioned_studies[4].id, investigation.studies[0].id
+    assert_equal 1, investigation.positioned_studies[0].position
+    assert_equal 5, investigation.positioned_studies[4].position
 
 end
 

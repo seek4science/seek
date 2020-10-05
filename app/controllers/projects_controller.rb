@@ -335,7 +335,7 @@ class ProjectsController < ApplicationController
     if params[:project][:ordered_investigation_ids]
       a1 = params[:project][:ordered_investigation_ids]
       a1.permit!
-      pos = 0
+      pos = 1
       a1.each_pair do |key, value |
         investigation = Investigation.find (value)
         investigation.position = pos
