@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_08_093735) do
+ActiveRecord::Schema.define(version: 2020_10_05_111816) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -664,6 +664,7 @@ ActiveRecord::Schema.define(version: 2020_09_08_093735) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "time_left_at"
+    t.boolean "has_left", default: false
     t.index ["person_id"], name: "index_group_memberships_on_person_id"
     t.index ["work_group_id", "person_id"], name: "index_group_memberships_on_work_group_id_and_person_id"
     t.index ["work_group_id"], name: "index_group_memberships_on_work_group_id"

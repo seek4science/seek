@@ -19,11 +19,18 @@ class GroupMembership < ApplicationRecord
   validates :work_group,:presence => {:message=>"A workgroup is required"}
 
   def has_left=(yes = false)
-    self.time_left_at = yes ? Time.now : nil
+    if yes
+      self.time_left_at ||= Time.now
+    else
+      self.time_left_at = nil
+    end
+    super(yes)
   end
 
+  # For now the `has_left` boolean field is just to indicate that the job has run, but in future consider also using it
+  # for a more efficient query to get old/current project members.
   def has_left
-    self.time_left_at && self.time_left_at.past?
+    super || time_left_at&.past?
   end
 
   def remember_previous_person
@@ -35,16 +42,16 @@ class GroupMembership < ApplicationRecord
     people << Person.find_by_id(@previous_person_id) unless @previous_person_id.blank?
 
     AuthLookupUpdateQueue.enqueue(people.compact.uniq)
-
-    if saved_changes.include?('time_left_at') && project
-      ProjectLeavingJob.new(person, project).queue_job(1, self.time_left_at || Time.now)
-    end
   end
 
   #whether the person can remove this person from the project. If they are an administrator and related programme administrator they can, but otherwise they cannot remove themself.
   #this is to prevent a project admin accidently removing themself and leaving the project un-administered
   def person_can_be_removed?
     !person.me? || User.current_user.is_admin? || person.is_programme_administrator?(project.programme)
+  end
+
+  def self.due_to_expire
+    where('time_left_at IS NOT NULL AND time_left_at <= ?', Time.now).where(has_left: false)
   end
 
   private

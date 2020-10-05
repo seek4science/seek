@@ -170,7 +170,7 @@ class Project < ApplicationRecord
   # indicates whether this project has a person, or associated user, as a member
   def has_member?(user_or_person)
     user_or_person = user_or_person.try(:person)
-    people.include? user_or_person
+    current_people.include? user_or_person
   end
 
   def human_disease_terms

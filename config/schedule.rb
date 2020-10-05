@@ -36,4 +36,5 @@ end
 every 10.minutes do
   runner "OpenbisEndpointCacheRefreshJob.queue_jobs"
   runner "OpenbisSyncJob.queue_jobs"
+  runner "ProjectLeavingJob.queue_jobs"
 end

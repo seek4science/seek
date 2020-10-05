@@ -1211,7 +1211,7 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:person, group_memberships: [group_membership])
     former_group_membership = Factory(:group_membership, time_left_at: 10.days.ago, work_group: wg)
     former_person = Factory(:person, group_memberships: [former_group_membership])
-    assert_enqueued_jobs 2, only: ProjectLeavingJob do
+    assert_no_enqueued_jobs only: ProjectLeavingJob do
       assert_no_difference('GroupMembership.count') do
         post :update_members, params: { id: project, memberships_to_flag: { group_membership.id.to_s => { time_left_at: 1.day.ago },
                                     former_group_membership.id.to_s => { time_left_at: '' } } }
