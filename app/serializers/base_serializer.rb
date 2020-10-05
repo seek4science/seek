@@ -72,6 +72,10 @@ class BaseSerializer < SimpleBaseSerializer
     associated('Document')
   end
 
+  def organisms
+    associated('Organism')
+  end
+
   def self_link
     polymorphic_path(object)
   end

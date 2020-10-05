@@ -54,6 +54,10 @@ class Programme < ApplicationRecord
       joins: [:funding_codes_as_text]
   )
 
+  def self.managed_programme
+    Programme.find_by_id(Seek::Config.managed_programme_id)
+  end
+
   def human_diseases
     projects.collect(&:human_diseases).flatten.uniq
   end

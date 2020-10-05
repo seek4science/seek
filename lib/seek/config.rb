@@ -344,10 +344,15 @@ module Seek
       value
     end
 
+    def omniauth_github_config
+      [omniauth_github_client_id, omniauth_github_secret, { scope: 'user:email' }]
+    end
+
     def omniauth_providers
       providers = {}
       providers[:ldap] = omniauth_ldap_config.merge(name: :ldap, form: SessionsController.action(:new)) if omniauth_ldap_enabled
       providers[:openid_connect] = omniauth_elixir_aai_config if omniauth_elixir_aai_enabled
+      providers[:github] = omniauth_github_config if omniauth_github_enabled
       providers
     end
   end

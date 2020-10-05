@@ -29,7 +29,8 @@
       "model_format": null,
       "environment": null,
       "model_image_link": null,
-      "other_creators": null
+      "other_creators": null,
+      "discussion_links": null
     },
     "relationships": {
       "creators": {
@@ -42,6 +43,9 @@
             "type": "people"
           }
         ]
+      },
+      "organisms": {
+        "data": []
       },
       "people": {
         "data": [

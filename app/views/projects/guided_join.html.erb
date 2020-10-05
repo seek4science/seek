@@ -1,0 +1,149 @@
+<style>
+  #project-search-results img {
+    padding: 0.5em;
+    height: 70px;
+    max-width: 70px;
+  }
+
+  #project-search-results td.project-title {
+    width: 20em;
+    padding: 0.5em;
+  }
+
+  #project-search-results td.project-description {
+    font-style: italic;
+  }
+
+</style>
+<%= form_tag request_join_projects_path do %>
+  <div class="row">
+    <div style="margin:auto;width:70%;">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <%= t('project') %>
+        </div>
+        <div class="panel-body">
+          <div class="help-block">
+            Search for the <%=t('project') %>, either by name or details related to it.
+            If you cannot find the <%=t('project') %> here, you could try the
+            <%= link_to "#{t('project')} search and filtering",projects_path,target: :_blank %> first to find the name.
+            <br/>
+            Once found, check the box next to the <%= t('project').pluralize %> you wish to request to join.
+          </div>
+
+          <%= label_tag :search_label, "#{t('project')} search" -%>
+          <div class="row">
+            <div class="col-md-10">
+              <%= text_field_tag 'project-search-terms', '', :class => "form-control" -%>
+            </div>
+            <div class="col">
+              <%= submit_tag 'Search', id: 'project-search-submit', :class => 'btn btn-primary' %>
+            </div>
+          </div>
+
+
+          <div id='project-search-results'>
+            <div class="alert alert-secondary text-center" role="alert">
+              <em>Search results</em>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div style="margin:auto;width:70%;">
+
+      <div class="panel panel-default" id='institution-selection'>
+        <div class="panel-heading"><%= t('institution') %></div>
+        <div class="panel-body">
+          <div class="form-group">
+            <%= render partial: 'institutions/select_or_define' %>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default" id='comments'>
+        <div class="panel-heading">Comments</div>
+        <div class="panel-body">
+          <div class="help-block">
+            Provide any additional details that you think will be useful with your request.
+          </div>
+          <div class="form-group">
+            <%= text_area_tag :comments, '', rows: 3, :class => "form-control" %>
+          </div>
+        </div>
+      </div>
+
+      <%= submit_tag('Submit', class: 'btn btn-primary', id: 'submit-button', disabled:true) %>
+    </div>
+  </div>
+<% end %>
+
+<script type='application/javascript'>
+
+
+    function checkSubmitButtonEnabled() {
+      var enabled = $j('#institution_id').val()
+          && $j('input.project-selected:checked').length > 0
+          && $j('select#institution_country').val();
+      $j('#submit-button').prop('disabled',!enabled);
+    }
+
+    function handleJsonResults(json) {
+        if (json.data.length == 0) {
+            $j('#project-search-results').html('No results');
+        }
+        else {
+            $j('#project-search-results').html(json.data.length + ' results');
+            $j.each(json.data, function(key,val){
+                var link = val.links.self;
+                console.log(link);
+                $j.getJSON(link, function(data) {
+                    console.log(data.data.attributes);
+                    $j('#project-search-results').append('<table><tbody>');
+                    $j('#project-search-results').append(HandlebarsTemplates['project_search/result_list'](data.data)).on('change','input.project-selected',function() {
+                        checkSubmitButtonEnabled();
+                    });
+                    $j('#project-search-results').append('</tbody></table>');
+                })
+            });
+
+        }
+    }
+
+    $j(document).ready(function () {
+
+      $j('form').on('submit',function() {
+         //clear the id if -1 before submitting
+         if ($j('#institution_id').val()=='-1') {
+             $j('#institution_id').val('');
+         }
+      });
+
+      $j('#project-search-submit').click(function (e) {
+          $j('#project-search-results').spinner('add');
+          var terms = $j('#project-search-terms').val();
+          var search_type = 'Project';
+          $j.ajax({ url: '<%= search_path %>/?q='+terms+"&search_type=projects",
+              dataType: "json",
+              success: function (resp) {
+                  handleJsonResults((resp))
+              },
+              error: function () {
+                  $j('#project-search-results').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
+              },
+              complete: function () {
+                  $j('#project-search-results').spinner('remove');
+              }
+          })
+         return false;
+      });
+
+    });
+
+
+</script>

@@ -10,8 +10,6 @@ class StrainsController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
 
-  include Seek::BreadCrumbs
-
   def new
     parent_strain = Strain.find_by_id(params[:parent_id])
     if !parent_strain.nil? && parent_strain.can_view?

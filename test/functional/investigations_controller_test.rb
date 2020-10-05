@@ -128,6 +128,22 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert !assigns(:investigation).new_record?
   end
 
+  test 'should create an investigations and associate it with a publication without publication type' do
+    user = Factory(:user)
+    project = user.person.projects.first
+    p = Factory(:publication)
+    p.publication_type_id = nil
+    disable_authorization_checks { p.save! }
+    login_as(user)
+    assert_difference('Investigation.count',1) do
+      post :create, params: { investigation: { title: 'investigation with publication', project_ids: [project.id.to_s],publication_ids: [p.id.to_s] } }
+    end
+    investigation = assigns(:investigation)
+    assert_nil p.publication_type_id
+    assert p.investigations.include?(investigation)
+    assert investigation.publications.include?(p)
+  end
+
   test 'should create with policy' do
     user = Factory(:user)
     project = user.person.projects.first
@@ -586,6 +602,61 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_equal 1,investigation.policy.permissions.count
     assert_equal person,investigation.policy.permissions.first.contributor
     assert_equal Policy::EDITING,investigation.policy.permissions.first.access_type
+
+  end
+
+
+
+  test 'create an investigation with custom metadata' do
+    cmt = Factory(:simple_investigation_custom_metadata_type)
+
+    login_as(Factory(:person))
+
+    assert_difference('Investigation.count') do
+      inv_attributes = Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}name":'fred',
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}age":22}}
+
+      put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert inv=assigns(:investigation)
+
+    assert cm = inv.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal '22',cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+  end
+
+  test 'create an investigation with custom metadata validated' do
+    cmt = Factory(:simple_investigation_custom_metadata_type)
+
+    login_as(Factory(:person))
+
+    # invalid age - needs to be a number
+    assert_no_difference('Investigation.count') do
+      inv_attributes = Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':'fred','_custom_metadata_age':'not a number'}}
+
+      put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert inv=assigns(:investigation)
+    refute inv.valid?
+
+    # name is required
+    assert_no_difference('Investigation.count') do
+      inv_attributes = Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':nil,'_custom_metadata_age':22}}
+
+      put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert inv=assigns(:investigation)
+    refute inv.valid?
 
   end
 

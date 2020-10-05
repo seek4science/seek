@@ -9,7 +9,6 @@ module Seek
           before_action :project_membership_required_appended, only: [:index]
           before_action :find_and_authorize_requested_item, only: %i[edit update destroy]
 
-          include Seek::BreadCrumbs
         end
 
         def model_class

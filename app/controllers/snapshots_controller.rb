@@ -10,7 +10,6 @@ class SnapshotsController < ApplicationController
   before_action :zenodo_oauth_client
   before_action :zenodo_oauth_session, only: [:export_submit]
 
-  include Seek::BreadCrumbs
   include Zenodo::Oauth2::SessionHelper
   include Seek::ExternalServiceWrapper
 

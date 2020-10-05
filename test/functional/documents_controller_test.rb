@@ -170,6 +170,24 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal [event],doc.events
   end
 
+  test 'update with no assays' do
+    person = Factory(:person)
+    creators = [Factory(:person), Factory(:person)]
+    assay = Factory(:assay, contributor:person)
+    document = Factory(:document,assays:[assay], contributor: person, creators:creators)
+
+    login_as(person)
+
+    assert document.can_edit?
+    assert_difference('AssayAsset.count', -1) do
+      assert_difference('ActivityLog.count',1) do
+         put :update, params: { id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id], assay_assets_attributes: [""] } }
+      end
+    end
+    assert_empty assigns(:document).assays
+    assert_redirected_to document_path(document)
+  end
+
   test 'should destroy document' do
     person = Factory(:person)
     document = Factory(:document, contributor: person)
@@ -1013,6 +1031,33 @@ class DocumentsControllerTest < ActionController::TestCase
     document = assigns(:document)
     assert_redirected_to document_path(document)
     assert_empty document.discussion_links
+  end
+
+  test 'should return to project page after destroy' do
+    person = Factory(:person)
+    project = Factory(:project)
+    document = Factory(:document, contributor: person, project_ids: [project.id])
+    login_as(person)
+    assert_difference('Document.count', -1) do
+      assert_no_difference('ContentBlob.count') do
+        delete :destroy, params: { id: document, return_to: project_path(project)}
+      end
+    end
+    assert_redirected_to project_path(project)
+  end
+
+  
+  test "shouldn't return to unauthorised host" do
+    person = Factory(:person)
+    project = Factory(:project)
+    document = Factory(:document, contributor: person, project_ids: [project.id])
+    login_as(person)
+    assert_difference('Document.count', -1) do
+      assert_no_difference('ContentBlob.count') do
+        delete :destroy, params: { id: document, return_to: "https://www.google.co.uk/"}
+      end
+    end
+    assert_redirected_to documents_path
   end
 
   private

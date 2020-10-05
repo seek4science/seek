@@ -24,13 +24,6 @@
 
 <div id="content">
   <div class="container-fluid">
-    <% unless breadcrumbs.empty? %>
-        <div class="breadcrumbs">
-          <ol class="breadcrumb">
-            <%= render_breadcrumbs :tag => 'li', :separator => ' ' %>
-          </ol>
-        </div>
-    <% end %>
 
     <%# applying styling to error / notice messages -%>
     <% if flash[:error] %>
@@ -42,6 +35,17 @@
         <%= alert_box('success', :id => 'notice_flash', :class => 'fade in') do %>
             <%= flash[:notice] %>
         <% end %>
+    <% end %>
+
+    <% if join_or_create_project_banner? %>
+      <div class="alert alert-warning text-center">
+        As a newly registered user, you are not yet a member of a <%= t('project') %>. Please
+        <%=
+          link_to(
+            button_tag("Join or Create a #{t('project')}", class:'btn btn-success'),
+          create_or_join_project_home_path)
+        %>
+      </div>
     <% end %>
 
     <%# main content part of every page -%>
