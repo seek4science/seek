@@ -35,7 +35,8 @@
           "size": 8
         }
       ],
-      "other_creators" : "Blogs, Joe"
+      "other_creators" : "Blogs, Joe",
+      "discussion_links": null
     },
     "relationships": {
       "creators": {

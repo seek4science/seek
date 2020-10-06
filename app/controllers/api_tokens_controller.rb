@@ -1,10 +1,6 @@
 class ApiTokensController < ApplicationController
   before_action :find_and_check_user
 
-  include Seek::BreadCrumbs
-
-  skip_before_action :add_breadcrumbs, only: [:destroy]
-
   def index
     @api_tokens = @user.api_tokens.order(created_at: :desc)
 

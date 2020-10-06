@@ -60,8 +60,8 @@ class HomesHelperTest < ActionView::TestCase
 
   test 'should handle snapshots for download and recently added' do
     person = Factory(:person)
-    snapshot1 = Factory(:investigation, contributor: person).create_snapshot
-    snapshot2 = Factory(:assay, contributor: person).create_snapshot
+    snapshot1 = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: person).create_snapshot
+    snapshot2 = Factory(:assay, policy: Factory(:publicly_viewable_policy), contributor: person).create_snapshot
     Factory(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
     Factory(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)
 

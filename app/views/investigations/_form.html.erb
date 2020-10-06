@@ -10,12 +10,16 @@
 
 <div class="form-group">
   <%= f.label :description -%>
-  <%= f.text_area :description, :rows => 5, :class=>"form-control" -%>
+  <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" -%>
 </div>
 
-<%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? && showDetails==1 -%>
+<%= render partial: 'custom_metadata/custom_metadata_type_selection', locals:{f:f, resource:@investigation} %>
 
-<%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales? && showDetails==1 %>
+<%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? && showDetails==1  -%>
+
+<%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@investigation} %>
+
+<%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales?  && showDetails==1 %>
 
 <%= render partial: 'assets/manage_specific_attributes', locals:{f:f, :object => object} if show_form_manage_specific_attributes? if showDetails==1 %>
 

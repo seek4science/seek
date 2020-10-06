@@ -11,14 +11,13 @@ class DocumentsController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
 
-  include Seek::BreadCrumbs
   include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
 
-  def new_version
+  def create_version
     if handle_upload_data(true)
       comments = params[:revision_comment]
 

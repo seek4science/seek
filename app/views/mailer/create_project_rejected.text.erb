@@ -1,0 +1,11 @@
+Hi <%= @requester.name %>,
+
+I'm afraid that your request to create the <%= t('project') %>, <%= @project_name %>, hasn't been approved.
+
+The following comments were provided as a reason:
+
+"<%= @comments %>"
+
+Regards,
+
+- The <%= Seek::Config.dm_project_name %> Team

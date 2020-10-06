@@ -15,7 +15,7 @@ end
 Factory.define(:patient_sample, parent: :sample) do |f|
   f.association :sample_type, factory: :patient_sample_type
   f.after_build do |sample|
-    sample.set_attribute_value(:full_name, 'Fred Bloggs')
+    sample.set_attribute_value('full name', 'Fred Bloggs')
     sample.set_attribute_value(:age, 44)
     sample.set_attribute_value(:weight, 88.7)
   end

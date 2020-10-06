@@ -1043,3 +1043,16 @@ hr.discussion-links-divider {
 div.discussion-link {
   word-wrap: break-word;
 }
+
+.typeahead-new-item {
+  color:darkblue;
+  font-style: bold;
+}
+
+span.disabled {
+  opacity: 0.65;
+}
+
+.btn.disabled img.icon {
+  opacity: 0.4;
+}

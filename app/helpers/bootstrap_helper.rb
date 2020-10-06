@@ -14,7 +14,14 @@ module BootstrapHelper
   # A button with an icon and text
   def button_link_to(text, icon, url, options = {})
     options[:class] = "btn #{options[:type] || 'btn-default'} #{options[:class]}".strip
-    icon_link_to(text, icon, url, options)
+    if (reason = options.delete(:disabled_reason))
+      options[:class] += ' disabled'
+      content_tag(:span, 'data-tooltip' => reason, onclick: "alert('#{reason}');") do
+        icon_link_to(text, icon, url, options)
+      end
+    else
+      icon_link_to(text, icon, url, options)
+    end
   end
 
   # A collapsible panel

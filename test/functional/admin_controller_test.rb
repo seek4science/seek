@@ -339,13 +339,18 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'update branding' do
+    assert_nil Seek::Config.header_image_avatar_id
     settings = {project_name: 'project name', project_type: 'project type', project_description: 'project description', project_keywords: 'project,    keywords, ',
                 project_link: 'http://project-link.com',application_name: 'app name',
                 dm_project_name: 'dm project name', dm_project_link: 'http://dm-project-link.com',
                 header_image_link: 'http://header-link.com/image.jpg', header_image_title: 'header image title',
                 copyright_addendum_content: 'copyright content', imprint_description: 'imprint description',
-                terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page'}
-    post :update_rebrand, params: settings
+                terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page',
+                header_image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+
+    assert_difference('Avatar.count', 1) do
+      post :update_rebrand, params: settings
+    end
     assert_redirected_to admin_path
 
     assert_equal 'project name', Seek::Config.project_name
@@ -363,6 +368,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 'terms page', Seek::Config.terms_page
     assert_equal 'privacy page', Seek::Config.privacy_page
     assert_equal 'about page', Seek::Config.about_page
+    assert Seek::Config.header_image_avatar_id > 0
   end
 
   test 'update pagination' do

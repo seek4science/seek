@@ -7,8 +7,7 @@ class CollectionsController < ApplicationController
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview, :update_annotations_ajax]
 
   include Seek::Publishing::PublishingCommon
-  include Seek::BreadCrumbs
-  # include Seek::Doi::Minting
+
   include Seek::IsaGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy

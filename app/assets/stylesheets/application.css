@@ -22,6 +22,7 @@
 *= require faceted_browsing
 *= require project_folders
 *= require publishing
+*= require sharing_peremission_change
 *= require settings
 *= require new_styles
 *= require jquery-ui
@@ -40,4 +41,5 @@
 *= require cytoscape_isa_graph
 *= require multi-step-wizard.css.erb
 *= require lightbox2
+*= require simplemde.min
 */

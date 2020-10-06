@@ -7,6 +7,7 @@ en:
   login:
     elixir_aai: 'ELIXIR AAI'
     ldap: 'LDAP'
+    github: 'GitHub'
 
   investigation: "Investigation"
   study: "Study"
@@ -129,3 +130,15 @@ en:
   maturity_level:
     released: 'Stable'
     work_in_progress: 'Work-in-progress'
+
+  joining_a_project: "<p>
+    You need to be a member of a <strong>%{project}</strong> before you can register content.<br/>
+    A %{project} can contain one or more people, and gives some additional background details, and credit, about the content is being registered.
+    Being in a %{project} allows you to easily share with others whilst collaborating, and also provides useful defaults such as Sharing permissions and License.
+    </p>
+    <p>
+    You have the option to either <strong>Join</strong> a %{project} you already know about, or <b>Create</b> a new one.
+    </p>
+    <p>
+    If you choose to create, you will have the option to be part of a site managed <strong>%{programme}</strong>, or create your own. If you create your own you will become an administrator of it, which will allow you to freely create your own additional %{projects} within it now or in the future.
+    </p>"

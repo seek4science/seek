@@ -20,7 +20,7 @@ end
 Factory.define(:simple_sample_type, parent: :sample_type) do |f|
   f.sequence(:title) { |n| "Simple Sample Type #{n}" }
   f.after_build do |type|
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'the title', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'the_title', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
   end
 end
 

@@ -4,9 +4,9 @@ module Seek
       include Seek::ExternalServiceWrapper
 
       def self.included(base)
-        base.before_action :set_asset_version, only: %i[mint_doi_confirm mint_doi minted_doi new_version update]
+        base.before_action :set_asset_version, only: %i[mint_doi_confirm mint_doi minted_doi create_version update]
         base.before_action :mint_doi_auth, only: %i[mint_doi_confirm mint_doi]
-        base.before_action :new_version_auth, only: [:new_version]
+        base.before_action :create_version_auth, only: [:create_version]
         base.before_action :unpublish_auth, only: [:update]
       end
 
@@ -62,7 +62,7 @@ module Seek
         true
       end
 
-      def new_version_auth
+      def create_version_auth
         asset = @asset_version.parent
         if asset.has_doi?
           error('Uploading new version is not possible', 'is invalid')

@@ -31,7 +31,6 @@ gem 'daemons'
 gem 'linkeddata'
 gem 'rdf'
 
-
 gem 'openseek-api'
 # for fancy content escaping in openbis integration
 gem 'loofah'
@@ -43,7 +42,6 @@ gem 'json-diff'
 gem 'rubyzip'
 
 gem 'equivalent-xml'
-gem 'breadcrumbs_on_rails'
 gem 'docsplit'
 gem 'pothoven-attachment_fu'
 gem 'exception_notification'
@@ -73,7 +71,6 @@ gem 'bioportal', '>=3.0', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
 gem 'convert_office', git: 'https://github.com/SysMO-DB/convert_office.git', ref: '753f2567dbd625bc89071e1150404efbb562e130'
 gem 'fleximage', git: 'https://github.com/SysMO-DB/fleximage.git', ref: 'bb1182f2716a9bf1b5d85e186d8bb7eec436797b'
-gem 'search_biomodel', '2.2.1', git: 'https://github.com/myGrid/search_biomodel.git'
 
 gem 'jquery-rails', '~> 4.2.2'
 gem 'jquery-ui-rails'
@@ -105,6 +102,7 @@ gem 'omniauth', '~> 1.3.1'
 gem 'omniauth-ldap', '~> 1.0.5'
 gem 'omniauth_openid_connect'
 gem 'omniauth-rails_csrf_protection', '~> 0.1'
+gem 'omniauth-github', '~> 1.2.0'
 
 gem 'ransack'
 
@@ -170,6 +168,8 @@ group :development do
   gem 'guard-rubycritic', require: false
   gem 'rails_best_practices'
   gem 'gem-licenses'
+  gem "better_errors"
+  gem "binding_of_caller"
 end
 
 group :test do

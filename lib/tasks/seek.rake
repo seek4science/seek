@@ -94,4 +94,10 @@ namespace :seek do
     Rack::Attack.cache.store.delete_matched("#{Rack::Attack.cache.prefix}:*")
     puts 'Done'
   end
+
+  desc "Clear encrypted settings"
+  task clear_encrypted_settings: :environment do
+    Settings.where(var: Seek::Config.encrypted_settings).destroy_all
+    puts 'Encrypted settings cleared'
+  end
 end

@@ -22,8 +22,8 @@ class SessionsController < ApplicationController
   end
 
   def create
-   auth = request.env['omniauth.auth'] # `omniauth.auth` comes from the omniauth rack middleware.
-                                       # See: https://github.com/omniauth/omniauth/wiki/Auth-Hash-Schema for schema.
+    auth = request.env['omniauth.auth'] # `omniauth.auth` comes from the omniauth rack middleware.
+    # See: https://github.com/omniauth/omniauth/wiki/Auth-Hash-Schema for schema.
     if auth && Seek::Config.omniauth_enabled
       # This check is only necessary if the server has not been restarted after an omniauth option was disabled.
       # Should be handled by `config/initializers/seek_omniauth.rb`.
@@ -112,6 +112,8 @@ class SessionsController < ApplicationController
       else
         return_to_url = url_for(controller: params[:called_from][:controller], action: params[:called_from][:action], id: params[:called_from][:id])
       end
+    elsif request.env.dig('omniauth.params', 'state')&.start_with?('return_to:')
+      return_to_url = request.env['omniauth.params']['state'].match(/return_to:(.+)/)&.captures&.last
     else
       return_to_url = session[:return_to] || request.env['HTTP_REFERER']
     end
@@ -170,7 +172,7 @@ class SessionsController < ApplicationController
             @user.activate if Seek::Config.omniauth_user_activate && !@user.active?
             @identity.user = @user
             @identity.save!
-            check_login(nil, person_params: auth['info'].slice(:first_name, :last_name, :email))
+            check_login(nil, person_params: auth['info'].slice(:first_name, :last_name, :email, :name))
           else # An unexpected error occurred whilst saving the user.
             failed_login "Cannot create a new user: #{@user.errors.full_messages.join(', ')}."
           end

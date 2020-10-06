@@ -51,6 +51,6 @@ class SampleExtractorTest < ActiveSupport::TestCase
     assert_equal 4, accepted.length
     assert_equal 0, rejected.length
     assert_equal ['Bob Monkhouse', 'Jesus Jones', 'Fred Flintstone', 'Bob'].sort,
-                 accepted.map { |s| s.data[:full_name] }.sort
+                 accepted.map { |s| s.data['full name'] }.sort
   end
 end

@@ -18,7 +18,7 @@ namespace :seek do
     convert_old_elixir_aai_settings
     refix_country_codes
     fix_missing_dois
-    download_efo
+    update_samples_json
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -177,26 +177,33 @@ namespace :seek do
     end
     puts "Done"
   end
-  
-  task(download_efo: [:environment]) do
-    puts "Downloading EFO..."
-    url = "http://data.bioontology.org/ontologies/EFO/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb&download_format=rdf"
-    pbar = nil
-    open(url, "rb", :content_length_proc => lambda {|t|
-    if t && 0 < t
-    pbar = ProgressBar.create(title: 'EFO', total:t, 
-            progress_mark:'█'.encode('utf-8')) 
+
+  task(update_samples_json: :environment) do
+    puts '... converting stored sample JSON ...'
+    SampleType.all.each do |sample_type|
+
+      # gather the attributes that need updating
+      attributes_for_update = sample_type.sample_attributes.select do |attr|
+        attr.accessor_name != attr.original_accessor_name
+      end
+
+      if attributes_for_update.any?
+        # work through each sample
+        sample_type.samples.each do |sample|
+          json = JSON.parse(sample.json_metadata)
+          attributes_for_update.each do |attr|
+            # replace the json key
+            json[attr.accessor_name] = json.delete(attr.original_accessor_name)
+          end
+          sample.update_column(:json_metadata,json.to_json)
+        end
+
+        # update the original accessor name for each affected attribute
+        attributes_for_update.each do |attr|
+          attr.update_column(:original_accessor_name, attr.accessor_name)
+        end
+      end
     end
-    }, :progress_proc => lambda {|s|
-    pbar.progress = s if pbar
-    }) do |page|
-        File.open('config/ontologies/EFO.rdf', "wb") do |f|
-                while chunk = page.read(1024)
-                    f.write(chunk)
-                end
-            end
-        end       
+    puts " ... finished updating sample JSON"
   end
-
-
 end
