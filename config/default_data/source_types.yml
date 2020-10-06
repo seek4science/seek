@@ -369,7 +369,7 @@ Nucleic_acid_sequencing_ILVO*:
             description: ""
             IRI: ""
         - attribute:
-            title: # Re-sequencing
+            title: "# Re-sequencing"
             short_name: "# Re-seq"
             description: "sequential number indicating the number of times that the same sample (individual) is sequenced with the same  technology (library)"
             IRI: ""
@@ -490,12 +490,12 @@ Plant_ILVO:
             description: ""
             IRI: ""
         - attribute:
-            title: # samples/pool*
+            title: "# samples/pool*"
             short_name: "# samples/pool"
             description: "number of genotypes in composite samples or pools"
             IRI: ""
         - attribute:
-            title: # samples/pool_code*
+            title: "# samples/pool_code*"
             short_name: "sp_code"
             description: ""
             IRI: ""
