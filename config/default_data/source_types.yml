@@ -441,4 +441,77 @@ Nucleic_acid_sequencing_ILVO*:
             short_name: "md5_SE"
             description: ""
             IRI: ""
+
+Plant_ILVO:
+    name: Plant-ILVO
+    group:
+        plant
+    source_type:
+        study
+    attributes:
+        - attribute:
+            title: species*
+            short_name: "species"
+            description: "plant species"
+            IRI: ""
+        - attribute:
+            title: sample type*
+            short_name: "sample_type"
+            description: "type sample for environmental samples"
+            IRI: ""
+        - attribute:
+            title: species_code*
+            short_name: "s_code"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: site or experiment*
+            short_name: "site/exp"
+            description: "the location where the sample was taken, potentially sequentially ordered. unique in combination with species, can also be the title of an experiment"
+            IRI: ""
+        - attribute:
+            title: site or experiment_remarks
+            short_name: "s/e_remarks"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: site or experiment_code*
+            short_name: "s/e_code"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: date sampling*
+            short_name: "YYMMDD_s"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: date sampling_code*
+            short_name: "ds_code"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: # samples/pool*
+            short_name: "# samples/pool"
+            description: "number of genotypes in composite samples or pools"
+            IRI: ""
+        - attribute:
+            title: # samples/pool_code*
+            short_name: "sp_code"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: individual*
+            short_name: "individual"
+            description: "genotype number or description of sample (with unique genome composition as sample) unique in combination with species and location or experiment"
+            IRI: ""
+        - attribute:
+            title: individual_remarks
+            short_name: "i_remarks"
+            description: ""
+            IRI: ""
+        - attribute:
+            title: genotype_code
+            short_name: "g_code"
+            description: ""
+            IRI: ""
             
