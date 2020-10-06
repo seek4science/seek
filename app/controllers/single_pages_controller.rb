@@ -17,7 +17,7 @@ class SinglePagesController < ApplicationController
     end
   end
 
-  include Seek::BreadCrumbs
+  # include Seek::BreadCrumbs
 
 
   def single_page_enabled
