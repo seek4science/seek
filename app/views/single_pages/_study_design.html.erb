@@ -60,13 +60,13 @@
     function sourceChange(i) {
         $j("#sourceAttribs tbody").empty()
         $j("#sourceSelect").val(i.value)
-        $j.each(sourceTypes[i.value].attributes, (k, attr) => {
+        $j.each(characteristics[i.value].attributes, (k, attr) => {
             $j("#sourceAttribs tbody").append(`<tr><td>${attr.title}</td><td>${attr.shortName}</td><td>${attr.des}</td></tr>`)
         })
     }
 
     $j("#btn-apply-source").on("click", () => {
-        $j.each(sourceTypes[sourceSelect.value].attributes, (k, attr) => {
+        $j.each(characteristics[sourceSelect.value].attributes, (k, attr) => {
             addAttrib(attr.title)
         })
     })
