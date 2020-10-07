@@ -8,7 +8,7 @@
       "attribute_map": [
         {
           "id": "504",
-          "title": "full_name",
+          "title": "full name",
           "sample_attibute_type": {
             "id": "777",
             "title": "Full name",
@@ -38,22 +38,6 @@
         ]
       },
       "samples": {
-        "data": [
-          {
-            "id": "7",
-            "type": "samples"
-          }
-        ]
-      },
-      "submitter": {
-        "data": [
-          {
-            "id": "1",
-            "type": "people"
-          }
-        ]
-      },
-      "assays": {
         "data": []
       }
     },

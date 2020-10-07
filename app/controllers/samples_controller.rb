@@ -3,6 +3,7 @@ class SamplesController < ApplicationController
   include Seek::PreviewHandling
   include Seek::AssetsCommon
   include Seek::IndexPager
+  include Seek::JSONMetadata
 
   before_action :samples_enabled?
   before_action :find_index_assets, only: :index
@@ -132,7 +133,7 @@ class SamplesController < ApplicationController
     attribute_map = params[:sample][:attribute_map]
     if (attribute_map)
       attribute_map.each do |key,value|
-        params[:sample]["__sample_data_#{key}"] = value
+        params[:sample]["#{METHOD_PREFIX}#{key}"] = value
       end
     end
     params.require(:sample).permit(:sample_type_id, :other_creators, :title, { project_ids: [] },
