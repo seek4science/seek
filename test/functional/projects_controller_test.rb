@@ -2101,11 +2101,11 @@ class ProjectsControllerTest < ActionController::TestCase
     end
 
     investigations = project.investigations
-    put :update, params: { id: project, project: { ordered_investigation_ids: investigation_map } }
+    put :reorder_investigations, params: { id: project, project: { ordered_investigation_ids: investigation_map } }
     assert_redirected_to(project_path(project))
 
     logout
-    put :update, params: { id: project, project: { ordered_investigation_ids: investigation_map } }
+    put :reorder_investigations, params: { id: project, project: { ordered_investigation_ids: investigation_map } }
 #    assert_redirected_to(project_path(project))
   end
 
@@ -2123,7 +2123,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
 
     investigations = project.investigations
-    put :update, params: { id: project, project: { ordered_investigation_ids: investigation_map } }
+    put :reorder_investigations, params: { id: project, project: { ordered_investigation_ids: investigation_map } }
     assert_redirected_to(project_path(project))
 
     assert_equal project.positioned_investigations[0].id, project.investigations[0].id
@@ -2133,7 +2133,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     investigation_map[4] = project.investigations[0].id
     investigation_map[0] = project.investigations[4].id
-    put :update, params: { id: project, project: { ordered_investigation_ids: investigation_map } }
+    put :reorder_investigations, params: { id: project, project: { ordered_investigation_ids: investigation_map } }
 
     assert_equal project.positioned_investigations[0].id, project.investigations[4].id
     assert_equal project.positioned_investigations[4].id, project.investigations[0].id

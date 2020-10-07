@@ -329,12 +329,10 @@ class ProjectsController < ApplicationController
     end
   end
 
-  # PUT /projects/1   , polymorphic: [:organism]
-  # PUT /projects/1.xml
-  def update
+  def reorder_investigations
+    @project = Project.find(params[:id])
     if params[:project][:ordered_investigation_ids]
       a1 = params[:project][:ordered_investigation_ids]
-      a1.permit!
       pos = 1
       a1.each_pair do |key, value |
         investigation = Investigation.find (value)
@@ -347,7 +345,11 @@ class ProjectsController < ApplicationController
       end
       return
     end
+  end
 
+  # PUT /projects/1   , polymorphic: [:organism]
+  # PUT /projects/1.xml
+  def update
     if @project.can_manage?(current_user)
       @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
     end

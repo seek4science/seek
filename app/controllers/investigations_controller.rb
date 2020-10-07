@@ -100,7 +100,7 @@ class InvestigationsController < ApplicationController
     end
   end
 
-  def update
+  def reorder_studies
     @investigation=Investigation.find(params[:id])
     if params[:investigation][:ordered_study_ids]
       a1 = params[:investigation][:ordered_study_ids]
@@ -114,7 +114,11 @@ class InvestigationsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to(@investigation) }
       end
-    else
+    end
+  end
+  
+  def update
+    @investigation=Investigation.find(params[:id])
       @investigation.update_attributes(investigation_params)
       update_sharing_policies @investigation
       update_relationships(@investigation, params)
@@ -129,7 +133,6 @@ class InvestigationsController < ApplicationController
           format.json {render json: json_api_errors(@investigation), status: :unprocessable_entity}
         end
       end
-    end
   end
 
   private

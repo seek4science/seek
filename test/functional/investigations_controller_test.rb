@@ -617,11 +617,11 @@ class InvestigationsControllerTest < ActionController::TestCase
     end
 
     studies = investigation.studies
-    put :update, params: { id: investigation, investigation: { ordered_study_ids: study_map } }
+    put :reorder_studies, params: { id: investigation, investigation: { ordered_study_ids: study_map } }
     assert_redirected_to(investigation_path(investigation))
 
     logout
-    put :update, params: { id: investigation, investigation: { ordered_study_ids: study_map } }
+    put :reorder_studies, params: { id: investigation, investigation: { ordered_study_ids: study_map } }
 #    assert_redirected_to(investigation_path(investigation))
   end
 
@@ -641,7 +641,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     assert_equal investigation.studies.size, 5
     studies = investigation.studies
-    put :update, params: { id: investigation, investigation: { ordered_study_ids: study_map } }
+    put 'reorder_studies', params: { id: investigation, investigation: { ordered_study_ids: study_map } }
     assert_redirected_to(investigation_path(investigation))
 
     assert_equal investigation.positioned_studies[0].id, investigation.studies[0].id
@@ -651,7 +651,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     study_map[4] = investigation.studies[0].id
     study_map[0] = investigation.studies[4].id
-    put :update, params: { id: investigation, investigation: { ordered_study_ids: study_map } }
+    put :reorder_studies, params: { id: investigation, investigation: { ordered_study_ids: study_map } }
 
     assert_equal investigation.positioned_studies[0].id, investigation.studies[4].id
     assert_equal investigation.positioned_studies[4].id, investigation.studies[0].id

@@ -52,7 +52,7 @@ class StudiesController < ApplicationController
     end
   end
 
-  def update
+  def reorder_assays
     @study = Study.find(params[:id])
     if params[:study][:ordered_assay_ids]
       a1 = params[:study][:ordered_assay_ids]
@@ -66,7 +66,11 @@ class StudiesController < ApplicationController
       respond_to do |format|
          format.html { redirect_to(@study) }
        end
-    else
+    end
+  end
+  
+  def update
+    @study = Study.find(params[:id])
       @study.attributes = study_params
       update_sharing_policies @study
       update_relationships(@study, params)
@@ -81,7 +85,6 @@ class StudiesController < ApplicationController
           format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
         end
       end
-    end
   end
 
   def show
