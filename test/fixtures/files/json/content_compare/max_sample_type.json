@@ -8,7 +8,7 @@
       "attribute_map": [
         {
           "id": "523",
-          "title": "full name",
+          "title": "full_name",
           "sample_attibute_type": {
             "id": "808",
             "title": "Full name",
