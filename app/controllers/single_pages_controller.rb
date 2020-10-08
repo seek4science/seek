@@ -117,7 +117,7 @@ class SinglePagesController < ApplicationController
       flowchart = Flowchart.where(study_id: assay.study.id).first
       if (flowchart)
         source_sample_type = SampleType.find(flowchart.source_sample_type_id)
-        source_sample_type_attributes = source_sample_type.sample_attributes.select(:required, :accessor_name, :sample_type_id, :id)
+        source_sample_type_attributes = source_sample_type.sample_attributes.select(:required, :original_accessor_name, :sample_type_id, :id)
         
         assay_sample_type = SampleType.find(assay.sample_type_id)
         # assay_samples = assay_sample_type.samples.json_metadata 
@@ -180,7 +180,7 @@ class SinglePagesController < ApplicationController
     all_assays = Study.find(assay.study.id).assays.where("position <= #{assay.position}").sort_by{|e| e[:position]}
     all_assays.each do |m|
       s = SampleType.find(m.sample_type_id)
-      final_header += s.sample_attributes.select(:required, :accessor_name, :sample_type_id, :id) if !s.nil?
+      final_header += s.sample_attributes.select(:required, :original_accessor_name, :sample_type_id, :id) if !s.nil?
     end
     final_header
   end

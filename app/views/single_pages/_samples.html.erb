@@ -35,7 +35,7 @@
                 if (res.data) {
                     // console.log(res)
                     // Remove link_id for now --> Is it needed in the future??
-                    const header = $j.grep(res.data.header, (n, i) => n.accessor_name != "link_id")
+                    const header = $j.grep(res.data.header, (n, i) => n.original_accessor_name != "link_id")
                     loadSampleTableHeader(header)
                     loadSampleData(res.data.samples, header)
                     requiredValidator()
@@ -52,7 +52,7 @@
     function loadSampleTableHeader(data) {
         $j('.sampleTable thead tr').empty()
         $j(data).each((i, x) => {
-            const TD = customTD(x.accessor_name, x.required, x.sample_type_id)
+            const TD = customTD(x.original_accessor_name, x.required, x.sample_type_id)
             // $(this).attr("data-id")
             $j('.sampleTable thead tr').append(TD)
         })
@@ -60,7 +60,7 @@
 
     function loadSampleData(data, headers) {
         $j('.sampleTable tbody').empty()
-        const header = $j.map(headers, (item, i) => item.accessor_name)
+        const header = $j.map(headers, (item, i) => item.original_accessor_name)
         const rows = consolidateRows(data)
         // const headerCount = $j('.sampleTable thead tr').length;
         $j(rows).each((i, row) => {
