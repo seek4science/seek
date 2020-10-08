@@ -10,7 +10,7 @@ class HomesControllerTest < ActionController::TestCase
     # check accessible outside
     get :funding
     assert_response :success
-    assert_select 'h1', /seek funding/i
+    assert_select 'h1', /seek.*funding/i
   end
 
   test 'test should be accessible to seek even if not logged in' do
