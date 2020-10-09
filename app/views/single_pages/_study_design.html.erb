@@ -4,11 +4,8 @@
             <div class="col-md-4">
                 <label>Source characteristics:</label>
                 <div class="input-group">
-                    <select class="form-control" id="sourceSelect" onchange="sourceChange(this);">
+                    <select class="form-control" id="sourceSelect" onchange="sourceChange();">
                     </select>
-                    <span class="input-group-btn">
-                        <input id="btn-apply-source" value="Apply" type="button" class="btn btn-primary">
-                    </span>
                 </div>
             </div>
         </div>
@@ -32,12 +29,17 @@
             </div>
         </div>
         <hr>
-        <%=  render partial: 'source_sample_type_table' %>
-        <hr>
-        <input id="btn-save-study-design" onClick="saveDesign()" value="Save Design" type="button" class="btn btn-primary">
+        <div id="sourceSampleTypeTable">
+            <label>The source sample type will look like:</label>
+            <%=  render partial: 'source_sample_type_table' %>
+            <hr>
+
+            <span style="color:red; font-size:11px"><i class="glyphicon glyphicon-info-sign"></i> After saving the design, you can't change the source characteristic.</span><br />
+            <input id="btn-save-study-design" onClick="saveDesign()" value="Save Design" type="button" class="btn btn-primary">
+        </div>
     </div>
 
-   
+
 
 </div>
 
@@ -57,19 +59,25 @@
             })
     }
 
-    function sourceChange(i) {
+    function sourceChange() {
+        let i = $j('#sourceSelect').val()
         $j("#sourceAttribs tbody").empty()
-        $j("#sourceSelect").val(i.value)
-        $j.each(characteristics[i.value].attributes, (k, attr) => {
+        $j("#sourceSelect").val(i)
+        $j.each(characteristics[i].attributes, (k, attr) => {
             $j("#sourceAttribs tbody").append(`<tr><td>${attr.title}</td><td>${attr.shortName}</td><td>${attr.des}</td></tr>`)
         })
-    }
 
-    $j("#btn-apply-source").on("click", () => {
+        $j('.tbl_sample_source thead tr').empty()
         $j.each(characteristics[sourceSelect.value].attributes, (k, attr) => {
             addAttrib(attr.title)
         })
-    })
+    }
+
+    // $j("#btn-apply-source").on("click", () => {
+    //     $j.each(characteristics[sourceSelect.value].attributes, (k, attr) => {
+    //         addAttrib(attr.title)
+    //     })
+    // })
 
     function addAttrib(text) {
         let options = {
@@ -223,10 +231,14 @@
             url: `/single_pages/${pid}/sample_source/${selectedItem.id}`,
             success: s => {
                 $j('.tbl_sample_source thead tr').empty()
-                $j(s.data).each((i, x) => {
-                    const TD = customTD(x.title, x.required)
-                    $j('.tbl_sample_source thead tr').append(TD)
-                })
+                console.log("s.data", s.data)
+                if (s.data)
+
+                    $j(s.data).each((i, x) => {
+                        const TD = customTD(x.title, x.required)
+                        $j('.tbl_sample_source thead tr').append(TD)
+                    })
+                else sourceChange()
             },
             error: e => {
                 console.error(e)
