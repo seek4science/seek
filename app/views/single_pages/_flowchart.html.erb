@@ -212,6 +212,7 @@
     }
 
     const loadFlowchart = () => {
+        $j("#sourceSampleTypeTable").css("visibility","hidden");
         const $flowchart = $j('#chart_canvas');
         const {
             id,
@@ -256,6 +257,7 @@
 
 
     const hideFlowchart = () => {
+        $j("#sourceSampleTypeTable").css("visibility","visible");
         $j("#flowchart-header").hide()
         window.location.href = "#study-details"
     }
@@ -605,6 +607,7 @@
     }
 
     $j("#btn_save_flowchart").on("click", async () => {
+        $j("#btn_save_flowchart").attr('disabled', true)
         if (selectedItem.type != "study") return
         let flowchartData = $j('#chart_canvas').flowchart('getData');
         if (validateFlowchart(flowchartData) == false) return
@@ -614,6 +617,7 @@
             updateFlowchart(flowchartData);
             return
         }
+        
         $j.each(newAssays, (i, assay) => {
             if ($j.inArray(assay.id, $j.map(existingAssays, a => a.id)) == -1) {
                 const {
