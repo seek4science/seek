@@ -7,7 +7,7 @@
             </div>
             <div class="col-md-11">
                 <div class="col-md-12">
-                    <p id="method-title"><strong style="text-align: center;">Title:</strong><input id="method_title" type="text" class="form-control" /></p>
+                    <p id="method-title"><strong style="text-align: center;">Title:</strong><input type="text" class="form-control" /></p>
                     </p>
                     <p id="method-description"> <strong>Description:</strong><input id="method_description" type="text" class="form-control" /></p>
                     <input type="hidden" id="method-id">
@@ -29,7 +29,7 @@
                 "type": "sops",
                 "id": methodId,
                 "attributes": {
-                    "title": $j("#method_title").val(),
+                    "title": $j("#method-title").val(),
                     "description": $j("#method_description").val()
                 }
             }
