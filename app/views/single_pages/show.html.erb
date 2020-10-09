@@ -233,7 +233,6 @@
              init_flowchart()
              addAssayTypeOptions()
              addSourcesOptions()
-            //  loadDesign()
         });
 
         const addInvestigations = (t) => {
@@ -254,20 +253,20 @@
         }
 
         const deleteItem = (t) => {
+            event.preventDefault()
             let {id, type} = selectedItem
+            if (type == "assay"){
+                deleteAssay(id, t)
+                return;
+            }
             if (!id || !type) {
                 alert("Please select item.")
                 return;
             }
-            if (confirm('Are you sure you want to delete the item?')) {
-                $j(t).attr('disabled','disabled')
-                  switch (type) {
-                    case "study":
-                        type = "studies"
-                        break;
-                    default:
-                        type+="s";
-                }
+            if (confirm('Are you sure you want to delete the ' + type + '?')) {
+                $j(t).attr('disabled', true)
+                if (type == "study") type = "studies"
+                else type += "s";
                 $j.ajax({
                     method: 'DELETE',
                     "headers": {
@@ -277,18 +276,65 @@
                     cache: false,
                     url: `/${type}/${id}`,
                     success: s => {
-                        // alert("Item was deleted successfully!")
                         location.reload(true);
                     },
                     error: e => {
                         console.error(e)
+                         $j(t).attr('disabled', false)
                         if (e.responseJSON.errors)
-                            alert(e.responseJSON.errors[0].title + '\n' + e.responseJSON.errors[0].details)
+                            alert(e.responseJSON.errors[0].title + '\n' +
+                             e.responseJSON.errors[0].details + '\n' + "There maybe some items associated with this item.")
                         else
                             alert('Cannot process the request')
                     }
                 })
             }
+        }
+
+        function deleteAssay(id, t){
+            if (confirm('Are you sure you want to delete the assay and all items associated with it?')) {
+                 const cb = (id) => {
+                    $j.ajax({
+                        method: 'DELETE',
+                        "headers": {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json"
+                        },
+                        cache: false,
+                        url: `/assays/${id}`,
+                        success: s => {
+                            location.reload(true);
+                        },
+                        error: e => {
+                            console.error(e)
+                            $j(t).attr('disabled', false)
+                            if (e.responseJSON.errors)
+                                alert(e.responseJSON.errors[0].title + '\n' + e.responseJSON.errors[0].details)
+                            else
+                                alert('Cannot process the request')
+                        }
+                    })
+                }
+                // TO-DO: Add a method to the API that deletes all assets of the assay
+                // For now, if the assay has assets other than SOP, the situation will be a bit of mess!
+                $j(t).attr('disabled', true)
+                deleteSOP($j("#method-id").val(), () => cb(id))
+            }
+        }
+
+        function deleteSOP(id, cb) {
+            $j.ajax({
+                method: 'DELETE',
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                cache: false,
+                url: `/sops/${id}`,
+                success: s => cb(),
+                error: e => e.responseJSON.errors ?
+                    alert(e.responseJSON.errors[0].title + '\n' + e.responseJSON.errors[0].details) : alert('Cannot process the request')
+            })
         }
 
         function breadcrumb(item) {
