@@ -6,7 +6,7 @@ class ScheduleTest < ActionDispatch::IntegrationTest
   end
 
   test 'should read schedule file' do
-    assert_equal 8, @schedule.jobs[:runner].count, "Should be 8: 3x Periodic Subscription, 1x ContentBlob Cleaner, 1x Newsfeed Refresh, 2x Openbis related, 1x ProjectLeaving"
+    assert_equal 6, @schedule.jobs[:runner].count, "Should be 8: 3x Periodic Subscription, 1x ContentBlob Cleaner, 1x Newsfeed Refresh, 1x General ApplicationJob"
 
     # Periodic emails
     daily = @schedule.jobs[:runner].detect { |job| job[:task] == "PeriodicSubscriptionEmailJob.new('daily').queue_job" }
@@ -35,18 +35,10 @@ class ScheduleTest < ActionDispatch::IntegrationTest
       assert_equal [731.minutes], news_refresh[:every]
     end
 
-    # Openbis
-    obis_refresh = @schedule.jobs[:runner].detect { |job| job[:task] == "OpenbisEndpointCacheRefreshJob.queue_jobs" }
-    obis_sync = @schedule.jobs[:runner].detect { |job| job[:task] == "OpenbisSyncJob.queue_jobs" }
-    assert obis_refresh
-    assert_equal [10.minutes], obis_refresh[:every]
-    assert obis_sync
-    assert_equal [10.minutes], obis_sync[:every]
-
-    # ProjectLeaving
-    project_leaving = @schedule.jobs[:runner].detect { |job| job[:task] == "ProjectLeavingJob.queue_jobs" }
-    assert project_leaving
-    assert_equal [10.minutes], project_leaving[:every]
+    # General
+    general = @schedule.jobs[:runner].detect { |job| job[:task] == "ApplicationJob.queue_timed_jobs" }
+    assert general
+    assert_equal [10.minutes], general[:every]
   end
 
   test 'executes tasks in schedule' do

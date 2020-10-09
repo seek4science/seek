@@ -61,4 +61,15 @@ class ApplicationJob < ActiveJob::Base
     Rails.logger.error(message)
     Rails.logger.error(exception)
   end
+
+  # A single point of entry to queue various jobs that depend on some period of time elapsing before they are run, without
+  # far-future scheduling (reasoning: https://lanceolsen.net/never-schedule-future-jobs/).
+  #
+  # Using a single method is faster than having individual entries for each type of job in `schedule.rb`, since it would
+  # have to initialise a SEEK instance for each.
+  def self.queue_timed_jobs
+    OpenbisEndpointCacheRefreshJob.queue_jobs
+    OpenbisSyncJob.queue_jobs
+    ProjectLeavingJob.queue_jobs
+  end
 end

@@ -19,6 +19,10 @@
 
 # Learn more: http://github.com/javan/whenever
 
+require File.expand_path(File.dirname(__FILE__) + "/../config/environment") unless defined? SEEK
+
+set :output, "#{path}/log/schedule.log"
+
 PeriodicSubscriptionEmailJob::DELAYS.each do |frequency, period|
   every period do
     runner "PeriodicSubscriptionEmailJob.new('#{frequency}').queue_job"
@@ -34,7 +38,5 @@ every Seek::Config.home_feeds_cache_timeout.minutes do # Crontab will need to be
 end
 
 every 10.minutes do
-  runner "OpenbisEndpointCacheRefreshJob.queue_jobs"
-  runner "OpenbisSyncJob.queue_jobs"
-  runner "ProjectLeavingJob.queue_jobs"
+  runner "ApplicationJob.queue_timed_jobs"
 end
