@@ -225,8 +225,8 @@
     position: relative;
     display: block;
     float: left;
-    width:25%;
-    text-align:center
+    width: 25%;
+    text-align: center
 }
 
 .bcrumb li a::after {
@@ -260,9 +260,7 @@
     z-index: 1;
 }
 
-.breadcrumb li:first-child a {
-  
-}
+.breadcrumb li:first-child a {}
 
 .bcrumb li:nth-child(2) a {
     background: #346090
@@ -284,7 +282,7 @@
     background: #cbe2f7;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
-   
+
 }
 
 .bcrumb li:nth-child(4) a:after {
@@ -360,3 +358,20 @@
     margin: 0em 0em 0em 0em;
     min-height: 50em;
 }
+
+.sourceAttribs tbody tr:nth-child(odd) {
+    background-color: #eee;
+}
+
+.sourceAttribs thead tr {
+    background-color: #ccc;
+}
+
+.sourceAttribs td, th {
+   padding: 4px;
+}
+
+.sourceAttribs th {
+    padding: 6px;
+    min-width: 100px;
+ }
