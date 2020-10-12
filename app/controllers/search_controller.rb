@@ -23,8 +23,6 @@ class SearchController < ApplicationController
     end
 
     if Scale.any?
-      @results_scaled = { 'all' => [] }
-      Scale.all.find_each { |scale| @results_scale[scale.key] = [] }
       @scale_key = search_params[:scale] || 'all'
       unless @scale_key == 'all'
         @results.each do |type, results|
