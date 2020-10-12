@@ -1,16 +1,15 @@
 require 'seek/external_search'
 
 module SearchHelper
-  include Seek::ExternalSearch
+
   def search_type_options
-    search_type_options = [['All', '']] | Seek::Util.searchable_types.collect { |c| [(c.name.underscore.humanize == 'Sop' ? t('sop') : c.name.underscore.humanize.pluralize), c.name.underscore.pluralize] }
-    search_type_options
+    [['All', '']] | Seek::Util.searchable_types.collect { |c| [(c.name.underscore.humanize == 'Sop' ? t('sop') : c.name.underscore.humanize.pluralize), c.name.underscore.pluralize] }
   end
 
   def external_search_tooltip_text
     text = 'Checking this box allows external resources to be includes in the search. '
     text << 'External resources include:  '
-    text << search_adaptor_names.collect { |name| "#{name}" }.join(', ')
+    text << Seek::ExternalSearch.instance.search_adaptor_names.collect { |name| "#{name}" }.join(', ')
     text << '. '
     text << 'This means the search will take longer, but will include results from other sites'
     text.html_safe
@@ -43,7 +42,7 @@ module SearchHelper
 
   # can only be supported if turned on and crossref api email is configured
   def external_search_supported?
-    Seek::Config.external_search_enabled && !Seek::Config.crossref_api_email.blank?
+    Seek::ExternalSearch.instance.supported?
   end
 
   def search_extractable_items(items, search_query)
