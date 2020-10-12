@@ -43,7 +43,7 @@ module SearchHelper
 
   # can only be supported if turned on and crossref api email is configured
   def external_search_supported?
-    Seek::Config.external_search_enabled && !Seek::Config.crossref_api_email.blank?
+    Seek::Config.external_search_enabled
   end
 
   def search_extractable_items(items, search_query)
