@@ -8,6 +8,7 @@ class SearchController < ApplicationController
 
   def index
     @results = {}
+    @external_results = []
 
     if Seek::Config.solr_enabled
       begin
