@@ -95,7 +95,7 @@ class ApplicationRecord < ActiveRecord::Base
     if searchable? && Seek::Config.solr_enabled
       search = search do |query|
         query.keywords(q)
-        query.paginate(page: 1, per_page: count)
+        query.paginate(page: 1, per_page: unscoped.count)
       end
 
       where(id: search.hits.map(&:primary_key))
