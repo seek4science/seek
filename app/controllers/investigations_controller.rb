@@ -12,6 +12,8 @@ class InvestigationsController < ApplicationController
   #defined in the application controller
   before_action :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
+  before_action :check_studies_are_for_this_investigation, only: %i[update]
+
   include Seek::Publishing::PublishingCommon
 
   include Seek::AnnotationCommon
@@ -89,22 +91,46 @@ class InvestigationsController < ApplicationController
     end
   end
 
-  def update
-    @investigation=Investigation.find(params[:id])
-    @investigation.update_attributes(investigation_params)
-    update_sharing_policies @investigation
-    update_relationships(@investigation, params)
-
+  def order_studies
+    @investigation = Investigation.find(params[:id])
     respond_to do |format|
-      if @investigation.save
-        flash[:notice] = "#{t('investigation')} was successfully updated."
+      format.html
+    end
+  end
+
+  def reorder_studies
+    @investigation=Investigation.find(params[:id])
+    if params[:investigation][:ordered_study_ids]
+      a1 = params[:investigation][:ordered_study_ids]
+      pos = 1
+      a1.each_pair do |key, value |
+        study = Study.find (value)
+        study.position = pos
+        pos += 1
+        study.save!
+      end
+      respond_to do |format|
         format.html { redirect_to(@investigation) }
-        format.json {render json: @investigation}
-      else
-        format.html { render :action => 'edit' }
-        format.json { render json: json_api_errors(@investigation), status: :unprocessable_entity }
       end
     end
+  end
+  
+  def update
+    @investigation=Investigation.find(params[:id])
+      @investigation.update_attributes(investigation_params)
+      update_sharing_policies @investigation
+      update_relationships(@investigation, params)
+
+      respond_to do |format|
+        if @investigation.save
+          flash[:notice] = "#{t('investigation')} was successfully updated."
+          format.html {redirect_to(@investigation)}
+          format.json {render json: @investigation}
+        else
+          format.html {render :action => 'edit'}
+          format.json {render json: json_api_errors(@investigation), status: :unprocessable_entity}
+        end
+      end
   end
 
 
@@ -113,8 +139,27 @@ class InvestigationsController < ApplicationController
 
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, :other_creators,
-                                          { creator_ids: [] },{ scales: [] }, { publication_ids: [] },
+                                          { creator_ids: [] },{ scales: [] }, { publication_ids: [] }, :position,
                                           { custom_metadata_attributes: determine_custom_metadata_keys })
   end
+
+  def check_studies_are_for_this_investigation
+    investigation_id = params[:id]
+    if params[:investigation][:ordered_study_ids]
+      a1 = params[:investigation][:ordered_study_ids]
+      a1.permit!
+      valid = true
+      a1.each_pair do |key, value |
+        a = Study.find (value)
+        valid = valid && !a.investigation.nil? && a.investigation_id.to_s == investigation_id
+      end
+      unless valid
+        error("Each ordered #{"Study"} must be associated with the Investigation", "is invalid (invalid #{"Study"})")
+        return false
+      end
+    end
+    return true
+  end
+
 
 end

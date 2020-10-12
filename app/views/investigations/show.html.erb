@@ -11,6 +11,10 @@
       </div>
     </div>
     <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @investigation} %>
+    <p id="position">
+      <b><%= "Investigation position" %>: </b>
+      <%= @investigation.position %>
+    </p>
     <%= render partial: 'general/isa_graph', locals: { root_item: @investigation, options: { depth: 4 } } %>
   </div>
   <div class="col-md-3 col-sm-4">

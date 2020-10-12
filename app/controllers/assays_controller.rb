@@ -178,8 +178,9 @@ class AssaysController < ApplicationController
   private
 
   def assay_params
-    params.require(:assay).permit(:title, :description, :position, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
-                                  :license, :other_creators, { document_ids: []}, { creator_ids: [] },
+    params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
+                                  :license, :other_creators, :position,
+                                  { document_ids: []}, { creator_ids: [] },
                                   { scales: [] }, { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },

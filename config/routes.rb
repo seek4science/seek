@@ -283,6 +283,7 @@ SEEK::Application.routes.draw do
       post :request_join
       post :request_create
     end
+    
     member do
       get :asset_report
       get :admin_members
@@ -293,6 +294,8 @@ SEEK::Application.routes.draw do
       get :overview
       get :administer_join_request
       post :respond_join_request
+      get :order_investigations
+      put :reorder_investigations
     end
     resources :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations,
               :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :collections, only: [:index]
@@ -367,6 +370,8 @@ SEEK::Application.routes.draw do
     resources :people, :projects, :assays, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
+      get :order_studies
+      post :reorder_studies
     end
   end
 
@@ -375,6 +380,10 @@ SEEK::Application.routes.draw do
       post :investigation_selected_ajax
     end
     resources :people, :projects, :assays, :investigations, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
+    member do
+      get :order_assays
+      post :reorder_assays
+    end
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do

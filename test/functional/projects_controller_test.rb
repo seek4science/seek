@@ -2089,7 +2089,60 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 'bad request',log.response
   end
 
-  private
+  test 'order investigations permission' do
+    owner = Factory(:project_administrator)
+    project = owner.projects.first
+    login_as(owner)
+    investigation_map = {}
+    5.times do |n|
+      investigation = Factory(:investigation, contributor: owner)
+      investigation.projects = [project]
+      investigation_map[n] = investigation.id
+    end
+
+    investigations = project.investigations
+    put :reorder_investigations, params: { id: project, project: { ordered_investigation_ids: investigation_map } }
+    assert_redirected_to(project_path(project))
+
+    logout
+    put :reorder_investigations, params: { id: project, project: { ordered_investigation_ids: investigation_map } }
+#    assert_redirected_to(project_path(project))
+  end
+
+  test 'order investigations does order' do
+    owner = Factory(:project_administrator)
+    project = owner.projects.first
+    login_as(owner)
+    investigation_map = {}
+    5.times do |n|
+      investigation = Factory(:investigation, contributor: owner)
+      investigation.projects = [project]
+      
+      investigation.position = n
+      investigation_map[n] = investigation.id
+    end
+
+    investigations = project.investigations
+    put :reorder_investigations, params: { id: project, project: { ordered_investigation_ids: investigation_map } }
+    assert_redirected_to(project_path(project))
+
+    assert_equal project.positioned_investigations[0].id, project.investigations[0].id
+    assert_equal project.positioned_investigations[4].id, project.investigations[4].id
+    assert_equal 1, project.positioned_investigations[0].position
+    assert_equal 5, project.positioned_investigations[4].position
+
+    investigation_map[4] = project.investigations[0].id
+    investigation_map[0] = project.investigations[4].id
+    put :reorder_investigations, params: { id: project, project: { ordered_investigation_ids: investigation_map } }
+
+    assert_equal project.positioned_investigations[0].id, project.investigations[4].id
+    assert_equal project.positioned_investigations[4].id, project.investigations[0].id
+    assert_equal 1, project.positioned_investigations[0].position
+    assert_equal 5, project.positioned_investigations[4].position
+
+end
+
+private
 
   def edit_max_object(project)
     for i in 1..5 do
@@ -2103,4 +2156,5 @@ class ProjectsControllerTest < ActionController::TestCase
   def valid_project
     { title: 'a title' }
   end
+
 end
