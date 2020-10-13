@@ -9,17 +9,17 @@ Plant_ArrayExpress:
             title: Organism*
             short_name: ""
             description: ""
-            IRI: ""
+            IRI: "http://purl.obolibrary.org/obo/OBI_0100026"
         - attribute:
             title: Developmental stage*
             short_name: ""
             description: ""
-            IRI: ""
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000399"
         - attribute:
             title: Age*
             short_name: ""
             description: ""
-            IRI: ""
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000246"
         - attribute:
             title: Age Measurement Unit*
             short_name: ""
@@ -29,7 +29,7 @@ Plant_ArrayExpress:
             title: Genotype*
             short_name: ""
             description: ""
-            IRI: ""
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000513"
         - attribute:
             title: Cultivar*
             short_name: ""
@@ -39,7 +39,7 @@ Plant_ArrayExpress:
             title: Organism part*
             short_name: ""
             description: ""
-            IRI: ""
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000635"
 
 PlantPhenotype_MIAPPE:
     name: PlantPhenotype-MIAPPE
@@ -240,7 +240,7 @@ Nucleic_acid_library_construction_ArrayExpress:
             description: ""
             IRI: ""
         - attribute:
-            title: Size range (bp)
+            title: Size range bp
             short_name: "SizeRange (bp)"
             description: ""
             IRI: ""
@@ -490,12 +490,12 @@ Plant_ILVO:
             description: ""
             IRI: ""
         - attribute:
-            title: "# samples/pool*"
+            title: "samples pool*"
             short_name: "# samples/pool"
             description: "number of genotypes in composite samples or pools"
             IRI: ""
         - attribute:
-            title: "# samples/pool_code*"
+            title: "samples pool_code*"
             short_name: "sp_code"
             description: ""
             IRI: ""
