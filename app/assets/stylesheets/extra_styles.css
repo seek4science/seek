@@ -125,9 +125,6 @@
     border-top-right-radius: 5px
 }
 
-.tableXs td {
-    border-radius: 5px
-}
 
 .file_selected {
     background-color: aliceblue;
@@ -367,11 +364,12 @@
     background-color: #ccc;
 }
 
-.sourceAttribs td, th {
-   padding: 4px;
+.sourceAttribs td,
+th {
+    padding: 4px;
 }
 
 .sourceAttribs th {
     padding: 6px;
     min-width: 100px;
- }
+}
