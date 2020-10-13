@@ -126,8 +126,9 @@ class SinglePagesController < ApplicationController
 
         all_samples = load_samples(assay, source_sample_type)
         rest_headers = load_headers(assay)
+        all_headers = load_IRI(source_sample_type_attributes + rest_headers)
 
-        data = { header: source_sample_type_attributes + rest_headers, samples: all_samples }
+        data = { header: all_headers, samples: all_samples }
           #  data: source_samples + assay_samples }
         render json: { status: :ok, data: data }
       else
@@ -189,19 +190,25 @@ class SinglePagesController < ApplicationController
   def load_samples (assay, source_sample_type)
     final_samples = {"0" => []}
     source_sample_type.samples.each_with_index do |s, i|
-      final_samples["0"] << {"id" => s.id, "data" => s.json_metadata}
+      final_samples["0"] << {"id" => s.id, "data" => s.json_metadata, "sample_type_id" => source_sample_type.id}
     end
 
     all_assays = Study.find(assay.study.id).assays.where("position <= #{assay.position}").sort_by{|e| e[:position]}
     all_assays.each_with_index do |m, i|
       final_samples[i+1] = []
       s = SampleType.find(m.sample_type_id)
-      s.samples.each do |s|
-        puts s.json_metadata
-        final_samples[i+1] << {"id" => s.id, "data" => s.json_metadata}
+      s.samples.each do |n|
+        final_samples[i+1] << {"id" => n.id, "data" => n.json_metadata, "sample_type_id" => s.id}
       end
     end
     final_samples
+  end
+
+  def load_IRI attrs
+      attrs.map do |m|
+      iri = SourceAttribute.where(name: m.original_accessor_name).first&.IRI || ""
+      m.as_json.merge!(IRI: iri)
+    end
   end
 
 end
