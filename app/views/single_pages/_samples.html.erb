@@ -1,7 +1,9 @@
 <div id="tbl_file_content">
-    <a class="btn btn-primary btn-sm" onclick="sample_add_row('.sampleTable')"> <i class="glyphicon glyphicon-plus"></i>Add Row</a>
-    <a id="sample_add_col" class="btn btn-primary btn-sm">
+    <a class="btn btn-primary btn-sm" onclick="AddRow('.sampleTable')"> <i class="glyphicon glyphicon-plus"></i>Add Row</a>
+    <a id="sample_add_col" class="btn btn-primary btn-sm" disabled="disabled">
         <i class="glyphicon glyphicon-plus"></i>Add Column</a>
+    <a id="sample_delete" class="btn btn-danger btn-sm">
+        <i class="glyphicon glyphicon-trash"></i>Delete Row(s)</a>
     <a class="btn btn-primary btn-sm pull-right" onclick="saveSamples()">Save</a>
     <div class="sampleTblContainer">
         <table>
@@ -33,12 +35,11 @@
             url: `/single_pages/${pid}/sample_table/${selectedItem.id}`,
             success: res => {
                 if (res.data) {
-                    // console.log(res)
                     // Remove link_id for now --> Is it needed in the future??
-                    const header = $j.grep(res.data.header, (n, i) => n.original_accessor_name != "link_id")
-                    loadSampleTableHeader(header)
-                    loadSampleData(res.data.samples, header)
-                    requiredValidator()
+                    // const header = $j.grep(res.data.header, (n, i) => n.original_accessor_name != "link_id")
+                    loadSampleTableHeader(res.data.header)
+                    loadSampleData(res.data.samples, res.data.header)
+                    validateTable()
                 } else {
                     $j('.sampleTable').html(
                         '<table class="table tableXs sampleTable"><thead class="thead-dark"><tr></tr></thead><tbody></tbody></table>'
@@ -48,52 +49,62 @@
         })
     }
 
-    // loads sample table header
-    function loadSampleTableHeader(data) {
-        $j('.sampleTable thead tr').empty()
-        $j(data).each((i, x) => {
-            const TD = customTD(x.original_accessor_name, x.required, x.sample_type_id)
-            // $(this).attr("data-id")
-            $j('.sampleTable thead tr').append(TD)
+    function loadSampleTableHeader(headers) {
+        const headTr = $j('.sampleTable thead tr')
+        // Adds the select column
+        headTr.empty().append("<th><input id='selectAll' onClick='selectAll(this)' type='checkbox'/></th>")
+        $j(headers).each((i, x) => {
+            const TH = customTD(x.original_accessor_name, x.required, x.sample_type_id, x.IRI)
+            headTr.append(TH)
         })
     }
 
     function loadSampleData(data, headers) {
         $j('.sampleTable tbody').empty()
-        const header = $j.map(headers, (item, i) => item.original_accessor_name)
         const rows = consolidateRows(data)
-        // const headerCount = $j('.sampleTable thead tr').length;
         $j(rows).each((i, row) => {
-            let newRow
-            $j.each(header, (i, val) => {
-                const sampleVal = findSampleVal(row, val)
+            let newRow = "<td><input type='checkbox'/></td>"
+            $j.each(headers, (i, x) => {
+                const sampleVal = findSampleVal(row, x)
                 newRow += createTD(sampleVal)
             })
-            $j('.sampleTable tbody').append('<tr>' + newRow + '</tr>')
+            $j('.sampleTable tbody').append(`<tr>` + newRow + '</tr>')
         })
+        // Set the Auto Complete
+        $j.each($j('.sampleTable tbody tr td:not(:first-child)'), (i, k) => {
+            const IRI = $j(k).closest('table').find('th').eq($j(k).index()).attr("IRI")
+            setAutoComplete(k, IRI)
+        })
+
     }
 
     function findSampleVal(row, key) {
         let result = {
-            text: undefined,
-            sampleId: undefined
+            text: "",
+            sampleId: "",
+            editable: key.original_accessor_name == "link_id" ? "" : "contenteditable"
         }
+        let link_id = ""
         $j.each(row, (n, samplePart) => {
-            if (samplePart.data[key] != undefined)
-                return result = {
-                    text: samplePart.data[key],
-                    sampleId: samplePart.sampleId
-                }
+            //samplePart.data[key.original_accessor_name] != undefined &&
+            if (!link_id && key.original_accessor_name == "link_id") link_id = samplePart.data[key.original_accessor_name]
+            if (key.sample_type_id == samplePart.sampleTypeid) {
+                result.text = samplePart.data[key.original_accessor_name]
+                result.sampleId = samplePart.sampleId
+                return
+            }
         })
+        result.text = link_id ? link_id : result.text
         return result
     }
 
     function createTD(sampleVal) {
-        text = sampleVal.text
-        sampleId = sampleVal.sampleId
-        if (text == undefined) text = ""
-        if (sampleId == undefined) sampleId = ""
-        return `<td contenteditable data-sampleid=${sampleId}>` + text + "</td>"
+        const {
+            text,
+            sampleId,
+            editable
+        } = sampleVal
+        return `<td ${editable} data-sampleid=${sampleId}>` + text + "</td>"
     }
 
     function consolidateRows(data) {
@@ -103,58 +114,86 @@
         $j(sourceSamples).each((i, row) => {
             let tableRow = [{
                 sampleId: row.id,
-                data: JSON.parse(row.data)
+                data: JSON.parse(row.data),
+                sampleTypeid: row.sample_type_id
             }]
-            $j(data).each((i, x) => {
+            $j(Object.keys(data)).each((j, x) => {
                 // TO_DO: check the following code in case of more sample existance
-                if (x.length > i)
+                if (data[x][i]) {
                     tableRow.push({
-                        sampleId: x.id,
-                        data: JSON.parse(x.data)
+                        sampleId: data[x][i].id,
+                        data: JSON.parse(data[x][i].data),
+                        sampleTypeid: data[x][i].sample_type_id
                     })
-                // $j.extend(true, tableRow, {id:x.id, data:JSON.parse(x.data)});
+                } else {
+                    tableRow.push({
+                        sampleId: "",
+                        data: {},
+                        sampleTypeid: ""
+                    })
+                }
             })
             rows.push(tableRow)
         })
-        // console.log("rows", rows)
         return rows
     }
 
-    function requiredValidator() {
+    function validateTable() {
         // Checks which cells are rquired and not yet filled
         let valid = true
         const required = $j.map($j('.sampleTable thead tr th').get(), (x, i) => !x.children.length > 0)
         const rows = $j('.sampleTable tbody tr').get()
         $j.each(rows, (i, row) => {
-            const tds = $j(row).find('td').get()
-            $j.each(tds, (j, td) => {
-                if (required[j] && $j(td).html() == "") {
-                    $j(td).css('border-bottom', '1px solid red');
-                    valid = false
-                }
-            })
+            if (!$j(row).attr("delete")) {
+                const tds = $j(row).find('td').get()
+                $j.each(tds, (j, td) => {
+                    if (required[j] && $j(td).html() == "") {
+                        // $j(td).css('border-bottom', '2px solid red');
+                        $j(td).css('background-color', '#e8c5c3');
+                        valid = false
+                    }
+                })
+            }
         })
         return valid
     }
 
     function saveSamples() {
+        if (!validateTable()) {
+            alert('Please fill the required fields.')
+            return
+        }
+
         // Get the new list of sample types and samples with their attributes
-        const header = $j('.sampleTable thead tr th')
+        let header = $j('.sampleTable thead tr th')
         const headerValue = $j.map(header, (x, i) => $j(x).html().replace(/<(?:.|\n)*?>/gm, '').trim())
         const _sampleTypes = $j.map(header, (x, i) => ({
             sampleTypeId: $j(x).attr("data-sampletypeid"),
             text: $j(x).html().replace(/<(?:.|\n)*?>/gm, '').trim()
         }))
         // Get all the rows of the table
-        const rows = $j('.sampleTable tbody tr').get()
+        const rows = $j('.sampleTable tbody tr').get();
         let samples = []
         for (let i = 0; i < rows.length; i++) {
             samples.push(...splitSamples(rows[i], _sampleTypes))
         }
         let sampleTypes = getSampleTypes(_sampleTypes);
-        console.log("sampleTypes", sampleTypes)
-        console.log("samples", samples)
-        // Check the sample API >> create / update
+        //----------------SAMPLE_TYPES UPDATE-----------------
+        // TO-DO: Check if the sample types has changed?
+        // updateSampleType(sampleTypes) // Will the jsonp_metadata of samples be updated automatically??
+        //----------------SAMPLES UPDATE-----------------
+        const updateSamples = $j.grep(samples, (x) => x.sampleId && !x.delete)
+        console.log("updateSamples", updateSamples)
+        updateSample(updateSamples)
+        //----------------SAMPLES CREATE-----------------
+        const createSamples = $j.grep(samples, (x) => !x.sampleId && !x.delete)
+        console.log("createSamples", createSamples)
+        createSample(createSamples)
+        //----------------SAMPLES DELETE-----------------
+        const deleteSamples = $j.grep(samples, (x) => x.delete && x.sampleId)
+        console.log("deleteSamples", deleteSamples)
+        deleteSample(deleteSamples)
+
     }
 
     function getSampleTypes(a) {
@@ -176,120 +215,154 @@
         let JSONMetadata = {}
         let samples = []
         $j.each($j(row).find('td'), (i, td) => {
-            if (samples.length == 0 || header[i].sampleTypeId != samples[samples.length - 1].sampleTypeId) {
-                samples.push({
-                    sampleId: $j(td).attr("data-sampleid"),
-                    sampleTypeId: header[i].sampleTypeId,
-                    JSONMetadata: {
+            if (i > 0) //Skips the select column
+                if (samples.length == 0 || header[i].sampleTypeId != samples[samples.length - 1].sampleTypeId) {
+                    samples.push({
+                        sampleId: $j(td).attr("data-sampleid"),
+                        sampleTypeId: header[i].sampleTypeId,
+                        JSONMetadata: {
+                            [`${header[i].text}`]: $j(td).html()
+                        },
+                        delete: $j(td).parent().attr("delete") ? true : false
+                    })
+                } else {
+                    $j.extend(true, samples[samples.length - 1].JSONMetadata, {
                         [`${header[i].text}`]: $j(td).html()
-                    }
-                })
-            } else {
-                $j.extend(true, samples[samples.length - 1].JSONMetadata, {
-                    [`${header[i].text}`]: $j(td).html()
-                });
-            }
+                    });
+                }
         })
         return samples
     }
 
-    function updateSampleType(){
-
+    function updateSampleType(sampleTypes) {
+        $j.each(sampleTypes, (k, sampleType) => {
+            const data = {
+                "data": {
+                    "type": "sample_types",
+                    "id": sampleType.id,
+                    "attributes": {
+                        "attribute_map": $j.map(sampleType.attributes, (x, i) => ({
+                            //  "id": "57",
+                            "title": x,
+                            "sample_attibute_type": {
+                                "id": "8"
+                            }
+                        }))
+                    }
+                }
+            }
+            $j.ajax({
+                method: 'POST',
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                cache: false,
+                url: '/sample_types',
+                data: JSON.stringify(data),
+                success: s => {
+                    console.log('sampleType was updated successfully! : ' + s.data.id)
+                },
+                error: (e) => {
+                    alert('An error occurred when updating the sampleType')
+                }
+            })
+        })
     }
 
-    function updateSample(){
-        
+    function updateSample(samples) {
+        $j.each(samples, (k, sample) => {
+            const data = {
+                "data": {
+                    "type": "samples",
+                    "attributes": {
+                        "attribute_map": sample.JSONMetadata
+                    }
+                }
+            }
+            $j.ajax({
+                method: 'PUT',
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                cache: false,
+                url: `/samples/${sample.sampleId}`,
+                data: JSON.stringify(data),
+                success: s => {
+                    console.log('The sample was updated successfully! : ' + s.data.id)
+                },
+                error: (e) => {
+                    alert('An error occurred when updating the sample')
+                }
+            })
+        })
     }
-    function createSample(){
 
+    function createSample(samples) {
+        $j.each(samples, (k, sample) => {
+            const data = {
+                "data": {
+                    "type": "samples",
+                    "attributes": {
+                        "title": "sample",
+                        "attribute_map": sample.JSONMetadata,
+                        "tags": null
+                    },
+                    "relationships": {
+                        "sample_type": {
+                            "data": {
+                                "id": sample.sampleTypeId,
+                                "type": "sample_types"
+                            }
+                        },
+                        "projects": {
+                            "data": [{
+                                "id": pid,
+                                "type": "projects"
+                            }]
+                        }
+                    }
+                }
+            }
+            $j.ajax({
+                method: 'POST',
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                cache: false,
+                url: '/samples',
+                data: JSON.stringify(data),
+                success: s => {
+                    console.log('The sample was created successfully! : ' + s.data.id)
+                },
+                error: (e) => {
+                    alert('An error occurred when creating the sample')
+                }
+            })
+        })
     }
 
-    // function mergeIOTables(dt, index) {
-    //     let headerAgg = [],
-    //         baseData = []
-    //     $j.each(dt, (k, v) => {
-    //         if (k <= index) {
-    //             let header = Object.keys(JSON.parse(v.content)[0])
-    //             headerAgg += [...headerAgg, ...header]
-    //             $j.each(header, (k, col) => {
-    //                 let hash = col.split('%')
-    //                 let options = hash.length > 1 ? {
-    //                     title: hash[0],
-    //                     tableClass: ".sampleTable",
-    //                     acTerm: hash[1],
-    //                     ableToRemove: false,
-    //                     extraInfo: v.id, //sampleId
-    //                     originalTitle: col
-    //                 } : {
-    //                     title: col,
-    //                     tableClass: ".sampleTable",
-    //                     ableToRemove: false,
-    //                     extraInfo: v.id,
-    //                     originalTitle: col
-    //                 }
-    //                 addColumn(options)
-    //             })
-    //         }
-    //     })
-    //     // Create the data object
-    //     let firstTable = TryJsonParse(dt[0].content)
-    //     if (firstTable) {
-    //         $j.each(firstTable, (k, v) => {
-    //             let row = {}, //v,
-    //                 id = v.id
-    //             $j.each(dt, (i, table) => {
-    //                 if (i <= index) {
-    //                     let currTable = TryJsonParse(table.content)
-    //                     if (currTable) {
-    //                         row = {
-    //                             ...row,
-    //                             ...currTable[k]
-    //                         }
-    //                     }
-    //                 }
-    //             })
-    //             baseData.push({
-    //                 ...row,
-    //                 id
-    //             })
-    //         })
-    //     }
-    //     //  console.log("baseData");
-    //     //  console.log(baseData);
-    //     // Populte table + apply ontology
-    //     if (baseData[0].id)
-    //         for (let i = 0; i < baseData.length; i++) addTableRow('.sampleTable', baseData[i])
-    //     add_remove_action(".sampleTable")
-    // }
-
-    // function loadMethod(std_id, asy_id) {
-    //     $j("#text_content").show()
-    //     $j.ajax({
-    //         type: 'GET',
-    //         cache: false,
-    //         url: pid + '/text_content',
-    //         data: {
-    //             std_id,
-    //             item_id: asy_id,
-    //             item_type: "method"
-    //         },
-    //         success: result => {
-    //             if (!result) {
-    //                 alert('Error retrieving content!')
-    //                 return
-    //             }
-    //             $j('#txt_file_content').val(result.data)
-    //             $j("#methodTitle").html(result.title)
-    //         }
-    //     })
-    // }
-
-    // $j('#btn_save_method').on('click', () => {
-    //     let std_id = $j("#selected_std_asy").attr('data-selected').split('_')[0]
-    //     let asy_id = $j("#selected_std_asy").attr('data-selected').split('_')[1]
-    //     let content = $j("#txt_file_content").val()
-    //     update_method(std_id, asy_id, content)
-    // })
+    function deleteSample(samples) {
+        $j.each(samples, (k, sample) => {
+            $j.ajax({
+                method: 'DELETE',
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                cache: false,
+                url: `/samples/${sample.sampleId}`,
+                success: s => {
+                    console.log('The sample was deleted successfully!')
+                },
+                error: (e) => {
+                    alert('An error occurred when deleting the sample')
+                }
+            })
+        })
+    }
 
     function addCustomCol(tblClass, bias, text = '', acTerm = '') {
         if (text.length == 0) text = $j.trim($j('.customCol').val())
@@ -307,22 +380,22 @@
 
     function AddRow(table) {
         let rowCount = $j(table).rowcount() + 1;
-        let newRow;
+        let newRow = "<td><input type='checkbox'/></td>";
         let rowId = uniqId()
         $j(table + ' thead tr').find('th').each(function(k, v) {
-            newRow += $j.trim($j(v).text().toLowerCase()) == "link_id" ? `<td>${rowId}</td>` :
+            if (k > 0) // Skips the select column
+                newRow += $j.trim($j(v).text().toLowerCase()) == "link_id" ? `<td>${rowId}</td>` :
                 '<td contenteditable></td>'
         });
         $j(table + ' tbody').append('<tr data-new="true">' + newRow + '</tr>')
-        setTableOntology(table)
     }
 
     function uniqId() {
         // return Math.random().toString(36).replace(/[^1-z]+/g, '').substr(0, 5);
         var result = '';
-        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
         var charactersLength = characters.length;
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < 8; i++) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
         return result;
@@ -335,36 +408,6 @@
     $j.fn.rowcount = function() {
         return $j('tr', $j(this).find('tbody')).length;
     };
-
-    // function AddCell(table, newColName) {
-    //     let colCount = $j(table).columnCount() + 1;
-    //     if (newColName.length < 3) {
-    //         alert("Please enter a valid column name!");
-    //         return;
-    //     }
-    //     if ($j(table).find('thead tr').find('th').length == 0) $j(table).find('thead tr').append('<th>' + newColName +
-    //         '</th>')
-    //     else $j(table).find('thead tr').find('th').eq(colCount - 2).after('<th>' + newColName + '</th>');
-    //     $j(table).find('tr').each(function() {
-    //         $j(this).find('td').eq(colCount - 2).after('<td contenteditable></td>');
-    //     });
-    // }
-
-    // function update_iotable(std_id, sample_id, content) {
-    //     $j.ajax({
-    //         type: 'PATCH',
-    //         cache: false,
-    //         url: pid + '/update_iotable',
-    //         data: {
-    //             std_id,
-    //             sample_id, // array
-    //             content // array
-    //         },
-    //         success: result => {
-    //             alert('Content saved successfully!')
-    //         }
-    //     })
-    // }
 
     function update_method(std_id, asy_id, content) {
         $j.ajax({
@@ -382,64 +425,28 @@
         })
     }
 
-
-    function applyOntology(tblClass, column, term) {
-
-
-        if (term.match("^custom")) {
-            $j(`${tblClass} tbody tr td:nth-child(${column})`).autocomplete({
-                source: acSource[term.split('-')[1]],
-                mustMatch: true
-            });
-        } else if (term.match("^generated")) {
-            let tds = $j(`${tblClass} tbody tr td:nth-child(${column})`)
-
-            $j.each(tds, (key, val) => {
-                if (!$j(tds[key]).attr("applied")) {
-                    $j(tds[key]).attr("applied", true)
-                    let temp = $j(tds[key]).text()
-                    $j(tds[key]).empty()
-                    $j(tds[key]).append(appendDropDown(GSource[term.split('-')[1]]))
-                    $j(tds[key]).children(':first').val(temp)
-                }
-            })
-        } else if (term.match("^attribute")) {
-            // TO BE IMPLEMENTED
-            let _term = term.split('-')[1]
-            for (let i = 0; i < methodTypes.length; i++) {
-                for (let j = 0; j < methodTypes[i].attributes.length; j++) {
-                    if (methodTypes[i].attributes[j].title == _term) {
-                        $j(`${tblClass} tbody tr td:nth-child(${column})`).autocomplete({
-                            source: methodTypes[i].attributes[j].ontology,
-                            mustMatch: true
-                        });
-                        return
-                    }
-                }
-            }
-
-        } else {
+    function setAutoComplete(e, IRI) {
+        $j(e).bind("keyup", function(event) {
             $j.ajax({
-                type: 'GET',
-                url: `https://fairdomhub.be/ontology/ontology/${term}`,
+                method: 'GET',
+                url: 'http://www.ebi.ac.uk/ols/api/select',
+                data: {
+                    fieldList: "label",
+                    rows: "10",
+                    ontology: "efo",
+                    q: `label:*${$j(e).html()}*`,
+                    allChildrenOf: IRI || undefined
+                },
                 cache: true,
                 success: s => {
-                    $j(`${tblClass} tbody tr td:nth-child(${column})`).autocomplete({
-                        source: eval(s),
+                    const source = $j.map(s.response.docs, (k, i) => k.label)
+                    $j(e).autocomplete({
+                        source,
                         mustMatch: true
                     });
-                    $j(`${tblClass} thead tr th:nth-child(${column})`).data("term", term);
                 }
             })
-        }
-    }
-
-    function setTableOntology(tblClass) {
-        let cols = $j(`${tblClass} thead tr th`)
-        for (let i = 0; i < cols.length; i++) {
-            let term = $j(`${tblClass} thead tr th:nth-child(${i + 1})`).data("term") || undefined
-            if (term) applyOntology(tblClass, i + 1, term)
-        }
+        })
     }
 
     function sample_add_row(tblClass) {
@@ -462,6 +469,8 @@
         })
     }
     $j("#sample_add_col").on("click", () => {
+        alert('This feature is not currently available.')
+        return
         showPreDefinedCols(event, '.sampleTable', 2)
     })
 
@@ -474,4 +483,37 @@
         select += "</select>"
         return select
     }
+
+    function selectAll(e) {
+        const checkBoxes = $j('.sampleTable tr td:first-child input')
+        $j.each(checkBoxes, (i, k) => {
+            k.checked = e.checked
+        })
+    }
+
+    function deselectAll() {
+        const checkBoxes = $j('.sampleTable tr td:first-child input')
+        $j.each(checkBoxes, (i, k) => {
+            k.checked = false
+        })
+    }
+
+    $j("#sample_delete").on("click", () => {
+        if (confirm("Are you sure you want to delete the selected samples?")) {
+            const selectedSamples = $j(".sampleTable tbody tr td:first-child")
+
+            $j.each(selectedSamples, (i, k) => {
+                if (($j(k).find("input")[0]).checked) {
+                    $j(k).parent().attr("delete", true)
+                    $j.each($j(k).parent().find("td"), (j, v) => {
+                        $j(v).attr("contenteditable", false)
+                            .css('background-color', '#cfcfcf')
+                            .css('border-color', '#b5b5b5')
+                            .css('text-decoration', 'line-through')
+                    })
+                }
+            })
+            deselectAll()
+        }
+    })
 </script>
