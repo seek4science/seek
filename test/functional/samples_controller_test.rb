@@ -127,6 +127,23 @@ class SamplesControllerTest < ActionController::TestCase
     assert !sample.get_attribute_value(:bool)
   end
 
+  test 'create with symbols' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:sample_type_with_symbols)
+    assert_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: type.id,
+                                        "#{Seek::JSONMetadata::METHOD_PREFIX}title&": 'A',
+                                        "#{Seek::JSONMetadata::METHOD_PREFIX}name ++##!": 'B' ,
+                                        "#{Seek::JSONMetadata::METHOD_PREFIX}size range (bp)":'C',
+                                        project_ids: [person.projects.first.id] } }
+    end
+    assert_not_nil sample = assigns(:sample)
+    assert_equal 'A',sample.get_attribute_value('title&')
+    assert_equal 'B',sample.get_attribute_value('name ++##!')
+    assert_equal 'C',sample.get_attribute_value('size range (bp)')
+  end
+
   test 'create and update with boolean' do
     person = Factory(:person)
     login_as(person)
