@@ -427,9 +427,14 @@
 
     function setAutoComplete(e, IRI) {
         $j(e).bind("keyup", function(event) {
+            const proxy = 'https://cors-anywhere.herokuapp.com/'
             $j.ajax({
                 method: 'GET',
-                url: 'http://www.ebi.ac.uk/ols/api/select',
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                },
+                contentType: 'text/plain',
+                url: proxy + 'http://www.ebi.ac.uk/ols/api/select',
                 data: {
                     fieldList: "label",
                     rows: "10",
@@ -437,7 +442,7 @@
                     q: `label:*${$j(e).html()}*`,
                     allChildrenOf: IRI || undefined
                 },
-                cache: true,
+                // cache: true,
                 success: s => {
                     const source = $j.map(s.response.docs, (k, i) => k.label)
                     $j(e).autocomplete({
