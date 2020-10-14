@@ -1119,5 +1119,27 @@ class SampleTest < ActiveSupport::TestCase
 
   end
 
+  test 'accessor with symbols' do
+    project = Factory(:project)
+    sample_type = Factory(:sample_type_with_symbols, project_ids: [project.id])
+    sample = Sample.new(sample_type: sample_type, project_ids:[project.id])
+    sample.set_attribute_value("title&","A")
+    sample.set_attribute_value('name ++##!','B')
+    sample.set_attribute_value('size range (bp)', 'C')
+    assert_equal 'A',sample.get_attribute_value('title&')
+    assert_equal 'B',sample.get_attribute_value('name ++##!')
+    assert_equal 'C',sample.get_attribute_value('size range (bp)')
+  end
+
+  test 'mass assignment with symbols' do
+    project = Factory(:project)
+    sample_type = Factory(:sample_type_with_symbols, project_ids: [project.id])
+    sample = Sample.new(sample_type: sample_type, project_ids:[project.id])
+    sample.update_attributes(data: { 'title&':'A','name ++##!':'B','size range (bp)':'C' })
+    assert_equal 'A',sample.get_attribute_value('title&')
+    assert_equal 'B',sample.get_attribute_value('name ++##!')
+    assert_equal 'C',sample.get_attribute_value('size range (bp)')
+  end
+
 
 end
