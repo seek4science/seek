@@ -817,8 +817,8 @@ class StudiesControllerTest < ActionController::TestCase
       cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
                                                    "#{Seek::JSONMetadata::METHOD_PREFIX}+name":'+name',
                                                    "#{Seek::JSONMetadata::METHOD_PREFIX}-name":'-name',
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}&name":'&name'}
-      }
+                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}&name":'&name',
+                                                    "#{Seek::JSONMetadata::METHOD_PREFIX}name(name)":'name(name)'}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -832,6 +832,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal '+name',cm.get_attribute_value('+name')
     assert_equal '-name',cm.get_attribute_value('-name')
     assert_equal '&name',cm.get_attribute_value('&name')
+    assert_equal 'name(name)',cm.get_attribute_value('name(name)')
   end
 
   test 'experimentalists only shown if set' do
