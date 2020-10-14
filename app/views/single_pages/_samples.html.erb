@@ -388,6 +388,11 @@
                 '<td contenteditable></td>'
         });
         $j(table + ' tbody').append('<tr data-new="true">' + newRow + '</tr>')
+          // Set the Auto Complete
+        $j.each($j('.sampleTable tbody tr:last td:not(:first-child)'), (i, k) => {
+            const IRI = $j(k).closest('table').find('th').eq($j(k).index()).attr("IRI")
+            setAutoComplete(k, IRI)
+        })
     }
 
     function uniqId() {
