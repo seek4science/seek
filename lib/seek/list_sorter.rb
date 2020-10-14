@@ -33,6 +33,10 @@ module Seek
       updated_at_desc: { title: 'Last update date (Descending)', order: 'updated_at DESC' },
       created_at_asc: { title: 'Creation date (Ascending)', order: 'created_at' },
       created_at_desc: { title: 'Creation date (Descending)', order: 'created_at DESC' },
+      relevance: { title: 'Relevance', order: '--relevance', proc: -> (items) {
+        ids = items.solr_cache(items.last_solr_query)
+        ids.map { |id| Arel::Nodes::Descending.new(items.arel_table[:id].eq(id)) }
+      } }
     }.with_indifferent_access.freeze
 
     # sort items in the related items hash according the rule for its type
@@ -49,8 +53,12 @@ module Seek
       if items.is_a?(ActiveRecord::Relation)
         orderings = strategy_for_relation(order, items)
         # Postgres requires any columns being ORDERed to be explicitly SELECTed (only when using DISTINCT?).
-        columns = [items.arel_table[Arel.star]] + orderings.reject { |n| n.is_a?(Arel::Nodes::Ordering) }
-        items.select(columns).order(orderings)
+        columns = [items.arel_table[Arel.star]] + orderings.reject { |n| n.is_a?(Proc) || n.is_a?(Arel::Nodes::Ordering) }
+        items = items.select(columns)
+        orderings.each do |ordering|
+          items = items.order(ordering.is_a?(Proc) ? ordering.call(items) : ordering)
+        end
+        items
       else
         items.sort(&strategy_for_enum(order))
       end
@@ -105,15 +113,19 @@ module Seek
     def self.strategy_for_relation(order, relation)
       fields_and_directions = order.split(',').map do |f|
         field, order = f.strip.split(' ', 2)
-        m = field.match(/LOWER\((.+)\)/)
-        field = m[1] if m
-        arel_field = relation.arel_table[field.to_sym]
-        arel_field = arel_field.eq(nil) if order == 'IS NULL'
-        arel_field = arel_field.lower if m
-        unless arel_field.is_a?(Arel::Nodes::Equality)
-          arel_field = order&.match?(/desc/i) ? arel_field.desc : arel_field.asc
+        if field.start_with?('--')
+          ORDER_OPTIONS[field.sub('--', '').to_sym][:proc]
+        else
+          m = field.match(/LOWER\((.+)\)/)
+          field = m[1] if m
+          arel_field = relation.arel_table[field.to_sym]
+          arel_field = arel_field.eq(nil) if order == 'IS NULL'
+          arel_field = arel_field.lower if m
+          unless arel_field.is_a?(Arel::Nodes::Equality)
+            arel_field = order&.match?(/desc/i) ? arel_field.desc : arel_field.asc
+          end
+          arel_field
         end
-        arel_field
       end
 
       # Note: The following fixes an inconsistency between sorting relations and enumerables.
