@@ -53,12 +53,8 @@ module Seek
       if items.is_a?(ActiveRecord::Relation)
         orderings = strategy_for_relation(order, items)
         # Postgres requires any columns being ORDERed to be explicitly SELECTed (only when using DISTINCT?).
-        columns = [items.arel_table[Arel.star]] + orderings.reject { |n| n.is_a?(Proc) || n.is_a?(Arel::Nodes::Ordering) }
-        items = items.select(columns)
-        orderings.each do |ordering|
-          items = items.order(ordering.is_a?(Proc) ? ordering.call(items) : ordering)
-        end
-        items
+        columns = [items.arel_table[Arel.star]] + orderings.reject { |n| n.is_a?(Arel::Nodes::Ordering) }
+        items.select(columns).order(orderings)
       else
         items.sort(&strategy_for_enum(order))
       end
@@ -111,7 +107,7 @@ module Seek
 
     # Returns an Array of Arel "orderings", which can be passed into `SomeModel#order` to sort a relation.
     def self.strategy_for_relation(order, relation)
-      fields_and_directions = order.split(',').map do |f|
+      fields_and_directions = order.split(',').flat_map do |f|
         field, order = f.strip.split(' ', 2)
         if field.start_with?('--')
           ORDER_OPTIONS[field.sub('--', '').to_sym][:proc]
