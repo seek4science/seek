@@ -815,10 +815,12 @@ class StudiesControllerTest < ActionController::TestCase
       investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
       cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}+name":'+name',
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}-name":'-name',
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}&name":'&name',
-                                                    "#{Seek::JSONMetadata::METHOD_PREFIX}name(name)":'name(name)'}}
+                                        data:{
+                                            "+name":'+name',
+                                            "-name":'-name',
+                                            "&name":'&name',
+                                            "name(name)":'name(name)'
+                                        }}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end

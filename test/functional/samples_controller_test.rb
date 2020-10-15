@@ -103,6 +103,26 @@ class SamplesControllerTest < ActionController::TestCase
     assert SampleTypeUpdateJob.new(type, false).exists?
   end
 
+  test 'create with validation error' do
+    person = Factory(:person)
+    creator = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assert_no_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: type.id,
+                                        data: { 'full name': 'Fred Smith', age: 'Fish' },
+                                        project_ids: [person.projects.first.id], creator_ids: [creator.id] } }
+    end
+    assert assigns(:sample)
+    sample = assigns(:sample)
+    assert_equal 'Fred Smith', sample.title
+    assert_equal 'Fred Smith', sample.get_attribute_value('full name')
+    assert_equal 'Fish', sample.get_attribute_value(:age)
+
+    refute sample.valid?
+
+  end
+
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
   test 'create and update with boolean from form' do
     person = Factory(:person)
@@ -133,9 +153,11 @@ class SamplesControllerTest < ActionController::TestCase
     type = Factory(:sample_type_with_symbols)
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id,
-                                        "#{Seek::JSONMetadata::METHOD_PREFIX}title&": 'A',
-                                        "#{Seek::JSONMetadata::METHOD_PREFIX}name ++##!": 'B' ,
-                                        "#{Seek::JSONMetadata::METHOD_PREFIX}size range (bp)":'C',
+                                        data:{
+                                            "title&": 'A',
+                                            "name ++##!": 'B' ,
+                                            "size range (bp)":'C'
+                                        },
                                         project_ids: [person.projects.first.id] } }
     end
     assert_not_nil sample = assigns(:sample)
