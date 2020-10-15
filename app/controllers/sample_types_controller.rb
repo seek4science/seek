@@ -79,8 +79,13 @@ class SampleTypesController < ApplicationController
   # PUT /sample_types/1
   # PUT /sample_types/1.json
   def update
+
+    if request.headers["Content-Type"] == "application/vnd.api+json" && request.request_method == "PUT"
+      @sample_attributes = SampleType.find(params[:id]).sample_attributes
+      SampleType.find(params[:id]).sample_attributes = []
+    end
+
     @sample_type.update_attributes(sample_type_params)
-    @sample_type.update_sample_type_attribute(params[:sample_type][:attribute_map]) if request.headers["Content-Type"] == "application/vnd.api+json" && request.request_method == "PUT"
     @sample_type.resolve_inconsistencies
     respond_to do |format|
       if @sample_type.save
@@ -139,18 +144,18 @@ class SampleTypesController < ApplicationController
 
   def sample_type_params
     attribute_map = params[:sample_type][:attribute_map]
-    if (attribute_map)
+      if (attribute_map)
       params[:sample_type][:sample_attributes_attributes] =[]
       attribute_map.each do |attribute|
         attribute[:sample_attribute_type_id] = attribute[:sample_attibute_type][:id]
         params[:sample_type][:sample_attributes_attributes] << attribute
+        end
       end
-    end
 
     if(params[:sample_type][:assay_assets_attributes])
       params[:sample_type][:assay_ids] = params[:sample_type][:assay_assets_attributes].map{|x| x[:assay_id]}
     end
-    
+
     params.require(:sample_type).permit(:title, :description, :tags,
                                         { project_ids: [],
                                           sample_attributes_attributes: [:id, :title, :pos, :required, :is_title,

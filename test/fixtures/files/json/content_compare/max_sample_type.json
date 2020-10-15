@@ -21,7 +21,6 @@
           "pos": "1",
           "unit_id": null,
           "is_title": true,
-          "accessor_name": "full_name",
           "sample_controlled_vocab_id": null,
           "linked_sample_type_id": null
         },
@@ -40,7 +39,6 @@
           "pos": "2",
           "unit_id": null,
           "is_title": false,
-          "accessor_name": "address",
           "sample_controlled_vocab_id": null,
           "linked_sample_type_id": null
         },
@@ -59,7 +57,6 @@
           "pos": "3",
           "unit_id": null,
           "is_title": false,
-          "accessor_name": "postcode",
           "sample_controlled_vocab_id": null,
           "linked_sample_type_id": null
         }
