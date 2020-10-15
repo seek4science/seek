@@ -110,7 +110,7 @@ module Seek
       fields_and_directions = order.split(',').flat_map do |f|
         field, order = f.strip.split(' ', 2)
         if field.start_with?('--')
-          ORDER_OPTIONS[field.sub('--', '').to_sym][:proc]
+          ORDER_OPTIONS[field.sub('--', '').to_sym][:proc].call(relation)
         else
           m = field.match(/LOWER\((.+)\)/)
           field = m[1] if m
