@@ -111,8 +111,8 @@ class ApplicationRecord < ActiveRecord::Base
   def self.solr_cache(query)
     init_solr_cache
     RequestStore.store[:solr][table_name][:last_query] = query
-    RequestStore.store[:solr][table_name][query] ||= yield
-    RequestStore.store[:solr][table_name][query]
+    RequestStore.store[:solr][table_name][query] ||= yield if block_given?
+    RequestStore.store[:solr][table_name][query] || []
   end
 
   def self.last_solr_query
