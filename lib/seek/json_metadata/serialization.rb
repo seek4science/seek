@@ -1,6 +1,5 @@
 module Seek
   module JSONMetadata
-
     module Serialization
       extend ActiveSupport::Concern
 
