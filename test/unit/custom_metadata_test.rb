@@ -112,24 +112,6 @@ class CustomMetadataTest < ActiveSupport::TestCase
     assert_equal 'name(name)',cm.get_attribute_value('name(name)')
   end
 
-  test 'accessor methods - with spaces' do
-    cm = CustomMetadata.new(custom_metadata_type: Factory.build(:study_custom_metadata_type_with_spaces), item: Factory(:study))
-    cm.send(Seek::JSONMetadata::METHOD_PREFIX+'full name=',"Stuart Little")
-    assert_equal "Stuart Little", cm.send(Seek::JSONMetadata::METHOD_PREFIX+'full name')
-  end
-
-  test 'accessor methods - with symbols' do
-    cm = CustomMetadata.new(custom_metadata_type: Factory.build(:study_custom_metadata_type_with_symbols), item: Factory(:study))
-    cm.send(Seek::JSONMetadata::METHOD_PREFIX+'+name=',"+name")
-    cm.send(Seek::JSONMetadata::METHOD_PREFIX+'-name=',"-name")
-    cm.send(Seek::JSONMetadata::METHOD_PREFIX+'&name=',"&name")
-    cm.send(Seek::JSONMetadata::METHOD_PREFIX+'name(name)=',"name(name)")
-    assert_equal "+name", cm.send(Seek::JSONMetadata::METHOD_PREFIX+'+name')
-    assert_equal "-name", cm.send(Seek::JSONMetadata::METHOD_PREFIX+'-name')
-    assert_equal "&name", cm.send(Seek::JSONMetadata::METHOD_PREFIX+'&name')
-    assert_equal "name(name)", cm.send(Seek::JSONMetadata::METHOD_PREFIX+'name(name)')
-  end
-
   test 'construct with item with mass assigment' do
     metadata_type = Factory(:simple_study_custom_metadata_type)
     contributor = Factory(:person)

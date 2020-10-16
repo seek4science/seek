@@ -32,52 +32,6 @@ class SampleTest < ActiveSupport::TestCase
     assert_not_nil sample.attributes['uuid']
   end
 
-  test 'responds to correct methods when sample type assigned' do
-    sample = Factory.build(:sample, sample_type: Factory(:patient_sample_type))
-    sample.save(validate: false)
-    sample = Sample.find(sample.id)
-    refute_nil sample.sample_type
-
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name'
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name='
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'age'
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'age='
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'postcode'
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'postcode='
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'weight'
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'weight='
-
-    # doesn't affect all sample classes
-    sample = Factory(:sample, sample_type: Factory(:simple_sample_type))
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name'
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name='
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'age'
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'age='
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'postcode'
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'postcode='
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'weight'
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'weight='
-  end
-
-  test 'removes methods with new assigned type' do
-    sample = Sample.new title: 'testing'
-    sample.sample_type = Factory(:patient_sample_type)
-
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name'
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name='
-
-    sample.sample_type = Factory(:simple_sample_type)
-
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name'
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name='
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'age'
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'age='
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'postcode'
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'postcode='
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'weight'
-    refute_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'weight='
-  end
-
   test 'mass assignment' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
@@ -105,7 +59,7 @@ class SampleTest < ActiveSupport::TestCase
     sample.set_attribute_value(:postcode, 'fish')
     refute sample.valid?
     assert_equal 1, sample.errors.count
-    assert_equal 'is not a valid Post Code', sample.errors[(Seek::JSONMetadata::METHOD_PREFIX + 'postcode').to_sym].first
+    assert_equal 'is not a valid Post Code', sample.errors[('postcode').to_sym].first
     sample.set_attribute_value(:postcode, 'M13 9PL')
     assert sample.valid?
   end
@@ -180,16 +134,6 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
 
-    # Method name
-    sample.send((Seek::JSONMetadata::METHOD_PREFIX + 'postcode=').to_sym, 'M14 8PL')
-    disable_authorization_checks { sample.save! }
-
-    sample = Sample.find(sample.id)
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
-    assert_equal 28, sample.get_attribute_value(:age)
-    assert_equal 88.9, sample.get_attribute_value(:weight)
-    assert_equal 'M14 8PL', sample.get_attribute_value(:postcode)
-
     # Hash
     sample.data[:weight] = 90.1
     disable_authorization_checks { sample.save! }
@@ -198,7 +142,7 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 28, sample.get_attribute_value(:age)
     assert_equal 90.1, sample.get_attribute_value(:weight)
-    assert_equal 'M14 8PL', sample.get_attribute_value(:postcode)
+    assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
   end
 
   test 'various methods of sample data assignment perform conversions' do
@@ -225,12 +169,6 @@ class SampleTest < ActiveSupport::TestCase
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert !sample.data[:bool]
-
-    # Method name
-    sample.send((Seek::JSONMetadata::METHOD_PREFIX + 'bool=').to_sym, '1')
-    assert sample.valid?
-    disable_authorization_checks { sample.save! }
-    assert sample.data[:bool]
 
     # Hash
     sample.data[:bool] = '0'
@@ -372,13 +310,11 @@ class SampleTest < ActiveSupport::TestCase
     id = sample.id
     assert_equal 5, sample.sample_type.sample_attributes.count
     assert_equal ['full name','age', 'weight', 'address', 'postcode'], sample.sample_type.sample_attributes.collect(&:accessor_name)
-    assert_respond_to sample, Seek::JSONMetadata::METHOD_PREFIX + 'full name'
 
     sample2 = Sample.find(id)
     assert_equal id, sample2.id
     assert_equal 5, sample2.sample_type.sample_attributes.count
     assert_equal ['full name','age', 'weight', 'address', 'postcode'], sample2.sample_type.sample_attributes.collect(&:original_accessor_name)
-    assert_respond_to sample2, Seek::JSONMetadata::METHOD_PREFIX + 'full name'
   end
 
   test 'projects' do
@@ -615,7 +551,7 @@ class SampleTest < ActiveSupport::TestCase
     sample.set_attribute_value(:seekstrain, '')
 
     refute sample.valid?
-    assert_not_empty sample.errors[strain_attribute.method_name]
+    assert_not_empty sample.errors[strain_attribute.title]
   end
 
   test 'strain attributes can appear as related items' do
@@ -722,9 +658,6 @@ class SampleTest < ActiveSupport::TestCase
     assert sample.valid?
     disable_authorization_checks { sample.save! }
 
-    assert sample.respond_to?(attribute1.method_name.to_sym)
-    assert sample.respond_to?(attribute2.method_name.to_sym)
-    refute sample.respond_to?(Seek::JSONMetadata::METHOD_PREFIX + 'hello_kitty')
     refute sample.respond_to?(:banana_type)
     refute sample.respond_to?(:license)
 
@@ -736,9 +669,6 @@ class SampleTest < ActiveSupport::TestCase
       sample.banana_type
     end
 
-    assert_nothing_raised do
-      sample.send(attribute1.method_name.to_sym)
-    end
   end
 
   test 'samples extracted from a data file cannot be edited' do
