@@ -49,8 +49,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert assigns(:sample)
     assert_equal type, assigns(:sample).sample_type
   end
-
-  #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
+  
   test 'create from form' do
     person = Factory(:person)
     creator = Factory(:person)
@@ -58,10 +57,11 @@ class SamplesControllerTest < ActionController::TestCase
     type = Factory(:patient_sample_type)
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id,
-                              "#{Seek::JSONMetadata::METHOD_PREFIX}full name": 'Fred Smith',
-                              "#{Seek::JSONMetadata::METHOD_PREFIX}age": '22',
-                              "#{Seek::JSONMetadata::METHOD_PREFIX}weight": '22.1',
-                              "#{Seek::JSONMetadata::METHOD_PREFIX}postcode": 'M13 9PL' ,
+                                        data:{
+                              "full name": 'Fred Smith',
+                              "age": '22',
+                              "weight": '22.1',
+                              "postcode": 'M13 9PL'} ,
                               project_ids: [person.projects.first.id], other_creators:'frank, mary', creator_ids: [creator.id] } }
     end
     assert assigns(:sample)
