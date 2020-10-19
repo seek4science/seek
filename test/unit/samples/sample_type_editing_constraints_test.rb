@@ -62,7 +62,7 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     refute c.allow_required?(:address)
     refute c.allow_required?(:postcode)
     assert c.allow_required?(:age)
-    assert c.allow_required?(:full_name)
+    assert c.allow_required?('full name')
 
     # accespts attribute
     attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'address' }
@@ -78,7 +78,7 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     refute c.allow_attribute_removal?(:address)
     assert c.allow_attribute_removal?(:postcode)
     refute c.allow_attribute_removal?(:age)
-    refute c.allow_attribute_removal?(:full_name)
+    refute c.allow_attribute_removal?('full name')
     # accespts attribute
     attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'address' }
     refute_nil attr
@@ -109,7 +109,7 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     assert c.send(:blanks?, :address)
     assert c.send(:blanks?, :postcode)
     refute c.send(:blanks?, :age)
-    refute c.send(:blanks?, :full_name)
+    refute c.send(:blanks?, 'full name')
   end
 
   test 'all_blank?' do
@@ -117,7 +117,7 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     refute c.send(:all_blank?, :address)
     assert c.send(:all_blank?, :postcode)
     refute c.send(:all_blank?, :age)
-    refute c.send(:all_blank?, :full_name)
+    refute c.send(:all_blank?, 'full name')
   end
 
   test 'allow_new_attribute' do
@@ -141,20 +141,20 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
       project = person.projects.first
       sample_type = Factory(:patient_sample_type, project_ids: [project.id])
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute_value(:full_name, 'Fred Blogs')
+      sample.set_attribute_value('full name', 'Fred Blogs')
       sample.set_attribute_value(:age, 22)
       sample.set_attribute_value(:weight, 12.2)
       sample.set_attribute_value(:address, 'Somewhere')
       sample.save!
 
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute_value(:full_name, 'Fred Jones')
+      sample.set_attribute_value('full name', 'Fred Jones')
       sample.set_attribute_value(:age, 22)
       sample.set_attribute_value(:weight, 12.2)
       sample.save!
 
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute_value(:full_name, 'Fred Smith')
+      sample.set_attribute_value('full name', 'Fred Smith')
       sample.set_attribute_value(:age, 22)
       sample.set_attribute_value(:weight, 12.2)
       sample.set_attribute_value(:address, 'Somewhere else')

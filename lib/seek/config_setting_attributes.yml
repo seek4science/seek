@@ -210,3 +210,4 @@ omniauth_github_client_id:
 omniauth_github_secret:
   encrypt: true
 ga4gh_trs_api_enabled:
+custom_metadata_enabled: false

@@ -593,4 +593,18 @@ class ApplicationController < ActionController::Base
       collection
     end
   end
+
+  def determine_custom_metadata_keys
+    keys = []
+    root_key = controller_name.singularize.to_sym
+    attribute_params = params[root_key][:custom_metadata_attributes]
+    if attribute_params && attribute_params[:custom_metadata_type_id].present?
+      metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
+      if metadata_type
+        keys = [:custom_metadata_type_id]
+        keys = keys + [{data:[metadata_type.custom_metadata_attributes.collect(&:title)]}]
+      end
+    end
+    keys
+  end
 end
