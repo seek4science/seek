@@ -277,14 +277,4 @@ class FoldersControllerTest < ActionController::TestCase
     get :index, params: { project_id: @project.id }
     assert_response :success
   end
-
-  test 'breadcrumb for project folder' do
-    get :index, params: { project_id: @project.id }
-    assert_response :success
-    assert_select 'div.breadcrumbs', text: /Home #{I18n.t('project').pluralize} Index #{@project.title} Folders Index/, count: 1 do
-      assert_select 'a[href=?]', root_path, count: 1
-      assert_select 'a[href=?]', projects_url, count: 1
-      assert_select 'a[href=?]', project_url(@project), count: 1
-    end
-  end
 end

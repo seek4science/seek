@@ -14,7 +14,6 @@ class StudiesController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
   include Seek::AnnotationCommon
-  include Seek::BreadCrumbs
   include Seek::IsaGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
@@ -130,6 +129,7 @@ class StudiesController < ApplicationController
 
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
-                                  :other_creators, { creator_ids: [] }, { scales: [] }, { publication_ids: [] })
+                                  :other_creators, { creator_ids: [] }, { scales: [] }, { publication_ids: [] },
+                                  { custom_metadata_attributes: determine_custom_metadata_keys })
   end
 end

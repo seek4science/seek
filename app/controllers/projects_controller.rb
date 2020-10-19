@@ -30,7 +30,6 @@ class ProjectsController < ApplicationController
   skip_before_action :project_membership_required
 
   cache_sweeper :projects_sweeper, only: %i[update create destroy]
-  include Seek::BreadCrumbs
 
   include Seek::IsaGraphExtensions
 

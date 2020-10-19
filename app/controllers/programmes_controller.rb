@@ -15,8 +15,6 @@ class ProgrammesController < ApplicationController
 
   skip_before_action :project_membership_required
 
-  include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
 
   respond_to :html, :json
