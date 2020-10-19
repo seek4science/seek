@@ -654,7 +654,9 @@ SEEK::Application.routes.draw do
         get "/flowchart/:study_id" => "single_pages#flowchart"
         get "/sample_table/:assay_id" => "single_pages#sample_table"
         get "/sample_source/:study_id" => "single_pages#sample_source"
+        get :ontology
         post :update_flowchart
+
       end
   end
 

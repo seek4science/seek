@@ -388,7 +388,7 @@
                 '<td contenteditable></td>'
         });
         $j(table + ' tbody').append('<tr data-new="true">' + newRow + '</tr>')
-          // Set the Auto Complete
+        // Set the Auto Complete
         $j.each($j('.sampleTable tbody tr:last td:not(:first-child)'), (i, k) => {
             const IRI = $j(k).closest('table').find('th').eq($j(k).index()).attr("IRI")
             setAutoComplete(k, IRI)
@@ -432,32 +432,51 @@
 
     function setAutoComplete(e, IRI) {
         $j(e).bind("keyup", function(event) {
-            const proxy = 'https://cors-anywhere.herokuapp.com/'
+            const setSource = (data) => {
+                $j(e).autocomplete({
+                    source: data || [],
+                    mustMatch: true
+                });
+            }
+            const url = `/single_pages/${pid}/ontology?iri=${IRI}`
             $j.ajax({
                 method: 'GET',
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
+                dataType: "json",
+                url,
+                cache: true,
+                beforeSend: function() {
+                    if (localCache.exist(url)) {
+                        setSource(localCache.get(url))
+                        return false;
+                    }
+                    return true;
                 },
-                contentType: 'text/plain',
-                url: proxy + 'http://www.ebi.ac.uk/ols/api/select',
-                data: {
-                    fieldList: "label",
-                    rows: "10",
-                    ontology: "efo",
-                    q: `label:*${$j(e).html()}*`,
-                    allChildrenOf: IRI || undefined
-                },
-                // cache: true,
-                success: s => {
-                    const source = $j.map(s.response.docs, (k, i) => k.label)
-                    $j(e).autocomplete({
-                        source,
-                        mustMatch: true
-                    });
+                complete: function(jqXHR, textStatus) {
+                    const data = jqXHR.responseJSON.data
+                    localCache.set(url, data, setSource(data));
                 }
             })
         })
     }
+
+    var localCache = {
+        data: {},
+        remove: function(url) {
+            delete localCache.data[url];
+        },
+        exist: function(url) {
+            return localCache.data.hasOwnProperty(url) && localCache.data[url] !== null;
+        },
+        get: function(url) {
+            console.log('Getting in cache for url' + url);
+            return localCache.data[url];
+        },
+        set: function(url, cachedData, callback) {
+            localCache.remove(url);
+            localCache.data[url] = cachedData;
+            if ($j.isFunction(callback)) callback(cachedData);
+        }
+    };
 
     function sample_add_row(tblClass) {
         AddRow(tblClass)

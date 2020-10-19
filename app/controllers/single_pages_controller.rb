@@ -17,9 +17,6 @@ class SinglePagesController < ApplicationController
     end
   end
 
-  # include Seek::BreadCrumbs
-
-
   def single_page_enabled
     unless Seek::Config.project_single_page_enabled
       flash[:error]="Not available"
@@ -99,7 +96,7 @@ class SinglePagesController < ApplicationController
     end
   end
 
-  #GET  study_id
+  #GET study_id
   def sample_source 
     flowchart = Flowchart.where(study_id: params[:study_id]).first
     if (flowchart)
@@ -137,6 +134,18 @@ class SinglePagesController < ApplicationController
     # rescue Exception => e
     #    render json: {status: :unprocessable_entity, error: e.message } 
     # end
+  end
+
+
+  #GET
+  def ontology
+    begin
+      reader = Seek::Ontologies::SourceTypeReader.instance
+      labels = reader.class_for_uri(params[:iri]).flatten_hierarchy.map {|m| m.label}
+      render json: { status: :ok, data: labels }
+    rescue Exception => e
+      render json: {status: :unprocessable_entity, error: e.message } 
+    end
   end
 
   private
@@ -206,7 +215,7 @@ class SinglePagesController < ApplicationController
 
   def load_IRI attrs
       attrs.map do |m|
-      iri = SourceAttribute.where(name: m.original_accessor_name).first&.IRI || ""
+      iri = SourceAttribute.where(name: m.original_accessor_name).first&.IRI || nil
       m.as_json.merge!(IRI: iri)
     end
   end
