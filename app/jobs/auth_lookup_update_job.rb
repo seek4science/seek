@@ -8,6 +8,10 @@ class AuthLookupUpdateJob < BatchJob
     1.hour
   end
 
+  def follow_on_job?
+    AuthLookupUpdateQueue.any?
+  end
+
   private
 
   def perform_job(item)
@@ -45,9 +49,5 @@ class AuthLookupUpdateJob < BatchJob
         end
       end
     end
-  end
-
-  def follow_on_job?
-    AuthLookupUpdateQueue.any?
   end
 end
