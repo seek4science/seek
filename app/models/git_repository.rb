@@ -17,8 +17,8 @@ class GitRepository
     File.join(Seek::Config.git_filestore_path, uuid)
   end
 
-  def base
-    @base ||= Git.init(local_path)
+  def git_base
+    @git_base ||= Git.init(local_path)
   end
 
   def clone_repo

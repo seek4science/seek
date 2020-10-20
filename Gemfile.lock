@@ -33,6 +33,13 @@ GIT
       rubyzip
 
 GIT
+  remote: https://github.com/ruby-git/ruby-git.git
+  revision: d1908f69f3248a8afbe7fa6e55f647eb8f669619
+  specs:
+    git (1.7.0)
+      rchardet (~> 1.8)
+
+GIT
   remote: https://github.com/ruby-rdf/rdf-virtuoso
   revision: 0cf165e1f244e16454362ae09b4a8ff4a8cd4e99
   branch: develop
@@ -266,8 +273,6 @@ GEM
     formatador (0.2.5)
     fssm (0.2.10)
     gem-licenses (0.2.2)
-    git (1.6.0)
-      rchardet (~> 1.8)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
     google-analytics-rails (1.1.0)
@@ -921,7 +926,7 @@ DEPENDENCIES
   fleximage!
   fssm
   gem-licenses
-  git
+  git!
   google-analytics-rails
   guard-rubycritic
   handlebars_assets

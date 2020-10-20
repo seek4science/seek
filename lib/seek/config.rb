@@ -211,10 +211,14 @@ module Seek
       append_filestore_path 'git'
     end
 
-    def append_filestore_path(inner_dir)
+    def git_temporary_filestore_path
+      append_filestore_path 'tmp', 'git'
+    end
+
+    def append_filestore_path(*inner_dir)
       path = filestore_path
       path = File.join(Rails.root, path) unless path.start_with? '/'
-      check_path_exists(File.join(path, inner_dir))
+      check_path_exists(File.join(path, *inner_dir))
     end
 
     def check_path_exists(path)
