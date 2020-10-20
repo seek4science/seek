@@ -36,7 +36,7 @@ class ApplicationJob < ActiveJob::Base
 
   after_perform do |job|
     if job.follow_on_job?
-      job.queue_job(default_priority, follow_on_delay.from_now)
+      job.queue_job(default_priority, follow_on_delay&.from_now)
     end
   end
 
