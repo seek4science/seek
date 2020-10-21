@@ -41,6 +41,10 @@ module Seek
     def redirect_location_on_success
       if params[:return_to] && params[:return_to] == 'my_items'
         items_person_path(current_person)
+      # Check referer's host before setting a return point
+      elsif params[:return_to] &&
+        (URI(params[:return_to]).host.blank? || URI(params[:return_to]).host==request.host)
+        params[:return_to]
       else
         url_for action: :index
       end

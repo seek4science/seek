@@ -129,6 +129,8 @@ gem "puma", ">= 3.12.6"
 
 gem "doorkeeper", ">= 5.2.5"
 
+gem 'request_store'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 
@@ -166,6 +168,8 @@ group :development do
   gem 'guard-rubycritic', require: false
   gem 'rails_best_practices'
   gem 'gem-licenses'
+  gem "better_errors"
+  gem "binding_of_caller"
 end
 
 group :test do

@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class SampleTest < ActiveSupport::TestCase
-
   test 'validation' do
     sample = Factory :sample, title: 'fish', sample_type: Factory(:simple_sample_type), data: { the_title: 'fish' }
     assert sample.valid?
@@ -32,57 +31,11 @@ class SampleTest < ActiveSupport::TestCase
     assert_not_nil sample.attributes['uuid']
   end
 
-  test 'responds to correct methods when sample type assigned' do
-    sample = Factory.build(:sample, sample_type: Factory(:patient_sample_type))
-    sample.save(validate: false)
-    sample = Sample.find(sample.id)
-    refute_nil sample.sample_type
-
-    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name'
-    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name='
-    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'age'
-    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'age='
-    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'postcode'
-    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'postcode='
-    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'weight'
-    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'weight='
-
-    # doesn't affect all sample classes
-    sample = Factory(:sample, sample_type: Factory(:simple_sample_type))
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name'
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name='
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'age'
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'age='
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'postcode'
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'postcode='
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'weight'
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'weight='
-  end
-
-  test 'removes methods with new assigned type' do
-    sample = Sample.new title: 'testing'
-    sample.sample_type = Factory(:patient_sample_type)
-
-    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name'
-    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name='
-
-    sample.sample_type = Factory(:simple_sample_type)
-
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name'
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name='
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'age'
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'age='
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'postcode'
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'postcode='
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'weight'
-    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'weight='
-  end
-
   test 'mass assignment' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
-    sample.update_attributes(data: { full_name: 'Fred Bloggs', age: 25, postcode: 'M12 9QL', weight: 0.22, address: 'somewhere' })
-    assert_equal 'Fred Bloggs', sample.get_attribute_value(:full_name)
+    sample.update_attributes(data: { 'full name': 'Fred Bloggs', age: 25, postcode: 'M12 9QL', weight: 0.22, address: 'somewhere' })
+    assert_equal 'Fred Bloggs', sample.get_attribute_value('full name')
     assert_equal 25, sample.get_attribute_value(:age)
     assert_equal 0.22, sample.get_attribute_value(:weight)
     assert_equal 'M12 9QL', sample.get_attribute_value(:postcode)
@@ -93,18 +46,19 @@ class SampleTest < ActiveSupport::TestCase
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
     refute sample.valid?
-    sample.set_attribute_value(:full_name, 'Bob Monkhouse')
+    sample.set_attribute_value('full name', 'Bob Monkhouse')
+    assert_equal 'Bob Monkhouse', sample.get_attribute_value('full name')
     sample.set_attribute_value(:age, 22)
     assert sample.valid?
 
-    sample.set_attribute_value(:full_name, 'FRED')
+    sample.set_attribute_value('full name', 'FRED')
     refute sample.valid?
 
-    sample.set_attribute_value(:full_name, 'Bob Monkhouse')
+    sample.set_attribute_value('full name', 'Bob Monkhouse')
     sample.set_attribute_value(:postcode, 'fish')
     refute sample.valid?
     assert_equal 1, sample.errors.count
-    assert_equal 'is not a valid Post Code', sample.errors[(SampleAttribute::METHOD_PREFIX + 'postcode').to_sym].first
+    assert_equal 'is not a valid Post Code', sample.errors['postcode'.to_sym].first
     sample.set_attribute_value(:postcode, 'M13 9PL')
     assert sample.valid?
   end
@@ -122,20 +76,20 @@ class SampleTest < ActiveSupport::TestCase
   test 'store and retrieve' do
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
-    sample.set_attribute_value(:full_name, 'Jimi Hendrix')
+    sample.set_attribute_value('full name', 'Jimi Hendrix')
     sample.set_attribute_value(:age, 27)
     sample.set_attribute_value(:weight, 88.9)
     sample.set_attribute_value(:postcode, 'M13 9PL')
     disable_authorization_checks { sample.save! }
 
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 27, sample.get_attribute_value(:age)
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
 
     sample = Sample.find(sample.id)
 
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 27, sample.get_attribute_value(:age)
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
@@ -145,7 +99,7 @@ class SampleTest < ActiveSupport::TestCase
 
     sample = Sample.find(sample.id)
 
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 28, sample.get_attribute_value(:age)
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
@@ -155,16 +109,16 @@ class SampleTest < ActiveSupport::TestCase
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
     # Mass assignment
-    sample.data = { full_name: 'Jimi Hendrix', age: 27, weight: 88.9, postcode: 'M13 9PL' }
+    sample.data = { 'full name': 'Jimi Hendrix', age: 27, weight: 88.9, postcode: 'M13 9PL' }
     disable_authorization_checks { sample.save! }
 
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 27, sample.get_attribute_value(:age)
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
 
     sample = Sample.find(sample.id)
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 27, sample.get_attribute_value(:age)
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
@@ -174,30 +128,20 @@ class SampleTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
 
     sample = Sample.find(sample.id)
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 28, sample.get_attribute_value(:age)
     assert_equal 88.9, sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
-
-    # Method name
-    sample.send((SampleAttribute::METHOD_PREFIX + 'postcode=').to_sym, 'M14 8PL')
-    disable_authorization_checks { sample.save! }
-
-    sample = Sample.find(sample.id)
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
-    assert_equal 28, sample.get_attribute_value(:age)
-    assert_equal 88.9, sample.get_attribute_value(:weight)
-    assert_equal 'M14 8PL', sample.get_attribute_value(:postcode)
 
     # Hash
     sample.data[:weight] = 90.1
     disable_authorization_checks { sample.save! }
 
     sample = Sample.find(sample.id)
-    assert_equal 'Jimi Hendrix', sample.get_attribute_value(:full_name)
+    assert_equal 'Jimi Hendrix', sample.get_attribute_value('full name')
     assert_equal 28, sample.get_attribute_value(:age)
     assert_equal 90.1, sample.get_attribute_value(:weight)
-    assert_equal 'M14 8PL', sample.get_attribute_value(:postcode)
+    assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
   end
 
   test 'various methods of sample data assignment perform conversions' do
@@ -224,12 +168,6 @@ class SampleTest < ActiveSupport::TestCase
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert !sample.data[:bool]
-
-    # Method name
-    sample.send((SampleAttribute::METHOD_PREFIX + 'bool=').to_sym, '1')
-    assert sample.valid?
-    disable_authorization_checks { sample.save! }
-    assert sample.data[:bool]
 
     # Hash
     sample.data[:bool] = '0'
@@ -329,15 +267,15 @@ class SampleTest < ActiveSupport::TestCase
   test 'json_metadata' do
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
-    sample.set_attribute_value(:full_name, 'Jimi Hendrix')
+    sample.set_attribute_value('full name', 'Jimi Hendrix')
     sample.set_attribute_value(:age, 27)
     sample.set_attribute_value(:weight, 88.9)
     sample.set_attribute_value(:postcode, 'M13 9PL')
     sample.set_attribute_value(:address, 'Somewhere on earth')
-    assert_equal %({"full_name":null,"age":null,"weight":null,"address":null,"postcode":null}), sample.json_metadata
+    assert_equal %({"full name":null,"age":null,"weight":null,"address":null,"postcode":null}), sample.json_metadata
     disable_authorization_checks { sample.save! }
     refute_nil sample.json_metadata
-    assert_equal %({"full_name":"Jimi Hendrix","age":27,"weight":88.9,"address":"Somewhere on earth","postcode":"M13 9PL"}), sample.json_metadata
+    assert_equal %({"full name":"Jimi Hendrix","age":27,"weight":88.9,"address":"Somewhere on earth","postcode":"M13 9PL"}), sample.json_metadata
   end
 
   test 'json metadata with awkward attributes' do
@@ -362,29 +300,27 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   # trying to track down an sqlite3 specific problem
-  test 'sqlite3 setting of accessor problem' do
+  test 'sqlite3 setting of original accessor problem' do
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
-    sample.set_attribute_value(:full_name, 'Jimi Hendrix')
+    sample.set_attribute_value('full name', 'Jimi Hendrix')
     sample.set_attribute_value(:age, 22)
     disable_authorization_checks { sample.save! }
     id = sample.id
     assert_equal 5, sample.sample_type.sample_attributes.count
-    assert_equal %w(full_name age weight address postcode), sample.sample_type.sample_attributes.collect(&:hash_key)
-    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name'
+    assert_equal ['full name', 'age', 'weight', 'address', 'postcode'], sample.sample_type.sample_attributes.collect(&:accessor_name)
 
     sample2 = Sample.find(id)
     assert_equal id, sample2.id
     assert_equal 5, sample2.sample_type.sample_attributes.count
-    assert_equal %w(full_name age weight address postcode), sample2.sample_type.sample_attributes.collect(&:hash_key)
-    assert_respond_to sample2, SampleAttribute::METHOD_PREFIX + 'full_name'
+    assert_equal ['full name', 'age', 'weight', 'address', 'postcode'], sample2.sample_type.sample_attributes.collect(&:original_accessor_name)
   end
 
   test 'projects' do
     person = Factory(:person)
-    sample = Factory(:sample, contributor:person)
+    sample = Factory(:sample, contributor: person)
     project = Factory(:project)
-    person.add_to_project_and_institution(project,person.institutions.first)
+    person.add_to_project_and_institution(project, person.institutions.first)
     sample.update_attributes(project_ids: [project.id])
     disable_authorization_checks { sample.save! }
     sample.reload
@@ -614,7 +550,7 @@ class SampleTest < ActiveSupport::TestCase
     sample.set_attribute_value(:seekstrain, '')
 
     refute sample.valid?
-    assert_not_empty sample.errors[strain_attribute.method_name]
+    assert_not_empty sample.errors[strain_attribute.title]
   end
 
   test 'strain attributes can appear as related items' do
@@ -686,8 +622,6 @@ class SampleTest < ActiveSupport::TestCase
     refute sample.valid?
   end
 
-
-
   test 'can create' do
     refute Sample.can_create?
     User.with_current_user Factory(:person).user do
@@ -721,9 +655,6 @@ class SampleTest < ActiveSupport::TestCase
     assert sample.valid?
     disable_authorization_checks { sample.save! }
 
-    assert sample.respond_to?(attribute1.method_name.to_sym)
-    assert sample.respond_to?(attribute2.method_name.to_sym)
-    refute sample.respond_to?(SampleAttribute::METHOD_PREFIX + 'hello_kitty')
     refute sample.respond_to?(:banana_type)
     refute sample.respond_to?(:license)
 
@@ -733,10 +664,6 @@ class SampleTest < ActiveSupport::TestCase
 
     assert_raises(NoMethodError) do
       sample.banana_type
-    end
-
-    assert_nothing_raised do
-      sample.send(attribute1.method_name.to_sym)
     end
   end
 
@@ -797,7 +724,7 @@ class SampleTest < ActiveSupport::TestCase
     person = Factory(:person)
     create_sample_attribute_type
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                    policy: Factory(:private_policy), contributor:person
+                                    policy: Factory(:private_policy), contributor: person
     sample_type = SampleType.new title: 'from template', projects: person.projects, contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
@@ -810,7 +737,7 @@ class SampleTest < ActiveSupport::TestCase
 
     # Change the projects
     new_projects = [Factory(:project), Factory(:project)]
-    new_projects.each{|p| person.add_to_project_and_institution(p,person.institutions.first)}
+    new_projects.each { |p| person.add_to_project_and_institution(p, person.institutions.first) }
     disable_authorization_checks do
       data_file.projects = new_projects
       data_file.save!
@@ -870,23 +797,23 @@ class SampleTest < ActiveSupport::TestCase
 
       type = SampleType.new(title: 'Sample type linked to other', project_ids: project_ids, contributor: person)
       type.sample_attributes << Factory.build(:sample_attribute, title: 'title', template_column_index: 1,
-                                              sample_attribute_type: Factory(:string_sample_attribute_type),
-                                              required: true, is_title: true, sample_type: type)
+                                                                 sample_attribute_type: Factory(:string_sample_attribute_type),
+                                                                 required: true, is_title: true, sample_type: type)
       type.sample_attributes << Factory.build(:sample_attribute, title: 'library id', template_column_index: 2,
-                                              sample_attribute_type: Factory(:sample_sample_attribute_type),
-                                              required: false, sample_type: type, linked_sample_type: source_type)
+                                                                 sample_attribute_type: Factory(:sample_sample_attribute_type),
+                                                                 required: false, sample_type: type, linked_sample_type: source_type)
       type.sample_attributes << Factory.build(:sample_attribute, title: 'info', template_column_index: 3,
-                                              sample_attribute_type: Factory(:string_sample_attribute_type),
-                                              required: false, sample_type: type)
+                                                                 sample_attribute_type: Factory(:string_sample_attribute_type),
+                                                                 required: false, sample_type: type)
       type.save!
 
-      data_file = Factory(:data_file, content_blob: Factory(:linked_samples_incomplete_content_blob), project_ids: project_ids, contributor:person)
+      data_file = Factory(:data_file, content_blob: Factory(:linked_samples_incomplete_content_blob), project_ids: project_ids, contributor: person)
 
       assert_difference('Sample.count', 4) do
         data_file.extract_samples(type, true, false)
       end
 
-      assert_equal [lib1, lib2], data_file.extracted_samples.map { |s| s.related_samples }.flatten.sort
+      assert_equal [lib1, lib2], data_file.extracted_samples.map(&:related_samples).flatten.sort
 
       data_file.content_blob = Factory(:linked_samples_complete_content_blob)
       data_file.save!
@@ -895,7 +822,7 @@ class SampleTest < ActiveSupport::TestCase
         data_file.extract_samples(type, true, true)
       end
 
-      assert_equal [lib1, lib2, lib3, lib4], data_file.reload.extracted_samples.map { |s| s.related_samples }.flatten.uniq.sort
+      assert_equal [lib1, lib2, lib3, lib4], data_file.reload.extracted_samples.map(&:related_samples).flatten.uniq.sort
     end
   end
 
@@ -972,7 +899,7 @@ class SampleTest < ActiveSupport::TestCase
 
     sample = Sample.new(sample_type: sample_type, project_ids: [project.id],
                         data: { title: 'Linking sample',
-                                patient: linked_sample.id})
+                                patient: linked_sample.id })
 
     disable_authorization_checks { sample.save! }
 
@@ -999,7 +926,7 @@ class SampleTest < ActiveSupport::TestCase
 
     sample = Sample.new(sample_type: sample_type, project_ids: [project.id],
                         data: { title: 'Linking sample',
-                                patient: linked_sample.id})
+                                patient: linked_sample.id })
 
     disable_authorization_checks { sample.save! }
 
@@ -1015,7 +942,7 @@ class SampleTest < ActiveSupport::TestCase
 
     sample = Sample.new(sample_type: sample_type, project_ids: [project.id],
                         data: { title: 'Linking sample',
-                                patient: linked_sample.id})
+                                patient: linked_sample.id })
 
     disable_authorization_checks { sample.save! }
 
@@ -1033,25 +960,24 @@ class SampleTest < ActiveSupport::TestCase
 
     sample_type = Factory(:simple_sample_type)
     sample_type.sample_attributes << Factory.build(:sample_attribute, title: 'ncbi',
-                                                   sample_attribute_type: Factory(:ncbi_id_sample_attribute_type),
-                                                   required: false,
-                                                   sample_type: sample_type)
+                                                                      sample_attribute_type: Factory(:ncbi_id_sample_attribute_type),
+                                                                      required: false,
+                                                                      sample_type: sample_type)
     sample_type.save!
 
     contributor = Factory(:person)
     User.with_current_user(contributor.user) do
-
-      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
+      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor: contributor)
       sample.set_attribute_value(:the_title, 'testing related orgs')
-      sample.set_attribute_value(:ncbi, "12345")
+      sample.set_attribute_value(:ncbi, '12345')
       sample.save!
 
-      assert_equal [org1,org2].sort,sample.related_organisms.sort
+      assert_equal [org1, org2].sort, sample.related_organisms.sort
     end
 
-    #with nil ncbi id
+    # with nil ncbi id
     User.with_current_user(contributor.user) do
-      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
+      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor: contributor)
       sample.set_attribute_value(:the_title, 'testing related orgs')
       sample.set_attribute_value(:ncbi, nil)
       sample.save!
@@ -1059,9 +985,9 @@ class SampleTest < ActiveSupport::TestCase
       assert_empty sample.related_organisms
     end
 
-    #with blank ncbi id
+    # with blank ncbi id
     User.with_current_user(contributor.user) do
-      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
+      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor: contributor)
       sample.set_attribute_value(:the_title, 'testing related orgs')
       sample.set_attribute_value(:ncbi, '')
       sample.save!
@@ -1069,9 +995,9 @@ class SampleTest < ActiveSupport::TestCase
       assert_empty sample.related_organisms
     end
 
-    #with partially matching ncbi id
+    # with partially matching ncbi id
     User.with_current_user(contributor.user) do
-      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
+      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor: contributor)
       sample.set_attribute_value(:the_title, 'testing related orgs')
       sample.set_attribute_value(:ncbi, '345')
       sample.save!
@@ -1079,44 +1005,63 @@ class SampleTest < ActiveSupport::TestCase
       assert_empty sample.related_organisms
     end
 
-    #shouldn't be duplicates
+    # shouldn't be duplicates
     sample_type = Factory(:simple_sample_type)
     sample_type.sample_attributes << Factory.build(:sample_attribute, title: 'ncbi',
-                                                   sample_attribute_type: Factory(:ncbi_id_sample_attribute_type),
-                                                   required: true,
-                                                   sample_type: sample_type)
+                                                                      sample_attribute_type: Factory(:ncbi_id_sample_attribute_type),
+                                                                      required: true,
+                                                                      sample_type: sample_type)
     sample_type.sample_attributes << Factory.build(:sample_attribute, title: 'ncbi2',
-                                                   sample_attribute_type: Factory(:ncbi_id_sample_attribute_type),
-                                                   required: true,
-                                                   sample_type: sample_type)
+                                                                      sample_attribute_type: Factory(:ncbi_id_sample_attribute_type),
+                                                                      required: true,
+                                                                      sample_type: sample_type)
     sample_type.save!
     User.with_current_user(contributor.user) do
-      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
+      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor: contributor)
       sample.set_attribute_value(:the_title, 'testing related orgs')
       sample.set_attribute_value(:ncbi, '12345')
       sample.set_attribute_value(:ncbi2, '12345')
       sample.save!
 
-      assert_equal [org1,org2].sort,sample.related_organisms.sort
+      assert_equal [org1, org2].sort, sample.related_organisms.sort
     end
 
-    #handles capitalized attribute name
+    # handles capitalized attribute name
     sample_type = Factory(:simple_sample_type)
     sample_type.sample_attributes << Factory.build(:sample_attribute, title: 'NcBi',
-                                                   sample_attribute_type: Factory(:ncbi_id_sample_attribute_type),
-                                                   required: true,
-                                                   sample_type: sample_type)
+                                                                      sample_attribute_type: Factory(:ncbi_id_sample_attribute_type),
+                                                                      required: true,
+                                                                      sample_type: sample_type)
     sample_type.save!
     User.with_current_user(contributor.user) do
-      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor:contributor)
+      sample = Sample.new(sample_type: sample_type, project_ids: [contributor.projects.first.id], contributor: contributor)
       sample.set_attribute_value(:the_title, 'testing related orgs')
-      sample.set_attribute_value(:ncbi, '12345')
+      sample.set_attribute_value(:NcBi, '12345')
       sample.save!
 
-      assert_equal [org1,org2].sort,sample.related_organisms.sort
+      assert_equal [org1, org2].sort, sample.related_organisms.sort
     end
-
   end
 
+  test 'accessor with symbols' do
+    project = Factory(:project)
+    sample_type = Factory(:sample_type_with_symbols, project_ids: [project.id])
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample.set_attribute_value('title&', 'A')
+    sample.set_attribute_value('name ++##!', 'B')
+    sample.set_attribute_value('size range (bp)', 'C')
+    assert_equal 'A', sample.get_attribute_value('title&')
+    assert_equal 'B', sample.get_attribute_value('name ++##!')
+    assert_equal 'C', sample.get_attribute_value('size range (bp)')
+  end
 
+  test 'mass assignment with symbols' do
+    project = Factory(:project)
+    sample_type = Factory(:sample_type_with_symbols, project_ids: [project.id])
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample.update_attributes(data: { 'title&': 'A', 'name ++##!': 'B', 'size range (bp)': 'C' })
+    assert_equal 'A', sample.get_attribute_value('title&')
+    assert_equal 'B', sample.get_attribute_value('name ++##!')
+    assert_equal 'C', sample.get_attribute_value('size range (bp)')
+  end
 end

@@ -353,6 +353,33 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.datetime "updated_at"
   end
 
+  create_table "custom_metadata",  force: :cascade do |t|
+    t.text "json_metadata"
+    t.string "item_type"
+    t.bigint "item_id"
+    t.bigint "custom_metadata_type_id"
+    t.index ["custom_metadata_type_id"], name: "index_custom_metadata_on_custom_metadata_type_id"
+    t.index ["item_type", "item_id"], name: "index_custom_metadata_on_item_type_and_item_id"
+  end
+
+  create_table "custom_metadata_attributes",  force: :cascade do |t|
+    t.bigint "custom_metadata_type_id"
+    t.bigint "sample_attribute_type_id"
+    t.boolean "required", default: false
+    t.integer "pos"
+    t.string "title"
+    t.bigint "sample_controlled_vocab_id"
+    t.index ["custom_metadata_type_id"], name: "index_custom_metadata_attributes_on_custom_metadata_type_id"
+    t.index ["sample_attribute_type_id"], name: "index_custom_metadata_attributes_on_sample_attribute_type_id"
+    t.index ["sample_controlled_vocab_id"], name: "index_custom_metadata_attributes_on_sample_controlled_vocab_id"
+  end
+
+  create_table "custom_metadata_types",  force: :cascade do |t|
+    t.string "title"
+    t.integer "contributor_id"
+    t.text "supported_type"
+  end
+
   create_table "data_file_auth_lookup", id: false,  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
@@ -1463,7 +1490,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "unit_id"
     t.boolean "is_title", default: false
     t.integer "template_column_index"
-    t.string "accessor_name"
+    t.string "original_accessor_name"
     t.integer "sample_controlled_vocab_id"
     t.integer "linked_sample_type_id"
     t.index ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"

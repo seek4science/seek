@@ -605,6 +605,62 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   end
 
+
+
+  test 'create an investigation with custom metadata' do
+    cmt = Factory(:simple_investigation_custom_metadata_type)
+
+    login_as(Factory(:person))
+
+    assert_difference('Investigation.count') do
+      inv_attributes = Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   data:{
+                                                       "name":'fred',
+                                                       "age":22}}}
+
+      put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert inv=assigns(:investigation)
+
+    assert cm = inv.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal '22',cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+  end
+
+  test 'create an investigation with custom metadata validated' do
+    cmt = Factory(:simple_investigation_custom_metadata_type)
+
+    login_as(Factory(:person))
+
+    # invalid age - needs to be a number
+    assert_no_difference('Investigation.count') do
+      inv_attributes = Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
+
+      put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert inv=assigns(:investigation)
+    refute inv.valid?
+
+    # name is required
+    assert_no_difference('Investigation.count') do
+      inv_attributes = Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
+
+      put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert inv=assigns(:investigation)
+    refute inv.valid?
+
+  end
+
   def edit_max_object(investigation)
     investigation.creators = [Factory(:person)]
     disable_authorization_checks { investigation.save! }
