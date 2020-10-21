@@ -493,21 +493,6 @@ class ProjectTest < ActiveSupport::TestCase
     assert project.work_groups.collect(&:people).flatten.empty?
     assert !project.can_delete?(user)
 
-    # can not delete if workgroups contain people
-    user = Factory(:admin).user
-    assert user.is_admin?
-    project = Factory(:project)
-    work_group = Factory(:work_group, project: project)
-    a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
-    refute project.work_groups.collect(&:people).flatten.empty?
-    refute project.can_delete?(user)
-
-    # can delete if admin and workgroups are empty
-    work_group.group_memberships.delete_all
-    assert project.work_groups.reload.collect(&:people).flatten.empty?
-    assert user.is_admin?
-    assert project.can_delete?(user)
-
     # cannot delete if there are assets, even if no people
     user = Factory(:admin).user
     project = Factory(:project)
