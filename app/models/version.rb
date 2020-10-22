@@ -15,7 +15,7 @@ class Version
   end
 
   def git_base
-    @git_base ||= git_repository.git_base
+    @git_base ||= Git.open(git_repository.local_path)
   end
 
   def local_path
@@ -52,14 +52,26 @@ class Version
     git_base.worktree(local_path, sha).remove
   end
 
+  # Returns the SHA1 for the commit/branch/tag
+  def sha
+    git_base.revparse(commit)
+  end
+
+  def tree
+    git_base.gtree(sha)
+  end
+
+  def trees
+    tree.trees
+  end
+
+  def blobs
+    tree.blobs
+  end
+
   private
 
   def worktree_id
     "#{local_path} #{sha}"
-  end
-
-  # Returns the SHA1 for the commit/branch/tag
-  def sha
-    @sha ||= git_base.revparse(commit)
   end
 end

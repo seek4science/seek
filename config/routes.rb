@@ -116,6 +116,16 @@ SEEK::Application.routes.draw do
     end
   end
 
+  concern :git do
+    resource :git, only: [] do
+      get 'tree(/:path)' => 'git#tree', constraints: { path: /.+/ }, as: :git_tree
+      get 'blob/:path' => 'git#blob', constraints: { path: /.+/ }, as: :git_blob
+      get 'raw/:path' => 'git#raw', constraints: { path: /.+/ }, as: :git_raw
+    end
+  end
+
+  resources :versions, concerns: [:git]
+
   resources :scales do
     collection do
       post :search
