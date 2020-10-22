@@ -292,18 +292,18 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  test 'can not destroy project if it contains people' do
-    project = projects(:four)
-    work_group = Factory(:work_group, project: project)
-    a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
-    get :show, params: { id: project }
-    assert_select 'span.disabled_icon', text: /Delete #{I18n.t('project')}/, count: 1
-    assert_no_difference('Project.count') do
-      delete :destroy, params: { id: project }
-    end
-    refute_nil flash[:error]
-  end
-
+  # test 'can not destroy project if it contains people' do
+  #   project = projects(:four)
+  #   work_group = Factory(:work_group, project: project)
+  #   a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
+  #   get :show, params: { id: project }
+  #   assert_select 'span.disabled_icon', text: /Delete #{I18n.t('project')}/, count: 1
+  #   assert_no_difference('Project.count') do
+  #     delete :destroy, params: { id: project }
+  #   end
+  #   refute_nil flash[:error]
+  # end
+  #
   def test_non_admin_should_not_manage_projects
     login_as(:aaron)
     get :manage, params: { id: Factory(:project) }
