@@ -68,6 +68,7 @@ layout: page
      - [Create a Sample](create-sample.html)
      - [Legacy Biosamples](legacy-biosamples.html)
 - [Using SEEK with openBIS](openbis.html)
+- [API Introduction](api.html)
 - [Contributing to these SEEK Documents](/contributing.html)
 
 
