@@ -6,7 +6,7 @@ title: Front page
 ## About SEEK
 
 The SEEK platform is a web-based resource for sharing heterogeneous scientific research datasets, 
-models or simulations, processes and research outcomes. Other details about SEEK can be found on the [SEEK4Science Website](https://seek4science.org)
+models or simulations, processes and research outcomes. More details about SEEK can be found on the [SEEK4Science Website](https://seek4science.org)
 
 For an example of SEEK please visit our [Demo](http://demo.seek4science.org).
 
