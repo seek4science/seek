@@ -27,13 +27,14 @@ function setupFoldersTree(dataJson, container_id, drop_accept_class) {
     })
     .on("activate_node.jstree", function (e, data) {
       var obj = $j(this).jstree(true).get_node(data.node.id).data;
-      var folder_id = obj.folder_id
-      var project_id = obj.project_id
-      var id = obj.id
-      var type = obj.type
+      var parent = $j(this).jstree(true).get_node(data.node.parent).data; 
+      var folder_id = obj.folder_id;
+      var project_id = obj.project_id;
+      var id = obj.id;
+      var type = obj.type;
       folder_id
         ? folder_clicked(folder_id, project_id)
-        : item_clicked(type, id);
+        : item_clicked(type, id, parent);
     });
 }
 
@@ -147,34 +148,38 @@ function folder_clicked(folder_id, project_id) {
   var path =
     "/projects/" + project_id + "/folders/" + folder_id + "/display_contents";
   displayed_folder_id = folder_id;
-  $j.ajax({ url: path, cache:false, dataType: "script" });
+  $j.ajax({ url: path, cache: false, dataType: "script" });
 }
 
-function item_clicked(type, id) {
+function item_clicked(type, id, parent) {
   hideAll();
   if (type == "folder") $j("#folder_contents").show();
   else $j("#" + type + "_contents").show();
   breadcrumb(type);
   selectedItem.id = id;
   selectedItem.type = type;
+  selectedItem.parent = parent
 
   switch (type) {
-    case "assay": 
-    case "investigation": 
-    case "study":{
+    case "assay":
+    case "investigation":
+    case "study": {
       $j.ajax({
-        url: "/single_pages/" + pid + "/render_sharing_form/" + id + "/type/" + type,
+        url:
+          "/single_pages/" +
+          pid +
+          "/render_sharing_form/" +
+          id +
+          "/type/" +
+          type,
       });
       break;
     }
   }
-  if (type == "study")
-  {
-    loadFlowchart()
-    loadDesign()
-  } 
-  else if (type == "assay")
-    load_samples()
+  if (type == "study") {
+    loadFlowchart();
+    loadDesign();
+  } else if (type == "assay") load_samples();
 }
 
 function hideAll() {
@@ -187,11 +192,11 @@ function hideAll() {
 
 function bounce(item, text) {
   item.addClass("animate");
-  setTimeout(function() {
+  setTimeout(function () {
     item.css("transform", "scale(2)");
     item.css("opacity", "0");
   }, 1);
-  setTimeout(function() {
+  setTimeout(function () {
     item.css("transform", "scale(1)");
     item.css("opacity", "1");
     item.text(text);
@@ -222,7 +227,7 @@ function bounce(item, text) {
             var a = d.createElement("a");
             a.href = n.state.separate.action;
             a.className = "treeaction glyphicon glyphicon-plus";
-            $j(a).attr("onclick", 'add'+ n.state.separate.label + '(this)');
+            $j(a).attr("onclick", "add" + n.state.separate.label + "(this)");
             obj.prepend(a);
           }
           obj.prepend(p);
