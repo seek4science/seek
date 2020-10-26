@@ -24,73 +24,12 @@
             of: $j(e.target),
             collision: "fit"
         });
-        $j("#btn_custom_col").attr("onclick", `addCustomCol('${tblClass}','${bias}')`);
-        $j("input:button.predef").each((index, val) => {
-            $j(val).attr("onclick",
-                `addCustomCol('${tblClass}','${bias}','${$j(val).val()}', '${$j(val).data("term")}')`);
-        })
-        removeUsedItems(tblClass)
-    }
-
-    function removeUsedItems(tblClass) {
-        var colNames = $j(`${tblClass} thead tr th`).map((i, val) => {
-            let temp = $j.trim($j(val).html().replace(/<a( |>).*?<\/a>/gi, ""))
-            return temp.length > 0 ? temp : undefined
-        }).get()
-        $j("#preDefinedList li input[type='button']").map((i, val) => {
-            if ($j.inArray($j(val).val(), colNames) != -1) {
-                $j(val).parent().hide()
-            } else {
-                $j(val).parent().show()
-            }
-        }).get()
-    }
-
-    function loadSamplesSourceTable(std_id) {
-        $j("#selected_std_asy").attr('data-selected', `${std_id}_`)
-        $j('.tbl_sample_source thead tr').empty()
-        $j('.tbl_sample_source tbody').empty()
-        $j.ajax({
-            type: 'GET',
-            cache: false,
-            url: pid + '/samples',
-            data: {
-                std_id
-            },
-            success: result => {
-                if (result.data.length == undefined) result.data = [result.data]
-                if (result.data.length > 0) {
-                    let data = JSON.parse(result.data[0].content)
-                    if (!data) return
-                    let header = Object.keys(data[0])
-                    $j.each(header, (k, col) => {
-                        let hash = col.split('%')
-                        let options = hash.length > 1 ? {
-                            title: hash[0],
-                            tableClass: ".tbl_sample_source",
-                            acTerm: hash[1],
-                            ableToRemove: false,
-                            extraInfo: 'init', //sampleId
-                            originalTitle: col
-                        } : {
-                            title: col,
-                            tableClass: ".tbl_sample_source",
-                            ableToRemove: false,
-                            extraInfo: 'init', //sampleId
-                            originalTitle: col
-                        }
-                        addColumn(options)
-                    })
-                    if (data[0].id)
-                        for (let i = 0; i < data.length; i++) addTableRow('.tbl_sample_source', data[i])
-                    add_remove_action(".tbl_sample_source")
-                    $j('.dpd').show()
-                    setTableOntology(".tbl_sample_source")
-
-                } else $j('.dpd').hide()
-            }
-
-
+        $j("#btn_custom_col").attr("onclick", `addCustomCol('${tblClass}','${bias}')`); // Custom Input
+        $j('#preDefinedList li:not(:first-child)').remove()
+        $j.each($j(`${tblClass} thead tr th:hidden`), (i, x) => {
+            const title = $j.trim($j(x).html().replace(/<a( |>).*?<\/a>/gi, ""))
+            $j('#preDefinedList').append(`<li><input type="button" class="btn btn-primary col-md-12 predef"
+                onClick= "addCustomCol('${tblClass}','${bias}','${title}')" value="${title}"></li>`)
         })
     }
 </script>

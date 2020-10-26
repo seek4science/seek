@@ -73,12 +73,6 @@
         })
     }
 
-    // $j("#btn-apply-source").on("click", () => {
-    //     $j.each(characteristics[sourceSelect.value].attributes, (k, attr) => {
-    //         addAttrib(attr.title)
-    //     })
-    // })
-
     function addAttrib(text) {
         let options = {
             title: text,
@@ -90,87 +84,21 @@
     }
 
     function addColumn(options) {
-        let {
-            value = '',
-                title,
-                tableClass,
-                bias = 1,
-                acTerm = '',
-                useOntology = true,
-                ableToRemove = true,
-                extraInfo = '',
-                originalTitle = ''
-        } = options
-
-        let action = ableToRemove ?
-            "<a href='' onclick='remove_col(event)'> <span style='color:white' class='glyphicon glyphicon-trash'></span></a>" :
-            ""
-        let colCount = $j(`${tableClass} thead tr th`).length;
-        let assayId = $j("#selected_item_id").val()
-        let element =
-            `<th data-term="${acTerm}" data-info="${extraInfo||assayId}" data-original="${originalTitle}">${title} ${action}</th>`
-        if (colCount == 0) {
-            $j(tableClass).find('thead').find('tr').append(element);
-        } else {
-            $j(tableClass).find('thead').find('th').eq(colCount - bias).after(element)
-        }
-        $j(tableClass).find('tr').each(function() {
-            $j(this).find('td').eq(colCount - bias).after(`<td contentEditable='true'>${value}</td>`);
+        let colCount = $j(`${options.tableClass} thead tr th:visible`).length;
+        let thIndex = -1
+        $j.each($j(options.tableClass + ' thead tr th:hidden'), (i, k) => {
+            if ($j.trim($j(k).html().replace(/<a( |>).*?<\/a>/gi, "")) == options.title) {
+                $j(k).show();
+                thIndex = $j(k).index()
+                return false;
+            }
+        })
+        $j(options.tableClass + ' tbody').find('tr').each(function() {
+            $j(this).find('td').eq(thIndex).show()
         });
 
-        if (acTerm && useOntology) {
-            applyOntology(tableClass, colCount == 0 ? 1 : colCount - bias + 2, acTerm)
-        }
-    }
-
-    function addTableRow(table, items = '', add_single = false) {
-        let action =
-            "<a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a>"
-        let defaultCol = '<td contentEditable="true">$$</td>'
-        let newRow, templates
-        let headers = $j(`${table} thead tr`).find('th')
-        let tdCount = headers.length
-        // Exception for sampleTable
-        if (table == ".sampleTable" || !items)
-            templates = headers;
-        else
-            templates = items
-        $j.each(templates, (i, a) => {
-            if (items) {
-                if (typeof(a) != 'string' && $j(a).data('original')) {
-                    let tmp = items[$j(a).data('original')]
-                    if (tmp) {
-                        newRow += defaultCol.replace('$$', tmp.replace('undefined', ''))
-                    } else {
-                        newRow += defaultCol.replace('$$', '')
-                    }
-                } else {
-                    newRow += defaultCol.replace('$$', a)
-                }
-            } else {
-                newRow += defaultCol.replace('$$', '')
-            }
-
-            // newRow += items ?
-            //     defaultCol.replace('$$', typeof(a) != 'string' && $j(a).data('original') ? items[$j(a).data(
-            //         'original')].replace(
-            //         'undefined', '') : a) :
-            //     defaultCol.replace('$$', '');
-
-            // Apply each column auto complete list
-            // TO-DO: cache auto complete list response rather than Ajax call each time
-            if (add_single) {
-                let term = $j(`${table} thead tr th:nth-child(${i+1})`).data("term") || ''
-                if (term.length > 1)
-                    applyOntology(table, i + 1, term)
-            }
-        });
-        $j(`${table} tbody`).append('<tr>' + newRow + '</tr>')
-        if (add_single) {
-            let td = $j(`${table} tbody tr:last td:last`)
-            td.append(action)
-            td.attr('contentEditable', false)
-        }
+        if (options.title)
+            HiddenAttributes("delete", options.title)
     }
 
     function createSampleType(sampleTypeData, cb) {
@@ -350,8 +278,6 @@
 
     function remove_col(e) {
         event.preventDefault();
-        alert('Removing an attribute is not currently available.')
-        return
         if (confirm("Do you really want to delete the column?")) {
             if ($j(e.target).closest('tr').find('th').length == 2) {
                 alert('Can not remove column. \nThere sould be at least one column.')
@@ -359,10 +285,11 @@
             }
             let th = $j(e.target).closest('th')
             $j(e.target).closest('table').find('tbody tr').each(function(i, tr) {
-                $j(tr).find(`td:eq(${th.index()})`).remove();
+                $j(tr).find(`td:eq(${th.index()})`).hide();
             });
-            th.remove()
+            th.hide()
+
+            HiddenAttributes("add", $j.trim(th.html().replace(/<a( |>).*?<\/a>/gi, "")))
         }
-        event.preventDefault();
     }
 </script>
