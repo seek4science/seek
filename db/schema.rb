@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_29_093059) do
+ActiveRecord::Schema.define(version: 2020_10_26_180430) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1115,6 +1115,12 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.index ["user_id"], name: "index_oauth_sessions_on_user_id"
   end
 
+  create_table "ontology_labels",  force: :cascade do |t|
+    t.string "label"
+    t.string "iri"
+    t.integer "sample_controlled_vocab_term_id"
+  end
+
   create_table "openbis_endpoints", id: :integer,  force: :cascade do |t|
     t.string "as_endpoint"
     t.string "space_perm_id"
@@ -1514,6 +1520,11 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.integer "sample_controlled_vocab_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "source_ontology"
+    t.string "parent_class"
+    t.string "short_name"
+    t.text "description"
+    t.boolean "required"
   end
 
   create_table "sample_controlled_vocabs", id: :integer,  force: :cascade do |t|
@@ -1522,6 +1533,8 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "first_letter", limit: 1
+    t.string "group"
+    t.string "item_type"
   end
 
   create_table "sample_resource_links", id: :integer,  force: :cascade do |t|
