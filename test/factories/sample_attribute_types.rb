@@ -96,3 +96,7 @@ Factory.define(:apples_sample_controlled_vocab, class: SampleControlledVocab) do
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: "Cox's Orange Pippin")
   end
 end
+
+Factory.define(:sample_controlled_vocab, class: SampleControlledVocab) do |f|
+  f.sequence(:title) { |n| "sample controlled vocab #{n}" }
+end
