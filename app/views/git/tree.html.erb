@@ -1,27 +1,12 @@
-<% tree = jstree_from_tree(@tree, params[:path], { state: { opened: true } }
-)
-%>
-<h1>Repo Browser</h1>
+<h1>Tree</h1>
 
-<div class="row">
-  <div class="col-sm-6">
-    <div id="repo-tree" style="min-height: 300px; border-right: 1px solid #ddd"></div>
-  </div>
-  <div class="col-sm-6">
-    <div id="repo-content" style="display: none"></div>
-  </div>
-</div>
+<%= git_breadcrumbs(@parent_resource, params[:path]) %>
 
-<script type="text/javascript">
-    $j(document).ready(function () {
-        $j('#repo-tree')
-            .bind('loaded.jstree', function() {})
-            .jstree({
-                'core': {
-                    // 'check_callback': true,
-                    // 'force_text': true,
-                    'data' : <%= raw(tree.to_json) %>
-                }
-            });
-    });
-</script>
+<ul class="pending-files">
+  <% @tree.trees.each do |name, tree| %>
+    <li><%= icon_link_to(name, 'organise', git_tree_version_git_path(@parent_resource, path: [params[:path], name].compact)) %></li>
+  <% end %>
+  <% @tree.blobs.each do |name, blob| %>
+    <li><%= icon_link_to(name, 'markup', git_blob_version_git_path(@parent_resource, path: [params[:path], name].compact)) %></li>
+  <% end %>
+</ul>

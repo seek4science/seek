@@ -1,0 +1,11 @@
+<h1>Blob</h1>
+
+<%= git_breadcrumbs(@parent_resource, params[:path]) %>
+
+<strong>Path: </strong> <%= params[:path] -%><br/>
+<strong>Size: </strong> <%= number_to_human_size @blob.size -%><br/>
+<strong>SHA: </strong> <code><%= @blob.sha %></code><br/>
+<hr/>
+<pre>
+  <%= raw @blob.contents %>
+</pre>

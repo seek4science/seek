@@ -30,6 +30,7 @@ class GitController < ApplicationController
 
     respond_to do |format|
       if @blob
+        format.html
         format.all { render plain: "Yes!" }
       else
         format.all { render plain: ':(', status: :not_found }
@@ -62,14 +63,11 @@ class GitController < ApplicationController
   end
 
   def fetch_parent
-    @parent_resource = Version.new
-    return # TODO
     get_parent_resource
     raise ActiveRecord::RecordNotFound unless @parent_resource
   end
 
   def authorize_parent
-    return # TODO
     unless @parent_resource.can_download?
       flash[:error] = "Not authorized."
       redirect_to :root

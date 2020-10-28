@@ -1,17 +1,11 @@
-class Version
-  DUMMY = {
-      commit: '36208e44ccaa5ecf584a3b8680cdbd9c3da31f98',
-  }
+class Version < ApplicationRecord
+  belongs_to :resource, polymorphic: true
 
-  attr_accessor :commit
-
-  def initialize(args = DUMMY)
-    @commit = args[:commit]
-  end
+  before_save :set_commit
 
   def git_repository
-    #asset.git_repository.git_base
-    GitRepository.new
+    #resource.git_repository
+    GitRepository.last
   end
 
   def git_base
@@ -22,35 +16,51 @@ class Version
     File.join(Seek::Config.git_temporary_filestore_path, git_repository.uuid, sha)
   end
 
-  def resolve(*path)
-    with_worktree do
-      File.join(local_path, path)
+  def list_files
+    git_base.ls_files
+  end
+
+  def file_contents(path, &block)
+    if block_given?
+      git_base.gblob("#{sha}:#{path}").contents(&block)
+    else
+      git_base.gblob("#{sha}:#{path}").contents
     end
   end
 
-  def with_worktree
-    w = worktree
-    if w.nil?
-      add_worktree
-    elsif !File.exist(w.dir)
-      remove_worktree
-      add_worktree
-    end
-
-    yield
+  def object(path)
+    git_base.object("#{sha}:#{path}")
   end
 
-  def worktree
-    git_base.worktrees[worktree_id]
-  end
-
-  def add_worktree
-    git_base.worktree(local_path, sha).add
-  end
-
-  def remove_worktree
-    git_base.worktree(local_path, sha).remove
-  end
+  # def resolve(*path)
+  #   with_worktree do
+  #     File.join(local_path, path)
+  #   end
+  # end
+  #
+  # def with_worktree
+  #   w = worktree
+  #   if w.nil?
+  #     add_worktree
+  #   elsif !File.exist(w.dir)
+  #     remove_worktree
+  #     add_worktree
+  #   end
+  #
+  #   yield
+  # end
+  #
+  # def worktree
+  #   git_base.worktrees[worktree_id]
+  # end
+  #
+  # def add_worktree
+  #   git_base.worktree(local_path, sha).add
+  # end
+  #
+  # def remove_worktree
+  #   git_base.worktree(local_path, sha).remove
+  # end
 
   # Returns the SHA1 for the commit/branch/tag
   def sha
@@ -58,7 +68,7 @@ class Version
   end
 
   def tree
-    git_base.gtree(sha)
+    git_base.gtree(commit)
   end
 
   def trees
@@ -71,7 +81,12 @@ class Version
 
   private
 
-  def worktree_id
-    "#{local_path} #{sha}"
+  def set_commit
+    self.commit ||= git_base.revparse(target) # Returns the SHA1 for the target (commit/branch/tag)
   end
+
+  #
+  # def worktree_id
+  #   "#{local_path} #{sha}"
+  # end
 end

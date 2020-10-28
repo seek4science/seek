@@ -118,9 +118,9 @@ SEEK::Application.routes.draw do
 
   concern :git do
     resource :git, only: [] do
-      get 'tree(/:path)' => 'git#tree', constraints: { path: /.+/ }, as: :git_tree
-      get 'blob/:path' => 'git#blob', constraints: { path: /.+/ }, as: :git_blob
-      get 'raw/:path' => 'git#raw', constraints: { path: /.+/ }, as: :git_raw
+      get 'tree(/*path)' => 'git#tree', constraints: { path: /.+/ }, as: :git_tree
+      get 'blob/*path' => 'git#blob', constraints: { path: /.+/ }, as: :git_blob
+      get 'raw/*path' => 'git#raw', constraints: { path: /.+/ }, as: :git_raw
     end
   end
 
