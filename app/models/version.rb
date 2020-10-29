@@ -4,16 +4,11 @@ class Version < ApplicationRecord
   before_save :set_commit
 
   def git_repository
-    #resource.git_repository
-    GitRepository.last
+    resource.git_repository
   end
 
   def git_base
     @git_base ||= Git.open(git_repository.local_path)
-  end
-
-  def local_path
-    File.join(Seek::Config.git_temporary_filestore_path, git_repository.uuid, sha)
   end
 
   def list_files
@@ -22,49 +17,14 @@ class Version < ApplicationRecord
 
   def file_contents(path, &block)
     if block_given?
-      git_base.gblob("#{sha}:#{path}").contents(&block)
+      git_base.gblob("#{commit}:#{path}").contents(&block)
     else
-      git_base.gblob("#{sha}:#{path}").contents
+      git_base.gblob("#{commit}:#{path}").contents
     end
   end
 
   def object(path)
-    git_base.object("#{sha}:#{path}")
-  end
-
-  # def resolve(*path)
-  #   with_worktree do
-  #     File.join(local_path, path)
-  #   end
-  # end
-  #
-  # def with_worktree
-  #   w = worktree
-  #   if w.nil?
-  #     add_worktree
-  #   elsif !File.exist(w.dir)
-  #     remove_worktree
-  #     add_worktree
-  #   end
-  #
-  #   yield
-  # end
-  #
-  # def worktree
-  #   git_base.worktrees[worktree_id]
-  # end
-  #
-  # def add_worktree
-  #   git_base.worktree(local_path, sha).add
-  # end
-  #
-  # def remove_worktree
-  #   git_base.worktree(local_path, sha).remove
-  # end
-
-  # Returns the SHA1 for the commit/branch/tag
-  def sha
-    git_base.revparse(commit)
+    git_base.object("#{commit}:#{path}")
   end
 
   def tree
@@ -84,9 +44,4 @@ class Version < ApplicationRecord
   def set_commit
     self.commit ||= git_base.revparse(target) # Returns the SHA1 for the target (commit/branch/tag)
   end
-
-  #
-  # def worktree_id
-  #   "#{local_path} #{sha}"
-  # end
 end

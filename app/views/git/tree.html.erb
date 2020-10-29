@@ -4,9 +4,9 @@
 
 <ul class="pending-files">
   <% @tree.trees.each do |name, tree| %>
-    <li><%= icon_link_to(name, 'organise', git_tree_version_git_path(@parent_resource, path: [params[:path], name].compact)) %></li>
+    <li><%= icon_link_to(name, 'organise', polymorphic_path([@parent_resource, :git_tree], path: [params[:path], name].compact)) %></li>
   <% end %>
   <% @tree.blobs.each do |name, blob| %>
-    <li><%= icon_link_to(name, 'markup', git_blob_version_git_path(@parent_resource, path: [params[:path], name].compact)) %></li>
+    <li><%= icon_link_to(name, 'markup', polymorphic_path([@parent_resource, :git_blob], path: [params[:path], name].compact)) %></li>
   <% end %>
 </ul>

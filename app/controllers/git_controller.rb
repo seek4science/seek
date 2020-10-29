@@ -1,66 +1,56 @@
 class GitController < ApplicationController
   before_action :fetch_parent
   before_action :authorize_parent
+  before_action :get_tree
+  before_action :get_blob, except: [:tree]
 
   def tree
-    @tree = @parent_resource.tree
-    path.each do |segment|
-      @tree = @tree.trees[segment]
-      break if @tree.nil?
-    end
-
     respond_to do |format|
-      if @tree
-        format.html
-        format.all { render plain: @tree.children.keys.join(', ')}
-      else
-        format.all { render plain: ':(', status: :not_found }
-      end
+      format.html
     end
   end
 
+  def download
+    stream_blob(@blob, path.last)
+  end
+
   def blob
-    @tree = @parent_resource.tree
-    path[0..-2].each do |segment|
-      @tree = @tree.trees[segment]
-      break if @tree.nil?
-    end
-
-    @blob = @tree.blobs[path.last]
-
-    if params[:dl] == '1'
-      stream_blob(@blob, path.last)
-    else
-      respond_to do |format|
-        if @blob
-          format.html
-          format.all { render plain: "Yes!" }
-        else
-          format.all { render plain: ':(', status: :not_found }
-        end
-      end
+    respond_to do |format|
+      format.html
     end
   end
 
   def raw
-    @tree = @parent_resource.tree
-    path[0..-2].each do |segment|
-      @tree = @tree.trees[segment]
-      break if @tree.nil?
-    end
-
-    @blob = @tree.blobs[path.last]
-
     respond_to do |format|
-      if @blob
-        format.all { render plain: @blob.contents }
-      else
-        format.all { render plain: ':(', status: :not_found }
-      end
+      format.all { render plain: @blob.contents }
     end
   end
 
   private
+
+  def get_tree
+    @tree = @parent_resource.tree
+    path[0..(action_name == 'tree' ? -1 : -2)].each do |segment|
+      @tree = @tree.trees[segment]
+      break if @tree.nil?
+    end
+
+    return if @tree
+
+    respond_to do |format|
+      format.all { render plain: 'Tree not found :(', status: :not_found }
+    end
+  end
+
+  def get_blob
+    @blob = @tree.blobs[path.last]
+
+    return if @blob
+
+    respond_to do |format|
+      format.all { render plain: 'Blob not found :(', status: :not_found }
+    end
+  end
 
   def path
     (params[:path] || '').split('/')
