@@ -1,7 +1,7 @@
 class GitController < ApplicationController
   before_action :fetch_parent
   before_action :authorize_parent
-  before_action :get_tree
+  before_action :get_tree, only: [:tree]
   before_action :get_blob, except: [:tree]
 
   def tree
@@ -11,7 +11,7 @@ class GitController < ApplicationController
   end
 
   def download
-    stream_blob(@blob, path.last)
+    stream_blob(@blob, path_param.split('/').last)
   end
 
   def blob
@@ -29,31 +29,23 @@ class GitController < ApplicationController
   private
 
   def get_tree
-    @tree = @parent_resource.tree
-    path[0..(action_name == 'tree' ? -1 : -2)].each do |segment|
-      @tree = @tree.trees[segment]
-      break if @tree.nil?
-    end
+    @tree = @parent_resource.object(path_param)
 
-    return if @tree
+    return if @tree&.tree?
 
-    respond_to do |format|
-      format.all { render plain: 'Tree not found :(', status: :not_found }
-    end
+    raise ActionController::RoutingError.new('Not Found')
   end
 
   def get_blob
-    @blob = @tree.blobs[path.last]
+    @blob = @parent_resource.object(path_param)
 
-    return if @blob
+    return if @blob&.blob?
 
-    respond_to do |format|
-      format.all { render plain: 'Blob not found :(', status: :not_found }
-    end
+    raise ActionController::RoutingError.new('Not Found')
   end
 
-  def path
-    (params[:path] || '').split('/')
+  def path_param
+    params[:path] || ''
   end
 
   def fetch_parent
@@ -74,9 +66,9 @@ class GitController < ApplicationController
     begin
       self.response_body = Enumerator.new do |yielder|
         blob.contents do |io|
-          bytes = io.read(1024)
-          break if bytes.nil?
-          yielder << bytes
+          while (bytes = io.read(1024))
+            yielder << bytes
+          end
         end
       end
     rescue Git::GitExecuteError => e
