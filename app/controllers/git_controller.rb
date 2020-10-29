@@ -28,12 +28,16 @@ class GitController < ApplicationController
 
     @blob = @tree.blobs[path.last]
 
-    respond_to do |format|
-      if @blob
-        format.html
-        format.all { render plain: "Yes!" }
-      else
-        format.all { render plain: ':(', status: :not_found }
+    if params[:dl] == '1'
+      stream_blob(@blob, path.last)
+    else
+      respond_to do |format|
+        if @blob
+          format.html
+          format.all { render plain: "Yes!" }
+        else
+          format.all { render plain: ':(', status: :not_found }
+        end
       end
     end
   end
@@ -71,6 +75,22 @@ class GitController < ApplicationController
     unless @parent_resource.can_download?
       flash[:error] = "Not authorized."
       redirect_to :root
+    end
+  end
+
+  def stream_blob(blob, filename)
+    response.headers['Content-Disposition'] = "attachment; filename=#{filename}"
+
+    begin
+      self.response_body = Enumerator.new do |yielder|
+        blob.contents do |io|
+          bytes = io.read(1024)
+          break if bytes.nil?
+          yielder << bytes
+        end
+      end
+    rescue Git::GitExecuteError => e
+
     end
   end
 end
