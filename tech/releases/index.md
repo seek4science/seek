@@ -20,7 +20,7 @@ This version includes the following bugfixes:
   * Fix to the external search over BioModels
   * Fixes to doing a search over filtered results, and maintaining the correct order from the search results
   * Adding new version comments for Documents
-  * Fix to DataSet schema.org markup
+  * Fix to Dataset schema.org markup
   
 [Closed issues for 1.10.3](https://github.com/seek4science/seek/milestone/4?closed=1)  
 
