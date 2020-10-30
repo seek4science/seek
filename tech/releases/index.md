@@ -11,6 +11,19 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.10.3
+
+Release date: _30th October 2020_
+
+This version includes the following bugfixes:
+
+  * Fix to the external search over BioModels
+  * Fixes to doing a search over filtered results, and maintaining the correct order from the search results
+  * Adding new version comments for Documents
+  * Fix to DataSet schema.org markup
+  
+[Closed issues for 1.10.3](https://github.com/seek4science/seek/milestone/4?closed=1)  
+
 ## Version 1.10.2
 
 Release date: _28th August 2020_
