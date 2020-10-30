@@ -8,7 +8,7 @@ class Version < ApplicationRecord
   end
 
   def git_base
-    @git_base ||= Git.open(git_repository.local_path)
+    git_repository.git_base
   end
 
   def list_files
