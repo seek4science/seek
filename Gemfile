@@ -130,6 +130,8 @@ gem "puma", ">= 3.12.6"
 
 gem "doorkeeper", ">= 5.2.5"
 
+gem 'request_store'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do

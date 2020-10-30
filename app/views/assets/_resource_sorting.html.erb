@@ -1,4 +1,5 @@
 <% options = Seek::ListSorter.options_for_select(controller_name.classify) %>
+<% options = [[Seek::ListSorter::ORDER_OPTIONS[:relevance][:title], :relevance], *options] if @active_filters[:query].present? %>
 <% url_template = url_for(page_and_sort_params.merge(page: nil, order: '_order_')) %>
 
 <form class="form-inline pull-right">
