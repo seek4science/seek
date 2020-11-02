@@ -10,5 +10,5 @@ module GitVersioning
     git_versions.last
   end
 
-  delegate :git_base, :list_files, :file_contents, :object, :commit, :tree, :trees,:blobs, to: :latest_git_version
+  delegate :git_base, :file_contents, :object, :commit, :tree, :trees,:blobs, to: :latest_git_version
 end
