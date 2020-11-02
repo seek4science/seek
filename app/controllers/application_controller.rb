@@ -592,7 +592,8 @@ class ApplicationController < ActionController::Base
     if attribute_params && attribute_params[:custom_metadata_type_id].present?
       metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
       if metadata_type
-        keys = [:custom_metadata_type_id] + metadata_type.custom_metadata_attributes.collect(&:method_name)
+        keys = [:custom_metadata_type_id]
+        keys = keys + [{data:[metadata_type.custom_metadata_attributes.collect(&:title)]}]
       end
     end
     keys

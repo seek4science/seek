@@ -25,6 +25,10 @@ module Seek
         result = BiomodelsSearchResult.new item_id
         result.title.blank? ? nil : result
       end
+
+      def supported?
+        true
+      end
     end
 
     class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :published_date, :publication_id, :publication_title, :model_id, :last_modification_date, :main_filename)

@@ -10,7 +10,7 @@ class HomesControllerTest < ActionController::TestCase
     # check accessible outside
     get :funding
     assert_response :success
-    assert_select 'h1', /seek funding/i
+    assert_select 'h1', /seek.*funding/i
   end
 
   test 'test should be accessible to seek even if not logged in' do
@@ -317,18 +317,6 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select 'span.headline_announcement_title', count: 0
-  end
-
-  test 'should not show external search without crossref' do
-    with_config_value :solr_enabled, true do
-      with_config_value :external_search_enabled, true do
-        with_config_value :crossref_api_email, '' do
-          get :index
-          assert_response :success
-          assert_select 'div#search_box input#include_external_search', count: 0
-        end
-      end
-    end
   end
 
   test 'should show external search when not logged in' do

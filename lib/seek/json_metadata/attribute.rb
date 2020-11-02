@@ -37,11 +37,6 @@ module Seek
         resolution
       end
 
-      # The method name used to get this attribute via a method call
-      def method_name
-        Seek::JSONMetadata::METHOD_PREFIX + accessor_name
-      end
-
       def pre_process_value(value)
         sample_attribute_type.pre_process_value(value, controlled_vocab: sample_controlled_vocab, linked_sample_type: linked_sample_type)
       end
