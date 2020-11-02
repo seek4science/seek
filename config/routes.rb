@@ -127,7 +127,7 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :versions, concerns: [:git]
+  resources :git_versions, concerns: [:git]
 
   resources :scales do
     collection do
