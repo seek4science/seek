@@ -1,4 +1,4 @@
-class Version < ApplicationRecord
+class GitVersion < ApplicationRecord
   belongs_to :resource, polymorphic: true
 
   before_save :set_commit

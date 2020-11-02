@@ -2,7 +2,7 @@ module GitVersioning
   extend ActiveSupport::Concern
 
   included do
-    has_many :git_versions, class_name: '::Version', as: :resource, dependent: :destroy
+    has_many :git_versions, as: :resource, dependent: :destroy
     has_one :git_repository, as: :resource
   end
 

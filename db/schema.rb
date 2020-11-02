@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_28_092841) do
+ActiveRecord::Schema.define(version: 2020_11_02_123716) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -690,6 +690,21 @@ ActiveRecord::Schema.define(version: 2020_10_28_092841) do
     t.string "uuid"
     t.text "remote"
     t.index ["resource_type", "resource_id"], name: "index_git_repositories_on_resource_type_and_resource_id"
+  end
+
+  create_table "git_versions",  force: :cascade do |t|
+    t.string "resource_type"
+    t.bigint "resource_id"
+    t.integer "version"
+    t.string "name"
+    t.text "description"
+    t.string "target"
+    t.string "commit"
+    t.boolean "mutable"
+    t.text "root_path"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["resource_type", "resource_id"], name: "index_git_versions_on_resource_type_and_resource_id"
   end
 
   create_table "group_memberships", id: :integer,  force: :cascade do |t|
@@ -1893,21 +1908,6 @@ ActiveRecord::Schema.define(version: 2020_10_28_092841) do
     t.integer "posts_count", default: 0
     t.datetime "last_seen_at"
     t.string "uuid"
-  end
-
-  create_table "versions",  force: :cascade do |t|
-    t.string "resource_type"
-    t.bigint "resource_id"
-    t.integer "version"
-    t.string "name"
-    t.text "description"
-    t.string "target"
-    t.string "commit"
-    t.boolean "mutable"
-    t.text "root_path"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["resource_type", "resource_id"], name: "index_versions_on_resource_type_and_resource_id"
   end
 
   create_table "work_groups", id: :integer,  force: :cascade do |t|
