@@ -62,6 +62,7 @@ class GitController < ApplicationController
 
   def stream_blob(blob, filename)
     response.headers['Content-Disposition'] = "attachment; filename=#{filename}"
+    response.headers['Content-Length'] = blob.size.to_s
 
     begin
       self.response_body = Enumerator.new do |yielder|
