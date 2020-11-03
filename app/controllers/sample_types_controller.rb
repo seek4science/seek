@@ -80,11 +80,6 @@ class SampleTypesController < ApplicationController
   # PUT /sample_types/1.json
   def update
 
-    if request.headers["Content-Type"] == "application/vnd.api+json" && request.request_method == "PUT"
-      @sample_attributes = SampleType.find(params[:id]).sample_attributes
-      SampleType.find(params[:id]).sample_attributes = []
-    end
-
     @sample_type.update_attributes(sample_type_params)
     @sample_type.resolve_inconsistencies
     respond_to do |format|
