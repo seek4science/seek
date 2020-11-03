@@ -129,17 +129,15 @@ class SamplesController < ApplicationController
   private
 
   def sample_params(sample_type=nil)
-    sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:accessor_name).collect(&:to_sym) | sample_type.sample_attributes.map(&:method_name).collect(&:to_sym) : []
-    attribute_map = params[:sample][:attribute_map]
-    if (attribute_map)
-      attribute_map.each do |key,value|
-        params[:sample]["#{METHOD_PREFIX}#{key}"] = value
-      end
+    sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:title).collect(&:to_sym) : []
+    if params[:sample][:attribute_map]
+        params[:sample][:data] = params[:sample].delete(:attribute_map)
     end
-    params.require(:sample).permit(:sample_type_id, :other_creators, :title, { project_ids: [] },
-                                   { data: sample_type_param_keys }, { creator_ids: [] }, 
-                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] }, sample_type_param_keys,
-                                   discussion_links_attributes:[:id, :url, :label, :_destroy])
+    puts params[:sample][:data]
+    params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
+                              { data: sample_type_param_keys }, { creator_ids: [] },
+                              { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                              discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   def update_sample_with_params
