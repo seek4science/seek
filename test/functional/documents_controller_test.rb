@@ -104,6 +104,26 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_redirected_to document_path(assigns(:document))
   end
 
+  test 'should create document version' do
+    document = Factory(:document)
+    login_as(document.contributor)
+
+    assert_difference('ActivityLog.count') do
+      assert_no_difference('Document.count') do
+        assert_difference('Document::Version.count') do
+          assert_difference('ContentBlob.count') do
+            post :new_version, params: { id: document.id, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }], revision_comments: 'new version!' }
+          end
+        end
+      end
+    end
+
+    assert_redirected_to document_path(assigns(:document))
+    assert_equal 2, assigns(:document).version
+    assert_equal 2, assigns(:document).versions.count
+    assert_equal 'new version!', assigns(:document).latest_version.revision_comments
+  end
+
   test 'should create and link to event' do
     person = Factory(:person)
     login_as(person)
