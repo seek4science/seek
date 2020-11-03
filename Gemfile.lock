@@ -988,6 +988,7 @@ DEPENDENCIES
   recaptcha (~> 4.1.0)
   redcarpet
   request-log-analyzer
+  request_store
   responders
   rest-client (~> 2.0)
   rfc-822

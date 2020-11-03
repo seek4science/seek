@@ -163,13 +163,6 @@ class Sample < ApplicationRecord
     sample_type ? data.values.reject(&:blank?).uniq : []
   end
 
-  # override to insert the extra accessors for mass assignment
-  def mass_assignment_authorizer(role)
-    extra = []
-    extra = sample_type.sample_attributes.collect(&:method_name) if sample_type
-    super(role) + extra
-  end
-
   def set_title_to_title_attribute_value
     self.title = title_from_data
   end

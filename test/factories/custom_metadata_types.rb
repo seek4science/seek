@@ -59,5 +59,6 @@ Factory.define(:study_custom_metadata_type_with_symbols, class: CustomMetadataTy
     a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'+name')
     a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'-name')
     a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'&name')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'name(name)')
   end
 end
