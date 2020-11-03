@@ -6,6 +6,16 @@
 
 <%= content_for :pagination %>
 
+<%# If there is no param for view, try to retrieve from session information %>
+<% if (!params.has_key?(:view) && session.has_key?(:view)) %>
+  <% params[:view] = session[:view]%>
+<% elsif (params.has_key?(:view))%>
+  <% session[:view] = params[:view]%>
+<% else %>
+  <% params[:view]=="default"%>
+  <% session[:view] = params[:view]%>
+<% end%>
+
 <div class="list_items_container">
   <ul id="view_tabs" class="nav nav-tabs">
     <li role="presentation" <% if params[:view]=="default" || !params.has_key?(:view) %> class="active" <%end%>>
@@ -24,16 +34,16 @@
     <table class="table table-hover table-bordered">
       <thead>
         <tr>
-          <th>Title</th>
-          <th>Creators</th>
-          <th>Project</th>
+          <th style="width:30%">Title</th>
+          <th style="width:30%">Creators</th>
+          <th style="width:30%">Project</th>
         </tr>
       </thead>
       <tbody>
-        <%= render partial: 'assets/resource_list_item_table', collection: objects %>%
+        <%= render partial: 'assets/resource_list_item_table', collection: objects %>
       </tbody>
     </table>
-  <% else %>
+  <% elsif params[:view]=="default" || !params.has_key?(:view) %>
     <%= render partial: 'assets/resource_list_item', collection: objects %>
   <% end %>
 </div>

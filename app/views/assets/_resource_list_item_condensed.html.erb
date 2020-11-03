@@ -33,25 +33,29 @@
   <div class="panel-heading rli-head">
     <div class="container">
       <div class="row">
-        <div class="col-sm-1">
-          <a
-            data-toggle="collapse"
-            data-target="#collapse_<%= resource.id%>"
-            aria-hidden="true"
-            aria-expanded="false"
-            ><span class="glyphicon glyphicon-option-horizontal"> </span>
-            <span class="glyphicon glyphicon-option-vertical"> </span>
-          </a>
+        <div class="col-sm-4">
+          <div class="row">
+            <div class="col-sm-2">
+              <a href="#"
+                data-toggle="collapse"
+                data-target="#collapse_<%= resource.id%>"
+                aria-hidden="true"
+                aria-expanded="false">
+                <span class="caret" style="border-width: 10px 8px 10px 8px;"> </span>
+              </a>
+            </div>
+            <div class="col-sm-10">
+              <%= list_item_title resource, title_options %>
+            </div>
+          </div>
         </div>
-        <div class="col-sm-3">
-          <%= list_item_title resource, title_options %>
-        </div>
-        <div class="col-sm-5">
+        <div class="col-sm-4">
           <%= list_item_person_list resource.creators %>
         </div>
         <% if resource.respond_to?(:projects) && ![Event, Person, Project, Institution, Programme, Collection].include?(resource.class) %>
-          <div class="col-sm-3 text-right">
+          <div class="col-sm-4 text-right">
             <div class="rli-project-list">
+            <b> Project: </b>
               <%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %>
             </div>  
           </div>
