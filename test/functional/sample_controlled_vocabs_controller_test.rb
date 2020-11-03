@@ -95,7 +95,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
   end
 
   test 'update' do
-    login_as(Factory(:project_administrator))
+    login_as(Factory(:admin))
     cv = Factory(:apples_sample_controlled_vocab)
     term_ids = cv.sample_controlled_vocab_terms.collect(&:id)
     assert_no_difference('SampleControlledVocab.count') do
@@ -158,7 +158,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
   end
 
   test 'destroy' do
-    login_as(Factory(:project_administrator))
+    login_as(Factory(:admin))
     cv = Factory(:apples_sample_controlled_vocab)
     assert_difference('SampleControlledVocab.count', -1) do
       assert_difference('SampleControlledVocabTerm.count', -4) do
@@ -168,6 +168,17 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
   end
 
   test 'need login to destroy' do
+    cv = Factory(:apples_sample_controlled_vocab)
+    assert_no_difference('SampleControlledVocab.count') do
+      assert_no_difference('SampleControlledVocabTerm.count') do
+        delete :destroy, params: { id: cv }
+      end
+    end
+    assert_response :redirect
+  end
+
+  test 'need to be project member to destroy' do
+    login_as(Factory(:user))
     cv = Factory(:apples_sample_controlled_vocab)
     assert_no_difference('SampleControlledVocab.count') do
       assert_no_difference('SampleControlledVocabTerm.count') do
