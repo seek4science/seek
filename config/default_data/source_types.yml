@@ -8,39 +8,229 @@ Plant_ArrayExpress:
         - attribute:
             title: Organism*
             short_name: ""
-            description: ""
+            description: "A material entity that is an individual living system, such as animal, plant, bacteria or virus, that is capable of replicating or reproducing, growth and maintenance in the right environment. An organism may be unicellular or made up, like humans, of many billions of cells divided into specialized tissues and organs."
             IRI: "http://purl.obolibrary.org/obo/OBI_0100026"
+        - attribute:
+            title: Organism part*
+            short_name: ""
+            description: "The part of organism's anatomy or substance arising from an organism from which the biomaterial was derived, excludes cells. E.g. tissue, organ, system, sperm, blood or body location (arm)."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000635"
         - attribute:
             title: Developmental stage*
             short_name: ""
-            description: ""
+            description: "A developmental stage is spatiotemporal region encompassing some part of the life cycle of an organism, e.g. blastula stage"
             IRI: "http://www.ebi.ac.uk/efo/EFO_0000399"
         - attribute:
             title: Age*
             short_name: ""
-            description: ""
+            description: "A temporal measurement of the time period elapsed since an identifiable point in the life cycle of an organism. If a developmental stage is specified, the identifiable point would be the beginning of that stage. Otherwise the identifiable point must be specified such as planting (e.g. 3 days post planting)."
             IRI: "http://www.ebi.ac.uk/efo/EFO_0000246"
-        - attribute:
-            title: Age Measurement Unit*
-            short_name: ""
-            description: ""
-            IRI: ""
-        - attribute:
-            title: Genotype*
-            short_name: ""
-            description: ""
-            IRI: "http://www.ebi.ac.uk/efo/EFO_0000513"
         - attribute:
             title: Cultivar*
             short_name: ""
+            description: "A cultivated plant variety selected and given a name because it has desirable characteristics that distinguish it from otherwise similar plants of the same species."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0005136"
+        - attribute:
+            title: Genotype*
+            short_name: ""
+            description: "The total sum of the genetic information of an organism that is known and relevant to the experiment being performed, including chromosomal, plasmid, viral or other genetic material which has been introduced into the organism either prior to or during the experiment."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000513"
+        - attribute:
+            title: Material Type*
+            short_name: ""
+            description: "The total sum of the genetic information of an organism that is known and relevant to the experiment being performed, including chromosomal, plasmid, viral or other genetic material which has been introduced into the organism either prior to or during the experiment."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000513"
+        - attribute:
+            title: Cell Line
+            short_name: ""
             description: ""
             IRI: ""
         - attribute:
-            title: Organism part*
+            title: Cell Type
+            short_name: ""
+            description: "A cell type is a distinct morphological or functional form of cell. Examples are epithelial, glial etc."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000324"
+        - attribute:
+            title: Clinical History
+            short_name: ""
+            description: "Is an information entity about the material's (i.e., the patient's) medical record as background information relevant to the experiment."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000352"
+        - attribute:
+            title: Compound
             short_name: ""
             description: ""
-            IRI: "http://www.ebi.ac.uk/efo/EFO_0000635"
-
+            IRI: ""
+        - attribute:
+            title: Description
+            short_name: ""
+            description: ""
+            IRI: "http://purl.org/dc/elements/1.1/description"
+        - attribute:
+            title: Diet
+            short_name: ""
+            description: "The customary allowance of food and drink taken by a person or an animal from day to day, particularly one especially planned to meet specific requirements of the individual, including or excluding certain items of food; a prescribed course of eating and drinking in which the amount and kind of food, as well as the times at which it is to be taken, are regulated for therapeutic purposes or selected with reference to a particular state of health. Regular course of eating and drinking adopted by a person or animal. This does not include DIET THERAPY, a specific diet prescribed in the treatment of a disease."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0002755"
+        - attribute:
+            title: Disease
+            short_name: ""
+            description: "A disease is a disposition to undergo pathological processes that exists in an organism because of one or more disorders in that organism."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000408"
+        - attribute:
+            title: Disease Staging
+            short_name: ""
+            description: "The stage or progression of a disease in an organism. Includes pathological staging of cancers and other disease progression. E.g. Dukes C stage describing colon cancer"
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000410"
+        - attribute:
+            title: Dose
+            short_name: ""
+            description: "The total quantity or strength of a substance administered at one time."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000428"
+        - attribute:
+            title: Ecotype
+            short_name: ""
+            description: "A biotype resulting from selection in a particular habitat, e.g. the A. thaliana Ecotype Ler"
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000434"
+        - attribute:
+            title: Environmental History
+            short_name: ""
+            description: "Information concerning the envinonrment a material entity has been exposed to, such as an organism from a lake."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0004444"
+        - attribute:
+            title: Environmetal stress
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Fraction
+            short_name: ""
+            description: "Definition: A dimensionless ratio unit which relates the part (the numerator) to the whole (the denominator)"
+            IRI: "http://purl.obolibrary.org/obo/UO_0000191"
+        - attribute:
+            title: Genetic Modification
+            short_name: ""
+            description: "A genetic modification of the genome of an organism which may occur naturally by spontaneous mutation, or be introduced by some experimental means. Examples of genetic modification include specification of a transgene or the gene knocked-out or details of transient transfection."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000510"
+        - attribute:
+            title: Growth Condition
+            short_name: ""
+            description: "A role that a material entity can play which enables particular conditions used to grow organisms or parts of the organism. This includes isolated environments such as cultures and open environments such as field studies."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000523"
+        - attribute:
+            title: Immunoprecipitate
+            short_name: ""
+            description: "The precipitate antibody bound target molecules generated when precipitating an antigen out of a solution during the process of immunoprecipitation."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000541"
+        - attribute:
+            title: Individual
+            short_name: ""
+            description: "An individual used a specimen in an experiment, from which a material sample was derived."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000542"
+        - attribute:
+            title: Infect
+            short_name: ""
+            description: "The detrimental process in which an infectious agent colonizes or replicates in a host environment"
+            IRI: "http://purl.obolibrary.org/obo/OBI_1110021"
+        - attribute:
+            title: Inferred Cell Type
+            short_name: ""
+            description: "A cell type classification that is determined as result of a single-cell analysis, such as cell clustering or trajectory analysis."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0010196"
+        - attribute:
+            title: Injury
+            short_name: ""
+            description: "Damage inflicted on the body as the direct or indirect result of an external force, with or without disruption of structural continuity."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000546"
+        - attribute:
+            title: Irradiate
+            short_name: ""
+            description: "The process of treating a material with radiation"
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000554"
+        - attribute:
+            title: Karyotype
+            short_name: ""
+            description: "A karyotype is the number and appearance of chromosomes in the nucleus of a eukaryotic cell."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0004426"
+        - attribute:
+            title: Phenotype
+            short_name: ""
+            description: "The observable form taken by some character (or group of characters) in an individual or an organism, excluding pathology and disease. The detectable outward manifestations of a specific genotype."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000651"
+        - attribute:
+            title: Post Analysis Well Quality
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Provider
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: RNA Interference
+            short_name: ""
+            description: "The process in which double-stranded RNAs silence cognate genes. Involves posttranscriptional gene inactivation ('silencing') both of transgenes or dsRNA introduced into a germline, and of the host gene(s) homologous to the transgenes or dsRNA. This silencing is triggered by the introduction of transgenes or double-stranded RNA (dsRNA), and can occur through a specific decrease in the level of mRNA, or by negative regulation of translation, of both host genes and transgenes."
+            IRI: "http://purl.obolibrary.org/obo/GO_0016246"
+        - attribute:
+            title: Replicate
+            short_name: ""
+            description: "A role played by a a biological sample in the context of an experiment where the intent is that biological or technical variation is measured."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000683"
+        - attribute:
+            title: Response to Treatment
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Sampling site
+            short_name: ""
+            description: "A site from which a sample, i.e. a statistically representative of the whole, is extracted from the whole. e.g. a liver sample"
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000688"
+        - attribute:
+            title: Sex
+            short_name: ""
+            description: "The assemblage of physical properties or qualities by which male is distinguished from female; the physical difference between male and female; the distinguishing peculiarity of male or female. An organismal quality inhering in a bearer by virtue of the bearer's ability to undergo sexual reproduction in order to differentiate the individuals or types involved. Term applied to any organism able to undergo sexual reproduction in order to differentiate the individuals or types involved. Sexual reproduction is defined as the ability to exchange genetic material with the potential of recombinant progeny."
+            IRI: "http://purl.obolibrary.org/obo/PATO_0000047"
+        - attribute:
+            title: Single Cell Indentifier
+            short_name: ""
+            description: "A unique identifier for a single cell specimen."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0010197"
+        - attribute:
+            title: Single Cell Well Quality
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Specimen With Known Storage Stage
+            short_name: ""
+            description: "A specimen for which it is known whether it has been subjected to storage of a specified type."
+            IRI: "http://purl.obolibrary.org/obo/OBI_0001472"
+        - attribute:
+            title: Stimulus
+            short_name: ""
+            description: ""
+            IRI: ""
+        - attribute:
+            title: Strain
+            short_name: ""
+            description: "A population of organisms that is geneticaly different from others of the same species and possessing a set of defined characteristics."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0005135"
+        - attribute:
+            title: Time
+            short_name: ""
+            description: "Time"
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0000721"
+        - attribute:
+            title: Tumor grading
+            short_name: ""
+            description: "Determination of the grade (severity/stage) of a tumor sample, used in cancer biology to describe abnormalities/qualities of tumor cells or tissues. Values can be described by terms from NCI Thesaurus."
+            IRI: "http://purl.obolibrary.org/obo/OBI_0600002"
+        - attribute:
+            title: Xenograft
+            short_name: ""
+            description: "Transplantation between animals of different species."
+            IRI: "http://www.ebi.ac.uk/efo/EFO_0003942"
+            
 PlantPhenotype_MIAPPE:
     name: PlantPhenotype-MIAPPE
     group:
@@ -206,27 +396,27 @@ Nucleic_acid_library_construction_ArrayExpress:
     attributes:
         - attribute:
             title: Library layout*
-            short_name: "LibLayout"
+            short_name: "lib_layout"
             description: ""
             IRI: ""
         - attribute:
             title: Library source*
-            short_name: "LibSource"
+            short_name: "lib_source"
             description: ""
             IRI: ""
         - attribute:
             title: Library strategy*
-            short_name: "LibStrategy"
+            short_name: "lib_strategy"
             description: ""
             IRI: ""
         - attribute:
             title: Library selection*
-            short_name: "LibSelection"
+            short_name: "lib_selection"
             description: ""
             IRI: ""
         - attribute:
             title: Library strand
-            short_name: "LibStrand"
+            short_name: "lib_strand"
             description: ""
             IRI: ""
         - attribute:
