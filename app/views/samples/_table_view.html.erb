@@ -24,7 +24,7 @@
                   <td><%= sample.id %></td>
                   <td><%= sample.title %></td>
                   <% shown_attributes.each do |attribute| %>
-                      <% if (errors = sample.errors[attribute.method_name]).any? %>
+                      <% if (errors = sample.errors[attribute.title]).any? %>
                           <td class="sample-field-error">
                             <%# Wrapping <div> needed for popover to display properly %>
                             <%= content_tag(:div, data: {

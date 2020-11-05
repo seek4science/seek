@@ -2750,7 +2750,7 @@
                     }
                 }
             }
-	    },
+        },
         "/people/{id}": {
             "parameters": [
                 {
@@ -5711,46 +5711,6 @@
             ],
             "additionalProperties": false
         },
-        "collectionSkeleton": {
-            "properties": {
-                "id": {
-                    "$ref": "#/definitions/nonEmptyString"
-                },
-                "type": {
-                    "$ref": "#/definitions/collectionType"
-                },
-                "attributes": {
-                    "type": "object",
-                    "properties": {
-                        "title": {
-                            "$ref": "#/definitions/nonEmptyString"
-                        }
-                    },
-                    "required": [
-                        "title"
-                    ],
-                    "additionalProperties": false
-                },
-                "links": {
-                    "$ref": "#/definitions/linksType"
-                }
-            },
-            "required": [
-                "id",
-                "type",
-                "attributes",
-                "links"
-            ],
-            "additionalProperties": false
-        },
-        "collectionSkeletons": {
-            "type": "array",
-            "minItems": 0,
-            "uniqueItems": true,
-            "items": {
-                "$ref": "#/definitions/collectionSkeleton"
-            }
-        },
         "collectionsResponse": {
             "type": "object",
             "properties": {
@@ -6707,89 +6667,6 @@
                 "$ref": "../examples/assayPatch.json"
             }
         },
-        "collectionResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "$ref": "#/definitions/nonEmptyString"
-                        },
-                        "type": {
-                            "$ref": "#/definitions/collectionType"
-                        },
-                        "attributes": {
-                            "$ref": "#/definitions/contributedTypeAttributes"
-                        },
-                        "relationships": {
-                            "type": "object",
-                            "properties": {
-                                "creators": {
-                                    "$ref": "#/definitions/peopleReferenceList"
-                                },
-                                "submitter": {
-                                    "$ref": "#/definitions/peopleReferenceList"
-                                },
-                                "people": {
-                                    "$ref": "#/definitions/peopleReferenceList"
-                                },
-                                "projects": {
-                                    "$ref": "#/definitions/projectReferencesList"
-                                },
-                                "publications": {
-                                    "$ref": "#/definitions/publicationReferencesList"
-                                },
-                                "items": {
-                                    "$ref": "#/definitions/collectionItemReferencesList"
-                                }
-                            },
-                            "required": [
-                                "creators",
-                                "submitter",
-                                "people",
-                                "projects",
-                                "publications",
-                                "items"
-                            ],
-                            "additionalProperties": false
-                        },
-                        "links": {
-                            "$ref": "#/definitions/linksType"
-                        },
-                        "meta": {
-                            "$ref": "#/definitions/metaType"
-                        }
-                    },
-                    "required": [
-                        "id",
-                        "type",
-                        "attributes",
-                        "relationships",
-                        "links",
-                        "meta"
-                    ],
-                    "additionalProperties": false
-                },
-                "included": {
-                    "type": "array",
-                    "minItems": 0,
-                    "uniqueItems": true,
-                    "items": {
-                        "$ref": "#/definitions/collectionItem"
-                    }
-                },
-                "jsonapi": {
-                    "$ref": "#/definitions/JsonApiVersion"
-                }
-            },
-            "required": [
-                "data",
-                "included",
-                "jsonapi"
-            ],
-            "additionalProperties": false
-        },
         "collectionPost": {
             "type": "object",
             "properties": {
@@ -6926,22 +6803,6 @@
                 "$ref": "../examples/collectionPatch.json"
             }
         },
-        "collectionItemResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/collectionItem"
-                },
-                "jsonapi": {
-                    "$ref": "#/definitions/JsonApiVersion"
-                }
-            },
-            "required": [
-                "data",
-                "jsonapi"
-            ],
-            "additionalProperties": false
-        },
         "collectionItemPost": {
             "type": "object",
             "properties": {
@@ -6961,7 +6822,6 @@
                                     "$ref": "#/definitions/nullableInteger"
                                 }
                             },
-                            "required": [],
                             "additionalProperties": false
                         },
                         "relationships": {
@@ -7014,7 +6874,6 @@
                                     "$ref": "#/definitions/nullableInteger"
                                 }
                             },
-                            "required": [],
                             "additionalProperties": false
                         },
                         "relationships": {
@@ -10652,26 +10511,86 @@
                 "$ref": "#/definitions/collectionSkeleton"
             }
         },
-        "collectionsResponse": {
+        "collectionResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/collectionSkeletons"
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "type": {
+                            "$ref": "#/definitions/collectionType"
+                        },
+                        "attributes": {
+                            "$ref": "#/definitions/contributedTypeAttributes"
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "creators": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "submitter": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "people": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                },
+                                "publications": {
+                                    "$ref": "#/definitions/publicationReferencesList"
+                                },
+                                "items": {
+                                    "$ref": "#/definitions/collectionItemReferencesList"
+                                }
+                            },
+                            "required": [
+                                "creators",
+                                "submitter",
+                                "people",
+                                "projects",
+                                "publications",
+                                "items"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "links": {
+                            "$ref": "#/definitions/linksType"
+                        },
+                        "meta": {
+                            "$ref": "#/definitions/metaType"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "type",
+                        "attributes",
+                        "relationships",
+                        "links",
+                        "meta"
+                    ],
+                    "additionalProperties": false
+                },
+                "included": {
+                    "type": "array",
+                    "minItems": 0,
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "#/definitions/collectionItem"
+                    }
                 },
                 "jsonapi": {
                     "$ref": "#/definitions/JsonApiVersion"
-                },
-                "meta": {
-                    "$ref": "#/definitions/baseMetaType"
-                },
-                "links": {
-                    "$ref": "#/definitions/indexLinks"
                 }
             },
             "required": [
                 "data",
-                "jsonapi",
-                "meta"
+                "included",
+                "jsonapi"
             ],
             "additionalProperties": false
         },
