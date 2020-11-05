@@ -471,9 +471,14 @@ module ApplicationHelper
     !(action_name == 'edit' || action_name == 'update')
   end
 
+  def pending_project_creation_request?
+    return false unless admin_logged_in?
+    return MessageLog.pending_project_creation_requests.any?
+  end
+
   #whether to show a banner encouraging you to join or create a project
   def join_or_create_project_banner?
-    return false if !logged_in_and_registered?
+    return false unless logged_in_and_registered?
     return false if logged_in_and_member?
     return false if current_page?(create_or_join_project_home_path) ||
         current_page?(guided_create_projects_path) ||

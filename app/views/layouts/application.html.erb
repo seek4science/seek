@@ -37,6 +37,14 @@
         <% end %>
     <% end %>
 
+    <% if pending_project_creation_request? %>
+      <div id='pending-project-creation-warning' class="alert alert-danger text-center">
+        There are pending <%= t('project') %> creation requests
+      </div>
+    <% end %>
+
+
+
     <% if join_or_create_project_banner? %>
       <div class="alert alert-warning text-center">
         As a newly registered user, you are not yet a member of a <%= t('project') %>. Please

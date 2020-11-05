@@ -139,6 +139,37 @@ class MessageLogTest < ActiveSupport::TestCase
     assert log.responded?
   end
 
+  test 'respond' do
+    log=valid_log
+    log.save!
+    refute log.responded?
+    assert_nil log.response
+
+    log.respond('hello')
+    log.reload
+
+    assert log.responded?
+    assert_equal 'hello',log.response
+  end
+
+  test 'project creation request scope' do
+    project = Project.new(title: 'my project')
+    project2 = Project.new(title: 'my project 2')
+    person = Factory(:person)
+    admin = Factory(:admin)
+    institution = Factory(:institution)
+
+    log1=MessageLog.log_project_creation_request(person,Factory(:programme),project,institution)
+    log2=MessageLog.log_project_creation_request(person,Factory(:programme),project2,institution)
+
+    assert_equal [log1,log2],MessageLog.project_creation_requests.sort_by(&:id)
+    assert_equal [log1,log2],MessageLog.pending_project_creation_requests.sort_by(&:id)
+
+    log1.respond('Accepted')
+    assert_equal [log1,log2],MessageLog.project_creation_requests.sort_by(&:id)
+    assert_equal [log2],MessageLog.pending_project_creation_requests
+  end
+
 
   private
 
