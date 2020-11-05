@@ -120,6 +120,7 @@ SEEK::Application.routes.draw do
       get :get_stats
       get :registration_form
       get :edit_tag
+      get :project_creation_requests
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job

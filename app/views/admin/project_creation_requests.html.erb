@@ -1,0 +1,9 @@
+<h1><%= @requests.count %> Pending <%= t('project') %> creation <%= "request".pluralize(@requests.count) %></h1>
+
+<ul>
+  <% @requests.each do |request| %>
+    <li>
+      Request from <%= link_to(request.sender.title, request.sender) %> - <%= link_to('Respond', administer_create_project_request_projects_path(message_log_id: request.id)) %>
+    </li>
+  <% end %>
+</ul>
