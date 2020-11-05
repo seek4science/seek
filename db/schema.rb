@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_02_123716) do
+ActiveRecord::Schema.define(version: 2020_11_05_130846) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -704,6 +704,7 @@ ActiveRecord::Schema.define(version: 2020_11_02_123716) do
     t.text "root_path"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "metadata"
     t.index ["resource_type", "resource_id"], name: "index_git_versions_on_resource_type_and_resource_id"
   end
 

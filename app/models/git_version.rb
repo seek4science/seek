@@ -3,6 +3,14 @@ class GitVersion < ApplicationRecord
 
   before_save :set_commit
 
+  def metadata
+    JSON.parse(super || '{}')
+  end
+
+  def metadata= m
+    super(m.to_json)
+  end
+
   def git_repository
     resource.git_repository
   end
@@ -46,6 +54,22 @@ class GitVersion < ApplicationRecord
       git_base.revparse(target) # Returns the SHA1 for the target (commit/branch/tag)
     rescue Git::GitExecuteError # Was it an origin branch that is not tracked locally?
       git_base.revparse("remotes/origin/#{target}")
+    end
+  end
+
+  # Check metadata, and parent resource for missing methods. Allows GitVersions to be used as a drop-in replacement for
+  #  Workflow::Version etc.
+  def respond_to_missing?(name, include_private = false)
+    metadata.key?(name.to_s) || resource.respond_to?(name) || super
+  end
+
+  def method_missing(method, *args, &block)
+    if metadata.key?(method.to_s) && args.empty?
+      metadata[method.to_s]
+    elsif resource.respond_to?(method)
+      resource.public_send(method, *args, &block)
+    else
+      super
     end
   end
 end
