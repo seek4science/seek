@@ -3,7 +3,6 @@ class Workflow < ApplicationRecord
   include Seek::UploadHandling::ExamineUrl
   include Seek::BioSchema::Support
   include WorkflowExtraction
-  include GitVersioning
 
   belongs_to :workflow_class, optional: true
   has_filter workflow_type: Seek::Filtering::Filter.new(value_field: 'workflow_classes.key',
@@ -20,6 +19,8 @@ class Workflow < ApplicationRecord
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   has_and_belongs_to_many :sops
+
+  git_versioning
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')

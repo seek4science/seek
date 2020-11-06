@@ -43,6 +43,14 @@ class GitVersion < ApplicationRecord
     tree.blobs
   end
 
+  def latest_git_version?
+    resource.latest_git_version == self
+  end
+
+  def is_a_version?
+    true
+  end
+
   private
 
   def set_commit
