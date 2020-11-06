@@ -162,7 +162,7 @@ class Study < ApplicationRecord
 
   def self.get_license(studies_file)
 
-    default_license = 'test'
+    default_license = 'CC-BY-SA-4.0'
     investigation_license_id = ''
     license_row_index = 7
     columns = [2]
@@ -186,7 +186,7 @@ class Study < ApplicationRecord
     license_id.remove('-').remove('.').remove(' ').upcase
   end
 
-  def self.check_study_is_valid(study, metadata)
+  def self.check_study_is_MIAPPE_compliant(study, metadata)
     mandatory_fields = %w[id title study_start_date contact_institution geographic_location_country experimental_site_name
                         description_of_the_experimental_design observation_unit_description description_of_growth_facility]
     missing_fields = []

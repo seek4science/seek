@@ -147,11 +147,6 @@ class StudiesController < ApplicationController
     # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: Factory(:private_policy))
     # study.policy = Policy.create(name: 'default policy', access_type: 1)
     # render plain: params[:studies].inspect
-    user_uuid = if User.current_user
-                  User.current_user.attributes['uuid'].to_s
-                else
-                  'user_uuid'
-                end
     metadata_types = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study')
     studies_length = params[:studies][:title].length
     studies_uploaded = false
@@ -160,7 +155,6 @@ class StudiesController < ApplicationController
     unless params[:existing_studies].blank?
       remove_existing_studies(params[:existing_studies])
     end
-
 
     studies_length.times do |index|
       metadata = generate_metadata(params[:studies], index)
@@ -175,49 +169,11 @@ class StudiesController < ApplicationController
         )
       }
       @study = Study.new(study_params)
-      Study.check_study_is_valid(@study, metadata)
+      Study.check_study_is_MIAPPE_compliant(@study, metadata)
       if @study.valid? && @study.save! && @study.custom_metadata.valid?
         studies_uploaded = true if @study.save
-
-        data_file_names = params[:studies][:data_files][index].split(', ')
-        data_file_names.length.times do |data_file_index|
-          study_metadata_id = params[:studies][:id][index]
-          study_id = CustomMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last.item_id
-          assay_class_id = AssayClass.where(title: 'Experimental assay').first.id
-          data_file_description = params[:studies][:data_file_description][index].split(', ')
-          assay_params = {
-            title: 'Assay for ' + params[:studies][:id][index] + '-' + (data_file_index + 1).to_s,
-            description: data_file_description[data_file_index],
-            study_id: study_id,
-            assay_class_id: assay_class_id
-          }
-
-          data_file_name = "#{data_file_names[data_file_index]}.csv"
-          data_file_url = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/data/#{data_file_name}"
-          data_file_content_blob = ContentBlob.new
-          data_file_content_blob.tmp_io_object = File.open(data_file_url)
-          data_file_content_blob.original_filename = "#{data_file_name}"
-
-          license = params[:studies][:license]
-          data_file_params = {
-            title: data_file_names[data_file_index],
-            description: data_file_description[data_file_index],
-            license: license,
-            projects: Project.where(title: 'Default Project'),
-            content_blob: data_file_content_blob
-          }
-
-          assay_asset_params = {
-            assay: Assay.new(assay_params),
-            asset: DataFile.new(data_file_params)
-          }
-          @assay_asset = AssayAsset.new(assay_asset_params)
-
-          if @assay_asset.valid? && @assay_asset.save!
-            data_file_uploaded = true if @assay_asset.save
-          end
-        end
       end
+      data_file_uploaded = create_batch_assay_asset(params, index)
     end
 
     batch_uploaded = studies_uploaded && data_file_uploaded
@@ -236,6 +192,57 @@ class StudiesController < ApplicationController
     else
       respond_to do |format|
         format.html { render action: 'batch_preview', status: :unprocessable_entity }
+      end
+    end
+  end
+
+  def create_batch_assay_asset(params, index)
+
+    user_uuid = if User.current_user
+                  User.current_user.attributes['uuid'].to_s
+                else
+                  'user_uuid'
+                end
+
+    data_file_names = params[:studies][:data_files][index].remove(' ').split(',')
+    data_file_names.length.times do |data_file_index|
+
+      study_metadata_id = params[:studies][:id][index]
+      study_id = CustomMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last.item_id
+      assay_class_id = AssayClass.where(title: 'Experimental assay').first.id
+      data_file_description = params[:studies][:data_file_description][index].remove(' ').split(',')
+      assay_params = {
+        title: 'Assay for ' + params[:studies][:id][index] + '-' + (data_file_index + 1).to_s,
+          description: data_file_description[data_file_index],
+          study_id: study_id,
+          assay_class_id: assay_class_id
+      }
+
+
+      # TODO Find file without using the extension.
+      data_file_name = "#{data_file_names[data_file_index]}.csv"
+      data_file_location = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/data/#{data_file_name}"
+      data_file_content_blob = ContentBlob.new
+      data_file_content_blob.tmp_io_object = File.open(data_file_location)
+      data_file_content_blob.original_filename = "#{data_file_name}"
+
+      license = params[:studies][:license]
+      data_file_params = {
+        title: data_file_names[data_file_index],
+          description: data_file_description[data_file_index],
+          license: license,
+          projects: Project.where(title: 'Default Project'),
+          content_blob: data_file_content_blob
+      }
+
+      assay_asset_params = {
+        assay: Assay.new(assay_params),
+        asset: DataFile.new(data_file_params)
+      }
+      @assay_asset = AssayAsset.new(assay_asset_params)
+
+      if @assay_asset.valid? && @assay_asset.save!
+        return true if @assay_asset.save
       end
     end
   end
