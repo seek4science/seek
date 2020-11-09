@@ -195,6 +195,7 @@ class WorkflowsController < ApplicationController
 
   def create_version_metadata
     @workflow = Workflow.find(params[:id])
+    @workflow.assign_attributes(workflow_params)
     update_sharing_policies(@workflow)
     filter_associated_projects(@workflow)
 
