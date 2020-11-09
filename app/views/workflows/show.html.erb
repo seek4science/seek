@@ -19,9 +19,7 @@
       </p>
     <% end %>
 
-    <div id="description">
-      <%= item_description(@display_workflow.description) %>
-    </div>
+    <%= item_description(@display_workflow.description) %>
 
     <% begin %>
       <% if @display_workflow.diagram_exists? || @display_workflow.can_render_diagram? %>
