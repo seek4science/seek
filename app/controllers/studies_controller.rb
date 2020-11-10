@@ -219,9 +219,9 @@ class StudiesController < ApplicationController
       }
 
 
-      # TODO Find file without using the extension.
-      data_file_name = "#{data_file_names[data_file_index]}.csv"
-      data_file_location = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/data/#{data_file_name}"
+      data_file_path = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/data/"
+      data_file_name = datafile_name_with_extension("#{data_file_names[data_file_index]}", data_file_path)
+      data_file_location = "#{data_file_path}#{data_file_name}"
       data_file_content_blob = ContentBlob.new
       data_file_content_blob.tmp_io_object = File.open(data_file_location)
       data_file_content_blob.original_filename = "#{data_file_name}"
@@ -267,6 +267,17 @@ class StudiesController < ApplicationController
       cultural_practices: studies_meta_data[:culturalPractices][index]
     }
     metadata
+  end
+
+  def datafile_name_with_extension(file_name, path)
+    files = Dir.entries(path)
+    files.each do |file|
+      if File.basename(file, '.*') == file_name
+        return file
+      elsif File.basename(file, '.*') == File.basename(file_name, '.*')
+        return file
+      end
+    end
   end
 
   def remove_existing_studies(studies)
