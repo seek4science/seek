@@ -435,31 +435,36 @@
     }
 
     function setAutoComplete(e, IRI) {
-        $j(e).bind("keyup", function(event) {
-            const setSource = (data) => {
-                $j(e).autocomplete({
-                    source: data || [],
-                    mustMatch: true
-                });
-            }
-            const url = `/single_pages/${pid}/ontology?iri=${IRI}`
-            $j.ajax({
-                method: 'GET',
-                dataType: "json",
-                url,
-                cache: true,
-                beforeSend: function() {
-                    if (localCache.exist(url)) {
-                        setSource(localCache.get(url))
-                        return false;
-                    }
-                    return true;
-                },
-                complete: function(jqXHR, textStatus) {
-                    const data = jqXHR.responseJSON.data
-                    localCache.set(url, data, setSource(data));
+        $j(e).bind("keydown", function(event) {
+            AutoComplete(e, IRI)
+        })
+        AutoComplete(e, IRI)
+    }
+
+    function AutoComplete(e, IRI) {
+        const setSource = (data) => {
+            $j(e).autocomplete({
+                source: data || [],
+                mustMatch: true
+            });
+        }
+        const url = `/single_pages/${pid}/ontology?iri=${IRI}`
+        $j.ajax({
+            method: 'GET',
+            dataType: "json",
+            url,
+            cache: true,
+            beforeSend: function() {
+                if (localCache.exist(url)) {
+                    setSource(localCache.get(url))
+                    return false;
                 }
-            })
+                return true;
+            },
+            complete: function(jqXHR, textStatus) {
+                const data = jqXHR.responseJSON.data
+                localCache.set(url, data, setSource(data));
+            }
         })
     }
 
@@ -473,6 +478,7 @@
         },
         get: function(url) {
             console.log('Getting in cache for url' + url);
+            console.log(localCache.data[url])
             return localCache.data[url];
         },
         set: function(url, cachedData, callback) {
