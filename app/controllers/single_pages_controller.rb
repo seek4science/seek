@@ -114,7 +114,8 @@ class SinglePagesController < ApplicationController
       flowchart = Flowchart.where(study_id: assay.study.id).first
       if (flowchart)
         source_sample_type = SampleType.find(flowchart.source_sample_type_id)
-        source_sample_type_attributes = source_sample_type.sample_attributes.select(:required, :original_accessor_name, :sample_type_id, :id)
+        source_sample_type_attributes = source_sample_type.sample_attributes.select(:required, :original_accessor_name,
+           :sample_type_id, :id)
         
         assay_sample_type = SampleType.find(assay.sample_type_id)
         # assay_samples = assay_sample_type.samples.json_metadata 
@@ -171,14 +172,14 @@ class SinglePagesController < ApplicationController
 
   def load_source_types
     source_list = []
-    list = SourceType.all()
-    list.each do |item|
-      source_list.push({title: item.name, type: item.source_type, attributes: 
-        item.source_attributes.map do |attribute|
-          {title: attribute.name,
-          shortName: attribute.short_name,
-          des: attribute.description,
-          required: attribute.required}
+    SampleControlledVocab.all().each do |item|
+      source_list.push({title: item.title, type: item.item_type, 
+        sampleCVId: item.id, attributes: 
+        item.sample_controlled_vocab_terms.map do |term|
+          { title: term.label,
+          shortName: term.short_name,
+          des: term.description,
+          required: term.required}
         end
       })
     end
@@ -215,7 +216,8 @@ class SinglePagesController < ApplicationController
 
   def load_IRI attrs
       attrs.map do |m|
-      iri = SourceAttribute.where(name: m.original_accessor_name).first&.IRI || nil
+      # iri = SourceAttribute.where(name: m.original_accessor_name).first&.IRI || nil
+      iri = SampleControlledVocabTerm.where(label: m.original_accessor_name).first&.parent_class || nil
       m.as_json.merge!(IRI: iri)
     end
   end
