@@ -10,10 +10,13 @@ class SampleControlledVocab < ApplicationRecord
 
   has_many :sample_types, through: :sample_attributes
   has_many :samples, through: :sample_types
+  belongs_to :repository_standard, inverse_of: :sample_controlled_vocabs
 
   validates :title, presence: true, uniqueness: true
 
   accepts_nested_attributes_for :sample_controlled_vocab_terms, allow_destroy: true
+  accepts_nested_attributes_for :repository_standard, allow_destroy: true
+
 
   grouped_pagination
 

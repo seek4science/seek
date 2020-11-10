@@ -73,10 +73,10 @@ class SampleControlledVocabsController < ApplicationController
   private
 
   def cv_params
-    params.require(:sample_controlled_vocab).permit(:title, :description, :group, :item_type,
+    params.require(:sample_controlled_vocab).permit(:title, :description, :group, :source_ontology, :ols_root_term_uri,
+                                                    :required, :short_name, :repository_standard_id,
                                                     { sample_controlled_vocab_terms_attributes: [:id, :_destroy, :label,
-                                                      :source_ontology, :parent_class, :short_name, :description,
-                                                      :required, ontology_labels_attributes: [:iri, :label] ]})
+                                                      :iri, :parent_iri]})
   end
 
 end

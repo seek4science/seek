@@ -1,7 +1,8 @@
 class SampleControlledVocabSerializer < BaseSerializer
-  attributes :title, :description, :group, :item_type
+  attributes :title, :description, :source_ontology, :ols_root_term_uri, :required, :short_name
   attributes :sample_controlled_vocab_terms_attributes
-
+  attributes :repository_standard
+  
   has_many :sample_controlled_vocab_terms
 
   def sample_controlled_vocab_terms_attributes
@@ -9,12 +10,8 @@ class SampleControlledVocabSerializer < BaseSerializer
      { 
        id: term.id.to_s,
        label: term.label,
-       source_ontology: term.source_ontology,
-       parent_class: term.parent_class,
-       short_name: term.short_name,
-       description: term.description,
-       required: term.required.to_s,
-       ontology_labels_attributes: term.ontology_labels.collect # The labels and IRIs
+       iri: term.iri,
+       parent_iri: term.parent_iri,
      }
     end
   end
