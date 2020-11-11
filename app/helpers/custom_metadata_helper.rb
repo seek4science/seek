@@ -21,6 +21,10 @@ module CustomMetadataHelper
       end
     when Seek::Samples::BaseType::BOOLEAN
       check_box_tag element_name, value, class: clz.to_s
+    when Seek::Samples::BaseType::SEEK_DATA_FILE
+      options = options_from_collection_for_select(DataFile.authorized_for(:view), :id,
+                                                   :title, value.try(:[],'id'))
+      select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{clz}")
     else
       text_field_tag element_name, value, class: "form-control #{clz}", placeholder: placeholder
     end
