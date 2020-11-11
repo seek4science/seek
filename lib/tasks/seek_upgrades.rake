@@ -19,6 +19,7 @@ namespace :seek do
     refix_country_codes
     fix_missing_dois
     update_samples_json
+    db:seed:sample_attribute_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
