@@ -29,7 +29,7 @@
    title_options = {}
 %>
 
-<tr>
+<tr class="<%= access_based_css_class%>">
   <% for column in tableview_columns -%>
     <% case column %>
     <% when "title" %>
