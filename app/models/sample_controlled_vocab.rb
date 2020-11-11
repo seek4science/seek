@@ -15,7 +15,7 @@ class SampleControlledVocab < ApplicationRecord
   validates :title, presence: true, uniqueness: true
 
   accepts_nested_attributes_for :sample_controlled_vocab_terms, allow_destroy: true
-  accepts_nested_attributes_for :repository_standard, allow_destroy: true
+  accepts_nested_attributes_for :repository_standard, :reject_if => :check_repository_standard
 
 
   grouped_pagination
@@ -45,5 +45,13 @@ class SampleControlledVocab < ApplicationRecord
 
   def update_sample_type_templates(_term)
     sample_types.each(&:queue_template_generation) unless new_record?
+  end
+
+  def check_repository_standard(repo)
+    if _repository_standard = RepositoryStandard.where(title: repo["title"], group_tag: repo["group_tag"]).first
+      self.repository_standard = _repository_standard
+      return true
+    end
+    return false
   end
 end

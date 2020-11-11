@@ -74,7 +74,8 @@ class SampleControlledVocabsController < ApplicationController
 
   def cv_params
     params.require(:sample_controlled_vocab).permit(:title, :description, :group, :source_ontology, :ols_root_term_uri,
-                                                    :required, :short_name, :repository_standard_id,
+                                                    :required, :short_name,
+                                                    { repository_standard_attributes: [:title, :url, :group_tag, :description, :repo_type]},
                                                     { sample_controlled_vocab_terms_attributes: [:id, :_destroy, :label,
                                                       :iri, :parent_iri]})
   end
