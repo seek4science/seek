@@ -43,6 +43,11 @@ Factory.define(:sample_sample_attribute_type, class: SampleAttributeType) do |f|
   f.base_type Seek::Samples::BaseType::SEEK_SAMPLE
 end
 
+Factory.define(:data_file_sample_attribute_type, class: SampleAttributeType) do |f|
+  f.sequence(:title) { |n| "Data file attribute type #{n}" }
+  f.base_type Seek::Samples::BaseType::SEEK_DATA_FILE
+end
+
 # very simple persons name, must be 2 words, first and second word starting with capital with all letters
 Factory.define(:full_name_sample_attribute_type, parent: :string_sample_attribute_type) do |f|
   f.regexp '[A-Z][a-z]+[ ][A-Z][a-z]+'

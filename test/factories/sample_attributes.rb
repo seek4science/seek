@@ -15,6 +15,11 @@ Factory.define(:any_string_sample_attribute, parent: :sample_attribute) do |f|
   f.required true
 end
 
+Factory.define(:data_file_sample_attribute, parent: :sample_attribute) do |f|
+  f.sample_attribute_type factory: :data_file_sample_attribute_type
+  f.required true
+end
+
 Factory.define(:sample_sample_attribute, parent: :sample_attribute) do |f|
   f.sequence(:title) { |n| "sample attribute #{n}" }
   f.linked_sample_type factory: :simple_sample_type

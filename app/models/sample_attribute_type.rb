@@ -85,6 +85,10 @@ class SampleAttributeType < ApplicationRecord
     base_type == Seek::Samples::BaseType::SEEK_STRAIN
   end
 
+  def seek_data_file?
+    base_type == Seek::Samples::BaseType::SEEK_DATA_FILE
+  end
+
   def base_type_handler(additional_options = {})
     Seek::Samples::AttributeTypeHandlers::AttributeTypeHandlerFactory.instance.for_base_type(base_type, additional_options)
   end
