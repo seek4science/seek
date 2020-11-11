@@ -1,4 +1,33 @@
 <% objects = resources_numerical_paginated %>
+<%# All tableview_columns values need to have a corresponding match in _resource_list_item_table.html.erb %>
+<%
+  # The user can keep a custom set of columns for each resource class
+  defaultColView = ["title","creators","projects"]
+  resource = objects[0]
+
+  # # Update stored column names
+  if params.has_key?(:table_cols)
+    session["tableview_" + resource.class.name] = params[:table_cols].split(',')
+  end
+
+  # Set columns to show
+  if session.has_key?("tableview_" + resource.class.name)
+    tableview_columns = session["tableview_"+resource.class.name]
+  else
+    tableview_columns = defaultColView
+  end
+
+  # Prepare available columns for this particular resource type
+  allowedColumns = ['title', 'creators', 'projects','web_page', 'technology_type_uri', 'city', 'citation', 'experimentalists', 'address', 'created_at', 'published_date', 'journal', 'imported_url', 'default_policy_id', 'abstract', 'assay_type_uri', 'default_license', 'model_image_id',  'updated_at', 'other_creators', 'begin_date', 'avatar_id', 'description', 'institution_id', 'id', 'site_root_uri', 'model_type_id', 'contributor_id', 'simulation_data', 'doi', 'license', 'ancestor_id', 'person_responsible_id', 'editor', 'last_jerm_run', 'url', 'site_credentials', 'recommended_environment_id', 'deleted_contributor', 'email', 'orcid', 'pubmed_id', 'organism_id', 'roles_mask', 'template_id', 'wiki_page', 'study_id', 'registered_mode', 'uuid', 'last_used_at', 'start_date', 'skype_name', 'suggested_assay_type_id', 'booktitle', 'publisher', 'last_name', 'suggested_technology_type_id', 'model_format_id', 'publication_type_id', 'human_disease_id', 'version', 'country', 'first_letter', 'end_date', 'imported_source', 'programme_id', 'phone', 'assay_class_id', 'use_default_policy', 'first_name', 'status_id', 'investigation_id', 'policy_id', 'parent_id']
+
+  availableColView = []
+  for col in allowedColumns
+    if resource.respond_to?(col)
+      availableColView.push(col)
+    end
+  end
+%>
+
 
 <% content_for :pagination do %>
   <%= render partial: 'general/paginate_numerical', locals: { objects: objects } if objects.respond_to?(:current_page) %>
@@ -7,12 +36,12 @@
 <%= content_for :pagination %>
 
 <%# If there is no param for view, try to retrieve from session information %>
-<% if (!params.has_key?(:view) && session.has_key?(:view)) %>
+<% if !params.has_key?(:view) && session.has_key?(:view) %>
   <% params[:view] = session[:view]%>
-<% elsif (params.has_key?(:view))%>
+<% elsif params.has_key?(:view)%>
   <% session[:view] = params[:view]%>
 <% else %>
-  <% params[:view]=="default"%>
+  <% params[:view] =="default"%>
   <% session[:view] = params[:view]%>
 <% end%>
 
@@ -34,13 +63,34 @@
     <table class="table table-hover table-bordered">
       <thead>
         <tr>
-          <th style="width:30%">Title</th>
-          <th style="width:30%">Creators</th>
-          <th style="width:30%">Project</th>
+          <% for column in tableview_columns -%>
+            <th style="width:<%= 100/tableview_columns.length %>%"><%= column %></th>
+          <% end -%>
+          <th>
+            <div id="tableview-colselector" class="dropdown">
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle"><span class="glyphicon glyphicon-cog"></span></a>
+                <ul class="dropdown-menu">
+                  <% for column in availableColView -%>
+                    <li>
+                      <div class="checkbox">
+                          <label>
+                              <input type="checkbox" value="<%= column %>"
+                              <% if tableview_columns.include?(column) %>
+                                checked
+                              <% end %>
+                              >
+                              <%= column %>
+                          </label>
+                      </div>
+                    </li>
+                  <% end -%>
+                </ul>
+            </div>
+          </th>
         </tr>
       </thead>
       <tbody>
-        <%= render partial: 'assets/resource_list_item_table', collection: objects %>
+        <%= render partial: 'assets/resource_list_item_table', collection: objects, locals: { tableview_columns: tableview_columns } %>
       </tbody>
     </table>
   <% elsif params[:view]=="default" || !params.has_key?(:view) %>
@@ -56,6 +106,18 @@
       const search_params = url.searchParams;
       search_params.set('view', $j(this).attr('view'));
       url.search = search_params.toString();
-      window.location = url
+      window.location = url;
+  });
+  $j('#tableview-colselector input[type="checkbox"]').click(function () {
+    table_cols = []
+    $j('#tableview-colselector input:checked').each(function() {
+      table_cols.push(this.value);
+    });
+    console.log(table_cols);
+    const url = new URL(window.location.href);
+    const search_params = url.searchParams;
+    search_params.set('table_cols', table_cols);
+    url.search = search_params.toString();
+    window.location = url;
   });
 </script>

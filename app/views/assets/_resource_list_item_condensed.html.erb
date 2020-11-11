@@ -49,9 +49,11 @@
             </div>
           </div>
         </div>
-        <div class="col-sm-4">
-          <%= list_item_person_list resource.creators %>
-        </div>
+        <% if resource.respond_to?('creators') %>
+          <div class="col-sm-4">
+            <%= list_item_person_list resource.creators %>
+          </div>
+        <% end %>
         <% if resource.respond_to?(:projects) && ![Event, Person, Project, Institution, Programme, Collection].include?(resource.class) %>
           <div class="col-sm-4 text-right">
             <div class="rli-project-list">
