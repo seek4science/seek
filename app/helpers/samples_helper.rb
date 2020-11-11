@@ -24,6 +24,10 @@ module SamplesHelper
                                                          :title, :id,
                                                          :title, value.try(:[],'id'))
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{clz}")
+    when Seek::Samples::BaseType::SEEK_DATA_FILE
+      options = options_from_collection_for_select(DataFile.authorized_for(:view), :id,
+                                                         :title, value.try(:[],'id'))
+      select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{clz}")
     when Seek::Samples::BaseType::CV
       terms = attribute.sample_controlled_vocab.sample_controlled_vocab_terms
       options = options_from_collection_for_select(terms, :label, :label, value)
@@ -65,6 +69,8 @@ module SamplesHelper
         seek_strain_attribute_display(value)
       when Seek::Samples::BaseType::SEEK_SAMPLE
         seek_sample_attribute_display(value)
+      when Seek::Samples::BaseType::SEEK_DATA_FILE
+        seek_data_file_attribute_display(value)
       else
         default_attribute_display(attribute, options, sample, value)
       end
@@ -72,10 +78,18 @@ module SamplesHelper
   end
 
   def seek_sample_attribute_display(value)
-    sample = Sample.find_by_id(value['id'])
-    if sample
-      if sample.can_view?
-        link_to sample.title, sample
+    seek_resource_attribute_display(Sample,value)
+  end
+
+  def seek_data_file_attribute_display(value)
+    seek_resource_attribute_display(DataFile,value)
+  end
+
+  def seek_resource_attribute_display(clz, value)
+    item = clz.find_by_id(value['id'])
+    if item
+      if item.can_view?
+        link_to item.title, item
       else
         content_tag :span, 'Hidden', class: 'none_text'
       end
