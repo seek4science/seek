@@ -64,7 +64,7 @@
       <thead>
         <tr>
           <% for column in tableview_columns -%>
-            <th style="width:<%= 100/tableview_columns.length %>%"><%= column %></th>
+            <th style="width:<%= 100/tableview_columns.length %>%"><%= t(column, default: column.to_s).titleize %></th>
           <% end -%>
           <th>
             <div id="tableview-colselector" class="dropdown">
@@ -79,7 +79,7 @@
                                 checked
                               <% end %>
                               >
-                              <%= column %>
+                              <%= t(column, default: column.to_s).titleize %>
                           </label>
                       </div>
                     </li>
