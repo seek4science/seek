@@ -127,17 +127,17 @@ class StudiesController < ApplicationController
                   'user_uuid'
                 end
     tempzip_path = params[:content_blobs][0][:data].tempfile.path
-    data_files, studies = Study.unzip_batch(tempzip_path, user_uuid)
+    data_files, studies = StudyBatchUpload.unzip_batch(tempzip_path, user_uuid)
     study_filename = File.basename(studies.first.to_s)
     studies_file = ContentBlob.new
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{study_filename}")
     studies_file.original_filename = "#{study_filename}"
     studies_file.save!
-    @studies = Study.extract_studies_from_file(studies_file)
+    @studies = StudyBatchUpload.extract_studies_from_file(studies_file)
     @study = @studies[0]
-    @studies_datafiles = Study.extract_study_data_from_file(studies_file)
-    @license = Study.get_license(studies_file)
-    @existing_studies = JSON.parse(Study.get_existing_studies(@studies))
+    @studies_datafiles = StudyBatchUpload.extract_study_data_from_file(studies_file)
+    @license = StudyBatchUpload.get_license_id(studies_file)
+    @existing_studies = JSON.parse(StudyBatchUpload.get_existing_studies(@studies))
 
     render 'studies/batch_preview'
   end
@@ -151,11 +151,6 @@ class StudiesController < ApplicationController
     studies_length = params[:studies][:title].length
     studies_uploaded = false
     data_file_uploaded = false
-
-    unless params[:existing_studies].blank?
-      remove_existing_studies(params[:existing_studies])
-    end
-
     studies_length.times do |index|
       metadata = generate_metadata(params[:studies], index)
       study_params = {
@@ -169,7 +164,7 @@ class StudiesController < ApplicationController
         )
       }
       @study = Study.new(study_params)
-      Study.check_study_is_MIAPPE_compliant(@study, metadata)
+      StudyBatchUpload.check_study_is_MIAPPE_compliant(@study, metadata)
       if @study.valid? && @study.save! && @study.custom_metadata.valid?
         studies_uploaded = true if @study.save
       end
@@ -184,9 +179,14 @@ class StudiesController < ApplicationController
                   else
                     'user_uuid'
                   end
+
+
+      unless params[:existing_studies].blank?
+        remove_existing_studies(params[:existing_studies])
+      end
       FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
       respond_to do |format|
-        flash[:notice] = "The #{t('studies')} were successfully created.<br/>".html_safe
+        flash[:notice] = "The #{t('study').pluralize} were successfully created.<br/>".html_safe
         format.html { redirect_to studies_path }
       end
     else
