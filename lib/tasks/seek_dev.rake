@@ -343,4 +343,14 @@ namespace :seek_dev do
 
   end
 
+  task make_ontology_study_cmt: :environment do
+    cmt = CustomMetadataType.new(title: 'Study Ontology CMT', supported_type:'Study')
+    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'ontology',
+                                                                  required:true,
+                                                                  sample_attribute_type:SampleAttributeType.where(title:'Controlled Vocabulary').first,
+                                                                  sample_controlled_vocab: SampleControlledVocab.find(4))
+    cmt.save!
+  end
+
 end

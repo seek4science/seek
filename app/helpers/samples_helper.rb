@@ -69,10 +69,21 @@ module SamplesHelper
         seek_sample_attribute_display(value)
       when Seek::Samples::BaseType::SEEK_DATA_FILE
         seek_data_file_attribute_display(value)
+      when Seek::Samples::BaseType::CV
+        seek_cv_attribute_display(value, attribute)
       else
         default_attribute_display(attribute, options, sample, value)
       end
     end
+  end
+
+  def seek_cv_attribute_display(value, attribute)
+    term = attribute.sample_controlled_vocab.sample_controlled_vocab_terms.where(label:value).last
+    content = value
+    if term && term.iri
+      content << " (#{term.iri}) "
+    end
+    content
   end
 
   def seek_sample_attribute_display(value)
