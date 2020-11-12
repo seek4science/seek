@@ -13,10 +13,13 @@ class SampleControlledVocab < ApplicationRecord
   belongs_to :repository_standard, inverse_of: :sample_controlled_vocabs
 
   validates :title, presence: true, uniqueness: true
+  validates :source_ontology, inclusion: { in: Ebi::OlsClient.ontology_keys }
+  validates :ols_root_term_uri, url: { allow_nil: true }
 
   accepts_nested_attributes_for :sample_controlled_vocab_terms, allow_destroy: true
   accepts_nested_attributes_for :repository_standard, :reject_if => :check_repository_standard
 
+  before_create :fetch_ontology_terms
 
   grouped_pagination
 
@@ -53,5 +56,18 @@ class SampleControlledVocab < ApplicationRecord
       return true
     end
     return false
+  end
+
+  def fetch_ontology_terms
+    if source_ontology.present? && ols_root_term_uri.present?
+      client = Ebi::OlsClient.new
+      terms = client.all_descendants(source_ontology, ols_root_term_uri)
+      hash = {}
+      terms.each_with_index do |term, i|
+        hash[(i + 1).to_s] = term
+      end
+
+      self.sample_controlled_vocab_terms_attributes = hash
+    end
   end
 end
