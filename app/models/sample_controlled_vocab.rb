@@ -13,7 +13,7 @@ class SampleControlledVocab < ApplicationRecord
   belongs_to :repository_standard, inverse_of: :sample_controlled_vocabs
 
   validates :title, presence: true, uniqueness: true
-  validates :source_ontology, inclusion: { in: Ebi::OlsClient.ontology_keys }
+  validates :source_ontology, inclusion: { in: Ebi::OlsClient.ontology_keys, allow_nil: true }
   validates :ols_root_term_uri, url: { allow_nil: true }
 
   accepts_nested_attributes_for :sample_controlled_vocab_terms, allow_destroy: true
