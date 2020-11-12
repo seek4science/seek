@@ -5,7 +5,7 @@ class StudiesExtractorTest < ActiveSupport::TestCase
   setup do
     @zip_file = "#{Rails.root}/test/fixtures/files/study_batch.zip"
     user_uuid = 'user_uuid'
-    @data_files, @studies = Study.unzip_batch @zip_file, user_uuid
+    @data_files, @studies = StudyBatchUpload.unzip_batch @zip_file, user_uuid
      #Factory(:study_template_content_blob)
   end
 
@@ -14,7 +14,7 @@ class StudiesExtractorTest < ActiveSupport::TestCase
       # Extracts study file and associated data files from zip
       # file_name = params[:data][:content_blob][:tempfile].path
     user_uuid = 'user_uuid'
-    data_files, studies = Study.unzip_batch @zip_file, user_uuid
+    data_files, studies = StudyBatchUpload.unzip_batch @zip_file, user_uuid
 
     assert_same 3, data_files.count
     assert_same 1, studies.count
@@ -32,7 +32,7 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
     studies_file.original_filename = @studies.first.name.to_s
     studies_file.save!
-    pp Study.extract_studies_from_file(studies_file)
+    pp StudyBatchUpload.extract_studies_from_file(studies_file)
 
     FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
   end
@@ -45,7 +45,7 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     studies_file.original_filename = @studies.first.name.to_s
     studies_file.save!
 
-    studies = Study.extract_studies_from_file(studies_file)
+    studies = StudyBatchUpload.extract_studies_from_file(studies_file)
     assert_same 3, studies.count
 
     assert_equal 'Clonal test of mapping pedigree 0504B in nursery', studies[0].title
@@ -70,12 +70,38 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     wrong_date_3 = '2020-15-08'
     wrong_date_4 = '2020/08/15'
 
-    assert_equal true, Study.validate_date(valid_date_1)
-    assert_equal true, Study.validate_date(valid_date_2)
-    assert_equal false, Study.validate_date(wrong_date_1)
-    assert_equal false, Study.validate_date(wrong_date_2)
-    assert_equal false, Study.validate_date(wrong_date_3)
-    assert_equal false, Study.validate_date(wrong_date_4)
+    assert_equal true, StudyBatchUpload.validate_date(valid_date_1)
+    assert_equal true, StudyBatchUpload.validate_date(valid_date_2)
+    assert_equal false, StudyBatchUpload.validate_date(wrong_date_1)
+    assert_equal false, StudyBatchUpload.validate_date(wrong_date_2)
+    assert_equal false, StudyBatchUpload.validate_date(wrong_date_3)
+    assert_equal false, StudyBatchUpload.validate_date(wrong_date_4)
 
   end
+
+
+  test 'get right licence from file' do
+    user_uuid = 'user_uuid'
+    Factory(:study_custom_metadata_type_for_MIAPPE)
+    studies_file = ContentBlob.new
+    studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
+    studies_file.original_filename = @studies.first.name.to_s
+    studies_file.save!
+
+    licence = StudyBatchUpload.get_license_id(studies_file)
+    assert_equal licence, 'CC-BY-SA-4.0'
+
+  end
+
+  test 'check if string is normalized ' do
+
+    my_string = 'Here is-my_test STRING'
+    normalize_output = StudyBatchUpload.normalize_license_id(my_string)
+    assert_not_equal normalize_output, 'Here is-my_test STRING'
+    assert_not_equal normalize_output, 'here is my test string'
+    assert_not_equal normalize_output, 'Hereismyteststring'
+    assert_equal normalize_output, 'HEREISMYTESTSTRING'
+  end
+
+
 end
