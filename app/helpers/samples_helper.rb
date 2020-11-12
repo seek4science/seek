@@ -30,7 +30,9 @@ module SamplesHelper
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{clz}")
     when Seek::Samples::BaseType::CV
       scv_id = attribute.sample_controlled_vocab.id
-      objects_input(element_name, [], typeahead:  {query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}",handlebars_template:'typeahead/controlled_vocab_term'}, limit:1)
+      existing_objects = []
+      existing_objects << Struct.new(:id,:name).new(value,value) if value
+      objects_input(element_name, existing_objects, typeahead:  {query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}",handlebars_template:'typeahead/controlled_vocab_term'}, limit:1)
     when Seek::Samples::BaseType::SEEK_SAMPLE
       terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
       options = options_from_collection_for_select(terms, :id, :title, value.try(:[],'id'))
