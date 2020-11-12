@@ -621,7 +621,11 @@ SEEK::Application.routes.draw do
 
   ### SAMPLE CONTROLLED VOCABS ###
 
-  resources :sample_controlled_vocabs
+  resources :sample_controlled_vocabs do
+    collection do
+      get :typeahead
+    end
+  end
 
   ### DOCUMENTS
 
