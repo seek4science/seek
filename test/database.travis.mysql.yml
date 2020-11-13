@@ -1,14 +1,17 @@
 test:
   adapter: mysql2
   database: seek_test
-  username: root
+  username: seek
+  password: test
 
 development:
   adapter: mysql2
-  database: seek_dev
-  username: root
+  database: seek_test_dev
+  username: seek
+  password: test
 
 production:
   adapter: mysql2
-  database: seek_prod
-  username: root
+  database: seek_test_prod
+  username: seek
+  password: test
