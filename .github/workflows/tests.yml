@@ -18,7 +18,8 @@ jobs:
           POSTGRES_USER: seek
           POSTGRES_DB: seek_test
           POSTGRES_PASSWORD: test
-        ports: 5432:5432
+        ports:
+          - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       mysql:
         image: mysql:5.7
@@ -27,7 +28,8 @@ jobs:
           MYSQL_PASSWORD: test
           MYSQL_DATABASE: seek_test
           MYSQL_ROOT_PASSWORD: test
-        ports: 33306:3306
+        ports:
+          - 33306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     strategy:
       fail-fast: false
