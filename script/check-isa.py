@@ -11,8 +11,6 @@ import io
 
 ### MAIN CODE
 
-ofile = open('/tmp/check-isa-output', 'w')
-
 with open(sys.argv[1], 'r') as myfile:
   td = myfile.read()
 
@@ -24,12 +22,8 @@ try:
 except:
     y = False
 
-if not x['errors'] and not x['warnings'] and y:
-    ofile.write('')
-else:
-    ofile.write('Not OK')
-
-ofile.close()
+if x['errors'] or x['warnings'] or not y:
+    print("Not OK")
 
 exit()
 

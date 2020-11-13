@@ -78,9 +78,7 @@ class InvestigationTest < ActiveSupport::TestCase
 
     result = `python script/check-isa.py #{t.path}`
 
-    output_file = '/tmp/check-isa-output'
-
-    assert !(File.file?(output_file) && !File.zero?(output_file))
+    assert result.blank?
   end
 
 # the lib/sysmo/title_trimmer mixin should automatically trim the title :before_save
