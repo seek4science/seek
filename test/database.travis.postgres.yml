@@ -2,13 +2,16 @@ test:
   adapter: postgresql
   database: travis_ci_test
   username: postgres
+  password: test
 
 development:
   adapter: postgresql
   database: travis_ci_dev
   username: postgres
+  password: test
 
 production:
   adapter: postgresql
   database: travis_ci_prod
   username: postgres
+  password: test
