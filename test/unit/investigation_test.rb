@@ -78,6 +78,9 @@ class InvestigationTest < ActiveSupport::TestCase
 
     result = `python script/check-isa.py #{t.path}`
 
+    puts "Result was: '#{result}'"
+    puts result.length
+
     assert result.blank?
   end
 
