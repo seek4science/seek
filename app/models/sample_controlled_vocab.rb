@@ -59,7 +59,7 @@ class SampleControlledVocab < ApplicationRecord
 
   def fetch_ontology_terms
     if source_ontology.present? && ols_root_term_uri.present? &&
-        (source_ontology_changed? && ols_root_term_uri_changed?) && Ebi::OlsClient.ontology_keys.include?(source_ontology)
+        (source_ontology_changed? || ols_root_term_uri_changed?) && Ebi::OlsClient.ontology_keys.include?(source_ontology)
       self.sample_controlled_vocab_terms.each(&:mark_for_destruction)
       client = Ebi::OlsClient.new
       terms = client.all_descendants(source_ontology, ols_root_term_uri)
