@@ -1,9 +1,5 @@
 name: tests
-on: [push]
-#  push:
-#    branches: ['**']
-#  pull_request:
-#    branches: ['**']
+on: [push, pull_request]
 
 jobs:
   tests:
@@ -38,12 +34,12 @@ jobs:
           - mysql
         suite:
           - rails test test/unit
-#          - rails test test/functional
-#          - rails test test/integration
-#          - rspec spec
-#          - rake teaspoon
-#          - rake assets:precompile
-#          - rake db:setup
+          - rails test test/functional
+          - rails test test/integration
+          - rspec spec
+          - rake teaspoon
+          - rake assets:precompile
+          - rake db:setup
         include:
           - database: postgres
             suite: rails test test/unit
@@ -64,21 +60,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-      #      - name: Ruby gem cache
-      #        uses: actions/cache@v1
-      #        with:
-      #          path: vendor/bundle
-      #          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-      #          restore-keys: |
-      #            ${{ runner.os }}-gems-
-      #      - name: Install gems
-      #        run: |
-      #          bundle config path vendor/bundle
-      #          bundle install --jobs 4 --retry 3
-      #      - name: Setup Node
-      #        uses: actions/setup-node@v1
-      #        with:
-      #          node-version: 10.13.0
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
