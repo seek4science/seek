@@ -3,7 +3,7 @@ test:
   database: seek_test
   username: seek
   password: test
-  host: localhost
+  host: mysql
   port: 3306
 
 development:
@@ -11,7 +11,7 @@ development:
   database: seek_test_dev
   username: seek
   password: test
-  host: localhost
+  host: mysql
   port: 3306
 
 production:
@@ -19,5 +19,5 @@ production:
   database: seek_test_prod
   username: seek
   password: test
-  host: localhost
+  host: mysql
   port: 3306
