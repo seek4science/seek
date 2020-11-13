@@ -8,7 +8,7 @@ on: [push]
 jobs:
   tests:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     services:
       postgres:
         image: postgres:11
@@ -30,12 +30,12 @@ jobs:
           - mysql
         suite:
           - rails test test/unit
-          - rails test test/functional
-          - rails test test/integration
-          - rspec spec
-          - rake teaspoon
-          - rake assets:precompile
-          - rake db:setup
+#          - rails test test/functional
+#          - rails test test/integration
+#          - rspec spec
+#          - rake teaspoon
+#          - rake assets:precompile
+#          - rake db:setup
         include:
           - database: postgres
             suite: rails test test/unit
@@ -44,6 +44,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '8' # The JDK version to make available on the path.
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
