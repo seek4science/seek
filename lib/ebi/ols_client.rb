@@ -49,7 +49,7 @@ module Ebi
         JSON.parse(RestClient.get("https://www.ebi.ac.uk/ols/api/ontologies?size=1000", accept: :json))
       end rescue nil
 
-      ontology_list ||= JSON.parse(Rails.root.join('config', 'ontologies', 'ebi_ontologies.json'))
+      ontology_list ||= JSON.parse(File.read(Rails.root.join('config', 'ontologies', 'ebi_ontologies.json')))
 
       @ontologies = ontology_list.dig('_embedded', 'ontologies')
     end
