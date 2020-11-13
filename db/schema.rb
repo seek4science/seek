@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_10_155721) do
+ActiveRecord::Schema.define(version: 2020_11_12_120344) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -182,8 +182,8 @@ ActiveRecord::Schema.define(version: 2020_11_10_155721) do
     t.integer "suggested_technology_type_id"
     t.text "other_creators"
     t.string "deleted_contributor"
-    t.integer "sample_type_id"
     t.integer "position"
+    t.integer "sample_type_id"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
@@ -1725,22 +1725,6 @@ ActiveRecord::Schema.define(version: 2020_11_10_155721) do
     t.integer "sop_id", null: false
     t.index ["sop_id"], name: "index_sops_workflows_on_sop_id"
     t.index ["workflow_id"], name: "index_sops_workflows_on_workflow_id"
-  end
-
-  create_table "source_attributes",  force: :cascade do |t|
-    t.bigint "source_type_id", null: false
-    t.string "name"
-    t.text "IRI"
-    t.boolean "required"
-    t.string "short_name"
-    t.text "description"
-    t.index ["source_type_id"], name: "index_source_attributes_on_source_type_id"
-  end
-
-  create_table "source_types",  force: :cascade do |t|
-    t.string "name"
-    t.string "group"
-    t.integer "source_type"
   end
 
   create_table "special_auth_codes", id: :integer,  force: :cascade do |t|
