@@ -76,10 +76,14 @@ jobs:
             ${{ runner.os }}-
       - name: Install Python dependencies
         run: pip install -r requirements.txt
-      - name: Setup test database
+      - name: Create test database
         run: |
           cp test/database.travis.${{ matrix.database }}.yml config/database.yml
           bundle exec rake db:create
-          bundle exec rake db:schema:load
+      - name: Set MySQL char set and collation
+        if: matrix.database == 'mysql'
+        run: echo -e "ALTER DATABASE seek_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\n" | bundle exec rails dbconsole -p
+      - name: Load test database schema
+        run: bundle exec rake db:schema:load
       - name: Run tests
         run: bundle exec ${{ matrix.suite }}
