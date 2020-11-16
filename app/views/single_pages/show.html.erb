@@ -92,8 +92,9 @@
         let AssayDetails = []
         let existingAssays = []
         const sourceTypes = <%= @sourceTypes.to_json.html_safe %>
-        const characteristics = $j(sourceTypes).map((i,x)=>{if(x.type==0) return x}).get()
-        const AssayTypes = $j(sourceTypes).map((i,x)=>{if(x.type==1) return x}).get()
+        console.log("sourceTypes",sourceTypes)
+        const characteristics = $j(sourceTypes).map((i,x)=>{if(x.type=="study") return x}).get()
+        const AssayTypes = $j(sourceTypes).map((i,x)=>{if(x.type=="assay") return x}).get()
         console.log("characteristics", characteristics)
         console.log("AssayTypes", AssayTypes)
 

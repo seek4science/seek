@@ -54,7 +54,7 @@
         // Adds the select column
         headTr.empty().append("<th><input id='selectAll' onClick='selectAll(this)' type='checkbox'/></th>")
         $j(headers).each((i, x) => {
-            const TH = customTD(x.original_accessor_name, x.required, x.sample_type_id, x.IRI)
+            const TH = customTD(x.original_accessor_name, x.required, x.sample_type_id)
             headTr.append(TH)
         })
     }
@@ -72,8 +72,8 @@
         })
         // Set the Auto Complete
         $j.each($j('.sampleTable tbody tr td:not(:first-child)'), (i, k) => {
-            const IRI = $j(k).closest('table').find('th').eq($j(k).index()).attr("IRI")
-            setAutoComplete(k, IRI)
+            const label = $j(k).closest('table').find('th').eq($j(k).index()).attr("label")
+            setAutoComplete(k, label)
         })
 
     }
@@ -119,6 +119,7 @@
             }]
             $j(Object.keys(data)).each((j, x) => {
                 // TO_DO: check the following code in case of more sample existance
+                // TO_DO: Get sourceSamples Link_id and search it in other records...
                 if (data[x][i]) {
                     tableRow.push({
                         sampleId: data[x][i].id,
@@ -393,8 +394,8 @@
         $j(table + ' tbody').append('<tr data-new="true">' + newRow + '</tr>')
         // Set the Auto Complete
         $j.each($j('.sampleTable tbody tr:last td:not(:first-child)'), (i, k) => {
-            const IRI = $j(k).closest('table').find('th').eq($j(k).index()).attr("IRI")
-            setAutoComplete(k, IRI)
+            const label = $j(k).closest('table').find('th').eq($j(k).index()).attr("label")
+            setAutoComplete(k, label)
         })
         hideAttributes()
     }
@@ -434,59 +435,64 @@
         })
     }
 
-    function setAutoComplete(e, IRI) {
-        $j(e).bind("keydown", function(event) {
-            AutoComplete(e, IRI)
+    function setAutoComplete(e, label) {
+        $j(e).bind("keyup", function(event) {
+            AutoComplete(e, label)
         })
-        AutoComplete(e, IRI)
+        // AutoComplete(e, label)
+
     }
 
-    function AutoComplete(e, IRI) {
+    function AutoComplete(e, label) {
         const setSource = (data) => {
             $j(e).autocomplete({
                 source: data || [],
                 mustMatch: true
             });
         }
-        const url = `/single_pages/${pid}/ontology?iri=${IRI}`
+        const url = `/single_pages/${pid}/ontology?label=${label}&query=${$j(e).html()}`
         $j.ajax({
             method: 'GET',
             dataType: "json",
             url,
-            cache: true,
-            beforeSend: function() {
-                if (localCache.exist(url)) {
-                    setSource(localCache.get(url))
-                    return false;
-                }
-                return true;
-            },
+            // cache: true,
+            // beforeSend: function() {
+            //     if (localCache.exist(url)) {
+            //         setSource(localCache.get(url))
+            //         return false;
+            //     }
+            //     return true;
+            // },
             complete: function(jqXHR, textStatus) {
                 const data = jqXHR.responseJSON.data
-                localCache.set(url, data, setSource(data));
+                setSource(data)
+                // localCache.set(url, data, setSource(data));
+            },
+            error: function(e){
+                console.log(e)
             }
         })
     }
 
-    var localCache = {
-        data: {},
-        remove: function(url) {
-            delete localCache.data[url];
-        },
-        exist: function(url) {
-            return localCache.data.hasOwnProperty(url) && localCache.data[url] !== null;
-        },
-        get: function(url) {
-            console.log('Getting in cache for url' + url);
-            console.log(localCache.data[url])
-            return localCache.data[url];
-        },
-        set: function(url, cachedData, callback) {
-            localCache.remove(url);
-            localCache.data[url] = cachedData;
-            if ($j.isFunction(callback)) callback(cachedData);
-        }
-    };
+    // var localCache = {
+    //     data: {},
+    //     remove: function(url) {
+    //         delete localCache.data[url];
+    //     },
+    //     exist: function(url) {
+    //         return localCache.data.hasOwnProperty(url) && localCache.data[url] !== null;
+    //     },
+    //     get: function(url) {
+    //         console.log('Getting in cache for url' + url);
+    //         console.log(localCache.data[url])
+    //         return localCache.data[url];
+    //     },
+    //     set: function(url, cachedData, callback) {
+    //         localCache.remove(url);
+    //         localCache.data[url] = cachedData;
+    //         if ($j.isFunction(callback)) callback(cachedData);
+    //     }
+    // };
 
     function sample_add_row(tblClass) {
         AddRow(tblClass)

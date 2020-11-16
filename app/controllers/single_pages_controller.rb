@@ -124,7 +124,8 @@ class SinglePagesController < ApplicationController
 
         all_samples = load_samples(assay, source_sample_type)
         rest_headers = load_headers(assay)
-        all_headers = load_IRI(source_sample_type_attributes + rest_headers)
+        all_headers = source_sample_type_attributes + rest_headers
+
 
         data = { header: all_headers, samples: all_samples }
           #  data: source_samples + assay_samples }
@@ -141,8 +142,10 @@ class SinglePagesController < ApplicationController
   #GET
   def ontology
     begin
-      reader = Seek::Ontologies::SourceTypeReader.instance
-      labels = reader.class_for_uri(params[:iri]).flatten_hierarchy.map {|m| m.label}
+      labels = (SampleControlledVocab.where(title: params[:label])
+      .first&.sample_controlled_vocab_terms || [])
+      .where("LOWER(label) like :query", query: "%#{params[:query].downcase}%")
+      .select("label").limit(params[:limit] || 100)
       render json: { status: :ok, data: labels }
     rescue Exception => e
       render json: {status: :unprocessable_entity, error: e.message } 
@@ -172,11 +175,11 @@ class SinglePagesController < ApplicationController
 
   def load_source_types
     source_list = []
-    SampleControlledVocab.all().each do |item|
-      source_list.push({title: item.title, type: item.item_type, 
-        sampleCVId: item.id, attributes: 
-        item.sample_controlled_vocab_terms.map do |term|
-          { title: term.label,
+    RepositoryStandard.all().each do |item|
+      source_list.push({title: item.title, type: item.repo_type, 
+        repoId: item.id, attributes: 
+        item.sample_controlled_vocabs.map do |term|
+          { title: term.title,
           shortName: term.short_name,
           des: term.description,
           required: term.required}
@@ -199,8 +202,13 @@ class SinglePagesController < ApplicationController
 
   def load_samples (assay, source_sample_type)
     final_samples = {"0" => []}
+    # linkId = ""
     source_sample_type.samples.each_with_index do |s, i|
       final_samples["0"] << {"id" => s.id, "data" => s.json_metadata, "sample_type_id" => source_sample_type.id}
+      # linkId = JSON.parse(s.json_metadata)["link_id"]
+      # puts "=================="
+      # puts linkId
+      # puts "=================="
     end
 
     all_assays = Study.find(assay.study.id).assays.where("position <= #{assay.position}").sort_by{|e| e[:position]}
@@ -213,13 +221,4 @@ class SinglePagesController < ApplicationController
     end
     final_samples
   end
-
-  def load_IRI attrs
-      attrs.map do |m|
-      # iri = SourceAttribute.where(name: m.original_accessor_name).first&.IRI || nil
-      iri = SampleControlledVocabTerm.where(label: m.original_accessor_name).first&.parent_class || nil
-      m.as_json.merge!(IRI: iri)
-    end
-  end
-
 end
