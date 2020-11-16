@@ -1,7 +1,3 @@
-branches:
-  except:
-    - actions
-
 language: ruby
 dist: bionic
 cache: bundler

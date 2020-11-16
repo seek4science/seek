@@ -1,23 +1,14 @@
 test:
   adapter: postgresql
-  database: seek_test
-  username: seek
-  password: test
-  host: localhost
-  port: 5432
+  database: travis_ci_test
+  username: postgres
 
 development:
   adapter: postgresql
-  database: seek_test_dev
-  username: seek
-  password: test
-  host: localhost
-  port: 5432
+  database: travis_ci_dev
+  username: postgres
 
 production:
   adapter: postgresql
-  database: seek_test_prod
-  username: seek
-  password: test
-  host: localhost
-  port: 5432
+  database: travis_ci_prod
+  username: postgres

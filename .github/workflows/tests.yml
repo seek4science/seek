@@ -78,7 +78,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Create test database
         run: |
-          cp test/database.travis.${{ matrix.database }}.yml config/database.yml
+          cp test/config/database.github.${{ matrix.database }}.yml config/database.yml
           bundle exec rake db:create
       - name: Set MySQL char set and collation
         if: matrix.database == 'mysql'
