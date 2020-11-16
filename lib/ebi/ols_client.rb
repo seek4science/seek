@@ -4,11 +4,12 @@ require 'rest-client'
 module Ebi
   class OlsClient
     def all_descendants(ontology_id, term_iri)
-      url = "https://www.ebi.ac.uk/ols/api/ontologies/#{ontology_id}/terms/#{double_url_encode(term_iri)}"
-
-      self_json = JSON.parse(RestClient.get(url, accept: :json))
-      @collected_iris = []
-      all_children(self_json)
+      Rails.cache.fetch("ebi_ontology_terms_#{ontology_id}_#{term_iri}") do
+        url = "https://www.ebi.ac.uk/ols/api/ontologies/#{ontology_id}/terms/#{double_url_encode(term_iri)}"
+        self_json = JSON.parse(RestClient.get(url, accept: :json))
+        @collected_iris = []
+        all_children(self_json)
+      end
     end
 
     def all_children(term_json, parent_iri = nil)
@@ -35,16 +36,33 @@ module Ebi
 
       child_terms.each do |child_json|
         next if @collected_iris.include?(child_json['iri'])
-        terms << all_children(child_json, term_json['iri'])
+        terms += all_children(child_json, term_json['iri'])
       end
 
       terms
     end
 
+    def self.ontologies
+      return @ontologies if @ontologies
+      ontology_list = Rails.cache.fetch('ebi_ontology_options') do
+        JSON.parse(RestClient.get("https://www.ebi.ac.uk/ols/api/ontologies?size=1000", accept: :json))
+      end rescue nil
+
+      ontology_list ||= JSON.parse(Rails.root.join('config', 'ontologies', 'ebi_ontologies.json'))
+
+      @ontologies = ontology_list.dig('_embedded', 'ontologies')
+    end
+
+    def self.ontology_keys
+      @ontology_keys ||= ontologies.map { |ontology| ontology.dig('config', 'namespace') }.sort.compact
+    end
+
     private
 
     def double_url_encode(id)
-      CGI.escape(CGI.escape(id)) # Yes this is correct
+      if (id != nil)
+        CGI.escape(CGI.escape(id)) # Yes this is correct
+      end
     end
   end
 end
