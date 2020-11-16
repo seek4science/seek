@@ -2,9 +2,6 @@
 
 import subprocess
 import sys
-
-# import isatools
-
 import isatools
 from isatools.model import *
 import io
@@ -19,11 +16,11 @@ x = isatools.isajson.validate(io.StringIO(td))
 try:
   i = isatools.isajson.load(io.StringIO(td))
   y = True
-except:
-    y = False
+except Exception as e:
+  print('isatools error: '+ repr(e), file=sys.stderr)
+  y = False
 
 if x['errors'] or x['warnings'] or not y:
     print("Not OK")
 
 exit()
-
