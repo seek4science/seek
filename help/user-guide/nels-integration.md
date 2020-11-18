@@ -45,14 +45,14 @@ When viewing NeLS data in SEEK, two additional buttons are present on the top ri
 
 ## Importing Sample Metadata
 
-Clicking the "Fetch sample metadata" button will immediately import the appropriate sample metadata spreadsheet into SEEK, and begin a background-task to extra SEEK samples from it.
+Clicking the "Fetch sample metadata" button will immediately import the appropriate sample metadata spreadsheet into SEEK, and begin a background task to extract SEEK samples from it.
 
 If a "data" sheet was present in the sample metadata spreadsheet, the contents of that sheet will be displayed in an expandable panel as shown in the screenshot below.
 This information is presented to make it easy to locate the appropriate file in NeLS for a given sample.
 
 ![NeLS sample extraction and location info](/images/user-guide/nels_location_info.png){:.screenshot}
 
-To complete the sample import process, click the "Review Extract Samples" button when the background-task has finished.
+To complete the sample import process, click the "Review Extract Samples" button when the background task has finished.
 
 ![NeLS sample review](/images/user-guide/nels_sample_extraction.png){:.screenshot}
 
