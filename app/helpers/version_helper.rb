@@ -42,6 +42,6 @@ module VersionHelper
   }.freeze
 
   def version_visibility_options(selected = nil)
-    options_for_select(Seek::ExplicitVersioning::VISIBILITY_INV.keys.map { |k| [VISIBILITY_LABELS[k], k] }, selected || version.visibility)
+    options_for_select(Seek::ExplicitVersioning::VISIBILITY_INV.keys.map { |k| [VISIBILITY_LABELS[k], k] }, selected)
   end
 end
