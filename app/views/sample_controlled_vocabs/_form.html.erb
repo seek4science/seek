@@ -27,11 +27,17 @@
     </div>
 
     <table id="new-terms" class="table">
+      <thead>
+      <th>Label<span class="required">*</span></th><th>IRI</th><th>Parent IRI</th><th></th>
+      </thead>
       <tbody>
       <% @sample_controlled_vocab.sample_controlled_vocab_terms.each_with_index do |term, index| %>
           <%= f.fields_for :sample_controlled_vocab_terms, term do |terms_f| %>
+
               <tr class="sample-cv-term" data-index="<%= index %>">
                 <td><%= terms_f.text_field :label, :class => 'form-control' %></td>
+                <td><%= terms_f.text_field :iri, :class => 'form-control' %></td>
+                <td><%= terms_f.text_field :parent_iri, :class => 'form-control' %></td>
                 <td>
                   <div class="btn-group" data-toggle="buttons">
                     <label class="btn btn-danger">
@@ -71,6 +77,12 @@
   <tr class="sample-cv-term success" data-index="--index--">
     <td>
       <input class="form-control" id="sample_controlled_vocab_sample_controlled_vocab_terms_attributes_--index--_label" name="sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][label]" type="text">
+    </td>
+    <td>
+      <input class="form-control" id="sample_controlled_vocab_sample_controlled_vocab_terms_attributes_--index--_iri" name="sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][iri]" type="text">
+    </td>
+    <td>
+      <input class="form-control" id="sample_controlled_vocab_sample_controlled_vocab_terms_attributes_--index--_parent_iri" name="sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][parent_iri]" type="text">
     </td>
     <td>
       <div class="btn-group" data-toggle="buttons">
