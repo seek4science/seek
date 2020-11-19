@@ -1,4 +1,5 @@
 class SampleControlledVocabsController < ApplicationController
+
   respond_to :html, :json
 
   include Seek::IndexPager
@@ -36,11 +37,15 @@ class SampleControlledVocabsController < ApplicationController
     @sample_controlled_vocab = SampleControlledVocab.new(cv_params)
     respond_to do |format|
       if @sample_controlled_vocab.save
+        Rails.logger.info("Sample Controlled Vocab Saved")
         format.html { redirect_to @sample_controlled_vocab, notice: 'The sample controlled vocabulary was successfully created.' }
         format.json { render json: @sample_controlled_vocab, status: :created, location: @sample_controlled_vocab, include: [params[:include]]}
+        format.js { render layout: false, content_type: 'text/javascript' }
       else
+        Rails.logger.info("Sample Controlled Vocab failed to save")
         format.html { render action: 'new' }
         format.json { render json: json_api_errors(@sample_controlled_vocab), status: :unprocessable_entity}
+        format.js { render layout: false, content_type: 'text/javascript' }
       end
     end
   end
