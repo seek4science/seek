@@ -5,7 +5,7 @@ set -e
 RUBY_VERSION=$(cat .ruby-version)
 GEMSET=$(cat .ruby-gemset)
 
-cp test/database.cc.yml config/database.yml
+cp test/config/database.cc.yml config/database.yml
 
 echo "USING RUBY - $RUBY_VERSION with gemset - $GEMSET"
 rvm list | grep $RUBY_VERSION > /dev/null || rvm install $RUBY_VERSION || exit 1
