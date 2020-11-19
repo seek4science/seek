@@ -1,4 +1,6 @@
 class GitVersion < ApplicationRecord
+  class ImmutableVersionException < StandardError; end
+
   belongs_to :resource, polymorphic: true
 
   before_save :set_commit
@@ -51,6 +53,15 @@ class GitVersion < ApplicationRecord
     true
   end
 
+  def add_file(path, io)
+    message = object(path) ? 'Updated' : 'Added'
+    perform_commit("#{message} #{path}") do |dir|
+      fullpath = Pathname.new(dir.path).join(path)
+      File.write(fullpath, io.read)
+      git_base.add(path)
+    end
+  end
+
   private
 
   def set_commit
@@ -62,6 +73,16 @@ class GitVersion < ApplicationRecord
       git_base.revparse(target) # Returns the SHA1 for the target (commit/branch/tag)
     rescue Git::GitExecuteError # Was it an origin branch that is not tracked locally?
       git_base.revparse("origin/#{target}")
+    end
+  end
+
+  def perform_commit(message, &block)
+    raise ImmutableVersionException unless mutable?
+    git_base.with_temp_working do |dir|
+      git_base.checkout(commit)
+      yield dir
+      git_base.commit(message)
+      self.commit = git_base.revparse('HEAD')
     end
   end
 
