@@ -12,11 +12,7 @@
               by <%= contributor version.contributor %>
             </small>
           </h4>
-          <p>
-            <% if resource.can_manage? %>
-              <small><%= link_to "Edit comment",'#',onclick:"$j('#edit_version_comment_form_#{version.version}').fadeToggle(); return false;" %></small>
-            <% end %>
-          </p>
+
           <p class="list-group-item-text">
             <% if version.revision_comments.blank? %>
               <span class="subtle">No revision comments</span>
@@ -24,18 +20,16 @@
               <%= white_list(version.revision_comments) -%>
             <% end %>
           </p>
-          <div class="subtle">
-            <% if version.visibility == :registered_users %>
+          <% unless version.visibility == :public %>
+            <div class="subtle">
               <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-              Only visible to registered users
-            <% elsif version.visibility == :private %>
-              <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-              Hidden
-            <% end %>
-            <% if resource.can_manage? %>
-              <%= render :partial=>"assets/edit_version_comment_form",:locals => {:version=>version} -%>
-            <% end %>
-          </div>
+              <%= VersionHelper::VISIBILITY_LABELS[version.visibility] %>
+            </div>
+          <% end %>
+
+          <% if resource.can_manage? %>
+            <%= render partial: 'assets/edit_version_form', locals: { version: version } %>
+          <% end %>
         </div>
         <div class="col-sm-4 text-right">
           <% if visible_versions.length > 1 && resource.is_a?(Model) %>
@@ -43,6 +37,9 @@
               <%= button_link_to("Compare", 'show', compare_versions_model_path(resource, version: displayed_resource.version, other_version: version.version).html_safe) -%>
             <% end %>
           <% end %>
+          <% if resource.can_manage? %>
+            <%= button_link_to('Edit', 'edit', '#', onclick:"$j('#edit_version_form_#{version.version}').fadeToggle(); return false;") -%>
+          <%end %>
           <% if Seek::Config.delete_asset_version_enabled && resource.can_edit?(User.current_user) && visible_versions.length > 1 %>
             <% path = polymorphic_path(resource, :version => version.version, :action => :destroy_version) %>
             <%= button_link_to("Delete", 'destroy', path,

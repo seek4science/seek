@@ -81,6 +81,10 @@ module Seek
             Seek::ExplicitVersioning::VISIBILITY[super]
           end
 
+          def can_change_visibility?
+            !latest_version? && (!respond_to?(:doi) || doi.blank?)
+          end
+
           def visible?(user = User.current_user)
             case visibility
             when :public

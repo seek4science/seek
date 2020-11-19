@@ -324,4 +324,31 @@ class SopTest < ActiveSupport::TestCase
     assert priv.visible?(manager)
     assert_equal [pub, reg, priv].sort, sop.visible_versions(manager).sort
   end
+
+  test 'can change visibility?' do
+    sop = Factory(:sop)
+    disable_authorization_checks do
+      sop.save_as_new_version('This version has a DOI')
+      sop.latest_version.update_column(:doi, '10.5072/test_doi')
+      sop.save_as_new_version('Another version')
+    end
+
+    assert_equal 3, sop.versions.count
+
+    v1 = sop.find_version(1)
+    v2 = sop.find_version(2)
+    v3 = sop.find_version(3)
+
+    assert_nil v1.doi
+    refute v1.latest_version?
+    assert v1.can_change_visibility?
+
+    refute_nil v2.doi
+    refute v2.latest_version?
+    refute v2.can_change_visibility?
+
+    assert_nil v3.doi
+    assert v3.latest_version?
+    refute v3.can_change_visibility?
+  end
 end
