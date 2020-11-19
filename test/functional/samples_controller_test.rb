@@ -50,7 +50,6 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal type, assigns(:sample).sample_type
   end
 
-  #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
   test 'create from form' do
     person = Factory(:person)
     creator = Factory(:person)
@@ -58,10 +57,11 @@ class SamplesControllerTest < ActionController::TestCase
     type = Factory(:patient_sample_type)
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id,
-                              "#{Seek::JSONMetadata::METHOD_PREFIX}full name": 'Fred Smith',
-                              "#{Seek::JSONMetadata::METHOD_PREFIX}age": '22',
-                              "#{Seek::JSONMetadata::METHOD_PREFIX}weight": '22.1',
-                              "#{Seek::JSONMetadata::METHOD_PREFIX}postcode": 'M13 9PL' ,
+                                        data:{
+                              "full name": 'Fred Smith',
+                              "age": '22',
+                              "weight": '22.1',
+                              "postcode": 'M13 9PL'} ,
                               project_ids: [person.projects.first.id], other_creators:'frank, mary', creator_ids: [creator.id] } }
     end
     assert assigns(:sample)
@@ -103,6 +103,26 @@ class SamplesControllerTest < ActionController::TestCase
     assert SampleTypeUpdateJob.new(type, false).exists?
   end
 
+  test 'create with validation error' do
+    person = Factory(:person)
+    creator = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assert_no_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: type.id,
+                                        data: { 'full name': 'Fred Smith', age: 'Fish' },
+                                        project_ids: [person.projects.first.id], creator_ids: [creator.id] } }
+    end
+    assert assigns(:sample)
+    sample = assigns(:sample)
+    assert_equal 'Fred Smith', sample.title
+    assert_equal 'Fred Smith', sample.get_attribute_value('full name')
+    assert_equal 'Fish', sample.get_attribute_value(:age)
+
+    refute sample.valid?
+
+  end
+
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
   test 'create and update with boolean from form' do
     person = Factory(:person)
@@ -112,8 +132,9 @@ class SamplesControllerTest < ActionController::TestCase
     type.save!
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id,
-                              "#{Seek::JSONMetadata::METHOD_PREFIX}the_title": 'ttt',
-                              "#{Seek::JSONMetadata::METHOD_PREFIX}bool": '1' ,
+                                        data: {
+                              the_title: 'ttt',
+                              bool: '1'} ,
                               project_ids: [person.projects.first.id] } }
     end
     assert_not_nil sample = assigns(:sample)
@@ -125,6 +146,25 @@ class SamplesControllerTest < ActionController::TestCase
     assert_not_nil sample = assigns(:sample)
     assert_equal 'ttt', sample.get_attribute_value(:the_title)
     assert !sample.get_attribute_value(:bool)
+  end
+
+  test 'create with symbols' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:sample_type_with_symbols)
+    assert_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: type.id,
+                                        data:{
+                                            "title&": 'A',
+                                            "name ++##!": 'B' ,
+                                            "size range (bp)":'C'
+                                        },
+                                        project_ids: [person.projects.first.id] } }
+    end
+    assert_not_nil sample = assigns(:sample)
+    assert_equal 'A',sample.get_attribute_value('title&')
+    assert_equal 'B',sample.get_attribute_value('name ++##!')
+    assert_equal 'C',sample.get_attribute_value('size range (bp)')
   end
 
   test 'create and update with boolean' do
@@ -191,10 +231,12 @@ class SamplesControllerTest < ActionController::TestCase
     assert_empty sample.creators
 
     assert_no_difference('Sample.count') do
-      put :update, params: { id: sample.id, sample: { "#{Seek::JSONMetadata::METHOD_PREFIX}full name": 'Jesus Jones',
-                                                      "#{Seek::JSONMetadata::METHOD_PREFIX}age": '47',
-                                                      "#{Seek::JSONMetadata::METHOD_PREFIX}postcode": 'M13 9QL',
-          creator_ids: [creator.id] } }
+      put :update, params: {id: sample.id, sample: {
+          data: {
+          "full name": 'Jesus Jones',
+          "age": '47',
+          "postcode": 'M13 9QL'},
+          creator_ids: [creator.id]}}
       assert_equal [creator], sample.creators
     end
 
@@ -249,10 +291,12 @@ class SamplesControllerTest < ActionController::TestCase
     project_ids = person.projects[0..1].collect(&:id)
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, title: 'My Sample',
-                                        '__metadata_attribute_full name': 'Fred Smith',
-                                        __metadata_attribute_age: '22',
-                                        __metadata_attribute_weight: '22.1',
-                                        __metadata_attribute_postcode: 'M13 9PL',
+                                        data: {
+                                            'full name': 'Fred Smith',
+                                            age: '22',
+                                            weight: '22.1',
+                                            postcode: 'M13 9PL'
+                                        },
                                         project_ids: project_ids } }
     end
     assert sample = assigns(:sample)
@@ -364,10 +408,12 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, title: 'My Sample',
-                                        "#{Seek::JSONMetadata::METHOD_PREFIX}full name": 'Fred Smith',
-                                        "#{Seek::JSONMetadata::METHOD_PREFIX}age": '22',
-                                        "#{Seek::JSONMetadata::METHOD_PREFIX}weight": '22.1',
-                                        "#{Seek::JSONMetadata::METHOD_PREFIX}postcode": 'M13 9PL' ,
+                                        data:{
+                                            "full name": 'Fred Smith',
+                                            "age": '22',
+                                            "weight": '22.1',
+                                            "postcode": 'M13 9PL'
+                                        },
                               project_ids: [person.projects.first.id] }, policy_attributes: valid_sharing }
     end
     assert sample = assigns(:sample)

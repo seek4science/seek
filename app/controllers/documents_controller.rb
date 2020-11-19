@@ -19,7 +19,7 @@ class DocumentsController < ApplicationController
 
   def create_version
     if handle_upload_data(true)
-      comments = params[:revision_comment]
+      comments = params[:revision_comments]
 
       respond_to do |format|
         if @document.save_as_new_version(comments)

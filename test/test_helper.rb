@@ -23,7 +23,7 @@ require 'minitest'
 require 'ostruct'
 require 'pry'
 
-Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new]
+Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true)]
 
 Minitest::Test.i_suck_and_my_tests_are_order_dependent!
 

@@ -707,8 +707,9 @@ class StudiesControllerTest < ActionController::TestCase
       investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
       cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}name":'fred',
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}age":22}}
+                                                   data:{
+                                                   "name":'fred',
+                                                   "age":22}}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -732,7 +733,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_no_difference('Study.count') do
       investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':'fred','_custom_metadata_age':'not a number'}}
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -744,7 +745,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_no_difference('Study.count') do
       investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, '_custom_metadata_name':nil,'_custom_metadata_age':22}}
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -763,8 +764,9 @@ class StudiesControllerTest < ActionController::TestCase
       investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
       cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}full name":'Paul Jones',
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}full address":'London, UK'}}
+                                                   data:{
+                                                   "full name":'Paul Jones',
+                                                   "full address":'London, UK'}}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -788,9 +790,10 @@ class StudiesControllerTest < ActionController::TestCase
       investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
       cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}full name":'full name',
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}Full name":'Full name',
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}full  name":'full  name'}}
+                                                   data:{
+                                                   "full name":'full name',
+                                                   "Full name":'Full name',
+                                                   "full  name":'full  name'}}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -815,10 +818,12 @@ class StudiesControllerTest < ActionController::TestCase
       investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
       cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}+name":'+name',
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}-name":'-name',
-                                                   "#{Seek::JSONMetadata::METHOD_PREFIX}&name":'&name'}
-      }
+                                        data:{
+                                            "+name":'+name',
+                                            "-name":'-name',
+                                            "&name":'&name',
+                                            "name(name)":'name(name)'
+                                        }}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -832,6 +837,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal '+name',cm.get_attribute_value('+name')
     assert_equal '-name',cm.get_attribute_value('-name')
     assert_equal '&name',cm.get_attribute_value('&name')
+    assert_equal 'name(name)',cm.get_attribute_value('name(name)')
   end
 
   test 'experimentalists only shown if set' do
