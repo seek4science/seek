@@ -30,14 +30,13 @@ class ApplicationController < ActionController::Base
 
   before_action :check_doorkeeper_scopes, if: :doorkeeper_token
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
-  before_action :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
+  before_action :convert_json_params, only: [:update, :destroy, :create, :create_version], if: :json_api_request?
 
   before_action :rdf_enabled? #only allows through rdf calls to supported types
 
   helper :all
 
   layout Seek::Config.main_layout
-
 
   def with_current_user
     User.with_current_user current_user do
@@ -377,7 +376,7 @@ class ApplicationController < ActionController::Base
         end
       when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
         action = 'create' if action == 'upload_for_tool' || action == 'create_metadata' || action == 'create_from_template'
-        action = 'update' if action == 'new_version'
+        action = 'update' if action == 'create_version'
         action = 'inline_view' if action == 'explore'
         if %w(show create update destroy download inline_view).include?(action)
           check_log_exists(action, controller_name, object)
@@ -564,6 +563,19 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def determine_custom_metadata_keys
+    keys = []
+    root_key = controller_name.singularize.to_sym
+    attribute_params = params[root_key][:custom_metadata_attributes]
+    if attribute_params && attribute_params[:custom_metadata_type_id].present?
+      metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
+      if metadata_type
+        keys = [:custom_metadata_type_id] + metadata_type.custom_metadata_attributes.collect(&:method_name)
+      end
+    end
+    keys
+  end
+
   # Dynamically get parent resource from URL.
   # i.e. /data_files/123/some_sub_resource/456
   # would fetch DataFile with ID 123
@@ -577,5 +589,26 @@ class ApplicationController < ActionController::Base
         @parent_resource = parent_class.find(params[parent_id_param])
       end
     end
+  end
+
+  def managed_programme_configured?
+    unless Programme.managed_programme
+      error("No managed #{t('programme')} is configured","No managed #{t('programme')} is configured")
+      return false
+    end
+  end
+
+  def determine_custom_metadata_keys
+    keys = []
+    root_key = controller_name.singularize.to_sym
+    attribute_params = params[root_key][:custom_metadata_attributes]
+    if attribute_params && attribute_params[:custom_metadata_type_id].present?
+      metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
+      if metadata_type
+        keys = [:custom_metadata_type_id]
+        keys = keys + [{data:[metadata_type.custom_metadata_attributes.collect(&:title)]}]
+      end
+    end
+    keys
   end
 end

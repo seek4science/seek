@@ -13,7 +13,7 @@ class ModelsController < ApplicationController
 
   include Seek::Jws::Simulator
   include Seek::Publishing::PublishingCommon
-  include Seek::BreadCrumbs
+
   include Bives
   include Seek::Doi::Minting
 
@@ -84,7 +84,7 @@ class ModelsController < ApplicationController
   # GET /models
   # GET /models.xml
 
-  def new_version
+  def create_version
     if handle_upload_data(true)
       comments = params[:revision_comments]
 
@@ -183,7 +183,7 @@ class ModelsController < ApplicationController
 
   def model_params
     params.require(:model).permit(:imported_source, :imported_url, :title, :description, { project_ids: [] }, :license,
-                                  :model_type_id, :model_format_id, :recommended_environment_id, :organism_id, :human_disease_id,
+                                  :model_type_id, :model_format_id, :recommended_environment_id, :organism_id, { organism_ids: []}, :human_disease_id,
                                   :other_creators,
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                   { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },

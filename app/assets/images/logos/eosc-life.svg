@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg877"
+   version="1.1"
+   viewBox="0 0 68.525436 58.496128"
+   height="58.496128mm"
+   width="68.525436mm"
+   sodipodi:docname="eosc-life.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1600"
+     inkscape:window-height="1177"
+     id="namedview19"
+     showgrid="false"
+     inkscape:zoom="4.6634191"
+     inkscape:cx="49.038024"
+     inkscape:cy="-19.992801"
+     inkscape:window-x="0"
+     inkscape:window-y="240"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g1532" />
+  <title
+     id="title1534">EOSC-Life logo</title>
+  <defs
+     id="defs871" />
+  <metadata
+     id="metadata874">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>EOSC-Life logo</dc:title>
+        <dc:date>2020-03-19</dc:date>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Stian Soiland-Reyes</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by/4.0/" />
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>The University of Manchester</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title>The University of Manchester</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:source>Recreated from eosc-life.eu bitmap logo</dc:source>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-18.332671,-37.438009)"
+     id="layer1">
+    <text
+       id="text1466"
+       y="176.3278"
+       x="162.6335"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458332"
+         y="185.69157"
+         x="162.6335"
+         id="tspan1464" /></text>
+    <g
+       id="g1532">
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.26913798px;line-height:0%;font-family:'Roboto Slab';-inkscape-font-specification:'Roboto Slab';letter-spacing:0px;word-spacing:0px;display:inline;opacity:0;fill:#1f8787;fill-opacity:1;stroke:none;stroke-width:0.10576151px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
+         x="19.077251"
+         y="94.765709"
+         id="text4148-3-7"
+         transform="scale(0.99784238,1.0021623)"><tspan
+           id="tspan4150-2"
+           x="19.077251"
+           y="94.765709"
+           style="font-size:13.94493103px;line-height:1.25;fill:#1f8787;fill-opacity:1;stroke-width:0.10576151px;"><tspan
+   style="font-weight:bold;stroke-width:0.10576151px;"
+   id="tspan1521">EOSC-</tspan>Life</tspan></text>
+      <path
+         inkscape:connector-curvature="0"
+         style="fill:#1f8787;fill-opacity:1;stroke-width:0.16632015"
+         d="m 33.338412,84.734174 c -2.264541,0.034 -4.212292,1.52892 -4.821412,3.70055 -0.32758,1.16806 -0.33158,1.71515 -0.02067,2.76211 0.50945,1.71551 1.620846,2.92854 3.199287,3.49177 0.3473,0.12393 1.192478,0.228 1.878437,0.231 2.060681,0.009 3.680373,-0.94843 4.628142,-2.73627 0.382821,-0.72207 0.440801,-1.02881 0.440801,-2.32854 0,-1.30377 -0.05799,-1.60754 -0.448035,-2.34973 -0.9369,-1.78272 -2.725531,-2.80289 -4.85655,-2.77089 z m 21.729422,0.005 c -1.686401,-0.0174 -2.793661,0.35636 -3.839043,1.29656 -1.135309,1.02108 -1.580782,2.09769 -1.580782,3.81941 2e-6,1.02492 0.08808,1.53228 0.383439,2.20865 0.456591,1.0456 1.69686,2.22995 2.711979,2.5895 0.980022,0.34717 3.312396,0.33521 4.360977,-0.0227 0.941429,-0.32137 1.130577,-0.72942 0.626316,-1.35237 -0.302998,-0.37435 -0.308883,-0.37486 -1.181322,-0.0894 -1.08847,0.35614 -2.756887,0.26066 -3.550688,-0.20309 -0.90275,-0.52741 -1.515835,-1.56188 -1.597837,-2.69647 -0.173289,-2.39662 1.204942,-4.01061 3.424082,-4.01061 0.711459,0 1.197985,0.11238 1.794205,0.41496 1.002001,0.50849 0.999564,0.50854 1.318784,0.0212 0.655098,-1.00015 -0.7303,-1.95349 -2.87011,-1.97559 z m -10.995194,0.003 c -2.61289,1.7e-4 -4.013192,1.04841 -4.013192,3.00395 0,1.48488 1.150461,2.30645 3.990972,2.84944 1.433589,0.27405 1.813084,0.41059 2.120284,0.76275 0.501509,0.5749 0.471537,1.00413 -0.111623,1.5875 -0.354251,0.35435 -0.659138,0.49186 -1.122929,0.50746 -1.362659,0.046 -2.332767,-0.0692 -3.130557,-0.37156 -1.092222,-0.41396 -1.312654,-0.39824 -1.585434,0.11162 -0.329629,0.61612 -0.06473,0.91849 1.187008,1.35548 1.322271,0.46161 3.674774,0.51886 4.851384,0.11782 2.070119,-0.7056 2.739898,-3.1878 1.220597,-4.52221 -0.547301,-0.48069 -1.102529,-0.66481 -3.84421,-1.27589 -1.754151,-0.39098 -2.388476,-1.29679 -1.517738,-2.16782 0.746731,-0.74701 3.065494,-0.70252 4.615223,0.0884 0.4715,0.24062 0.647538,0.26508 0.768429,0.10852 0.89753,-1.16238 -0.682464,-2.15559 -3.428214,-2.15542 z m -20.582206,0.20619 c -1.801986,0 -3.208228,0.0712 -3.396692,0.17208 -0.306162,0.16391 -0.321944,0.39456 -0.321944,4.79609 0,2.54329 0.05142,4.67593 0.114205,4.73873 0.06278,0.0623 1.652869,0.0939 3.533634,0.0692 l 3.419946,-0.045 0.05064,-0.7028 0.05116,-0.7028 -2.71198,-0.046 -2.711462,-0.0455 -0.04858,-1.28933 c -0.02671,-0.70906 -0.02671,-1.30076 0,-1.31516 0.02671,-0.0144 1.208555,-0.0709 2.626197,-0.12506 l 2.57762,-0.0982 0.05426,-0.47801 c 0.03001,-0.26275 -0.02946,-0.56185 -0.132291,-0.66507 -0.113527,-0.11395 -1.147248,-0.2208 -2.631881,-0.2713 l -2.445329,-0.0832 v -1.16427 -1.16427 l 2.565735,-0.046 c 2.614383,-0.0469 3.004985,-0.13944 3.004985,-0.71107 0,-0.74525 -0.340859,-0.82321 -3.59823,-0.82321 z m 10.07122,1.35031 c 1.985055,0.0197 3.362069,1.44636 3.362069,3.55688 0,1.52489 -0.689648,2.68625 -1.936317,3.26182 -1.581221,0.73002 -3.42117,0.19147 -4.32325,-1.26556 -0.43148,-0.69688 -0.499195,-0.96499 -0.499195,-1.98334 0,-2.07987 1.110216,-3.39871 2.992066,-3.55482 0.137514,-0.0114 0.272291,-0.0163 0.404627,-0.015 z m 27.190071,3.83077 c -0.177012,1.2e-4 -0.375092,0.004 -0.595829,0.0109 l -1.554943,0.0481 -0.05323,0.46715 c -0.02948,0.25713 0.03798,0.57829 0.149862,0.71314 0.158851,0.19188 0.552834,0.23482 1.799376,0.19792 l 1.596284,-0.0475 0.05013,-0.51315 c 0.06745,-0.69144 -0.152567,-0.87732 -1.391647,-0.87643 z"
+         id="path1498-6" />
+      <path
+         style="opacity:0;fill:#1f8787;fill-opacity:1;stroke-width:0.16632015"
+         d="m 33.338412,84.734526 c -2.264541,0.034 -4.212292,1.528918 -4.821412,3.70055 -0.32758,1.168058 -0.33158,1.715145 -0.02067,2.762104 0.50945,1.715511 1.620847,2.928549 3.199287,3.491778 0.3473,0.123931 1.192479,0.227994 1.878438,0.230994 2.060681,0.0094 3.680373,-0.948428 4.628142,-2.736268 0.38282,-0.722069 0.440801,-1.028811 0.440801,-2.328539 0,-1.303772 -0.05799,-1.607537 -0.448035,-2.349728 -0.9369,-1.78272 -2.725531,-2.80289 -4.856551,-2.770891 z m 21.729422,0.0047 c -1.686401,-0.01739 -2.793661,0.356362 -3.839043,1.296562 -1.135309,1.02108 -1.580783,2.097685 -1.580783,3.819406 3e-6,1.024919 0.08808,1.532278 0.38344,2.208649 0.456591,1.045601 1.69686,2.229948 2.711979,2.589506 0.980022,0.34717 3.312395,0.335203 4.360976,-0.02274 0.94143,-0.321371 1.130578,-0.729424 0.626317,-1.352373 -0.302999,-0.374351 -0.308883,-0.374861 -1.181323,-0.0894 -1.088469,0.35614 -2.756886,0.26066 -3.550687,-0.203088 -0.90275,-0.52741 -1.515835,-1.561886 -1.597837,-2.696478 -0.173289,-2.396619 1.204942,-4.010607 3.424081,-4.010607 0.71146,0 1.197986,0.112382 1.794206,0.414962 1.002001,0.50849 0.999564,0.508537 1.318784,0.02119 0.655098,-1.000151 -0.7303,-1.95349 -2.87011,-1.975591 z m -10.995194,0.0026 c -2.61289,1.7e-4 -4.013192,1.048409 -4.013192,3.00395 0,1.484881 1.150461,2.306449 3.990972,2.849438 1.433589,0.27405 1.813084,0.410593 2.120284,0.762746 0.501509,0.5749 0.471537,1.004139 -0.111623,1.5875 -0.354251,0.354359 -0.659138,0.49186 -1.122929,0.50746 -1.362659,0.04597 -2.332767,-0.06918 -3.130557,-0.371552 -1.092222,-0.413961 -1.312654,-0.39824 -1.585434,0.11162 -0.329629,0.61612 -0.06473,0.918483 1.187008,1.355474 1.322271,0.46161 3.674774,0.518861 4.851384,0.117821 2.070119,-0.705598 2.739898,-3.187795 1.220597,-4.522205 -0.547301,-0.48069 -1.102529,-0.66481 -3.84421,-1.27589 -1.754151,-0.39098 -2.388476,-1.296796 -1.517738,-2.167826 0.746731,-0.747011 3.065494,-0.702514 4.615223,0.08837 0.4715,0.24062 0.647538,0.26508 0.768429,0.108521 0.89753,-1.162381 -0.682464,-2.155584 -3.428214,-2.155423 z m -20.582206,0.206187 c -1.801986,0 -3.208228,0.07118 -3.396692,0.172083 -0.306162,0.163912 -0.321944,0.39456 -0.321944,4.796091 0,2.543289 0.05142,4.675928 0.114205,4.738727 0.06278,0.0623 1.652869,0.09395 3.533634,0.06925 l 3.419946,-0.04496 0.05064,-0.702799 0.05116,-0.7028 -2.71198,-0.04599 -2.711462,-0.04547 -0.04858,-1.289328 c -0.02671,-0.70906 -0.02671,-1.300766 0,-1.315164 0.02671,-0.0144 1.208555,-0.07086 2.626197,-0.125058 l 2.57762,-0.09819 0.05426,-0.478007 c 0.03001,-0.262752 -0.02946,-0.561855 -0.132291,-0.665077 -0.113527,-0.113948 -1.147248,-0.2208 -2.631881,-0.271301 l -2.445329,-0.0832 v -1.164269 -1.16427 l 2.565735,-0.04599 c 2.614383,-0.04695 3.004985,-0.139438 3.004985,-0.711068 0,-0.745249 -0.340859,-0.823206 -3.59823,-0.823206 z m 10.07122,1.350307 c 1.985055,0.01968 3.362069,1.44636 3.362069,3.556889 0,1.524889 -0.689648,2.686245 -1.936317,3.261815 -1.581221,0.73002 -3.42117,0.191473 -4.32325,-1.265555 -0.43148,-0.696881 -0.499195,-0.964991 -0.499195,-1.983341 0,-2.079871 1.110216,-3.398713 2.992066,-3.554822 0.137514,-0.01141 0.272291,-0.0163 0.404627,-0.01499 z m 27.19007,3.830772 c -0.177011,1.27e-4 -0.375092,0.004 -0.595828,0.01085 l -1.554943,0.04806 -0.05323,0.467154 c -0.02948,0.25713 0.03798,0.578286 0.149862,0.713137 0.158851,0.191878 0.552834,0.23482 1.799374,0.197918 l 1.596284,-0.04754 0.05013,-0.513149 c 0.06745,-0.691441 -0.152567,-0.877321 -1.391648,-0.876432 z"
+         id="path1498"
+         inkscape:connector-curvature="0" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.68354382px;line-height:0%;font-family:'Roboto Slab';-inkscape-font-specification:'Roboto Slab, weight=255';font-variant-ligatures:no-common-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr;text-anchor:start;display:inline;opacity:0;fill:#1f8787;fill-opacity:1;stroke:none;stroke-width:1.14031589px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-variant-position:normal;"
+         x="61.663311"
+         y="95.158089"
+         id="text4148-3"
+         transform="scale(1.0075724,0.99248453)"><tspan
+           id="tspan4150"
+           x="61.663311"
+           y="95.158089"
+           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.68354382px;line-height:1.25;font-family:'Roboto Slab';-inkscape-font-specification:'Roboto Slab, weight=255';font-variant-ligatures:no-common-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr;text-anchor:start;fill:#1f8787;fill-opacity:1;stroke:none;stroke-width:1.14031589px;stroke-opacity:1;font-variant-position:normal;">Life</tspan></text>
+      <g
+         transform="matrix(0.26458333,0,0,0.26458333,-11.252325,-24.470498)"
+         style="display:inline;opacity:1"
+         id="g858">
+        <path
+           id="path3416-9"
+           d="m 183.05567,287.29968 a 28.096702,28.518926 0 0 0 -13.38476,3.81383 28.096702,28.518926 0 0 0 -14.04866,24.69738 v 9.04504 h -10.83028 a 29.194542,27.982157 0 0 0 -25.28354,13.99063 29.194542,27.982157 0 0 0 0,27.98304 29.194542,27.982157 0 0 0 25.28354,13.99063 h 67.02308 v -65.00934 a 28.096702,28.518926 0 0 0 -14.04867,-24.69738 28.096702,28.518926 0 0 0 -14.71071,-3.81383 z"
+           style="display:inline;opacity:1;fill:#1f8787;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        <path
+           id="path3416-7-3"
+           d="m 366.591,338.06121 a 43.206872,41.773753 0 0 0 -5.77805,-19.90025 43.206872,41.773753 0 0 0 -37.41714,-20.88732 h -13.70345 v -16.10231 a 42.393656,43.406003 0 0 0 -21.19616,-37.59119 42.393656,43.406003 0 0 0 -42.39501,0 42.393656,43.406003 0 0 0 -21.19614,37.59119 v 99.6489 h 98.49076 a 43.206872,41.773753 0 0 0 37.41714,-20.88733 43.206872,41.773753 0 0 0 5.77805,-21.87169 z"
+           style="display:inline;opacity:1;fill:#f9b233;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      </g>
+      <g
+         aria-label="Life"
+         transform="matrix(1.0075724,0,0,0.99248452,1.4238468,-16.415746)"
+         style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.68354416px;line-height:0%;font-family:'Roboto Slab';-inkscape-font-specification:'Roboto Slab, weight=255';font-variant-ligatures:no-common-ligatures;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#1f8787;fill-opacity:1;stroke:none;stroke-width:1.14031589px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         id="text4148-3-6">
+        <path
+           d="m 60.831526,111.71238 v -0.58128 l 1.089071,-0.0869 v -8.38518 l -1.089071,-0.0869 v -0.58797 h 1.089071 0.80177 1.089071 v 0.58797 l -1.089071,0.0869 v 8.39186 h 4.082347 l 0.07349,-1.57013 h 0.654779 v 2.23159 z"
+           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.68354416px;line-height:1.25;font-family:'Roboto Slab';-inkscape-font-specification:'Roboto Slab,  weight=255';font-variant-ligatures:no-common-ligatures;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#1f8787;fill-opacity:1;stroke:none;stroke-width:1.14031589px;stroke-opacity:1"
+           id="path1617"
+           inkscape:connector-curvature="0" />
+        <path
+           d="m 68.762369,111.71238 v -0.58128 l 1.089071,-0.0869 v -5.88633 l -1.089071,-0.0869 v -0.58796 h 1.890841 v 6.56115 l 1.089072,0.0869 v 0.58128 z m 0.995531,-9.26713 v -1.15588 h 0.89531 v 1.15588 z"
+           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.68354416px;line-height:1.25;font-family:'Roboto Slab';-inkscape-font-specification:'Roboto Slab,  weight=255';font-variant-ligatures:no-common-ligatures;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#1f8787;fill-opacity:1;stroke:none;stroke-width:1.14031589px;stroke-opacity:1"
+           id="path1619"
+           inkscape:connector-curvature="0" />
+        <path
+           d="m 73.065202,111.71238 v -0.58128 l 1.089071,-0.0869 v -5.91306 h -1.202655 v -0.64809 h 1.202655 v -1.06235 q 0,-1.08239 0.541195,-1.67704 0.547877,-0.59464 1.530045,-0.59464 0.227168,0 0.461018,0.0334 0.240531,0.0267 0.481062,0.0935 l -0.106903,0.6481 q -0.167035,-0.0401 -0.354115,-0.0601 -0.180398,-0.0267 -0.400885,-0.0267 -0.654779,0 -1.002213,0.41425 -0.347433,0.41425 -0.347433,1.16925 v 1.06235 h 1.757213 v 0.64809 h -1.757213 v 5.91306 l 1.155885,0.0869 v 0.58128 z"
+           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.68354416px;line-height:1.25;font-family:'Roboto Slab';-inkscape-font-specification:'Roboto Slab,  weight=255';font-variant-ligatures:no-common-ligatures;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#1f8787;fill-opacity:1;stroke:none;stroke-width:1.14031589px;stroke-opacity:1"
+           id="path1621"
+           inkscape:connector-curvature="0" />
+        <path
+           d="m 81.009409,111.85269 q -0.928717,0 -1.636948,-0.44766 -0.70823,-0.45433 -1.109115,-1.24942 -0.400885,-0.80177 -0.400885,-1.84407 v -0.36748 q 0,-1.03562 0.400885,-1.84407 0.400885,-0.81513 1.08239,-1.28283 0.688186,-0.4677 1.530044,-0.4677 0.888629,0 1.516682,0.38084 0.634735,0.38084 0.968806,1.07571 0.340752,0.68818 0.340752,1.62358 v 0.68151 h -5.011063 l -0.01336,0.29398 q 0.0067,0.80177 0.293982,1.42982 0.293983,0.62805 0.815133,0.98885 0.527832,0.3608 1.2227,0.3608 0.681504,0 1.195973,-0.21381 0.521151,-0.22048 0.915355,-0.59464 l 0.340752,0.54787 q -0.420929,0.40089 -1.022257,0.66814 -0.594646,0.26058 -1.429823,0.26058 z m -2.265001,-4.40974 h 4.155842 v -0.20044 q 0,-0.63473 -0.247213,-1.13584 -0.240531,-0.50779 -0.694867,-0.79509 -0.447655,-0.2873 -1.08239,-0.2873 -0.574602,0 -1.03562,0.31403 -0.461017,0.30734 -0.755,0.84854 -0.287301,0.53451 -0.354115,1.21601 z"
+           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.68354416px;line-height:1.25;font-family:'Roboto Slab';-inkscape-font-specification:'Roboto Slab,  weight=255';font-variant-ligatures:no-common-ligatures;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#1f8787;fill-opacity:1;stroke:none;stroke-width:1.14031589px;stroke-opacity:1"
+           id="path1623"
+           inkscape:connector-curvature="0" />
+      </g>
+    </g>
+  </g>
+</svg>

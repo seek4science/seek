@@ -16,8 +16,6 @@ class InvestigationsController < ApplicationController
 
   include Seek::AnnotationCommon
 
-  include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
 
   require "isatab_converter"
@@ -109,11 +107,14 @@ class InvestigationsController < ApplicationController
     end
   end
 
+
+
   private
 
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, :other_creators,
-                                          { creator_ids: [] },{ scales: [] }, { publication_ids: [] })
+                                          { creator_ids: [] },{ scales: [] }, { publication_ids: [] },
+                                          { custom_metadata_attributes: determine_custom_metadata_keys })
   end
 
 end

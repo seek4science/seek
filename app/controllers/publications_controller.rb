@@ -10,8 +10,6 @@ class PublicationsController < ApplicationController
   before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy]
   before_action :suggest_authors, only: [:manage]
 
-  include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
   include PublicationsHelper
 
@@ -232,7 +230,7 @@ class PublicationsController < ApplicationController
     end
 
     respond_to do |format|
-      format.json { render json: authors }
+      format.json { render json: authors.to_json }
       format.xml  { render xml: authors }
     end
   end
@@ -268,7 +266,7 @@ class PublicationsController < ApplicationController
     author = PublicationAuthor.where(first_name: first_name, last_name: last_name).limit(1)
 
     respond_to do |format|
-      format.json { render json: authors }
+      format.json { render json: authors.to_json }
       format.xml  { render xml: authors }
     end
   end

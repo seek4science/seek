@@ -76,7 +76,7 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
       project = person.projects.first
       sample_type = Factory(:patient_sample_type, project_ids: [project.id])
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute_value(:full_name, 'Fred Blogs')
+      sample.set_attribute_value('full name', 'Fred Blogs')
       sample.set_attribute_value(:age, 22)
       sample.set_attribute_value(:weight, 12.2)
       sample.set_attribute_value(:address, 'Somewhere')
@@ -84,14 +84,14 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
       sample.save!
 
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute_value(:full_name, 'Fred Jones')
+      sample.set_attribute_value('full name', 'Fred Jones')
       sample.set_attribute_value(:age, 22)
       sample.set_attribute_value(:weight, 12.2)
       sample.set_attribute_value(:postcode, 'M12 9LJ')
       sample.save!
 
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute_value(:full_name, 'Fred Smith')
+      sample.set_attribute_value('full name', 'Fred Smith')
       sample.set_attribute_value(:age, 22)
       sample.set_attribute_value(:weight, 12.2)
       sample.set_attribute_value(:address, 'Somewhere else')

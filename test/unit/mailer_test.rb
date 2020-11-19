@@ -383,6 +383,89 @@ class MailerTest < ActionMailer::TestCase
     end
   end
 
+  test 'request join project with new institution' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://hub.com') do
+        project = Factory(:project)
+        institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
+        comments = 'some comments'
+        person = Factory(:person)
+        log = MessageLog.log_project_membership_request(person, project, institution, comments)
+        email = Mailer.request_join_project(person.user, project, institution.to_json,comments, log)
+        refute_nil email
+        refute_nil email.body
+      end
+    end
+  end
+
+  test 'request join project existing institution' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        project = Factory(:project)
+        institution = Factory(:institution)
+        comments = 'some comments'
+        person = Factory(:person)
+        log = MessageLog.log_project_membership_request(person, project, institution, comments)
+        email = Mailer.request_join_project(person.user, project, institution.to_json,comments, log)
+        refute_nil email
+        refute_nil email.body
+
+      end
+    end
+  end
+
+  test 'request create project for programme' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        programme_admin = Factory(:programme_administrator)
+        programme = programme_admin.programmes.first
+        refute_empty programme.programme_administrators
+        project = Project.new(title:'My lovely project')
+        institution = Factory(:institution)
+        sender = Factory(:person)
+        log = MessageLog.log_project_creation_request(sender,programme,project,institution)
+        email = Mailer.request_create_project_for_programme(sender.user, programme, project.to_json, institution.to_json,log)
+        refute_nil email
+        refute_nil email.body
+      end
+    end
+  end
+
+  test 'request create project and programme' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
+        project = Project.new(title:'My lovely project')
+        programme = Programme.new(title:'My lovely programme')
+        sender = Factory(:person)
+        log = MessageLog.log_project_creation_request(sender,programme,project,institution)
+        email = Mailer.request_create_project_and_programme(sender.user, programme.to_json, project.to_json, institution.to_json,log)
+        refute_nil email
+        refute_nil email.body
+      end
+    end
+  end
+
+  test 'join project rejected' do
+    project = Factory(:project,title:'project to join')
+    requester = Factory(:person)
+    comments = "You are evil"
+    email = Mailer.join_project_rejected(requester, project, comments)
+    refute_nil email
+    refute_nil email.body
+    assert_equal "Your request to join the Project, project to join, hasn't been approved",email.subject
+  end
+
+  test 'create project rejected' do
+    requester = Factory(:person)
+    project_name='My Project'
+    comments = 'load of rubbish'
+    email = Mailer.create_project_rejected(requester,project_name,comments)
+    refute_nil email
+    refute_nil email.body
+  end
+
+
   private
 
   def encode_mail(message)

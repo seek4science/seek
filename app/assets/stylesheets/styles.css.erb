@@ -173,12 +173,6 @@ table.list_item .tags {
     margin-top: 0.7em;
 }
 
-span.disabled, span.disabled-button,
-a.disabled, a.disabled-button{
-    filter:progid:DXImageTransform.Microsoft.Alpha( Opacity=50 );
-    opacity: 0.50;
-    pointer-events: none;
-}
 a[disabled] {
   pointer-events: none;
 }
@@ -515,7 +509,7 @@ ul.users_details li p {
 }
 
 #publication_preview_container {
-    max-height: 26em;
+    max-height: 50em;
 }
 
 #publication_preview {
@@ -1607,3 +1601,14 @@ table#storage-stats thead {
   font-weight: bolder;
 }
 
+#description,
+.list_item_desc{
+  overflow: auto;
+  max-height: 40em;
+}
+
+#description img,
+.list_item_desc img,
+.editor-preview-side img{
+  max-width:95%;
+}

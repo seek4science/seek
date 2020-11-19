@@ -220,15 +220,17 @@ module ApplicationHelper
       res = simple_format(res, {}, sanitize: false).html_safe if options[:description] == true || options[:address] == true
       if options[:description] == true && options[:markdown] == true
         markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, tables: true)
-        # remove <p> and <br> tags, markdown render cannot handle them
+        # replace br with newlines to fix list render issues
+        res.gsub!(/<br\s*\/>/, "\n")
+        # remove <p> and <br> tags, Redcarpet markdown render cannot handle them
         scrubber = Rails::Html::TargetScrubber.new
-        scrubber.tags = ['p']
+        scrubber.tags = ['p','br']
         res = Loofah.fragment(res).scrub!(scrubber).to_s
         res = markdown.render(res)
       end
       res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link]
       res = mail_to(res) if options[:email]
-      res = link_to(res, res, popup: true) if options[:external_link]
+      res = link_to(res, res, popup: true, target: :_blank) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
       res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(CountryCodes.code(text))) if options[:link_as_country]
     end
@@ -467,6 +469,20 @@ module ApplicationHelper
   # whether manage attributes should be shown, dont show if editing (rather than new or managing)
   def show_form_manage_specific_attributes?
     !(action_name == 'edit' || action_name == 'update')
+  end
+
+  #whether to show a banner encouraging you to join or create a project
+  def join_or_create_project_banner?
+    return false if !logged_in_and_registered?
+    return false if logged_in_and_member?
+    return false if current_page?(create_or_join_project_home_path) ||
+        current_page?(guided_create_projects_path) ||
+        current_page?(guided_join_projects_path)
+
+    #current_page? doesn't work with POST
+    return false if ['request_join','request_create'].include?(action_name)
+
+    return Seek::Config.programmes_enabled && Programme.managed_programme
   end
 
   PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => I18n.t('institution').pluralize,

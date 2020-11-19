@@ -19,6 +19,7 @@ namespace :seek do
     refix_country_codes
     fix_missing_dois
     set_version_visibility
+    update_samples_json
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -205,5 +206,34 @@ namespace :seek do
     end
 
     puts "Done"
+  end
+
+  task(update_samples_json: :environment) do
+    puts '... converting stored sample JSON ...'
+    SampleType.all.each do |sample_type|
+
+      # gather the attributes that need updating
+      attributes_for_update = sample_type.sample_attributes.select do |attr|
+        attr.accessor_name != attr.original_accessor_name
+      end
+
+      if attributes_for_update.any?
+        # work through each sample
+        sample_type.samples.each do |sample|
+          json = JSON.parse(sample.json_metadata)
+          attributes_for_update.each do |attr|
+            # replace the json key
+            json[attr.accessor_name] = json.delete(attr.original_accessor_name)
+          end
+          sample.update_column(:json_metadata,json.to_json)
+        end
+
+        # update the original accessor name for each affected attribute
+        attributes_for_update.each do |attr|
+          attr.update_column(:original_accessor_name, attr.accessor_name)
+        end
+      end
+    end
+    puts " ... finished updating sample JSON"
   end
 end

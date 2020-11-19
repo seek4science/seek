@@ -204,6 +204,12 @@ Factory.define(:binary_content_blob, parent: :content_blob) do |f|
   f.data { File.new("#{Rails.root}/test/fixtures/files/little_file.txt", 'rb').read }
 end
 
+Factory.define(:study_template_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'study_batch.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/study_batch.zip", 'rb').read }
+end
+
 Factory.define(:sample_type_template_content_blob, parent: :content_blob) do |f|
   f.original_filename 'sample-type-example.xlsx'
   f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -371,4 +377,10 @@ Factory.define(:just_cwl_ro_crate, parent: :content_blob) do |f|
   f.original_filename 'just-cwl-workflow.crate.zip'
   f.content_type 'application/zip'
   f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/just-cwl-workflow.crate.zip", 'rb').read }
+end
+
+Factory.define(:fully_remote_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'all_remote.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/all_remote.crate.zip", 'rb').read }
 end

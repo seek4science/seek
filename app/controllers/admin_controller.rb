@@ -2,7 +2,6 @@ require 'delayed/command'
 
 class AdminController < ApplicationController
   include CommonSweepers
-  include Seek::BreadCrumbs
 
   RESTART_MSG = "Your settings have been updated. If you changed some settings e.g. search, you need to restart some processes.
                  Please see the buttons and explanations below.".freeze
@@ -42,6 +41,7 @@ class AdminController < ApplicationController
     # Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
     Seek::Config.project_admin_sample_type_restriction = string_to_boolean params[:project_admin_sample_type_restriction]
     Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
+    Seek::Config.managed_programme_id = params[:managed_programme_id]
 
     Seek::Config.set_smtp_settings 'address', params[:address]
     Seek::Config.set_smtp_settings 'domain', params[:domain]
@@ -68,6 +68,10 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_elixir_aai_enabled = string_to_boolean params[:omniauth_elixir_aai_enabled]
     Seek::Config.omniauth_elixir_aai_client_id = params[:omniauth_elixir_aai_client_id]
     Seek::Config.omniauth_elixir_aai_secret = params[:omniauth_elixir_aai_secret]
+
+    Seek::Config.omniauth_github_enabled = string_to_boolean params[:omniauth_github_enabled]
+    Seek::Config.omniauth_github_client_id = params[:omniauth_github_client_id]
+    Seek::Config.omniauth_github_secret = params[:omniauth_github_secret]
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
     Seek::Config.filtering_enabled = string_to_boolean params[:filtering_enabled]

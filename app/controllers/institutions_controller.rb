@@ -12,7 +12,6 @@ class InstitutionsController < ApplicationController
   skip_before_action :project_membership_required
 
   cache_sweeper :institutions_sweeper, only: [:update, :create, :destroy]
-  include Seek::BreadCrumbs
 
   api_actions :index, :show, :create, :update, :destroy
 
@@ -88,6 +87,31 @@ class InstitutionsController < ApplicationController
         format.xml  { render xml: @institution.errors, status: :unprocessable_entity }
         format.json { render json: json_api_errors(@institution), status: :unprocessable_entity }
       end
+    end
+  end
+
+  # For use in autocompleters
+  def typeahead
+    results = Institution.where("LOWER(title) LIKE :query
+                                  OR LOWER(city) LIKE :query
+                                  OR LOWER(address) LIKE :query",
+                           query: "%#{params[:query].downcase}%").limit(params[:limit] || 10)
+    items = results.map do |institution|
+      { id: institution.id,
+        name: institution.title,
+        web_page: institution.web_page,
+        city: institution.city,
+        country:institution.country,
+        country_name: CountryCodes.country(institution.country),
+        hint: institution.typeahead_hint }
+    end
+
+    if params[:include_new]
+      items.unshift({id:-1, name:params[:query],web_page:'',country:'', country_name:'',city:'',hint:"new item", new:true})
+    end
+
+    respond_to do |format|
+      format.json { render json: items.to_json }
     end
   end
 
