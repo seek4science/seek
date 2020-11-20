@@ -52,11 +52,9 @@ module Seek #:nodoc:
       end
 
       Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.each do |action|
-        eval <<-END_EVAL
-          def can_#{action}? user = User.current_user
-            self.parent.can_perform? '#{action}', user
-          end
-        END_EVAL
+        define_method "can_#{action}?" do |user = User.current_user|
+          self.parent.can_perform?(action, user)
+        end
       end
 
       # assumes all versioned resources are also taggable

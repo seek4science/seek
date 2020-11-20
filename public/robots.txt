@@ -4,3 +4,6 @@ User-Agent: *
 Disallow: /*download$
 Disallow: /*download*
 Disallow: /models/*simulate*
+Disallow: /*?filter*
+Disallow: /*&filter*
+Disallow: /login*

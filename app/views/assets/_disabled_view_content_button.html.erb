@@ -1,0 +1,7 @@
+<% if icon_view %>
+  <span class="disabled" data-tooltip='<%= tooltip(explanation) %>'>
+    <%= image('show', :onclick => "alert('#{explanation}');") %>
+  </span>
+<% else %>
+  <%= button_link_to('View content', 'show', nil, disabled_reason: explanation) %>
+<% end %>

@@ -23,7 +23,9 @@ class AssaysControllerTest < ActionController::TestCase
     hidden = Factory(:experimental_assay, policy: Factory(:private_policy)) # ensure at least one hidden assay exists
     get :index, params: { page: 'all', format: 'xml' }
     assert_response :success
-    assert_equal assigns(:assays).sort_by(&:id), Assay.authorize_asset_collection(assigns(:assays), 'view', users(:aaron)).sort_by(&:id), "#{t('assays.assay').downcase.pluralize} haven't been authorized"
+    assert_equal assigns(:assays).sort_by(&:id),
+                 assigns(:assays).authorized_for('view', users(:aaron)).sort_by(&:id),
+                 "#{t('assays.assay').downcase.pluralize} haven't been authorized"
     assert !assigns(:assays).include?(hidden)
   end
 
@@ -184,14 +186,6 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_select 'p#assay_type', text: /Catabolic response/, count: 1
     assert_select 'p#technology_type', text: /Binding/, count: 1
-  end
-
-  test 'should not show tagging when not logged in' do
-    logout
-    public_assay = Factory(:experimental_assay, policy: Factory(:public_policy))
-    get :show, params: { id: public_assay }
-    assert_response :success
-    assert_select 'div#tags_box', count: 0
   end
 
   test 'should show modelling assay' do
@@ -639,7 +633,7 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select 'div.list_item_title a[href=?]', sop_path(sops(:sop_with_private_policy_and_custom_sharing)), count: 0
       assert_select 'div.list_item_actions a[href=?]', download_sop_path(sops(:sop_with_private_policy_and_custom_sharing)), count: 0
 
-      assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:downloadable_data_file)), text: 'Download Only', count: 1
+      assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:downloadable_data_file)), text: 'Downloadable Only', count: 1
       assert_select 'div.list_item_actions a[href=?]', download_data_file_path(data_files(:downloadable_data_file)), count: 1
       assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:private_data_file)), count: 0
       assert_select 'div.list_item_actions a[href=?]', download_data_file_path(data_files(:private_data_file)), count: 0
@@ -812,7 +806,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'filtering by person' do
     person = people(:person_for_model_owner)
-    get :index, params: { filter: { person: person.id }, page: 'all' }
+    get :index, params: { filter: { contributor: person.id }, page: 'all' }
     assert_response :success
     a = assays(:metabolomics_assay)
     a2 = assays(:modelling_assay_with_data_and_relationship)
@@ -1242,19 +1236,20 @@ class AssaysControllerTest < ActionController::TestCase
 
     get :show, params: { id: assay.id }
     assert_response :success
-    assert_select 'span.author_avatar a[href=?]', "/people/#{creator.id}"
+    assert_select 'li.author-list-item a[href=?]', "/people/#{creator.id}"
   end
 
   test 'should show other creators' do
     assay = Factory(:assay, policy: Factory(:public_policy))
-    other_creators = 'other creators'
+    other_creators = 'john smith, jane smith'
     assay.other_creators = other_creators
     assay.save
     assay.reload
 
     get :show, params: { id: assay.id }
     assert_response :success
-    assert_select 'div.panel-body div', text: other_creators
+    assert_select 'li.author-list-item', text: 'john smith'
+    assert_select 'li.author-list-item', text: 'jane smith'
   end
 
   test 'programme assays through nested routing' do

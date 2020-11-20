@@ -2,6 +2,7 @@ class PeopleController < ApplicationController
   include Seek::IndexPager
   include Seek::AnnotationCommon
   include Seek::Publishing::PublishingCommon
+  include Seek::Sharing::SharingCommon
   include Seek::Publishing::GatekeeperPublish
   include Seek::FacetedBrowsing
   include Seek::DestroyHandling
@@ -9,7 +10,7 @@ class PeopleController < ApplicationController
   include RelatedItemsHelper
 
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[show edit update destroy items]
+  before_action :find_and_authorize_requested_item, only: %i[show edit update destroy items batch_sharing_permission_preview]
   before_action :current_user_exists, only: %i[register create new]
   before_action :is_during_registration, only: [:register]
   before_action :is_user_admin_auth, only: [:destroy]
@@ -21,9 +22,10 @@ class PeopleController < ApplicationController
   skip_after_action :request_publish_approval, :log_publishing, only: %i[create update]
 
   cache_sweeper :people_sweeper, only: %i[update create destroy]
-  include Seek::BreadCrumbs
 
   protect_from_forgery only: []
+
+  api_actions :index, :show, :create, :update, :destroy, :current
 
   # GET /people/1
   # GET /people/1.xml
@@ -32,13 +34,25 @@ class PeopleController < ApplicationController
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
-      format.json {render json: @person}
+      format.json {render json: @person, include: [params[:include]]}
     end
   end
 
   def items
     respond_to do |format|
       format.html
+    end
+  end
+
+  def current
+    respond_to do |format|
+      format.json do
+        if logged_in?
+          render json: current_user.person
+        else
+          render json: { errors: [{ title: 'No user logged in'}] }, status: :not_found
+        end
+      end
     end
   end
 
@@ -89,7 +103,11 @@ class PeopleController < ApplicationController
     if email && Person.not_registered_with_matching_email(email).any?
       render :is_this_you, locals: { email: email }
     else
-      @person = Person.new(email: email)
+      p = { email: email }
+      p[:first_name], p[:last_name] = params[:name].split(' ') if params[:name].present?
+      p[:first_name] = params[:first_name] if params[:first_name]
+      p[:last_name] = params[:last_name] if params[:last_name]
+      @person = Person.new(p)
     end
   end
 
@@ -116,16 +134,21 @@ class PeopleController < ApplicationController
           if @person.only_first_admin_person?
             format.html { redirect_to registration_form_admin_path(during_setup: 'true') }
           else
-            format.html { redirect_to(@person) }
+            if Seek::Config.programmes_enabled && Programme.managed_programme
+              format.html { redirect_to(create_or_join_project_home_path)}
+            else
+              format.html { redirect_to(@person) }
+            end
+
           end
           format.xml { render xml: @person, status: :created, location: @person }
-          format.json {render json: @person, status: :created, location: @person }
+          format.json {render json: @person, status: :created, location: @person, include: [params[:include]] }
         else
           Mailer.signup(current_user).deliver_later
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to controller: 'users', action: 'activation_required' }
-          format.json { render json: @person, status: :created} # There must be more to be done
+          format.json { render json: @person, status: :created, include: [params[:include]]} # There must be more to be done
         end
       else
         format.html { render redirect_action }
@@ -137,18 +160,12 @@ class PeopleController < ApplicationController
 
   def notify_admin_and_project_administrators_of_new_user
     Mailer.contact_admin_new_user(notification_params.to_h, current_user).deliver_later
-
-    # send mail to project managers
-    project_administrators = project_administrators_of_selected_projects params[:projects]
-    project_administrators.each do |project_administrator|
-      Mailer.contact_project_administrator_new_user(project_administrator, notification_params.to_h, current_user).deliver_later
-    end
   end
 
   # PUT /people/1
   # PUT /people/1.xml
   def update
-    @person.disciplines.clear if params[:discipline_ids].nil?
+    @person.disciplines.clear if params[:discipline_ids].nil? #????
 
     set_tools_and_expertise(@person, params)
 
@@ -162,7 +179,7 @@ class PeopleController < ApplicationController
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
-        format.json {render json: @person}
+        format.json {render json: @person, include: [params[:include]]}
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @person.errors, status: :unprocessable_entity }
@@ -226,7 +243,7 @@ class PeopleController < ApplicationController
       people = project.people
     else
       workgroup = WorkGroup.find_by_project_id_and_institution_id(project_id, institution_id)
-      people = workgroup.people
+      people = workgroup ? workgroup.people : []
     end
     people_list = people.collect { |p| [h(p.name), p.email, p.id] }
     respond_to do |format|
@@ -278,7 +295,7 @@ class PeopleController < ApplicationController
   end
 
   def notification_params
-    params.permit(:projects, :institutions, :other_projects, :other_institutions)
+    params.permit({ projects: [] }, { institutions: [] }, :other_projects, :other_institutions)
   end
 
   def set_tools_and_expertise(person, params)
@@ -341,22 +358,5 @@ class PeopleController < ApplicationController
       error('You cannot register a new profile to yourself as you are already registered', 'Is invalid (already registered)')
       false
     end
-  end
-
-  def find_assets
-    @people = nil
-    if params[:discipline_id]
-      @discipline = Discipline.find_by_id(params[:discipline_id])
-      @people = @discipline.try(:people) || []
-    elsif params[:project_position_id]
-      @project_position = ProjectPosition.find(params[:project_position_id])
-      @people = Person.includes(:group_memberships)
-      # FIXME: this needs double checking, (a) not sure its right, (b) can be paged when using find.
-      @people = @people.reject { |p| (p.group_memberships & @project_position.group_memberships).empty? }
-    end
-
-    super unless @people
-
-    @people = @people.select(&:can_view?)
   end
 end

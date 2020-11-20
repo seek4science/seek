@@ -1,0 +1,24 @@
+<style>
+
+  #bioportal_visualise_container {
+      height: 70em;
+      padding: 2em;
+  }
+  iframe#bioportal_visualisation {
+      padding:0.5em;
+      border: solid 1px #bbb;
+      width: 100%;
+      height: 80%;
+      overflow: visible;
+  }
+</style>
+<ul class="sectionIcons">
+  <li>
+    <%= image_tag_for_key('back', human_disease_path(@human_disease), nil, nil, "Back to #{@human_disease.title}") -%>
+  </li>
+</ul>
+<br/>
+<h1>Visualising the term <em><%= @human_disease.concept_uri %></em> defined for the human disease <em><%= @human_disease.title %></em></h1>
+<div id="bioportal_visualise_container">
+    <%= visualise_ontology @human_disease,:show_concept=>true,:apikey=>Seek::Config.bioportal_api_key %>
+</div>

@@ -6,7 +6,7 @@ module Seek
 
     def bulk_destroy
       unless params['ids'].blank?
-        model_class = controller_name.classify.constantize
+        model_class = controller_model
         objects = model_class.find(params['ids'])
         objects.each(&:destroy)
         redirect_back(fallback_location: root_path)

@@ -58,29 +58,55 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
   end
 
   test 'authorization_permissions' do
-    with_config_value :auth_lookup_enabled, true do
-      Sop.delete_all
-      user = Factory(:person).user
-      other_user = Factory :user
-      sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
-      Sop.clear_lookup_table
+    [true, false].each do |lookup_enabled|
+      with_config_value :auth_lookup_enabled, lookup_enabled do
+        Sop.delete_all
+        user = Factory(:person).user
+        other_user = Factory :user
+        sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
+        Sop.clear_lookup_table
 
-      sop.update_lookup_table(user)
-      sop.update_lookup_table(other_user)
+        sop.update_lookup_table(user) if lookup_enabled
+        sop.update_lookup_table(other_user) if lookup_enabled
 
-      permissions = sop.authorization_permissions user
-      assert permissions.can_view
-      assert permissions.can_download
-      assert permissions.can_edit
-      assert permissions.can_manage
-      assert permissions.can_delete
+        permissions = sop.authorization_permissions user
+        assert permissions.can_view
+        assert permissions.can_download
+        assert permissions.can_edit
+        assert permissions.can_manage
+        assert permissions.can_delete
 
-      permissions = sop.authorization_permissions other_user
-      assert permissions.can_view
-      assert permissions.can_download
-      assert permissions.can_edit
-      assert !permissions.can_manage
-      assert !permissions.can_delete
+        permissions = sop.authorization_permissions other_user
+        assert permissions.can_view
+        assert permissions.can_download
+        assert permissions.can_edit
+        refute permissions.can_manage
+        refute permissions.can_delete
+
+        Investigation.delete_all
+        user = Factory(:person).user
+        other_user = Factory :user
+        study = Factory(:study, contributor: user.person, policy: Factory(:editing_public_policy))
+        inv = study.investigation
+        Investigation.clear_lookup_table
+
+        inv.update_lookup_table(user) if lookup_enabled
+        inv.update_lookup_table(other_user) if lookup_enabled
+
+        permissions = inv.authorization_permissions user
+        assert permissions.can_view
+        assert permissions.can_download
+        assert permissions.can_edit
+        assert permissions.can_manage
+        refute permissions.can_delete, "State should not allow delete, because investigation has studies"
+
+        permissions = inv.authorization_permissions other_user
+        assert permissions.can_view
+        assert permissions.can_download
+        assert permissions.can_edit
+        refute permissions.can_manage
+        refute permissions.can_delete
+      end
     end
   end
 

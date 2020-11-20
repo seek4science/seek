@@ -18,7 +18,10 @@
 
 <%= item_actions_dropdown do %>
   <% if item.can_edit? -%>
-    <li><%= image_tag_for_key('manage', edit_publication_path(item), nil, nil, 'Manage Publication') -%></li>
+    <li><%= image_tag_for_key('edit', edit_publication_path(item), nil, nil, 'Edit Publication') -%></li>
+  <% end -%>
+  <% if item.can_manage? -%>
+    <li><%= image_tag_for_key('manage', manage_publication_path(item), nil, nil, 'Manage Publication') -%></li>
   <% end -%>
 
   <% if item.can_delete? -%>

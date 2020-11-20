@@ -19,10 +19,6 @@
   <%= admin_text_setting(:application_name, Seek::Config.application_name,
                          "Application name", "The name of your application, as used in sentences, if you are extending SEEK and wish to give it a different name.") %>
 
-
-  <%= admin_text_setting(:application_name, Seek::Config.application_name,
-                         "Application name", "The name of your application, as used in sentences, if you are extending SEEK and wish to give it a different name.") %>
-
   <%= admin_text_setting(:dm_project_name, Seek::Config.dm_project_name,
                          "Data management #{t('project')} name", "The name of the data management #{t('project')}, if different from the #{t('project')}, as used in titles. For example, in SysMO the #{t('project')} is SysMO, but the DM #{t('project')} name is SysMO-DB.") %>
 
@@ -59,7 +55,7 @@
 
   <div class="additional_settings" id="imprint_details" style="<%= show_or_hide_block Seek::Config.imprint_enabled -%>">
     <%= admin_textarea_setting(:imprint_description, Seek::Config.imprint_description,
-                               nil, "Here you give the text for your SEEK imprint, to comply with German/your country's law and your institution/university's rules.
+                               nil, "Here you give the text for your SEEK imprint, to comply with German/your country's law and your organization's rules.
                                Or you can give the link to its content from external site. You can input basic html tags and formats.
                                Below is an example. You can see how it is under homes/imprint", :rows => 30) %>
   </div>

@@ -4,6 +4,11 @@ en:
   search_prompt: "Search here..."
   seek_id: "SEEK ID"
 
+  login:
+    elixir_aai: 'ELIXIR AAI'
+    ldap: 'LDAP'
+    github: 'GitHub'
+
   investigation: "Investigation"
   study: "Study"
   assay: "Assay"
@@ -20,24 +25,32 @@ en:
   workflow: "Workflow"
   workflows:
     workflow: "Workflow"
+    cwl_workflow: "CWL workflow"
+    galaxy_workflow: "Galaxy workflow"
+    knime_workflow: "KNIME workflow"
+    ro_workflow: "Research Object workflow"
   node: "Workflow Node"
   nodes:
     node: "Workflow Node"
   publication: "Publication"
   presentation: "Presentation"
   event: "Event"
+  collection: "Collection"
 
   sample: "Sample"
   sample_type: "Sample type"
   strain: "Strain"
   scale: "Scale"
   organism: "Organism"
+  human_disease: "Human Disease"
 
   person: "Person"
   project: "Project"
   institution: "Institution"
   programme: "Programme"
   profile: "Profile"
+  avatar: "Avatar"
+  private_asset: 'Hidden item'
 
   gadget:
     new_heading: "New or upload"
@@ -57,6 +70,7 @@ en:
     jerm_templates: "JERM templates"
     feedback: "Provide feedback"
     isa_best_practice: "ISA best practice"
+    vocabularies: "Vocabularies"
 
   favourite_group: "favourite groups"
 
@@ -66,7 +80,7 @@ en:
 
   actions_button: "Actions"
   submit_button:
-    upload: 'Upload and Save'
+    upload: 'Register'
     create: 'Create'
     update: 'Update'
 
@@ -88,16 +102,43 @@ en:
   pal: 'PAL'
   programme_administrator: 'Programme administrator'
 
-  contributor: 'contributor' # A person who submitted the resource to SEEK
+  contributor: 'submitter' # A person who submitted the resource to SEEK
+  contribution: 'submission'
   creator: 'creator' # A person who was involved with the creation of the resource
   person_responsible: 'person responsible'
 
   jerm_harvester_name: 'The JERM Harvester'
-  deleted_contributor_name: 'Deleted contributor'
+  deleted_contributor_name: 'Deleted submitter'
 
   null_license: 'No license - no permission to use unless the owner grants a licence'
 
   activerecord:
-      attributes:
-        person:
-          title: "Full name"
+    attributes:
+      person:
+        title: "Full name"
+      collection:
+        creators: 'Maintainers'
+
+  activemodel:
+    attributes:
+      workflow_crate_builder:
+        abstract_cwl: "Abstract CWL"
+
+  oauth_session: 'OAuth Session'
+  identity: 'Identity'
+  api_token: 'API token'
+  maturity_level:
+    released: 'Stable'
+    work_in_progress: 'Work-in-progress'
+
+  joining_a_project: "<p>
+    You need to be a member of a <strong>%{project}</strong> before you can register content.<br/>
+    A %{project} can contain one or more people, and gives some additional background details, and credit, about the content is being registered.
+    Being in a %{project} allows you to easily share with others whilst collaborating, and also provides useful defaults such as Sharing permissions and License.
+    </p>
+    <p>
+    You have the option to either <strong>Join</strong> a %{project} you already know about, or <b>Create</b> a new one.
+    </p>
+    <p>
+    If you choose to create, you will have the option to be part of a site managed <strong>%{programme}</strong>, or create your own. If you create your own you will become an administrator of it, which will allow you to freely create your own additional %{projects} within it now or in the future.
+    </p>"

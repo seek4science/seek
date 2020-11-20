@@ -23,7 +23,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 20 Nov 2018 12:33:48 GMT
+      - Mon, 14 Oct 2019 08:15:20 GMT
       Server:
       - Finatra
       Strict-Transport-Security:
@@ -31,30 +31,28 @@ http_interactions:
       Content-Security-Policy:
       - upgrade-insecure-requests
       X-Ratelimit-Remaining:
-      - '99'
+      - '2'
       Ncbi-Phid:
-      - D0BD4A451B24456500002229F39AF29A.1.1.m_5
+      - D0BDB88C816F70D5000036451789E276.1.1.m_5
       Cache-Control:
       - private
-      L5d-Success-Class:
-      - '1.0'
       Ncbi-Sid:
-      - 52038EC4D66552CC_9925SID
+      - 716AB49810108DC1_E3C1SID
       X-Ratelimit-Limit:
-      - '100'
+      - '3'
       Access-Control-Allow-Origin:
       - "*"
+      Content-Length:
+      - '1916'
       Content-Type:
       - text/plain; charset=UTF-8
       Set-Cookie:
-      - ncbi_sid=52038EC4D66552CC_9925SID; domain=.nih.gov; path=/; expires=Wed, 20
-        Nov 2019 12:33:49 GMT
+      - ncbi_sid=716AB49810108DC1_E3C1SID; domain=.nih.gov; path=/; expires=Wed, 14
+        Oct 2020 08:15:20 GMT
       X-Ua-Compatible:
       - IE=Edge
       X-Xss-Protection:
       - 1; mode=block
-      Transfer-Encoding:
-      - chunked
     body:
       encoding: ASCII-8BIT
       string: "\nPMID- 27899646\nOWN - NLM\nSTAT- MEDLINE\nDCOM- 20170615\nLR  - 20181113\nIS
@@ -124,5 +122,5 @@ http_interactions:
         - 10.1093/nar/gkw1032 [doi]\nPST - ppublish\nSO  - Nucleic Acids Res. 2017
         Jan 4;45(D1):D404-D407. doi: 10.1093/nar/gkw1032. Epub\n      2016 Nov 28.\n"
     http_version: 
-  recorded_at: Tue, 20 Nov 2018 12:32:55 GMT
+  recorded_at: Mon, 14 Oct 2019 08:15:20 GMT
 recorded_with: VCR 2.9.3

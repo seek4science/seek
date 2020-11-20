@@ -209,7 +209,6 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    puts flash[:error]
     refute flash[:error]
     assert_equal "Registered all #{batch_ids.size} OpenBIS entities", flash[:notice]
 

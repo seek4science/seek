@@ -38,10 +38,11 @@ min-width:
 	border: 1px dotted #999;
 }
 
-
-.list_items_container{
-    margin-left:auto;
-    margin-right:auto;
+.list_items_container {
+  margin-left:auto;
+  margin-right:auto;
+  clear: both;
+  padding-top: 5px;
 }
 
 table.list_item {
@@ -172,12 +173,6 @@ table.list_item .tags {
     margin-top: 0.7em;
 }
 
-span.disabled, span.disabled-button,
-a.disabled, a.disabled-button{
-    filter:progid:DXImageTransform.Microsoft.Alpha( Opacity=50 );
-    opacity: 0.50;
-    pointer-events: none;
-}
 a[disabled] {
   pointer-events: none;
 }
@@ -514,7 +509,7 @@ ul.users_details li p {
 }
 
 #publication_preview_container {
-    max-height: 26em;
+    max-height: 50em;
 }
 
 #publication_preview {
@@ -837,6 +832,14 @@ img.visibility_icon {
 }
 
 #edit_organism li span {
+	font-weight: bold;
+}
+
+#edit_human_disease li {
+	list-style: none;
+}
+
+#edit_human_disease li span {
 	font-weight: bold;
 }
 
@@ -1458,22 +1461,15 @@ div#version_box .compare {
 #search_label {
     padding-right: 0.25em;
 }
-#test_url_result div#url_type {
-    font-size:larger;
-}
-#test_url_result div#url_info {
 
-}
-#test_url_result img {
-    max-width: 8em;
-    max-height: 8em;
-    min-width: 3em;
-    min-height: 3em;
-    float:left;
-    padding-right:1em;
-}
-#test_url_result img {
-    vertical-align: text-top;
+#test_url_result img.preview {
+  max-width: 8em;
+  max-height: 8em;
+  min-width: 3em;
+  min-height: 3em;
+  float:left;
+  padding-right:1em;
+  vertical-align: text-top;
 }
 
 #no-index-items-text {
@@ -1483,21 +1479,21 @@ div#version_box .compare {
     padding:1em;
 }
 
-#pending-files {
+.pending-files {
     list-style: none;
-    padding: 10px 0 0 0;
+    padding: 0;
     margin: 0;
 }
 
-#pending-files li {
+.pending-files li {
     vertical-align: middle;
 }
 
-#pending-files span {
+.pending-files span {
     vertical-align: middle;
 }
 
-#pending-files a {
+.pending-files a {
     padding-left: 0.75em;
 }
 
@@ -1605,3 +1601,14 @@ table#storage-stats thead {
   font-weight: bolder;
 }
 
+#description,
+.list_item_desc{
+  overflow: auto;
+  max-height: 40em;
+}
+
+#description img,
+.list_item_desc img,
+.editor-preview-side img{
+  max-width:95%;
+}

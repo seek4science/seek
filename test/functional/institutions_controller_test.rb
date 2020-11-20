@@ -212,12 +212,6 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal person.user, log.culprit
   end
 
-  test 'no resource count stats' do
-    get :index
-    assert_response :success
-    assert_select '#resource-count-stats', count: 0
-  end
-
   def edit_max_object(inst)
     for i in 1..5 do
       Factory(:person).add_to_project_and_institution(Factory(:project), inst)

@@ -40,11 +40,19 @@ module Seek
       end
 
       def assay_type_uri=(uri)
-        suggested_type_uri_assignment(uri, 'assay_type') || super
+        if suggested_type_uri_assignment(uri, 'assay_type')
+          super(suggested_assay_type.ontology_uri)
+        else
+          super(uri)
+        end
       end
 
       def technology_type_uri=(uri)
-        suggested_type_uri_assignment(uri, 'technology_type') || super
+        if suggested_type_uri_assignment(uri, 'technology_type')
+          super(suggested_technology_type.ontology_uri)
+        else
+          super(uri)
+        end
       end
 
       def suggested_type_uri_assignment(uri, type)

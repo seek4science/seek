@@ -309,12 +309,6 @@ class OrganismsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'no resource count stats' do
-    get :index
-    assert_response :success
-    assert_select '#resource-count-stats', count: 0
-  end
-
   test 'samples in related items' do
     person = Factory(:person)
     login_as(person.user)

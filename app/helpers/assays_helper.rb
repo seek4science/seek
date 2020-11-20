@@ -36,6 +36,27 @@ module AssaysHelper
     result.html_safe
   end
 
+  def assay_human_disease_list_item(assay_human_disease)
+    unless assay_human_disease.human_disease.nil?
+      result = link_to assay_human_disease.human_disease.title, assay_human_disease.human_disease
+      result.html_safe
+    end
+  end
+
+  def list_assay_human_diseases(attribute, assay_human_diseases, html_options = {})
+    result = "<p class='#{html_options[:class]}' id='#{html_options[:id]}'> <b>#{attribute}</b>: "
+
+    result << if assay_human_diseases.any?
+      assay_human_diseases.collect { |ad| assay_human_disease_list_item(ad) }.join(', ').html_safe
+    else
+      content_tag(:span, 'No human diseases', class: :none_text)
+    end
+
+    result << '</p>'
+
+    result.html_safe
+  end
+
   # the selection dropdown box for selecting the study for an assay
   def assay_study_selection(element_name, current_study)
     grouped_options = grouped_options_for_study_selection(current_study)
@@ -69,7 +90,7 @@ module AssaysHelper
   # returns a map of the studies that can be selected, grouped by investigation
   # this includes the editable studies, plus the current associated study if it is not already included (i.e not edtiable)
   def selectable_studies_mapped_to_investigation(current_study)
-    studies = Study.all_authorized_for(:edit)
+    studies = Study.authorized_for('edit').to_a
     studies << current_study if current_study && !current_study.can_edit?
     investigation_map = {}
     studies.each do |study|

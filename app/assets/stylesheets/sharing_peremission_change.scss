@@ -1,0 +1,82 @@
+#sharing_items {
+
+  .hide_permission
+  {
+    display:none;
+  }
+
+  .root-node>i.jstree-ocl, .root-node>a.jstree-anchor
+  {
+    display:none;
+  }
+
+  .jstree-default .jstree-clicked {
+    background: #dee9f3;
+    border-radius: 2px;
+  }
+
+  #jstree {
+    width: 100%;
+    border-left:none;
+
+    a.permission-node {
+      margin-left:5px;
+    }
+
+    a.permission-node>i.jstree-checkbox,
+    a.permission-node>i.jstree-icon {
+      display:none;
+    }
+
+    .asset-node-row>i.jstree-ocl,
+    .asset-node-row>i.jstree-icon {
+      visibility: visible;
+    }
+  }
+
+  #jstree_not_isa {
+
+    max-height:600px;
+    overflow-x:hidden;
+    overflow: auto;
+
+
+    .jstree-themeicon {
+      background-size: 24px !important;
+    }
+
+    a.permission-node>i.jstree-checkbox,
+    a.permission-node>i.jstree-icon,
+    li.asset-type-node>a>i.jstree-checkbox,
+    .asset-type-node>a>i.jstree-icon,
+    .asset-node-row>i.jstree-ocl{
+      display:none;
+    }
+  }
+}
+
+.sharing_permission_changed {
+  margin-bottom: 5px;
+  padding: 0 10px;
+  font-weight: bold;
+  background-color: #adfc96;
+  color: black;
+}
+
+.sharing_permission_changed::before{
+  content: "+";
+  margin: 0 20px 0 0;
+}
+
+#hiddencheckboxs input {
+  display:none;
+}
+
+.highlight-colour{
+  color:green;
+  font-weight: bold;
+}
+
+.permissions-table .permission-column.sharing-color {
+  color: green;
+}

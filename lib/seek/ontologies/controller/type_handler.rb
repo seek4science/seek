@@ -42,7 +42,7 @@ module Seek
         def find_and_authorize_assays
           @assays = []
           return unless @type_class
-          @assays = Assay.authorize_asset_collection(@type_class.assays, 'view')
+          @assays = @type_class.assays.authorized_for('view')
         end
 
         def invalid_label?
@@ -50,7 +50,7 @@ module Seek
         end
 
         def link_to_alternative
-          path = eval("#{controller_name}_path(:uri=>@type_class.uri, :label=> @type_class.label)")
+          path = polymorphic_path(controller_name, uri: @type_class.uri, label: @type_class.label)
           view_context.link_to(@type_class.label, path, style: 'font-style:italic;font-weight:bold;')
         end
 

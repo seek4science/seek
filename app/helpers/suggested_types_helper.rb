@@ -40,13 +40,12 @@ module SuggestedTypesHelper
   end
 
   def all_types_text(join_word = 'and')
-    model_class = controller_name.classify.constantize
+    model_class = controller_model
     model_class.all_term_types.map { |type| type.split('_').join(' ') }.join(" #{join_word} ")
   end
 
   def cancel_link
-    manage_path = eval "#{controller_name}_path"
-    cancel_button(manage_path)
+    cancel_button(polymorphic_path(controller_name))
   end
 
   def ontology_editor_display(types, selected_uri = nil)

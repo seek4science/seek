@@ -1,0 +1,3 @@
+class OauthAuthorizationsController < Doorkeeper::AuthorizationsController
+  skip_before_action :project_membership_required
+end

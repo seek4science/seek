@@ -22,6 +22,7 @@
 *= require faceted_browsing
 *= require project_folders
 *= require publishing
+*= require sharing_peremission_change
 *= require settings
 *= require new_styles
 *= require jquery-ui
@@ -29,6 +30,7 @@
 *= require bootstrap-tagsinput
 *= require bootstrap-multiselect
 *= require organisms
+*= require human_diseases
 *= require samples
 *= require DataTables-1.10.11/dataTables.bootstrap
 *= require DataTables-1.10.11/select.bootstrap
@@ -39,4 +41,5 @@
 *= require cytoscape_isa_graph
 *= require multi-step-wizard.css.erb
 *= require lightbox2
+*= require simplemde.min
 */

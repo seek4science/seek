@@ -247,8 +247,7 @@ class AssetTest < ActiveSupport::TestCase
     end
 
     df.policy = Factory(:public_policy)
-    df.doi = 'test_doi'
-    disable_authorization_checks { df.save }
+    df.find_version(1).update_column(:doi, 'test_doi')
     assert !df.find_version(1).can_mint_doi?
   end
 
@@ -256,8 +255,7 @@ class AssetTest < ActiveSupport::TestCase
     df = Factory :data_file
     assert !df.find_version(1).has_doi?
     assert !df.has_doi?
-    df.doi = 'test_doi'
-    disable_authorization_checks { df.save }
+    df.find_version(1).update_column(:doi, 'test_doi')
     assert df.find_version(1).has_doi?
     assert df.has_doi?
   end

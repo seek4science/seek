@@ -84,9 +84,11 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   test 'generates valid DataCite metadata' do
-    snapshot = @investigation.create_snapshot
+    types = [@investigation.create_snapshot, @study.create_snapshot, @assay.create_snapshot]
 
-    assert snapshot.datacite_metadata.validate
+    types.each do |type|
+      assert type.datacite_metadata.validate, "#{type.class.name} did not generate valid metadata."
+    end
   end
 
   test 'creates DOI via datacite' do
@@ -287,6 +289,18 @@ class SnapshotTest < ActiveSupport::TestCase
 
     assert_equal snapshot.resource_type, reindex_job.item_type
     assert_equal snapshot.resource_id, reindex_job.item_id
+  end
+
+  test 'snapshots destroyed with parent object' do
+    snapshot1 = @study.create_snapshot
+    snapshot2 = @study.create_snapshot
+
+    assert_difference('Snapshot.count', -2) do
+      disable_authorization_checks { @study.destroy }
+    end
+
+    assert snapshot1.destroyed?
+    assert snapshot2.destroyed?
   end
 
   private

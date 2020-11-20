@@ -11,11 +11,11 @@ class PresentationsController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
 
-  include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
 
-  def new_version
+  api_actions :index, :show, :create, :update, :destroy
+
+  def create_version
     if handle_upload_data(true)
       comments=params[:revision_comments]
 
@@ -37,7 +37,7 @@ class PresentationsController < ApplicationController
  # PUT /presentations/1
   # PUT /presentations/1.xml
   def update
-    @presentation.attributes = presentation_params
+    @presentation.update_attributes(presentation_params)
     update_annotations(params[:tag_list], @presentation) if params.key?(:tag_list)
     update_sharing_policies @presentation
     update_relationships(@presentation,params)
@@ -60,7 +60,7 @@ class PresentationsController < ApplicationController
         end
         flash[:notice] = "#{t('presentation')} metadata was successfully updated."
         format.html { redirect_to presentation_path(@presentation) }
-        format.json { render json: @presentation }
+        format.json { render json: @presentation, include: [params[:include]] }
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@presentation), status: :unprocessable_entity }
@@ -74,7 +74,8 @@ class PresentationsController < ApplicationController
     params.require(:presentation).permit(:title, :description, :other_creators, :license, :parent_name,
                                          { event_ids: [] }, { project_ids: [] },
                                          { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                         { creator_ids: [] }, { publication_ids: [] })
+                                         { creator_ids: [] }, { publication_ids: [] },
+                                         discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :presentation_params

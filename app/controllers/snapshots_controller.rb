@@ -10,7 +10,6 @@ class SnapshotsController < ApplicationController
   before_action :zenodo_oauth_client
   before_action :zenodo_oauth_session, only: [:export_submit]
 
-  include Seek::BreadCrumbs
   include Zenodo::Oauth2::SessionHelper
   include Seek::ExternalServiceWrapper
 
@@ -23,7 +22,7 @@ class SnapshotsController < ApplicationController
   def show
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @snapshot }
+      format.json { render json: @snapshot, include: [params[:include]] }
     end
   end
 

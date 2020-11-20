@@ -31,7 +31,6 @@ module RdfHelper
           resource.to_schema_ld.html_safe
         end
       rescue Exception => exception
-        raise exception
         data={}
         data[:message] = 'Error embedding Schema JSON-LD into page HEAD'
         data[:item] = resource.inspect
@@ -43,7 +42,7 @@ module RdfHelper
 
   def determine_resource_for_schema_ld
     if controller_name=='homes' && action_name=='index'
-      Seek::BioSchema::DataCatalogueMockModel.new
+      Seek::BioSchema::DataCatalogMockModel.new
     elsif action_name == 'show'
       resource_for_controller
     end

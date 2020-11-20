@@ -92,8 +92,9 @@ module Seek
         return if param.nil?
 
         param.keys.each do |asset_class|
+          klass = asset_class.constantize
           param[asset_class].keys.each do |id|
-            asset = eval("#{asset_class}.find_by_id(#{id})")
+            asset = klass.find_by_id(id)
             decision = param[asset_class][id]['decision']
             case decision.to_i
             when 1

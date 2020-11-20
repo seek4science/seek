@@ -6,11 +6,10 @@ require 'json-diff'
 
 module JsonRestTestCases
 
-  JSONAPI_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'json', 'rest', 'jsonapi-schema-v1')
+  JSONAPI_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', 'api', 'jsonapi-schema-v1')
 
   def definitions_path
-    File.join(Rails.root, 'public', '2010', 'json', 'rest',
-              'definitions.json')
+    File.join(Rails.root, 'public', 'api', 'definitions', 'definitions.json')
   end
 
   def validate_json(path)
@@ -61,7 +60,7 @@ module JsonRestTestCases
     className = @controller.class.name.dup
     className[0] = className[0].downcase
     fragment = '#/definitions/' + className.gsub('Controller', 'Response')
-    get :index, format: 'json'
+    get :index, params: rest_index_url_options, format: 'json'
     if check_for_501_index_return
       assert_response :not_implemented
     else
@@ -86,7 +85,7 @@ module JsonRestTestCases
     ['min', 'max'].each do |m|
       object = get_test_object(m)
       json_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'content_compare',
-                            "#{m}_#{@controller.controller_name.classify.downcase}.json")
+                            "#{m}_#{@controller.controller_name.singularize}.json")
       # parse such that backspace is eliminated and null turns to nil
       json_to_compare = JSON.parse(File.read(json_file))
 
@@ -96,6 +95,7 @@ module JsonRestTestCases
 
       assert_response :success
       parsed_response = JSON.parse(@response.body)
+      # puts JSON.pretty_generate(parsed_response)
       check_content_diff(json_to_compare, parsed_response)
     end
   end
@@ -108,7 +108,11 @@ module JsonRestTestCases
     diff.reverse_each do |el|
       # the self link must start with the pluralized controller's name (e.g. /people)
       if el['path'] =~ /self/
-        assert_match /\/#{plural_obj}\/\d+/, el['value']
+        if plural_obj == 'collection_items' # ugh
+          assert_match /\/collections\/\d+\/items\/\d+/, el['value']
+        else
+          assert_match /\/#{plural_obj}\/\d+/, el['value']
+        end
         # url in version, e.g.  base_url/data_files/877365356?version=1
       elsif el['path'] =~ /versions\/\d+\/url/
         assert_match /#{base}\/#{plural_obj}\/\d+\?version=\d+/, el['value']
@@ -126,7 +130,7 @@ module JsonRestTestCases
     end
 
     diff.delete_if do |el|
-      el['path'] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|download|md5sum|sha1sum|project_id|position_id|tags|members/
+      el['path'] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|download|md5sum|sha1sum|project_id|position_id|tags|members|links\/items/
     end
 
     assert_equal [], diff
@@ -139,13 +143,13 @@ module JsonRestTestCases
   end
   # check if this current controller type doesn't support read
   def check_for_501_read_return
-    clz = @controller.controller_name.classify.constantize.to_s
+    clz = @controller.controller_model.to_s
     %w[Sample SampleType Strain].include?(clz)
   end
 
   # check if this current controller type doesn't support index
   def check_for_501_index_return
-    clz = @controller.controller_name.classify.constantize.to_s
+    clz = @controller.controller_model.to_s
     %w[Sample Strain].include?(clz)
   end
 
@@ -153,14 +157,12 @@ module JsonRestTestCases
   def get_test_object(m)
     type = @controller.controller_name.classify
     opts = type.constantize.method_defined?(:policy) ? { policy: Factory(:publicly_viewable_policy) } : {}
-
-    Factory("#{m}_#{type.downcase}".to_sym, opts)
+    opts[:publication_type] = Factory(:journal) if type.constantize.method_defined?(:publication_type)
+    Factory("#{m}_#{type.underscore}".to_sym, opts)
   end
 
   def response_code_for_not_available(format)
-    clz = @controller.controller_name.classify.constantize
-    id = 9999
-    id += 1 until clz.find_by_id(id).nil?
+    id = (@controller.controller_model.maximum(:id) || 0) + 1357
 
     url_opts = rest_show_url_options.merge(id: id, format: format)
 
@@ -171,7 +173,7 @@ module JsonRestTestCases
   end
 
   def response_code_for_not_accessible(format)
-    clz = @controller.controller_name.classify.constantize
+    clz = @controller.controller_model
     if clz.respond_to?(:authorization_supported?) && clz.authorization_supported?
       itemname = @controller.controller_name.singularize.underscore
       item = Factory itemname.to_sym, policy: Factory(:private_policy)
@@ -184,6 +186,10 @@ module JsonRestTestCases
   end
 
   def rest_show_url_options(_object = rest_api_test_object)
+    {}
+  end
+
+  def rest_index_url_options()
     {}
   end
 end

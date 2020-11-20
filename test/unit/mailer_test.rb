@@ -55,41 +55,23 @@ class MailerTest < ActionMailer::TestCase
     assert_equal expected_text, encode_mail(Mailer.feedback(users(:aaron), 'This is a test feedback', 'testing the feedback message', false))
   end
 
-  test 'request resource' do
-    @expected.subject = 'A Sysmo SEEK member requested a protected file: Picture'
-    @expected.to = ['Datafile Owner <data_file_owner@email.com>', 'OwnerOf MyFirstSop <owner@sop.com>']
+  test 'request contact' do
+    @expected.to = ['Maximilian Maxi-Mum <maximal_person@email.com>']
     @expected.from = 'no-reply@sysmo-db.org'
-    @expected.reply_to = 'Aaron Spiggle <aaron@email.com>'
+    @expected.body = read_fixture('request_contact')
+    @owner = Factory(:max_person)
+    details = 'here are some more details.'
+    presentation = Factory :ppt_presentation, contributor: @owner
+    @expected.subject = 'A Sysmo SEEK member requests to discuss with you regarding '+ presentation.title
 
-    @expected.body = read_fixture('request_resource')
-
-    resource = data_files(:picture)
-    user = users(:aaron)
-    details = 'here are some more details'
+    requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
+    @expected.reply_to = requester.person.email_with_name
 
     expected_text = encode_mail(@expected)
-    expected_text.gsub!('-person_id-', user.person.id.to_s)
-
-    assert_equal expected_text, encode_mail(Mailer.request_resource(user, resource, details))
-  end
-
-  test 'request resource no details' do
-    @expected.subject = 'A Sysmo SEEK member requested a protected file: Picture'
-    # TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
-    @expected.to = "Datafile Owner <data_file_owner@email.com>,\r\n\t OwnerOf MyFirstSop <owner@sop.com>"
-    @expected.from = 'no-reply@sysmo-db.org'
-    @expected.reply_to = 'Aaron Spiggle <aaron@email.com>'
-
-    @expected.body = read_fixture('request_resource_no_details')
-
-    resource = data_files(:picture)
-    user = users(:aaron)
-    details = ''
-
-    expected_text = encode_mail(@expected)
-    expected_text.gsub!('-person_id-', user.person.id.to_s)
-
-    assert_equal expected_text, encode_mail(Mailer.request_resource(user, resource, details))
+    expected_text.gsub!('-person_id-', requester.person.id.to_s)
+    expected_text.gsub!('-resource_id-', presentation.id.to_s)
+    expected_text.gsub!('--title--', presentation.title.to_s)
+    assert_equal expected_text, encode_mail(Mailer.request_contact(requester, presentation, details))
   end
 
   test 'request publish approval' do
@@ -400,6 +382,89 @@ class MailerTest < ActionMailer::TestCase
       end
     end
   end
+
+  test 'request join project with new institution' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://hub.com') do
+        project = Factory(:project)
+        institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
+        comments = 'some comments'
+        person = Factory(:person)
+        log = MessageLog.log_project_membership_request(person, project, institution, comments)
+        email = Mailer.request_join_project(person.user, project, institution.to_json,comments, log)
+        refute_nil email
+        refute_nil email.body
+      end
+    end
+  end
+
+  test 'request join project existing institution' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        project = Factory(:project)
+        institution = Factory(:institution)
+        comments = 'some comments'
+        person = Factory(:person)
+        log = MessageLog.log_project_membership_request(person, project, institution, comments)
+        email = Mailer.request_join_project(person.user, project, institution.to_json,comments, log)
+        refute_nil email
+        refute_nil email.body
+
+      end
+    end
+  end
+
+  test 'request create project for programme' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        programme_admin = Factory(:programme_administrator)
+        programme = programme_admin.programmes.first
+        refute_empty programme.programme_administrators
+        project = Project.new(title:'My lovely project')
+        institution = Factory(:institution)
+        sender = Factory(:person)
+        log = MessageLog.log_project_creation_request(sender,programme,project,institution)
+        email = Mailer.request_create_project_for_programme(sender.user, programme, project.to_json, institution.to_json,log)
+        refute_nil email
+        refute_nil email.body
+      end
+    end
+  end
+
+  test 'request create project and programme' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
+        project = Project.new(title:'My lovely project')
+        programme = Programme.new(title:'My lovely programme')
+        sender = Factory(:person)
+        log = MessageLog.log_project_creation_request(sender,programme,project,institution)
+        email = Mailer.request_create_project_and_programme(sender.user, programme.to_json, project.to_json, institution.to_json,log)
+        refute_nil email
+        refute_nil email.body
+      end
+    end
+  end
+
+  test 'join project rejected' do
+    project = Factory(:project,title:'project to join')
+    requester = Factory(:person)
+    comments = "You are evil"
+    email = Mailer.join_project_rejected(requester, project, comments)
+    refute_nil email
+    refute_nil email.body
+    assert_equal "Your request to join the Project, project to join, hasn't been approved",email.subject
+  end
+
+  test 'create project rejected' do
+    requester = Factory(:person)
+    project_name='My Project'
+    comments = 'load of rubbish'
+    email = Mailer.create_project_rejected(requester,project_name,comments)
+    refute_nil email
+    refute_nil email.body
+  end
+
 
   private
 

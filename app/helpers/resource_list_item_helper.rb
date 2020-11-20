@@ -11,6 +11,8 @@ module ResourceListItemHelper
                         'assets/resource_actions_td'
                       elsif resource.is_a?(Organism)
                         'organisms/resource_actions_td'
+                      elsif resource.is_a?(HumanDisease)
+                        'human_diseases/resource_actions_td'
                       end
     actions_partial
   end
@@ -106,13 +108,13 @@ module ResourceListItemHelper
     if items.empty?
       html << "<span class='none_text'>Not specified</span>"
     else
-      items.each do |i|
+      items.each_with_index do |i, idx|
         value = if block_given?
                   yield(i)
                 else
                   (link_to get_object_title(i), show_resource_path(i))
                 end
-        html << value + (i == items.last ? '' : ', ')
+        html << value + (idx == (items.length - 1) ? '' : ', ')
       end
     end
     html += '</p>'
@@ -166,7 +168,7 @@ module ResourceListItemHelper
     return '' if hide_if_blank && text.blank?
     text = strip_tags(text) if text && text.length > length
     content_tag :div, class: 'list_item_desc' do
-      text_or_not_specified(text, description: true, auto_link: auto_link, length: length)
+      text_or_not_specified(text, description: true, auto_link: auto_link, length: length, markdown: true)
     end.html_safe
   end
 
@@ -248,11 +250,11 @@ module ResourceListItemHelper
     html = ''
     other_html = ''
     content_tag(:p, class: 'list_item_attribute') do
-      html << content_tag(:b, "#{contributor_count == 1 ? key : key.pluralize}: ")
+      html << content_tag(:b, "#{key.pluralize(contributor_count)}: ")
       if (key == 'Author')
         html << contributors.map do |author|
-          if author.person && author.person.can_view?
-            link_to get_object_title(author.person), show_resource_path(author.person)
+          if author.person
+            link_to author.full_name, show_resource_path(author.person)
           else
             author.full_name
           end

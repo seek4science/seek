@@ -1,37 +1,9 @@
 module RelatedItemsHelper
-  def prepare_resource_hash(resource_hash, authorization_already_done = false, limit = nil, show_empty_tabs = false)
-    perform_authorization(resource_hash) unless authorization_already_done
-    limit_items(resource_hash, limit) unless limit.nil?
-    remove_empty_tabs(resource_hash) unless show_empty_tabs
+  def prepare_resource_hash(resource_hash)
     update_item_details(resource_hash)
   end
 
   private
-
-  def perform_authorization(resource_hash)
-    resource_hash.each_value do |resource_item|
-      unless res[:items].empty?
-        update_resource_items_for_authorization(resource_item)
-      end
-    end
-  end
-
-  def update_resource_items_for_authorization(resource_item)
-    total_count = resource_item[:items].size
-    total = resource_item[:items]
-    resource_item[:items] = resource_item[:items].select(&:can_view?)
-    resource_item[:hidden_items] = total - resource_item[:items]
-    resource_item[:hidden_count] = total_count - resource_item[:items].size
-  end
-
-  def limit_items(resource_hash, limit)
-    resource_hash.each_value do |res|
-      next unless limit && res[:items].size > limit
-      res[:extra_count] = res[:items].size - limit
-      res[:extra_items] = res[:items][limit...(res[:items].size)]
-      res[:items] = res[:items][0...limit]
-    end
-  end
 
   def update_item_details(resource_hash)
     ordered_keys(resource_hash).map { |key| resource_hash[key].merge(type: key) }.each do |resource_type|
@@ -54,13 +26,13 @@ module RelatedItemsHelper
   end
 
   def resource_type_total_visible_count(resource_type)
-    resource_type[:items].count + resource_type[:extra_count]
+    resource_type[:items_count] + resource_type[:extra_count]
   end
 
   def resource_type_tab_title(resource_type)
     "#{resource_type[:visible_resource_type]} "\
-        "(#{(resource_type[:items].length + resource_type[:extra_count])}" +
-      ((resource_type[:hidden_count]) > 0 ? "+#{resource_type[:hidden_count]}" : '') + ')'
+        "(#{(resource_type_total_visible_count(resource_type))}" +
+        ((resource_type[:hidden_count]) > 0 ? "+#{resource_type[:hidden_count]}" : '') + ')'
   end
 
   def ordered_keys(resource_hash)
@@ -69,121 +41,20 @@ module RelatedItemsHelper
     end
   end
 
-  def remove_empty_tabs(resource_hash)
-    resource_hash.each do |key, res|
-      resource_hash.delete(key) if (res[:items].size + res[:hidden_count]) == 0
-    end
-  end
-
   # Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
   def get_related_resources(resource, limit = nil)
     return resource_hash_lazy_load(resource) if Seek::Config.tabs_lazy_load_enabled
 
-    related = collect_related_items(resource)
+    items_hash = {}
+    resource.class.related_type_methods.each_key do |type|
+      next if type == 'Organism' && !resource.is_a?(Sample)
+      enabled_method = "#{type.pluralize.underscore}_enabled"
+      next if Seek::Config.respond_to?(enabled_method) && !Seek::Config.send(enabled_method)
 
-    # Authorize
-    authorize_related_items(related)
-
-    Seek::ListSorter.related_items(related)
-
-    # Limit items viewable, and put the excess count in extra_count
-    related.each_key do |key|
-      if limit && related[key][:items].size > limit && %w[Project Investigation Study Assay Person Specimen Sample Snapshot].include?(resource.class.name)
-        related[key][:extra_count] = related[key][:items].size - limit
-        related[key][:items] = related[key][:items][0...limit]
-      end
+      items_hash[type] = resource.get_related(type)
     end
 
-    related
-  end
-
-  def relatable_types
-    { 'Person' => {}, 'Project' => {}, 'Institution' => {}, 'Investigation' => {},
-      'Study' => {}, 'Assay' => {}, 'DataFile' => {}, 'Document' => {},
-      'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {}, 'Organism' => {},
-      'Strain' => {}, 'Sample' => {}, 'Workflow' => {}, 'Node' => {} }
-  end
-
-  def related_items_method(resource, item_type)
-    method_name = item_type.underscore.pluralize
-
-    if resource.respond_to? "related_#{method_name}"
-      resource.send "related_#{method_name}"
-    elsif resource.respond_to? "related_#{method_name.singularize}"
-      Array(resource.send("related_#{method_name.singularize}"))
-    elsif resource.respond_to? method_name
-      resource.send method_name
-    elsif item_type != 'Person' && resource.respond_to?(method_name.singularize) # check is to avoid Person.person
-      Array(resource.send(method_name.singularize))
-    else
-      []
-    end
-  end
-
-  def self.relations_methods
-    resource_klass = self.class
-    method_hash = {}
-    relatable_types.each_key do |item_type|
-      method_name = item_type.underscore.pluralize
-
-      if resource_klass.method_defined? "related_#{method_name}"
-        method_hash[item_type] = "related_#{method_name}"
-      elsif resource.respond_to? "related_#{method_name.singularize}"
-        method_hash[item_type] = "related_#{method_name.singularize}"
-      elsif resource.respond_to? method_name
-        method_hash[item_type] = method_name
-      elsif item_type != 'Person' && resource.respond_to?(method_name.singularize) # check is to avoid Person.person
-        method_hash[item_type] = method_name
-      else
-        []
-      end
-    end
-    method_hash
-  end
-
-  def authorize_related_items(related)
-    related.each do |key, res|
-      res[:items] = [] if res[:items].nil?
-      res[:items] = res[:items].uniq.compact
-      next if res[:items].empty? || res[:items].nil?
-      total_count = res[:items].size
-      if key == 'Project' || key == 'Institution' || key == 'SampleType'
-        res[:hidden_count] = 0
-      elsif (key == 'Workflow' || key == 'Node') && !Seek::Config.workflows_enabled
-        res[:items] = []
-        res[:hidden_count] = 0
-      elsif key == 'Person'
-        if Seek::Config.is_virtualliver && User.current_user.nil?
-          res[:items] = []
-          res[:hidden_count] = total_count
-        else
-          res[:hidden_count] = 0
-        end
-      else
-        total = res[:items]
-        if key.constantize.method_defined? :policy
-          res[:items] = key.constantize.authorize_asset_collection res[:items], 'view', User.current_user
-        end
-        res[:hidden_count] = total_count - res[:items].size
-        res[:hidden_items] = total - res[:items]
-      end
-    end
-    end
-
-  def collect_related_items(resource)
-    related = relatable_types
-    related.delete('Person') if resource.is_a?(Person) # to avoid the same person showing up
-    related.delete('Organism') unless resource.is_a?(Sample)
-
-    answerable = {}
-    related.each_key do |type|
-      related[type][:items] = related_items_method(resource, type)
-      related[type][:hidden_items] = []
-      related[type][:hidden_count] = 0
-      related[type][:extra_count] = 0
-      answerable[type] = !related[type][:items].nil?
-    end
-    related
+    related_items_hash(items_hash, limit)
   end
 
   def sort_project_member_by_status(resource, project_id)
@@ -198,5 +69,36 @@ module RelatedItemsHelper
       person_id = params[:person_id]
     end
     person_id
+  end
+
+  def related_items_hash(items_hash, limit = nil)
+    hash = {}
+    items_hash.each do |type, items|
+      hash[type] = {}
+      hash[type][:items] = items
+      hash[type][:items_count] = hash[type][:items].count
+      hash[type][:hidden_items] = []
+      hash[type][:hidden_count] = 0
+      hash[type][:extra_count] = 0
+
+      if hash[type][:items].any?
+        total = hash[type][:items].to_a
+        total_count = hash[type][:items_count]
+        hash[type][:items] = hash[type][:items].authorized_for('view', User.current_user).to_a
+        hash[type][:items_count] = hash[type][:items].count
+        hash[type][:hidden_count] = total_count - hash[type][:items_count]
+        hash[type][:hidden_items] = total - hash[type][:items]
+
+        hash[type][:items] = Seek::ListSorter.sort_by_order(hash[type][:items], Seek::ListSorter.order_for_view(type, :related))
+
+        if limit && hash[type][:items_count] > limit
+          hash[type][:items] = hash[type][:items].first(limit)
+          hash[type][:extra_count] = hash[type][:items_count] - limit
+          hash[type][:items_count] = limit
+        end
+      end
+    end
+
+    hash
   end
 end

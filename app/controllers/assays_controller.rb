@@ -4,7 +4,6 @@ class AssaysController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :assays_enabled?
-
   before_action :find_assets, :only=>[:index]
   before_action :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :manage, :manage_update, :show, :new_object_based_on_existing_one]
 
@@ -14,9 +13,9 @@ class AssaysController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
 
-  include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
+
+  api_actions :index, :show, :create, :update, :destroy
 
   def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])
@@ -108,6 +107,7 @@ class AssaysController < ApplicationController
     @assay = Assay.new(assay_params)
 
     update_assay_organisms @assay, params
+    update_assay_human_diseases @assay, params
     @assay.contributor=current_person
     update_sharing_policies @assay
     update_annotations(params[:tag_list], @assay)
@@ -117,7 +117,7 @@ class AssaysController < ApplicationController
       respond_to do |format|
         flash[:notice] = "#{t('assays.assay')} was successfully created."
         format.html { redirect_to(@assay) }
-        format.json {render json: @assay}
+        format.json {render json: @assay, include: [params[:include]]}
       end
     else
       respond_to do |format|
@@ -129,6 +129,7 @@ class AssaysController < ApplicationController
 
   def update
     update_assay_organisms @assay, params
+    update_assay_human_diseases @assay, params
     update_annotations(params[:tag_list], @assay)
     update_sharing_policies @assay
     update_relationships(@assay, params)
@@ -137,7 +138,7 @@ class AssaysController < ApplicationController
       if @assay.update_attributes(assay_params)
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
         format.html { redirect_to(@assay) }
-        format.json {render json: @assay}
+        format.json {render json: @assay, include: [params[:include]]}
       else
         format.html { render :action => "edit", status: :unprocessable_entity }
         format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
@@ -156,12 +157,20 @@ class AssaysController < ApplicationController
     end
   end
 
+  def update_assay_human_diseases assay,params
+    human_diseases             = params[:assay_human_disease_ids] || params[:assay][:human_disease_ids] || []
+    assay.assay_human_diseases = []
+    Array(human_diseases).each do |human_disease_id|
+      assay.associate_human_disease(human_disease_id)
+    end
+  end
+
   def show
     respond_to do |format|
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show'}
-      format.json {render json: @assay}
+      format.json {render json: @assay, include: [params[:include]]}
 
     end
   end

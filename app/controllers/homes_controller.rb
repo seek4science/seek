@@ -1,6 +1,9 @@
 class HomesController < ApplicationController
+  helper HumanDiseasesHelper
+
   before_action :redirect_to_sign_up_when_no_user
-  before_action :login_required, only: %i[feedback send_feedback]
+  before_action :login_required, only: %i[feedback send_feedback create_or_join_project]
+  before_action :redirect_to_create_or_join_if_no_member, only: %i[index]
 
   respond_to :html, only: [:index]
 
@@ -68,19 +71,9 @@ class HomesController < ApplicationController
     end
   end
 
-  private
-
-  RECENT_SIZE = 3
-
-  def classify_for_tabs(result_collection)
-    # FIXME: this is duplicated in application_helper - but of course you can't call that from within controller
-    results = {}
-
-    result_collection.each do |res|
-      results[res.class.name] = [] unless results[res.class.name]
-      results[res.class.name] << res
+  def redirect_to_create_or_join_if_no_member
+    if User.logged_in? && !User.logged_in_and_member? && Seek::Config.programmes_enabled && Programme.managed_programme.present?
+      redirect_to create_or_join_project_home_path
     end
-
-    results
   end
 end

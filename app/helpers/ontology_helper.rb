@@ -91,7 +91,7 @@ module OntologyHelper
       content_tag :span, 'No child terms', class: 'none_text'
     else
       children.map do |child|
-        n = Assay.authorize_asset_collection(child.assays, 'view').count
+        n = child.assays.authorized_for('view').count
         link_to_ontology_term(child, "#{child.label} (#{n})", type, class: 'child_term')
       end.join(' | ').html_safe
     end

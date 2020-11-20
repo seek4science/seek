@@ -4,11 +4,11 @@ class SendPeriodicEmailsJob < SeekEmailJob
   DELAYS = { 'daily' => 1.day, 'weekly' => 1.week, 'monthly' => 1.month }.freeze
 
   Subscription::FREQUENCIES.drop(1).each do |frequency|
-    eval <<-END_EVAL
-    def self.#{frequency}_exists?
-      SendPeriodicEmailsJob.new('#{frequency}').exists?
+    singleton_class.instance_eval do
+      define_method "#{frequency}_exists?" do
+        SendPeriodicEmailsJob.new(frequency).exists?
+      end
     end
-    END_EVAL
   end
 
   attr_reader :frequency

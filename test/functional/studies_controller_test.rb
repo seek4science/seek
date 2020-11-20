@@ -22,7 +22,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_not_nil assigns(:studies)
-    assert !assigns(:studies).empty?
+    refute assigns(:studies).empty?
   end
 
   test 'should show aggregated publications linked to assay' do
@@ -30,9 +30,9 @@ class StudiesControllerTest < ActionController::TestCase
     assay1 = Factory :assay, policy: Factory(:public_policy), contributor:person
     assay2 = Factory :assay, policy: Factory(:public_policy), contributor:person
 
-    pub1 = Factory :publication, title: 'pub 1'
-    pub2 = Factory :publication, title: 'pub 2'
-    pub3 = Factory :publication, title: 'pub 3'
+    pub1 = Factory :publication, title: 'pub 1', publication_type: Factory(:journal)
+    pub2 = Factory :publication, title: 'pub 2', publication_type: Factory(:journal)
+    pub3 = Factory :publication, title: 'pub 3', publication_type: Factory(:journal)
     Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub1
     Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
 
@@ -296,7 +296,7 @@ class StudiesControllerTest < ActionController::TestCase
       assert_select 'div.list_item_title a[href=?]', sop_path(sops(:sop_with_private_policy_and_custom_sharing)), count: 0
       assert_select 'div.list_item_actions a[href=?]', download_sop_path(sops(:sop_with_private_policy_and_custom_sharing)), count: 0
 
-      assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:downloadable_data_file)), text: 'Download Only', count: 1
+      assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:downloadable_data_file)), text: 'Downloadable Only', count: 1
       assert_select 'div.list_item_actions a[href=?]', download_data_file_path(data_files(:downloadable_data_file)), count: 1
       assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:private_data_file)), count: 0
       assert_select 'div.list_item_actions a[href=?]', download_data_file_path(data_files(:private_data_file)), count: 0
@@ -353,7 +353,7 @@ class StudiesControllerTest < ActionController::TestCase
     study = Factory(:study, policy: Factory(:public_policy))
     get :show, params: { id: study }
     assert_response :success
-    assert_select '.author_avatar' do
+    assert_select 'li.author-list-item' do
       assert_select 'a[href=?]', person_path(study.contributing_user.person) do
         assert_select 'img'
       end
@@ -444,19 +444,19 @@ class StudiesControllerTest < ActionController::TestCase
 
     get :show, params: { id: study.id }
     assert_response :success
-    assert_select 'span.author_avatar a[href=?]', "/people/#{creator.id}"
+    assert_select 'li.author-list-item a[href=?]', "/people/#{creator.id}"
   end
 
   test 'should show other creators' do
     study = Factory(:study, policy: Factory(:public_policy))
-    other_creators = 'other creators'
+    other_creators = 'frodo baggins'
     study.other_creators = other_creators
     study.save
     study.reload
 
     get :show, params: { id: study.id }
     assert_response :success
-    assert_select 'div.panel-body div', text: other_creators
+    assert_select 'li.author-list-item', text: 'frodo baggins'
   end
 
   test 'should not multiply creators after calling show' do
@@ -695,6 +695,185 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal 1,study.policy.permissions.count
     assert_equal person,study.policy.permissions.first.contributor
     assert_equal Policy::EDITING,study.policy.permissions.first.access_type
+
+  end
+
+  test 'create a study with custom metadata' do
+    cmt = Factory(:simple_study_custom_metadata_type)
+
+    login_as(Factory(:person))
+
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   data:{
+                                                   "name":'fred',
+                                                   "age":22}}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal '22',cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+  end
+
+  test 'create a study with custom metadata validated' do
+    cmt = Factory(:simple_study_custom_metadata_type)
+
+    login_as(Factory(:person))
+
+    # invalid age - needs to be a number
+    assert_no_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+    refute study.valid?
+
+    # name is required
+    assert_no_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+    refute study.valid?
+
+  end
+
+  test 'create a study with custom metadata with spaces in attribute names' do
+    cmt = Factory(:study_custom_metadata_type_with_spaces)
+
+    login_as(Factory(:person))
+
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   data:{
+                                                   "full name":'Paul Jones',
+                                                   "full address":'London, UK'}}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+
+    assert study.valid?
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'Paul Jones',cm.get_attribute_value('full name')
+    assert_equal 'London, UK',cm.get_attribute_value('full address')
+  end
+
+  test 'create a study with custom metadata with clashing attribute names' do
+    cmt = Factory(:study_custom_metadata_type_with_clashes)
+
+    login_as(Factory(:person))
+
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   data:{
+                                                   "full name":'full name',
+                                                   "Full name":'Full name',
+                                                   "full  name":'full  name'}}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+
+    assert study.valid?
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'full name',cm.get_attribute_value('full name')
+    assert_equal 'Full name',cm.get_attribute_value('Full name')
+    assert_equal 'full  name',cm.get_attribute_value('full  name')
+  end
+
+  test 'create a study with custom metadata with attribute names with symbols' do
+    cmt = Factory(:study_custom_metadata_type_with_symbols)
+
+    login_as(Factory(:person))
+
+    assert_difference('Study.count') do
+      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                        data:{
+                                            "+name":'+name',
+                                            "-name":'-name',
+                                            "&name":'&name',
+                                            "name(name)":'name(name)'
+                                        }}}
+
+      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert study=assigns(:study)
+
+    assert study.valid?
+    assert cm = study.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal '+name',cm.get_attribute_value('+name')
+    assert_equal '-name',cm.get_attribute_value('-name')
+    assert_equal '&name',cm.get_attribute_value('&name')
+    assert_equal 'name(name)',cm.get_attribute_value('name(name)')
+  end
+
+  test 'experimentalists only shown if set' do
+    person = Factory(:person)
+    login_as(person)
+    study = Factory(:study,experimentalists:'some experimentalists',contributor:person)
+    refute study.experimentalists.blank?
+
+    get :edit, params:{id:study}
+    assert_response :success
+
+    assert_select 'input#study_experimentalists', count:1
+
+    get :show, params:{id:study}
+    assert_response :success
+
+    assert_select 'p',text:/Experimentalists:/,count:1
+
+    study = Factory(:study,contributor:person)
+    assert study.experimentalists.blank?
+
+    get :edit, params:{id:study}
+    assert_response :success
+
+    assert_select 'input#study_experimentalists', count:0
+
+    get :show, params:{id:study}
+    assert_response :success
+
+    assert_select 'p',text:/Experimentalists:/, count:0
+
+    get :new
+    assert_response :success
+
+    assert_select 'input#study_experimentalists', count:0
+
 
   end
 end

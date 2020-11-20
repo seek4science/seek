@@ -1,22 +1,19 @@
-<% filtered ||= (!params[:filtered].nil? && params[:filtered]) -%>
 <% selected_classes = "active" -%>
-<nav>
-  <div class="alphabetical_pagination text-center">
+<nav class="pagination-container">
+  <div class="alphabetical_pagination">
     <ul class="pagination pagination-sm">
-      <% unless filtered %>
-          <li class="<%= current_page == "top" ? selected_classes : "" %>"><%= link_to "Top", {:id => params[:id], page: "top"} %></li>
-      <% end %>
+      <li class="<%= current_page == "top" ? selected_classes : "" %>"><%= link_to "Top", page_and_sort_params.merge(id: params[:id], page: 'top') %></li>
       <% pages.each do |page| -%>
           <% current_page_class = page==current_page ? selected_classes : "" -%>
           <% page_title = page=="?" ? "Other" : page -%>
           <% if page_totals[page]>0 -%>
-              <li class="<%= current_page_class %>"><%= link_to page_title, {:id => params[:id], :page => page} %></li>
+              <li class="<%= current_page_class %>"><%= link_to page_title, page_and_sort_params.merge(id: params[:id], page: page) %></li>
           <% else -%>
               <li class="disabled <%= current_page_class %>"><a href='#'><%= h(page_title) %></a></li>
           <% end -%>
 
       <% end -%>
-      <li class="<%= current_page == "all" ? selected_classes : "" %>"><%= link_to "All", {:id => params[:id], :page => "all"} %></li>
+      <li class="<%= current_page == "all" ? selected_classes : "" %>"><%= link_to "All", page_and_sort_params.merge(id: params[:id], page: 'all') %></li>
     </ul>
   </div>
 </nav>

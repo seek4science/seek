@@ -41,7 +41,7 @@ module Seek
           if action == 'download' && !asset_type.new.is_downloadable?
             []
           else
-            asset_type.all_authorized_for(action, user, project)
+            project.send(asset_type.table_name).authorized_for(action, user)
           end
         end
       end

@@ -4,15 +4,10 @@ class Assay < ApplicationRecord
   include Seek::Taggable
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-  # needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
-  def projects
-    study.try(:projects) || []
-  end
-
   # needs to before acts_as_isa - otherwise auto_index=>false is overridden by Seek::Search::CommonFields
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
-      text :organism_terms, :assay_type_label, :technology_type_label
+      text :organism_terms, :human_disease_terms, :assay_type_label, :technology_type_label
 
       text :strains do
         strains.compact.map(&:title)
@@ -23,6 +18,7 @@ class Assay < ApplicationRecord
   # needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
   belongs_to :study
   has_many :projects, through: :study
+  has_filter :project
 
   acts_as_isa
   acts_as_snapshottable
@@ -33,6 +29,10 @@ class Assay < ApplicationRecord
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
   has_many :organisms, through: :assay_organisms, inverse_of: :assays
+  has_many :assay_human_diseases, dependent: :destroy, inverse_of: :assay
+  has_many :human_diseases, through: :assay_human_diseases, inverse_of: :assays
+  has_filter :organism
+  has_filter :human_disease
   has_many :strains, through: :assay_organisms
   has_many :tissue_and_cell_types, through: :assay_organisms
 
@@ -60,6 +60,8 @@ class Assay < ApplicationRecord
 
   # a temporary store of added assets - see AssayReindexer
   attr_reader :pending_related_assets
+
+  has_filter :assay_class, :assay_type, :technology_type
 
   enforce_authorization_on_association :study, :view
 
@@ -91,6 +93,8 @@ class Assay < ApplicationRecord
   def associate(asset, options = {})
     if asset.is_a?(Organism)
       associate_organism(asset)
+    elsif asset.is_a?(HumanDisease)
+      associate_human_disease(asset)
     else
       assay_asset = assay_assets.detect { |aa| aa.asset == asset }
 
@@ -162,11 +166,16 @@ class Assay < ApplicationRecord
       new_object.send("#{type}=", try(type))
     end
     new_object.assay_organisms = try(:assay_organisms)
+    new_object.assay_human_diseases = try(:assay_human_diseases)
     new_object
   end
 
   def organism_terms
     organisms.collect(&:searchable_terms).flatten
+  end
+
+  def human_disease_terms
+    human_diseases.collect(&:searchable_terms).flatten
   end
 
   def self.user_creatable?
@@ -194,6 +203,17 @@ class Assay < ApplicationRecord
     end
   end
 
+  # Associates a human disease with the assay
+  # human disease may be either an ID or HumanDisease instance
+  def associate_human_disease(human_disease)
+    human_disease = HumanDisease.find(human_disease) if human_disease.is_a?(Numeric) || human_disease.is_a?(String)
+    assay_human_disease = AssayHumanDisease.new(assay: self, human_disease: human_disease)
+
+    unless AssayHumanDisease.exists_for?(human_disease, self)
+      assay_human_diseases << assay_human_disease
+    end
+  end
+
   # overides that from Seek::RDF::RdfGeneration, as Assay entity depends upon the AssayClass (modelling, or experimental) of the Assay
   def rdf_type_entity_fragment
     { 'EXP' => 'Experimental_assay', 'MODEL' => 'Modelling_analysis' }[assay_class.key]
@@ -209,6 +229,10 @@ class Assay < ApplicationRecord
 
   def data_files_attributes= attributes
     set_assay_assets_for('DataFile', attributes)
+  end
+
+  def self.filter_by_projects(projects)
+    joins(:projects).where(studies: { investigations: { investigations_projects: { project_id: projects } } })
   end
 
   private
@@ -232,5 +256,9 @@ class Assay < ApplicationRecord
 
     self.assay_assets = (other_assay_assets + new_type_assay_assets)
     self.assay_assets
+  end
+
+  def related_publication_ids
+    publication_ids
   end
 end

@@ -23,7 +23,7 @@ require 'minitest'
 require 'ostruct'
 require 'pry'
 
-Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new]
+Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true)]
 
 Minitest::Test.i_suck_and_my_tests_are_order_dependent!
 
@@ -95,7 +95,7 @@ class ActiveSupport::TestCase
   end
 
   def check_for_soffice
-    unless Seek::Config.soffice_available?
+    unless Seek::Config.soffice_available?(true)
       skip("soffice is not available on port #{ConvertOffice::ConvertOfficeConfig.options[:soffice_port]}, skipping test")
     end
   end
@@ -226,12 +226,6 @@ class ActiveSupport::TestCase
     path
   end
 
-  def assert_enqueued_emails(n)
-    assert_difference 'ActionMailer::Base.deliveries.size', n do
-      yield
-    end
-  end
-
   def assert_no_emails
     assert_no_difference 'ActionMailer::Base.deliveries.size' do
       yield
@@ -267,6 +261,10 @@ class ActiveSupport::TestCase
     elsif request.session['flash'] && request.session['flash']['flashes']
       @request.session['flash']['flashes'].delete(target.to_s)
     end
+  end
+
+  def open_fixture_file(path)
+    File.open(File.join(Rails.root, 'test', 'fixtures', 'files', *path.split('/')))
   end
 end
 

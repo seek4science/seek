@@ -6,13 +6,13 @@ module Seek
         view: Set.new(%i[
                         view show index search favourite favourite_delete comment comment_delete comments
                         comments_timeline rate tag items statistics tag_suggestions preview runs
-                        new_object_based_on_existing_one samples_table
+                        new_object_based_on_existing_one samples_table current
                       ]).freeze,
 
         download: Set.new(%i[
                             download named_download launch submit_job data execute plot explore visualise
                             export_as_xgmml download_log download_results input output download_output download_input
-                            view_result compare_versions simulate
+                            view_result compare_versions simulate diagram ro_crate
                           ]).freeze,
 
         edit: Set.new(%i[

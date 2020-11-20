@@ -47,6 +47,7 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
     html_blob_attrs = { data: nil, url: 'http://www.abc.com' }
 
     Seek::Util.inline_viewable_content_types.each do |klass|
+      next if klass == Workflow
       underscored_type_name = klass.name.underscore
 
       with_config_value :show_as_external_link_enabled, true do
@@ -79,6 +80,65 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
           assert_link_button remote_without_local
         end
       end
+    end
+  end
+
+  test 'show add to collection button if collection available as owner' do
+    collection = Factory(:collection, contributor: @current_user.person)
+    document = Factory(:public_document)
+
+    get "/documents/#{document.id}"
+
+    assert_response :success
+
+    assert_select '#buttons' do
+      assert_select '.btn.dropdown-toggle', text: 'Add to collection'
+      assert_select '[data-role="add-to-collection-list"]' do
+        assert_select 'a[data-collection-id=?]', collection.id.to_s
+      end
+    end
+  end
+
+  test 'show add to collection button if collection available as creator' do
+    collection = Factory(:collection, creators: [@current_user.person])
+    document = Factory(:public_document)
+    refute_equal @current_user.person, collection.contributor
+
+    get "/documents/#{document.id}"
+
+    assert_response :success
+
+    assert_select '#buttons' do
+      assert_select '.btn.dropdown-toggle', text: 'Add to collection'
+      assert_select '[data-role="add-to-collection-list"]' do
+        assert_select 'a[data-collection-id=?]', collection.id.to_s
+      end
+    end
+  end
+
+  test 'do not show add to collection button if item already in collection' do
+    collection = Factory(:collection, contributor: @current_user.person)
+    document = Factory(:public_document)
+    collection.items.create!(asset: document)
+
+    get "/documents/#{document.id}"
+
+    assert_response :success
+
+    assert_select '#buttons' do
+      assert_select '.btn.dropdown-toggle', text: 'Add to collection', count: 0
+    end
+  end
+
+  test 'do not show add to collection button on collection itself' do
+    collection = Factory(:collection, contributor: @current_user.person)
+
+    get "/collections/#{collection.id}"
+
+    assert_response :success
+
+    assert_select '#buttons' do
+      assert_select '.btn.dropdown-toggle', text: 'Add to collection', count: 0
     end
   end
 

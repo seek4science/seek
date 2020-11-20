@@ -2,6 +2,7 @@ class StudiesController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
 
+  before_action :studies_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[edit update destroy manage manage_update show new_object_based_on_existing_one]
 
@@ -12,12 +13,10 @@ class StudiesController < ApplicationController
   before_action :check_assays_are_not_already_associated_with_another_study, only: %i[create update]
 
   include Seek::Publishing::PublishingCommon
-
   include Seek::AnnotationCommon
-
-  include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
+
+  api_actions :index, :show, :create, :update, :destroy
 
   def new_object_based_on_existing_one
     @existing_study = Study.find(params[:id])
@@ -53,7 +52,7 @@ class StudiesController < ApplicationController
       if @study.save
         flash[:notice] = "#{t('study')} was successfully updated."
         format.html { redirect_to(@study) }
-        format.json {render json: @study}
+        format.json {render json: @study, include: [params[:include]]}
       else
         format.html { render action: 'edit', status: :unprocessable_entity }
         format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
@@ -68,7 +67,7 @@ class StudiesController < ApplicationController
       format.html
       format.xml
       format.rdf { render template: 'rdf/show' }
-      format.json {render json: @study}
+      format.json {render json: @study, include: [params[:include]]}
     end
   end
 
@@ -81,7 +80,7 @@ class StudiesController < ApplicationController
       respond_to do |format|
         flash[:notice] = "The #{t('study')} was successfully created.<br/>".html_safe
         format.html { redirect_to study_path(@study) }
-        format.json { render json: @study }
+        format.json { render json: @study, include: [params[:include]] }
       end
     else
       respond_to do |format|
@@ -119,10 +118,192 @@ class StudiesController < ApplicationController
     end
   end
 
+  def batch_uploader; end
+
+  def preview_content
+    user_uuid = if User.current_user
+                  User.current_user.attributes['uuid'].to_s
+                else
+                  'user_uuid'
+                end
+    tempzip_path = params[:content_blobs][0][:data].tempfile.path
+    data_files, studies = StudyBatchUpload.unzip_batch(tempzip_path, user_uuid)
+    study_filename = File.basename(studies.first.to_s)
+    studies_file = ContentBlob.new
+    studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{study_filename}")
+    studies_file.original_filename = "#{study_filename}"
+    studies_file.save!
+    @studies = StudyBatchUpload.extract_studies_from_file(studies_file)
+    @study = @studies[0]
+    @studies_datafiles = StudyBatchUpload.extract_study_data_from_file(studies_file)
+    @license = StudyBatchUpload.get_license_id(studies_file)
+    @existing_studies = JSON.parse(StudyBatchUpload.get_existing_studies(@studies))
+
+    render 'studies/batch_preview'
+  end
+
+  def batch_create
+    # create method will be called for each study
+    # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: Factory(:private_policy))
+    # study.policy = Policy.create(name: 'default policy', access_type: 1)
+    # render plain: params[:studies].inspect
+    metadata_types = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study')
+    studies_length = params[:studies][:title].length
+    studies_uploaded = false
+    data_file_uploaded = false
+    studies_length.times do |index|
+      metadata = generate_metadata(params[:studies], index)
+      study_params = {
+        title: params[:studies][:title][index],
+        description: params[:studies][:description][index],
+        investigation_id: params[:study][:investigation_id],
+        person_responsible_id: params[:study][:person_responsible_id],
+        custom_metadata: CustomMetadata.new(
+          custom_metadata_type: metadata_types.last,
+          data: metadata
+        )
+      }
+      @study = Study.new(study_params)
+      StudyBatchUpload.check_study_is_MIAPPE_compliant(@study, metadata)
+      if @study.valid? && @study.save! && @study.custom_metadata.valid?
+        studies_uploaded = true if @study.save
+      end
+      data_file_uploaded = create_batch_assay_asset(params, index)
+    end
+
+    batch_uploaded = studies_uploaded && data_file_uploaded
+
+    if batch_uploaded
+      user_uuid = if User.current_user
+                    User.current_user.attributes['uuid'].to_s
+                  else
+                    'user_uuid'
+                  end
+
+
+      unless params[:existing_studies].blank?
+        remove_existing_studies(params[:existing_studies])
+      end
+      FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
+      respond_to do |format|
+        flash[:notice] = "The #{t('study').pluralize} were successfully created.<br/>".html_safe
+        format.html { redirect_to studies_path }
+      end
+    else
+      respond_to do |format|
+        format.html { render action: 'batch_preview', status: :unprocessable_entity }
+      end
+    end
+  end
+
+  def create_batch_assay_asset(params, index)
+
+    user_uuid = if User.current_user
+                  User.current_user.attributes['uuid'].to_s
+                else
+                  'user_uuid'
+                end
+
+    data_file_names = params[:studies][:data_files][index].remove(' ').split(',')
+    data_file_names.length.times do |data_file_index|
+
+      study_metadata_id = params[:studies][:id][index]
+      study_id = CustomMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last.item_id
+      assay_class_id = AssayClass.where(title: 'Experimental assay').first.id
+      data_file_description = params[:studies][:data_file_description][index].remove(' ').split(',')
+      assay_params = {
+        title: 'Assay for ' + params[:studies][:id][index] + '-' + (data_file_index + 1).to_s,
+          description: data_file_description[data_file_index],
+          study_id: study_id,
+          assay_class_id: assay_class_id
+      }
+
+
+      data_file_path = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/data/"
+      data_file_name = datafile_name_with_extension("#{data_file_names[data_file_index]}", data_file_path)
+      data_file_location = "#{data_file_path}#{data_file_name}"
+      data_file_content_blob = ContentBlob.new
+      data_file_content_blob.tmp_io_object = File.open(data_file_location)
+      data_file_content_blob.original_filename = "#{data_file_name}"
+
+      license = params[:studies][:license]
+      data_file_params = {
+        title: data_file_names[data_file_index],
+          description: data_file_description[data_file_index],
+          license: license,
+          projects: Project.where(title: 'Default Project'),
+          content_blob: data_file_content_blob
+      }
+
+      assay_asset_params = {
+        assay: Assay.new(assay_params),
+        asset: DataFile.new(data_file_params)
+      }
+      @assay_asset = AssayAsset.new(assay_asset_params)
+
+      if @assay_asset.valid? && @assay_asset.save!
+        return true if @assay_asset.save
+      end
+    end
+  end
+
+  def generate_metadata(studies_meta_data, index)
+    metadata = {
+      id: studies_meta_data[:id][index],
+      study_start_date: studies_meta_data[:startDate][index],
+      study_end_date: studies_meta_data[:endDate][index] || '',
+      contact_institution: studies_meta_data[:contactInstitution][index],
+      geographic_location_country: studies_meta_data[:geographicLocationCountry][index],
+      experimental_site_name: studies_meta_data[:experimentalSiteName][index],
+      latitude: studies_meta_data[:latitude][index],
+      longitude: studies_meta_data[:longitude][index],
+      altitude: studies_meta_data[:altitude][index],
+      description_of_the_experimental_design: studies_meta_data[:descriptionOfTheExperimentalDesign][index],
+      type_of_experimental_design: studies_meta_data[:typeOfExperimentalDesign][index],
+      observation_unit_level_hierarchy: studies_meta_data[:observationUnitLevelHierarchy][index],
+      observation_unit_description: studies_meta_data[:observationUnitDescription][index],
+      description_of_growth_facility: studies_meta_data[:descriptionOfGrowthFacility][index],
+      type_of_growth_facility: studies_meta_data[:typeOfGrowthFacility][index],
+      cultural_practices: studies_meta_data[:culturalPractices][index]
+    }
+    metadata
+  end
+
+  def datafile_name_with_extension(file_name, path)
+    files = Dir.entries(path)
+    files.each do |file|
+      if File.basename(file, '.*') == file_name
+        return file
+      elsif File.basename(file, '.*') == File.basename(file_name, '.*')
+        return file
+      end
+    end
+  end
+
+  def remove_existing_studies(studies)
+
+    existing_studies = JSON.parse(studies.to_json)
+
+    existing_studies.each do |study|
+      study_id = JSON.parse(study.gsub("=>",":"))["id"].to_i
+      metadata_id = JSON.parse(study.gsub("=>",":"))["metadata_id"].to_i
+
+      Study.where(id: study_id).delete_all
+      CustomMetadata.where(id: metadata_id).delete_all
+      assays = Assay.where(study_id: study_id)
+      assays.each do |assay|
+        AssayAsset.where(assay_id: assay.id).delete_all
+      end
+      assays.delete_all
+
+    end
+
+  end
+
   private
   def validate_person_responsible(p)
     if (!p[:person_responsible_id].nil?) && (!Person.exists?(p[:person_responsible_id]))
-      render json: {error: "Person responsible does not exist", status: :unprocessable_entity}, status: :unprocessable_entity
+      render json: {error: 'Person responsible does not exist', status: :unprocessable_entity}, status: :unprocessable_entity
       return false
     end
     true
@@ -130,6 +311,7 @@ class StudiesController < ApplicationController
 
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
-                                  :other_creators, { creator_ids: [] }, { scales: [] }, { publication_ids: [] })
+                                  :other_creators, { creator_ids: [] }, { scales: [] }, { publication_ids: [] },
+                                  { custom_metadata_attributes: determine_custom_metadata_keys })
   end
 end

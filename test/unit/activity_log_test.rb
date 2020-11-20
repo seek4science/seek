@@ -67,4 +67,39 @@ class ActivityLogTest < ActiveSupport::TestCase
     assert_includes logs, al2
     refute_includes logs, al3
   end
+
+  test 'can render link?' do
+    disable_authorization_checks do
+      public = Factory(:public_document)
+      private = Factory(:private_document)
+      public_log = Factory(:activity_log, activity_loggable: public, action: 'create', created_at: 2.hour.ago)
+      private_log = Factory(:activity_log, activity_loggable: private, action: 'create', created_at: 2.hour.ago)
+
+      assert public_log.can_render_link?
+      refute private_log.can_render_link?
+
+      public.destroy!
+
+      refute public_log.reload.can_render_link?
+
+      assay = Factory(:assay, policy: Factory(:publicly_viewable_policy))
+      snapshot = assay.create_snapshot
+      snapshot_log = Factory(:activity_log, activity_loggable: snapshot, action: 'create', created_at: 2.hour.ago)
+
+      assert snapshot_log.can_render_link?
+
+      assay.destroy!
+
+      refute snapshot_log.reload.can_render_link?
+
+      public2 = Factory(:public_document)
+      version = public2.latest_version
+      version_log = Factory(:activity_log, activity_loggable: version, action: 'create', created_at: 2.hour.ago)
+      assert version_log.can_render_link?
+
+      public2.destroy!
+
+      refute version_log.reload.can_render_link?
+    end
+  end
 end

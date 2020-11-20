@@ -1,6 +1,6 @@
 <% item = items_related_to %>
-<% resource_hash = get_related_resources(item) %>
 <% limit ||= Seek::Config.related_items_limit %>
+<% resource_hash = get_related_resources(item, limit) %>
 <% title ||= 'Related items' %>
 <h2><%= title %></h2>
 <% if Seek::Config.tabs_lazy_load_enabled %>
@@ -13,9 +13,6 @@
 <% else %>
     <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => {:resource_hash => resource_hash,
                                                                                   :narrow_view => true,
-                                                                                  :authorization_already_done => true,
                                                                                   :item => item,
-                                                                                  :actions_partial_disable => false,
-                                                                                  :limit => limit} -%>
-
+                                                                                  :actions_partial_disable => false} -%>
 <% end %>

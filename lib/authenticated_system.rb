@@ -12,7 +12,7 @@ module AuthenticatedSystem
     if defined? @current_user
       @current_user
     else
-      @current_user = (login_from_session || login_from_basic_auth || login_from_cookie || User.guest)
+      self.current_user = (user_from_session || user_from_doorkeeper  || user_from_basic_auth || user_from_cookie || user_from_api_token || User.guest)
     end
   end
 
@@ -58,7 +58,10 @@ module AuthenticatedSystem
   #   skip_before_action :login_required
   #
   def login_required
-    authorized? || access_denied
+    unless authorized?
+      flash[:error]="You need to be logged in"
+      access_denied(main_app.login_path)
+    end
   end
 
   # Redirect as appropriate when an access request fails.
@@ -69,13 +72,13 @@ module AuthenticatedSystem
   # behavior in case the user is not authorized
   # to access the requested action.  For example, a popup window might
   # simply close itself.
-  def access_denied
+  def access_denied(redirect_path = main_app.root_path)
     request.format = :html if request.env['HTTP_USER_AGENT'] =~ /msie/i
 
     respond_to do |format|
       format.html do
         store_return_to_location
-        redirect_to main_app.root_path
+        redirect_to redirect_path
       end
       format.any do
         request_http_basic_authentication 'Web Password'
@@ -108,26 +111,44 @@ module AuthenticatedSystem
   end
 
   # Called from #current_user.  First attempt to login by the user id stored in the session.
-  def login_from_session
-    self.current_user = User.find_by_id(session[:user_id]) if session[:user_id]
+  def user_from_session
+    User.find_by_id(session[:user_id]) if session[:user_id]
   end
 
   # Called from #current_user.  Now, attempt to login by basic authentication information.
-  def login_from_basic_auth
+  def user_from_basic_auth
     authenticate_with_http_basic do |username, password|
-      self.current_user = User.authenticate(username, password)
-      sleep 2 if Rails.env.production? && (username.present? && !self.current_user) # Throttle incorrect login
-      self.current_user
+      user = User.authenticate(username, password)
+      sleep 2 if Rails.env.production? && (username.present? && !user) # Throttle incorrect login
+      user
     end
   end
 
   # Called from #current_user.  Finaly, attempt to login by an expiring token in the cookie.
-  def login_from_cookie
-    user = cookies[:auth_token] && User.find_by_remember_token(cookies[:auth_token])
-    if user && user.remember_token?
-      cookies[:auth_token] = { :value => user.remember_token, :expires => user.remember_token_expires_at }
-      self.current_user = user
+  def user_from_cookie
+    return unless cookies[:auth_token]
+
+    user = User.find_by_remember_token(cookies[:auth_token])
+    if user&.remember_token?
+      cookies[:auth_token] = { value: user.remember_token, expires: user.remember_token_expires_at }
+      user
     end
   end
 
+  def user_from_api_token
+    authenticate_with_http_token do |api_token, _options|
+      return unless api_token.length > 1
+
+      user = User.from_api_token(api_token)
+      sleep 2 if Rails.env.production? && !user # Throttle incorrect login
+      user
+    end
+  end
+
+  # Is the user authenticated through an OAuth application?
+  def user_from_doorkeeper
+    if doorkeeper_token&.accessible?
+      User.find(doorkeeper_token.resource_owner_id)
+    end
+  end
 end

@@ -5,14 +5,12 @@ bioportal_api_key:
 jws_online_root:
 internal_help_enabled:
 external_help_url:
-workflows_enabled:
 hide_details_enabled:
 registration_disabled:
 registration_disabled_description:
 activation_required_enabled:
 smtp:
   encrypt: true
-default_pages:
 project_type:
 project_link:
 type_managers_enabled:
@@ -51,12 +49,8 @@ is_virtualliver:
 sabiork_ws_base_url:
 filestore_path:
 tagline_prefix:
-events_enabled:
 modelling_analysis_enabled:
-organisms_enabled:
-models_enabled:
-assays_enabled:
-publications_enabled:
+human_diseases_enabled:
 jerm_enabled:
 email_enabled:
 jws_enabled:
@@ -81,7 +75,6 @@ documentation_enabled:
 tagging_enabled:
 authorization_checks_enabled:
 magic_guest_enabled:
-programmes_enabled:
 assay_type_ontology_file:
 technology_type_ontology_file:
 modelling_analysis_type_ontology_file:
@@ -90,6 +83,7 @@ technology_type_base_uri:
 modelling_analysis_type_base_uri:
 header_tagline_text_enabled:
 related_items_limit:
+  convert: :to_i
 faceted_browsing_enabled:
 facet_enable_for_pages:
 faceted_search_enabled:
@@ -130,8 +124,6 @@ hard_max_cachable_size:
   convert: :to_i
 tag_threshold:
   convert: :to_i
-limit_latest:
-  convert: :to_i
 max_visible_tags:
   convert: :to_i
 piwik_analytics_id_site:
@@ -163,12 +155,7 @@ permissions_popup:
   convert: :to_i
 auth_lookup_update_batch_size:
   convert: :to_i
-samples_enabled:
 project_admin_sample_type_restriction:
-omniauth_enabled:
-omniauth_user_create:
-omniauth_user_activate:
-omniauth_providers:
 openbis_enabled:
 openbis_download_limit:
 openbis_debug:
@@ -190,3 +177,39 @@ nels_permalink_base:
 nels_use_dummy_client:
 allow_private_address_access:
 session_store_timeout:
+filtering_enabled:
+sorting:
+results_per_page_default:
+  convert: :to_i
+results_per_page:
+cwl_viewer_url:
+# Types enabled
+documents_enabled:
+events_enabled:
+isa_enabled:
+models_enabled:
+organisms_enabled:
+programmes_enabled:
+managed_programme_id:
+publications_enabled:
+samples_enabled:
+workflows_enabled:
+collections_enabled:
+# Omniauth
+omniauth_enabled:
+omniauth_user_create:
+omniauth_user_activate:
+omniauth_elixir_aai_enabled:
+omniauth_elixir_aai_client_id:
+omniauth_elixir_aai_secret:
+  encrypt: true
+omniauth_ldap_enabled:
+omniauth_ldap_config:
+  encrypt: true
+omniauth_github_enabled:
+omniauth_github_client_id:
+omniauth_github_secret:
+  encrypt: true
+custom_metadata_enabled: false
+search_results_limit:
+  convert: :to_i

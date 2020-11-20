@@ -1,0 +1,44 @@
+<% if options.first %>
+  <% url_template = url_for(page_and_sort_params.merge({ page: nil, filter: with_filter(:query, '_query_', replace: true) })) %>
+  <div class="filter-category collapsed" data-filter-category="<%= key.to_s -%>">
+    <div class="filter-category-title">Query</div>
+    <div class="filter-option-field-group">
+      <%= text_field_tag(nil, options.first.value, data: { url: url_template },
+                         placeholder: 'Search here...',
+                         id: 'filter-search-field',
+                         autocomplete: 'off',
+                         class: 'filter-option-field') -%>
+      <% if options.first.active? %>
+        <%= link_to(page_and_sort_params.merge({ page: nil, filter: without_filter(key, options.first.value)}),
+                    title: "Clear the search field.",
+                    class: 'filter-option-field-clear') do %>
+          &times;
+        <% end %>
+      <% end %>
+      <%= link_to('Go', '#', id: 'filter-search-button', class: 'filter-option-field-button') %>
+    </div>
+
+    <script>
+        (function () {
+            var field = $j('#filter-search-field');
+            var button = $j('#filter-search-button');
+            var doSearch = function () {
+                if (field.val())
+                  window.location = field.data('url').replace("_query_", field.val());
+            };
+
+            field.keypress(function (event) {
+                if (event.key === 'Enter') {
+                    doSearch();
+                    return false;
+                }
+            });
+
+            button.click(function () {
+                doSearch();
+                return false;
+            });
+        })();
+    </script>
+  </div>
+<% end %>

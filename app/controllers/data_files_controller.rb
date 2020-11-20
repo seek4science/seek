@@ -12,12 +12,12 @@ class DataFilesController < ApplicationController
 
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob,
-                                                             :request_resource, :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
+                                                             :preview, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
   before_action :find_display_asset, only: [:show, :explore, :download]
   before_action :xml_login_only, only: [:upload_for_tool, :upload_from_email]
   before_action :get_sample_type, only: :extract_samples
   before_action :check_already_extracted, only: :extract_samples
-  before_action :forbid_new_version_if_samples, :only => :new_version
+  before_action :forbid_new_version_if_samples, :only => :create_version
 
   before_action :oauth_client, only: :retrieve_nels_sample_metadata
   before_action :nels_oauth_session, only: :retrieve_nels_sample_metadata
@@ -28,11 +28,11 @@ class DataFilesController < ApplicationController
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
 
-  include Seek::BreadCrumbs
-
   include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
+
+  api_actions :index, :show, :create, :update, :destroy
 
   def plot
     sheet = params[:sheet] || 2
@@ -61,7 +61,7 @@ class DataFilesController < ApplicationController
     end
   end
 
-  def new_version
+  def create_version
     if handle_upload_data(true)
       comments = params[:revision_comments]
 
@@ -79,7 +79,7 @@ class DataFilesController < ApplicationController
           flash[:error] = 'Unable to save newflash[:error] version'
         end
         format.html { redirect_to @data_file }
-        format.json { render json: @data_file}
+        format.json { render json: @data_file, include: [params[:include]]}
       end
     else
       flash[:error] = flash.now[:error]
@@ -146,7 +146,7 @@ class DataFilesController < ApplicationController
           respond_to do |format|
             flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
             format.html { redirect_to data_file_path(@data_file) }
-            format.json { render json: @data_file }
+            format.json { render json: @data_file, include: [params[:include]] }
           end
         end
       else
@@ -169,7 +169,7 @@ class DataFilesController < ApplicationController
       if @data_file.update_attributes(data_file_params)
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
-        format.json {render json: @data_file}
+        format.json {render json: @data_file, include: [params[:include]]}
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@data_file), status: :unprocessable_entity }
@@ -201,10 +201,7 @@ class DataFilesController < ApplicationController
     scope = scope.joins(:projects).where(projects: { id: current_user.person.projects }) unless (params[:all_projects] == 'true')
     scope = scope.where(simulation_data: true) if (params[:simulation_data] == 'true')
     scope = scope.with_extracted_samples if (params[:with_samples] == 'true')
-
-    @data_files = DataFile.authorize_asset_collection(
-      scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").distinct, 'view'
-    ).first(20)
+    @data_files = scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").distinct.authorized_for('view').first(20)
 
     respond_to do |format|
       format.html { render partial: 'data_files/association_preview', collection: @data_files, locals: { hide_sample_count: !params[:with_samples] } }
@@ -392,6 +389,7 @@ class DataFilesController < ApplicationController
     @create_new_assay = assay_params.delete(:create_assay)
 
     update_sharing_policies(@data_file)
+    update_annotations(params[:tag_list], @data_file)
 
     @assay = Assay.new(assay_params)
     if sop_id
@@ -416,7 +414,6 @@ class DataFilesController < ApplicationController
     all_valid = all_valid && @data_file.save && blob.save
 
     if all_valid
-      update_annotations(params[:tag_list], @data_file)
 
       update_relationships(@data_file, params)
 
@@ -432,7 +429,7 @@ class DataFilesController < ApplicationController
         # the assay_id param can also contain the relationship type
         @data_file.assays << @assay if @create_new_assay
         format.html { redirect_to data_file_path(@data_file) }
-        format.json { render json: @data_file }
+        format.json { render json: @data_file, include: [params[:include]] }
       end
 
     else
@@ -505,7 +502,8 @@ class DataFilesController < ApplicationController
                                       :license, :other_creators,{ event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      { scales: [] }, { publication_ids: [] })
+                                      { scales: [] }, { publication_ids: [] },
+                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   def data_file_assay_params

@@ -1,11 +1,12 @@
-<% image_for_object = eval("#{@image_for}.find(#{@image_for_id})") -%>
+<% image_for_object = @image_for.find(@image_for_id) -%>
+<% return_path = params[:return_to] ? params[:return_to] : polymorphic_path([image_for_object, :model_images]) -%>
 <h1>Upload <%= @image_for -%> Image: <%= link_to image_for_object.title, url_for(image_for_object) -%></h1>
 
 <%= error_messages_for :model_image -%>
 
 <%= form_tag({:action => :create}, :multipart => true) do %>
     <%= hidden_field_tag(:model_id, @image_for_id ) -%>
-    <%= hidden_field_tag(:return_to, params[:return_to] ? params[:return_to] : eval("#{@image_for.downcase}_model_images_path(#{@imager_for_id})")) -%>
+    <%= hidden_field_tag(:return_to, return_path) -%>
     <br/>
 
     <div class="center-block">
@@ -16,6 +17,6 @@
       <br/>
 
       <%= submit_tag "Upload", data: { disable_with: 'Uploading...' } %>
-      or <%= cancel_button(params[:return_to] ? params[:return_to] : eval("#{@image_for.downcase}_model_images_path(#{@image_for_id})")) -%>
+      or <%= cancel_button(return_path) -%>
     </div>
 <% end %>

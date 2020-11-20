@@ -3,46 +3,81 @@ module Seek
     module ExamineUrl
       include Seek::UploadHandling::ContentInspection
 
-      def handle_good_http_response(url, info)
-        @content_type = info[:content_type]
-        @size = info[:file_size]
-        if content_is_webpage?(@content_type)
-          @is_webpage = true
-          if (is_myexperiment_url? url)
+      def examine_url
+        # check content type and size
+        url = params[:data_url]
+        @info = {}
+        @type = 'file'
+        @content_blob = ContentBlob.new(url: url)
+        begin
+          uri = URI(url)
+          handler = @content_blob.remote_content_handler
+          if handler
+            @info = handler.info
+            if @info[:code]
+              if @info[:code] == 200
+                handle_good_http_response(handler)
+              else
+                handle_bad_http_response(@info[:code])
+              end
+            end
           else
-            page = summarize_webpage(url)
-            @title = page.title
-            @description = page.description
-            @image = page.images.best
+            @type = 'warning'
+            @warning_msg = "Unhandled URL scheme: #{uri.scheme}. The given URL will be presented as a clickable link."
           end
-        else
-          @is_webpage = false
-          @filename = info[:file_name]
+        rescue StandardError => e
+          handle_exception_response(e)
+        end
+
+        respond_to do |format|
+          format.html { render partial: 'content_blobs/examine_url_result', status: @type == 'error' ? 400 : 200 }
         end
       end
 
-      def handle_good_ftp_response(_url, info)
-        @is_webpage = false
-        @size = info[:file_size]
-        @content_type = info[:content_type]
-        @filename = info[:file_name]
+      private
+
+      def handle_good_http_response(handler)
+        if handler.is_a?(Seek::DownloadHandling::GithubHTTPHandler)
+          @type = 'github'
+        elsif is_myexperiment_url?(handler.url)
+          @type = 'webpage'
+          xml_url = url[0..-6] + '.xml'
+
+          xml_doc = Nokogiri::XML(open(xml_url))
+          xml_doc.xpath('/*/description').each do |node|
+            @info[:description] = node.text
+          end
+          xml_doc.xpath('/*/title').each do |node|
+            @info[:title] = node.text
+          end
+          xml_doc.xpath('/*/preview').each do |node|
+            @info[:image] = node.text
+          end
+        elsif content_is_webpage?(@info[:content_type])
+          @type = 'webpage'
+          page = summarize_webpage(handler.url)
+          @info[:title] = page.title&.strip
+          @info[:description] = page.description&.strip
+          @info[:image] = page.images.best
+        end
       end
 
       def handle_bad_http_response(code)
+        @type = 'error'
+
         case code
         when 401, 403
-          @unauthorized = true
+          @type = 'warning'
+          @warning_msg = "Access to this link is unauthorized. You can still register it as a link, but somebody wishing to access it may need a username and password to login to the site and download the file."
         when 405
-          @error = true
           @error_msg = "We can't find out information about this URL - Method not allowed response."
         when 404
-          @error = true
           @error_msg = 'Nothing can be found at that URL. Please check the address and try again'
+        when 400
+          @error_msg = 'The URL appears to be invalid'
         when 490
-          @error = true
           @error_msg = 'That URL is inaccessible. Please check the address and try again'
         else
-          @error = true
           @error_msg = "We can't find out information about this URL - unhandled response code: #{code}"
         end
       end
@@ -50,46 +85,15 @@ module Seek
       def handle_exception_response(exception)
         case exception
         when URI::InvalidURIError
-          @error = true
-          @error_msg = 'The URL appears to be invalid'
+          handle_bad_http_response(400)
         else
           fail exception
         end
       end
 
-      def is_myexperiment_url? (url)
+      def is_myexperiment_url?(url)
         URI uri = URI(url)
-        @is_workflow = false
-        if !uri.hostname.include? "myexperiment"
-          return false
-        end
-        if !uri.path.end_with? ".html"
-          return false
-        end
-        if uri.path.include? "/workflow"
-          @is_workflow = true
-        end
-        begin
-          xml_url = url[0..-6] + '.xml'
-
-          xml_doc = Nokogiri::XML(open(xml_url))
-          xml_doc.xpath('/*/description').each do |node|
-            @description = node.text
-          end
-          xml_doc.xpath('/*/title').each do |node|
-            @title = node.text
-          end
-          xml_doc.xpath('/*/preview').each do |node|
-            @image = node.text
-          end
-
-
-          return true
-        rescue
-          return false
-        end
-
-        return false
+        uri.hostname.include?('myexperiment.org') && uri.path.end_with?('.html')
       end
     end
   end
