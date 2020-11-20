@@ -8,7 +8,7 @@ layout: page
 ## Related Projects
 
 * [WorkflowHub](https://about.workflowhub.eu/)
-  - <https://workflowhub.eu/> is bsaed on SEEK
+  - <https://workflowhub.eu/> is based on SEEK
 * [OpenBIS](http://fair-dom.org/platform/openbis/)
 * [BioVel](http://web.archive.org/web/20180202071633/http://www.biovel.eu/) (archived 2018-02-02)
   - [BioVel portal](http://web.archive.org/web/20171112080623/https://portal.biovel.eu/) (archived 2017-11-12) was based on SEEK
