@@ -62,6 +62,6 @@ HITS gGmbH.
 
 ## scale images (To BE UPDATED)
 
-scale slider images in `public/images/slider` are not allowed to be modified and
-redistributed.
+scale slider images in `app/assets/images/scales/vl-scales` are not allowed to be modified and
+redistributed [see 30dd3f..ee37abd](https://github.com/seek4science/seek/commits/30dd3f9a7c142bd5e6dace8ccef17205e9f4b5d4/public/images/slider)
 
