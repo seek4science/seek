@@ -45,20 +45,20 @@ HITS gGmbH.
 
 ## Icons and themes
 
-* [Fairdom Logo: Autumn Firefly Design](http://autumn-firefly.co.uk/)
+* Fairdom Logo: [Autumn Firefly Design](http://autumn-firefly.co.uk/)
 * [FamFamFam icon set (flags and silk)](http://www.famfamfam.com/lab/icons/silk/)
-* [Institution icon](http://iconeden.com/)
-* [Test Tube & Flask icons](http://www.clker.com/clipart-test-tube-icon.html)
-* [Crystal Clear Icon Set (LGPL)](http://www.iconarchive.com/show/crystal-clear-icons-by-everaldo.html)
+* Institution icon: from [Icon Eden](http://web.archive.org/web/20150206235106/http://www.iconeden.com/) (archived 2015-02-06)
+* [Test Tube & Flask icons](http://www.clker.com/clipart-test-tube-icon.html) by OCAL on clker
+* [Crystal Clear Icon Set](http://www.iconarchive.com/show/crystal-clear-icons-by-everaldo.html) (LGPL)
 * [Organism Icon from IconIcon](http://iconicon.net/?page_id=79)
-* [Zoom images](http://www.lokeshdhakar.com/projects/lightbox2/)
-* [Presentation icon](http://www.mricons.com/icon/785/128/presentation-slides-icon) (LGPL)
-* [Strain image](http://en.wikipedia.org/wiki/File:Enterococcus_faecalis20023-300.jpg#file) (Wikimedia Commons)
+* Zoom images from [Lightbox by Lokesh Dhakar](http://www.lokeshdhakar.com/projects/lightbox2/)
+* [Presentation icon](http://web.archive.org/web/20110508124549/http://www.mricons.com/icon/785/128/presentation-slides-icon) (archived 2011-05-08) by David Vignoni at Mr. Icons (LGPL)
+* [Strain image](http://en.wikipedia.org/wiki/File:Enterococcus_faecalis20023-300.jpg#file) from Wikimedia Commons
 * [expand plus icon](http://findicons.com/icon/439241/toggle_expand?id=439541) by Jack Cai, Creative Commons Attribution (by) 
 * [collapse minus icon](http://findicons.com/icon/439180/toggle_collapse?id=439440) by Jack Cai, Creative Commons Attribution (by)
-* Waiting icon [FatCow Web Hosting](http://www.fatcow.com/)
+* Waiting icon from [FatCow Web Hosting](http://www.fatcow.com/)
 * [Font awesome](http://fortawesome.github.io/Font-Awesome/)
-* [Fatcow icons set(Creative Commons Attribution)](http://www.fatcow.com/free-icons)
+* [Fatcow icons set](http://www.fatcow.com/free-icons) (Creative Commons Attribution)
 
 ## scale images (To BE UPDATED)
 
