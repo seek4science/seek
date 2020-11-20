@@ -2,7 +2,6 @@ class StatsController < ApplicationController
   before_action :get_scope
   before_action :check_access_rights
   before_action :get_dates, only: %i[asset_activity contributors contributions asset_accessibility]
-  before_action :add_breadcrumbs
 
   def dashboard
     respond_to do |format|
@@ -69,17 +68,5 @@ class StatsController < ApplicationController
 
   def check_access_rights
     is_user_admin_auth
-  end
-
-  def add_breadcrumbs
-    if @scope == :admin
-      add_breadcrumb 'Administration', admin_path
-    else
-      type = @scope.class.name.downcase
-      add_breadcrumb type.pluralize.humanize, polymorphic_path(type.pluralize.to_sym)
-      add_breadcrumb @scope.title, polymorphic_path(@scope)
-    end
-
-    add_breadcrumb 'Dashboard'
   end
 end
