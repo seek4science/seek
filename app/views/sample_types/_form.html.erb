@@ -1,9 +1,5 @@
 <% tab ||= 'manual' %>
 
-<span id='modal-dialogues'>
-    <%= sample_controlled_vocab_model_dialog('cv-modal') %>
-</span>
-
 <%= form_for(@sample_type, html: { multipart: true }) do |f| %>
     <%= f.error_messages %>
 
@@ -83,8 +79,6 @@
 <script>
     //used to hold the element Id that needs updating after creating a new CV
     $j(document).ready(function () {
-        SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();
-        SampleTypeControlledVocab.resetModalControlledVocabForm();
         // Make rows sortable
         SampleTypes.bindSortable();
         SampleTypes.recalculatePositions();

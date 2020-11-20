@@ -55,10 +55,6 @@
                      include_blank: true,
                      class: 'form-control controlled-vocab-selection',
                      disabled: !allow_type_change %>
-      <% if allow_type_change %>
-        <a class="btn btn-default cv-edit-button" href="#" role="button" disabled="true" target="_blank">Edit</a>
-        <%= create_sample_controlled_vocab_model_button  %>
-      <% end %>
 
     </div>
     <div class='sample-type-block' style="<%= 'display:none;' unless sample_attribute.try(:seek_sample?) %>">

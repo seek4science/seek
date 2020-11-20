@@ -108,14 +108,6 @@ var SampleTypeControlledVocab = {
         return $j('#'+SampleTypeControlledVocab.controlledVocabSelectionTagId);
     },
 
-    //resets the modal
-    resetModalControlledVocabForm: function () {
-        $j('#cv-modal').remove();
-        $j('#modal-dialogues').append(SampleTypeControlledVocab.blankControlledVocabModelForm.clone());
-        initialiseCVForm();
-        SampleTypeControlledVocab.bindNewControlledVocabShowEvent();
-    },
-
     //selected CV item changed
     controlledVocabChanged: function() {
         var id=$j(this).find(':selected')[0].value;

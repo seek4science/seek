@@ -13,25 +13,6 @@ module SampleTypesHelper
     end
   end
 
-  def create_sample_controlled_vocab_model_button
-    modal_id = 'cv-modal'
-    button_link_to('New', 'add', '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}")
-  end
-
-  def sample_controlled_vocab_model_dialog(modal_id)
-    modal_options = { id: modal_id, size: 'xl', 'data-role' => 'create-sample-controlled-vocab-form' }
-
-    modal_title = 'Create Sample Controlled Vocab'
-
-    modal(modal_options) do
-      modal_header(modal_title) +
-        modal_body do
-          @sample_controlled_vocab = SampleControlledVocab.new
-          render partial: 'sample_controlled_vocabs/form', locals: { remote: true }
-        end
-    end
-  end
-
   def sample_type_grouped_options
     sample_types = SampleType.all
     projects = current_user.person.projects
