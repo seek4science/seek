@@ -25,7 +25,6 @@ class SampleControlledVocabsController < ApplicationController
 
   def new
     @sample_controlled_vocab = SampleControlledVocab.new
-    @sample_controlled_vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new
     respond_with(@sample_controlled_vocab)
   end
 
