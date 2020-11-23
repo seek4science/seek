@@ -10,6 +10,11 @@
           </a>
           <span class="subtle"><%= version_text -%></span>
         </div>
+         <div id="elixir-belgium-credit">
+          <a href="https://www.elixir-belgium.org/" target="_blank" class="powered-by">
+            <%= image(:elixir_belgium_logo, width: 85, height: 85) %>
+          </a>
+        </div>
         <% cache cache_name, skip_digest: true do -%>
           <div class="ft-info">
             <% if Seek::Config.dm_project_link != Seek::Config.project_link %>
