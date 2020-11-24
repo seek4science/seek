@@ -8,10 +8,6 @@ class SinglePagesControllerTest < ActionController::TestCase
     login_as @member
   end
 
-  # test "routes" do
-  #   assert_generates "/single_pages/1/render_sharing_form/1/type/study", controller: "single_pages", action: "render_sharing_form", id: 1, type: "study"
-  # end
-
   test 'should show' do
     project = Factory(:project)
     get :show, params: { id: project.id }
@@ -100,21 +96,103 @@ class SinglePagesControllerTest < ActionController::TestCase
     assert_equal source_types.kind_of?(Array), true
     source_type = source_types[0]
     assert_equal source_type[:title], 'Plant-ArrayExpress'
-    assert_equal source_type[:type], 0
+    assert_equal source_type[:type], "study"
     assert_equal source_type[:attributes].kind_of?(Array), true
     assert_equal source_type[:attributes][0][:title], 'Organism'
     assert_equal source_type[:attributes][0][:required], true
   end
 
+  test 'should return sample table' do
+  end
+
+  test 'should return nil if assay doesnt have position' do
+    setup_entities
+    samples = @controller.send :load_samples, @assay3, @st1 
+    assert_nil samples
+
+  end
+
+  test 'should load samples' do
+    setup_entities
+    samples = @controller.send :load_samples, @assay1, @st0 
+    assert_equal true, samples[0][0].kind_of?(Hash)
+    assert_equal true, samples[1][0].kind_of?(Hash)
+    assert_equal JSON.parse(samples[0][0]["data"])["link_id"],  JSON.parse(samples[1][0]["data"])["link_id"]
+
+  end
+
+  test 'should load Ontologies' do
+    populate_source_types
+    query = "hal"
+    get :ontology, params: {id: "1", label: "organism",  query: query, format: 'json' }
+    assert_response :success
+    data = JSON.parse(response.body)["data"]
+    assert_equal data.length, 2
+    data.each do |d|
+      assert_includes d["label"].downcase, query.downcase
+    end
+  end
 
   private
 
   def populate_source_types
-    source_type = SourceType.new(name: "Plant-ArrayExpress", group: "plant", source_type: 0)
-    source_type.save!
-    source_attribute = SourceAttribute.new(source_type_id: source_type.id, name: "Organism", required: 1)
-    source_attribute.save!
-    source_type
+    r = RepositoryStandard.new(title: "Plant-ArrayExpress", group_tag: "plant", repo_type: "study")
+    v = r.sample_controlled_vocabs.new(title: "Organism", short_name:"Org", description:"description", required:"true")
+    v.sample_controlled_vocab_terms.new(label: "synthetic construct")
+    v.sample_controlled_vocab_terms.new(label: "freshwater sediment metagenome")
+    v.sample_controlled_vocab_terms.new(label: "Haloferax volcanii")
+    v.sample_controlled_vocab_terms.new(label: "Halobacterium salinarum")
+
+    r.sample_controlled_vocabs.new(title: "Organism part", short_name:"Org_part", description:"description", required:"false")
+    r.sample_controlled_vocabs.new(title: "Developmental stage", short_name:"dev_stg", description:"description", required:"true")
+    r.save!
+  end
+
+
+  def setup_entities
+    person = User.current_user.person
+    study = Factory(:min_study, contributor: person, policy: Factory(:public_policy))
+
+    @st0 = SampleType.new title: 'st0', project_ids: [@project.id] , contributor: person
+    @st0.sample_attributes << Factory(:sample_attribute, title: 'some_field', is_title: true, required: true, sample_attribute_type: Factory(:string_sample_attribute_type), sample_type: @st0)
+    @st0.sample_attributes << Factory(:sample_attribute, title: 'another_field', sample_attribute_type: Factory(:string_sample_attribute_type), required: false, sample_type: @st0)
+    @st0.sample_attributes << Factory(:sample_attribute, title: 'link_id', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, sample_type: @st0)
+    @st0.save!
+
+    @st1 = SampleType.new title: 'st1', project_ids: [@project.id] , contributor: person
+    @st1.sample_attributes << Factory(:sample_attribute, title: 'organism', is_title: true, required: true, sample_attribute_type: Factory(:string_sample_attribute_type), sample_type: @st1)
+    @st1.sample_attributes << Factory(:sample_attribute, title: 'organism part', sample_attribute_type: Factory(:string_sample_attribute_type), required: false, sample_type: @st1)
+    @st1.sample_attributes << Factory(:sample_attribute, title: 'link_id', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, sample_type: @st1)
+    @st1.save!
+
+    st2 = SampleType.new title: 'st2', project_ids: [@project.id] , contributor: person
+    st2.sample_attributes << Factory(:sample_attribute, title: 'organism', is_title: true, required: true, sample_attribute_type: Factory(:string_sample_attribute_type), sample_type: st2)
+    st2.sample_attributes << Factory(:sample_attribute, title: 'organism part', sample_attribute_type: Factory(:string_sample_attribute_type), required: false, sample_type: st2)
+    st2.sample_attributes << Factory(:sample_attribute, title: 'link_id', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, sample_type: st2)
+    st2.save!
+
+    @assay1 = Factory(:min_assay, contributor: person, policy: Factory(:public_policy))
+    @assay1.position = 0;
+    @assay1.study = study
+    @assay1.sample_type_id = @st1.id
+    @assay1.save!
+
+    assay2 = Factory(:min_assay, contributor: person, policy: Factory(:public_policy))
+    assay2.position = 1;
+    assay2.study = study
+    assay2.sample_type_id = st2.id
+    assay2.save!
+
+    @assay3 = Factory(:min_assay, contributor: person, policy: Factory(:public_policy))
+    @assay3.study = study
+    @assay3.save!
+
+    sample0 = Sample.new(sample_type: @st0, contributor: person, project_ids: [@project.id])
+    sample0.update_attributes(data: { some_field: 'some_field 0', another_field: 'another_field 0', link_id: '7c0dm3d' })
+    sample1 = Sample.new(sample_type: @st1, contributor: person, project_ids: [@project.id])
+    sample1.update_attributes(data: { organism: 'organism 1', "organism part": 'organism part 1', link_id: '7c0dm3d' })
+    sample2 = Sample.new(sample_type: st2, contributor: person, project_ids: [@project.id])
+    sample2.update_attributes(data: { organism: 'organism 2', "organism part": 'organism part 2', link_id: '7c0dm3d' })
   end
 
 end
