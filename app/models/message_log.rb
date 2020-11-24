@@ -15,17 +15,19 @@ class MessageLog < ApplicationRecord
   validates :resource, :message_type, :sender, presence: true
   validate :project_required_for_project_membership_request
 
+  scope :recent, -> { where('created_at >= ?', RECENT_PERIOD.ago) }
+  scope :pending, -> { where(response:nil) }
+
   scope :project_membership_requests, -> { where(message_type: PROJECT_MEMBERSHIP_REQUEST) }
   scope :contact_requests, -> { where(message_type: CONTACT_REQUEST) }
   scope :project_creation_requests, -> { where(message_type: PROJECT_CREATION_REQUEST) }
-  scope :pending_project_creation_requests, -> { project_creation_requests.where(response:nil)}
 
-  scope :recent, -> { where('created_at >= ?', RECENT_PERIOD.ago) }
+  # project creation requests that haven't been responded to
+  scope :pending_project_creation_requests, -> { project_creation_requests.pending }
+  scope :pending_project_join_requests, -> (projects) {where(resource:projects).project_membership_requests.pending}
 
   # message logs created since the recent period, for that person and project
-  def self.recent_project_membership_requests(person, project)
-    MessageLog.where("resource_type = 'Project' AND resource_id = ?", project.id).where(sender: person).project_membership_requests.recent
-  end
+  scope :recent_project_membership_requests, ->(person,project) { where(resource:project).where(sender: person).project_membership_requests.recent }
 
   def respond(comments)
     self.update_column(:response,comments)
