@@ -39,7 +39,12 @@ class ProjectsController < ApplicationController
   def guided_join
     @project = Project.find(params[:id]) if params[:id]
     respond_to do |format|
-      format.html
+      if @project && !@project.allow_request_membership?
+        flash[:error] = "Unable to request to join this #{t('project')}, either you are already a member or currently have a pending request"
+        format.html { redirect_to(@project) }
+      else
+        format.html
+      end
     end
   end
 

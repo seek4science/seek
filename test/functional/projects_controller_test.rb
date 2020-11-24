@@ -1701,6 +1701,39 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'guided join with project' do
+    project = Factory(:project_administrator).projects.first
+    person = Factory(:person)
+
+    login_as(person)
+
+    get :guided_join, params:{id:project.id}
+    assert_response :success
+    assert_select "input[type=checkbox][name='projects[]'][checked=checked]",value:project.id
+  end
+
+  test 'invalid guided join' do
+    #already a member
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    refute_nil project
+
+    login_as(person)
+
+    get :guided_join, params:{id:project.id}
+    assert_redirected_to project
+    assert flash[:error]
+
+    project = Factory(:project_administrator).projects.first
+
+    # already requested
+    MessageLog.log_project_membership_request(person, project, Factory(:institution), '')
+    get :guided_join, params:{id:project.id}
+    assert_redirected_to project
+    assert flash[:error]
+
+  end
+
   test 'guided_create' do
     prog = Factory(:programme)
     person = Factory(:person_not_in_project)
