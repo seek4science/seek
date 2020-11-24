@@ -38,6 +38,7 @@ class ProjectsController < ApplicationController
   api_actions :index, :show, :create, :update, :destroy
 
   def guided_join
+    @project = Project.find(params[:id]) if params[:id]
     respond_to do |format|
       format.html
     end
@@ -113,9 +114,10 @@ class ProjectsController < ApplicationController
 
     @comments = params[:comments]
     @projects.each do |project|
-      log = MessageLog.log_project_membership_request(current_user.person, project, @institution, @comments)
-      Mailer.request_join_project(current_user, project, @institution.to_json, @comments, log).deliver_later
-
+      if project.allow_request_membership? # protects against malicious spamming
+        log = MessageLog.log_project_membership_request(current_user.person, project, @institution, @comments)
+        Mailer.request_join_project(current_user, project, @institution.to_json, @comments, log).deliver_later
+      end
     end
 
     flash.now[:notice]="Thank you, your request to join has been sent"
