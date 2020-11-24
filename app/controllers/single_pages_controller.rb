@@ -66,7 +66,7 @@ class SinglePagesController < ApplicationController
         # items = assays.map.with_index {|n,i| {id: n.id.to_s, left: i*180+40, top: i%2==0 ? 50 : 100}}
         return render json: {error:"no flowchart" }, status: :unprocessable_entity
       else
-        #Filter items that don't exist anymore
+        #Filters items that don't exist anymore
         items = JSON.parse(flowchart.items).map{|n| n if assay_ids.include?(n["id"]) || n["id"].blank?}.compact
       end
       operators = items.map {|item| create_operator(item,study)}
@@ -109,33 +109,25 @@ class SinglePagesController < ApplicationController
 
   #GET 
   def sample_table
-    # begin
+    begin
       assay =  Assay.find(params[:assay_id])
       flowchart = Flowchart.where(study_id: assay.study.id).first
       if (flowchart)
         source_sample_type = SampleType.find(flowchart.source_sample_type_id)
         source_sample_type_attributes = source_sample_type.sample_attributes.select(:required, :original_accessor_name,
            :sample_type_id, :id)
-        
         assay_sample_type = SampleType.find(assay.sample_type_id)
-        # assay_samples = assay_sample_type.samples.json_metadata 
-        # Load all samples sample...
-        # source_samples = source_sample_type.samples.json_metadata #.where(contributor_id: 1)
-
         all_samples = load_samples(assay, source_sample_type)
         rest_headers = load_headers(assay)
         all_headers = source_sample_type_attributes + rest_headers
-
-
         data = { header: all_headers, samples: all_samples }
-          #  data: source_samples + assay_samples }
         render json: { status: :ok, data: data }
       else
         render json: { status: :unprocessable_entity, error: "The flowchart does not exist." }
       end
-    # rescue Exception => e
-    #    render json: {status: :unprocessable_entity, error: e.message } 
-    # end
+    rescue Exception => e
+       render json: {status: :unprocessable_entity, error: e.message } 
+    end
   end
 
 
@@ -201,22 +193,26 @@ class SinglePagesController < ApplicationController
 
 
   def load_samples (assay, source_sample_type)
-    final_samples = {"0" => []}
-    # linkId = ""
-    source_sample_type.samples.each_with_index do |s, i|
-      final_samples["0"] << {"id" => s.id, "data" => s.json_metadata, "sample_type_id" => source_sample_type.id}
-      # linkId = JSON.parse(s.json_metadata)["link_id"]
-      # puts "=================="
-      # puts linkId
-      # puts "=================="
+    return nil if assay.position.nil? 
+    final_samples = {0 => []}
+    link_ids = []
+    source_sample_type.samples.each do |s|
+      final_samples[0] << {"id" => s.id, "data" => s.json_metadata, "sample_type_id" => source_sample_type.id}
+      link_ids << s.get_attribute_value(:link_id)
     end
-
+    # puts Study.find(assay.study.id).assays.length
     all_assays = Study.find(assay.study.id).assays.where("position <= #{assay.position}").sort_by{|e| e[:position]}
     all_assays.each_with_index do |m, i|
+      # puts m
       final_samples[i+1] = []
       s = SampleType.find(m.sample_type_id)
-      s.samples.each do |n|
-        final_samples[i+1] << {"id" => n.id, "data" => n.json_metadata, "sample_type_id" => s.id}
+      link_ids.each do |id|
+        s.samples.each do |n|
+          if (n.get_attribute_value(:link_id) == id)
+            final_samples[i+1] << {"id" => n.id, "data" => n.json_metadata, "sample_type_id" => s.id}
+            break
+          end
+        end
       end
     end
     final_samples
