@@ -197,6 +197,8 @@ class MessageLogTest < ActiveSupport::TestCase
     log2.respond('Rejected')
     assert_empty MessageLog.pending_project_join_requests([project2])
 
+    assert_empty MessageLog.pending_project_join_requests([])
+
   end
 
 

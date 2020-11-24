@@ -43,6 +43,12 @@
       </div>
     <% end %>
 
+    <% if pending_project_join_request? %>
+      <div id='pending-project-join-warning' class="alert alert-danger text-center">
+        There are pending join requests for <%= t('project').pluralize %> you administer
+      </div>
+    <% end %>
+
 
 
     <% if join_or_create_project_banner? %>

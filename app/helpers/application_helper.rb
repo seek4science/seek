@@ -6,6 +6,7 @@ module ApplicationHelper
   include Recaptcha::ClientHelper
   include VersionHelper
   include ImagesHelper
+  include SessionsHelper
 
   def no_items_to_list_text
     content_tag :div, id: 'no-index-items-text' do
@@ -474,6 +475,13 @@ module ApplicationHelper
   def pending_project_creation_request?
     return false unless admin_logged_in?
     return MessageLog.pending_project_creation_requests.any?
+  end
+
+  def pending_project_join_request?
+    return false unless project_administrator_logged_in?
+    person = User.current_user.person
+    projects = person.projects.select{|proj| person.is_project_administrator?(proj)}
+    return MessageLog.pending_project_join_requests(projects).any?
   end
 
   #whether to show a banner encouraging you to join or create a project
