@@ -6,21 +6,20 @@ class ProjectsController < ApplicationController
   include Seek::DestroyHandling
   include ApiHelper
 
-  before_action :login_required, only: [:request_membership, :guided_join, :guided_create, :request_join, :request_create,
+  before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,
                                         :administer_join_request, :respond_join_request,:administer_create_project_request, :respond_create_project_request]
 
   before_action :managed_programme_configured?, only: [:guided_create], if: Proc.new{Seek::Config.programmes_enabled}
 
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
                                                admin_member_roles update_members storage_report
-                                               request_membership overview administer_join_request respond_join_request]
+                                               overview administer_join_request respond_join_request]
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create,:administer_create_project_request, :respond_create_project_request]
   before_action :is_user_admin_auth, only: %i[manage destroy]
   before_action :editable_by_user, only: %i[edit update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request]
   before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
-  before_action :allow_request_membership, only: [:request_membership]
 
   before_action :validate_message_log_for_join, only: [:administer_join_request, :respond_join_request]
   before_action :validate_message_log_for_create, only: [:administer_create_project_request, :respond_create_project_request]
@@ -440,19 +439,6 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def request_membership
-    details = params[:details]
-    mail = Mailer.request_membership(current_user, @project, details)
-    mail.deliver_later
-    MessageLog.log_project_membership_request(current_user.person,@project,nil, details)
-
-    flash[:notice]='Membership request has been sent'
-
-    respond_with do |format|
-      format.html{redirect_to(@project)}
-    end
-  end
-
   def overview
 
   end
@@ -629,13 +615,6 @@ class ProjectsController < ApplicationController
     unless @project.can_manage?(current_user)
       error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
-    end
-  end
-
-  def allow_request_membership
-    unless Seek::Config.email_enabled && @project.allow_request_membership?
-      error("Cannot request membership of this #{t('project').downcase}", 'is invalid (invalid state)')
-      false
     end
   end
 

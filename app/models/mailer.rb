@@ -162,17 +162,6 @@ class Mailer < ActionMailer::Base
     )
   end
 
-  def request_membership(user, project, details)
-    @owners = project.project_administrators
-    @requester = user.person
-    @resource = project
-    @details = details
-    mail(from: Seek::Config.noreply_sender,
-         to: project.project_administrators.collect(&:email_with_name),
-         reply_to: @requester.email_with_name,
-         subject: "#{@requester.email_with_name} requested membership of project: #{@resource.title}")
-  end
-
   def request_join_project(user, project, institution_json, comments, message_log)
     @owners = project.project_administrators
     @requester = user.person

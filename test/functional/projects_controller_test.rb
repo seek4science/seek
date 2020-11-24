@@ -1514,46 +1514,6 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
-  test 'request membership' do
-    project = Factory(:project_administrator).projects.first #needs a project admin
-    person = Factory(:person)
-    login_as(person)
-    assert_enqueued_emails(1) do
-      assert_difference('MessageLog.count') do
-        post :request_membership, params: { id:project, details:'blah blah' }
-      end
-
-    end
-    assert_redirected_to(project)
-    refute_nil flash[:notice]
-    log = MessageLog.last
-    assert_equal project,log.resource
-    assert_equal person,log.sender
-    assert_equal MessageLog::PROJECT_MEMBERSHIP_REQUEST,log.message_type
-
-    logout
-    login_as(project.project_administrators.first)
-
-    assert_no_enqueued_emails  do
-      assert_no_difference('MessageLog.count') do
-        post :request_membership, params: { id:project, details:'blah blah' }
-      end
-    end
-    assert_redirected_to :root
-    refute_nil flash[:error]
-
-    project=Factory(:project)
-    assert_empty(project.people)
-    assert_no_enqueued_emails  do
-      assert_no_difference('MessageLog.count') do
-        post :request_membership, params: { id:project, details:'blah blah' }
-      end
-    end
-    assert_redirected_to :root
-    refute_nil flash[:error]
-
-  end
-
   test 'can remove members with project subscriptions' do
     proj_admin = Factory(:project_administrator)
     project = proj_admin.projects.first
@@ -1754,7 +1714,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test 'request_join_project with known project and institution' do
     person = Factory(:person_not_in_project)
-    project = Factory(:project)
+    project = Factory(:project_administrator).projects.first #project needs to have an admin
     institution = Factory(:institution)
     login_as(person)
     params = {
@@ -1782,8 +1742,9 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test 'request_join_project with known project and new institution' do
     person = Factory(:person_not_in_project)
-    project = Factory(:project)
+    project = Factory(:project_administrator).projects.first #project needs to have an admin
     login_as(person)
+
     institution_params = {
         title:'fish',
         city:'Sheffield',
