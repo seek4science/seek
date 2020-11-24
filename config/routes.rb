@@ -375,7 +375,33 @@ SEEK::Application.routes.draw do
 
   resources :studies, concerns: [:publishable, :has_snapshots, :isa] do
     collection do
+      get :preview
+      get :batch_uploader
+      post :preview_content
+      post :batch_create
+      post :create_content_blob
       post :investigation_selected_ajax
+      post :items_for_result
+    end
+    resources :snapshots, :only => [:show, :new, :create, :destroy] do
+      member do
+        get :mint_doi_confirm
+        post :mint_doi
+        get :download
+        get :export, action: :export_preview
+        post :export, action: :export_submit
+      end
+    end
+    member do
+      get :new_object_based_on_existing_one
+      post :check_related_items
+      post :check_gatekeeper_required
+      post :publish_related_items
+      post :publish
+      get :published
+      get :isa_children
+      get :manage
+      patch :manage_update
     end
     resources :people, :projects, :assays, :investigations, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
   end
@@ -514,6 +540,7 @@ SEEK::Application.routes.draw do
     end
     resources :people, :projects, :institutions, :investigations, :studies, :assays,
               :data_files, :models, :sops, :workflows, :nodes, :presentations, :documents, :events, :publications, :organisms, :human_diseases, :collections, only: [:index]
+    concerns :has_dashboard, controller: :programme_stats
   end
 
   resources :publications, concerns: [:asset] do

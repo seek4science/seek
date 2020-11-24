@@ -1,0 +1,23 @@
+test:
+  adapter: mysql2
+  database: seek_test
+  username: seek
+  password: test
+  host: 127.0.0.1
+  port: 33306
+
+development:
+  adapter: mysql2
+  database: seek_test_dev
+  username: seek
+  password: test
+  host: 127.0.0.1
+  port: 33306
+
+production:
+  adapter: mysql2
+  database: seek_test_prod
+  username: seek
+  password: test
+  host: 127.0.0.1
+  port: 33306

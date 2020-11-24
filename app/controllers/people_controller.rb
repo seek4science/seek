@@ -100,6 +100,7 @@ class PeopleController < ApplicationController
   # people yet to be assigned, or create a new one if you don't exist
   def register
     email = params[:email]
+    @existing_email = email && Person.where(email: email).any?
     if email && Person.not_registered_with_matching_email(email).any?
       render :is_this_you, locals: { email: email }
     else
