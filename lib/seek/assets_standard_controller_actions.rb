@@ -145,13 +145,14 @@ module Seek
       item
     end
 
-    def edit_version_comment
+    def edit_version
       item = class_for_controller_name.find(params[:id])
-      @comment = item.versions.find_by(version: params[:version])
-      if @comment.update(revision_comments: params[:revision_comments])
-        flash[:notice] = "The comment of version #{params[:version]} was successfully updated."
+      version = item.versions.find_by(version: params[:version])
+
+      if version&.update_attributes(edit_version_params(version))
+        flash[:notice] = "Version #{params[:version]} was successfully updated."
       else
-        flash[:error] = "Unable to update the comment of version #{params[:version]}. Please try again."
+        flash[:error] = "Unable to update version #{params[:version]}. Please try again."
       end
       redirect_to item
     end
@@ -160,6 +161,12 @@ module Seek
       return false unless item.respond_to?(:parent_name) && !item.parent_name.blank?
       render partial: 'assets/back_to_fancy_parent', locals: { child: item, parent_name: item.parent_name }
       true
+    end
+
+    def edit_version_params(version)
+      p = [:revision_comments]
+      p << :visibility if version.can_change_visibility?
+      params.permit(*p)
     end
 
     def json_api_include_param

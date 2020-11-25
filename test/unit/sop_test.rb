@@ -252,4 +252,103 @@ class SopTest < ActiveSupport::TestCase
     assert_includes sop.contributors, sop.contributor
     assert_includes sop.contributors, user.person
   end
+
+  test 'sets default version visibility' do
+    sop = Factory(:sop)
+    disable_authorization_checks do
+      sop.save_as_new_version('Updated sop as part of a test')
+    end
+
+    v = sop.reload.latest_version
+
+    assert_equal :public, v.visibility
+    assert_equal v.class.default_visibility, v.visibility
+  end
+
+  test 'gets and sets version visibility' do
+    sop = Factory(:sop)
+    disable_authorization_checks do
+      sop.save_as_new_version('Updated sop as part of a test')
+    end
+
+    v = sop.reload.latest_version
+
+    v.visibility = :private
+    assert_equal :private, v.visibility
+    v.visibility = :registered_users
+    assert_equal :registered_users, v.visibility
+    v.visibility = :public
+    assert_equal :public, v.visibility
+    v.visibility = :fish
+    assert_not_equal :fish, v.visibility
+    assert_equal v.class.default_visibility, v.visibility
+  end
+
+  test 'lists visible versions' do
+    sop = Factory(:sop)
+    pub, reg, priv = nil
+
+    disable_authorization_checks do
+      pub = sop.latest_version
+      pub.visibility = :public
+      pub.save!
+
+      sop.save_as_new_version('Registered users')
+      reg = sop.reload.latest_version
+      reg.visibility = :registered_users
+      reg.save!
+
+      sop.save_as_new_version('Private')
+      priv = sop.reload.latest_version
+      priv.visibility = :private
+      priv.save!
+    end
+
+    assert_equal 3, sop.versions.length
+
+    assert pub.visible?(nil)
+    refute reg.visible?(nil)
+    refute priv.visible?(nil)
+    assert_equal [pub].sort, sop.visible_versions(nil).sort
+
+    registered_user = Factory(:person).user
+    assert pub.visible?(registered_user)
+    assert reg.visible?(registered_user)
+    refute priv.visible?(registered_user)
+    assert_equal [pub, reg].sort, sop.visible_versions(registered_user).sort
+
+    manager = sop.contributor.user
+    assert sop.can_manage?(manager)
+    assert pub.visible?(manager)
+    assert reg.visible?(manager)
+    assert priv.visible?(manager)
+    assert_equal [pub, reg, priv].sort, sop.visible_versions(manager).sort
+  end
+
+  test 'can change visibility?' do
+    sop = Factory(:sop)
+    disable_authorization_checks do
+      sop.save_as_new_version('This version has a DOI')
+      sop.latest_version.update_column(:doi, '10.5072/test_doi')
+      sop.save_as_new_version('Another version')
+    end
+
+    assert_equal 3, sop.versions.count
+
+    v1 = sop.find_version(1)
+    v2 = sop.find_version(2)
+    v3 = sop.find_version(3)
+
+    assert_nil v1.doi
+    refute v1.latest_version?
+    assert v1.can_change_visibility?
+
+    refute_nil v2.doi
+    refute v2.latest_version?
+    refute v2.can_change_visibility?
+
+    assert_nil v3.doi
+    assert v3.latest_version?
+    refute v3.can_change_visibility?
+  end
 end
