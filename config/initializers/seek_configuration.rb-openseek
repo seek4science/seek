@@ -128,6 +128,7 @@ def load_seek_config_defaults!
   Seek::Config.default :is_virtualliver, false
 
   Seek::Config.default :related_items_limit,5
+  Seek::Config.default :search_results_limit,5
 
 # Faceted Browsing and Faceted Search
   Seek::Config.default :faceted_browsing_enabled, false
@@ -146,7 +147,8 @@ def load_seek_config_defaults!
   Seek::Config.default :open_id_authentication_store,:memory
   Seek::Config.default :session_store_timeout, 1.hour
 
-
+  # Custom Metadata
+  Seek::Config.default :custom_metadata_enabled, false
 
   #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
   Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]

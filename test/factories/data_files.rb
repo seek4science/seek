@@ -14,6 +14,10 @@ Factory.define(:data_file) do |f|
   end
 end
 
+Factory.define(:public_data_file, parent: :data_file) do |f|
+  f.policy { Factory(:downloadable_public_policy) }
+end
+
 Factory.define(:min_data_file, class: DataFile) do |f|
   f.with_project_contributor
   f.title 'A Minimal DataFile'

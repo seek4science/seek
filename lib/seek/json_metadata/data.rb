@@ -1,8 +1,11 @@
 module Seek
-  module Samples
-    class SampleData < HashWithIndifferentAccess
+  module JSONMetadata
+    class Data < HashWithIndifferentAccess
+      class InvalidKeyException < RuntimeError; end
 
       attr_accessor :sample_type
+
+      delegate :metadata_attributes, to: :sample_type
 
       def initialize(sample_type = nil, json = nil)
         if sample_type
@@ -16,7 +19,7 @@ module Seek
       end
 
       # Pre-processes the value before setting
-      alias_method :orig_set_value, :[]=
+      alias orig_set_value []=
 
       def []=(key, value)
         super(key, pre_process_value(key, value))
@@ -25,15 +28,27 @@ module Seek
       # Mass assign values provided as a hash. Pre-processes by default, but can be avoided by passing `pre_process: false`
       def mass_assign(hash, pre_process: true)
         method = pre_process ? :[]= : :orig_set_value
+        validate_hash(hash)
         hash.each do |key, value|
-          self.send(method, key, value)
+          send(method, key, value)
         end
       end
 
       private
 
+      def validate_hash(hash)
+        attribute_keys = metadata_attributes.collect(&:accessor_name)
+        provided_keys = hash.keys.collect(&:to_s)
+        wrong = provided_keys - attribute_keys
+        if wrong.any?
+          raise InvalidKeyException,
+                'invalid attribute keys in data assignment, must match attribute titles ' \
+                "(#{'culprit'.pluralize(wrong.size)} - #{wrong.join(',')}"
+        end
+      end
+
       def initialize_structure
-        pairs = @sample_type.sample_attributes.map do |attribute|
+        pairs = metadata_attributes.map do |attribute|
           [attribute.accessor_name, nil]
         end
 
@@ -45,7 +60,7 @@ module Seek
       end
 
       def attribute_for_attribute_name(attribute_name)
-        @sample_type.sample_attributes.where(accessor_name: attribute_name).first
+        metadata_attributes.detect { |attr| attr.accessor_name == attribute_name.to_s }
       end
     end
   end

@@ -2,7 +2,6 @@ require 'delayed/command'
 
 class AdminController < ApplicationController
   include CommonSweepers
-  include Seek::BreadCrumbs
 
   RESTART_MSG = "Your settings have been updated. If you changed some settings e.g. search, you need to restart some processes.
                  Please see the buttons and explanations below.".freeze
@@ -219,6 +218,9 @@ class AdminController < ApplicationController
 
     valid = only_positive_integer(params[:results_per_page_default], 'default items per page')
     Seek::Config.results_per_page_default = params[:results_per_page_default] if valid
+    Seek::Config.related_items_limit = params[:related_items_limit]
+    Seek::Config.search_results_limit = params[:search_results_limit]
+
     update_redirect_to(valid, 'pagination')
   end
 

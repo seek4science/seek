@@ -220,9 +220,11 @@ module ApplicationHelper
       res = simple_format(res, {}, sanitize: false).html_safe if options[:description] == true || options[:address] == true
       if options[:description] == true && options[:markdown] == true
         markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, tables: true)
-        # remove <p> and <br> tags, markdown render cannot handle them
+        # replace br with newlines to fix list render issues
+        res.gsub!(/<br\s*\/>/, "\n")
+        # remove <p> and <br> tags, Redcarpet markdown render cannot handle them
         scrubber = Rails::Html::TargetScrubber.new
-        scrubber.tags = ['p']
+        scrubber.tags = ['p','br']
         res = Loofah.fragment(res).scrub!(scrubber).to_s
         res = markdown.render(res)
       end

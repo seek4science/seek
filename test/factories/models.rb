@@ -13,6 +13,10 @@ Factory.define(:model) do |f|
   end
 end
 
+Factory.define(:public_model, parent: :model) do |f|
+  f.policy { Factory(:downloadable_public_policy) }
+end
+
 Factory.define(:min_model, class: Model) do |f|
   f.with_project_contributor
   f.title 'A Minimal Model'

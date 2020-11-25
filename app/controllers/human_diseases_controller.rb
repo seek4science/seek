@@ -15,7 +15,6 @@ class HumanDiseasesController < ApplicationController
   include BioPortal::RestAPI
   include Seek::ExternalServiceWrapper
   include Seek::IndexPager
-  include Seek::BreadCrumbs
 
   def show
     respond_to do |format|

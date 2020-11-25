@@ -1,0 +1,43 @@
+<div id="in-progress" class="text-center">
+  <p class="alert alert-info">Please wait whilst the uploaded file is processed ...</p>
+  <%= image('large_spinner') %>
+</div>
+
+<div id="response-error" class="alert alert-danger" style="display:none;">
+  <p>
+  Unfortunately a problem occurred processing the file. The problem was been reported.
+  </p>
+  <p>
+    Please try again later.
+  </p>
+  <p class="text-right small">Error: <span id="error-message"/></p>
+</div>
+
+
+<script type="application/javascript">
+
+
+    $j(document).ready(function () {
+        var payload = <%= raw extraction_forward_payload_json(@data_file, :data_file).to_json %>;
+
+        var request = $j.ajax({
+            type: "POST",
+            contentType: "application/json",
+            dataType: "html",
+            timeout: 0,
+            url: '<%= rightfield_extraction_ajax_data_files_path -%>',
+            data: JSON.stringify(payload)
+        });
+
+        request.done(function (data) {
+            window.location='<%= provide_metadata_data_files_path %>'
+        }).fail(function (jqXHR, textStatus,errorThrown) {
+            alert(errorThrown);
+            alert(textStatus);
+            $j('#in-progress').hide();
+            $j('#response-error').show();
+            $j('#error-message').html(jqXHR.responseText);
+        })
+    });
+
+</script>
