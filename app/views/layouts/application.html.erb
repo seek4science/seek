@@ -45,7 +45,7 @@
 
     <% if pending_project_join_request? %>
       <div id='pending-project-join-warning' class="alert alert-danger text-center">
-        There are pending join requests for <%= t('project').pluralize %> you administer
+        There are pending join requests for <%= t('project').pluralize %> you administer - <%= link_to('Full List',project_join_requests_projects_path) %>
       </div>
     <% end %>
 

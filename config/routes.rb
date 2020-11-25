@@ -285,6 +285,7 @@ SEEK::Application.routes.draw do
       post :request_create
       get :administer_create_project_request
       post :respond_create_project_request
+      get :project_join_requests
     end
     member do
       get :asset_report

@@ -1,0 +1,9 @@
+<h1><%= @requests.count %> pending <%= t('project') %> join <%= "request".pluralize(@requests.count) %></h1>
+
+<ul id='project-join-requests'>
+  <% @requests.each do |request| %>
+    <li>
+      Request from <%= link_to(request.sender.title, request.sender) %>, for <%= t('project') %> <%= link_to(request.resource.title,request.resource) %> - <%= link_to('Respond', administer_join_request_project_path(request.resource,message_log_id: request.id)) %>
+    </li>
+  <% end %>
+</ul>

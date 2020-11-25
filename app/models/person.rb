@@ -396,6 +396,11 @@ class Person < ApplicationRecord
     }
   end
 
+  # projects this person is project admin of
+  def administered_projects
+    projects.select{|proj| person.is_project_administrator?(proj)}
+  end
+
   private
 
   # a before_save trigger, that checks if the person is the first one created, and if so defines it as admin

@@ -7,7 +7,9 @@ class ProjectsController < ApplicationController
   include ApiHelper
 
   before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,
-                                        :administer_join_request, :respond_join_request,:administer_create_project_request, :respond_create_project_request]
+                                        :administer_join_request, :respond_join_request,
+                                        :administer_create_project_request, :respond_create_project_request,
+                                        :project_join_requests]
 
   before_action :managed_programme_configured?, only: [:guided_create], if: Proc.new{Seek::Config.programmes_enabled}
 
@@ -35,6 +37,14 @@ class ProjectsController < ApplicationController
   respond_to :html, :json
 
   api_actions :index, :show, :create, :update, :destroy
+
+  def project_join_requests
+    person = current_person
+    @requests = MessageLog.pending_project_join_requests(person.administered_projects)
+    respond_to do |format|
+      format.html
+    end
+  end
 
   def guided_join
     @project = Project.find(params[:id]) if params[:id]

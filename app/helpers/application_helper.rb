@@ -480,7 +480,7 @@ module ApplicationHelper
   def pending_project_join_request?
     return false unless project_administrator_logged_in?
     person = User.current_user.person
-    projects = person.projects.select{|proj| person.is_project_administrator?(proj)}
+    projects = person.administered_projects
     return MessageLog.pending_project_join_requests(projects).any?
   end
 

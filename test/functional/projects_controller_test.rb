@@ -2486,6 +2486,66 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test 'project join request' do
+    person1 = Factory(:project_administrator)
+    person2 = Factory(:project_administrator)
+    project1 = person1.projects.first
+    project2 = person2.projects.first
+
+    requester1 = Factory(:person)
+    requester2 = Factory(:person)
+    requester3 = Factory(:person)
+
+    log1 = MessageLog.log_project_membership_request(requester1,project1,Factory(:institution),'')
+    log2 = MessageLog.log_project_membership_request(requester2,project1,Factory(:institution),'')
+    log3 = MessageLog.log_project_membership_request(Factory(:person),project2,Factory(:institution),'')
+
+    logout
+    get :project_join_requests
+    assert_redirected_to login_path
+
+    login_as(person1)
+
+    get :project_join_requests
+    assert_response :success
+
+    assert_select 'h1',text:/2 pending project join/i
+
+    assert_select 'ul#project-join-requests' do
+      assert_select 'li',count:2
+      assert_select 'a[href=?]',person_path(requester1),text:requester1.title
+      assert_select 'a[href=?]',person_path(requester2),text:requester2.title
+      assert_select 'a[href=?]',administer_join_request_project_path(project1,message_log_id: log1.id)
+      assert_select 'a[href=?]',administer_join_request_project_path(project1,message_log_id: log2.id)
+      assert_select 'a[href=?]',project_path(project1),count:2
+
+      assert_select 'a[href=?]',person_path(requester3),count:0
+      assert_select 'a[href=?]',administer_join_request_project_path(project2,message_log_id: log3.id),count:0
+      assert_select 'a[href=?]',project_path(project2),count:0
+    end
+
+    login_as(Factory(:person))
+    get :project_join_requests
+    assert_response :success
+
+    assert_select 'h1',text:/0 pending project join/i
+
+    assert_select 'ul#project-join-requests' do
+      assert_select 'li',count:0
+      assert_select 'a[href=?]',person_path(requester1),text:requester1.title,count:0
+      assert_select 'a[href=?]',person_path(requester2),text:requester2.title,count:0
+      assert_select 'a[href=?]',administer_join_request_project_path(project1,message_log_id: log1.id),count:0
+      assert_select 'a[href=?]',administer_join_request_project_path(project1,message_log_id: log2.id),count:0
+      assert_select 'a[href=?]',project_path(project1),count:0
+
+      assert_select 'a[href=?]',person_path(requester3),count:0
+      assert_select 'a[href=?]',administer_join_request_project_path(project2,message_log_id: log3.id),count:0
+      assert_select 'a[href=?]',project_path(project2),count:0
+    end
+  end
+
+
+
   private
 
   def edit_max_object(project)
