@@ -26,8 +26,8 @@ USER www-data
 
 WORKDIR $APP_DIR
 
-# CWL dependencies, galaxy2cwl
-RUN pip3 install cwltool==3.0.20200324120055 html5lib==1.0.1 galaxy2cwl==0.1.4
+# Python dependencies from requirements.txt
+RUN pip3 install -r requirements.txt
 
 
 # Bundle install throw errors if Gemfile has been modified since Gemfile.lock
