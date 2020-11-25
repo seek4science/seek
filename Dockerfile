@@ -17,7 +17,8 @@ RUN apt-get update -qq && \
 		poppler-utils postgresql-client sqlite3 links telnet vim-tiny zip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    locale-gen en_US.UTF-8
+    locale-gen en_US.UTF-8 && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 RUN mkdir -p $APP_DIR
 RUN chown -R www-data $APP_DIR /var/www
