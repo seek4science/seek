@@ -539,6 +539,7 @@ SEEK::Application.routes.draw do
     end
     resources :people, :projects, :institutions, :investigations, :studies, :assays,
               :data_files, :models, :sops, :workflows, :nodes, :presentations, :documents, :events, :publications, :organisms, :human_diseases, :collections, only: [:index]
+    concerns :has_dashboard, controller: :programme_stats
   end
 
   resources :publications, concerns: [:asset] do

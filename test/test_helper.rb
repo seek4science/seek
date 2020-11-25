@@ -22,6 +22,7 @@ require 'minitest/reporters'
 require 'minitest'
 require 'ostruct'
 require 'pry'
+require 'json_test_helper'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true)]
 
