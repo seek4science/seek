@@ -139,6 +139,68 @@ class MessageLogTest < ActiveSupport::TestCase
     assert log.responded?
   end
 
+  test 'respond' do
+    log=valid_log
+    log.save!
+    refute log.responded?
+    assert_nil log.response
+
+    log.respond('hello')
+    log.reload
+
+    assert log.responded?
+    assert_equal 'hello',log.response
+  end
+
+  test 'project creation request scope' do
+    project = Project.new(title: 'my project')
+    project2 = Project.new(title: 'my project 2')
+    person = Factory(:person)
+    admin = Factory(:admin)
+    institution = Factory(:institution)
+
+    log1=MessageLog.log_project_creation_request(person,Factory(:programme),project,institution)
+    log2=MessageLog.log_project_creation_request(person,Factory(:programme),project2,institution)
+
+    assert_equal [log1,log2],MessageLog.project_creation_requests.sort_by(&:id)
+    assert_equal [log1,log2],MessageLog.pending_project_creation_requests.sort_by(&:id)
+
+    log1.respond('Accepted')
+    assert_equal [log1,log2],MessageLog.project_creation_requests.sort_by(&:id)
+    assert_equal [log2],MessageLog.pending_project_creation_requests
+  end
+
+  test 'pending project join requests' do
+
+    person1 = Factory(:project_administrator)
+    person2 = Factory(:project_administrator)
+    project1 = person1.projects.first
+    project2 = person2.projects.first
+    project3 = Factory(:project)
+
+
+    log1a = MessageLog.log_project_membership_request(Factory(:person),project1,Factory(:institution),'')
+    log1b = MessageLog.log_project_membership_request(Factory(:person),project1,Factory(:institution),'')
+    log2 = MessageLog.log_project_membership_request(Factory(:person),project2,Factory(:institution),'')
+
+
+    assert_equal [log1a,log1b],MessageLog.pending_project_join_requests([project1]).sort_by(&:id)
+    assert_equal [log1a,log1b,log2],MessageLog.pending_project_join_requests([project1,project2]).sort_by(&:id)
+    assert_equal [log2],MessageLog.pending_project_join_requests([project2]).sort_by(&:id)
+
+    log1a.respond('Rejected')
+    assert_equal [log1b],MessageLog.pending_project_join_requests([project1]).sort_by(&:id)
+    assert_equal [log1b,log2],MessageLog.pending_project_join_requests([project1,project2]).sort_by(&:id)
+    log1b.respond('Accepted')
+    assert_empty MessageLog.pending_project_join_requests([project1])
+    assert_equal [log2],MessageLog.pending_project_join_requests([project1,project2])
+    log2.respond('Rejected')
+    assert_empty MessageLog.pending_project_join_requests([project2])
+
+    assert_empty MessageLog.pending_project_join_requests([])
+
+  end
+
 
   private
 
