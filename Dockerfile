@@ -13,17 +13,22 @@ RUN apt-get update -qq && \
 		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
 		libxslt1-dev locales default-mysql-client nginx nodejs openjdk-8-jdk \
+		python3 python3-pip python3-setuptools python3-wheel python3-psutil python3-dev \
 		poppler-utils postgresql-client sqlite3 links telnet vim-tiny zip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     locale-gen en_US.UTF-8
 
 RUN mkdir -p $APP_DIR
-RUN chown www-data $APP_DIR
+RUN chown -R www-data $APP_DIR /var/www
 
 USER www-data
 
 WORKDIR $APP_DIR
+
+# CWL dependencies, galaxy2cwl
+RUN pip3 install cwltool==3.0.20200324120055 html5lib==1.0.1 galaxy2cwl==0.1.4
+
 
 # Bundle install throw errors if Gemfile has been modified since Gemfile.lock
 COPY Gemfile* ./
