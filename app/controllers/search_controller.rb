@@ -45,7 +45,7 @@ class SearchController < ApplicationController
     respond_to do |format|
       format.html
       format.json do
-        render json: @results,
+        render json: @results.values.inject(&:+),
                each_serializer: SkeletonSerializer,
                links: { self: search_path(search_params) },
                meta: {
