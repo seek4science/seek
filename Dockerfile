@@ -26,8 +26,6 @@ USER www-data
 
 WORKDIR $APP_DIR
 
-# Python dependencies from requirements.txt
-RUN pip3 install -r requirements.txt
 
 
 # Bundle install throw errors if Gemfile has been modified since Gemfile.lock
@@ -44,6 +42,9 @@ USER root
 RUN chown -R www-data solr config docker public /var/www db/schema.rb
 USER www-data
 RUN touch config/using-docker #allows us to see within SEEK we are running in a container
+
+# Python dependencies from requirements.txt
+RUN pip3 install -r requirements.txt
 
 # SQLite Database (for asset compilation)
 RUN mkdir sqlite3-db && \
