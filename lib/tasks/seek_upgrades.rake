@@ -10,6 +10,7 @@ namespace :seek do
     update_samples_json
     migrate_old_jobs
     delete_redundant_jobs
+    set_version_visibility
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -108,5 +109,34 @@ namespace :seek do
     end
 
     puts "Deleted #{deleted} jobs"
+  end
+
+  task(set_version_visibility: :environment) do
+    puts "Setting version visibility..."
+    disable_authorization_checks do
+      [DataFile::Version, Document::Version, Model::Version, Node::Version, Presentation::Version, Sop::Version, Workflow::Version].each do |klass|
+        scope = klass.where(visibility: nil)
+        count = scope.count
+        if count == 0
+          puts "  No #{klass.name} with unset visibility found, skipping"
+          next
+        else
+          print "  Updating #{count} #{klass.name}'s visibility"
+        end
+
+        check_doi = klass.attribute_method?(:doi)
+        # Go through all versions and set the "latest" versions to publicly visible
+        scope.find_each do |version|
+          if version.latest_version? || check_doi && version.doi.present?
+            version.update_column(:visibility, Seek::ExplicitVersioning::VISIBILITY_INV[:public])
+          else
+            version.update_column(:visibility, Seek::ExplicitVersioning::VISIBILITY_INV[:registered_users])
+          end
+        end
+        puts " - done"
+      end
+    end
+
+    puts "Done"
   end
 end

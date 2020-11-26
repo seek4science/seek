@@ -48,7 +48,7 @@ SEEK::Application.routes.draw do
   concern :has_versions do
     member do
       post :create_version
-      post :edit_version_comment
+      post :edit_version
       delete :destroy_version
     end
   end
@@ -120,6 +120,7 @@ SEEK::Application.routes.draw do
       get :get_stats
       get :registration_form
       get :edit_tag
+      get :project_creation_requests
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
@@ -282,6 +283,9 @@ SEEK::Application.routes.draw do
       get :guided_create
       post :request_join
       post :request_create
+      get :administer_create_project_request
+      post :respond_create_project_request
+      get :project_join_requests
     end
     member do
       get :asset_report
@@ -293,6 +297,7 @@ SEEK::Application.routes.draw do
       get :overview
       get :administer_join_request
       post :respond_join_request
+      get :guided_join
     end
     resources :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations,
               :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :collections, only: [:index]
@@ -527,8 +532,6 @@ SEEK::Application.routes.draw do
     collection do
       post :items_for_result
       get :awaiting_activation
-      get :administer_create_project_request
-      post :respond_create_project_request
     end
     member do
       get :activation_review
