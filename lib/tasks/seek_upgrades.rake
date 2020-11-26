@@ -102,7 +102,7 @@ namespace :seek do
     deleted = 0
 
     ['SendPeriodicEmailsJob', 'ContentBlobCleanerJob', 'NewsFeedRefreshJob', 'ProjectLeavingJob',
-     'OpenbisEndpointCacheRefreshJob', 'OpenbisSyncJob'].each do |klass|
+     'OpenbisEndpointCacheRefreshJob', 'OpenbisSyncJob', 'ReindexingJob'].each do |klass|
       jobs = Delayed::Job.where(failed_at: nil).where('handler LIKE ?', "%#{klass}%")
       deleted += jobs.count
       jobs.destroy_all
