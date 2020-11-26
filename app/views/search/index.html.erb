@@ -1,47 +1,58 @@
+<%
+  limit ||= Seek::Config.search_results_limit
+  resource_hash = related_items_hash(@results, limit)
+  if @external_results.any?
+    c = classify_for_tabs(@external_results)
+    resource_hash.merge!(c)
+  end
+
+  any = resource_hash.any? { |key, res| res[:items_count] > 0 || res[:hidden_count] > 0 }
+%>
+
 <div class="show_basic">
   <% unless !logged_in? || params[:saved_search] %>
-      <%= alert_box do %>
-          <%= savable_search_icon(search_path, 24, {:search_query => params[:search_query] || params[:q],
-                                                            :search_type => params[:search_type],
-                                                            :include_external_search => params[:include_external_search]},
-                                  {:class => "search favouritable"}) -%>
-          Drag this icon over to your Favourites to save this search.
-      <% end %>
+    <%= alert_box do %>
+      <%= savable_search_icon(search_path, 24, { search_query: params[:search_query] || params[:q],
+                                                 search_type: params[:search_type],
+                                                 include_external_search: params[:include_external_search] },
+                              { class: "search favouritable" }) -%>
+      Drag this icon over to your Favourites to save this search.
+    <% end %>
   <% end %>
 
-  <% if !@results.blank? %>
-      <% if Seek::Config.faceted_search_enabled && ie_support_faceted_browsing? %>
-          <%
-             filter_path = url_for(:controller => 'search', :action => 'index',
-                                   :search_query => params[:search_query],
-                                   :search_type => params[:search_type],
-                                   :include_external_search=>params[:include_external_search],
-                                   :filter => true)
-             unfilter_path = url_for(:controller => 'search', :action => 'index',
-                                     :search_query => params[:search_query],
-                                     :search_type => params[:search_type],
-                                     :include_external_search=>params[:include_external_search])
-          %>
-          <div class="text-center">
-              <%= button_link_to('Filter results', 'filter', filter_path,
-                                    {:style => params[:filter] == 'true' ? 'display: none' : ''}, )  %>
+  <% if any %>
+    <% if Seek::Config.faceted_search_enabled && ie_support_faceted_browsing? %>
+      <%
+        filter_path = url_for(controller: 'search', action: 'index',
+                              search_query: params[:search_query],
+                              search_type: params[:search_type],
+                              include_external_search: params[:include_external_search],
+                              filter: true)
+        unfilter_path = url_for(controller: 'search', action: 'index',
+                                search_query: params[:search_query],
+                                search_type: params[:search_type],
+                                include_external_search: params[:include_external_search])
+      %>
+      <div class="text-center">
+        <%= button_link_to('Filter results', 'filter', filter_path,
+                           {style: params[:filter] == 'true' ? 'display: none' : ''}, )  %>
 
-              <%= button_link_to('Stop filtering results', 'filter', unfilter_path,
-                                    {:style => params[:filter] == 'true' ? '' : 'display: none'})  %>
-          </div>
-          <% if params[:filter] == 'true' %>
-            <%= render :partial => "faceted_browsing/faceted_search" -%>
-          <% else %>
-              <% resource_hash = classify_for_tabs @results -%>
-              <%= render :partial => "assets/resource_listing_tabbed_by_class",
-                         :locals => {:resource_hash => resource_hash,
-                                     :display_immediately => false } -%>
-          <% end %>
+        <%= button_link_to('Stop filtering results', 'filter', unfilter_path,
+                           {style: params[:filter] == 'true' ? '' : 'display: none'})  %>
+      </div>
+      <% if params[:filter] == 'true' %>
+        <%= render partial: "faceted_browsing/faceted_search", locals: { resource_hash: resource_hash } -%>
       <% else %>
-          <% resource_hash = classify_for_tabs @results -%>
-          <%= render :partial => "assets/resource_listing_tabbed_by_class",
-                     :locals => {:resource_hash => resource_hash,
-                                 :display_immediately => true } -%>
+        <%= render partial: "assets/resource_listing_tabbed_by_class",
+                   locals: { resource_hash: resource_hash,
+                             display_immediately: false,
+                             index_params: { filter: { query: params[:search_query] || params[:q] } } } -%>
       <% end %>
+    <% else %>
+      <%= render partial: "assets/resource_listing_tabbed_by_class",
+                 locals: { resource_hash: resource_hash,
+                           display_immediately: true,
+                           index_params: { filter: { query: params[:search_query] || params[:q] } } } -%>
+    <% end %>
   <% end %>
 </div>

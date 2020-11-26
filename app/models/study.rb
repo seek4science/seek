@@ -28,6 +28,7 @@ class Study < ApplicationRecord
 
   enforce_authorization_on_association :investigation, :view
 
+
   %w[data_file sop model document].each do |type|
     has_many "#{type}_versions".to_sym, -> { distinct }, through: :assays
     has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :assays, source: type.pluralize.to_sym
@@ -61,7 +62,7 @@ class Study < ApplicationRecord
   end
 
   def self.filter_by_projects(projects)
-    joins(:projects).where(investigations: { investigations_projects: { project_id: projects } })
+    joins(:projects).where(investigations: {investigations_projects: {project_id: projects}})
   end
 
   def related_publication_ids
