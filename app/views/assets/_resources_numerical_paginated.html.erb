@@ -93,7 +93,7 @@
         <%= render partial: 'assets/resource_list_item_table', collection: objects, locals: { tableview_columns: tableview_columns } %>
       </tbody>
     </table>
-  <% elsif params[:view]=="default" || !params.has_key?(:view) %>
+  <% else %>
     <%= render partial: 'assets/resource_list_item', collection: objects %>
   <% end %>
 </div>
