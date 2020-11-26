@@ -39,6 +39,14 @@ class Document < ApplicationRecord
             primary_key: :document_id, foreign_key: :asset_id
   end
 
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['title','version']
+  end
+  def columns_allowed
+    super + ['title','version','doi','license','last_used_at','other_creators','deleted_contributor']  
+  end
+
   def use_mime_type_for_avatar?
     true
   end

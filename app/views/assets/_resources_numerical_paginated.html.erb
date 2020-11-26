@@ -2,8 +2,8 @@
 <%# All tableview_columns values need to have a corresponding match in _resource_list_item_table.html.erb %>
 <%
   # The user can keep a custom set of columns for each resource class
-  defaultColView = ["title","creators","projects"]
   resource = objects[0]
+  defaultColView = resource.columns_default
 
   # # Update stored column names
   if params.has_key?(:table_cols)
@@ -18,14 +18,7 @@
   end
 
   # Prepare available columns for this particular resource type
-  allowedColumns = ['title', 'creators', 'projects','web_page', 'technology_type_uri', 'city', 'citation', 'experimentalists', 'address', 'created_at', 'published_date', 'journal', 'imported_url', 'default_policy_id', 'abstract', 'assay_type_uri', 'default_license', 'model_image_id',  'updated_at', 'other_creators', 'begin_date', 'avatar_id', 'description', 'institution_id', 'id', 'site_root_uri', 'model_type_id', 'contributor_id', 'simulation_data', 'doi', 'license', 'ancestor_id', 'person_responsible_id', 'editor', 'last_jerm_run', 'url', 'site_credentials', 'recommended_environment_id', 'deleted_contributor', 'email', 'orcid', 'pubmed_id', 'organism_id', 'roles_mask', 'template_id', 'wiki_page', 'study_id', 'registered_mode', 'uuid', 'last_used_at', 'start_date', 'skype_name', 'suggested_assay_type_id', 'booktitle', 'publisher', 'last_name', 'suggested_technology_type_id', 'model_format_id', 'publication_type_id', 'human_disease_id', 'version', 'country', 'first_letter', 'end_date', 'imported_source', 'programme_id', 'phone', 'assay_class_id', 'use_default_policy', 'first_name', 'status_id', 'investigation_id', 'policy_id', 'parent_id']
-
-  availableColView = []
-  for col in allowedColumns
-    if resource.respond_to?(col)
-      availableColView.push(col)
-    end
-  end
+  availableColView = resource.columns_allowed
 %>
 
 
