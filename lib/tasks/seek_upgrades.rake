@@ -9,6 +9,7 @@ namespace :seek do
     environment
     update_samples_json
     set_version_visibility
+    remove_old_project_join_logs
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -75,7 +76,7 @@ namespace :seek do
   end
 
   task(set_version_visibility: :environment) do
-    puts "Setting version visibility..."
+    puts "... Setting version visibility..."
     disable_authorization_checks do
       [DataFile::Version, Document::Version, Model::Version, Node::Version, Presentation::Version, Sop::Version, Workflow::Version].each do |klass|
         scope = klass.where(visibility: nil)
@@ -100,6 +101,19 @@ namespace :seek do
       end
     end
 
-    puts "Done"
+    puts "... Done"
+  end
+
+  task(remove_old_project_join_logs: :environment) do
+    puts "... Removing redundant project join request logs ..."
+    logs = MessageLog.project_membership_requests
+    logs.each do |log|
+      begin
+        JSON.parse(log.details)
+      rescue JSON::ParserError
+        log.destroy
+      end
+    end
+    puts "... Done"
   end
 end
