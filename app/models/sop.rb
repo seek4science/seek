@@ -30,6 +30,14 @@ class Sop < ApplicationRecord
       label_mapping: Seek::Filterer::MAPPINGS[:technology_type_label],
       joins: [:assays]
   )
+  
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['title','version']
+  end
+  def columns_allowed
+    super + ['title','last_used_at','version','other_creators','doi','license','deleted_contributor']
+  end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     acts_as_doi_mintable(proxy: :parent, general_type: 'Text')
