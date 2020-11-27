@@ -21,6 +21,12 @@ then
     bundle exec rake db:seed:openseek:default_openbis_endpoint
 fi
 
+echo "UPDATING CRONTAB"
+bundle exec whenever --update-crontab
+
+echo "STARTING CRON"
+cron
+
 # Start Rails
 echo "STARTING SEEK"
 bundle exec puma -C docker/puma.rb -d
@@ -28,9 +34,6 @@ bundle exec puma -C docker/puma.rb -d
 # Workers
 if [ -z $NO_ENTRYPOINT_WORKERS ] #Don't start if flag set, for use with docker-compose
 then
-    echo "UPDATING CRONTAB"
-    bundle exec whenever --update-crontab
-    
     echo "STARTING WORKERS"
     bundle exec rake seek:workers:start &
 fi

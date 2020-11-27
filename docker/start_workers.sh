@@ -15,9 +15,6 @@ start_soffice
 # Search
 start_or_setup_search
 
-echo "UPDATING CRONTAB"
-bundle exec whenever --update-crontab
-
 echo "STARTING WORKERS"
 bundle exec rake seek:workers:start
 tail -f log/production.log
