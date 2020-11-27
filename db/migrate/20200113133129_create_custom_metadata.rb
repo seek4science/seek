@@ -4,7 +4,7 @@ class CreateCustomMetadata < ActiveRecord::Migration[5.2]
     if (table_exists? :custom_metadata)
       drop_table :custom_metadata
     end
-    
+
     create_table :custom_metadata do |t|
       t.text :json_metadata
       t.references :item, polymorphic:true, index:true

@@ -2511,8 +2511,8 @@ class ProjectsControllerTest < ActionController::TestCase
 
     assert_select 'h1',text:/2 pending project join/i
 
-    assert_select 'ul#project-join-requests' do
-      assert_select 'li',count:2
+    assert_select 'table#project-join-requests' do
+      assert_select 'tbody tr',count:2
       assert_select 'a[href=?]',person_path(requester1),text:requester1.title
       assert_select 'a[href=?]',person_path(requester2),text:requester2.title
       assert_select 'a[href=?]',administer_join_request_project_path(project1,message_log_id: log1.id)
@@ -2530,8 +2530,8 @@ class ProjectsControllerTest < ActionController::TestCase
 
     assert_select 'h1',text:/0 pending project join/i
 
-    assert_select 'ul#project-join-requests' do
-      assert_select 'li',count:0
+    assert_select 'table#project-join-requests' do
+      assert_select 'tbody tr',count:0
       assert_select 'a[href=?]',person_path(requester1),text:requester1.title,count:0
       assert_select 'a[href=?]',person_path(requester2),text:requester2.title,count:0
       assert_select 'a[href=?]',administer_join_request_project_path(project1,message_log_id: log1.id),count:0
