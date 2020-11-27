@@ -34,21 +34,21 @@
     <% case column %>
     <% when "title" %>
       <td><%= list_item_title resource, title_options %></td>
-    <% when "creators" %>
-      <% if resource.respond_to?('creators') %>
-        <td><%= list_item_person_list resource.creators %></td>
-      <% else %>
-        <td> Field not found </td>
-      <% end %>
     <% when "projects" %>
       <% if resource.respond_to?('projects') %>
         <td><%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %></td>
       <% else %>
         <td> Field not found </td>
       <% end %>
+    <% when "tags" %>
+      <% if resource.respond_to?('tags') %>
+        <td><%= resource.send(column).join(",") %></td>
+      <% else %>
+        <td> Field not found </td>
+      <% end %>
     <% else  %>
       <% if resource.respond_to?(column) %>
-        <td><%= resource.send(column) %></td>
+        <td><%= text_or_not_specified(resource.send(column),length: 300, auto_link: true) %></td>
       <% else %>
         <td>Unknown Column parameter</td>
       <% end %>
