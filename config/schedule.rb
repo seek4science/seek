@@ -18,6 +18,12 @@
 # end
 
 # Learn more: http://github.com/javan/whenever
+#
+
+# Set environment variables
+ENV.each_key do |key|
+  env key.to_sym, ENV[key]
+end
 
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment") unless defined? SEEK
 
