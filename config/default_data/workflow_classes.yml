@@ -2,23 +2,28 @@ cwl_workflow_class:
   id: 1
   title: Common Workflow Language
   key: CWL
+  extractor: CWL
 
 galaxy_workflow_class:
   id: 2
   title: Galaxy
   key: Galaxy
+  extractor: Galaxy
 
 knime_workflow_class:
   id: 3
   title: KNIME
   key: KNIME
+  extractor: KNIME
 
 nextflow_class:
   id: 5
   title: Nextflow
   key: Nextflow
+  extractor: Nextflow
 
 snakemake_class:
   id: 6
   title: Snakemake
   key: Snakemake
+  extractor: Snakemake

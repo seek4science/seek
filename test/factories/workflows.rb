@@ -2,19 +2,28 @@
 Factory.define(:cwl_workflow_class, class: WorkflowClass) do |f|
   f.title I18n.t('workflows.cwl_workflow')
   f.key 'CWL'
+  f.extractor 'CWL'
   f.description 'Common Workflow Language'
 end
 
 Factory.define(:galaxy_workflow_class, class: WorkflowClass) do |f|
   f.title I18n.t('workflows.galaxy_workflow')
   f.key 'Galaxy'
+  f.extractor 'Galaxy'
   f.description 'Galaxy'
 end
 
 Factory.define(:nextflow_workflow_class, class: WorkflowClass) do |f|
   f.title I18n.t('workflows.nextflow_workflow')
   f.key 'Nextflow'
+  f.extractor 'Nextflow'
   f.description 'Nextflow'
+end
+
+Factory.define(:unextractable_workflow_class, class: WorkflowClass) do |f|
+  f.title 'Mystery'
+  f.key 'Mystery'
+  f.description 'Mysterious'
 end
 
 # Workflow

@@ -2,11 +2,7 @@ module Seek
   module WorkflowExtractors
     class Base
       def self.ro_crate_metadata
-        {
-            "@id" => "#workflow_type",
-            "@type" => "ComputerLanguage",
-            "name" => "Unrecognized Workflow Type"
-        }
+        nil
       end
 
       def self.available_diagram_formats(formats)

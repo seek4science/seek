@@ -68,7 +68,7 @@ module WorkflowExtraction
     wf = crate.main_workflow || ROCrate::Workflow.new(crate, c.filepath, c.original_filename)
     wf.content_size = c.file_size
     crate.main_workflow = wf
-    crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, extractor_class.ro_crate_metadata)
+    crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, wf.workflow_class.ro_crate_metadata)
 
     begin
       d = diagram
