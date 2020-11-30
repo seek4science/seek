@@ -9,7 +9,7 @@
 
       <% resource.custom_metadata.custom_metadata_attributes.each do |attribute| %>
         <p>
-          <label><%= attribute.title %>:</label>
+          <label><%= attribute.title.humanize%>:</label>
           <%= display_attribute(resource.custom_metadata, attribute, link: true) %>
         </p>
       <% end %>

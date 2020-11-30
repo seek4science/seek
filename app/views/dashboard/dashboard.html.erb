@@ -1,4 +1,4 @@
-<% scope = @project || :admin %>
+<% scope = @scope %>
 
 <script>
     <%# A simple object to hold a list of functions for updating (refresh) each of the dashboard panels,
@@ -13,7 +13,7 @@
 
 <div class="row">
   <div class="col-sm-8">
-    <%= render partial: 'general/page_title', locals: { title: "#{@project ? t('project').capitalize : Seek::Config.application_name } Dashboard" } %>
+    <%= render partial: 'general/page_title', locals: { title: "#{scope == :admin ? Seek::Config.application_name : t(scope.class.name.downcase).capitalize} Dashboard" } %>
   </div>
   <div class="col-sm-4">
     <div id="dashboard-controls" class="form-inline text-right">

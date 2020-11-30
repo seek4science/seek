@@ -1,5 +1,4 @@
 class SearchController < ApplicationController
-
   include Seek::FacetedBrowsing
 
   class InvalidSearchException < RuntimeError; end
@@ -7,9 +6,10 @@ class SearchController < ApplicationController
   api_actions :index
 
   def index
-    @results = []
-    if Seek::Config.solr_enabled
+    @results = {}
+    @external_results = []
 
+    if Seek::Config.solr_enabled
       begin
         perform_search
       rescue InvalidSearchException => e
@@ -21,32 +21,31 @@ class SearchController < ApplicationController
       end
     end
 
-    @results_scaled = Scale.all.collect {|scale| [scale.key, @results.select {|item| !item.respond_to?(:scale_ids) or item.scale_ids.include? scale.id}]}
-    @results_scaled << ['all', @results]
-    @results_scaled = Hash[*@results_scaled.flatten(1)]
-    if search_params[:scale]
-      # when user does not login, search_params[:scale] is nil
-      @results = @results_scaled[search_params[:scale]]
-      @scale_key = search_params[:scale]
-    else
-       @results = @results_scaled['all']
-       @scale_key = 'all'
+    if Scale.any?
+      @scale_key = search_params[:scale] || 'all'
+      unless @scale_key == 'all'
+        @results.each do |type, results|
+          klass = type.constantize
+          if klass.reflect_on_association(:scales)
+            @results[type] = results.joins(:scales).where(scales: { key: @scale_key })
+          end
+        end
+      end
     end
 
-    if @results.empty?
+    matches = @results.values.sum(&:count) + @external_results.count
+    if matches.zero?
       flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'.".html_safe
     else
-      flash.now[:notice]="#{@results.size} #{@results.size==1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content.".html_safe
+      flash.now[:notice]="#{matches} #{matches==1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content.".html_safe
     end
-
-    @include_external_search = search_params[:include_external_search]=="1"
 
     view_context.ie_support_faceted_browsing? if Seek::Config.faceted_search_enabled
 
     respond_to do |format|
       format.html
       format.json do
-        render json: @results,
+        render json: @results.values.inject(&:+),
                each_serializer: SkeletonSerializer,
                links: { self: search_path(search_params) },
                meta: {
@@ -68,8 +67,6 @@ class SearchController < ApplicationController
 
     downcase_query = @search_query.downcase
 
-    @results=[]
-
     searchable_types = Seek::Util.searchable_types
 
     raise InvalidSearchException.new("Query string is empty or blank") if downcase_query.blank?
@@ -85,18 +82,11 @@ class SearchController < ApplicationController
       end
 
       sources.each do |source|
-        search = source.search do |query|
-          query.keywords(downcase_query)
-          query.paginate(:page => 1, :per_page => source.count ) if source.count > 30  # By default, Sunspot requests the first 30 results from Solr
-        end #.results
-        @search_hits = search.hits
-        search_result = search.results.compact.authorized_for('view')
-        @results |= search_result
+        @results[source.to_s] = source.with_search_query(downcase_query).authorized_for('view')
       end
 
       if search_params[:include_external_search] == "1"
-        external_results = Seek::ExternalSearch.instance.external_search(downcase_query, type)
-        @results |= external_results
+        @external_results = Seek::ExternalSearch.instance.external_search(downcase_query, type)
       end
 
       @results
@@ -108,5 +98,4 @@ class SearchController < ApplicationController
   def search_params
     params.permit(:search_type, :q, :search_query, :include_external_search, :scale)
   end
-
 end

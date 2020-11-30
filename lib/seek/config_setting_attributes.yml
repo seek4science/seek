@@ -83,6 +83,7 @@ technology_type_base_uri:
 modelling_analysis_type_base_uri:
 header_tagline_text_enabled:
 related_items_limit:
+  convert: :to_i
 faceted_browsing_enabled:
 facet_enable_for_pages:
 faceted_search_enabled:
@@ -211,3 +212,5 @@ omniauth_github_secret:
   encrypt: true
 ga4gh_trs_api_enabled:
 custom_metadata_enabled: false
+search_results_limit:
+  convert: :to_i

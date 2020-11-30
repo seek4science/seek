@@ -1,0 +1,92 @@
+
+<% resource = resource_list_item_condensed
+
+   content_partial = get_list_item_content_partial(resource)
+
+   actions_partial_disable ||= false
+   actions_partial = actions_partial_disable ? nil : get_list_item_actions_partial(resource)
+   avatar_partial = get_list_item_avatar_partial(resource) if avatar_partial.nil?
+
+   #dont show JERM avatar for strain without contributor, as there are strains without contributor and are not harvested
+   avatar_partial = nil if (resource.kind_of?(Strain) && resource.contributor.try(:person).nil?) || resource.is_a?(Organism)
+   avatar_content = avatar_partial.blank? ? nil : render(:partial=> avatar_partial,:locals=>{:resource => resource})
+
+   access_based_css_class = "list_item"
+   if Seek::Config.is_virtualliver
+     access_based_css_class += if resource.respond_to?(:private?) && resource.private?
+                                               " private_list_item"
+                                             elsif resource.respond_to?(:public?) && resource.public?
+                                               " public_list_item"
+                                             else
+                                               ""
+                                             end
+   end
+
+   content_grid_size = 9
+   content_grid_size += 1 if avatar_content.blank?
+   content_grid_size += 2 if actions_partial.blank?
+
+   title_options = {}
+%>
+
+<div class="panel panel-default <%= access_based_css_class%>">
+  <div class="panel-heading rli-head">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="row">
+            <div class="col-sm-2">
+              <a href="#"
+                data-toggle="collapse"
+                data-target="#collapse_<%= resource.id%>"
+                aria-hidden="true"
+                aria-expanded="false">
+                <span class="caret" style="border-width: 10px 8px 10px 8px;"> </span>
+              </a>
+            </div>
+            <div class="col-sm-10">
+              <%= list_item_title resource, title_options %>
+            </div>
+          </div>
+        </div>
+        <% if resource.respond_to?('creators') %>
+          <div class="col-sm-4">
+            <%= list_item_person_list resource.creators %>
+          </div>
+        <% end %>
+        <% if resource.respond_to?(:projects) && ![Event, Person, Project, Institution, Programme, Collection].include?(resource.class) %>
+          <div class="col-sm-4 text-right">
+            <div class="rli-project-list">
+            <b> Project: </b>
+              <%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %>
+            </div>  
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div id="collapse_<%= resource.id%>" class="collapse">
+    <div class="panel-body">
+      <div class="row">
+        <% unless avatar_content.blank? %>
+            <div class="col-md-1 col-sm-2 col-xs-3 <%='hidden-xs' unless resource.is_a?(Person)-%> text-center list_item_avatar">
+              <%= avatar_content %>
+            </div>
+        <% end %>
+        <div class="col-md-<%=content_grid_size-%> col-sm-<%=content_grid_size - 1-%> <%='col-xs-9' if resource.is_a?(Person)-%> list_item_content">
+          <%= render :partial=> content_partial,:locals=>{:resource => resource} %>
+        </div>
+        <% unless actions_partial.blank? %>
+            <div class="col-sm-2 text-right list_item_actions">
+              <%= render :partial=> actions_partial, :locals=>{:resource => resource} %>
+            </div>
+        <% end %>
+      </div>
+    </div>
+    <% unless [Person, Project, Institution, Programme, Organism, HumanDisease].include?(resource.class)  %>
+        <div class="panel-footer hidden-xs small">
+          <%= list_item_timestamp resource %>
+        </div>
+    <% end %>
+  </div>
+</div>
