@@ -113,21 +113,18 @@ module Seek
       end
 
       def self.determine_extractor_class(language)
-        matchable = ['identifier', 'name', 'alternateName', '@id', 'url']
-        @extractor_matcher ||= [Seek::WorkflowExtractors::CWL,
-                                Seek::WorkflowExtractors::Galaxy,
-                                Seek::WorkflowExtractors::Nextflow,
-                                Seek::WorkflowExtractors::Snakemake,
-                                Seek::WorkflowExtractors::KNIME].map do |extractor|
-          [extractor.ro_crate_metadata.slice(*matchable), extractor]
-        end
+        mapping = {
+            'identifier' => :identifier,
+            'name' => :title,
+            'alternateName' => :alternate_name,
+            '@id' => key,
+            'url' => :url
+        }
 
-        matchable.each do |key|
-          extractor = @extractor_matcher.detect do |hash, extractor|
-            !language[key].nil? && !hash[key].nil? && language[key] == hash[key]
-          end
-
-          return extractor[1] if extractor
+        mapping.each do |property, attribute|
+          next if language[property].nil?
+          result = WorkflowClass.where(attribute => language[property]).first
+          return result.extractor_class if result
         end
 
         nil

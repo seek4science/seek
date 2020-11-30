@@ -1,14 +1,18 @@
 require 'test_helper'
 
 class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
+  setup do
+    @galaxy = WorkflowClass.find_by_key('Galaxy') || Factory(:galaxy_workflow_class)
+  end
 
   test 'builds local file crate' do
+    pp WorkflowClass.all
     params = { workflow: { data: fixture_file_upload('files/workflows/1-PreProcessing.ga') },
                diagram: { data: fixture_file_upload('files/file_picture.png') },
                abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
     }
     builder = WorkflowCrateBuilder.new(params)
-    builder.workflow_extractor_class = Seek::WorkflowExtractors::Galaxy
+    builder.workflow_class = @galaxy
     cb_params = builder.build
     assert cb_params[:tmp_io_object].respond_to?(:read), 'tmp_io_object missing or not readable?'
     assert cb_params[:file_size] > 100, "Crate file size unexpectedly small: #{cb_params[:file_size]}"
@@ -27,7 +31,7 @@ class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
                abstract_cwl: { data_url: 'http://workflow.com/rp2.cwl' }
     }
     builder = WorkflowCrateBuilder.new(params)
-    builder.workflow_extractor_class = Seek::WorkflowExtractors::Galaxy
+    builder.workflow_class = @galaxy
     cb_params = builder.build
     assert cb_params[:tmp_io_object].respond_to?(:read), 'tmp_io_object missing or not readable?'
     assert cb_params[:file_size] > 100, "Crate file size unexpectedly small: #{cb_params[:file_size]}"

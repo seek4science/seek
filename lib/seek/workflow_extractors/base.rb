@@ -1,10 +1,6 @@
 module Seek
   module WorkflowExtractors
     class Base
-      def self.ro_crate_metadata
-        nil
-      end
-
       def self.available_diagram_formats(formats)
         formats = formats.with_indifferent_access
         @default_diagram_format = formats.delete(:default) || formats.keys.first.to_sym

@@ -24,11 +24,17 @@ class WorkflowClass < ApplicationRecord
   end
 
   def ro_crate_metadata
-    extractor_class.ro_crate_metadata || {
+    m = {
         "@id" => "##{key}",
         "@type" => "ComputerLanguage",
         "name" => title
     }
+
+    m['alternateName'] = alternate_name if alternate_name.present?
+    m['identifier'] = identifier if identifier.present?
+    m['url'] = url if url.present?
+
+    m
   end
 
   private

@@ -20,7 +20,7 @@ namespace :seek do
     fix_missing_dois
     update_samples_json
 
-    assign_workflow_class_extractors
+    db:seed:workflow_classes
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -207,20 +207,5 @@ namespace :seek do
       end
     end
     puts " ... finished updating sample JSON"
-  end
-
-  task(assign_workflow_class_extractors: :environment) do
-    puts "Updating workflow classes to set 'extractor' column"
-    count = 0
-    WorkflowClass.unextractable.each do |workflow_class|
-      begin
-        Seek::WorkflowExtractors.const_get("Seek::WorkflowExtractors::#{workflow_class.key}")
-        workflow_class.update_column(:extractor, workflow_class.key)
-        count += 1
-      rescue NameError
-        puts "Could't find extractor class with key '#{workflow_class.key}' for: WorkflowClass.find(#{workflow_class.id})"
-      end
-    end
-    puts "...updated #{count} workflow classes"
   end
 end
