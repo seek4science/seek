@@ -2,7 +2,7 @@ require 'test_helper'
 
 class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
   setup do
-    @galaxy = WorkflowClass.find_by_key('Galaxy') || Factory(:galaxy_workflow_class)
+    @galaxy = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
   end
 
   test 'builds local file crate' do

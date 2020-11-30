@@ -5,7 +5,7 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
   include HtmlHelper
 
   setup do
-    @galaxy = WorkflowClass.find_by_key('Galaxy') || Factory(:galaxy_workflow_class)
+    @galaxy = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
   end
 
   test 'uploads a new version of a workflow' do
