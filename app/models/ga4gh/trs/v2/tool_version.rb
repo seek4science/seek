@@ -7,9 +7,9 @@ module Ga4gh
         delegate_missing_to :@workflow_version
 
         DESCRIPTOR_TYPE_MAPPING = {
-            'CWL' => 'CWL',
-            'Nextflow' => 'NFL',
-            'Galaxy' => 'GALAXY'
+            'cwl' => 'CWL',
+            'nextflow' => 'NFL',
+            'galaxy' => 'GALAXY'
         }
 
         def initialize(tool, workflow_version)
