@@ -68,7 +68,7 @@ class WorkflowClass < ApplicationRecord
 
   def assign_key
     return if key.present?
-    self.key = self.class.unique_key(title.parameterize.underscore.camelize)
+    self.key = self.class.unique_key(title.parameterize.underscore)
   end
 
   def self.unique_key(suggested_key)

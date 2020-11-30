@@ -72,7 +72,7 @@ class WorkflowClassTest < ActiveSupport::TestCase
                      "identifier"=>{"@id"=>"https://w3id.org/cwl/v1.0/"},
                      "url"=>{"@id"=>"https://www.commonwl.org/"}
                  }, cwl)
-    assert_equal({"@id"=>"#MyOtherType", "@type"=>"ComputerLanguage", "name"=>"My other type"}, other)
+    assert_equal({"@id"=>"#my_other_type", "@type"=>"ComputerLanguage", "name"=>"My other type"}, other)
   end
 
   test 'match from metadata' do
