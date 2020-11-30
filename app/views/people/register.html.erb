@@ -2,9 +2,24 @@
 
 <%= form_for @person do |f| %>
   <%= f.error_messages %>
-  <%= render :partial=>"name_details_form", :locals=>{:f=>f} %>
-  <%= render :partial => 'contact_details_form', :locals => {:f => f} %>
+  <% if @existing_email %>
+    <%= alert_box('warning', hide_button: true) do %>
+      A user already exists with the email address: <code><%= @person.email %></code>
+      <% if current_user.uses_omniauth? %>
+        <p>
+          If you wanted to link this identity to your existing <%= Seek::Config.application_name %> account, please
+          <%= render partial: 'cancel_registration' %>, then log in using that account and click the "Manage Identities"
+          option in the top-right user menu, where you will be able to add an identity to your account.
+          <%= link_to('For detailed guidance on how to do this, click here.',
+                      'https://docs.seek4science.org/help/user-guide/managing-identities.html', target: :_blank) %>
+        </p>
+      <% end %>
+    <% end %>
+  <% end %>
 
-  <%= f.submit("Create",data: { disable_with: 'Creating...' }, :class => 'btn btn-primary') %>
-  <%= render :partial=>"cancel_registration" %>
+  <%= render partial: 'name_details_form', locals: { f: f } %>
+  <%= render partial: 'contact_details_form', locals: { f: f } %>
+
+  <%= f.submit('Create', data: { disable_with: 'Creating...' }, class: 'btn btn-primary') %>
+  <%= render partial: 'cancel_registration' %>
 <% end -%>

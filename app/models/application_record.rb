@@ -31,6 +31,14 @@ class ApplicationRecord < ActiveRecord::Base
   def self.is_taggable?
     false # defaults to false, unless it includes Taggable which will override this and check the configuration
   end
+  
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    ['description','created_at']
+  end
+  def columns_allowed
+    ['description','created_at','updated_at']
+  end
 
   # takes and ignores arguments for use in :after_add => :update_timestamp, etc.
   def update_timestamp(*_args)

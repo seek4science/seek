@@ -374,6 +374,8 @@ class AdminControllerTest < ActionController::TestCase
   test 'update pagination' do
     post :update_pagination, params: {
         results_per_page_default: 9,
+        search_results_limit: '45',
+        related_items_limit: 123,
         results_per_page: { people: 6, 'models' => '300', publications: '', sops: nil },
         sorting: { people: 'created_at_asc', models: :created_at_desc,
                    data_files: 'published_at_desc', sops: 'bananabread' } }
@@ -392,6 +394,9 @@ class AdminControllerTest < ActionController::TestCase
     assert_nil Seek::Config.results_per_page_for('publications')
     assert_nil Seek::Config.results_per_page_for('sops')
     assert_nil Seek::Config.results_per_page_for('data_files'), "Shouldn't set to a value that is not a valid sorting option."
+
+    assert_equal 45, Seek::Config.search_results_limit
+    assert_equal 123, Seek::Config.related_items_limit
   end
 
   test 'update LDAP settings' do

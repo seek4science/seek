@@ -6,23 +6,27 @@ class ProjectsController < ApplicationController
   include Seek::DestroyHandling
   include ApiHelper
 
-  before_action :login_required, only: [:request_membership, :guided_join, :guided_create, :request_join, :request_create, :administer_join_request, :respond_join_request]
+  before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,
+                                        :administer_join_request, :respond_join_request,
+                                        :administer_create_project_request, :respond_create_project_request,
+                                        :project_join_requests]
 
-  before_action :programmes_enabled?,only: [:guided_create]
-  before_action :managed_programme_configured?, only: [:guided_create]
+  before_action :managed_programme_configured?, only: [:guided_create], if: Proc.new{Seek::Config.programmes_enabled}
 
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
                                                admin_member_roles update_members storage_report
-                                               request_membership overview administer_join_request respond_join_request]
+                                               overview administer_join_request respond_join_request]
   before_action :find_assets, only: [:index]
-  before_action :auth_to_create, only: %i[new create]
+  before_action :auth_to_create, only: %i[new create,:administer_create_project_request, :respond_create_project_request]
   before_action :is_user_admin_auth, only: %i[manage destroy]
   before_action :editable_by_user, only: %i[edit update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request]
   before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
-  before_action :allow_request_membership, only: [:request_membership]
 
-  before_action :validate_message_log, only: [:administer_join_request, :respond_join_request]
+  before_action :validate_message_log_for_join, only: [:administer_join_request, :respond_join_request]
+  before_action :validate_message_log_for_create, only: [:administer_create_project_request, :respond_create_project_request]
+  before_action :parse_message_log_details, only: [:administer_create_project_request]
+  before_action :check_message_log_programme_permissions, only: [:administer_create_project_request, :respond_create_project_request], if: Proc.new{Seek::Config.programmes_enabled}
 
   skip_before_action :project_membership_required
 
@@ -34,9 +38,23 @@ class ProjectsController < ApplicationController
 
   api_actions :index, :show, :create, :update, :destroy
 
-  def guided_join
+  def project_join_requests
+    person = current_person
+    @requests = MessageLog.pending_project_join_requests(person.administered_projects)
     respond_to do |format|
       format.html
+    end
+  end
+
+  def guided_join
+    @project = Project.find(params[:id]) if params[:id]
+    respond_to do |format|
+      if @project && !@project.allow_request_membership?
+        flash[:error] = "Unable to request to join this #{t('project')}, either you are already a member or currently have a pending request"
+        format.html { redirect_to(@project) }
+      else
+        format.html
+      end
     end
   end
 
@@ -80,11 +98,11 @@ class ProjectsController < ApplicationController
         sender.save!
         Mailer.notify_user_projects_assigned(sender,[@project]).deliver_later
         flash[:notice]="Request accepted and #{sender.name} added to #{t('project')} and notified"
-        @message_log.update_column(:response,'Accepted')
+        @message_log.respond('Accepted')
       end
     else
       comments = params['reject_details']
-      @message_log.update_column(:response,comments)
+      @message_log.respond(comments)
       Mailer.join_project_rejected(sender,@project,comments).deliver_later
       flash[:notice]="Request rejected and #{sender.name} has been notified"
     end
@@ -110,9 +128,10 @@ class ProjectsController < ApplicationController
 
     @comments = params[:comments]
     @projects.each do |project|
-      log = MessageLog.log_project_membership_request(current_user.person, project, @institution, @comments)
-      Mailer.request_join_project(current_user, project, @institution.to_json, @comments, log).deliver_later
-
+      if project.allow_request_membership? # protects against malicious spamming
+        log = MessageLog.log_project_membership_request(current_user.person, project, @institution, @comments)
+        Mailer.request_join_project(current_user, project, @institution.to_json, @comments, log).deliver_later
+      end
     end
 
     flash.now[:notice]="Thank you, your request to join has been sent"
@@ -138,12 +157,17 @@ class ProjectsController < ApplicationController
       Mailer.request_create_project_for_programme(current_user, @programme,@project.to_json, @institution.to_json, log).deliver_later
 
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
-    else
+    elsif Seek::Config.programmes_enabled
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, log).deliver_later
       flash.now[:notice]="Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
+    else
+      @programme=nil
+      log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+      Mailer.request_create_project(current_user, @project.to_json, @institution.to_json, log).deliver_later
+      flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     end
 
 
@@ -430,21 +454,79 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def request_membership
-    details = params[:details]
-    mail = Mailer.request_membership(current_user, @project, details)
-    mail.deliver_later
-    MessageLog.log_project_membership_request(current_user.person,@project,nil, details)
-
-    flash[:notice]='Membership request has been sent'
-
-    respond_with do |format|
-      format.html{redirect_to(@project)}
-    end
-  end
-
   def overview
 
+  end
+
+  def administer_create_project_request
+
+    respond_to do |format|
+      format.html
+    end
+
+  end
+
+  def respond_create_project_request
+
+    requester = @message_log.sender
+    make_programme_admin=false
+
+    if params['accept_request']=='1'
+
+      # @programme already populated in before_filter when checking permissions
+      make_programme_admin = @programme&.new_record?
+
+      if params['institution']['id']
+        @institution = Institution.find(params['institution']['id'])
+      else
+        @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country]))
+      end
+
+      @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
+      @project.programme = @programme
+
+      validate_error_msg = []
+
+      unless @project.valid?
+        validate_error_msg << "The #{t('project')} is invalid, #{@project.errors.full_messages.join(', ')}"
+      end
+      unless @programme.nil? || @programme.valid?
+        validate_error_msg << "The #{t('programme')} is invalid, #{@programme.errors.full_messages.join(', ')}"
+      end
+      unless @institution.valid?
+        validate_error_msg << "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
+      end
+
+      validate_error_msg = validate_error_msg.join('<br/>').html_safe
+
+      if validate_error_msg.blank?
+        requester.add_to_project_and_institution(@project, @institution)
+        requester.is_project_administrator = true,@project
+        requester.is_programme_administrator = true, @programme if make_programme_admin
+
+        disable_authorization_checks do
+          requester.save!
+        end
+
+        @message_log.respond('Accepted')
+        flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
+        Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+
+        redirect_to(@project)
+      else
+        flash.now[:error] = validate_error_msg
+        render action: :administer_create_project_request
+      end
+
+    else
+      comments = params['reject_details']
+      @message_log.respond(comments)
+      project_name = JSON.parse(@message_log.details)['project']['title']
+      Mailer.create_project_rejected(requester,project_name,comments).deliver_later
+      flash[:notice]="Request rejected and #{requester.name} has been notified"
+
+      redirect_to :root
+    end
   end
 
   private
@@ -551,20 +633,66 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def allow_request_membership
-    unless Seek::Config.email_enabled && @project.allow_request_membership?
-      error("Cannot request membership of this #{t('project').downcase}", 'is invalid (invalid state)')
-      false
-    end
-  end
-
-  def validate_message_log
+  def validate_message_log_for_join
     @message_log = MessageLog.find_by_id(params[:message_log_id])
 
     error_msg ||= "message log not found" unless @message_log
     error_msg ||= ("message log doesn't match #{t('project')}" if @message_log.resource != @project)
     error_msg ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_MEMBERSHIP_REQUEST)
     error_msg ||= ("message has already been responded to" if @message_log.responded?)
+
+    if error_msg
+      error(error_msg, error_msg)
+      return false
+    end
+  end
+
+  def validate_message_log_for_create
+    @message_log = MessageLog.find_by_id(params[:message_log_id])
+    error_msg ||= "message log not found" unless @message_log
+    error_msg ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST)
+    error_msg ||= ("message has already been responded to" if @message_log.responded?)
+    #error_msg ||= ('you have no permission to create a project' unless Project.can_create?)
+    if error_msg
+      error(error_msg, error_msg)
+      return false
+    end
+
+  end
+
+  def parse_message_log_details
+    details = JSON.parse(@message_log.details)
+    if details['programme']
+      @programme = Programme.new(details['programme'])
+      @programme = Programme.find(@programme.id) unless @programme.id.nil?
+    end
+
+    @project = Project.new(details['project'])
+    @project = Project.find(@project.id) unless @project.id.nil?
+
+    @institution = Institution.new(details['institution'])
+    @institution = Institution.find(@institution.id) unless @institution.id.nil?
+
+
+  end
+
+  # check programme permissions for responding to a MesasgeLog
+  def check_message_log_programme_permissions
+    error_msg = nil
+
+    unless @programme
+      if params['programme']['id']
+        @programme = Programme.find(params['programme']['id'])
+      else
+        @programme = Programme.new(params.require(:programme).permit([:title]))
+      end
+    end
+
+    if @programme.new_record?
+      error_msg = "You need to be an administrator" unless User.admin_logged_in?
+    else
+      error_msg = "No rights to administer #{t('programme')}" unless @programme.can_manage?
+    end
 
     if error_msg
       error(error_msg, error_msg)

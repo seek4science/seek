@@ -81,3 +81,4 @@ coverage/
 
 Test\ Results*.html
 
+docker-compose.override.yml

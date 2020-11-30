@@ -119,7 +119,7 @@ class ApplicationController < ActionController::Base
   def page_and_sort_params
     permitted = Seek::Filterer.new(controller_model).available_filter_keys.flat_map { |p| [p, { p => [] }] }
     permitted_filter_params = { filter: permitted }
-    params.permit(:page, :sort, :order, permitted_filter_params)
+    params.permit(:page, :sort, :order, :view, permitted_filter_params)
   end
 
   helper_method :page_and_sort_params
@@ -561,6 +561,19 @@ class ApplicationController < ActionController::Base
                        details: 'This action is not permitted for API clients using OAuth.' }] }, status: :forbidden }
       end
     end
+  end
+
+  def determine_custom_metadata_keys
+    keys = []
+    root_key = controller_name.singularize.to_sym
+    attribute_params = params[root_key][:custom_metadata_attributes]
+    if attribute_params && attribute_params[:custom_metadata_type_id].present?
+      metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
+      if metadata_type
+        keys = [:custom_metadata_type_id] + metadata_type.custom_metadata_attributes.collect(&:method_name)
+      end
+    end
+    keys
   end
 
   # Dynamically get parent resource from URL.
