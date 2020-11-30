@@ -4,6 +4,9 @@ Factory.define(:cwl_workflow_class, class: WorkflowClass) do |f|
   f.key 'CWL'
   f.extractor 'CWL'
   f.description 'Common Workflow Language'
+  f.alternate_name 'CWL'
+  f.identifier 'https://w3id.org/cwl/v1.0/'
+  f.url 'https://www.commonwl.org/'
 end
 
 Factory.define(:galaxy_workflow_class, class: WorkflowClass) do |f|
@@ -11,6 +14,8 @@ Factory.define(:galaxy_workflow_class, class: WorkflowClass) do |f|
   f.key 'Galaxy'
   f.extractor 'Galaxy'
   f.description 'Galaxy'
+  f.identifier 'https://galaxyproject.org/'
+  f.url 'https://galaxyproject.org/'
 end
 
 Factory.define(:nextflow_workflow_class, class: WorkflowClass) do |f|
@@ -18,6 +23,8 @@ Factory.define(:nextflow_workflow_class, class: WorkflowClass) do |f|
   f.key 'Nextflow'
   f.extractor 'Nextflow'
   f.description 'Nextflow'
+  f.identifier 'https://www.nextflow.io/'
+  f.url 'https://www.nextflow.io/'
 end
 
 Factory.define(:unextractable_workflow_class, class: WorkflowClass) do |f|

@@ -1,6 +1,12 @@
 module Seek
   module WorkflowExtractors
     class Base
+      NULL_CLASS_METADATA = {
+          "@id" => "#workflow_type",
+          "@type" => "ComputerLanguage",
+          "name" => "Unrecognized Workflow Type"
+      }
+
       def self.available_diagram_formats(formats)
         formats = formats.with_indifferent_access
         @default_diagram_format = formats.delete(:default) || formats.keys.first.to_sym

@@ -113,21 +113,8 @@ module Seek
       end
 
       def self.determine_extractor_class(language)
-        mapping = {
-            'identifier' => :identifier,
-            'name' => :title,
-            'alternateName' => :alternate_name,
-            '@id' => key,
-            'url' => :url
-        }
-
-        mapping.each do |property, attribute|
-          next if language[property].nil?
-          result = WorkflowClass.where(attribute => language[property]).first
-          return result.extractor_class if result
-        end
-
-        nil
+        workflow_class = WorkflowClass.match_from_metadata(language.properties)
+        workflow_class&.extractor_class || Seek::WorkflowExtractors::Base
       end
 
       private
@@ -135,7 +122,7 @@ module Seek
       def main_workflow_extractor_class(crate)
         return @main_workflow_extractor_class if @main_workflow_extractor_class
 
-        self.class.determine_extractor_class(crate&.main_workflow&.programming_language) || Seek::WorkflowExtractors::Base
+        self.class.determine_extractor_class(crate&.main_workflow&.programming_language)
       end
 
       def main_workflow_extractor(crate)

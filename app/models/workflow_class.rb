@@ -31,10 +31,37 @@ class WorkflowClass < ApplicationRecord
     }
 
     m['alternateName'] = alternate_name if alternate_name.present?
-    m['identifier'] = identifier if identifier.present?
-    m['url'] = url if url.present?
+    m['identifier'] = { '@id' => identifier } if identifier.present?
+    m['url'] = { '@id' => url } if url.present?
 
     m
+  end
+
+  # Match priority: identifier, name (title), alternateName (alternate_name), @id (key), url
+  def self.match_from_metadata(metadata)
+    match = nil
+
+    iden = metadata.dig('identifier', '@id')
+    match = where(identifier: iden).first if iden.present?
+    return match if match
+
+    names = [metadata['name'], metadata['alternateName']].compact
+    if names.any?
+      match = where(title: names).first
+      return match if match
+
+      match = where(alternate_name: names).first
+      return match if match
+    end
+
+    match = where(key: metadata['@id'].sub('#', '')).first
+    return match if match
+
+    u = metadata.dig('url', '@id')
+    match = where(url: u).first if u.present?
+    return match if match
+
+    match
   end
 
   private

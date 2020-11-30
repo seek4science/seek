@@ -74,4 +74,75 @@ class WorkflowClassTest < ActiveSupport::TestCase
                  }, cwl)
     assert_equal({"@id"=>"#MyOtherType", "@type"=>"ComputerLanguage", "name"=>"My other type"}, other)
   end
+
+  test 'match from metadata' do
+    WorkflowClass.destroy_all
+
+    tav = WorkflowClass.create!(title: 'Taverna Workflow Engine',
+                                key: 'TAV',
+                                alternate_name: 'Taverna',
+                                identifier: 'https://doi.org/10.1093/nar/gkt328',
+                                url: 'https://taverna.incubator.apache.org/')
+
+    cwl = Factory(:cwl_workflow_class)
+
+    # Match on name
+    match = WorkflowClass.match_from_metadata(
+        "@id" => "#tavvo",
+        "@type" => "ComputerLanguage",
+        "name" => "Taverna")
+
+    assert_equal tav, match
+
+    # Match on alt name
+    match = WorkflowClass.match_from_metadata(
+        "@id" => "#tavvo",
+        "@type" => "ComputerLanguage",
+        "name" => "Tavvo",
+        "alternateName" => "Taverna Workflow Engine")
+
+    assert_equal tav, match
+
+    # Match on identifier
+    match = WorkflowClass.match_from_metadata(
+        "@id" => "#cwl",
+        "@type" => "ComputerLanguage",
+        "identifier" => { "@id" => "https://doi.org/10.1093/nar/gkt328" },
+        "alternateName" => "blalbalbla ignore me")
+
+    assert_equal tav, match
+
+    # Match on URL
+    match = WorkflowClass.match_from_metadata(
+        "@id" => "#something",
+        "@type" => "ComputerLanguage",
+        "name" => "not helpful",
+        "url" => { "@id" => "https://taverna.incubator.apache.org/" })
+
+    assert_equal tav, match
+
+    # Match on key
+    match = WorkflowClass.match_from_metadata("@id" => "#tav")
+
+    assert_equal tav, match
+
+    # Match priority for ambiguous lookups
+    match = WorkflowClass.match_from_metadata(
+        "@id" => "#taverna",
+        "name" => "Taverna",
+        "@type" => "ComputerLanguage",
+        "identifier" => { "@id" => "https://w3id.org/cwl/v1.0/" },
+        "alternateName" => "blalbalbla ignore me")
+
+    assert_equal cwl, match
+
+    # No match
+    match = WorkflowClass.match_from_metadata(
+        "@id" => "#booboo",
+        "name" => "Abloobloobloo",
+        "@type" => "ComputerLanguage",
+        "alternateName" => "blalbalbla ignore me")
+
+    assert_nil match
+  end
 end

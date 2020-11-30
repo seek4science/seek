@@ -93,7 +93,7 @@ class WorkflowsController < ApplicationController
     # This Workflow instance is just to make `handle_upload_data` work. It is not persisted beyond this action.
     @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
     @crate_builder = WorkflowCrateBuilder.new(ro_crate_params)
-    @crate_builder.workflow_class = @workflow&.workflow_class
+    @crate_builder.workflow_class = @workflow.workflow_class
     blob_params = @crate_builder.build
     content_blob = @workflow.build_content_blob(blob_params)
 
