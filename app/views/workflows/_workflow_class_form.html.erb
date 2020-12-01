@@ -1,0 +1,9 @@
+<% selected ||= nil %>
+
+<div id="workflow-class-form">
+  <label class="required">Workflow type</label>
+  <%= icon_link_to('New workflow type', 'new', '#', 'data-toggle' => 'modal', 'data-target' => "#workflow-class-modal") %>
+  <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title', selected),
+                 include_blank: 'Other',
+                 class: 'form-control' %>
+</div>

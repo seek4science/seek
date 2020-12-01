@@ -532,6 +532,8 @@ SEEK::Application.routes.draw do
     resources :people, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, only: [:index]
   end
 
+  resources :workflow_classes, except: [:show]
+
   resources :nodes, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     resources :people, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, only: [:index]
   end
