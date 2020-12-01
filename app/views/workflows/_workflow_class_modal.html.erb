@@ -2,28 +2,8 @@
   <% modal_header('New Workflow Type') %>
   <% modal_body do %>
     <%= form_for(WorkflowClass.new, remote: true) do |f| %>
-      <div class="form-group">
-        <%= f.label :title, class: 'required' -%><br/>
-        <%= f.text_field :title %>
-      </div>
 
-      <div class="form-group">
-        <%= f.label :alternate_name -%><br/>
-        <%= f.text_field :alternate_name %>
-        <p class="help-block">If this type is known by another name, you can specify it here.</p>
-      </div>
-
-      <div class="form-group">
-        <%= f.label :identifier -%><br/>
-        <%= f.text_field :identifier %>
-        <p class="help-block">An optional URI to identify this workflow type.</p>
-      </div>
-
-      <div class="form-group">
-        <%= f.label :url -%><br/>
-        <%= f.text_field :url %>
-        <p class="help-block">An optional URL to the official web page of this workflow type.</p>
-      </div>
+      <%= render partial: 'workflow_classes/workflow_class_fields', locals: { f: f } %>
 
       <div>
         <%= submit_tag "Create", data: { disable_with: 'Creating...' }, class: 'btn btn-primary' %>

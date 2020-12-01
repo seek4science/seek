@@ -1,4 +1,6 @@
 class WorkflowClass < ApplicationRecord
+  has_many :workflows, inverse_of: :workflow_class
+  has_many :workflow_versions, class_name: 'Workflow::Version', inverse_of: :workflow_class
   belongs_to :contributor, class_name: 'Person', optional: true
 
   before_validation :assign_and_format_key, on: [:create]
@@ -62,6 +64,22 @@ class WorkflowClass < ApplicationRecord
     return match if match
 
     match
+  end
+
+  def self.can_create?
+    User.logged_in?
+  end
+
+  def can_delete?(user = User.current_user)
+    can_manage? && workflows.empty? && workflow_versions.empty?
+  end
+
+  def can_manage?(user = User.current_user)
+    user && (user.is_admin? || user.person == contributor)
+  end
+
+  def can_edit?(_user = User.current_user)
+    can_manage?
   end
 
   private

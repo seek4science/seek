@@ -1,0 +1,54 @@
+<div class="pull-right">
+  <% if WorkflowClass.can_create? %>
+    <%= button_link_to('New Workflow Type', 'new', new_workflow_class_path) %>
+  <% end %>
+</div>
+
+<%= index_title(WorkflowClass.model_name.human.pluralize) %>
+
+<table class="table table-hover">
+  <thead>
+  <tr>
+    <th>Title</th>
+    <th>Key</th>
+    <th>Alt. Name</th>
+    <th>Identifier</th>
+    <th>URL</th>
+    <th># Workflows</th>
+    <th>Contributor</th>
+    <th>Created at</th>
+    <th>Updated at</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @workflow_classes.each do |wc| %>
+    <tr>
+      <td><%= wc.title -%></td>
+      <td><%= wc.key -%></td>
+      <td><%= wc.alternate_name -%></td>
+      <td><%= wc.identifier -%></td>
+      <td><%= wc.url -%></td>
+      <td><%= wc.workflows.count -%></td>
+      <td>
+        <% if wc.contributor %>
+          <%= link_to wc.contributor.name, wc.contributor -%>
+        <% else %>
+          <span class="none_text">n/a</span>
+        <% end %>
+      </td>
+      <td><%= wc.created_at -%></td>
+      <td><%= wc.updated_at -%></td>
+      <td>
+        <% if wc.can_edit? %>
+          <%= button_link_to('Edit', 'edit', edit_workflow_class_path(wc)) -%>
+        <%end %>
+        <% if wc.can_delete? %>
+          <%= button_link_to('Delete', 'destroy', workflow_class_path(wc), method: :delete,
+                             data: { confirm: "Are you sure you wish to delete this type?" }) -%>
+        <%end %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
