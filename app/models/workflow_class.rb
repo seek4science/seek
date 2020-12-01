@@ -1,7 +1,7 @@
 class WorkflowClass < ApplicationRecord
   belongs_to :contributor, class_name: 'Person', optional: true
 
-  before_validation :assign_key
+  before_validation :assign_and_format_key, on: [:create]
 
   validates :title, uniqueness: true
   validates :key, uniqueness: true
@@ -66,12 +66,12 @@ class WorkflowClass < ApplicationRecord
 
   private
 
-  def assign_key
-    return if key.present?
-    self.key = self.class.unique_key(title.parameterize.underscore)
+  def assign_and_format_key
+    k = self.key ? self.key.underscore.downcase : self.class.generate_key(title.parameterize.underscore)
+    self.key = k
   end
 
-  def self.unique_key(suggested_key)
+  def self.generate_key(suggested_key)
     extra = 0
     key = suggested_key
     while where(key: key).exists? do

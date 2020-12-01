@@ -44,7 +44,7 @@ module Seek
       end
 
       def self.workflow_class
-        WorkflowClass.find_by_key(name.demodulize)
+        WorkflowClass.find_by_key(name.demodulize.underscore)
       end
     end
   end

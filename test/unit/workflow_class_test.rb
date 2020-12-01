@@ -47,6 +47,8 @@ class WorkflowClassTest < ActiveSupport::TestCase
   end
 
   test 'extractable boolean and finders' do
+    WorkflowClass.destroy_all
+
     ex = Factory(:cwl_workflow_class)
     un = Factory(:unextractable_workflow_class)
 
@@ -61,6 +63,8 @@ class WorkflowClassTest < ActiveSupport::TestCase
   end
 
   test 'ro crate metadata' do
+    WorkflowClass.destroy_all
+
     cwl = Factory(:cwl_workflow_class).ro_crate_metadata
     other = Factory(:unextractable_workflow_class, title: 'My other type', key: nil).ro_crate_metadata
 
