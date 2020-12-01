@@ -266,7 +266,7 @@ SEEK::Application.routes.draw do
       post :batch_change_permssion_for_selected_items
       post :batch_sharing_permission_changed
     end
-    resources :projects, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :collections, only: [:index]
+    resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :collections, only: [:index]
     resources :avatars do
       member do
         post :select
@@ -299,7 +299,7 @@ SEEK::Application.routes.draw do
       post :respond_join_request
       get :guided_join
     end
-    resources :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations,
+    resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations,
               :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :collections, only: [:index]
 
     resources :openbis_endpoints do
@@ -358,7 +358,7 @@ SEEK::Application.routes.draw do
       post :items_for_result
       get  :typeahead
     end
-    resources :people, :projects, :specimens, only: [:index]
+    resources :people, :programmes, :projects, :specimens, only: [:index]
     resources :avatars do
       member do
         post :select
@@ -369,7 +369,7 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations, concerns: [:publishable, :has_snapshots, :isa] do
-    resources :people, :projects, :assays, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
+    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
     end
@@ -405,7 +405,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
-    resources :people, :projects, :assays, :investigations, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
+    resources :people, :programmes, :projects, :assays, :investigations, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
@@ -417,7 +417,7 @@ SEEK::Application.routes.draw do
         post :register
       end
     end
-    resources :people, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, only: [:index]
   end
 
   # to be removed as STI does not work in too many places
@@ -459,11 +459,11 @@ SEEK::Application.routes.draw do
         post :create_from_existing
       end
     end
-    resources :people, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, only: [:index]
   end
 
   resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset] do
-    resources :people, :projects, :publications, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :publications, :events, :collections, only: [:index]
   end
 
   resources :models, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
@@ -485,7 +485,7 @@ SEEK::Application.routes.draw do
         post :select
       end
     end
-    resources :people, :projects, :investigations, :assays, :studies, :publications, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :studies, :publications, :events, :collections, only: [:index]
   end
 
   resources :sops, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
@@ -494,7 +494,7 @@ SEEK::Application.routes.draw do
         post :create_from_existing
       end
     end
-    resources :people, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :workflows, :collections, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :workflows, :collections, only: [:index]
   end
 
   resources :workflows, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
@@ -511,11 +511,11 @@ SEEK::Application.routes.draw do
       get :new_version
       post :create_version_metadata
     end
-    resources :people, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, only: [:index]
   end
 
   resources :nodes, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
-    resources :people, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, only: [:index]
   end
 
   resources :content_blobs, except: [:show, :index, :update, :create, :destroy] do
@@ -540,7 +540,7 @@ SEEK::Application.routes.draw do
       get :reject_activation_confirmation
       get :storage_report
     end
-    resources :people, :projects, :institutions, :investigations, :studies, :assays,
+    resources :people, :projects, :institutions, :investigations, :studies, :assays, :samples,
               :data_files, :models, :sops, :workflows, :nodes, :presentations, :documents, :events, :publications, :organisms, :human_diseases, :collections, only: [:index]
     concerns :has_dashboard, controller: :programme_stats
   end
@@ -558,11 +558,11 @@ SEEK::Application.routes.draw do
       post :update_metadata
       post :request_contact
     end
-    resources :people, :projects, :investigations, :assays, :studies, :models, :data_files, :documents, :presentations, :organisms, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :studies, :models, :data_files, :documents, :presentations, :organisms, :events, :collections, only: [:index]
   end
 
   resources :events, concerns: [:asset] do
-    resources :people, :projects, :data_files, :publications, :documents, :presentations, :collections, only: [:index]
+    resources :people, :programmes, :projects, :data_files, :publications, :documents, :presentations, :collections, only: [:index]
   end
 
   resource :policies do
@@ -578,14 +578,14 @@ SEEK::Application.routes.draw do
       get :existing_strains_for_assay_organism
       get :strains_of_selected_organism
     end
-    resources :specimens, :assays, :people, :projects, :samples, only: [:index]
+    resources :specimens, :assays, :people, :programmes, :projects, :samples, only: [:index]
   end
 
   resources :organisms do
     collection do
       post :search_ajax
     end
-    resources :projects, :assays, :studies, :models, :strains, :specimens, :samples, :publications, only: [:index]
+    resources :projects, :programmes, :assays, :studies, :models, :strains, :specimens, :samples, :publications, only: [:index]
     member do
       get :visualise
     end
@@ -595,7 +595,7 @@ SEEK::Application.routes.draw do
     collection do
       post :search_ajax
     end
-    resources :projects, :assays, :studies, :models, :publications, only: [:index]
+    resources :projects, :programmes, :assays, :studies, :models, :publications, only: [:index]
     member do
       get :visualise
       get :tree
@@ -624,7 +624,7 @@ SEEK::Application.routes.draw do
       get :attribute_form
       get :filter
     end
-    resources :people, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
+    resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
               :strains, :organisms, :collections, only: [:index]
   end
 
@@ -656,12 +656,12 @@ SEEK::Application.routes.draw do
   ### DOCUMENTS
 
   resources :documents, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
-    resources :people, :projects, :programmes, :investigations, :assays, :studies, :publications, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :programmes, :investigations, :assays, :studies, :publications, :events, :collections, only: [:index]
   end
 
   resources :collections, concerns: [:publishable, :has_doi, :asset] do
     resources :items, controller: :collection_items
-    resources :people, :projects, :programmes, :investigations, :assays, :studies, :publications, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :programmes, :investigations, :assays, :studies, :publications, :events, :collections, only: [:index]
     resources :avatars do
       member do
         post :select
