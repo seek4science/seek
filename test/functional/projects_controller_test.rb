@@ -1033,7 +1033,8 @@ class ProjectsControllerTest < ActionController::TestCase
     prog = Factory(:programme, projects: [Factory(:project), Factory(:project)])
     get :show, params: { id: prog.projects.first }
     assert_select 'strong', text: /#{I18n.t('programme')}/i, count: 1
-    assert_select 'a[href=?]', programme_path(prog), text: prog.title, count: 1
+    assert_select '.box_about_actor a[href=?]', programme_path(prog), text: prog.title, count: 1
+    assert_select '.related-items a[href=?]', programme_path(prog), text: prog.title, count: 1
   end
 
   test 'programme not shown when disabled' do
