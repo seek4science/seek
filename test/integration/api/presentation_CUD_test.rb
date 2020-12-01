@@ -111,7 +111,6 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
 
     h = JSON.parse(response.body)
 
-    pp h
     errors = h["errors"]
 
     assert errors.any?
