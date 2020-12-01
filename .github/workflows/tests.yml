@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       RAILS_ENV: test
+      TERM: dumb-color
     services:
       postgres:
         image: postgres:11
