@@ -6,7 +6,6 @@ class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
   end
 
   test 'builds local file crate' do
-    pp WorkflowClass.all
     params = { workflow: { data: fixture_file_upload('files/workflows/1-PreProcessing.ga') },
                diagram: { data: fixture_file_upload('files/file_picture.png') },
                abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
