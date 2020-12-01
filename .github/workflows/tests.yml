@@ -33,18 +33,7 @@ jobs:
         database:
           - mysql
         suite:
-          - rails test test/unit
-          - rails test test/functional
-          - rails test test/integration
-          - rspec spec
-          - rake teaspoon
-          - rake assets:precompile
           - rake db:setup
-        include:
-          - database: postgres
-            suite: rails test test/unit
-          - database: sqlite3
-            suite: rails test test/unit
     steps:
       - name: Install system dependencies
         run: sudo apt install libcurl4-gnutls-dev
@@ -60,6 +49,10 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      - name: Print some env vars
+        run: |
+          echo $TERM
+          echo "$stdout.tty?.to_s" | ruby
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
