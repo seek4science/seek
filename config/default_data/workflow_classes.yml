@@ -1,5 +1,4 @@
 cwl_workflow_class:
-  id: 1
   title: Common Workflow Language
   key: cwl
   extractor: CWL
@@ -8,7 +7,6 @@ cwl_workflow_class:
   url: https://www.commonwl.org/
 
 galaxy_workflow_class:
-  id: 2
   title: Galaxy
   key: galaxy
   extractor: Galaxy
@@ -16,7 +14,6 @@ galaxy_workflow_class:
   url: https://galaxyproject.org/
 
 knime_workflow_class:
-  id: 3
   title: KNIME
   key: knime
   extractor: KNIME
@@ -24,7 +21,6 @@ knime_workflow_class:
   url: https://www.knime.com/
 
 nextflow_class:
-  id: 5
   title: Nextflow
   key: nextflow
   extractor: Nextflow
@@ -32,7 +28,6 @@ nextflow_class:
   url: https://www.nextflow.io/
 
 snakemake_class:
-  id: 6
   title: Snakemake
   key: snakemake
   extractor: Snakemake
