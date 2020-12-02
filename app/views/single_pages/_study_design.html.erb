@@ -167,10 +167,10 @@
         })
     }
 
-    function customTD(title, required = true, info = null) {
+    function customTD(sample_controlled_vocab_id, title, required = true, info = null) {
         const action = required ? "" :
             "<a href='' onclick='remove_col(event)'> <span style='color:white' class='glyphicon glyphicon-trash'></span></a>"
-        return `<th data-sampletypeid=${info} label="${title}">${title} ${action}</th>`
+        return `<th data-sampletypeid=${info} sample_controlled_vocab_id="${sample_controlled_vocab_id}">${title} ${action}</th>`
     }
 
     function sampleTypeData(attributes, title, assayId = null) {
@@ -179,7 +179,7 @@
         // const headers = getHeaderText('.tbl_sample_source')
         const attributeMap = $j(attributes).map((i, x) => ({
             "title": x.title.toLowerCase(),
-            "sample_attibute_type": { // Typo in sampleType controller
+            "sample_attribute_type": {
                 "id": "18"
             },
             "sample_controlled_vocab_id": x.id,
@@ -192,7 +192,7 @@
         //Add a custom ID attribute to the sample type, in order to link right samples of different sample types
         attributeMap.push({
             "title": "link_id",
-            "sample_attibute_type": {
+            "sample_attribute_type": {
                 "id": "8" //string
             },
             "required": true,
