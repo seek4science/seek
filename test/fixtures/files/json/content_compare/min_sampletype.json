@@ -9,7 +9,7 @@
         {
           "id": "504",
           "title": "full name",
-          "sample_attibute_type": {
+          "sample_attribute_type": {
             "id": "777",
             "title": "Full name",
             "base_type": "String",

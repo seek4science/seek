@@ -142,7 +142,7 @@ class SampleTypesController < ApplicationController
       if (attribute_map)
       params[:sample_type][:sample_attributes_attributes] =[]
       attribute_map.each do |attribute|
-        attribute[:sample_attribute_type_id] = attribute[:sample_attibute_type][:id]
+        attribute[:sample_attribute_type_id] = attribute[:sample_attribute_type][:id]
         params[:sample_type][:sample_attributes_attributes] << attribute
         end
       end

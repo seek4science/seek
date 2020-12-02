@@ -9,7 +9,7 @@
         {
           "id": "523",
           "title": "full_name",
-          "sample_attibute_type": {
+          "sample_attribute_type": {
             "id": "808",
             "title": "Full name",
             "base_type": "String",
@@ -27,7 +27,7 @@
         {
           "id": "526",
           "title": "address",
-          "sample_attibute_type": {
+          "sample_attribute_type": {
             "id": "811",
             "title": "Address",
             "base_type": "Text",
@@ -45,7 +45,7 @@
         {
           "id": "527",
           "title": "postcode",
-          "sample_attibute_type": {
+          "sample_attribute_type": {
             "id": "812",
             "title": "Post Code",
             "base_type": "String",
