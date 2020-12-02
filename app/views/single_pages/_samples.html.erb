@@ -54,7 +54,7 @@
         // Adds the select column
         headTr.empty().append("<th><input id='selectAll' onClick='selectAll(this)' type='checkbox'/></th>")
         $j(headers).each((i, x) => {
-            const TH = customTD(x.original_accessor_name, x.required, x.sample_type_id)
+            const TH = customTD(x.sample_controlled_vocab_id, x.original_accessor_name, x.required, x.sample_type_id)
             headTr.append(TH)
         })
     }
@@ -72,8 +72,8 @@
         })
         // Set the Auto Complete
         $j.each($j('.sampleTable tbody tr td:not(:first-child)'), (i, k) => {
-            const label = $j(k).closest('table').find('th').eq($j(k).index()).attr("label")
-            setAutoComplete(k, label)
+            const sample_controlled_vocab_id = $j(k).closest('table').find('th').eq($j(k).index()).attr("sample_controlled_vocab_id")
+            setAutoComplete(k, sample_controlled_vocab_id)
         })
 
     }
@@ -248,7 +248,7 @@
                         "attribute_map": $j.map(sampleType.attributes, (x, i) => ({
                             //  "id": "57",
                             "title": x,
-                            "sample_attibute_type": {
+                            "sample_attribute_type": {
                                 "id": "8"
                             }
                         }))
@@ -394,8 +394,8 @@
         $j(table + ' tbody').append('<tr data-new="true">' + newRow + '</tr>')
         // Set the Auto Complete
         $j.each($j('.sampleTable tbody tr:last td:not(:first-child)'), (i, k) => {
-            const label = $j(k).closest('table').find('th').eq($j(k).index()).attr("label")
-            setAutoComplete(k, label)
+            const sample_controlled_vocab_id = $j(k).closest('table').find('th').eq($j(k).index()).attr("sample_controlled_vocab_id")
+            setAutoComplete(k, sample_controlled_vocab_id)
         })
         hideAttributes()
     }
@@ -435,22 +435,22 @@
         })
     }
 
-    function setAutoComplete(e, label) {
+    function setAutoComplete(e, sample_controlled_vocab_id) {
         $j(e).bind("keyup", function(event) {
-            AutoComplete(e, label)
+            AutoComplete(e, sample_controlled_vocab_id)
         })
         // AutoComplete(e, label)
 
     }
 
-    function AutoComplete(e, label) {
+    function AutoComplete(e, sample_controlled_vocab_id) {
         const setSource = (data) => {
             $j(e).autocomplete({
                 source: data || [],
                 mustMatch: true
             });
         }
-        const url = `/single_pages/${pid}/ontology?label=${label}&query=${$j(e).html()}`
+        const url = `/single_pages/${pid}/ontology?sample_controlled_vocab_id=${sample_controlled_vocab_id}&query=${$j(e).html()}`
         $j.ajax({
             method: 'GET',
             dataType: "json",
@@ -468,7 +468,7 @@
                 setSource(data)
                 // localCache.set(url, data, setSource(data));
             },
-            error: function(e){
+            error: function(e) {
                 console.log(e)
             }
         })

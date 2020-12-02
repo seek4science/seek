@@ -115,7 +115,7 @@ class SinglePagesController < ApplicationController
       if (flowchart)
         source_sample_type = SampleType.find(flowchart.source_sample_type_id)
         source_sample_type_attributes = source_sample_type.sample_attributes.select(:required, :original_accessor_name,
-           :sample_type_id, :id)
+           :sample_type_id, :id, :sample_controlled_vocab_id)
         assay_sample_type = SampleType.find(assay.sample_type_id)
         all_samples = load_samples(assay, source_sample_type)
         rest_headers = load_headers(assay)
@@ -134,8 +134,8 @@ class SinglePagesController < ApplicationController
   #GET
   def ontology
     begin
-      labels = (SampleControlledVocab.where(title: params[:label])
-      .first&.sample_controlled_vocab_terms || [])
+      labels = (SampleControlledVocab.find(params[:sample_controlled_vocab_id])
+      &.sample_controlled_vocab_terms || [])
       .where("LOWER(label) like :query", query: "%#{params[:query].downcase}%")
       .select("label").limit(params[:limit] || 100)
       render json: { status: :ok, data: labels }
@@ -187,7 +187,7 @@ class SinglePagesController < ApplicationController
     all_assays = Study.find(assay.study.id).assays.where("position <= #{assay.position}").sort_by{|e| e[:position]}
     all_assays.each do |m|
       s = SampleType.find(m.sample_type_id)
-      final_header += s.sample_attributes.select(:required, :original_accessor_name, :sample_type_id, :id) if !s.nil?
+      final_header += s.sample_attributes.select(:required, :original_accessor_name, :sample_type_id, :id, :sample_controlled_vocab_id) if !s.nil?
     end
     final_header
   end
