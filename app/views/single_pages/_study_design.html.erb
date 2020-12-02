@@ -61,7 +61,7 @@
     }
 
     function sourceChange() {
-        
+
         let i = $j('#sourceSelect').val()
         $j("#sourceAttribs tbody").empty()
         $j("#sourceSelect").val(i)
@@ -71,7 +71,7 @@
 
         $j('.tbl_sample_source thead tr').empty()
         $j.each(characteristics[sourceSelect.value].attributes, (k, attr) => {
-            $j(".tbl_sample_source thead tr").append(`<th>${attr.title}</th>`)//(customTD(attr.title,attr.required))
+            $j(".tbl_sample_source thead tr").append(`<th>${attr.title}</th>`) //(customTD(attr.title,attr.required))
         })
     }
 
@@ -179,9 +179,10 @@
         // const headers = getHeaderText('.tbl_sample_source')
         const attributeMap = $j(attributes).map((i, x) => ({
             "title": x.title.toLowerCase(),
-            "sample_attibute_type": {
-                "id": "8"
+            "sample_attibute_type": { // Typo in sampleType controller
+                "id": "18"
             },
+            "sample_controlled_vocab_id": x.id,
             "required": x.required,
             "pos": (i + 1).toString(),
             "unit_id": null,
