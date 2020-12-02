@@ -171,7 +171,8 @@ class SinglePagesController < ApplicationController
       source_list.push({title: item.title, type: item.repo_type, 
         repoId: item.id, attributes: 
         item.sample_controlled_vocabs.map do |term|
-          { title: term.title,
+          { id: term.id,
+          title: term.title,
           shortName: term.short_name,
           des: term.description,
           required: term.required}
