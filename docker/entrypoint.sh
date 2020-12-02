@@ -23,9 +23,10 @@ fi
 
 echo "UPDATING CRONTAB"
 bundle exec whenever --update-crontab
+crontab -l > /seek/seek.crontab # Dump crontab to a file so supercronic can read it
 
-echo "STARTING CRON"
-cron
+echo "STARTING SUPERCRONIC"
+supercronic /seek/seek.crontab
 
 # Start Rails
 echo "STARTING SEEK"
