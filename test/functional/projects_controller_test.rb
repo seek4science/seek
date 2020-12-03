@@ -1209,7 +1209,7 @@ class ProjectsControllerTest < ActionController::TestCase
     wg = Factory(:work_group, project: project)
     group_membership = Factory(:group_membership, work_group: wg)
     person = Factory(:person, group_memberships: [group_membership])
-    former_group_membership = Factory(:group_membership, time_left_at: 10.days.ago, work_group: wg)
+    former_group_membership = Factory(:group_membership, time_left_at: 10.days.ago, work_group: wg, has_left: true)
     former_person = Factory(:person, group_memberships: [former_group_membership])
     assert_no_enqueued_jobs only: ProjectLeavingJob do
       assert_no_difference('GroupMembership.count') do
@@ -1222,7 +1222,8 @@ class ProjectsControllerTest < ActionController::TestCase
     end
 
     assert group_membership.reload.has_left
-    assert !former_group_membership.reload.has_left
+    refute former_group_membership.reload.has_left
+    refute former_group_membership.reload[:has_left]
   end
 
   test 'cannot flag members of other projects as leaving' do
