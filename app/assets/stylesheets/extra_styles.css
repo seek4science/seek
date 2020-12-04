@@ -373,3 +373,8 @@ th {
     padding: 6px;
     min-width: 100px;
 }
+
+.highlight {
+    max-height: 200px;
+    overflow: scroll;
+}
