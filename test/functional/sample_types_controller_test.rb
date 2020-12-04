@@ -172,7 +172,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     sample_attributes_fields[2][:_destroy] = '1'
     sample_attributes_fields = Hash[sample_attributes_fields.each_with_index.map { |f, i| [i.to_s, f] }]
 
-    assert sample_type.template_generation_task.completed?
+    assert sample_type.template_generation_task.reload.completed?
 
     assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [sample_type]) do
       assert_enqueued_with(job: SampleTypeUpdateJob, args: [sample_type, true]) do
@@ -183,7 +183,8 @@ class SampleTypesControllerTest < ActionController::TestCase
                                                                    tags: "fish,#{golf.value.text}"
             } }
 
-            assert sample_type.template_generation_task.pending?
+
+            assert sample_type.template_generation_task.reload.pending?
           end
         end
       end
