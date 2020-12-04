@@ -730,6 +730,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     # avoid the callback, which will automatically call queue_template_generation
     type = Factory(:simple_sample_type, project_ids: @project_ids)
     type.template_generation_task.destroy!
+    type.reload
 
     assert_difference('Task.count', 1) do
       assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [type]) do
@@ -741,7 +742,7 @@ class SampleTypeTest < ActiveSupport::TestCase
                                           content_blob: Factory(:sample_type_template_content_blob),
                                           uploaded_template: true,
                                           project_ids: @project_ids)
-    assert_nil type_with_uploaded_template.template_generation_task
+    refute type_with_uploaded_template.template_generation_task.pending?
 
     assert_no_difference('Task.count') do
       assert_no_enqueued_jobs(only: SampleTemplateGeneratorJob) do
@@ -749,12 +750,14 @@ class SampleTypeTest < ActiveSupport::TestCase
           type_with_uploaded_template.queue_template_generation
           type_with_uploaded_template = SampleType.find(type_with_uploaded_template.id)
           refute_nil type_with_uploaded_template.content_blob
+          refute type_with_uploaded_template.template_generation_task.pending?
         end
       end
     end
 
     type_with_blob = Factory(:simple_sample_type)
     type_with_blob.template_generation_task.destroy!
+    type_with_blob.reload
     type_with_blob.content_blob = Factory(:sample_type_template_content_blob)
     assert_difference('Task.count', 1) do
       assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [type_with_blob]) do
@@ -762,6 +765,7 @@ class SampleTypeTest < ActiveSupport::TestCase
           type_with_blob.queue_template_generation
           type_with_blob = SampleType.find(type_with_blob.id)
           assert_nil type_with_blob.content_blob
+          assert type_with_blob.template_generation_task.pending?
         end
       end
     end
@@ -775,25 +779,25 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     assert sample_type.valid?
     assert sample_type.new_record?
-    assert_nil sample_type.template_generation_task
+    refute sample_type.template_generation_task.pending?
 
     assert_difference('Task.count', 1) do
       assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [sample_type]) do
         disable_authorization_checks { sample_type.save! }
-        assert sample_type.reload.template_generation_task
+        assert sample_type.reload.template_generation_task.pending?
       end
     end
 
     sample_type = Factory(:simple_sample_type)
     assert sample_type.template_generation_task
     sample_type.template_generation_task.destroy!
-    assert_nil sample_type.reload.template_generation_task
+    refute sample_type.reload.template_generation_task.pending?
 
     assert_difference('Task.count', 1) do
       assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [sample_type]) do
         sample_type.title = 'sample type test job'
         disable_authorization_checks { sample_type.save! }
-        assert sample_type.reload.template_generation_task
+        assert sample_type.reload.template_generation_task.pending?
       end
     end
   end
