@@ -2354,20 +2354,78 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
     sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
-
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
-    sample_type.content_blob = Factory(:sample_type_template_content_blob)
-    sample_type.build_attributes_from_template
-    # this is to force the full name to be 2 words, so that one row fails
-    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
-    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
-    sample_type.save!
+    puts data_file.sample_template?
 
     assert_difference('Sample.count', 0) do
       post :extract_samples, params: { id: data_file.id }
     end
 
     assert_redirected_to select_sample_type_data_file_path(data_file) # Test for this is in data_files_controller_test
+  end
+
+  test 'show data file with "extract samples" button' do
+    create_sample_attribute_type
+    person = Factory(:project_administrator)
+    login_as(person)
+
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                        policy: Factory(:private_policy), contributor: person
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    sample_type.save!
+
+    get :show, params: { id: data_file.id }
+
+    assert_select 'a.btn', text: /Extract samples/
+  end
+
+  test 'show data file with sample extraction in progress' do
+    create_sample_attribute_type
+    person = Factory(:project_administrator)
+    login_as(person)
+
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                        policy: Factory(:private_policy), contributor: person
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    sample_type.save!
+
+    data_file.tasks.create!(key: 'sample_extraction', status: Task::STATUS_QUEUED)
+
+    get :show, params: { id: data_file.id }
+
+    assert_select '#sample-extraction-status', text: /Queued/
+  end
+
+  test 'show data file with sample extraction done and ready for review' do
+    create_sample_attribute_type
+    person = Factory(:project_administrator)
+    login_as(person)
+
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                        policy: Factory(:private_policy), contributor: person
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    sample_type.save!
+
+    Seek::Samples::Extractor.new(data_file, sample_type).extract
+    data_file.tasks.create!(key: 'sample_extraction', status: Task::STATUS_DONE)
+
+    get :show, params: { id: data_file.id }
+
+    assert_select '#sample-extraction-status a[href=?]', confirm_extraction_data_file_path(data_file)
   end
 
   test 'extract from data file queues job' do
@@ -2389,8 +2447,14 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.save!
 
     assert_no_difference('Sample.count') do
-      assert_enqueued_jobs(1, only: SampleDataExtractionJob) do
-        post :extract_samples, params: { id: data_file.id }
+      assert_difference('Task.count') do
+        assert_enqueued_jobs(1, only: SampleDataExtractionJob) do
+          refute data_file.reload.sample_extraction_task
+
+          post :extract_samples, params: { id: data_file.id }
+
+          assert data_file.reload.sample_extraction_task
+        end
       end
     end
 
@@ -2598,10 +2662,12 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('Sample.count') do
       assert_enqueued_jobs(1, only: SampleDataExtractionJob) do
-        VCR.use_cassette('nels/get_sample_metadata') do
-          post :retrieve_nels_sample_metadata, params: { id: data_file }
+        assert_difference('Task.count') do
+          VCR.use_cassette('nels/get_sample_metadata') do
+            post :retrieve_nels_sample_metadata, params: { id: data_file }
 
-          assert_redirected_to data_file
+            assert_redirected_to data_file
+          end
         end
       end
     end
