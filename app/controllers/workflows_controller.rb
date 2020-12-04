@@ -270,7 +270,7 @@ class WorkflowsController < ApplicationController
 
   def retrieve_content(blob)
     if !blob.file_exists?
-      @content_blob.remote_content_fetch_task&.cancel
+      blob.remote_content_fetch_task&.cancel
       blob.retrieve
     end
   end
