@@ -51,6 +51,14 @@ class Event < ApplicationRecord
     false
   end
 
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['title','start_date','end_date','city','country']
+  end
+  def columns_allowed
+    super + ['start_date','end_date','address','city','country','url','title','deleted_contributor']
+  end
+
   # defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
     Seek::Config.events_enabled

@@ -32,7 +32,7 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
     studies_file.original_filename = @studies.first.name.to_s
     studies_file.save!
-    pp StudyBatchUpload.extract_studies_from_file(studies_file)
+    StudyBatchUpload.extract_studies_from_file(studies_file)
 
     FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
   end

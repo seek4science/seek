@@ -77,6 +77,14 @@ class DataFile < ApplicationRecord
     def event_ids=(_events_ids); end
   end
 
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['title','version']
+  end
+  def columns_allowed
+    super + ['title','last_used_at','version','other_creators','doi','license','simulation_data','deleted_contributor']
+  end
+
   def included_to_be_copied?(symbol)
     case symbol.to_s
     when 'activity_logs', 'versions', 'attributions', 'relationships', 'inverse_relationships', 'annotations'
