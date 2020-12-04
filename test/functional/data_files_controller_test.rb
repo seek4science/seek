@@ -1784,7 +1784,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'small.txt', blob.original_filename
     assert_equal 'text/plain', blob.content_type
     assert_equal 100, blob.file_size
-    assert blob.caching_task&.pending?
+    assert blob.remote_content_fetch_task&.pending?
   end
 
   test 'should not create cache job if setting disabled' do
@@ -1815,7 +1815,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_equal 'small.txt', blob.original_filename
       assert_equal 'text/plain', blob.content_type
       assert_equal 100, blob.file_size
-      refute blob.caching_task&.pending?
+      refute blob.remote_content_fetch_task&.pending?
     end
   end
 
@@ -1848,7 +1848,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_equal 'big.txt', blob.original_filename
       assert_equal 'text/plain', blob.content_type
       assert_equal 5000, blob.file_size
-      refute blob.caching_task&.pending?
+      refute blob.remote_content_fetch_task&.pending?
     end
   end
 
@@ -1880,7 +1880,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'big.txt', blob.original_filename
     assert_equal 'text/plain', blob.content_type
     assert_equal 5000, blob.file_size
-    refute blob.caching_task&.pending?
+    refute blob.remote_content_fetch_task&.pending?
   end
 
   test 'should not automatically create cache job for webpage links' do
@@ -1908,7 +1908,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !blob.url.blank?
     assert blob.original_filename.blank?
     assert_equal 'text/html', blob.content_type
-    refute blob.caching_task&.pending?
+    refute blob.remote_content_fetch_task&.pending?
   end
 
   test "should create cache job for large file if user requests 'make_local_copy'" do
@@ -1941,7 +1941,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'big.txt', blob.original_filename
     assert_equal 'text/plain', blob.content_type
     assert_equal 5000, blob.file_size
-    assert blob.caching_task&.pending?
+    assert blob.remote_content_fetch_task&.pending?
   end
 
   test 'should create data file for remote URL that does not respond to HEAD' do
@@ -1973,7 +1973,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'nohead.txt', blob.original_filename
     assert_equal 'text/plain', blob.content_type
     assert_equal 5000, blob.file_size
-    assert blob.caching_task&.pending?
+    assert blob.remote_content_fetch_task&.pending?
   end
 
   test 'should create data file for remote URL with a space at the end' do
@@ -2347,14 +2347,23 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
+    # First matching type
+    sample_type = SampleType.new title: 'from template 1', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
     sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
     sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
-    puts data_file.sample_template?
+
+    # Second matching type
+    sample_type = SampleType.new title: 'from template 2', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    # this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
 
     assert_difference('Sample.count', 0) do
       post :extract_samples, params: { id: data_file.id }
@@ -2449,11 +2458,9 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('Sample.count') do
       assert_difference('Task.count') do
         assert_enqueued_jobs(1, only: SampleDataExtractionJob) do
-          refute data_file.reload.sample_extraction_task
-
           post :extract_samples, params: { id: data_file.id }
 
-          assert data_file.reload.sample_extraction_task
+          assert data_file.reload.sample_extraction_task&.pending?
         end
       end
     end

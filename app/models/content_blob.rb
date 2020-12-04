@@ -242,9 +242,7 @@ class ContentBlob < ApplicationRecord
     self.class.valid_url?(url)
   end
 
-  def caching_task
-    tasks.where(key: 'remote_content_fetch').first
-  end
+  has_task :remote_content_fetch
 
   private
 
@@ -299,9 +297,7 @@ class ContentBlob < ApplicationRecord
 
   def create_retrieval_job
     if Seek::Config.cache_remote_files && !file_exists? && !url.blank? && (make_local_copy || cachable?) && remote_content_handler
-      start_task('remote_content_fetch') do
-        RemoteContentFetchingJob.perform_later(self)
-      end
+      RemoteContentFetchingJob.perform_later(self)
     end
   end
 

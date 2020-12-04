@@ -23,6 +23,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::Permissions::AuthorizationEnforcement
   include Seek::Permissions::ActsAsAuthorized
   include Seek::RelatedItems
+  include HasTasks
 
   include Annotations::Acts::Annotatable
   include Annotations::Acts::AnnotationSource
@@ -129,13 +130,4 @@ class ApplicationRecord < ActiveRecord::Base
   has_filter query: Seek::Filtering::SearchFilter.new
   has_filter created_at: Seek::Filtering::DateFilter.new(field: :created_at,
                                                          presets: [24.hours, 1.week, 1.month, 1.year, 5.years])
-
-  has_many :tasks, as: :resource, dependent: :destroy
-
-  def start_task(key)
-    task = tasks.where(key: key).first_or_initialize
-    return if task.persisted? && task.pending?
-    task.update_attribute(:status, Task::STATUS_WAITING)
-    yield
-  end
 end

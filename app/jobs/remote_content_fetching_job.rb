@@ -6,6 +6,6 @@ class RemoteContentFetchingJob < TaskJob
   end
 
   def task
-    arguments[0].caching_task
+    arguments[0].remote_content_fetch_task
   end
 end

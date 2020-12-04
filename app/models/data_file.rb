@@ -231,7 +231,5 @@ class DataFile < ApplicationRecord
     end
   end
 
-  def sample_extraction_task
-    tasks.where(key: 'sample_extraction').last
-  end
+  has_task :sample_extraction
 end

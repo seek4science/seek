@@ -4,26 +4,33 @@ class Task < ApplicationRecord
   STATUS_ACTIVE = 'active'.freeze
   STATUS_DONE = 'done'.freeze
   STATUS_FAILED = 'failed'.freeze
+  STATUS_CANCELLED = 'cancelled'.freeze
   belongs_to :resource, polymorphic: true, inverse_of: :tasks
-  before_validation :initialize_status
-  validates :status, inclusion: { in: [STATUS_WAITING, STATUS_QUEUED, STATUS_ACTIVE, STATUS_DONE, STATUS_FAILED] }
 
   def completed?
     status == STATUS_DONE || status == STATUS_FAILED
   end
 
   def pending?
-    status.nil? || status == STATUS_WAITING || status == STATUS_QUEUED
+    status == STATUS_WAITING || status == STATUS_QUEUED
   end
 
   def in_progress?
     status == STATUS_QUEUED || status == STATUS_ACTIVE
   end
 
-  private
+  def cancelled?
+    status == STATUS_CANCELLED
+  end
 
-  def initialize_status
-    self.status ||= STATUS_WAITING
+  def start
+    return if persisted? && (pending? || in_progress?)
+    update_attribute(:status, Task::STATUS_WAITING)
+    yield if block_given?
+  end
+
+  def cancel
+    update_attribute(:status, Task::STATUS_CANCELLED)
   end
 end
 

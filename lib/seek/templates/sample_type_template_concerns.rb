@@ -9,6 +9,7 @@ module Seek
         validate :validate_template_file
         has_one :content_blob, as: :asset, dependent: :destroy
         alias_method :template, :content_blob
+        has_task :template_generation
         extend ClassMethods
       end
 
@@ -20,9 +21,7 @@ module Seek
             content_blob.destroy
             update_attribute(:content_blob, nil)
           end
-          start_task('template_generation') do
-            SampleTemplateGeneratorJob.new(self).queue_job
-          end
+          SampleTemplateGeneratorJob.new(self).queue_job
         end
       end
 
@@ -62,10 +61,6 @@ module Seek
 
       def compatible_template_file?
         template_reader.compatible?
-      end
-
-      def template_generation_task
-        tasks.where(key: 'template_generation').first
       end
 
       # private
