@@ -2,6 +2,7 @@ class StudiesController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
 
+  before_action :studies_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[edit update destroy manage manage_update show new_object_based_on_existing_one]
 
@@ -13,7 +14,6 @@ class StudiesController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
   include Seek::AnnotationCommon
-  include Seek::BreadCrumbs
   include Seek::IsaGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
@@ -130,6 +130,7 @@ class StudiesController < ApplicationController
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
                                   :other_creators, { creator_ids: [] }, { scales: [] }, { publication_ids: [] },
-                                  discussion_links_attributes:[:id, :url, :label, :_destroy])
+                                  discussion_links_attributes:[:id, :url, :label, :_destroy],
+                                  { custom_metadata_attributes: determine_custom_metadata_keys })
   end
 end

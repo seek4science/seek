@@ -85,14 +85,7 @@ module Seek
 
     def assign_index_variables
       # Parent resource
-      parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
-      if parent_id_param
-        parent_type = parent_id_param.to_s.chomp('_id')
-        parent_class = parent_type.camelize.constantize
-        if parent_class
-          @parent_resource = parent_class.find(params[parent_id_param])
-        end
-      end
+      get_parent_resource
 
       # Page
       @page = page_and_sort_params[:page]
@@ -114,6 +107,7 @@ module Seek
         @order = :updated_at_desc if @page == 'top' && Seek::ListSorter.options(controller_model.name).include?(:updated_at_desc)
         # Sort by `title` if on an alphabetical page, and its a valid sort option for this type.
         @order = :title_asc if @page.match?(/[?A-Z]+/) && Seek::ListSorter.options(controller_model.name).include?(:title_asc)
+        @order ||= :relevance if page_and_sort_params.dig(:filter, :query).present? && Seek::Config.solr_enabled
         @order ||= Seek::Config.sorting_for(controller_name)&.to_sym
         @order ||= Seek::ListSorter.key_for_view(controller_model.name, :index)
       end

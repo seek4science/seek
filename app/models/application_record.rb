@@ -15,6 +15,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::TitleTrimmer
   include Seek::ActsAsAsset
   include Seek::ActsAsISA
+  include Seek::ActsAsCustomMetadata
   include Seek::Doi::ActsAsDoiMintable
   include Seek::Doi::ActsAsDoiParent
   include Seek::ResearchObjects::ActsAsSnapshottable
@@ -41,7 +42,7 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def defines_own_avatar?
-    respond_to?(:avatar)
+    false
   end
 
   def use_mime_type_for_avatar?
@@ -94,15 +95,36 @@ class ApplicationRecord < ActiveRecord::Base
 
   def self.with_search_query(q)
     if searchable? && Seek::Config.solr_enabled
-      search = search do |query|
-        query.keywords(q)
-        query.paginate(page: 1, per_page: count)
+      ids = solr_cache(q) do
+        search = search do |query|
+          query.keywords(q)
+          query.paginate(page: 1, per_page: unscoped.count)
+        end
+
+        search.hits.map(&:primary_key)
       end
 
-      where(id: search.hits.map(&:primary_key))
+      where(id: ids)
     else
-      where('1=1')
+      all
     end
+  end
+
+  def self.solr_cache(query)
+    init_solr_cache
+    RequestStore.store[:solr][table_name][:last_query] = query
+    RequestStore.store[:solr][table_name][query] ||= yield if block_given?
+    RequestStore.store[:solr][table_name][query] || []
+  end
+
+  def self.last_solr_query
+    init_solr_cache
+    RequestStore.store[:solr][table_name][:last_query]
+  end
+
+  def self.init_solr_cache
+    RequestStore.store[:solr] ||= {}
+    RequestStore.store[:solr][table_name] ||= { results: {} }
   end
 
   has_filter query: Seek::Filtering::SearchFilter.new

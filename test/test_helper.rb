@@ -262,6 +262,10 @@ class ActiveSupport::TestCase
       @request.session['flash']['flashes'].delete(target.to_s)
     end
   end
+
+  def open_fixture_file(path)
+    File.open(File.join(Rails.root, 'test', 'fixtures', 'files', *path.split('/')))
+  end
 end
 
 # Load seed data

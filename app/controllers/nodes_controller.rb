@@ -5,17 +5,16 @@ class NodesController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :find_assets, :only => [ :index ]
-  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview, :update_annotations_ajax]
   before_action :find_display_asset, :only=>[:show, :download]
 
   include Seek::Publishing::PublishingCommon
 
-  include Seek::BreadCrumbs
   include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
 
-  def new_version
+  def create_version
     if handle_upload_data(true)
       comments=params[:revision_comments]
 
@@ -44,7 +43,7 @@ class NodesController < ApplicationController
 
     respond_to do |format|
       if @node.update_attributes(node_params)
-        flash[:notice] = "#{t('Node')} metadata was successfully updated."
+        flash[:notice] = "#{t('node')} metadata was successfully updated."
         format.html { redirect_to node_path(@node) }
         format.json { render json: @node, include: [params[:include]] }
       else

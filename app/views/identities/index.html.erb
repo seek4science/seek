@@ -7,6 +7,9 @@
     <% if Seek::Config.omniauth_ldap_enabled %>
       <li><%= link_to(t("login.ldap"), '#', 'data-toggle' => 'modal', 'data-target' => "#ldap-form") -%></li>
     <% end %>
+    <% if Seek::Config.omniauth_github_enabled %>
+      <li><%= link_to(t("login.github"), omniauth_authorize_path(:github), method: :post) -%></li>
+    <% end %>
   <% end %>
 </div>
 

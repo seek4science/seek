@@ -9,7 +9,6 @@ module Seek
           before_action :project_membership_required_appended, only: [:index]
           before_action :find_and_authorize_requested_item, only: %i[edit update destroy]
 
-          include Seek::BreadCrumbs
         end
 
         def model_class
@@ -26,7 +25,7 @@ module Seek
         end
 
         def edit
-          @suggested_type = eval("@#{controller_name.singularize}")
+          @suggested_type = instance_variable_get("@#{controller_name.singularize}")
           @suggested_type.term_type = params[:term_type]
           respond_to do |format|
             format.html { render template: 'suggested_types/edit' }
@@ -59,7 +58,7 @@ module Seek
         end
 
         def update
-          @suggested_type = eval("@#{controller_name.singularize}")
+          @suggested_type = instance_variable_get("@#{controller_name.singularize}")
           @suggested_type.update_attributes(type_params)
           saved = @suggested_type.save
           respond_to do |format|
@@ -75,7 +74,7 @@ module Seek
         end
 
         def destroy
-          @suggested_type = eval("@#{controller_name.singularize}")
+          @suggested_type = instance_variable_get("@#{controller_name.singularize}")
           respond_to do |format|
             if @suggested_type.can_destroy?
               @suggested_type.destroy

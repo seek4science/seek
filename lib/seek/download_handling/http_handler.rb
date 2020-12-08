@@ -32,6 +32,12 @@ module Seek
             content_length = response.headers[:content_length]
             file_name = determine_filename_from_disposition(response.headers[:content_disposition])
             code = response.code
+          rescue RestClient::UnsupportedMediaType => e
+            accept_header = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+            response = RestClient.head(url, accept: accept_header)
+            content_type = response.headers[:content_tyspe]
+            content_length = response.headers[:content_length]
+            code = response.code
           rescue RestClient::MethodNotAllowed,RestClient::NotFound => e # Try a GET if HEAD isn't allowed, but don't download anything
             if @fallback_to_get
               begin

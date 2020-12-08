@@ -5,6 +5,7 @@ class SampleAttributeType < ApplicationRecord
   validate :validate_allowed_type, :validate_regular_expression, :validate_resolution
 
   has_many :sample_attributes, inverse_of: :sample_attribute_type
+  has_many :custom_metadata_attributes, inverse_of: :sample_attribute_type
 
   before_save :set_defaults_attributes
   after_initialize :set_defaults_attributes
@@ -57,7 +58,7 @@ class SampleAttributeType < ApplicationRecord
   end
 
   def validate_resolution
-    (!resolution.present?) || (resolution.include? '\\')
+    !resolution.present? || (resolution.include? '\\')
   end
 
   def check_value_against_base_type(value, additional_options)

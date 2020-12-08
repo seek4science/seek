@@ -87,6 +87,29 @@ module AssetsHelper
     "publish[#{item.class.name}][#{item.id}]"
   end
 
+  def sharing_item_param(item)
+    if item.try(:is_isa?)
+      "share_isa[#{item.class.name}][#{item.id}]"
+    elsif  (item.respond_to? (:investigations)) && (!item.investigations.any?)
+      "share_not_isa[#{item.class.name}][#{item.id}]"
+    elsif !item.respond_to? (:investigations)
+      "share_not_isa[#{item.class.name}][#{item.id}]"
+    else
+      "share_isa[#{item.class.name}][#{item.id}]"
+    end
+  end
+
+  def include_downloadable_item?(items)
+    has_downloadable_item = false
+    items.each do |item|
+      if (item.try(:is_downloadable?))
+        has_downloadable_item = true
+      end
+      break if has_downloadable_item
+    end
+    has_downloadable_item
+  end
+
   def text_for_resource(resource_or_text)
     if resource_or_text.is_a?(String)
       text = resource_or_text.underscore.humanize
@@ -260,6 +283,20 @@ module AssetsHelper
     else
       false
     end
+  end
+
+  def source_link_button(source_link)
+    url = source_link.url
+    uri = URI.parse(url)
+    if uri.hostname.include?('github.com')
+      image = 'github'
+      text = 'View on GitHub'
+    else
+      image = 'external_link'
+      text = 'Visit source'
+    end
+
+    button_link_to(text, image, source_link.url, target: :_blank)
   end
 
   #if there are creators, the email will be sent only to them, otherwise sent to the contributor

@@ -7,7 +7,7 @@ module Seek #:nodoc:
 
       module ClassMethods
         def acts_as_snapshottable
-          has_many :snapshots, as: :resource, foreign_key: :resource_id
+          has_many :snapshots, as: :resource, foreign_key: :resource_id, dependent: :destroy
 
           # Index DOIs from snapshots in Solr
           searchable(auto_index: false) do

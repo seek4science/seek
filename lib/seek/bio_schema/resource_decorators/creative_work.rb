@@ -3,13 +3,11 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a Event
       class CreativeWork < Thing
-        associated_items provider: :projects,
-                         creator: :creators,
-                         subject_of: :events
+        associated_items producer: :projects
 
         schema_mappings license: :license,
-                        creator: :creator,
-                        provider: :provider,
+                        all_creators: :creator,
+                        producer: :producer,
                         created_at: :dateCreated,
                         updated_at: :dateModified,
                         content_type: :encodingFormat,
@@ -23,6 +21,14 @@ module Seek
         def license
           return unless resource.license
           Seek::License.find(resource.license)&.url
+        end
+
+        def all_creators
+          others = other_creators&.split(',')&.collect(&:strip)&.compact || []
+          others = others.collect { |name| { "@type": 'Person', "name": name } }
+          all = (mini_definitions(creators) || []) + others
+          return if all.empty?
+          all
         end
       end
     end

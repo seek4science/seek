@@ -1,0 +1,34 @@
+
+Hi <%= @owners.collect{|o| o.name}.join(", ") -%>,
+
+The <%= Seek::Config.application_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested membership of <%= "#{@project.title} (#{project_url(@project)})" %>.
+
+<% if @institution.id.nil? %>
+  <%
+    title = @institution.title.blank? ? 'No title provided' : @institution.title
+    web_page = @institution.web_page.blank? ? 'No web page provided' : @institution.web_page
+    country = @institution.country.blank? ? 'No country provided' : CountryCodes.country(@institution.country)
+
+  %>
+They provided the following details about their <%= t('institution') %>:
+  <%= t('institution') %> title: '<%= title %>'
+  <%= t('institution') %> web page: '<%= web_page %>'
+  <%= t('institution') %> country: '<%= country %>'
+<% else %>
+They indicated that they are associated with the existing <%= t('institution') %> <%= "#{@institution.title} (#{institution_url(@institution)}" %>
+<% end %>
+
+<% unless @comments.blank? -%>
+<%=@requester.first_name.capitalize -%> also provided some additional details about why they wish to join:
+
+    "<%= sanitize(@comments) -%>"
+
+<% end -%>
+
+You can quickly accept or reject this request by going to <%= administer_join_request_project_url(@project,message_log_id:@message_log.id) %>.
+
+You can reply to <%= @requester.first_name.capitalize -%> by replying to this email.
+
+This is an automated email.
+
+- <%= Seek::Config.dm_project_name %> Team

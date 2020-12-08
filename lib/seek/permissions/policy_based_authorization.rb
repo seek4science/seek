@@ -19,8 +19,8 @@ module Seek
           belongs_to :policy, autosave: true
           enforce_required_access_for_owner :policy, :manage
 
-          after_create :add_initial_auth_lookup
-          after_commit :check_to_queue_update_auth_table
+          after_commit :immediate_auth_update, on: [:create, :update]
+          after_commit :check_to_queue_update_auth_table, on: [:create, :update]
           after_destroy { |record| record.policy.try(:destroy_if_redundant) }
 
           const_set('AuthLookup', Class.new(::AuthLookup)).class_eval do |c|
@@ -38,27 +38,27 @@ module Seek
       # - state_allows_#{action} - to chekc that the state of the object allows that action to proceed
       #
       # by default state_allows_#{action} always returns true, but can be overridden in the particular model type to tune its behaviour
-      Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.each do |action|
-        eval <<-END_EVAL
-            def can_#{action}? user = User.current_user
-              authorized_for_#{action}?(user) && state_allows_#{action}?(user)
-            end
+      Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.each do |action_sym|
+        action = action_sym.to_s
 
-            def authorized_for_#{action}? user = User.current_user
-                return true if new_record?
-                user_id = user.nil? ? 0 : user.id
-                if Seek::Config.auth_lookup_enabled
-                  lookup = self.lookup_for("#{action}", user_id)
-                else
-                  lookup=nil
-                end
-                if lookup.nil?
-                  authorized_for_action(user,"#{action}")
-                else
-                  lookup
-                end
-            end
-        END_EVAL
+        define_method "can_#{action}?" do |user = User.current_user|
+          send("authorized_for_#{action}?", user) && send("state_allows_#{action}?", user)
+        end
+
+        define_method "authorized_for_#{action}?" do |user = User.current_user|
+          return true if new_record?
+          user_id = user.nil? ? 0 : user.id
+          if Seek::Config.auth_lookup_enabled
+            lookup = self.lookup_for(action, user_id)
+          else
+            lookup = nil
+          end
+          if lookup.nil?
+            authorized_for_action(user, action)
+          else
+            lookup
+          end
+        end
       end
 
       module AuthLookupArrayExtensions
@@ -116,7 +116,7 @@ module Seek
         end
 
         def lookup_class
-          const_get("#{name}::AuthLookup")
+          Object.const_get("#{name}::AuthLookup")
         end
 
         # removes all entries from the authorization lookup type for this authorized type
@@ -164,14 +164,13 @@ module Seek
       end
 
       # immediately update for the current user and anonymous user
-      def add_initial_auth_lookup
+      def immediate_auth_update
         update_lookup_table(User.current_user) unless User.current_user.nil?
         update_lookup_table(nil)
       end
 
       # triggers a background task to update or create the authorization lookup table records for this item
       def check_to_queue_update_auth_table
-        return if destroyed?
         if try(:creators_changed?) || (previous_changes.keys & %w[contributor_id owner_id]).any?
           AuthLookupUpdateQueue.enqueue(self)
         end

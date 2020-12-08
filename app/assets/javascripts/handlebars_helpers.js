@@ -10,11 +10,7 @@ Handlebars.registerHelper('checkPrivilege', function(permission, accessType){
     return parseInt(permission.access_type) == parseInt(accessType) ? ' checked=checked' : '';
 });
 
-Handlebars.registerHelper('checkPrivilege', function(permission, accessType){
-    return parseInt(permission.access_type) == parseInt(accessType) ? ' checked=checked' : '';
-});
-
-Handlebars.registerHelper ('truncate', function (str, len) { // taken from https://gist.github.com/TastyToast/5053642
+Handlebars.registerHelper('truncate', function (str, len) { // taken from https://gist.github.com/TastyToast/5053642
     if (str.length > len && str.length > 0) {
         var new_str = str + " ";
         new_str = str.substr (0, len);
@@ -25,3 +21,14 @@ Handlebars.registerHelper ('truncate', function (str, len) { // taken from https
     }
     return str;
 });
+
+Handlebars.registerHelper('I18n', function (str) {
+        if (I18n !== undefined) {
+            str = I18n.t(str);
+        }
+
+        return str;
+    }
+);
+
+Handlebars.registerHelper('downcase', function (str) { return str.toLowerCase(); });

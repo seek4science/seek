@@ -4,7 +4,7 @@
     <div class="row">
       <div class="col-sm-6">
         <%= list_item_simple_list resource.projects, t('project').pluralize %>
-        <%= list_item_simple_list resource.institutions, "Institutions" %>
+        <%= list_item_simple_list resource.institutions, t('institution').pluralize %>
 
         <% unless hide_contact_details?(resource) %>
             <%= list_item_optional_attribute "Email", mail_to(h(resource.email)) %>

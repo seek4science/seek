@@ -1,5 +1,5 @@
 <%
-   biomodel_link = "http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}"
+   biomodel_link = "https://www.ebi.ac.uk/biomodels/#{resource.model_id}"
 %>
 
 <div class="panel panel-default">
@@ -26,7 +26,7 @@
 
       <div class="col-sm-2 text-right list_item_actions">
         <%
-           biomodel_download_link = "http://www.ebi.ac.uk/biomodels-main/download?mid=#{resource.model_id}"
+           biomodel_download_link = resource.download_link
            description_for_import = resource.abstract
         -%>
 

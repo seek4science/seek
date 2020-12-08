@@ -1,0 +1,17 @@
+<% if Seek::Config.human_diseases_enabled %>
+  <div id="human_disease_gadget" class="panel panel-default">
+    <div class="panel-heading">
+      Human Diseases
+    </div>
+
+    <div class="panel-body">
+      <ul>
+        <% HumanDisease.all.sort_by(&:title).each do |human_disease| %>
+          <li>
+            <%= link_to human_disease.title, human_disease %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% end %>

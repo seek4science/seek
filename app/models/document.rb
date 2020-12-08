@@ -44,7 +44,6 @@ class Document < ApplicationRecord
   end
 
   def self.user_creatable?
-    true
+    Seek::Config.documents_enabled
   end
-
 end

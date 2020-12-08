@@ -399,7 +399,7 @@ class ModelsControllerTest < ActionController::TestCase
     m = Factory(:model, contributor: User.current_user.person)
     assert_difference('Model::Version.count', 1) do
       assert_difference('ModelImage.count') do
-        post :new_version, params: { id: m, model: { title: m.title },
+        post :create_version, params: { id: m, model: { title: m.title },
                                      content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }],
                                      revision_comments: 'This is a new revision',
                                      model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') } }
@@ -625,7 +625,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     # create new version
     assert_difference('Model::Version.count', 1) do
-      post :new_version, params: { id: m, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }] }
+      post :create_version, params: { id: m, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }] }
     end
     assert_redirected_to model_path(assigns(:model))
     m = Model.find(m.id)
@@ -655,7 +655,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 'cronwright.xml',m.versions[0].content_blobs.first.original_filename
 
     assert_difference('Model::Version.count', 1) do
-      post :new_version, params: { id: m, model: { title: m.title}, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }], revision_comments: 'This is a new revision' }
+      post :create_version, params: { id: m, model: { title: m.title}, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }], revision_comments: 'This is a new revision' }
     end
 
     # check previous version isn't affected
@@ -987,7 +987,7 @@ class ModelsControllerTest < ActionController::TestCase
     retained_content_blob = m.content_blobs.first
     login_as(m.contributor)
     assert_difference('Model::Version.count', 1) do
-      post :new_version, params: { id: m, model: { title: m.title }, content_blobs: [{ data: file_for_upload }], retained_content_blob_ids: [retained_content_blob.id] }
+      post :create_version, params: { id: m, model: { title: m.title }, content_blobs: [{ data: file_for_upload }], retained_content_blob_ids: [retained_content_blob.id] }
     end
 
     # check previous version isn't affected

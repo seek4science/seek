@@ -1,0 +1,27 @@
+<h1>New <%= t('collection') %></h1>
+
+<%= form_tag({:action => :create}, :multipart => true) do -%>
+    <div class="asset_form">
+      <%= error_messages_for :collection -%>
+
+      <div class="form-group">
+        <label class="required">Title</label>
+        <% collection_title_value = (params[:collection].blank? || params[:collection][:title].blank?) ? nil : params[:collection][:title] -%>
+        <%= text_field_tag 'collection[title]', collection_title_value, :class=>"form-control" -%>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <% collection_description_value = (params[:collection].blank? || params[:collection][:description].blank?) ? nil : params[:collection][:description] -%>
+        <%= text_area_tag 'collection[description]', collection_description_value, :class=>"form-control" -%>
+      </div>
+
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @collection, :allow_nil => Seek::Config.is_virtualliver } %>
+
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @collection } %>
+
+      <%= fields_for(@collection) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
+
+      <%= form_submit_buttons(@collection) %>
+    </div>
+<% end -%>

@@ -39,14 +39,6 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
                      r: ApiTestHelper.method(:render_erb) }
   end
 
-  def populate_extra_relationships(hash = nil)
-    person_id = @current_user.person.id
-    extra_relationships = {}
-    extra_relationships[:submitter] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
-    extra_relationships[:people] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
-    extra_relationships.with_indifferent_access
-  end
-
   test 'should not delete investigation with studies' do
     inv = Factory(:max_investigation)
     assert_no_difference('Investigation.count') do

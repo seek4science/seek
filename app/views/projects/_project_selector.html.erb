@@ -27,7 +27,7 @@
   end
 
   field_name = "#{resource.class.name.underscore}[project_ids][]"
-  title = 'Projects'
+  title = t('project').pluralize
   title += '<span class="required">*</span>'.html_safe unless allow_nil
 
   object_type_text = resource.class.name.underscore.humanize
@@ -36,7 +36,7 @@
 <%= folding_panel(title, false, id: "add_projects_form",
                   help_text: "Here you can associate the #{object_type_text} with specific #{t('project').downcase.pluralize}.") do %>
     <p class="help-block">
-      The following projects are associated with this <%= object_type_text -%>:
+      The following <%= t('project').downcase.pluralize -%> are associated with this <%= object_type_text -%>:
     </p>
     <div id="project-selector">
       <%# The following line ensures that the parameter is always sent, even when nothing is selected.
@@ -59,7 +59,7 @@
       <div class="association_step">
         <div class="form-group">
           <select autocomplete="off" class="form-control" id="projects-selector-select">
-            <option selected="selected">Select a project...</option>
+            <option selected="selected">Select a <%= t('project').downcase -%>...</option>
             <option v-for="project in possibilities" :value="project.id">{{ project.title }}</option>
           </select>
         </div>
@@ -92,17 +92,14 @@
           var project = this.possibilities[i];
           if (project.id == projectId) {
             this.selected.push(project);
-            // Ask if they want to use the default policy (if there is one)
-            if (Sharing.defaultPolicies[project.id] && (skipPrompt || confirm('' + project.title + ' has a default policy specified, do you want to apply it?'))) {
-              Sharing.applyPolicy(Sharing.defaultPolicies[project.id]);
-            } else { // Otherwise just add a permission for the project
-              Sharing.addPermissionForProject(project);
-            }
+            Sharing.defaultPolicyPrompt(project, skipPrompt);
 
             // Select the default license
             if (this.selected.length === 1 && Sharing.defaultLicenses[project.id]) {
-              $j('#license-select').val(Sharing.defaultLicenses[project.id]);
-              zenodoExport.setLicenseUrl();
+                if ($j('#license-select option[value="'+Sharing.defaultLicenses[project.id]+'"]').length) {
+                    $j('#license-select').val(Sharing.defaultLicenses[project.id]);
+                    zenodoExport.setLicenseUrl();
+                }
             }
             this.possibilities.splice(i, 1);
           }

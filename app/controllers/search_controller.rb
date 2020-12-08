@@ -1,5 +1,5 @@
 class SearchController < ApplicationController
-  include Seek::ExternalSearch
+
   include Seek::FacetedBrowsing
 
   class InvalidSearchException < RuntimeError; end
@@ -95,7 +95,7 @@ class SearchController < ApplicationController
       end
 
       if search_params[:include_external_search] == "1"
-        external_results = external_search(downcase_query, type)
+        external_results = Seek::ExternalSearch.instance.external_search(downcase_query, type)
         @results |= external_results
       end
 
@@ -107,10 +107,6 @@ class SearchController < ApplicationController
 
   def search_params
     params.permit(:search_type, :q, :search_query, :include_external_search, :scale)
-  end
-
-  def include_external_search?
-    Seek::Config.external_search_enabled && search_params[:include_external_search]
   end
 
 end

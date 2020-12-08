@@ -1,0 +1,182 @@
+{
+    "data": {
+        "id": "21",
+        "type": "workflows",
+        "attributes": {
+            "policy": {
+                "access": "download",
+                "permissions": [
+                    {
+                        "resource": {
+                            "id": "12",
+                            "type": "projects"
+                        },
+                        "access": "download"
+                    }
+                ]
+            },
+            "title": "A CWL Worfklow",
+            "description": "Testing CWL upload",
+            "license": "CC-BY-4.0",
+            "latest_version": 1,
+            "tags": null,
+            "versions": [
+                {
+                    "version": 1,
+                    "revision_comments": null,
+                    "url": "http://localhost:3000/workflows/21?version=1"
+                }
+            ],
+            "version": 1,
+            "revision_comments": null,
+            "created_at": "2020-01-31T13:51:34.000Z",
+            "updated_at": "2020-01-31T13:52:39.000Z",
+            "content_blobs": [
+                {
+                    "original_filename": "rp2-to-rp2path.cwl",
+                    "url": null,
+                    "md5sum": "7ba0ca461d61c6971ac0d7e998cb7f12",
+                    "sha1sum": "37c6f1f4c5e4e2b9c290295afe67e28b16876b25",
+                    "content_type": "application/octet-stream",
+                    "link": "http://localhost:3000/workflows/21/content_blobs/1464",
+                    "size": 1200
+                }
+            ],
+            "other_creators": null,
+            "workflow_class": {
+                "title": "Common Workflow Language",
+                "key": "CWL",
+                "description": null
+            },
+            "internals": {
+                "inputs": [
+                    {
+                        "id": "rulesfile",
+                        "name": null,
+                        "description": null,
+                        "type": null,
+                        "default_value": null
+                    },
+                    {
+                        "id": "sourcefile",
+                        "name": null,
+                        "description": null,
+                        "type": null,
+                        "default_value": null
+                    },
+                    {
+                        "id": "sinkfile",
+                        "name": null,
+                        "description": null,
+                        "type": null,
+                        "default_value": null
+                    },
+                    {
+                        "id": "reverse",
+                        "name": null,
+                        "description": null,
+                        "type": null,
+                        "default_value": null
+                    },
+                    {
+                        "id": "max-steps",
+                        "name": null,
+                        "description": null,
+                        "type": null,
+                        "default_value": null
+                    }
+                ],
+                "outputs": [
+                    {
+                        "id": "compounds",
+                        "name": null,
+                        "description": null,
+                        "type": "File"
+                    },
+                    {
+                        "id": "reactions",
+                        "name": null,
+                        "description": null,
+                        "type": "File"
+                    },
+                    {
+                        "id": "sinks",
+                        "name": null,
+                        "description": null,
+                        "type": "File"
+                    }
+                ],
+                "steps": [
+                    {
+                        "id": "rp2",
+                        "name": null,
+                        "description": null
+                    },
+                    {
+                        "id": "rp2paths",
+                        "name": null,
+                        "description": null
+                    }
+                ]
+            }
+        },
+        "relationships": {
+            "creators": {
+                "data": []
+            },
+            "submitter": {
+                "data": [
+                    {
+                        "id": "321",
+                        "type": "people"
+                    }
+                ]
+            },
+            "people": {
+                "data": [
+                    {
+                        "id": "321",
+                        "type": "people"
+                    }
+                ]
+            },
+            "projects": {
+                "data": [
+                    {
+                        "id": "12",
+                        "type": "projects"
+                    }
+                ]
+            },
+            "investigations": {
+                "data": []
+            },
+            "studies": {
+                "data": []
+            },
+            "assays": {
+                "data": []
+            },
+            "publications": {
+                "data": []
+            },
+            "sops": {
+                "data": []
+            }
+        },
+        "links": {
+            "self": "/workflows/21?version=1",
+            "diagram": "/workflows/21/diagram?version=1"
+        },
+        "meta": {
+            "created": "2020-01-31T13:51:34.000Z",
+            "modified": "2020-01-31T13:52:39.000Z",
+            "api_version": "0.2",
+            "uuid": "b7bd6eb0-265e-0138-94a3-74939ff51fe0",
+            "base_url": "http://localhost:3000"
+        }
+    },
+    "jsonapi": {
+        "version": "1.0"
+    }
+}

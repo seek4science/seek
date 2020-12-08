@@ -5,6 +5,8 @@ module Seek
       class DataFile < CreativeWork
         include ActionView::Helpers::NumberHelper
 
+        associated_items subject_of: :events
+
         schema_mappings doi: :identifier,
                         distribution: :distribution
 
@@ -35,7 +37,7 @@ module Seek
         end
 
         def schema_type
-          'DataSet'
+          'Dataset'
         end
       end
     end

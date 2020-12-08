@@ -1,8 +1,8 @@
 <%= panel("Your Institution details for this #{t('project')}") do %>
     <p class="alert alert-info">
       If you wish to be automatically assigned to the <%= t('project') %>, and also become
-      the <%= t('project_administrator') %> then please check the box below and select your institution. If your
-      Institution is not listed, you may need to <%= link_to 'Create the Institution', new_institution_path %> first.
+      the <%= t('project_administrator') %> then please check the box below and select your <%= t('institution').downcase %>. If your
+      <%= t('institution') -%>> is not listed, you may need to <%= link_to "Create the #{t('institution')}", new_institution_path %> first.
     </p>
 
     <div class='form-group'>
@@ -10,7 +10,7 @@
       make me the <%= t('project_administrator') %>.
     </div>
     <div class='form-group' id='institution' style='display:none;'>
-      <label for='institution'>Your Institution</label>
+      <label for='institution'>Your <%= t('institution') %></label>
       <%= select_tag 'default_member[institution_id]', options_from_collection_for_select(Institution.order(:title), "id", "title"), :class => 'form-control' %>
     </div>
 

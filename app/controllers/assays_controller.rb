@@ -4,7 +4,6 @@ class AssaysController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :assays_enabled?
-
   before_action :find_assets, :only=>[:index]
   before_action :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :manage, :manage_update, :show, :new_object_based_on_existing_one]
 
@@ -13,8 +12,6 @@ class AssaysController < ApplicationController
   before_action :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
   include Seek::Publishing::PublishingCommon
-
-  include Seek::BreadCrumbs
 
   include Seek::IsaGraphExtensions
 
@@ -110,6 +107,7 @@ class AssaysController < ApplicationController
     @assay = Assay.new(assay_params)
 
     update_assay_organisms @assay, params
+    update_assay_human_diseases @assay, params
     @assay.contributor=current_person
     update_sharing_policies @assay
     update_annotations(params[:tag_list], @assay)
@@ -131,6 +129,7 @@ class AssaysController < ApplicationController
 
   def update
     update_assay_organisms @assay, params
+    update_assay_human_diseases @assay, params
     update_annotations(params[:tag_list], @assay)
     update_sharing_policies @assay
     update_relationships(@assay, params)
@@ -155,6 +154,14 @@ class AssaysController < ApplicationController
       o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")
       culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
       assay.associate_organism(o_id, strain_id, culture_growth,t_id,t_title)
+    end
+  end
+
+  def update_assay_human_diseases assay,params
+    human_diseases             = params[:assay_human_disease_ids] || params[:assay][:human_disease_ids] || []
+    assay.assay_human_diseases = []
+    Array(human_diseases).each do |human_disease_id|
+      assay.associate_human_disease(human_disease_id)
     end
   end
 

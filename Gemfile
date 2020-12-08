@@ -31,7 +31,6 @@ gem 'daemons'
 gem 'linkeddata'
 gem 'rdf'
 
-
 gem 'openseek-api'
 # for fancy content escaping in openbis integration
 gem 'loofah'
@@ -43,7 +42,6 @@ gem 'json-diff'
 gem 'rubyzip'
 
 gem 'equivalent-xml'
-gem 'breadcrumbs_on_rails'
 gem 'docsplit'
 gem 'pothoven-attachment_fu'
 gem 'exception_notification'
@@ -73,7 +71,6 @@ gem 'bioportal', '>=3.0', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
 gem 'convert_office', git: 'https://github.com/SysMO-DB/convert_office.git', ref: '753f2567dbd625bc89071e1150404efbb562e130'
 gem 'fleximage', git: 'https://github.com/SysMO-DB/fleximage.git', ref: 'bb1182f2716a9bf1b5d85e186d8bb7eec436797b'
-gem 'search_biomodel', '2.2.1', git: 'https://github.com/myGrid/search_biomodel.git'
 
 gem 'jquery-rails', '~> 4.2.2'
 gem 'jquery-ui-rails'
@@ -105,6 +102,7 @@ gem 'omniauth', '~> 1.3.1'
 gem 'omniauth-ldap', '~> 1.0.5'
 gem 'omniauth_openid_connect'
 gem 'omniauth-rails_csrf_protection', '~> 0.1'
+gem 'omniauth-github', '~> 1.2.0'
 
 gem 'ransack'
 
@@ -131,8 +129,19 @@ gem "puma", ">= 3.12.6"
 
 gem "doorkeeper", ">= 5.2.5"
 
+gem 'request_store'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
+
+gem 'ro-crate-ruby', git: 'https://github.com/fbacall/ro-crate-ruby.git'
+
+gem 'git'
+
+gem 'redcarpet'
+
+gem 'i18n-js'
+
 source 'https://rails-assets.org' do
   gem 'rails-assets-bootstrap-multiselect', '~> 0.9.13'
   gem 'rails-assets-bootstrap-tagsinput', '~> 0.8.0'
@@ -159,6 +168,8 @@ group :development do
   gem 'guard-rubycritic', require: false
   gem 'rails_best_practices'
   gem 'gem-licenses'
+  gem "better_errors"
+  gem "binding_of_caller"
 end
 
 group :test do

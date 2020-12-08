@@ -8,8 +8,6 @@ class FoldersController < ApplicationController
   before_action :get_folders,:only=>[:index,:move_asset_to,:create_folder]
   before_action :get_asset, :only=>[:move_asset_to,:remove_asset]
 
-  include Seek::BreadCrumbs
-
   def show
     respond_to do |format|
       format.html
@@ -107,7 +105,7 @@ class FoldersController < ApplicationController
   def check_project
     @project = Project.find(params[:project_id])
     if @project.nil? || !current_person.projects.include?(@project)
-      error("You must be a member of the project", "is invalid (not in project)")
+      error("You must be a member of the #{t('project').downcase}", "is invalid (not in #{t('project').downcase})")
     end
   end
 

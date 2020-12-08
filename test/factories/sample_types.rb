@@ -20,7 +20,7 @@ end
 Factory.define(:simple_sample_type, parent: :sample_type) do |f|
   f.sequence(:title) { |n| "Simple Sample Type #{n}" }
   f.after_build do |type|
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'the title', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'the_title', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
   end
 end
 
@@ -77,5 +77,14 @@ Factory.define(:linked_optional_sample_type, parent: :sample_type) do |f|
   f.after_build do |type|
     type.sample_attributes << Factory.build(:sample_attribute, title: 'title', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
     type.sample_attributes << Factory.build(:sample_sample_attribute, title: 'patient', linked_sample_type: Factory(:patient_sample_type,project_ids:type.projects.collect(&:id)), required: false, sample_type: type)
+  end
+end
+
+Factory.define(:sample_type_with_symbols, parent: :sample_type) do |f|
+  f.sequence(:title) { |n| "sample type with symbols #{n}" }
+  f.after_build do |type|
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'title&', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'name ++##!', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: false, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'size range (bp)', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: false, sample_type: type)
   end
 end
