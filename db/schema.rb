@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_05_091606) do
+ActiveRecord::Schema.define(version: 2020_11_19_101609) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -412,6 +412,7 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.string "license"
     t.boolean "simulation_data", default: false
     t.string "deleted_contributor"
+    t.integer "visibility"
     t.index ["contributor_id"], name: "index_data_file_versions_contributor"
     t.index ["data_file_id"], name: "index_data_file_versions_on_data_file_id"
   end
@@ -513,6 +514,7 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.datetime "updated_at"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "visibility"
     t.index ["contributor_id"], name: "index_document_versions_on_contributor"
     t.index ["document_id"], name: "index_document_versions_on_document_id"
   end
@@ -914,6 +916,7 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.string "license"
     t.string "deleted_contributor"
     t.integer "human_disease_id"
+    t.integer "visibility"
     t.index ["contributor_id"], name: "index_model_versions_on_contributor"
     t.index ["model_id"], name: "index_model_versions_on_model_id"
   end
@@ -1000,6 +1003,7 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
+    t.integer "visibility"
     t.index ["contributor_id"], name: "index_node_versions_on_contributor"
     t.index ["node_id"], name: "index_node_versions_on_node_id"
   end
@@ -1222,6 +1226,7 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.integer "policy_id"
     t.string "license"
     t.string "deleted_contributor"
+    t.integer "visibility"
   end
 
   create_table "presentation_versions_projects", id: false,  force: :cascade do |t|
@@ -1671,6 +1676,7 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
+    t.integer "visibility"
     t.index ["contributor_id"], name: "index_sop_versions_on_contributor"
     t.index ["sop_id"], name: "index_sop_versions_on_sop_id"
   end
@@ -1940,6 +1946,7 @@ ActiveRecord::Schema.define(version: 2020_08_05_091606) do
     t.text "metadata"
     t.integer "workflow_class_id"
     t.integer "maturity_level"
+    t.integer "visibility"
     t.index ["contributor_id"], name: "index_workflow_versions_on_contributor"
     t.index ["workflow_id"], name: "index_workflow_versions_on_workflow_id"
   end

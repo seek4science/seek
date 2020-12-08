@@ -132,6 +132,14 @@ class Person < ApplicationRecord
   def person
     self
   end
+    
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['first_name','last_name']
+  end
+  def columns_allowed
+    super + ['first_name','last_name','email','phone','skype_name','web_page','orcid']
+  end
 
   # not registered profiles that match this email
   def self.not_registered_with_matching_email(email)
@@ -394,6 +402,11 @@ class Person < ApplicationRecord
         name: name,
         identifier: orcid.present? ? orcid : rdf_seek_id
     }
+  end
+
+  # projects this person is project admin of
+  def administered_projects
+    projects.select{|proj| person.is_project_administrator?(proj)}
   end
 
   private

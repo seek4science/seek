@@ -2,16 +2,11 @@
 
 import subprocess
 import sys
-
-# import isatools
-
 import isatools
 from isatools.model import *
 import io
 
 ### MAIN CODE
-
-ofile = open('/tmp/check-isa-output', 'w')
 
 with open(sys.argv[1], 'r') as myfile:
   td = myfile.read()
@@ -21,15 +16,11 @@ x = isatools.isajson.validate(io.StringIO(td))
 try:
   i = isatools.isajson.load(io.StringIO(td))
   y = True
-except:
-    y = False
+except Exception as e:
+  print('isatools error: '+ repr(e), file=sys.stderr)
+  y = False
 
-if not x['errors'] and not x['warnings'] and y:
-    ofile.write('')
-else:
-    ofile.write('Not OK')
-
-ofile.close()
+if x['errors'] or x['warnings'] or not y:
+    print("Not OK")
 
 exit()
-

@@ -313,6 +313,10 @@ class User < ApplicationRecord
     joins(:api_tokens).where(api_tokens: { encrypted_token: ApiToken.encrypt_token(token) }).first
   end
 
+  def uses_omniauth?
+    identities.any?
+  end
+
   protected
 
   # before filter
