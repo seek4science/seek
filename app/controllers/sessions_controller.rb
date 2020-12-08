@@ -145,7 +145,7 @@ class SessionsController < ApplicationController
     else # The identity does not have an associated user.
       # *** LEGACY SUPPORT ***
       if auth.provider.to_s == 'ldap' # If using LDAP, attempt to find user by login.
-        @user = User.find_by_login(auth['info']['nickname'])
+        @user = User.find_by_login(auth.info.nickname)
         if @user
           @identity.user = @user
           @identity.save! # Update identity so we don't have to do this again.
@@ -160,7 +160,7 @@ class SessionsController < ApplicationController
         if Seek::Config.omniauth_user_create # Create a new user if allowed.
           create_user_from_omniauth(auth)
         else # If user creation is not allowed, too bad.
-          failed_login "The authenticated user: #{auth['info']['nickname']} does not have a #{Seek::Config.application_name} account."
+          failed_login "The authenticated user: #{auth.info.nickname} does not have a #{Seek::Config.application_name} account."
         end
       end
     end
@@ -184,7 +184,8 @@ class SessionsController < ApplicationController
       @user.activate if Seek::Config.omniauth_user_activate && !@user.active?
       @identity.user = @user
       @identity.save!
-      check_login(nil, person_params: auth['info'].slice(:first_name, :last_name, :email, :name))
+      person_params = auth.info.with_indifferent_access.slice(:first_name, :last_name, :email, :name)
+      check_login(nil, person_params: person_params)
     else # An unexpected error occurred whilst saving the user.
       failed_login "Cannot create a new user: #{@user.errors.full_messages.join(', ')}."
     end
