@@ -1,6 +1,14 @@
 require 'test_helper'
 
 class WorkflowClassTest < ActiveSupport::TestCase
+  setup do
+    $authorization_checks_disabled = true
+  end
+
+  teardown do
+    $authorization_checks_disabled = false
+  end
+
   test 'validate uniqueness of workflow class title' do
     c1 = WorkflowClass.new(title: 'A Class', key: 'class1')
     assert c1.save
