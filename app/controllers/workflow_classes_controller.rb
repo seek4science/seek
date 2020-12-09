@@ -54,7 +54,7 @@ class WorkflowClassesController < ApplicationController
 
   private
 
-  def handle_authorization_failure(*_)
+  def handle_authorization_failure_redirect(*_)
     redirect_to workflow_classes_path
   end
 

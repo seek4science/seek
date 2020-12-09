@@ -244,7 +244,19 @@ class ApplicationController < ActionController::Base
       params.delete :policy_attributes unless object.can_manage?(current_user)
     else
       respond_to do |format|
-        format.html { handle_authorization_failure(object, privilege) }
+        format.html do
+          case privilege
+          when :publish, :manage, :edit, :download, :delete
+            if current_user.nil?
+              flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}, you may need to login first."
+            else
+              flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}."
+            end
+            handle_authorization_failure_redirect(object, privilege)
+          else
+            render template: 'general/landing_page_for_hidden_item', locals: { item: object }, status: :forbidden
+          end
+        end
         format.rdf { render plain: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
         format.xml { render plain: "<error>You may not #{privilege} #{name}:#{params[:id]}</error>", status: :forbidden }
         format.json { render json: { errors: [{ title: 'Forbidden',
@@ -255,18 +267,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def handle_authorization_failure(object, privilege)
-    case privilege
-    when :publish, :manage, :edit, :download, :delete
-      if current_user.nil?
-        flash[:error] = "You are not authorized to #{privilege} this #{controller_name.singularize.humanize}, you may need to login first."
-      else
-        flash[:error] = "You are not authorized to #{privilege} this #{controller_name.singularize.humanize}."
-      end
-      redirect_to(object)
-    else
-      render template: 'general/landing_page_for_hidden_item', locals: { item: object }, status: :forbidden
-    end
+  def handle_authorization_failure_redirect(object, privilege)
+    redirect_to(object)
   end
 
   def auth_to_create
