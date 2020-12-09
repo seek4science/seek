@@ -20,6 +20,23 @@ class WorkflowClassesControllerTest < ActionController::TestCase
     assert_select 'a.btn[href=?]', edit_workflow_class_path(c2), count: 0
   end
 
+  test 'admin can edit any workflow class' do
+    person = Factory(:person)
+    c1, c2 = nil
+    disable_authorization_checks do
+      c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
+      c2 = WorkflowClass.create!(title: 'Another Class', key: 'class1')
+    end
+
+    login_as(Factory(:admin))
+
+    get :index
+
+    assert_response :success
+    assert_select 'a.btn[href=?]', edit_workflow_class_path(c1)
+    assert_select 'a.btn[href=?]', edit_workflow_class_path(c2)
+  end
+
   test 'get new' do
     person = Factory(:person)
     login_as(person)
@@ -62,7 +79,6 @@ class WorkflowClassesControllerTest < ActionController::TestCase
     assert_equal 'new_class', wc.key
   end
 
-
   test 'update workflow class' do
     person = Factory(:person)
     c1 = nil
@@ -70,6 +86,20 @@ class WorkflowClassesControllerTest < ActionController::TestCase
       c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
     end
     login_as(person)
+
+    put :update, params: { id: c1.id, workflow_class: { title: 'Wut' } }
+
+    assert_redirected_to workflow_classes_path
+    assert_equal 'Wut', c1.reload.title
+  end
+
+  test 'update workflow class as admin' do
+    person = Factory(:person)
+    c1 = nil
+    disable_authorization_checks do
+      c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
+    end
+    login_as(Factory(:admin))
 
     put :update, params: { id: c1.id, workflow_class: { title: 'Wut' } }
 
@@ -89,6 +119,53 @@ class WorkflowClassesControllerTest < ActionController::TestCase
       delete :destroy, params: { id: c1.id }
     end
 
+    assert_redirected_to workflow_classes_path
+  end
+
+  test 'cannot create workflow class if not registered' do
+    person = Factory(:person)
+    logout
+    p = { title: 'New Class',
+          alternate_name: 'nc',
+          identifier: 'https://workflow-classes.ninja/nc',
+          url: 'https://workflow-classes.info/info/nc.html' }
+
+    assert_no_difference('WorkflowClass.count') do
+      post :create, params: { workflow_class: p }
+    end
+
+    assert flash[:error].include?('create')
+    assert_redirected_to workflow_classes_path
+  end
+
+  test 'cannot update workflow class if not contributor/admin' do
+    person = Factory(:person)
+    c1 = nil
+    disable_authorization_checks do
+      c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
+    end
+    login_as(Factory(:person))
+
+    put :update, params: { id: c1.id, workflow_class: { title: 'Wut' } }
+
+    assert flash[:error].include?('not authorized to edit')
+    assert_redirected_to workflow_classes_path
+    refute_equal 'Wut', c1.reload.title
+  end
+
+  test 'cannot destroy workflow class if not contributor/admin' do
+    person = Factory(:person)
+    c1 = nil
+    disable_authorization_checks do
+      c1 = WorkflowClass.create!(title: 'My Class', key: 'mine', contributor: person)
+    end
+    login_as(Factory(:person))
+
+    assert_no_difference('WorkflowClass.count') do
+      delete :destroy, params: { id: c1.id }
+    end
+
+    assert flash[:error].include?('not authorized to delete')
     assert_redirected_to workflow_classes_path
   end
 end

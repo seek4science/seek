@@ -54,6 +54,10 @@ class WorkflowClassesController < ApplicationController
 
   private
 
+  def handle_authorization_failure(*_)
+    redirect_to workflow_classes_path
+  end
+
   def workflow_class_params
     params.require(:workflow_class).permit(:title, :alternate_name, :identifier, :url)
   end
