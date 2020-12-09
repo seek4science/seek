@@ -32,6 +32,11 @@ then
     bundle exec rake seek:workers:start &
 fi
 
+# Ensure things have started up and logs are available before tailing
+while [ ! -f log/puma.out ] || [ ! -f log/puma.err ] || [ ! -f log/production.log ]
+do
+  sleep 0.2
+done
 
 tail -f log/puma.out log/puma.err log/production.log &
 
