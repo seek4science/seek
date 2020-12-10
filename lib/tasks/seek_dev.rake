@@ -426,7 +426,16 @@ namespace :seek_dev do
     else
       puts "CMT for Assay already exists"
     end
-
   end
 
+  task report_missing_related_items_routes: :environment do
+    Seek::RelatedItems::RELATABLE_TYPES.each do |type|
+      klass = type.constantize
+      methods = klass.related_type_methods
+      methods.each_key do |assoc|
+        x = Rails.application.routes.url_helpers.send("#{type.underscore}_#{assoc.pluralize.underscore}_path", 1) rescue nil
+        puts "Missing! #{type.underscore}_#{assoc.pluralize.underscore}_path" if x.nil?
+      end
+    end
+  end
 end
