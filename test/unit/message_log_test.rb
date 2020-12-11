@@ -201,6 +201,37 @@ class MessageLogTest < ActiveSupport::TestCase
 
   end
 
+  test 'destroy when person is' do
+
+    MessageLog.destroy_all
+
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+
+    project = Project.new(title: 'my project')
+    institution = Factory(:institution)
+
+    MessageLog.log_project_creation_request(person1,Factory(:programme),project,institution)
+    MessageLog.log_project_creation_request(person2,Factory(:programme),project,institution)
+
+    project = Factory(:project)
+    MessageLog.log_project_membership_request(person1,project,Factory(:institution),'')
+    MessageLog.log_project_membership_request(person2,project,Factory(:institution),'')
+
+
+    assert_difference('MessageLog.count',-2) do
+      assert_difference('Person.count',-1) do
+        disable_authorization_checks do
+          person1.destroy
+        end
+      end
+    end
+
+    assert_equal 2, MessageLog.all.count
+    assert_equal [person2],MessageLog.all.collect(&:sender).uniq
+
+  end
+
 
   private
 
@@ -208,5 +239,7 @@ class MessageLogTest < ActiveSupport::TestCase
     resource = Factory(:project)
     sender = Factory(:person)
     MessageLog.new(resource: resource, sender: sender, details: 'blah blah', message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+
+
   end
 end
