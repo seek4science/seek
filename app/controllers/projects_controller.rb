@@ -152,12 +152,16 @@ class ProjectsController < ApplicationController
 
     if params[:programme_id]
       @programme = Programme.find(params[:programme_id])
-      raise 'Not managed programme' unless @programme.site_managed?
       raise "no #{t('programme')} can be found" if @programme.nil?
-      log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
-      Mailer.request_create_project_for_programme(current_user, @programme,@project.to_json, @institution.to_json, log).deliver_later
-
-      flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
+      if admin_logged_in? || current_person.is_programme_administrator?(@programme)
+        log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+      elsif @programme.managed_programme?
+        log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+        Mailer.request_create_project_for_programme(current_user, @programme,@project.to_json, @institution.to_json, log).deliver_later
+        flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
+      else
+        raise 'Invalid Programme'
+      end
     elsif Seek::Config.programmes_enabled
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
@@ -171,9 +175,12 @@ class ProjectsController < ApplicationController
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     end
 
-
-    respond_to do |format|
-      format.html
+    if admin_logged_in? || (@programme && current_person.is_programme_administrator?(@programme))
+      redirect_to administer_create_project_request_projects_path(message_log_id:log.id)
+    else
+      respond_to do |format|
+        format.html
+      end
     end
   end
 

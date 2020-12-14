@@ -1743,8 +1743,28 @@ class ProjectsControllerTest < ActionController::TestCase
       get :guided_create
     end
     assert_response :success
+    assert_select 'input#managed_programme', count:1
+
   end
 
+  test 'guided create with administered programmes' do
+    person = Factory(:programme_administrator)
+    prog = Factory(:programme, title:'THE MANAGED ONE')
+    person_prog = person.programmes.first
+    another_prog = Factory(:programme)
+    login_as(person)
+    with_config_value(:managed_programme_id, prog.id) do
+      get :guided_create
+    end
+    assert_response :success
+    assert_select 'input#managed_programme', count:0
+    assert_select 'select#programme_id' do
+      assert_select 'option',count:2
+      assert_select 'option',value:prog.id,text:prog.title
+      assert_select 'option',value:person_prog.id,text:person_prog.title
+      assert_select 'option',value:another_prog.id,text:another_prog.title, count:0
+    end
+  end
 
   test 'request_join_project with known project and institution' do
     person = Factory(:person_not_in_project)
@@ -1809,7 +1829,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 'http://google.com', institution_details['web_page']
   end
 
-  test 'request create project with managed programme' do
+  test 'request create project with site managed programme' do
     person = Factory(:person_not_in_project)
     programme = Factory(:programme)
     institution = Factory(:institution)
@@ -1829,6 +1849,37 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_response :success
       assert flash[:notice]
       log = MessageLog.last
+      details = JSON.parse(log.details)
+      assert_equal institution.title, details['institution']['title']
+      assert_equal institution.id, details['institution']['id']
+      assert_equal institution.country, details['institution']['country']
+      assert_equal programme.title, details['programme']['title']
+      assert_equal programme.id, details['programme']['id']
+      project_details = details['project']
+      assert_equal 'description', project_details['description']
+      assert_equal 'The Project', project_details['title']
+    end
+  end
+
+  test 'request create project with own administered programme' do
+    person = Factory(:programme_administrator)
+    programme = person.programmes.first
+    institution = Factory(:institution)
+    login_as(person)
+    with_config_value(:managed_programme_id, nil) do
+      params = {
+        programme_id: programme.id,
+        project: { title: 'The Project',description:'description',web_page:'web_page'},
+        institution: {id: institution.id}
+      }
+      assert_enqueued_emails(0) do
+        assert_difference('MessageLog.count',1) do
+          post :request_create, params: params
+        end
+      end
+      log = MessageLog.last
+      assert_redirected_to administer_create_project_request_projects_path(message_log_id:log.id)
+
       details = JSON.parse(log.details)
       assert_equal institution.title, details['institution']['title']
       assert_equal institution.id, details['institution']['id']
