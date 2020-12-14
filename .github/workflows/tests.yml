@@ -48,7 +48,7 @@ jobs:
             suite: rails test test/unit
     steps:
       - name: Install system dependencies
-        run: sudo apt install libcurl4-gnutls-dev
+        run: sudo apt update && sudo apt install libcurl4-gnutls-dev
         # build-essential git imagemagick libgmp-dev \
         #    libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
         #    libxml++2.6-dev libxslt1-dev nodejs openjdk-8-jdk openssh-server poppler-utils zip
