@@ -8,9 +8,9 @@ module Seek
     class ROCrate < Base
       available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', jpg: 'image/jpeg', default: :svg)
 
-      def initialize(io, inner_extractor_class: nil)
+      def initialize(io, main_workflow_class: nil)
         @io = io
-        @main_workflow_extractor_class = inner_extractor_class
+        @main_workflow_class = main_workflow_class
       end
 
       def can_render_diagram?
@@ -43,7 +43,7 @@ module Seek
               else
                 main_workflow_extractor(crate).metadata
               end
-          m[:workflow_class_id] ||= main_workflow_extractor(crate).class.workflow_class&.id
+          m[:workflow_class_id] ||= main_workflow_class(crate)&.id
 
           # Metadata from crate
           if crate['keywords'] && m[:tags].blank?
@@ -112,39 +112,19 @@ module Seek
         end
       end
 
-      def self.determine_extractor_class(language)
-        matchable = ['identifier', 'name', 'alternateName', '@id', 'url']
-        @extractor_matcher ||= [Seek::WorkflowExtractors::CWL,
-                                Seek::WorkflowExtractors::Galaxy,
-                                Seek::WorkflowExtractors::Nextflow,
-                                Seek::WorkflowExtractors::Snakemake,
-                                Seek::WorkflowExtractors::KNIME].map do |extractor|
-          [extractor.ro_crate_metadata.slice(*matchable), extractor]
-        end
-
-        matchable.each do |key|
-          extractor = @extractor_matcher.detect do |hash, extractor|
-            !language[key].nil? && !hash[key].nil? && language[key] == hash[key]
-          end
-
-          return extractor[1] if extractor
-        end
-
-        nil
-      end
-
       private
 
-      def main_workflow_extractor_class(crate)
-        return @main_workflow_extractor_class if @main_workflow_extractor_class
+      def main_workflow_class(crate)
+        return @main_workflow_class if @main_workflow_class
 
-        self.class.determine_extractor_class(crate&.main_workflow&.programming_language) || Seek::WorkflowExtractors::Base
+        WorkflowClass.match_from_metadata(crate&.main_workflow&.programming_language&.properties || {})
       end
 
       def main_workflow_extractor(crate)
-        return @main_workflow_extractor if @main_workflow_extractor
+        workflow_class = main_workflow_class(crate)
+        extractor_class = workflow_class&.extractor_class || Seek::WorkflowExtractors::Base
 
-        main_workflow_extractor_class(crate).new(crate&.main_workflow&.source)
+        extractor_class.new(crate&.main_workflow&.source)
       end
 
       def abstract_cwl_extractor(crate)

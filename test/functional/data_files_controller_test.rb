@@ -1467,12 +1467,17 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :forbidden
   end
 
-  test "should show error for the user who doesn't login or is not the project member, when the user specify the version and this version is not the latest version" do
+  test "should show error for the anonymous user who tries to view 'registered-users-only' version" do
     published_data_file = Factory(:data_file, policy: Factory(:public_policy))
 
     published_data_file.save_as_new_version
     Factory(:content_blob, asset: published_data_file, asset_version: published_data_file.version)
     published_data_file.reload
+
+    disable_authorization_checks do
+      published_data_file.find_version(1).update_attributes!(visibility: :registered_users)
+      published_data_file.find_version(2).update_attributes!(visibility: :public)
+    end
 
     logout
     get :show, params: { id: published_data_file, version: 1 }

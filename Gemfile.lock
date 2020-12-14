@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/fbacall/ro-crate-ruby.git
-  revision: 70804d34264481e70d0fe83ecc6ad76eda164e74
+  revision: b3064850df7acf966b2964da46ee42b8526ac8be
   specs:
     ro-crate-ruby (0.3.0)
       addressable
@@ -529,7 +529,7 @@ GEM
       pry (~> 0.9)
       slop (~> 3.0)
     psych (2.2.4)
-    public_suffix (4.0.5)
+    public_suffix (4.0.6)
     puma (4.3.5)
       nio4r (~> 2.0)
     pyu-ruby-sasl (0.0.3.3)

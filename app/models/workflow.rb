@@ -49,7 +49,7 @@ class Workflow < ApplicationRecord
   end
 
   def avatar_key
-    workflow_class ? "#{workflow_class.key.downcase}_workflow" : 'workflow'
+    workflow_class&.extractor&.present? ? "#{workflow_class.key.downcase}_workflow" : 'workflow'
   end
 
   def self.user_creatable?

@@ -353,7 +353,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        '@id' => "http://localhost:3000/people/#{@person.id}",
                        'name' => @person.name }],
                  'version' => 1,
-                 'programmingLanguage' => 'CWL workflow',
+                 'programmingLanguage' => 'Common Workflow Language',
                  'input' => [
                    { '@type' => 'FormalParameter',
                      'name' => '#main/input.cofsfile' },

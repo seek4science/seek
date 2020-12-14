@@ -20,8 +20,8 @@
           <span class="subtle">Set up the welcome message and description of your <%= t('project') %>, configure the news feeds.</span>
         </li>
         <li>
-          <%= link_to "Index page behaviour", pagination_admin_path %><br/>
-          <span class="subtle">Control which items are displayed by default on index pages.</span>
+          <%= link_to "Paging/Sorting settings", pagination_admin_path %><br/>
+          <span class="subtle">Change options relating to pagination and sorting of items on index pages, and various other places.</span>
         </li>
       </ul>
     </div>
@@ -37,6 +37,7 @@
             <li><%= link_to "Manage #{t('project').pluralize.downcase}", manage_projects_path %></li>
         <% end %>
         <!-- <li><%= link_to 'Manage compounds', compounds_path %></li> -->
+        <li><%= link_to "Manage #{WorkflowClass.model_name.human.pluralize}", workflow_classes_path %></li>
       </ul>
       <ul>
         <li>

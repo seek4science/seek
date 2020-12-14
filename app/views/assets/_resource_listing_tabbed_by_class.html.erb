@@ -9,6 +9,7 @@
    item ||= nil
    hide_view_all ||= false
    display_immediately ||= false
+   index_params ||= {}
 
    ordered_resource_types = prepare_resource_hash(resource_hash)
 
@@ -19,9 +20,10 @@
     <div class="tabpanel related-items">
       <%= render :partial => 'assets/resource_listing_tab_nav', :locals => { :types => ordered_resource_types } %>
       <div class="tab-content">
+        <% active = true %>
         <% ordered_resource_types.each_with_index do |type, i| -%>
             <% unless type[:items].empty? && (type[:hidden_count] == 0) %>
-                <div id="<%= type[:tab_id] -%>" role="tabpanel" class="tab-pane <%= 'active' if i == 0-%>">
+                <div id="<%= type[:tab_id] -%>" role="tabpanel" class="tab-pane <%= 'active' if active -%>">
                   <% unless type[:items].empty? %>
                       <%= render :partial => "assets/resource_list", :locals => { :collection => type[:items],
                                                                                   :authorization_for_showing_already_done => true,
@@ -34,7 +36,7 @@
                           <% if item %>
                               <%= link_to "View all #{pluralize(type[:total_visible], 'item')}", [item, type[:type].tableize] -%>
                           <% elsif !hide_view_all %>
-                              <%= link_to "View all items", polymorphic_path(type[:type].pluralize.underscore) %>
+                              <%= link_to "View all #{pluralize(type[:total_visible], 'item')}", polymorphic_path(type[:type].pluralize.underscore, index_params) %>
                           <% end-%>
                         </div>
                       </div>
@@ -47,6 +49,7 @@
                       </div>
                   <% end %>
                 </div>
+              <% active = false %>
             <% end -%>
         <% end -%>
       </div>

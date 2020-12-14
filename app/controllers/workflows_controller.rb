@@ -93,7 +93,7 @@ class WorkflowsController < ApplicationController
     # This Workflow instance is just to make `handle_upload_data` work. It is not persisted beyond this action.
     @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
     @crate_builder = WorkflowCrateBuilder.new(ro_crate_params)
-    @crate_builder.workflow_extractor_class = @workflow&.extractor_class
+    @crate_builder.workflow_class = @workflow.workflow_class
     blob_params = @crate_builder.build
     content_blob = @workflow.build_content_blob(blob_params)
 
@@ -195,6 +195,7 @@ class WorkflowsController < ApplicationController
 
   def create_version_metadata
     @workflow = Workflow.find(params[:id])
+    @workflow.assign_attributes(workflow_params)
     update_sharing_policies(@workflow)
     filter_associated_projects(@workflow)
 

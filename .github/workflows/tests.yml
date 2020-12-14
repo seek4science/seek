@@ -1,0 +1,91 @@
+name: tests
+on: [push, pull_request]
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-18.04
+    env:
+      RAILS_ENV: test
+      TERM: dumb-color
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: seek
+          POSTGRES_DB: seek_test
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_USER: seek
+          MYSQL_PASSWORD: test
+          MYSQL_DATABASE: seek_test
+          MYSQL_ROOT_PASSWORD: test
+        ports:
+          - 33306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - mysql
+        suite:
+          - rails test test/unit
+          - rails test test/functional
+          - rails test test/integration
+          - rspec spec
+          - rake teaspoon
+          - rake assets:precompile
+          - rake db:setup
+        include:
+          - database: postgres
+            suite: rails test test/unit
+          - database: sqlite3
+            suite: rails test test/unit
+    steps:
+      - name: Install system dependencies
+        run: sudo apt install libcurl4-gnutls-dev
+        # build-essential git imagemagick libgmp-dev \
+        #    libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
+        #    libxml++2.6-dev libxslt1-dev nodejs openjdk-8-jdk openssh-server poppler-utils zip
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '8' # The JDK version to make available on the path.
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          # Look to see if there is a cache hit for the corresponding requirements file
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+      - name: Create test database
+        run: |
+          cp test/config/database.github.${{ matrix.database }}.yml config/database.yml
+          bundle exec rake db:create
+      - name: Set MySQL char set and collation
+        if: matrix.database == 'mysql'
+        run: echo -e "ALTER DATABASE seek_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\n" | bundle exec rails dbconsole -p
+      - name: Load test database schema
+        run: bundle exec rake db:schema:load
+      - name: Run tests
+        run: bundle exec ${{ matrix.suite }}

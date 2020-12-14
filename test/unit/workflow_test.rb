@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class WorkflowTest < ActiveSupport::TestCase
-
   test 'validations' do
     workflow = Factory :workflow
     workflow.title = ''
@@ -165,5 +164,12 @@ class WorkflowTest < ActiveSupport::TestCase
       refute crate.main_workflow_diagram
       assert crate.main_workflow_cwl
     end
+  end
+
+  test 'create a workflow using a workflow class that does not have an extractor' do
+    workflow_class = WorkflowClass.create(title: 'New Type', key: 'newtype')
+    workflow = Factory(:workflow, workflow_class: workflow_class)
+
+    assert workflow.valid?
   end
 end
