@@ -10,7 +10,7 @@
   </tr>
   </thead>
   <tbody>
-  <% @requests.each do |request| %>
+  <% @requests.select(&:sender).each do |request| %>
     <tr>
       <td><%= link_to(request.sender.title, request.sender) %></td>
       <td><%= JSON.parse(request.details)['project']['title'] %></td>
