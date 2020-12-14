@@ -102,6 +102,8 @@ class Person < ApplicationRecord
 
   has_many :publication_authors
 
+  has_many :sent_message_logs, class_name: 'MessageLog', foreign_key: :sender_id, dependent: :destroy
+
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
       text :project_positions
