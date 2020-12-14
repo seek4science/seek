@@ -495,7 +495,7 @@ module ApplicationHelper
     #current_page? doesn't work with POST
     return false if ['request_join','request_create'].include?(action_name)
 
-    return Seek::Config.programmes_enabled && Programme.managed_programme
+    return Seek::Config.programmes_enabled && Programme.site_managed_programme
   end
 
   PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => I18n.t('institution').pluralize,

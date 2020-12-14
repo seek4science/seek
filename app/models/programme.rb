@@ -54,8 +54,12 @@ class Programme < ApplicationRecord
       joins: [:funding_codes_as_text]
   )
 
-  def self.managed_programme
+  def self.site_managed_programme
     Programme.find_by_id(Seek::Config.managed_programme_id)
+  end
+
+  def site_managed?
+    self == Programme.site_managed_programme
   end
 
   def human_diseases
