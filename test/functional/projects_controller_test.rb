@@ -1816,7 +1816,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     with_config_value(:managed_programme_id, programme.id) do
       params = {
-          managed_programme: '1',
+          programme_id: programme.id,
           project: { title: 'The Project',description:'description',web_page:'web_page'},
           institution: {id: institution.id}
       }

@@ -592,7 +592,7 @@ class ApplicationController < ActionController::Base
   end
 
   def managed_programme_configured?
-    unless Programme.managed_programme
+    unless Programme.site_managed_programme
       error("No managed #{t('programme')} is configured","No managed #{t('programme')} is configured")
       return false
     end

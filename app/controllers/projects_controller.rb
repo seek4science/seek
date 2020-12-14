@@ -151,8 +151,9 @@ class ProjectsController < ApplicationController
       @institution = Institution.new(inst_params)
     end
 
-    if params[:managed_programme]
-      @programme = Programme.managed_programme
+    if params[:programme_id]
+      @programme = Programme.find(params[:programme_id])
+      raise 'Not managed programme' unless @programme.site_managed?
       raise "no #{t('programme')} can be found" if @programme.nil?
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       Mailer.request_create_project_for_programme(current_user, @programme,@project.to_json, @institution.to_json, log).deliver_later
