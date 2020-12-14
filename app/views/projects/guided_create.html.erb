@@ -15,11 +15,18 @@
               it. To have one created, then please provide the name. You will be able to provide additional details, if you wish, once it has been created.
             </div>
 
-            <label>
+            <% if programme_administrator_logged_in? %>
+              <% programmes = (User.current_user.person.administered_programmes + [Programme.site_managed_programme]).compact.uniq %>
+              <%= select_tag :programme_id,options_from_collection_for_select(programmes,:id, :title), class: 'form-control' %>
+            <% else %>
               <%= hidden_field_tag :programme_id, Programme.site_managed_programme.id %>
-              <%= check_box_tag :site_managed_programme, '1', true %>
-              <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}?" %>
-            </label>
+              <label>
+                <%= check_box_tag :site_managed_programme, '1', true %>
+                <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}?" %>
+              </label>
+            <% end %>
+
+
             <div id='programme-details' style="display:none;">
               <%= label_tag :programme_title, "Title" %><span class="required">*</span>
               <%= text_field_tag 'programme[title]', '', class: 'form-control' %>
@@ -68,7 +75,7 @@
     function checkSubmitButtonEnabled() {
         var progEnabled = <%= Seek::Config.programmes_enabled %>;
         var enabled = $j('#institution_id').val()
-            && !progEnabled || ($j('input#programme_id').val() || $j('input#programme_title').val())
+            && !progEnabled || ($j('#programme_id').val() || $j('input#programme_title').val())
             && $j('input#project_title').val()
             && $j('select#institution_country').val();
         $j('#submit-button').prop('disabled',!enabled);
