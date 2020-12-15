@@ -155,7 +155,7 @@ class ProjectsController < ApplicationController
       raise "no #{t('programme')} can be found" if @programme.nil?
       if admin_logged_in? || current_person.is_programme_administrator?(@programme)
         log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
-      elsif @programme.managed_programme?
+      elsif @programme.site_managed?
         log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
         Mailer.request_create_project_for_programme(current_user, @programme,@project.to_json, @institution.to_json, log).deliver_later
         flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
