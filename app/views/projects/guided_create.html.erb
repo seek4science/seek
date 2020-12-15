@@ -21,7 +21,7 @@
             <% else %>
               <%= hidden_field_tag :programme_id, Programme.site_managed_programme.id %>
               <label>
-                <%= check_box_tag :site_managed_programme, '1', true %>
+                <%= check_box_tag :managed_programme, '1', true %>
                 <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}?" %>
               </label>
             <% end %>
