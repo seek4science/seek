@@ -149,10 +149,12 @@ class ProjectsController < ApplicationController
       @institution = Institution.new(inst_params)
     end
 
+    # A Programme has been selected, or it is a Site Managed Programme
     if params[:programme_id]
+
       @programme = Programme.find(params[:programme_id])
       raise "no #{t('programme')} can be found" if @programme.nil?
-      if admin_logged_in? || current_person.is_programme_administrator?(@programme)
+      if @programme.can_manage?
         log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       elsif @programme.site_managed?
         log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
@@ -161,12 +163,15 @@ class ProjectsController < ApplicationController
       else
         raise 'Invalid Programme'
       end
+    # A new project has been requested
     elsif Seek::Config.programmes_enabled && Seek::Config.programme_user_creation_enabled
+
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, log).deliver_later
       flash.now[:notice]="Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
+    # No Programme at all
     else
       @programme=nil
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
