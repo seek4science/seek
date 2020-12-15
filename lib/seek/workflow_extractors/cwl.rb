@@ -49,7 +49,7 @@ module Seek
           path = f.path
         end
 
-        packed_cwl_string = `cwltool --pack #{path}`
+        packed_cwl_string = `cwltool --quiet --pack #{path}`
         if $?.success?
           cwl_string = packed_cwl_string
         else

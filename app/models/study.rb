@@ -28,6 +28,7 @@ class Study < ApplicationRecord
 
   enforce_authorization_on_association :investigation, :view
 
+
   %w[data_file sop model document].each do |type|
     has_many "#{type}_versions".to_sym, -> { distinct }, through: :assays
     has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :assays, source: type.pluralize.to_sym
@@ -35,6 +36,14 @@ class Study < ApplicationRecord
 
   def assets
     related_data_files + related_sops + related_models + related_publications + related_documents
+  end
+  
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['title']
+  end
+  def columns_allowed
+    super + ['title','experimentalists','other_creators','deleted_contributor']
   end
 
   def state_allows_delete? *args
@@ -53,7 +62,7 @@ class Study < ApplicationRecord
   end
 
   def self.filter_by_projects(projects)
-    joins(:projects).where(investigations: { investigations_projects: { project_id: projects } })
+    joins(:projects).where(investigations: {investigations_projects: {project_id: projects}})
   end
 
   def related_publication_ids

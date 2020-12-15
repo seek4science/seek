@@ -62,3 +62,26 @@ Factory.define(:study_custom_metadata_type_with_symbols, class: CustomMetadataTy
     a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'name(name)')
   end
 end
+
+Factory.define(:study_custom_metadata_type_for_MIAPPE, class: CustomMetadataType) do |f|
+  f.title 'MIAPPE metadata'
+  f.supported_type 'Study'
+  f.after_build do |a|
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'id')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'study_start_date')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'study_end_date')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'contact_institution')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'geographic_location_country')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'experimental_site_name')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'latitude')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'longitude')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'altitude')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'description_of_the_experimental_design')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'type_of_experimental_design')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'observation_unit_level_hierarchy')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'observation_unit_description')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'description_of_growth_facility')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'type_of_growth_facility')
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, title:'cultural_practices')
+  end
+end

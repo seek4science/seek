@@ -1,18 +1,15 @@
-<h1>Index page behaviour</h1>
+<h1>Paging/Sorting behaviour</h1>
 
 <%= form_tag action: 'update_pagination' do %>
   <p class="help-block">
-    On this page you can configure the default sorting that is applied for each index page in the "Browse" section,
-    and how many items should appear per page by default.
+    On this page you can configure options relating to pagination and sorting of items on index pages, and various
+    other places where items are listed.
   </p>
 
-  <div class="row">
-    <div class="col-sm-4">
-      <%= admin_text_setting(:results_per_page_default, Seek::Config.results_per_page_default,
-                             'Default items per page', "The number of items shown per page by default.",
-                             onkeypress: "javascript: return onlyNumbers(event);") %>
-    </div>
-  </div>
+  <h2>Index Pages</h2>
+  <%= admin_text_setting(:results_per_page_default, Seek::Config.results_per_page_default,
+                         'Default items per page', "The number of items shown per page on index pages by default.",
+                         onkeypress: "javascript: return onlyNumbers(event);") %>
 
   <table class="table table-condensed" style="width: auto">
     <thead>
@@ -48,6 +45,15 @@
     <% end %>
     </tbody>
   </table>
+
+  <h2>Other</h2>
+  <%= admin_text_setting(:related_items_limit, Seek::Config.related_items_limit,
+                         'Related items limit', 'The number of items per category displayed in the "Related items" section, before the user has to click the "View all..." link.',
+                         onkeypress: "javascript: return onlyNumbers(event);") %>
+
+  <%= admin_text_setting(:search_results_limit, Seek::Config.search_results_limit,
+                         'Search results limit', 'The number of search results per category displayed when performing a general search, before the user has to click the "View all..." link.',
+                         onkeypress: "javascript: return onlyNumbers(event);") %>
 
   <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
   <%= cancel_button admin_path %>
