@@ -1,25 +1,13 @@
-<%
-
-  #states
-  show_programme_box = Seek::Config.programmes_enabled && ( programme_administrator_logged_in? || Programme.site_managed_programme.present? || Seek::Config.programme_user_creation_enabled )
-  programme_dropdown = programme_administrator_logged_in?
-  managed_checkbox = !programme_dropdown && Programme.site_managed_programme.present? && Seek::Config.programme_user_creation_enabled
-  managed_only = !programme_dropdown && Programme.site_managed_programme.present? && !Seek::Config.programme_user_creation_enabled
-  creation_allowed = Seek::Config.programme_user_creation_enabled
-  creation_allowed_only = creation_allowed && !(programme_administrator_logged_in? || Programme.site_managed_programme.present?)
-
-%>
-
 <%= form_tag request_create_projects_path do %>
   <div class="row">
     <div  style="margin:auto;width:70%;">
 
-      <% if show_programme_box %>
+      <% if Seek::ProjectFormProgrammeOptions.show_programme_box? %>
         <div class="panel panel-default">
           <div class="panel-heading"><%= t('programme') %></div>
           <div class="panel-body">
 
-            <% if programme_dropdown %>
+            <% if Seek::ProjectFormProgrammeOptions.programme_dropdown? %>
 
               <div class="help-block">
                 Select the <%= t('programme') %> you wish to associate the new <%= t('project') %> with, out of the following list that you administer.
@@ -31,7 +19,7 @@
               <% end %>
               <% programmes = (User.current_user.person.administered_programmes + [Programme.site_managed_programme]).compact.uniq %>
               <%= select_tag :programme_id,options_from_collection_for_select(programmes,:id, :title), class: 'form-control' %>
-              <% if creation_allowed %>
+              <% if Seek::ProjectFormProgrammeOptions.creation_allowed? %>
                 <div class="help-block">
                   Alternatively you can choose to create a new <%= t('programme') %>, which after approval your new <%= t('project') %> will be associated with.
                 </div>
@@ -41,7 +29,7 @@
                 </label>
               <% end %>
 
-            <% elsif managed_checkbox %>
+            <% elsif Seek::ProjectFormProgrammeOptions.managed_checkbox? %>
 
               <%= hidden_field_tag :programme_id, Programme.site_managed_programme.id %>
               <div class="help-block">
@@ -56,7 +44,7 @@
                 <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}?" %>
               </label>
 
-            <% elsif managed_only %>
+            <% elsif Seek::ProjectFormProgrammeOptions.managed_only? %>
 
               <%= hidden_field_tag :programme_id, Programme.site_managed_programme.id %>
               <div class="help-block">
@@ -66,8 +54,8 @@
             <% end %>
 
 
-            <% if creation_allowed %>
-              <% if creation_allowed_only %>
+            <% if Seek::ProjectFormProgrammeOptions.creation_allowed? %>
+              <% if Seek::ProjectFormProgrammeOptions.creation_allowed_only? %>
                 <div id='programme-details'>
               <% else %>
                 <div id='programme-details' style="display:none;">
@@ -135,7 +123,7 @@
             }
         });
 
-       <% if managed_checkbox %>
+       <% if Seek::ProjectFormProgrammeOptions.managed_checkbox? %>
          $j('input#managed_programme').on('change', function() {
              if ($j('input#managed_programme:checked').length == 0) {
                  $j('#programme-details').show();
@@ -150,7 +138,7 @@
          });
        <% end %>
 
-       <% if creation_allowed && programme_dropdown %>
+       <% if Seek::ProjectFormProgrammeOptions.creation_allowed? && Seek::ProjectFormProgrammeOptions.programme_dropdown? %>
         $j('input#new_programme').on('change', function() {
             if ($j('input#new_programme:checked').length == 1) {
                 $j('#programme-details').show();
