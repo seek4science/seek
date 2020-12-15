@@ -166,8 +166,6 @@ group :development do
   gem 'pry-remote'
   gem 'request-log-analyzer'
   gem 'rubocop', require: false
-  gem 'rubycritic', require: false
-  gem 'guard-rubycritic', require: false
   gem 'rails_best_practices'
   gem 'gem-licenses'
   gem "better_errors"
@@ -175,7 +173,6 @@ group :development do
 end
 
 group :test do
-  gem 'ruby-prof', '0.15.9'
   gem 'test-prof'
   gem 'rails-perftest'
   gem 'minitest', '5.10.3'
