@@ -11,8 +11,6 @@ class ProjectsController < ApplicationController
                                         :administer_create_project_request, :respond_create_project_request,
                                         :project_join_requests]
 
-  before_action :managed_programme_configured?, only: [:guided_create], if: Proc.new{Seek::Config.programmes_enabled}
-
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
                                                admin_member_roles update_members storage_report
                                                overview administer_join_request respond_join_request]
@@ -163,7 +161,7 @@ class ProjectsController < ApplicationController
       else
         raise 'Invalid Programme'
       end
-    elsif Seek::Config.programmes_enabled
+    elsif Seek::Config.programmes_enabled && Seek::Config.programme_user_creation_enabled
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
@@ -176,7 +174,7 @@ class ProjectsController < ApplicationController
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     end
 
-    if admin_logged_in? || (@programme && current_person.is_programme_administrator?(@programme))
+    if @programme.can_manage?
       redirect_to administer_create_project_request_projects_path(message_log_id:log.id)
     else
       respond_to do |format|
