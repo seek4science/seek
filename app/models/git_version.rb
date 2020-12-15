@@ -2,6 +2,7 @@ class GitVersion < ApplicationRecord
   class ImmutableVersionException < StandardError; end
 
   belongs_to :resource, polymorphic: true
+  validates :target, presence: true
 
   before_save :set_commit
 
@@ -60,6 +61,12 @@ class GitVersion < ApplicationRecord
       File.write(fullpath, io.read)
       git_base.add(path)
     end
+  end
+
+  def freeze_version
+    self.metadata = resource.attributes
+    self.mutable = false
+    save!
   end
 
   private
