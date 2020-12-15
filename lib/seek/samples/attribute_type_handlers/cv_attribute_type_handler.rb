@@ -5,7 +5,7 @@ module Seek
         class MissingControlledVocabularyException < AttributeHandlerException; end
 
         def test_value(value)
-          fail "'#{value}' is not included in the controlled vocabulary" unless controlled_vocab.includes_term?(value)
+          fail "'#{value}' is not included in the controlled vocabulary" unless controlled_vocab.source_ontology.blank? ? controlled_vocab.includes_term?(value) : true
         end
 
         private
