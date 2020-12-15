@@ -122,9 +122,9 @@ class SinglePagesControllerTest < ActionController::TestCase
   end
 
   test 'should load Ontologies' do
-    populate_source_types
+    cvId = populate_source_types
     query = "hal"
-    get :ontology, params: {id: "1", label: "organism",  query: query, format: 'json' }
+    get :ontology, params: {id: "1", sample_controlled_vocab_id: cvId,  query: query, format: 'json' }
     assert_response :success
     data = JSON.parse(response.body)["data"]
     assert_equal data.length, 2
@@ -146,6 +146,7 @@ class SinglePagesControllerTest < ActionController::TestCase
     r.sample_controlled_vocabs.new(title: "Organism part", short_name:"Org_part", description:"description", required:"false")
     r.sample_controlled_vocabs.new(title: "Developmental stage", short_name:"dev_stg", description:"description", required:"true")
     r.save!
+    return v.id
   end
 
 
