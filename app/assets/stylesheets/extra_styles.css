@@ -106,7 +106,7 @@
     color: white;
     text-align: center;
     white-space: nowrap;
-    font-size: 11px
+    font-size: 13px
 }
 
 .tableXs tr:nth-child(even) {
@@ -377,4 +377,14 @@ th {
 .highlight {
     max-height: 200px;
     overflow: scroll;
+}
+
+.tableSeparate {
+    color: transparent !important;
+    background-color: white !important;
+    border-right: 2px black dashed !important;
+    border-left: 2px black dashed !important;
+    border-top-width: 0 !important;
+    border-bottom-width: 0 !important;
+    max-width: 30px !important;
 }

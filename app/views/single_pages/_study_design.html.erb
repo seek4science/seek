@@ -90,7 +90,7 @@
         });
 
         if (options.title)
-            HiddenAttributes("delete", options.title)
+            manageVisibility("unhide", options.title)
     }
 
     function createSampleType(sampleTypeData, cb) {
@@ -152,7 +152,6 @@
             url: `/single_pages/${pid}/sample_source/${selectedItem.id}`,
             success: s => {
                 $j('.tbl_sample_source thead tr').empty()
-                console.log("s.data", s.data)
                 if (s.data)
 
                     $j(s.data).each((i, x) => {
@@ -170,7 +169,7 @@
     function customTD(sample_controlled_vocab_id, title, required = true, info = null) {
         const action = required ? "" :
             "<a href='' onclick='remove_col(event)'> <span style='color:white' class='glyphicon glyphicon-trash'></span></a>"
-        return `<th data-sampletypeid=${info} sample_controlled_vocab_id="${sample_controlled_vocab_id}">${title} ${action}</th>`
+        return `<th data-sampletypeid=${info} optional=${!required} sample_controlled_vocab_id="${sample_controlled_vocab_id}">${title} ${action}</th>`
     }
 
     function sampleTypeData(attributes, title, assayId = null) {
@@ -283,7 +282,7 @@
             });
             th.hide()
 
-            HiddenAttributes("add", $j.trim(th.html().replace(/<a( |>).*?<\/a>/gi, "")))
+            manageVisibility("hide", $j.trim(th.html().replace(/<a( |>).*?<\/a>/gi, "")))
         }
     }
 </script>

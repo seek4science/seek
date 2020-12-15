@@ -4,6 +4,7 @@
         <i class="glyphicon glyphicon-plus"></i>Add Column</a>
     <a id="sample_delete" class="btn btn-danger btn-sm">
         <i class="glyphicon glyphicon-trash"></i>Delete Row(s)</a>
+    <a id="hide_optionals" class="btn btn-primary btn-sm">Hide optionals</a>
     <a class="btn btn-primary btn-sm pull-right" onclick="saveSamples()">Save</a>
     <div class="sampleTblContainer">
         <table>
@@ -534,34 +535,84 @@
     })
 
     function hideAttributes() {
-        const visibleAttributes = HiddenAttributes("get")
+        const hiddenAttrs = manageVisibility("get").toString()
+        const hiddenSampleTypes = manageVisibility("get", null, "sampleTypes").toString()
         $j.each($j('.sampleTable thead tr th'), (i, th) => {
             const title = $j.trim($j(th).html().replace(/<a( |>).*?<\/a>/gi, ""))
-            if (visibleAttributes.includes(title)) { // Check with TH hidden list
+            const sampleTypeId = $j(th).attr("data-sampletypeid")
+            if (hiddenAttrs.includes(title) || (hiddenSampleTypes.includes(sampleTypeId) && title != "link_id")) { // Check with TH hidden list
                 $j.each($j('.sampleTable tbody tr'), (i, tr) => {
                     $j(tr).find(`td:eq(${$j(th).index()})`).hide();
                 });
                 $j(th).hide()
-                // HiddenAttributes("add", title)
+            } else {
+                $j.each($j('.sampleTable tbody tr'), (i, tr) => {
+                    $j(tr).find(`td:eq(${$j(th).index()})`).show();
+                });
+                $j(th).show()
+            }
+            if (title == "link_id") {
+                if (!$j(th).hasClass("initialized")) {
+                    $j(th).addClass("initialized")
+                    $j(th).addClass("tableSeparate")
+                    // $j(th).css("position", "relative")
+                    const sampleTypeId = $j(th).attr("data-sampletypeid")
+                    $j(th).append(`<a onclick="toggleSampleType(${sampleTypeId})" style='text-decoration:none'><i style='color:black;font-size:14px;display:block;cursor:pointer'></i></a>`)
+                    $j(th).css("width", "20px")
+                    // $j(th).append("<p style='writing-mode: vertical-rl;color:black; display:block; position:absolute'>  Source sample </p>")
+                }
+                const status = hiddenSampleTypes.includes(sampleTypeId) ? "open" : "close"
+                $j(th).find("i").attr('class', `glyphicon glyphicon-eye-${status}`)
+                $j.each($j('.sampleTable tbody tr'), (i, tr) => {
+                    $j(tr).find(`td:eq(${$j(th).index()})`).addClass("tableSeparate")
+                });
             }
         })
     }
 
-    function HiddenAttributes(action, obj) {
+    function hideOptionalAttrs() {
+        $j.each($j('.sampleTable thead tr th'), (i, th) => {
+            const optional = $j(th).attr("optional")
+            const title = $j.trim($j(th).html().replace(/<a( |>).*?<\/a>/gi, ""))
+            if (optional == "true") {
+                $j.each($j('.sampleTable tbody tr'), (i, tr) => {
+                    $j(tr).find(`td:eq(${$j(th).index()})`).hide();
+                });
+                $j(th).hide()
+                manageVisibility("hide", title)
+            }
+        })
+    }
+
+    function toggleSampleType(id) {
+        manageVisibility("toggle", id, "sampleTypes")
+        hideAttributes()
+    }
+
+    function manageVisibility(action, item, field = "attributes") {
         // localStorage.clear();
         // return
+        if (item) item = item.toString()
         const std_id = selectedItem.parent.id
-        const key = `${uid}_${pid}_${std_id}_dynamicTableHeader`
+        const key = `${uid}_${pid}_${std_id}_dynamicTableHidden${field == "attributes" ? "Attributes" : "SampleTypes"}`
         if (!localStorage[key])
             localStorage[key] = JSON.stringify([]);
         let header = JSON.parse(localStorage[key])
-        if (action == "delete") {
-            header = $j.grep(header, k => k != obj)
-        } else if (action == "add") {
-            if (!header[obj])
-                header.push(obj)
+        if (action == "unhide") {
+            header = $j.grep(header, k => k != item)
+        } else if (action == "hide") {
+            if (!header.includes(item)) header.push(item)
         } else if (action == "get")
             return JSON.parse(localStorage[key])
+        else if (action == "toggle") {
+            if (!header.includes(item)) header.push(item)
+            else header = $j.grep(header, k => k != item)
+        }
         localStorage[key] = JSON.stringify(header);
     }
+
+
+    $j("#hide_optionals").on("click", () => {
+        hideOptionalAttrs()
+    })
 </script>
