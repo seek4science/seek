@@ -173,6 +173,7 @@ group :development do
 end
 
 group :test do
+  gem 'ruby-prof'
   gem 'test-prof'
   gem 'rails-perftest'
   gem 'minitest', '5.10.3'
