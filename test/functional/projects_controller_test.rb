@@ -1938,6 +1938,47 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'request create project without programmes' do
+    person = Factory(:person_not_in_project)
+
+    login_as(person)
+    with_config_value(:programmes_enabled, false) do
+      params = {
+        project: { title: 'The Project',description:'description',web_page:'web_page'},
+        institution: {title:'the inst',web_page:'the page',city:'London',country:'GB'}
+      }
+      assert_enqueued_emails(1) do
+        assert_difference('MessageLog.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('Project.count') do
+              post :request_create, params: params
+            end
+          end
+        end
+      end
+
+      assert_response :success
+      assert flash[:notice]
+      log = MessageLog.last
+      details = JSON.parse(log.details)
+      project_details = details['project']
+      institution_details = details['institution']
+
+
+      assert_equal 'GB',institution_details['country']
+      assert_equal 'London',institution_details['city']
+      assert_equal 'the page',institution_details['web_page']
+      assert_equal 'the inst',institution_details['title']
+      assert_nil institution_details['id']
+
+      assert_equal 'description', project_details['description']
+      assert_equal 'The Project', project_details['title']
+      assert_nil  project_details['id']
+
+      assert_nil details['programme']
+    end
+  end
+
   test 'administer join request' do
     person = Factory(:project_administrator)
     project = person.projects.first

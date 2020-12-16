@@ -44,7 +44,7 @@
 <script type=application/javascript>
 
     function checkSubmitButtonEnabled() {
-        var progEnabled = <%= Seek::Config.programmes_enabled %>;
+        var progEnabled = <%= Seek::ProjectFormProgrammeOptions.show_programme_box? %>;
         var enabled = $j('#institution_id').val()
             && !progEnabled || ($j('#programme_id').val() || $j('input#programme_title').val())
             && $j('input#project_title').val()

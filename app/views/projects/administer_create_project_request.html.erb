@@ -10,7 +10,7 @@
           The user <%= link_to(@message_log.sender.title, @message_log.sender) %> has requested to create a <%= t('project') %>
         </div>
 
-        <% if Seek::Config.programmes_enabled %>
+        <% if Seek::Config.programmes_enabled && @programme %>
           <div class="panel panel-default">
             <div class="panel-heading">
               <%= t('programme') %>
