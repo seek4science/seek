@@ -8,32 +8,32 @@ module Seek
         Seek::Config.programmes_enabled && (
           programme_administrator_logged_in? ||
             Programme.site_managed_programme.present? ||
-            Seek::Config.programme_user_creation_enabled
+            Programme.can_create?
         )
       end
 
       # whether the programmes should be selected from a drop down box
       def programme_dropdown?
-        programme_administrator_logged_in?
+        show_programme_box? && programme_administrator_logged_in?
       end
 
       # whether there should be a checkbox to select a managed programme
       def managed_checkbox?
         !programme_dropdown? &&
           Programme.site_managed_programme.present? &&
-          Seek::Config.programme_user_creation_enabled
+          Programme.can_create?
       end
 
       # whether managed programmes are forced and the only option
       def managed_only?
         !programme_dropdown? &&
           Programme.site_managed_programme.present? &&
-          !Seek::Config.programme_user_creation_enabled
+          !Programme.can_create?
       end
 
       # whether programme creation is an allowed option
       def creation_allowed?
-        Seek::Config.programme_user_creation_enabled
+        show_programme_box? && Programme.can_create?
       end
 
       # whether creating a new programme is the only option

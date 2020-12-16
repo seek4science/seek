@@ -164,22 +164,25 @@ class ProjectsController < ApplicationController
         raise 'Invalid Programme'
       end
     # A new project has been requested
-    elsif Seek::Config.programmes_enabled && Seek::Config.programme_user_creation_enabled
-
+    elsif Seek::ProjectFormProgrammeOptions.creation_allowed?
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
-      Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, log).deliver_later
+      unless User.admin_logged_in?
+        Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, log).deliver_later
+      end
       flash.now[:notice]="Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
     # No Programme at all
-    else
+    elsif !Seek::ProjectFormProgrammeOptions.show_programme_box?
       @programme=nil
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
-      Mailer.request_create_project(current_user, @project.to_json, @institution.to_json, log).deliver_later
+      unless User.admin_logged_in?
+        Mailer.request_create_project(current_user, @project.to_json, @institution.to_json, log).deliver_later
+      end
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     end
 
-    if @programme.can_manage?
+    if (@programme && @programme.can_manage?) || User.admin_logged_in?
       redirect_to administer_create_project_request_projects_path(message_log_id:log.id)
     else
       respond_to do |format|
@@ -734,6 +737,7 @@ class ProjectsController < ApplicationController
   # check programme permissions for responding to a MesasgeLog
   def check_message_log_programme_permissions
     error_msg = nil
+    return unless @programme || params['programme']
 
     unless @programme
       if params['programme']['id']
