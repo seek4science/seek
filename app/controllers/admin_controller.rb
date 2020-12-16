@@ -15,6 +15,13 @@ class AdminController < ApplicationController
     end
   end
 
+  def project_creation_requests
+    @requests = MessageLog.pending_project_creation_requests
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def update_admins
     admin_ids = params[:admins].split(',') || []
     current_admins = Person.admins
@@ -118,6 +125,7 @@ class AdminController < ApplicationController
     Seek::Config.zenodo_client_secret = params[:zenodo_client_secret].try(:strip)
 
     Seek::Config.openbis_enabled = string_to_boolean(params[:openbis_enabled])
+    Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
 
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
     Seek::Config.nels_client_id = params[:nels_client_id].try(:strip)
@@ -218,6 +226,9 @@ class AdminController < ApplicationController
 
     valid = only_positive_integer(params[:results_per_page_default], 'default items per page')
     Seek::Config.results_per_page_default = params[:results_per_page_default] if valid
+    Seek::Config.related_items_limit = params[:related_items_limit]
+    Seek::Config.search_results_limit = params[:search_results_limit]
+
     update_redirect_to(valid, 'pagination')
   end
 

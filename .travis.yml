@@ -39,7 +39,7 @@ before_install:
 
 before_script:
   - sh -c "if [ '$DB_TYPE' = 'pgsql' ]; then psql -c 'create database travis_ci_test; create database travis_ci_dev; create database travis_ci_prod;' -U postgres; fi"
-  - cp test/database.travis.$DB_TYPE.yml config/database.yml
+  - cp test/config/database.travis.$DB_TYPE.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:create
   - RAILS_ENV=test bundle exec rake db:schema:load
   - sh -c "if [ '$SUITE' = 'rake assets:precompile RAILS_ENV=production' ]; then RAILS_ENV=production bundle exec rake db:create; fi"

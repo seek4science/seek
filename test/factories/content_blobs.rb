@@ -204,6 +204,12 @@ Factory.define(:binary_content_blob, parent: :content_blob) do |f|
   f.data { File.new("#{Rails.root}/test/fixtures/files/little_file.txt", 'rb').read }
 end
 
+Factory.define(:study_template_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'study_batch.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/study_batch.zip", 'rb').read }
+end
+
 Factory.define(:sample_type_template_content_blob, parent: :content_blob) do |f|
   f.original_filename 'sample-type-example.xlsx'
   f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'

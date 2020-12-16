@@ -131,6 +131,14 @@ class Project < ApplicationRecord
   def pals
     people_with_the_role(Seek::Roles::PAL)
   end
+    
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['title','web_page']
+  end
+  def columns_allowed
+    super + ['title','web_page','wiki_page','site_credentials','start_date','end_date']
+  end
 
   # returns people belong to the admin defined seek 'role' for this project
   def people_with_the_role(role)

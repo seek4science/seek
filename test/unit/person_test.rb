@@ -1298,4 +1298,20 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test 'administered projects' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+
+    assert_equal [project],person.administered_projects
+
+    project2 = Factory(:project)
+    person.add_to_project_and_institution(project2,Factory(:institution))
+    person.is_project_administrator = true, project2
+    project3 = Factory(:project)
+    person.add_to_project_and_institution(project3,Factory(:institution))
+    person.save!
+
+    assert_equal [project,project2],person.administered_projects.sort_by(&:id)
+  end
+
 end

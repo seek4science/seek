@@ -22,8 +22,12 @@ require 'minitest/reporters'
 require 'minitest'
 require 'ostruct'
 require 'pry'
+require 'json_test_helper'
 
-Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new]
+Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true,
+                                                                   color: true,
+                                                                   detailed_skip: false,
+                                                                   slow_count: 10)]
 
 Minitest::Test.i_suck_and_my_tests_are_order_dependent!
 

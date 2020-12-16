@@ -15,31 +15,6 @@ module SearchHelper
     text.html_safe
   end
 
-  def get_resource_hash(scale, external_resource_hash)
-    internal_resource_hash = {}
-    if external_resource_hash.blank?
-      @results_scaled[scale].each do |item|
-        tab = item.respond_to?(:tab) ? item.tab : item.class.name
-        if item.respond_to?(:is_external_search_result?) && item.is_external_search_result?
-          external_resource_hash[tab] = [] unless external_resource_hash[tab]
-          external_resource_hash[tab] << item
-        else
-          internal_resource_hash[tab] = [] unless internal_resource_hash[tab]
-          internal_resource_hash[tab] << item
-        end
-      end
-    else
-      @results_scaled[scale].each do |item|
-        tab = item.respond_to?(:tab) ? item.tab : item.class.name
-        unless item.respond_to?(:is_external_search_result?) && item.is_external_search_result?
-          internal_resource_hash[tab] = [] unless internal_resource_hash[tab]
-          internal_resource_hash[tab] << item
-        end
-      end
-    end
-    [internal_resource_hash, external_resource_hash]
-  end
-
   # can only be supported if turned on and crossref api email is configured
   def external_search_supported?
     Seek::ExternalSearch.instance.supported?

@@ -5,10 +5,16 @@ var Projects = {
     actions: {
         add: function () {
             var people = $j('#people_ids').tagsinput('items');
-            var institution_id = $j("#institution_ids").val();
-            var institution_title = $j("#institution_ids option:selected").text();
+            var institution_tag = $j('#institution_id').tagsinput('items')[0];
+            var institution_id = '';
+            var institution_title = '';
+            if (institution_tag) {
+                institution_id = institution_tag.id;
+                institution_title = institution_tag.name;
+            }
+
             var errors = [];
-            var toRemove = [];
+            var peopleToRemove = [];
 
             if(institution_id == '') {
                 errors.push(I18n.t('institution').toLowerCase() + ' is required!');
@@ -26,14 +32,16 @@ var Projects = {
                                 institution_title: institution_title })
                         };
                         Projects.addChange(change);
-                        toRemove.push({ id: value.id });
+                        peopleToRemove.push({ id: value.id });
                     } else {
                         errors.push(value.name + ' is already a member of the project through that institution.');
                     }
                 });
 
-                for(var i = 0; i < toRemove.length; i++)
-                    $j('#people_ids').tagsinput('remove', toRemove[i]);
+                $j('#institution_id').tagsinput('remove', {id: institution_id})
+
+                for(var i = 0; i < peopleToRemove.length; i++)
+                    $j('#people_ids').tagsinput('remove', peopleToRemove[i]);
             }
 
             if(errors.length > 0)

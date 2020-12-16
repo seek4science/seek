@@ -1,3 +1,7 @@
+<% if show_copasi_button? %>
+  <%= open_with_copasi_button @display_model %>
+<% end %>
+
 <% if show_jws_simulate? %>
     <%= button_link_to("Simulate #{t('model')} on JWS", 'execute',
                        simulate_model_path(item, :version => @display_model.version, :code => params[:code]), :method=>:post,:title => "Simulate #{t('model')} on JWS") %>

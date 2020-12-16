@@ -7,7 +7,8 @@ teusink_v1:
   model: teusink
   version: 1
   projects: [sysmo_project]
-  policy: policy_for_test_with_projects_institutions  
+  policy: policy_for_test_with_projects_institutions
+  visibility: 2
 
 teusink_v2:
   contributor: person_for_model_owner
@@ -19,6 +20,7 @@ teusink_v2:
   version: 2
   projects: [sysmo_project]
   policy: policy_for_test_with_projects_institutions
+  visibility: 2
 
 teusink_with_space_v1:
   contributor: person_for_model_owner
@@ -30,6 +32,7 @@ teusink_with_space_v1:
   projects: [sysmo_project]
   model: teusink_with_space
   policy: policy_for_test_with_projects_institutions
+  visibility: 2
   
 jws_model_v1:
   contributor: person_for_model_owner
@@ -40,7 +43,8 @@ jws_model_v1:
   model: jws_model
   version: 1  
   projects: [sysmo_project]
-  policy: fully_public_policy  
+  policy: fully_public_policy
+  visibility: 2
   
 francos_model_v1:
   contributor: person_for_model_owner
@@ -51,7 +55,8 @@ francos_model_v1:
   model: francos_model
   version: 1  
   projects: [sysmo_project]
-  policy: policy_for_test_with_projects_institutions    
+  policy: policy_for_test_with_projects_institutions
+  visibility: 2
 
 model_with_format_and_type_v1:
   contributor: person_for_model_owner
@@ -65,6 +70,7 @@ model_with_format_and_type_v1:
   version: 1
   projects: [other_project] # not linked to any project for now
   policy: fully_public_policy
+  visibility: 2
 
 model_with_links_in_description_v1:
   contributor: person_for_model_owner
@@ -76,6 +82,7 @@ model_with_links_in_description_v1:
   version: 1
   projects: [sysmo_project]
   policy: sysmo_member_edit
+  visibility: 2
   
 model_with_different_owner_v1:
   contributor: pal
@@ -87,6 +94,7 @@ model_with_different_owner_v1:
   version: 1  
   projects: [other_project] # not linked to any project for now
   policy: fully_public_policy
+  visibility: 2
 
 model_with_no_contributor_v1:
   title: Model with no contributor
@@ -97,6 +105,7 @@ model_with_no_contributor_v1:
   version: 1
   projects: [sysmo_project]
   policy: sysmo_member_edit
+  visibility: 2
   
 model_jws_incompatible_v1:
   title: A model that is neither JWS Dat or SBML
@@ -106,7 +115,8 @@ model_jws_incompatible_v1:
   last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]
-  policy: sysmo_member_edit  
+  policy: sysmo_member_edit
+  visibility: 2
   
 non_sbml_xml_v1:  
   title: Non SBML XML
@@ -116,7 +126,8 @@ non_sbml_xml_v1:
   last_used_at: 2009-04-03 11:09:18
   version: 1  
   projects: [other_project]
-  policy: policy_for_test_with_projects_institutions  
+  policy: policy_for_test_with_projects_institutions
+  visibility: 2
   
 invalid_sbml_xml_v1:
   contributor: person_for_model_owner
@@ -127,7 +138,8 @@ invalid_sbml_xml_v1:
   last_used_at: 2009-04-02 11:09:18
   version: 1  
   projects: [other_project]
-  policy: policy_for_test_with_projects_institutions 
+  policy: policy_for_test_with_projects_institutions
+  visibility: 2
   
 non_jws_dat_v1:  
   title: Non JWS Online Dat file
@@ -138,6 +150,7 @@ non_jws_dat_v1:
   version: 1  
   projects: [other_project]
   policy: policy_for_test_with_projects_institutions
+  visibility: 2
 
 private_model_vi1:
   title: Private model
@@ -148,3 +161,4 @@ private_model_vi1:
   version: 1
   projects: [sysmo_project]
   policy: private_policy
+  visibility: 2

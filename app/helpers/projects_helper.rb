@@ -133,7 +133,7 @@ module ProjectsHelper
   end
 
   # whether the request membership button should be shown
-  def request_project_membership_button_enabled?(project)
+  def request_join_project_button_enabled?(project)
     Seek::Config.email_enabled &&
       project.allow_request_membership?
   end
