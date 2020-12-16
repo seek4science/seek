@@ -133,7 +133,6 @@ class SamplesController < ApplicationController
     if params[:sample][:attribute_map]
         params[:sample][:data] = params[:sample].delete(:attribute_map)
     end
-    puts params[:sample][:data]
     params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
                               { data: sample_type_param_keys }, { creator_ids: [] },
                               { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
