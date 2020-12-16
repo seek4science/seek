@@ -9,8 +9,9 @@ module Seek
         # don't allow multiple calls
         return if reflect_on_association(:git_versions)
 
-        cattr_accessor :git_versioned_class_name
+        cattr_accessor :git_versioned_class_name, :proxy_class_name
         self.git_versioned_class_name = options[:class_name]  || 'GitVersion'
+        self.proxy_class_name = options[:proxy_class_name]  || 'ResourceProxy'
 
         class_eval do
           has_many :git_versions, class_name: "#{self}::#{git_versioned_class_name}", as: :resource, dependent: :destroy
@@ -57,14 +58,28 @@ module Seek
           def remove_worktree
             git_base.worktree(git_working_path, commit).remove
           end
+
+          def self.proxy_class
+            const_get(proxy_class_name)
+          end
+
+          def self.git_versioned_class
+            const_get(git_versioned_class_name)
+          end
         end
 
         # create the dynamic versioned model
         const_set(git_versioned_class_name, Class.new(::GitVersion)).class_eval do
+          def proxy
+            resource.class.proxy_class.new(resource, self)
+          end
+        end
+
+        const_set(proxy_class_name, Class.new(::ResourceProxy)).class_eval do
           # ...
         end
 
-        versioned_class.class_eval(&extension) if block_given?
+        proxy_class.class_eval(&extension) if block_given?
       end
     end
   end

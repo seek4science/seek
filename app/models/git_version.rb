@@ -92,20 +92,4 @@ class GitVersion < ApplicationRecord
       self.commit = git_base.revparse('HEAD')
     end
   end
-
-  # Check metadata, and parent resource for missing methods. Allows GitVersions to be used as a drop-in replacement for
-  #  Workflow::Version etc.
-  def respond_to_missing?(name, include_private = false)
-    metadata.key?(name.to_s) || resource.respond_to?(name) || super
-  end
-
-  def method_missing(method, *args, &block)
-    if metadata.key?(method.to_s) && args.empty?
-      metadata[method.to_s]
-    elsif resource.respond_to?(method)
-      resource.public_send(method, *args, &block)
-    else
-      super
-    end
-  end
 end

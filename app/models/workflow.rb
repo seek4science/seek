@@ -20,7 +20,11 @@ class Workflow < ApplicationRecord
 
   has_and_belongs_to_many :sops
 
-  git_versioning
+  git_versioning do
+    def workflow_class
+      WorkflowClass.find_by_id(workflow_class_id)
+    end
+  end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
