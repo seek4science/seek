@@ -35,6 +35,10 @@ Factory.define(:workflow) do |f|
   end
 end
 
+Factory.define(:public_workflow, parent: :workflow) do |f|
+  f.policy { Factory(:downloadable_public_policy) }
+end
+
 Factory.define(:min_workflow, class: Workflow) do |f|
   f.with_project_contributor
   f.title 'A Minimal Workflow'

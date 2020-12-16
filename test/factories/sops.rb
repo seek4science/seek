@@ -15,6 +15,10 @@ Factory.define(:sop) do |f|
   end
 end
 
+Factory.define(:public_sop, parent: :sop) do |f|
+  f.policy { Factory(:downloadable_public_policy) }
+end
+
 Factory.define(:min_sop, class: Sop) do |f|
   f.with_project_contributor
   f.title 'A Minimal Sop'

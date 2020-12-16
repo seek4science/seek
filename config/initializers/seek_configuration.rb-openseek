@@ -128,6 +128,7 @@ def load_seek_config_defaults!
   Seek::Config.default :is_virtualliver, false
 
   Seek::Config.default :related_items_limit,5
+  Seek::Config.default :search_results_limit,5
 
 # Faceted Browsing and Faceted Search
   Seek::Config.default :faceted_browsing_enabled, false

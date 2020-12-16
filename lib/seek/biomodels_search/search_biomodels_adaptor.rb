@@ -17,6 +17,7 @@ module Seek
           biomodels_result.title.blank?
         end
       rescue StandardError => exception
+        raise exception if Rails.env.development?
         Seek::Errors::ExceptionForwarder.send_notification(exception, data: { query: query })
         []
       end
@@ -55,9 +56,9 @@ module Seek
 
         json = JSON.parse(json)
         self.title = json['name']
-        self.publication_title = json['publication']['title']
+        self.publication_title = json.dig('publication', 'title')
         self.abstract = json['description']
-        self.authors = json['publication']['authors'].collect { |author| author['name'] }
+        self.authors = (json.dig('publication', 'authors') || []).collect { |author| author['name'] }
         self.published_date = Time.at(json['firstPublished'] / 1000)
         latest_version = json['history']['revisions'].sort { |rev| rev['version'] }.first
         self.last_modification_date = Time.at(latest_version['submitted'] / 1000)

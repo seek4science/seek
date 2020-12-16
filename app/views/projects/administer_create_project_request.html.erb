@@ -1,5 +1,5 @@
 <div>
-  <%= form_tag respond_create_project_request_programmes_path do %>
+  <%= form_tag respond_create_project_request_projects_path do %>
 
     <%= hidden_field_tag :message_log_id,@message_log.id %>
 
@@ -10,24 +10,26 @@
           The user <%= link_to(@message_log.sender.title, @message_log.sender) %> has requested to create a <%= t('project') %>
         </div>
 
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <%= t('programme') %>
-          </div>
-          <div class="panel-body">
-            <% if @programme.new_record? %>
-              They have requested a new <%= t('programme') %>, with the following:
-              <div class="form-group">
-                <%= label_tag 'Title' %><span class="required">*</span>
-                <%= text_field_tag 'programme[title]',@programme.title, class:'form-control' %>
-              </div>
-            <% else %>
-              It will be associated with the <%= t('programme') %>, <%= link_to @programme.title,@programme %>, which you administer.
-              <%= hidden_field_tag 'programme[id]',@programme.id %>
-            <% end %>
-          </div>
+        <% if Seek::Config.programmes_enabled %>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <%= t('programme') %>
+            </div>
+            <div class="panel-body">
+              <% if @programme.new_record? %>
+                They have requested a new <%= t('programme') %>, with the following:
+                <div class="form-group">
+                  <%= label_tag 'Title' %><span class="required">*</span>
+                  <%= text_field_tag 'programme[title]',@programme.title, class:'form-control' %>
+                </div>
+              <% else %>
+                It will be associated with the <%= t('programme') %>, <%= link_to @programme.title,@programme %>, which you administer.
+                <%= hidden_field_tag 'programme[id]',@programme.id %>
+              <% end %>
+            </div>
 
-        </div>
+          </div>
+        <% end %>
 
         <div class="panel panel-default">
           <div class="panel-heading">

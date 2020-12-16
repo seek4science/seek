@@ -1033,7 +1033,8 @@ class ProjectsControllerTest < ActionController::TestCase
     prog = Factory(:programme, projects: [Factory(:project), Factory(:project)])
     get :show, params: { id: prog.projects.first }
     assert_select 'strong', text: /#{I18n.t('programme')}/i, count: 1
-    assert_select 'a[href=?]', programme_path(prog), text: prog.title, count: 1
+    assert_select '.box_about_actor a[href=?]', programme_path(prog), text: prog.title, count: 1
+    assert_select '.related-items a[href=?]', programme_path(prog), text: prog.title, count: 1
   end
 
   test 'programme not shown when disabled' do
@@ -1514,46 +1515,6 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
-  test 'request membership' do
-    project = Factory(:project_administrator).projects.first #needs a project admin
-    person = Factory(:person)
-    login_as(person)
-    assert_enqueued_emails(1) do
-      assert_difference('MessageLog.count') do
-        post :request_membership, params: { id:project, details:'blah blah' }
-      end
-
-    end
-    assert_redirected_to(project)
-    refute_nil flash[:notice]
-    log = MessageLog.last
-    assert_equal project,log.resource
-    assert_equal person,log.sender
-    assert_equal MessageLog::PROJECT_MEMBERSHIP_REQUEST,log.message_type
-
-    logout
-    login_as(project.project_administrators.first)
-
-    assert_no_enqueued_emails  do
-      assert_no_difference('MessageLog.count') do
-        post :request_membership, params: { id:project, details:'blah blah' }
-      end
-    end
-    assert_redirected_to :root
-    refute_nil flash[:error]
-
-    project=Factory(:project)
-    assert_empty(project.people)
-    assert_no_enqueued_emails  do
-      assert_no_difference('MessageLog.count') do
-        post :request_membership, params: { id:project, details:'blah blah' }
-      end
-    end
-    assert_redirected_to :root
-    refute_nil flash[:error]
-
-  end
-
   test 'can remove members with project subscriptions' do
     proj_admin = Factory(:project_administrator)
     project = proj_admin.projects.first
@@ -1741,6 +1702,39 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'guided join with project' do
+    project = Factory(:project_administrator).projects.first
+    person = Factory(:person)
+
+    login_as(person)
+
+    get :guided_join, params:{id:project.id}
+    assert_response :success
+    assert_select "input[type=checkbox][name='projects[]'][checked=checked]",value:project.id
+  end
+
+  test 'invalid guided join' do
+    #already a member
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    refute_nil project
+
+    login_as(person)
+
+    get :guided_join, params:{id:project.id}
+    assert_redirected_to project
+    assert flash[:error]
+
+    project = Factory(:project_administrator).projects.first
+
+    # already requested
+    MessageLog.log_project_membership_request(person, project, Factory(:institution), '')
+    get :guided_join, params:{id:project.id}
+    assert_redirected_to project
+    assert flash[:error]
+
+  end
+
   test 'guided_create' do
     prog = Factory(:programme)
     person = Factory(:person_not_in_project)
@@ -1754,7 +1748,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test 'request_join_project with known project and institution' do
     person = Factory(:person_not_in_project)
-    project = Factory(:project)
+    project = Factory(:project_administrator).projects.first #project needs to have an admin
     institution = Factory(:institution)
     login_as(person)
     params = {
@@ -1782,8 +1776,9 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test 'request_join_project with known project and new institution' do
     person = Factory(:person_not_in_project)
-    project = Factory(:project)
+    project = Factory(:project_administrator).projects.first #project needs to have an admin
     login_as(person)
+
     institution_params = {
         title:'fish',
         city:'Sheffield',
@@ -2088,6 +2083,469 @@ class ProjectsControllerTest < ActionController::TestCase
     assert log.responded?
     assert_equal 'bad request',log.response
   end
+
+  test 'administer create request project with new programme and institution' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new(title:'my institution')
+    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+    assert_response :success
+  end
+
+  test 'admininister create request can be accessed by programme admin' do
+    person = Factory(:programme_administrator)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = person.programmes.first
+    institution = Institution.new(title:'my institution')
+    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+    assert_response :success
+
+    another_person = Factory(:programme_administrator)
+    login_as(another_person)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+  test 'admininister create request cannot be accessed by a different programme admin' do
+    person = Factory(:programme_administrator)
+    another_person = Factory(:programme_administrator)
+    login_as(another_person)
+
+    project = Project.new(title:'new project')
+    programme = person.programmes.first
+    institution = Institution.new(title:'my institution')
+    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+  test 'administer create request can be accessed by site admin for new programme' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new(title:'my institution')
+    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+    assert_response :success
+  end
+
+  test 'administer create request cannot be accessed by none site admin for new programme' do
+    person = Factory(:programme_administrator)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new(title:'my institution')
+    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+  test 'respond create project request - new programme and institution' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new({title:'institution', country:'DE'})
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'new project updated',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            title:'new programme updated'
+        },
+        institution:{
+            title:'new institution updated',
+            city:'Paris',
+            country:'FR'
+        }
+    }
+
+    assert_enqueued_emails(1) do
+      assert_difference('Programme.count') do
+        assert_difference('Project.count') do
+          assert_difference('Institution.count') do
+            assert_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    project = Project.last
+    programme = Programme.last
+    institution = Institution.last
+
+    assert_redirected_to(project_path(project))
+    assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
+
+    assert_equal 'new project updated', project.title
+    assert_equal 'new programme updated', programme.title
+    assert_equal 'new institution updated', institution.title
+
+    assert_includes programme.projects,project
+    assert_includes project.people, requester
+    assert_includes project.institutions, institution
+    assert_includes programme.programme_administrators, requester
+    assert_includes project.project_administrators, requester
+
+    log.reload
+    assert log.responded?
+    assert_equal 'Accepted',log.response
+
+  end
+
+  test 'respond create project request - new programme requires site admin' do
+    person = Factory(:programme_administrator)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new({title:'institution', country:'DE'})
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'new project updated',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            title:'new programme updated'
+        },
+        institution:{
+            title:'new institution updated',
+            city:'Paris',
+            country:'FR'
+        }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    log.reload
+    refute log.responded?
+
+  end
+
+  test 'respond create project request - new programme and institution, project invalid' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new({title:'institution', country:'DE'})
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:''
+        },
+        programme:{
+            title:'new programme updated'
+        },
+        institution:{
+            title:'new institution updated',
+            city:'Paris',
+            country:'FR'
+        }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_equal "The Project is invalid, Title can't be blank",flash[:error]
+
+    log.reload
+    refute log.responded?
+
+  end
+
+
+  test 'respond create project request - new programme and institution, programme and institution invalid' do
+    person = Factory(:admin)
+    duplicate_institution=Factory(:institution)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new({title:'institution', country:'DE'})
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'a valid project'
+        },
+        programme:{
+            title:''
+        },
+        institution:{
+            title:duplicate_institution.title,
+            city:'Paris',
+            country:'FR'
+        }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_equal "The Programme is invalid, Title can't be blank<br/>The Institution is invalid, Title has already been taken",flash[:error]
+
+    log.reload
+    refute log.responded?
+  end
+
+  test 'respond create project request - existing programme and institution' do
+    person = Factory(:programme_administrator)
+    programme = person.programmes.first
+    institution = Factory(:institution)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'new project',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            id:programme.id
+        },
+        institution:{
+            id:institution.id
+        }
+    }
+
+    assert_enqueued_emails(1) do
+      assert_no_difference('Programme.count') do
+        assert_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    project = Project.last
+    programme.reload
+
+    assert_redirected_to(project_path(project))
+    assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
+
+    assert_includes programme.projects,project
+    assert_includes project.people, requester
+    assert_includes project.institutions, institution
+    refute_includes programme.programme_administrators, requester
+    assert_includes project.project_administrators, requester
+
+    log.reload
+    assert log.responded?
+    assert_equal 'Accepted',log.response
+
+  end
+
+  test 'respond create project request - existing programme need prog admin rights' do
+    person = Factory(:programme_administrator)
+    another_admin = Factory(:programme_administrator)
+    programme = person.programmes.first
+    institution = Factory(:institution)
+    login_as(another_admin)
+    project = Project.new(title:'new project',web_page:'my new project')
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        accept_request: '1',
+        project:{
+            title:'new project',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            id:programme.id
+        },
+        institution:{
+            id:institution.id
+        }
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    log.reload
+    refute log.responded?
+
+
+  end
+
+  test 'respond create project request - rejected' do
+    person = Factory(:programme_administrator)
+    programme = person.programmes.first
+    institution = Factory(:institution)
+    login_as(person)
+    project = Project.new(title:'new project',web_page:'my new project')
+    requester = Factory(:person)
+    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    params = {
+        message_log_id:log.id,
+        reject_details:'not very good',
+        project:{
+            title:'new project',
+            web_page:'http://proj.org'
+        },
+        programme:{
+            id:programme.id
+        },
+        institution:{
+            id:institution.id
+        }
+    }
+
+    assert_enqueued_emails(1) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              post :respond_create_project_request, params:params
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to(root_path)
+    assert_equal "Request rejected and #{log.sender.name} has been notified",flash[:notice]
+
+    refute_includes programme.programme_administrators, requester
+
+    log.reload
+    assert log.responded?
+    assert_equal 'not very good',log.response
+
+  end
+
+  test 'project join request' do
+    person1 = Factory(:project_administrator)
+    person2 = Factory(:project_administrator)
+    project1 = person1.projects.first
+    project2 = person2.projects.first
+
+    requester1 = Factory(:person)
+    requester2 = Factory(:person)
+    requester3 = Factory(:person)
+
+    log1 = MessageLog.log_project_membership_request(requester1,project1,Factory(:institution),'')
+    log2 = MessageLog.log_project_membership_request(requester2,project1,Factory(:institution),'')
+    log3 = MessageLog.log_project_membership_request(Factory(:person),project2,Factory(:institution),'')
+
+    logout
+    get :project_join_requests
+    assert_redirected_to login_path
+
+    login_as(person1)
+
+    get :project_join_requests
+    assert_response :success
+
+    assert_select 'h1',text:/2 pending project join/i
+
+    assert_select 'table#project-join-requests' do
+      assert_select 'tbody tr',count:2
+      assert_select 'a[href=?]',person_path(requester1),text:requester1.title
+      assert_select 'a[href=?]',person_path(requester2),text:requester2.title
+      assert_select 'a[href=?]',administer_join_request_project_path(project1,message_log_id: log1.id)
+      assert_select 'a[href=?]',administer_join_request_project_path(project1,message_log_id: log2.id)
+      assert_select 'a[href=?]',project_path(project1),count:2
+
+      assert_select 'a[href=?]',person_path(requester3),count:0
+      assert_select 'a[href=?]',administer_join_request_project_path(project2,message_log_id: log3.id),count:0
+      assert_select 'a[href=?]',project_path(project2),count:0
+    end
+
+    login_as(Factory(:person))
+    get :project_join_requests
+    assert_response :success
+
+    assert_select 'h1',text:/0 pending project join/i
+
+    assert_select 'table#project-join-requests' do
+      assert_select 'tbody tr',count:0
+      assert_select 'a[href=?]',person_path(requester1),text:requester1.title,count:0
+      assert_select 'a[href=?]',person_path(requester2),text:requester2.title,count:0
+      assert_select 'a[href=?]',administer_join_request_project_path(project1,message_log_id: log1.id),count:0
+      assert_select 'a[href=?]',administer_join_request_project_path(project1,message_log_id: log2.id),count:0
+      assert_select 'a[href=?]',project_path(project1),count:0
+
+      assert_select 'a[href=?]',person_path(requester3),count:0
+      assert_select 'a[href=?]',administer_join_request_project_path(project2,message_log_id: log3.id),count:0
+      assert_select 'a[href=?]',project_path(project2),count:0
+    end
+  end
+
+
 
   private
 
