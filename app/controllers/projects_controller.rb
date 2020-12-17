@@ -522,9 +522,14 @@ class ProjectsController < ApplicationController
           requester.save!
         end
 
-        @message_log.respond('Accepted')
-        flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
-        Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+        if @message_log.sent_by_self?
+          @message_log.destroy
+          flash[:notice]="#{t('project')} created"
+        else
+          @message_log.respond('Accepted')
+          flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
+          Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+        end
 
         redirect_to(@project)
       else
@@ -533,11 +538,16 @@ class ProjectsController < ApplicationController
       end
 
     else
-      comments = params['reject_details']
-      @message_log.respond(comments)
-      project_name = JSON.parse(@message_log.details)['project']['title']
-      Mailer.create_project_rejected(requester,project_name,comments).deliver_later
-      flash[:notice]="Request rejected and #{requester.name} has been notified"
+      if @message_log.sent_by_self?
+        @message_log.destroy
+        flash[:notice]="#{t('project')} creation cancelled"
+      else
+        comments = params['reject_details']
+        @message_log.respond(comments)
+        project_name = JSON.parse(@message_log.details)['project']['title']
+        Mailer.create_project_rejected(requester,project_name,comments).deliver_later
+        flash[:notice]="Request rejected and #{requester.name} has been notified"
+      end
 
       redirect_to :root
     end
