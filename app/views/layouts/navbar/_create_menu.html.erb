@@ -11,9 +11,9 @@
     <% if can_create_programmes? %>
         <li><%= link_to t('programme'), new_programme_path %></li>
     <% end %>
-    <% if can_create_projects? %>
-        <li><%= link_to t("project"), new_project_path %></li>
-    <% end %>
+
+    <li><%= link_to t("project"), guided_create_projects_path %></li>
+
     <% if can_create_institutions? %>
         <li><%= link_to t("institution"), new_institution_path %></li>
     <% end %>

@@ -1,11 +1,3 @@
-<%
-  #slightly different text if you are the creator
-  if @message_log.sent_by_self?
-    top_text = ''
-  else
-    top_text = "The user #{link_to(@message_log.sender.title, @message_log.sender)} has requested to create a #{t('project')}"
-  end
-%>
 <div>
   <%= form_tag respond_create_project_request_projects_path do %>
 
@@ -14,9 +6,11 @@
     <div class="panel panel-default">
       <div class="panel-body">
 
-        <div>
-          <%= top_text %>
-        </div>
+        <% unless @message_log.sent_by_self? %>
+          <div>
+            The user <%= link_to(@message_log.sender.title, @message_log.sender) %> has requested to create a <%= t('project') %>
+          </div>
+        <% end %>
 
         <% if Seek::Config.programmes_enabled && @programme %>
           <div class="panel panel-default">
