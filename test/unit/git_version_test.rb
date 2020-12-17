@@ -66,4 +66,25 @@ class GitVersionTest < ActiveSupport::TestCase
     assert v.commit.blank?
     assert_empty v.blobs
   end
+
+  test 'automatically init local git repo' do
+    w = Factory(:workflow)
+    v = w.git_versions.create
+
+    assert v.git_repository
+    assert w.local_git_repository
+    assert_equal w.local_git_repository, v.git_repository
+  end
+
+  test 'automatically link existing remote git repos' do
+    w = Factory(:workflow)
+    v = w.git_versions.create(git_repository_remote: 'https://git.git/git.git')
+    w2 = Factory(:workflow)
+    v2 = w2.git_versions.create(git_repository_remote: 'https://git.git/git.git')
+
+    assert_nil w.local_git_repository
+    assert_nil w2.local_git_repository
+    assert_equal v.git_repository, v2.git_repository
+  end
+
 end

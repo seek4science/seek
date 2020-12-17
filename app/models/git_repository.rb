@@ -1,14 +1,15 @@
 require 'git'
 
 class GitRepository < ApplicationRecord
-  belongs_to :resource, polymorphic: true
-  after_create :initialize_local_repository
+  belongs_to :resource, polymorphic: true, optional: true
+  has_many :git_versions
+  after_create :initialize_repository
   after_create :setup_remote, if: -> { remote.present? }
 
   acts_as_uniquely_identifiable
 
   def local_path
-    File.join(Seek::Config.git_filestore_path, uuid)
+    File.join(Seek::Config.git_filestore_path, remote.present? ? uuid : "#{resource_type}-#{resource_id}")
   end
 
   def git_base
@@ -22,7 +23,7 @@ class GitRepository < ApplicationRecord
 
   private
 
-  def initialize_local_repository
+  def initialize_repository
     Git.init(local_path)
   end
 

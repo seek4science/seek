@@ -1,7 +1,10 @@
 class GitVersion < ApplicationRecord
   class ImmutableVersionException < StandardError; end
 
+  attr_writer :git_repository_remote
   belongs_to :resource, polymorphic: true
+  belongs_to :git_repository
+  before_validation :set_git_version_and_repo, on: :create
   before_save :set_commit, unless: -> { target.blank? }
 
   def metadata
@@ -10,10 +13,6 @@ class GitVersion < ApplicationRecord
 
   def metadata= m
     super(m.to_json)
-  end
-
-  def git_repository
-    resource.git_repository
   end
 
   def git_base
@@ -68,6 +67,10 @@ class GitVersion < ApplicationRecord
     save!
   end
 
+  def proxy
+    resource.class.proxy_class.new(resource, self)
+  end
+
   private
 
   def set_commit
@@ -89,6 +92,14 @@ class GitVersion < ApplicationRecord
       yield dir
       git_base.commit(message)
       self.commit = git_base.revparse('HEAD')
+    end
+  end
+
+  def set_git_version_and_repo
+    if @git_repository_remote
+      self.git_repository = GitRepository.where(remote: @git_repository_remote).first_or_initialize
+    else
+      self.git_repository = resource.local_git_repository || resource.build_local_git_repository
     end
   end
 end
