@@ -10,10 +10,10 @@
 <%= select_tag :programme_id,options_from_collection_for_select(programmes,:id, :title), class: 'form-control' %>
 <% if Seek::ProjectFormProgrammeOptions.creation_allowed? %>
   <div class="help-block">
-    Alternatively you can choose to create a new <%= t('programme') %>, which after approval your new <%= t('project') %> will be associated with.
+    Alternatively you can choose to create a new <%= t('programme') %>, which your new <%= t('project') %> will be associated with.
   </div>
   <label>
     <%= check_box_tag :new_programme, '1', false %>
-    <%= "Request a new #{t('programme')}?" %>
+    <%= "Create a new #{t('programme')}?" %>
   </label>
 <% end %>
