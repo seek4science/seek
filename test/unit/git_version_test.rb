@@ -33,4 +33,37 @@ class GitVersionTest < ActiveSupport::TestCase
   ensure
     FileUtils.rm_rf(repo.remote)
   end
+
+  test 'add file' do
+    repo = Factory(:local_repository)
+    workflow = repo.resource
+
+    v = workflow.git_versions.create!(mutable: true)
+    assert_equal 'This Workflow', v.proxy.title
+    assert v.mutable?
+    assert v.commit.blank?
+
+    v.add_file('blah.txt', StringIO.new('blah'))
+
+    assert v.commit.present?
+    assert_includes v.blobs.keys, 'blah.txt'
+    assert_equal 'blah', v.file_contents('blah.txt')
+  end
+
+  test 'cannot add file to immutable version' do
+    repo = Factory(:local_repository)
+    workflow = repo.resource
+
+    v = workflow.git_versions.create!(mutable: false)
+    assert_equal 'This Workflow', v.proxy.title
+    refute v.mutable?
+    assert v.commit.blank?
+
+    assert_raise(GitVersion::ImmutableVersionException) do
+      v.add_file('blah.txt', StringIO.new('blah'))
+    end
+
+    assert v.commit.blank?
+    assert_empty v.blobs
+  end
 end

@@ -2,9 +2,7 @@ class GitVersion < ApplicationRecord
   class ImmutableVersionException < StandardError; end
 
   belongs_to :resource, polymorphic: true
-  validates :target, presence: true
-
-  before_save :set_commit
+  before_save :set_commit, unless: -> { target.blank? }
 
   def metadata
     JSON.parse(super || '{}')
@@ -23,6 +21,7 @@ class GitVersion < ApplicationRecord
   end
 
   def file_contents(path, &block)
+    return unless commit
     if block_given?
       git_base.gblob("#{commit}:#{path}").contents(&block)
     else
@@ -31,19 +30,19 @@ class GitVersion < ApplicationRecord
   end
 
   def object(path)
-    git_base.object("#{commit}:#{path}")
+    git_base.object("#{commit}:#{path}") if commit
   end
 
   def tree
-    git_base.gtree(commit)
+    git_base.gtree(commit) if commit
   end
 
   def trees
-    tree.trees
+    commit ? tree.trees : []
   end
 
   def blobs
-    tree.blobs
+    commit ? tree.blobs : []
   end
 
   def latest_git_version?
@@ -86,7 +85,7 @@ class GitVersion < ApplicationRecord
   def perform_commit(message, &block)
     raise ImmutableVersionException unless mutable?
     git_base.with_temp_working do |dir|
-      git_base.checkout(commit)
+      git_base.checkout(commit) if commit
       yield dir
       git_base.commit(message)
       self.commit = git_base.revparse('HEAD')
