@@ -1,6 +1,8 @@
 class GitVersion < ApplicationRecord
   class ImmutableVersionException < StandardError; end
 
+  include Seek::Git
+
   attr_writer :git_repository_remote
   belongs_to :resource, polymorphic: true
   belongs_to :git_repository
@@ -20,11 +22,13 @@ class GitVersion < ApplicationRecord
   end
 
   def file_contents(path, &block)
-    return unless commit
+    blob = object(path)
+    return unless blob&.blob?
+
     if block_given?
-      git_base.gblob("#{commit}:#{path}").contents(&block)
+      blob.contents(&block)
     else
-      git_base.gblob("#{commit}:#{path}").contents
+      blob.contents
     end
   end
 
@@ -37,11 +41,11 @@ class GitVersion < ApplicationRecord
   end
 
   def trees
-    commit ? tree.trees : []
+    tree&.trees || []
   end
 
   def blobs
-    commit ? tree.blobs : []
+    tree&.blobs || []
   end
 
   def latest_git_version?
@@ -52,10 +56,21 @@ class GitVersion < ApplicationRecord
     true
   end
 
+  def file_exists?(path)
+    subtree = tree
+    path.split('/').each do |segment|
+      return false unless subtree && subtree.children.key?(segment)
+      subtree = subtree.children[segment]
+    end
+
+    true
+  end
+
   def add_file(path, io)
-    message = object(path) ? 'Updated' : 'Added'
+    message = file_exists?(path) ? 'Updated' : 'Added'
     perform_commit("#{message} #{path}") do |dir|
       fullpath = Pathname.new(dir.path).join(path)
+      FileUtils.mkdir_p(fullpath.dirname)
       File.write(fullpath, io.read)
       git_base.add(path)
     end
@@ -86,21 +101,16 @@ class GitVersion < ApplicationRecord
   end
 
   def perform_commit(message, &block)
-    user_name, user_email = nil
     raise ImmutableVersionException unless mutable?
-    user_name = git_base.config('user.name')
-    user_email = git_base.config('user.email')
-    git_base.config('user.name', User.current_user&.person&.name || Seek::Config.application_name)
-    git_base.config('user.email', User.current_user&.person&.email || Seek::Config.noreply_sender)
-    git_base.with_temp_working do |dir|
-      git_base.checkout(commit) if commit
-      yield dir
-      git_base.commit(message)
-      self.commit = git_base.revparse('HEAD')
+
+    with_git_user do
+      git_base.with_temp_working do |dir|
+        git_base.checkout(commit) if commit
+        yield dir
+        git_base.commit(message)
+        self.commit = git_base.revparse('HEAD')
+      end
     end
-  ensure
-    git_base.config('user.name', user_name)
-    git_base.config('user.email', user_email)
   end
 
   def set_git_version_and_repo
