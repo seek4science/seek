@@ -311,15 +311,11 @@ class AssaysControllerTest < ActionController::TestCase
                            assay_class_id: assay_classes(:modelling_assay_class).id }
       cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
                                                    data:{'name':'fred','age':22}}}
-
        post :create, params: { assay: assay_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
 
     assert assay=assigns(:assay)
-
-    puts assay.inspect
     assert cm = assay.custom_metadata
-
     assert_equal cmt, cm.custom_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal '22',cm.get_attribute_value('age')
