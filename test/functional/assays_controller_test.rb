@@ -301,6 +301,60 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal 'fish', assay.assay_type_label
   end
 
+  test 'create a assay with custom metadata' do
+    cmt = Factory(:simple_assay_custom_metadata_type)
+    login_as(Factory(:person))
+    assert_difference('Assay.count') do
+
+      assay_attributes = { title: 'test',
+                           study_id: Factory(:study,contributor:User.current_user.person).id,
+                           assay_class_id: assay_classes(:modelling_assay_class).id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   data:{'name':'fred','age':22}}}
+
+       post :create, params: { assay: assay_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert assay=assigns(:assay)
+
+    puts assay.inspect
+    assert cm = assay.custom_metadata
+
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal '22',cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+  end
+
+  test 'create a assay with custom metadata validated' do
+    cmt = Factory(:simple_assay_custom_metadata_type)
+    login_as(Factory(:person))
+
+    assert_no_difference('Assay.count') do
+      assay_attributes = { title: 'test',
+                           study_id: Factory(:study,contributor:User.current_user.person).id,
+                           assay_class_id: assay_classes(:modelling_assay_class).id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
+
+
+      post :create, params: { assay: assay_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert assay=assigns(:assay)
+    refute assay.valid?
+
+    assert_no_difference('Assay.count') do
+      assay_attributes = { title: 'test',
+                           study_id: Factory(:study,contributor:User.current_user.person).id,
+                           assay_class_id: assay_classes(:modelling_assay_class).id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
+
+      post :create, params: { assay: assay_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+    assert assay=assigns(:assay)
+    refute assay.valid?
+  end
+
   test 'should update assay with suggested assay and tech type' do
     assay = Factory(:experimental_assay, contributor: User.current_user.person)
     assay_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'fish')

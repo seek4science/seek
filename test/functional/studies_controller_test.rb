@@ -752,7 +752,6 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert study=assigns(:study)
     refute study.valid?
-
   end
 
   test 'create a study with custom metadata with spaces in attribute names' do
