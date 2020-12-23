@@ -1,5 +1,5 @@
 module Seek #:nodoc:
-  module YellowPages #:nodoc:
+  module ActsAsYellowPages #:nodoc:
     def self.included(mod)
       mod.extend(ClassMethods)
     end
@@ -17,6 +17,7 @@ module Seek #:nodoc:
         has_many :activity_logs, as: :activity_loggable
 
         acts_as_uniquely_identifiable
+        acts_as_discussable
 
         # grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people, project, institution
         # load the configuration for the pagination
@@ -35,9 +36,9 @@ module Seek #:nodoc:
         end if Seek::Config.solr_enabled
 
         class_eval do
-          extend Seek::YellowPages::SingletonMethods
+          extend Seek::ActsAsYellowPages::SingletonMethods
         end
-        include Seek::YellowPages::InstanceMethods
+        include Seek::ActsAsYellowPages::InstanceMethods
         include Seek::Search::BackgroundReindexing
         include Seek::BioSchema::Support
         include Seek::Rdf::RdfGeneration
@@ -46,7 +47,7 @@ module Seek #:nodoc:
       end
 
       def is_yellow_pages?
-        include?(Seek::YellowPages::InstanceMethods)
+        include?(Seek::ActsAsYellowPages::InstanceMethods)
       end
     end
 

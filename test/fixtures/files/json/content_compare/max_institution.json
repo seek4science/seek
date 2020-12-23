@@ -10,7 +10,11 @@
       "city": "Manchester",
       "address": "Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom",
       "web_page": "http://www.mib.ac.uk/",
-      "discussion_links" : null
+      "discussion_links": [{
+        "id": 55,
+        "url": "http://www.slack.com/",
+        "label": "Slack"
+      }]
     },
     "relationships": {
       "people": {

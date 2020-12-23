@@ -75,8 +75,6 @@ class Project < ApplicationRecord
   #  is to be used)
   belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
-  acts_as_discussable
-
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
     Programme.where(id: programme_id)

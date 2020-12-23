@@ -53,6 +53,7 @@ Factory.define(:max_workflow, class: Workflow) do |f|
   f.with_project_contributor
   f.title 'A Maximal Workflow'
   f.description 'How to run a simulation in GROMACS'
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.workflow_class { WorkflowClass.find_by_key('CWL') || Factory(:cwl_workflow_class) }
   f.projects { [Factory.build(:max_project)] }
   f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}

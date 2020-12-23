@@ -65,8 +65,6 @@ class Assay < ApplicationRecord
 
   enforce_authorization_on_association :study, :view
 
-  acts_as_discussable
-
   def default_contributor
     User.current_user.try :person
   end

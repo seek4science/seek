@@ -1,5 +1,5 @@
 module Seek #:nodoc:
-  module Discussable #:nodoc:
+  module ActsAsDiscussable #:nodoc:
     def self.included(mod)
       mod.extend(ClassMethods)
     end
@@ -14,13 +14,13 @@ module Seek #:nodoc:
         accepts_nested_attributes_for :discussion_links, allow_destroy:true
 
         class_eval do
-          extend Seek::Discussable::SingletonMethods
+          extend Seek::ActsAsDiscussable::SingletonMethods
         end
-        include Seek::Discussable::InstanceMethods
+        include Seek::ActsAsDiscussable::InstanceMethods
       end
 
       def is_discussable?
-        include?(Seek::Discussable::InstanceMethods)
+        include?(Seek::ActsAsDiscussable::InstanceMethods)
       end
     end
 

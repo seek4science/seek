@@ -2576,7 +2576,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal AssetLink::DISCUSSION, project.discussion_links.first.link_type
   end
 
-  test 'should show discussion link' do
+  test 'AAAAA_should show discussion link' do
     disc_link = Factory(:discussion_link)
     project = Factory(:project)
     project.discussion_links = [disc_link]
