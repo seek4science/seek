@@ -1,0 +1,40 @@
+<%
+  refs = git_repository.remote_refs
+%>
+
+<ul class="nav nav-tabs" role="tablist">
+  <li class="active">
+    <a href="#refs-branches" aria-controls="refs-branches" role="tab" data-toggle="tab">Branches</a>
+  </li>
+  <li>
+    <a href="#refs-tags" aria-controls="refs-tags" role="tab" data-toggle="tab">Tags</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane select-ref-pane active" id="refs-branches">
+    <ul>
+      <% refs[:branches].map do |ref| %>
+        <div class="radio">
+          <label>
+            <%= radio_button_tag(:ref, ref[:ref], ref[:default]) -%>
+            <%= ref[:name] %>
+          </label>
+        </div>
+      <% end %>
+    </ul>
+  </div>
+
+  <div role="tabpanel" class="tab-pane select-ref-pane" id="refs-tags">
+    <ul>
+      <% refs[:tags].map do |ref| %>
+        <div class="radio">
+          <label>
+            <%= radio_button_tag(:ref, ref[:ref]) -%>
+            <%= ref[:name] %>
+          </label>
+        </div>
+      <% end %>
+    </ul>
+  </div>
+</div>

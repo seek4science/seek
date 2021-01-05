@@ -1,0 +1,25 @@
+<% @job_status ||= git_repository.fetching_status %>
+<% in_progress = git_repository.fetching? %>
+
+<div id="fetching-status">
+  <div class="alert alert-info" role="alert">
+    <strong>Checkout:</strong>
+    <% if in_progress %>
+      <%= @job_status.to_s.humanize %>
+      <%= image 'spinner' %>
+      <script>
+          setTimeout(function () {
+              $j.ajax('<%= fetching_status_git_repository_path(git_repository) %>', {
+                      data: { 'previous_status': '<%= @job_status -%>' },
+                      success: function (html) {
+                          $j('#fetching-status').replaceWith(html);
+                      }
+                  }
+              );
+          }, 5000);
+      </script>
+    <% else %>
+      Done
+    <% end %>
+  </div>
+</div>

@@ -1056,3 +1056,9 @@ span.disabled {
 .btn.disabled img.icon {
   opacity: 0.4;
 }
+
+.select-ref-pane {
+  max-height: 15em;
+  overflow-y: scroll;
+  box-shadow: 0px -2px 3px #ccc inset;
+}

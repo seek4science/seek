@@ -703,6 +703,12 @@ SEEK::Application.routes.draw do
     end
   end
 
+  resources :git_repositories do
+    member do
+      get :fetching_status
+    end
+  end
+
   ### ASSAY AND TECHNOLOGY TYPES ###
 
   get '/assay_types/', to: 'assay_types#show', as: 'assay_types'
