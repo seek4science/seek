@@ -50,12 +50,18 @@ class AdminController < ApplicationController
     Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
     Seek::Config.managed_programme_id = params[:managed_programme_id]
 
-    Seek::Config.set_smtp_settings 'address', params[:address]
-    Seek::Config.set_smtp_settings 'domain', params[:domain]
-    Seek::Config.set_smtp_settings 'authentication', params[:authentication]
-    Seek::Config.set_smtp_settings 'user_name', params[:smtp_user_name]
-    Seek::Config.set_smtp_settings 'password', params[:smtp_password]
-    Seek::Config.set_smtp_settings 'enable_starttls_auto', params[:enable_starttls_auto] == '1'
+    Seek::Config.set_smtp_settings('address', params[:address]) if params.key?(:address)
+    port_is_integer = true
+    if params.key?(:port)
+      port = params[:port]
+      port_is_integer = only_integer(port, 'port')
+      Seek::Config.set_smtp_settings('port', port) if port_is_integer
+    end
+    Seek::Config.set_smtp_settings('domain', params[:domain]) if params.key?(:domain)
+    Seek::Config.set_smtp_settings('authentication', params[:authentication]) if params.key?(:authentication)
+    Seek::Config.set_smtp_settings('user_name', params[:smtp_user_name]) if params.key?(:smtp_user_name)
+    Seek::Config.set_smtp_settings('password', params[:smtp_password]) if params.key?(:smtp_password)
+    Seek::Config.set_smtp_settings('enable_starttls_auto', params[:enable_starttls_auto] == '1') if params.key?(:enable_starttls_auto)
 
     Seek::Config.support_email_address = params[:support_email_address]
     Seek::Config.noreply_sender = params[:noreply_sender]
@@ -137,10 +143,6 @@ class AdminController < ApplicationController
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
     Seek::Config.time_lock_doi_for = time_lock_doi_for.to_i if time_lock_is_integer
-
-    port = params[:port]
-    port_is_integer = only_integer(port, 'port')
-    Seek::Config.set_smtp_settings('port', port) if port_is_integer
 
     Seek::Util.clear_cached
 
