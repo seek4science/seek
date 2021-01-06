@@ -11,7 +11,7 @@ module Seek
 
       def item_uri(item)
         uri = item.rdf_resource.to_uri.to_s
-        uri << "?version=#{item.version}" if item.respond_to?(:version)
+        uri = (uri + "?version=#{item.version}") if item.respond_to?(:version)
         uri
       end
     end
