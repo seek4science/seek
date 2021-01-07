@@ -60,6 +60,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert person.is_asset_gatekeeper?(project)
     assert person.is_pal?(project)
     assert person.is_admin?
+    assert_equal 55,person.roles_mask
 
     person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'project_administrator', items: [project])])
 
@@ -68,6 +69,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert person.is_asset_gatekeeper?(project)
     assert person.is_pal?(project)
     assert person.is_admin?
+    assert_equal 51,person.roles_mask
 
     person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'asset_gatekeeper', items: [project])])
 
@@ -76,6 +78,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     refute person.is_asset_gatekeeper?(project)
     assert person.is_pal?(project)
     assert person.is_admin?
+    assert_equal 35,person.roles_mask
 
     person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'pal', items: [project])])
 
@@ -84,6 +87,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     refute person.is_asset_gatekeeper?(project)
     refute person.is_pal?(project)
     assert person.is_admin?
+    assert_equal 33,person.roles_mask
 
     person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'programme_administrator', items: person.programmes)])
 
@@ -92,6 +96,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     refute person.is_asset_gatekeeper?(project)
     refute person.is_pal?(project)
     assert person.is_admin?
+    assert_equal 1,person.roles_mask
 
     person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'admin')])
 
@@ -100,6 +105,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     refute person.is_asset_gatekeeper?(project)
     refute person.is_pal?(project)
     refute person.is_admin?
+    assert_equal 0,person.roles_mask
 
     # roles mask isn;t affected if roving a role somebody doesn't belong to
     person = Factory(:programme_administrator)
@@ -127,6 +133,42 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert person.is_pal?(project)
     refute person.is_asset_gatekeeper?(project)
     refute person.is_admin?
+  end
+
+  test 'repeatedly removing role' do
+    person = Factory(:programme_administrator)
+    programme1 = person.programmes.first
+    programme2 = Factory(:programme)
+
+    person.is_programme_administrator = true, programme2
+    person.is_asset_gatekeeper = true, person.projects.first
+
+    assert_equal 48, person.roles_mask
+    assert person.is_programme_administrator_of_any_programme?
+    assert person.is_programme_administrator?(programme1)
+    assert person.is_programme_administrator?(programme2)
+
+    person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'programme_administrator', items: programme1)])
+
+    assert_equal 48, person.roles_mask
+    assert person.is_programme_administrator_of_any_programme?
+    refute person.is_programme_administrator?(programme1)
+    assert person.is_programme_administrator?(programme2)
+
+    person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'programme_administrator', items: programme2)])
+
+    assert_equal 16, person.roles_mask
+    refute person.is_programme_administrator_of_any_programme?
+    refute person.is_programme_administrator?(programme1)
+    refute person.is_programme_administrator?(programme2)
+
+    person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'programme_administrator', items: programme2)])
+
+    assert_equal 16, person.roles_mask
+    refute person.is_programme_administrator_of_any_programme?
+    refute person.is_programme_administrator?(programme1)
+    refute person.is_programme_administrator?(programme2)
+
   end
 
   test 'destroying a person destroys the project role details' do
