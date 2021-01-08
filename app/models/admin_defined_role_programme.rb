@@ -5,6 +5,7 @@ class AdminDefinedRoleProgramme < ApplicationRecord
 
   after_commit :queue_update_auth_table, :if=>:persisted?
   before_destroy :queue_update_auth_table
+  after_destroy :remove_person_from_role
 
   validates :programme,:person, presence:true
   validates :role_mask,numericality: {greater_than:0,less_than_or_equal_to:32}
@@ -13,6 +14,10 @@ class AdminDefinedRoleProgramme < ApplicationRecord
 
   def queue_update_auth_table
     AuthLookupUpdateQueue.enqueue(person)
+  end
+
+  def remove_person_from_role
+    person.is_programme_administrator=false,programme
   end
 
 end

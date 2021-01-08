@@ -40,7 +40,7 @@ class Programme < ApplicationRecord
 
   after_save :handle_administrator_ids, if: -> { @administrator_ids }
   before_create :activate_on_create
-  before_destroy :remove_programme_administrators_on_destroy, prepend: true
+
 
 
   # scopes
@@ -118,12 +118,6 @@ class Programme < ApplicationRecord
   end
 
   private
-
-  def remove_programme_administrators_on_destroy
-    programme_administrators.each do |pa|
-      pa.remove_roles([Seek::Roles::RoleInfo.new(role_name: Seek::Roles::PROGRAMME_ADMINISTRATOR, items: [self])])
-    end
-  end
 
   # set the administrators, assigned from the params to :adminstrator_ids
   def handle_administrator_ids

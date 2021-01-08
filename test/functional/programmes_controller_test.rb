@@ -69,17 +69,27 @@ class ProgrammesControllerTest < ActionController::TestCase
     programme = programme_administrator.programmes.first
 
     refute_empty programme.projects
+    assert programme_administrator.is_programme_administrator?(programme)
+
+    refute programme.can_delete?
 
     assert_no_difference('Programme.count') do
-      delete :destroy, params: { id: programme.id }
+      assert_no_difference('AdminDefinedRoleProgramme.count') do
+        delete :destroy, params: { id: programme.id }
+      end
     end
     refute_nil flash[:error]
 
     programme.projects = []
     programme.save!
+    assert programme_administrator.is_programme_administrator?(programme)
+
+    assert programme.can_delete?
 
     assert_difference('Programme.count', -1) do
-      delete :destroy, params: { id: programme.id }
+      assert_difference('AdminDefinedRoleProgramme.count',-1) do
+        delete :destroy, params: { id: programme.id }
+      end
     end
     assert_redirected_to programmes_path
   end
