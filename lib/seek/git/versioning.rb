@@ -20,13 +20,13 @@ module Seek
 
             attr_writer :git_version_attributes
 
-            after_create :save_version_on_create
+            after_create :save_git_version_on_create
 
             def latest_git_version
               git_versions.last
             end
 
-            def save_version_on_create
+            def save_git_version_on_create
               version = self.git_versions.build(git_version_attributes)
               version.metadata = self.attributes
               version.save
