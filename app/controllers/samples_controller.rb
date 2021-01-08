@@ -126,24 +126,67 @@ class SamplesController < ApplicationController
     end
   end
 
+  def batch_create
+    result = []
+    params[:data].each do |par|
+      params =  Seek::Api::ParameterConverter.new("samples").convert(par)
+      @sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
+      update_sample_with_params(params)
+      result.push(par[:ex_id]) if !@sample.save
+    end
+    render json: { status: result.empty? ? :ok : :unprocessable_entity, failed: result }  
+  end
+
+  def batch_update
+    result = []
+    params[:data].each do |par|
+      begin
+        params =  Seek::Api::ParameterConverter.new("samples").convert(par)
+        @sample = Sample.find(par[:id])
+        update_sample_with_params(params)
+        result.push(par[:id]) if !@sample.save
+      rescue 
+        result.push(par[:id]) 
+      end
+    end
+    render json: { status: result.empty? ? :ok : :unprocessable_entity, failed: result }  
+  end
+
+  def batch_delete
+    result = []
+    params[:data].each do |par|
+      begin
+        @sample = Sample.find(par[:id])
+        result.push(par[:id]) if !(@sample.can_delete? && @sample.destroy)
+      rescue 
+        result.push(par[:id]) 
+      end
+    end
+    render json: { status: result.empty? ? :ok : :unprocessable_entity, failed: result }  
+  end
+
+
   private
 
-  def sample_params(sample_type=nil)
+  def sample_params(args={})
+    sample_type = args[:sample_type]
+    _params = args[:params] || params
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:title).collect(&:to_sym) : []
-    if params[:sample][:attribute_map]
-        params[:sample][:data] = params[:sample].delete(:attribute_map)
+    if _params[:sample][:attribute_map]
+      _params[:sample][:data] = _params[:sample].delete(:attribute_map)
     end
-    params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
+    _params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
                               { data: sample_type_param_keys }, { creator_ids: [] },
                               { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                               discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
-  def update_sample_with_params
-    @sample.update_attributes(sample_params(@sample.sample_type))
+  def update_sample_with_params(_params=nil)
+    _params ||= params
+    @sample.update_attributes(sample_params({params: _params, sample_type: @sample.sample_type}))
     update_sharing_policies @sample
-    update_annotations(params[:tag_list], @sample)
-    update_relationships(@sample, params)
+    update_annotations(_params[:tag_list], @sample)
+    update_relationships(@sample, _params)
     @sample.save
   end
 
