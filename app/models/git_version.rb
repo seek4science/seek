@@ -1,7 +1,7 @@
 class GitVersion < ApplicationRecord
   class ImmutableVersionException < StandardError; end
 
-  include Seek::Git
+  include Seek::Git::Util
 
   attr_writer :git_repository_remote
   belongs_to :resource, polymorphic: true

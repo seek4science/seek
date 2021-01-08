@@ -79,14 +79,48 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'automatically link existing remote git repos' do
-    w = Factory(:workflow)
-    v = w.git_versions.create(git_repository_remote: 'https://git.git/git.git')
-    w2 = Factory(:workflow)
-    v2 = w2.git_versions.create(git_repository_remote: 'https://git.git/git.git')
+    w = Factory(:workflow, git_version_attributes: { git_repository_remote: 'https://git.git/git.git' })
+    w2 = Factory(:workflow, git_version_attributes: { git_repository_remote: 'https://git.git/git.git' })
 
     assert_nil w.local_git_repository
     assert_nil w2.local_git_repository
-    assert_equal v.git_repository, v2.git_repository
+    assert_equal w.latest_git_version.git_repository, w2.latest_git_version.git_repository
   end
 
+  test 'create git version on create' do
+    # Make sure remote repo exists
+    Factory(:workflow, git_version_attributes: { git_repository_remote: 'https://git.git/git.git' })
+
+    assert_difference('GitVersion.count', 1) do
+      assert_no_difference('GitRepository.count') do
+        w = Factory(:workflow, title: 'Test', description: 'Testy', git_version_attributes: {
+            target: 'master',
+            git_repository_remote: 'https://git.git/git.git'
+        })
+        assert_equal 1, w.git_versions.count
+
+        v = w.git_versions.last
+        assert_equal 'Test', v.proxy.title
+        assert_equal 'Testy', v.proxy.description
+        assert_equal 'https://git.git/git.git', v.git_repository.remote
+        assert_equal 'master', v.target
+      end
+    end
+  end
+
+  test 'create git version with local repo and defaults on create' do
+    assert_difference('GitVersion.count', 1) do
+      assert_difference('GitRepository.count', 1) do
+        w = Factory(:workflow, title: 'Test', description: 'Testy')
+        assert_equal 1, w.git_versions.count
+
+        v = w.git_versions.last
+        assert_equal 'Test', v.proxy.title
+        assert_equal 'Testy', v.proxy.description
+        assert_nil v.git_repository.remote
+        assert_equal 'master', v.target, 'Target should be master by default'
+        assert_equal 'Version 1', v.name
+      end
+    end
+  end
 end

@@ -14,7 +14,7 @@ class GitRepository < ApplicationRecord
 
   def git_base
     return unless persisted?
-    @git_base ||= Git.open(local_path)
+    @git_base ||= Seek::Git::Base.base_class.new(Git.open(local_path))
   end
 
   def fetch
