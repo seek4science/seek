@@ -10,6 +10,7 @@ namespace :seek do
     update_samples_json
     set_version_visibility
     remove_old_project_join_logs
+    fix_negative_programme_role_mask
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -115,5 +116,16 @@ namespace :seek do
       end
     end
     puts "... Done"
+  end
+
+  task(fix_negative_programme_role_mask: :environment) do
+    problems = Person.all.select{|person| person.roles_mask < 0}
+    problems.each do |person|
+      mask = person.roles_mask
+      while mask < 0
+        mask = mask + 32
+      end
+      person.update_column(:roles_mask,mask)
+    end
   end
 end
