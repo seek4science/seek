@@ -91,6 +91,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
 
     person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'programme_administrator', items: person.programmes)])
 
+    refute person.is_programme_administrator_of_any_programme?
     refute person.is_programme_administrator?(person.programmes.first)
     refute person.is_project_administrator?(project)
     refute person.is_asset_gatekeeper?(project)
@@ -490,6 +491,13 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
 
   test 'order of roles' do
     assert_equal %w(admin pal project_administrator asset_housekeeper asset_gatekeeper programme_administrator), Seek::Roles::Roles.role_names, 'The order of the roles is critical as it determines the mask that is used.'
+  end
+
+  test 'mask for role' do
+    roles = %w(admin pal project_administrator asset_housekeeper asset_gatekeeper programme_administrator)
+    expected_masks = [1,2,4,8,16,32]
+    actual_masks = roles.collect{|role| Seek::Roles::Roles.instance.mask_for_role(role)}
+    assert_equal expected_masks, actual_masks
   end
 
   test 'factories for roles' do
