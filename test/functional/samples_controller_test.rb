@@ -949,6 +949,27 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'M13 9PL', sample1.get_attribute_value(:postcode)
   end
 
+  test 'terminate batch_create if error' do
+    person = Factory(:person)
+    creator = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assert_difference('Sample.count', 0) do
+        post :batch_create, params: {data:[
+        {ex_id: "1",data:{type: "samples", attributes:{attribute_map:{"full name": 'Fred Smith', "age": '22', "weight": '22.1' ,"postcode": 'M13 9PL'}},
+        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
+        sample_type:{ data:{id: type.id, type: "sample_types"}}}}},
+        {ex_id: "2", data:{type: "samples",attributes:{attribute_map:{"wrong attribute": 'David Tailor', "age": '33', "weight": '33.1' ,"postcode": 'M12 8PL'}},
+        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
+        sample_type:{data:{id: type.id, type: "sample_types"}}}}}]}
+    end
+
+    json_response = JSON.parse(response.body)
+    assert_equal 1, json_response["errors"].length
+    assert_equal "2", json_response["errors"][0]["ex_id"].to_s
+  end
+
+
   test 'batch_update' do
     login_as(Factory(:person))
     creator = Factory(:person)
