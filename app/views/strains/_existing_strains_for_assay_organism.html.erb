@@ -2,11 +2,11 @@
 <div id="existing_strains_for_assay_organism">
   <% if existing_strains_for_assay_organism.empty? -%>
       <p class="none_text">
-        No strains have been defined for <b><%= h(organism.title) -%></b> for your projects.
+        No strains have been defined for <b><%= h(organism.title) -%></b> for your <%= t('project').downcase.pluralize -%>.
       </p>
   <% else -%>
       <p class="none_text">
-        Here are the strains for <b><%= h(organism.title) -%></b> defined for your projects.<br/>
+        Here are the strains for <b><%= h(organism.title) -%></b> defined for your <%= t('project').downcase.pluralize -%>.<br/>
         If required, please select the appropriate one.
       </p>
       <%= select_tag :strains,

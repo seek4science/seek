@@ -22,8 +22,12 @@ require 'minitest/reporters'
 require 'minitest'
 require 'ostruct'
 require 'pry'
+require 'json_test_helper'
 
-Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new]
+Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true,
+                                                                   color: true,
+                                                                   detailed_skip: false,
+                                                                   slow_count: 10)]
 
 module ActionView
   class Renderer
@@ -259,6 +263,10 @@ class ActiveSupport::TestCase
     elsif request.session['flash'] && request.session['flash']['flashes']
       @request.session['flash']['flashes'].delete(target.to_s)
     end
+  end
+
+  def open_fixture_file(path)
+    File.open(File.join(Rails.root, 'test', 'fixtures', 'files', *path.split('/')))
   end
 end
 

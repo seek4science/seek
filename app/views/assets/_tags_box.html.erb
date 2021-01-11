@@ -3,17 +3,18 @@
    object=instance_variable_get("@#{entity}")
    title||="Tags"
    all_tags,all_item_tags = fetch_tags_for_item object
-   owner_item_tags = object.annotations.with_attribute_name("tag").by_source("User",User.current_user.id).collect{|a| a.value}.uniq
+   owner_item_tags = current_user ? object.annotations.with_attribute_name("tag").by_source("User",User.current_user.id).collect{|a| a.value}.uniq : []
    create_tag_link_text = ((owner_item_tags.empty? ? "Add your tags" : "Update your tags") + ' <span class="caret"></span>').html_safe
    existing_tags = owner_item_tags.map(&:text).uniq
 %>
 
 <%= panel(title, :id => "tags_box", :help_text => "Tagging an item helps describe it and other people find it. You can contribute by applying your own tags to this item. The weight of a tag indicates how often it has been used.") do %>
-    <%= render :partial=>"tags/tag_cloud", :locals=>{:tags=>all_item_tags, :show_overall_count=>true, :id=>"tag_cloud", :tags_smaller=>true, :no_tags_text=>"This item has not yet been tagged."} %>
+  <%= render :partial=>"tags/tag_cloud", :locals=>{:tags=>all_item_tags, :show_overall_count=>true, :id=>"tag_cloud", :tags_smaller=>true, :no_tags_text=>"This item has not yet been tagged."} %>
 
+  <% if current_user %>
     <hr/>
     <div class="text-center">
-        <%= button_link_to(create_tag_link_text, 'tag', nil, :onclick => "$j('#create_a_tag').slideToggle();") %>
+      <%= button_link_to(create_tag_link_text, 'tag', nil, :onclick => "$j('#create_a_tag').slideToggle();") %>
     </div>
 
     <div id="create_a_tag" style="display:none;">
@@ -24,10 +25,11 @@
                                    :complete => "$j('#create_a_tag').hide();",
                                    :remote => true}) do
       %>
-          <small>Either select a suggested tag whilst typing, or type a comma to end and define a new tag.</small>
-          <%= tags_input(:tag_list, existing_tags, :typeahead => true) %>
-          <%= submit_tag "Update", :class => 'btn btn-default' -%>
-          <%= image_tag("ajax-loader.gif", :id => 'tags_spinner', :style => 'display: none') -%>
+        <small>Either select a suggested tag whilst typing, or type a comma to end and define a new tag.</small>
+        <%= tags_input(:tag_list, existing_tags, :typeahead => true) %>
+        <%= submit_tag "Update", :class => 'btn btn-default' -%>
+        <%= image_tag("ajax-loader.gif", :id => 'tags_spinner', :style => 'display: none') -%>
       <% end -%>
     </div>
+  <% end %>
 <% end %>

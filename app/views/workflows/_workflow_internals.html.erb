@@ -14,10 +14,10 @@
         <tbody>
         <% workflow.inputs.each do |input| %>
           <tr>
-            <td class="id"><%= input.id %></td>
-            <td class="name"><%= input.name %></td>
-            <td class="description"><%= input.description %></td>
-            <td class="type"><%= input.type %></td>
+            <td class="id"><%= text_or_not_specified(input.id, none_text: 'n/a') %></td>
+            <td class="name"><%= text_or_not_specified(input.name, none_text: 'n/a') %></td>
+            <td class="description"><%= text_or_not_specified(input.description, none_text: 'n/a') %></td>
+            <td class="type"><%= port_types(input) %></td>
           </tr>
         <% end %>
         </tbody>
@@ -62,10 +62,10 @@
         <tbody>
         <% workflow.outputs.each do |output| %>
           <tr>
-            <td class="id"><%= output.id %></td>
-            <td class="name"><%= output.name %></td>
-            <td class="description"><%= output.description %></td>
-            <td class="type"><%= output.type %></td>
+            <td class="id"><%= text_or_not_specified(output.id, none_text: 'n/a') %></td>
+            <td class="name"><%= text_or_not_specified(output.name, none_text: 'n/a') %></td>
+            <td class="description"><%= text_or_not_specified(output.description, none_text: 'n/a') %></td>
+            <td class="type"><%= port_types(output) %></td>
           </tr>
         <% end %>
         </tbody>

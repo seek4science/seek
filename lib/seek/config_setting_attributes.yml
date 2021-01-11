@@ -50,9 +50,11 @@ sabiork_ws_base_url:
 filestore_path:
 tagline_prefix:
 modelling_analysis_enabled:
+human_diseases_enabled:
 jerm_enabled:
 email_enabled:
 jws_enabled:
+copasi_enabled:
 external_search_enabled:
 piwik_analytics_enabled:
 seek_video_link:
@@ -82,6 +84,7 @@ technology_type_base_uri:
 modelling_analysis_type_base_uri:
 header_tagline_text_enabled:
 related_items_limit:
+  convert: :to_i
 faceted_browsing_enabled:
 facet_enable_for_pages:
 faceted_search_enabled:
@@ -188,9 +191,11 @@ isa_enabled:
 models_enabled:
 organisms_enabled:
 programmes_enabled:
+managed_programme_id:
 publications_enabled:
 samples_enabled:
 workflows_enabled:
+collections_enabled:
 # Omniauth
 omniauth_enabled:
 omniauth_user_create:
@@ -202,3 +207,10 @@ omniauth_elixir_aai_secret:
 omniauth_ldap_enabled:
 omniauth_ldap_config:
   encrypt: true
+omniauth_github_enabled:
+omniauth_github_client_id:
+omniauth_github_secret:
+  encrypt: true
+custom_metadata_enabled: false
+search_results_limit:
+  convert: :to_i

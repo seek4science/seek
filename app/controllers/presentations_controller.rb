@@ -11,13 +11,11 @@ class PresentationsController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
 
-  include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
 
-  def new_version
+  def create_version
     if handle_upload_data(true)
       comments=params[:revision_comments]
 
@@ -77,7 +75,7 @@ class PresentationsController < ApplicationController
                                          { event_ids: [] }, { project_ids: [] },
                                          { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                          { creator_ids: [] }, { publication_ids: [] },
-                                         asset_links_attributes:[:id, :url, :link_type, :_destroy])
+                                         discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :presentation_params

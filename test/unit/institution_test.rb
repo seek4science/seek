@@ -222,7 +222,5 @@ class InstitutionTest < ActiveSupport::TestCase
     }
     institution.reload
     assert_equal 'DE',institution.country
-
-
   end
 end

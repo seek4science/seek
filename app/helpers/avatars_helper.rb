@@ -25,8 +25,7 @@ module AvatarsHelper
   end
 
   def avatar_image_tag_for_item(item, alternative, size, alt, css_class = 'framed')
-    case item.class.name.split('::').first.downcase
-    when 'person', 'institution', 'project', 'programme'
+    if item.defines_own_avatar?
       avatar_according_to_user_upload(alternative, item, size, css_class)
     else
       resource_avatar(item, alt: alt, class: css_class)
@@ -35,7 +34,7 @@ module AvatarsHelper
 
   def avatar_according_to_user_upload(alternative, item, size, css_class = 'framed')
     if item.avatar_selected?
-      image_tag avatar_url(item, item.avatar_id, size), alt: alternative, class: css_class
+      image_tag avatar_url(item, item.avatar, size), alt: alternative, class: css_class
     else
       default_avatar(item.class.name, size, alternative, '', css_class)
     end
@@ -51,17 +50,16 @@ module AvatarsHelper
     [alternative, tooltip_text]
   end
 
-  def avatar_url(avatar_for_instance, avatar_id, size = nil)
+  def avatar_url(owner, avatar, size = nil)
     #serve_from_public = Rails.configuration.assets.enabled
     if Rails.env.production?
-      avatar = Avatar.find(avatar_id)
-      if avatar_for_instance.avatars.include?(avatar)
+      if owner.avatars.include?(avatar)
         avatar.public_asset_url(size)
       else
         raise 'Avatar does not belong to instance'
       end
     else
-      basic_url = polymorphic_path([avatar_for_instance, avatar])
+      basic_url = polymorphic_path([owner, avatar])
       append_size_parameter(basic_url, size)
     end
   end

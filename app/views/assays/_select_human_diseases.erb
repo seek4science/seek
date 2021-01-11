@@ -1,0 +1,51 @@
+<%
+   select_truncate_length=120
+   available_human_diseases = HumanDisease.order(:title)
+   existing_json = associations_json_from_assay_human_diseases(@assay.assay_human_diseases)
+-%>
+<%= folding_panel('Human Diseases', false,
+                  help_text: "Here you can associate the #{t('assays.assay').downcase} with specific human diseases.") do %>
+    <p>
+      The following Human Diseases are involved in this <%= "#{@assay_text}" -%>:
+    </p>
+
+    <%= associations_list('human_disease_to_list', 'associations/assay_human_disease', existing_json, empty_text: 'No Human Diseases') %>
+
+    <div class="association_step form-group">
+      <label><span class="assay_human_disease_info">Choose an human_disease</span></label>
+      <%= select_tag :possible_human_diseases,
+                     options_for_select(available_human_diseases.map { |d| [truncate(h(d.title), length: select_truncate_length), d.id]}),
+                     promt: 'Select Human Disease ...', class: 'form-control' -%>
+      <%= button_link_to "Include in the #{@assay_text}", 'new', '#', id: 'add-human-disease-btn' %>
+    </div>
+
+<% end %>
+
+<script type="text/javascript">
+    $j(document).ready(function () {
+
+        $j('#add-human-disease-btn').click(function () {
+            var list = $j('#human_disease_to_list').data('associationList');
+            var selectedHumanDisease = $j("#possible_human_diseases option:selected");
+
+            var dis = {
+                human_disease_id: parseInt(selectedHumanDisease.val()),
+                human_disease_title: selectedHumanDisease.text(),
+            };
+
+            var existing = list.find(function (d) {
+                return d.human_disease_id === dis.human_disease_id
+            });
+
+            if (!existing) {
+                list.add(dis);
+            } else {
+                existing.element.highlight('blue');
+            }
+
+            return false;
+        });
+
+        $j('#possible_human_diseases').change(); // Trigger `change` event on select to act on initial state.
+    });
+</script>

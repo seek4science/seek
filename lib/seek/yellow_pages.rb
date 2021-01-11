@@ -14,15 +14,7 @@ module Seek #:nodoc:
 
         validates :title, presence: true
 
-        has_many :avatars,
-                 as: :owner,
-                 dependent: :destroy
-
         has_many :activity_logs, as: :activity_loggable
-
-        validates :avatar, associated: true
-
-        belongs_to :avatar
 
         acts_as_uniquely_identifiable
 
@@ -50,6 +42,7 @@ module Seek #:nodoc:
         include Seek::BioSchema::Support
         include Seek::Rdf::RdfGeneration
         include Seek::Rdf::ReactToAssociatedChange
+        include HasCustomAvatar
       end
 
       def is_yellow_pages?
@@ -65,11 +58,6 @@ module Seek #:nodoc:
     end
 
     module InstanceMethods
-      # "false" returned by this helper method won't mean that no avatars are uploaded for this yellow page model;
-      # it rather means that no avatar (other than default placeholder) was selected for the yellow page model
-      def avatar_selected?
-        !avatar_id.nil?
-      end
     end
   end
 end

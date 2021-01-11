@@ -13,6 +13,9 @@
 
   <div class="col-sm-6 hidden-xs">
     <%= list_item_optional_attribute "Organism", resource.organism.try(:title), resource.organism %>
+    <% if Seek::Config.human_diseases_enabled %>
+      <%= list_item_optional_attribute "Human Disease", resource.human_disease.try(:title), resource.human_disease %>
+    <% end %>
     <% if Seek::Config.isa_enabled %>
       <%= list_item_authorized_list resource.investigations, t('investigation').pluralize, true, 50, true %>
       <%= list_item_authorized_list resource.studies, t('study').pluralize, true, 50, true %>

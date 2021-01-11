@@ -1,0 +1,10 @@
+<% if Seek::Config.human_diseases_enabled %>
+    <%= folding_panel("Details about the human disease") do %>
+        <div class="form-group">
+            <label>Human Disease</label>
+            <%= select model_class.name.underscore.to_sym, :human_disease_id,
+                       HumanDisease.order(:title).collect{|o| [o.title.capitalize,o.id]},
+                       {:include_blank=>"Not specified"}, {:class => 'form-control'} -%>
+        </div>
+    <% end %>
+<% end %>

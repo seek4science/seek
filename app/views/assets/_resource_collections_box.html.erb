@@ -1,0 +1,55 @@
+<%# This partial expects 3 parameters to be defined: -%>
+<%# - resource - instance of resource for which the attributions are displayed -%>
+
+<% main_list_section_length = 2 -%>
+<% collections ||= resource.collections -%>
+<% truncate_to ||= 22 -%>
+<% collections = collections.map { |c| c.can_view? ? c : nil }.sort_by { |x| x.nil? ? 1 : 0 } # Move "private" collections to the bottom of the list %>
+
+<%= panel('Collections', help_text: "Which collections does this resource appear in?") do %>
+  <% unless collections.blank? -%>
+    <ul class="list collapsed" id="collections-list">
+      <% collections.each_with_index do |item, index| -%>
+        <%= content_tag(:li, class: index >= main_list_section_length ? 'hidden-item' : '') do %>
+          <% if item -%>
+            <% item_type = item.class.name -%>
+            <% by_text = item.contributor.nil? ? "" : " by #{h(item.contributor.name)}" %>
+            <% tooltip_txt = "#{item_type.humanize}: \"#{h(item.title)}\"#{by_text}" -%>
+            <%= link_to(item, 'data-tooltip' => tooltip_txt) do %>
+              <%= avatar(item, 32, true, nil, nil, false, nil) %>
+              <%= truncate(item.title, length: truncate_to) %>
+            <% end %>
+          <% else -%>
+            <span class="none_text">Private collection</span>
+          <% end -%>
+        <% end %>
+      <% end  %>
+    </ul>
+
+    <%# if a collection has more than "main_list_section_length" items an "expand" link is provided which opens up the rest of the items -%>
+    <% if collections.length > main_list_section_length -%>
+      <%= link_to(("More " + image('expand')).html_safe, '#', id: 'more_link_collections', class: 'pull-right')-%>
+      <%= link_to(("Less " + image('collapse')).html_safe, '#', id: 'less_link_collections', style: 'display: none', class: 'pull-right')-%>
+    <% end -%>
+  <% else -%>
+    <p class="none_text">None</p>
+  <% end %>
+<% end %>
+
+<script>
+    $j('#more_link_collections').click(function () {
+        $j('#collections-list').removeClass('collapsed');
+        $j('#more_link_collections').hide();
+        $j('#less_link_collections').show();
+
+        return false;
+    });
+
+    $j('#less_link_collections').click(function () {
+        $j('#collections-list').addClass('collapsed');
+        $j('#more_link_collections').show();
+        $j('#less_link_collections').hide();
+
+        return false;
+    });
+</script>

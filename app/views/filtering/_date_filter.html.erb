@@ -36,7 +36,7 @@
                                                           role: 'seek-date-filter',
                                                           'apply-filter-url' => apply_url,
                                                           'remove-filter-url' => remove_url  }) do %>
-    <div class="filter-category-title"><%= key.to_s.humanize %></div>
+    <div class="filter-category-title"><%= t(key, default: key.to_s).titleize %></div>
     <%= select_tag(nil,
                    options_for_select(option_pairs, selected_option_value),
                    data: { role: 'seek-date-filter-select' },

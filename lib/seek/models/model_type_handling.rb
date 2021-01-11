@@ -33,6 +33,11 @@ module Seek
       def is_jws_supported?(model = self)
         !model.content_blobs.detect { |cb| cb.is_jws_dat? || cb.is_sbml? }.nil?
       end
+
+      def is_copasi_supported?(model = self)
+        !model.content_blobs.detect { |cb| cb.is_copasi? || cb.is_sbml? }.nil?
+      end
+
     end
   end
 end

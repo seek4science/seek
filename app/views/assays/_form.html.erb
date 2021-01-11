@@ -12,8 +12,12 @@
 
 <div class="form-group">
   <%= f.label :description -%><br/>
-  <%= f.text_area :description, :rows => 5, :class=>"form-control"  -%>
+  <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit"  -%>
 </div>
+
+<%= render partial: 'custom_metadata/custom_metadata_type_selection', locals:{f:f, resource:@assay} %>
+
+<%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@assay} %>
 
 <% if Seek::Config.is_virtualliver -%>
     <div class="form-group">
@@ -59,6 +63,12 @@
     <% if Seek::Config.organisms_enabled %>
         <div id="add_organism_form">
           <%= render :partial=>"assays/select_organisms" -%>
+        </div>
+    <% end %>
+
+    <% if Seek::Config.human_diseases_enabled %>
+        <div id="add_human_disease_form">
+          <%= render :partial=>"assays/select_human_diseases" -%>
         </div>
     <% end %>
 

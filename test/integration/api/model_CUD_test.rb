@@ -9,6 +9,8 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     @clz = 'model'
     @plural_clz = @clz.pluralize
     @project = @current_user.person.projects.first
+    @organism = Factory(:organism)
+    @project.organisms << @organism
     investigation = Factory(:investigation, projects: [@project], contributor: @current_person)
     study = Factory(:study, investigation: investigation, contributor: @current_person)
     @assay = Factory(:assay, study: study, contributor: @current_person)
@@ -23,16 +25,11 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
-    model = Factory(:model, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
+    model = Factory(:model, policy: Factory(:public_policy),
+                    contributor: @current_person, creators: [@creator],
+                    discussion_links:[Factory(:discussion_link)])
+    @discussion_link = model.discussion_links.first
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: model.id})
-  end
-
-  def populate_extra_relationships(hash = nil)
-    extra_relationships = {}
-    extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
-    extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' },
-                                            { id: @creator.id.to_s, type: 'people' }] }
-    extra_relationships.with_indifferent_access
   end
 
   test 'can add content to API-created model' do
@@ -125,10 +122,10 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     h = JSON.parse(response.body)
 
     hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
-    hash_comparison(populate_extra_attributes, h['data']['attributes'])
+    hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
 
     hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
-    hash_comparison(populate_extra_relationships, h['data']['relationships'])
+    hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
   end
 
   test 'returns sensible error objects' do

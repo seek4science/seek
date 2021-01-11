@@ -118,7 +118,7 @@ module HomesHelper
       selected_activity_logs = []
       activity_logs.each do |activity_log|
         included = selected_activity_logs.index { |log| log.activity_loggable == activity_log.activity_loggable }
-        if !included && activity_log.activity_loggable && activity_log.activity_loggable.can_view?
+        if !included && activity_log.can_render_link?
           selected_activity_logs << activity_log
         end
         break if selected_activity_logs.length >= number_of_item
@@ -134,7 +134,7 @@ module HomesHelper
       activity_logs = ActivityLog.where(['action = ? AND created_at > ? AND activity_loggable_type in (?)', 'create', time, item_types]).order('created_at DESC')
       selected_activity_logs = []
       activity_logs.each do |log|
-        if log.activity_loggable && item_types.include?(log.activity_loggable_type) && log.activity_loggable.can_view?
+        if log.can_render_link? && item_types.include?(log.activity_loggable_type)
           selected_activity_logs << log
         end
         break if selected_activity_logs.length >= number_of_item

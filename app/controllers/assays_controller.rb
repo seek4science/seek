@@ -13,8 +13,6 @@ class AssaysController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
 
-  include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
@@ -109,6 +107,7 @@ class AssaysController < ApplicationController
     @assay = Assay.new(assay_params)
 
     update_assay_organisms @assay, params
+    update_assay_human_diseases @assay, params
     @assay.contributor=current_person
     update_sharing_policies @assay
     update_annotations(params[:tag_list], @assay)
@@ -130,6 +129,7 @@ class AssaysController < ApplicationController
 
   def update
     update_assay_organisms @assay, params
+    update_assay_human_diseases @assay, params
     update_annotations(params[:tag_list], @assay)
     update_sharing_policies @assay
     update_relationships(@assay, params)
@@ -157,6 +157,14 @@ class AssaysController < ApplicationController
     end
   end
 
+  def update_assay_human_diseases assay,params
+    human_diseases             = params[:assay_human_disease_ids] || params[:assay][:human_disease_ids] || []
+    assay.assay_human_diseases = []
+    Array(human_diseases).each do |human_disease_id|
+      assay.associate_human_disease(human_disease_id)
+    end
+  end
+
   def show
     respond_to do |format|
       format.html
@@ -175,7 +183,8 @@ class AssaysController < ApplicationController
                                   { scales: [] }, { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
-                                  { publication_ids: [] }
+                                  { publication_ids: [] },
+                                  { custom_metadata_attributes: determine_custom_metadata_keys }
                                   ).tap do |assay_params|
       assay_params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if assay_params.key?(:document_ids)
       assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)

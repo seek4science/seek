@@ -1,0 +1,23 @@
+test:
+  adapter: postgresql
+  database: seek_test
+  username: seek
+  password: test
+  host: localhost
+  port: 5432
+
+development:
+  adapter: postgresql
+  database: seek_test_dev
+  username: seek
+  password: test
+  host: localhost
+  port: 5432
+
+production:
+  adapter: postgresql
+  database: seek_test_prod
+  username: seek
+  password: test
+  host: localhost
+  port: 5432

@@ -34,4 +34,14 @@ module VersionHelper
   def document_version_url(document_version)
     document_url(document_version.parent, version: document_version.version)
   end
+
+  VISIBILITY_LABELS = {
+      private: 'Hidden',
+      registered_users: 'Only visible to registered users',
+      public: 'Visible to anyone'
+  }.freeze
+
+  def version_visibility_options(selected = nil)
+    options_for_select(Seek::ExplicitVersioning::VISIBILITY_INV.keys.map { |k| [VISIBILITY_LABELS[k], k] }, selected)
+  end
 end

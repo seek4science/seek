@@ -39,6 +39,9 @@
     <% if Seek::Config.documents_enabled %>
       <li><%= link_to t("document").pluralize, documents_path %></li>
     <% end %>
+    <% if Seek::Config.collections_enabled %>
+      <li><%= link_to t("collection").pluralize, collections_path %></li>
+    <% end %>
 
     <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
     <li><%= link_to t("presentation").pluralize, presentations_path %></li>
@@ -52,6 +55,14 @@
       <% end %>
       <% if Seek::Config.organisms_enabled %>
           <li><%= link_to t("organism").pluralize, organisms_path %></li>
+      <% end %>
+    <% end %>
+
+    <% if Seek::Config.human_diseases_enabled %>
+      <li role="presentation" class="dropdown-header"><%= t("menu.vocabularies") -%></li>
+
+      <% if Seek::Config.human_diseases_enabled %>
+        <li><%= link_to t("human_disease").pluralize, human_diseases_path %></li>
       <% end %>
     <% end %>
   </ul>

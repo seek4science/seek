@@ -1,0 +1,22 @@
+
+
+<tr>
+    <td class='project-checkbox'>
+      <input type="checkbox" name='projects[]' id='projects_{{id}}' value='{{ id }}' data-project-id="{{ id }}" class="project-selected"/>
+    </td>
+    <td>
+      {{#if attributes.avatar}}
+        <img src="{{ attributes.avatar  }}" />
+      {{else}}
+        <%= image_tag(Seek::ImageFileDictionary.instance.image_filename_for_key(:project_avatar),height:'50px') %>
+      {{/if}}
+    </td>
+    <td class='project-title'><a href='{{ links.self }}' target="_blank">{{ truncate attributes.title 60 }}</a></td>
+    <td  class='project-description'>
+      {{#if attributes.description }}
+        {{ truncate attributes.description 300 }}
+      {{else}}
+        <span class="none_text">No description</span>
+      {{/if}}
+    </td>
+</tr>

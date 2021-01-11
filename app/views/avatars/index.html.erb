@@ -21,8 +21,8 @@
 <div class="avatar-gallery">
   <% @avatars.each do |avatar| %>
       <div class="avatar">
-        <%= link_to avatar_url(@avatar_owner_instance, avatar.id, "large") do -%>
-            <%= image_tag avatar_url(@avatar_owner_instance, avatar.id, 100), :alt => @avatar_owner_instance.title, :class => 'framed' -%>
+        <%= link_to avatar_url(@avatar_owner_instance, avatar, "large") do -%>
+            <%= image_tag avatar_url(@avatar_owner_instance, avatar, 100), :alt => @avatar_owner_instance.title, :class => 'framed' -%>
         <% end %>
         <% if avatar.selected? -%><br/>(Current)<% end -%>
         <% if editable %>

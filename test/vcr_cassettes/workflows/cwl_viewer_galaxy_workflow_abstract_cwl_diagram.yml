@@ -1,0 +1,249 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://localhost:8080/graph/svg
+    body:
+      encoding: UTF-8
+      string: "class: Workflow\r\ncwlVersion: v1.2.0-dev2\r\ndoc: 'Preprocessing of
+        raw SARS-CoV-2 reads. This workflow contains an alternate starting point to
+        avoid the data to be downloaded from the NCBI SRA. More info can be found
+        at https://covid19.galaxyproject.org/genomics/'\r\ninputs:\r\n  0_Input Dataset
+        Collection:\r\n    format: data\r\n    type: File\r\n  1_Input Dataset Collection:\r\n
+        \   format: data\r\n    type: File\r\noutputs: {}\r\nsteps:\r\n  10_Filter
+        SAM or BAM, output SAM or BAM:\r\n    in:\r\n      input1: 7_Map with BWA-MEM/bam_output\r\n
+        \   out:\r\n    - output1\r\n    run:\r\n      class: Operation\r\n      id:
+        toolshed_g2_bx_psu_edu_repos_devteam_samtool_filter2_samtool_filter2_1_8\r\n
+        \     inputs:\r\n        input1:\r\n          format: Any\r\n          type:
+        File\r\n      outputs:\r\n        output1:\r\n          doc: sam\r\n          type:
+        File\r\n  11_MergeSamFiles:\r\n    in:\r\n      inputFile: 9_Filter SAM or
+        BAM, output SAM or BAM/output1\r\n    out:\r\n    - outFile\r\n    run:\r\n
+        \     class: Operation\r\n      id: toolshed_g2_bx_psu_edu_repos_devteam_picard_picard_MergeSamFiles_2_18_2_1\r\n
+        \     inputs:\r\n        inputFile:\r\n          format: Any\r\n          type:
+        File\r\n      outputs:\r\n        outFile:\r\n          doc: bam\r\n          type:
+        File\r\n  12_MergeSamFiles:\r\n    in:\r\n      inputFile: 10_Filter SAM or
+        BAM, output SAM or BAM/output1\r\n    out:\r\n    - outFile\r\n    run:\r\n
+        \     class: Operation\r\n      id: toolshed_g2_bx_psu_edu_repos_devteam_picard_picard_MergeSamFiles_2_18_2_1\r\n
+        \     inputs:\r\n        inputFile:\r\n          format: Any\r\n          type:
+        File\r\n      outputs:\r\n        outFile:\r\n          doc: bam\r\n          type:
+        File\r\n  13_Samtools fastx:\r\n    in:\r\n      input: 11_MergeSamFiles/outFile\r\n
+        \   out:\r\n    - nonspecific\r\n    run:\r\n      class: Operation\r\n      id:
+        toolshed_g2_bx_psu_edu_repos_iuc_samtools_fastx_samtools_fastx_1_9+galaxy1\r\n
+        \     inputs:\r\n        input:\r\n          format: Any\r\n          type:
+        File\r\n      outputs:\r\n        nonspecific:\r\n          doc: fasta\r\n
+        \         type: File\r\n  14_Samtools fastx:\r\n    in:\r\n      input: 12_MergeSamFiles/outFile\r\n
+        \   out:\r\n    - forward\r\n    - reverse\r\n    run:\r\n      class: Operation\r\n
+        \     id: toolshed_g2_bx_psu_edu_repos_iuc_samtools_fastx_samtools_fastx_1_9+galaxy1\r\n
+        \     inputs:\r\n        input:\r\n          format: Any\r\n          type:
+        File\r\n      outputs:\r\n        forward:\r\n          doc: fasta\r\n          type:
+        File\r\n        reverse:\r\n          doc: fasta\r\n          type: File\r\n
+        \ 2_fastp:\r\n    in:\r\n      single_paired|paired_input: 0_Input Dataset
+        Collection\r\n    out:\r\n    - output_paired_coll\r\n    - report_html\r\n
+        \   - report_json\r\n    run:\r\n      class: Operation\r\n      id: toolshed_g2_bx_psu_edu_repos_iuc_fastp_fastp_0_19_3_3\r\n
+        \     inputs:\r\n        single_paired|paired_input:\r\n          format:
+        Any\r\n          type: File\r\n      outputs:\r\n        output_paired_coll:\r\n
+        \         doc: input\r\n          type: File\r\n        report_html:\r\n          doc:
+        html\r\n          type: File\r\n        report_json:\r\n          doc: json\r\n
+        \         type: File\r\n  3_NanoPlot:\r\n    in:\r\n      mode|reads|files:
+        1_Input Dataset Collection\r\n    out:\r\n    - output_html\r\n    - nanostats\r\n
+        \   - nanostats_post_filtering\r\n    - read_length\r\n    - log_read_length\r\n
+        \   run:\r\n      class: Operation\r\n      id: toolshed_g2_bx_psu_edu_repos_iuc_nanoplot_nanoplot_1_28_2+galaxy1\r\n
+        \     inputs:\r\n        mode|reads|files:\r\n          format: Any\r\n          type:
+        File\r\n      outputs:\r\n        log_read_length:\r\n          doc: png\r\n
+        \         type: File\r\n        nanostats:\r\n          doc: txt\r\n          type:
+        File\r\n        nanostats_post_filtering:\r\n          doc: txt\r\n          type:
+        File\r\n        output_html:\r\n          doc: html\r\n          type: File\r\n
+        \       read_length:\r\n          doc: png\r\n          type: File\r\n  4_FastQC:\r\n
+        \   in:\r\n      input_file: 1_Input Dataset Collection\r\n    out:\r\n    -
+        html_file\r\n    - text_file\r\n    run:\r\n      class: Operation\r\n      id:
+        toolshed_g2_bx_psu_edu_repos_devteam_fastqc_fastqc_0_72\r\n      inputs:\r\n
+        \       input_file:\r\n          format: Any\r\n          type: File\r\n      outputs:\r\n
+        \       html_file:\r\n          doc: html\r\n          type: File\r\n        text_file:\r\n
+        \         doc: txt\r\n          type: File\r\n  5_Map with minimap2:\r\n    in:\r\n
+        \     fastq_input|fastq_input1: 1_Input Dataset Collection\r\n    out:\r\n
+        \   - alignment_output\r\n    run:\r\n      class: Operation\r\n      id:
+        toolshed_g2_bx_psu_edu_repos_iuc_minimap2_minimap2_2_12\r\n      inputs:\r\n
+        \       fastq_input|fastq_input1:\r\n          format: Any\r\n          type:
+        File\r\n      outputs:\r\n        alignment_output:\r\n          doc: bam\r\n
+        \         type: File\r\n  6_MultiQC:\r\n    in:\r\n      results_0|software_cond|input:
+        2_fastp/report_json\r\n    out:\r\n    - stats\r\n    - html_report\r\n    run:\r\n
+        \     class: Operation\r\n      id: toolshed_g2_bx_psu_edu_repos_iuc_multiqc_multiqc_1_7\r\n
+        \     inputs:\r\n        results_0|software_cond|input:\r\n          format:
+        Any\r\n          type: File\r\n      outputs:\r\n        html_report:\r\n
+        \         doc: html\r\n          type: File\r\n        stats:\r\n          doc:
+        input\r\n          type: File\r\n  7_Map with BWA-MEM:\r\n    in:\r\n      fastq_input|fastq_input1:
+        2_fastp/output_paired_coll\r\n    out:\r\n    - bam_output\r\n    run:\r\n
+        \     class: Operation\r\n      id: toolshed_g2_bx_psu_edu_repos_devteam_bwa_bwa_mem_0_7_17_1\r\n
+        \     inputs:\r\n        fastq_input|fastq_input1:\r\n          format: Any\r\n
+        \         type: File\r\n      outputs:\r\n        bam_output:\r\n          doc:
+        bam\r\n          type: File\r\n  8_MultiQC:\r\n    in:\r\n      results_0|software_cond|output_0|input:
+        4_FastQC/text_file\r\n    out:\r\n    - stats\r\n    - html_report\r\n    run:\r\n
+        \     class: Operation\r\n      id: toolshed_g2_bx_psu_edu_repos_iuc_multiqc_multiqc_1_7\r\n
+        \     inputs:\r\n        results_0|software_cond|output_0|input:\r\n          format:
+        Any\r\n          type: File\r\n      outputs:\r\n        html_report:\r\n
+        \         doc: html\r\n          type: File\r\n        stats:\r\n          doc:
+        input\r\n          type: File\r\n  9_Filter SAM or BAM, output SAM or BAM:\r\n
+        \   in:\r\n      input1: 5_Map with minimap2/alignment_output\r\n    out:\r\n
+        \   - output1\r\n    run:\r\n      class: Operation\r\n      id: toolshed_g2_bx_psu_edu_repos_devteam_samtool_filter2_samtool_filter2_1_8\r\n
+        \     inputs:\r\n        input1:\r\n          format: Any\r\n          type:
+        File\r\n      outputs:\r\n        output1:\r\n          doc: sam\r\n          type:
+        File\r\n\r\n"
+    headers:
+      Accept:
+      - image/svg+xml
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - rest-client/2.0.2 (linux-gnu x86_64) ruby/2.4.9p362
+      Content-Type:
+      - text/plain
+      Content-Length:
+      - '6333'
+      Host:
+      - localhost:8080
+  response:
+    status:
+      code: 200
+      message: ''
+    headers:
+      Content-Disposition:
+      - inline; filename="graph.svg"
+      Content-Type:
+      - image/svg+xml
+      Content-Length:
+      - '7772'
+      Date:
+      - Mon, 04 May 2020 11:05:56 GMT
+    body:
+      encoding: UTF-8
+      string: |
+        <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+        <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+         "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+        <!-- Generated by graphviz version 2.38.0 (20140413.2041)
+         -->
+        <!-- Title: workflow Pages: 1 -->
+        <svg width="384pt" height="200pt"
+         viewBox="0.00 0.00 395.00 206.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <g id="graph0" class="graph" transform="scale(0.972222 0.972222) rotate(0) translate(4 202)">
+        <title>workflow</title>
+        <g id="clust1" class="cluster"><title>cluster_inputs</title>
+        <polygon fill="none" stroke="black" stroke-dasharray="5,2" points="10,-135 10,-190 379,-190 379,-135 10,-135"/>
+        <text text-anchor="middle" x="53" y="-178" font-family="Times,serif" font-size="10.00">Workflow Inputs</text>
+        </g>
+        <g id="clust2" class="cluster"><title>cluster_outputs</title>
+        <polygon fill="none" stroke="black" stroke-dasharray="5,2" points="8,-8 8,-63 196,-63 196,-8 8,-8"/>
+        <text text-anchor="middle" x="55" y="-51" font-family="Times,serif" font-size="10.00">Workflow Outputs</text>
+        </g>
+        <!-- minDepth -->
+        <g id="node1" class="node"><title>minDepth</title>
+        <polygon fill="#94ddf4" stroke="black" points="18.5,-143.5 18.5,-162.5 77.5,-162.5 77.5,-143.5 18.5,-143.5"/>
+        <text text-anchor="middle" x="48" y="-150.5" font-family="Helvetica,sans-Serif" font-size="10.00">minDepth</text>
+        </g>
+        <!-- rp2paths -->
+        <g id="node10" class="node"><title>rp2paths</title>
+        <polygon fill="lightgoldenrodyellow" stroke="black" points="83,-71.5 83,-90.5 137,-90.5 137,-71.5 83,-71.5"/>
+        <text text-anchor="middle" x="110" y="-78.5" font-family="Helvetica,sans-Serif" font-size="10.00">rp2paths</text>
+        </g>
+        <!-- minDepth&#45;&gt;rp2paths -->
+        <g id="edge4" class="edge"><title>minDepth&#45;&gt;rp2paths</title>
+        <path fill="none" stroke="black" d="M55.6024,-143.417C66.0145,-131.661 84.8456,-110.4 97.388,-96.2394"/>
+        <polygon fill="black" stroke="black" points="99.5282,-97.5182 102.335,-90.6536 95.8601,-94.2693 99.5282,-97.5182"/>
+        </g>
+        <!-- sinkfile -->
+        <g id="node2" class="node"><title>sinkfile</title>
+        <polygon fill="#94ddf4" stroke="black" points="189.5,-143.5 189.5,-162.5 236.5,-162.5 236.5,-143.5 189.5,-143.5"/>
+        <text text-anchor="middle" x="213" y="-150.5" font-family="Helvetica,sans-Serif" font-size="10.00">sinkfile</text>
+        </g>
+        <!-- rp2 -->
+        <g id="node11" class="node"><title>rp2</title>
+        <polygon fill="lightgoldenrodyellow" stroke="black" points="188,-107.5 188,-126.5 218,-126.5 218,-107.5 188,-107.5"/>
+        <text text-anchor="middle" x="203" y="-114.5" font-family="Helvetica,sans-Serif" font-size="10.00">rp2</text>
+        </g>
+        <!-- sinkfile&#45;&gt;rp2 -->
+        <g id="edge7" class="edge"><title>sinkfile&#45;&gt;rp2</title>
+        <path fill="none" stroke="black" d="M210.477,-143.42C209.62,-140.509 208.634,-137.157 207.665,-133.861"/>
+        <polygon fill="black" stroke="black" points="209.953,-132.957 205.627,-126.933 205.252,-134.34 209.953,-132.957"/>
+        </g>
+        <!-- rulesfile -->
+        <g id="node3" class="node"><title>rulesfile</title>
+        <polygon fill="#94ddf4" stroke="black" points="135,-143.5 135,-162.5 185,-162.5 185,-143.5 135,-143.5"/>
+        <text text-anchor="middle" x="160" y="-150.5" font-family="Helvetica,sans-Serif" font-size="10.00">rulesfile</text>
+        </g>
+        <!-- rulesfile&#45;&gt;rp2 -->
+        <g id="edge8" class="edge"><title>rulesfile&#45;&gt;rp2</title>
+        <path fill="none" stroke="black" d="M170.851,-143.42C175.5,-139.744 181.038,-135.365 186.197,-131.286"/>
+        <polygon fill="black" stroke="black" points="188.032,-132.959 192.003,-126.695 184.993,-129.115 188.032,-132.959"/>
+        </g>
+        <!-- max&#45;steps -->
+        <g id="node4" class="node"><title>max&#45;steps</title>
+        <polygon fill="#94ddf4" stroke="black" points="309,-143.5 309,-162.5 371,-162.5 371,-143.5 309,-143.5"/>
+        <text text-anchor="middle" x="340" y="-150.5" font-family="Helvetica,sans-Serif" font-size="10.00">max&#45;steps</text>
+        </g>
+        <!-- max&#45;steps&#45;&gt;rp2 -->
+        <g id="edge9" class="edge"><title>max&#45;steps&#45;&gt;rp2</title>
+        <path fill="none" stroke="black" d="M324.715,-143.395C318.725,-140.34 311.693,-137.134 305,-135 278.341,-126.5 246.336,-122.049 225.375,-119.867"/>
+        <polygon fill="black" stroke="black" points="225.388,-117.407 218.183,-119.162 224.911,-122.283 225.388,-117.407"/>
+        </g>
+        <!-- bsourcefile -->
+        <g id="node5" class="node"><title>bsourcefile</title>
+        <polygon fill="#94ddf4" stroke="black" points="241,-143.5 241,-162.5 305,-162.5 305,-143.5 241,-143.5"/>
+        <text text-anchor="middle" x="273" y="-150.5" font-family="Helvetica,sans-Serif" font-size="10.00">bsourcefile</text>
+        </g>
+        <!-- bsourcefile&#45;&gt;rp2 -->
+        <g id="edge10" class="edge"><title>bsourcefile&#45;&gt;rp2</title>
+        <path fill="none" stroke="black" d="M255.336,-143.42C245.99,-138.881 234.438,-133.27 224.567,-128.475"/>
+        <polygon fill="black" stroke="black" points="225.416,-126.164 218.049,-125.31 223.275,-130.572 225.416,-126.164"/>
+        </g>
+        <!-- reverse -->
+        <g id="node6" class="node"><title>reverse</title>
+        <polygon fill="#94ddf4" stroke="black" points="81.5,-143.5 81.5,-162.5 130.5,-162.5 130.5,-143.5 81.5,-143.5"/>
+        <text text-anchor="middle" x="106" y="-150.5" font-family="Helvetica,sans-Serif" font-size="10.00">reverse</text>
+        </g>
+        <!-- reverse&#45;&gt;rp2paths -->
+        <g id="edge6" class="edge"><title>reverse&#45;&gt;rp2paths</title>
+        <path fill="none" stroke="black" d="M106.49,-143.417C107.138,-132.081 108.291,-111.907 109.098,-97.783"/>
+        <polygon fill="black" stroke="black" points="111.552,-97.782 109.506,-90.6536 106.66,-97.5024 111.552,-97.782"/>
+        </g>
+        <!-- sinks -->
+        <g id="node7" class="node"><title>sinks</title>
+        <polygon fill="#94ddf4" stroke="black" points="148,-16.5 148,-35.5 188,-35.5 188,-16.5 148,-16.5"/>
+        <text text-anchor="middle" x="168" y="-23.5" font-family="Helvetica,sans-Serif" font-size="10.00">sinks</text>
+        </g>
+        <!-- compounds -->
+        <g id="node8" class="node"><title>compounds</title>
+        <polygon fill="#94ddf4" stroke="black" points="76.5,-16.5 76.5,-35.5 143.5,-35.5 143.5,-16.5 76.5,-16.5"/>
+        <text text-anchor="middle" x="110" y="-23.5" font-family="Helvetica,sans-Serif" font-size="10.00">compounds</text>
+        </g>
+        <!-- reactions -->
+        <g id="node9" class="node"><title>reactions</title>
+        <polygon fill="#94ddf4" stroke="black" points="16,-16.5 16,-35.5 72,-35.5 72,-16.5 16,-16.5"/>
+        <text text-anchor="middle" x="44" y="-23.5" font-family="Helvetica,sans-Serif" font-size="10.00">reactions</text>
+        </g>
+        <!-- rp2paths&#45;&gt;sinks -->
+        <g id="edge1" class="edge"><title>rp2paths&#45;&gt;sinks</title>
+        <path fill="none" stroke="black" d="M129.617,-71.3409C133.953,-69.016 138.339,-66.232 142,-63 148.726,-57.0626 154.4,-48.8292 158.743,-41.7347"/>
+        <polygon fill="black" stroke="black" points="160.894,-42.9103 162.349,-35.638 156.676,-40.4157 160.894,-42.9103"/>
+        </g>
+        <!-- rp2paths&#45;&gt;sinks -->
+        <!-- rp2paths&#45;&gt;compounds -->
+        <g id="edge2" class="edge"><title>rp2paths&#45;&gt;compounds</title>
+        <path fill="none" stroke="black" d="M110,-71.2481C110,-63.5303 110,-52.0953 110,-42.7835"/>
+        <polygon fill="black" stroke="black" points="112.45,-42.589 110,-35.589 107.55,-42.5891 112.45,-42.589"/>
+        </g>
+        <!-- rp2paths&#45;&gt;reactions -->
+        <g id="edge3" class="edge"><title>rp2paths&#45;&gt;reactions</title>
+        <path fill="none" stroke="black" d="M89.8278,-71.4967C85.0823,-69.076 80.1905,-66.2115 76,-63 67.9109,-56.8007 60.2711,-48.3447 54.4862,-41.1859"/>
+        <polygon fill="black" stroke="black" points="56.3313,-39.5679 50.094,-35.5555 52.4678,-42.5818 56.3313,-39.5679"/>
+        </g>
+        <!-- rp2&#45;&gt;sinks -->
+        <!-- rp2&#45;&gt;rp2paths -->
+        <g id="edge5" class="edge"><title>rp2&#45;&gt;rp2paths</title>
+        <path fill="none" stroke="black" d="M187.643,-110.386C174.732,-105.666 155.894,-98.7784 140.006,-92.9701"/>
+        <polygon fill="black" stroke="black" points="140.82,-90.6589 133.404,-90.5563 139.137,-95.261 140.82,-90.6589"/>
+        </g>
+        </g>
+        </svg>
+    http_version: 
+  recorded_at: Mon, 04 May 2020 11:05:56 GMT
+recorded_with: VCR 2.9.3

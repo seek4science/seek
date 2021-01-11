@@ -23,7 +23,7 @@ module Seek
         @default_diagram_format || superclass.default_diagram_format
       end
 
-      available_diagram_formats(png: 'image/png', default: :png)
+      available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', jpg: 'image/jpeg', default: :png)
 
       def initialize(io)
         @io = io

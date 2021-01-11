@@ -83,6 +83,65 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'show add to collection button if collection available as owner' do
+    collection = Factory(:collection, contributor: @current_user.person)
+    document = Factory(:public_document)
+
+    get "/documents/#{document.id}"
+
+    assert_response :success
+
+    assert_select '#buttons' do
+      assert_select '.btn.dropdown-toggle', text: 'Add to collection'
+      assert_select '[data-role="add-to-collection-list"]' do
+        assert_select 'a[data-collection-id=?]', collection.id.to_s
+      end
+    end
+  end
+
+  test 'show add to collection button if collection available as creator' do
+    collection = Factory(:collection, creators: [@current_user.person])
+    document = Factory(:public_document)
+    refute_equal @current_user.person, collection.contributor
+
+    get "/documents/#{document.id}"
+
+    assert_response :success
+
+    assert_select '#buttons' do
+      assert_select '.btn.dropdown-toggle', text: 'Add to collection'
+      assert_select '[data-role="add-to-collection-list"]' do
+        assert_select 'a[data-collection-id=?]', collection.id.to_s
+      end
+    end
+  end
+
+  test 'do not show add to collection button if item already in collection' do
+    collection = Factory(:collection, contributor: @current_user.person)
+    document = Factory(:public_document)
+    collection.items.create!(asset: document)
+
+    get "/documents/#{document.id}"
+
+    assert_response :success
+
+    assert_select '#buttons' do
+      assert_select '.btn.dropdown-toggle', text: 'Add to collection', count: 0
+    end
+  end
+
+  test 'do not show add to collection button on collection itself' do
+    collection = Factory(:collection, contributor: @current_user.person)
+
+    get "/collections/#{collection.id}"
+
+    assert_response :success
+
+    assert_select '#buttons' do
+      assert_select '.btn.dropdown-toggle', text: 'Add to collection', count: 0
+    end
+  end
+
   private
 
   def create_content_blobs(asset, multi_attrs)

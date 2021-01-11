@@ -15,8 +15,6 @@ class ProgrammesController < ApplicationController
 
   skip_before_action :project_membership_required
 
-  include Seek::BreadCrumbs
-
   include Seek::IsaGraphExtensions
 
   respond_to :html, :json
@@ -121,6 +119,8 @@ class ProgrammesController < ApplicationController
     end
   end
 
+
+
   private
 
   #whether the item needs or can be activated, which affects steps around activation of rejection
@@ -135,12 +135,10 @@ class ProgrammesController < ApplicationController
   def inactive_view_allowed?
     return true if @programme.is_activated? || User.admin_logged_in?
     unless result=(User.logged_in_and_registered? && @programme.programme_administrators.include?(current_person))
-      error("This programme is not activated and cannot be viewed", "cannot view (not activated)", :forbidden)
+      error("This #{t('programme').downcase} is not activated and cannot be viewed", "cannot view (not activated)", :forbidden)
     end
     result
   end
-
-  private
 
   def fetch_assets
     if User.admin_logged_in?

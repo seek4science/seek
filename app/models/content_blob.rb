@@ -8,7 +8,7 @@ require 'rest-client'
 class ContentBlob < ApplicationRecord
   include Seek::ContentTypeDetection
   include Seek::ContentExtraction
-  include Seek::UrlValidation
+  extend Seek::UrlValidation
   prepend Seek::Openbis::Blob
   prepend Nels::Blob
 
@@ -230,6 +230,10 @@ class ContentBlob < ApplicationRecord
   end
 
   def remote_content_handler
+    self.class.remote_content_handler_for(url)
+  end
+
+  def self.remote_content_handler_for(url)
     return nil unless valid_url?(url)
     uri = URI(url)
     case uri.scheme
@@ -242,6 +246,10 @@ class ContentBlob < ApplicationRecord
         Seek::DownloadHandling::HTTPHandler.new(url)
       end
     end
+  end
+
+  def valid_url?(url)
+    self.class.valid_url?(url)
   end
 
   private

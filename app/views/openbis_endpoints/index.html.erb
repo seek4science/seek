@@ -1,7 +1,7 @@
 
 <%=
   content_tag(:h2) do
-    "OpenBIS Spaces for the project #{link_to(@project.title,@project)}".html_safe
+    "OpenBIS Spaces for the #{t('project').downcase} #{link_to(@project.title,@project)}".html_safe
   end
 
 %>

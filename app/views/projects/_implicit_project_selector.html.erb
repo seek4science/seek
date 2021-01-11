@@ -13,15 +13,12 @@
     if (lookupId) {
       var projects = projectsLookup[parseInt(lookupId)];
       if (projects && projects.length) {
-          Sharing.implicitProjects = projects;
-        if (projects.length == 1) {
-          // Ask if they want to use the default policy (if there is one)
-          if (Sharing.defaultPolicies[projects[0].id] && (skipPrompt || confirm('' + projects[0].title + ' has a default policy specified, do you want to apply it?'))) {
-            Sharing.applyPolicy(Sharing.defaultPolicies[projects[0].id]);
-          } else { // Otherwise just add a permission for the project
-            Sharing.addPermissionForProject(projects[0]);
-          }
+        Sharing.implicitProjects = projects;
+
+        if (projects.length === 1) {
+          Sharing.defaultPolicyPrompt(projects[0], skipPrompt);
         }
+
         for (var i = 0; i < projects.length; i++) {
           Sharing.addPermissionForProject(projects[i]);
         }

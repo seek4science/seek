@@ -2,13 +2,31 @@ module ApiTestHelper
   include AuthenticatedTestHelper
 
   # Override me!
-  def populate_extra_attributes(hash = nil)
+  def populate_extra_attributes(request_hash = {})
     {}.with_indifferent_access
   end
 
-  # Override me!
-  def populate_extra_relationships(hash = nil)
-    {}.with_indifferent_access
+  # Add relationships that weren't in the original POST/PATCH request, but are in the response (such as submitter)
+  def populate_extra_relationships(request_hash = {})
+    extra_relationships = {}
+    klass = @clz.classify.constantize
+    existing = request_hash.dig('data', 'id') # Is it an existing resource, or something being created?
+    add_contributor = klass.method_defined?(:contributor) && !existing
+    if add_contributor
+      extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
+    end
+    if klass.method_defined?(:creators)
+      people = (request_hash.dig('data', 'relationships', 'creators', 'data') || []).map(&:symbolize_keys)
+      people << { id: @current_person.id.to_s, type: 'people' } if add_contributor
+      if people.any?
+        extra_relationships[:people] ||= {}
+        extra_relationships[:people][:data] ||= []
+        extra_relationships[:people][:data] += people
+        extra_relationships[:people][:data] = extra_relationships[:people][:data].uniq { |d| d[:id] }
+      end
+    end
+
+    extra_relationships.with_indifferent_access
   end
 
   def definitions_path
@@ -78,6 +96,7 @@ module ApiTestHelper
   end
 
   def test_create
+    debug = false # || true # Uncomment to enable
     begin
       create_post_values
     rescue NameError
@@ -85,19 +104,28 @@ module ApiTestHelper
 
     ['min','max'].each do |m|
       if defined? @post_values
-        @to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values)
+        to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values)
+      else
+        template_file = File.join(ApiTestHelper.template_dir, "post_#{m}_#{@clz}.json.erb")
+        template = ERB.new(File.read(template_file))
+        to_post = JSON.parse(template.result(binding))
       end
-      #puts "create, to_post #{m}", @to_post
+      puts "create, to_post #{m}", to_post if debug
 
-      if @to_post.blank?
+      if to_post.blank?
         skip
       end
 
-      validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz.camelize(:lower)}Post"
+      validate_json_against_fragment to_post.to_json, "#/definitions/#{@clz.camelize(:lower)}Post"
 
       # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
       assert_difference("#{@clz.classify}.count") do
-        post "/#{@plural_clz}.json", params: @to_post.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+        post collection_url, params: to_post.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+        if debug
+          puts "==== Response ===="
+          puts response.body
+          puts "=================="
+        end
         assert_response :success
       end
 
@@ -107,14 +135,14 @@ module ApiTestHelper
       h = JSON.parse(response.body)
       to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes : []
       
-      hash_comparison(@to_post['data']['attributes'].except(*to_ignore), h['data']['attributes'])
+      hash_comparison(to_post['data']['attributes'].except(*to_ignore), h['data']['attributes'])
 
-      if @to_post['data'].has_key?('relationships')
-        hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
+      if to_post['data'].has_key?('relationships')
+        hash_comparison(to_post['data']['relationships'], h['data']['relationships'])
       end
 
-      hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
-      hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
+      hash_comparison(populate_extra_attributes(to_post), h['data']['attributes'])
+      hash_comparison(populate_extra_relationships(to_post), h['data']['relationships'])
     end
   end
 
@@ -132,10 +160,10 @@ module ApiTestHelper
     end
 
     assert_difference ("#{@clz.classify.constantize}.count"), -1 do
-      delete "/#{@plural_clz}/#{obj.id}.json"
+      delete member_url(obj)
       assert_response :success
     end
-    get "/#{@plural_clz}/#{obj.id}.json"
+    get member_url(obj)
     assert_response :not_found
     validate_json_against_fragment response.body, '#/definitions/errors'
   end
@@ -145,7 +173,7 @@ module ApiTestHelper
     obj = object_with_private_policy
     @to_post["data"]["id"] = "#{obj.id}"
     @to_post["data"]["attributes"]["title"] = "updated by an unauthorized"
-    patch "/#{@plural_clz}/#{obj.id}.json", params: @to_post
+    patch member_url(obj), params: @to_post
     assert_response :forbidden
     validate_json_against_fragment response.body, '#/definitions/errors'
   end
@@ -154,7 +182,7 @@ module ApiTestHelper
     user_login(Factory(:person))
     obj = object_with_private_policy
     assert_no_difference("#{@clz.classify.constantize}.count") do
-      delete "/#{@plural_clz}/#{obj.id}.json"
+      delete member_url(obj)
       assert_response :forbidden
       validate_json_against_fragment response.body, '#/definitions/errors'
     end
@@ -165,7 +193,7 @@ module ApiTestHelper
     post_clone['data']['id'] = '100000000'
 
     assert_no_difference ("#{@clz.classify.constantize}.count") do
-      post "/#{@plural_clz}.json", params: post_clone
+      post collection_url, params: post_clone
       assert_response :unprocessable_entity
       validate_json_against_fragment response.body, '#/definitions/errors'
       assert_match 'A POST request is not allowed to specify an id', response.body
@@ -177,7 +205,7 @@ module ApiTestHelper
     post_clone['data']['type'] = 'wrong'
 
     assert_no_difference ("#{@clz.classify.constantize}.count") do
-      post "/#{@plural_clz}.json", params: post_clone
+      post collection_url, params: post_clone
       assert_response :unprocessable_entity
       validate_json_against_fragment response.body, '#/definitions/errors'
       assert_match "The specified data:type does not match the URL's object (#{post_clone['data']['type']} vs. #{@plural_clz})", response.body
@@ -189,7 +217,7 @@ module ApiTestHelper
     post_clone['data'].delete('type')
 
     assert_no_difference ("#{@clz.classify.constantize}.count") do
-      post "/#{@plural_clz}.json", params: post_clone
+      post collection_url, params: post_clone
       assert_response :unprocessable_entity
       validate_json_against_fragment response.body, '#/definitions/errors'
       assert_match "A POST/PUT request must specify a data:type", response.body
@@ -213,7 +241,8 @@ module ApiTestHelper
 
       #fetch original object
       obj_id = @to_patch['data']['id']
-      get "/#{@plural_clz}/#{obj_id}.json"
+      obj = @clz.classify.constantize.find(obj_id)
+      get member_url(obj)
       assert_response :success
       #puts "after get: ", response.body
       original = JSON.parse(response.body)
@@ -221,7 +250,7 @@ module ApiTestHelper
       validate_json_against_fragment @to_patch.to_json, "#/definitions/#{@clz.camelize(:lower)}Patch"
 
       assert_no_difference("#{@clz.classify}.count") do
-        patch "/#{@plural_clz}/#{obj_id}.json", params: @to_patch.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+        patch member_url(obj), params: @to_patch.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
         assert_response :success
       end
 
@@ -264,7 +293,7 @@ module ApiTestHelper
     to_patch = load_patch_template(id: '100000000')
 
     assert_no_difference ("#{@clz.classify.constantize}.count") do
-      put "/#{@plural_clz}/#{obj.id}.json", params: to_patch
+      put member_url(obj), params: to_patch
       assert_response :unprocessable_entity
       validate_json_against_fragment response.body, '#/definitions/errors'
       assert_match "id specified by the PUT request does not match object-id in the JSON input", response.body
@@ -277,7 +306,7 @@ module ApiTestHelper
     to_patch['data']['type'] = 'wrong'
 
     assert_no_difference ("#{@clz.classify.constantize}.count") do
-      put "/#{@plural_clz}/#{obj.id}.json", params: to_patch
+      put member_url(obj), params: to_patch
       assert_response :unprocessable_entity
       validate_json_against_fragment response.body, '#/definitions/errors'
       assert_match "The specified data:type does not match the URL's object (#{to_patch['data']['type']} vs. #{@plural_clz})", response.body
@@ -290,7 +319,7 @@ module ApiTestHelper
     to_patch['data'].delete('type')
 
     assert_no_difference ("#{@clz.classify.constantize}.count") do
-      put "/#{@plural_clz}/#{obj.id}.json", params: to_patch
+      put member_url(obj), params: to_patch
       assert_response :unprocessable_entity
       validate_json_against_fragment response.body, '#/definitions/errors'
       assert_match "A POST/PUT request must specify a data:type", response.body
@@ -298,6 +327,14 @@ module ApiTestHelper
   end
 
   private
+
+  def collection_url
+    "/#{@plural_clz}.json"
+  end
+
+  def member_url(obj)
+    "/#{@plural_clz}/#{obj.id}.json"
+  end
 
   ##
   # Compare `result` Hash against `source`.

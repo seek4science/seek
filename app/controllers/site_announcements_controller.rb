@@ -1,5 +1,4 @@
 class SiteAnnouncementsController < ApplicationController
-  include Seek::BreadCrumbs
 
   before_action :login_required, except: %i[feed notification_settings update_notification_settings]
 

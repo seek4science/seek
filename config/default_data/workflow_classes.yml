@@ -17,3 +17,8 @@ nextflow_class:
   id: 5
   title: Nextflow
   key: Nextflow
+
+snakemake_class:
+  id: 6
+  title: Snakemake
+  key: Snakemake

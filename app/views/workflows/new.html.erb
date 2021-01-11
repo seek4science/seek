@@ -1,34 +1,13 @@
 <h1>New <%= t('workflow') %></h1>
 
-<%= form_tag({ action: :create_content_blob }, multipart: true) do -%>
-  <%= hidden_field_tag 'workflow[parent_name]', @workflow.parent_name%>
-  <div class="asset_form">
-    <%= error_messages_for :workflow -%>
+<%= panel do %>
+  Currently there are two ways to register a workflow:
+  <ul>
+    <li><strong>Simple</strong> - as a file with a picture and a CWL description if you have one</li>
+    <li><strong>Advanced</strong> - as a <em>Workflow RO Crate</em> (Note: this format is under development, click <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">here</a> to find out more)</li>
+  </ul>
+  <br/>
+  Currently supported workflow types are: <%= WorkflowClass.order(:title).pluck(:title).join(', ') %>.
+<% end %>
 
-    <%= alert_box('info', hide_button: true) do %>
-      A workflow can be uploaded as a <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">Workfow RO Crate</a> (recommended),
-      or as a separate workflow file.
-      <br/><br/>
-      Currently supported workflow types are: <%= WorkflowClass.order(:title).pluck(:title).join(', ') %>.
-    <% end %>
-
-    <%= render partial: 'assets/upload_box', locals: { resource: @workflow } -%>
-
-    <div class="form-group">
-      <label class="required">Workflow type</label>
-      <%= select_tag :workflow_class_id, options_from_collection_for_select(WorkflowClass.order(:title), 'id', 'title'),
-                     include_blank: '(Determine from Workflow RO Crate)',
-                     class: 'form-control' %>
-      <p class="help-block">Unless uploading an Workflow RO Crate, please specify the workflow type.</p>
-    </div>
-
-    <div>
-      <%= create_button id: 'workflow_submit_btn',
-                        onclick: "return validateResourceFields('workflow')",
-                        class: 'btn btn-primary',
-                        button_text:'Upload',
-                        'workflow-upload-file-text' => 'Upload'-%>
-      or <%= cancel_button(workflows_path) -%>
-    </div>
-  </div>
-<% end -%>
+<%= render 'upload_form' %>

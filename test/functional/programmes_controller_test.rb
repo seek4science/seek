@@ -45,7 +45,7 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   test 'new page not accessible to logged out user' do
     get :new
-    assert_redirected_to :root
+    assert_redirected_to login_path
   end
 
   test 'only admin can destroy' do
@@ -69,17 +69,27 @@ class ProgrammesControllerTest < ActionController::TestCase
     programme = programme_administrator.programmes.first
 
     refute_empty programme.projects
+    assert programme_administrator.is_programme_administrator?(programme)
+
+    refute programme.can_delete?
 
     assert_no_difference('Programme.count') do
-      delete :destroy, params: { id: programme.id }
+      assert_no_difference('AdminDefinedRoleProgramme.count') do
+        delete :destroy, params: { id: programme.id }
+      end
     end
     refute_nil flash[:error]
 
     programme.projects = []
     programme.save!
+    assert programme_administrator.is_programme_administrator?(programme)
+
+    assert programme.can_delete?
 
     assert_difference('Programme.count', -1) do
-      delete :destroy, params: { id: programme.id }
+      assert_difference('AdminDefinedRoleProgramme.count',-1) do
+        delete :destroy, params: { id: programme.id }
+      end
     end
     assert_redirected_to programmes_path
   end
@@ -394,7 +404,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_no_difference('Programme.count') do
       post :create, params: { programme: { title: 'A programme' } }
     end
-    assert_redirected_to :root
+    assert_redirected_to login_path
   end
 
   test 'activation review available to admin' do
@@ -718,6 +728,8 @@ class ProgrammesControllerTest < ActionController::TestCase
 
     assert_equal 0, assigns(:programme).funding_codes.length
   end
+
+
 
   def edit_max_object(programme)
     for i in 1..5 do

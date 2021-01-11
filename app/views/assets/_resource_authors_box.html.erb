@@ -4,54 +4,44 @@
 <%# - truncate_to - length of the texts after which truncation is activated -%>
 <%# - title - the title of the box (defaults to Creators if missing) -%>
 <%
-creators ||= nil
-title ||= "#{t('contributor').capitalize} and #{t('creator').capitalize.pluralize}"
-contributor = resource.contributor
-creators ||= resource.creators.reject { |c| contributor && (c == contributor) }
+  creators ||= nil
+  title ||= "#{t('creator').capitalize.pluralize} and #{t('contributor').capitalize}"
+  contributor = resource.contributor
+  creators ||= resource.creators
+  other_creators ||= resource.respond_to?(:other_creators) ? (resource.other_creators || '').split(',').map(&:strip).map { |s| h(s) } : []
+  avatar_size ||= 20
+  total_creator_count = creators.length + other_creators.length
 %>
 
 <%= panel(title, :help_text => "These are the people that uploaded the item, along with other people involved in creating it. Sometimes the uploader may have uploaded the item on behalf of its contributors.") do %>
-  <div class="author_list text-center">
-    <span class="author_avatar author_avatar-contributor">
+  <h5 class="author-list-title"><%= t('creator').capitalize.pluralize(total_creator_count) -%></h5>
+  <% if total_creator_count == 0 %>
+    <span class="none_text">Not specified</span>
+  <% end %>
+  <ul class="author-list">
+    <% creators.each_with_index do |creator| %>
+      <% if creator.can_view? %>
+        <li class="author-list-item"><%= favouritable_icon(creator, avatar_size) -%> <%= link_to(creator.name, creator) -%></li>
+      <% end %>
+    <% end %>
+    <% other_creators.each do |other_creator| %>
+      <li class="author-list-item"><%= other_creator -%></li>
+    <% end %>
+  </ul>
+
+  <h5 class="author-list-title"><%= t('contributor').capitalize -%></h5>
+  <ul class="author-list">
+    <li class="author-list-item">
       <% if contributor %>
-        <%= favouritable_icon(contributor, 50, tooltip_suffix: " (#{t('contributor').capitalize})", corner_icon: 'new') -%>
+        <%= favouritable_icon(contributor, avatar_size, tooltip_suffix: " (#{t('contributor').capitalize})") -%>
+        <%= link_to(contributor.name, contributor) %>
       <% else %>
         <% if resource.has_deleted_contributor? %>
-          <%= deleted_contributor_contributor_icon -%>
+          <%= deleted_contributor_contributor_icon(size: avatar_size) -%> <span class="none_text">deleted</span>
         <% elsif resource.has_jerm_contributor? %>
-          <%= the_jerm_contributor_contributor_icon -%>
+          <%= the_jerm_contributor_contributor_icon(size: avatar_size) -%> JERM
         <% end %>
       <% end %>
-    </span>
-    <% creators.shift(4).each do |creator| %>
-        <% if creator.nil? || creator.can_view? %>
-            <span class="author_avatar"><%= favouritable_icon(creator,50) -%></span>
-        <% elsif creator.title_is_public? %>
-            [<%= h(creator.name) %>]
-        <% end %>
-    <% end %>
-    <span id='unexpanded'><br/><%= link_to "Expand", '#', onclick: "$j('#unexpanded').hide();$j('#expanded').show(); return false;" unless creators.empty? %></span>
-
-    <span id='expanded' style="display: none;">
-      <% creators.each do |creator| %>
-          <% if creator.can_view? %>
-              <span class="author_avatar"><%= favouritable_icon(creator, 50) -%></span>
-          <% elsif creator.title_is_public? %>
-              [<%= h(creator.name) %>]
-          <% end %>
-      <% end %>
-      <br/><%= link_to "Unexpand", '#', onclick: "$j('#expanded').hide();$j('#unexpanded').show(); return false;"%>
-    </span>
-  </div>
-
-    <% if resource.respond_to?(:other_creators) && !resource.other_creators.blank? -%>
-        <p class="heading">
-          <%= help_icon("Non-SEEK registered members who helped with the creation of this file.") -%>
-          Other <%= t('creator').pluralize -%>
-        </p>
-        <div style="border: 1px dashed #BBB; margin: 0.5em;padding: 3px;text-align:left">
-          <%= h(resource.other_creators) %>
-        </div>
-    <% end -%>
-
+    </li>
+  </ul>
 <% end %>

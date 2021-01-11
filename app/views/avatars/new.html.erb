@@ -1,29 +1,18 @@
-<% avatar_for_object = @avatar_for.constantize.find(@avatar_for_id) -%>
-<% return_path = params[:return_to] || polymorphic_path([avatar_for_object, :avatars]) %>
-<h1>Upload <%= @avatar_for.humanize -%>
-  Picture: <%= link_to avatar_for_object.title, url_for(avatar_for_object) -%></h1>
+<% return_path = params[:return_to] || polymorphic_path([@parent_resource, :avatars]) %>
+<h1>Upload <%= @parent_resource.class.name.humanize -%> Picture: <%= link_to @parent_resource.title, url_for(@parent_resource) -%></h1>
 
 <%= error_messages_for :avatar -%>
 
-<%= form_tag({:action => :create}, :multipart => true) do %>
-
-    <%= hidden_field_tag(:owner_type, @avatar_for) -%>
-    <%= hidden_field_tag(:owner_id, @avatar_for_id) -%>
+<%= form_tag({ action: :create }, multipart: true) do %>
     <%= hidden_field_tag(:return_to, return_path) -%>
-    <br/>
-    <p>
 
-      <b>Picture file: </b>
-      <br/>
+    <div class="form-group">
+      <label class="required">Picture file: </label>
       <%= file_field 'avatar', 'image_file' %>
-    </p>
+    </div>
 
-    <br/>
-
-    <p>
-
-    <%= submit_tag "Upload", data: { disable_with: 'Uploading...' }, :class => "btn btn-primary" %>
-    or <%= cancel_button(return_path) -%>
-
-    </p>
+    <div>
+      <%= submit_tag "Upload", data: { disable_with: 'Uploading...' }, :class => "btn btn-primary" %>
+      or <%= cancel_button(return_path) -%>
+    </div>
 <% end %>

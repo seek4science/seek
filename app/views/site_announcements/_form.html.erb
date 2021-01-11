@@ -25,7 +25,9 @@
   <div id="announcement_expires" style="display: none;">
     <%= f.label :expires,"Expires at" -%>
     <br/>
-    <%= f.text_field :expires_at, data: { calendar: 'mixed' }, class: "calendar form-control", placeholder: Time.now.utc -%>
+    <div style="position: relative">
+      <%= f.text_field :expires_at, data: { calendar: 'mixed' }, class: "calendar form-control", placeholder: Time.now.utc -%>
+    </div>
     <br/>
     <span class="headline_announcement_date">( Current server time is <%= Time.now.utc -%> )</span>
   </div>

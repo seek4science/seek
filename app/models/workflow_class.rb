@@ -1,5 +1,10 @@
 class WorkflowClass < ApplicationRecord
   def extractor_class
-    self.class.const_get("Seek::WorkflowExtractors::#{key}")
+    class_name = "Seek::WorkflowExtractors::#{key}"
+    begin
+      self.class.const_get(class_name)
+    rescue NameError
+      Seek::WorkflowExtractors::Base
+    end
   end
 end

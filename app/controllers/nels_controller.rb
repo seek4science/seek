@@ -12,10 +12,6 @@ class NelsController < ApplicationController
   rescue_from RestClient::Unauthorized, :with => :unauthorized_response
   rescue_from RestClient::InternalServerError, :with => :nels_error_response
 
-  include Seek::BreadCrumbs
-
-  skip_before_action :add_breadcrumbs, only: :callback
-
   def callback
     hash = @oauth_client.get_token(params[:code])
 
@@ -91,7 +87,7 @@ class NelsController < ApplicationController
     end
 
     unless @assay.projects.any?(&:nels_enabled)
-      flash[:error] = 'This assay is not associated with a NeLS-enabled project.'
+      flash[:error] = "This assay is not associated with a NeLS-enabled #{t('project').downcase}."
       redirect_to @assay
       return false
     end
