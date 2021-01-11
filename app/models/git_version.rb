@@ -96,7 +96,7 @@ class GitVersion < ApplicationRecord
     begin
       git_base.revparse(target) # Returns the SHA1 for the target (commit/branch/tag)
     rescue Git::GitExecuteError # Was it an origin branch that is not tracked locally?
-      git_base.revparse("origin/#{target}")
+      git_base.revparse("remotes/origin/#{target}") rescue nil
     end
   end
 

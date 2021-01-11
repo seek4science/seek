@@ -40,6 +40,10 @@ module Seek
               { name: "Version #{git_versions.count + 1}", target: 'master' }
             end
 
+            def state_allows_download?(*args)
+              latest_git_version.commit.present?
+            end
+
             # def git_working_path
             #   File.join(Seek::Config.git_temporary_filestore_path, uuid)
             # end
