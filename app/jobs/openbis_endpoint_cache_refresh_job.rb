@@ -8,7 +8,8 @@ class OpenbisEndpointCacheRefreshJob < ApplicationJob
     endpoint.refresh_metadata
   end
 
-  def self.queue_jobs
+  # jobs created if due, triggered by the scheduler.rb
+  def self.queue_timed_jobs
     return unless Seek::Config.openbis_enabled
     OpenbisEndpoint.find_each do |endpoint|
       endpoint.create_refresh_metadata_job if endpoint.due_cache_refresh?

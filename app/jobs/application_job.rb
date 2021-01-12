@@ -68,8 +68,8 @@ class ApplicationJob < ActiveJob::Base
   # Using a single method is faster than having individual entries for each type of job in `schedule.rb`, since it would
   # have to initialise a SEEK instance for each.
   def self.queue_timed_jobs
-    OpenbisEndpointCacheRefreshJob.queue_jobs
-    OpenbisSyncJob.queue_jobs
-    ProjectLeavingJob.queue_jobs
+    OpenbisEndpointCacheRefreshJob.queue_timed_jobs
+    OpenbisSyncJob.queue_timed_jobs
+    ProjectLeavingJob.queue_timed_jobs
   end
 end

@@ -98,7 +98,8 @@ class OpenbisSyncJob < BatchJob
     t < 3 ? 3 : t
   end
 
-  def self.queue_jobs
+  # jobs created if due, triggered by the scheduler.rb
+  def self.queue_timed_jobs
     return unless Seek::Config.openbis_enabled && Seek::Config.openbis_autosync
     OpenbisEndpoint.find_each do |endpoint|
       endpoint.create_sync_metadata_job if endpoint.due_sync?

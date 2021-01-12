@@ -7,7 +7,8 @@ class ProjectLeavingJob < ApplicationJob
     group_membership.update_column(:has_left, true)
   end
 
-  def self.queue_jobs
+  # jobs created if due, triggered by the scheduler.rb
+  def self.queue_timed_jobs
     GroupMembership.due_to_expire.find_each do |group_membership|
       ProjectLeavingJob.perform_later(group_membership)
     end
