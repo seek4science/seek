@@ -233,7 +233,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     assert @job.follow_on_job?
   end
 
-  test 'queue_jobs creates jobs for each endpoint needing sync' do
+  test 'queue_timed_jobs creates jobs for each endpoint needing sync' do
     endpoint2 = Factory(:openbis_endpoint, refresh_period_mins: 60, space_perm_id: 'API-SPACE2')
     no_sync_needed = Factory(:openbis_endpoint, refresh_period_mins: 60, last_sync: 2.seconds.ago)
 
@@ -247,7 +247,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     assert_enqueued_jobs(2, only: OpenbisSyncJob) do
       assert_enqueued_with(job: OpenbisSyncJob, args: [@endpoint, OpenbisSyncJob::BATCH_SIZE]) do
         assert_enqueued_with(job: OpenbisSyncJob, args: [endpoint2, OpenbisSyncJob::BATCH_SIZE]) do
-          OpenbisSyncJob.queue_jobs
+          OpenbisSyncJob.queue_timed_jobs
         end
       end
     end
@@ -261,24 +261,24 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     refute_nil @endpoint.last_sync
   end
 
-  test 'queue_jobs does nothing if autosync disabled' do
+  test 'queue_timed_jobs does nothing if autosync disabled' do
     with_config_value(:openbis_autosync, false) do
       endpoint = Factory(:openbis_endpoint, refresh_period_mins: 60)
       assert endpoint.due_sync?
 
       assert_no_enqueued_jobs(only: OpenbisSyncJob) do
-        OpenbisSyncJob.queue_jobs
+        OpenbisSyncJob.queue_timed_jobs
       end
     end
   end
 
-  test 'queue_jobs does nothing if openbis disabled' do
+  test 'queue_timed_jobs does nothing if openbis disabled' do
     with_config_value(:openbis_enabled, false) do
       endpoint = Factory(:openbis_endpoint, refresh_period_mins: 60)
       assert endpoint.due_sync?
 
       assert_no_enqueued_jobs(only: OpenbisSyncJob) do
-        OpenbisSyncJob.queue_jobs
+        OpenbisSyncJob.queue_timed_jobs
       end
     end
   end

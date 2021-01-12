@@ -21,7 +21,7 @@ class PersonLeavingJobTest < ActiveSupport::TestCase
     end
   end
 
-  test 'queue jobs' do
+  test 'queue timed jobs' do
     asset_housekeeper = Factory(:asset_housekeeper)
     person1 = Factory(:brand_new_person)
     gm1 = person1.group_memberships.create(work_group: asset_housekeeper.work_groups.first, time_left_at: 3.days.ago)
@@ -32,7 +32,7 @@ class PersonLeavingJobTest < ActiveSupport::TestCase
 
     assert_enqueued_jobs 1, only: ProjectLeavingJob do
       assert_enqueued_with job: ProjectLeavingJob, args: [gm1] do
-        ProjectLeavingJob.queue_jobs
+        ProjectLeavingJob.queue_timed_jobs
       end
     end
   end

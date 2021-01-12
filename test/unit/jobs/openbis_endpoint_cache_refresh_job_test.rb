@@ -8,7 +8,7 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
     assert_equal 1, endpoint.refreshed
   end
 
-  test 'queue_jobs creates jobs for each endpoint needing a cache refresh' do
+  test 'queue_timed_jobs creates jobs for each endpoint needing a cache refresh' do
     OpenbisEndpoint.delete_all
     endpoint1 = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: 'frog',
                                     web_endpoint: 'http://my-openbis.org/doesnotmatter',
@@ -36,7 +36,7 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
     assert_nil endpoint1.last_cache_refresh
     assert_nil endpoint2.last_cache_refresh
     assert_enqueued_jobs(2, only: OpenbisEndpointCacheRefreshJob) do
-      OpenbisEndpointCacheRefreshJob.queue_jobs
+      OpenbisEndpointCacheRefreshJob.queue_timed_jobs
     end
 
     OpenbisEndpointCacheRefreshJob.perform_now(endpoint1)
@@ -50,17 +50,17 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
 
     assert_enqueued_jobs(1, only: OpenbisEndpointCacheRefreshJob) do
       assert_enqueued_with(job: OpenbisEndpointCacheRefreshJob, args: [endpoint3]) do
-        OpenbisEndpointCacheRefreshJob.queue_jobs
+        OpenbisEndpointCacheRefreshJob.queue_timed_jobs
       end
     end
   end
 
-  test 'queue_jobs does nothing if openbis disabled' do
+  test 'queue_timed_jobs does nothing if openbis disabled' do
     with_config_value(:openbis_enabled, false) do
       Factory(:openbis_endpoint, refresh_period_mins: 60)
 
       assert_no_enqueued_jobs(only: OpenbisEndpointCacheRefreshJob) do
-        OpenbisEndpointCacheRefreshJob.queue_jobs
+        OpenbisEndpointCacheRefreshJob.queue_timed_jobs
       end
     end
   end
