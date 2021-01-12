@@ -10,7 +10,7 @@ class ApplicationJob < ActiveJob::Base
 
   # time before the job is run
   def default_delay
-    nil
+    0.seconds
   end
 
   # whether a new job will be created once this one finishes.
@@ -36,7 +36,7 @@ class ApplicationJob < ActiveJob::Base
 
   after_perform do |job|
     if job.follow_on_job?
-      job.queue_job(default_priority, follow_on_delay&.from_now)
+      job.queue_job(default_priority, follow_on_delay)
     end
   end
 
@@ -47,9 +47,9 @@ class ApplicationJob < ActiveJob::Base
 
   # adds the job to the Delayed Job queue. Will not create it if it already exists and allow_duplicate is false,
   # or by default allow_duplicate_jobs? returns false.
-  def queue_job(priority = nil, time = default_delay&.from_now)
+  def queue_job(priority = nil, delay = default_delay)
     args = { }
-    args[:wait_until] = time if time
+    args[:wait] = delay if delay
     args[:priority] = priority if priority
 
     enqueue(args)
