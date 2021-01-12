@@ -14,7 +14,7 @@ class GitVersionTest < ActiveSupport::TestCase
     `unzip -qq #{repo.remote}.zip -d #{Pathname.new(repo.remote).parent}`
     RemoteGitCheckoutJob.new(repo).perform
 
-    v = workflow.git_versions.create!(target: 'master', mutable: true)
+    v = workflow.git_versions.create!(ref: 'refs/heads/master', mutable: true)
     assert_empty v.metadata
     assert_equal 'This Workflow', v.proxy.title
     assert v.mutable?
@@ -94,7 +94,7 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_difference('GitVersion.count', 1) do
       assert_no_difference('GitRepository.count') do
         w = Factory(:workflow, title: 'Test', description: 'Testy', git_version_attributes: {
-            target: 'master',
+            ref: 'refs/head/master',
             git_repository_remote: 'https://git.git/git.git'
         })
         assert_equal 1, w.git_versions.count
@@ -103,7 +103,7 @@ class GitVersionTest < ActiveSupport::TestCase
         assert_equal 'Test', v.proxy.title
         assert_equal 'Testy', v.proxy.description
         assert_equal 'https://git.git/git.git', v.git_repository.remote
-        assert_equal 'master', v.target
+        assert_equal 'refs/head/master', v.ref
       end
     end
   end
@@ -118,7 +118,7 @@ class GitVersionTest < ActiveSupport::TestCase
         assert_equal 'Test', v.proxy.title
         assert_equal 'Testy', v.proxy.description
         assert_nil v.git_repository.remote
-        assert_equal 'master', v.target, 'Target should be master by default'
+        assert_equal 'refs/head/master', v.ref, 'Ref should be master by default'
         assert_equal 'Version 1', v.name
       end
     end

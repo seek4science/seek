@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_17_111747) do
+ActiveRecord::Schema.define(version: 2021_01_12_161021) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -700,7 +700,7 @@ ActiveRecord::Schema.define(version: 2020_12_17_111747) do
     t.integer "version"
     t.string "name"
     t.text "description"
-    t.string "target"
+    t.string "ref"
     t.string "commit"
     t.boolean "mutable"
     t.text "root_path"

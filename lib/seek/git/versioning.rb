@@ -37,7 +37,7 @@ module Seek
             end
 
             def default_git_version_attributes
-              { name: "Version #{git_versions.count + 1}", target: 'master' }
+              { name: "Version #{git_versions.count + 1}", ref: 'refs/head/master' }
             end
 
             def state_allows_download?(*args)

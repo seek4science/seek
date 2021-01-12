@@ -12,6 +12,10 @@ module Seek
       def self.base_class
         Rails.env.test? ? Seek::Git::MockBase : self
       end
+
+      def self.ls_remote(remote, ref = nil)
+        ::Git.ls_remote(ref ? "#{remote} #{ref}" : remote)
+      end
     end
   end
 end

@@ -7,7 +7,7 @@ class GitVersion < ApplicationRecord
   belongs_to :resource, polymorphic: true
   belongs_to :git_repository
   before_validation :set_git_version_and_repo, on: :create
-  before_save :set_commit, unless: -> { target.blank? }
+  before_save :set_commit, unless: -> { ref.blank? }
 
   def metadata
     JSON.parse(super || '{}')
@@ -94,9 +94,9 @@ class GitVersion < ApplicationRecord
 
   def get_commit
     begin
-      git_base.revparse(target) # Returns the SHA1 for the target (commit/branch/tag)
-    rescue Git::GitExecuteError # Was it an origin branch that is not tracked locally?
-      git_base.revparse("remotes/origin/#{target}") rescue nil
+      git_base.revparse(ref) # Returns the SHA1 for the ref
+    rescue Git::GitExecuteError # Is the repo not fetched?
+      git_repository.find_ref(ref)
     end
   end
 

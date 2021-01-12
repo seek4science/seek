@@ -65,6 +65,15 @@ class GitRepository < ApplicationRecord
                      end
   end
 
+  def find_ref(ref)
+    remote_refs.each_value do |val|
+      return val if ref == 'HEAD' && val[:default]
+      return val if val[:ref] == ref
+    end
+
+    nil
+  end
+
   private
 
   def initialize_repository
