@@ -127,59 +127,47 @@ class SamplesController < ApplicationController
   end
 
   def batch_create
-    result = []
-    items = []
-
-    params[:data].each do |par|
-      params =  Seek::Api::ParameterConverter.new("samples").convert(par)
-      @sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
-      update_sample_with_params(params)
-      if @sample.valid?
-        items.push(@sample)
-      else
-        result.push({ ex_id: par[:ex_id], error: @sample.errors.messages }) 
+    errors = []
+    param_converter = Seek::Api::ParameterConverter.new("samples")
+    Sample.transaction do
+      params[:data].each do |par|
+        params =  param_converter.convert(par)
+        sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
+        update_sample_with_params(params, sample)
+        errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) if !sample.save
       end
+      raise ActiveRecord::Rollback if !errors.empty?
     end
-    if result.empty?
-      begin
-        Sample.transaction do
-          items.map do |sample| 
-            raise ActiveRecord::Rollback unless sample.save
-          end
-        end
-      rescue 
-        return render json: { status: :unprocessable_entity, message: "The sample failed to save due to a server error." }
-      end
-    end
-    render json: { status: result.empty? ? :ok : :unprocessable_entity, message: "The operation was terminated due to errors." , errors: result }
+    render json: { status: errors.empty? ? :ok : :unprocessable_entity, errors: errors }
   end
 
   def batch_update
-    result = []
+    errors = []
+    param_converter = Seek::Api::ParameterConverter.new("samples")
     params[:data].each do |par|
       begin
-        params =  Seek::Api::ParameterConverter.new("samples").convert(par)
-        @sample = Sample.find(par[:id])
-        update_sample_with_params(params)
-        result.push(par[:id]) if !@sample.save
+        params = param_converter.convert(par)
+        sample = Sample.find(par[:id])
+        update_sample_with_params(params, sample)
+        errors.push(par[:id]) if !sample.save
       rescue 
-        result.push(par[:id]) 
+        errors.push(par[:id]) 
       end
     end
-    render json: { failed: result }, status: result.empty? ? :ok : :unprocessable_entity
+    render json: { status: errors.empty? ? :ok : :unprocessable_entity, errors: errors }
   end
 
   def batch_delete
-    result = []
+    errors = []
     params[:data].each do |par|
       begin
-        @sample = Sample.find(par[:id])
-        result.push(par[:id]) if !(@sample.can_delete? && @sample.destroy)
+        sample = Sample.find(par[:id])
+        errors.push(par[:id]) if !(sample.can_delete? && sample.destroy)
       rescue 
-        result.push(par[:id]) 
+        errors.push(par[:id]) 
       end
     end
-    render json: { failed: result }, status: result.empty? ? :ok : :unprocessable_entity
+    render json: { status: errors.empty? ? :ok : :unprocessable_entity, errors: errors }
   end
 
 
@@ -197,16 +185,17 @@ class SamplesController < ApplicationController
                               discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
-  def update_sample_with_params(_params=nil)
+  def update_sample_with_params(_params=nil, sample=nil)
+    sample ||= @sample
     if _params.nil?
-      @sample.update_attributes(sample_params(@sample.sample_type))
+      sample.update_attributes(sample_params(sample.sample_type))
     else  
-      @sample.assign_attributes(sample_params(@sample.sample_type, _params))
+      sample.assign_attributes(sample_params(sample.sample_type, _params))
     end
-    update_sharing_policies @sample
-    update_annotations(params[:tag_list], @sample)
-    update_relationships(@sample, params)
-    @sample.save if _params.nil?
+    update_sharing_policies sample
+    update_annotations(params[:tag_list], sample)
+    update_relationships(sample, params)
+    sample.save if _params.nil?
   end
 
   def find_index_assets

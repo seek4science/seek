@@ -933,13 +933,6 @@ class SamplesControllerTest < ActionController::TestCase
         tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
         sample_type:{data:{id: type.id, type: "sample_types"}}}}}]}
     end
-    assert assigns(:sample)
-    sample = assigns(:sample)
-    assert_equal 'David Tailor', sample.title
-    assert_equal 'David Tailor', sample.get_attribute_value('full name')
-    assert_equal '33', sample.get_attribute_value(:age)
-    assert_equal '33.1', sample.get_attribute_value(:weight)
-    assert_equal 'M12 8PL', sample.get_attribute_value(:postcode)
 
     sample1 = Sample.all.first
     assert_equal 'Fred Smith', sample1.title
@@ -947,6 +940,13 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal '22', sample1.get_attribute_value(:age)
     assert_equal '22.1', sample1.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample1.get_attribute_value(:postcode)
+
+    sample2 = Sample.limit(2)[1]
+    assert_equal 'David Tailor', sample2.title
+    assert_equal 'David Tailor', sample2.get_attribute_value('full name')
+    assert_equal '33', sample2.get_attribute_value(:age)
+    assert_equal '33.1', sample2.get_attribute_value(:weight)
+    assert_equal 'M12 8PL', sample2.get_attribute_value(:postcode)
   end
 
   test 'terminate batch_create if error' do
@@ -986,18 +986,6 @@ class SamplesControllerTest < ActionController::TestCase
       assert_equal [creator], sample1.creators
     end
 
-    assert assigns(:sample)
-    last_updated_sample = assigns(:sample)
-    last_updated_sample = Sample.find(last_updated_sample.id)
-    assert_equal type_id2, last_updated_sample.sample_type.id
-    assert_equal 'David Tailor', last_updated_sample.title
-    assert_equal 'David Tailor', last_updated_sample.get_attribute_value('full name')
-    assert_equal '33', last_updated_sample.get_attribute_value(:age)
-    assert_nil last_updated_sample.get_attribute_value(:postcode)
-    assert_equal '33.1', last_updated_sample.get_attribute_value(:weight)
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(sample2.sample_type, false).exists?
-
     first_updated_sample = Sample.all.first
     assert_equal type_id1, first_updated_sample.sample_type.id
     assert_equal 'Alfred Marcus', first_updated_sample.title
@@ -1007,6 +995,18 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal '22.1', first_updated_sample.get_attribute_value(:weight)
     # job should have been triggered
     assert SampleTypeUpdateJob.new(sample1.sample_type, false).exists?
+
+
+    last_updated_sample = Sample.limit(2)[1]
+    last_updated_sample = Sample.find(last_updated_sample.id)
+    assert_equal type_id2, last_updated_sample.sample_type.id
+    assert_equal 'David Tailor', last_updated_sample.title
+    assert_equal 'David Tailor', last_updated_sample.get_attribute_value('full name')
+    assert_equal '33', last_updated_sample.get_attribute_value(:age)
+    assert_nil last_updated_sample.get_attribute_value(:postcode)
+    assert_equal '33.1', last_updated_sample.get_attribute_value(:weight)
+    # job should have been triggered
+    assert SampleTypeUpdateJob.new(sample2.sample_type, false).exists?
   end
 
   test 'batch_delete' do
