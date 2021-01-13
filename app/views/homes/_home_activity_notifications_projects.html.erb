@@ -1,0 +1,9 @@
+
+<div id="home_latest_additions" style="padding: 20px;height:100%;">
+  <h2>Latest additions</h2>
+  <ul class="feed">
+    <% recently_added_item_logs_hash(1.years.ago, 8).each do |added_item_log| -%>
+        <%= display_single_log_item_hash(added_item_log, 'added') -%>
+    <% end %>
+  </ul>
+</div>

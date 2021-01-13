@@ -1,0 +1,22 @@
+<div class="panel panel-default" id="home_features" style="padding: 20px;height:100%;">
+  <h1 class="text-center">Quick start</h1>
+    <div class="row" style="display: flex;align-items: center;">
+      <div class="col-sm-7">
+        <h4>Create new programme</h4> A programme groups all your projects under it
+      </div>
+        <div class="col-sm-5 text-center">
+        <% if can_create_programmes? %>
+          <a class="btn btn-success" href="<%=new_programme_path%>" role="button" aria-label="Left Align" style="white-space: normal;"> Create programme </a>
+        <% end %>
+      </div>
+    </div>
+    <br>
+    <div class="row" style="display: flex;align-items: center;">
+      <div class="col-sm-7">
+        <h4>Join existing projects</h4> Browse projects that interest you and request membership
+      </div>
+      <div class="col-sm-5 text-center">
+        <a class="btn btn-success" href="<%=projects_path%>" role="button" aria-label="Left Align" style="white-space: normal;"> Join project </a>       
+      </div>
+    </div>
+</div>

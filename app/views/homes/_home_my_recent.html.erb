@@ -1,0 +1,10 @@
+<div id="home_home_my_recent">
+  <h2>My recent</h2>
+  <ul class="feed">
+    <% activity = current_user.person.recent_activity(Seek::Config.recent_contributions_number_of_entries).select {|a| a.activity_loggable} %>
+    <% items = convert_logs_to_hash(activity) %>
+    <% items.each do |item| %>
+        <%= display_single_log_item_hash(item, item[:action]=='create' ? 'added' : 'updated') -%>
+    <% end %>
+  </ul>
+</div>
