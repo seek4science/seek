@@ -182,6 +182,8 @@ ActiveRecord::Schema.define(version: 2020_12_21_153232) do
     t.integer "suggested_technology_type_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "sample_type_id"
+    t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
   create_table "asset_doi_logs", id: :integer,  force: :cascade do |t|
@@ -1267,6 +1269,7 @@ ActiveRecord::Schema.define(version: 2020_12_21_153232) do
     t.text "funding_details"
     t.boolean "is_activated", default: false
     t.text "activation_rejection_reason"
+    t.boolean "open_for_projects", default: false
   end
 
   create_table "project_descendants", id: false,  force: :cascade do |t|
