@@ -93,11 +93,7 @@ class GitVersion < ApplicationRecord
   end
 
   def get_commit
-    begin
-      git_base.revparse(ref) # Returns the SHA1 for the ref
-    rescue Git::GitExecuteError # Is the repo not fetched?
-      git_repository.find_ref(ref)
-    end
+    git_repository.resolve_ref(ref) if ref
   end
 
   def perform_commit(message, &block)

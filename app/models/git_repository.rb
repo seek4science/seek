@@ -47,7 +47,7 @@ class GitRepository < ApplicationRecord
   def remote_refs
     @remote_refs ||= if remote.present?
                        refs = { branches: [], tags: [] }
-                       hash = Git.ls_remote(remote)
+                       hash = Seek::Git::Base.base_class.ls_remote(remote)
                        head = hash['head'][:sha]
                        hash['branches'].each do |name, info|
                          h = { name: name, ref: "refs/heads/#{name}", sha: info[:sha], default: info[:sha] == head }
@@ -65,13 +65,29 @@ class GitRepository < ApplicationRecord
                      end
   end
 
-  def find_ref(ref)
-    remote_refs.each_value do |val|
-      return val if ref == 'HEAD' && val[:default]
-      return val if val[:ref] == ref
+  def find_remote_ref(ref)
+    remote_refs.each_value do |refs|
+      refs.each do |val|
+        return val[:sha] if ref == 'HEAD' && val[:default]
+        return val[:sha] if val[:ref] == ref
+      end
     end
 
-    nil
+    raise 'Ref not found!'
+  end
+
+  # Return the commit SHA for the given ref.
+  # If local, fetch from the git db; if it's a remote repo, fetch using `ls-remote` to get an up-to-date reference
+  def resolve_ref(ref)
+    if remote?
+      find_remote_ref(ref)
+    else
+      git_base.revparse(ref)
+    end
+  end
+
+  def remote?
+    remote.present?
   end
 
   private
