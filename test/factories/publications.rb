@@ -35,6 +35,7 @@ end
 
 Factory.define(:max_publication, class: Publication) do |f|
   f.title 'A Maximal Publication'
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.journal 'Journal of Molecular Biology'
   f.published_date '2017-10-10'
   f.doi 'https://doi.org/10.5072/abcd'

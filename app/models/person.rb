@@ -212,6 +212,11 @@ class Person < ApplicationRecord
     shares_project?(other_item) || shares_programme?(other_item)
   end
 
+  # Do not allow discussion of people
+  def self.is_discussable?
+    return false
+  end
+  
   def self.userless_people
     Person.includes(:user).select { |p| p.user.nil? }
   end

@@ -6,9 +6,10 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::VersionedResource
   include Seek::ExplicitVersioning
   include Seek::Favouritable
+  include Seek::ActsAsDiscussable
   include Seek::ActsAsFleximageExtension
   include Seek::UniquelyIdentifiable
-  include Seek::YellowPages
+  include Seek::ActsAsYellowPages
   include Seek::GroupedPagination
   include Seek::Scalable
   include Seek::TitleTrimmer

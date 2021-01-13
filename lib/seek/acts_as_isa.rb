@@ -16,6 +16,7 @@ module Seek
         acts_as_scalable
         acts_as_authorized
         acts_as_uniquely_identifiable
+        acts_as_discussable
         has_extended_custom_metadata
 
         title_trimmer

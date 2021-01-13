@@ -31,6 +31,7 @@ Factory.define(:max_data_file, class: DataFile) do |f|
   f.with_project_contributor
   f.title 'A Maximal DataFile'
   f.description 'Results - Sampling conformations of ATP-Mg inside the binding pocket'
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.projects { [Factory.build(:max_project)] }
   f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
   f.events {[Factory.build(:event, policy: Factory(:public_policy))]}

@@ -25,6 +25,8 @@
   <%= f.country_select :country, nil, { :include_blank => 'Please select...' }, :class=>"form-control" -%>
 </div>
 
+<%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @institution} -%>
+
 <%= f.submit(institution ? "Update" : "Create",data: { disable_with: (institution ? "Updating..." : "Creating...") },
              :class => 'btn btn-primary') -%> or
 <%= cancel_button(institution ? institution_path(institution.id) : institutions_path) -%>

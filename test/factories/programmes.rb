@@ -18,6 +18,7 @@ end
 Factory.define(:max_programme, class: Programme) do |f|
   f.title "A Maximal Programme"
   f.description "A very exciting programme"
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.web_page "http://www.synbiochem.co.uk"
   f.funding_details "Someone is funding this for me"
   f.projects { [Factory.build(:max_project)] }
