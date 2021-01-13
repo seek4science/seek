@@ -1,30 +1,12 @@
 # Job responsible for generating Excel spreadsheet templates from samples
-class SampleTemplateGeneratorJob < SeekJob
-  attr_reader :sample_type_id
+class SampleTemplateGeneratorJob < TaskJob
+  queue_as QueueNames::SAMPLES
 
-  def initialize(sample_type)
-    @sample_type_id = sample_type.id
+  def perform(sample_type)
+    sample_type.generate_template
   end
 
-  def perform_job(item)
-    item.generate_template
-  end
-
-  def gather_items
-    [sample_type].compact
-  end
-
-  def allow_duplicate_jobs?
-    false
-  end
-
-  def queue_name
-    QueueNames::SAMPLES
-  end
-
-  private
-
-  def sample_type
-    SampleType.find_by_id(sample_type_id)
+  def task
+    arguments[0].template_generation_task
   end
 end

@@ -23,7 +23,7 @@
 
   <% if asset.can_manage? && (display_asset.version == asset.version) && asset.sample_template? && asset.extracted_samples.empty? %>
     <%# the job isn't in progress or waiting for confirmation of results %>
-    <% unless SampleDataExtractionJob.in_progress?(asset) || Seek::Samples::Extractor.new(asset).fetch %>
+    <% unless asset.sample_extraction_task&.in_progress? || Seek::Samples::Extractor.new(asset).fetch %>
       <%= button_link_to('Extract samples', 'extract_samples', extract_samples_data_file_path(@data_file), method: :post) %>
     <% end %>
   <% end %>

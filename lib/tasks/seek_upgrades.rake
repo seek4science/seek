@@ -8,6 +8,8 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     update_samples_json
+    migrate_old_jobs
+    delete_redundant_jobs
     set_version_visibility
     remove_old_project_join_logs
     fix_negative_programme_role_mask
@@ -74,6 +76,41 @@ namespace :seek do
       end
     end
     puts " ... finished updating sample JSON"
+  end
+
+  task(migrate_old_jobs: :environment) do
+    puts "Migrating RdfGenerationJobs..."
+    count = RdfGenerationQueue.count
+    Delayed::Job.where(failed_at: nil).where('handler LIKE ?', '%RdfGenerationJob%').find_each do |job|
+      data = YAML.load(job.handler.sub("--- !ruby/object:RdfGenerationJob\n",''))
+      item = nil
+      begin
+        item = data["item_type_name"].constantize.find(data["item_id"])
+      rescue StandardError => e
+        puts "Exception migrating job (#{job.id}) #{e.class} #{e.message}"
+        puts e.backtrace.join("\n")
+      else
+        RdfGenerationQueue.enqueue(item, refresh_dependents: data["refresh_dependents"], queue_job: false) if item
+        job.destroy
+      end
+    end
+    queued = (RdfGenerationQueue.count - count)
+    RdfGenerationJob.new.queue_job if queued > 0
+    puts "Queued RDF generation for #{queued} items"
+  end
+
+  task(delete_redundant_jobs: :environment) do
+    puts "Deleting redundant jobs..."
+    deleted = 0
+
+    ['SendPeriodicEmailsJob', 'ContentBlobCleanerJob', 'NewsFeedRefreshJob', 'ProjectLeavingJob',
+     'OpenbisEndpointCacheRefreshJob', 'OpenbisSyncJob', 'ReindexingJob'].each do |klass|
+      jobs = Delayed::Job.where(failed_at: nil).where('handler LIKE ?', "%#{klass}%")
+      deleted += jobs.count
+      jobs.destroy_all
+    end
+
+    puts "Deleted #{deleted} jobs"
   end
 
   task(set_version_visibility: :environment) do

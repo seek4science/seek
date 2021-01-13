@@ -162,6 +162,7 @@ GEM
     builder (3.2.4)
     case_transform (0.2)
       activesupport
+    chronic (0.10.2)
     citeproc (1.0.5)
       namae (~> 0.8)
     citeproc-ruby (1.1.6)
@@ -806,6 +807,10 @@ GEM
     websocket-driver (0.7.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    whenever (1.0.0)
+      chronic (>= 0.6.3)
+    whenever-test (1.0.1)
+      whenever
     will_paginate (3.1.8)
     yaml_db (0.7.0)
       rails (>= 3.0)
@@ -952,6 +957,8 @@ DEPENDENCIES
   validate_url
   vcr (~> 2.9)
   webmock
+  whenever (~> 1.0.0)
+  whenever-test
   will_paginate (~> 3.1)
   yaml_db
   zenodo-client!

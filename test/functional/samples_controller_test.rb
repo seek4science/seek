@@ -55,14 +55,16 @@ class SamplesControllerTest < ActionController::TestCase
     creator = Factory(:person)
     login_as(person)
     type = Factory(:patient_sample_type)
-    assert_difference('Sample.count') do
-      post :create, params: { sample: { sample_type_id: type.id,
-                                        data:{
-                              "full name": 'Fred Smith',
-                              "age": '22',
-                              "weight": '22.1',
-                              "postcode": 'M13 9PL'} ,
-                              project_ids: [person.projects.first.id], other_creators:'frank, mary', creator_ids: [creator.id] } }
+    assert_enqueued_with(job: SampleTypeUpdateJob, args: [type, false]) do
+      assert_difference('Sample.count') do
+        post :create, params: { sample: { sample_type_id: type.id,
+                                          data:{
+                                "full name": 'Fred Smith',
+                                "age": '22',
+                                "weight": '22.1',
+                                "postcode": 'M13 9PL'} ,
+                                project_ids: [person.projects.first.id], other_creators:'frank, mary', creator_ids: [creator.id] } }
+      end
     end
     assert assigns(:sample)
     sample = assigns(:sample)
@@ -74,9 +76,6 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal person, sample.contributor
     assert_equal [creator], sample.creators
     assert_equal 'frank, mary',sample.other_creators
-
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(type, false).exists?
   end
 
   test 'create' do
@@ -84,10 +83,12 @@ class SamplesControllerTest < ActionController::TestCase
     creator = Factory(:person)
     login_as(person)
     type = Factory(:patient_sample_type)
-    assert_difference('Sample.count') do
-      post :create, params: { sample: { sample_type_id: type.id,
-                              data: { 'full name': 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
-                              project_ids: [person.projects.first.id], creator_ids: [creator.id] } }
+    assert_enqueued_with(job: SampleTypeUpdateJob, args: [type, false]) do
+      assert_difference('Sample.count') do
+        post :create, params: { sample: { sample_type_id: type.id,
+                                data: { 'full name': 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
+                                project_ids: [person.projects.first.id], creator_ids: [creator.id] } }
+      end
     end
     assert assigns(:sample)
     sample = assigns(:sample)
@@ -98,9 +99,6 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
     assert_equal person, sample.contributor
     assert_equal [creator], sample.creators
-
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(type, false).exists?
   end
 
   test 'create with validation error' do
@@ -230,14 +228,16 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_empty sample.creators
 
-    assert_no_difference('Sample.count') do
-      put :update, params: {id: sample.id, sample: {
-          data: {
-          "full name": 'Jesus Jones',
-          "age": '47',
-          "postcode": 'M13 9QL'},
-          creator_ids: [creator.id]}}
-      assert_equal [creator], sample.creators
+    assert_enqueued_with(job: SampleTypeUpdateJob, args: [sample.sample_type, false]) do
+      assert_no_difference('Sample.count') do
+        put :update, params: {id: sample.id, sample: {
+            data: {
+            "full name": 'Jesus Jones',
+            "age": '47',
+            "postcode": 'M13 9QL'},
+            creator_ids: [creator.id]}}
+        assert_equal [creator], sample.creators
+      end
     end
 
     assert assigns(:sample)
@@ -250,8 +250,6 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal '47', updated_sample.get_attribute_value(:age)
     assert_nil updated_sample.get_attribute_value(:weight)
     assert_equal 'M13 9QL', updated_sample.get_attribute_value(:postcode)
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(sample.sample_type, false).exists?
   end
 
   test 'update' do
@@ -262,10 +260,12 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_empty sample.creators
 
-    assert_no_difference('Sample.count') do
-      put :update, params: { id: sample.id, sample: { data: { 'full name': 'Jesus Jones', age: '47', postcode: 'M13 9QL' },
-                                            creator_ids: [creator.id] } }
-      assert_equal [creator], sample.creators
+    assert_enqueued_with(job: SampleTypeUpdateJob, args: [sample.sample_type, false]) do
+      assert_no_difference('Sample.count') do
+        put :update, params: { id: sample.id, sample: { data: { 'full name': 'Jesus Jones', age: '47', postcode: 'M13 9QL' },
+                                              creator_ids: [creator.id] } }
+        assert_equal [creator], sample.creators
+      end
     end
 
     assert assigns(:sample)
@@ -278,8 +278,6 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal '47', updated_sample.get_attribute_value(:age)
     assert_nil updated_sample.get_attribute_value(:weight)
     assert_equal 'M13 9QL', updated_sample.get_attribute_value(:postcode)
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(sample.sample_type, false).exists?
   end
 
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
@@ -624,12 +622,12 @@ class SamplesControllerTest < ActionController::TestCase
     type = sample.sample_type
     login_as(person.user)
     assert sample.can_delete?
-    assert_difference('Sample.count', -1) do
-      delete :destroy, params: { id: sample }
+    assert_enqueued_with(job: SampleTypeUpdateJob, args: [type, false]) do
+      assert_difference('Sample.count', -1) do
+        delete :destroy, params: { id: sample }
+      end
     end
     assert_redirected_to root_path
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(type, false).exists?
   end
 
   test 'linked samples show up in related items, for both directions' do

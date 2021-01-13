@@ -137,10 +137,9 @@ gem 'bundler', '>= 1.8.4'
 gem 'ro-crate-ruby', git: 'https://github.com/fbacall/ro-crate-ruby.git'
 
 gem 'git'
-
 gem 'redcarpet'
-
 gem 'i18n-js'
+gem 'whenever', '~> 1.0.0', require: false
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-bootstrap-multiselect', '~> 0.9.13'
@@ -181,6 +180,7 @@ group :test do
   gem 'vcr', '~> 2.9'
   gem 'rails-controller-testing'
   gem 'simplecov'
+  gem 'whenever-test'
 end
 
 group :test, :development do

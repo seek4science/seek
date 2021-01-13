@@ -371,9 +371,11 @@ class ProgrammesControllerTest < ActionController::TestCase
   test 'user can create programme, and becomes programme administrator' do
     p = Factory(:person)
     login_as(p)
-    assert_difference('Programme.count') do
-      assert_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count", 1) do # activation email
-        post :create, params: { programme: { title: 'A programme', funding_codes: 'aaa,bbb', web_page: '', description: '', funding_details: '' } }
+    with_config_value(:email_enabled, true) do
+      assert_difference('Programme.count') do
+        assert_enqueued_emails(1) do # activation email
+          post :create, params: { programme: { title: 'A programme', funding_codes: 'aaa,bbb', web_page: '', description: '', funding_details: '' } }
+        end
       end
     end
     prog = assigns(:programme)
@@ -389,9 +391,11 @@ class ProgrammesControllerTest < ActionController::TestCase
   test "admin doesn't become programme administrator by default" do
     p = Factory(:admin)
     login_as(p)
-    assert_difference('Programme.count') do
-      assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do # no email for admin creation
-        post :create, params: { programme: { title: 'A programme' } }
+    with_config_value(:email_enabled, true) do
+      assert_difference('Programme.count') do
+        assert_no_enqueued_emails do # no email for admin creation
+          post :create, params: { programme: { title: 'A programme' } }
+        end
       end
     end
     prog = assigns(:programme)
@@ -448,8 +452,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count", 1) do
-      put :accept_activation, params: { id: programme }
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_emails(1) do
+        put :accept_activation, params: { id: programme }
+      end
     end
 
     assert_redirected_to programme
@@ -467,8 +473,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(programme_administrator)
 
-    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
-      put :accept_activation, params: { id: programme }
+    with_config_value(:email_enabled, true) do
+      assert_no_enqueued_emails do
+        put :accept_activation, params: { id: programme }
+      end
     end
 
     assert_redirected_to :root
@@ -485,8 +493,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
-      put :accept_activation, params: { id: programme }
+    with_config_value(:email_enabled, true) do
+      assert_no_enqueued_emails do
+        put :accept_activation, params: { id: programme }
+      end
     end
 
     assert_redirected_to :root
@@ -544,8 +554,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count", 1) do
-      put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_emails(1) do
+        put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+      end
     end
 
     assert_redirected_to programme
@@ -564,8 +576,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(programme_administrator)
 
-    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
-      put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+    with_config_value(:email_enabled, true) do
+      assert_no_enqueued_emails do
+        put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+      end
     end
 
     assert_redirected_to :root
@@ -583,8 +597,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
-      put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+    with_config_value(:email_enabled, true) do
+      assert_no_enqueued_emails do
+        put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+      end
     end
 
     assert_redirected_to :root
@@ -728,8 +744,6 @@ class ProgrammesControllerTest < ActionController::TestCase
 
     assert_equal 0, assigns(:programme).funding_codes.length
   end
-
-
 
   def edit_max_object(programme)
     for i in 1..5 do

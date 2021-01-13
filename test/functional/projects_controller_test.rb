@@ -877,33 +877,29 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:person)
     project = person.projects.first
     login_as(person)
-    Delayed::Job.delete_all
 
-    post :update, params: { id: project, project: { description: 'sdfkuhsdfkhsdfkhsdf' } }
-
-    assert ProjectChangedEmailJob.new(project).exists?
+    assert_enqueued_with(job: ProjectChangedEmailJob) do
+      post :update, params: { id: project, project: { description: 'sdfkuhsdfkhsdfkhsdf' } }
+    end
   end
 
   test 'no email job created when edited by an admin' do
     person = Factory(:admin)
     project = person.projects.first
     login_as(person)
-    Delayed::Job.delete_all
 
-    post :update, params: { id: project, project: { description: 'sdfkuhsdfkhsdfkhsdf' } }
-
-    refute ProjectChangedEmailJob.new(project).exists?
+    assert_no_enqueued_jobs(only: ProjectChangedEmailJob) do
+      post :update, params: { id: project, project: { description: 'sdfkuhsdfkhsdfkhsdf' } }
+    end
   end
 
   test 'no email job created when edited by an project administrator' do
     person = Factory(:project_administrator)
     project = person.projects.first
     login_as(person)
-    Delayed::Job.delete_all
-
-    post :update, params: { id: project, project: { description: 'sdfkuhsdfkhsdfkhsdf' } }
-
-    refute ProjectChangedEmailJob.new(project).exists?
+    assert_no_enqueued_jobs(only: ProjectChangedEmailJob) do
+      post :update, params: { id: project, project: { description: 'sdfkuhsdfkhsdfkhsdf' } }
+    end
   end
 
   test 'projects belonging to an institution through nested route' do
@@ -1214,9 +1210,9 @@ class ProjectsControllerTest < ActionController::TestCase
     wg = Factory(:work_group, project: project)
     group_membership = Factory(:group_membership, work_group: wg)
     person = Factory(:person, group_memberships: [group_membership])
-    former_group_membership = Factory(:group_membership, time_left_at: 10.days.ago, work_group: wg)
+    former_group_membership = Factory(:group_membership, time_left_at: 10.days.ago, work_group: wg, has_left: true)
     former_person = Factory(:person, group_memberships: [former_group_membership])
-    assert_difference("Delayed::Job.where(\"handler LIKE '%ProjectLeavingJob%'\").count", 2) do
+    assert_no_enqueued_jobs only: ProjectLeavingJob do
       assert_no_difference('GroupMembership.count') do
         post :update_members, params: { id: project, memberships_to_flag: { group_membership.id.to_s => { time_left_at: 1.day.ago },
                                     former_group_membership.id.to_s => { time_left_at: '' } } }
@@ -1227,7 +1223,8 @@ class ProjectsControllerTest < ActionController::TestCase
     end
 
     assert group_membership.reload.has_left
-    assert !former_group_membership.reload.has_left
+    refute former_group_membership.reload.has_left
+    refute former_group_membership.reload[:has_left]
   end
 
   test 'cannot flag members of other projects as leaving' do

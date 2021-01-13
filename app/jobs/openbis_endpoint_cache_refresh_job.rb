@@ -1,57 +1,18 @@
 # job to periodically clear and refresh the cache
-class OpenbisEndpointCacheRefreshJob < SeekJob
-  attr_accessor :openbis_endpoint_id
+class OpenbisEndpointCacheRefreshJob < ApplicationJob
+  queue_with_priority 3
 
-  def initialize(openbis_endpoint)
-    @openbis_endpoint_id = openbis_endpoint.id
-  end
-
-  def perform_job(endpoint)
+  def perform(endpoint)
+    return unless Seek::Config.openbis_enabled
+    return unless endpoint&.persisted?
     endpoint.refresh_metadata
   end
 
-  def gather_items
-    [endpoint].compact
-  end
-
-  def allow_duplicate_jobs?
-    false
-  end
-
-  def default_priority
-    3
-  end
-
-  def follow_on_delay
-    if endpoint
-      endpoint.refresh_period_mins.minutes
-    else
-      120.minutes
-    end
-  end
-
-  def follow_on_job?
-    Seek::Config.openbis_enabled && endpoint # don't follow on if the endpoint no longer exists
-  end
-
-  # overidden to ignore_locked false by default
-  def exists?(ignore_locked = false)
-    super(ignore_locked)
-  end
-
-  # overidden to ignore_locked false by default
-  def count(ignore_locked = false)
-    super(ignore_locked)
-  end
-
-  def self.create_initial_jobs
+  # jobs created if due, triggered by the scheduler.rb
+  def self.queue_timed_jobs
     return unless Seek::Config.openbis_enabled
-    OpenbisEndpoint.all.each(&:create_refresh_metadata_job)
-  end
-
-  private
-
-  def endpoint
-    OpenbisEndpoint.find_by_id(openbis_endpoint_id)
+    OpenbisEndpoint.find_each do |endpoint|
+      endpoint.create_refresh_metadata_job if endpoint.due_cache_refresh?
+    end
   end
 end

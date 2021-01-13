@@ -1,19 +1,16 @@
-class ProjectLeavingJob < SeekJob
-  attr_reader :person_id
-  attr_reader :project_id
-
-  def initialize(person, project)
-    @person_id = person.try(:id)
-    @project_id = project.try(:id)
+class ProjectLeavingJob < ApplicationJob
+  def perform(group_membership)
+    project = group_membership.project
+    person = group_membership.person
+    return if project.nil? || person.nil?
+    AuthLookupUpdateQueue.enqueue(([person] + project.asset_housekeepers).compact.uniq)
+    group_membership.update_column(:has_left, true)
   end
 
-  def perform_job(item)
-    if item[:project]
-      AuthLookupUpdateQueue.enqueue(([item[:person]] + item[:project].asset_housekeepers).compact.uniq)
+  # jobs created if due, triggered by the scheduler.rb
+  def self.queue_timed_jobs
+    GroupMembership.due_to_expire.find_each do |group_membership|
+      ProjectLeavingJob.perform_later(group_membership)
     end
-  end
-
-  def gather_items
-    [{ person: Person.find_by_id(person_id), project: Project.find_by_id(project_id) }]
   end
 end
