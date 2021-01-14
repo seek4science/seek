@@ -11,10 +11,11 @@
         </div>
 
         <div class="form-group">
-          <label class="control-label">2. Select the <%= t('institution').downcase %> through which these people are involved with the <%= t('project').downcase %></label>
-          <%= select_tag :institution_ids, options_from_collection_for_select(Institution.order(:title), "id", "title"),
+          <label class="control-label">2. Type the name of the <%= t('institution').downcase %> through which these people are involved with the <%= t('project').downcase %></label>
+          <%#= select_tag :institution_ids, options_from_collection_for_select(Institution.order(:title), "id", "title"),
                          :include_blank => true,
                          :class => 'form-control' %>
+          <%= objects_input('institution_id', [], typeahead:  {query_url: typeahead_institutions_path + '?query=%QUERY',handlebars_template:'typeahead/institution'}, limit:1) -%>
         </div>
 
         <%= button_link_to('Add', 'new', 'javascript:Projects.actions.add();') -%>

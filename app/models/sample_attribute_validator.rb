@@ -4,10 +4,10 @@ class SampleAttributeValidator < ActiveModel::Validator
     record.sample_type.sample_attributes.each do |attribute|
       val = record.get_attribute_value(attribute)
       if record.blank_attribute?(attribute)
-        record.errors[attribute.method_name] << 'is required' if attribute.required?
+        record.errors[attribute.title] << 'is required' if attribute.required?
       else
         unless attribute.validate_value?(val)
-          record.errors[attribute.method_name] << "is not a valid #{attribute.sample_attribute_type.title}"
+          record.errors[attribute.title] << "is not a valid #{attribute.sample_attribute_type.title}"
         end
       end
     end

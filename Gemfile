@@ -54,7 +54,7 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '>= 1.10.4'
+gem 'nokogiri', '>= 1.11.0.rc4'
 gem 'rdf-virtuoso', git: 'https://github.com/ruby-rdf/rdf-virtuoso', branch: 'develop'
 gem 'terrapin'
 gem 'lograge'
@@ -84,7 +84,7 @@ gem 'bootstrap-sass', '>=3.4.1'
 gem 'sass-rails', '~> 5.0'
 gem 'sprockets-rails'
 
-gem 'ro-bundle', '~> 0.2.4'
+gem 'ro-bundle', '~> 0.2.5'
 gem 'handlebars_assets'
 gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 
@@ -129,16 +129,17 @@ gem "puma", ">= 3.12.6"
 
 gem "doorkeeper", ">= 5.2.5"
 
+gem 'request_store'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 
 gem 'ro-crate-ruby', git: 'https://github.com/fbacall/ro-crate-ruby.git'
 
 gem 'git'
-
 gem 'redcarpet'
-
 gem 'i18n-js'
+gem 'whenever', '~> 1.0.0', require: false
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-bootstrap-multiselect', '~> 0.9.13'
@@ -162,8 +163,6 @@ group :development do
   gem 'pry-remote'
   gem 'request-log-analyzer'
   gem 'rubocop', require: false
-  gem 'rubycritic', require: false
-  gem 'guard-rubycritic', require: false
   gem 'rails_best_practices'
   gem 'gem-licenses'
   gem "better_errors"
@@ -171,7 +170,7 @@ group :development do
 end
 
 group :test do
-  gem 'ruby-prof', '0.15.9'
+  gem 'ruby-prof'
   gem 'test-prof'
   gem 'rails-perftest'
   gem 'minitest', '5.10.3'
@@ -181,6 +180,7 @@ group :test do
   gem 'vcr', '~> 2.9'
   gem 'rails-controller-testing'
   gem 'simplecov'
+  gem 'whenever-test'
 end
 
 group :test, :development do

@@ -52,7 +52,7 @@ echo "copying database dump file ..."
 docker run --rm --volumes-from seek -v $location:/backup ubuntu bash -c "cp /backup/seek.sql /seek/filestore/"
 
 echo "loading up database ..."
-docker exec seek bash -c 'bundle exec rake db:drop && bundle exec rake db:create'
+docker exec seek bash -c 'DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rake db:drop && bundle exec rake db:create'
 docker exec seek bash -c 'mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h$MYSQL_HOST $MYSQL_DATABASE < /seek/filestore/seek.sql'
 
 echo "cleaning up"

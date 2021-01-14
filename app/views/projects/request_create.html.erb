@@ -2,32 +2,34 @@
   <div style="width:70%;margin:auto">
     <div class="panel panel-default">
       <div class="panel-body">
-        <% if @programme.id.nil? %>
-          <%
-            mail_recipients = "#{Seek::Config.dm_project_name} administrators"
-            to_be_created = "#{t('programme')} and #{t('project')}"
-          %>
-          <p>
-            You have requested for a new <%= t('programme') %>, and a <%= t('project') %> to be created within it.
-          </p>
-          <p>
-            You will become an administrator of both the <%= t('programme') %> and <%= t('project') %>
-          </p>
-          <p>
-            You have described the new <%= t('programme') %> with the following details:
-          <ul>
-            <li><strong>Title:</strong> <%= text_or_not_specified(@programme.title) %></li>
-          </ul>
-          </p>
-        <% else %>
-          <%
-            mail_recipients = t('project_administrator').pluralize
-            to_be_created = "#{t('project')}"
-          %>
-          <p>
-            You have requested for a <%= t('project') %> to be created within a <%= Seek::Config.dm_project_name %>
-            managed <%= t('programme') %>.
-          </p>
+        <% if @programme %>
+          <% if @programme.id.nil? %>
+            <%
+              mail_recipients = "#{Seek::Config.dm_project_name} administrators"
+              to_be_created = "#{t('programme')} and #{t('project')}"
+            %>
+            <p>
+              You have requested for a new <%= t('programme') %>, and a <%= t('project') %> to be created within it.
+            </p>
+            <p>
+              You will become an administrator of both the <%= t('programme') %> and <%= t('project') %>
+            </p>
+            <p>
+              You have described the new <%= t('programme') %> with the following details:
+            <ul>
+              <li><strong>Title:</strong> <%= text_or_not_specified(@programme.title) %></li>
+            </ul>
+            </p>
+          <% else %>
+            <%
+              mail_recipients = t('project_administrator').pluralize
+              to_be_created = "#{t('project')}"
+            %>
+            <p>
+              You have requested for a <%= t('project') %> to be created within a <%= Seek::Config.dm_project_name %>
+              managed <%= t('programme') %>.
+            </p>
+          <% end %>
         <% end %>
 
         <p style="padding-top: 1em;">

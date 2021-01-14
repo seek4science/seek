@@ -33,6 +33,8 @@ class SampleType < ApplicationRecord
 
   belongs_to :contributor, class_name: 'Person'
 
+  has_many :assays
+
   validates :title, presence: true
   validates :title, length: { maximum: 255 }
   validates :description, length: { maximum: 65_535 }
@@ -69,6 +71,14 @@ class SampleType < ApplicationRecord
       Sample.record_timestamps = true
       Sample.set_callback :save, :after, :queue_sample_type_update_job
     end
+  end
+
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['title','uploaded_template']
+  end
+  def columns_allowed
+    super + ['title','uploaded_template','deleted_contributor']
   end
 
   # fixes inconsistencies following form submission that could cause validation errors
@@ -112,10 +122,6 @@ class SampleType < ApplicationRecord
 
   def editing_constraints
     Seek::Samples::SampleTypeEditingConstraints.new(self)
-  end
-
-  def attribute_by_method_name(method_name)
-    sample_attributes.detect { |attr| attr.method_name == method_name }
   end
 
   private

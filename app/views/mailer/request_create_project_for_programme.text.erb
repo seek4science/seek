@@ -1,9 +1,18 @@
 
 Hi <%= @admins.collect{|o| o.name}.join(", ") -%>,
 
-The <%= Seek::Config.application_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a <%= t('project')  %> is created within your <%= t('programme') %> -%>.
+<% if @programme %>
 
-The <%= t('programme') %> is <%= "#{@programme.title} (#{programme_url(@programme)})" %>
+  The <%= Seek::Config.application_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a new <%= t('project')  %> is created within your <%= t('programme') %> %>.
+
+  The <%= t('programme') %> is <%= "#{@programme.title} (#{programme_url(@programme)})" %>
+
+<% else %>
+
+  The <%= Seek::Config.application_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a new <%= t('project')  %> is created %>.
+
+<% end %>
+
 
 They provided the following details about the <%= t('project') %>
   <%= t('project') %> title: '<%= @project.title %>'
@@ -30,7 +39,7 @@ They indicated that they are associated with the existing <%= "#{@institution.ti
 
 <% end -%>
 
-You can quickly accept or reject this request by going to <%= administer_create_project_request_programmes_url(message_log_id:@message_log.id) %>.
+You can quickly accept or reject this request by going to <%= administer_create_project_request_projects_url(message_log_id:@message_log.id) %>.
 
 You can reply to <%= @requester.first_name.capitalize -%> by replying to this email.
 

@@ -21,6 +21,14 @@
 
   <div class="col-md-3 col-sm-4">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @institution } -%>
+
+    <% if @institution.is_discussable? -%>
+      <% if @institution.discussion_links.select{|link| link.url.present?}.any?  %>
+        <%= render partial: 'assets/discussion_links_box', locals: {resource: @institution } -%>
+      <% end -%>
+    <% end -%>
+
+
   </div>
 </div>
 

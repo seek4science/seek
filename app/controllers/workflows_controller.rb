@@ -270,9 +270,7 @@ class WorkflowsController < ApplicationController
 
   def retrieve_content(blob)
     if !blob.file_exists?
-      if (caching_job = blob.caching_job).exists?
-        caching_job.first.destroy
-      end
+      blob.remote_content_fetch_task&.cancel
       blob.retrieve
     end
   end

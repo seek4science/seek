@@ -1,4 +1,4 @@
-FROM ruby:2.4-stretch
+FROM ruby:2.6-stretch
 
 MAINTAINER Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall
 
@@ -13,17 +13,21 @@ RUN apt-get update -qq && \
 		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
 		libxslt1-dev locales default-mysql-client nginx nodejs openjdk-8-jdk \
+		python3 python3-pip python3-setuptools python3-wheel python3-psutil python3-dev \
 		poppler-utils postgresql-client sqlite3 links telnet vim-tiny zip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    locale-gen en_US.UTF-8
+    locale-gen en_US.UTF-8 && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 RUN mkdir -p $APP_DIR
-RUN chown www-data $APP_DIR
+RUN chown -R www-data $APP_DIR /var/www
 
 USER www-data
 
 WORKDIR $APP_DIR
+
+
 
 # Bundle install throw errors if Gemfile has been modified since Gemfile.lock
 COPY Gemfile* ./
@@ -40,6 +44,9 @@ RUN chown -R www-data solr config docker public /var/www db/schema.rb
 USER www-data
 RUN touch config/using-docker #allows us to see within SEEK we are running in a container
 
+# Python dependencies from requirements.txt
+RUN pip3 install -r requirements.txt
+
 # SQLite Database (for asset compilation)
 RUN mkdir sqlite3-db && \
     cp docker/database.docker.sqlite3.yml config/database.yml && \
@@ -52,6 +59,17 @@ RUN bundle exec rake assets:precompile && \
 
 #root access needed for next couple of steps
 USER root
+
+# Install supercronic - a cron alternative
+ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.1.12/supercronic-linux-amd64 \
+    SUPERCRONIC=supercronic-linux-amd64 \
+    SUPERCRONIC_SHA1SUM=048b95b48b708983effb2e5c935a1ef8483d9e3e
+
+RUN curl -fsSLO "$SUPERCRONIC_URL" \
+ && echo "${SUPERCRONIC_SHA1SUM}  ${SUPERCRONIC}" | sha1sum -c - \
+ && chmod +x "$SUPERCRONIC" \
+ && mv "$SUPERCRONIC" "/usr/local/bin/${SUPERCRONIC}" \
+ && ln -s "/usr/local/bin/${SUPERCRONIC}" /usr/local/bin/supercronic
 
 # NGINX config
 COPY docker/nginx.conf /etc/nginx/nginx.conf

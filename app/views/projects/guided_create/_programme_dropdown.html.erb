@@ -1,0 +1,19 @@
+<div class="help-block">
+  Select the <%= t('programme') %> you wish to associate the new <%= t('project') %> with, out of the following list that you administer.
+</div>
+<% if !admin_logged_in? && Programme.site_managed_programme.present? %>
+  <div class="help-block">
+    You can also choose the <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}" %>, <%= link_to Programme.site_managed_programme.title, Programme.site_managed_programme %>, and if so you will need to wait for approval.
+  </div>
+<% end %>
+<% programmes = (User.current_user.person.administered_programmes + [Programme.site_managed_programme]).compact.uniq %>
+<%= select_tag :programme_id,options_from_collection_for_select(programmes,:id, :title), class: 'form-control' %>
+<% if Seek::ProjectFormProgrammeOptions.creation_allowed? %>
+  <div class="help-block">
+    Alternatively you can choose to create a new <%= t('programme') %>, which your new <%= t('project') %> will be associated with.
+  </div>
+  <label>
+    <%= check_box_tag :new_programme, '1', false %>
+    <%= "Create a new #{t('programme')}?" %>
+  </label>
+<% end %>

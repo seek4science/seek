@@ -100,6 +100,7 @@ class PeopleController < ApplicationController
   # people yet to be assigned, or create a new one if you don't exist
   def register
     email = params[:email]
+    @existing_email = email && Person.where(email: email).any?
     if email && Person.not_registered_with_matching_email(email).any?
       render :is_this_you, locals: { email: email }
     else
@@ -127,14 +128,14 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.save && current_user.save
         if Seek::Config.email_enabled && during_registration
-          notify_admin_and_project_administrators_of_new_user
+          Mailer.contact_admin_new_user(current_user).deliver_later
         end
         if current_user.active?
           flash[:notice] = 'Person was successfully created.'
           if @person.only_first_admin_person?
             format.html { redirect_to registration_form_admin_path(during_setup: 'true') }
           else
-            if Seek::Config.programmes_enabled && Programme.managed_programme
+            if Seek::Config.programmes_enabled && Programme.site_managed_programme
               format.html { redirect_to(create_or_join_project_home_path)}
             else
               format.html { redirect_to(@person) }
@@ -156,10 +157,6 @@ class PeopleController < ApplicationController
         format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
     end
-  end
-
-  def notify_admin_and_project_administrators_of_new_user
-    Mailer.contact_admin_new_user(notification_params.to_h, current_user).deliver_later
   end
 
   # PUT /people/1

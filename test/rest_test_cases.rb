@@ -8,7 +8,7 @@ module RestTestCases
   extend ActiveSupport::Concern
 
   # types that should be skipped for JSON testing
-  SKIPPED_JSON = %w[Sample SampleType Strain].freeze
+  SKIPPED_JSON = %w[Sample Strain].freeze
 
   included do
     type_name = controller_class.controller_path.classify.to_s

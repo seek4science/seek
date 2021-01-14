@@ -21,7 +21,7 @@ end
 Factory.define(:publication) do |f|
   f.sequence(:title) { |n| "A Publication #{n}" }
   f.sequence(:pubmed_id) { |n| n }
-  f.projects { [Factory.build(:project)] }
+  f.projects { [Factory(:project)] }
   f.association :contributor, factory: :person
   f.association :publication_type, factory: :journal
 end
@@ -29,12 +29,13 @@ end
 Factory.define(:min_publication, class: Publication) do |f|
   f.title 'A Minimal Publication'
   f.doi 'https://doi.org/10.5072/abcd'
-  f.projects { [Factory.build(:min_project)] }
+  f.projects { [Factory(:min_project)] }
   f.association :publication_type, factory: :journal
 end
 
 Factory.define(:max_publication, class: Publication) do |f|
   f.title 'A Maximal Publication'
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.journal 'Journal of Molecular Biology'
   f.published_date '2017-10-10'
   f.doi 'https://doi.org/10.5072/abcd'
@@ -46,7 +47,7 @@ Factory.define(:max_publication, class: Publication) do |f|
   f.booktitle 'Proceedings of the 3rd bwHPC-Symposium: Heidelberg 2016'
   f.publisher 'Heidelberg University Library, heiBOOKS'
   f.publication_type_id  Factory(:journal).id
-  f.projects { [Factory.build(:max_project)] }
+  f.projects { [Factory(:max_project)] }
   f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.association :publication_type, factory: :journal

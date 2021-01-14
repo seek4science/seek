@@ -1,10 +1,15 @@
-class AuthLookupUpdateJob < SeekJob
-  def queue_name
-    QueueNames::AUTH_LOOKUP
-  end
+class AuthLookupUpdateJob < BatchJob
+  include CommonSweepers
+
+  queue_as QueueNames::AUTH_LOOKUP
+  queue_with_priority 0
 
   def timelimit
     1.hour
+  end
+
+  def follow_on_job?
+    AuthLookupUpdateQueue.any?
   end
 
   private
@@ -19,15 +24,11 @@ class AuthLookupUpdateJob < SeekJob
     elsif item.is_a?(Person)
       update_assets_for_user item.user unless item.user.nil?
     else
-      Delayed::Job.logger.error("Unexpected type encountered: #{item.class.name}")
+      Rails.logger.error("Unexpected type encountered: #{item.class.name}")
     end
 
     # required to make sure that cached fragments that contain details related to authorization are regenerated after the job has run
     expire_auth_related_fragments
-  end
-
-  def retry_item(item)
-    add_items_to_queue(item, 15.seconds.from_now, 1)
   end
 
   def gather_items
@@ -48,21 +49,5 @@ class AuthLookupUpdateJob < SeekJob
         end
       end
     end
-  end
-
-  def follow_on_job?
-    AuthLookupUpdateQueue.any? && !exists?
-  end
-
-  def default_priority
-    0
-  end
-
-  def follow_on_priority
-    0
-  end
-
-  def follow_on_delay
-    0.seconds
   end
 end

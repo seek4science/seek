@@ -509,7 +509,7 @@ ul.users_details li p {
 }
 
 #publication_preview_container {
-    max-height: 26em;
+    max-height: 50em;
 }
 
 #publication_preview {
@@ -1601,6 +1601,7 @@ table#storage-stats thead {
   font-weight: bolder;
 }
 
+/* Markdown presentation*/
 #description,
 .list_item_desc{
   overflow: auto;
@@ -1611,4 +1612,15 @@ table#storage-stats thead {
 .list_item_desc img,
 .editor-preview-side img{
   max-width:95%;
+}
+
+/* condensed list collapse icons */
+.list_items_container a{
+  cursor: pointer;
+}
+.list_items_container a[aria-expanded='true'] .glyphicon-option-horizontal {
+  display: none;
+}
+.list_items_container a[aria-expanded='false'] .glyphicon-option-vertical {
+  display: none;
 }

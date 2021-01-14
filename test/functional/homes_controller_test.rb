@@ -10,7 +10,7 @@ class HomesControllerTest < ActionController::TestCase
     # check accessible outside
     get :funding
     assert_response :success
-    assert_select 'h1', /seek funding/i
+    assert_select 'h1', /seek.*funding/i
   end
 
   test 'test should be accessible to seek even if not logged in' do
@@ -319,18 +319,6 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'span.headline_announcement_title', count: 0
   end
 
-  test 'should not show external search without crossref' do
-    with_config_value :solr_enabled, true do
-      with_config_value :external_search_enabled, true do
-        with_config_value :crossref_api_email, '' do
-          get :index
-          assert_response :success
-          assert_select 'div#search_box input#include_external_search', count: 0
-        end
-      end
-    end
-  end
-
   test 'should show external search when not logged in' do
     with_config_value :solr_enabled, true do
       with_config_value :external_search_enabled, true do
@@ -523,6 +511,39 @@ class HomesControllerTest < ActionController::TestCase
       assert_response :success
       assert_select 'div.ft-info a[href=?]', privacy_home_path, text: /Privacy Policy/
     end
+  end
+
+  test 'alert for pending project creation' do
+    project = Project.new(title: 'my project')
+    person = Factory(:person)
+    admin = Factory(:admin)
+    institution = Factory(:institution)
+
+    MessageLog.destroy_all
+
+    login_as(admin)
+
+    get :index
+    assert_select 'div#pending-project-creation-warning',text:/There are pending/, count:0
+
+    log1=MessageLog.log_project_creation_request(person,Factory(:programme),project,institution)
+
+    get :index
+    assert_select 'div#pending-project-creation-warning',text:/There are pending/, count:1
+
+    login_as(Factory(:person))
+
+    get :index
+    assert_select 'div#pending-project-creation-warning',text:/There are pending/, count:0
+
+    login_as(admin)
+    get :index
+    assert_select 'div#pending-project-creation-warning',text:/There are pending/, count:1
+
+    log1.respond('fish')
+    get :index
+    assert_select 'div#pending-project-creation-warning',text:/There are pending/, count:0
+
   end
 
   def uri_to_guardian_feedtest

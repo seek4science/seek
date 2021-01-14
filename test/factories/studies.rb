@@ -18,6 +18,7 @@ end
 Factory.define(:max_study, parent: :min_study) do |f|
   f.title "A Maximal Study"
   f.description "The Study of many things"
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.experimentalists "Wet lab people"
   f.other_creators "Marie Curie"
   f.after_build do |s|

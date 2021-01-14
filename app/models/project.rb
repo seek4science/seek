@@ -131,6 +131,14 @@ class Project < ApplicationRecord
   def pals
     people_with_the_role(Seek::Roles::PAL)
   end
+    
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['title','web_page']
+  end
+  def columns_allowed
+    super + ['title','web_page','wiki_page','site_credentials','start_date','end_date']
+  end
 
   # returns people belong to the admin defined seek 'role' for this project
   def people_with_the_role(role)
@@ -170,7 +178,7 @@ class Project < ApplicationRecord
   # indicates whether this project has a person, or associated user, as a member
   def has_member?(user_or_person)
     user_or_person = user_or_person.try(:person)
-    people.include? user_or_person
+    current_people.include? user_or_person
   end
 
   def human_disease_terms
@@ -233,8 +241,10 @@ class Project < ApplicationRecord
         samples.empty? && sample_types.empty?
   end
 
-  def self.can_create?
-    User.admin_logged_in? || User.activated_programme_administrator_logged_in?
+  def self.can_create?(user = User.current_user)
+    User.admin_logged_in? ||
+      User.activated_programme_administrator_logged_in? ||
+        (user && Programme.any? { |p| p.allows_user_projects? })
   end
 
   # set the administrators, assigned from the params to :project_administrator_ids
@@ -292,9 +302,9 @@ class Project < ApplicationRecord
   # whether the user is able to request membership of this project
   def allow_request_membership?(user = User.current_user)
     user.present? &&
-        project_administrators.any? &&
-        !has_member?(user) &&
-        MessageLog.recent_project_membership_requests(user.try(:person),self).empty?
+      project_administrators.any? &&
+      !has_member?(user) &&
+      MessageLog.recent_project_membership_requests(user.try(:person),self).empty?
   end
 
   def validate_end_date

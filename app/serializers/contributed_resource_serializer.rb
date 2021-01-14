@@ -7,15 +7,9 @@ class ContributedResourceSerializer < PCSSerializer
     serialize_annotations(object)
   end
 
-  attribute :discussion_links do
-    object.discussion_links.collect do |link|
-      {id:link.id, label: link.label, url: link.url}
-    end
-  end
-
   attribute :versions, if: -> { object.respond_to?(:versions) } do
     versions_data = []
-    object.versions.each do |v|
+    object.visible_versions.each do |v|
       path = polymorphic_path(object, version: v.version)
       versions_data.append(version: v.version,
                            revision_comments: v.revision_comments.presence,
