@@ -18,132 +18,22 @@
   });
 </script>
 
+<% who_uses_content = YAML.load(File.read(File.join(Rails.root, 'config/home', 'who_uses.yml'))) %>
+
 <div class="panel panel-default" id="home_who_uses" style="padding: 20px; position:relative">
   <h1 class="text-center">Who is using it?</h1>
   <div class="row">
     <div id="carousel-control" class="carousel">
-
-      <div class="card col-sm-12 text-center" style="flex-shrink: 0;">
-        <a class="image-link" target="_blank" href="https://covid.pages.uni.lu/">
-          <img style="width:auto;height:200px;" src='/assets/front_page/who_uses-covid-project.png'>
-        </a>
-        <h3> COVID-19 Disease Map </h3>
-        <p style="font-size: larger;"> It helps us to coordinate and communicate across a large-scale community effort - the development of the COVID-19 Disease Map. This way we are sure all community members are visible and credited for their contributions, and the content we develop can be shared in a stable and transparent way. </p>
-        <i> Marek Ostaszewski, Research Fellow, Université du Luxembourg </i>
-      </div>
-<%#     
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <a class="image-link" target="_blank" href="https://covid.pages.uni.lu/">
-        <img style="width:25%" src='/assets/front_page/WevQueryLogo.png'>
-      </a>
-      <h3>WevQuery</h3>
-      <p> Organising our data would have been a nightmare without using Fairdomhub. </p>
-    </div>
-    
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <a class="image-link" target="_blank" href="https://seek4science.org/organise.html">
-        <img style="height:167px; object-fit:contain;" src='/assets/front_page/openBIS_Logo.png'>
-      </a>
-      <h3>OpenBIS</h3>
-      <p> Fairdomhub helped us exchange information without having to worry about privacy. </p>
-    </div>
-    
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <a class="image-link" target="_blank" href="https://covid.pages.uni.lu/">
-        <img style="width:75%" src='/assets/front_page/WevQueryLogo.png'>
-      </a>
-      <h3>WevQuery</h3>
-      <p> Organising our data would have been a nightmare without using Fairdomhub. </p>
-    </div>
-
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <a class="image-link" target="_blank" href="https://covid.pages.uni.lu/">
-        <img style="width:75%" src='/assets/front_page/who_uses-covid-project.png'>
-      </a>
-      <h3>COVID-19 Disease Map</h3>
-      <p> Fairdomhub helped us exchange information without having to worry about privacy. </p>
-    </div>
-    
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <a class="image-link" target="_blank" href="https://covid.pages.uni.lu/">
-        <img style="width:75%" src='/assets/front_page/WevQueryLogo.png'>
-      </a>
-      <h3>WevQuery</h3>
-      <p> Organising our data would have been a nightmare without using Fairdomhub. </p>
-    </div>
-
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <a class="image-link" target="_blank" href="https://covid.pages.uni.lu/">
-        <img style="width:75%" src='/assets/front_page/who_uses-covid-project.png'>
-      </a>
-      <h3>COVID-19 Disease Map</h3>
-      <p> Fairdomhub helped us exchange information without having to worry about privacy. </p>
-    </div>
-    
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <a class="image-link" target="_blank" href="https://covid.pages.uni.lu/">
-        <img style="width:75%" src='/assets/front_page/WevQueryLogo.png'>
-      </a>
-      <h3>WevQuery</h3>
-      <p> Organising our data would have been a nightmare without using Fairdomhub. </p>
-    </div>
-    
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div>
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div>
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div>
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div>
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div>
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div>
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div>
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div>
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div>
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div>
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div>
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div>
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div>
-    <div class="card col-sm-5 text-center" style="flex-shrink: 0;">
-      <h2>Flexible sharing controls</h2>
-      <p>There is a lot of flexibility and control over who can see, download or edit your items.</p>
-    </div> %>
+      <% who_uses_content.each do |item| %>
+        <div class="card col-sm-12 text-center" style="flex-shrink: 0;">
+          <a class="image-link" target="_blank" href="<%= item['url'] %>">
+            <img style="width:auto;height:200px;" src='<%= item['logo'] %>'>
+          </a>
+          <h3> <%= item['title'] %> </h3>
+          <p style="font-size: larger;"> <%= item['description'] %> </p>
+          <i> <%= item['author'] %> </i>
+        </div>
+      <% end %>
     </div>
 
     <a id="carousel-left" href="/">
