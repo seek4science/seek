@@ -91,6 +91,18 @@ class InstitutionsController < ApplicationController
     end
   end
 
+  # returns a list of all institutions in JSON format
+  def request_all
+    # listing all institutions is public data, but still
+    # we require login to protect from unwanted requests
+    institution_list = Institution.get_all_institutions_listing
+    respond_to do |format|
+       format.json do
+         render json: institution_list
+       end
+    end
+  end
+
   private
 
   def institution_params
