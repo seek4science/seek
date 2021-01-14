@@ -598,15 +598,13 @@ class PeopleControllerTest < ActionController::TestCase
       sop = Factory(:sop, projects: [proj], policy: Factory(:public_policy))
       df = Factory(:data_file, projects: [proj], policy: Factory(:public_policy))
 
-
-
       # subscribe to project
       put :update, params: { id: current_person, receive_notifications: true, person: { project_subscriptions_attributes: { '0' => { project_id: proj.id, frequency: 'weekly', _destroy: '0' } } } }
       assert_redirected_to current_person
 
       project_subscription = ProjectSubscription.where({project_id:proj.id, person_id:current_person.id}).first
       assert_difference 'Subscription.count', 2 do
-        ProjectSubscriptionJob.new(project_subscription.id).perform
+        ProjectSubscriptionJob.perform_now(project_subscription)
       end
       assert sop.subscribed?(current_person)
       assert df.subscribed?(current_person)
@@ -615,7 +613,7 @@ class PeopleControllerTest < ActionController::TestCase
       assert_enqueued_emails 1 do
         Factory(:activity_log, activity_loggable: sop, action: 'update')
         Factory(:activity_log, activity_loggable: df, action: 'update')
-        SendPeriodicEmailsJob.new('weekly').perform
+        PeriodicSubscriptionEmailJob.perform_now('weekly')
       end
 
       # unsubscribe to project
@@ -632,7 +630,7 @@ class PeopleControllerTest < ActionController::TestCase
       assert_no_enqueued_emails do
         Factory(:activity_log, activity_loggable: sop, action: 'update')
         Factory(:activity_log, activity_loggable: df, action: 'update')
-        SendPeriodicEmailsJob.new('weekly').perform
+        PeriodicSubscriptionEmailJob.perform_now('weekly')
       end
     end
   end

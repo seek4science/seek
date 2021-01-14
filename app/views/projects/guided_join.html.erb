@@ -15,70 +15,78 @@
   }
 
 </style>
+
+
 <%= form_tag request_join_projects_path do %>
   <div class="row">
     <div style="margin:auto;width:70%;">
 
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <%= t('project') %>
-        </div>
-        <div class="panel-body">
-          <div class="help-block">
-            Search for the <%=t('project') %>, either by name or details related to it.
-            If you cannot find the <%=t('project') %> here, you could try the
-            <%= link_to "#{t('project')} search and filtering",projects_path,target: :_blank %> first to find the name.
-            <br/>
-            Once found, check the box next to the <%= t('project').pluralize %> you wish to request to join.
-          </div>
+      <%= panel(t('project')) do %>
+        <% if @project %>
+          Requesting to join <%= link_to(@project.title, @project) %>
 
-          <%= label_tag :search_label, "#{t('project')} search" -%>
-          <div class="row">
-            <div class="col-md-10">
-              <%= text_field_tag 'project-search-terms', '', :class => "form-control" -%>
+          <%= check_box_tag 'projects[]',@project.id,true,class:'project-selected hidden' %>
+
+        <% else %>
+          <% if Seek::Config.solr_enabled %>
+            <div class="help-block">
+              Search for the <%= t('project') %>, either by name or details related to it.
+              If you cannot find the <%= t('project') %> here, you could try the
+              <%= link_to "#{t('project')} search and filtering", projects_path, target: :_blank %> first to find the
+              name.
+              <br/>
+              Once found, check the box next to the <%= t('project').pluralize %> you wish to request to join.
             </div>
-            <div class="col">
-              <%= submit_tag 'Search', id: 'project-search-submit', :class => 'btn btn-primary' %>
+
+            <%= label_tag :search_label, "#{t('project')} search" -%>
+            <div class="row">
+              <div class="col-md-10">
+                <%= text_field_tag 'project-search-terms', '', :class => "form-control" -%>
+              </div>
+              <div class="col">
+                <%= submit_tag 'Search', id: 'project-search-submit', :class => 'btn btn-primary' %>
+              </div>
             </div>
-          </div>
 
 
-          <div id='project-search-results'>
-            <div class="alert alert-secondary text-center" role="alert">
-              <em>Search results</em>
+            <div id='project-search-results'>
+              <div class="alert alert-secondary text-center" role="alert">
+                <em>Search results</em>
+              </div>
             </div>
-          </div>
-
-        </div>
-      </div>
+          <% else %>
+            <div class="alert alert-warning">
+              Search is currently disabled, so you are unable to search for the <%=t('project') %> to join here.
+            </div>
+            <div class="help-block">
+              Instead you can <%= link_to("Browse #{t('project').pluralize}",projects_path) %>.
+              Once you find the one you wish to join, you can select the "Request Membership" button from its page.
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
     </div>
   </div>
 
   <div class="row">
     <div style="margin:auto;width:70%;">
 
-      <div class="panel panel-default" id='institution-selection'>
-        <div class="panel-heading"><%= t('institution') %></div>
-        <div class="panel-body">
-          <div class="form-group">
-            <%= render partial: 'institutions/select_or_define' %>
-          </div>
+      <%= panel(t('institution')) do %>
+        <div class="form-group">
+          <%= render partial: 'institutions/select_or_define' %>
         </div>
-      </div>
+      <% end %>
 
-      <div class="panel panel-default" id='comments'>
-        <div class="panel-heading">Comments</div>
-        <div class="panel-body">
-          <div class="help-block">
-            Provide any additional details that you think will be useful with your request.
-          </div>
-          <div class="form-group">
-            <%= text_area_tag :comments, '', rows: 3, :class => "form-control" %>
-          </div>
+      <%= panel('Comments') do %>
+        <div class="help-block">
+          Provide any additional details that you think will be useful with your request.
         </div>
-      </div>
+        <div class="form-group">
+          <%= text_area_tag :comments, '', rows: 3, :class => "form-control" %>
+        </div>
+      <% end %>
 
-      <%= submit_tag('Submit', class: 'btn btn-primary', id: 'submit-button', disabled:true) %>
+      <%= submit_tag('Submit', class: 'btn btn-primary', id: 'submit-button', disabled: true) %>
     </div>
   </div>
 <% end %>

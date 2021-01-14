@@ -55,6 +55,15 @@ class Model < ApplicationRecord
       joins: [:assays]
   )
 
+
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['title','version']
+  end
+  def columns_allowed
+    super + ['title','recommended_environment_id','last_used_at','version','other_creators','imported_source','imported_url','model_image_id','doi','license']
+  end
+
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     include Seek::Models::ModelExtraction
     acts_as_doi_mintable(proxy: :parent, general_type: 'Model')

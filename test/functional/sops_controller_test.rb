@@ -1585,6 +1585,67 @@ class SopsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'can edit version revision comments' do
+    sop = Factory(:sop)
+    login_as(sop.contributor)
+    disable_authorization_checks do
+      sop.save_as_new_version('something')
+    end
+
+    assert_not_equal 'modified', sop.find_version(2).revision_comments
+
+    post :edit_version, params: { id: sop.id, version: 2, revision_comments: 'modified' }
+    assert_redirected_to sop
+
+    assert_equal 'modified', sop.find_version(2).reload.revision_comments
+  end
+
+  test 'can edit version visibility' do
+    sop = Factory(:sop)
+    login_as(sop.contributor)
+    disable_authorization_checks do
+      sop.save_as_new_version('new v')
+    end
+
+    assert_not_equal :registered_users, sop.find_version(1).visibility
+
+    post :edit_version, params: { id: sop.id, version: 1, visibility: 'registered_users' }
+    assert_redirected_to sop
+
+    assert_equal :registered_users, sop.find_version(1).reload.visibility
+  end
+
+  test 'cannot edit version visibility if doi minted' do
+    sop = Factory(:sop)
+    login_as(sop.contributor)
+    disable_authorization_checks do
+      sop.save_as_new_version('yep')
+      sop.find_version(1).update_column(:doi, '10.5072/wtf')
+    end
+
+    assert_equal :public, sop.find_version(1).visibility
+
+    post :edit_version, params: { id: sop.id, version: 1, visibility: 'private' }
+    assert_redirected_to sop
+
+    assert_equal :public, sop.find_version(1).reload.visibility, 'Should not have changed visibility - DOI present'
+  end
+
+  test 'cannot edit version visibility if latest version' do
+    sop = Factory(:sop)
+    login_as(sop.contributor)
+    disable_authorization_checks do
+      sop.save_as_new_version('fhsdkjhfgjlk')
+    end
+
+    assert_equal :public, sop.find_version(2).visibility
+
+    post :edit_version, params: { id: sop.id, version: 2, visibility: 'private' }
+    assert_redirected_to sop
+
+    assert_equal :public, sop.find_version(2).reload.visibility, 'Should not have changed visibility - latest version'
+  end
+
   private
 
   def doi_citation_mock

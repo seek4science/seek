@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       RAILS_ENV: test
+      TERM: dumb-color
     services:
       postgres:
         image: postgres:11
@@ -40,6 +41,7 @@ jobs:
           - rake teaspoon
           - rake assets:precompile
           - rake db:setup
+          - rake db:migrate
         include:
           - database: postgres
             suite: rails test test/unit
@@ -47,13 +49,14 @@ jobs:
             suite: rails test test/unit
     steps:
       - name: Install system dependencies
-        run: sudo apt install libcurl4-gnutls-dev
+        run: sudo apt update && sudo apt install libcurl4-gnutls-dev
         # build-essential git imagemagick libgmp-dev \
         #    libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
         #    libxml++2.6-dev libxslt1-dev nodejs openjdk-8-jdk openssh-server poppler-utils zip
       - name: Checkout code
         uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
+      - name: Setup Java
+        uses: actions/setup-java@v1
         with:
           java-version: '8' # The JDK version to make available on the path.
       - name: Setup Ruby
@@ -83,6 +86,11 @@ jobs:
       - name: Set MySQL char set and collation
         if: matrix.database == 'mysql'
         run: echo -e "ALTER DATABASE seek_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\n" | bundle exec rails dbconsole -p
+      - name: Checkout previous schema
+        if: github.event_name == 'push' && matrix.suite == 'rake db:migrate' && github.event.before != '0000000000000000000000000000000000000000'
+        run: |
+          git fetch origin ${{ github.event.before }}
+          git checkout ${{ github.event.before }} -- db/schema.rb
       - name: Load test database schema
         run: bundle exec rake db:schema:load
       - name: Run tests

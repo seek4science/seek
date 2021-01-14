@@ -1,0 +1,26 @@
+
+  <div class="panel panel-default">
+    <div class="panel-heading"><%= t('programme') %></div>
+    <div class="panel-body">
+
+      <% if Seek::ProjectFormProgrammeOptions.programme_dropdown? %>
+
+        <%= render partial: 'projects/guided_create/programme_dropdown' %>
+
+      <% elsif Seek::ProjectFormProgrammeOptions.managed_checkbox? %>
+
+        <%= render partial: 'projects/guided_create/managed_programme_checkbox' %>
+
+      <% elsif Seek::ProjectFormProgrammeOptions.managed_only? %>
+        <%= hidden_field_tag :programme_id, Programme.site_managed_programme.id %>
+        <div class="help-block">
+          Your new <%= t('project') %> will be linked to the <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}" %>, <%= link_to Programme.site_managed_programme.title, Programme.site_managed_programme %>.
+        </div>
+      <% end %>
+
+      <% if Seek::ProjectFormProgrammeOptions.creation_allowed? %>
+          <%= render partial:'projects/guided_create/programme_details' %>
+      <% end %>
+
+      </div>
+    </div>

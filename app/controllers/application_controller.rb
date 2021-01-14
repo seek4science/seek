@@ -119,7 +119,7 @@ class ApplicationController < ActionController::Base
   def page_and_sort_params
     permitted = Seek::Filterer.new(controller_model).available_filter_keys.flat_map { |p| [p, { p => [] }] }
     permitted_filter_params = { filter: permitted }
-    params.permit(:page, :sort, :order, permitted_filter_params)
+    params.permit(:page, :sort, :order, :view, permitted_filter_params)
   end
 
   helper_method :page_and_sort_params
@@ -588,13 +588,6 @@ class ApplicationController < ActionController::Base
       if parent_class
         @parent_resource = parent_class.find(params[parent_id_param])
       end
-    end
-  end
-
-  def managed_programme_configured?
-    unless Programme.managed_programme
-      error("No managed #{t('programme')} is configured","No managed #{t('programme')} is configured")
-      return false
     end
   end
 

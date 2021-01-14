@@ -513,6 +513,39 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'alert for pending project creation' do
+    project = Project.new(title: 'my project')
+    person = Factory(:person)
+    admin = Factory(:admin)
+    institution = Factory(:institution)
+
+    MessageLog.destroy_all
+
+    login_as(admin)
+
+    get :index
+    assert_select 'div#pending-project-creation-warning',text:/There are pending/, count:0
+
+    log1=MessageLog.log_project_creation_request(person,Factory(:programme),project,institution)
+
+    get :index
+    assert_select 'div#pending-project-creation-warning',text:/There are pending/, count:1
+
+    login_as(Factory(:person))
+
+    get :index
+    assert_select 'div#pending-project-creation-warning',text:/There are pending/, count:0
+
+    login_as(admin)
+    get :index
+    assert_select 'div#pending-project-creation-warning',text:/There are pending/, count:1
+
+    log1.respond('fish')
+    get :index
+    assert_select 'div#pending-project-creation-warning',text:/There are pending/, count:0
+
+  end
+
   def uri_to_guardian_feedtest
     uri_to_feed 'guardian_atom.xml'
   end

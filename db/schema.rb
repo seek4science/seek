@@ -1455,15 +1455,6 @@ ActiveRecord::Schema.define(version: 2020_11_10_155721) do
     t.datetime "updated_at"
   end
 
-  create_table "repository_standards",  force: :cascade do |t|
-    t.string "title"
-    t.string "url"
-    t.string "group_tag"
-    t.string "repo_type"
-    t.text "description"
-    t.index ["title", "group_tag"], name: "index_repository_standards_title_group_tag"
-  end
-
   create_table "resource_publish_logs", id: :integer,  force: :cascade do |t|
     t.string "resource_type"
     t.integer "resource_id"
@@ -1523,8 +1514,6 @@ ActiveRecord::Schema.define(version: 2020_11_10_155721) do
     t.integer "sample_controlled_vocab_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "iri"
-    t.string "parent_iri"
   end
 
   create_table "sample_controlled_vocabs", id: :integer,  force: :cascade do |t|
@@ -1533,11 +1522,6 @@ ActiveRecord::Schema.define(version: 2020_11_10_155721) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "first_letter", limit: 1
-    t.string "source_ontology"
-    t.string "ols_root_term_uri"
-    t.boolean "required"
-    t.string "short_name"
-    t.integer "repository_standard_id"
   end
 
   create_table "sample_resource_links", id: :integer,  force: :cascade do |t|

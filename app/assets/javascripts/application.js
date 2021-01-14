@@ -58,3 +58,4 @@
 //= require i18n/translations
 //= require_tree ./templates
 //= require simplemde.min
+//= require admin

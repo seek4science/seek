@@ -24,6 +24,7 @@ class Assay < ApplicationRecord
   acts_as_snapshottable
 
   belongs_to :institution
+  belongs_to :sample_type 
 
 
   belongs_to :assay_class
@@ -77,6 +78,14 @@ class Assay < ApplicationRecord
 
   def state_allows_delete?(*args)
     assets.empty? && publications.empty? && super
+  end
+  
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['title','assay_type_uri']
+  end
+  def columns_allowed
+    super + ['title','assay_type_uri', 'tags']
   end
 
   # returns true if this is a modelling class of assay
