@@ -1,0 +1,11 @@
+--- 
+- title: COVID-19 Disease Map
+  url: https://covid.pages.uni.lu/
+  logo: /assets/front_page/who_uses-covid-project.png
+  description: It helps us to coordinate and communicate across a large-scale community effort - the development of the COVID-19 Disease Map. This way we are sure all community members are visible and credited for their contributions, and the content we develop can be shared in a stable and transparent way.
+  author: Marek Ostaszewski, Research Fellow, Université du Luxembourg 
+- title: test project
+  url: https://covid.pages.uni.lu/
+  logo: /assets/front_page/who_uses-covid-project.png
+  description: test description.
+  author: Test Author
