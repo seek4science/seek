@@ -184,6 +184,11 @@ class AdminControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'get auth consistency stats' do
+    get :get_stats, xhr: true, params: { page: 'auth_consistency' }
+    assert_response :success
+  end
+
   test 'The configuration should stay the same after test_email_configuration' do
     smtp_hash = ActionMailer::Base.smtp_settings
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
