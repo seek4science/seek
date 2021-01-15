@@ -83,7 +83,7 @@ module JsonTestHelper
   # check if this current controller type doesn't support read
   def check_for_501_read_return
     clz = @controller.controller_model.to_s
-    %w[Sample SampleType Strain].include?(clz)
+    %w[Strain].include?(clz)
   end
 
   # check if this current controller type doesn't support index

@@ -222,6 +222,19 @@ module AssetsHelper
     end
   end
 
+  def open_with_copasi_button (asset)
+
+    files =   asset.content_blobs
+    download_path = polymorphic_path([files.first.asset, files.first], action: :download, code: params[:code])
+    copasi_download_path =  "copasi://process?downloadUrl=http://"+request.host_with_port+download_path+"&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
+
+    tooltip_text_copasi_button = "Simulate the publicly accessible model in your local installed Copasi. "
+
+    button= button_link_to('Simulate Model in Copasi', 'copasi', copasi_download_path, class: 'btn btn-default', disabled: asset.download_disabled?, 'data-tooltip' => tooltip(tooltip_text_copasi_button))
+
+    button
+  end
+
   def view_content_button(asset)
     render partial: 'assets/view_content', locals: { content_blob: asset.single_content_blob, button_style: true }
   end

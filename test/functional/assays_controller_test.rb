@@ -301,6 +301,56 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal 'fish', assay.assay_type_label
   end
 
+  test 'create a assay with custom metadata' do
+    cmt = Factory(:simple_assay_custom_metadata_type)
+    login_as(Factory(:person))
+    assert_difference('Assay.count') do
+
+      assay_attributes = { title: 'test',
+                           study_id: Factory(:study,contributor:User.current_user.person).id,
+                           assay_class_id: assay_classes(:modelling_assay_class).id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+                                                   data:{'name':'fred','age':22}}}
+       post :create, params: { assay: assay_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert assay=assigns(:assay)
+    assert cm = assay.custom_metadata
+    assert_equal cmt, cm.custom_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal '22',cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+  end
+
+  test 'create a assay with custom metadata validated' do
+    cmt = Factory(:simple_assay_custom_metadata_type)
+    login_as(Factory(:person))
+
+    assert_no_difference('Assay.count') do
+      assay_attributes = { title: 'test',
+                           study_id: Factory(:study,contributor:User.current_user.person).id,
+                           assay_class_id: assay_classes(:modelling_assay_class).id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
+
+
+      post :create, params: { assay: assay_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+    assert assay=assigns(:assay)
+    refute assay.valid?
+
+    assert_no_difference('Assay.count') do
+      assay_attributes = { title: 'test',
+                           study_id: Factory(:study,contributor:User.current_user.person).id,
+                           assay_class_id: assay_classes(:modelling_assay_class).id }
+      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
+
+      post :create, params: { assay: assay_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+    assert assay=assigns(:assay)
+    refute assay.valid?
+  end
+
   test 'should update assay with suggested assay and tech type' do
     assay = Factory(:experimental_assay, contributor: User.current_user.person)
     assay_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'fish')
@@ -1771,4 +1821,61 @@ class AssaysControllerTest < ActionController::TestCase
 
   end
 
-end
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    assay_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'fish')
+    tech_type = Factory(:suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', label: 'carrot')
+    assert_difference('AssetLink.discussion.count') do
+    assert_difference('Assay.count') do
+      post :create, params: { assay: { title: 'test',
+                                       technology_type_uri: tech_type.uri,
+                                       assay_type_uri: assay_type.uri,
+                                       study_id: Factory(:study,contributor:User.current_user.person).id,
+                                       assay_class_id: Factory(:experimental_assay_class).id,
+                                       discussion_links_attributes: [{url: "http://www.slack.com/"}]},
+                              policy_attributes: valid_sharing }
+    end
+    end
+    assay = assigns(:assay)
+    assert_equal 'http://www.slack.com/', assay.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, assay.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    disc_link = Factory(:discussion_link)
+    assay = Factory(:assay, contributor: User.current_user.person)
+    assay.discussion_links = [disc_link]
+    get :show, params: { id: assay }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update node with discussion link' do
+    person = Factory(:person)
+    assay = Factory(:assay, contributor: person)
+    login_as(person)
+    assert_nil assay.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: assay.id, assay: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
+      end
+    end
+    assert_redirected_to assay_path(assigns(:assay))
+    assert_equal 'http://www.slack.com/', assay.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    assay = Factory(:assay, contributor: person)
+    assay.discussion_links = [asset_link]
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: assay.id, assay: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+    end
+    assert_redirected_to assay_path(assay = assigns(:assay))
+    assert_empty assay.discussion_links
+  end
+
+  end

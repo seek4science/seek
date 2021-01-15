@@ -11,7 +11,6 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     @endpoint.assay_types = ['TZ_FAIR_ASSAY', 'EXPERIMENTAL_STEP'] #needed for automatic picking up of assays
     assert @endpoint.save
     @job = OpenbisSyncJob.new(@endpoint, @batch_size)
-    Delayed::Job.destroy_all # avoids jobs created from the after_create callback, this is tested for OpenbisEndpoint
     @person = Factory(:person, project: @endpoint.project)
     User.current_user = nil # @person.user
   end
@@ -216,10 +215,10 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     assert_equal [asset], needs
   end
 
-  test 'follow_on_delay gives 1 second if marked refresh left or endpoint default otherwise' do
+  test 'follow_on_job? is true if marked refresh left or endpoint default otherwise' do
     assert @endpoint.save
 
-    assert_equal @endpoint.refresh_period_mins.minutes, @job.follow_on_delay
+    refute @job.follow_on_job?
 
     asset = ExternalAsset.new
     asset.seek_service = @endpoint
@@ -231,60 +230,60 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
       assert asset.save
     end
 
-    assert_equal 1.seconds, @job.follow_on_delay
-  end
-
-  test 'follow_on_job? checks for unsynchronized and global config' do
-    assert @endpoint.save
-
-    assert_equal @endpoint.refresh_period_mins.minutes, @job.follow_on_delay
-
-    asset = ExternalAsset.new
-    asset.seek_service = @endpoint
-    asset.external_service = @endpoint.web_endpoint
-    asset.external_id = 1
-    asset.sync_state = :refresh
-    asset.synchronized_at = DateTime.now - (@endpoint.refresh_period_mins + 5).minutes
-    travel -(@endpoint.refresh_period_mins + 5).minutes do
-      assert asset.save
-    end
-
-    assert Seek::Config.openbis_enabled
-    assert Seek::Config.openbis_autosync
-
     assert @job.follow_on_job?
-
-    Seek::Config.openbis_autosync = false
-    refute @job.follow_on_job?
-
-    Seek::Config.openbis_autosync = true
-    Seek::Config.openbis_enabled = false
-    refute @job.follow_on_job?
   end
 
-  test 'create initial jobs creates jobs for each endpoint' do
+  test 'queue_timed_jobs creates jobs for each endpoint needing sync' do
     endpoint2 = Factory(:openbis_endpoint, refresh_period_mins: 60, space_perm_id: 'API-SPACE2')
+    no_sync_needed = Factory(:openbis_endpoint, refresh_period_mins: 60, last_sync: 2.seconds.ago)
 
     assert endpoint2.save
-    assert_equal 2, OpenbisEndpoint.count
+    assert @endpoint.due_sync?
+    assert endpoint2.due_sync?
+    refute no_sync_needed.due_sync?
+    assert_equal 3, OpenbisEndpoint.count
+    assert_equal 2, OpenbisEndpoint.all.select(&:due_sync?).count
 
-    Delayed::Job.destroy_all
-    assert_difference('Delayed::Job.count', 2) do
-      OpenbisSyncJob.create_initial_jobs
-    end
-
-    assert OpenbisSyncJob.new(@endpoint).exists?
-    assert OpenbisSyncJob.new(endpoint2).exists?
-
-    Seek::Config.openbis_autosync = false
-    Delayed::Job.destroy_all
-    assert_no_difference('Delayed::Job.count') do
-      OpenbisSyncJob.create_initial_jobs
+    assert_enqueued_jobs(2, only: OpenbisSyncJob) do
+      assert_enqueued_with(job: OpenbisSyncJob, args: [@endpoint, OpenbisSyncJob::BATCH_SIZE]) do
+        assert_enqueued_with(job: OpenbisSyncJob, args: [endpoint2, OpenbisSyncJob::BATCH_SIZE]) do
+          OpenbisSyncJob.queue_timed_jobs
+        end
+      end
     end
   end
 
+  test 'sync job updates `last_sync` timestamp' do
+    assert_nil @endpoint.last_sync
 
-  test 'perfom_job does nothing on synchronized assets' do
+    OpenbisSyncJob.perform_now(@endpoint)
+
+    refute_nil @endpoint.last_sync
+  end
+
+  test 'queue_timed_jobs does nothing if autosync disabled' do
+    with_config_value(:openbis_autosync, false) do
+      endpoint = Factory(:openbis_endpoint, refresh_period_mins: 60)
+      assert endpoint.due_sync?
+
+      assert_no_enqueued_jobs(only: OpenbisSyncJob) do
+        OpenbisSyncJob.queue_timed_jobs
+      end
+    end
+  end
+
+  test 'queue_timed_jobs does nothing if openbis disabled' do
+    with_config_value(:openbis_enabled, false) do
+      endpoint = Factory(:openbis_endpoint, refresh_period_mins: 60)
+      assert endpoint.due_sync?
+
+      assert_no_enqueued_jobs(only: OpenbisSyncJob) do
+        OpenbisSyncJob.queue_timed_jobs
+      end
+    end
+  end
+
+  test 'perform_job does nothing on synchronized assets' do
     assay = Factory :assay, contributor: @person
     assert assay.data_files.empty?
 
@@ -308,7 +307,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     assert assay.data_files.empty?
   end
 
-  test 'perfom_job refresh content and dependencies on non-synchronized assay like asset' do
+  test 'perform_job refresh content and dependencies on non-synchronized assay like asset' do
     assay = Factory :assay, contributor: @person
     assert_empty assay.data_files
 
@@ -336,7 +335,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     assert_equal zample.dataset_ids.length, assay.data_files.length
   end
 
-  test 'perfom_job refresh content and dependencies on non-synchronized study like asset' do
+  test 'perform_job refresh content and dependencies on non-synchronized study like asset' do
     study = Factory :study, contributor: @person
     assert_empty study.assays
     assert_empty study.related_data_files
@@ -373,7 +372,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
   end
 
 
-  test 'perfom_job always update mod stamp even if no content change' do
+  test 'perform_job always update mod stamp even if no content change' do
     assay = Factory :assay
 
     # normal sample
@@ -409,7 +408,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     end
   end
 
-  test 'perfom_job always update mod stamp even if errors' do
+  test 'perform_job always update mod stamp even if errors' do
     assay = Factory :assay, contributor: @person
 
     # normal sample
@@ -457,7 +456,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     end
   end
 
-  test 'perfom_job sets fatal if failures larger than threshold' do
+  test 'perform_job sets fatal if failures larger than threshold' do
     assay = Factory :assay, contributor: @person
 
     # normal sample

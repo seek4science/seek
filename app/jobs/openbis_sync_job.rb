@@ -1,15 +1,21 @@
 # job to periodically take OBIS assets that are due to synchronization
 # and refresh their content with the current state in OBIS
 # It can also follow the dependent Objects/DataSets and register them if so configured
-class OpenbisSyncJob < SeekJob
-  attr_accessor :openbis_endpoint_id
+class OpenbisSyncJob < BatchJob
+  queue_with_priority 3
 
   # debug is with puts so it can be easily seen on tests screens
   DEBUG = Seek::Config.openbis_debug ? true : false
+  BATCH_SIZE = 20
 
-  def initialize(openbis_endpoint, batch_size = 20)
-    @openbis_endpoint_id = openbis_endpoint.id
-    @batch_size = batch_size || 20
+  def initialize(openbis_endpoint, batch_size = BATCH_SIZE)
+    super(openbis_endpoint, batch_size)
+  end
+
+  def perform(*args)
+    return unless Seek::Config.openbis_enabled
+    return unless endpoint&.persisted?
+    super.tap { endpoint.touch(:last_sync) }
   end
 
   def perform_job(obis_asset)
@@ -68,42 +74,6 @@ class OpenbisSyncJob < SeekJob
     need_sync.to_a
   end
 
-  def allow_duplicate_jobs?
-    false
-  end
-
-  def default_priority
-    3
-  end
-
-  def follow_on_delay
-    needed = need_sync.count
-    Rails.logger.info "OBis syn will follow with #{needed} items" if DEBUG
-    return 1.seconds if need_sync.count.positive?
-
-    if endpoint
-      endpoint.refresh_period_mins.minutes
-    else
-      120.minutes
-    end
-  end
-
-  def follow_on_job?
-    Rails.logger.info "Follow? count #{count} #{count(true)}" if DEBUG
-    return false unless Seek::Config.openbis_enabled && Seek::Config.openbis_autosync
-    (count(true) < 1) && endpoint # don't follow on if the endpoint no longer exists
-  end
-
-  # overidden to ignore_locked false by default
-  def exists?(ignore_locked = false)
-    super(ignore_locked)
-  end
-
-  # overidden to ignore_locked false by default
-  def count(ignore_locked = false)
-    super(ignore_locked)
-  end
-
   def need_sync
     # bussines rule
     # - status refresh or failed
@@ -120,7 +90,7 @@ class OpenbisSyncJob < SeekJob
         .where('synchronized_at < ? AND (sync_state = ? OR (updated_at < ? AND sync_state =?))',
                old, ExternalAsset.sync_states[:refresh], too_fresh, ExternalAsset.sync_states[:failed])
         .order(:sync_state, :updated_at)
-        .limit(@batch_size)
+        .limit(batch_size)
   end
 
   def failure_threshold
@@ -128,10 +98,12 @@ class OpenbisSyncJob < SeekJob
     t < 3 ? 3 : t
   end
 
-  def self.create_initial_jobs
+  # jobs created if due, triggered by the scheduler.rb
+  def self.queue_timed_jobs
     return unless Seek::Config.openbis_enabled && Seek::Config.openbis_autosync
-    OpenbisEndpoint.all.each(&:create_sync_metadata_job)
-    # OpenbisEndpoint.all.each { |point| OpenbisSyncJob.new(point).queue_job }
+    OpenbisEndpoint.find_each do |endpoint|
+      endpoint.create_sync_metadata_job if endpoint.due_sync?
+    end
   end
 
   def seek_util
@@ -140,11 +112,17 @@ class OpenbisSyncJob < SeekJob
     Seek::Openbis::SeekUtil.new
   end
 
+  def follow_on_job?
+    endpoint&.persisted? && need_sync.any?
+  end
+
   private
 
+  def batch_size
+    arguments[1]
+  end
+
   def endpoint
-    # looks like local variables are wrote to yaml and becomes job parameter
-    # @endpoint ||= OpenbisEndpoint.find_by_id(openbis_endpoint_id)
-    OpenbisEndpoint.find_by_id(openbis_endpoint_id)
+    arguments[0]
   end
 end

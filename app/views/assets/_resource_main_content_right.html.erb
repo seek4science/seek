@@ -10,7 +10,7 @@
                                                                title: authors_title } -%>
 <% end -%>
 
-<% if resource.respond_to?(:discussion_links) -%>
+<% if resource.is_discussable? -%>
   <% if resource.discussion_links.select{|link| link.url.present?}.any?  %>
     <%= render partial: 'assets/discussion_links_box', locals: {resource: resource } -%>
   <% end -%>

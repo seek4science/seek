@@ -41,6 +41,7 @@ Factory.define(:max_document, class: Document) do |f|
   f.with_project_contributor
   f.title 'A Maximal Document'
   f.description 'The important report we did for ~important-milestone~'
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.policy { Factory(:downloadable_public_policy) }
   f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}

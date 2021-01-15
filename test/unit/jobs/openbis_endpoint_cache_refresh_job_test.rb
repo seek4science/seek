@@ -2,56 +2,14 @@ require 'test_helper'
 require 'openbis_test_helper'
 
 class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
-  def setup
-    @endpoint = Factory(:openbis_endpoint, refresh_period_mins: 88)
-    @job = OpenbisEndpointCacheRefreshJob.new(@endpoint)
-    Delayed::Job.destroy_all # avoids jobs created from the after_create callback, this is tested for OpenbisEndpoint
-  end
-
-  test 'exists' do
-    refute @job.exists?
-    @job.queue_job
-    assert @job.exists?
-  end
-
-  test 'queue' do
-    assert_difference('Delayed::Job.count', 1) do
-      @job.queue_job
-    end
-
-    assert_no_difference('Delayed::Job.count') do
-      @job.queue_job
-    end
-  end
-
-  test 'follow on delay' do
-    assert_equal 88.minutes, @job.follow_on_delay
-    disable_authorization_checks { @endpoint.update_attributes(refresh_period_mins: 299) }
-    assert_equal 299.minutes, @job.follow_on_delay
-  end
-
-  test 'delete jobs' do
-    @job.queue_job
-    assert_difference('Delayed::Job.count', -1) do
-      @job.delete_jobs
-    end
-    refute @job.exists?
-  end
-
-  test 'defaults' do
-    assert_equal 3, @job.default_priority
-    refute @job.allow_duplicate_jobs?
-    assert @job.follow_on_job?
-  end
-
   test 'perform_job calls refresh on endpoint' do
     endpoint = MockEndpoint.new
-    @job = OpenbisEndpointCacheRefreshJob.new(endpoint)
-    @job.perform_job(endpoint)
+    OpenbisEndpointCacheRefreshJob.perform_now(endpoint)
     assert_equal 1, endpoint.refreshed
   end
 
-  test 'create_initial_jobs creates jobs for each endpoint' do
+  test 'queue_timed_jobs creates jobs for each endpoint needing a cache refresh' do
+    OpenbisEndpoint.delete_all
     endpoint1 = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: 'frog',
                                     web_endpoint: 'http://my-openbis.org/doesnotmatter',
                                     as_endpoint: 'http://my-openbis.org/doesnotmatter',
@@ -66,24 +24,44 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
                                     space_perm_id: 'space2',
                                     refresh_period_mins: 60
 
+    not_needing_refresh = Factory(:openbis_endpoint, refresh_period_mins: 60, last_cache_refresh: Time.now)
+    # Reload before getting timestamp to avoid comparison error later: No visible difference in the ActiveSupport::TimeWithZone#inspect output
+    not_needing_refresh_timestamp = not_needing_refresh.reload.last_cache_refresh
+
     disable_authorization_checks do
       assert endpoint1.save
       assert endpoint2.save
     end
 
-    diff = OpenbisEndpoint.count
-
-    Delayed::Job.destroy_all
-    assert_difference('Delayed::Job.count', diff) do
-      OpenbisEndpointCacheRefreshJob.create_initial_jobs
+    assert_nil endpoint1.last_cache_refresh
+    assert_nil endpoint2.last_cache_refresh
+    assert_enqueued_jobs(2, only: OpenbisEndpointCacheRefreshJob) do
+      OpenbisEndpointCacheRefreshJob.queue_timed_jobs
     end
-    assert OpenbisEndpointCacheRefreshJob.new(endpoint1).exists?
-    assert OpenbisEndpointCacheRefreshJob.new(endpoint2).exists?
 
-    Seek::Config.openbis_enabled = false
-    Delayed::Job.destroy_all
-    assert_no_difference('Delayed::Job.count') do
-      OpenbisEndpointCacheRefreshJob.create_initial_jobs
+    OpenbisEndpointCacheRefreshJob.perform_now(endpoint1)
+    OpenbisEndpointCacheRefreshJob.perform_now(endpoint2)
+
+    refute_nil endpoint1.reload.last_cache_refresh
+    refute_nil endpoint2.reload.last_cache_refresh
+    assert_equal not_needing_refresh_timestamp, not_needing_refresh.reload.last_cache_refresh
+
+    endpoint3 = Factory(:openbis_endpoint, refresh_period_mins: 60)
+
+    assert_enqueued_jobs(1, only: OpenbisEndpointCacheRefreshJob) do
+      assert_enqueued_with(job: OpenbisEndpointCacheRefreshJob, args: [endpoint3]) do
+        OpenbisEndpointCacheRefreshJob.queue_timed_jobs
+      end
+    end
+  end
+
+  test 'queue_timed_jobs does nothing if openbis disabled' do
+    with_config_value(:openbis_enabled, false) do
+      Factory(:openbis_endpoint, refresh_period_mins: 60)
+
+      assert_no_enqueued_jobs(only: OpenbisEndpointCacheRefreshJob) do
+        OpenbisEndpointCacheRefreshJob.queue_timed_jobs
+      end
     end
   end
 
@@ -97,6 +75,10 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
 
     def refresh_metadata
       @refreshed += 1
+    end
+
+    def persisted?
+      true
     end
   end
 end

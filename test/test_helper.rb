@@ -91,6 +91,9 @@ Kernel.class_eval do
 end
 
 class ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+  include ActionMailer::TestHelper
+
   setup :clear_rails_cache, :create_initial_person
   teardown :clear_current_user
 
@@ -230,23 +233,6 @@ class ActiveSupport::TestCase
     path
   end
 
-  def assert_no_emails
-    assert_no_difference 'ActionMailer::Base.deliveries.size' do
-      yield
-    end
-  end
-
-  def assert_enqueued_emails(n)
-    assert_difference(-> { ActiveJob::Base.queue_adapter.enqueued_jobs.select { |j| j.fetch(:job) == ActionMailer::DeliveryJob }.count }, n) do
-      yield
-    end
-  end
-
-  def assert_no_enqueued_emails
-    assert_no_difference(-> { ActiveJob::Base.queue_adapter.enqueued_jobs.select { |j| j.fetch(:job) == ActionMailer::DeliveryJob }.count }) do
-      yield
-    end
-  end
   # debugging
 
   # saves the @response.body to a temp file, and prints out the file path

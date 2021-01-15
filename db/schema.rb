@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_30_132019) do
+ActiveRecord::Schema.define(version: 2020_12_21_153232) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -165,7 +165,7 @@ ActiveRecord::Schema.define(version: 2020_11_30_132019) do
   end
 
   create_table "assays", id: :integer,  force: :cascade do |t|
-    t.string "title"
+    t.text "title"
     t.text "description"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -182,6 +182,8 @@ ActiveRecord::Schema.define(version: 2020_11_30_132019) do
     t.integer "suggested_technology_type_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "sample_type_id"
+    t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
   create_table "asset_doi_logs", id: :integer,  force: :cascade do |t|
@@ -232,6 +234,7 @@ ActiveRecord::Schema.define(version: 2020_11_30_132019) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "priority", default: 0
+    t.index ["item_id", "item_type"], name: "index_auth_lookup_update_queues_on_item_id_and_item_type"
   end
 
   create_table "avatars", id: :integer,  force: :cascade do |t|
@@ -692,6 +695,7 @@ ActiveRecord::Schema.define(version: 2020_11_30_132019) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "time_left_at"
+    t.boolean "has_left", default: false
     t.index ["person_id"], name: "index_group_memberships_on_person_id"
     t.index ["work_group_id", "person_id"], name: "index_group_memberships_on_work_group_id_and_person_id"
     t.index ["work_group_id"], name: "index_group_memberships_on_work_group_id"
@@ -1133,6 +1137,8 @@ ActiveRecord::Schema.define(version: 2020_11_30_132019) do
     t.string "encrypted_password"
     t.string "encrypted_password_iv"
     t.text "meta_config_json"
+    t.datetime "last_sync"
+    t.datetime "last_cache_refresh"
   end
 
   create_table "organisms", id: :integer,  force: :cascade do |t|
@@ -1267,6 +1273,7 @@ ActiveRecord::Schema.define(version: 2020_11_30_132019) do
     t.text "funding_details"
     t.boolean "is_activated", default: false
     t.text "activation_rejection_reason"
+    t.boolean "open_for_projects", default: false
   end
 
   create_table "project_descendants", id: false,  force: :cascade do |t|
@@ -1429,6 +1436,16 @@ ActiveRecord::Schema.define(version: 2020_11_30_132019) do
     t.index ["contributor_id"], name: "index_publications_on_contributor"
   end
 
+  create_table "rdf_generation_queues",  force: :cascade do |t|
+    t.integer "item_id"
+    t.string "item_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "priority", default: 0
+    t.boolean "refresh_dependents"
+    t.index ["item_id", "item_type"], name: "index_rdf_generation_queues_on_item_id_and_item_type"
+  end
+
   create_table "recommended_model_environments", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.datetime "created_at"
@@ -1440,6 +1457,8 @@ ActiveRecord::Schema.define(version: 2020_11_30_132019) do
     t.integer "item_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer "priority", default: 0
+    t.index ["item_id", "item_type"], name: "index_reindexing_queues_on_item_id_and_item_type"
   end
 
   create_table "relationship_types", id: :integer,  force: :cascade do |t|
@@ -1770,7 +1789,7 @@ ActiveRecord::Schema.define(version: 2020_11_30_132019) do
   end
 
   create_table "studies", id: :integer,  force: :cascade do |t|
-    t.string "title"
+    t.text "title"
     t.text "description"
     t.integer "investigation_id"
     t.text "experimentalists"
@@ -1849,6 +1868,17 @@ ActiveRecord::Schema.define(version: 2020_11_30_132019) do
 
   create_table "tags", id: :integer,  force: :cascade do |t|
     t.string "name"
+  end
+
+  create_table "tasks",  force: :cascade do |t|
+    t.string "resource_type"
+    t.bigint "resource_id"
+    t.string "key"
+    t.string "status"
+    t.integer "attempts", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["resource_type", "resource_id"], name: "index_tasks_on_resource_type_and_resource_id"
   end
 
   create_table "text_values", id: :integer,  force: :cascade do |t|

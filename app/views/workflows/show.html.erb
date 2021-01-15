@@ -5,7 +5,7 @@
 <%= render partial: 'assets/upload_new_version_form', locals: { resource: @workflow } -%>
 
 <div class="row">
-  <% if @display_workflow&.content_blob&.caching_job&.exists? %>
+  <% if @display_workflow&.content_blob&.remote_content_fetch_task&.pending? %>
     <div class="col-sm-12">
       <%= alert_box('info', hide_button: true) do %>
         The content of this workflow has not yet been downloaded. Please check back later.

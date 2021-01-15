@@ -232,6 +232,20 @@ class MessageLogTest < ActiveSupport::TestCase
 
   end
 
+  test 'sent by self' do
+    person = Factory(:person)
+    log = MessageLog.log_project_creation_request(person,Factory(:programme),Factory(:project),Factory(:institution))
+    User.with_current_user(person.user) do
+      assert log.sent_by_self?
+    end
+    User.with_current_user(Factory(:user)) do
+      refute log.sent_by_self?
+    end
+    User.with_current_user(nil) do
+      refute log.sent_by_self?
+    end
+  end
+
 
   private
 

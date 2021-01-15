@@ -6,11 +6,13 @@
     <div class="panel panel-default">
       <div class="panel-body">
 
-        <div>
-          The user <%= link_to(@message_log.sender.title, @message_log.sender) %> has requested to create a <%= t('project') %>
-        </div>
+        <% unless @message_log.sent_by_self? %>
+          <div>
+            The user <%= link_to(@message_log.sender.title, @message_log.sender) %> has requested to create a <%= t('project') %>
+          </div>
+        <% end %>
 
-        <% if Seek::Config.programmes_enabled %>
+        <% if Seek::Config.programmes_enabled && @programme %>
           <div class="panel panel-default">
             <div class="panel-heading">
               <%= t('programme') %>
@@ -85,23 +87,35 @@
           </div>
         </div>
 
-        <div>
-          <label>
+        <% if @message_log.sent_by_self? %>
+          <span style="display:none">
             <%= check_box_tag 'accept_request','1',true %>
-            Accept this request
-          </label>
-        </div>
+          </span>
+          <%= submit_tag('Create', class: 'btn btn-success',id:'submit-button') %>
+          <%= submit_tag('Cancel', class: 'btn btn-default',id:'cancel-button') %>
 
-        <div id='reject-details-block' style="display:none;">
-
-          <%= label_tag "Reasons for rejection" %>
-          <div class="help-block">
-            Provide details why it was rejected. Note that this will be forwarded onto to the requester.
+        <% else %>
+          <div>
+            <label>
+              <%= check_box_tag 'accept_request','1',true %>
+              Accept this request
+            </label>
           </div>
-          <%= text_area_tag 'reject_details','',class:'form-control' %>
-        </div>
 
-        <%= submit_tag('Accept', class: 'btn btn-success',id:'submit-button') %>
+          <div id='reject-details-block' style="display:none;">
+
+            <%= label_tag "Reasons for rejection" %>
+            <div class="help-block">
+              Provide details why it was rejected. Note that this will be forwarded onto to the requester.
+            </div>
+            <%= text_area_tag 'reject_details','',class:'form-control' %>
+          </div>
+
+          <%= submit_tag('Accept', class: 'btn btn-success',id:'submit-button') %>
+
+        <% end %>
+
+
       </div>
     </div>
 
@@ -132,12 +146,18 @@
     }
 
     $j(document).ready(function () {
-        $j('input#accept_request').on('change',function() {
-            submitButtonStatus();
-            rejectDetailsStatus();
-        })
-        submitButtonStatus();
-        rejectDetailsStatus();
+        <% if @message_log.sent_by_self? %>
+          $j('#cancel-button').on('click',function() {
+              $j('input#accept_request').prop( "checked", false );
+          });
+        <% else %>
+          $j('input#accept_request').on('change',function() {
+              submitButtonStatus();
+              rejectDetailsStatus();
+          });
+          submitButtonStatus();
+          rejectDetailsStatus();
+        <% end %>
     });
 
 </script>

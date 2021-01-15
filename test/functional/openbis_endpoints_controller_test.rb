@@ -54,9 +54,8 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
                           permissions_attributes: project_permissions([@project], Policy::ACCESSIBLE) }
 
     assert_difference('OpenbisEndpoint.count') do
-      assert_difference('Delayed::Job.count', 2) do
-        post :create, params: { project_id: @project.id, openbis_endpoint:
-            {
+      post :create, params: { project_id: @project.id, openbis_endpoint:
+          {
               as_endpoint: 'http://as.com',
               dss_endpoint: 'http://dss.com',
               web_endpoint: 'http://web.com',
@@ -66,11 +65,13 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
               space_perm_id: 'space-id',
               study_types: 'ST1, ST2',
               assay_types: 'ASSAY, DEFAULT'
-            }, policy_attributes: policy_attributes }
-      end
+          }, policy_attributes: policy_attributes }
     end
+
     assert assigns(:openbis_endpoint)
     ep = assigns(:openbis_endpoint)
+    assert ep.due_cache_refresh?
+    assert ep.due_sync?
     assert_equal 'http://as.com', ep.as_endpoint
     assert_equal 'http://dss.com', ep.dss_endpoint
     assert_equal 'http://web.com', ep.web_endpoint

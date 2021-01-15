@@ -86,6 +86,9 @@
                            'JWS Online Root URL', "This is the root URL for the JWS Online server SEEK communicates with, e.g. #{Seek::Config.default_jws_online_root} .") %>
   </div>
 
+  <%= admin_checkbox_setting(:copasi_enabled, 1, Seek::Config.copasi_enabled,
+                             "Copasi enabled", "Whether support for running a publicly available model in Copasi is enabled.") %>
+
   <%= admin_checkbox_setting(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,
                              "Google analytics enabled", "Allows you to keep track of site traffic using Google Analytics. You need to register with Google Analytics and get a tracker ID.",
                              :onchange=>toggle_appear_javascript('google_anaylitics_block')) %>

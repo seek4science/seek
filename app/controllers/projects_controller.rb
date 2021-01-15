@@ -11,8 +11,6 @@ class ProjectsController < ApplicationController
                                         :administer_create_project_request, :respond_create_project_request,
                                         :project_join_requests]
 
-  before_action :managed_programme_configured?, only: [:guided_create], if: Proc.new{Seek::Config.programmes_enabled}
-
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
                                                admin_member_roles update_members storage_report
                                                overview administer_join_request respond_join_request]
@@ -150,29 +148,45 @@ class ProjectsController < ApplicationController
       @institution = Institution.new(inst_params)
     end
 
-    if params[:managed_programme]
-      @programme = Programme.managed_programme
-      raise "no #{t('programme')} can be found" if @programme.nil?
-      log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
-      Mailer.request_create_project_for_programme(current_user, @programme,@project.to_json, @institution.to_json, log).deliver_later
+    # A Programme has been selected, or it is a Site Managed Programme
+    if params[:programme_id]
 
-      flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
-    elsif Seek::Config.programmes_enabled
+      @programme = Programme.find(params[:programme_id])
+      raise "no #{t('programme')} can be found" if @programme.nil?
+      if @programme.can_manage?
+        log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+      elsif @programme.site_managed?
+        log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+        Mailer.request_create_project_for_programme(current_user, @programme,@project.to_json, @institution.to_json, log).deliver_later
+        flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
+      else
+        raise 'Invalid Programme'
+      end
+    # A new project has been requested
+    elsif Seek::ProjectFormProgrammeOptions.creation_allowed?
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
-      Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, log).deliver_later
+      unless User.admin_logged_in?
+        Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, log).deliver_later
+      end
       flash.now[:notice]="Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
-    else
+    # No Programme at all
+    elsif !Seek::ProjectFormProgrammeOptions.show_programme_box?
       @programme=nil
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
-      Mailer.request_create_project(current_user, @project.to_json, @institution.to_json, log).deliver_later
+      unless User.admin_logged_in?
+        Mailer.request_create_project(current_user, @project.to_json, @institution.to_json, log).deliver_later
+      end
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
     end
 
-
-    respond_to do |format|
-      format.html
+    if (@programme && @programme.can_manage?) || User.admin_logged_in?
+      redirect_to administer_create_project_request_projects_path(message_log_id:log.id)
+    else
+      respond_to do |format|
+        format.html
+      end
     end
   end
 
@@ -508,9 +522,14 @@ class ProjectsController < ApplicationController
           requester.save!
         end
 
-        @message_log.respond('Accepted')
-        flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
-        Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+        if @message_log.sent_by_self?
+          @message_log.destroy
+          flash[:notice]="#{t('project')} created"
+        else
+          @message_log.respond('Accepted')
+          flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
+          Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+        end
 
         redirect_to(@project)
       else
@@ -519,11 +538,16 @@ class ProjectsController < ApplicationController
       end
 
     else
-      comments = params['reject_details']
-      @message_log.respond(comments)
-      project_name = JSON.parse(@message_log.details)['project']['title']
-      Mailer.create_project_rejected(requester,project_name,comments).deliver_later
-      flash[:notice]="Request rejected and #{requester.name} has been notified"
+      if @message_log.sent_by_self?
+        @message_log.destroy
+        flash[:notice]="#{t('project')} creation cancelled"
+      else
+        comments = params['reject_details']
+        @message_log.respond(comments)
+        project_name = JSON.parse(@message_log.details)['project']['title']
+        Mailer.create_project_rejected(requester,project_name,comments).deliver_later
+        flash[:notice]="Request rejected and #{requester.name} has been notified"
+      end
 
       redirect_to :root
     end
@@ -548,7 +572,8 @@ class ProjectsController < ApplicationController
 
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, { organism_ids: [] }, :parent_id, :start_date,
-                        :end_date, :funding_codes, { human_disease_ids: [] }]
+                        :end_date, :funding_codes, { human_disease_ids: [] },
+                        discussion_links_attributes:[:id, :url, :label, :_destroy] ]
 
     if User.admin_logged_in?
       permitted_params += [:site_root_uri, :site_username, :site_password, :nels_enabled]
@@ -560,8 +585,11 @@ class ProjectsController < ApplicationController
                            { asset_gatekeeper_ids: [] }, { asset_housekeeper_ids: [] }, { pal_ids: [] }]
     end
 
-    if params[:project][:programme_id].present? && Programme.find_by_id(params[:project][:programme_id])&.can_manage?
-      permitted_params += [:programme_id]
+    if params[:project][:programme_id].present?
+      prog = Programme.find_by_id(params[:project][:programme_id])
+      if prog&.can_manage? || prog&.allows_user_projects?
+        permitted_params += [:programme_id]
+      end
     end
 
     params.require(:project).permit(permitted_params)
@@ -679,6 +707,7 @@ class ProjectsController < ApplicationController
   # check programme permissions for responding to a MesasgeLog
   def check_message_log_programme_permissions
     error_msg = nil
+    return unless @programme || params['programme']
 
     unless @programme
       if params['programme']['id']

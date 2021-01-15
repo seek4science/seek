@@ -3,6 +3,7 @@ class SamplesController < ApplicationController
   include Seek::PreviewHandling
   include Seek::AssetsCommon
   include Seek::IndexPager
+  include Seek::JSONMetadata
 
   before_action :samples_enabled?
   before_action :find_index_assets, only: :index
@@ -19,7 +20,6 @@ class SamplesController < ApplicationController
         format.html
         format.json {render json: :not_implemented, status: :not_implemented }
       end
-      #respond_with(@samples)
     else
       respond_to do |format|
         format.html {super}
@@ -40,15 +40,26 @@ class SamplesController < ApplicationController
   def create
     @sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
     update_sample_with_params
-    flash[:notice] = 'The sample was successfully created.' if @sample.save
-    respond_with(@sample)
+    if @sample.save
+      respond_to do |format|
+        flash[:notice] = 'The sample was successfully created.'
+        format.html { redirect_to sample_path(@sample) }
+        format.json { render json: @sample }
+      end
+    else
+      respond_to do |format|
+        format.html { render :action => "new" }
+        format.json { render json: json_api_errors(@sample), status: :unprocessable_entity }
+      end
+    end
+
   end
 
   def show
     @sample = Sample.find(params[:id])
     respond_to do |format|
       format.html
-      format.json {render json: :not_implemented, status: :not_implemented }
+      format.json {render json: @sample, include: [params[:include]]}
     end
   end
 
@@ -60,18 +71,32 @@ class SamplesController < ApplicationController
   def update
     @sample = Sample.find(params[:id])
     update_sample_with_params
-    flash[:notice] = 'The sample was successfully updated.' if @sample.save
-    respond_with(@sample)
+    respond_to do |format|
+      if @sample.save
+        flash[:notice] = 'The sample was successfully updated.'
+        format.html { redirect_to sample_path(@sample) }
+        format.json { render json: @sample }
+      else
+        flash[:error] = 'It was not possible to update the sample.'
+        format.html { redirect_to root_path }
+        format.json {render json: {:status => 403}, :status => 403}
+      end
+    end
   end
 
   def destroy
     @sample = Sample.find(params[:id])
-    if @sample.can_delete? && @sample.destroy
-      flash[:notice] = 'The sample was successfully deleted.'
-    else
-      flash[:error] = 'It was not possible to delete the sample.'
+    respond_to do |format|
+      if @sample.can_delete? && @sample.destroy
+        flash[:notice] = 'The sample was successfully deleted.'
+        format.html { redirect_to root_path }
+        format.json {render json: {status: :ok}, status: :ok}
+      else
+        flash[:error] = 'It was not possible to delete the sample.'
+        format.html { redirect_to root_path }
+        format.json {render json: {:status => 403}, :status => 403}
+      end
     end
-    respond_with(@sample, location: root_path)
   end
 
   # called from AJAX, returns the form containing the attributes for the sample_type_id
@@ -105,10 +130,13 @@ class SamplesController < ApplicationController
 
   def sample_params(sample_type=nil)
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:title).collect(&:to_sym) : []
+    if params[:sample][:attribute_map]
+        params[:sample][:data] = params[:sample].delete(:attribute_map)
+    end
     params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
-                                   { data: sample_type_param_keys }, { creator_ids: [] },
-                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                   discussion_links_attributes:[:id, :url, :label, :_destroy])
+                              { data: sample_type_param_keys }, { creator_ids: [] },
+                              { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                              discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   def update_sample_with_params
